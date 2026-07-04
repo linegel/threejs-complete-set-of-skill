@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "id": "procedural-field-generated-variants",
+  "description": "Reduced-tier packed biome field variants for field parity, material-mask diagnostics, and filtering experiments.",
+  "generatorVersion": "phase1-webgpu-field-bake-2026-07-04",
+  "colorSpace": "NoColorSpace",
+  "channelMeanings": {
+    "r": "macroHeight",
+    "g": "ridge",
+    "b": "cavity",
+    "a": "moisture"
+  },
+  "coverage": {
+    "macroHeight": { "min": 0.03, "max": 0.98 },
+    "ridge": { "min": 0.02, "max": 0.99 },
+    "cavity": { "min": 0.01, "max": 0.97 },
+    "moisture": { "min": 0.0, "max": 1.0 }
+  },
+  "seamTolerance": 0.025,
+  "parityTolerance": 0.001,
+  "assets": [
+    {
+      "id": "biome-field-a",
+      "path": "biome-field-a.png",
+      "width": 512,
+      "height": 512,
+      "channels": 4,
+      "byteLength": 493800,
+      "sha256": "90c3e906b8df1e4ef7642a48e226dee888cfb754b7fd85a8160e504042cc6bb6",
+      "seed": 1103,
+      "colorSpace": "NoColorSpace"
+    },
+    {
+      "id": "biome-field-b",
+      "path": "biome-field-b.png",
+      "width": 512,
+      "height": 512,
+      "channels": 4,
+      "byteLength": 464726,
+      "sha256": "fcd64ed7dacfc80a0c0c9a8f4c08e73e0e5b7fb0b7a8069de136952712c185ea",
+      "seed": 2207,
+      "colorSpace": "NoColorSpace"
+    },
+    {
+      "id": "biome-field-c",
+      "path": "biome-field-c.png",
+      "width": 512,
+      "height": 512,
+      "channels": 4,
+      "byteLength": 505871,
+      "sha256": "7fb727575f03eb45da910e4b752ecac433ac7d12cf3f17627e98127973a48010",
+      "seed": 3301,
+      "colorSpace": "NoColorSpace"
+    }
+  ]
+}

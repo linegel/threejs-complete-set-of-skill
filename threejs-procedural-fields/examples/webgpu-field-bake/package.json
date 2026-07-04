@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "node --check field-bundle.mjs && node --check field-bake.mjs && node --check validate-field-contract.mjs",
+    "validate": "node validate-field-contract.mjs"
+  }
+}
