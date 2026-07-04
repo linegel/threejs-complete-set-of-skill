@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "id": "lut-aerial-perspective",
+  "description": "Precomputed atmosphere lookup tables for the WebGPU LUT atmosphere example.",
+  "source": {
+    "name": "jeantimex/geospatial",
+    "url": "https://github.com/jeantimex/geospatial",
+    "revision": "d166316ad38f9a21f6d7a3293b808bc7f920283e",
+    "algorithm": "Bruneton-family precomputed transmittance, scattering, and irradiance LUTs"
+  },
+  "storage": {
+    "componentType": "float16",
+    "byteOrder": "little-endian",
+    "format": "RGBAFormat",
+    "type": "HalfFloatType",
+    "channels": 4,
+    "bytesPerChannel": 2,
+    "colorSpace": "NoColorSpace",
+    "minFilter": "LinearFilter",
+    "magFilter": "LinearFilter",
+    "wrapS": "ClampToEdgeWrapping",
+    "wrapT": "ClampToEdgeWrapping",
+    "wrapR": "ClampToEdgeWrapping",
+    "unpackAlignment": 1,
+    "generateMipmaps": false
+  },
+  "radianceUnits": "scene-linear atmosphere radiance in kilometer-scaled Bruneton LUT units",
+  "atmosphere": {
+    "bottomRadiusMeters": 6360000,
+    "topRadiusMeters": 6420000,
+    "solarIrradiance": [1.474, 1.8504, 1.91198],
+    "sunAngularRadius": 0.004675,
+    "rayleighScatteringPerKm": [0.005802, 0.013558, 0.0331],
+    "mieScatteringPerKm": [0.003996, 0.003996, 0.003996],
+    "mieExtinctionPerKm": [0.00444, 0.00444, 0.00444],
+    "miePhaseG": 0.8,
+    "absorptionExtinctionPerKm": [0.00065, 0.001881, 0.000085],
+    "groundAlbedo": 0.1,
+    "rayleighDensity": [
+      {
+        "widthMeters": 60000,
+        "expTerm": 1,
+        "expScalePerKm": -0.125,
+        "linearTerm": 0,
+        "constantTerm": 0
+      }
+    ],
+    "mieDensity": [
+      {
+        "widthMeters": 60000,
+        "expTerm": 1,
+        "expScalePerKm": -0.833333,
+        "linearTerm": 0,
+        "constantTerm": 0
+      }
+    ],
+    "absorptionDensity": [
+      {
+        "widthMeters": 25000,
+        "expTerm": 0,
+        "expScalePerKm": 0,
+        "linearTermPerKm": 0.0666667,
+        "constantTerm": -0.666667
+      },
+      {
+        "widthMeters": 0,
+        "expTerm": 0,
+        "expScalePerKm": 0,
+        "linearTermPerKm": -0.0666667,
+        "constantTerm": 2.666667
+      }
+    ]
+  },
+  "textures": {
+    "transmittance": {
+      "path": "transmittance.bin",
+      "class": "DataTexture",
+      "width": 256,
+      "height": 64,
+      "depth": 1,
+      "byteLength": 131072,
+      "sha256": "2af2ce84317148150a2c55dfd17daeb5539ebd8631b74645f0b5cf5a08e0a491",
+      "channelLayout": ["r", "g", "b", "unused"],
+      "coordinateSpace": "radius and cosine to top atmosphere"
+    },
+    "scattering": {
+      "path": "scattering.bin",
+      "class": "Data3DTexture",
+      "width": 256,
+      "height": 128,
+      "depth": 32,
+      "byteLength": 8388608,
+      "sha256": "ad2ff8d6e4e5fddc9cab223b03e7e32778080be645ee555bb15d22c7e9d8dd56",
+      "channelLayout": ["combinedRayleighAndHigherOrder.r", "combinedRayleighAndHigherOrder.g", "combinedRayleighAndHigherOrder.b", "singleMieRatio"],
+      "coordinateSpace": "packed radius, view cosine, sun cosine, view-sun cosine slices"
+    },
+    "irradiance": {
+      "path": "irradiance.bin",
+      "class": "DataTexture",
+      "width": 64,
+      "height": 16,
+      "depth": 1,
+      "byteLength": 8192,
+      "sha256": "6e7a45138f585e721dc7f0b749da341f7c6d305eb04bc62332c30e0e84571a94",
+      "channelLayout": ["r", "g", "b", "unused"],
+      "coordinateSpace": "surface radius and sun cosine sky irradiance"
+    }
+  }
+}
