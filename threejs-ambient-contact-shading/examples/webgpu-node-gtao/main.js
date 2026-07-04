@@ -111,6 +111,7 @@ export async function createWebGPUNodeGTAO( {
 	const renderer = new THREE.WebGPURenderer( {
 		canvas,
 		antialias: enableTemporal === false,
+		reversedDepthBuffer: true,
 		outputBufferType: THREE.HalfFloatType
 	} );
 	renderer.setPixelRatio( dpr );
@@ -122,7 +123,7 @@ export async function createWebGPUNodeGTAO( {
 	camera.updateProjectionMatrix();
 
 	const renderPipeline = new THREE.RenderPipeline( renderer );
-	const scenePass = pass( scene, camera );
+	const gbufferPass = pass( scene, camera );
 	const mrtOutputs = {
 		output,
 		normal: normalView
@@ -132,12 +133,12 @@ export async function createWebGPUNodeGTAO( {
 		mrtOutputs.velocity = velocity;
 	}
 
-	scenePass.setMRT( mrt( mrtOutputs ) );
+	gbufferPass.setMRT( mrt( mrtOutputs ) );
 
-	const sceneColor = scenePass.getTextureNode( 'output' );
-	const sceneDepth = scenePass.getTextureNode( 'depth' );
-	const sceneNormal = scenePass.getTextureNode( 'normal' );
-	const velocityNode = enableTemporal === true ? scenePass.getTextureNode( 'velocity' ) : null;
+	const sceneColor = gbufferPass.getTextureNode( 'output' );
+	const sceneDepth = gbufferPass.getTextureNode( 'depth' );
+	const sceneNormal = gbufferPass.getTextureNode( 'normal' );
+	const velocityNode = enableTemporal === true ? gbufferPass.getTextureNode( 'velocity' ) : null;
 	const gtaoNode = ao( sceneDepth, sceneNormal, camera );
 	configureGTAO( gtaoNode );
 
@@ -148,7 +149,9 @@ export async function createWebGPUNodeGTAO( {
 	const rawAO = gtaoNode.getTextureNode();
 	const denoisedAO = enableDenoise === true ? denoise( rawAO, sceneDepth, sceneNormal, camera ) : rawAO;
 	const visibility = denoisedAO.r;
-	const materialContextOutput = builtinAOContext( visibility, sceneColor );
+	const litScenePass = pass( scene, camera );
+	litScenePass.contextNode = builtinAOContext( visibility );
+	const materialContextOutput = litScenePass.getTextureNode( 'output' );
 	const temporallyFilteredOutput = enableTemporal === true
 		? traa( materialContextOutput, sceneDepth, velocityNode, camera )
 		: materialContextOutput;
@@ -199,7 +202,8 @@ export async function createWebGPUNodeGTAO( {
 	function dispose() {
 		gtaoNode.dispose?.();
 		denoisedAO.dispose?.();
-		scenePass.dispose?.();
+		gbufferPass.dispose?.();
+		litScenePass.dispose?.();
 		renderPipeline.dispose();
 		renderer.dispose();
 	}
@@ -207,7 +211,8 @@ export async function createWebGPUNodeGTAO( {
 	return {
 		renderer,
 		renderPipeline,
-		scenePass,
+		gbufferPass,
+		litScenePass,
 		scene,
 		camera,
 		gtaoNode,

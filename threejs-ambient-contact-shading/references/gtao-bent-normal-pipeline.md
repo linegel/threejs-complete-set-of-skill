@@ -25,8 +25,8 @@ Algorithm class comes first. For this domain the fastest correct architecture
 is the official node GTAO path:
 
 1. One `RenderPipeline` owns the frame.
-2. One `pass(scene, camera)` owns the scene render and exposes color, depth,
-   and view normals through MRT when available.
+2. One `pass(scene, camera)` is the depth/normal prepass and exposes depth plus
+   view normals through MRT when available.
 3. `ao(depthNode, normalNode, camera)` creates the `GTAONode` scalar
    visibility pass.
 4. AO runs at half linear resolution unless a fixed-view benchmark proves full
@@ -35,7 +35,10 @@ is the official node GTAO path:
    has valid velocity, depth rejection, and camera-cut reset.
 6. `DenoiseNode` is an optional quality setting when temporal filtering is not
    active or when the scene cannot tolerate temporal artifacts.
-7. A custom TSL bent-normal/horizon path is an extension, not the default. It
+7. A second lit scene pass receives `builtinAOContext(visibility)` through
+   `scenePass.contextNode`, so `NodeMaterial.setupAmbientOcclusion()` applies
+   AO during material lighting rather than after color output.
+8. A custom TSL bent-normal/horizon path is an extension, not the default. It
    must beat the built-in path for a documented use case such as directional
    ambient tint or specialized diagnostics.
 
@@ -72,16 +75,15 @@ const renderer = new THREE.WebGPURenderer( {
 await renderer.init();
 
 const renderPipeline = new THREE.RenderPipeline( renderer );
-const scenePass = pass( scene, camera );
+const gbufferPass = pass( scene, camera );
 
-scenePass.setMRT( mrt( {
+gbufferPass.setMRT( mrt( {
   output,
   normal: normalView
 } ) );
 
-const sceneColor = scenePass.getTextureNode( 'output' );
-const sceneDepth = scenePass.getTextureNode( 'depth' );
-const sceneNormal = scenePass.getTextureNode( 'normal' );
+const sceneDepth = gbufferPass.getTextureNode( 'depth' );
+const sceneNormal = gbufferPass.getTextureNode( 'normal' );
 
 const gtao = ao( sceneDepth, sceneNormal, camera );
 gtao.resolutionScale = 0.5;
@@ -91,10 +93,13 @@ gtao.distanceFallOff.value = 0.35;
 gtao.thickness.value = 0.35;
 
 const visibility = gtao.getTextureNode().r;
-const materialContextOutput = builtinAOContext( visibility, sceneColor );
+const litScenePass = pass( scene, camera );
+litScenePass.contextNode = builtinAOContext( visibility );
+const materialContextOutput = litScenePass.getTextureNode( 'output' );
 
 // Keep the material AO slot and ambientOcclusion lighting property in the graph.
-// builtinAOContext multiplies existing materialAO by the screen-space visibility
+// PassNode merges contextNode into renderer.contextNode during its scene render;
+// builtinAOContext multiplies existing materialAO by screen-space visibility
 // before the lighting model applies ambientOcclusion to indirect energy.
 const lightingContract = {
   contextNode: materialContextOutput,
@@ -111,11 +116,6 @@ visibility, and the physical lighting model applies `ambientOcclusion` to
 indirect diffuse and indirect specular occlusion before output conversion.
 Direct lights and emission are not multiplied.
 
-A final color multiply is only failure or compatibility-compromise text in this
-reference. If the app cannot pass AO through material or lighting context, use
-the residual indirect split in Section 8 as an explicit compatibility
-compromise and keep direct/emissive exclusion tests mandatory.
-
 Use `renderPipeline.render()` in the animation loop. Dispose `RenderPipeline`,
 `PassNode`, `GTAONode`, `DenoiseNode`, `TRAANode`, and any custom storage
 resources when the effect is removed.
@@ -130,18 +130,21 @@ await renderer.init();
 if ( renderer.backend.isWebGPUBackend ) {
   // Full tier: MRT normals, GTAONode, TRAANode/DenoiseNode, optional storage extension.
 } else {
-  // Reduced tier: scalar AO only, fewer samples, static material AO, or disabled AO.
+  throw new Error( 'threejs-ambient-contact-shading requires WebGPU; route explicit fallback requests to threejs-compatibility-fallbacks.' );
 }
 ```
 
-Quality tiers:
+Legacy WebGL implementation (deprecated, do not extend): none in this folder;
+explicit requests for how to apply fallback when WebGPU is unavailable route to
+`../threejs-compatibility-fallbacks/`.
+
+Quality tiers inside the canonical WebGPU architecture:
 
 | Tier | Inputs | AO path | Temporal | Output |
 | --- | --- | --- | --- | --- |
 | Ultra | MRT color, depth, normal, velocity | `GTAONode` at 0.5 scale, optional custom bent-normal extension | `TRAANode` with AO temporal filtering | scalar visibility plus validated directional ambient tint |
 | High | MRT color, depth, normal | `GTAONode` at 0.5 scale | optional `DenoiseNode` | scalar visibility |
 | Medium | depth plus reconstructed normal or reduced MRT | `GTAONode` at 0.5 or 0.25 scale, lower samples | off by default | scalar visibility |
-| Low | static materials or static AO assets | material AO maps/static AO | none | no dynamic screen-space pass |
 
 If a setting disables AO, bypass the AO node in the pipeline. Setting intensity
 or scale to zero while still rendering the pass is not a performance win.
@@ -311,20 +314,11 @@ AO should modulate ambient visibility:
 - indirect diffuse and environment response before tone mapping;
 - optional bent-direction environment sampling only after the one-wall test.
 
-Avoid final color darkening. If the app has only a forward scene color in post,
-split the residual cautiously:
-
-```text
-indirectEstimate = albedo * environmentIntensity * irradiance
-indirect = min(indirectEstimate, sceneColor)
-direct = sceneColor - indirect
-occludedIndirect = indirect * visibility
-output = direct + occludedIndirect
-```
-
-This residual composite is an advanced compatibility compromise. It is approximate for
-specular, emissive, transparent, and bloom-fed surfaces; material/node-level
-integration is preferred.
+Avoid final color darkening. Do not present a scene-color residual split as the
+canonical path in this flagship skill; if a project explicitly asks how to apply
+fallback when WebGPU or the required material-lighting context is unavailable,
+route that discussion to `../threejs-compatibility-fallbacks/` and name the
+lost guarantees.
 
 ## 9. Performance budgets
 

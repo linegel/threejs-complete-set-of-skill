@@ -43,7 +43,7 @@ Read [references/gtao-bent-normal-pipeline.md](references/gtao-bent-normal-pipel
 ## Capability Gate
 
 Every implementation initializes the renderer and gates features by backend
-capability. The degraded tier is a quality tier, not a parallel shader stack.
+capability.
 
 ```js
 await renderer.init();
@@ -51,19 +51,21 @@ await renderer.init();
 if ( renderer.backend.isWebGPUBackend ) {
   // Full tier: GTAONode, MRT normals, TRAANode/DenoiseNode, optional storage extension.
 } else {
-  // Reduced tier: lower AO samples, scalar AO only, static material AO,
-  // or disabled AO on bandwidth-limited targets.
+  throw new Error( 'threejs-ambient-contact-shading requires WebGPU; route explicit fallback requests to threejs-compatibility-fallbacks.' );
 }
 ```
 
-## Quality Tiers
+Legacy WebGL implementation (deprecated, do not extend): none in this folder;
+explicit requests for how to apply fallback when WebGPU is unavailable route to
+`../threejs-compatibility-fallbacks/`.
+
+## WebGPU Quality Tiers
 
 | Tier | Use | Settings |
 | --- | --- | --- |
 | Ultra | Desktop discrete GPU, cinematic close inspection | `GTAONode`, MRT normals, temporal filtering through `TRAANode`, half-res AO, optional `DenoiseNode`, custom bent-normal extension only after validation |
 | High | Desktop integrated GPU and normal production default | `GTAONode`, MRT normals, `resolutionScale = 0.5`, normal-aware bilateral reconstruction, no directional tint unless required |
-| Medium | Mobile or thermally constrained devices | `GTAONode`, depth-reconstructed normals if MRT pressure is too high, fewer samples, half/quarter-res AO, no temporal history unless ghosting tests pass |
-| Low | Non-primary backend or low memory | Static material AO, material AO maps, reduced radius, or disabled dynamic AO |
+| Medium | WebGPU mobile or thermally constrained devices | `GTAONode`, depth-reconstructed normals if MRT pressure is too high, fewer samples, half/quarter-res AO, no temporal history unless ghosting tests pass |
 
 ## Performance Budgets
 

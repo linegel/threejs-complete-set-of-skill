@@ -2,8 +2,11 @@ import {
 	AO_FIXTURE_IDS,
 	assertFixtureManifestMatchesReference
 } from './fixtures.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const DEPTH_MODES = new Set( [ 'standard', 'reversed', 'logarithmic' ] );
+const EXAMPLE_SOURCE_PATH = fileURLToPath( new URL( './main.js', import.meta.url ) );
 
 export const DEFAULT_AO_CONFIG = Object.freeze( {
 	enabled: true,
@@ -24,6 +27,9 @@ export const DEFAULT_AO_CONFIG = Object.freeze( {
 		texelSize: Object.freeze( [ 1 / 1280, 1 / 720 ] )
 	} ),
 	depthMode: 'reversed',
+	renderer: Object.freeze( {
+		reversedDepthBuffer: true
+	} ),
 	temporal: Object.freeze( {
 		enabled: false,
 		velocitySource: null,
@@ -63,6 +69,37 @@ function normalizeTemporalConfig( config ) {
 	};
 }
 
+function readExampleSource() {
+	return readFileSync( EXAMPLE_SOURCE_PATH, 'utf8' );
+}
+
+export function validateExampleSourceContracts( source = readExampleSource() ) {
+	const errors = [];
+	const rendererOptionsMatch = source.match( /new\s+THREE\.WebGPURenderer\s*\(\s*\{[\s\S]*?\}\s*\)/ );
+
+	if ( /builtinAOContext\s*\(\s*visibility\s*,/.test( source ) ) {
+		errors.push( 'builtinAOContext must be assigned to a scene pass context, not wrapped around an already-rendered pass texture.' );
+	}
+
+	if ( ! /litScenePass\.contextNode\s*=\s*builtinAOContext\s*\(\s*visibility\s*\)/.test( source ) ) {
+		errors.push( 'litScenePass.contextNode must apply builtinAOContext( visibility ) before the lit scene render.' );
+	}
+
+	if ( ! /gbufferPass\s*=\s*pass\s*\(\s*scene\s*,\s*camera\s*\)/.test( source ) ) {
+		errors.push( 'example must keep a depth/normal gbuffer prepass for GTAO inputs.' );
+	}
+
+	if ( rendererOptionsMatch === null || ! /reversedDepthBuffer\s*:\s*true/.test( rendererOptionsMatch[ 0 ] ) ) {
+		errors.push( 'renderer must set reversedDepthBuffer: true when validator depthMode is reversed.' );
+	}
+
+	if ( errors.length > 0 ) {
+		throw new Error( `Invalid example source contract:\n- ${ errors.join( '\n- ' ) }` );
+	}
+
+	return true;
+}
+
 export function validateAOConfig( config = {} ) {
 	const merged = {
 		...DEFAULT_AO_CONFIG,
@@ -70,6 +107,10 @@ export function validateAOConfig( config = {} ) {
 		viewport: {
 			...DEFAULT_AO_CONFIG.viewport,
 			...( config.viewport ?? {} )
+		},
+		renderer: {
+			...DEFAULT_AO_CONFIG.renderer,
+			...( config.renderer ?? {} )
 		},
 		temporal: normalizeTemporalConfig( config ),
 		customBentNormal: {
@@ -122,6 +163,10 @@ export function validateAOConfig( config = {} ) {
 		errors.push( 'depthMode must be one of standard, reversed, or logarithmic.' );
 	}
 
+	if ( merged.depthMode === 'reversed' && merged.renderer.reversedDepthBuffer !== true ) {
+		errors.push( 'reversed depthMode requires renderer.reversedDepthBuffer === true.' );
+	}
+
 	if ( temporal.enabled === true ) {
 		if ( ! temporal.velocitySource ) errors.push( 'temporal AO requires a velocity source.' );
 		if ( temporal.depthRejection !== true ) errors.push( 'temporal AO requires depth rejection.' );
@@ -142,6 +187,8 @@ export function validateAOConfig( config = {} ) {
 	}
 
 	const fixtureIds = assertFixtureManifestMatchesReference( AO_FIXTURE_IDS );
+
+	validateExampleSourceContracts( config.exampleSource );
 
 	if ( errors.length > 0 ) {
 		throw new Error( `Invalid AO config:\n- ${ errors.join( '\n- ' ) }` );
@@ -177,6 +224,26 @@ function fixtureConfig( name ) {
 				enabled: true,
 				oneWallFixtureStatus: 'pending',
 				directionalTintEnabled: true
+			}
+		};
+	}
+
+	if ( name === 'broken-builtin-ao-context' ) {
+		return {
+			exampleSource: [
+				'const gbufferPass = pass( scene, camera );',
+				'const sceneColor = gbufferPass.getTextureNode( "output" );',
+				'const materialContextOutput = builtinAOContext( visibility' + ', sceneColor );',
+				'const renderer = new THREE.WebGPURenderer( { reversedDepthBuffer: true } );'
+			].join( '\n' )
+		};
+	}
+
+	if ( name === 'renderer-depth-mismatch' ) {
+		return {
+			depthMode: 'reversed',
+			renderer: {
+				reversedDepthBuffer: false
 			}
 		};
 	}

@@ -3,7 +3,9 @@
 This folder is the Phase 1 executable contract for ambient contact shading.
 It uses `WebGPURenderer`, `RenderPipeline`, `pass()`, `mrt({ output, normal:
 normalView })`, built-in `ao()`, optional `denoise()`, optional `traa()`, and
-`builtinAOContext()` for material-context AO application.
+`builtinAOContext()` on a lit scene pass for material-context AO application.
+The renderer opts into `reversedDepthBuffer: true`; the validator rejects a
+reversed-depth config that omits that renderer option.
 
 Run:
 
