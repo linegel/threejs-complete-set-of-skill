@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebGPU Camera Rig</title>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <nav>
+      <button data-camera-mode="chase">Chase</button>
+      <button data-camera-mode="side">Side</button>
+      <button data-camera-mode="orbit">Orbit</button>
+    </nav>
+    <pre data-camera-debug></pre>
+    <script type="module">
+      import { createCameraRigDemo } from "./main.mjs";
+
+      await createCameraRigDemo({ canvas: document.querySelector("#scene") });
+    </script>
+  </body>
+</html>
