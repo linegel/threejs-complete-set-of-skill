@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebGPU Procedural Timelines</title>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <script type="module">
+      import { createProceduralTimelineDemo } from "./main.js";
+
+      const demo = createProceduralTimelineDemo();
+      await demo.initialize({ canvas: document.querySelector("#scene") });
+    </script>
+  </body>
+</html>
