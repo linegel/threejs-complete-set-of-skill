@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "scripts": {
+    "check": "node --check constants.js && node --check webgpu-bounded-water.js && node --check index.js && node --check validate-water-contracts.mjs",
+    "validate": "node validate-water-contracts.mjs"
+  }
+}
