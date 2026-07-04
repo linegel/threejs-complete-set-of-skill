@@ -1,0 +1,9 @@
+GPL-3.0 license boundary placeholder.
+
+The GPL-derived wet puddle rain example and copied assets in this package are
+kept behind the checked-in license boundary documented by
+`assets/wet-puddle-rain/THIRD_PARTY_LICENSES.md` and
+`assets/wet-puddle-rain/source_materials/THIRD_PARTY_NOTICES.md`.
+
+Use the SPDX identifier `GPL-3.0-only` for the copied reference material unless
+the upstream source states otherwise.
