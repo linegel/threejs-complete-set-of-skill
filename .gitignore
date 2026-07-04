@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+artifacts/
+.claude/settings.local.json
+.agent/
+__pycache__/
+*.log
