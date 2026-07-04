@@ -1,0 +1,12 @@
+{
+  "name": "threejs-webgpu-image-pipeline",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check *.js && node --input-type=module -e \"await import('./main.js')\"",
+    "validate": "node validateImagePipelineConfig.js && node validateImagePipelineConfig.js --expect-invalid duplicate-scene-render duplicate-output-owner double-output-transform missing-velocity-convention undeclared-mrt-consumer"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "sceneId": "wave-d-shared-framegraph",
+  "qualityStage": "Phase 2 / Wave D static contract",
+  "evidenceStatus": "static-contract-only",
+  "blockedBy": "../../../artifacts/visual-validation/wave-c-status.md",
+  "rendering": {
+    "renderer": "WebGPURenderer",
+    "renderPipelineOwner": "threejs-image-pipeline",
+    "sceneRenderCount": 1,
+    "renderPipelineCount": 1,
+    "outputNodeOwner": "threejs-image-pipeline",
+    "outputTransformOwner": "renderOutput"
+  },
+  "sharedResources": {
+    "gbuffer": {
+      "owner": "threejs-image-pipeline",
+      "writers": [
+        "threejs-image-pipeline"
+      ],
+      "resource": "scenePass.setMRT(mrt(...))",
+      "outputs": [
+        "output",
+        "depth",
+        "normal",
+        "albedo",
+        "emissive",
+        "velocity"
+      ],
+      "consumers": [
+        "threejs-ambient-contact-shading",
+        "threejs-bloom",
+        "threejs-exposure-color-grading",
+        "threejs-sky-atmosphere-and-haze",
+        "threejs-volumetric-clouds",
+        "threejs-rain-snow-and-wet-surfaces",
+        "threejs-visual-validation"
+      ]
+    },
+    "velocity": {
+      "owner": "threejs-image-pipeline",
+      "writers": [
+        "threejs-image-pipeline"
+      ],
+      "convention": "previous/current clip-to-NDC velocity in data/no-color MRT",
+      "consumers": [
+        "threejs-procedural-motion-systems",
+        "threejs-camera-controls-and-rigs",
+        "threejs-volumetric-clouds",
+        "threejs-procedural-vegetation",
+        "threejs-visual-validation"
+      ]
+    },
+    "weatherEnvelope": {
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "writers": [
+        "threejs-rain-snow-and-wet-surfaces"
+      ],
+      "schema": [
+        "time",
+        "deltaTime",
+        "wind",
+        "progress",
+        "precipitationRate",
+        "cloudCoverage",
+        "seaState",
+        "qualityTier",
+        "debugMode"
+      ],
+      "consumers": [
+        "threejs-spectral-ocean",
+        "threejs-volumetric-clouds",
+        "threejs-procedural-vegetation",
+        "threejs-water-optics",
+        "threejs-procedural-materials",
+        "threejs-visual-validation"
+      ]
+    },
+    "toneMap": {
+      "owner": "threejs-exposure-color-grading",
+      "writers": [
+        "threejs-exposure-color-grading"
+      ],
+      "graphOwner": "threejs-image-pipeline",
+      "domainIn": "scene-linear HDR",
+      "domainOut": "tone-mapped linear",
+      "consumers": [
+        "threejs-image-pipeline"
+      ]
+    },
+    "outputTransform": {
+      "owner": "renderOutput",
+      "writers": [
+        "renderOutput"
+      ],
+      "graphOwner": "threejs-image-pipeline",
+      "domainIn": "tone-mapped linear",
+      "domainOut": "display-referred sRGB",
+      "consumers": [
+        "browser-canvas",
+        "threejs-visual-validation"
+      ]
+    }
+  },
+  "systems": {
+    "ocean": {
+      "skill": "threejs-spectral-ocean",
+      "consumes": [
+        "gbuffer",
+        "weatherEnvelope",
+        "toneMap"
+      ],
+      "publishes": [
+        "waterNormal",
+        "foamMask",
+        "emissive"
+      ],
+      "privatePostOwner": false
+    },
+    "atmosphere": {
+      "skill": "threejs-sky-atmosphere-and-haze",
+      "consumes": [
+        "gbuffer",
+        "weatherEnvelope",
+        "toneMap"
+      ],
+      "publishes": [
+        "skyRadiance",
+        "aerialPerspective"
+      ],
+      "privatePostOwner": false
+    },
+    "clouds": {
+      "skill": "threejs-volumetric-clouds",
+      "consumes": [
+        "gbuffer",
+        "velocity",
+        "weatherEnvelope",
+        "toneMap"
+      ],
+      "publishes": [
+        "cloudRadiance",
+        "cloudTransmittance",
+        "cloudVelocity"
+      ],
+      "privatePostOwner": false
+    },
+    "vegetation": {
+      "skill": "threejs-procedural-vegetation",
+      "consumes": [
+        "gbuffer",
+        "velocity",
+        "weatherEnvelope"
+      ],
+      "publishes": [
+        "alpha",
+        "normal",
+        "wetness",
+        "shadowCasterDeformation"
+      ],
+      "privatePostOwner": false
+    },
+    "validation": {
+      "skill": "threejs-visual-validation",
+      "consumes": [
+        "gbuffer",
+        "velocity",
+        "weatherEnvelope",
+        "toneMap",
+        "outputTransform"
+      ],
+      "publishes": [
+        "visual-contract.json",
+        "evidence-manifest.json",
+        "screenshots",
+        "timings.json",
+        "leak-loop.json"
+      ],
+      "privatePostOwner": false
+    }
+  },
+  "browserProof": {
+    "required": true,
+    "availableInThisSession": false,
+    "blockedBy": "../../../artifacts/visual-validation/wave-c-status.md",
+    "requiredArtifacts": [
+      "renderer-info.json",
+      "render-targets.json",
+      "storage-resources.json",
+      "timings.json",
+      "leak-loop.json",
+      "images/final.design.png",
+      "images/no-post.design.png",
+      "images/diagnostics.mosaic.png"
+    ]
+  }
+}

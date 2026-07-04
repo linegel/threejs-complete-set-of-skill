@@ -1,0 +1,9 @@
+{
+  "name": "threejs-integration-shared-framegraph",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node validate-integration-manifest.mjs",
+    "check": "node --check validate-integration-manifest.mjs && node validate-integration-manifest.mjs"
+  }
+}
