@@ -1,0 +1,13 @@
+{
+  "request": {
+    "explicitFallbackWhenWebGPUUnavailable": true,
+    "canonicalOwner": "threejs-water-optics",
+    "target": "old browser with no WebGPU backend"
+  },
+  "backend": {
+    "webgpuAvailable": false,
+    "missing": [ "WebGPU backend", "storage textures", "timestamp queries" ],
+    "memoryCapMB": 96,
+    "frameBudgetMs": 16
+  }
+}

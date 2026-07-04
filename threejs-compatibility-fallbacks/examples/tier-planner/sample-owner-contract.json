@@ -1,0 +1,39 @@
+{
+  "owner": "threejs-water-optics",
+  "features": [
+    {
+      "id": "dynamic-heightfield",
+      "canonicalInvariant": "Heightfield waves and normals derive from the same water state.",
+      "missingPrimitive": "storage textures",
+      "downgradeAxis": "precomputed-static",
+      "kept": "shared wave identity in baked map set",
+      "lost": "live drop propagation and object-driven ripples",
+      "implementation": "generate NoColorSpace height/normal/caustic texture sequence offline",
+      "validation": "compare baked no-post water, height/normal parity manifest, and dispose/recreate texture counts",
+      "frameBudgetMs": 16,
+      "passCount": 2,
+      "memoryCapMB": 96,
+      "resolution": "256 square baked sequence",
+      "updateCadence": "static or keyed clip",
+      "screenshots": [ "final.design.png", "no-post.design.png", "diagnostics.mosaic.png" ],
+      "metricThresholds": [ "memory <= 96 MiB", "no live storage textures claimed" ]
+    },
+    {
+      "id": "gpu-timing",
+      "canonicalInvariant": "Timing evidence separates GPU timestamp timing from CPU proxy timing.",
+      "missingPrimitive": "timestamp queries",
+      "downgradeAxis": "labelled-proxy",
+      "kept": "fixed sample window and CPU timing label",
+      "lost": "direct GPU timestamp proof",
+      "implementation": "record CPU-only proxy timing and do not claim GPU headroom",
+      "validation": "timings.json has gpuTimingUnavailable=true and gpuTimingLabel=CPU-only proxy",
+      "frameBudgetMs": 16,
+      "passCount": 2,
+      "memoryCapMB": 96,
+      "resolution": "matches rendered tier",
+      "updateCadence": "fixed validation window",
+      "screenshots": [ "final.design.png" ],
+      "metricThresholds": [ "gpu timing not reported as zero" ]
+    }
+  ]
+}
