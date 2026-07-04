@@ -8,6 +8,7 @@ import {
 	fract,
 	max,
 	mix,
+	modelWorldMatrix,
 	mrt,
 	normalView,
 	output,
@@ -18,6 +19,8 @@ import {
 	reflect,
 	smoothstep,
 	texture,
+	transformNormal,
+	transformNormalToView,
 	uniform,
 	vec2,
 	vec3,
@@ -78,21 +81,23 @@ export function createOceanSurfaceMaterial( cascades, {
 	const foamScaleNode = uniform( 2.5 );
 	const debugModeNode = uniform( OCEAN_DEBUG_MODES[ debugMode ] ?? OCEAN_DEBUG_MODES.final );
 
-	const xz = positionLocal.xz;
+	const xz = positionWorld.xz;
 	const displacement = addSampledCascades( cascades, 'displacementTexture', xz );
 	const derivatives = addSampledCascades( cascades, 'derivativesTexture', xz );
 	const crossJacobian = addSampledCascades( cascades, 'crossJacobianFoamTexture', xz );
 	const displacedPosition = positionLocal.add( vec3( displacement.x, displacement.y, displacement.z ) );
 	const denominatorX = max( float( 0.18 ), float( 1.0 ).add( derivatives.z ) );
 	const denominatorZ = max( float( 0.18 ), float( 1.0 ).add( derivatives.w ) );
-	const resolvedNormal = normalize( vec3(
+	const resolvedNormalLocal = normalize( vec3(
 		derivatives.x.negate().div( denominatorX ),
 		1.0,
 		derivatives.y.negate().div( denominatorZ )
 	) );
+	const resolvedNormalWorld = transformNormal( resolvedNormalLocal, modelWorldMatrix );
+	const resolvedNormalView = transformNormalToView( resolvedNormalLocal );
 	const viewDirection = normalize( cameraPosition.sub( positionWorld ) );
-	const fresnel = float( 0.02 ).add( float( 0.98 ).mul( pow( float( 1.0 ).sub( max( dot( resolvedNormal, viewDirection ), 0.0 ) ), 5.0 ) ) );
-	const reflectedDirection = normalize( reflect( viewDirection.negate(), resolvedNormal ) );
+	const fresnel = float( 0.02 ).add( float( 0.98 ).mul( pow( float( 1.0 ).sub( max( dot( resolvedNormalWorld, viewDirection ), 0.0 ) ), 5.0 ) ) );
+	const reflectedDirection = normalize( reflect( viewDirection.negate(), resolvedNormalWorld ) );
 	const reflection = skyRadianceTSL( {
 		direction: reflectedDirection,
 		sunDirection: sunDirectionNode,
@@ -102,11 +107,11 @@ export function createOceanSurfaceMaterial( cascades, {
 	} );
 	const crest = smoothstep( - 0.1, 1.1, displacement.y );
 	const halfVector = normalize( sunDirectionNode.add( viewDirection ) );
-	const scatter = pow( max( dot( resolvedNormal, halfVector ), 0.0 ), 4.0 ).mul( crest );
+	const scatter = pow( max( dot( resolvedNormalWorld, halfVector ), 0.0 ), 4.0 ).mul( crest );
 	const body = mix( deepColorNode, scatterColorNode, scatter.add( 0.12 ).clamp( 0.0, 1.0 ) );
 	const water = mix( body, reflection, fresnel );
 	const foamCoverage = buildFoamCoverage( cascades, xz, foamThresholdNode, foamScaleNode );
-	const foamLight = float( 0.55 ).add( float( 0.6 ).mul( max( dot( resolvedNormal, sunDirectionNode ), 0.0 ) ) );
+	const foamLight = float( 0.55 ).add( float( 0.6 ).mul( max( dot( resolvedNormalWorld, sunDirectionNode ), 0.0 ) ) );
 	const shadedFoam = foamColorNode.mul( foamLight );
 	const finalColor = mix( water, shadedFoam, foamCoverage );
 
@@ -115,7 +120,7 @@ export function createOceanSurfaceMaterial( cascades, {
 	const slopesDebug = vec3( derivatives.x.abs(), derivatives.y.abs(), crossJacobian.x.abs() ).mul( 0.5 );
 	const jacobianDebug = mix( vec3( 0.95, 0.18, 0.05 ), vec3( 0.04, 0.12, 0.18 ), crossJacobian.y.clamp( 0.0, 1.0 ) );
 	const foamDebug = vec3( foamCoverage );
-	const normalDebug = resolvedNormal.mul( 0.5 ).add( 0.5 );
+	const normalDebug = resolvedNormalWorld.mul( 0.5 ).add( 0.5 );
 	let colorNode = finalColor;
 	colorNode = mix( colorNode, heightDebug, debugModeNode.equal( OCEAN_DEBUG_MODES.height ) );
 	colorNode = mix( colorNode, displacementDebug, debugModeNode.equal( OCEAN_DEBUG_MODES.displacement ) );
@@ -130,7 +135,7 @@ export function createOceanSurfaceMaterial( cascades, {
 		metalness: 0.0
 	} );
 	material.positionNode = displacedPosition;
-	material.normalNode = resolvedNormal;
+	material.normalNode = resolvedNormalView;
 	material.colorNode = colorNode;
 	material.roughnessNode = float( 0.035 );
 	material.metalnessNode = float( 0.0 );
@@ -139,6 +144,13 @@ export function createOceanSurfaceMaterial( cascades, {
 		debugModeNode,
 		foamThresholdNode,
 		foamScaleNode
+	};
+	material.userData.oceanDiagnosticNodes = {
+		sampleSpace: 'world-xz',
+		resolvedNormal: resolvedNormalWorld,
+		subGridNormalContribution: vec3( 0, 0, 0 ),
+		finalWithoutFoam: water,
+		finalWithoutDetail: finalColor
 	};
 
 	return material;

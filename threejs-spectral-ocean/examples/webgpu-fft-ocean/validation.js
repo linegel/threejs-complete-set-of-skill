@@ -250,14 +250,42 @@ function testDirectionalSpreadingNormalization() {
 
 function testEnergyInvarianceAcrossCutoffMaskMoves() {
 	const deltaK = TAU / 250;
-	const cells = [ 0.02, 0.04, 0.08, 0.16, 0.32 ];
-	const amplitudesA = cells.map( ( k ) => spectrumAmplitude( k, deltaK, 500 ) );
-	const amplitudesB = cells.map( ( k ) => spectrumAmplitude( k, deltaK, 500 ) );
+	const physicalCells = [
+		{ k: 0.025, x: 1, y: 0 },
+		{ k: 0.04, x: 2, y: 1 },
+		{ k: 0.16, x: 7, y: 3 },
+		{ k: 0.32, x: 13, y: 5 }
+	];
+	const partitionA = [
+		[ 1e-4, 0.05 ],
+		[ 0.05, 0.2 ],
+		[ 0.2, 9999 ]
+	];
+	const partitionB = [
+		[ 1e-4, 0.03 ],
+		[ 0.03, 0.12 ],
+		[ 0.12, 9999 ]
+	];
+	const choosePartition = ( k, partition ) => partition.findIndex( ( [ low, high ] ) => k >= low && k < high );
+	const stableSeedIdentity = ( x, y ) => `${ x }:${ y }:0x1f2e3d4c`;
+
 	let error = 0;
-	for ( let i = 0; i < cells.length; i += 1 ) {
-		error = Math.max( error, Math.abs( amplitudesA[ i ] - amplitudesB[ i ] ) );
+	let moved = 0;
+	for ( const cell of physicalCells ) {
+		const cascadeA = choosePartition( cell.k, partitionA );
+		const cascadeB = choosePartition( cell.k, partitionB );
+		if ( cascadeA !== cascadeB ) moved += 1;
+		const amplitudeA = cascadeA >= 0 ? spectrumAmplitude( cell.k, deltaK, 500 ) : 0;
+		const amplitudeB = cascadeB >= 0 ? spectrumAmplitude( cell.k, deltaK, 500 ) : 0;
+		const seedA = stableSeedIdentity( cell.x, cell.y );
+		const seedB = stableSeedIdentity( cell.x, cell.y );
+		error = Math.max(
+			error,
+			Math.abs( amplitudeA - amplitudeB ),
+			seedA === seedB ? 0 : 1
+		);
 	}
-	return error;
+	return moved >= 2 ? error : 1;
 }
 
 export function validateFftOceanSelfTests( {

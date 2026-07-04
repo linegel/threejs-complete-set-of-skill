@@ -99,18 +99,17 @@ export const DEFAULT_OCEAN_CONFIG = Object.freeze( {
 	} )
 } );
 
-export function chooseOceanTier( renderer, requested = 'high', {
-	explicitFallbackWhenWebGPUUnavailable = false
-} = {} ) {
+export const WEBGPU_REQUIRED_ROUTE_MESSAGE = 'WebGPU backend required for the canonical FFT ocean path. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route that teaching to threejs-compatibility-fallbacks.';
+
+export function chooseOceanTier( renderer, requested = 'high' ) {
 	const capabilities = validateOceanCapabilities( renderer, OCEAN_QUALITY_TIERS[ requested ] ?? OCEAN_QUALITY_TIERS.high );
 	const webgpu = capabilities.nativeStorage === true;
 
-	if ( webgpu !== true && explicitFallbackWhenWebGPUUnavailable !== true ) {
-		throw new Error( 'WebGPU backend required for the canonical FFT ocean path. Only request fallback teaching when the user explicitly asks how to apply fallback when WebGPU is unavailable.' );
+	if ( webgpu !== true ) {
+		throw new Error( WEBGPU_REQUIRED_ROUTE_MESSAGE );
 	}
 
-	const tierName = webgpu ? requested : 'low';
-	const tier = OCEAN_QUALITY_TIERS[ tierName ];
+	const tier = OCEAN_QUALITY_TIERS[ requested ];
 
 	if ( ! tier ) {
 		throw new Error( `Unknown ocean quality tier "${ requested }".` );
@@ -118,8 +117,8 @@ export function chooseOceanTier( renderer, requested = 'high', {
 
 	return {
 		...tier,
-		dynamicFft: webgpu,
-		source: webgpu ? 'webgpu-tsl-compute' : 'fallback-teaching-static',
+		dynamicFft: true,
+		source: 'webgpu-tsl-compute',
 		capabilities
 	};
 }

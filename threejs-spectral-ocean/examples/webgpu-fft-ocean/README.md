@@ -44,9 +44,9 @@ Independent packed fields are batched at the same stage only when they own disjo
 | `medium` | 256² | 2 | under 22 MiB | balanced |
 | `low` | 128² | 1 | under 8 MiB | mobile or budgeted WebGPU preview |
 
-The canonical path requires WebGPU. The static fallback-teaching branch is only
-for the explicit request to apply fallback when WebGPU is unavailable; it does
-not create a parallel shader renderer and leaves dynamic FFT disabled.
+The canonical path requires WebGPU. On a non-WebGPU backend, throw with a
+routing message to `threejs-compatibility-fallbacks`; do not build or document a
+reduced fallback tier inside this skill.
 
 ## Contract Validation
 
@@ -57,11 +57,11 @@ npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate
 ```
 
 This validates FFT fixtures, spectrum physics checks, the `[5,17,250]` cascade
-counterexample, missing-requirement reasons, and storage accounting against the
-declared tier budget. It also asserts that GPU readback fixtures for
-`createBitReverseNode()`, `createFftStageNode()`, and assembly remain required
-for browser acceptance; Node validation reports that gate as
-`pending-browser-webgpu`, never as passed.
+counterexample, missing-requirement reasons, source-level contract rails, and
+storage accounting against the declared tier budget. In Node, GPU readback
+reports `pending-browser-webgpu`; in a WebGPU browser, small readback fixtures
+for `createBitReverseNode()`, `createFftStageNode()`, and assembly run before
+`initialized = true`.
 
 ## Debug Modes
 

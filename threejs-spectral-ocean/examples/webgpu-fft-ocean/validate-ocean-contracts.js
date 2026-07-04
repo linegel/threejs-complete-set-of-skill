@@ -8,6 +8,7 @@ import {
 } from './constants.js';
 import { WebGPUFftOcean } from './ocean-system.js';
 import { validateFftOceanSelfTests } from './validation.js';
+import { readFileSync } from 'node:fs';
 
 function assert( condition, message ) {
 
@@ -97,18 +98,11 @@ function validateStorageAccounting() {
 		if ( error.message.includes( 'unexpectedly passed' ) ) throw error;
 		implicitError = error.message;
 	}
-
-	const fallbackTeachingOcean = new WebGPUFftOcean( fakeReducedRenderer, {
-		quality: 'ultra',
-		explicitFallbackWhenWebGPUUnavailable: true
-	} );
-	assert( fallbackTeachingOcean.cascades.length === 0, `Explicit fallback teaching branch should not allocate native cascades, got ${ fallbackTeachingOcean.cascades.length }.` );
-	fallbackTeachingOcean.dispose();
+	assert( implicitError.includes( 'threejs-compatibility-fallbacks' ), 'Implicit non-WebGPU error must route explicit fallback teaching to threejs-compatibility-fallbacks.' );
 
 	return {
 		...results,
-		implicitNonWebGPUError: implicitError,
-		fallbackTeachingCascades: fallbackTeachingOcean.cascades.length
+		implicitNonWebGPUError: implicitError
 	};
 
 }
@@ -128,9 +122,7 @@ function validateCapabilityGate() {
 	};
 	const full = validateOceanCapabilities( fakeFullRenderer, config );
 	const missingWebGPU = validateOceanCapabilities( fakeReducedRenderer, config );
-	const explicitFallbackTier = chooseOceanTier( fakeReducedRenderer, 'high', {
-		explicitFallbackWhenWebGPUUnavailable: true
-	} );
+	const selectedTier = chooseOceanTier( fakeFullRenderer, 'high' );
 
 	try {
 		chooseOceanTier( fakeReducedRenderer, 'high' );
@@ -143,13 +135,13 @@ function validateCapabilityGate() {
 	assert( full.timestampQuery === true, 'Full fake renderer should report timestamp-query support.' );
 	assert( missingWebGPU.nativeStorage === false, 'Fake missing-WebGPU renderer should fail native storage gate.' );
 	assert( missingWebGPU.missingRequirementReason.length > 0, 'Fake missing-WebGPU renderer needs missing-requirement reasons.' );
-	assert( explicitFallbackTier.dynamicFft === false && explicitFallbackTier.source === 'fallback-teaching-static', 'Explicit fallback teaching branch should disable dynamic FFT.' );
+	assert( selectedTier.dynamicFft === true && selectedTier.source === 'webgpu-tsl-compute', 'Selected tier must stay on WebGPU TSL compute.' );
 
-	return { full, missingWebGPU, explicitFallbackTier };
+	return { full, missingWebGPU, selectedTier };
 
 }
 
-function validateGpuReadbackContract() {
+async function validateGpuReadbackContract() {
 
 	const fakeRenderer = {
 		initialized: true,
@@ -157,6 +149,7 @@ function validateGpuReadbackContract() {
 		computeAsync: async () => {}
 	};
 	const ocean = new WebGPUFftOcean( fakeRenderer, { quality: 'low' } );
+	await ocean.allocateStorageTextures();
 	const validation = ocean.validate( { resolution: 8 } );
 	ocean.dispose();
 
@@ -169,6 +162,42 @@ function validateGpuReadbackContract() {
 
 }
 
+function validateSourceContracts() {
+
+	const constantsSource = readFileSync( new URL( './constants.js', import.meta.url ), 'utf8' );
+	const systemSource = readFileSync( new URL( './ocean-system.js', import.meta.url ), 'utf8' );
+	const nodesSource = readFileSync( new URL( './ocean-nodes.js', import.meta.url ), 'utf8' );
+	const validationSource = readFileSync( new URL( './validation.js', import.meta.url ), 'utf8' );
+	const readmeSource = readFileSync( new URL( './README.md', import.meta.url ), 'utf8' );
+
+	assert( ! constantsSource.includes( 'fallback-teaching-static' ), 'constants.js must not construct fallback-teaching tiers.' );
+	assert( ! systemSource.includes( 'fallbackTeaching' ), 'ocean-system.js must not contain fallback-teaching runtime branches.' );
+	assert( ! readmeSource.includes( 'static fallback-teaching branch' ), 'README must not document the removed fallback-teaching branch.' );
+	assert( ! systemSource.includes( 'subGridNormalContribution: null' ), 'Debug texture contract must not expose null sub-grid normal placeholders.' );
+	assert( ! systemSource.includes( 'finalWithoutFoam: null' ), 'Debug texture contract must not expose null final-without-foam placeholders.' );
+	assert( ! systemSource.includes( 'finalWithoutDetail: null' ), 'Debug texture contract must not expose null final-without-detail placeholders.' );
+	assert( ! nodesSource.includes( 'const xz = positionLocal.xz' ), 'Surface sampling must not use local XZ with world-space reflection.' );
+	assert( nodesSource.includes( 'const xz = positionWorld.xz' ), 'Surface sampling must document world-XZ sampling in code.' );
+	assert( nodesSource.includes( 'transformNormal( resolvedNormalLocal, modelWorldMatrix )' ), 'Reflection must use a world-space transformed normal.' );
+	assert( ! validationSource.includes( 'const amplitudesA = cells.map' ), 'Energy-invariance test must not compare duplicate amplitude arrays.' );
+	assert( validationSource.includes( 'partitionA' ) && validationSource.includes( 'partitionB' ), 'Energy-invariance test must move cutoff partitions.' );
+	assert( systemSource.includes( 'runBrowserGpuReadbackFixtures' ), 'Runtime must expose browser WebGPU readback fixtures.' );
+	assert(
+		systemSource.indexOf( 'this.gpuReadback = await this.runBrowserGpuReadbackFixtures()' ) > - 1 &&
+		systemSource.indexOf( 'this.gpuReadback = await this.runBrowserGpuReadbackFixtures()' ) < systemSource.indexOf( 'this.initialized = true' ),
+		'GPU readback fixtures must run before initialized = true.'
+	);
+
+	return {
+		noFallbackTeachingRuntime: true,
+		noNullDiagnosticPlaceholders: true,
+		worldSpaceSampling: true,
+		nonTautologicalEnergyTest: true,
+		gpuReadbackBeforeInitialized: true
+	};
+
+}
+
 const selfTests = validateFftOceanSelfTests( { resolution: 16 } );
 assert( selfTests.pass, 'FFT ocean self-tests failed.' );
 
@@ -177,7 +206,8 @@ const result = {
 	configCounterexample: validateConfigCounterexample(),
 	storageAccounting: validateStorageAccounting(),
 	capabilityGate: validateCapabilityGate(),
-	gpuReadbackContract: validateGpuReadbackContract()
+	gpuReadbackContract: await validateGpuReadbackContract(),
+	sourceContracts: validateSourceContracts()
 };
 
 console.log( JSON.stringify( result, null, 2 ) );

@@ -1,8 +1,17 @@
 import * as THREE from 'three/webgpu';
-import { uniform } from 'three/tsl';
+import {
+	Fn,
+	float,
+	instanceIndex,
+	textureStore,
+	uvec2,
+	uniform,
+	vec4
+} from 'three/tsl';
 
 import {
 	PACKED_FIELD_LAYOUT,
+	WEBGPU_REQUIRED_ROUTE_MESSAGE,
 	createBitReverseTexture,
 	createButterflyTexture,
 	createCascadeDescriptors,
@@ -111,6 +120,50 @@ function makeFftPlan( cascade, fieldIndex, resources ) {
 	};
 }
 
+function createReadbackPatternNode( textureTarget, resolution, name ) {
+	const kernel = Fn( ( { outputTex } ) => {
+		const x = instanceIndex.mod( resolution );
+		const y = instanceIndex.div( resolution );
+		const cell = uvec2( x, y );
+		textureStore( outputTex, cell, vec4( float( y.mul( resolution ).add( x ) ), float( x ), float( y ), 1.0 ) ).toWriteOnly();
+	} );
+
+	return kernel( { outputTex: textureTarget } ).compute( resolution * resolution, [ 64 ] ).setName( name );
+}
+
+function readPixel( readback, x, y, width, height ) {
+	const tightElements = width * height * 4;
+	const bytesPerTexel = readback.BYTES_PER_ELEMENT * 4;
+	const paddedElementsPerRow = Math.ceil( ( width * bytesPerTexel ) / 256 ) * 256 / readback.BYTES_PER_ELEMENT;
+	const elementsPerRow = readback.length === tightElements ? width * 4 : paddedElementsPerRow;
+	const offset = y * elementsPerRow + x * 4;
+	return [
+		readback[ offset ],
+		readback[ offset + 1 ],
+		readback[ offset + 2 ],
+		readback[ offset + 3 ]
+	];
+}
+
+function maxPixelError( actual, expected ) {
+	let error = 0;
+	for ( let index = 0; index < expected.length; index += 1 ) {
+		error = Math.max( error, Math.abs( actual[ index ] - expected[ index ] ) );
+	}
+	return error;
+}
+
+function pendingGpuReadback( reason ) {
+	return {
+		pass: null,
+		status: 'pending-browser-webgpu',
+		requiredForBrowserAcceptance: true,
+		fixtures: [ 'bit-reversal-x', 'fft-stage-0-x', 'assembly-jacobian-foam' ],
+		nodes: [ 'createBitReverseNode', 'createFftStageNode', 'createCenterAndAssembleNode' ],
+		reason
+	};
+}
+
 class WebGPUFftOceanCascade {
 	constructor( descriptor, shared, config ) {
 		this.index = descriptor.index;
@@ -198,10 +251,7 @@ class WebGPUFftOceanCascade {
 			jacobianDeterminant: this.resources.textures.crossJacobianFoam,
 			foamCoverage: this.resources.textures.crossJacobianFoam,
 			foamHistory: this.resources.textures.foamHistory[ this.currentFoamHistory ],
-			resolvedNormal: this.resources.textures.derivatives,
-			subGridNormalContribution: null,
-			finalWithoutFoam: null,
-			finalWithoutDetail: null
+			resolvedNormal: this.resources.textures.derivatives
 		};
 	}
 
@@ -236,20 +286,17 @@ export class WebGPUFftOcean {
 		this.config = mergeOceanConfig( options );
 		validateOceanConfig( this.config );
 		this.capabilities = validateOceanCapabilities( renderer, this.config );
-		this.explicitFallbackWhenWebGPUUnavailable = options.explicitFallbackWhenWebGPUUnavailable === true;
-		if ( this.capabilities.nativeStorage !== true && this.explicitFallbackWhenWebGPUUnavailable !== true ) {
-			throw new Error( 'WebGPU backend required for the canonical FFT ocean path. Only set explicitFallbackWhenWebGPUUnavailable when the user explicitly asks how to apply fallback when WebGPU is unavailable.' );
+		if ( this.capabilities.nativeStorage !== true ) {
+			throw new Error( WEBGPU_REQUIRED_ROUTE_MESSAGE );
 		}
-		this.fallbackTeachingActive = false;
 		this.initialized = false;
+		this.gpuReadback = pendingGpuReadback( 'Browser WebGPU storage texture readback has not run yet.' );
 		this.timeUniform = uniform( 0 );
 		this.dtUniform = uniform( 1 / 60 );
 		this.butterflyTexture = null;
 		this.bitReverseTexture = null;
 		this.cascades = [];
-		if ( this.capabilities.nativeStorage === true ) {
-			this.createNativeResources();
-		}
+		this.createNativeResources();
 		this.diagnostics = {
 			tier: this.config.quality,
 			format: this.config.textureType === THREE.FloatType ? 'rgba32float' : 'rgba16float',
@@ -275,16 +322,7 @@ export class WebGPUFftOcean {
 
 	async allocateStorageTextures() {
 		if ( this.capabilities.nativeStorage !== true ) {
-			if ( this.explicitFallbackWhenWebGPUUnavailable !== true ) {
-				throw new Error( 'WebGPU backend required for the canonical FFT ocean path.' );
-			}
-			this.useExplicitFallbackTeachingTier( {
-				resolution: 128,
-				cascades: 1,
-				source: 'fallback-teaching-static',
-				dynamicFft: false
-			} );
-			return;
+			throw new Error( WEBGPU_REQUIRED_ROUTE_MESSAGE );
 		}
 
 		this.createNativeResources();
@@ -298,18 +336,14 @@ export class WebGPUFftOcean {
 			await submitCompute( this.renderer, cascade.initNode );
 			await submitCompute( this.renderer, cascade.clearFoamNodes );
 		}
+		this.gpuReadback = await this.runBrowserGpuReadbackFixtures();
+		if ( this.gpuReadback.pass === false ) {
+			throw new Error( `WebGPU FFT ocean readback validation failed: ${ JSON.stringify( this.gpuReadback.errors ) }` );
+		}
 		this.initialized = true;
 	}
 
-	useExplicitFallbackTeachingTier( tier ) {
-		this.fallbackTeachingActive = true;
-		this.diagnostics.tier = 'fallback-teaching-static';
-		this.diagnostics.fallbackTeachingReason = `${ this.capabilities.missingRequirementReason.join( '; ' ) || 'native storage unavailable' }; no alternate shader backend is created.`;
-		this.diagnostics.fallbackTeachingTier = tier;
-	}
-
 	async update( timeSeconds, dtSeconds = 1 / 60 ) {
-		if ( this.fallbackTeachingActive ) return;
 		if ( ! this.initialized ) await this.allocateStorageTextures();
 
 		this.timeUniform.value = timeSeconds;
@@ -331,20 +365,111 @@ export class WebGPUFftOcean {
 		}
 	}
 
+	async runBrowserGpuReadbackFixtures() {
+		const copyTextureToBuffer = this.renderer?.backend?.copyTextureToBuffer;
+		if ( typeof copyTextureToBuffer !== 'function' ) {
+			return pendingGpuReadback( 'renderer.backend.copyTextureToBuffer is unavailable in this Node-level environment.' );
+		}
+
+		const resolution = 8;
+		const fixtureConfig = mergeOceanConfig( {
+			quality: 'low',
+			resolution,
+			cascadeCount: 1,
+			patchLengthsMeters: [ 64 ],
+			textureType: THREE.FloatType
+		} );
+		const cascade = createCascadeDescriptors( fixtureConfig )[ 0 ];
+		const butterflyTexture = createButterflyTexture( resolution );
+		const bitReverseTexture = createBitReverseTexture( resolution );
+		const input = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-input' } );
+		const output = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-output' } );
+		const scratch = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-scratch' } );
+		const field3 = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-field3' } );
+		const previousFoam = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-previous-foam' } );
+		const displacement = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-displacement' } );
+		const derivatives = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-derivatives' } );
+		const crossJacobianFoam = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-cross-jacobian-foam' } );
+		const foamHistory = createStorageTexture( resolution, { type: THREE.FloatType, filter: THREE.NearestFilter, label: 'ocean-readback-foam-history' } );
+		const errors = {};
+
+		try {
+			await submitCompute( this.renderer, createReadbackPatternNode( input, resolution, 'ocean:readback:pattern' ) );
+			await submitCompute( this.renderer, createBitReverseNode( resolution, 0, {
+				inputTex: input,
+				outputTex: output,
+				bitReverseTex: bitReverseTexture
+			} ) );
+			const bitReverse = await copyTextureToBuffer.call( this.renderer.backend, output, 0, 0, resolution, resolution, 0 );
+			errors.bitReverseX = maxPixelError( readPixel( bitReverse, 1, 0, resolution, resolution ), [ 4, 4, 0, 1 ] );
+
+			await submitCompute( this.renderer, createClearTextureNode( input, resolution, [ 1, 0, 0, 0 ], 'ocean:readback:fft-clear' ) );
+			await submitCompute( this.renderer, createFftStageNode( resolution, 0, 0, {
+				inputTex: input,
+				outputTex: output,
+				butterflyTex: butterflyTexture
+			} ) );
+			const fftStage = await copyTextureToBuffer.call( this.renderer.backend, output, 0, 0, resolution, resolution, 0 );
+			errors.fftStageEven = maxPixelError( readPixel( fftStage, 0, 0, resolution, resolution ), [ 2, 0, 0, 0 ] );
+			errors.fftStageOdd = maxPixelError( readPixel( fftStage, 1, 0, resolution, resolution ), [ 0, 0, 0, 0 ] );
+
+			await submitCompute( this.renderer, [
+				createClearTextureNode( input, resolution, [ 2, 3, 0, 0 ], 'ocean:readback:assembly-field0' ),
+				createClearTextureNode( output, resolution, [ 4, 5, 0, 0 ], 'ocean:readback:assembly-field1' ),
+				createClearTextureNode( scratch, resolution, [ 6, 7, 0, 0 ], 'ocean:readback:assembly-field2' ),
+				createClearTextureNode( field3, resolution, [ - 0.1, - 0.2, 0, 0 ], 'ocean:readback:assembly-field3' ),
+				createClearTextureNode( previousFoam, resolution, [ 1, 0, 1, 1 ], 'ocean:readback:assembly-previous-foam' )
+			] );
+			await submitCompute( this.renderer, createCenterAndAssembleNode( cascade, {
+				field0: input,
+				field1: output,
+				field2: scratch,
+				field3,
+				previousFoam,
+				displacement,
+				derivatives,
+				crossJacobianFoam,
+				foamHistory,
+				dt: this.dtUniform
+			} ) );
+			const assembled = await copyTextureToBuffer.call( this.renderer.backend, displacement, 0, 0, resolution, resolution, 0 );
+			errors.assemblyDisplacement = maxPixelError( readPixel( assembled, 0, 0, resolution, resolution ), [ 2.6, 4, 3.9, - 41.6062 ] );
+		} finally {
+			for ( const texture of [
+				butterflyTexture,
+				bitReverseTexture,
+				input,
+				output,
+				scratch,
+				field3,
+				previousFoam,
+				displacement,
+				derivatives,
+				crossJacobianFoam,
+				foamHistory
+			] ) {
+				texture.dispose?.();
+			}
+		}
+
+		const pass = Object.values( errors ).every( ( error ) => error <= 1e-3 );
+		return {
+			pass,
+			status: pass ? 'passed-browser-webgpu' : 'failed-browser-webgpu',
+			requiredForBrowserAcceptance: true,
+			fixtures: [ 'bit-reversal-x', 'fft-stage-0-x', 'assembly-jacobian-foam' ],
+			nodes: [ 'createBitReverseNode', 'createFftStageNode', 'createCenterAndAssembleNode' ],
+			errors
+		};
+	}
+
 	validate( options = {} ) {
 		const selfTests = validateFftOceanSelfTests( options );
 		return {
 			pass: selfTests.pass,
 			config: true,
 			selfTests,
-			gpuReadback: {
-				pass: null,
-				status: 'pending-browser-webgpu',
-				requiredForBrowserAcceptance: true,
-				fixtures: [ 'DC', 'one-bin-x', 'one-bin-y', 'derivative-sign', 'jacobian-determinant' ],
-				nodes: [ 'createBitReverseNode', 'createFftStageNode', 'createCenterAndAssembleNode' ],
-				reason: 'StorageTexture readback is browser/backend-specific; run in a WebGPU browser harness for pixel error capture.'
-			}
+			gpuReadback: this.gpuReadback
 		};
 	}
 
