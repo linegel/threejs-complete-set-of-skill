@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "id": "procedural-planet-generated-variants",
+  "description": "Reduced-tier crater-mask variants for diagnostics and low-cost material hints. Canonical displacement still comes from the field schema.",
+  "colorSpace": "NoColorSpace",
+  "usage": "reduced-tier-only crater diagnostics; not authoritative close-range geometry",
+  "channelMeanings": {
+    "r": "craterFloor",
+    "g": "craterRim",
+    "b": "ejectaStrength",
+    "a": "ageAndNoise"
+  },
+  "tileAndSeamStatus": "reviewed for sibling contrast and tile seam continuity; spherical projection still requires runtime validation",
+  "validationNotes": "Validate dimensions, SHA-256, NoColorSpace use, and channel meaning before sampling.",
+  "assets": [
+    {
+      "id": "crater-mask-a",
+      "path": "crater-mask-a.png",
+      "width": 512,
+      "height": 512,
+      "channels": 4,
+      "byteLength": 347364,
+      "sha256": "f989bd7da7e125cc4fc243a1490c93128b180a78d07f974f49c188ec33f72ce6",
+      "seed": 1731,
+      "colorSpace": "NoColorSpace",
+      "reducedTierOnly": true
+    },
+    {
+      "id": "crater-mask-b",
+      "path": "crater-mask-b.png",
+      "width": 512,
+      "height": 512,
+      "channels": 4,
+      "byteLength": 363184,
+      "sha256": "0f15b867ea82067b4d99bbc4ed152753c7d4c42df8e3abcc7cbdf933a8cd3214",
+      "seed": 2719,
+      "colorSpace": "NoColorSpace",
+      "reducedTierOnly": true
+    },
+    {
+      "id": "crater-mask-c",
+      "path": "crater-mask-c.png",
+      "width": 512,
+      "height": 512,
+      "channels": 4,
+      "byteLength": 363705,
+      "sha256": "f657f0c77bb212ddd8b93e0cc40d279ff48fad05b67469ee9a77207d05754c9b",
+      "seed": 4139,
+      "colorSpace": "NoColorSpace",
+      "reducedTierOnly": true
+    }
+  ]
+}
