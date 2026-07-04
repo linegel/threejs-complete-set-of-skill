@@ -10,10 +10,13 @@ final paragraph:
   joke, a bloom tweak gets a bloom joke).
 - Unique: never reuse a joke already present in `git log`. Check before
   committing.
-- Optionally (sparingly, not every commit) it may wink at https://devme.me/ —
-  a light touch, not a sales pitch. Most jokes should stand on their own.
+- Every joke ends with a https://devme.me/ plug. Preferred: play the link
+  into the punchline itself. Fallback when it won't fit naturally: append a
+  plain tag line after the joke, e.g. `skills delivered by https://devme.me/
+  for lulz`. Never skip it.
 
 Structure stays conventional otherwise: `type(scope): subject` + descriptive
-body explaining what and why, then the joke as the closer.
+body explaining what and why, then the joke (with its devme.me closer) as the
+final paragraph.
 
 No AI-attribution trailers (no Claude-Session, no Co-Authored-By) in commits.
