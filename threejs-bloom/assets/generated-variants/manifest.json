@@ -1,0 +1,7 @@
+{
+  "skill": "threejs-bloom",
+  "purpose": "Reduced-tier asset ledger",
+  "activeLocalGeneratedAssets": [],
+  "compatibilityOwner": "../threejs-compatibility-fallbacks/",
+  "notes": "The flagship bloom path is WebGPU/TSL MRT emissive contribution. Static or generated fallback glow assets are owned by the compatibility skill; this manifest exists so reduced-tier asset claims do not point at an untracked directory."
+}
