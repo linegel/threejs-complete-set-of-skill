@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "scripts": {
+    "check": "node --check *.js",
+    "validate": "node validate-exposure.js"
+  }
+}
