@@ -49,6 +49,7 @@ function assertContains( text, patterns, label ) {
 
 }
 
+const skill = await readText( 'SKILL.md' );
 const recipes = await readText( 'references/router-recipes.md' );
 const template = await readText( 'examples/router-preflight-template.md' );
 
@@ -61,6 +62,31 @@ const recipeNames = [
 	'post-heavy dashboard'
 ];
 
+const sharedResourceOwnerKeys = [
+	'gbuffer',
+	'depth',
+	'normal',
+	'velocity',
+	'history',
+	'weatherEnvelope',
+	'toneMap',
+	'outputTransform',
+	'adaptiveResolution'
+];
+
+assert.doesNotMatch(
+	recipes,
+	/shared-resource owners:/,
+	'recipes must use sharedResourceOwners, not shared-resource owners'
+);
+
+assertContains( skill, [ /sharedResourceOwners:/ ], 'SKILL route manifest' );
+assertContains(
+	skill,
+	sharedResourceOwnerKeys.map( ( key ) => new RegExp( `\\n  ${ key }:` ) ),
+	'SKILL route manifest sharedResourceOwners'
+);
+
 for ( const recipeName of recipeNames ) {
 
 	const section = extractSection( recipes, recipeName );
@@ -69,11 +95,16 @@ for ( const recipeName of recipeNames ) {
 		/selectedSkills:/,
 		/primaryOwner:/,
 		/deferredSkills:/,
-		/shared-resource owners:/,
+		/sharedResourceOwners:/,
 		/omittedSkills:/,
 		/acceptanceEvidence:/,
 		/\$threejs-[a-z0-9-]+/
 	], recipeName );
+	assertContains(
+		section,
+		sharedResourceOwnerKeys.map( ( key ) => new RegExp( `\\n  ${ key }:` ) ),
+		`${ recipeName } sharedResourceOwners`
+	);
 
 }
 
@@ -104,6 +135,7 @@ assertContains( template, [
 	/selectedSkills:/,
 	/omittedSkills:/,
 	/sharedResourceOwners:/,
+	/adaptiveResolution:/,
 	/ownershipMap:/,
 	/source-space:/,
 	/world-space:/,
@@ -123,6 +155,7 @@ assertContains( template, [
 	/deployment:/,
 	/editor tooling:/,
 	/physics engines:/,
+	/compatibility:/,
 	/## acceptance evidence/,
 	/acceptanceEvidence:/,
 	/debugViewList:/,
@@ -136,5 +169,5 @@ assertContains( template, [
 console.log( JSON.stringify( {
 	pass: true,
 	recipeCount: recipeNames.length,
-	checkedTemplateFields: 39
+	checkedTemplateFields: 41
 }, null, 2 ) );

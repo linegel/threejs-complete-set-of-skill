@@ -23,10 +23,16 @@ primaryOwner: $threejs-procedural-planets
 deferredSkills:
   - $threejs-exposure-color-grading
   - $threejs-volumetric-clouds
-shared-resource owners:
+sharedResourceOwners:
   gbuffer: $threejs-image-pipeline
+  depth: $threejs-image-pipeline
+  normal: $threejs-image-pipeline
   velocity: $threejs-image-pipeline
+  history: $threejs-image-pipeline
+  weatherEnvelope: not used by this route
   toneMap: $threejs-image-pipeline
+  outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
 omittedSkills:
   - $threejs-water-optics: bounded pool/refraction ownership is not the horizon-scale cause
   - $threejs-bloom: defer until ocean/atmosphere HDR signal is proven
@@ -53,10 +59,16 @@ primaryOwner: $threejs-rain-snow-and-wet-surfaces
 deferredSkills:
   - $threejs-bloom
   - $threejs-exposure-color-grading
-shared-resource owners:
-  weatherEnvelope: $threejs-rain-snow-and-wet-surfaces
+sharedResourceOwners:
   gbuffer: $threejs-image-pipeline
+  depth: $threejs-image-pipeline
+  normal: $threejs-image-pipeline
+  velocity: $threejs-image-pipeline
+  history: $threejs-image-pipeline
+  weatherEnvelope: $threejs-rain-snow-and-wet-surfaces
   toneMap: $threejs-image-pipeline
+  outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
 omittedSkills:
   - $threejs-volumetric-clouds: sky volume is not requested
   - $threejs-spectral-ocean: large-water spectra are not the cause
@@ -82,9 +94,16 @@ primaryOwner: $threejs-procedural-vegetation
 deferredSkills:
   - $threejs-scalable-real-time-shadows
   - $threejs-ambient-contact-shading
-shared-resource owners:
+sharedResourceOwners:
+  gbuffer: $threejs-image-pipeline
+  depth: $threejs-image-pipeline
+  normal: $threejs-image-pipeline
   velocity: $threejs-image-pipeline
+  history: $threejs-image-pipeline
+  weatherEnvelope: not used by this route
   toneMap: $threejs-image-pipeline
+  outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
 omittedSkills:
   - $threejs-procedural-geometry: general mesh writing is secondary to growth/wind
   - $threejs-bloom: no HDR emission cause yet
@@ -109,9 +128,16 @@ primaryOwner: $threejs-black-holes-and-space-effects
 deferredSkills:
   - $threejs-bloom
   - $threejs-exposure-color-grading
-shared-resource owners:
+sharedResourceOwners:
+  gbuffer: $threejs-image-pipeline
+  depth: $threejs-image-pipeline
+  normal: $threejs-image-pipeline
+  velocity: $threejs-image-pipeline
+  history: $threejs-image-pipeline
+  weatherEnvelope: not used by this route
   toneMap: $threejs-image-pipeline
   outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
 omittedSkills:
   - $threejs-particles-trails-and-effects: no time-local particle event is requested
   - $threejs-sky-atmosphere-and-haze: planetary scattering is not the light transport cause
@@ -136,9 +162,16 @@ primaryOwner: $threejs-procedural-materials
 deferredSkills:
   - $threejs-bloom
   - $threejs-exposure-color-grading
-shared-resource owners:
+sharedResourceOwners:
   gbuffer: $threejs-image-pipeline
+  depth: $threejs-image-pipeline
+  normal: $threejs-image-pipeline
+  velocity: $threejs-image-pipeline
+  history: $threejs-image-pipeline
+  weatherEnvelope: not used by this route
   toneMap: $threejs-image-pipeline
+  outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
 omittedSkills:
   - asset pipeline: glTF/KTX2/DRACO setup routes to official docs or project tooling
   - $threejs-procedural-geometry: imported mesh silhouette is not being authored
@@ -163,10 +196,16 @@ selectedSkills:
 primaryOwner: $threejs-image-pipeline
 deferredSkills:
   - $threejs-sky-atmosphere-and-haze
-shared-resource owners:
+sharedResourceOwners:
   gbuffer: $threejs-image-pipeline
+  depth: $threejs-image-pipeline
+  normal: $threejs-image-pipeline
+  velocity: $threejs-image-pipeline
+  history: $threejs-image-pipeline
+  weatherEnvelope: not used by this route
   toneMap: $threejs-image-pipeline
   outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
 omittedSkills:
   - UI overlays: DOM/app UI stays outside flagship graphics skills
   - $threejs-procedural-materials: load only if material identity is the missing signal

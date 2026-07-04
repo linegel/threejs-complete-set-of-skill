@@ -52,6 +52,7 @@ sharedResourceOwners:
   weatherEnvelope:
   toneMap:
   outputTransform:
+  adaptiveResolution:
 ownershipMap:
   source-space:
   world-space:

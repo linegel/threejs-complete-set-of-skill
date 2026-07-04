@@ -52,10 +52,14 @@ primaryOwner: ""
 deferredSkills: []
 sharedResourceOwners:
   gbuffer: ""
+  depth: ""
+  normal: ""
   velocity: ""
+  history: ""
   weatherEnvelope: ""
   toneMap: ""
   outputTransform: ""
+  adaptiveResolution: ""
 acceptanceEvidence:
   requiredDebugViews: []
   requiredMetrics: []
@@ -67,6 +71,9 @@ acceptanceEvidence:
 mechanism. `omittedSkills` records tempting but unnecessary skills and why they
 were not loaded. `primaryOwner` is the skill that owns the first non-post visual
 mechanism. `deferredSkills` are loaded only after their input signal exists.
+Every recipe and route manifest must carry the same `sharedResourceOwners` keys
+shown above, using an explicit empty or not-used value when the route does not
+consume that shared resource.
 
 ### Preflight Checkpoint Outputs
 
@@ -75,7 +82,7 @@ Treat preflight as data, not prose:
 | Checkpoint | Required output |
 | --- | --- |
 | backendManifest | Three.js revision, initialized backend, browser/device/GPU class, `getOutputBufferType()`, feature flags, and blocker if unavailable |
-| routeManifest | `selectedSkills`, `omittedSkills`, `primaryOwner`, `deferredSkills`, `acceptanceEvidence` |
+| routeManifest | `selectedSkills`, `omittedSkills`, `primaryOwner`, `deferredSkills`, `sharedResourceOwners`, `acceptanceEvidence` |
 | ownershipMap | depth, normal, velocity, history, weather, tone-map, output-transform, and adaptive-resolution owners |
 | budgetTable | frame ms, pass count, draw calls, triangles/instances, dispatches, storage bytes, render-target bytes |
 | debugViewList | no-post baseline plus every field/pass needed to prove the mechanism |
@@ -102,6 +109,10 @@ const capabilities = {
 
 if ( renderer.backend.isWebGPUBackend ) {
   // Canonical path: TSL + NodeMaterial + RenderPipeline + compute/storage as needed.
+} else {
+  throw new Error(
+    'Canonical flagship route requires WebGPU; if fallback teaching was explicitly requested, route to $threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
@@ -145,7 +156,7 @@ Every routed implementation defines explicit tiers inside the canonical WebGPU/T
 | Budgeted | Frame time or memory exceeds budget | Lower DPR, lower pass resolution with `setResolutionScale()`, fewer raymarch steps/samples, smaller simulation grids, sparser LOD, and update amortization. |
 | Minimum viable | WebGPU exists but the target GPU is below budget | Keep the same architecture while reducing density, resolution, history length, update cadence, and optional passes. |
 
-Do not define WebGL or alternate-renderer tiers here. Use
+Do not define alternate-renderer tiers here. Use
 `$threejs-compatibility-fallbacks` only for an explicit request to teach how to
 apply fallback when WebGPU is unavailable.
 
@@ -178,6 +189,7 @@ Record measured `renderer.info`, draw calls, triangles, texture/render-target co
 | atlas-filtered blocks, planetary surfaces, terrain wetness, lava/emissive procedural surfaces, authored frame PBR, specular AA | `$threejs-procedural-materials` | Use for BRDF/material identity; pair with fields for shared masks and geometry for actual silhouette changes. |
 | sculpted rails/frames, branch rings, semantic mesh writers, material groups | `$threejs-procedural-geometry` | Use when vertices, normals, UV density, or material slots must be authored. |
 | trees, stylized grass, GPU-computed grass, branching organisms, roots, foliage, rooted wind deformation | `$threejs-procedural-vegetation` | Use for biological distribution/growth/wind; pair with fields only for terrain or biome control. |
+| procedural creatures, fauna, NPCs, spec-driven bodies, SDF blend-shell skins, capsule rigs, gait/hop/flight/swim locomotion, creature crowds, creature labs | `$threejs-procedural-creatures` | Use for living-actor bodies and locomotion; use motion systems for generic transform timelines, vegetation for plants; imported skinned-clip pipelines stay a declared gap. |
 | buildings, facade grammars, profiles, ornaments, modular mesh writers | `$threejs-procedural-buildings-and-cities` | Use for authored building grammar; use geometry for general mesh construction without architectural semantics. |
 | planets, terrain, craters, biome fields, coastlines, spherical detail | `$threejs-procedural-planets` | Use for planetary terrain/body ownership; pair with atmosphere only after body scale and horizon are fixed. |
 | sky scattering, planetary shells, depth-based aerial perspective | `$threejs-sky-atmosphere-and-haze` | Use for air/sky/light transport; use image pipeline only for final exposure and color ownership. |
@@ -250,7 +262,7 @@ Use route-away entries when the request is outside this pack's expert scope:
 | editor tooling | Use editor/tooling docs or project conventions. |
 | physics engines | Use a physics engine or project-local integration; route visual effects only after physical state is available. |
 | generic app architecture | Keep framework/state/router decisions outside this visual skill pack. |
-| WebGPU-unavailable fallback teaching | Use `$threejs-compatibility-fallbacks` only when the user explicitly asks how to apply fallback when WebGPU is unavailable. |
+| Teaching how to apply fallback when WebGPU is unavailable | Use `$threejs-compatibility-fallbacks` only when the user explicitly asks how to apply fallback when WebGPU is unavailable. |
 
 ## Acceptance Gate
 
@@ -258,7 +270,7 @@ A routed task is incomplete until the implementation exposes:
 
 - installed Three.js revision, initialized backend, target browser/device/GPU class, and migration-guide check;
 - deterministic seed or reproducible inputs;
-- explicit full/balanced/reduced quality tiers and the condition that selects each tier;
+- explicit Full/Budgeted/Minimum viable quality tiers and the condition that selects each tier;
 - visual debug modes for controlling fields, intermediate buffers, and shared MRT/history outputs;
 - parameters grouped by perceptual role;
 - no-post baseline that still reads;
