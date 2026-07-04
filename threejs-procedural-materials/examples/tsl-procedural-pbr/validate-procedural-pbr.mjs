@@ -14,6 +14,8 @@ import {
   createWalnutPbrMaterial,
   disposeProceduralPbrMaterial,
   disposeTextureSet,
+  initializeProceduralPbrMaterialData,
+  PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE,
   proceduralPbrDebugModes,
   setProceduralPbrDebugMode,
   validateProceduralPbrConfig,
@@ -21,6 +23,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const assetRoot = resolve(__dirname, "../../assets/generated-variants");
+const materialSourcePath = resolve(__dirname, "procedural-pbr-materials.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -41,6 +44,15 @@ function assertMaterialSlots(name, material, expectedSlots) {
     assert(material[slot] !== undefined && material[slot] !== null, `${name} missing ${slot}`);
   }
   assert(material.userData.proceduralPbr?.normalVarianceSource === "normalNode", `${name} normal-variance debug must derive from normalNode`);
+}
+
+async function validateSourceGuards() {
+  const source = await readFile(materialSourcePath, "utf8");
+  assert(!/\bbumpMap\s*\(/.test(source), "scalar procedural height must not be routed through bumpMap()");
+  assert(source.includes("function createDerivativeNormalFromHeight"), "missing scalar-height derivative normal helper");
+  assert(source.includes("scaledHeight.dFdx()") && source.includes("scaledHeight.dFdy()"), "derivative normal must consume height screen-space derivatives");
+  assert(source.includes("positionView.dFdx()") && source.includes("normalView"), "derivative normal must use r185 view-space surface-gradient inputs");
+  return "passed";
 }
 
 async function validateAssetManifest() {
@@ -95,35 +107,86 @@ function validateMaterials() {
   const gold = createAntiqueGoldPbrMaterial();
   const ebony = createEbonyFramePbrMaterial();
   const lava = createLavaEmissivePbrMaterial();
+  const materials = { walnut, gold, ebony, lava };
 
   assertMaterialSlots("walnut", walnut, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskShadowNode", "clearcoatNode", "clearcoatRoughnessNode"]);
   assertMaterialSlots("gold", gold, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskShadowNode", "clearcoatNode", "clearcoatRoughnessNode"]);
   assertMaterialSlots("ebony", ebony, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskShadowNode", "clearcoatNode", "clearcoatRoughnessNode"]);
   assertMaterialSlots("lava", lava, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "emissiveNode", "maskShadowNode"]);
 
-  for (const mode of proceduralPbrDebugModes.keys()) {
-    assert(setProceduralPbrDebugMode(walnut, mode), `debug mode ${mode} failed`);
+  for (const [name, material] of Object.entries(materials)) {
+    for (const mode of proceduralPbrDebugModes.keys()) {
+      assert(setProceduralPbrDebugMode(material, mode), `${name} debug mode ${mode} failed`);
+    }
   }
 
-  disposeProceduralPbrMaterial(walnut);
-  disposeProceduralPbrMaterial(walnut);
+  let materialDisposeCount = 0;
+  walnut.dispose = () => { materialDisposeCount += 1; };
+  assert(disposeProceduralPbrMaterial(walnut), "first material dispose should report work");
+  assert(!disposeProceduralPbrMaterial(walnut), "second material dispose should be idempotent");
+  assert(materialDisposeCount === 1, "disposeProceduralPbrMaterial must dispose once over repeated calls");
   disposeProceduralPbrMaterial(gold);
   disposeProceduralPbrMaterial(ebony);
   disposeProceduralPbrMaterial(lava);
 
   let disposed = 0;
   const disposable = { dispose: () => { disposed += 1; } };
-  disposeTextureSet({ a: disposable, b: null });
-  disposeTextureSet({ a: disposable });
-  assert(disposed === 2, "disposeTextureSet should be deterministic and null-safe");
+  const textureSet = { a: disposable, b: null };
+  assert(disposeTextureSet(textureSet) === 1, "disposeTextureSet should dispose one live texture");
+  assert(disposeTextureSet(textureSet) === 0, "disposeTextureSet should clear entries and be idempotent");
+  assert(disposed === 1, "disposeTextureSet must dispose once over repeated calls");
 
   return ["walnut", "antiqueGold", "ebony", "lava"];
+}
+
+async function validateCapabilityGate() {
+  let computeCalls = 0;
+  let restoredTarget = false;
+  const webgpuRenderer = {
+    backend: { isWebGPUBackend: true },
+    getRenderTarget: () => "previous-target",
+    setRenderTarget: (target) => {
+      restoredTarget = target === "previous-target";
+    },
+    init: async () => {},
+    computeAsync: async (nodes) => {
+      computeCalls = nodes.length;
+    },
+  };
+  const pass = await initializeProceduralPbrMaterialData(webgpuRenderer, { computeNodes: ["cause-map", "instance-state"] });
+  assert(pass.isWebGPUBackend === true && pass.computeNodeCount === 2, "native WebGPU capability gate failed");
+  assert(computeCalls === 2, "compute nodes were not dispatched on native WebGPU");
+  assert(restoredTarget, "capability helper must restore render target");
+
+  let rejected = false;
+  let nonWebgpuRestoredTarget = false;
+  const nonWebgpuRenderer = {
+    backend: { isWebGPUBackend: false },
+    getRenderTarget: () => "old-target",
+    setRenderTarget: (target) => {
+      nonWebgpuRestoredTarget = target === "old-target";
+    },
+    init: async () => {},
+    computeAsync: async () => {
+      throw new Error("compute should not run on non-WebGPU");
+    },
+  };
+  try {
+    await initializeProceduralPbrMaterialData(nonWebgpuRenderer, { computeNodes: ["unused"] });
+  } catch (error) {
+    rejected = error.message === PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE;
+  }
+  assert(rejected, "non-WebGPU backend must throw with fallback-routing message");
+  assert(nonWebgpuRestoredTarget, "non-WebGPU rejection must still restore render target");
+  return "passed";
 }
 
 const result = {
   materials: validateMaterials(),
   config: validateProceduralPbrConfig(),
   configFailures: "passed",
+  sourceGuards: await validateSourceGuards(),
+  capabilityGate: await validateCapabilityGate(),
   assets: await validateAssetManifest(),
 };
 validateConfigFailures();

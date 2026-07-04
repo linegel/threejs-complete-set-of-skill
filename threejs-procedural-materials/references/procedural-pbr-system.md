@@ -54,15 +54,13 @@ variant count, dynamic storage, and sample budgets change.
 
 ```js
 await renderer.init();
-if (renderer.backend.isWebGPUBackend) {
-  await renderer.computeAsync([generateCauseMaps, generateInstanceState]);
-} else {
-  selectReducedMaterialTier({
-    generatedMapSize: 512,
-    dynamicStorage: false,
-    triplanarTier: "hero-only",
-  });
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    "threejs-procedural-materials requires native WebGPU. For explicit fallback requests, route to threejs-compatibility-fallbacks.",
+  );
 }
+
+await renderer.computeAsync([generateCauseMaps, generateInstanceState]);
 ```
 
 Quality tiers:
@@ -71,7 +69,7 @@ Quality tiers:
 | --- | --- | --- | --- |
 | Ultra | `StorageTexture` cause maps at 1024-2048, optional manual mip chain, generated once or on targeted invalidation | TSL fields plus texture arrays, triplanar/hex tiling only for hero surfaces, derivative normals, specular AA | `StorageInstancedBufferAttribute` or `instancedArray()` storage nodes |
 | High | packed KTX2/BasisU maps or generated 512-1024 cause maps | UV/array sampling first, limited triplanar, 3-5 octave procedural fields | static instanced attributes plus small dynamic node uniforms |
-| Reduced | assets from `assets/generated-variants/`, 256-512 maps, fewer variants | UV/array sampling, no manual anisotropic taps, 1-3 octave fields | baked attributes; only for an explicit request for how to apply fallback when WebGPU is unavailable |
+| Mobile | assets from `assets/generated-variants/`, 256-512 maps, fewer variants | UV/array sampling, no manual anisotropic taps, 1-3 octave fields | baked attributes on native WebGPU mobile |
 
 ## NodeMaterial Slot Contract
 
@@ -81,7 +79,7 @@ Every procedural material documents which node slots it owns:
 colorNode: identity base color, wetness/burn/ore/climate color shifts
 roughnessNode: identity roughness plus wetness, dust, polish, heat, frost
 metalnessNode: identity metalness, oxide, exposed ore, inclusions
-normalNode: normalMap(), bumpMap(), or derivative normal from shared height
+normalNode: normalMap(), bumpMap(texture(...)), or derivative normal from shared scalar height
 aoNode: authored cavity or terrain contact, never fake global lighting
 opacityNode / alphaTestNode / maskNode: cutout, dissolve, erosion, cards
 emissiveNode: only real material emission in HDR scene-linear units
@@ -139,7 +137,7 @@ Interface-space and color-space ownership:
 | Planet radial space | undeformed radial attributes, longitude circle coordinates | biome colors convert as color; climate masks stay data |
 | Generated texture space | `texture(causeMap, coords.uv)` and cached cause maps | lava and variant cause maps are `NoColorSpace` RGBA data |
 | Height units | authored meters or documented material units | height is data; never treat it as color |
-| Normal space | `normalMap()`, `bumpMap()`, or derivative normal from shared height | normal maps and normal variance are `NoColorSpace` data |
+| Normal space | `normalMap()`, `bumpMap(texture(...))`, or derivative normal from shared scalar height | normal maps and normal variance are `NoColorSpace` data |
 | Instance attributes | `attribute()`, `StorageInstancedBufferAttribute`, `instancedArray()` | variant/dissolve/lifetime are data fields |
 | Scene-linear material color | `colorNode`, `emissiveNode`, authored identity bundles | emission stays scene-linear HDR until post |
 | Output owner boundary | `RenderPipeline.outputColorTransform` or one `renderOutput()` | forbids sRGB-as-data and forbids material-owned display encoding |
@@ -199,9 +197,11 @@ Clamp filtered roughness into the material's authored range before assigning
 views.
 
 For texture normal maps, use `normalMap()` and keep normal textures as
-`NoColorSpace`. For scalar procedural height, use `bumpMap()` when the built-in
-node is sufficient; use a custom derivative normal only when it needs shared
-height, distance filtering, or orientation-specific behavior.
+`NoColorSpace`. For texture height maps, `bumpMap(texture(heightMap))` is valid
+because the node can resample offset UVs. Do not feed an already-evaluated
+scalar procedural height into `bumpMap()`; derive the final normal from
+screen-space derivatives of that height and surface position, then feed that
+same final normal into specular AA.
 
 ## Authored PBR Response Bundles
 
@@ -277,7 +277,7 @@ Preferred data paths:
 - `StorageInstancedBufferAttribute` or `instancedArray()` for computed instance
   state.
 - `storage()` nodes to read/write structured instance data in compute.
-- static `InstancedBufferAttribute` only for reduced tiers or immutable data.
+- static `InstancedBufferAttribute` only for mobile tiers or immutable data.
 
 Per-instance dissolve:
 
@@ -323,7 +323,7 @@ Per hero material family:
 | --- | ---: | ---: | --- |
 | Desktop discrete | <= 0.8 ms at 1440p | <= 128 MB, 1024-2048 maps, 1-3 init dispatches | <= 2 full-rate passes, reduced bloom/AO |
 | Desktop integrated | <= 1.4 ms at 1080p | <= 64 MB, 512-1024 maps | <= 1 full-rate pass, reduced effects |
-| Mobile/reduced | <= 2.0 ms at 720p internal | <= 32 MB, 256-512 maps | no optional full-rate post |
+| Mobile | <= 2.0 ms at 720p internal | <= 32 MB, 256-512 maps | no optional full-rate post |
 
 Micro budgets:
 

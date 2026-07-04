@@ -27,7 +27,7 @@ explicit seed + stable object/world/UV coordinates
   -> authored identity bundle: walnut, gold, ebony, or lava crust/heat
   -> causal modifiers: tarnish, lacquer polish, lava exposure, dissolve
   -> filtered microstructure: fwidth-gated detail
-  -> derivative normal: bumpMap(shared height)
+  -> derivative normal: screen-space derivatives of shared scalar height
   -> specular AA: dFdx/dFdy(final normal) widens roughness
   -> NodeMaterial PBR slots
   -> app-owned RenderPipeline / BloomNode / output transform
@@ -35,8 +35,10 @@ explicit seed + stable object/world/UV coordinates
 
 No compute dispatch is required for the default materials. Optional generated
 cause-map or instance-state compute should run before rendering, then feed the
-same slots. `initializeProceduralPbrMaterialData()` shows the capability gate
-and restores the renderer render target after compute.
+same slots. `initializeProceduralPbrMaterialData()` shows the native WebGPU
+capability gate: it throws on a non-WebGPU backend with a route to
+`../threejs-compatibility-fallbacks/`, and restores the renderer render target
+after compute or rejection.
 
 ## Quality Tiers
 
@@ -44,7 +46,7 @@ and restores the renderer render target after compute.
 | --- | --- | --- | --- |
 | Ultra | 1024-2048 generated cause maps plus storage instanced attributes | TSL fields, optional hero triplanar, derivative normals, specular AA | desktop discrete |
 | High | 512-1024 packed/generated cause maps | UV or object-space fields first, limited triplanar | desktop integrated |
-| Reduced | 256-512 maps from `assets/generated-variants/` | no dynamic triplanar on repeats, static dissolve attributes | explicit request for how to apply fallback when WebGPU is unavailable |
+| Mobile | 256-512 maps from `assets/generated-variants/` | no dynamic triplanar on repeats, static dissolve attributes | native WebGPU mobile |
 
 ## Budgets
 
@@ -52,7 +54,7 @@ and restores the renderer render target after compute.
 - Common PBR path: keep under 8-12 texture/noise samples per pixel.
 - Triplanar hero path: 18+ samples must be justified by close inspection.
 - Storage: keep generated material textures and attributes <= 128 MB on Ultra,
-  <= 64 MB on High, <= 32 MB on Reduced.
+  <= 64 MB on High, <= 32 MB on Mobile.
 - Draws: one material per identity family; variants come from attributes.
 
 ## Debug Modes

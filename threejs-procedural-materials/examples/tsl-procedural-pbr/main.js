@@ -192,6 +192,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   const canvas = document.querySelector("#scene");
   const debugSelect = document.querySelector("#debug");
   const rawEmissive = document.querySelector("#raw-emissive");
+  const bloomOnly = document.querySelector("#bloom-only");
   const noPost = document.querySelector("#no-post");
   const scale = document.querySelector("#scale");
 
@@ -209,9 +210,17 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     pixelRatio: window.devicePixelRatio,
   });
 
+  function setExclusiveSceneDebugMode(activeControl, mode) {
+    for (const control of [rawEmissive, bloomOnly, noPost]) {
+      if (control !== activeControl) control.checked = false;
+    }
+    app.setSceneDebugMode(activeControl.checked ? mode : SCENE_DEBUG_MODES.final);
+  }
+
   debugSelect.addEventListener("change", () => app.setDebugMode(debugSelect.value));
-  rawEmissive.addEventListener("change", () => app.setSceneDebugMode(rawEmissive.checked ? SCENE_DEBUG_MODES.rawEmissive : SCENE_DEBUG_MODES.final));
-  noPost.addEventListener("change", () => app.setSceneDebugMode(noPost.checked ? SCENE_DEBUG_MODES.noPost : SCENE_DEBUG_MODES.final));
+  rawEmissive.addEventListener("change", () => setExclusiveSceneDebugMode(rawEmissive, SCENE_DEBUG_MODES.rawEmissive));
+  bloomOnly.addEventListener("change", () => setExclusiveSceneDebugMode(bloomOnly, SCENE_DEBUG_MODES.bloomOnly));
+  noPost.addEventListener("change", () => setExclusiveSceneDebugMode(noPost, SCENE_DEBUG_MODES.noPost));
   scale.addEventListener("input", () => app.setMaterialScale(Number(scale.value)));
   window.addEventListener("resize", () => app.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio));
   rendererLoop(app);

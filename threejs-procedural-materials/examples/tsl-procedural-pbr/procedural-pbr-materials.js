@@ -12,7 +12,6 @@ import {
 
 import {
   attribute,
-  bumpMap,
   color,
   dFdx,
   dFdy,
@@ -25,7 +24,9 @@ import {
   mx_noise_float,
   mx_worley_noise_float,
   normalLocal,
+  normalView,
   positionLocal,
+  positionView,
   positionWorld,
   select,
   smoothstep,
@@ -39,6 +40,11 @@ import {
 
 export const TRIPLANAR_COST_NOTE =
   "Full triplanar projection costs 3 texture samples per channel before filtering; reserve it for UV-less or close hero surfaces.";
+
+export const PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE =
+  "threejs-procedural-materials requires a native WebGPU backend for canonical compute/storage/MRT material work. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to ../threejs-compatibility-fallbacks/.";
+
+const disposedProceduralMaterials = new WeakSet();
 
 export const proceduralPbrDebugModes = new Map([
   ["final", 0],
@@ -258,7 +264,7 @@ function createStructuralFields(coords, {
 
 // Build order 9: variants and dissolve come from instanced attributes, not
 // cloned materials. Missing attributes compile to zero, which is the intact
-// reduced-tier default.
+// default.
 function createPerInstanceDissolve(fields) {
   const instanceDissolve = attribute("instanceDissolve", "float");
   const instanceVariant = attribute("instanceVariant", "float");
@@ -274,6 +280,20 @@ function createPerInstanceDissolve(fields) {
     dissolveCause,
     mask,
   };
+}
+
+// The built-in texture bump node resamples height at offset UVs. Scalar procedural
+// height is already evaluated, so feed its screen-space derivatives directly.
+function createDerivativeNormalFromHeight(height, strength = float(1)) {
+  const scaledHeight = height.mul(strength);
+  const dpdx = positionView.dFdx();
+  const dpdy = positionView.dFdy();
+  const r1 = dpdy.cross(normalView);
+  const r2 = normalView.cross(dpdx);
+  const det = dpdx.dot(r1);
+  const grad = det.sign().mul(scaledHeight.dFdx().mul(r1).add(scaledHeight.dFdy().mul(r2)));
+
+  return det.abs().mul(normalView).sub(grad).normalize();
 }
 
 // Build order 6: widen roughness from shared-height derivatives before the
@@ -412,7 +432,7 @@ function createWoodLikeMaterial(identity, {
     ? mix(grainColor, createTriplanarProjectionNode(triplanarMap, { scale: 1.2 }).node.rgb, 0.22)
     : grainColor.mul(fields.grain.mul(0.18).add(0.9));
   const roughness = mix(float(identity.roughnessRange[0]), float(identity.roughnessRange[1]), fields.cavity);
-  const normalNode = bumpMap(fields.height, float(1.0).mul(uniforms.normalStrength));
+  const normalNode = createDerivativeNormalFromHeight(fields.height, float(1.0).mul(uniforms.normalStrength));
   const specular = createSpecularAA(roughness, normalNode, {
     specularAAStrength: uniforms.specularAAStrength,
     roughnessRange: identity.roughnessRange,
@@ -481,7 +501,7 @@ export function createAntiqueGoldPbrMaterial({
   const base = mix(color(identity.secondaryColor), color(identity.baseColor), wornEdge);
   const colorNode = mix(base, color(0x2c3324), tarnish.mul(0.28));
   const roughness = mix(float(identity.roughnessRange[0]), float(identity.roughnessRange[1]), tarnish);
-  const normalNode = bumpMap(fields.height, float(0.65).mul(uniforms.normalStrength));
+  const normalNode = createDerivativeNormalFromHeight(fields.height, float(0.65).mul(uniforms.normalStrength));
   const specular = createSpecularAA(roughness, normalNode, {
     specularAAStrength: uniforms.specularAAStrength,
     roughnessRange: identity.roughnessRange,
@@ -565,7 +585,7 @@ export function createLavaEmissivePbrMaterial({
   const lava = mix(color(authoredLavaIdentity.lavaCool), color(authoredLavaIdentity.lavaHot), heat);
   const colorNode = mix(crust, lava, heat.mul(0.35));
   const roughness = mix(float(0.74), float(0.28), heat);
-  const normalNode = bumpMap(fields.height.add(heat.mul(0.012)), uniforms.normalStrength);
+  const normalNode = createDerivativeNormalFromHeight(fields.height.add(heat.mul(0.012)), uniforms.normalStrength);
   const specular = createSpecularAA(roughness, normalNode, {
     specularAAStrength: uniforms.specularAAStrength,
     roughnessRange: [0.28, 0.82],
@@ -696,10 +716,13 @@ export async function initializeProceduralPbrMaterialData(renderer, {
   try {
     await renderer.init();
     const isWebGPUBackend = renderer.backend?.isWebGPUBackend === true;
-    if (isWebGPUBackend && computeNodes.length > 0) {
+    if (!isWebGPUBackend) {
+      throw new Error(PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE);
+    }
+    if (computeNodes.length > 0) {
       await renderer.computeAsync(computeNodes);
     }
-    return { isWebGPUBackend };
+    return { isWebGPUBackend, computeNodeCount: computeNodes.length };
   } finally {
     if (renderer.setRenderTarget && previousRenderTarget !== undefined) {
       renderer.setRenderTarget(previousRenderTarget);
@@ -708,6 +731,8 @@ export async function initializeProceduralPbrMaterialData(renderer, {
 }
 
 export function disposeProceduralPbrMaterial(material) {
+  if (!material || disposedProceduralMaterials.has(material)) return false;
+
   const state = material.userData.proceduralPbr;
   if (state?.disposeTextures) {
     for (const textureToDispose of state.disposeTextures) {
@@ -716,10 +741,18 @@ export function disposeProceduralPbrMaterial(material) {
     state.disposeTextures.length = 0;
   }
   material.dispose?.();
+  disposedProceduralMaterials.add(material);
+  return true;
 }
 
 export function disposeTextureSet(textureSet) {
-  for (const textureToDispose of Object.values(textureSet)) {
+  if (!textureSet || typeof textureSet !== "object") return 0;
+
+  let disposedCount = 0;
+  for (const [key, textureToDispose] of Object.entries(textureSet)) {
     textureToDispose?.dispose?.();
+    if (textureToDispose?.dispose) disposedCount += 1;
+    delete textureSet[key];
   }
+  return disposedCount;
 }

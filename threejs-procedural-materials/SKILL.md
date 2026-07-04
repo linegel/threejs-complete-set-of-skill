@@ -38,8 +38,9 @@ The target graph writes:
   textures sampled through TSL.
 - `roughnessNode`, `metalnessNode`, `aoNode`, `opacityNode`, and physical slots
   from the same identity weights.
-- `normalNode` from `normalMap()`, `bumpMap()`, or a derivative normal built
-  from the same height field using `dFdx()`, `dFdy()`, and `fwidth()`.
+- `normalNode` from `normalMap()`, `bumpMap(texture(...))` for texture height
+  maps, or a derivative normal built from scalar procedural height using
+  `dFdx()`, `dFdy()`, and `fwidth()`.
 - `emissiveNode` only for actual material emission; route glow through
   `$threejs-bloom` and `BloomNode` in the node render pipeline.
 - `positionNode`, `castShadowPositionNode`, and
@@ -70,21 +71,19 @@ Use the sibling examples as domain sources, not implementation recipes:
 
 ## Capability Gate And Tiers
 
-Initialize the renderer before selecting quality. The top tier uses native
-compute/storage for generated material data and instance state; the reduced
-tier uses smaller generated maps, static variants, or baked instance attributes.
+Initialize the renderer before selecting quality. This flagship skill teaches
+the native WebGPU path only; explicit requests for how to apply fallback when
+WebGPU is unavailable route to `$threejs-compatibility-fallbacks`.
 
 ```js
 await renderer.init();
-if (renderer.backend.isWebGPUBackend) {
-  await renderer.computeAsync([buildMaterialFieldNode, buildInstanceStateNode]);
-} else {
-  useReducedMaterialTier({
-    fieldResolution: 512,
-    variants: "assets/generated-variants/",
-    dynamicDissolve: false,
-  });
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    "threejs-procedural-materials requires native WebGPU. For explicit fallback requests, route to threejs-compatibility-fallbacks.",
+  );
 }
+
+await renderer.computeAsync([buildMaterialFieldNode, buildInstanceStateNode]);
 ```
 
 Quality tiers:
@@ -93,7 +92,7 @@ Quality tiers:
 | --- | --- | --- |
 | Ultra | TSL fields, `StorageTexture` generated cause maps, `StorageInstancedBufferAttribute` dissolve/state, triplanar only where UVs cannot carry scale | desktop discrete, close inspection |
 | High | TSL fields plus packed KTX2/BasisU maps, 2-axis or single-axis projection where possible, derivative normals, per-instance attributes | desktop integrated |
-| Reduced | precomputed generated variants, lower field resolution, fewer octaves, disabled dynamic dissolve, no triplanar beyond hero assets | mobile or non-native backend |
+| Mobile | precomputed generated variants, lower field resolution, fewer octaves, static dissolve attributes, no triplanar beyond hero assets | native WebGPU mobile tier |
 
 ## Performance Budgets
 
