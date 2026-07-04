@@ -83,8 +83,7 @@ if (renderer.backend.isWebGPUBackend === true) {
 Budgeted WebGPU tiers keep the same visual contract but use smaller grids,
 fewer temporal samples, lower diagnostic resolution, or other named quality
 settings inside the WebGPU architecture. They are not second implementation
-recipes. Do not teach how to apply fallback here; route that only when the user
-explicitly asks how to apply fallback when WebGPU is unavailable.
+recipes.
 
 ## Required Evidence
 
@@ -160,6 +159,7 @@ skill such as `$threejs-procedural-planets`, `$threejs-volumetric-clouds`,
 `$threejs-spectral-ocean`, `$threejs-water-optics`, `$threejs-bloom`,
 `$threejs-ambient-contact-shading`, `$threejs-scalable-real-time-shadows`,
 `$threejs-dynamic-surface-effects`, `$threejs-procedural-vegetation`,
+`$threejs-procedural-creatures`,
 `$threejs-procedural-geometry`, `$threejs-procedural-materials`,
 `$threejs-particles-trails-and-effects`, or `$threejs-black-holes-and-space-effects`. Use this
 protocol to decide whether the result is acceptable.

@@ -97,7 +97,7 @@ const capabilities = {
 if (renderer.backend.isWebGPUBackend === true) {
   qualityTier = 'native-compute';
 } else {
-  throw new Error('WebGPU backend required for canonical visual validation. If the user explicitly asked how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.');
+  throw new Error('WebGPU backend required for canonical visual validation.');
 }
 ```
 
@@ -112,9 +112,7 @@ Do not silently lower quality until a frame looks fast enough. Record the
 preserved mechanism and the expected visual loss for every native WebGPU
 budget setting. The Node harness may emit `node-schema-fixture` only for schema
 self-tests; browser validation must replace fixture PNGs and unavailable
-backend fields with WebGPU evidence. Teaching how to apply fallback when WebGPU
-is unavailable belongs only in `../threejs-compatibility-fallbacks/` when the
-user explicitly asks for it.
+backend fields with WebGPU evidence.
 
 ## Evidence Bundle
 
@@ -153,11 +151,11 @@ required files before success:
 | File | Required fields |
 | --- | --- |
 | `visual-contract.json` | `subject`, `identity`, `invariants`, `invariantArtifacts`, `requiredImages`, `requiredDiagnostics`, `requiredMetrics`, `blockingFailures`, `frameBudgetMs`, `memoryBudgetMB` |
-| `evidence-manifest.json` | `skill`, `sceneId`, `threeRevision`, `renderer`, `backend`, `qualityTier`, `viewport`, `camera`, `seed`, `time`, `colorPipeline`, `postStack`, `thresholds`, `stochasticMasks`, `knownCompromises` |
+| `evidence-manifest.json` | `skill`, `sceneId`, `threeRevision`, `browser`, `os`, `gpuAdapter`, `renderer`, `backend`, `qualityTier`, `viewport`, `camera`, `seed`, `time`, `assets`, `colorPipeline`, `postStack`, `thresholds`, `stochasticMasks`, `knownCompromises` |
 | `renderer-info.json` | `threeRevision`, `renderer`, `isPrimaryBackend`, `coordinateSystem`, `initialized`, `outputBufferType`, `compatibilityMode`, `trackTimestamp`, `features`, `limits`, `unavailableReason`, `info` |
 | `render-targets.json` | `required`, `targets`, `totalBytes` |
 | `storage-resources.json` | `required`, `resources`, `totalBytes` |
-| `timings.json` | `required`, `warmupFrames`, `sampleFrames`, `cpuFrameMs`, `gpuFrameMs`, `gpuTimingUnavailable`, `gpuTimingLabel`, `qualityTierChanges` |
+| `timings.json` | `required`, `warmupFrames`, `sampleFrames`, `cpuFrameMs`, `gpuFrameMs`, `gpuTimingUnavailable`, `gpuTimingLabel`, `renderTimestampMs`, `computeTimestampMs`, `qualityTierChanges` |
 | `leak-loop.json` | `required`, `loops`, `summary`, `allowedCacheNotes` |
 
 Required images include `images/final.design.png`,
@@ -360,6 +358,7 @@ Every render target row must include:
 | MRT count | number and names of outputs |
 | lifetime | transient, persistent, history, capture-only |
 | memory estimate | bytes and formula |
+| readback layout | `rowBytes`, 256-byte-aligned `bytesPerRow`, and padded `byteLength` when pixels are copied from WebGPU |
 
 ### Storage resources
 

@@ -24,6 +24,9 @@ export const artifactSchemas = {
 			'skill',
 			'sceneId',
 			'threeRevision',
+			'browser',
+			'os',
+			'gpuAdapter',
 			'renderer',
 			'backend',
 			'qualityTier',
@@ -31,6 +34,7 @@ export const artifactSchemas = {
 			'camera',
 			'seed',
 			'time',
+			'assets',
 			'colorPipeline',
 			'postStack',
 			'thresholds',
@@ -73,9 +77,11 @@ export const artifactSchemas = {
 			'gpuFrameMs',
 			'gpuTimingUnavailable',
 			'gpuTimingLabel',
+			'renderTimestampMs',
+			'computeTimestampMs',
 			'qualityTierChanges'
 		],
-		nullable: [ 'gpuFrameMs' ]
+		nullable: [ 'gpuFrameMs', 'renderTimestampMs', 'computeTimestampMs' ]
 	},
 	'leak-loop.json': {
 		required: [ 'required', 'loops', 'summary', 'allowedCacheNotes' ],
@@ -101,6 +107,17 @@ const allowedQualityTiers = new Set( [
 	'native-budgeted',
 	'node-schema-fixture'
 ] );
+
+const requiredLeakLoopNames = [
+	'resize',
+	'dpr-change',
+	'quality-tier-switch',
+	'debug-mode-switch',
+	'history-reset',
+	'asset-reload',
+	'scene-teardown',
+	'dispose-recreate'
+];
 
 export function getRequiredImagePaths() {
 
@@ -137,6 +154,46 @@ function requireFiniteNumber( value, label ) {
 	if ( typeof value !== 'number' || Number.isFinite( value ) === false ) {
 
 		throw new Error( `${ label } must be a finite number.` );
+
+	}
+
+}
+
+function requireBoolean( value, label ) {
+
+	if ( typeof value !== 'boolean' ) {
+
+		throw new Error( `${ label } must be a boolean.` );
+
+	}
+
+}
+
+function requireString( value, label ) {
+
+	if ( typeof value !== 'string' || value.length === 0 ) {
+
+		throw new Error( `${ label } must be a non-empty string.` );
+
+	}
+
+}
+
+function requireStringOrNull( value, label ) {
+
+	if ( value !== null && typeof value !== 'string' ) {
+
+		throw new Error( `${ label } must be a string or null.` );
+
+	}
+
+}
+
+function requireArray( value, label ) {
+
+	if ( Array.isArray( value ) === false ) {
+
+		throw new Error( `${ label } must be an array.` );
 
 	}
 
@@ -256,6 +313,146 @@ function validateStochasticMasks( masks ) {
 
 }
 
+function validateViewport( viewport ) {
+
+	requireObject( viewport, 'evidence-manifest.json.viewport' );
+	requireKeys( viewport, [ 'width', 'height', 'dpr' ], 'evidence-manifest.json.viewport' );
+	requireFiniteNumber( viewport.width, 'evidence-manifest.json.viewport.width' );
+	requireFiniteNumber( viewport.height, 'evidence-manifest.json.viewport.height' );
+	requireFiniteNumber( viewport.dpr, 'evidence-manifest.json.viewport.dpr' );
+
+	if ( viewport.width <= 0 || viewport.height <= 0 || viewport.dpr <= 0 ) {
+
+		throw new Error( 'evidence-manifest.json.viewport values must be positive.' );
+
+	}
+
+}
+
+function validateBackendRecord( backend ) {
+
+	requireObject( backend, 'evidence-manifest.json.backend' );
+	requireKeys( backend, [
+		'isPrimaryBackend',
+		'coordinateSystem',
+		'initialized',
+		'deviceLostObserved',
+		'uncapturedErrors',
+		'features',
+		'limits',
+		'unavailableReason'
+	], 'evidence-manifest.json.backend' );
+
+	if ( backend.isPrimaryBackend !== null ) {
+
+		requireBoolean( backend.isPrimaryBackend, 'evidence-manifest.json.backend.isPrimaryBackend' );
+
+	}
+
+	requireBoolean( backend.initialized, 'evidence-manifest.json.backend.initialized' );
+	requireBoolean( backend.deviceLostObserved, 'evidence-manifest.json.backend.deviceLostObserved' );
+	requireArray( backend.uncapturedErrors, 'evidence-manifest.json.backend.uncapturedErrors' );
+
+	if ( backend.features !== null ) {
+
+		requireArray( backend.features, 'evidence-manifest.json.backend.features' );
+
+	}
+
+	if ( backend.limits !== null ) {
+
+		requireObject( backend.limits, 'evidence-manifest.json.backend.limits' );
+
+	}
+
+	if ( backend.features === null && typeof backend.unavailableReason !== 'string' ) {
+
+		throw new Error( 'evidence-manifest.json.backend needs unavailableReason when features are null.' );
+
+	}
+
+}
+
+function validateAssets( assets ) {
+
+	requireArray( assets, 'evidence-manifest.json.assets' );
+
+	for ( const asset of assets ) {
+
+		requireObject( asset, 'evidence-manifest.json.assets[]' );
+		requireKeys( asset, [ 'id' ], 'evidence-manifest.json.assets[]' );
+		requireString( asset.id, 'evidence-manifest.json.assets[].id' );
+
+		if ( Object.hasOwn( asset, 'url' ) ) {
+
+			requireString( asset.url, 'evidence-manifest.json.assets[].url' );
+
+		}
+
+		if ( Object.hasOwn( asset, 'hash' ) ) {
+
+			requireString( asset.hash, 'evidence-manifest.json.assets[].hash' );
+
+		}
+
+	}
+
+}
+
+export function getExpectedWebGPUReadbackLayout( width, height, bytesPerTexel = 4 ) {
+
+	requireFiniteNumber( width, 'readback.width' );
+	requireFiniteNumber( height, 'readback.height' );
+	requireFiniteNumber( bytesPerTexel, 'readback.bytesPerTexel' );
+
+	if ( Number.isInteger( width ) === false || Number.isInteger( height ) === false || width <= 0 || height <= 0 ) {
+
+		throw new Error( 'readback dimensions must be positive integers.' );
+
+	}
+
+	const rowBytes = width * bytesPerTexel;
+	const bytesPerRow = Math.ceil( rowBytes / 256 ) * 256;
+	const byteLength = ( ( height - 1 ) * bytesPerRow ) + rowBytes;
+
+	return { rowBytes, bytesPerRow, byteLength };
+
+}
+
+function validateReadbackLayout( target ) {
+
+	if ( Object.hasOwn( target, 'readback' ) === false ) {
+
+		return;
+
+	}
+
+	const { readback } = target;
+	requireObject( readback, `render-target ${ target.name }.readback` );
+	requireKeys( readback, [ 'rowBytes', 'bytesPerRow', 'byteLength' ], `render-target ${ target.name }.readback` );
+
+	const expected = getExpectedWebGPUReadbackLayout( target.width, target.height, readback.bytesPerTexel ?? 4 );
+
+	for ( const key of [ 'rowBytes', 'bytesPerRow', 'byteLength' ] ) {
+
+		requireFiniteNumber( readback[ key ], `render-target ${ target.name }.readback.${ key }` );
+
+		if ( Number.isInteger( readback[ key ] ) === false ) {
+
+			throw new Error( `render-target ${ target.name }.readback.${ key } must be an integer.` );
+
+		}
+
+		if ( readback[ key ] !== expected[ key ] ) {
+
+			throw new Error( `render-target ${ target.name }.readback.${ key } must match WebGPU padded row layout.` );
+
+		}
+
+	}
+
+}
+
 export function validateVisualContract( contract ) {
 
 	requireObject( contract, 'visual-contract.json' );
@@ -322,7 +519,7 @@ export function validateEvidenceManifest( manifest ) {
 
 	if ( manifest.qualityTier !== 'node-schema-fixture' && manifest.backend?.isPrimaryBackend !== true ) {
 
-		throw new Error( 'Canonical visual validation requires a WebGPU backend; route explicit WebGPU-unavailable fallback teaching elsewhere.' );
+		throw new Error( 'Canonical visual validation requires a WebGPU backend.' );
 
 	}
 
@@ -332,7 +529,14 @@ export function validateEvidenceManifest( manifest ) {
 
 	}
 
+	requireString( manifest.browser, 'evidence-manifest.json.browser' );
+	requireString( manifest.os, 'evidence-manifest.json.os' );
+	requireStringOrNull( manifest.gpuAdapter, 'evidence-manifest.json.gpuAdapter' );
+	requireString( manifest.renderer, 'evidence-manifest.json.renderer' );
+	validateBackendRecord( manifest.backend );
+	validateViewport( manifest.viewport );
 	validateCameraRecord( manifest.camera );
+	validateAssets( manifest.assets );
 	validateThresholds( manifest.thresholds );
 	validateStochasticMasks( manifest.stochasticMasks );
 
@@ -369,9 +573,28 @@ export function validateTimings( timings ) {
 
 		}
 
+		if ( timings.renderTimestampMs !== null || timings.computeTimestampMs !== null || timings.gpuFrameMs !== null ) {
+
+			throw new Error( 'CPU-only proxy timing must not carry GPU timestamp values.' );
+
+		}
+
 	} else {
 
 		assertMetricTriplet( timings.gpuFrameMs, 'timings.json.gpuFrameMs' );
+		requireFiniteNumber( timings.renderTimestampMs, 'timings.json.renderTimestampMs' );
+
+		if ( timings.gpuTimingLabel !== 'GPU timestamp' ) {
+
+			throw new Error( 'Available GPU timing must be labelled "GPU timestamp".' );
+
+		}
+
+		if ( timings.computeTimestampMs !== null ) {
+
+			requireFiniteNumber( timings.computeTimestampMs, 'timings.json.computeTimestampMs' );
+
+		}
 
 	}
 
@@ -392,6 +615,67 @@ export function validateInventories( renderTargets, storageResources ) {
 
 	}
 
+	if ( Array.isArray( renderTargets.targets ) === false || renderTargets.targets.length === 0 ) {
+
+		throw new Error( 'render-targets.json must list at least one target.' );
+
+	}
+
+	for ( const target of renderTargets.targets ) {
+
+		requireObject( target, 'render-targets.json.targets[]' );
+		requireKeys( target, [
+			'name',
+			'role',
+			'owner',
+			'width',
+			'height',
+			'dprScale',
+			'format',
+			'type',
+			'colorSpace',
+			'samples',
+			'depthStencil',
+			'mrtCount',
+			'lifetime',
+			'memoryBytes'
+		], 'render-targets.json.targets[]' );
+		requireString( target.name, 'render-targets.json.targets[].name' );
+		requireString( target.owner, `render-target ${ target.name }.owner` );
+		requireFiniteNumber( target.width, `render-target ${ target.name }.width` );
+		requireFiniteNumber( target.height, `render-target ${ target.name }.height` );
+		requireFiniteNumber( target.memoryBytes, `render-target ${ target.name }.memoryBytes` );
+		validateReadbackLayout( target );
+
+	}
+
+	if ( Array.isArray( storageResources.resources ) === false || storageResources.resources.length === 0 ) {
+
+		throw new Error( 'storage-resources.json must list storage evidence or an explicit none record.' );
+
+	}
+
+	for ( const resource of storageResources.resources ) {
+
+		requireObject( resource, 'storage-resources.json.resources[]' );
+		requireKeys( resource, [
+			'name',
+			'kind',
+			'dimensions',
+			'format',
+			'bytes',
+			'ownerDispatch',
+			'dispatchSize',
+			'workgroupAssumptions',
+			'synchronization',
+			'readbackPolicy',
+			'resetPolicy'
+		], 'storage-resources.json.resources[]' );
+		requireString( resource.name, 'storage-resources.json.resources[].name' );
+		requireFiniteNumber( resource.bytes, `storage resource ${ resource.name }.bytes` );
+
+	}
+
 	return true;
 
 }
@@ -404,6 +688,18 @@ export function validateLeakLoop( leakLoop ) {
 	if ( leakLoop.loops.length === 0 ) {
 
 		throw new Error( 'leak-loop.json must record at least one lifecycle loop.' );
+
+	}
+
+	const loopNames = new Set( leakLoop.loops.map( ( loop ) => loop.name ) );
+
+	for ( const name of requiredLeakLoopNames ) {
+
+		if ( loopNames.has( name ) === false ) {
+
+			throw new Error( `leak-loop.json is missing required lifecycle loop "${ name }".` );
+
+		}
 
 	}
 

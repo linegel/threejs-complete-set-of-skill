@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import * as THREE from 'three';
 
 import { createDiagnosticPng } from './png.js';
-import { getRequiredImagePaths, validateArtifactBundle } from './schema/artifact-schemas.js';
+import { getExpectedWebGPUReadbackLayout, getRequiredImagePaths, validateArtifactBundle } from './schema/artifact-schemas.js';
 import { r185NodePipelineImports } from './browser-webgpu-surface.js';
 
 function makeCameraRecord() {
@@ -167,6 +167,8 @@ export function createEvidenceManifest( artifactDir ) {
 
 export function createTargetInventory() {
 
+	const readback = getExpectedWebGPUReadbackLayout( 96, 64, 4 );
+
 	return {
 		required: true,
 		totalBytes: 96 * 64 * 8 * 3,
@@ -185,7 +187,8 @@ export function createTargetInventory() {
 				depthStencil: 'depth texture from scene pass',
 				mrtCount: 3,
 				lifetime: 'capture-only',
-				memoryBytes: 96 * 64 * 8
+				memoryBytes: 96 * 64 * 8,
+				readback
 			},
 			{
 				name: 'scene-normal',
@@ -201,7 +204,8 @@ export function createTargetInventory() {
 				depthStencil: 'shared scene depth',
 				mrtCount: 3,
 				lifetime: 'capture-only',
-				memoryBytes: 96 * 64 * 8
+				memoryBytes: 96 * 64 * 8,
+				readback
 			},
 			{
 				name: 'scene-emissive',
@@ -217,7 +221,8 @@ export function createTargetInventory() {
 				depthStencil: 'shared scene depth',
 				mrtCount: 3,
 				lifetime: 'capture-only',
-				memoryBytes: 96 * 64 * 8
+				memoryBytes: 96 * 64 * 8,
+				readback
 			}
 		]
 	};
@@ -248,16 +253,22 @@ export function createStorageInventory() {
 
 }
 
-export function createTimingRecord() {
+export function createTimingRecord( timestampEvidence = null ) {
+
+	const renderTimestampMs = timestampEvidence?.gpuTimingUnavailable === false && Number.isFinite( timestampEvidence.renderTimestampMs ) ? timestampEvidence.renderTimestampMs : null;
+	const computeTimestampMs = timestampEvidence?.gpuTimingUnavailable === false && Number.isFinite( timestampEvidence.computeTimestampMs ) ? timestampEvidence.computeTimestampMs : null;
+	const hasGpuTiming = renderTimestampMs !== null;
 
 	return {
 		required: true,
 		warmupFrames: 0,
 		sampleFrames: 2,
 		cpuFrameMs: { median: 0.1, p95: 0.2, unit: 'ms' },
-		gpuFrameMs: null,
-		gpuTimingUnavailable: true,
-		gpuTimingLabel: 'CPU-only proxy',
+		gpuFrameMs: hasGpuTiming ? { median: renderTimestampMs, p95: renderTimestampMs, unit: 'ms' } : null,
+		gpuTimingUnavailable: hasGpuTiming === false,
+		gpuTimingLabel: hasGpuTiming ? 'GPU timestamp' : 'CPU-only proxy',
+		renderTimestampMs,
+		computeTimestampMs,
 		readbackCaptureMs: { median: 0.3, p95: 0.5, unit: 'ms' },
 		drawCalls: 1,
 		triangles: 2,
@@ -272,27 +283,28 @@ export function createTimingRecord() {
 
 export function createLeakLoopRecord() {
 
+	const before = { rendererInfoMemory: { geometries: 0, textures: 0 }, targetBytes: createTargetInventory().totalBytes, storageBytes: 0 };
+	const makeLoop = ( name ) => ( {
+		name,
+		iterations: 2,
+		before,
+		after: before,
+		deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 },
+		thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 },
+		pass: true
+	} );
+
 	return {
 		required: true,
 		loops: [
-			{
-				name: 'resize',
-				iterations: 2,
-				before: { rendererInfoMemory: { geometries: 0, textures: 0 }, targetBytes: createTargetInventory().totalBytes, storageBytes: 0 },
-				after: { rendererInfoMemory: { geometries: 0, textures: 0 }, targetBytes: createTargetInventory().totalBytes, storageBytes: 0 },
-				deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 },
-				thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 },
-				pass: true
-			},
-			{
-				name: 'dispose-recreate',
-				iterations: 2,
-				before: { rendererInfoMemory: { geometries: 0, textures: 0 }, targetBytes: createTargetInventory().totalBytes, storageBytes: 0 },
-				after: { rendererInfoMemory: { geometries: 0, textures: 0 }, targetBytes: createTargetInventory().totalBytes, storageBytes: 0 },
-				deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 },
-				thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 },
-				pass: true
-			}
+			makeLoop( 'resize' ),
+			makeLoop( 'dpr-change' ),
+			makeLoop( 'quality-tier-switch' ),
+			makeLoop( 'debug-mode-switch' ),
+			makeLoop( 'history-reset' ),
+			makeLoop( 'asset-reload' ),
+			makeLoop( 'scene-teardown' ),
+			makeLoop( 'dispose-recreate' )
 		],
 		summary: { pass: true, uncapturedBackendErrors: [], knownInternalCacheDeltas: [] },
 		allowedCacheNotes: [ 'Node demo has no renderer-owned internal caches; browser runs must replace this with real before/after renderer.info values.' ]
@@ -306,7 +318,7 @@ async function writeJson( path, data ) {
 
 }
 
-export async function writeDefaultEvidenceBundle( artifactDir ) {
+export async function writeDefaultEvidenceBundle( artifactDir, options = {} ) {
 
 	await mkdir( join( artifactDir, 'images' ), { recursive: true } );
 
@@ -315,7 +327,7 @@ export async function writeDefaultEvidenceBundle( artifactDir ) {
 	await writeJson( join( artifactDir, 'renderer-info.json' ), createRendererInfoRecord() );
 	await writeJson( join( artifactDir, 'render-targets.json' ), createTargetInventory() );
 	await writeJson( join( artifactDir, 'storage-resources.json' ), createStorageInventory() );
-	await writeJson( join( artifactDir, 'timings.json' ), createTimingRecord() );
+	await writeJson( join( artifactDir, 'timings.json' ), createTimingRecord( options.timestampEvidence ) );
 	await writeJson( join( artifactDir, 'leak-loop.json' ), createLeakLoopRecord() );
 
 	for ( const imagePath of getRequiredImagePaths() ) {

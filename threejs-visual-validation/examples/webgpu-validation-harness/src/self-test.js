@@ -115,6 +115,59 @@ async function testGpuTimingLabelRejects() {
 
 }
 
+async function testGpuTimingTimestampRejects() {
+
+	const dir = await makeBundle();
+
+	try {
+
+		const timingsPath = join( dir, 'timings.json' );
+		const timings = JSON.parse( await readFile( timingsPath, 'utf8' ) );
+		timings.gpuTimingUnavailable = false;
+		timings.gpuTimingLabel = 'GPU timestamp';
+		timings.gpuFrameMs = { median: 0, p95: 0, unit: 'ms' };
+		timings.renderTimestampMs = null;
+		await writeJson( timingsPath, timings );
+
+		return await expectRejects(
+			'GPU timing without render timestamp',
+			() => validateArtifactBundle( dir ),
+			/renderTimestampMs/,
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
+async function testManifestRequiredFieldRejects( field ) {
+
+	const dir = await makeBundle();
+
+	try {
+
+		const manifestPath = join( dir, 'evidence-manifest.json' );
+		const manifest = await readJson( manifestPath );
+		delete manifest[ field ];
+		await writeJson( manifestPath, manifest );
+
+		return await expectRejects(
+			`missing manifest ${ field }`,
+			() => validateArtifactBundle( dir ),
+			new RegExp( field ),
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
 async function testStaleReducedTierRejects() {
 
 	const dir = await makeBundle();
@@ -191,6 +244,57 @@ async function testLeakDeltaRejects() {
 
 }
 
+async function testMissingLeakLoopRejects() {
+
+	const dir = await makeBundle();
+
+	try {
+
+		const leakPath = join( dir, 'leak-loop.json' );
+		const leakLoop = await readJson( leakPath );
+		leakLoop.loops = leakLoop.loops.filter( ( loop ) => loop.name !== 'dpr-change' );
+		await writeJson( leakPath, leakLoop );
+
+		return await expectRejects(
+			'missing DPR leak loop',
+			() => validateArtifactBundle( dir ),
+			/dpr-change/,
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
+async function testReadbackStrideRejects() {
+
+	const dir = await makeBundle();
+
+	try {
+
+		const targetsPath = join( dir, 'render-targets.json' );
+		const renderTargets = await readJson( targetsPath );
+		const target = renderTargets.targets[ 0 ];
+		target.readback.bytesPerRow = target.readback.byteLength / target.height;
+		await writeJson( targetsPath, renderTargets );
+
+		return await expectRejects(
+			'fractional readback stride',
+			() => validateArtifactBundle( dir ),
+			/readback\.bytesPerRow|padded row/,
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
 export async function runSelfTest() {
 
 	return {
@@ -199,9 +303,15 @@ export async function runSelfTest() {
 			await testFinalOnlyContractRejects(),
 			await testBlankPngRejects(),
 			await testGpuTimingLabelRejects(),
+			await testGpuTimingTimestampRejects(),
+			await testManifestRequiredFieldRejects( 'browser' ),
+			await testManifestRequiredFieldRejects( 'os' ),
+			await testManifestRequiredFieldRejects( 'assets' ),
 			await testStaleReducedTierRejects(),
 			await testManualCameraRejects(),
 			await testLeakDeltaRejects(),
+			await testMissingLeakLoopRejects(),
+			await testReadbackStrideRejects(),
 		],
 	};
 

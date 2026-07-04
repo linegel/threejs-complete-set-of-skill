@@ -19,8 +19,10 @@ Expected result: `/tmp/threejs-validation-demo` contains
 The validation script runs `src/validate.js`, which writes the bundle and then
 executes `src/self-test.js`. The self-test corrupts generated bundles and proves
 that final-only contracts, blank no-post PNGs, unlabelled CPU-only GPU timing,
-stale reduced-tier labels, manual camera evidence, and leak deltas over
-threshold are rejected.
+GPU timing without a render timestamp, missing manifest `browser` / `os` /
+`assets`, stale reduced-tier labels, manual camera evidence, leak deltas over
+threshold, missing lifecycle loops, and fractional WebGPU readback strides are
+rejected.
 
 ## Step 1 — Backend Manifest
 
@@ -80,7 +82,8 @@ Expected: timing records either GPU timestamp metrics or the exact label
 
 Inspect `leak-loop.json`.
 
-Expected: resize and dispose/recreate loops record before/after resource counts,
-deltas, thresholds, pass/fail, and allowed cache notes. A browser integration
-must replace the Node demo counts with real `renderer.info` and target/storage
-inventories.
+Expected: resize, DPR change, quality-tier switch, debug-mode switch, history
+reset, asset reload, scene teardown, and dispose/recreate loops record
+before/after resource counts, deltas, thresholds, pass/fail, and allowed cache
+notes. A browser integration must replace the Node demo counts with real
+`renderer.info` and target/storage inventories.

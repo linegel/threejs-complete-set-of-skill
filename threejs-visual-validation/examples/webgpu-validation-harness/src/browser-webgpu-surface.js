@@ -86,14 +86,22 @@ export async function resolveTimestampEvidence( renderer ) {
 
 	try {
 
-		await renderer.resolveTimestampsAsync( 'render' );
-		await renderer.resolveTimestampsAsync( 'compute' );
+		const renderTimestampMs = await renderer.resolveTimestampsAsync('render');
+		const computeTimestampMs = await renderer.resolveTimestampsAsync('compute');
+
+		if ( Number.isFinite( renderTimestampMs ) === false ) {
+
+			throw new Error( 'renderer.resolveTimestampsAsync("render") did not return a timestamp.' );
+
+		}
 
 		return {
 			gpuTimingUnavailable: false,
 			gpuTimingLabel: 'GPU timestamp',
-			renderTimestamp: renderer.info.render.timestamp ?? null,
-			computeTimestamp: renderer.info.compute.timestamp ?? null
+			renderTimestampMs,
+			computeTimestampMs: Number.isFinite( computeTimestampMs ) ? computeTimestampMs : null,
+			rendererInfoRenderTimestampMs: renderer.info.render.timestamp ?? null,
+			rendererInfoComputeTimestampMs: renderer.info.compute.timestamp ?? null
 		};
 
 	} catch ( error ) {
