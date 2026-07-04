@@ -1,13 +1,18 @@
-# Three.js WebGPU Skill Pack
+# Three.js WebGPU Skill Pack for TSL, Procedural Graphics, and Visual Validation
 
-Specialized agent skills for building ambitious Three.js scenes with a
-WebGPU- and TSL-first architecture.
+Specialized agent skills for building ambitious Three.js WebGPU scenes with a
+TSL-first architecture, procedural graphics systems, generated texture assets,
+and screenshot-backed visual validation.
 
 This is not a generic Three.js tutorial. It is a practical skill pack for
 agents that need to design, implement, debug, and validate advanced real-time
 graphics systems: atmospheres, oceans, procedural worlds, particles, camera
 rigs, post-processing pipelines, shadows, water, clouds, and GPU-backed surface
 effects.
+
+Use this repository when an agent needs current Three.js WebGPU guidance for
+procedural oceans, volumetric clouds, wet surfaces, cratered planets, procedural
+materials, vegetation, star fields, image pipelines, and reproducible visual QA.
 
 ## Why This Exists
 
@@ -107,6 +112,168 @@ system with HDR emission and bloom ownership.
 | [`threejs-particles-trails-and-effects`](threejs-particles-trails-and-effects/SKILL.md) | Particles, trails, plasma, wakes, sparks, debris, dense-swap effect pools, and scene-relative HDR emission. |
 | [`threejs-dynamic-surface-effects`](threejs-dynamic-surface-effects/SKILL.md) | Frost, thaw, touch clearing, history ping-pong, decay/diffusion masks, reduced blur, and refraction surfaces. |
 | [`threejs-black-holes-and-space-effects`](threejs-black-holes-and-space-effects/SKILL.md) | Black holes, accretion disks, wormholes, curved-ray integration, procedural star fields, and bounded space effects. |
+
+## Generated Three.js Texture Assets and Validation Screenshots
+
+Several skills include deterministic generated PNG texture variants under
+`assets/generated-variants/`. These Three.js texture assets are repeatable
+starting points for examples, diagnostics, and low-cost fallback demos; they are
+not final art direction. Agents can use these generated assets directly from the
+skill folder when that keeps a demo simple, or replace/regenerate them on
+request when the user wants a different style, resolution, channel contract, or
+domain-specific look.
+
+The contact sheet is an overview index only. The validation screenshots below
+are the reviewable evidence for the two families currently covered by
+skill-local domain gates: rain ripple normal maps and procedural planet crater
+masks.
+
+![Contact sheet of 30 deterministic Three.js generated texture assets for water caustics, ocean wave seeds, cloud weather maps, rain ripple normals, frost crystals, lava cause maps, meadow density masks, star fields, biome fields, and planet crater masks](docs/generated-asset-contact-sheet.png)
+
+| Skill | Suggested generated assets | Useful for |
+| --- | --- | --- |
+| [`threejs-water-optics`](threejs-water-optics/SKILL.md) | `caustic-field-{a,b,c}.png` | Caustic floor projection, shallow-water intensity fields, and diagnostics. |
+| [`threejs-spectral-ocean`](threejs-spectral-ocean/SKILL.md) | `directional-wave-seed-{a,b,c}.png` | Preview height/slope seeds and ocean normal-debug experiments. |
+| [`threejs-volumetric-clouds`](threejs-volumetric-clouds/SKILL.md) | `weather-map-{a,b,c}.png` | Packed RGBA coverage, cloud type/detail, vertical bias, and erosion inputs. |
+| [`threejs-rain-snow-and-wet-surfaces`](threejs-rain-snow-and-wet-surfaces/SKILL.md) | `ripple-normal-{a,b,c}.png` | RGBA `NoColorSpace` ripple normals for wet asphalt, puddles, and fallback rain tiers. |
+| [`threejs-dynamic-surface-effects`](threejs-dynamic-surface-effects/SKILL.md) | `frost-crystal-{a,b,c}.png` | Frost/thaw masks, crystalline structure targets, and refraction-normal derivation. |
+| [`threejs-procedural-materials`](threejs-procedural-materials/SKILL.md) | `lava-cause-{a,b,c}.png` | Packed rock, crack, emission, and grain cause maps for material-channel debugging. |
+| [`threejs-procedural-vegetation`](threejs-procedural-vegetation/SKILL.md) | `meadow-density-{a,b,c}.png` | Packed density, path, clump, and flower masks for grass and meadow placement. |
+| [`threejs-black-holes-and-space-effects`](threejs-black-holes-and-space-effects/SKILL.md) | `starfield-tile-{a,b,c}.png` | Tileable star/debug backgrounds for space-effect prototypes. |
+| [`threejs-procedural-fields`](threejs-procedural-fields/SKILL.md) | `biome-field-{a,b,c}.png` | Packed altitude, moisture, wear, and biome fields for CPU/GPU parity tests. |
+| [`threejs-procedural-planets`](threejs-procedural-planets/SKILL.md) | `crater-mask-{a,b,c}.png` | RGBA `NoColorSpace` crater masks for reduced-tier spherical projection and material diagnostics. |
+
+### Three.js Rain Ripple Normal Validation Screenshots
+
+The rain and wet-surfaces pilot validates generated ripple normal maps as
+`NoColorSpace` wet-surface normal data. The screenshots show dry asphalt, wet
+asphalt without ripples, wet asphalt with each ripple variant, normal-field
+diagnostics, camera-distance checks, stress views, and temporal wetness gating.
+This evidence is meant to teach how the `threejs-rain-snow-and-wet-surfaces`
+skill applies generated ripple textures to a real material response.
+
+![Three.js WebGPU rain ripple normal validation final design showing dry asphalt, wet baseline, ripple variants A B C, and normal-debug panels](docs/visual-validation/rain-generated-ripples/final.design.png)
+
+Final design: compares dry asphalt, wet asphalt without ripple normals, wet
+asphalt with each generated ripple-normal variant, and normal-map diagnostics.
+
+![Three.js WebGPU rain ripple normal validation no-post baseline showing wetness gating before and after ripple-normal contribution](docs/visual-validation/rain-generated-ripples/no-post.design.png)
+
+No-post baseline: proves the wet-surface response exists without relying on
+post-processing or a single final beauty frame.
+
+![Three.js WebGPU rain ripple normal validation diagnostics mosaic showing tiled seam stress and normal-field views for all ripple variants](docs/visual-validation/rain-generated-ripples/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes normal fields and tile-seam stress for every ripple
+variant.
+
+![Close camera screenshot of generated ripple-normal response on grazing wet asphalt in Three.js WebGPU validation](docs/visual-validation/rain-generated-ripples/camera.near.png)
+
+Near camera: checks close inspection of wet asphalt highlight response.
+
+![Design camera screenshot for generated rain ripple normal validation on wet asphalt in Three.js WebGPU](docs/visual-validation/rain-generated-ripples/camera.design.png)
+
+Design camera: repeats the authored review framing for regression comparison.
+
+![Far camera screenshot showing tiled generated ripple normal diagnostics for minified wet-surface validation](docs/visual-validation/rain-generated-ripples/camera.far.png)
+
+Far camera: checks minified and tiled ripple-normal behavior.
+
+![Seed baseline screenshot for generated Three.js rain ripple normal validation](docs/visual-validation/rain-generated-ripples/seed-0001.final.png)
+
+Seed baseline: records the fixed deterministic seed used by the evidence
+bundle.
+
+![Stress screenshot for generated Three.js rain ripple normal validation with diagnostics and tiled seam pressure](docs/visual-validation/rain-generated-ripples/seed-stress.final.png)
+
+Stress seed: increases tiling pressure so seam problems are visible.
+
+![Temporal start screenshot for generated rain ripple normals before wetness reaches the ripple contribution threshold](docs/visual-validation/rain-generated-ripples/temporal.t000.png)
+
+Temporal start: shows the wetness gate before ripple normals contribute.
+
+![Temporal response screenshot for generated rain ripple normals after wetness activates the wet-surface normal response](docs/visual-validation/rain-generated-ripples/temporal.t001.png)
+
+Temporal response: shows ripple normals only after the wetness state reaches the
+normal-response band.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/rain-generated-ripples/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/rain-generated-ripples/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/rain-generated-ripples/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/rain-generated-ripples/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/rain-generated-ripples/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/rain-generated-ripples/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/rain-generated-ripples/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/rain-generated-ripples/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/rain-generated-ripples/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/rain-generated-ripples/temporal.t001.png) |
+
+### Three.js Procedural Planet Crater Mask Validation Screenshots
+
+The procedural planet pilot validates generated crater-mask PNGs on spherical
+and close-patch terrain views. The screenshots show that crater masks are used
+as `NoColorSpace` data for projected planet material and diagnostics, not as
+flat color thumbnails. This evidence is meant to teach how the
+`threejs-procedural-planets` skill applies crater masks to spherical projection,
+height/material response, channel diagnostics, and projection stress.
+
+![Three.js procedural planet crater-mask validation final design showing crater variants on orbit-scale spheres and close terrain patches](docs/visual-validation/planet-generated-craters/final.design.png)
+
+Final design: shows each generated crater-mask variant on orbit-scale spherical
+views and close terrain patches.
+
+![Three.js procedural planet crater-mask validation no-post baseline and diagnostics view](docs/visual-validation/planet-generated-craters/no-post.design.png)
+
+No-post baseline: keeps crater interpretation reviewable without presentation
+effects hiding weak geometry or material response.
+
+![Three.js procedural planet crater-mask diagnostics mosaic showing crater channels and height-material views for generated variants](docs/visual-validation/planet-generated-craters/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes crater channel behavior and height/material views.
+
+![Close camera screenshot of generated crater-mask displacement and material response on a procedural planet patch](docs/visual-validation/planet-generated-craters/camera.near.png)
+
+Near camera: checks close crater-ring and floor/rim material response.
+
+![Design camera screenshot for generated crater masks on procedural planet validation](docs/visual-validation/planet-generated-craters/camera.design.png)
+
+Design camera: repeats the authored orbit and close-patch review framing.
+
+![Far camera screenshot showing generated crater masks surviving orbit-scale procedural planet projection](docs/visual-validation/planet-generated-craters/camera.far.png)
+
+Far camera: checks that crater masks remain legible at reduced orbit scale.
+
+![Seed baseline screenshot for generated procedural planet crater-mask validation](docs/visual-validation/planet-generated-craters/seed-0001.final.png)
+
+Seed baseline: records the deterministic crater-mask state used by the evidence
+bundle.
+
+![Projection stress screenshot for generated crater masks on procedural planet terrain diagnostics](docs/visual-validation/planet-generated-craters/seed-stress.final.png)
+
+Stress seed: exposes channel/projection behavior under diagnostic pressure.
+
+![State comparison start screenshot for generated crater-mask spherical projection validation](docs/visual-validation/planet-generated-craters/temporal.t000.png)
+
+State start: captures the lower projection-scale state.
+
+![State comparison response screenshot for generated crater-mask spherical projection stress validation](docs/visual-validation/planet-generated-craters/temporal.t001.png)
+
+State response: captures the higher projection-scale stress state for comparison.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/planet-generated-craters/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/planet-generated-craters/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/planet-generated-craters/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/planet-generated-craters/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/planet-generated-craters/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/planet-generated-craters/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/planet-generated-craters/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/planet-generated-craters/seed-stress.final.png) |
+| Temporal/state start | [temporal.t000.png](docs/visual-validation/planet-generated-craters/temporal.t000.png) |
+| Temporal/state response | [temporal.t001.png](docs/visual-validation/planet-generated-craters/temporal.t001.png) |
 
 ## Repository Layout
 

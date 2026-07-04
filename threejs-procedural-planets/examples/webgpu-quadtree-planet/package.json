@@ -1,4 +1,12 @@
 {
   "type": "module",
-  "private": true
+  "private": true,
+  "scripts": {
+    "validate": "node validate-planet.mjs && node validate-generated-craters.mjs",
+    "validate:generated-assets": "node validate-generated-craters.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
+  }
 }

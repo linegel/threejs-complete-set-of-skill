@@ -1,7 +1,12 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check constants.js && node --check webgpu-bounded-water.js && node --check index.js && node --check validate-water-contracts.mjs",
-    "validate": "node validate-water-contracts.mjs"
+    "check": "node --check constants.js && node --check webgpu-bounded-water.js && node --check index.js && node --check validate-water-contracts.mjs && node --check generated-caustics-browser.mjs && node --check validate-generated-caustics.mjs",
+    "validate": "node validate-water-contracts.mjs && node validate-generated-caustics.mjs",
+    "validate:generated-assets": "node validate-generated-caustics.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
   }
 }

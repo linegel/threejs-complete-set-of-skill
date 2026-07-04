@@ -1,6 +1,11 @@
 {
   "type": "module",
   "scripts": {
-    "validate": "node validate.js"
+    "validate": "node validate.js && node validate-generated-ripples.mjs",
+    "validate:generated-assets": "node validate-generated-ripples.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
   }
 }

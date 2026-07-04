@@ -179,6 +179,71 @@ export function decodeGeneratedRgbaPng( buffer ) {
 
 }
 
+export function decodeGeneratedRgbaPixels( buffer ) {
+
+	const { width, height, raw } = decodeGeneratedRgbaPng( buffer );
+	const bytesPerPixel = 4;
+	const rowBytes = width * bytesPerPixel;
+	const scanlineLength = 1 + rowBytes;
+	const pixels = Buffer.alloc( rowBytes * height );
+
+	for ( let y = 0; y < height; y ++ ) {
+
+		const rowOffset = y * scanlineLength;
+		const filter = raw[ rowOffset ];
+		const sourceOffset = rowOffset + 1;
+		const targetOffset = y * rowBytes;
+		const previousOffset = targetOffset - rowBytes;
+
+		for ( let x = 0; x < rowBytes; x ++ ) {
+
+			const source = raw[ sourceOffset + x ];
+			const left = x >= bytesPerPixel ? pixels[ targetOffset + x - bytesPerPixel ] : 0;
+			const up = y > 0 ? pixels[ previousOffset + x ] : 0;
+			const upLeft = y > 0 && x >= bytesPerPixel ? pixels[ previousOffset + x - bytesPerPixel ] : 0;
+			let value;
+
+			if ( filter === 0 ) {
+
+				value = source;
+
+			} else if ( filter === 1 ) {
+
+				value = source + left;
+
+			} else if ( filter === 2 ) {
+
+				value = source + up;
+
+			} else if ( filter === 3 ) {
+
+				value = source + Math.floor( ( left + up ) / 2 );
+
+			} else if ( filter === 4 ) {
+
+				const p = left + up - upLeft;
+				const pa = Math.abs( p - left );
+				const pb = Math.abs( p - up );
+				const pc = Math.abs( p - upLeft );
+				const predictor = pa <= pb && pa <= pc ? left : pb <= pc ? up : upLeft;
+				value = source + predictor;
+
+			} else {
+
+				throw new Error( `Unsupported PNG row filter ${ filter }.` );
+
+			}
+
+			pixels[ targetOffset + x ] = value & 0xff;
+
+		}
+
+	}
+
+	return { width, height, pixels };
+
+}
+
 export function assertNonBlankGeneratedPng( buffer, pathLabel = 'PNG' ) {
 
 	const { width, height, raw } = decodeGeneratedRgbaPng( buffer );
