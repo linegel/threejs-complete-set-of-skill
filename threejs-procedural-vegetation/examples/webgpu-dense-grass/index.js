@@ -1,0 +1,15 @@
+export {
+  DEFAULT_BLADE_SEGMENTS,
+  DEFAULT_BLADES_PER_PATCH,
+  DEFAULT_PATCH_SIZE,
+  DenseGrassSystem,
+  createDebugGroundPlane,
+  createWebGPUDenseGrassSystem,
+  denseGrassQualityTiers,
+  loadMeadowDensityMask,
+  meadowDensityMaskPaths,
+  validateDenseGrassCapabilities,
+  validateDenseGrassConfig,
+  validateDenseGrassSystem,
+  webgpuDenseGrassDebugModes,
+} from "./dense-grass-system.js";
