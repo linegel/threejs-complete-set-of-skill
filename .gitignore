@@ -5,3 +5,12 @@ artifacts/
 .agent/
 __pycache__/
 *.log
+
+# Development scaffolding kept local-only, not part of the published skill set
+plan.md
+review.md
+agents/
+ASSET_VARIANT_REVIEW.md
+FINAL_REPORT.md
+IMPROVEMENT_PLAN.md
+SKILL_QUALITY_BAR.md
