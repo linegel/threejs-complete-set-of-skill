@@ -58,13 +58,17 @@ initialization:
 ```js
 await renderer.init();
 
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: MRT emissive-output selective bloom through RenderPipeline.
-} else {
-  // Reduced tier: smaller authored contribution maps, static glow assets,
-  // lower bloom resolution, or bloom disabled. Do not build a parallel renderer.
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error(
+    'WebGPU backend required for threejs-bloom. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.'
+  );
 }
+
+// WebGPU tiers may reduce bloomScale, pixelRatioCap, contributor count, or
+// disable bloom while preserving a readable base scene.
 ```
+
+Legacy WebGL implementation (deprecated, do not extend): none in this skill folder; explicit fallback requests route to `$threejs-compatibility-fallbacks`.
 
 ## Failure Conditions
 

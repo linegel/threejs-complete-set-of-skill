@@ -47,7 +47,7 @@ export const QUALITY_TIERS = Object.freeze( {
 		bloomScale: 0.25,
 		sceneScale: 1,
 		pixelRatioCap: 1,
-		contributionMode: 'authored-static-or-disabled',
+		contributionMode: 'disabled-in-reduced-tier',
 		dynamicContribution: false,
 		maxSparkCount: 6
 	}
@@ -216,7 +216,8 @@ function nodeSpriteMaterial( {
 	material.opacityNode = float( alpha );
 	material.emissiveNode = color( emissiveColor ).mul( float( emissiveIntensity ) );
 	material.mrtNode = mrt( {
-		emissive: vec4( color( emissiveColor ).mul( float( emissiveIntensity ) ), alpha )
+		emissive: vec4( color( emissiveColor ).mul( float( emissiveIntensity ) ), alpha ),
+		transparentEmitter: vec4( color( emissiveColor ).mul( float( emissiveIntensity ) ), alpha )
 	} );
 	material.userData.transparentEmitterPolicy = {
 		id: 'transparent-emitter',
@@ -394,7 +395,7 @@ export function selectBloomPipelineMode( {
 		dynamicMrt,
 		liveBloom: dynamicMrt,
 		isWebGPUBackend,
-		contributionPolicy: dynamicMrt ? 'mrt-emissive' : 'static-or-disabled',
+		contributionPolicy: dynamicMrt ? 'mrt-emissive' : 'disabled-in-reduced-tier',
 		budgetReason: dynamicMrt ? [] : [ 'dynamic MRT emissive bloom disabled for reduced WebGPU tier' ]
 	};
 
@@ -546,7 +547,8 @@ export async function createNodeSelectiveBloomExample( {
 
 		scenePass.setMRT( mrt( {
 			output,
-			emissive
+			emissive,
+			transparentEmitter: vec4( 0, 0, 0, 0 )
 		} ) );
 
 	}
@@ -568,6 +570,9 @@ export async function createNodeSelectiveBloomExample( {
 
 	}
 	const bloomOutput = bloomPass === null ? sceneColor.mul( float( 0 ) ) : bloomPass.getTextureNode();
+	const transparentEmitterContribution = quality.dynamicMrt === true
+		? scenePass.getTextureNode( 'transparentEmitter' )
+		: sceneColor.mul( float( 0 ) );
 	const preToneMapLuminance = luminance( sceneColor.rgb );
 	const falseColorLuminance = vec4(
 		preToneMapLuminance,
@@ -576,7 +581,6 @@ export async function createNodeSelectiveBloomExample( {
 		1
 	);
 	const resolutionScaleOverlay = sceneColor.mul( float( 0.65 ) ).add( vec4( vec3( float( quality.bloomScale ) ), 1 ).mul( float( 0.35 ) ) );
-	const transparentEmitterContribution = quality.dynamicMrt === true ? emissiveContribution : sceneColor.mul( float( 0 ) );
 
 	const pipelineNodes = {
 		sceneColor,
@@ -600,7 +604,7 @@ export async function createNodeSelectiveBloomExample( {
 		renderer.setPixelRatio( pixelRatio );
 		renderer.setSize( width, height, false );
 		scenePass.setSize( width, height );
-		bloomPass.setSize( width, height );
+		if ( bloomPass !== null ) bloomPass.setSize( width, height );
 
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();

@@ -130,19 +130,18 @@ backend path:
 ```js
 await renderer.init();
 
-const quality = renderer.backend.isWebGPUBackend
-  ? {
-      name: 'full',
-      bloomScale: 0.5,
-      contributionMode: 'mrt-emissive',
-      dynamicContribution: true
-    }
-  : {
-      name: 'reduced',
-      bloomScale: 0.25,
-      contributionMode: 'authored-static-or-disabled',
-      dynamicContribution: false
-    };
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error(
+    'WebGPU backend required for threejs-bloom. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.'
+  );
+}
+
+const quality = {
+  name: 'full',
+  bloomScale: 0.5,
+  contributionMode: 'mrt-emissive',
+  dynamicContribution: true
+};
 ```
 
 Quality tiers:
@@ -157,14 +156,14 @@ balanced:
   fewer transparent contribution surfaces.
 
 reduced:
-  static glow cards or generated contribution textures,
-  bloomScale 0.25-0.33, static emissive hierarchy, optional bloom disable.
+  same WebGPU renderer and readable base scene,
+  bloomScale 0.25-0.33, fewer transparent contributors, optional bloom disable.
 ```
 
-The reduced tier is a quality reduction, not a second renderer recipe. Prefer
-static contribution detail, smaller transparent effect counts, or a disabled
-bloom node with the base scene still readable. Broad compatibility assets or
-explicit requests for how to apply fallback when WebGPU is unavailable belong in `../threejs-compatibility-fallbacks/`.
+Reduced is a WebGPU quality tier, not a non-WebGPU recipe. Prefer lower
+resolution, smaller transparent effect counts, or a disabled bloom node with
+the base scene still readable. If the user explicitly asks how to apply
+fallback when WebGPU is unavailable, route to `../threejs-compatibility-fallbacks/`.
 
 ## Signal order and color ownership
 
@@ -304,8 +303,8 @@ mobile: <= 2.0 ms at 720p-1080p with bloomScale 0.25-0.33
 ```
 
 If a target misses budget, reduce algorithmic cost first: lower bloom
-resolution, narrow the contribution target, reduce transparent emitters, or use
-static contribution textures. Do not add a second scene render to regain
+resolution, narrow the contribution target, reduce transparent emitters, or
+disable bloom in reduced tier. Do not add a second scene render to regain
 selectivity.
 
 ## Replaced techniques
@@ -369,6 +368,6 @@ Acceptance checks:
 - threshold and smooth width are tuned before tone mapping;
 - radius remains visually stable across resize and pixel-ratio caps;
 - the full tier meets the scene-render multiplier of 1x;
-- reduced tiers degrade gracefully through resolution or authored assets, not
+- reduced tiers degrade gracefully through resolution or bloom disable, not
   a parallel renderer;
 - final output has exactly one tone-map and output color conversion owner.

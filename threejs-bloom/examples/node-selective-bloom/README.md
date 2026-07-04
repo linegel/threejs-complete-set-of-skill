@@ -64,7 +64,7 @@ balanced:
   bloomScale 0.33, pixelRatioCap 1.5, fewer transparent/effect contributors
 
 reduced:
-  bloomScale 0.25, pixelRatioCap 1, dynamicMrt false, authored-static-or-disabled contribution policy
+  bloomScale 0.25, pixelRatioCap 1, dynamicMrt false, disabled-in-reduced-tier contribution policy
 ```
 
 The reduced tier is a quality reduction with `dynamicMrt:false`; it keeps the base scene readable without a live MRT-dependent bloom path.
