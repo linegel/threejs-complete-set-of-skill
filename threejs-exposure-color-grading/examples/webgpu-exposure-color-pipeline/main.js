@@ -46,6 +46,11 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 	renderer.toneMapping = NoToneMapping;
 	renderer.toneMappingExposure = 1;
 	await renderer.init();
+	if ( renderer.backend.isWebGPUBackend !== true ) {
+
+		throw new Error( 'WebGPU backend unavailable for the canonical exposure path; route fallback teaching to threejs-compatibility-fallbacks.' );
+
+	}
 
 	const scene = new Scene();
 	scene.background = new Color( 0x05070a );
@@ -86,14 +91,22 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		histogramBins: HISTOGRAM_BINS
 	} );
 	const partialBuffer = options.partialBuffer ?? new StorageBufferAttribute( storageBytes.partialCount, 4, Float32Array );
-	const exposureStateBuffer = options.exposureStateBuffer ?? new StorageBufferAttribute( 2, 4, Float32Array );
+	const exposureFloatStateBuffer = options.exposureFloatStateBuffer ?? new StorageBufferAttribute( 1, 4, Float32Array );
+	const exposureUintStateBuffer = options.exposureUintStateBuffer ?? new StorageBufferAttribute( 1, 4, Uint32Array );
 	const histogramBuffer = options.histogramBuffer ?? new StorageBufferAttribute( HISTOGRAM_BINS, 1, Uint32Array );
+	exposureFloatStateBuffer.array.set( [ 0.18, 1, 1, 0 ] );
+	exposureUintStateBuffer.array.set( [ 1, HISTOGRAM_BINS, 0, 0 ] );
 
 	const exposureNodes = createExposureReductionNodes( {
+		hdrTextureNode: hdrColor,
+		meterMaskNode: options.meterMask ?? null,
+		meterWidth: METER_WIDTH,
+		meterHeight: METER_HEIGHT,
 		pixelCount,
 		workgroupSize,
 		partialBuffer,
-		exposureStateBuffer,
+		exposureFloatStateBuffer,
+		exposureUintStateBuffer,
 		histogramBuffer,
 		histogramBins: HISTOGRAM_BINS
 	} );
@@ -103,9 +116,10 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		lutTexture,
 		lutSize: lutTexture.image.width,
 		mapping: options.toneMapping ?? NeutralToneMapping,
-		outputColorSpace: renderer.outputColorSpace
+		outputColorSpace: renderer.outputColorSpace,
+		exposureState: exposureNodes.state
 	} );
-	const postToneMapLinear = toneMapping( options.toneMapping ?? NeutralToneMapping, 1, hdrColor );
+	const postToneMapLinear = toneMapping( options.toneMapping ?? NeutralToneMapping, 1, hdrColor.mul( exposureNodes.state.floatState.element( 0 ).z ) );
 
 	renderPipeline.outputColorTransform = false;
 	renderPipeline.outputNode = finalNode;
@@ -126,7 +140,8 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		normal,
 		storageBuffers: {
 			partialBuffer,
-			exposureStateBuffer,
+			exposureFloatStateBuffer,
+			exposureUintStateBuffer,
 			histogramBuffer
 		},
 		ownership: {
@@ -141,8 +156,11 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 
 	function render( deltaSeconds = 1 / 60 ) {
 
-		void deltaSeconds;
+		exposureNodes.deltaSecondsNode.value = deltaSeconds;
 		mesh.rotation.y += 0.004;
+		renderer.compute( exposureNodes.reduceHdrToPartials );
+		renderer.compute( exposureNodes.reducePartialsToAggregate );
+		renderer.compute( exposureNodes.resolveExposureState );
 		renderPipeline.render();
 
 	}
@@ -153,7 +171,8 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		material.dispose();
 		lutTexture.dispose();
 		partialBuffer.dispose?.();
-		exposureStateBuffer.dispose?.();
+		exposureFloatStateBuffer.dispose?.();
+		exposureUintStateBuffer.dispose?.();
 		histogramBuffer.dispose?.();
 		renderPipeline.dispose?.();
 		renderer.dispose();

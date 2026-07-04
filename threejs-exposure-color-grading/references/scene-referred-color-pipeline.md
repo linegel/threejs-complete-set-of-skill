@@ -42,7 +42,19 @@ only for compact telemetry readback, not to drive the current frame.
 Complete r185 import/API skeleton:
 
 ```js
-import * as THREE from 'three/webgpu';
+import {
+  ACESFilmicToneMapping,
+  AgXToneMapping,
+  ColorManagement,
+  Data3DTexture,
+  HalfFloatType,
+  LinearSRGBColorSpace,
+  NeutralToneMapping,
+  NoColorSpace,
+  NoToneMapping,
+  Vector3,
+  WebGPURenderer
+} from 'three/webgpu';
 import {
   Fn,
   mrt,
@@ -56,26 +68,27 @@ import {
   workgroupArray,
   workgroupBarrier
 } from 'three/tsl';
-import {
-  acesFilmicToneMapping,
-  agxToneMapping,
-  neutralToneMapping
-} from 'three/tsl';
 import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';
 
-const renderer = new THREE.WebGPURenderer( {
+const renderer = new WebGPURenderer( {
   antialias: false,
-  outputBufferType: THREE.HalfFloatType
+  outputBufferType: HalfFloatType
 } );
-renderer.toneMapping = THREE.NoToneMapping;
+renderer.toneMapping = NoToneMapping;
 
-const lutTexture = new THREE.Data3DTexture();
-lutTexture.colorSpace = THREE.NoColorSpace;
+const toneMappingModes = {
+  neutral: NeutralToneMapping,
+  agx: AgXToneMapping,
+  aces: ACESFilmicToneMapping
+};
+
+const lutTexture = new Data3DTexture();
+lutTexture.colorSpace = NoColorSpace;
 
 const luminanceCoefficients =
-  THREE.ColorManagement.getLuminanceCoefficients(
-    new THREE.Vector3(),
-    THREE.LinearSRGBColorSpace
+  ColorManagement.getLuminanceCoefficients(
+    new Vector3(),
+    LinearSRGBColorSpace
   );
 ```
 
@@ -268,9 +281,9 @@ Tone-mapper selection:
 
 | Mapping | Use |
 | --- | --- |
-| `neutralToneMapping` / Neutral mapping | Product/PBR color fidelity and stable swatch validation |
-| `agxToneMapping` / AgX mapping | Neutral filmic rolloff with fewer hue surprises |
-| `acesFilmicToneMapping` / ACES mapping | Cinematic contrast with known hue/saturation tradeoffs |
+| `NeutralToneMapping` | Product/PBR color fidelity and stable swatch validation |
+| `AgXToneMapping` | Neutral filmic rolloff with fewer hue surprises |
+| `ACESFilmicToneMapping` | Cinematic contrast with known hue/saturation tradeoffs |
 | `linearToneMapping`, `reinhardToneMapping`, `cineonToneMapping` | Only when the project has an explicit look target or prior calibration |
 
 If the LUT must move before tone mapping, rebuild it for a scene-linear or log

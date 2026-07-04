@@ -9,7 +9,8 @@ export const SPEED_UP = 3.2;
 export const SPEED_DOWN = 1.1;
 export const STALE_TIMEOUT_SECONDS = 1.0;
 export const EXPOSURE_PARTIAL_FLOATS = 4;
-export const EXPOSURE_STATE_FLOATS = 8;
+export const EXPOSURE_STATE_FLOATS = 4;
+export const EXPOSURE_STATE_UINTS = 4;
 export const LINEAR_SRGB_LUMINANCE_COEFFICIENTS = Object.freeze( [ 0.2126, 0.7152, 0.0722 ] );
 
 export function luminanceLinearSRGB( rgb, coefficients = LINEAR_SRGB_LUMINANCE_COEFFICIENTS ) {
@@ -94,9 +95,9 @@ export function estimateExposureStorageBytes( pixelCount = METER_WIDTH * METER_H
 	return {
 		partialCount,
 		partialsBytes: partialCount * EXPOSURE_PARTIAL_FLOATS * 4,
-		stateBytes: EXPOSURE_STATE_FLOATS * 4,
+		stateBytes: ( EXPOSURE_STATE_FLOATS + EXPOSURE_STATE_UINTS ) * 4,
 		histogramBytes: histogramBins * 4,
-		totalBytes: partialCount * EXPOSURE_PARTIAL_FLOATS * 4 + EXPOSURE_STATE_FLOATS * 4 + histogramBins * 4
+		totalBytes: partialCount * EXPOSURE_PARTIAL_FLOATS * 4 + ( EXPOSURE_STATE_FLOATS + EXPOSURE_STATE_UINTS ) * 4 + histogramBins * 4
 	};
 
 }

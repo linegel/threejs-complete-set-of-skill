@@ -1,4 +1,6 @@
 import {
+	EXPOSURE_STATE_FLOATS,
+	EXPOSURE_STATE_UINTS,
 	HISTOGRAM_BINS,
 	MAX_EXPOSURE,
 	METER_HEIGHT,
@@ -22,6 +24,7 @@ import {
 } from './debug-views.js';
 import {
 	EXPOSURE_PARTIAL_STRUCT,
+	EXPOSURE_STATE_BUFFER_LAYOUT,
 	EXPOSURE_STATE_STRUCT,
 	apiSkeletonImports,
 	createExposureReductionNodes,
@@ -29,11 +32,51 @@ import {
 } from './exposure-nodes.js';
 import { createExposureColorPipeline } from './main.js';
 import { createIdentityLutData, sampleIdentityLutNearest } from './lut.js';
-import { StorageBufferAttribute } from 'three/webgpu';
+import {
+	DataTexture,
+	FloatType,
+	RGBAFormat,
+	StorageBufferAttribute
+} from 'three/webgpu';
+import { texture } from 'three/tsl';
+import { readFileSync } from 'node:fs';
+
+const EXAMPLE_ROOT = new URL( './', import.meta.url );
 
 function assert( condition, message ) {
 
 	if ( ! condition ) throw new Error( message );
+
+}
+
+function readExampleSource( path ) {
+
+	return readFileSync( new URL( path, EXAMPLE_ROOT ), 'utf8' );
+
+}
+
+function expectRejects( callback, message ) {
+
+	try {
+
+		callback();
+
+	} catch ( error ) {
+
+		return error.message;
+
+	}
+
+	throw new Error( message );
+
+}
+
+function createValidationTextureNode() {
+
+	const data = new Float32Array( [ 0.18, 0.18, 0.18, 1 ] );
+	const map = new DataTexture( data, 1, 1, RGBAFormat, FloatType );
+	map.needsUpdate = true;
+	return texture( map );
 
 }
 
@@ -210,6 +253,9 @@ function validateExposureStructContracts() {
 
 	assert( partialFields.length * 4 === 16, 'ExposurePartial must remain 16 bytes.' );
 	assert( stateFields.length * 4 === 32, 'ExposureState must remain 32 bytes.' );
+	assert( EXPOSURE_STATE_FLOATS === 4 && EXPOSURE_STATE_UINTS === 4, 'ExposureState implementation must be split into four float and four uint fields.' );
+	assert( EXPOSURE_STATE_BUFFER_LAYOUT.floatState.includes( 'average, target, current, staleSeconds' ), 'Float state layout must name exposure float fields.' );
+	assert( EXPOSURE_STATE_BUFFER_LAYOUT.uintState.includes( 'valid, histogramOffset, frameIndex, flags' ), 'Uint state layout must name exposure flag fields.' );
 
 	return { partialFields, stateFields };
 
@@ -231,23 +277,113 @@ function validateReductionNodeConstruction() {
 
 	const pixelCount = METER_WIDTH * METER_HEIGHT;
 	const storage = estimateExposureStorageBytes( pixelCount );
+	const hdrTextureNode = createValidationTextureNode();
+	const meterMaskNode = createValidationTextureNode();
+	const exposureFloatStateBuffer = new StorageBufferAttribute( 1, 4, Float32Array );
+	const exposureUintStateBuffer = new StorageBufferAttribute( 1, 4, Uint32Array );
 	const nodes = createExposureReductionNodes( {
+		hdrTextureNode,
+		meterMaskNode,
 		pixelCount,
 		workgroupSize: WORKGROUP_SIZE,
 		partialBuffer: new StorageBufferAttribute( storage.partialCount, 4, Float32Array ),
-		exposureStateBuffer: new StorageBufferAttribute( 2, 4, Float32Array ),
+		exposureFloatStateBuffer,
+		exposureUintStateBuffer,
 		histogramBuffer: new StorageBufferAttribute( HISTOGRAM_BINS, 1, Uint32Array ),
 		histogramBins: HISTOGRAM_BINS
 	} );
 
 	assert( nodes.structs.length === 2, 'Reduction node contract must expose partial and state structs.' );
-	assert( nodes.partials && nodes.state && nodes.histogram, 'Reduction node contract must expose storage nodes.' );
-	assert( nodes.reduceHdrToPartials && nodes.resolveExposureState, 'Reduction node contract must expose compute nodes.' );
+	assert( nodes.partials && nodes.state && nodes.floatState && nodes.uintState && nodes.histogram, 'Reduction node contract must expose typed storage nodes.' );
+	assert( exposureFloatStateBuffer.array instanceof Float32Array, 'Exposure float state must use Float32Array storage.' );
+	assert( exposureUintStateBuffer.array instanceof Uint32Array, 'Exposure uint state must use Uint32Array storage.' );
+	assert( nodes.reduceHdrToPartials && nodes.reducePartialsToAggregate && nodes.resolveExposureState, 'Reduction node contract must expose reduce, aggregate, and resolve compute nodes.' );
 
 	return {
 		structs: nodes.structs.length,
 		hasStorageNodes: true,
-		hasComputeNodes: true
+		hasComputeNodes: true,
+		floatStateType: exposureFloatStateBuffer.array.constructor.name,
+		uintStateType: exposureUintStateBuffer.array.constructor.name
+	};
+
+}
+
+function assertReductionSourceContract( source ) {
+
+	const requiredTokens = [
+		'hdrTextureNode',
+		'meterMaskNode',
+		'hdrTextureNode.sample',
+		'meterMaskNode.sample',
+		'dot( hdrSample, luminanceCoefficients )',
+		"workgroupArray( 'vec4', workgroupSize )",
+		'partials.element( partialIndex ).assign',
+		'reducePartialsToAggregate',
+		'floatState.element( 0 ).assign',
+		'uintState.element( 0 ).assign',
+		'histogram.element( 0 ).assign'
+	];
+
+	for ( const token of requiredTokens ) {
+
+		assert( source.includes( token ), `Reduction source missing ${ token }.` );
+
+	}
+
+	assert( ! /localPartials\.element\( 0 \)\.assign\( vec4\( 0, 0, 99, -99 \) \);\s*workgroupBarrier\(\);/.test( source ), 'Reduction source must not be the old no-op workgroup stub.' );
+	assert( ! source.includes( 'const postToneMapLinear = toneMapping( mapping, 1, hdrColor );' ), 'Output node must not tone-map raw HDR without current exposure.' );
+	assert( source.includes( 'const currentExposure = exposureState.floatState.element( 0 ).z;' ), 'Output node must read current exposure from typed state storage.' );
+	assert( source.includes( 'toneMapping( mapping, 1, exposedHdr )' ), 'Output node must tone-map HDR after adapted exposure.' );
+
+	return true;
+
+}
+
+function assertMainSourceContract( source ) {
+
+	assert( source.includes( 'renderer.backend.isWebGPUBackend !== true' ), 'main.js must gate after renderer.init().' );
+	assert( source.includes( 'threejs-compatibility-fallbacks' ), 'Backend gate must route fallback teaching to threejs-compatibility-fallbacks.' );
+	assert( source.match( /renderer\.compute\( exposureNodes\./g )?.length === 3, 'render() must dispatch reduce, aggregate, and resolve compute nodes.' );
+	assert( source.includes( 'exposureFloatStateBuffer' ) && source.includes( 'exposureUintStateBuffer' ), 'main.js must allocate split typed exposure state buffers.' );
+	assert( ! source.includes( 'new StorageBufferAttribute( 2, 4, Float32Array )' ), 'main.js must not store mixed ExposureState as two float vec4s.' );
+
+	return true;
+
+}
+
+function assertReferenceToneMappingContract( source ) {
+
+	assert( source.includes( 'NeutralToneMapping' ), 'Reference skeleton must import numeric tone mapping constants.' );
+	assert( source.includes( 'AgXToneMapping' ), 'Reference skeleton must import AgX numeric tone mapping constant.' );
+	assert( source.includes( 'ACESFilmicToneMapping' ), 'Reference skeleton must import ACES numeric tone mapping constant.' );
+	assert( ! /neutralToneMapping[\s\S]*agxToneMapping[\s\S]*acesFilmicToneMapping[\s\S]*from 'three\/tsl'/.test( source ), 'Reference skeleton must not pass lower-case TSL functions as toneMapping() mapping constants.' );
+
+	return true;
+
+}
+
+function validateSourceContractsRejectKnownDefects() {
+
+	const exposureNodesSource = readExampleSource( 'exposure-nodes.js' );
+	const mainSource = readExampleSource( 'main.js' );
+	const referenceSource = readFileSync( new URL( '../../references/scene-referred-color-pipeline.md', EXAMPLE_ROOT ), 'utf8' );
+
+	assertReductionSourceContract( exposureNodesSource );
+	assertMainSourceContract( mainSource );
+	assertReferenceToneMappingContract( referenceSource );
+
+	const rejected = [
+		expectRejects( () => assertReductionSourceContract( "const reduceHdrToPartials = Fn(() => { const localPartials = workgroupArray( 'vec4', workgroupSize ); localPartials.element( 0 ).assign( vec4( 0, 0, 99, -99 ) );\\n\\t\\tworkgroupBarrier(); })();" ), 'Old no-op reduction fixture unexpectedly passed.' ),
+		expectRejects( () => assertReductionSourceContract( 'const postToneMapLinear = toneMapping( mapping, 1, hdrColor );' ), 'Raw-HDR tone mapping fixture unexpectedly passed.' ),
+		expectRejects( () => assertMainSourceContract( 'await renderer.init(); renderPipeline.render();' ), 'Missing compute dispatch fixture unexpectedly passed.' ),
+		expectRejects( () => assertMainSourceContract( 'const exposureStateBuffer = new StorageBufferAttribute( 2, 4, Float32Array ); renderer.compute( exposureNodes.reduceHdrToPartials ); renderer.compute( exposureNodes.reducePartialsToAggregate ); renderer.compute( exposureNodes.resolveExposureState );' ), 'Mixed float ExposureState fixture unexpectedly passed.' ),
+		expectRejects( () => assertReferenceToneMappingContract( "import {\\n  acesFilmicToneMapping,\\n  agxToneMapping,\\n  neutralToneMapping\\n} from 'three/tsl';" ), 'Lower-case tone-mapping fixture unexpectedly passed.' )
+	];
+
+	return {
+		checked: [ 'exposure-nodes.js', 'main.js', 'references/scene-referred-color-pipeline.md' ],
+		rejectedFixtures: rejected.length
 	};
 
 }
@@ -310,7 +446,8 @@ export function runExposureValidation() {
 		structContracts: validateExposureStructContracts(),
 		readbackPolicy: validateReadbackPolicy(),
 		reductionNodeConstruction: validateReductionNodeConstruction(),
-		debugCheckpointContract: validateDebugCheckpointContract()
+		debugCheckpointContract: validateDebugCheckpointContract(),
+		sourceContracts: validateSourceContractsRejectKnownDefects()
 	};
 
 	try {
