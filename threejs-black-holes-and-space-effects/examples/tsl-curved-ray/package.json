@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "scripts": {
+    "check": "node --check curved-ray-accretion.js && node --check main.mjs && node --check validate-curved-ray-contracts.mjs && node --check validate-transform-contracts.mjs && node --check validate-wormhole-reference-rays.mjs && node --check validate-temporal-history.mjs",
+    "smoke": "node main.mjs --smoke",
+    "validate": "node validate-curved-ray-contracts.mjs && node validate-transform-contracts.mjs && node validate-wormhole-reference-rays.mjs && node validate-temporal-history.mjs && node main.mjs --smoke",
+    "serve": "python3 -m http.server 4173 --bind 127.0.0.1 -d ../../.."
+  }
+}
