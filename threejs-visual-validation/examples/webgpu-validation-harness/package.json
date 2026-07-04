@@ -1,0 +1,12 @@
+{
+  "name": "threejs-webgpu-validation-harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node src/validate.js",
+    "check": "node --check src/*.js src/schema/*.js && node --input-type=module -e \"await import('./src/browser-webgpu-surface.js')\""
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}
