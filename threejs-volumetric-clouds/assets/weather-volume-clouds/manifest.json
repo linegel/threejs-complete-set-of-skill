@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "jeantimex/geospatial cloud texture assets",
+    "repository": "https://github.com/jeantimex/geospatial",
+    "revision": "d166316ad38f9a21f6d7a3293b808bc7f920283e",
+    "license": "MIT",
+    "licenseFile": "THIRD_PARTY_LICENSES.md"
+  },
+  "assets": [
+    {
+      "id": "local-weather",
+      "path": "local_weather.png",
+      "kind": "weather-map",
+      "width": 512,
+      "height": 512,
+      "channels": "rgba8",
+      "channelSemantics": {
+        "r": "low-cloud Worley FBM",
+        "g": "middle-cloud Worley FBM",
+        "b": "high-cloud anisotropic Perlin",
+        "a": "auxiliary variation mask"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "byteLength": 679653,
+      "sha256": "b84daef855dc5eebcc9b174fe832ba75a98e44b846dde201bce354417cc08031"
+    },
+    {
+      "id": "turbulence",
+      "path": "turbulence.png",
+      "kind": "curl-field",
+      "width": 128,
+      "height": 128,
+      "channels": "rgba8",
+      "channelSemantics": {
+        "rgb": "normalized curl displacement field",
+        "a": "unused"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "byteLength": 49691,
+      "sha256": "ec2b1b0af4a6a6104102b21e58beb300b0a3d334c0281d84fde8c91d322910f9"
+    },
+    {
+      "id": "shape",
+      "path": "shape.bin",
+      "kind": "base-shape-volume",
+      "width": 128,
+      "height": 128,
+      "depth": 128,
+      "channels": "r8",
+      "channelSemantics": {
+        "r": "Perlin-Worley base cloud shape"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "typedArray": "Uint8Array",
+      "byteLength": 2097152,
+      "sha256": "ef65cf6156894720c00bf572c49e3e254f8899c4b5158246e5a35a1922e2519c"
+    },
+    {
+      "id": "shape-detail",
+      "path": "shape_detail.bin",
+      "kind": "detail-volume",
+      "width": 32,
+      "height": 32,
+      "depth": 32,
+      "channels": "r8",
+      "channelSemantics": {
+        "r": "Worley-only height-dependent erosion detail"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "typedArray": "Uint8Array",
+      "byteLength": 32768,
+      "sha256": "c09112199c6e0281b74ff5283c11c2943ae082650b9b67978cf5d59ed2956e4f"
+    },
+    {
+      "id": "stbn",
+      "path": "stbn.bin",
+      "kind": "spatiotemporal-blue-noise",
+      "width": 128,
+      "height": 128,
+      "depth": 64,
+      "channels": "r8",
+      "channelSemantics": {
+        "r": "first-step jitter sample indexed by pixel and frame"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "NearestFilter",
+      "magFilter": "NearestFilter",
+      "mipmaps": false,
+      "typedArray": "Uint8Array",
+      "byteLength": 1048576,
+      "sha256": "51f52f21e5578384585050390821a0a486dcb81e11a716fa7b92fbb6515ba852"
+    },
+    {
+      "id": "weather-map-a",
+      "path": "../generated-variants/weather-map-a.png",
+      "kind": "generated-weather-variant",
+      "width": 512,
+      "height": 512,
+      "channels": "rgba8",
+      "channelSemantics": {
+        "rgba": "deterministic packed weather diagnostic variant"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "byteLength": 264127,
+      "sha256": "a34942bd3188dbeda0bbd8c317c7222c26c6e6a58d8567eb5b92e616d4553cb0"
+    },
+    {
+      "id": "weather-map-b",
+      "path": "../generated-variants/weather-map-b.png",
+      "kind": "generated-weather-variant",
+      "width": 512,
+      "height": 512,
+      "channels": "rgba8",
+      "channelSemantics": {
+        "rgba": "deterministic packed weather diagnostic variant"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "byteLength": 266616,
+      "sha256": "beac5a10f24d34a17ecd3349b340576beb944f1b393890de6c471437227feada"
+    },
+    {
+      "id": "weather-map-c",
+      "path": "../generated-variants/weather-map-c.png",
+      "kind": "generated-weather-variant",
+      "width": 512,
+      "height": 512,
+      "channels": "rgba8",
+      "channelSemantics": {
+        "rgba": "deterministic packed weather diagnostic variant"
+      },
+      "colorSpace": "NoColorSpace",
+      "wrap": "RepeatWrapping",
+      "minFilter": "LinearFilter",
+      "magFilter": "LinearFilter",
+      "mipmaps": false,
+      "byteLength": 262908,
+      "sha256": "59de4acc2d6bfc7932c26b3f7538e9695ce40e4098a1339a7aea4917008e4194"
+    }
+  ]
+}
