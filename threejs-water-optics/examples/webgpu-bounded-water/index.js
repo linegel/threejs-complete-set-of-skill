@@ -17,7 +17,5 @@ export {
   createBoundedWaterMaterial,
   createBoundedWaterMesh,
   createBoundedWaterRenderPipeline,
-  createReducedBoundedWaterMaterial,
-  createReducedBoundedWaterMesh,
   createWebGPUBoundedWaterSystem,
 } from "./webgpu-bounded-water.js";

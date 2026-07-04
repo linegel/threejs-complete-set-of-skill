@@ -35,6 +35,7 @@ import {
   faceDirection,
   float,
   globalId,
+  linearDepth,
   max,
   min,
   mix,
@@ -64,7 +65,6 @@ import {
   vec3,
   vec4,
   viewportDepthTexture,
-  viewportLinearDepth,
   viewportSharedTexture,
 } from "three/tsl";
 import {
@@ -729,8 +729,8 @@ export function createBoundedWaterMaterial({
     const refractedUv = clamp(screen.add(refractionOffset), 0.002, 0.998).toVar();
     const sampledDepth = texture(sceneDepthNode, refractedUv).r;
     const currentDepth = texture(sceneDepthNode, screen).r;
-    const sampledLinearDepth = viewportLinearDepth(sampledDepth);
-    const currentLinearDepth = viewportLinearDepth(currentDepth);
+    const sampledLinearDepth = linearDepth(sampledDepth);
+    const currentLinearDepth = linearDepth(currentDepth);
     const sampledViewZ = perspectiveDepthToViewZ(sampledDepth, cameraNear, cameraFar);
     const currentViewZ = perspectiveDepthToViewZ(currentDepth, cameraNear, cameraFar);
     const inBounds = refractedUv.x.greaterThan(0.001)
@@ -796,133 +796,6 @@ export function createBoundedWaterMaterial({
   return material;
 }
 
-export function createReducedBoundedWaterMaterial({
-  timeNode = float(0),
-  debugMode = WATER_DEBUG_MODES.final,
-  sceneColorNode = viewportSharedTexture(),
-  sceneDepthNode = viewportDepthTexture(),
-  parameters = DEFAULT_WATER_PARAMETERS,
-  analyticBandCount = WATER_QUALITY_TIERS.reduced.analyticBands,
-  microBandCount = WATER_QUALITY_TIERS.reduced.microBands,
-} = {}) {
-  // This material is only for explicit teaching on how to apply fallback when
-  // WebGPU is unavailable. It deliberately avoids StorageTexture sampling.
-  const material = new MeshPhysicalNodeMaterial({
-    side: DoubleSide,
-    transparent: true,
-    depthWrite: false,
-    roughness: parameters.roughness,
-    metalness: 0,
-    transmission: 0,
-  });
-
-  const debugModeNode = uniform(debugMode, "int");
-  const sunDirection = vec3(parameters.sunDirection.x, parameters.sunDirection.y, parameters.sunDirection.z);
-  const absorption = vec3(parameters.absorptionPerMeter.x, parameters.absorptionPerMeter.y, parameters.absorptionPerMeter.z);
-  const deepBody = vec3(parameters.deepBodyColor.x, parameters.deepBodyColor.y, parameters.deepBodyColor.z);
-  const shallowScatter = vec3(parameters.shallowScatterColor.x, parameters.shallowScatterColor.y, parameters.shallowScatterColor.z);
-  const foamColor = vec3(parameters.foamColor.x, parameters.foamColor.y, parameters.foamColor.z);
-
-  material.positionNode = Fn(() => {
-    const baseXZ = positionLocal.xz;
-    const analytic = buildAnalyticWaveDisplacementTSL(baseXZ, timeNode, analyticBandCount);
-    return vec3(
-      positionLocal.x.add(analytic.x),
-      positionLocal.y.add(analytic.y),
-      positionLocal.z.add(analytic.z),
-    );
-  })();
-
-  const waterOutput = Fn(() => {
-    const localXZ = positionLocal.xz;
-    const analytic = buildAnalyticWaveDisplacementTSL(localXZ, timeNode, analyticBandCount).toVar();
-    const analyticNormalCrest = buildAnalyticNormalAndCrestTSL(localXZ, positionWorld.xz, timeNode, analyticBandCount, microBandCount).toVar();
-    const normalValue = normalize(analyticNormalCrest.xyz).toVar();
-    normalValue.assign(normalValue.mul(faceDirection));
-
-    const viewDirection = normalize(cameraPosition.sub(positionWorld));
-    const underwater = dot(normalValue, viewDirection).lessThan(0);
-    const eta = select(underwater, float(parameters.waterIor / parameters.airIor), float(parameters.airIor / parameters.waterIor));
-    const f0 = pow(float(parameters.airIor).sub(parameters.waterIor).div(float(parameters.airIor).add(parameters.waterIor)), 2.0);
-    const nDotV = abs(dot(normalValue, viewDirection));
-    const fresnel = clamp(f0.add(float(1).sub(f0).mul(pow(float(1).sub(nDotV), 5.0))), 0, 1);
-    const refracted = refract(viewDirection.negate(), normalValue, eta);
-    const screen = screenUV;
-    const refractionOffset = refracted.xz
-      .mul(parameters.refractionStrength * 0.55)
-      .mul(float(1).sub(fresnel))
-      .mul(0.1);
-    const unclampedUv = screen.add(refractionOffset).toVar();
-    const refractedUv = clamp(unclampedUv, 0.002, 0.998).toVar();
-    const sampledDepth = texture(sceneDepthNode, refractedUv).r;
-    const currentDepth = texture(sceneDepthNode, screen).r;
-    const sampledLinearDepth = viewportLinearDepth(sampledDepth);
-    const currentLinearDepth = viewportLinearDepth(currentDepth);
-    const sampledViewZ = perspectiveDepthToViewZ(sampledDepth, cameraNear, cameraFar);
-    const currentViewZ = perspectiveDepthToViewZ(currentDepth, cameraNear, cameraFar);
-    const inBounds = unclampedUv.x.greaterThan(0.001)
-      .and(unclampedUv.x.lessThan(0.999))
-      .and(unclampedUv.y.greaterThan(0.001))
-      .and(unclampedUv.y.lessThan(0.999));
-    const notForeground = sampledLinearDepth.greaterThanEqual(currentLinearDepth.sub(0.0004));
-    const refractionValid = inBounds.and(notForeground);
-    const pathLength = select(refractionValid, max(abs(sampledViewZ.sub(currentViewZ)), 0.15), float(parameters.fallbackDepthMeters));
-    const transmittance = exp(absorption.mul(pathLength).negate());
-    const sceneRefraction = texture(sceneColorNode, refractedUv).rgb;
-    const fallbackBody = mix(deepBody, shallowScatter, clamp(normalValue.y, 0, 1));
-    const refractedBody = mix(fallbackBody, sceneRefraction, select(refractionValid, float(0.5), float(0.0)));
-
-    const reflected = reflect(viewDirection.negate(), normalValue);
-    const reflection = buildSkyColorTSL(reflected, sunDirection);
-    const reflectedSun = clamp(dot(reflected, sunDirection), 0, 1);
-    const reflectionGlint = vec3(1.0, 0.95, 0.72).mul(pow(reflectedSun, 1800.0)).mul(8.0)
-      .add(vec3(1.0, 0.7, 0.36).mul(pow(reflectedSun, 12.0)).mul(0.8));
-    const halfVector = normalize(viewDirection.add(sunDirection));
-    const specular = pow(clamp(dot(normalValue, halfVector), 0, 1), 900.0).mul(8.0);
-    const crest = analyticNormalCrest.w;
-    const foam = smoothstep(0.18, 0.55, crest);
-    const causticProxy = clamp(crest.mul(1.7).add(max(float(0), normalValue.y).mul(0.05)), 0, 1);
-
-    const transmitted = refractedBody.mul(float(1).sub(fresnel)).mul(transmittance);
-    const reflectedEnergy = reflection.add(reflectionGlint).mul(fresnel);
-    const finalColor = mix(
-      transmitted
-        .add(reflectedEnergy)
-        .add(vec3(1.0, 0.96, 0.8).mul(specular).mul(float(1).sub(fresnel).mul(0.25)))
-        .add(vec3(0.55, 0.72, 0.95).mul(causticProxy).mul(float(1).sub(fresnel)).mul(0.045)),
-      foamColor,
-      foam.mul(0.25),
-    );
-
-    If(debugModeNode.equal(WATER_DEBUG_MODES.height), () => {
-      finalColor.assign(mix(vec3(0.03, 0.08, 0.14), vec3(0.8, 0.25, 0.08), clamp(analytic.y.mul(2.0).add(0.5), 0, 1)));
-    }).ElseIf(debugModeNode.equal(WATER_DEBUG_MODES.velocity), () => {
-      finalColor.assign(vec3(0.0, 0.08, 0.14));
-    }).ElseIf(debugModeNode.equal(WATER_DEBUG_MODES.normals), () => {
-      finalColor.assign(normalValue.mul(0.5).add(0.5));
-    }).ElseIf(debugModeNode.equal(WATER_DEBUG_MODES.caustics), () => {
-      finalColor.assign(vec3(causticProxy));
-    }).ElseIf(debugModeNode.equal(WATER_DEBUG_MODES.refractionValidity), () => {
-      finalColor.assign(mix(vec3(0.75, 0.06, 0.02), vec3(0.02, 0.78, 0.45), select(refractionValid, float(1), float(0))));
-    });
-
-    return vec4(finalColor, 0.84);
-  });
-
-  material.outputNode = waterOutput();
-  material.userData.reducedTier = true;
-  material.userData.usesStorageTexture = false;
-  material.userData.reason = "Explicit request to teach how to apply fallback when WebGPU is unavailable.";
-  material.userData.debugModeNode = debugModeNode;
-  material.userData.setDebugMode = (mode) => {
-    debugModeNode.value = typeof mode === "string" ? WATER_DEBUG_MODES[mode] : mode;
-    material.needsUpdate = true;
-  };
-  material.userData.syncSimulationTextures = () => undefined;
-
-  return material;
-}
-
 export function createBoundedWaterMesh({
   heightfield,
   width = heightfield.parameters.worldSize.x,
@@ -943,40 +816,18 @@ export function createBoundedWaterMesh({
   return mesh;
 }
 
-export function createReducedBoundedWaterMesh({
-  parameters = DEFAULT_WATER_PARAMETERS,
-  tier = WATER_QUALITY_TIERS.reduced,
-  material = createReducedBoundedWaterMaterial({ parameters }),
-} = {}) {
-  const width = parameters.worldSize.x;
-  const depth = parameters.worldSize.y;
-  const segments = Math.max(16, Math.min(96, tier.resolution - 1));
-  const geometry = new PlaneGeometry(width, depth, segments, segments);
-  geometry.rotateX(-Math.PI * 0.5);
-  const yExtent = estimateWaterVerticalAmplitude(parameters, tier.analyticBands);
-  geometry.boundingBox = new Box3(
-    new Vector3(width * -0.5, -yExtent, depth * -0.5),
-    new Vector3(width * 0.5, yExtent, depth * 0.5),
-  );
-  geometry.boundingSphere = new Sphere(new Vector3(0, 0, 0), Math.sqrt(width * width + depth * depth) * 0.5 + yExtent);
-  const mesh = new Mesh(geometry, material);
-  mesh.name = "Reduced analytic bounded water surface";
-  mesh.userData.reducedTier = {
-    tier: "reduced",
-    usesStorageTexture: false,
-    reason: "Explicit request to teach how to apply fallback when WebGPU is unavailable.",
-  };
-  return mesh;
-}
-
-export function createBoundedWaterRenderPipeline(renderer, scene, camera, {
+export function createBoundedWaterRenderPipeline(renderer, opaqueScene, camera, {
   useMRT = true,
   outputToneMapping = NoToneMapping,
   outputColorSpace = renderer.outputColorSpace,
 } = {}) {
   // Build order 5: scene color/depth ownership lives in the node render
-  // pipeline, and renderOutput() is the single output transform owner.
-  const scenePass = pass(scene, camera);
+  // pipeline, and the pass must exclude the water mesh it feeds.
+  if (!opaqueScene || !camera) {
+    throw new Error("createBoundedWaterRenderPipeline requires a separate opaqueScene and camera for water refraction inputs.");
+  }
+
+  const scenePass = pass(opaqueScene, camera);
 
   if (useMRT) {
     scenePass.setMRT(mrt({
@@ -1010,17 +861,16 @@ export function createBoundedWaterRenderPipeline(renderer, scene, camera, {
 export async function createWebGPUBoundedWaterSystem(renderer, {
   tier = "high",
   seed = 1,
-  scene = null,
   camera = null,
   timeNode = float(0),
   debugMode = WATER_DEBUG_MODES.final,
   parameters = {},
-  explicitFallbackWhenWebGPUUnavailable = false,
+  sceneColorScene = null,
 } = {}) {
   await renderer.init();
 
   const backendIsWebGPU = renderer.backend?.isWebGPUBackend === true;
-  const selectedTierName = backendIsWebGPU ? tier : "reduced";
+  const selectedTierName = tier;
   const selectedTier = WATER_QUALITY_TIERS[selectedTierName] ?? WATER_QUALITY_TIERS.high;
   const resolvedParameters = {
     ...DEFAULT_WATER_PARAMETERS,
@@ -1029,50 +879,13 @@ export async function createWebGPUBoundedWaterSystem(renderer, {
   };
 
   if (!backendIsWebGPU) {
-    if (!explicitFallbackWhenWebGPUUnavailable) {
-      throw new Error("WebGPU backend required for the canonical bounded water path. Analytic fallback teaching is opt-in and should be used only when the user explicitly asks how to apply fallback when WebGPU is unavailable.");
-    }
-
-    const configValidation = validateWaterConfig({ tier: selectedTier, parameters: resolvedParameters });
-    const pipeline = scene && camera ? createBoundedWaterRenderPipeline(renderer, scene, camera) : null;
-    const material = createReducedBoundedWaterMaterial({
-      timeNode,
-      debugMode,
-      sceneColorNode: pipeline?.colorNode ?? viewportSharedTexture(),
-      sceneDepthNode: pipeline?.depthNode ?? viewportDepthTexture(),
-      parameters: resolvedParameters,
-      analyticBandCount: selectedTier.analyticBands,
-      microBandCount: selectedTier.microBands,
-    });
-    const mesh = createReducedBoundedWaterMesh({ parameters: resolvedParameters, tier: selectedTier, material });
-    mesh.userData.sceneColorExclusion = "Create the scene pass before adding this mesh, or render opaque/background layers only, so water refraction does not sample itself.";
-
-    return {
-      renderer,
-      backendIsWebGPU,
-      tier: "reduced",
-      seed,
-      heightfield: null,
-      material,
-      mesh,
-      pipeline,
-      configValidation,
-      fallbackTeachingReason: "Analytic water fallback is only for an explicit request to teach how to apply fallback when WebGPU is unavailable.",
-      update() {
-        return undefined;
-      },
-      dispose() {
-        mesh.geometry.dispose();
-        material.dispose();
-        pipeline?.dispose();
-      },
-    };
+    throw new Error("WebGPU backend required for the canonical bounded water path. Route fallback teaching to ../threejs-compatibility-fallbacks/.");
   }
 
   const heightfield = new WebGPUBoundedWaterHeightfield(renderer, { tier: selectedTierName, parameters: resolvedParameters });
   await heightfield.initialize({ async: true });
 
-  const pipeline = scene && camera ? createBoundedWaterRenderPipeline(renderer, scene, camera) : null;
+  const pipeline = sceneColorScene && camera ? createBoundedWaterRenderPipeline(renderer, sceneColorScene, camera) : null;
   const material = createBoundedWaterMaterial({
     heightfield,
     timeNode,
@@ -1084,7 +897,7 @@ export async function createWebGPUBoundedWaterSystem(renderer, {
     microBandCount: heightfield.tier.microBands,
   });
   const mesh = createBoundedWaterMesh({ heightfield, material });
-  mesh.userData.sceneColorExclusion = "Create the scene pass before adding this mesh, or render opaque/background layers only, so water refraction does not sample itself.";
+  mesh.userData.sceneColorSource = "Samples the separate sceneColorScene passed to createWebGPUBoundedWaterSystem; do not add this mesh to that opaque scene.";
 
   return {
     renderer,
@@ -1096,9 +909,6 @@ export async function createWebGPUBoundedWaterSystem(renderer, {
     mesh,
     pipeline,
     update(deltaSeconds) {
-      if (!backendIsWebGPU) {
-        return undefined;
-      }
       const result = heightfield.step(deltaSeconds);
       material.userData.syncSimulationTextures();
       return result;

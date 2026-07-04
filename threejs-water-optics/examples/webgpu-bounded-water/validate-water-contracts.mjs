@@ -2,11 +2,10 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { Vector2 } from "three/webgpu";
+import { float, linearDepth, viewportLinearDepth } from "three/tsl";
 import {
   DEFAULT_WATER_PARAMETERS,
   WATER_QUALITY_TIERS,
-  createReducedBoundedWaterMaterial,
-  createReducedBoundedWaterMesh,
   createWebGPUBoundedWaterSystem,
   validateWaterConfig,
   waterCourantNumber,
@@ -14,6 +13,8 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "webgpu-bounded-water.js"), "utf8");
+const readme = readFileSync(join(here, "README.md"), "utf8");
+const reference = readFileSync(join(here, "../../references/water-surface-system.md"), "utf8");
 
 function assert(condition, message) {
   if (!condition) {
@@ -51,26 +52,35 @@ assert(waterCourantNumber({
   worldSize: DEFAULT_WATER_PARAMETERS.worldSize,
 }) === tiers.high.courant, "waterCourantNumber must match validateWaterConfig output.");
 
-assert(source.includes("viewportLinearDepth"), "Depth-aware refraction must use viewportLinearDepth.");
+const linearDepthProbe = linearDepth(float(0.5));
+assert(typeof viewportLinearDepth !== "function", "viewportLinearDepth is a const node in Three.js r185, not a callable function.");
+assert(linearDepthProbe !== undefined, "linearDepth(float(...)) must construct a TSL depth conversion node.");
+
+assert(source.includes("linearDepth(sampledDepth)"), "Depth-aware refraction must call linearDepth(sampledDepth).");
+assert(source.includes("linearDepth(currentDepth)"), "Depth-aware refraction must call linearDepth(currentDepth).");
+assert(!source.includes("viewportLinearDepth("), "Depth-aware refraction must not call viewportLinearDepth(...); it is not callable in r185.");
 assert(source.includes("perspectiveDepthToViewZ"), "Depth-aware refraction must convert raw depth to view-Z meters.");
 assert(!source.includes("mul(80.0)"), "Raw nonlinear depth deltas must not be scaled by a magic meter factor.");
 assert(!source.includes("frustumCulled = false"), "Water mesh must use computed bounds instead of disabling frustum culling.");
+assert(source.includes("createBoundedWaterRenderPipeline(renderer, sceneColorScene, camera)"), "System must build refraction inputs from a separate sceneColorScene.");
+assert(source.includes("pass(opaqueScene, camera)"), "Render pipeline must render an opaque scene, not the live water scene.");
 assert(source.includes("sceneColorNode: pipeline?.colorNode"), "Material must consume pipeline-owned scene color when available.");
 assert(source.includes("sceneDepthNode: pipeline?.depthNode"), "Material must consume pipeline-owned depth when available.");
 assert(source.includes("refract(lightIncident"), "Caustic kernels must use refracted ray-bundle sampling.");
-assert(source.includes("heightfield: null"), "Explicit WebGPU-unavailable handling must not expose a live heightfield.");
-assert(source.includes("usesStorageTexture: false"), "Reduced material and mesh must advertise that they do not sample live StorageTextures.");
+assert(!source.includes("explicitFallbackWhenWebGPUUnavailable"), "Flagship water skill must not carry an in-skill fallback teaching branch.");
+assert(!source.includes("createReducedBoundedWaterMaterial"), "Flagship water skill must not export reduced fallback material recipes.");
+assert(!source.includes("createReducedBoundedWaterMesh"), "Flagship water skill must not export reduced fallback mesh recipes.");
+assert(source.includes("../threejs-compatibility-fallbacks/"), "Non-WebGPU routing message must point to the compatibility fallback skill.");
 
-const reducedMaterial = createReducedBoundedWaterMaterial();
-assert(reducedMaterial.userData.reducedTier === true, "Reduced material must mark itself as reduced-tier.");
-assert(reducedMaterial.userData.usesStorageTexture === false, "Reduced material must not use StorageTexture sampling.");
-assert(reducedMaterial.userData.waterStateTextureNode === undefined, "Reduced material must not expose a water state texture node.");
-assert(reducedMaterial.userData.normalCausticTextureNode === undefined, "Reduced material must not expose a normal/caustic texture node.");
+for (const row of ["`coord`", "`coordUv`", "`world`", "`height/velocity`", "`normalCaustic.rg`", "`refractedUv`", "depth samples", "color samples", "data textures"]) {
+  assert(reference.includes(row), `Reference interface-space table missing ${row}.`);
+}
+assert(reference.includes("linearDepth(value)") && reference.includes("view-Z meters"), "Reference must define raw depth to view-Z meter conversion.");
 
-const reducedMesh = createReducedBoundedWaterMesh({ material: reducedMaterial });
-assert(reducedMesh.userData.reducedTier.tier === "reduced", "Reduced mesh must mark its tier.");
-assert(reducedMesh.userData.reducedTier.usesStorageTexture === false, "Reduced mesh must not depend on live StorageTextures.");
-assert(reducedMesh.geometry.boundingBox !== null, "Reduced mesh must have computed culling bounds.");
+const checkpointCount = (readme.match(/You must see/g) ?? []).length;
+const mistakeCount = (readme.match(/if /g) ?? []).length;
+assert(checkpointCount >= 7, `README must contain at least seven build checkpoints, got ${checkpointCount}.`);
+assert(mistakeCount >= 7, `README checkpoints must include likely mistakes, got ${mistakeCount}.`);
 
 const fakeReducedRenderer = {
   backend: { isWebGPUBackend: false },
@@ -78,42 +88,29 @@ const fakeReducedRenderer = {
   async init() {},
 };
 
-let rejectedImplicitFallback = false;
+let rejectedNonWebGPU = false;
 try {
   await createWebGPUBoundedWaterSystem(fakeReducedRenderer, { tier: "ultra" });
 } catch (error) {
-  rejectedImplicitFallback = /opt-in|explicitly asks/.test(error.message);
+  rejectedNonWebGPU = /WebGPU backend required/.test(error.message) &&
+    /threejs-compatibility-fallbacks/.test(error.message);
 }
 
-assert(rejectedImplicitFallback, "Fallback teaching for missing WebGPU must require explicit opt-in.");
-
-const reducedSystem = await createWebGPUBoundedWaterSystem(fakeReducedRenderer, {
-  tier: "ultra",
-  explicitFallbackWhenWebGPUUnavailable: true,
-});
-assert(reducedSystem.backendIsWebGPU === false, "Fake renderer should exercise the explicit WebGPU-unavailable handling.");
-assert(reducedSystem.tier === "reduced", "Explicit WebGPU-unavailable handling must select the reduced tier.");
-assert(reducedSystem.heightfield === null, "Explicit WebGPU-unavailable handling must not create a StorageTexture heightfield.");
-assert(reducedSystem.material.userData.usesStorageTexture === false, "Explicit WebGPU-unavailable material must not sample StorageTextures.");
-assert(reducedSystem.mesh.userData.reducedTier.usesStorageTexture === false, "Explicit WebGPU-unavailable mesh must not depend on StorageTextures.");
-assert(reducedSystem.configValidation.pass === true, "Reduced tier config validation must pass.");
-
-reducedSystem.dispose();
-reducedMesh.geometry.dispose();
-reducedMaterial.dispose();
+assert(rejectedNonWebGPU, "Missing WebGPU must throw and route fallback teaching to the compatibility skill.");
 
 console.log(JSON.stringify({
   pass: true,
   tiers,
   rejectedUnsafeConfig,
-  rejectedImplicitFallback,
-  reducedTierUsesStorageTexture: false,
+  rejectedNonWebGPU,
   checks: [
     "CFL/Courant gate",
     "depth-to-viewZ meters",
     "pipeline-owned scene color/depth",
     "computed culling bounds",
     "refracted ray-bundle caustics",
-    "explicit opt-in fallback teaching when WebGPU is unavailable",
+    "interface-space table",
+    "checkpointed README",
+    "WebGPU-unavailable routing to compatibility fallbacks",
   ],
 }, null, 2));

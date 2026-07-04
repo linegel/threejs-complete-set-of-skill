@@ -5,6 +5,7 @@ artifacts/
 .agent/
 __pycache__/
 *.log
+AGENTS.md
 
 # Development scaffolding kept local-only, not part of the published skill set
 plan.md

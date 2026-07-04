@@ -1,6 +1,6 @@
 # WebGPU Bounded Water
 
-Canonical WebGPU/TSL example for `threejs-water-optics`. It demonstrates the production path from the skill: bounded heightfield simulation in ping-ponged `StorageTexture` state, fixed-step `Fn().compute()` kernels, differential-area caustics, and a `MeshPhysicalNodeMaterial` water surface with side-aware Fresnel, Beer-Lambert absorption, depth-aware refraction, analytic reduced surface behavior, and debug views.
+Canonical WebGPU/TSL example for `threejs-water-optics`. It demonstrates the production path from the skill: bounded heightfield simulation in ping-ponged `StorageTexture` state, fixed-step `Fn().compute()` kernels, differential-area caustics, and a `MeshPhysicalNodeMaterial` water surface with side-aware Fresnel, Beer-Lambert absorption, depth-aware refraction, and debug views.
 
 Legacy render-target ping-pong is intentionally not used.
 
@@ -37,13 +37,11 @@ Caustics are computed from local area compression with `max(area, epsilon)`, fin
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Ultra | 512 | 1/240 s | 4 | 5 + 4 micro | ~6 MiB for three RGBA16F fields |
 | High | 256 | 1/120 s | 3 | 4 + 3 micro | ~1.5 MiB |
-| Reduced | 128 | 1/60 s | 2 | 3 + 0 micro | ~0.375 MiB |
+| Budgeted | 128 | 1/60 s | 2 | 3 + 0 micro | ~0.375 MiB |
 
-Analytic fallback teaching is documented only for the explicit request to apply
-fallback when WebGPU is unavailable. It requires
-`explicitFallbackWhenWebGPUUnavailable: true`, uses smaller grids/fewer bands,
-and can be paired with `assets/generated-variants/` by a host app; it is not
-the default route or a separate primary implementation path.
+If `renderer.backend.isWebGPUBackend` is false after `await renderer.init()`,
+this example throws and routes fallback teaching to
+`../threejs-compatibility-fallbacks/`.
 
 ## Debug Modes
 
@@ -55,6 +53,9 @@ the default route or a separate primary implementation path.
 - `refractionValidity`
 
 ## Minimal Usage
+
+Pass `sceneColorScene` as a host-owned opaque/background scene that does not
+contain `water.mesh`.
 
 ```js
 import { WebGPURenderer } from "three/webgpu";
@@ -68,7 +69,7 @@ const renderer = new WebGPURenderer({ antialias: false });
 const water = await createWebGPUBoundedWaterSystem(renderer, {
   tier: "high",
   seed: 42,
-  scene,
+  sceneColorScene: opaqueScene,
   camera,
   timeNode: float(0),
 });
@@ -83,6 +84,7 @@ for (const drop of seededDropSequence(42, 4)) {
 function frame(deltaSeconds) {
   water.update(deltaSeconds);
   water.pipeline?.render();
+  renderer.render(scene, camera);
 }
 ```
 

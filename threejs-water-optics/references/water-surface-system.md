@@ -131,7 +131,7 @@ Interface spaces:
 | `height/velocity` | meters and meters/second in RGBA16F data | ping-pong state | displacement, normals, caustics | frame-rate constants violate CFL stability |
 | `normalCaustic.rg` | slope in local XZ | normal/caustic compute | material normal | unrelated normal maps imply waves absent in geometry |
 | `refractedUv` | screen UV | material refraction | scene color/depth | no depth test samples foreground objects |
-| depth samples | raw depth -> `viewportLinearDepth` / view-Z meters | image pipeline scene pass | refraction validity/path length | raw nonlinear depth deltas are not meters |
+| depth samples | raw depth -> `linearDepth(value)` / view-Z meters | image pipeline scene pass | refraction validity/path length | raw nonlinear depth deltas are not meters |
 | color samples | scene-linear HDR | image pipeline color node | water material | material must not own display encoding |
 | data textures | `NoColorSpace` | storage/caustic/noise maps | compute and material | sRGB-as-data washes slopes and masks |
 
@@ -292,7 +292,7 @@ parallax, or wave-camera clearance.
 | --- | --- | ---: | --- | --- | ---: |
 | Ultra | 512-1024 square fixed-step | 2-4/frame | 3-5 RGBA half-float storage textures | full-res water, optional half-res caustic filter | 0.6-1.5 ms desktop discrete |
 | High | 256-512 square fixed-step | 2-3/frame | 3-4 RGBA half-float storage textures | half-res refraction where acceptable | 1.0-2.5 ms desktop integrated |
-| Reduced | 128-256 square or static variants | 0-2/frame | 2-3 compact textures | clamped or static refraction | 1.5-3.5 ms mobile / explicit WebGPU-unavailable request |
+| Reduced | 128-256 square or static variants | 0-2/frame | 2-3 compact textures | clamped or static refraction | 1.5-3.5 ms mobile / explicit request to apply fallback when WebGPU is unavailable |
 
 Rules:
 
@@ -353,7 +353,8 @@ steps exceed the tier budget.
 - Unchecked area division for caustics was replaced by epsilon-clamped,
   intensity-clamped differential area with invalid-value diagnostics.
 - Screen-offset refraction without depth tests was replaced by depth-aware
-  refraction with foreground rejection and explicit fallback behavior.
+  refraction with foreground rejection and an explicit branch for teaching how
+  to apply fallback when WebGPU is unavailable.
 - Normal-only water as the main recipe was replaced by shared TSL displacement
   and normals; normal-only water remains a deliberate reduced geometry tier.
 - Private scene-color ownership was replaced by node pipeline ownership through
