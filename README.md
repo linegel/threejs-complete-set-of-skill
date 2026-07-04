@@ -1,13 +1,13 @@
 # Three.js WebGPU Skill Pack
 
-Specialized Codex skills for building ambitious Three.js scenes with a modern
-WebGPU and TSL-first architecture.
+Specialized agent skills for building ambitious Three.js scenes with a
+WebGPU- and TSL-first architecture.
 
-This repository is not a generic Three.js tutorial. It is a practical skill
-pack for agents that need to design, implement, debug, and validate advanced
-real-time graphics systems: atmospheres, oceans, procedural worlds, particles,
-camera rigs, post-processing pipelines, shadows, water, clouds, and GPU-backed
-surface effects.
+This is not a generic Three.js tutorial. It is a practical skill pack for
+agents that need to design, implement, debug, and validate advanced real-time
+graphics systems: atmospheres, oceans, procedural worlds, particles, camera
+rigs, post-processing pipelines, shadows, water, clouds, and GPU-backed surface
+effects.
 
 ## Why This Exists
 
@@ -17,8 +17,10 @@ scale. A rain scene needs particles, wet surfaces, puddle optics, shadows, and
 post-processing ownership. A black-hole scene needs curved-ray integration,
 HDR signal discipline, bloom, and fixed-view diagnostics.
 
-These skills encode those boundaries so Codex can choose the right expert
-guidance without loading everything at once.
+These skills encode those boundaries so a skill-aware agent runtime can choose
+the right expert guidance without loading the whole repository into context.
+The pack is intended for Codex, Claude, and any compatible agent shell that can
+load local skill folders.
 
 The pack is built around a few hard rules:
 
@@ -33,14 +35,14 @@ The pack is built around a few hard rules:
 
 ## Quick Start
 
-Use the chooser first when the request spans more than one rendering system:
+Use the router first when the request spans more than one rendering system:
 
 ```text
 Use $threejs-choose-skills to plan a WebGPU/TSL scene with an ocean at sunset,
 volumetric clouds, camera flythrough, bloom, exposure, and validation.
 ```
 
-Then load the specific skills it routes to:
+Then load the specific skills it selects:
 
 ```text
 Use $threejs-spectral-ocean and $threejs-sky-atmosphere-and-haze to build the
@@ -48,7 +50,7 @@ water and sky systems, then use $threejs-image-pipeline and
 $threejs-visual-validation to assemble and verify the final frame.
 ```
 
-For a single focused task, invoke that skill directly:
+For a focused task, invoke that skill directly:
 
 ```text
 Use $threejs-particles-trails-and-effects to build a pooled spark and debris
@@ -113,7 +115,6 @@ Each skill is a standalone folder:
 ```text
 threejs-skill-name/
   SKILL.md                 Required skill metadata and core guidance
-  agents/openai.yaml       UI display name, summary, and default prompt
   references/              Deeper technical guidance loaded only when needed
   examples/                Runnable or inspectable implementation examples
   assets/                  Visual assets used by examples or generated outputs
@@ -127,7 +128,8 @@ and migration context for the pack.
 
 ## Requirements
 
-- Codex or another skill-aware agent runtime.
+- A skill-aware agent runtime such as Codex, Claude, or another compatible agent
+  shell that can load local skill folders.
 - Node.js for examples and local Three.js inspection.
 - Three.js `^0.185.1` as pinned in [`package.json`](package.json).
 - A browser/device with WebGPU support for full runtime validation.
@@ -140,19 +142,21 @@ npm install
 
 ## Validation
 
-Validate each skill folder after edits:
+This repository does not currently ship a single top-level validation command.
+After edits, run the checks that match the files you touched:
 
 ```bash
-for dir in threejs-*; do
-  [ -f "$dir/SKILL.md" ] || continue
-  python3 /path/to/skill-creator/scripts/quick_validate.py "$dir"
-done
+npm install
+node threejs-choose-skills/examples/router-contract.test.mjs
+
+find . -name node_modules -prune -o -name '*.mjs' -print \
+  -exec node --check {} \;
 ```
 
 A good change also checks:
 
 - Skill folder name matches `name:` in `SKILL.md`.
-- `agents/openai.yaml` default prompt mentions the exact `$skill-name`.
+- `SKILL.md` frontmatter has a precise `description:` trigger.
 - Cross-skill links point to current folders.
 - Examples still parse or run at their stated level.
 - No obsolete WebGL path is presented as the flagship implementation.
