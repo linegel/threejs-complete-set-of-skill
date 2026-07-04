@@ -1,0 +1,12 @@
+{
+  "name": "threejs-webgpu-node-gtao",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check *.js",
+    "validate": "node validate.js"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}
