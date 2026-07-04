@@ -182,8 +182,8 @@ The README must say:
 Current pass:
 
 - README catalog and contact sheet are present.
-- README marks only rain ripple normals and planet crater masks as
-  screenshot-backed domain-covered families.
+- README marks water caustic fields, rain ripple normals, and planet crater
+  masks as screenshot-backed domain-covered families.
 
 ## Shared Validator Architecture
 
@@ -220,20 +220,26 @@ All validators should reuse the visual-validation harness schema where possible:
 ## Skill Order
 
 The work should proceed from highest risk of misleading validation to lower
-risk:
+risk. Water optics is complete; the remaining order is:
 
-1. `threejs-water-optics` caustic fields
-2. `threejs-spectral-ocean` directional wave seeds
-3. `threejs-volumetric-clouds` weather maps
-4. `threejs-dynamic-surface-effects` frost crystal maps
-5. `threejs-procedural-materials` lava cause maps
-6. `threejs-procedural-vegetation` meadow density masks
-7. `threejs-black-holes-and-space-effects` starfield tiles
-8. `threejs-procedural-fields` biome field maps
+1. `threejs-spectral-ocean` directional wave seeds
+2. `threejs-volumetric-clouds` weather maps
+3. `threejs-dynamic-surface-effects` frost crystal maps
+4. `threejs-procedural-materials` lava cause maps
+5. `threejs-procedural-vegetation` meadow density masks
+6. `threejs-black-holes-and-space-effects` starfield tiles
+7. `threejs-procedural-fields` biome field maps
 
 ## Per-Skill Plans
 
 ### 1. Water Optics: Caustic Fields
+
+Status: complete. Validator:
+`threejs-water-optics/examples/webgpu-bounded-water/validate-generated-caustics.mjs`.
+Evidence:
+`artifacts/visual-validation/water-generated-caustics/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/water-generated-caustics/`.
 
 Skill promise:
 

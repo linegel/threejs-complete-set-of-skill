@@ -124,9 +124,9 @@ request when the user wants a different style, resolution, channel contract, or
 domain-specific look.
 
 The contact sheet is an overview index only. The validation screenshots below
-are the reviewable evidence for the two families currently covered by
-skill-local domain gates: rain ripple normal maps and procedural planet crater
-masks.
+are the reviewable evidence for the families currently covered by skill-local
+domain gates: water caustic fields, rain ripple normal maps, and procedural
+planet crater masks.
 
 ![Contact sheet of 30 deterministic Three.js generated texture assets for water caustics, ocean wave seeds, cloud weather maps, rain ripple normals, frost crystals, lava cause maps, meadow density masks, star fields, biome fields, and planet crater masks](docs/generated-asset-contact-sheet.png)
 
@@ -142,6 +142,37 @@ masks.
 | [`threejs-black-holes-and-space-effects`](threejs-black-holes-and-space-effects/SKILL.md) | `starfield-tile-{a,b,c}.png` | Tileable star/debug backgrounds for space-effect prototypes. |
 | [`threejs-procedural-fields`](threejs-procedural-fields/SKILL.md) | `biome-field-{a,b,c}.png` | Packed altitude, moisture, wear, and biome fields for CPU/GPU parity tests. |
 | [`threejs-procedural-planets`](threejs-procedural-planets/SKILL.md) | `crater-mask-{a,b,c}.png` | RGBA `NoColorSpace` crater masks for reduced-tier spherical projection and material diagnostics. |
+
+### Three.js Water Caustic Field Validation Screenshots
+
+The water optics pilot validates generated caustic fields as reduced-tier
+`NoColorSpace` data for shallow bounded-water floor projection. The screenshots
+separate the dry floor, water without caustics, caustic-enabled variants,
+caustic-only diagnostics, tiled seam stress, camera-distance checks, and
+temporal caustic drift.
+
+![Three.js WebGPU water caustic validation final design showing dry floor, water without caustics, generated caustic variants, and caustic-only projections](docs/visual-validation/water-generated-caustics/final.design.png)
+
+Final design: compares dry and wet baselines with each generated caustic
+variant and caustic-only contribution.
+
+![Three.js WebGPU water caustic validation diagnostics mosaic showing tiled seam stress and source-channel views](docs/visual-validation/water-generated-caustics/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes tiled seam stress and source-channel behavior for
+all caustic variants.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/water-generated-caustics/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/water-generated-caustics/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/water-generated-caustics/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/water-generated-caustics/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/water-generated-caustics/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/water-generated-caustics/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/water-generated-caustics/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/water-generated-caustics/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/water-generated-caustics/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/water-generated-caustics/temporal.t001.png) |
 
 ### Three.js Rain Ripple Normal Validation Screenshots
 
