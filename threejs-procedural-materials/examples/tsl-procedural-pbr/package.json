@@ -1,0 +1,12 @@
+{
+  "name": "threejs-tsl-procedural-pbr",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check *.js && node --check *.mjs",
+    "validate": "node validate-procedural-pbr.mjs"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}

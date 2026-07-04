@@ -1,0 +1,40 @@
+{
+  "skill": "threejs-procedural-materials",
+  "colorSpace": "NoColorSpace",
+  "provenance": "Deterministic generated lava cause maps for the Phase 1 TSL procedural PBR example.",
+  "channelMeanings": {
+    "r": "crust coverage",
+    "g": "fracture network",
+    "b": "heat exposure",
+    "a": "thermal intensity"
+  },
+  "assets": [
+    {
+      "file": "lava-cause-a.png",
+      "width": 512,
+      "height": 512,
+      "format": "RGBA",
+      "seed": "lava-cause-a",
+      "sha256": "697f8a449aa607238ab577d1b5114d0a5e609a37e5bbe183898304d707c72da9",
+      "colorSpace": "NoColorSpace"
+    },
+    {
+      "file": "lava-cause-b.png",
+      "width": 512,
+      "height": 512,
+      "format": "RGBA",
+      "seed": "lava-cause-b",
+      "sha256": "3d5d42d29d2bf0d486ea953184821aa67a0eaff893af1fac4b08222a2a96efed",
+      "colorSpace": "NoColorSpace"
+    },
+    {
+      "file": "lava-cause-c.png",
+      "width": 512,
+      "height": 512,
+      "format": "RGBA",
+      "seed": "lava-cause-c",
+      "sha256": "da4f763cc032f75f6f5dfe201112981bcb03b65eb4d172ff0f0f06e320dcc3ae",
+      "colorSpace": "NoColorSpace"
+    }
+  ]
+}
