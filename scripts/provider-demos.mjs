@@ -42,6 +42,153 @@ export const PROVIDER_DEMOS = [
     debugModes: ["final", "no-caustics", "diagnostic"],
   },
   {
+    id: "cloud-generated-weather-maps",
+    skill: "threejs-volumetric-clouds",
+    title: "Weather Map Cloud Layers",
+    sceneId: "cloud-generated-weather-maps",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-weather-map tier",
+    livePath: "demos/cloud-generated-weather-maps/",
+    poster: "visual-validation/cloud-generated-weather-maps/final.design.png",
+    evidenceDir: "visual-validation/cloud-generated-weather-maps/",
+    sourceExample: "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds",
+    validationCommand:
+      "npm --prefix threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds run validate:generated-assets",
+    providerClaim:
+      "Generated weather maps are used as live scene inputs for layered cloud density and erosion response.",
+    limitations: [
+      "Generated weather maps are reduced-tier diagnostic inputs.",
+      "The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.",
+    ],
+    debugModes: ["final", "weather-debug", "shell-slice"],
+  },
+  {
+    id: "fields-generated-biome-maps",
+    skill: "threejs-procedural-fields",
+    title: "Biome Field Terrain",
+    sceneId: "fields-generated-biome-maps",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-field tier",
+    livePath: "demos/fields-generated-biome-maps/",
+    poster: "visual-validation/fields-generated-biome-maps/final.design.png",
+    evidenceDir: "visual-validation/fields-generated-biome-maps/",
+    sourceExample: "threejs-procedural-fields/examples/webgpu-field-bake",
+    validationCommand:
+      "npm --prefix threejs-procedural-fields/examples/webgpu-field-bake run validate:generated-assets",
+    providerClaim:
+      "Generated biome maps are used as live scene inputs for terrain height, placement markers, and material response.",
+    limitations: [
+      "Generated biome maps are reduced-tier diagnostics.",
+      "The production field path remains shared CPU/TSL parity plus compute/storage bakes when reuse justifies it.",
+    ],
+    debugModes: ["final", "flat", "channel-debug"],
+  },
+  {
+    id: "frost-generated-crystals",
+    skill: "threejs-dynamic-surface-effects",
+    title: "Frost Crystal Surface",
+    sceneId: "frost-generated-crystals",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-structure tier",
+    livePath: "demos/frost-generated-crystals/",
+    poster: "visual-validation/frost-generated-crystals/final.design.png",
+    evidenceDir: "visual-validation/frost-generated-crystals/",
+    sourceExample: "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost",
+    validationCommand:
+      "npm --prefix threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost run validate:generated-assets",
+    providerClaim:
+      "Generated frost crystal fields are used as live scene inputs for surface structure, tint, and thaw diagnostics.",
+    limitations: [
+      "Generated crystal maps are reduced-tier static inputs.",
+      "The production frost path remains StorageTexture history, reduced blur, and TSL refraction.",
+    ],
+    debugModes: ["final", "structure", "thaw-band"],
+  },
+  {
+    id: "materials-generated-lava-causes",
+    skill: "threejs-procedural-materials",
+    title: "Lava Cause Material",
+    sceneId: "materials-generated-lava-causes",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-material-cause tier",
+    livePath: "demos/materials-generated-lava-causes/",
+    poster: "visual-validation/materials-generated-lava-causes/final.design.png",
+    evidenceDir: "visual-validation/materials-generated-lava-causes/",
+    sourceExample: "threejs-procedural-materials/examples/tsl-procedural-pbr",
+    validationCommand:
+      "npm --prefix threejs-procedural-materials/examples/tsl-procedural-pbr run validate:generated-assets",
+    providerClaim:
+      "Generated lava cause maps are used as live scene inputs for PBR crust, normal relief, and raw emissive response.",
+    limitations: [
+      "Generated lava maps are reduced-tier diagnostic inputs.",
+      "The production material path remains NodeMaterial PBR slots with HDR emissive and BloomNode ownership.",
+    ],
+    debugModes: ["final", "cool-crust", "raw-emissive"],
+  },
+  {
+    id: "ocean-generated-wave-seeds",
+    skill: "threejs-spectral-ocean",
+    title: "Directional Wave Seed Surface",
+    sceneId: "ocean-generated-wave-seeds",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-wave-seed tier",
+    livePath: "demos/ocean-generated-wave-seeds/",
+    poster: "visual-validation/ocean-generated-wave-seeds/final.design.png",
+    evidenceDir: "visual-validation/ocean-generated-wave-seeds/",
+    sourceExample: "threejs-spectral-ocean/examples/webgpu-fft-ocean",
+    validationCommand:
+      "npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate:generated-assets",
+    providerClaim:
+      "Generated directional wave seeds are used as live scene inputs for reduced-tier displacement and slope diagnostics.",
+    limitations: [
+      "Generated wave seeds are reduced-tier preview/debug inputs.",
+      "The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.",
+    ],
+    debugModes: ["final", "calm", "slope-debug"],
+  },
+  {
+    id: "space-generated-starfields",
+    skill: "threejs-black-holes-and-space-effects",
+    title: "Curved-Ray Starfield Preview",
+    sceneId: "space-generated-starfields",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-starfield tier",
+    livePath: "demos/space-generated-starfields/",
+    poster: "visual-validation/space-generated-starfields/final.design.png",
+    evidenceDir: "visual-validation/space-generated-starfields/",
+    sourceExample: "threejs-black-holes-and-space-effects/examples/tsl-curved-ray",
+    validationCommand:
+      "npm --prefix threejs-black-holes-and-space-effects/examples/tsl-curved-ray run validate:generated-assets",
+    providerClaim:
+      "Generated star tiles are used as live scene inputs for a repeatable background around a bounded lensing proxy.",
+    limitations: [
+      "Generated star tiles are distant/background-tier inputs.",
+      "The production space path remains bounded adaptive ray integration and final-direction environment lookup.",
+    ],
+    debugModes: ["final", "no-lens", "star-debug"],
+  },
+  {
+    id: "vegetation-generated-meadow-density",
+    skill: "threejs-procedural-vegetation",
+    title: "Meadow Density Placement",
+    sceneId: "vegetation-generated-meadow-density",
+    purpose: "live directional provider demo",
+    tier: "native-budgeted generated-density tier",
+    livePath: "demos/vegetation-generated-meadow-density/",
+    poster: "visual-validation/vegetation-generated-meadow-density/final.design.png",
+    evidenceDir: "visual-validation/vegetation-generated-meadow-density/",
+    sourceExample: "threejs-procedural-vegetation/examples/webgpu-dense-grass",
+    validationCommand:
+      "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:generated-assets",
+    providerClaim:
+      "Generated meadow density maps are used as live scene inputs for placement, path clearing, flower tint, and LOD response.",
+    limitations: [
+      "Generated meadow maps are reduced-tier diagnostic inputs.",
+      "The production vegetation path remains chunked compute/storage instance data, patch culling, and rooted wind.",
+    ],
+    debugModes: ["final", "density-debug", "low-lod"],
+  },
+  {
     id: "rain-generated-ripples",
     skill: "threejs-rain-snow-and-wet-surfaces",
     title: "Wet Surface Ripple Normals",
