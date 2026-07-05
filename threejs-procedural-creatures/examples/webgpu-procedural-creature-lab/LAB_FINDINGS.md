@@ -70,3 +70,18 @@
   `deterministic-canvas-lab`, not `WebGPURenderer`. The artifact gates therefore prove the
   package runtime/capture contracts and adapter identity metadata, but not a real GPU
   snapped-shell render path. This must be closed before claiming full plan completion.
+
+## Stage 3 — driver + locomotion strengthening (this session)
+
+- **Expected** (reference §9): "hop apex sampling (step the clock to the exact apex)".
+  **Observed**: with continuous state durations, the apex generally falls BETWEEN 1/60 ticks,
+  so a fixed-step `seek(apexTime)` cannot satisfy a 1e-9 apex assertion. **Applied delta**:
+  hopper state durations are quantized to tick boundaries in the lab implementation
+  (idle/crouch/air/land rounded to whole ticks) so the apex is exactly reachable by seek.
+  Candidate doctrine note for §6/§9: "under a fixed-step driver, quantize state-machine
+  durations to whole ticks so evidence sampling can land on exact state events."
+- **Gate strengthening deltas vs the inherited (ba569eb) suite**: stance-foot-drift (row 9,
+  1e-9, stationary AND moving, irregular render-dt pattern) was absent; platform-foot-slide
+  (row 12) had no platform; IK gate was 10x looser than the 4-decimals contract; swim gate
+  sampled one instant. All four now match the §10 table; mutations (raw-dt bypass, dropped
+  Gram-Schmidt Y) demonstrated failing.

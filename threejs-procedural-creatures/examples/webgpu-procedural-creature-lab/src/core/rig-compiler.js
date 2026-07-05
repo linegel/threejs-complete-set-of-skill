@@ -109,7 +109,7 @@ function compilePart(part, origin, scaleValue) {
 		const radius = part.r * scaleValue;
 		const a = add(origin, scale(part.a, scaleValue));
 		const b = add(origin, scale(part.b, scaleValue));
-		records.push(makePrimitive(part, a, b, radius, radius, color, effectiveK(part, part.r, scaleValue), 'capsule'));
+		records.push(makePrimitive(part, a, b, radius, radius, color, effectiveK(part, part.r, scaleValue), 'capsule', { flap: part.flap }));
 	}
 
 	if (part.shape === 'cone') {
@@ -117,7 +117,7 @@ function compilePart(part, origin, scaleValue) {
 		const rb = part.r2 * scaleValue;
 		const a = add(origin, scale(part.a, scaleValue));
 		const b = add(origin, scale(part.b, scaleValue));
-		records.push(makePrimitive(part, a, b, ra, rb, color, effectiveK(part, Math.max(part.r, part.r2), scaleValue), 'cone'));
+		records.push(makePrimitive(part, a, b, ra, rb, color, effectiveK(part, Math.max(part.r, part.r2), scaleValue), 'cone', { flap: part.flap }));
 	}
 
 	if (part.shape === 'sphere') {

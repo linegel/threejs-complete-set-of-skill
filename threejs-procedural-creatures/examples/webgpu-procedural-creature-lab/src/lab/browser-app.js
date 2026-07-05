@@ -1,4 +1,4 @@
-import { createDriver, getPoseSnapshot, seek, step } from '../core/driver.js';
+import { createDriver, getPoseSnapshot, POSE_STRIDE, seek, step } from '../core/driver.js';
 import { evaluateField } from '../core/field.js';
 import { createLCG } from '../core/lcg.js';
 import { compileSpec } from '../core/rig-compiler.js';
@@ -91,9 +91,9 @@ function drawCreature(compiled, pose, index, total, debugMode) {
 	ctx.shadowColor = 'rgba(0,0,0,0.35)';
 	ctx.shadowBlur = 10;
 	for (let slot = 0; slot < compiled.slots.length; slot++) {
-		const base = slot * 8;
+		const base = slot * POSE_STRIDE;
 		const a = [pose[base], pose[base + 1], pose[base + 2]];
-		const b = [pose[base + 3], pose[base + 4], pose[base + 5]];
+		const b = [pose[base + 4], pose[base + 5], pose[base + 6]];
 		const pa = project(a, origin, scale);
 		const pb = project(b, origin, scale);
 		const radius = Math.max(compiled.slots[slot].ra, compiled.slots[slot].rb) * scale;

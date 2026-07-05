@@ -1,293 +1,321 @@
-const FIXED_DT = 1 / 60;
-const MAX_SUBSTEPS = 4;
+import { createLCG } from './lcg.js';
+import { poseTransform } from './rig-compiler.js';
+import { createFlyerState, sampleFlyer } from './locomotion/flyer.js';
+import { createGaitState, stepGait } from './locomotion/gait.js';
+import { createHopperState, sampleHopper, stepHopper } from './locomotion/hopper.js';
+import { createRopeState, stepRopes } from './locomotion/rope.js';
+import { createSwimState, stepSwim } from './locomotion/swim.js';
+
+export const FIXED_DT = 1 / 60;
+export const POSE_STRIDE = 12;
 const MAX_ACCUMULATOR = 0.25;
 
-import { createGaitState, stepGait } from './locomotion/gait.js';
-import { makeHopperState, stepHopper } from './locomotion/hopper.js';
-import { makeFlyerState, stepFlyer } from './locomotion/flyer.js';
-import { makeRopeState, stepRope } from './locomotion/rope.js';
-import { makeSwimState, stepSwim } from './locomotion/swim.js';
-
-function primitiveRecordsFor(compiler) {
-	return compiler?.primitiveRecords ?? compiler?.slots ?? [];
+function recordsFor(compiled) {
+	return compiled?.primitiveRecords ?? compiled?.slots ?? [];
 }
 
-function clonePoseFloat32(source) {
-	if (source instanceof Float32Array) return source.slice();
-	if (Array.isArray(source)) return new Float32Array(source);
-	return new Float32Array(0);
+function finite(value, fallback = 0) {
+	return Number.isFinite(value) ? value : fallback;
 }
 
-function createZeroPose(slotCount) {
-	return new Float32Array(slotCount * 8);
+function cloneRoot(root) {
+	return {
+		position: root.position.slice(),
+		velocity: root.velocity.slice(),
+		yaw: root.yaw,
+	};
 }
 
-function poseFromCompiler(compiler) {
-	const primitiveRecords = primitiveRecordsFor(compiler);
-	const slotCount = primitiveRecords.length;
-	const pose = createZeroPose(slotCount);
-	for (let slot = 0; slot < slotCount; slot++) {
-		const slotData = primitiveRecords[slot];
-		const base = slot * 8;
-		pose[base + 0] = slotData.a?.[0] ?? 0;
-		pose[base + 1] = slotData.a?.[1] ?? 0;
-		pose[base + 2] = slotData.a?.[2] ?? 0;
-		pose[base + 3] = slotData.b?.[0] ?? 0;
-		pose[base + 4] = slotData.b?.[1] ?? 0;
-		pose[base + 5] = slotData.b?.[2] ?? 0;
-		pose[base + 6] = 1;
-		pose[base + 7] = 1;
+function writeSlot(pose, slot, a, ra, b, rb, k, color) {
+	const base = slot * POSE_STRIDE;
+	pose[base + 0] = finite(a?.[0]);
+	pose[base + 1] = finite(a?.[1]);
+	pose[base + 2] = finite(a?.[2]);
+	pose[base + 3] = finite(ra);
+	pose[base + 4] = finite(b?.[0]);
+	pose[base + 5] = finite(b?.[1]);
+	pose[base + 6] = finite(b?.[2]);
+	pose[base + 7] = finite(rb);
+	pose[base + 8] = finite(k);
+	pose[base + 9] = finite(color?.[0], 0.85);
+	pose[base + 10] = finite(color?.[1], 0.72);
+	pose[base + 11] = finite(color?.[2], 0.5);
+}
+
+function restPose(compiled) {
+	const records = recordsFor(compiled);
+	const pose = new Float32Array(records.length * POSE_STRIDE);
+	for (let slot = 0; slot < records.length; slot++) {
+		const record = records[slot];
+		writeSlot(pose, slot, record.a, record.ra, record.b, record.rb, record.k, record.color);
 	}
 	return pose;
 }
 
-function allocateTransform(slotCount, target, source) {
-	if (!target || target.length !== source.length) return clonePoseFloat32(source);
-	const dst = target;
-	dst.set(source);
-	if (slotCount > 0) {
-		for (let slot = 0; slot < slotCount; slot++) {
-			const base = slot * 8;
-			dst[base + 6] = dst[base + 6] || 1;
-			dst[base + 7] = dst[base + 7] || 1;
-		}
-	}
-	return dst;
-}
-
-function lerp(a, b, t) {
-	return a * (1 - t) + b * t;
-}
-
-function interpolatePoses(previous, next, alpha, out) {
-	if (previous.length !== next.length || out.length !== previous.length) {
-		throw new Error('Interpolation buffers must share exact pose length');
-	}
-	for (let i = 0; i < previous.length; i++) {
-		out[i] = lerp(previous[i], next[i], alpha);
-	}
-	return out;
-}
-
-function makePoseTransform(compiler, options = {}) {
-	const slotCount = primitiveRecordsFor(compiler).length;
-	const pose = poseFromCompiler(compiler);
-	return applyBiomeTransform(pose, slotCount, options);
-}
-
-function applyBiomeTransform(pose, slotCount, options = {}) {
-	const squash = Number.isFinite(options.squash) ? Math.max(1e-6, options.squash) : 1;
-	const yaw = Number.isFinite(options.yaw) ? options.yaw : 0;
-	const roll = Number.isFinite(options.roll) ? options.roll : 0;
-	const tx = options.translation?.[0] || 0;
-	const ty = options.translation?.[1] || 0;
-	const tz = options.translation?.[2] || 0;
-	const cy = Math.cos(yaw);
-	const sy = Math.sin(yaw);
-	const cr = Math.cos(roll);
-	const sr = Math.sin(roll);
-	const out = new Float32Array(pose.length);
-
-	for (let slot = 0; slot < slotCount; slot++) {
-		const base = slot * 8;
-		for (let endpoint = 0; endpoint < 2; endpoint++) {
-			const p = endpoint === 0 ? base : base + 3;
-			const x = pose[p + 0];
-			const y = pose[p + 1];
-			const z = pose[p + 2];
-			const ry = cy * x + sy * z;
-			const rz = -sy * x + cy * z;
-			const rx = cr * ry - sr * y;
-			const ry2 = sr * ry + cr * y;
-			out[p + 0] = rx / Math.sqrt(squash) + tx;
-			out[p + 1] = ry2 * squash + ty;
-			out[p + 2] = rz / Math.sqrt(squash) + tz;
-		}
-		out[base + 6] = pose[base + 6];
-		out[base + 7] = pose[base + 7];
-	}
-
-	for (let i = 0; i < out.length; i += 1) {
-		if (!Number.isFinite(out[i])) out[i] = pose[i];
-	}
-	return out;
-}
-
-function buildLocomotionState(spec, compiler) {
-	switch (spec.locomotion.type) {
-		case 'biped':
-		case 'quadruped':
-		case 'hexapod':
-			return { type: 'gait', state: createGaitState(spec, compiler) };
-		case 'hopper':
-			return { type: 'hopper', state: makeHopperState(spec, compiler) };
-		case 'flyer':
-			return { type: 'flyer', state: makeFlyerState(spec, compiler) };
-		case 'swimmer':
-			return { type: 'swimmer', state: makeSwimState(spec, compiler) };
-		default:
-			return { type: 'none', state: null };
-	}
-}
-
-function stepLocomotion(system, dt, context = {}) {
-	if (!system.locomotionState) return system.currentPose;
-	const normalizeResult = (result) => {
-		if (result instanceof Promise) {
-			throw new Error('async locomotion step returned inside fixed-step driver');
-		}
-		if (result instanceof Float32Array) return result;
-		if (result?.pose instanceof Float32Array) return result.pose;
-		if (Array.isArray(result?.pose)) return new Float32Array(result.pose);
-		throw new Error(`locomotion ${system.locomotionState.type} did not return a pose buffer`);
+function writeBasePose(driver, pose) {
+	const records = driver.records;
+	const squash = Math.max(finite(driver.localPose.squash, 1), 1e-6);
+	const bodyLift = finite(driver.compiled?.bodyLift) * Math.min(squash, 1);
+	const translate = [
+		finite(driver.localPose.position?.[0]),
+		finite(driver.localPose.position?.[1]) + bodyLift,
+		finite(driver.localPose.position?.[2]),
+	];
+	const transform = {
+		squash,
+		roll: finite(driver.localPose.roll),
+		yaw: finite(driver.localPose.yaw),
+		translate,
 	};
-	if (system.locomotionState.type === 'gait') {
-		return normalizeResult(stepGait(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
+	for (let slot = 0; slot < records.length; slot++) {
+		const record = records[slot];
+		writeSlot(
+			pose,
+			slot,
+			poseTransform(record.a, transform),
+			record.ra,
+			poseTransform(record.b, transform),
+			record.rb,
+			record.k,
+			record.color,
+		);
 	}
-	if (system.locomotionState.type === 'hopper') {
-		return normalizeResult(stepHopper(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
-	}
-	if (system.locomotionState.type === 'flyer') {
-		return normalizeResult(stepFlyer(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
-	}
-	if (system.locomotionState.type === 'swimmer') {
-		return normalizeResult(stepSwim(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
-	}
-	return system.currentPose;
 }
 
-export function createDriver(spec, compiler, options = {}) {
-	const slotCount = primitiveRecordsFor(compiler).length;
-	if (slotCount <= 0) {
-		throw new Error('Driver requires at least one primitive slot.');
+function interpolatePose(previous, current, alpha, out) {
+	for (let i = 0; i < current.length; i++) out[i] = previous[i] + (current[i] - previous[i]) * alpha;
+	return out;
+}
+
+function makePlatform(options, time) {
+	const sample = typeof options.platformFn === 'function'
+		? options.platformFn(time)
+		: null;
+	return {
+		position: [
+			finite(sample?.position?.[0]),
+			finite(sample?.position?.[1]),
+			finite(sample?.position?.[2]),
+		],
+		yaw: finite(sample?.yaw),
+	};
+}
+
+function normalizeStepArgs(dtMsOrContext, maybeContext) {
+	if (dtMsOrContext && typeof dtMsOrContext === 'object') {
+		return { dtMs: 1000 / 60, context: dtMsOrContext };
 	}
-	const fixedTransform = makePoseTransform(compiler, options.transform ?? {});
-	const driver = {
+	return {
+		dtMs: Number.isFinite(dtMsOrContext) ? dtMsOrContext : 1000 / 60,
+		context: maybeContext ?? {},
+	};
+}
+
+function buildLocomotion(spec, compiled, options, rng) {
+	const type = spec?.locomotion?.type ?? 'none';
+	return {
+		type,
+		gait: ['biped', 'quadruped', 'hexapod'].includes(type) ? createGaitState(spec, compiled) : null,
+		hopper: type === 'hopper' ? createHopperState(spec, compiled, rng) : null,
+		flyer: type === 'flyer' ? createFlyerState(spec, compiled, rng) : null,
+		swim: type === 'swimmer' ? createSwimState(spec, compiled, options.waterHeightFn) : null,
+		ropes: createRopeState(spec, compiled),
+	};
+}
+
+function resetDriver(driver) {
+	const seed = driver.seed;
+	const rng = createLCG(seed);
+	driver.rng = rng;
+	driver.time = 0;
+	driver.ticks = 0;
+	driver.accumulator = 0;
+	driver.root = { position: [0, 0, 0], velocity: [0, 0, 0], yaw: 0 };
+	driver.localPose = { squash: 1, roll: 0, yaw: 0, position: [0, 0, 0] };
+	driver.telemetry = {};
+	driver.locomotion = buildLocomotion(driver.spec, driver.compiled, driver.options, rng);
+	writeBasePose(driver, driver.currentPose);
+	driver.previousPose.set(driver.currentPose);
+	driver.presentPose.set(driver.currentPose);
+}
+
+function updateRoot(driver, context) {
+	const previous = driver.root.position.slice();
+	const providedVelocity = context.rootVelocity;
+	const hasVelocity = Array.isArray(providedVelocity);
+	const velocity = hasVelocity
+		? [finite(providedVelocity[0]), finite(providedVelocity[1]), finite(providedVelocity[2])]
+		: [0, 0, finite(driver.spec?.locomotion?.speed)];
+
+	driver.root.velocity = velocity;
+	driver.root.position = [
+		previous[0] + velocity[0] * FIXED_DT,
+		previous[1] + velocity[1] * FIXED_DT,
+		previous[2] + velocity[2] * FIXED_DT,
+	];
+	if (Array.isArray(context.rootPosition)) {
+		driver.root.position = [
+			finite(context.rootPosition[0]),
+			finite(context.rootPosition[1]),
+			finite(context.rootPosition[2]),
+		];
+	}
+	if (Number.isFinite(context.rootYaw)) driver.root.yaw = context.rootYaw;
+	else if (Math.hypot(velocity[0], velocity[2]) > 1e-12) driver.root.yaw = Math.atan2(velocity[0], velocity[2]);
+}
+
+function applyLocomotion(driver, context) {
+	const type = driver.locomotion.type;
+	const platform = makePlatform(driver.options, driver.time);
+	const fixedContext = {
+		...context,
+		time: driver.time,
+		nextTime: driver.time + FIXED_DT,
 		fixedDt: FIXED_DT,
-		maxAccumulator: MAX_ACCUMULATOR,
-		maxSubsteps: MAX_SUBSTEPS,
-		spec,
-		compiler,
-		time: 0,
-		accumulator: 0,
-		stepIndex: 0,
-		previousPose: allocateTransform(slotCount, null, fixedTransform),
-		currentPose: allocateTransform(slotCount, null, fixedTransform),
-		presentPose: allocateTransform(slotCount, null, fixedTransform),
-		locomotionState: buildLocomotionState(spec, compiler),
-		rootTransform: { position: [0, 0, 0], velocity: [0, 0, 0], yaw: 0 },
-		lastContext: { rootPosition: [0, 0, 0], rootYaw: 0 }
+		root: driver.root,
+		platform,
 	};
+
+	driver.localPose = { squash: 1, roll: 0, yaw: 0, position: [0, 0, 0] };
+
+	if (type === 'hopper') {
+		const result = stepHopper(driver.locomotion.hopper, FIXED_DT, driver.root);
+		driver.localPose.squash = result.squash;
+		driver.telemetry.hopper = result.telemetry;
+	} else if (type === 'flyer') {
+		const result = sampleFlyer(driver.locomotion.flyer, driver.time + FIXED_DT, driver.root);
+		driver.localPose.roll = result.bank;
+		driver.telemetry.flyer = result.telemetry;
+	} else if (type === 'swimmer') {
+		const result = stepSwim(driver.locomotion.swim, FIXED_DT, driver.time + FIXED_DT, driver.root);
+		driver.localPose.roll = result.roll;
+		driver.localPose.yaw = result.yaw;
+		driver.localPose.position = [0, result.localY, 0];
+		driver.telemetry.swim = result.telemetry;
+	}
+
+	writeBasePose(driver, driver.currentPose);
+
+	if (type === 'flyer') {
+		const result = sampleFlyer(driver.locomotion.flyer, driver.time + FIXED_DT, driver.root);
+		result.writeFlaps(driver.currentPose, driver.records);
+		driver.telemetry.flyer = result.telemetry;
+	}
+
+	if (driver.locomotion.gait) {
+		const result = stepGait(driver.locomotion.gait, driver.currentPose, driver.spec.locomotion, fixedContext);
+		driver.telemetry.gait = result.telemetry;
+	}
+
+	const ropeTelemetry = stepRopes(driver.locomotion.ropes, driver.currentPose, FIXED_DT);
+	if (ropeTelemetry.groups.length > 0) driver.telemetry.ropes = ropeTelemetry;
+}
+
+function fixedTick(driver, context = {}) {
+	driver.previousPose.set(driver.currentPose);
+	updateRoot(driver, context);
+	applyLocomotion(driver, context);
+	driver.time = (driver.ticks + 1) * FIXED_DT;
+	driver.ticks += 1;
+	driver.presentPose.set(driver.currentPose);
+}
+
+export function createDriver(spec, compiled, options = {}) {
+	const records = recordsFor(compiled);
+	if (records.length === 0) throw new Error('createDriver requires at least one compiled primitive slot');
+	const seed = Number.isFinite(options.seed) ? options.seed : (Number.isFinite(spec?.seed) ? spec.seed : 1);
+	const pose = restPose(compiled);
+	const driver = {
+		spec,
+		compiled,
+		records,
+		options,
+		seed,
+		rng: createLCG(seed),
+		time: 0,
+		ticks: 0,
+		accumulator: 0,
+		root: { position: [0, 0, 0], velocity: [0, 0, 0], yaw: 0 },
+		localPose: { squash: 1, roll: 0, yaw: 0, position: [0, 0, 0] },
+		previousPose: pose.slice(),
+		currentPose: pose.slice(),
+		presentPose: pose.slice(),
+		telemetry: {},
+		locomotion: null,
+	};
+	driver.locomotion = buildLocomotion(spec, compiled, options, driver.rng);
+	writeBasePose(driver, driver.currentPose);
+	driver.previousPose.set(driver.currentPose);
+	driver.presentPose.set(driver.currentPose);
 	return driver;
 }
 
-export function stepDriver(driver, dtSeconds, context = {}) {
-	if (!driver) throw new Error('driver required');
-	const dt = Number.isFinite(dtSeconds) ? Math.max(0, dtSeconds) : FIXED_DT;
-	const clampedDt = Math.min(dt, driver.maxAccumulator);
-	const rootPosition = context.rootPosition ?? driver.lastContext.rootPosition;
-	const rootYaw = Number.isFinite(context.rootYaw) ? context.rootYaw : driver.lastContext.rootYaw;
-	const rootVel = context.rootVelocity ?? [0, 0, 0];
-	const rootDelta = [
-		Number.isFinite(rootPosition?.[0]) ? rootPosition[0] - driver.lastContext.rootPosition[0] : 0,
-		Number.isFinite(rootPosition?.[1]) ? rootPosition[1] - driver.lastContext.rootPosition[1] : 0,
-		Number.isFinite(rootPosition?.[2]) ? rootPosition[2] - driver.lastContext.rootPosition[2] : 0
-	];
-	driver.lastContext = {
-		rootPosition: [
-			Number.isFinite(rootPosition?.[0]) ? rootPosition[0] : 0,
-			Number.isFinite(rootPosition?.[1]) ? rootPosition[1] : 0,
-			Number.isFinite(rootPosition?.[2]) ? rootPosition[2] : 0
-		],
-		rootYaw
-	};
-
-	driver.rootTransform = {
-		position: driver.lastContext.rootPosition,
-		velocity: rootVel,
-		yaw: rootYaw
-	};
-	driver.accumulator += clampedDt;
+export function advance(driver, dtSeconds, context = {}) {
+	if (!driver) throw new Error('advance requires a driver');
+	const dt = Math.min(Math.max(finite(dtSeconds), 0), MAX_ACCUMULATOR);
+	driver.accumulator = Math.min(driver.accumulator + dt, MAX_ACCUMULATOR);
 	let substeps = 0;
-	const maxSubsteps = Math.min(Math.max(1, driver.maxSubsteps), 32);
-	const fixedDt = driver.fixedDt;
-
-	while (driver.accumulator >= fixedDt && substeps < maxSubsteps) {
-		driver.currentPose = allocateTransform(driver.currentPose.length / 8, driver.currentPose, driver.currentPose);
-		driver.previousPose.set(driver.currentPose);
-		driver.currentPose = stepLocomotion(driver, fixedDt, {
-			time: driver.time,
-			fixedStep: fixedDt,
-			stepIndex: substeps,
-			rootPosition: driver.rootTransform.position,
-			rootYaw,
-			rootVelocity: [
-				Number.isFinite(rootVel[0]) ? rootVel[0] : rootDelta[0] / fixedDt,
-				Number.isFinite(rootVel[1]) ? rootVel[1] : rootDelta[1] / fixedDt,
-				Number.isFinite(rootVel[2]) ? rootVel[2] : rootDelta[2] / fixedDt
-			],
-		}
-		);
-		driver.stepIndex += 1;
-		driver.time += fixedDt;
-		driver.accumulator -= fixedDt;
+	while (driver.accumulator + 1e-15 >= FIXED_DT) {
+		fixedTick(driver, context);
+		driver.accumulator -= FIXED_DT;
 		substeps += 1;
 	}
+	const alpha = Math.max(0, Math.min(1, driver.accumulator / FIXED_DT));
+	if (substeps > 0 && alpha === 0) driver.presentPose.set(driver.currentPose);
+	else interpolatePose(driver.previousPose, driver.currentPose, alpha, driver.presentPose);
+	return getPose(driver, { alpha, substeps });
+}
 
-	if (substeps >= maxSubsteps && driver.accumulator >= fixedDt) {
-		driver.accumulator = fixedDt; // deterministic clamp
-	}
+export function step(driver, nTicks, dtMs = 1000 / 60, maybeContext = {}) {
+	const { dtMs: normalizedDtMs, context } = normalizeStepArgs(dtMs, maybeContext);
+	const ticks = Math.max(0, Math.floor(finite(nTicks)));
+	let result = getPose(driver);
+	for (let i = 0; i < ticks; i++) result = advance(driver, normalizedDtMs / 1000, context);
+	return result;
+}
 
-	const alpha = Math.min(1, driver.accumulator / fixedDt);
-	driver.presentPose = interpolatePoses(driver.previousPose, driver.currentPose, alpha, new Float32Array(driver.currentPose.length));
+export function seek(driver, tSeconds) {
+	if (!driver) throw new Error('seek requires a driver');
+	const targetTicks = Math.max(0, Math.round(finite(tSeconds) * 60));
+	if (targetTicks < driver.ticks) resetDriver(driver);
+	while (driver.ticks < targetTicks) fixedTick(driver, {});
+	driver.accumulator = 0;
+	driver.presentPose.set(driver.currentPose);
+	return getPose(driver, { alpha: 0, substeps: 0 });
+}
+
+export function getPose(driver, extra = {}) {
 	return {
 		time: driver.time,
-		alpha,
 		pose: driver.presentPose,
-		substeps
+		root: cloneRoot(driver.root),
+		telemetry: driver.telemetry,
+		...extra,
 	};
-}
-
-export function seek(driver, timeSeconds) {
-	if (!driver) throw new Error('driver required');
-	const target = Number.isFinite(timeSeconds) ? Math.max(0, timeSeconds) : 0;
-	const desiredTicks = Math.max(0, Math.floor(target / FIXED_DT + 1e-6));
-	const currentTicks = Math.max(0, Math.floor((driver.time + 1e-10) / FIXED_DT));
-	const deltaTicks = desiredTicks - currentTicks;
-	if (deltaTicks <= 0) return { time: driver.time, pose: driver.presentPose ?? driver.currentPose, matched: true };
-	stepDriver(driver, deltaTicks * FIXED_DT, { exact: true, rootVelocity: [0, 0, 0] });
-	driver.accumulator = 0;
-	return { time: driver.time, pose: driver.presentPose ?? driver.currentPose, ticks: deltaTicks };
-}
-
-export function step(driver, ticks, context = {}) {
-	const integerTicks = Number.isFinite(ticks) ? Math.max(0, Math.floor(ticks)) : 1;
-	return stepDriver(driver, integerTicks * FIXED_DT, context);
-}
-
-export function advance(driver, timeSeconds, context = {}) {
-	return seek(driver, timeSeconds);
-}
-
-export function reset(driver, compiler, options = {}) {
-	if (!driver) throw new Error('driver required');
-	driver.time = 0;
-	driver.accumulator = 0;
-	driver.stepIndex = 0;
-	driver.currentPose = poseFromCompiler(driver.compiler);
-	driver.previousPose = poseFromCompiler(driver.compiler);
-	driver.presentPose = poseFromCompiler(driver.compiler);
-	driver.locomotionState = buildLocomotionState(driver.spec, driver.compiler);
-	return driver;
 }
 
 export function getPoseSnapshot(driver) {
-	if (!driver) throw new Error('driver required');
+	const snapshot = getPose(driver);
 	return {
-		time: driver.time,
-		accumulator: driver.accumulator,
-		stepIndex: driver.stepIndex,
-		type: driver.locomotionState?.type ?? 'none',
-		pose: Array.from(driver.presentPose)
+		...snapshot,
+		pose: Array.from(snapshot.pose),
 	};
 }
+
+export function rootTransformSingleApplication(driver) {
+	const pose = driver.currentPose;
+	const root = driver.root;
+	const rootPlanar = Math.hypot(root.position[0], root.position[2]);
+	if (rootPlanar < 1e-12 && Math.abs(root.yaw) < 1e-12) return true;
+	for (let slot = 0; slot < driver.records.length; slot++) {
+		const base = slot * POSE_STRIDE;
+		for (const offset of [0, 4]) {
+			const x = pose[base + offset + 0];
+			const z = pose[base + offset + 2];
+			if (Math.abs(x - root.position[0]) < 1e-9 && Math.abs(z - root.position[2]) < 1e-9 && rootPlanar > 1e-6) return false;
+		}
+	}
+	return true;
+}
+
+export { sampleHopper };

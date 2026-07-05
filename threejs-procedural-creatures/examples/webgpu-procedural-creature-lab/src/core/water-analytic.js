@@ -1,51 +1,49 @@
+import { createLCG } from './lcg.js';
+
 const TWO_PI = Math.PI * 2;
 
-const FALLBACK_WAVES = [
-  { wavelength: 5.4, amplitude: 0.04, direction: [ 0.92, 0.28 ], phase: 0.0 },
-  { wavelength: 3.2, amplitude: 0.025, direction: [ -0.48, 0.88 ], phase: 0.5 },
-  { wavelength: 9.0, amplitude: 0.018, direction: [ 0.2, -1.0 ], phase: 0.25 }
-];
-
-function normalizeDirection(v) {
-  const x = Number(v?.[0] ?? 1);
-  const y = Number(v?.[1] ?? 0);
-  const len = Math.hypot(x, y) || 1;
-  return [ x / len, y / len ];
+function normalize2(x, z) {
+	const d = Math.hypot(x, z);
+	return d > 1e-12 ? [x / d, z / d] : [1, 0];
 }
 
-function analyticFallback(x, z, timeSeconds) {
-  const t = Number.isFinite(timeSeconds) ? timeSeconds : 0;
-  let height = 0;
-  for (const wave of FALLBACK_WAVES) {
-    const direction = normalizeDirection(wave.direction);
-    const k = TWO_PI / Math.max(0.2, Number(wave.wavelength));
-    const omega = Math.sqrt(9.81 * k);
-    const phase = k * (direction[0] * Number(x) + direction[1] * Number(z)) - omega * t + Number(wave.phase || 0);
-    height += Number(wave.amplitude) * Math.sin(phase);
-  }
-  return height;
+export function createAnalyticWater({ seed = 1 } = {}) {
+	const rng = createLCG(seed);
+	const phase = rng.nextFloat() * TWO_PI;
+	const baseAngle = rng.nextFloat() * TWO_PI;
+	const waves = [
+		{ amplitude: 0.06, wavelength: 3.1, speed: 0.9, angle: baseAngle + 0.0, phase },
+		{ amplitude: 0.04, wavelength: 1.7, speed: 1.3, angle: baseAngle + 2.4, phase: phase + 1.7 },
+		{ amplitude: 0.025, wavelength: 0.9, speed: 1.8, angle: baseAngle + 4.8, phase: phase + 3.1 },
+	].map((wave) => ({
+		...wave,
+		direction: normalize2(Math.cos(wave.angle), Math.sin(wave.angle)),
+		k: TWO_PI / wave.wavelength,
+	}));
+
+	// Derived: max height is 0.125 and max slope is about 0.25, a calm analytic
+	// surface small enough for the 0.09 buoyancy-coupling gate to be meaningful.
+	return function waterHeight(x, z, t) {
+		let h = 0;
+		for (const wave of waves) {
+			const along = x * wave.direction[0] + z * wave.direction[1];
+			h += wave.amplitude * Math.sin(wave.k * (along - wave.speed * t) + wave.phase);
+		}
+		return h;
+	};
 }
 
-let _providerCache = null;
-
-export async function getWaterHeightProvider() {
-  if (_providerCache) return _providerCache;
-  _providerCache = {
-    getWaterHeight: analyticFallback,
-    estimateHeightError: 0,
-    source: 'analytic-fallback'
-  };
-  return _providerCache;
+export function createWaterProviderAdapter(providerFn) {
+	if (typeof providerFn !== 'function') {
+		throw new Error('water provider must be a function (x, z, t) => number');
+	}
+	return (x, z, t) => {
+		const value = providerFn(x, z, t);
+		if (!Number.isFinite(value)) {
+			throw new Error('water provider returned a non-finite height');
+		}
+		return value;
+	};
 }
 
-export function getWaterHeight(x, z, timeSeconds, options = {}) {
-  return analyticFallback(x, z, timeSeconds, options);
-}
-
-export async function getWaterHeightAsync(x, z, timeSeconds, options = {}) {
-  const provider = await getWaterHeightProvider();
-  const fn = provider.getWaterHeight;
-  return fn(Number(x), Number(z), Number.isFinite(timeSeconds) ? timeSeconds : 0, options);
-}
-
-export { analyticFallback as getWaterHeightFallback };
+export const getWaterHeight = createAnalyticWater({ seed: 1 });

@@ -1,115 +1,40 @@
-import { getWaterHeight } from '../water-analytic.js';
-
-function clamp01(v) {
-  return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0;
+function clamp(v, lo, hi) {
+	return Math.max(lo, Math.min(hi, v));
 }
 
-function clampPositive(v, fallback) {
-  return Number.isFinite(v) && v > 0 ? v : fallback;
+export function createSwimState(spec, compiled, waterHeightFn) {
+	const records = compiled.primitiveRecords ?? compiled.slots ?? [];
+	const rootRecord = records.find((record) => /^(main|body|torso|core)$/i.test(record.partId ?? '')) ?? records[0];
+	const restCenterY = ((rootRecord?.a?.[1] ?? 0) + (rootRecord?.b?.[1] ?? 0)) * 0.5;
+	return {
+		getWaterHeight: typeof waterHeightFn === 'function' ? waterHeightFn : (() => 0),
+		stiffness: clamp(Number(spec.locomotion?.buoyancy ?? 1) * 80, 1, 80),
+		undulation: Number(spec.locomotion?.undulation ?? 0),
+		restOffset: Math.max(0.04, restCenterY),
+		bodyY: 0,
+	};
 }
 
-function sample(pose, slot, point = 0) {
-  const base = slot * 8 + (point === 1 ? 3 : 0);
-  return [ pose[base], pose[base + 1], pose[base + 2] ];
-}
-
-function set(pose, slot, point, value) {
-  const base = slot * 8 + (point === 1 ? 3 : 0);
-  pose[base] = value[0];
-  pose[base + 1] = value[1];
-  pose[base + 2] = value[2];
-}
-
-function blend(a, b, t) {
-  return [ a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t ];
-}
-
-export function makeSwimState(spec = {}, compiler = {}) {
-  const locomotion = spec.locomotion || {};
-  const records = compiler?.primitiveRecords ?? [];
-  const namedRoot = records.find((record) => /^(main|body|torso)$/i.test(record.partId ?? ''));
-  const largest = records.reduce((best, record) => {
-    const radius = Math.max(record.ra ?? 0, record.rb ?? 0);
-    return radius > best.radius ? { slot: record.partSlot ?? 0, radius } : best;
-  }, { slot: 0, radius: -Infinity });
-  return {
-    time: 0,
-    buoyancy: clampPositive(locomotion.buoyancy, 0.9),
-    undulation: clampPositive(locomotion.undulation, 0.24),
-    frequency: clampPositive(locomotion.frequency, 1.2),
-    drag: clampPositive(locomotion.drag ?? 0.22, 0.22),
-    rootSlot: Math.max(0, namedRoot?.partSlot ?? largest.slot ?? 0),
-    bodyHeight: 0,
-    phaseOffset: Number.isFinite(locomotion.phaseOffset) ? locomotion.phaseOffset : 0,
-    sideBias: Number.isFinite(locomotion.sideBias) ? locomotion.sideBias : 0,
-    lastWaterHeight: 0
-  };
-}
-
-export function stepSwim(state, pose, locomotion = {}, dt = 1 / 60, context = {}) {
-  if (!state || !pose) throw new Error('state and pose are required');
-  const fixedDt = Number.isFinite(dt) && dt > 0 ? dt : 1 / 60;
-  const rootX = context.rootPosition?.[0] ?? 0;
-  const rootZ = context.rootPosition?.[2] ?? 0;
-  const t = state.time += fixedDt;
-
-  const slots = pose.length / 8;
-  const waveAmp = state.undulation * 0.6;
-  const sway = Math.sin(t * state.frequency + state.phaseOffset) * waveAmp;
-  const wave = Math.sin(t * state.frequency * 0.7 + state.phaseOffset * 1.2) * waveAmp;
-  const waterHeight = getWaterHeight(rootX, rootZ, t);
-
-  const targetOffset = clamp01(state.buoyancy);
-  const targetY = waterHeight;
-  state.bodyHeight = targetY;
-  state.lastWaterHeight = waterHeight;
-
-  const rootSlot = state.rootSlot;
-  const rootA = sample(pose, rootSlot, 0);
-  const rootB = sample(pose, rootSlot, 1);
-  const blended = blend(rootA, rootB, 0.5);
-
-  const forward = [ 0, 0, 0.02 + state.sideBias * 0.02 ];
-
-  for (let slot = 0; slot < slots; slot++) {
-    const a = sample(pose, slot, 0);
-    const b = sample(pose, slot, 1);
-    const lane = slot / Math.max(1, slots - 1);
-    const phase = lane * 1.3 + state.phaseOffset + t * state.frequency;
-    const lift = Math.sin(phase + state.phaseOffset) * sway + wave * 0.35;
-    const yMix = slot === rootSlot ? 1 : 0.08 + lane * 0.26;
-
-    const targetA = [
-      a[0] + forward[0] * lane,
-      blend([0, blended[1], 0], [0, targetY, 0], yMix)[1] + (slot === rootSlot ? 0 : lift),
-      a[2] + forward[2] * lane + Math.cos(phase) * 0.02
-    ];
-    const targetB = [
-      b[0] + forward[0] * (lane + 0.3),
-      blend([0, blended[1], 0], [0, targetY, 0], yMix)[1] + (slot === rootSlot ? 0 : lift * 0.85),
-      b[2] + forward[2] * (lane + 0.3) + Math.cos(phase + 0.4) * 0.02
-    ];
-
-    const damp = Math.exp(-state.drag * lane * fixedDt);
-    const response = slot === rootSlot ? 1 : 0.35 * damp;
-    set(pose, slot, 0, [
-      a[0] + (targetA[0] - a[0]) * response,
-      a[1] + (targetA[1] - a[1]) * response,
-      a[2] + (targetA[2] - a[2]) * response
-    ]);
-    set(pose, slot, 1, [
-      b[0] + (targetB[0] - b[0]) * response,
-      b[1] + (targetB[1] - b[1]) * response,
-      b[2] + (targetB[2] - b[2]) * response
-    ]);
-  }
-
-  return {
-    pose,
-    state,
-    waterHeight,
-    bodyHeight: targetY,
-    sway: wave,
-    buoyancy: targetOffset
-  };
+export function stepSwim(state, dt, simTime, root) {
+	const waterY = state.getWaterHeight(root.position[0], root.position[2], simTime);
+	const targetY = waterY + state.restOffset;
+	const response = clamp(state.stiffness * dt, 0, 1);
+	state.bodyY += (targetY - state.bodyY) * response;
+	root.position[1] = state.bodyY;
+	root.velocity = [root.velocity[0], (targetY - state.bodyY) / Math.max(dt, 1e-9), root.velocity[2]];
+	const phase = simTime * 2 * Math.PI * 0.45;
+	return {
+		localY: Math.sin(phase) * state.undulation * 0.04,
+		roll: Math.sin(phase) * state.undulation * 0.28,
+		yaw: Math.sin(phase + Math.PI * 0.5) * state.undulation * 0.08,
+		telemetry: {
+			waterY,
+			targetY,
+			bodyY: state.bodyY,
+			restOffset: state.restOffset,
+			error: Math.abs(state.bodyY - targetY),
+			phase,
+			stiffness: state.stiffness,
+		},
+	};
 }
