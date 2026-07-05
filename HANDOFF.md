@@ -71,11 +71,15 @@ Per-skill ms tables (ocean 2.5–4, clouds tiers, creatures 0.5–3, post stack)
 frame with no aggregation rule or tier-exclusion matrix. *Fix:* one section: composed scenes declare a frame
 budget; the router allocates per-subsystem ceilings and forbids tier combinations whose table sum exceeds it.
 
-**3.4 Routing divergence: `~/.claude/skills` vs workspace. [A — re-check both sides]**
-Installed copies route `threejs-image-pipeline` to `$threejs-screen-space-ambient-occlusion`; workspace
-routes to `$threejs-ambient-contact-shading`. Installed copies also reference deprecated WebGL examples.
-An agent loading from the global inventory routes to a nonexistent sibling. *Fix:* sync mechanism or alias
-table; add a divergence check to the choose-skills preflight.
+**3.4 Routing divergence: `~/.claude/skills` vs workspace. [V — mostly resolved; one gap]**
+Historical state: installed copies routed `threejs-image-pipeline` to `$threejs-screen-space-ambient-occlusion`
+(and used old names: `threejs-skill-router`, `threejs-shadow-systems`, `threejs-camera-direction`,
+`threejs-atmosphere-aerial-perspective`, `threejs-temporal-surfaces`, `threejs-precipitation-surfaces`,
+`threejs-raymarched-space-effects`) while the workspace used the current names. Verified 2026-07-05 late
+session: the live installed inventory now matches workspace names — the sync landed. **Residual [V] gap:**
+`threejs-procedural-creatures` is absent from the installed inventory entirely, so it is unroutable from a
+live session until installed. *Remaining fix:* install the creatures skill; add a divergence check to the
+choose-skills preflight so this class of drift is caught mechanically next time.
 
 ### Tier 2: contained correctness / physics defects
 
@@ -87,6 +91,13 @@ and group velocity exactly in the sparkle/whitecap band. *Fix:* add σ/ρ to pre
 **Also [V]:** per-stage `await renderer.computeAsync` across log₂N stages × 2 axes × cascades is a
 host-serialized dispatch storm (~50+ submission boundaries/frame at 512²×3); batch stages or drop the
 per-stage await where ordering is already enforced by resource dependencies.
+**Also [A], smaller:** (a) the fft-ocean example sets `pipeline.outputColorTransform = true` while owning a
+`renderOutput()`-style path — composition with image-pipeline risks double conversion; align with the
+one-owner rule. (b) Cascade band mask `step(low,k)·step(k,high)` is closed on both ends — a bin landing
+exactly on a handoff double-counts; make intervals half-open `[low, high)` (P2; exact coincidence is
+measure-zero across differing patch lengths, so severity is low). (c) **Open allegation, neither confirmed
+nor struck:** IFFT packing of two real fields may discard `.zw` outputs at assembly
+(`compute-kernels.js` pack vs assembly unpack) — verify at kernel level before filing or dismissing.
 
 **3.6 `threejs-volumetric-clouds` — legacy example is unbounded; validation is token-grep. [V]**
 `examples/weather-volume-clouds/cloud-system.js:83` `PRIMARY_STEPS = 320` with LIGHT_STEPS=5–6 per step;
@@ -134,6 +145,13 @@ re-verification against the current example. [V/A]
 absent (no accumulator α, renders last fixed step); GPU compute kernel writes only `simTime`, never
 dispatched by the demo. Implement or re-scope the claims. [V]
 **3.13 `threejs-compatibility-fallbacks`** — loss ledger has no `procedural-creatures` row. [V]
+**3.14 Cross-cutting: no `getWaterHeight(x,z,t)` provider. [V by absence]** The creatures swimmer couples
+via an *injected* CPU-evaluable water height (buoyancy spring, gate `< 0.09` world units), but no water
+skill provides one: water-optics' analytic surface omits the sim heightfield; spectral-ocean's field is
+GPU-resident with no CPU export (readback in the hot path is forbidden pack-wide). *Fix:* the query-side
+coupling contract — each water owner exposes a CPU truncated dominant-wave sum of the *same authored
+spectrum/waves* with a stated parity error vs the GPU field (bounded → water-optics; open sea →
+spectral-ocean). This is also the template for any future physics coupling.
 
 Clean on current evidence (no action): bloom, exposure-color-grading, procedural-geometry,
 procedural-materials, water-optics, procedural-vegetation (one [A]: per-patch `InstancedMesh` may exceed
