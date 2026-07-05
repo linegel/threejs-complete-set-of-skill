@@ -186,10 +186,15 @@ compiler rules, locomotion constants and gates, scale architecture, the
 quality ladder toward skinned-look results, the creature-lab contract, the
 boot/compile/spawn contract, and the numeric gate table.
 
-Canonical runnable example: not yet included. The next required artifact is a
-self-verifying `examples/` lab that proves CPU/TSL parity, determinism,
-culling, snap residuals, stance drift, boot gates, and tier budgets against
-the reference's numeric gate table.
+Canonical runnable example: `examples/webgpu-procedural-creature-lab/`.
+The lab currently provides a pure-core runtime, TSL adapter module boundaries,
+deterministic `window.__lab` browser surface, Playwright capture harness,
+numeric gates, and artifact gates for field math, snap residuals, shell counts,
+locomotion, determinism, boot metrics, and capture manifests. Current caveat:
+the visible capture path is deterministic canvas evidence over the core and
+adapter contracts; the remaining canonical closure is a real `WebGPURenderer`
+snapped-shell scene whose visible, shadow, received-shadow, and outline paths
+consume the same snapped position node.
 
 ## Failure Conditions
 
