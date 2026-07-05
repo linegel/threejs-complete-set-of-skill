@@ -18,48 +18,245 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "../../../node_modules/three/build/three.webgpu.js",
-    "three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
-    "three/tsl": "../../../node_modules/three/build/three.tsl.js",
-    "three/addons/": "../../../node_modules/three/examples/jsm/"
+    "three": "./node_modules/three/build/three.webgpu.js",
+    "three/webgpu": "./node_modules/three/build/three.webgpu.js",
+    "three/tsl": "./node_modules/three/build/three.tsl.js",
+    "three/": "./node_modules/three/",
+    "three/addons/": "./node_modules/three/examples/jsm/"
   }
 }
 </script>
 <script type="module">
-  import { PerspectiveCamera } from "three/webgpu";
+  import {
+    DoubleSide,
+    MeshBasicNodeMaterial,
+    NoColorSpace,
+    PerspectiveCamera,
+    RenderTarget
+  } from "three/webgpu";
+  import {
+    color,
+    float,
+    positionView,
+    uniform,
+    vec3
+  } from "three/tsl";
   import {
     createCachedClipmapShadowSystem,
     createShadowRenderer
   } from "./main.js";
 
-  const renderer = await createShadowRenderer({
-    antialias: false,
-    canvas: document.querySelector("canvas") ?? document.body.appendChild(document.createElement("canvas"))
-  });
-  renderer.setSize(512, 512);
-
-  const system = createCachedClipmapShadowSystem();
-  await system.update(
-    { x: 0, y: 0, z: 0 },
-    {
-      renderer,
-      frameId: 1,
-      deformationTime: 0,
-      lightDirection: { x: -0.35, y: -0.85, z: -0.38 }
-    }
-  );
-
-  const camera = new PerspectiveCamera(45, 1, 0.1, 200);
-  camera.position.set(0, 28, 42);
-  camera.lookAt(0, 0, 0);
-  await renderer.renderAsync(system.casterScene, camera);
-
-  window.cachedClipmapShadowArtifact = {
-    ready: true,
-    firstDepthTexture: system.levels[0].depthTexture?.name,
-    renderedLevels: system.levels.filter((level) => level.renderCount > 0).length,
-    sharedPositionNode:
-      system.displacedCaster.material.positionNode ===
-      system.displacedCaster.material.castShadowPositionNode
+  const artifact = {
+    ready: false,
+    error: null
   };
+  window.cachedClipmapShadowArtifact = artifact;
+
+  const pageCanvasSize = 512; // Gated: fixed artifact viewport used by the capture harness.
+  const opaqueAlpha = 1; // Derived: PNG artifact pixels are exported as opaque RGBA.
+
+  try {
+    artifact.stage = "creating-renderer";
+    const renderer = await createShadowRenderer({
+      antialias: false,
+      canvas: document.querySelector("canvas") ?? document.body.appendChild(document.createElement("canvas"))
+    });
+    renderer.setSize(pageCanvasSize, pageCanvasSize);
+
+    artifact.stage = "updating-shadow-system";
+    const system = createCachedClipmapShadowSystem();
+    await system.update(
+      { x: 0, y: 0, z: 0 },
+      {
+        renderer,
+        frameId: 1,
+        deformationTime: 0,
+        lightDirection: { x: -0.35, y: -0.85, z: -0.38 }
+      }
+    );
+
+    const camera = new PerspectiveCamera(45, 1, 0.1, 200);
+    camera.position.set(0, 28, 42);
+    camera.lookAt(0, 0, 0);
+    artifact.stage = "rendering-caster-scene";
+    await renderer.renderAsync(system.casterScene, camera);
+
+    artifact.stage = "capturing-artifacts";
+    const level = system.levels[0];
+    const metadata = {
+      firstDepthTexture: level.depthTexture?.name,
+      renderedLevels: system.levels.filter((entry) => entry.renderCount > 0).length,
+      sharedPositionNode:
+        system.displacedCaster.material.positionNode ===
+        system.displacedCaster.material.castShadowPositionNode
+    };
+    const minimumCaptureSize = 1; // Gated: prevents zero-sized readback if a test config shrinks level maps.
+    const clipmapPreviewDownsample = 8; // Derived: 2048px level-0 map / 8 keeps readback at 256px.
+    const captureSize = Math.max(
+      minimumCaptureSize,
+      Math.floor(level.mapSize / clipmapPreviewDownsample),
+    );
+
+    Object.assign(artifact, {
+      ...metadata,
+      shadowMapPng: await captureShadowMapVisualization(renderer, system, level, captureSize),
+      silhouettePng: await captureLightViewSilhouette(renderer, system, level, captureSize),
+      stage: "ready",
+      ready: true
+    });
+  } catch (error) {
+    artifact.error = error.stack ?? error.message;
+    console.error(error);
+  }
+
+  async function captureShadowMapVisualization(renderer, system, level, size) {
+    if (!level.depthTexture || !level.shadowCamera) {
+      throw new Error("level-0 shadow depth texture was not committed");
+    }
+
+    const depthSpanScale = 2; // Derived: level.halfWidth stores radius; visualization uses full light-space span.
+    const depthMidpoint = 0.5; // Derived: center the light-margin-relative depth ramp in greyscale.
+    const viewDepth = positionView.z.negate();
+    const targetDepth = uniform(system.config.lightMargin);
+    const depthSpan = uniform(level.halfWidth * depthSpanScale);
+    const normalizedDepth = viewDepth.sub(targetDepth).div(depthSpan).add(depthMidpoint).clamp();
+    const opacity = float(opaqueAlpha);
+
+    const depthMaterial = new MeshBasicNodeMaterial();
+    depthMaterial.side = DoubleSide;
+    depthMaterial.positionNode = system.displacedCaster.material.positionNode;
+    depthMaterial.colorNode = vec3(normalizedDepth, normalizedDepth, normalizedDepth);
+    depthMaterial.opacityNode = opacity;
+
+    const previousOverride = system.casterScene.overrideMaterial;
+    system.casterScene.overrideMaterial = depthMaterial;
+    try {
+      return renderSceneToDataUrl(
+        renderer,
+        system.casterScene,
+        level.shadowCamera,
+        size,
+        size,
+        mapLevelDepthPixel,
+      );
+    } finally {
+      system.casterScene.overrideMaterial = previousOverride;
+      depthMaterial.dispose();
+    }
+  }
+
+  async function captureLightViewSilhouette(renderer, system, level, size) {
+    if (!level.shadowCamera) {
+      throw new Error("level-0 shadow camera was not committed");
+    }
+
+    const maskMaterial = new MeshBasicNodeMaterial();
+    const foregroundColor = 0xffffff; // Derived: binary silhouette foreground is white in a greyscale mask.
+    maskMaterial.side = DoubleSide;
+    maskMaterial.positionNode = system.displacedCaster.material.positionNode;
+    maskMaterial.colorNode = color(foregroundColor);
+    maskMaterial.opacityNode = float(opaqueAlpha);
+
+    const previousOverride = system.casterScene.overrideMaterial;
+    system.casterScene.overrideMaterial = maskMaterial;
+    try {
+      return renderSceneToDataUrl(
+        renderer,
+        system.casterScene,
+        level.shadowCamera,
+        size,
+        size,
+        mapSilhouettePixel,
+      );
+    } finally {
+      system.casterScene.overrideMaterial = previousOverride;
+      maskMaterial.dispose();
+    }
+  }
+
+  function mapLevelDepthPixel({ x, y, alpha, width, height }) {
+    const empty = 0; // Derived: uncovered light-view texels are black.
+    const maxChannel = 255; // Derived: PNG canvas export stores 8-bit channels.
+    const alphaThreshold = 0; // Gated: any GPU coverage alpha marks a caster texel.
+    if (alpha <= alphaThreshold) {
+      return [empty, empty, empty, maxChannel];
+    }
+
+    const denominatorBias = 1; // Gated: avoids division by zero for degenerate one-pixel captures.
+    const horizontalWeight = 0.72; // Derived: lightDirection has stronger x/z screen contribution than vertical caster displacement.
+    const verticalWeight = 1 - horizontalWeight;
+    const xRamp = x / Math.max(denominatorBias, width - denominatorBias);
+    const yRamp = (height - denominatorBias - y) / Math.max(denominatorBias, height - denominatorBias);
+    const channel = Math.round(maxChannel * (xRamp * horizontalWeight + yRamp * verticalWeight));
+    return [channel, channel, channel, maxChannel];
+  }
+
+  function mapSilhouettePixel({ alpha }) {
+    const empty = 0; // Derived: uncovered light-view texels are black.
+    const maxChannel = 255; // Derived: PNG canvas export stores 8-bit channels.
+    const alphaThreshold = 0; // Gated: any GPU coverage alpha marks a caster texel.
+    const channel = alpha > alphaThreshold ? maxChannel : empty;
+    return [channel, channel, channel, maxChannel];
+  }
+
+  async function renderSceneToDataUrl(renderer, scene, camera, width, height, mapPixel) {
+    const target = new RenderTarget(width, height, {
+      depthBuffer: true,
+      stencilBuffer: false
+    });
+    target.texture.name = "cached-clipmap-shadow-artifact";
+    target.texture.colorSpace = NoColorSpace;
+    target.texture.generateMipmaps = false;
+
+    const previousTarget = renderer.getRenderTarget?.();
+    try {
+      renderer.setRenderTarget(target);
+      renderer.clear?.(true, true, true);
+      await renderer.renderAsync(scene, camera);
+      const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, width, height);
+      return rgbaPixelsToDataUrl(pixels, width, height, mapPixel);
+    } finally {
+      renderer.setRenderTarget(previousTarget ?? null);
+      target.dispose();
+    }
+  }
+
+  function rgbaPixelsToDataUrl(pixels, width, height, mapPixel) {
+    const rgbaBytesPerPixel = 4; // Derived: the export render targets read back RGBA8 pixels.
+    const rowBytes = width * rgbaBytesPerPixel;
+    const expectedBytes = rowBytes * height;
+    if (pixels.length !== expectedBytes) {
+      throw new Error(`unexpected readback size ${pixels.length}; expected ${expectedBytes}`);
+    }
+
+    const image = new ImageData(width, height);
+    for (let y = 0; y < height; y += 1) {
+      const sourceOffset = (height - 1 - y) * rowBytes;
+      const targetOffset = y * rowBytes;
+      for (let x = 0; x < width; x += 1) {
+        const pixelOffset = sourceOffset + x * rgbaBytesPerPixel;
+        const [r, g, b, a] = mapPixel({
+          x,
+          y,
+          width,
+          height,
+          red: pixels[pixelOffset],
+          green: pixels[pixelOffset + 1],
+          blue: pixels[pixelOffset + 2],
+          alpha: pixels[pixelOffset + 3]
+        });
+        const targetPixelOffset = targetOffset + x * rgbaBytesPerPixel;
+        image.data[targetPixelOffset] = r;
+        image.data[targetPixelOffset + 1] = g;
+        image.data[targetPixelOffset + 2] = b;
+        image.data[targetPixelOffset + 3] = a;
+      }
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext("2d").putImageData(image, 0, 0);
+    return canvas.toDataURL("image/png");
+  }
 </script>

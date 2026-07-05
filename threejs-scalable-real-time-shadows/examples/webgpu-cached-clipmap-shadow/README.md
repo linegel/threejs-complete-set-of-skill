@@ -39,5 +39,20 @@ Run:
 node threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/validate.js --allow-missing-gpu
 ```
 
-Without `--allow-missing-gpu`, validation expects browser artifacts via
-`--artifacts <dir>` and exits non-zero when they are absent.
+The GPU artifact layer now has a browser producer. From this example directory,
+run:
+
+```bash
+node capture-shadow-depth.mjs
+```
+
+The capture harness serves the repo root, opens `browser.html` under Playwright
+Chromium with WebGPU flags, writes `artifacts/shadow-map.png`,
+`artifacts/silhouette.png`, and `artifacts/shadow-capture.json`, then runs:
+
+```bash
+node validate.js --artifacts artifacts
+```
+
+Without either `--allow-missing-gpu` or produced artifacts, validation exits
+non-zero because the artifact layer is intentionally required.
