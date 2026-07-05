@@ -32,6 +32,9 @@ stable coordinates
   -> node post/output
 ```
 
+Texture-space/decoupled shading is a considered alternative, not the default
+specular-stability path; read [the image-pipeline note](../threejs-image-pipeline/references/production-image-pipeline.md#considered-alternative-texture-space--decoupled-shading) before replacing derivative normals, specular AA, or TRAA with cached radiance.
+
 The target graph writes:
 
 - `colorNode` from linear authored identity colors or `SRGBColorSpace` color

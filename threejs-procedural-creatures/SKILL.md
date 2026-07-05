@@ -77,6 +77,8 @@ this order; every step ends in something renderable or assertable.
 8. **Shading.** Normals from the field gradient; albedo from proximity-blended
    part colors over the same candidate set; banded toon ramp; SDF self-AO
    (few taps along the normal) so blended limbs read grounded, not inflated.
+   For toon hatching or paint-stroke stability that wants texture-space
+   evaluation, read [the image-pipeline note](../threejs-image-pipeline/references/production-image-pipeline.md#considered-alternative-texture-space--decoupled-shading); it is an exception path, not a default creature lighting cache.
    Prove shadow parity: the shadow/depth path must consume the same snapped
    position function, verified by a silhouette-vs-shadow test, not assumed.
    Decode authored sRGB colors to linear before any uniform/storage upload.

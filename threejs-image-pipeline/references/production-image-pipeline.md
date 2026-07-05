@@ -280,6 +280,49 @@ mobile/tiled: 4.0-7.0 ms at 720p-900p
 - Replaced display-referred grading ambiguity with explicit LUT domains and a
   single `renderOutput()`/`outputColorTransform` decision.
 
+## Considered Alternative: Texture-Space / Decoupled Shading
+
+The default doctrine for this pack is decouple DATA, not RADIANCE.
+Fixed-parametrization evaluation already belongs in data bakes and histories:
+`$threejs-procedural-fields` field/height bakes,
+`$threejs-dynamic-surface-effects` `StorageTexture` histories, and
+`$threejs-spectral-ocean` frequency-space derivatives. Specular stability comes
+from source band-limiting, derivative-filtered normal bands, specular AA, and
+`TRAANode`, not from caching shaded radiance.
+
+Texture-space or decoupled shading means Renderman-style fixed-lattice
+evaluation and modern texel-shading variants: shade in a surface parameter
+domain, then reuse or filter the result later. Keep it as a considered
+alternative ONLY for these cases:
+
+- stylized surface-space looks that must remain stable in parametrization
+  space, such as toon hatching, paint strokes, and authored band patterns;
+- expensive view-independent shading on geometry with a unique, well-behaved
+  parametrization;
+- shading reuse across stereo views or frames, where the reuse contract is the
+  feature being built.
+
+It is not the default here:
+
+- the pack's procedural geometry is parametrization-hostile. Triplanar planets,
+  atlas-repeat facades, displaced oceans, and generated blend shells do not
+  share one unique, stable UV lattice;
+- cached radiance is view-dependent and mips non-linearly. Shading before
+  filtering breaks specular energy, especially when roughness, normals,
+  Fresnel, shadows, or environment response change with view;
+- WebGPU-in-Three.js r185 has no VRS or texel-shading plumbing. To ship it
+  anyway, the skill would hand-roll scheduling, residency, invalidation,
+  filtering, and debug ownership against this pipeline's one-owner contract.
+
+Use texture-space shading when a sibling skill explicitly owns the
+parametrization, the shaded quantity is truly view-independent or intentionally
+stylized, and the artifact proves filtering and invalidation. Otherwise, bake
+causes, histories, or derivatives; shade radiance in the owned scene/post
+pipeline.
+
+This note exists so the alternative is not re-litigated, in the same spirit as
+the spectral-ocean Jacobian symmetry note.
+
 ## Lifecycle And Diagnostics
 
 Lifecycle checklist:
