@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three.js WebGPU Skill Pack — TSL, Procedural Graphics, Visual Validation</title>
+<meta name="description" content="25 specialized agent skills for ambitious Three.js WebGPU/TSL scenes: oceans, clouds, planets, water optics, image pipelines, and screenshot-backed visual validation." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#e8e4da; --dim:#8b8778;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --serif:'Instrument Serif',serif; --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:15px;line-height:1.65;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+/* nav */
+nav{display:flex;justify-content:space-between;align-items:baseline;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--serif);font-size:22px;letter-spacing:.02em}
+nav .links{display:flex;gap:28px;font-size:13px;color:var(--dim)}
+nav .links a:hover{color:var(--amber)}
+/* hero */
+header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
+.kicker{color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px;animation:rise .7s ease both}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(44px,7.2vw,96px);line-height:1.02;letter-spacing:-.01em;max-width:14ch;animation:rise .7s .08s ease both}
+h1 em{font-style:italic;color:var(--amber)}
+.lede{margin-top:34px;max-width:62ch;color:var(--dim);animation:rise .7s .16s ease both}
+.stats{display:flex;gap:clamp(28px,5vw,72px);margin-top:56px;padding-top:28px;border-top:1px solid var(--line);animation:rise .7s .24s ease both}
+.stat b{display:block;font-family:var(--serif);font-weight:400;font-size:40px;color:var(--ink)}
+.stat span{font-size:12px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+/* sections */
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,48px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+/* quickstart */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+.step{background:var(--bg2);border:1px solid var(--line);padding:26px 26px 22px;position:relative}
+.step .n{position:absolute;top:-14px;left:22px;background:var(--bg);border:1px solid var(--line);color:var(--amber);
+  font-size:12px;padding:2px 10px;letter-spacing:.15em}
+.step h3{font-family:var(--serif);font-weight:400;font-size:21px;margin-bottom:10px}
+.step p{color:var(--dim);font-size:13.5px;margin-bottom:14px}
+pre{background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:12.5px;line-height:1.6;color:#cfc9ba;white-space:pre-wrap}
+code{font-family:var(--mono)}
+/* catalog */
+.category{margin-bottom:64px}
+.category-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 26px;margin-bottom:24px}
+.category-head h3{font-family:var(--serif);font-weight:400;font-size:27px;color:var(--amber)}
+.category-head p{color:var(--dim);font-size:13px;max-width:60ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card-index{font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-family:var(--serif);font-weight:400;font-size:21px}
+.card p{color:var(--dim);font-size:12.8px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05)}
+figcaption{padding:16px 18px;font-size:12.5px}
+figcaption strong{display:block;font-family:var(--serif);font-weight:400;font-size:17px;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+/* footer */
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:13px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="#">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="#quickstart">Usage</a><a href="#skills">Skills</a><a href="#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="kicker">TSL-first · WebGPURenderer · Screenshot-backed validation</p>
+  <h1>25 expert skills for <em>ambitious</em> Three.js WebGPU scenes.</h1>
+  <p class="lede">Not a tutorial. A skill pack for agents — Claude Code, Codex, and any shell that loads local skill folders — that need to design, implement, debug, and <strong>prove</strong> advanced real-time graphics: oceans, atmospheres, planets, volumetric clouds, water optics, particles, shadows, and full node post pipelines.</p>
+  <div class="stats">
+    <div class="stat"><b>25</b><span>skills</span></div>
+    <div class="stat"><b>44</b><span>runnable examples</span></div>
+    <div class="stat"><b>TSL</b><span>node-first architecture</span></div>
+    <div class="stat"><b>PNG+JSON</b><span>regression evidence</span></div>
+  </div>
+</header>
+
+<div class="section" id="quickstart"><div class="wrap">
+  <h2>Usage</h2>
+  <p class="sub">Clone the repo where your agent can see it, then invoke skills by name. The router picks the smallest useful set; each skill carries its own references, agents, and runnable examples.</p>
+  <div class="steps">
+    <div class="step"><span class="n">01</span><h3>Install</h3>
+      <p>Clone next to your project, or symlink the skill folders into your agent's skills directory (e.g. <code>~/.claude/skills/</code>).</p>
+      <pre><code>git clone https://github.com/linegel/threejs-complete-set-of-skill.git</code></pre></div>
+    <div class="step"><span class="n">02</span><h3>Route</h3>
+      <p>Start broad requests with the router so only the relevant experts are loaded into context.</p>
+      <pre><code>Use $threejs-choose-skills to plan a WebGPU/TSL
+scene with an ocean at sunset, volumetric clouds,
+camera flythrough, bloom, and validation.</code></pre></div>
+    <div class="step"><span class="n">03</span><h3>Build &amp; validate</h3>
+      <p>Load the selected skills, build the visual cause first, then prove the frame with reproducible evidence.</p>
+      <pre><code>Use $threejs-spectral-ocean and
+$threejs-sky-atmosphere-and-haze, then
+$threejs-visual-validation to verify the frame.</code></pre></div>
+  </div>
+</div></div>
+
+<div class="section" id="skills"><div class="wrap">
+  <h2>Skill catalog</h2>
+  <p class="sub">One owner for depth, tone mapping, and output color. Build the visual cause first; use post to preserve it. Validate with evidence, not one attractive screenshot. Every card links to the full SKILL.md.</p>
+
+    <section class="category">
+      <div class="category-head">
+        <h3>Planning and Validation</h3>
+        <p>Route requests to the right experts and prove the result with reproducible evidence.</p>
+      </div>
+      <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md" style="--d:0ms">
+        <span class="card-index">01</span>
+        <h4>Three.js WebGPU/TSL Choose Skills</h4>
+        <p>Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.</p>
+        <span class="card-meta">$threejs-choose-skills</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md" style="--d:40ms">
+        <span class="card-index">02</span>
+        <h4>Visual Validation</h4>
+        <p>Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.</p>
+        <span class="card-meta">$threejs-visual-validation · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-compatibility-fallbacks/SKILL.md" style="--d:80ms">
+        <span class="card-index">03</span>
+        <h4>Three.js Compatibility Fallbacks</h4>
+        <p>Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.</p>
+        <span class="card-meta">$threejs-compatibility-fallbacks · 1 example</span>
+      </a>
+      </div>
+    </section>
+
+    <section class="category">
+      <div class="category-head">
+        <h3>Cameras, Lighting, and Final Image</h3>
+        <p>Who owns depth, tone mapping, and the last pass — the difference between a demo and an image.</p>
+      </div>
+      <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-camera-controls-and-rigs/SKILL.md" style="--d:120ms">
+        <span class="card-index">04</span>
+        <h4>Camera Controls and Rigs</h4>
+        <p>Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration.</p>
+        <span class="card-meta">$threejs-camera-controls-and-rigs · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/SKILL.md" style="--d:160ms">
+        <span class="card-index">05</span>
+        <h4>Scalable Real-Time Shadows</h4>
+        <p>Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity.</p>
+        <span class="card-meta">$threejs-scalable-real-time-shadows · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/SKILL.md" style="--d:200ms">
+        <span class="card-index">06</span>
+        <h4>Ambient Contact Shading</h4>
+        <p>Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.</p>
+        <span class="card-meta">$threejs-ambient-contact-shading · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-bloom/SKILL.md" style="--d:240ms">
+        <span class="card-index">07</span>
+        <h4>Bloom</h4>
+        <p>Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics.</p>
+        <span class="card-meta">$threejs-bloom · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/SKILL.md" style="--d:280ms">
+        <span class="card-index">08</span>
+        <h4>Exposure and Color Grading</h4>
+        <p>Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading.</p>
+        <span class="card-meta">$threejs-exposure-color-grading · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md" style="--d:320ms">
+        <span class="card-index">09</span>
+        <h4>Image Pipeline</h4>
+        <p>Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.</p>
+        <span class="card-meta">$threejs-image-pipeline · 2 examples</span>
+      </a>
+      </div>
+    </section>
+
+    <section class="category">
+      <div class="category-head">
+        <h3>Worlds and Environments</h3>
+        <p>Skies, oceans, weather, and water that share causes instead of fighting each other.</p>
+      </div>
+      <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-sky-atmosphere-and-haze/SKILL.md" style="--d:360ms">
+        <span class="card-index">10</span>
+        <h4>Sky, Atmosphere, and Haze</h4>
+        <p>Implement maximum-performance sky, atmosphere, and haze systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, RenderPipeline, compute-generated scattering LUTs, depth-aware aerial perspective, sun/moon discs, and atmosphere-aware lighting.</p>
+        <span class="card-meta">$threejs-sky-atmosphere-and-haze · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-volumetric-clouds/SKILL.md" style="--d:400ms">
+        <span class="card-index">11</span>
+        <h4>Volumetric Clouds</h4>
+        <p>Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers.</p>
+        <span class="card-meta">$threejs-volumetric-clouds · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/SKILL.md" style="--d:440ms">
+        <span class="card-index">12</span>
+        <h4>Spectral Ocean</h4>
+        <p>Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.</p>
+        <span class="card-meta">$threejs-spectral-ocean · 4 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md" style="--d:480ms">
+        <span class="card-index">13</span>
+        <h4>Water Optics</h4>
+        <p>Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.</p>
+        <span class="card-meta">$threejs-water-optics · 3 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md" style="--d:520ms">
+        <span class="card-index">14</span>
+        <h4>Rain, Snow, and Wet Surfaces</h4>
+        <p>Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.</p>
+        <span class="card-meta">$threejs-rain-snow-and-wet-surfaces · 3 examples</span>
+      </a>
+      </div>
+    </section>
+
+    <section class="category">
+      <div class="category-head">
+        <h3>Procedural Content</h3>
+        <p>Fields, materials, geometry, buildings, planets, vegetation, creatures — authored systems, not noise soup.</p>
+      </div>
+      <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md" style="--d:560ms">
+        <span class="card-index">15</span>
+        <h4>Procedural Fields</h4>
+        <p>Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.</p>
+        <span class="card-meta">$threejs-procedural-fields · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-materials/SKILL.md" style="--d:600ms">
+        <span class="card-index">16</span>
+        <h4>Procedural Materials</h4>
+        <p>Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.</p>
+        <span class="card-meta">$threejs-procedural-materials · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-geometry/SKILL.md" style="--d:640ms">
+        <span class="card-index">17</span>
+        <h4>Procedural Geometry</h4>
+        <p>Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.</p>
+        <span class="card-meta">$threejs-procedural-geometry · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/SKILL.md" style="--d:680ms">
+        <span class="card-index">18</span>
+        <h4>Procedural Buildings and Cities</h4>
+        <p>Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.</p>
+        <span class="card-meta">$threejs-procedural-buildings-and-cities · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md" style="--d:720ms">
+        <span class="card-index">19</span>
+        <h4>Procedural Planets</h4>
+        <p>Author high-performance procedural planetary bodies in latest Three.js with WebGPURenderer, TSL, NodeMaterial, cube-sphere quadtree LOD, GPU displacement, coupled crater/biome/climate fields, analytic normals, altitude LOD, and atmosphere handoff from orbit through close approach.</p>
+        <span class="card-meta">$threejs-procedural-planets · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md" style="--d:760ms">
+        <span class="card-index">20</span>
+        <h4>Procedural Vegetation</h4>
+        <p>Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.</p>
+        <span class="card-meta">$threejs-procedural-vegetation · 5 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md" style="--d:800ms">
+        <span class="card-index">21</span>
+        <h4>Procedural Creatures</h4>
+        <p>Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.</p>
+        <span class="card-meta">$threejs-procedural-creatures</span>
+      </a>
+      </div>
+    </section>
+
+    <section class="category">
+      <div class="category-head">
+        <h3>Motion and Effects</h3>
+        <p>Kinematics, particles, surface history, and spacetime — motion with frame-rate-independent discipline.</p>
+      </div>
+      <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md" style="--d:840ms">
+        <span class="card-index">22</span>
+        <h4>Procedural Motion Systems</h4>
+        <p>Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.</p>
+        <span class="card-meta">$threejs-procedural-motion-systems · 1 example</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-particles-trails-and-effects/SKILL.md" style="--d:880ms">
+        <span class="card-index">23</span>
+        <h4>Particles, Trails, and Effects</h4>
+        <p>Author production WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for ship-conforming reentry plasma, generated capsule wakes, compute-updated instanced sparks, timed dissolving debris, dense-swap effect pools, and MRT-driven scene-relative HDR emission hierarchy.</p>
+        <span class="card-meta">$threejs-particles-trails-and-effects · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-dynamic-surface-effects/SKILL.md" style="--d:920ms">
+        <span class="card-index">24</span>
+        <h4>Dynamic Surface Effects</h4>
+        <p>Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.</p>
+        <span class="card-meta">$threejs-dynamic-surface-effects · 2 examples</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-black-holes-and-space-effects/SKILL.md" style="--d:960ms">
+        <span class="card-index">25</span>
+        <h4>Black Holes and Space Effects</h4>
+        <p>Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.</p>
+        <span class="card-meta">$threejs-black-holes-and-space-effects · 2 examples</span>
+      </a>
+      </div>
+    </section>
+</div></div>
+
+<div class="section" id="gallery"><div class="wrap">
+  <h2>Validation gallery</h2>
+  <p class="sub">Frames produced and verified by the skills themselves — fixed-view design contracts, per-signal diagnostics mosaics, and deterministic generated texture assets.</p>
+  <div class="gallery">
+      <figure>
+        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Procedural planet — crater field" loading="lazy" />
+        <figcaption><strong>Procedural planet — crater field</strong><span>threejs-procedural-planets · final design frame from the fixed-view visual contract</span></figcaption>
+      </figure>
+      <figure>
+        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded water — generated caustics" loading="lazy" />
+        <figcaption><strong>Bounded water — generated caustics</strong><span>threejs-water-optics · differential-area caustics with depth-aware refraction</span></figcaption>
+      </figure>
+      <figure>
+        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Rain — generated ripple normals" loading="lazy" />
+        <figcaption><strong>Rain — generated ripple normals</strong><span>threejs-rain-snow-and-wet-surfaces · wet-surface ripples from generated normal variants</span></figcaption>
+      </figure>
+      <figure>
+        <img src="visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Diagnostics mosaic — planet" loading="lazy" />
+        <figcaption><strong>Diagnostics mosaic — planet</strong><span>threejs-visual-validation · per-signal diagnostic passes, not a single pretty screenshot</span></figcaption>
+      </figure>
+      <figure>
+        <img src="visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Diagnostics mosaic — water" loading="lazy" />
+        <figcaption><strong>Diagnostics mosaic — water</strong><span>threejs-visual-validation · effect isolation across the node pipeline</span></figcaption>
+      </figure>
+      <figure>
+        <img src="generated-asset-contact-sheet.png" alt="Generated texture asset contact sheet" loading="lazy" />
+        <figcaption><strong>Generated texture asset contact sheet</strong><span>deterministic PNG variants shipped under assets/generated-variants/</span></figcaption>
+      </figure>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill#readme">Full README</a> · MIT-spirited, agent-tested</span>
+</footer></div>
+</body>
+</html>
