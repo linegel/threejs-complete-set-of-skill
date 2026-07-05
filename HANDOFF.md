@@ -41,6 +41,35 @@ is `prompts/audit-provenance-free-constants.md` (three-bucket test: Derived / Ga
 
 ## 3. Defect register — ordered by blast radius
 
+**Remediation status (2026-07-05 session, orchestrator-verified — every commit below carries an
+independently re-run validator plus a mutation check proving the gate can fail). The formal
+companion spec — derivations, gate inequalities, mutation-check register — is
+`REMEDIATION_PLAN.md` at repo root (baseline `add38f6`); it supersedes the operational
+checklists where they differ:**
+
+| Item | Status | Commit |
+| --- | --- | --- |
+| 3.1 fields parity | CLOSED | `48174c2` |
+| 3.2 shadow depth renders + caster parity | CLOSED | `2123c56` |
+| 3.3 composed-budget mutex | CLOSED | `1995a1c` |
+| 3.4 routing divergence | CLOSED (creatures installed, 11 stale copies archived, manifest v0.4.0, preflight in `1995a1c`) | — |
+| 3.5 ocean (pack combine + NEW Nyquist mask, capillary, batching, half-open mask, Hermitian gate, Jacobian doc) | CLOSED | `c8746ef` |
+| 3.6 clouds (quarantine, real march, memory table, height-mix rename) | CLOSED | `6307f02` |
+| 3.7 sky (one owner, executed LUTs, throw) | CLOSED | `9e63605` |
+| 3.8 planets (fused gradient, real parity) | CLOSED | `a068da1` |
+| 3.9 creatures Wave A doc closures | CLOSED (`3a543c2`); **Wave B lab (3.9e) still OPEN** | `3a543c2` |
+| 3.10 visual-validation enforcement | CLOSED | `83e914f` |
+| 3.11 image-pipeline residuals + W1 velocity/depth contracts | CLOSED | `beff380` |
+| 3.12 motion interpolation + real compute | CLOSED | `4664f4a` |
+| 3.13 fallbacks creatures rows | CLOSED | `4273eb4` |
+| 3.14 getWaterHeight coupling | CLOSED (CPU samplers + parity gates, truncation bound, coupling template) | `6c71a73` |
+| W12 vegetation draw-budget reconciliation | CLOSED | `8582bdb` |
+
+New defects found and fixed during orchestrator verification (not in the original register):
+ocean Nyquist-bin non-Hermitian derivative spectra (in `c8746ef`); visual-validation unknown-fixture
+silent no-op (in `83e914f`); motion validator not driving the real demo loop (in `4664f4a`);
+image-pipeline CLI never building the real graph (in `beff380`).
+
 ### Tier 1: poisons downstream skills
 
 **3.1 `threejs-procedural-fields` — parity validator is vacuous; CPU and TSL genuinely diverge. [V]**
