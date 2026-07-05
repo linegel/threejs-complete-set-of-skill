@@ -65,6 +65,8 @@ export function advanceDeltaPolicy(policy, rawDeltaSeconds, stepFixed) {
   }
 
   if (policy.accumulator >= policy.fixedStep) {
+    // Spiral-of-death clamp: discard the remainder after maxSubsteps so a
+    // hidden-tab resume cannot execute an unbounded fixed-step backlog.
     policy.accumulator = 0;
     policy.droppedSubstep = true;
   }
@@ -91,6 +93,52 @@ export function createMotionState({ seed = DEFAULT_SEED, streamId = 3 } = {}) {
     },
     eventLog: [],
   };
+}
+
+export function copyMotionState(target, source) {
+  target.seed = source.seed;
+  target.streamId = source.streamId;
+  target.rngCounter = source.rngCounter;
+  target.phaseId = source.phaseId;
+  target.phaseLocalTime = source.phaseLocalTime;
+  target.position.copy(source.position);
+  target.velocity.copy(source.velocity);
+  target.baseQuaternion.copy(source.baseQuaternion);
+  target.quaternion.copy(source.quaternion);
+  target.angularVelocity.copy(source.angularVelocity);
+  target.eventFlags.stageDetached = source.eventFlags.stageDetached;
+  target.eventFlags.dockingCaptured = source.eventFlags.dockingCaptured;
+  target.eventFlags.terminalLocked = source.eventFlags.terminalLocked;
+  target.eventLog.length = 0;
+  for (const event of source.eventLog) target.eventLog.push({ ...event });
+  return target;
+}
+
+export function createMotionStateSlots({ seed = DEFAULT_SEED, streamId = 3 } = {}) {
+  const previous = createMotionState({ seed, streamId });
+  const current = createMotionState({ seed, streamId });
+  const render = createMotionState({ seed, streamId });
+  stepTimelineState(current, 0, 0);
+  copyMotionState(previous, current);
+  copyMotionState(render, current);
+  return { previous, current, render };
+}
+
+export function getPresentationAlpha(policy) {
+  if (policy.fixedStep <= 0) return 0;
+  return Math.min(Math.max(policy.accumulator / policy.fixedStep, 0), 1);
+}
+
+export function interpolateMotionState(target, previous, current, alpha) {
+  copyMotionState(target, previous);
+  target.position.copy(previous.position).lerp(current.position, alpha);
+  target.velocity.copy(previous.velocity).lerp(current.velocity, alpha);
+  target.quaternion.copy(previous.quaternion).slerp(current.quaternion, alpha).normalize();
+  target.baseQuaternion.copy(target.quaternion);
+  target.angularVelocity.copy(previous.angularVelocity).lerp(current.angularVelocity, alpha);
+  target.phaseId = current.phaseId;
+  target.phaseLocalTime = previous.phaseLocalTime + (current.phaseLocalTime - previous.phaseLocalTime) * alpha;
+  return target;
 }
 
 export function logOneShotEvent(state, time, eventName, actorId = 0) {

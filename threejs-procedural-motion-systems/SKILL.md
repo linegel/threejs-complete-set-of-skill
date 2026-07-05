@@ -11,6 +11,11 @@ is latest Three.js `WebGPURenderer` from `three/webgpu`, `THREE.Timer`,
 materials, and scale routing to instanced attributes or compute-updated storage
 buffers before per-object updates become the bottleneck.
 
+Number labels: Gated values are validation limits, quality tiers, or budget
+ceilings. Derived values come from actor count, authored scene scale, preset
+equations, or measured hardware. Do not present a number as universal unless it
+is labeled by one of those contracts.
+
 ## Build order
 
 Throughput decision table:
@@ -27,18 +32,20 @@ Throughput decision table:
    `StorageBufferAttribute`, `storage()` nodes, and `renderer.compute()`.
 2. Create one renderer loop with `await renderer.init()`,
    `timer.connect(document)`, `timer.update(timestamp)`, fixed-step
-   accumulation for deterministic simulation, and presentation interpolation
-   from analytic time rather than frame count.
+   accumulation for deterministic simulation, previous/current fixed-state
+   slots, `alpha = accumulator / fixedStep`, and presentation transforms
+   interpolated from previous/current state rather than frame count.
 3. Define phase contracts, event boundaries, seed ownership, phase-local time,
    replay reset/disposal, and a `DeltaPolicy` with raw delta, clamped delta,
    fixed step, max substeps, simulation time, and presentation time.
 4. Derive target position/orientation analytically from named coordinate
    frames: world, subject local, orbital radial/tangent, docking axis, rotating
    hull frame, or camera-authored presentation frame.
-5. Encode high-count transforms as compact state: position, velocity, base
-   quaternion, angular velocity, phase id, seed, and flags in storage buffers;
-   evaluate per-instance pose in compute or vertex TSL instead of walking
-   thousands of `Object3D` transforms.
+5. Encode high-count transforms as compact state: previous position, current
+   position, velocity, base quaternion, angular velocity, phase id, seed, and
+   flags in storage buffers; dispatch compute from the fixed-step loop and
+   evaluate render pose in vertex TSL from previous/current storage plus alpha
+   instead of walking thousands of `Object3D` transforms.
 6. Use frame-rate-independent smoothing with `alpha = 1 - pow(k, dt)` for
    perceptual response, and use bounded second-order springs only when velocity
    is part of the authored motion.
@@ -73,6 +80,9 @@ if ( renderer.backend.isWebGPUBackend ) {
 ```
 
 Do not write a parallel renderer implementation in this skill.
+
+Quality tiers use Gated counts and rates unless a preset explicitly labels a
+number as Derived from authored scene scale, actor count, or measured hardware.
 
 Quality tiers:
 

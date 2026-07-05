@@ -5,6 +5,11 @@ launch, staging, docking, spring, rotating-frame, detachment, and debris motion.
 The best path is analytic semantic state first, then instanced node attributes
 or compute/storage state for scale.
 
+Number labels: Gated values are validation limits, quality tiers, or explicit
+budget gates. Derived values come from the authored scene scale, preset
+equations, actor count, or measured hardware. Treat unfit hardware or scale as
+a reason to choose a lower tier, not to silently change the motion contract.
+
 ## Contents
 
 - Architecture contract
@@ -70,6 +75,12 @@ const policy = {
   presentationTime: 0
 };
 
+const fixedState = {
+  previous: createProceduralState(),
+  current: createProceduralState(),
+  render: createProceduralState()
+};
+
 renderer.setAnimationLoop( ( timestamp ) => {
   timer.update( timestamp );
 
@@ -80,7 +91,9 @@ renderer.setAnimationLoop( ( timestamp ) => {
 
   let substeps = 0;
   while ( policy.accumulator >= policy.fixedStep && substeps < policy.maxSubsteps ) {
-    stepProceduralAnimation( policy.fixedStep, policy.simulationTime );
+    copyProceduralState( fixedState.previous, fixedState.current );
+    stepProceduralAnimation( fixedState.current, policy.fixedStep, policy.simulationTime + policy.fixedStep );
+    stepGpuAnimation( policy.fixedStep, policy.simulationTime + policy.fixedStep );
     policy.simulationTime += policy.fixedStep;
     policy.accumulator -= policy.fixedStep;
     substeps ++;
@@ -88,12 +101,17 @@ renderer.setAnimationLoop( ( timestamp ) => {
 
   if ( substeps === policy.maxSubsteps ) policy.accumulator = 0;
 
-  renderProceduralFrame( policy );
+  const alpha = policy.accumulator / policy.fixedStep;
+  interpolateProceduralState( fixedState.render, fixedState.previous, fixedState.current, alpha );
+  renderProceduralFrame( fixedState.render, alpha );
 } );
 ```
 
 The policy owns raw delta, clamped delta, fixed step, max substeps, simulation
-time, presentation time, replay time, and pause/resume behavior. Mixers,
+time, presentation time, replay time, and pause/resume behavior. The
+spiral-of-death clamp is Gated by `maxSubsteps`; when the gate is hit, discard
+the remainder and record the drop for diagnostics instead of executing an
+unbounded backlog. Mixers,
 compute dispatches, springs, and presentation-only effects consume this policy
 rather than sampling their own clocks.
 
@@ -123,7 +141,7 @@ belong in the compatibility-fallbacks skill.
 | Need | Import |
 | --- | --- |
 | Renderer, timer, pipeline, storage | `WebGPURenderer`, `Timer`, `RenderPipeline`, `StorageInstancedBufferAttribute`, `StorageBufferAttribute` from `three/webgpu` |
-| TSL compute/storage | `Fn`, `instanceIndex`, `storage`, `uniform`, `vec4`, `pass`, `mrt`, `renderOutput` from `three/tsl` |
+| TSL compute/storage | `Fn`, `instanceIndex`, `mix`, `positionLocal`, `storage`, `uniform`, `vec3`, `vec4`, `pass`, `mrt`, `renderOutput` from `three/tsl` |
 | Temporal reprojection | `traa` from `three/addons/tsl/display/TRAANode.js` |
 | Bloom | `bloom` from `three/addons/tsl/display/BloomNode.js` |
 | Ambient occlusion | `ao` from `three/addons/tsl/display/GTAONode.js` |
@@ -224,32 +242,69 @@ validation readback buffers before a replay begins.
 ## TSL/storage scaling path
 
 Use `StorageInstancedBufferAttribute` for per-instance state consumed by
-`InstancedMesh`, and `StorageBufferAttribute` for general compute state. Wrap
-them with TSL `storage()` nodes and update them with `Fn().compute(count)`.
+`InstancedMesh`, and `StorageBufferAttribute` for static parameters or general
+compute state. Keep two dynamic pose slots. Compute writes the next fixed state;
+vertex TSL reads previous/current slots and blends by the CPU-owned
+presentation alpha.
 
 ```ts
-import { Fn, instanceIndex, storage, uniform, vec4 } from 'three/tsl';
+import * as THREE from 'three/webgpu';
+import { Fn, instanceIndex, mix, positionLocal, storage, uniform, vec3, vec4 } from 'three/tsl';
 
-const poseAttribute = new THREE.StorageInstancedBufferAttribute(
-  instanceCount,
-  4,
-  Float32Array
+const instanceCount = derivedVisibleInstanceCount;
+const previousPose = new THREE.StorageInstancedBufferAttribute( instanceCount, 4 );
+const currentPose = new THREE.StorageInstancedBufferAttribute( instanceCount, 4 );
+const velocityState = new THREE.StorageInstancedBufferAttribute( instanceCount, 4 );
+const staticMotion = new THREE.StorageBufferAttribute( instanceCount, 4 );
+
+const previousPoseNode = storage( previousPose, 'vec4', instanceCount );
+const currentPoseNode = storage( currentPose, 'vec4', instanceCount );
+const velocityNode = storage( velocityState, 'vec4', instanceCount );
+const staticNode = storage( staticMotion, 'vec4', instanceCount );
+const fixedStep = uniform( 1 / 120 );
+const simTime = uniform( 0 );
+const alpha = uniform( 0 );
+
+const integratePose = Fn( ( { previousPose, currentPose, velocity, staticMotion } ) => {
+  const i = instanceIndex;
+  const current = currentPose.element( i );
+  const v = velocity.element( i );
+  const anchor = staticMotion.element( i );
+  const target = anchor.xyz.add( vec3( 0, anchor.w.sin().mul( 0.25 ), 0 ) );
+  const acceleration = target.sub( current.xyz ).mul( anchor.w.mul( anchor.w ) ).sub( v.xyz.mul( anchor.w.mul( 1.85 ) ) );
+  const nextVelocity = v.xyz.add( acceleration.mul( fixedStep ) );
+
+  previousPose.element( i ).assign( current );
+  currentPose.element( i ).assign( vec4( current.xyz.add( nextVelocity.mul( fixedStep ) ), current.w ) );
+  velocity.element( i ).assign( vec4( nextVelocity, v.w ) );
+} )( { previousPose: previousPoseNode, currentPose: currentPoseNode, velocity: velocityNode, staticMotion: staticNode } )
+  .compute( instanceCount, [ 64 ] )
+  .setName( 'motion:integrate-instance-spring' );
+
+material.positionNode = positionLocal.add(
+  mix(
+    previousPoseNode.element( instanceIndex ).xyz,
+    currentPoseNode.element( instanceIndex ).xyz,
+    alpha
+  )
 );
 
-const pose = storage( poseAttribute, 'vec4', instanceCount );
-const simTime = uniform( 0 );
-
-const integratePose = Fn( () => {
-  const i = instanceIndex;
-  const current = pose.element( i );
-  pose.element( i ).assign( vec4( current.xyz, simTime ) );
-} )().compute( instanceCount );
-
 function stepGpuAnimation( dt: number, time: number ) {
+  fixedStep.value = dt;
   simTime.value = time;
   renderer.compute( integratePose );
 }
+
+function renderGpuAnimation( presentationAlpha: number ) {
+  alpha.value = presentationAlpha;
+  renderPipeline.render();
+}
 ```
+
+Derived/Gated labels for the snippet: `instanceCount` is Derived from visible
+actor count and LOD; `fixedStep` is Derived from the delta policy; workgroup
+size `64` is Gated by the compute budget and device validation; spring stiffness
+and damping are Derived from the per-instance frequency stored in `staticMotion`.
 
 Use one dispatch for simple analytic timelines, two to three dispatches when
 you also compact active actors or update chunk bounds. Avoid readback in the
