@@ -13,6 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
 import { SCIENCE } from './science-cards.mjs';
+import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = 'https://github.com/linegel/threejs-complete-set-of-skill';
@@ -246,6 +247,12 @@ const galleryHtml = GALLERY.map((g) => `
         <figcaption><strong>${esc(g.title)}</strong><span>${esc(g.note)}</span></figcaption>
       </figure></a>`).join('');
 
+const liveDemoHtml = PROVIDER_DEMOS.map((demo) => `
+      <a href="${demo.livePath}"><figure>
+        <img src="${demo.poster}" alt="${esc(demo.title)}" loading="lazy" />
+        <figcaption><strong>${esc(demo.title)}</strong><span>${esc(demo.skill)} · ${esc(demo.providerClaim)}</span></figcaption>
+      </figure></a>`).join('');
+
 const HARNESSES = [
   { name: 'Claude Code', how: 'Symlink (or copy) the skill folders into your personal or project skills directory; they appear in the Skill tool automatically.', code: `git clone ${REPO}.git\nln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/` },
   { name: 'Codex CLI', how: 'Point Codex at the folders via AGENTS.md: list each skill name + path and instruct it to read the SKILL.md when the task matches.', code: `git clone ${REPO}.git\n# in AGENTS.md: "For Three.js WebGPU work, read the matching\n# threejs-*/SKILL.md from ./threejs-complete-set-of-skill/"` },
@@ -386,6 +393,13 @@ ${catalog}
   <h2>Validation gallery</h2>
   <p class="sub">Frames produced and verified by the skills themselves — fixed-view design contracts, per-signal diagnostics mosaics, and deterministic generated texture assets. Click through to the owning skill.</p>
   <div class="gallery">${galleryHtml}
+  </div>
+</div></div>
+
+<div class="section" id="demos"><div class="wrap">
+  <h2>Live WebGPU demos</h2>
+  <p class="sub">GitHub Pages demos that initialize WebGPU in the browser. They are integration probes and reduced-tier provider surfaces, not substitute production engines.</p>
+  <div class="gallery">${liveDemoHtml}
   </div>
 </div></div>
 
@@ -631,6 +645,7 @@ ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
   return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`;
 }).join('\n')}
+${PROVIDER_DEMOS.map((demo) => `  <url><loc>${SITE}${demo.livePath}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`).join('\n')}
 </urlset>
 `);
 

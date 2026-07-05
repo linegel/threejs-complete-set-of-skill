@@ -177,7 +177,7 @@
      "name": "Procedural Planets",
      "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-planets.html",
      "description": "Author high-performance procedural planetary bodies in latest Three.js with WebGPURenderer, TSL, NodeMaterial, cube-sphere quadtree LOD, GPU displacement, coupled crater/biome/climate fields, analytic normals, altitude LOD, and atmosphere handoff from orbit through close approach.",
-     "dateModified": "2026-07-05T04:09:15+03:00"
+     "dateModified": "2026-07-05T05:36:19+03:00"
     },
     {
      "@type": "ListItem",
@@ -193,7 +193,7 @@
      "name": "Rain, Snow, and Wet Surfaces",
      "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-rain-snow-and-wet-surfaces.html",
      "description": "Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.",
-     "dateModified": "2026-07-05T02:51:00+03:00"
+     "dateModified": "2026-07-05T05:36:19+03:00"
     },
     {
      "@type": "ListItem",
@@ -241,7 +241,7 @@
      "name": "Water Optics",
      "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html",
      "description": "Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.",
-     "dateModified": "2026-07-05T04:41:47+03:00"
+     "dateModified": "2026-07-05T05:41:12+03:00"
     }
    ]
   }
@@ -640,6 +640,29 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       <a href="skills/threejs-procedural-materials.html"><figure>
         <img src="generated-asset-contact-sheet.png" alt="Generated texture asset contact sheet" loading="lazy" />
         <figcaption><strong>Generated texture asset contact sheet</strong><span>deterministic PNG variants shipped under assets/generated-variants/</span></figcaption>
+      </figure></a>
+  </div>
+</div></div>
+
+<div class="section" id="demos"><div class="wrap">
+  <h2>Live WebGPU demos</h2>
+  <p class="sub">GitHub Pages demos that initialize WebGPU in the browser. They are integration probes and reduced-tier provider surfaces, not substitute production engines.</p>
+  <div class="gallery">
+      <a href="demos/water-integration-surface/"><figure>
+        <img src="visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" loading="lazy" />
+        <figcaption><strong>Water Integration Surface</strong><span>threejs-water-optics · The bounded-water core integrates into a host scene with presets, quality selection, buoyancy, spray probes, deterministic ticks, transparent ordering, and mask-gap evidence.</span></figcaption>
+      </figure></a>
+      <a href="demos/water-generated-caustics/"><figure>
+        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" loading="lazy" />
+        <figcaption><strong>Bounded Water Caustic Projection</strong><span>threejs-water-optics · Generated caustic fields are used as live scene inputs for a bounded-water floor projection.</span></figcaption>
+      </figure></a>
+      <a href="demos/rain-generated-ripples/"><figure>
+        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Wet Surface Ripple Normals" loading="lazy" />
+        <figcaption><strong>Wet Surface Ripple Normals</strong><span>threejs-rain-snow-and-wet-surfaces · Generated ripple normal variants are used as live scene inputs for wet asphalt lighting response.</span></figcaption>
+      </figure></a>
+      <a href="demos/planet-generated-craters/"><figure>
+        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Reduced-Tier Crater Mask Planet" loading="lazy" />
+        <figcaption><strong>Reduced-Tier Crater Mask Planet</strong><span>threejs-procedural-planets · Generated crater mask channels are used as live scene inputs for relief and material response on a WebGPU sphere.</span></figcaption>
       </figure></a>
   </div>
 </div></div>

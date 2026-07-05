@@ -26,7 +26,7 @@
    "description": "Author high-performance procedural planetary bodies in latest Three.js with WebGPURenderer, TSL, NodeMaterial, cube-sphere quadtree LOD, GPU displacement, coupled crater/biome/climate fields, analytic normals, altitude LOD, and atmosphere handoff from orbit through close approach.",
    "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-planets.html",
    "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
-   "dateModified": "2026-07-05T04:09:15+03:00",
+   "dateModified": "2026-07-05T05:36:19+03:00",
    "isPartOf": {
     "@type": "SoftwareSourceCode",
     "name": "Three.js WebGPU Skill Pack",
@@ -165,8 +165,8 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="meta-row">
     <span class="chip a">$threejs-procedural-planets</span>
     <span class="chip">2 runnable examples</span>
-    <span class="chip">Latest skill update <time datetime="2026-07-05T04:09:15+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/a068da1a11a64e9a13e7d197e65114ef250b5384">commit a068da1 ↗</a>
+    <span class="chip">Latest skill update <time datetime="2026-07-05T05:36:19+03:00">2026-07-05</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/73ac89625ab16bfbabae4739890a89eb3485e70b">commit 73ac896 ↗</a>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-planets/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -233,7 +233,11 @@ direction in a <code>surfaceDirection</code> attribute and treat it as the canon
 planet coordinate.</li>
 <li>Evaluate shared TSL <code>Fn</code> field functions for displacement, material causes,
 and diagnostics. Reuse the same functions in vertex displacement, surface
-material nodes, and compute passes.</li>
+material nodes, and compute passes.
+Parity-bearing value-noise corners use the <code>lowbias32-u32-lattice</code> integer
+hash family: CPU uses <code>Math.imul</code>/<code>&gt;&gt;&gt; 0</code> wrapping, and TSL uses <code>uint</code>
+arithmetic plus the same bit shifts and multipliers. Do not use
+transcendental hashes for CPU/GPU parity paths.</li>
 <li>Run compute passes through <code>renderer.compute()</code> or <code>renderer.computeAsync()</code>
 to fill <code>StorageBufferAttribute</code> patch data, parity sample buffers, optional
 indirect dispatch data, and cached min/max bounds.</li>

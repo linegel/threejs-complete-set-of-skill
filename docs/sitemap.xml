@@ -26,4 +26,8 @@
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html</loc><lastmod>2026-07-05</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-volumetric-clouds.html</loc><lastmod>2026-07-05</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html</loc><lastmod>2026-07-05</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/water-integration-surface/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/water-generated-caustics/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/rain-generated-ripples/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/planet-generated-craters/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>

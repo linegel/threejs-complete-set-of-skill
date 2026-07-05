@@ -1,5 +1,26 @@
 export const PROVIDER_DEMOS = [
   {
+    id: "water-integration-surface",
+    skill: "threejs-water-optics",
+    title: "Water Integration Surface",
+    sceneId: "water-integration-surface",
+    purpose: "live host-integration demo",
+    tier: "native WebGPU bounded-water integration",
+    livePath: "demos/water-integration-surface/",
+    poster: "visual-validation/water-integration-surface/integration-surface-readback.png",
+    evidenceDir: "visual-validation/water-integration-surface/",
+    sourceExample: "threejs-water-optics/EXPERIMENTAL/water-integration-surface",
+    validationCommand:
+      "npm --prefix threejs-water-optics/EXPERIMENTAL/water-integration-surface run validate",
+    providerClaim:
+      "The bounded-water core integrates into a host scene with presets, quality selection, buoyancy, spray probes, deterministic ticks, transparent ordering, and mask-gap evidence.",
+    limitations: [
+      "The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented.",
+      "The host project owns post-processing, transparent ordering, and final output conversion.",
+    ],
+    debugModes: ["live", "preset-switch", "sync-tick"],
+  },
+  {
     id: "water-generated-caustics",
     skill: "threejs-water-optics",
     title: "Bounded Water Caustic Projection",
