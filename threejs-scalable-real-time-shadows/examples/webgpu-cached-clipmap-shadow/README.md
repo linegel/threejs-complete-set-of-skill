@@ -56,3 +56,14 @@ node validate.js --artifacts artifacts
 
 Without either `--allow-missing-gpu` or produced artifacts, validation exits
 non-zero because the artifact layer is intentionally required.
+
+Evidence provenance, stated precisely: `shadow-map.png` is a light-view
+depth-ramp re-render of the caster scene through the SAME shared displaced
+`positionNode` the shadow pass uses, and `silhouette.png` is the light-view
+binary coverage mask — neither is a texel readback of the cached level-0 depth
+atlas (r185 depth textures are not directly bufferable from this page; a raw
+sample readback returned zeros). The claim "the cached atlas was really
+rendered" is carried by the separate validator gate that counts real renderer
+draws per committed level plus the `firstDepthTexture`/`renderedLevels`
+metadata in `shadow-capture.json`; the PNGs prove the displaced caster is what
+the light sees. Do not cite the PNGs as atlas contents.

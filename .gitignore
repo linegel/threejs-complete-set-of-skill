@@ -15,3 +15,5 @@ ASSET_VARIANT_REVIEW.md
 FINAL_REPORT.md
 IMPROVEMENT_PLAN.md
 SKILL_QUALITY_BAR.md
+# symlinked playwright installs in example dirs (gitignore dir pattern misses symlinks)
+threejs-*/examples/*/node_modules
