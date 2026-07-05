@@ -118,14 +118,20 @@ The contract must record:
 
 For the canonical `examples/webgpu-field-bake/` contract, CPU and TSL must
 import the same `FIELD_ALGORITHM` object from `field-constants.mjs`. That object
-owns hash primes, seed wrapping, octave counts, lacunarity, gain, warp seed
-offsets, and derived-channel coefficients. Do not copy those numbers into CPU
-or TSL code. `validate-field-contract.mjs` enforces shared-object identity and
-CPU golden fixtures at `1e-12` absolute error; the value is the validator's
-fixture drift threshold for JavaScript double evaluation. Browser WebGPU
-artifacts are accepted only through `--artifacts <dir>` and must satisfy the
-manifest `parityTolerance` value, currently `0.001` in
-`assets/generated-variants/manifest.json`.
+owns the integer lattice hash multipliers, lowbias32 mix constants, seed
+wrapping convention, octave counts, lacunarity, gain, warp seed offsets, and
+derived-channel coefficients. Do not copy those numbers into CPU or TSL code.
+The canonical hash floors the lattice coordinate, converts i32 cell bits to
+u32, mixes with `Math.imul`/TSL `uint` wrapping arithmetic, and scales the final
+u32 by `2^-32`; no sin-dot hash is allowed in the parity path.
+`validate-field-contract.mjs` enforces shared-object identity and CPU golden
+fixtures at `1e-12` absolute error; the value is the validator's fixture drift
+threshold for JavaScript double evaluation. Browser WebGPU artifacts are
+accepted only through `--artifacts <dir>` and must satisfy the derived
+per-channel `1e-4` tolerance. The derivation is `u=2^-24`,
+`gamma_384 ~= 2.29e-5`, with a 4.4x margin for warp/channel arithmetic and
+driver pow decomposition; placement-mask threshold consumers use a `1e-4`
+guard band around threshold `0.5`.
 
 ## Build Order
 

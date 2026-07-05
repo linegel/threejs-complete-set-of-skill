@@ -34,10 +34,15 @@ export const FIELD_PARITY_CHANNELS = deepFreeze([
 export const FIELD_ALGORITHM = deepFreeze({
   defaultSeed: 17,
   hash: {
-    primes: [127.1, 311.7, 74.7],
-    seedWrap: 65536,
-    seedMultiplier: 19.1999,
-    outputMultiplier: 43758.5453123,
+    family: "lowbias32-u32-lattice",
+    // Gated constants: odd u32 lattice decorrelators plus Chris Wellons'
+    // lowbias32 finalizer. CPU uses Math.imul/u32 wraps; TSL uses u32 wraps.
+    latticeMultipliers: [0x8da6b343, 0xd8163841, 0xcb1ab31f],
+    seedMultiplier: 0x9e3779b9,
+    mixMultipliers: [0x21f0aaad, 0x735a2d97],
+    mixShifts: [16, 15, 15],
+    seedWrap: 4294967296,
+    outputScale: 1 / 4294967296,
     octaveSeedStep: 17,
   },
   warp: {
@@ -103,7 +108,7 @@ export const FIELD_ALGORITHM = deepFreeze({
 });
 
 export const FIELD_SPECTRUM = deepFreeze({
-  hashFamily: "trilinear value noise with sin-dot hash and deterministic seed wrapping",
+  hashFamily: "trilinear value noise with u32 lattice lowbias32 hash and deterministic seed wrapping",
   outputRange: [0, 1],
   normalization: "octave weights normalized by accumulated amplitude",
   lacunarity: { min: 1.7, max: 2.35, default: FIELD_ALGORITHM.bands.macroHeight.lacunarity },

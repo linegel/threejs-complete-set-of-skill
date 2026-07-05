@@ -1,17 +1,18 @@
 import {
   Fn,
   abs,
+  bitcast,
   clamp as clampNode,
   dot,
   float,
   floor,
   fract as fractNode,
+  int,
   mix,
-  mod,
   normalize,
   pow,
-  sin,
   smoothstep as smoothstepNode,
+  uint,
   vec3,
   vec4,
 } from "three/tsl";
@@ -45,19 +46,40 @@ export {
 export const CPU_FIELD_ALGORITHM = FIELD_ALGORITHM;
 export const TSL_FIELD_ALGORITHM = FIELD_ALGORITHM;
 
-function wrapSeed(seed) {
-  const { seedWrap } = FIELD_ALGORITHM.hash;
-  return ((seed % seedWrap) + seedWrap) % seedWrap;
+function latticeCoordToU32(value) {
+  // CPU<->TSL convention: floor to i32, then reinterpret i32 bits as u32.
+  // This makes negative cells match WGSL bitcast<u32>(i32(floor(p))).
+  return (Math.floor(value) | 0) >>> 0;
+}
+
+function seedToU32(seed) {
+  return (Math.floor(seed) | 0) >>> 0;
+}
+
+function u32Mul(a, b) {
+  return Math.imul(a >>> 0, b >>> 0) >>> 0;
+}
+
+function lowbias32(value) {
+  const { mixMultipliers, mixShifts } = FIELD_ALGORITHM.hash;
+  let h = value >>> 0;
+  h = (h ^ (h >>> mixShifts[0])) >>> 0;
+  h = u32Mul(h, mixMultipliers[0]);
+  h = (h ^ (h >>> mixShifts[1])) >>> 0;
+  h = u32Mul(h, mixMultipliers[1]);
+  h = (h ^ (h >>> mixShifts[2])) >>> 0;
+  return h >>> 0;
 }
 
 function hash3(x, y, z, seed) {
-  const { primes, seedMultiplier, outputMultiplier } = FIELD_ALGORITHM.hash;
-  const n =
-    x * primes[0] +
-    y * primes[1] +
-    z * primes[2] +
-    wrapSeed(seed) * seedMultiplier;
-  return fract(Math.sin(n) * outputMultiplier);
+  const { latticeMultipliers, seedMultiplier, outputScale } = FIELD_ALGORITHM.hash;
+  const h =
+    u32Mul(latticeCoordToU32(x), latticeMultipliers[0]) ^
+    u32Mul(latticeCoordToU32(y), latticeMultipliers[1]) ^
+    u32Mul(latticeCoordToU32(z), latticeMultipliers[2]) ^
+    u32Mul(seedToU32(seed), seedMultiplier);
+  const mixed = lowbias32(h);
+  return Math.fround(Math.fround(mixed) * outputScale);
 }
 
 function valueNoise3(x, y, z, seed) {
@@ -240,20 +262,35 @@ export function sampleFieldCPU({ domain, coordinate, seed = FIELD_ALGORITHM.defa
   };
 }
 
-function wrappedSeedNode(seed) {
-  const wrap = FIELD_ALGORITHM.hash.seedWrap;
-  return mod(mod(seed, wrap).add(wrap), wrap);
+function latticeCoordToU32Node(value) {
+  // CPU<->TSL convention: floor to i32, then reinterpret i32 bits as u32.
+  // This is the TSL form of `(Math.floor(value) | 0) >>> 0` for negatives.
+  return bitcast(int(value), "uint");
 }
 
-function hash3Node(position, seed) {
-  const { primes, seedMultiplier, outputMultiplier } = FIELD_ALGORITHM.hash;
-  return fractNode(
-    sin(
-      dot(position, vec3(primes[0], primes[1], primes[2])).add(
-        wrappedSeedNode(seed).mul(seedMultiplier),
-      ),
-    ).mul(outputMultiplier),
-  );
+function seedToU32Node(seed) {
+  return bitcast(int(floor(seed)), "uint");
+}
+
+function lowbias32Node(value) {
+  const { mixMultipliers, mixShifts } = FIELD_ALGORITHM.hash;
+  let h = uint(value);
+  h = h.bitXor(h.shiftRight(uint(mixShifts[0])));
+  h = h.mul(uint(mixMultipliers[0]));
+  h = h.bitXor(h.shiftRight(uint(mixShifts[1])));
+  h = h.mul(uint(mixMultipliers[1]));
+  h = h.bitXor(h.shiftRight(uint(mixShifts[2])));
+  return h;
+}
+
+function hash3Node(cell, seed) {
+  const { latticeMultipliers, seedMultiplier, outputScale } = FIELD_ALGORITHM.hash;
+  const h = latticeCoordToU32Node(cell.x)
+    .mul(uint(latticeMultipliers[0]))
+    .bitXor(latticeCoordToU32Node(cell.y).mul(uint(latticeMultipliers[1])))
+    .bitXor(latticeCoordToU32Node(cell.z).mul(uint(latticeMultipliers[2])))
+    .bitXor(seedToU32Node(seed).mul(uint(seedMultiplier)));
+  return float(lowbias32Node(h)).mul(outputScale);
 }
 
 function valueNoise3Node(position, seed) {

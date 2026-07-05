@@ -53,6 +53,12 @@ sampleField = Fn(inputs -> {
 The CPU port exists for geometry generation, offline assets, reduced tiers, and
 parity checks. It is not a separate look-development path. Constants, seeds,
 hashes, remaps, wrapping, and normalization must match the TSL function.
+For parity-bearing value noise, use an integer lattice hash: floor cell
+coordinates, reinterpret i32 cell bits as u32 for negative-coordinate wrapping,
+mix odd u32 lattice multipliers and the u32 seed, then finalize with a
+published integer mixer such as lowbias32. Do not use `fract(A * sin(dot()))`
+for CPU-vs-GPU contracts; WGSL sin accuracy is not portable outside `[-pi, pi]`
+and the large post-sin multiplier destroys low bits.
 
 ## Coherent Noise Spectrum
 
@@ -60,7 +66,7 @@ Approved families for canonical examples:
 
 | family | output range | use |
 | --- | --- | --- |
-| deterministic value hash | 0-1 | CPU parity fixtures, reduced-tier assets |
+| deterministic u32 value hash | 0-1 | CPU parity fixtures, reduced-tier assets |
 | gradient/simplex-style noise | -1 to 1 or remapped 0-1 | smooth macro and meso fields |
 | ridged transform `1 - abs(2n - 1)` | 0-1 | ridge, vein, wrinkle, crest fields |
 | stratified jitter | bounded cell-local range | authored placement, craters, branches |
@@ -372,16 +378,19 @@ tolerance = per field, usually 1e-4 to 1e-3 for scalar masks
 ```
 
 The `examples/webgpu-field-bake/` implementation uses
-`field-constants.mjs` as the sole owner of hash primes, seed wrapping, octave
-parameters, warp offsets, and derived-channel coefficients. CPU and TSL import
-the same `FIELD_ALGORITHM` object. `validate-field-contract.mjs` first asserts
-that shared-object identity, then checks `field-golden-fixtures.json` at
-`1e-12` absolute error. Browser WebGPU readback writes `field-readback.json`;
+`field-constants.mjs` as the sole owner of u32 lattice hash multipliers,
+lowbias32 mix constants, seed wrapping, octave parameters, warp offsets, and
+derived-channel coefficients. CPU and TSL import the same `FIELD_ALGORITHM`
+object. `validate-field-contract.mjs` first asserts that shared-object
+identity, then checks `field-golden-fixtures.json` at `1e-12` absolute error.
+Browser WebGPU readback writes `field-readback.json`;
 `validate-field-contract.mjs --artifacts <dir>` compares every channel against
-the CPU sampler at the manifest `parityTolerance`, currently `0.001` in
-`assets/generated-variants/manifest.json`. Without artifacts, the validator
-reports `gpuParity: "not-run"` and fails unless `--allow-missing-gpu` is
-explicit.
+the CPU sampler at a derived `1e-4` tolerance: `u=2^-24`,
+`gamma_384 ~= 2.29e-5`, plus a 4.4x margin for warp/channel arithmetic and
+driver pow decomposition. Placement-mask threshold consumers use a `1e-4`
+guard band around threshold `0.5`; outside that band the thresholded bit must
+match. Without artifacts, the validator reports `gpuParity: "not-run"` and
+fails unless `--allow-missing-gpu` is explicit.
 
 Checks:
 

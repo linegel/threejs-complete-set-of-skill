@@ -53,15 +53,19 @@ async function createApp() {
   const seedUniform = uniform(FIELD_ALGORITHM.defaultSeed);
   const warpStrengthUniform = uniform(FIELD_ALGORITHM.warp.amplitude);
 
+  // Data readback must bypass the material pipeline: colorNode routes through
+  // opacity/alpha handling and the output color transform, which forces the
+  // alpha lane to 1 and re-encodes the RGB lanes. fragmentNode writes the raw
+  // field vec4 to the FloatType target untouched.
   const packedMaterial = new MeshBasicNodeMaterial();
-  packedMaterial.colorNode = sampleField({
+  packedMaterial.fragmentNode = sampleField({
     coordinate: coordinateUniform,
     seed: seedUniform,
     warpStrength: warpStrengthUniform,
   });
 
   const derivedMaterial = new MeshBasicNodeMaterial();
-  derivedMaterial.colorNode = sampleFieldDerived({
+  derivedMaterial.fragmentNode = sampleFieldDerived({
     coordinate: coordinateUniform,
     seed: seedUniform,
     warpStrength: warpStrengthUniform,
@@ -84,9 +88,11 @@ async function createApp() {
     renderer.setRenderTarget(target);
     await renderer.renderAsync(scene, camera);
     renderer.setRenderTarget(null);
-    const buffer = new Float32Array(4);
-    const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, 1, 1, buffer);
-    return Array.from(pixels ?? buffer);
+    // r185 signature: (renderTarget, x, y, w, h, textureIndex = 0, faceIndex = 0);
+    // it allocates and returns the typed array itself - passing a destination
+    // buffer as arg 6 is read as textureIndex and crashes the backend lookup.
+    const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, 1, 1);
+    return Array.from(pixels);
   }
 
   async function captureFieldReadback(probes = fixedProbes) {

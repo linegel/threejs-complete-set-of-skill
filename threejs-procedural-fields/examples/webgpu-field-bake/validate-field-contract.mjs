@@ -30,8 +30,30 @@ const manifestDir = dirname(manifestPath);
 const fixturePath = resolve(here, "field-golden-fixtures.json");
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
-const tolerance = manifest.parityTolerance;
 const fixtureTolerance = 1e-12;
+
+const f32UnitRoundoff = 2 ** -24;
+const gamma = (ops) => (ops * f32UnitRoundoff) / (1 - ops * f32UnitRoundoff);
+
+// Derived gate: the u32 lattice hash makes corner values bit-identical after
+// the CPU f32 conversion. Remaining drift is f32-vs-f64 arithmetic in three
+// warp noises, four-octave fBm, trilinear lerps, pow/channel remaps, and the
+// smooth placement mask. A deepest chain of <=384 rounded ops gives
+// gamma_384 ~= 2.29e-5; the 4x Lipschitz/driver-libm margin gates every
+// continuous channel at 1e-4. This is derived, not taken from the asset
+// manifest's historical 0.001 image tolerance.
+const gpuParityDerivation = Object.freeze({
+  unitRoundoff: f32UnitRoundoff,
+  deepestRoundedOps: 384,
+  gammaDeepest: gamma(384),
+  margin: 4.4,
+  hashCornerError: 0,
+  thresholdGuardBand: 1e-4,
+});
+const gpuParityTolerances = Object.freeze(
+  Object.fromEntries(FIELD_PARITY_CHANNELS.map((channel) => [channel, 1e-4])),
+);
+const placementMaskThreshold = 0.5;
 
 function parseArgs(argv) {
   const options = {
@@ -178,6 +200,8 @@ function validateGpuReadback(artifactDir) {
   let maxAbsError = 0;
   let meanAbsError = 0;
   let count = 0;
+  let placementGuardBandSamples = 0;
+  const channelMaxErrors = Object.fromEntries(FIELD_PARITY_CHANNELS.map((channel) => [channel, 0]));
   const samples = readback.samples.map((entry, index) => {
     assert(entry.probe, `GPU readback sample ${index} is missing probe`);
     assert(entry.values, `GPU readback sample ${index} is missing values`);
@@ -188,9 +212,26 @@ function validateGpuReadback(artifactDir) {
       assert(Number.isFinite(actual), `GPU readback sample ${index} ${channel} is not finite`);
       const error = Math.abs(actual - cpu[channel]);
       channelErrors[channel] = error;
+      channelMaxErrors[channel] = Math.max(channelMaxErrors[channel], error);
       maxAbsError = Math.max(maxAbsError, error);
       meanAbsError += error;
       count += 1;
+      const tolerance = gpuParityTolerances[channel];
+      if (error > tolerance) {
+        throw new Error(
+          `GPU parity ${channel} sample ${index} absError ${error} exceeds tolerance ${tolerance}`,
+        );
+      }
+      if (channel === "placementMask") {
+        const actualBit = actual >= placementMaskThreshold;
+        const expectedBit = cpu[channel] >= placementMaskThreshold;
+        const inGuardBand = Math.abs(cpu[channel] - placementMaskThreshold) <= gpuParityDerivation.thresholdGuardBand;
+        if (inGuardBand) placementGuardBandSamples += 1;
+        assert(
+          actualBit === expectedBit || inGuardBand,
+          `placementMask threshold mismatch outside guard band at sample ${index}`,
+        );
+      }
     }
     return {
       probe: entry.probe,
@@ -200,16 +241,17 @@ function validateGpuReadback(artifactDir) {
   });
 
   meanAbsError = count === 0 ? 0 : meanAbsError / count;
-  if (maxAbsError > tolerance) {
-    throw new Error(`GPU parity maxAbsError ${maxAbsError} exceeds tolerance ${tolerance}`);
-  }
   return {
     pass: true,
     status: "passed",
     artifactDir,
-    tolerance,
+    tolerances: gpuParityTolerances,
+    derivation: gpuParityDerivation,
     maxAbsError,
+    channelMaxErrors,
     meanAbsError,
+    placementMaskThreshold,
+    placementGuardBandSamples,
     samples,
   };
 }
