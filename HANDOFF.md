@@ -263,3 +263,43 @@ merge per band).
 3.9/3.13. Rationale: parity and shadows unblock every displacing skill; routing and the mutex are cheap and
 systemic; physics fixes are contained; validation credibility last because each earlier fix already forces
 its validator upgrade under protocol rule 4.
+
+## 6. Remediation evidence (2026-07-05 close-out session)
+
+Every row below was run by the orchestrating session itself (not delegate-reported). GPU rows
+executed through real Chrome/WebGPU captures on this machine.
+
+| Validator (command) | Result | Key figure | Commit |
+| --- | --- | --- | --- |
+| fields `capture.mjs` → `validate-field-contract.mjs --artifacts` | PASS end-to-end | GPU parity maxAbsError 3.5e-7 vs derived 1e-4; TSL-only seed mutation fails at 0.109 | `8855aa7` |
+| shadows `capture-shadow-depth.mjs` → `validate.js --artifacts` | PASS end-to-end | artifact layer live (light-view depth-ramp + silhouette; provenance stated in README); blank-silhouette mutation fails | `ec23979`+`b2d9d43` |
+| planets `capture-planet-readback.mjs` → `validate-planet.mjs --artifacts` | PASS end-to-end | maxAbsError 1.8e-3 vs derived 5e-3 gradient / 1e-4 scalar; TSL-only mutation fails at 0.095 | `74af54c` |
+| image-pipeline `validateImagePipelineConfig.js` + `validate-integration-manifest.mjs` | PASS | live-graph single-pass gate | `beff380` |
+| choose-skills `router-contract.test.mjs` | PASS | 6 recipes, 41 template fields | `1995a1c` |
+| ocean `validation.js` + `validate-ocean-contracts.js` | PASS | pack-combine + Hermitian + partner-lane gates | `c8746ef` |
+| clouds `validation.js` | PASS | executed march step×res per tier | `6307f02` |
+| sky `validation.js` | PASS | LUT physical gates | `9e63605` |
+| motion `validation.js` | PASS | real-loop interpolation gate | `4664f4a` |
+| water-optics `validate-water-contracts.mjs` | PASS | analytic parity <1e-12 | `6c71a73` |
+| visual-validation `src/validate.js` | PASS | budget + pixel-diff self-tests | `83e914f` |
+| vegetation `validation.js` | PASS | draw-ceiling gate | `8582bdb` |
+
+**Honest history for 3.1/3.2/3.8:** their first-wave commits closed the CPU/structural layers,
+but the GPU layers were NOT executable at that point: the fields capture crashed on an r185
+readback-signature bug and forced-alpha colorNode routing; the shadow validator had no artifact
+producer; planets had no producer AND both fields+planets still hashed via
+`fract(sin·43758.5453)` — underivable across f64/f32 per `REMEDIATION_PLAN.md` §1.1. The
+close-out session replaced the hash with a u32 lattice + lowbias32 family (bit-identical
+corners CPU/GPU), fixed the harness, and built both producers. GPU parity is now measured,
+not asserted.
+
+**Provenance audit (this session, `e8bca40`):** the three-bucket sweep over all doc hunks
+since `add38f6` found one arithmetic error (k_sigma 364→367) and eight labeling gaps (creature
+pending-gate notes, authored-constant provenance) — all fixed, all touched validators re-run
+green. Spot-verification of the five prior self-reported commits (`31e7f18`, `a20dfa2`,
+`41a7e9a`, `cb95d9e`, `4bca3bd`): all five hold with real validator runs.
+
+**Open items:** Wave B creature lab (3.9e) — gated on explicit owner go-ahead (its thresholds
+are annotated as pending gates pack-wide). `GROK_BUILD_PROBLEMS.v1-15k.md` — proposed for
+deletion as a superseded duplicate (this table now carries the record); owner approves or
+vetoes; not deleted unilaterally.
