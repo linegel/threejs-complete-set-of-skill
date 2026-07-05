@@ -5,6 +5,7 @@ export const DIRTY_REASON_BITS = Object.freeze({
   snappedCenterChanged: 1 << 3,
   cacheAgeExpired: 1 << 4,
   lightDirectionChanged: 1 << 5,
+  deformationChanged: 1 << 6,
 });
 
 export const SHADOW_ARCHITECTURE_DECISIONS = Object.freeze([
@@ -254,6 +255,16 @@ export function invalidateSphere(levels, sphereLightSpace, reason = "invalidate"
       level.dirtyReasonBits |= DIRTY_REASON_BITS.forceDirty;
       touched.push({ index: level.index, reason });
     }
+  }
+  return touched;
+}
+
+export function invalidateAllLevels(levels, reasonBit = DIRTY_REASON_BITS.forceDirty, reason = "invalidate") {
+  const touched = [];
+  for (const level of levels) {
+    level.forceDirty = true;
+    level.dirtyReasonBits |= reasonBit;
+    touched.push({ index: level.index, reason });
   }
   return touched;
 }

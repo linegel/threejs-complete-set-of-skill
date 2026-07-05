@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>WebGPU Cached Clipmap Shadow Artifact Page</title>
+<style>
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: #111;
+  }
+
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../../node_modules/three/build/three.webgpu.js",
+    "three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
+    "three/tsl": "../../../node_modules/three/build/three.tsl.js",
+    "three/addons/": "../../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+  import { PerspectiveCamera } from "three/webgpu";
+  import {
+    createCachedClipmapShadowSystem,
+    createShadowRenderer
+  } from "./main.js";
+
+  const renderer = await createShadowRenderer({
+    antialias: false,
+    canvas: document.querySelector("canvas") ?? document.body.appendChild(document.createElement("canvas"))
+  });
+  renderer.setSize(512, 512);
+
+  const system = createCachedClipmapShadowSystem();
+  await system.update(
+    { x: 0, y: 0, z: 0 },
+    {
+      renderer,
+      frameId: 1,
+      deformationTime: 0,
+      lightDirection: { x: -0.35, y: -0.85, z: -0.38 }
+    }
+  );
+
+  const camera = new PerspectiveCamera(45, 1, 0.1, 200);
+  camera.position.set(0, 28, 42);
+  camera.lookAt(0, 0, 0);
+  await renderer.renderAsync(system.casterScene, camera);
+
+  window.cachedClipmapShadowArtifact = {
+    ready: true,
+    firstDepthTexture: system.levels[0].depthTexture?.name,
+    renderedLevels: system.levels.filter((level) => level.renderCount > 0).length,
+    sharedPositionNode:
+      system.displacedCaster.material.positionNode ===
+      system.displacedCaster.material.castShadowPositionNode
+  };
+</script>

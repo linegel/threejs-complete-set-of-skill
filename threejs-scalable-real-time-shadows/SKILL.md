@@ -40,6 +40,10 @@ Quality tiers are algorithmic, not alternate implementations:
 - `high`: 3-4 levels or 2x2 `TileShadowNode`, reduced far distance, targeted invalidation.
 - `reduced`: one shadow or two near levels, static far receivers, precomputed terrain/structure caster sets.
 
+For custom clipmaps, treat those level counts as authoring starts only:
+`examples/webgpu-cached-clipmap-shadow/clipmap-config.js` derives the actual
+`levelCount`, and `validate.js` enforces the resulting resource count.
+
 ## Custom Clipmap Contract
 
 Use a custom cached clipmap only after built-in nodes fail the open-world requirement. The implementation must:
@@ -57,18 +61,20 @@ Read [references/cached-clipmap-shadows.md](references/cached-clipmap-shadows.md
 
 Use `examples/webgpu-cached-clipmap-shadow/` as the canonical Phase 1 contract
 for custom clipmaps. It includes the decision record, `CachedClipmapShadowNode`
-hook boundary, per-level `inverseMapSize` gates, targeted invalidation,
-dispose counters, and `node examples/webgpu-cached-clipmap-shadow/validate.js`.
+hook boundary, per-level `DepthTexture` render targets, fitted orthographic
+level cameras, per-level `inverseMapSize` gates, targeted invalidation,
+displaced-caster node identity checks, dispose counters, and
+`node examples/webgpu-cached-clipmap-shadow/validate.js --allow-missing-gpu`.
 
 ## Budgets
 
 Set budgets before tuning visuals:
 
-- Shadow passes: bounded scene `1`; cascades `2-4`; tiles `tilesX * tilesY`; custom clipmap `dynamicLevels + cachedBudget + forcedInvalidations`.
-- Map memory: `sum(width * height * bytesPerDepthTexel)` plus any debug/variance maps; keep the default custom profile under 64 MiB on desktop and under 24 MiB on integrated/mobile tiers.
-- Sampled shadow textures per material: stay under the target backend limit; prefer 3-4 custom levels before raising map count.
-- Draw calls: count per shadow pass. Split static and dynamic casters so cached coarse passes skip unchanged static geometry.
-- GPU time targets: desktop discrete <= 1.5 ms average / <= 4 ms spike; desktop integrated <= 2.5 ms average / <= 6 ms spike; mobile/reduced <= 3 ms average / <= 8 ms spike.
+- Shadow passes: bounded scene `1`; cascades `2-4`; tiles `tilesX * tilesY`; custom clipmap `dynamicLevels + cachedBudget + forcedInvalidations`. The example validator asserts one renderer draw per selected custom level.
+- Map memory: `sum(width * height * bytesPerDepthTexel)` plus any debug/variance maps. The default custom profile is computed by `estimateShadowMemoryBytes()` and checked by `validateClipmapConfig()`.
+- Sampled shadow textures per material: stay under the target backend limit. The example validator checks custom level count against `sampledTextureLimit`; prefer fewer validated levels before raising map count.
+- Draw calls: count per shadow pass. The custom example validator spies on the renderer and fails if scheduled levels do not draw.
+- GPU timing claims must come from a browser artifact capture for the target device. The Node validator enforces the executable count/memory/resource contracts and reports GPU artifacts as `not-run` unless `--allow-missing-gpu` is supplied.
 - Compute/storage: dirty-mask and caster-compaction dispatches should stay below one dispatch per changed chunk class plus one prefix/compaction dispatch; no CPU readback in the frame loop.
 
 ## Color And Output

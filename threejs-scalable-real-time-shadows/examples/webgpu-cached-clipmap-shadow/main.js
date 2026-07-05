@@ -1,6 +1,16 @@
-import { DirectionalLight, RenderPipeline, Vector3, WebGPURenderer } from "three/webgpu";
+import {
+  DirectionalLight,
+  Mesh,
+  MeshStandardNodeMaterial,
+  PlaneGeometry,
+  RenderPipeline,
+  Scene,
+  Vector3,
+  WebGPURenderer,
+} from "three/webgpu";
 import { CSMShadowNode } from "three/addons/csm/CSMShadowNode.js";
 import { TileShadowNode } from "three/addons/tsl/shadows/TileShadowNode.js";
+import { Fn, positionLocal, sin, uniform, vec3 } from "three/tsl";
 
 import {
   DEFAULT_CLIPMAP_CONFIG,
@@ -70,6 +80,7 @@ export function createCachedClipmapShadowSystem({
 
   const node = new CachedClipmapShadowNode(light, light.shadow, validation.config);
   node.attachToLight(light);
+  const { scene: casterScene, caster: displacedCaster } = createRenderableShadowCasterScene();
 
   return {
     light,
@@ -78,6 +89,8 @@ export function createCachedClipmapShadowSystem({
     config: validation.config,
     levels: node.levels,
     scene: createDeterministicValidationScene(),
+    casterScene,
+    displacedCaster,
     debugSnapshot() {
       return createDebugSnapshot({
         levels: node.levels,
@@ -86,9 +99,29 @@ export function createCachedClipmapShadowSystem({
         architecture,
       });
     },
-    update(cameraLight = new Vector3()) {
-      node.updateBefore({ cameraLight });
-      node.renderShadow({ frameId: 0 });
+    update(cameraLight = new Vector3(), frame = {}) {
+      if (frame.deformationTime !== undefined) {
+        displacedCaster.displacementTime.value = frame.deformationTime;
+      }
+      node.updateBefore({
+        cameraLight,
+        lightDirectionChanged: frame.lightDirectionChanged,
+        deformationFields: [
+          {
+            id: "shared-wave-caster",
+            uniform: displacedCaster.displacementTime,
+            boundsLightSpace: frame.deformationBoundsLightSpace,
+          },
+        ],
+      });
+      return node.renderShadow({
+        frameId: frame.frameId ?? 0,
+        renderer: frame.renderer,
+        casterScene: frame.casterScene ?? casterScene,
+        lightDirection: frame.lightDirection,
+        lightBasis: frame.lightBasis,
+        lightSpaceToWorld: frame.lightSpaceToWorld,
+      });
     },
     dispose() {
       node.dispose();
@@ -102,4 +135,45 @@ export function createSeededShadowValidationScene(seed = 1234) {
 
 export function normalizeShadowConfig(config = {}) {
   return clampClipmapConfig(config);
+}
+
+export function createSharedDisplacedCaster({
+  displacementTime = uniform(0),
+  displacementAmplitude = uniform(0.35),
+} = {}) {
+  const sharedPositionNode = Fn(() =>
+    positionLocal.add(
+      vec3(
+        0,
+        sin(positionLocal.x.mul(0.31).add(displacementTime)).mul(displacementAmplitude),
+        0,
+      ),
+    ),
+  )();
+
+  const material = new MeshStandardNodeMaterial();
+  material.positionNode = sharedPositionNode;
+  material.castShadowPositionNode = sharedPositionNode;
+  material.receivedShadowPositionNode = sharedPositionNode;
+
+  const mesh = new Mesh(new PlaneGeometry(24, 24, 32, 32), material);
+  mesh.name = "shared-position-node-displaced-caster";
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData.shadowCasterParity = {
+    sharedPositionNode,
+    positionNode: material.positionNode,
+    castShadowPositionNode: material.castShadowPositionNode,
+    receivedShadowPositionNode: material.receivedShadowPositionNode,
+  };
+
+  return { mesh, material, displacementTime, displacementAmplitude, sharedPositionNode };
+}
+
+export function createRenderableShadowCasterScene() {
+  const scene = new Scene();
+  scene.name = "cached-clipmap-shadow-caster-scene";
+  const caster = createSharedDisplacedCaster();
+  scene.add(caster.mesh);
+  return { scene, caster };
 }

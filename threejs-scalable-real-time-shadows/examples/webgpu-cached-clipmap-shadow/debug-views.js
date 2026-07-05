@@ -64,7 +64,7 @@ export function createDeterministicValidationScene(seed = 1234) {
     },
     wind: {
       id: "windDisplacedCaster",
-      casterParity: "castShadowPositionNode uses same wind phase as visible material",
+      casterParity: "positionNode, castShadowPositionNode, and receivedShadowPositionNode are the same object",
     },
     invalidate: {
       id: "streamedChunkInvalidation",

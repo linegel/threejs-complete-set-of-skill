@@ -1,6 +1,6 @@
 # Cached Clipmap Shadow System
 
-Use this reference only for streaming directional-light worlds where built-in WebGPU shadow nodes are not enough because coarse shadow coverage must persist across frames and be invalidated by changed world chunks. The performance win comes from caching and targeted updates: one good cached design can be 10-100x cheaper than re-rendering every wide level every frame at the same apparent quality.
+Use this reference only for streaming directional-light worlds where built-in WebGPU shadow nodes are not enough because coarse shadow coverage must persist across frames and be invalidated by changed world chunks. The performance win comes from caching and targeted updates; claim a speedup only from a benchmark decision record captured on the target scene and device.
 
 ## Physics / Visibility Contract
 
@@ -73,9 +73,12 @@ Step 3: texel snapping. Checkpoint: desired X/Y centers snap by world texel
 width per level. Expected debug: `texelGrid`. Failure symptom: crawl under
 slow pan.
 
-Step 4: render commit. Checkpoint: material-facing centers change only after a
-level render completes. Expected debug: `desiredVsCommittedCenter`. Failure
-symptom: rhythmic boundary flicker.
+Step 4: render commit. Checkpoint: each selected level binds its own
+`DepthTexture` render target, fits an orthographic light camera to the snapped
+level bounds, draws the caster scene, and only then publishes material-facing
+centers. Expected debug: `desiredVsCommittedCenter`, per-level render count,
+and target/depth texture identity. Failure symptom: rhythmic boundary flicker
+or a CPU scheduler that advances state without drawing shadow depth.
 
 Step 5: sampling weights. Checkpoint: `setupShadowFilter` samples every level
 unconditionally, then applies weights. Expected debug: `crossFadeWeights` and
@@ -88,6 +91,11 @@ cached budget and targeted spheres mark only touched levels. Expected debug:
 Step 7: bias. Checkpoint: normal bias scales by world texel width and
 `biasNode` is available for material/receiver variants. Expected debug:
 `biasNodeNormalBias`.
+
+Step 8: caster parity. Checkpoint: a displaced caster assigns the same node
+object to `positionNode`, `castShadowPositionNode`, and when used
+`receivedShadowPositionNode`. Expected validation: object identity, not text
+similarity.
 
 Dispose checkpoint: detach the custom node and balance disposal counters for
 shadow nodes, cloned shadows, level lights, level targets, storage, and debug
@@ -142,6 +150,11 @@ Treat fallback as reduced quality, not a second renderer implementation.
 | `reduced` | One shadow or two near levels | 512-1024 | Static/precomputed far casters, no compute queue, conservative invalidation. |
 
 Quality knobs change level count, map size, far distance, and update cadence. They do not switch to raw backend source strings or hand-authored backend code.
+For custom clipmaps, the table values are starting profiles. The exact level
+count is derived by `computeLevelCount()`, memory by
+`estimateShadowMemoryBytes()`, and scheduled draw count by
+`selectLevelsForUpdate()`; `validate.js` enforces those derived counts for the
+canonical example.
 
 ## 4. Representation
 
@@ -394,7 +407,7 @@ class CachedClipmapShadowNode extends ShadowNode {
 }
 ```
 
-Use `setupShadowPosition()` behavior from `ShadowBaseNode` so node-material displacement, morphing, skinning, instancing, and batched transforms match the visible pass. Use `LightShadow.biasNode` for level-aware bias when a uniform numeric bias is not enough.
+Use `setupShadowPosition()` behavior from `ShadowBaseNode` so node-material displacement, morphing, skinning, instancing, and batched transforms match the visible pass. Use one shared position node object for visible and shadow caster deformation; do not duplicate the formula per cascade or per shadow hook. Use `LightShadow.biasNode` for level-aware bias when a uniform numeric bias is not enough.
 
 ## 12. Cross-Level Selection And Sampling
 
@@ -484,11 +497,45 @@ The visible pass and shadow pass must agree on world position and coverage:
 - Static caster sets and dynamic caster sets are separated so cached far levels do not redraw unchanged static geometry unnecessarily.
 - Layer masks and cast/receive flags are audited per shadow level.
 
+Working displaced-caster recipe from
+`examples/webgpu-cached-clipmap-shadow/main.js`:
+
+```js
+const sharedPositionNode = Fn(() =>
+  positionLocal.add(
+    vec3(
+      0,
+      sin(positionLocal.x.mul(0.31).add(displacementTime)).mul(displacementAmplitude),
+      0,
+    ),
+  ),
+)();
+
+material.positionNode = sharedPositionNode;
+material.castShadowPositionNode = sharedPositionNode;
+material.receivedShadowPositionNode = sharedPositionNode;
+```
+
+The validator asserts object identity:
+
+```js
+material.positionNode === material.castShadowPositionNode;
+material.positionNode === material.receivedShadowPositionNode;
+```
+
+That identity is the contract. Recreating the same formula in a second `Fn()`
+is not equivalent because it can drift in uniforms, precision, cache ownership,
+or per-level scheduling.
+
 If a visible effect cannot be represented in the shadow node path, either remove it from the caster silhouette or budget the matching shadow deformation explicitly.
 
 ## 16. Budgets
 
-State budgets in the implementation notes and fail validation when they drift:
+State budgets in the implementation notes and fail validation when they drift.
+The canonical validator enforces level count, render-call count, memory, target
+ownership, dirty-bit invalidation, and parity identity in Node. Browser GPU
+timings are separate measured artifacts; do not state millisecond performance
+without attaching the capture that produced it.
 
 ```text
 level count:
@@ -512,13 +559,17 @@ compute:
   dirty-mask dispatches only for changed chunk classes
 ```
 
-Targets:
+For the canonical example, those custom values are not freehand claims:
+`validate.js` checks `computeLevelCount(config)`, memory, sampled texture limit,
+and one renderer call per selected level. Built-in cascade/tile counts come
+from their pass topology.
 
-| Device tier | Average shadow GPU time | Spike budget | Suggested memory ceiling |
+Measured timing rows must be filled from the project capture, not copied from
+this reference:
+
+| Device tier | Average shadow GPU time | Spike budget | Memory ceiling |
 | --- | ---: | ---: | ---: |
-| Desktop discrete | <= 1.5 ms | <= 4 ms | 64 MiB |
-| Desktop integrated | <= 2.5 ms | <= 6 ms | 32 MiB |
-| Mobile/reduced | <= 3 ms | <= 8 ms | 24 MiB |
+| Target device | measured from browser artifact capture | measured from browser artifact capture | enforced from `sum(width * height * bytesPerDepthTexel)` |
 
 When over budget, reduce algorithmic cost first: fewer levels, lower far distance, smaller far maps, lower cached budget, better invalidation, tighter caster lists. Raising resolution is the last step.
 
@@ -602,6 +653,9 @@ Run these before shipping:
 - Quality-tier smoke test on budgeted WebGPU settings.
 - Dispose/recreate loop with GPU memory counters.
 - Fixed-view screenshots and GPU timings through `$threejs-visual-validation`.
+  In this example, `validate.js --artifacts <dir>` requires
+  `shadow-map.png` and `silhouette.png` to exist and differ; without artifacts
+  it exits non-zero unless `--allow-missing-gpu` is supplied.
 
 ## 20. Replaced Techniques
 
