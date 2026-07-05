@@ -1,0 +1,17 @@
+{
+  "name": "webgpu-procedural-creature-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/validation/run-validate.mjs",
+    "validate": "node src/validation/run-validate.mjs",
+    "capture": "node capture-creature-lab.mjs",
+    "validate:manifest": "node src/validation/validate-lab-artifacts.mjs"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0"
+  }
+}

@@ -181,7 +181,11 @@ locomotion sweep gate — rest-AABB adjacency is a heuristic, not a theorem; add
 (c) specify world-planted foot target → body-frame IK → SoA → culling-bounds pipeline (double-applied root
 transform is otherwise undetectable); (d) reconcile stance-drift thresholds (gait `<1e-9`/frame vs evidence
 `<1e-4` vs platform `<1e-4`) by naming their spaces (sim-step vs world vs platform-relative); (e) the real
-closure is the Wave B lab: `examples/webgpu-procedural-creature-lab/` with the 15-gate `npm run validate`.
+closure is the Wave B lab: `examples/webgpu-procedural-creature-lab/` whose `npm run validate` executes
+the full reference §10 table — 19 rows (15 mechanism + 4 boot gates; the earlier "15-gate" phrasing
+undercounted) plus CPU/TSL parity, world-drift evidence, and leak-loop auxiliaries.
+IN PROGRESS (owner go-ahead 2026-07-05): stage 1 landed — package scaffold + fail-closed gate runner
+(born failing on an empty suite; exit ≠ 0 until real gates register).
 
 ### Tier 3: validation credibility
 
