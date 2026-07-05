@@ -8,6 +8,10 @@ import { makeFlyerState, stepFlyer } from './locomotion/flyer.js';
 import { makeRopeState, stepRope } from './locomotion/rope.js';
 import { makeSwimState, stepSwim } from './locomotion/swim.js';
 
+function primitiveRecordsFor(compiler) {
+	return compiler?.primitiveRecords ?? compiler?.slots ?? [];
+}
+
 function clonePoseFloat32(source) {
 	if (source instanceof Float32Array) return source.slice();
 	if (Array.isArray(source)) return new Float32Array(source);
@@ -19,10 +23,11 @@ function createZeroPose(slotCount) {
 }
 
 function poseFromCompiler(compiler) {
-	const slotCount = compiler?.primitiveRecords?.length ?? 0;
+	const primitiveRecords = primitiveRecordsFor(compiler);
+	const slotCount = primitiveRecords.length;
 	const pose = createZeroPose(slotCount);
 	for (let slot = 0; slot < slotCount; slot++) {
-		const slotData = compiler.primitiveRecords[slot];
+		const slotData = primitiveRecords[slot];
 		const base = slot * 8;
 		pose[base + 0] = slotData.a?.[0] ?? 0;
 		pose[base + 1] = slotData.a?.[1] ?? 0;
@@ -65,7 +70,7 @@ function interpolatePoses(previous, next, alpha, out) {
 }
 
 function makePoseTransform(compiler, options = {}) {
-	const slotCount = compiler?.primitiveRecords?.length ?? 0;
+	const slotCount = primitiveRecordsFor(compiler).length;
 	const pose = poseFromCompiler(compiler);
 	return applyBiomeTransform(pose, slotCount, options);
 }
@@ -94,9 +99,9 @@ function applyBiomeTransform(pose, slotCount, options = {}) {
 			const rz = -sy * x + cy * z;
 			const rx = cr * ry - sr * y;
 			const ry2 = sr * ry + cr * y;
-			out[p + 0] = ry2 * squash + tx;
-			out[p + 1] = (ry2) + ty;
-			out[p + 2] = rz * squash + tz;
+			out[p + 0] = rx / Math.sqrt(squash) + tx;
+			out[p + 1] = ry2 * squash + ty;
+			out[p + 2] = rz / Math.sqrt(squash) + tz;
 		}
 		out[base + 6] = pose[base + 6];
 		out[base + 7] = pose[base + 7];
@@ -127,23 +132,32 @@ function buildLocomotionState(spec, compiler) {
 
 function stepLocomotion(system, dt, context = {}) {
 	if (!system.locomotionState) return system.currentPose;
+	const normalizeResult = (result) => {
+		if (result instanceof Promise) {
+			throw new Error('async locomotion step returned inside fixed-step driver');
+		}
+		if (result instanceof Float32Array) return result;
+		if (result?.pose instanceof Float32Array) return result.pose;
+		if (Array.isArray(result?.pose)) return new Float32Array(result.pose);
+		throw new Error(`locomotion ${system.locomotionState.type} did not return a pose buffer`);
+	};
 	if (system.locomotionState.type === 'gait') {
-		return stepGait(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context).pose;
+		return normalizeResult(stepGait(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
 	}
 	if (system.locomotionState.type === 'hopper') {
-		return stepHopper(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context);
+		return normalizeResult(stepHopper(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
 	}
 	if (system.locomotionState.type === 'flyer') {
-		return stepFlyer(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context);
+		return normalizeResult(stepFlyer(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
 	}
 	if (system.locomotionState.type === 'swimmer') {
-		return stepSwim(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context);
+		return normalizeResult(stepSwim(system.locomotionState.state, system.currentPose, system.spec?.locomotion ?? {}, dt, context));
 	}
 	return system.currentPose;
 }
 
 export function createDriver(spec, compiler, options = {}) {
-	const slotCount = compiler?.primitiveRecords?.length ?? 0;
+	const slotCount = primitiveRecordsFor(compiler).length;
 	if (slotCount <= 0) {
 		throw new Error('Driver requires at least one primitive slot.');
 	}

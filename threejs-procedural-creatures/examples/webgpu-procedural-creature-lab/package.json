@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check src/validation/run-validate.mjs",
+    "check": "node --check capture-creature-lab.mjs && node --check src/validation/run-validate.mjs && node --check src/validation/validate-lab-artifacts.mjs && node --check src/validation/gates/artifact-gates.mjs && node --check src/validation/gates/field-gates.mjs && node --check src/validation/gates/snap-gates.mjs && node --check src/validation/gates/shell-gates.mjs && node --check src/validation/gates/sweep-gates.mjs && node --check src/validation/gates/locomotion-gates.mjs && node --check src/validation/gates/determinism-gates.mjs && node --check src/lab/browser-app.js && node --check src/lab/specs/genome.js && node --check src/core/lcg.js && node --check src/core/spec-schema.js && node --check src/core/rig-compiler.js && node --check src/core/field.js && node --check src/core/newton-snap.js && node --check src/core/shell-writer.js && node --check src/core/driver.js && node --check src/core/water-analytic.js && node --check src/core/locomotion/gait.js && node --check src/core/locomotion/ik.js && node --check src/core/locomotion/hopper.js && node --check src/core/locomotion/flyer.js && node --check src/core/locomotion/rope.js && node --check src/core/locomotion/swim.js && node --check src/core/locomotion/genome.js && node --check src/tsl/pose-storage.js && node --check src/tsl/field-nodes.js && node --check src/tsl/materials.js && node --check src/tsl/outline-pass.js",
     "validate": "node src/validation/run-validate.mjs",
     "capture": "node capture-creature-lab.mjs",
     "validate:manifest": "node src/validation/validate-lab-artifacts.mjs"

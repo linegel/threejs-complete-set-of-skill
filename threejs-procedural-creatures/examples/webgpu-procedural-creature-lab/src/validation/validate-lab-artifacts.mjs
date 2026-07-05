@@ -1,160 +1,111 @@
-import { readFileSync } from 'node:fs';
 import { existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
-
-import { decodeGeneratedRgbaPng } from '../../../threejs-visual-validation/examples/webgpu-validation-harness/src/png.js';
-import { validateArtifactBundle, getRequiredImagePaths } from '../../../threejs-visual-validation/examples/webgpu-validation-harness/src/schema/artifact-schemas.js';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const projectRoot = resolve(here, '../../../../');
-const defaultArtifactDir = resolve(projectRoot, 'threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts');
+const labRoot = resolve(here, '../..');
+const defaultArtifactDir = resolve(labRoot, 'artifacts');
 
-function absDiff(a, b) {
-  return Math.abs(a - b);
+const requiredImages = [
+	'images/final.design.png',
+	'images/no-post.design.png',
+	'images/diagnostics.mosaic.png',
+	'images/final.debug.off.png',
+	'images/final.debug.unsnapped.png',
+	'images/final.debug.distance.png',
+	'images/final.debug.normals.png',
+	'images/final.debug.weights.png',
+	'images/tier-switcher.png',
+	'images/silhouette-shadow-composite.png',
+	'images/hop-apex.png',
+	'images/seed-grid.png',
+];
+
+function gate(name, passed, details = {}) {
+	return { name, status: passed ? 'pass' : 'fail', details };
 }
 
-function sumDifferences(a, b) {
-  const h = Math.min(a.height, b.height);
-  const w = Math.min(a.width, b.width);
-  let sum = 0;
-  for (let y = 0; y < h; y += 1) {
-    for (let x = 0; x < w; x += 1) {
-      const aOffset = y * w * 4 + x * 4;
-      const bOffset = y * w * 4 + x * 4;
-      for (let i = 0; i < 3; i += 1) {
-        sum += absDiff(a.raw[aOffset + i + 1], b.raw[bOffset + i + 1]);
-      }
-    }
-  }
-  return sum / (h * w);
+async function readJson(path, fallback = null) {
+	try {
+		return JSON.parse(await readFile(path, 'utf8'));
+	} catch {
+		return fallback;
+	}
 }
 
-async function readManifest(path) {
-  return JSON.parse(await readFile(path, 'utf8'));
-}
-
-function requireFile(path) {
-  if (!existsSync(path)) {
-    return false;
-  }
-  return true;
-}
-
-function validateGateRow(name, passed, details = null) {
-  return { name, status: passed ? 'pass' : 'fail', details };
+function hasNumber(object, key) {
+	return typeof object?.[key] === 'number' && Number.isFinite(object[key]);
 }
 
 export async function validateManifestArtifacts(artifactDirArg = defaultArtifactDir) {
-  const base = resolve(artifactDirArg);
-  const requiredImages = getRequiredImagePaths('creature-lab').concat([
-    'images/final.design.png',
-    'images/no-post.design.png',
-    'images/diagnostics.mosaic.png',
-    'images/final.debug.off.png',
-    'images/final.debug.unsnapped.png',
-    'images/final.debug.distance.png',
-    'images/final.debug.normals.png',
-    'images/final.debug.weights.png',
-  ]);
+	const base = resolve(artifactDirArg);
+	const manifestPath = resolve(base, 'manifest.json');
+	const metricsPath = resolve(base, 'metrics.json');
+	const snapshotPath = resolve(base, 'lab-snapshot.json');
+	const reports = [];
 
-  const reports = [];
-  let allPass = true;
+	const manifest = await readJson(manifestPath);
+	reports.push(gate('manifest.exists', manifest !== null, { path: manifestPath }));
+	if (!manifest) return summarize(reports, base);
 
-  const manifestPath = resolve(base, 'manifest.json');
-  const evidenceManifestPath = resolve(base, 'evidence-manifest.json');
-  const metricsPath = resolve(base, 'metrics.json');
-  const visualContractPath = resolve(base, 'visual-contract.json');
+	reports.push(gate('manifest.kind', manifest.kind === 'creature-lab-artifacts', { kind: manifest.kind }));
+	reports.push(gate('manifest.images-listed', Array.isArray(manifest.images) && requiredImages.every((path) => manifest.images.includes(path)), { requiredImages }));
 
-  if (!requireFile(manifestPath)) {
-    reports.push(validateGateRow('manifest.exists', false, { path: manifestPath }));
-    return {
-      status: 'fail',
-      summary: { passCount: reports.filter((entry) => entry.status === 'pass').length, failCount: reports.length },
-      gates: reports,
-    };
-  }
+	for (const image of requiredImages) {
+		reports.push(gate(`image:${image}`, existsSync(resolve(base, image)), { path: image }));
+	}
 
-  const manifest = await readManifest(manifestPath);
-  const schemaPath = resolve(base, 'manifest.schema.json');
-  if (!existsSync(schemaPath)) {
-    reports.push(validateGateRow('manifest.schema-missing', false, { path: schemaPath }));
-    allPass = false;
-  } else {
-    const schema = await readManifest(schemaPath);
-    const required = validateArtifactBundle(manifest, schema);
-    reports.push(validateGateRow('manifest.schema', required === null, { schema: typeof required }));
-  }
+	const metrics = await readJson(metricsPath, {});
+	reports.push(gate('metrics.exists', Object.keys(metrics).length > 0, { path: metricsPath }));
+	reports.push(gate('row13.shadow-silhouette', hasNumber(metrics, 'silhouetteDiffTexels') && metrics.silhouetteDiffTexels <= metrics.silhouetteDiffThresholdTexels, {
+		value: metrics.silhouetteDiffTexels,
+		threshold: metrics.silhouetteDiffThresholdTexels,
+		sharedPositionNode: metrics.sharedPositionNode,
+	}));
+	reports.push(gate('row15.browser-determinism', metrics.deterministicPair === true && metrics.pngHashEqual === true && metrics.poseHashEqual === true, {
+		deterministicPair: metrics.deterministicPair,
+		pngHashEqual: metrics.pngHashEqual,
+		poseHashEqual: metrics.poseHashEqual,
+	}));
+	reports.push(gate('row16.pipeline-compiles-after-reveal', metrics.pipelineCompilesAfterReveal === 0, { value: metrics.pipelineCompilesAfterReveal }));
+	reports.push(gate('row17.buffer-reallocs-after-init', metrics.bufferReallocsAfterInit === 0, { value: metrics.bufferReallocsAfterInit }));
+	reports.push(gate('row18.spawn-cost', hasNumber(metrics, 'spawnMedianMs') && metrics.spawnMedianMs <= 0.25, { value: metrics.spawnMedianMs, threshold: 0.25 }));
+	reports.push(gate('row19.first-frame-ratio', hasNumber(metrics, 'firstFrameRatio') && metrics.firstFrameRatio <= 1.5, { value: metrics.firstFrameRatio, threshold: 1.5 }));
+	reports.push(gate('cpu-tsl-field-parity-artifact', hasNumber(metrics, 'cpuTslMaxError') && metrics.cpuTslMaxError <= metrics.cpuTslTolerance, {
+		value: metrics.cpuTslMaxError,
+		threshold: metrics.cpuTslTolerance,
+	}));
+	reports.push(gate('world-drift-artifact', hasNumber(metrics, 'worldDriftMax') && metrics.worldDriftMax < 1e-4, { value: metrics.worldDriftMax, threshold: 1e-4 }));
+	reports.push(gate('leak-loop-flat', metrics.leakLoopFlat === true, { leakLoopFlat: metrics.leakLoopFlat }));
 
-  const metrics = await readManifest(metricsPath).catch(() => ({}));
-  const requiredFields = [ 'spawnMedianMs', 'firstFrameRatio', 'pipelineCompilesAfterReveal', 'bufferReallocsAfterInit', 'deterministicPair', 'renderMs', 'msByTier', 'silhouetteDiffTexels' ];
-  const metricPresence = requiredFields.every((field) => Object.hasOwn(metrics, field));
-  reports.push(validateGateRow('artifact.metrics-presence', metricPresence));
+	const snapshot = await readJson(snapshotPath, null);
+	reports.push(gate('window-lab-snapshot', snapshot !== null && snapshot.ready === true && Array.isArray(snapshot.specs), { path: snapshotPath }));
 
-  for (const imagePath of requiredImages) {
-    const fullImage = resolve(base, imagePath);
-    if (!requireFile(fullImage)) {
-      reports.push(validateGateRow('artifact.image', false, { path: fullImage }));
-      allPass = false;
-      continue;
-    }
-    reports.push(validateGateRow('artifact.image', true, { path: imagePath }));
-  }
-
-  const seedGrid = resolve(base, 'images/seed-grid.png');
-  if (!requireFile(seedGrid)) {
-    reports.push(validateGateRow('artifact.seedGrid', false, { path: 'images/seed-grid.png' }));
-  } else {
-    const png = await readFileSync(seedGrid);
-    const decoded = decodeGeneratedRgbaPng(png);
-    reports.push(validateGateRow('artifact.seedGrid', decoded.width > 0 && decoded.height > 0, decoded));
-  }
-
-  if (Object.hasOwn(metrics, 'visualContractPath')) {
-    const contractPath = resolve(projectRoot, metrics.visualContractPath);
-    if (requireFile(contractPath)) {
-      reports.push(validateGateRow('artifact.visual-contract', true, { path: contractPath }));
-    } else {
-      reports.push(validateGateRow('artifact.visual-contract', false, { path: contractPath }));
-      allPass = false;
-    }
-  }
-
-  if (Object.hasOwn(metrics, 'windowLabSnapshotPath')) {
-    const snapPath = resolve(base, metrics.windowLabSnapshotPath);
-    if (!requireFile(snapPath)) {
-      reports.push(validateGateRow('artifact.lab-snapshot', false, { path: snapPath }));
-      allPass = false;
-    } else {
-      reports.push(validateGateRow('artifact.lab-snapshot', true, { path: snapPath }));
-    }
-  }
-
-  const bootstrap = {}
-  return {
-    status: allPass && reports.every((entry) => entry.status === 'pass') ? 'pass' : 'fail',
-    gates: reports,
-    summary: {
-      passCount: reports.filter((entry) => entry.status === 'pass').length,
-      failCount: reports.filter((entry) => entry.status === 'fail').length,
-      path: base,
-      artifactManifest: manifest,
-      bootstrap,
-      requiredImages,
-    },
-  };
+	return summarize(reports, base, manifest, metrics);
 }
 
-if (import.meta.url === `file://${ process.argv[1] }`) {
-  const artifactArg = process.argv.includes('--artifact-dir')
-    ? process.argv[process.argv.indexOf('--artifact-dir') + 1]
-    : defaultArtifactDir;
-  const result = await validateManifestArtifacts(artifactArg);
-  if (result.status !== 'pass') {
-    console.error(JSON.stringify(result, null, 2));
-    process.exitCode = 1;
-  } else {
-    console.log(JSON.stringify(result, null, 2));
-  }
+function summarize(reports, base, manifest = null, metrics = null) {
+	const failed = reports.filter((entry) => entry.status === 'fail');
+	return {
+		status: failed.length === 0 ? 'pass' : 'fail',
+		summary: {
+			total: reports.length,
+			passed: reports.length - failed.length,
+			failed: failed.length,
+			path: base,
+		},
+		gates: reports,
+		manifest,
+		metrics,
+	};
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+	const artifactArg = process.argv.includes('--artifact-dir')
+		? process.argv[process.argv.indexOf('--artifact-dir') + 1]
+		: defaultArtifactDir;
+	const result = await validateManifestArtifacts(artifactArg);
+	console.log(JSON.stringify(result, null, 2));
+	if (result.status !== 'pass') process.exitCode = 1;
 }

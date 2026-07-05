@@ -1,5 +1,3 @@
-import { normalize } from './hopper.js';
-
 const TWO_PI = Math.PI * 2;
 
 function clamp01(v) {
@@ -16,6 +14,16 @@ function add(a, b) {
 
 function mul(v, s) {
   return [ v[0] * s, v[1] * s, v[2] * s ];
+}
+
+function len(v) {
+  return Math.hypot(v[0], v[1], v[2]);
+}
+
+function normalize(v) {
+  const l = len(v);
+  if (!Number.isFinite(l) || l < 1e-9) return [0, 0, 0];
+  return [v[0] / l, v[1] / l, v[2] / l];
 }
 
 function clamp(v, min, max) {

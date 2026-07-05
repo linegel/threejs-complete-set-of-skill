@@ -80,10 +80,10 @@ export function solveLimbTarget2Bone(hip, foot, upperLength, lowerLength, hint =
 	const segment = {
 		hip: [ hip[ 0 ], hip[ 1 ], hip[ 2 ] ],
 		knee: [ knee[ 0 ], knee[ 1 ], knee[ 2 ] ],
-		foot: [ footPos[ 0 ], footPos[ 1 ], footPos[ 2 ] ],
+		foot: [ lowerEndpoint[ 0 ], lowerEndpoint[ 1 ], lowerEndpoint[ 2 ] ],
 		segments: {
 			upperLength: norm(sub(knee, hip)),
-			lowerLength: norm(sub(footPos, knee))
+			lowerLength: norm(sub(lowerEndpoint, knee))
 		},
 		a,
 		h,
@@ -130,4 +130,3 @@ export function update2BoneIK(state, target, force = false) {
 	state.lastSegment = segment;
 	return segment;
 }
-

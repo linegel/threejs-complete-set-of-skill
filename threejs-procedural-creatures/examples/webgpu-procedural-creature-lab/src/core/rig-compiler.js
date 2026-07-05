@@ -150,8 +150,14 @@ function compilePart(part, origin, scaleValue) {
 		const foot = add(knee, [0.06 * side * scaleValue, -part.lower * scaleValue, 0.05 * forward * scaleValue]);
 		const ra = part.r * scaleValue;
 		const rb = part.r * 0.82 * scaleValue;
-		records.push(makePrimitive(part, hip, knee, ra, rb, color, effectiveK(part, part.r, scaleValue), 'leg-upper', { legSegment: 'upper' }));
-		records.push(makePrimitive(part, knee, foot, rb, rb * 0.88, color, effectiveK(part, part.r, scaleValue), 'leg-lower', { legSegment: 'lower' }));
+		const meta = {
+			hip: hip.slice(),
+			upper: part.upper * scaleValue,
+			lower: part.lower * scaleValue,
+			phase: part.phase ?? 0,
+		};
+		records.push(makePrimitive(part, hip, knee, ra, rb, color, effectiveK(part, part.r, scaleValue), 'leg-upper', { legSegment: 'upper', meta }));
+		records.push(makePrimitive(part, knee, foot, rb, rb * 0.88, color, effectiveK(part, part.r, scaleValue), 'leg-lower', { legSegment: 'lower', meta }));
 	}
 
 	return records;
@@ -213,8 +219,15 @@ function buildAdjacency(slots, excursion) {
 
 function buildCandidateSets(slots, adjacency, candidateK) {
 	return slots.map((slot, owner) => {
-		const ranked = adjacency[owner]
-			.map((index) => ({ index, distance: dist(slot.a, slots[index].a) }))
+		const adjacent = new Set(adjacency[owner]);
+		const ownerCenter = scale(add(slot.a, slot.b), 0.5);
+		const ranked = slots
+			.map((candidate, index) => {
+				const candidateCenter = scale(add(candidate.a, candidate.b), 0.5);
+				const adjacencyBias = adjacent.has(index) ? -1e-3 : 0;
+				return { index, distance: dist(ownerCenter, candidateCenter) + adjacencyBias };
+			})
+			.filter((entry) => entry.index !== owner)
 			.sort((a, b) => a.distance - b.distance || a.index - b.index)
 			.slice(0, candidateK)
 			.map((entry) => entry.index);
@@ -278,9 +291,17 @@ export function compileSpec(inputSpec, options = {}) {
 	const maxRadius = Math.max(0, ...slots.map((slot) => Math.max(slot.ra, slot.rb)));
 	const slotClasses = slots.map((slot) => slot.slotClass).join(',');
 	const digest = `${SCHEMA_VERSION}|${COMPILER_VERSION}|${tier}|${slotClasses}|${stableStringify(geometryDigestInput(spec))}`;
+	const primitiveRecords = slots.map((slot, partSlot) => ({
+		...slot,
+		partSlot,
+		shape: slot.slotClass,
+		sourceShape: slot.shape,
+		meta: slot.meta ?? {},
+	}));
 
 	return {
 		slots,
+		primitiveRecords,
 		candidateSets,
 		adjacency,
 		bodyLift: computeBodyLift(spec),

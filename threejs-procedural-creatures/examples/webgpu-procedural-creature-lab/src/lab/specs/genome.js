@@ -1,5 +1,5 @@
-import { createLabMutationSeed } from '../../core/locomotion/genome.js';
-import { validateCharacterSpec } from '../../core/spec-schema.js';
+import { makeSeededRngFromString } from '../../core/lcg.js';
+import { validateSpec } from '../../core/spec-schema.js';
 
 function wrap01(v) {
   return Math.max(0, Math.min(1, v));
@@ -80,7 +80,7 @@ export function createGenomeSpec(baseSpec, options = {}) {
       seed: Number.isFinite(seed) ? Number(seed) + i : i
     };
 
-    validateCharacterSpec(spec);
+    validateSpec(spec);
     out.push(spec);
   }
 
@@ -88,21 +88,5 @@ export function createGenomeSpec(baseSpec, options = {}) {
 }
 
 export function createLabMutationSeed(seedText = 'lab-locus') {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < seedText.length; i++) {
-    h ^= seedText.charCodeAt(i);
-    h = Math.imul(h, 16777619) >>> 0;
-  }
-  const state = h || 2147483647;
-  let x = state;
-  return {
-    state: x,
-    nextUInt32() {
-      x = (Math.imul(x, 1664525) + 1013904223) >>> 0;
-      return x;
-    },
-    nextFloat() {
-      return this.nextUInt32() / 0x100000000;
-    }
-  };
+  return makeSeededRngFromString(seedText);
 }
