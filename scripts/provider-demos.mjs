@@ -141,6 +141,86 @@ export const PROVIDER_DEMOS = [
     debugModes: ["final", "no-haze", "lut-debug"],
   },
   {
+    id: "camera-rig-handoff-demo",
+    skill: "threejs-camera-controls-and-rigs",
+    title: "Scale-Aware Camera Rig",
+    sceneId: "camera-rig-handoff-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier camera-owner scene",
+    livePath: "demos/camera-rig-handoff-demo/",
+    visual: { kind: "camera", label: "scale-aware chase + handoff pose" },
+    sourceExample: "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig",
+    validationCommand:
+      "node threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/cameraValidation.mjs",
+    providerClaim:
+      "One camera owner derives chase, side, and handoff poses from subject scale and projection envelopes.",
+    limitations: [
+      "The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path.",
+      "The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.",
+    ],
+    debugModes: ["final", "side", "handoff"],
+  },
+  {
+    id: "procedural-motion-timeline-demo",
+    skill: "threejs-procedural-motion-systems",
+    title: "Procedural Motion Timeline",
+    sceneId: "procedural-motion-timeline-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier analytic-timeline scene",
+    livePath: "demos/procedural-motion-timeline-demo/",
+    visual: { kind: "motion", label: "phase timeline + seeded debris" },
+    sourceExample: "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines",
+    validationCommand:
+      "node threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validation.js",
+    providerClaim:
+      "Named phases drive analytic launch, staging, docking, and debris motion without frame-count state.",
+    limitations: [
+      "The docs page uses a small CPU-side hero actor set for readability.",
+      "The production skill remains fixed-step replay, previous/current storage slots, compute dispatch ownership, and quaternion frame contracts.",
+    ],
+    debugModes: ["final", "phase-debug", "replay-slice"],
+  },
+  {
+    id: "pooled-particles-effects-demo",
+    skill: "threejs-particles-trails-and-effects",
+    title: "Pooled Particles And Trails",
+    sceneId: "pooled-particles-effects-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier effect-pool scene",
+    livePath: "demos/pooled-particles-effects-demo/",
+    visual: { kind: "effects", label: "event pool + shell/wake/sparks" },
+    sourceExample: "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects",
+    validationCommand:
+      "node threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/validate-effects.mjs",
+    providerClaim:
+      "Seeded event packets feed a dense visual pool with shell, wake, spark, and bloom-isolated views.",
+    limitations: [
+      "The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path.",
+      "The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.",
+    ],
+    debugModes: ["final", "pool-debug", "bloom-off"],
+  },
+  {
+    id: "procedural-geometry-writer-demo",
+    skill: "threejs-procedural-geometry",
+    title: "Semantic Mesh Writer Bench",
+    sceneId: "procedural-geometry-writer-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier semantic-writer scene",
+    livePath: "demos/procedural-geometry-writer-demo/",
+    visual: { kind: "geometry", label: "profile sweep + material groups" },
+    sourceExample: "threejs-procedural-geometry/examples/semantic-mesh-writer",
+    validationCommand:
+      "node threejs-procedural-geometry/examples/semantic-mesh-writer/validate-geometry.js --fixture frame-hero --json",
+    providerClaim:
+      "Semantic dimensions, material groups, hard-edge duplication, and LOD tiers drive inspectable generated geometry.",
+    limitations: [
+      "The docs page implements a compact runtime frame-profile writer for inspection.",
+      "The production skill remains preallocated typed-array writers, exact group coverage, tangent validation, batching decisions, and targeted update ranges.",
+    ],
+    debugModes: ["final", "groups", "wire"],
+  },
+  {
     id: "water-generated-caustics",
     skill: "threejs-water-optics",
     title: "Bounded Water Caustic Projection",

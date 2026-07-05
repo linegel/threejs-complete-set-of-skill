@@ -311,6 +311,8 @@ footer a:hover{text-decoration:underline}
 .live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
 .live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
 .live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
+.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
+.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
 header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
 header .kicker{animation:rise .7s ease both}
 h1{font-weight:700;font-size:clamp(40px,6.4vw,84px);line-height:1.04;letter-spacing:-.03em;max-width:15ch;animation:rise .7s .08s ease both}
@@ -712,6 +714,38 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
         <span class="lv-m">final / no-haze / lut-debug</span>
       </div>
         <figcaption><strong>Atmosphere And Haze Stack</strong><span>threejs-sky-atmosphere-and-haze · Shared sky, sun, depth haze, and LUT diagnostic views preserve one atmosphere parameter model.</span></figcaption>
+      </figure></a>
+      <a href="demos/camera-rig-handoff-demo/"><figure>
+        <div class="live-visual live-visual--camera" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>scale-aware chase + handoff pose</strong>
+        <span class="lv-m">final / side / handoff</span>
+      </div>
+        <figcaption><strong>Scale-Aware Camera Rig</strong><span>threejs-camera-controls-and-rigs · One camera owner derives chase, side, and handoff poses from subject scale and projection envelopes.</span></figcaption>
+      </figure></a>
+      <a href="demos/procedural-motion-timeline-demo/"><figure>
+        <div class="live-visual live-visual--motion" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>phase timeline + seeded debris</strong>
+        <span class="lv-m">final / phase-debug / replay-slice</span>
+      </div>
+        <figcaption><strong>Procedural Motion Timeline</strong><span>threejs-procedural-motion-systems · Named phases drive analytic launch, staging, docking, and debris motion without frame-count state.</span></figcaption>
+      </figure></a>
+      <a href="demos/pooled-particles-effects-demo/"><figure>
+        <div class="live-visual live-visual--effects" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>event pool + shell/wake/sparks</strong>
+        <span class="lv-m">final / pool-debug / bloom-off</span>
+      </div>
+        <figcaption><strong>Pooled Particles And Trails</strong><span>threejs-particles-trails-and-effects · Seeded event packets feed a dense visual pool with shell, wake, spark, and bloom-isolated views.</span></figcaption>
+      </figure></a>
+      <a href="demos/procedural-geometry-writer-demo/"><figure>
+        <div class="live-visual live-visual--geometry" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>profile sweep + material groups</strong>
+        <span class="lv-m">final / groups / wire</span>
+      </div>
+        <figcaption><strong>Semantic Mesh Writer Bench</strong><span>threejs-procedural-geometry · Semantic dimensions, material groups, hard-edge duplication, and LOD tiers drive inspectable generated geometry.</span></figcaption>
       </figure></a>
       <a href="demos/water-generated-caustics/"><figure>
         <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" loading="lazy" />

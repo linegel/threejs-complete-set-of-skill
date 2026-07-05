@@ -33,6 +33,10 @@
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/image-pipeline-framegraph-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/shadow-cascade-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/sky-atmosphere-haze-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/camera-rig-handoff-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/procedural-motion-timeline-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/pooled-particles-effects-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/procedural-geometry-writer-demo/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/water-generated-caustics/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/cloud-generated-weather-maps/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://linegel.github.io/threejs-complete-set-of-skill/demos/fields-generated-biome-maps/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>

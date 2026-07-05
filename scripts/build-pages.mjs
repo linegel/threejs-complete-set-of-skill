@@ -342,6 +342,8 @@ ${baseCss}
 .live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
 .live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
 .live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
+.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
+.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
 header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
 header .kicker{animation:rise .7s ease both}
 h1{font-weight:700;font-size:clamp(40px,6.4vw,84px);line-height:1.04;letter-spacing:-.03em;max-width:15ch;animation:rise .7s .08s ease both}

@@ -124,6 +124,86 @@ const DEMOS = {
     evidenceHref: "../../skills/threejs-sky-atmosphere-and-haze.html",
     evidenceLabel: "Skill Contract",
   },
+  "camera-rig-handoff-demo": {
+    title: "Scale-Aware Camera Rig",
+    skill: "$threejs-camera-controls-and-rigs",
+    claim: "Live directional demo: one camera owner derives chase, side, and handoff poses from subject scale and projection envelopes.",
+    variants: [
+      ["compact-drone"],
+      ["long-ship"],
+      ["large-world"],
+    ],
+    modes: [
+      ["final", "Chase"],
+      ["side", "Side Rig"],
+      ["handoff", "Handoff"],
+    ],
+    camera: [0, 2.2, 7.2],
+    target: [0, 0.7, 0],
+    factory: createCameraRigScene,
+    evidenceHref: "../../skills/threejs-camera-controls-and-rigs.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "procedural-motion-timeline-demo": {
+    title: "Procedural Motion Timeline",
+    skill: "$threejs-procedural-motion-systems",
+    claim: "Live directional demo: named phases drive analytic launch, staging, docking, and debris motion without frame-count state.",
+    variants: [
+      ["launch-staging"],
+      ["spin-docking"],
+      ["debris-release"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["phase-debug", "Phase Debug"],
+      ["replay-slice", "Replay Slice"],
+    ],
+    camera: [6.8, 3.8, 7.2],
+    target: [0, 1.1, 0],
+    factory: createProceduralMotionScene,
+    evidenceHref: "../../skills/threejs-procedural-motion-systems.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "pooled-particles-effects-demo": {
+    title: "Pooled Particles And Trails",
+    skill: "$threejs-particles-trails-and-effects",
+    claim: "Live directional demo: seeded event packets feed a dense visual pool with shell, wake, spark, and bloom-isolated views.",
+    variants: [
+      ["reentry-plasma"],
+      ["impact-sparks"],
+      ["debris-dissolve"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["pool-debug", "Pool Debug"],
+      ["bloom-off", "Bloom Off"],
+    ],
+    camera: [5.7, 3.2, 6.4],
+    target: [0, 0.75, 0],
+    factory: createPooledParticlesScene,
+    evidenceHref: "../../skills/threejs-particles-trails-and-effects.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "procedural-geometry-writer-demo": {
+    title: "Semantic Mesh Writer Bench",
+    skill: "$threejs-procedural-geometry",
+    claim: "Live directional demo: semantic dimensions, material groups, hard-edge duplication, and LOD tiers drive inspectable generated geometry.",
+    variants: [
+      ["hero-profile"],
+      ["standard-profile"],
+      ["crowd-profile"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["groups", "Groups"],
+      ["wire", "Wire"],
+    ],
+    camera: [5.8, 3.4, 6.2],
+    target: [0, 0.75, 0],
+    factory: createProceduralGeometryScene,
+    evidenceHref: "../../skills/threejs-procedural-geometry.html",
+    evidenceLabel: "Skill Contract",
+  },
   "water-generated-caustics": {
     title: "Bounded Water Caustic Projection",
     skill: "$threejs-water-optics",
@@ -2055,6 +2135,596 @@ async function createSkyAtmosphereScene(scene) {
         layer.position.x = Math.sin(time * (0.09 + index * 0.03)) * (0.18 + index * 0.08);
       });
       sunDisc.scale.setScalar(1 + Math.sin(time * 0.7) * 0.035);
+    },
+  };
+}
+
+function computeStableCameraPose(camera, target, desired, upHint) {
+  const forward = new THREE.Vector3().subVectors(target, desired).normalize();
+  const up = upHint.clone().normalize();
+  if (Math.abs(forward.dot(up)) > 0.985) {
+    up.set(Math.abs(forward.y) < 0.9 ? 0 : 1, Math.abs(forward.y) < 0.9 ? 1 : 0, 0).normalize();
+  }
+  const right = new THREE.Vector3().crossVectors(forward, up).normalize();
+  const correctedUp = new THREE.Vector3().crossVectors(right, forward).normalize();
+  const back = forward.clone().multiplyScalar(-1);
+  const basis = new THREE.Matrix4().makeBasis(right, correctedUp, back);
+  camera.position.copy(desired);
+  camera.quaternion.setFromRotationMatrix(basis).normalize();
+}
+
+async function createCameraRigScene(scene, { camera, controls } = {}) {
+  scene.background = new THREE.Color(0x081018);
+  scene.fog = new THREE.Fog(0x081018, 9, 26);
+  scene.add(new THREE.HemisphereLight(0xb8d4ff, 0x182018, 1.35));
+  const sun = new THREE.DirectionalLight(0xffe4bd, 3.6);
+  sun.position.set(-4.2, 6.2, 5.0);
+  scene.add(sun);
+  if (controls) controls.enabled = false;
+
+  const world = new THREE.Group();
+  scene.add(world);
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(18, 10, 36, 20),
+    new THREE.MeshStandardMaterial({
+      map: makeGroundTexture({ base: "#13212a", line: "rgba(127,212,193,0.13)" }),
+      color: 0x758894,
+      roughness: 0.82,
+    }),
+  );
+  ground.rotation.x = -Math.PI / 2;
+  world.add(ground);
+
+  const subject = new THREE.Group();
+  world.add(subject);
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.72, 0.36, 2.4),
+    new THREE.MeshStandardMaterial({ color: 0x7eb6d6, roughness: 0.35, metalness: 0.08 }),
+  );
+  subject.add(body);
+  const nose = new THREE.Mesh(
+    new THREE.ConeGeometry(0.36, 0.72, 24),
+    new THREE.MeshStandardMaterial({ color: 0xd9b66c, roughness: 0.42 }),
+  );
+  nose.rotation.x = Math.PI / 2;
+  nose.position.z = -1.52;
+  subject.add(nose);
+  const finMaterial = new THREE.MeshStandardMaterial({ color: 0xc76d58, roughness: 0.55 });
+  for (const x of [-0.52, 0.52]) {
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.72, 0.52), finMaterial);
+    fin.position.set(x, -0.18, 0.7);
+    subject.add(fin);
+  }
+  const thruster = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.0, 1.0),
+    new THREE.MeshBasicMaterial({
+      map: makeGlowDiscTexture("rgba(255, 176, 72, 0.96)", "rgba(255, 90, 24, 0)"),
+      color: 0xffb454,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  thruster.position.z = 1.45;
+  subject.add(thruster);
+
+  const guideGroup = new THREE.Group();
+  world.add(guideGroup);
+  const chaseGuide = makeRectOutline(2.2, 1.3, 0x7fd4c1);
+  chaseGuide.rotation.x = -Math.PI / 2;
+  chaseGuide.position.y = 0.03;
+  guideGroup.add(chaseGuide);
+  const sideGuide = makeRectOutline(3.8, 2.2, 0xffb454);
+  sideGuide.rotation.x = -Math.PI / 2;
+  sideGuide.position.y = 0.05;
+  guideGroup.add(sideGuide);
+
+  const farChunks = new THREE.InstancedMesh(
+    new THREE.BoxGeometry(0.32, 0.32, 0.32),
+    new THREE.MeshStandardMaterial({ color: 0x526873, roughness: 0.8 }),
+    80,
+  );
+  const dummy = new THREE.Object3D();
+  for (let i = 0; i < 80; i += 1) {
+    dummy.position.set((((i * 37) % 100) / 100 - 0.5) * 15, 0.16, (((i * 61) % 100) / 100 - 0.5) * 8);
+    dummy.scale.setScalar(0.5 + ((i * 17) % 30) / 45);
+    dummy.updateMatrix();
+    farChunks.setMatrixAt(i, dummy.matrix);
+  }
+  world.add(farChunks);
+
+  const profiles = [
+    { scale: 0.78, speed: 0.7, far: 34, label: "compact" },
+    { scale: 1.32, speed: 0.45, far: 52, label: "long" },
+    { scale: 1.95, speed: 0.32, far: 96, label: "large" },
+  ];
+  let profile = profiles[0];
+  let activeMode = "final";
+  const virtualOrigin = new THREE.Vector3();
+  const cameraPosition = new THREE.Vector3();
+  const cameraTarget = new THREE.Vector3();
+  const chasePose = new THREE.Vector3();
+  const sidePose = new THREE.Vector3();
+  const handoffStart = new THREE.Vector3(0, 2.2, 7.2);
+  const handoffTarget = new THREE.Vector3();
+
+  const applyProjection = () => {
+    if (!camera) return;
+    camera.fov = activeMode === "handoff" ? 42 : activeMode === "side" ? 48 : 45;
+    camera.near = Math.max(0.08, profile.scale * 0.05);
+    camera.far = profile.far;
+    camera.updateProjectionMatrix();
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+      subject.scale.setScalar(profile.scale);
+      applyProjection();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      guideGroup.visible = mode !== "final";
+      applyProjection();
+    },
+    update(time) {
+      const subjectLength = 2.4 * profile.scale;
+      subject.position.set(Math.sin(time * profile.speed) * 1.5, 0.72 + Math.sin(time * 1.3) * 0.08, Math.cos(time * profile.speed * 0.74) * 1.1);
+      subject.rotation.y = Math.sin(time * profile.speed) * 0.22;
+      subject.rotation.z = Math.sin(time * 1.7) * 0.035;
+      thruster.lookAt(camera?.position ?? new THREE.Vector3(0, 2, 7));
+      guideGroup.position.copy(subject.position);
+      virtualOrigin.set(
+        activeMode === "handoff" ? 1000000 + Math.sin(time * 0.1) * 64 : 0,
+        0,
+        activeMode === "handoff" ? -2000000 + Math.cos(time * 0.1) * 64 : 0,
+      );
+      world.position.copy(virtualOrigin).multiplyScalar(-0.000001);
+
+      cameraTarget.copy(subject.position).add(new THREE.Vector3(0, subjectLength * 0.16, -subjectLength * 0.16));
+      chasePose.copy(subject.position).add(new THREE.Vector3(0, subjectLength * 0.62, subjectLength * 2.2));
+      sidePose.copy(subject.position).add(new THREE.Vector3(subjectLength * 3.2, subjectLength * 0.92, subjectLength * 1.1));
+      const handoffT = activeMode === "handoff" ? (Math.sin(time * 0.5) + 1) * 0.5 : 0;
+      handoffTarget.copy(sidePose).lerp(chasePose, handoffT);
+      cameraPosition
+        .copy(activeMode === "side" ? sidePose : activeMode === "handoff" ? handoffTarget : chasePose);
+      if (activeMode === "handoff") {
+        const ease = 1 - (1 - handoffT) ** 1.8;
+        cameraPosition.lerpVectors(handoffStart, handoffTarget, ease);
+      }
+      if (camera) {
+        computeStableCameraPose(camera, cameraTarget, cameraPosition, new THREE.Vector3(0, 1, 0));
+      }
+      farChunks.rotation.y = Math.sin(time * 0.05) * 0.02;
+    },
+  };
+}
+
+function smoothstep(edge0, edge1, x) {
+  const t = clampValue((x - edge0) / Math.max(0.00001, edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+async function createProceduralMotionScene(scene) {
+  scene.background = new THREE.Color(0x070b12);
+  scene.fog = new THREE.Fog(0x070b12, 9, 28);
+  scene.add(new THREE.HemisphereLight(0xb5caff, 0x19120e, 1.2));
+  const sun = new THREE.DirectionalLight(0xffdfb0, 3.2);
+  sun.position.set(-4.5, 6.4, 5.0);
+  scene.add(sun);
+
+  const pad = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.15, 1.35, 0.16, 64),
+    new THREE.MeshStandardMaterial({ color: 0x38444a, roughness: 0.72, metalness: 0.08 }),
+  );
+  pad.position.y = 0.08;
+  scene.add(pad);
+
+  const rocket = new THREE.Group();
+  scene.add(rocket);
+  const stageA = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.34, 1.55, 32), new THREE.MeshStandardMaterial({ color: 0xd8d6cf, roughness: 0.48 }));
+  stageA.position.y = 0.78;
+  rocket.add(stageA);
+  const stageB = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.95, 32), new THREE.MeshStandardMaterial({ color: 0x78a9d0, roughness: 0.42 }));
+  stageB.position.y = 1.98;
+  rocket.add(stageB);
+  const capsule = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.55, 32), new THREE.MeshStandardMaterial({ color: 0xd9b66c, roughness: 0.4 }));
+  capsule.position.y = 2.72;
+  rocket.add(capsule);
+  const flame = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.05, 1.05),
+    new THREE.MeshBasicMaterial({
+      map: makeGlowDiscTexture("rgba(255, 205, 72, 0.96)", "rgba(255, 72, 16, 0)"),
+      color: 0xffb454,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  flame.rotation.x = -Math.PI / 2;
+  rocket.add(flame);
+
+  const dock = new THREE.Group();
+  scene.add(dock);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.045, 16, 96), new THREE.MeshStandardMaterial({ color: 0xbfc6cc, roughness: 0.38, metalness: 0.2 }));
+  ring.rotation.x = Math.PI / 2;
+  dock.position.set(0, 2.5, -1.4);
+  dock.add(ring);
+  const port = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.18), new THREE.MeshStandardMaterial({ color: 0xffb454, roughness: 0.4 }));
+  port.position.z = 1.05;
+  dock.add(port);
+
+  const debris = new THREE.InstancedMesh(
+    new THREE.IcosahedronGeometry(0.055, 0),
+    new THREE.MeshStandardMaterial({ color: 0xd08b5c, roughness: 0.62 }),
+    120,
+  );
+  const dummy = new THREE.Object3D();
+  scene.add(debris);
+
+  const debugGroup = new THREE.Group();
+  scene.add(debugGroup);
+  for (let i = 0; i < 4; i += 1) {
+    const marker = new THREE.Mesh(
+      new THREE.BoxGeometry(0.12, 0.1 + i * 0.18, 0.12),
+      new THREE.MeshBasicMaterial({ color: [0x7fd4c1, 0xffb454, 0xd98cff, 0x86e36f][i] }),
+    );
+    marker.position.set(-1.8 + i * 0.42, 0.08 + marker.geometry.parameters.height / 2, 1.8);
+    debugGroup.add(marker);
+  }
+  const replayLine = makeRectOutline(4.2, 2.8, 0x7fd4c1);
+  replayLine.rotation.x = -Math.PI / 2;
+  replayLine.position.y = 0.05;
+  scene.add(replayLine);
+
+  const profiles = [
+    { phase: "launch", speed: 0.92, debris: 32 },
+    { phase: "dock", speed: 0.58, debris: 16 },
+    { phase: "debris", speed: 0.74, debris: 120 },
+  ];
+  let profile = profiles[0];
+  let activeMode = "final";
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+    },
+    setMode(mode) {
+      activeMode = mode;
+      debugGroup.visible = mode === "phase-debug";
+      replayLine.visible = mode === "replay-slice";
+    },
+    update(time) {
+      const sequenceTime = (time * profile.speed) % 12;
+      const ascentT = smoothstep(0.7, 5.8, sequenceTime);
+      const stageT = smoothstep(4.2, 6.4, sequenceTime);
+      const dockT = smoothstep(5.6, 10.8, sequenceTime);
+      rocket.visible = true;
+      dock.visible = profile.phase !== "launch" || activeMode !== "replay-slice";
+      const launchHeight = ascentT * ascentT * 3.8;
+      rocket.position.set(Math.sin(ascentT * Math.PI) * 0.55, 0.18 + launchHeight, Math.cos(ascentT * Math.PI) * -0.62);
+      rocket.rotation.z = Math.sin(time * 2.4) * 0.018 * (1 - ascentT);
+      rocket.rotation.y = ascentT * 0.8 + dockT * Math.PI * 2.0;
+      stageA.position.x = stageT * -0.95;
+      stageA.position.z = stageT * 0.42;
+      stageA.rotation.z = stageT * 0.9;
+      flame.visible = activeMode !== "phase-debug" && ascentT < 0.96;
+      flame.position.y = -0.05;
+      flame.scale.setScalar(0.62 + Math.sin(time * 24) * 0.08);
+      dock.rotation.z = time * (profile.phase === "dock" ? 0.85 : 0.38) * (1 - smoothstep(9.4, 11.4, sequenceTime));
+      if (profile.phase === "dock") {
+        rocket.position.lerpVectors(new THREE.Vector3(2.8, 2.1, 1.8), dock.position.clone().add(new THREE.Vector3(0, 0, 1.08)), dockT);
+        rocket.rotation.z = Math.PI / 2 + Math.sin(time * 0.8) * 0.05 * (1 - dockT);
+      }
+      const count = profile.debris;
+      debris.count = count;
+      for (let i = 0; i < count; i += 1) {
+        const release = smoothstep(4.8 + (i % 12) * 0.04, 8.5, sequenceTime);
+        const angle = i * 2.399963 + time * 0.24;
+        const radius = release * (0.45 + (i % 9) * 0.08);
+        dummy.position.set(Math.cos(angle) * radius, 0.8 + release * (0.4 + (i % 7) * 0.12), Math.sin(angle) * radius);
+        dummy.rotation.set(time * 0.4 + i, time * 0.31, i * 0.2);
+        dummy.scale.setScalar(0.55 + release * 0.9);
+        dummy.updateMatrix();
+        debris.setMatrixAt(i, dummy.matrix);
+      }
+      debris.instanceMatrix.needsUpdate = true;
+      debugGroup.children.forEach((marker, index) => {
+        marker.scale.y = [ascentT, stageT, dockT, sequenceTime / 12][index] * 2.0 + 0.1;
+      });
+    },
+  };
+}
+
+async function createPooledParticlesScene(scene, { camera } = {}) {
+  scene.background = new THREE.Color(0x08070b);
+  scene.fog = new THREE.Fog(0x08070b, 7, 20);
+  scene.add(new THREE.HemisphereLight(0x6e7fa0, 0x1b110d, 0.85));
+  const key = new THREE.DirectionalLight(0xffd2aa, 2.3);
+  key.position.set(-3, 5, 4);
+  scene.add(key);
+
+  const ship = new THREE.Group();
+  scene.add(ship);
+  const hull = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.36, 1.9, 8, 24),
+    new THREE.MeshStandardMaterial({ color: 0xb9c6cf, roughness: 0.4, metalness: 0.08 }),
+  );
+  hull.rotation.x = Math.PI / 2;
+  ship.add(hull);
+  const shellTexture = makeGlowDiscTexture("rgba(255, 170, 72, 0.75)", "rgba(180, 50, 255, 0)");
+  const shell = new THREE.Mesh(
+    new THREE.SphereGeometry(1.0, 48, 24),
+    new THREE.MeshBasicMaterial({
+      map: shellTexture,
+      color: 0xff8a42,
+      transparent: true,
+      opacity: 0.38,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  shell.scale.set(0.82, 0.56, 1.9);
+  ship.add(shell);
+
+  const wakeGroup = new THREE.Group();
+  scene.add(wakeGroup);
+  const wakeMaterials = [
+    new THREE.MeshBasicMaterial({ color: 0xff8738, transparent: true, opacity: 0.30, depthWrite: false, blending: THREE.AdditiveBlending }),
+    new THREE.MeshBasicMaterial({ color: 0x8c6cff, transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending }),
+    new THREE.MeshBasicMaterial({ color: 0x6fdcff, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending }),
+  ];
+  wakeMaterials.forEach((material, index) => {
+    const wake = new THREE.Mesh(new THREE.ConeGeometry(0.42 + index * 0.25, 2.5 + index * 0.8, 36, 1, true), material);
+    wake.rotation.x = -Math.PI / 2;
+    wake.position.z = 1.2 + index * 0.45;
+    wakeGroup.add(wake);
+  });
+
+  const sparkTexture = makeGlowDiscTexture("rgba(255, 235, 160, 0.96)", "rgba(255, 80, 24, 0)");
+  const sparkMaterial = new THREE.MeshBasicMaterial({
+    map: sparkTexture,
+    color: 0xffd07a,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const sparkCount = 360;
+  const sparkMesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.12, 0.12), sparkMaterial, sparkCount);
+  const dummy = new THREE.Object3D();
+  scene.add(sparkMesh);
+
+  const debugPanels = new THREE.Group();
+  scene.add(debugPanels);
+  ["emissive", "velocity", "ao"].forEach((kind, index) => {
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.82, 0.82), new THREE.MeshBasicMaterial({ map: makeSignalTexture(kind) }));
+    panel.position.set(-2.1 + index * 1.0, 1.9, -1.4);
+    debugPanels.add(panel);
+  });
+
+  const profiles = [
+    { flow: new THREE.Vector3(0.05, -0.2, 1).normalize(), shell: 1.0, sparks: 220, wake: 1.0 },
+    { flow: new THREE.Vector3(-0.4, -0.35, 0.8).normalize(), shell: 0.65, sparks: 360, wake: 0.72 },
+    { flow: new THREE.Vector3(0.2, -0.15, 0.96).normalize(), shell: 0.38, sparks: 130, wake: 0.45 },
+  ];
+  let profile = profiles[0];
+  let activeMode = "final";
+
+  const applyMode = () => {
+    debugPanels.visible = activeMode === "pool-debug";
+    shell.visible = activeMode !== "pool-debug";
+    wakeGroup.visible = activeMode !== "pool-debug";
+    sparkMaterial.blending = activeMode === "bloom-off" ? THREE.NormalBlending : THREE.AdditiveBlending;
+    wakeMaterials.forEach((material, index) => {
+      material.opacity = activeMode === "bloom-off" ? 0.08 + index * 0.02 : (0.30 - index * 0.07) * profile.wake;
+    });
+    shell.material.opacity = activeMode === "bloom-off" ? 0.12 : 0.38 * profile.shell;
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+      sparkMesh.count = profile.sparks;
+      applyMode();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      applyMode();
+    },
+    update(time) {
+      ship.position.set(Math.sin(time * 0.24) * 0.45, 0.95 + Math.sin(time * 0.8) * 0.08, -0.25);
+      ship.rotation.y = Math.sin(time * 0.35) * 0.28;
+      ship.rotation.z = Math.sin(time * 0.53) * 0.06;
+      wakeGroup.position.copy(ship.position);
+      wakeGroup.rotation.copy(ship.rotation);
+      shell.scale.set(0.82 + Math.sin(time * 2.1) * 0.04, 0.56 + Math.sin(time * 1.7) * 0.03, 1.9);
+      for (let i = 0; i < profile.sparks; i += 1) {
+        const phase = ((i * 0.618033 + time * (0.12 + (i % 5) * 0.015)) % 1 + 1) % 1;
+        const angle = i * 2.399963;
+        const spread = phase * (1.2 + (i % 11) * 0.035);
+        dummy.position.copy(ship.position).add(new THREE.Vector3(
+          Math.cos(angle) * spread * 0.65,
+          -phase * 0.7 + Math.sin(angle * 1.7) * 0.12,
+          1.1 + phase * (1.8 + (i % 7) * 0.08),
+        ));
+        dummy.scale.setScalar((1 - phase) * 1.2 + 0.18);
+        if (camera) dummy.lookAt(camera.position);
+        dummy.updateMatrix();
+        sparkMesh.setMatrixAt(i, dummy.matrix);
+      }
+      sparkMesh.instanceMatrix.needsUpdate = true;
+      debugPanels.rotation.y = Math.sin(time * 0.25) * 0.04;
+    },
+  };
+}
+
+function buildFrameWriterGeometry({ profileSamples = 64, lengthSegments = 72, railWidth = 0.72 } = {}) {
+  const positions = [];
+  const normals = [];
+  const uvs = [];
+  const colors = [];
+  const indices = [];
+  const groups = [];
+  const outerW = 4.6;
+  const outerH = 3.2;
+  const innerW = outerW - railWidth * 2;
+  const innerH = outerH - railWidth * 2;
+
+  const depthAt = (t) => {
+    const crown = 0.355 * Math.sin(Math.PI * t) ** 0.56;
+    const innerBead = 0.105 * Math.exp(-(((t - 0.085) / 0.033) ** 2));
+    const outerBead = 0.092 * Math.exp(-(((t - 0.905) / 0.038) ** 2));
+    const innerGroove = -0.115 * Math.exp(-(((t - 0.205) / 0.043) ** 2));
+    const outerGroove = -0.102 * Math.exp(-(((t - 0.735) / 0.052) ** 2));
+    return (crown + innerBead + outerBead + innerGroove + outerGroove) * railWidth;
+  };
+  const addVertex = (x, y, z, u, v, color) => {
+    positions.push(x, y, z);
+    normals.push(0, 0, 1);
+    uvs.push(u, v);
+    colors.push(color.r, color.g, color.b);
+    return positions.length / 3 - 1;
+  };
+  const addRail = (orientation, materialIndex, color) => {
+    const startIndex = indices.length;
+    const base = positions.length / 3;
+    for (let s = 0; s <= lengthSegments; s += 1) {
+      const ss = s / lengthSegments;
+      for (let p = 0; p <= profileSamples; p += 1) {
+        const t = p / profileSamples;
+        let x = 0;
+        let y = 0;
+        if (orientation === "top") {
+          x = -outerW / 2 + ss * outerW;
+          y = innerH / 2 + t * railWidth;
+        } else if (orientation === "bottom") {
+          x = outerW / 2 - ss * outerW;
+          y = -innerH / 2 - t * railWidth;
+        } else if (orientation === "left") {
+          x = -innerW / 2 - t * railWidth;
+          y = -outerH / 2 + ss * outerH;
+        } else {
+          x = innerW / 2 + t * railWidth;
+          y = outerH / 2 - ss * outerH;
+        }
+        addVertex(x, y, depthAt(t), ss * 4, t * railWidth * 2, color);
+      }
+    }
+    const row = profileSamples + 1;
+    for (let s = 0; s < lengthSegments; s += 1) {
+      for (let p = 0; p < profileSamples; p += 1) {
+        const a = base + s * row + p;
+        const b = base + (s + 1) * row + p;
+        const c = base + s * row + p + 1;
+        const d = base + (s + 1) * row + p + 1;
+        indices.push(a, b, c, b, d, c);
+      }
+    }
+    groups.push({ start: startIndex, count: indices.length - startIndex, materialIndex });
+  };
+  addRail("top", 0, new THREE.Color(0xd2a462));
+  addRail("bottom", 1, new THREE.Color(0xb88455));
+  addRail("left", 2, new THREE.Color(0x8fb7c5));
+  addRail("right", 3, new THREE.Color(0x79a68c));
+  const geometry = new THREE.BufferGeometry();
+  geometry.setIndex(indices);
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  geometry.groups = groups;
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  geometry.userData = {
+    writer: {
+      vertices: positions.length / 3,
+      triangles: indices.length / 3,
+      groups: groups.length,
+      profileSamples,
+      lengthSegments,
+    },
+  };
+  return geometry;
+}
+
+async function createProceduralGeometryScene(scene) {
+  scene.background = new THREE.Color(0x10100d);
+  scene.fog = new THREE.Fog(0x10100d, 8, 18);
+  addLights(scene);
+  const materials = [
+    new THREE.MeshStandardMaterial({ color: 0xd2a462, roughness: 0.48, metalness: 0.05, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0xb88455, roughness: 0.58, metalness: 0.04, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x8fb7c5, roughness: 0.42, metalness: 0.03, vertexColors: true }),
+    new THREE.MeshStandardMaterial({ color: 0x79a68c, roughness: 0.54, metalness: 0.03, vertexColors: true }),
+  ];
+  const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xf4e7ca, wireframe: true });
+  const groupMaterials = [
+    new THREE.MeshBasicMaterial({ color: 0xffb454 }),
+    new THREE.MeshBasicMaterial({ color: 0x7fd4c1 }),
+    new THREE.MeshBasicMaterial({ color: 0xd98cff }),
+    new THREE.MeshBasicMaterial({ color: 0x8be36c }),
+  ];
+  const mesh = new THREE.Mesh(buildFrameWriterGeometry({ profileSamples: 64, lengthSegments: 72 }), materials);
+  mesh.rotation.x = -0.15;
+  mesh.position.y = 1.05;
+  scene.add(mesh);
+
+  const backing = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.0, 1.75),
+    new THREE.MeshStandardMaterial({ color: 0x252a2d, roughness: 0.82 }),
+  );
+  backing.position.set(0, 1.05, -0.08);
+  scene.add(backing);
+
+  const normalDebug = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x7fd4c1, transparent: true, opacity: 0.72 }));
+  scene.add(normalDebug);
+  const updateNormals = () => {
+    const geometry = mesh.geometry;
+    const position = geometry.attributes.position;
+    const normal = geometry.attributes.normal;
+    const lines = [];
+    const stride = Math.max(1, Math.floor(position.count / 140));
+    for (let i = 0; i < position.count; i += stride) {
+      const x = position.getX(i);
+      const y = position.getY(i) + 1.05;
+      const z = position.getZ(i);
+      lines.push(x, y, z, x + normal.getX(i) * 0.08, y + normal.getY(i) * 0.08, z + normal.getZ(i) * 0.08);
+    }
+    normalDebug.geometry.dispose();
+    normalDebug.geometry = new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(lines, 3));
+  };
+  updateNormals();
+
+  const profiles = [
+    { profileSamples: 72, lengthSegments: 96, scale: 1.0 },
+    { profileSamples: 48, lengthSegments: 64, scale: 0.96 },
+    { profileSamples: 24, lengthSegments: 32, scale: 0.9 },
+  ];
+  let activeMode = "final";
+  let profile = profiles[0];
+
+  const rebuild = () => {
+    mesh.geometry.dispose();
+    mesh.geometry = buildFrameWriterGeometry(profile);
+    mesh.scale.setScalar(profile.scale);
+    updateNormals();
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+      rebuild();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      mesh.material = mode === "wire" ? wireMaterial : mode === "groups" ? groupMaterials : materials;
+      normalDebug.visible = mode !== "final";
+      backing.visible = mode !== "groups";
+    },
+    update(time) {
+      mesh.rotation.y = Math.sin(time * 0.25) * 0.16;
+      normalDebug.rotation.copy(mesh.rotation);
+      backing.rotation.y = mesh.rotation.y;
     },
   };
 }
