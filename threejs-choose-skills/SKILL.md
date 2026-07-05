@@ -270,6 +270,10 @@ Published rows used:
 - `$threejs-image-pipeline`, `Budgets`, row `Desktop discrete`: full post
   frame cost `2.0-4.0 ms at 1440p`; maximum `4.0 ms`.
 - Router fixed overhead: `0.5 ms scene pass + 0.5 ms shared upsamples = 1.0 ms`.
+  Both `0.5 ms` inputs are authored planning placeholders, not measured or
+  validator-gated costs: replace them with the composed scene's own measured
+  scene-pass and upsample timings (from `$threejs-visual-validation` GPU timing
+  evidence) before trusting any aggregate within `1 ms` of the budget line.
 
 Initial aggregate:
 

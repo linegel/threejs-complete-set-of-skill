@@ -5,6 +5,13 @@ WebGPU is unavailable. The canonical owner remains authoritative; this file
 records what may be weakened, what must never be faked, and what evidence must
 replace canonical proof.
 
+Pending gate on the creature rows: the numeric thresholds and tier constants
+they cite (`< 0.02` residual, `K` per tier, the `seek(t)` equality) are the
+creature skill's lab-gate contract, and that lab is not yet built (`HANDOFF.md`
+§3 item 3.9e). Until it lands, "Preserved tiers rerun tests" means rerunning
+the contract once the lab exists — no creature row may cite passed evidence
+today.
+
 | owner skill | canonical invariant | permitted downgrade | forbidden fake | validation delta |
 | --- | --- | --- | --- | --- |
 | threejs-spectral-ocean | FFT cascades use real spectra, Hermitian packing, frequency-space derivatives, and foam history. | Fewer cascades, smaller grids, precomputed displacement/foam loops. | Gerstner piles presented as spectral FFT water. | DC/one-bin/derivative tests still pass or are marked removed; screenshots name lost foam dynamics. |

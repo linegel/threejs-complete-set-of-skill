@@ -139,7 +139,7 @@ For water near 20 C, use `sigma/rho = 7.28e-5 m^3/s^2`. The capillary-gravity cr
 k_sigma = sqrt(g * rho / sigma) = sqrt(g / (sigma/rho))
 ```
 
-For a 5 m patch at `N = 512`, `k_max = pi * N / L ~= 322 rad/m` and `k_sigma ~= 364 rad/m`. At the band top, the capillary/gravity ratio is `(sigma/rho) * k_max^2 / g ~= 0.8`, so the capillary-gravity phase speed is about 34% higher than the gravity-only value and omitting the term incurs that scale of phase-speed error. This is not a `>> 1` regime, but it is large enough to decorrelate short-wave phase.
+For a 5 m patch at `N = 512`, `k_max = pi * N / L ~= 322 rad/m` and `k_sigma = sqrt(9.81 / 7.28e-5) ~= 367 rad/m`. At the band top, the capillary/gravity ratio is `(sigma/rho) * k_max^2 / g ~= 0.77`, so the capillary-gravity phase speed is about 33% higher than the gravity-only value (`sqrt(1 + 0.77) - 1 ~= 0.33`) and omitting the term incurs that scale of phase-speed error. This is not a `>> 1` regime, but it is large enough to decorrelate short-wave phase.
 
 The sea state sums local wind sea and swell:
 

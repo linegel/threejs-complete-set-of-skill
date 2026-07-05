@@ -57,7 +57,7 @@ a second path here.
 
 ## Dense Grass Build Order
 
-1. Choose patch size from culling, not from texture dimensions. A good default is 16-32 m patches with 8-20 k blades each; keep one `InstancedMesh` per patch per LOD representation, and budget submitted draw objects as `visibleDraws = drawObjectsPerPatch * visiblePatches`.
+1. Choose patch size from culling, not from texture dimensions. An authored starting point (not a gated value — tune it against your own scene's culling and density budget) is 16-32 m patches with 8-20 k blades each; keep one `InstancedMesh` per patch per LOD representation, and budget submitted draw objects as `visibleDraws = drawObjectsPerPatch * visiblePatches`.
 2. Allocate static storage attributes: origin/height/width/facing/bend, clump id/density/species, color variation, terrain normal, and packed material flags. Prefer 16-byte alignment and pack half-precision-like ranges into normalized fields when visual error is below one pixel.
 3. Run one initialization dispatch per chunk with `Fn().compute(count)` and deterministic hash seeds. Write to `StorageInstancedBufferAttribute` via `storage()` nodes or use `instancedArray()` then `toAttribute()` for render consumption.
 4. Use the same terrain field, density mask, path mask, and clump field for placement, material variation, and LOD thresholds. Do not let visual color clumps drift from density clumps.
@@ -68,7 +68,7 @@ a second path here.
 
 Use `renderer.compute()` when dispatch order can stay inside the frame graph; use `renderer.computeAsync()` for explicit initialization, streaming chunk generation, readback-free validation steps, or when the app needs a promise boundary.
 
-Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In `examples/webgpu-dense-grass/dense-grass-system.js`, each patch owns one blade `InstancedMesh` and one impostor-card `InstancedMesh`; `getStats().drawObjectsPerPatch` reports `2`, and `validateDenseGrassConfig()` uses `visibleDrawObjectCeiling = patchCount * 2`. Derive patch count as `visiblePatchesWorst = (2 * patchGridRadius + 1)^2`. The ultra preset comment cites `81` patches, `1.46M` visible blades, and `2` draw objects per visible patch; the high preset comment cites `49` patches, `588k` visible blades, and `2-12` submitted patch draws typical after frustum culling.
+Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In `examples/webgpu-dense-grass/dense-grass-system.js`, each patch owns one blade `InstancedMesh` and one impostor-card `InstancedMesh`; `getStats().drawObjectsPerPatch` reports `2`, and `validateDenseGrassConfig()` uses `visibleDrawObjectCeiling = patchCount * 2`. Derive patch count as `visiblePatchesWorst = (2 * patchGridRadius + 1)^2`. The ultra preset comment cites `81` patches, `1.46M` visible blades, and `2` draw objects per visible patch; the high preset comment cites `49` patches, `588k` visible blades, and `2-12` submitted patch draws typical after frustum culling. The worst-case counts are Derived (the `(2r+1)^2` grid arithmetic above) and the ceiling is Gated by `validateDenseGrassConfig()`; the `2-12` typical range is an observed after-culling figure from the example scene, not a gate — only the ceiling is enforced.
 
 | Preset | Source parameters | Worst visible patches | Worst submitted draw objects | Allocated blades |
 | --- | --- | ---: | ---: | ---: |

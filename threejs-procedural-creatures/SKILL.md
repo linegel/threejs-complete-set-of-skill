@@ -43,7 +43,9 @@ this order; every step ends in something renderable or assertable.
    a bounded per-vertex candidate set (owner + K neighbours, K = 4–8). The
    K-candidate fold approximates the canonical sequential, order-dependent
    global smooth-min fold; rest-AABB adjacency is only a selection heuristic,
-   and the full-field locomotion sweep gate is the acceptance bound.
+   and the full-field locomotion sweep gate is the acceptance bound (that gate
+   runs in the Wave B creature lab — pending, `HANDOFF.md` §3 item 3.9e; until
+   it lands, K is an authored default with no passed-evidence claim).
 4. **Pose runtime.** The runtime pose is a typed-array SoA buffer
    (`a.xyz|ra`, `b.xyz|rb`, `k|rgb` per slot), not object graphs re-copied
    into per-material vectors. Locomotion advances on a fixed-step accumulator

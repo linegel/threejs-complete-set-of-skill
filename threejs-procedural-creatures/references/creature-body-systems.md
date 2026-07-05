@@ -290,7 +290,8 @@ which evaluates the exact authored analytic wave list and declares the live
 StorageTexture heightfield residual as a separate budget. The provider owns the
 parity-error obligation; creature locomotion treats the query as authoritative,
 does not blend in GPU readback, and must keep buoyancy response error against
-that injected surface `< 0.09` world units across a seeded run.
+that injected surface `< 0.09` world units across a seeded run (executed by the
+§10 lab gate table — pending until the Wave B lab lands).
 
 ## 7. Scale architecture
 
@@ -418,6 +419,12 @@ imports) is the proving ground; the shipping scene stays a thin adapter.
 Wire evidence bundles per `$threejs-visual-validation`.
 
 ## 10. Numeric gates
+
+Pending gate: the lab that executes this table is not yet built (`HANDOFF.md`
+§3 item 3.9e — the register's one open item). Every threshold below is the
+contract that lab must enforce; until it exists, none of these rows may be
+cited as passed evidence. CPU-derivable rows (smin, gradient, taper) are
+additionally checked by the settled-math derivations in §2–§4.
 
 | Gate | Threshold |
 | --- | --- |

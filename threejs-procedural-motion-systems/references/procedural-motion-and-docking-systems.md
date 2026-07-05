@@ -303,8 +303,14 @@ function renderGpuAnimation( presentationAlpha: number ) {
 
 Derived/Gated labels for the snippet: `instanceCount` is Derived from visible
 actor count and LOD; `fixedStep` is Derived from the delta policy; workgroup
-size `64` is Gated by the compute budget and device validation; spring stiffness
-and damping are Derived from the per-instance frequency stored in `staticMotion`.
+size `64` is an authored default chosen as a whole multiple of the common GPU
+subgroup widths (32 and 64) — the compute contract records it, but no validator
+asserts it as a device gate; spring stiffness `omega^2` is Derived from the
+per-instance frequency `anchor.w` stored in `staticMotion`, and the damping
+factor `1.85` is Derived as `2 * zeta * omega` with authored damping ratio
+`zeta = 0.925` (slightly under-critical, so arrivals settle with one soft
+overshoot instead of creeping in); the `0.25` bob amplitude is an authored
+demo constant with no gate.
 
 Use one dispatch for simple analytic timelines, two to three dispatches when
 you also compact active actors or update chunk bounds. Avoid readback in the

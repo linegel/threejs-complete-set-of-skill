@@ -76,6 +76,10 @@ frequency bins per cascade:
 ```js
 import { createCpuWaterHeightSampler } from './examples/webgpu-fft-ocean/index.js';
 
+// dominantBinCount is an authored speed/accuracy default; whatever value is
+// chosen, estimateTruncationError() computes the exact omitted-coefficient
+// bound for it at construction, and validation.js gates the bound (it
+// validates at 255 bins so dispersion bugs cannot hide under truncation).
 const sampler = createCpuWaterHeightSampler({ quality: 'high', dominantBinCount: 32 });
 const surfaceY = sampler.getWaterHeight(worldX, worldZ, timeSeconds);
 const parity = sampler.estimateTruncationError();
