@@ -248,8 +248,8 @@ const galleryHtml = GALLERY.map((g) => `
       </figure></a>`).join('');
 
 const safeClass = (s) => String(s ?? 'runtime').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'runtime';
-const liveDemoVisual = (demo) => demo.poster
-  ? `<img src="${demo.poster}" alt="${esc(demo.title)}" loading="lazy" />`
+const liveDemoVisual = (demo, prefix = '') => demo.poster
+  ? `<img src="${prefix}${demo.poster}" alt="${esc(demo.title)}" loading="lazy" />`
   : `<div class="live-visual live-visual--${safeClass(demo.visual?.kind)}" aria-hidden="true">
         <span class="lv-k">Live WebGPU</span>
         <strong>${esc(demo.visual?.label ?? demo.title)}</strong>
@@ -450,11 +450,13 @@ for (const slug of slugs) {
   const next = skills[slugs[(idx + 1) % slugs.length]];
   const science = SCIENCE[slug];
   const validation = VALIDATION[slug];
+  const skillDemos = PROVIDER_DEMOS.filter((demo) => demo.skill === slug);
   const pageUrl = `${SITE}skills/${slug}.html`;
   const ogImg = validation ? `${SITE}${validation[0][0]}` : OG_IMAGE;
   const updateHtml = s.update ? `<span class="chip">Latest skill update <time datetime="${esc(s.update.iso)}">${esc(s.update.date)}</time></span>
     <a class="chip" href="${esc(s.update.url)}">commit ${esc(s.update.shortHash)} ↗</a>` :
     '<span class="chip">Latest skill update unavailable</span>';
+  const demoChipHtml = skillDemos.length ? `<span class="chip">${skillDemos.length} browser demo${skillDemos.length > 1 ? 's' : ''}</span>` : '';
 
   const examplesHtml = s.examples.length ? `
   <div class="section" id="examples"><div class="wrap">
@@ -465,6 +467,18 @@ for (const slug of slugs) {
         <h4>${esc(e)}</h4>
         <span class="card-meta">${slug}/examples/${e}</span>
       </a>`).join('')}
+    </div>
+  </div></div>` : '';
+
+  const skillDemosHtml = skillDemos.length ? `
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Live WebGPU demos</h2>
+    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
+    <div class="gallery">${skillDemos.map((demo) => `
+      <a href="../${demo.livePath}"><figure>
+        ${liveDemoVisual(demo, '../')}
+        <figcaption><strong>${esc(demo.title)}</strong><span>${esc(demo.providerClaim)}</span></figcaption>
+      </figure></a>`).join('')}
     </div>
   </div></div>` : '';
 
@@ -568,6 +582,24 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 .pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
 .pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
+.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
+  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.live-visual:before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
+  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
+.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
+.live-visual>*{position:relative}
+.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
+.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
+.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
+.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
+.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
+.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
+.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
+.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
+.live-visual--validation{--accent:#b8a4ff}
 </style>
 </head>
 <body>
@@ -579,6 +611,7 @@ ${navHtml('../')}
   <p class="lede">${esc(s.desc)}</p>
   <div class="meta-row">
     <span class="chip a">$${slug}</span>
+    ${demoChipHtml}
     ${s.examples.length ? `<span class="chip">${s.examples.length} runnable example${s.examples.length > 1 ? 's' : ''}</span>` : ''}
     ${updateHtml}
     <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
@@ -586,6 +619,7 @@ ${navHtml('../')}
   </div>
 </header>
 
+${skillDemosHtml}
 ${validationHtml}
 ${examplesHtml}
 
