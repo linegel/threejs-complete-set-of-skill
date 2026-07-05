@@ -1,5 +1,17 @@
 # Repository Agent Notes
 
+## Local Three.js Skill Source
+
+For Three.js work on this machine, this checkout is the authoritative skill
+source. When a task names or matches a `threejs-*` skill, load the matching
+`/Users/linegel/_reps/threejs/threejs-*/SKILL.md` from this repo before using
+any global copy under `/Users/linegel/.codex/skills`.
+
+If a skill exists both here and globally, the repo-local version wins. If a
+task spans multiple rendering systems, start with this repo's
+`threejs-choose-skills/SKILL.md` and then load the smallest relevant set of
+repo-local skills it selects.
+
 ## Commit Messages
 
 After requested edits pass verification, commit the completed change. Do not
