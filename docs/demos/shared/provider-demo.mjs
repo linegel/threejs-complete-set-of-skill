@@ -4,6 +4,126 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const asset = (name) => new URL(`./generated-variants/${name}`, import.meta.url).href;
 
 const DEMOS = {
+  "ambient-contact-shading-demo": {
+    title: "Ambient Contact Shading Lab",
+    skill: "$threejs-ambient-contact-shading",
+    claim: "Live directional demo: contact visibility grounds ambient light while direct light and emissive terms remain readable.",
+    variants: [
+      ["balanced-contact"],
+      ["tight-crevices"],
+      ["wide-indirect"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["no-ao", "AO Off"],
+      ["ao-debug", "AO Debug"],
+    ],
+    camera: [5.2, 3.7, 6.3],
+    target: [0, 0.65, 0],
+    factory: createAmbientContactScene,
+    evidenceHref: "../../skills/threejs-ambient-contact-shading.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "selective-bloom-demo": {
+    title: "Selective HDR Bloom Bench",
+    skill: "$threejs-bloom",
+    claim: "Live directional demo: emissive signal is isolated from readable base materials before the bloom response is added back.",
+    variants: [
+      ["warm-filament"],
+      ["cyan-plasma"],
+      ["mixed-signage"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["base-only", "Base Only"],
+      ["bloom-only", "Bloom Only"],
+    ],
+    camera: [5.6, 3.1, 6.1],
+    target: [0, 0.75, 0],
+    factory: createBloomScene,
+    evidenceHref: "../../skills/threejs-bloom.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "exposure-color-grading-demo": {
+    title: "Scene-Referred Exposure Rig",
+    skill: "$threejs-exposure-color-grading",
+    claim: "Live directional demo: an HDR meter drives asymmetric exposure adaptation before tone-map-domain grading.",
+    variants: [
+      ["gray-card"],
+      ["bright-window"],
+      ["emitter-sweep"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["identity-lut", "Identity LUT"],
+      ["meter-debug", "Meter Debug"],
+    ],
+    camera: [5.0, 2.8, 6.2],
+    target: [0, 0.85, -0.6],
+    factory: createExposureScene,
+    evidenceHref: "../../skills/threejs-exposure-color-grading.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "image-pipeline-framegraph-demo": {
+    title: "Shared Signal Framegraph",
+    skill: "$threejs-image-pipeline",
+    claim: "Live directional demo: one scene pass feeds owned color, depth, normal, emissive, and velocity-style signal views.",
+    variants: [
+      ["beauty-frame"],
+      ["velocity-stress"],
+      ["diagnostic-heavy"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["signals", "Signals"],
+      ["bypass-post", "Bypass Post"],
+    ],
+    camera: [5.8, 3.8, 6.6],
+    target: [0, 0.75, 0],
+    factory: createImagePipelineScene,
+    evidenceHref: "../../skills/threejs-image-pipeline.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "shadow-cascade-demo": {
+    title: "Scalable Shadow Coverage",
+    skill: "$threejs-scalable-real-time-shadows",
+    claim: "Live directional demo: bounded, cascade-style, and cached-budget views expose coverage, update scope, and bias pressure.",
+    variants: [
+      ["bounded-yard"],
+      ["cascade-run"],
+      ["cached-coarse"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["cascade-debug", "Cascade Debug"],
+      ["single-map", "Single Map"],
+    ],
+    camera: [6.4, 4.6, 7.4],
+    target: [0, 0.6, 0],
+    factory: createShadowScene,
+    evidenceHref: "../../skills/threejs-scalable-real-time-shadows.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "sky-atmosphere-haze-demo": {
+    title: "Atmosphere And Haze Stack",
+    skill: "$threejs-sky-atmosphere-and-haze",
+    claim: "Live directional demo: shared sky, sun, depth haze, and LUT diagnostic views preserve one atmosphere parameter model.",
+    variants: [
+      ["sea-level"],
+      ["mountain-air"],
+      ["low-orbit"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["no-haze", "No Haze"],
+      ["lut-debug", "LUT Debug"],
+    ],
+    camera: [6.0, 3.4, 6.8],
+    target: [0, 0.9, -0.8],
+    factory: createSkyAtmosphereScene,
+    evidenceHref: "../../skills/threejs-sky-atmosphere-and-haze.html",
+    evidenceLabel: "Skill Contract",
+  },
   "water-generated-caustics": {
     title: "Bounded Water Caustic Projection",
     skill: "$threejs-water-optics",
@@ -211,7 +331,8 @@ if (!config) {
 titleEl.textContent = config.title;
 skillEl.textContent = config.skill;
 claimEl.textContent = config.claim;
-evidenceEl.href = new URL(`../../visual-validation/${demoId}/final.design.png`, import.meta.url).href;
+evidenceEl.href = new URL(config.evidenceHref ?? `../../visual-validation/${demoId}/final.design.png`, import.meta.url).href;
+evidenceEl.textContent = config.evidenceLabel ?? "QA evidence frame";
 
 const textureLoader = new THREE.TextureLoader();
 
@@ -256,7 +377,7 @@ function createModeButtons(sceneApi) {
   const evidence = document.createElement("a");
   evidence.className = "pill";
   evidence.href = evidenceEl.href;
-  evidence.textContent = "QA Evidence";
+  evidence.textContent = config.evidenceLabel ?? "QA Evidence";
   controlsEl.append(evidence);
 }
 
@@ -384,6 +505,155 @@ function makeTransparentDiscTexture() {
   const texture = new THREE.CanvasTexture(c);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+function makeDarkDiscTexture() {
+  const size = 256;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext("2d");
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 4, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, "rgba(0, 0, 0, 0.72)");
+  gradient.addColorStop(0.42, "rgba(0, 0, 0, 0.38)");
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeGlowDiscTexture(core = "rgba(255, 210, 120, 0.96)", rim = "rgba(255, 145, 55, 0)") {
+  const size = 256;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext("2d");
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 5, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, core);
+  gradient.addColorStop(0.28, core.replace("0.96", "0.48"));
+  gradient.addColorStop(1, rim);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeBandTexture(stops) {
+  const size = 512;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext("2d");
+  const gradient = ctx.createLinearGradient(0, 0, 0, size);
+  for (const [offset, color] of stops) gradient.addColorStop(offset, color);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const image = ctx.getImageData(0, 0, size, size);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const offset = (y * size + x) * 4;
+      const grain = ((x * 13 + y * 17 + (x * y) % 37) % 15) - 7;
+      image.data[offset] = Math.max(0, Math.min(255, image.data[offset] + grain));
+      image.data[offset + 1] = Math.max(0, Math.min(255, image.data[offset + 1] + grain));
+      image.data[offset + 2] = Math.max(0, Math.min(255, image.data[offset + 2] + grain));
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeSignalTexture(kind) {
+  const size = 256;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext("2d");
+  const image = ctx.createImageData(size, size);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const u = x / (size - 1);
+      const v = y / (size - 1);
+      const offset = (y * size + x) * 4;
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      if (kind === "normal") {
+        r = Math.floor(65 + u * 165);
+        g = Math.floor(60 + (1 - v) * 160);
+        b = Math.floor(185 + Math.sin((u + v) * Math.PI) * 50);
+      } else if (kind === "depth") {
+        const d = Math.floor(24 + (1 - v) * 205);
+        r = d;
+        g = d;
+        b = d + Math.floor(u * 18);
+      } else if (kind === "emissive") {
+        const stripe = Math.abs(Math.sin((u * 5.2 + v * 2.1) * Math.PI)) ** 18;
+        r = Math.floor(20 + stripe * 235);
+        g = Math.floor(28 + stripe * 142);
+        b = Math.floor(42 + stripe * 60);
+      } else if (kind === "velocity") {
+        const line = Math.abs(((x + y * 0.55) % 48) - 24) < 2 ? 1 : 0;
+        r = Math.floor(28 + line * 210 + u * 50);
+        g = Math.floor(40 + v * 140);
+        b = Math.floor(70 + line * 160);
+      } else if (kind === "ao") {
+        const dx = u - 0.52;
+        const dy = v - 0.56;
+        const ring = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) * 2.3);
+        const d = Math.floor(220 - ring * 175);
+        r = d;
+        g = d;
+        b = d;
+      } else {
+        r = Math.floor(35 + u * 180);
+        g = Math.floor(52 + (1 - v) * 140);
+        b = Math.floor(70 + Math.sin(u * Math.PI) * 130);
+      }
+      image.data[offset] = r;
+      image.data[offset + 1] = g;
+      image.data[offset + 2] = b;
+      image.data[offset + 3] = 255;
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  ctx.strokeStyle = "rgba(255,255,255,0.22)";
+  ctx.lineWidth = 2;
+  for (let i = 32; i < size; i += 48) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i, size);
+    ctx.moveTo(0, i);
+    ctx.lineTo(size, i);
+    ctx.stroke();
+  }
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function clampValue(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function makeRectOutline(width, depth, color) {
+  const hw = width / 2;
+  const hd = depth / 2;
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute([
+    -hw, 0, -hd, hw, 0, -hd,
+    hw, 0, -hd, hw, 0, hd,
+    hw, 0, hd, -hw, 0, hd,
+    -hw, 0, hd, -hw, 0, -hd,
+  ], 3));
+  return new THREE.LineSegments(
+    geometry,
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 }),
+  );
 }
 
 function updateMaterialMaps(material, texture, keys) {
@@ -1039,6 +1309,756 @@ async function createMeadowScene(scene) {
   };
 }
 
+async function createAmbientContactScene(scene) {
+  scene.background = new THREE.Color(0x10151a);
+  scene.fog = new THREE.Fog(0x10151a, 8, 18);
+  const hemi = new THREE.HemisphereLight(0xc8dbff, 0x262018, 1.45);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xfff0c5, 4.2);
+  sun.position.set(-3.2, 6.2, 4.8);
+  scene.add(sun);
+
+  const floorMaterial = new THREE.MeshStandardMaterial({
+    map: makeGroundTexture({ base: "#2b302e", line: "rgba(215,230,220,0.13)" }),
+    color: 0x8f988d,
+    roughness: 0.82,
+  });
+  const debugFloorMaterial = new THREE.MeshBasicMaterial({ color: 0xd9ded5 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 5.2, 32, 24), floorMaterial);
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x7d8784, roughness: 0.88 });
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 2.6, 24, 12), wallMaterial);
+  wall.position.set(0, 1.3, -2.6);
+  scene.add(wall);
+
+  const contactTexture = makeDarkDiscTexture();
+  const contactMaterial = new THREE.MeshBasicMaterial({
+    map: contactTexture,
+    transparent: true,
+    opacity: 0.44,
+    depthWrite: false,
+  });
+  const debugContactMaterial = new THREE.MeshBasicMaterial({
+    map: contactTexture,
+    color: 0x111111,
+    transparent: true,
+    opacity: 0.72,
+    depthWrite: false,
+  });
+
+  const contacts = [];
+  const addContact = (x, z, sx, sz) => {
+    const disc = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), contactMaterial.clone());
+    disc.rotation.x = -Math.PI / 2;
+    disc.position.set(x, 0.024, z);
+    disc.scale.set(sx, sz, 1);
+    scene.add(disc);
+    contacts.push({ disc, sx, sz });
+    return disc;
+  };
+
+  addContact(-1.45, -0.25, 1.25, 0.72);
+  addContact(0.18, 0.4, 1.75, 0.8);
+  addContact(1.55, -0.95, 0.95, 0.62);
+  const cornerContact = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 2.4), contactMaterial.clone());
+  cornerContact.position.set(0, 1.1, -2.575);
+  cornerContact.scale.y = 0.82;
+  scene.add(cornerContact);
+
+  const objectMaterials = [
+    new THREE.MeshStandardMaterial({ color: 0xd9b36c, roughness: 0.58, metalness: 0.02 }),
+    new THREE.MeshStandardMaterial({ color: 0x72a9c6, roughness: 0.34, metalness: 0.0 }),
+    new THREE.MeshStandardMaterial({ color: 0xbfc6ce, roughness: 0.42, metalness: 0.15 }),
+  ];
+  const debugObjectMaterial = new THREE.MeshBasicMaterial({ color: 0xf2f0e8 });
+  const objects = [
+    new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), objectMaterials[0]),
+    new THREE.Mesh(new THREE.SphereGeometry(0.52, 48, 32), objectMaterials[1]),
+    new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.58, 1.1, 48), objectMaterials[2]),
+  ];
+  objects[0].position.set(-1.45, 0.48, -0.25);
+  objects[1].position.set(0.18, 0.54, 0.4);
+  objects[2].position.set(1.55, 0.56, -0.95);
+  objects.forEach((object) => {
+    object.castShadow = true;
+    scene.add(object);
+  });
+
+  const emitter = new THREE.Mesh(
+    new THREE.BoxGeometry(0.18, 1.3, 0.18),
+    new THREE.MeshStandardMaterial({
+      color: 0x9bdcff,
+      emissive: 0x66dfff,
+      emissiveIntensity: 2.2,
+      roughness: 0.2,
+    }),
+  );
+  emitter.position.set(2.35, 0.75, 0.55);
+  scene.add(emitter);
+  const emitterLight = new THREE.PointLight(0x66dfff, 5.5, 5);
+  emitterLight.position.copy(emitter.position);
+  scene.add(emitterLight);
+
+  const profiles = [
+    { scale: 1.0, opacity: 0.44, ambient: 1.45, sun: 4.2 },
+    { scale: 0.68, opacity: 0.62, ambient: 1.18, sun: 4.6 },
+    { scale: 1.42, opacity: 0.32, ambient: 1.72, sun: 3.8 },
+  ];
+
+  let activeMode = "final";
+  let activeProfile = profiles[0];
+  const applyProfile = () => {
+    hemi.intensity = activeMode === "ao-debug" ? 0.35 : activeProfile.ambient;
+    sun.intensity = activeMode === "ao-debug" ? 0.35 : activeProfile.sun;
+    contacts.forEach(({ disc, sx, sz }) => {
+      disc.scale.set(sx * activeProfile.scale, sz * activeProfile.scale, 1);
+      disc.material.opacity = activeMode === "ao-debug" ? 0.82 : activeProfile.opacity;
+    });
+    cornerContact.material.opacity = activeMode === "ao-debug" ? 0.62 : activeProfile.opacity * 0.75;
+  };
+
+  return {
+    setVariant(index) {
+      activeProfile = profiles[index] ?? profiles[0];
+      applyProfile();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      const debug = mode === "ao-debug";
+      floor.material = debug ? debugFloorMaterial : floorMaterial;
+      wall.material = debug ? debugFloorMaterial : wallMaterial;
+      contacts.forEach(({ disc }) => {
+        disc.visible = mode !== "no-ao";
+        disc.material = debug ? debugContactMaterial.clone() : contactMaterial.clone();
+      });
+      cornerContact.visible = mode !== "no-ao";
+      cornerContact.material = debug ? debugContactMaterial.clone() : contactMaterial.clone();
+      objects.forEach((object, index) => {
+        object.material = debug ? debugObjectMaterial : objectMaterials[index];
+      });
+      emitter.visible = !debug;
+      emitterLight.visible = !debug;
+      applyProfile();
+    },
+    update(time) {
+      objects[0].rotation.set(0.16, time * 0.24, -0.08);
+      objects[1].position.y = 0.54 + Math.sin(time * 1.4) * 0.025;
+      objects[2].rotation.y = -time * 0.18;
+      emitter.material.emissiveIntensity = 2.0 + Math.sin(time * 2.1) * 0.25;
+    },
+  };
+}
+
+async function createBloomScene(scene, { camera } = {}) {
+  scene.background = new THREE.Color(0x07090d);
+  scene.fog = new THREE.Fog(0x07090d, 8, 18);
+  scene.add(new THREE.HemisphereLight(0x8fa9c8, 0x14100d, 0.85));
+  const key = new THREE.DirectionalLight(0xffe2bc, 2.2);
+  key.position.set(-3, 5, 4);
+  scene.add(key);
+
+  const baseGroup = new THREE.Group();
+  scene.add(baseGroup);
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(7.4, 4.8, 32, 24),
+    new THREE.MeshStandardMaterial({
+      map: makeGroundTexture({ base: "#151921", line: "rgba(165,190,220,0.12)" }),
+      color: 0x9aa4b1,
+      roughness: 0.68,
+      metalness: 0.04,
+    }),
+  );
+  floor.rotation.x = -Math.PI / 2;
+  baseGroup.add(floor);
+
+  for (let i = 0; i < 7; i += 1) {
+    const block = new THREE.Mesh(
+      new THREE.BoxGeometry(0.42 + (i % 3) * 0.18, 0.35 + (i % 2) * 0.35, 0.5),
+      new THREE.MeshStandardMaterial({ color: 0x5e6873, roughness: 0.58, metalness: 0.15 }),
+    );
+    block.position.set(-2.7 + i * 0.9, block.geometry.parameters.height / 2, -0.85 + (i % 2) * 1.25);
+    baseGroup.add(block);
+  }
+
+  const glowTexture = makeGlowDiscTexture();
+  const bloomGroup = new THREE.Group();
+  scene.add(bloomGroup);
+  const cores = [];
+  const halos = [];
+  const lights = [];
+  const corePositions = [
+    [-1.65, 0.7, -0.55],
+    [0.05, 1.05, 0.35],
+    [1.72, 0.78, -0.4],
+  ];
+  corePositions.forEach(([x, y, z], index) => {
+    const core = new THREE.Mesh(
+      index === 1 ? new THREE.SphereGeometry(0.28, 32, 24) : new THREE.CylinderGeometry(0.08, 0.08, 1.25, 24),
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xffa34d,
+        emissiveIntensity: 3.2,
+        roughness: 0.18,
+      }),
+    );
+    core.position.set(x, y, z);
+    if (index !== 1) core.rotation.z = Math.PI / 2;
+    bloomGroup.add(core);
+    cores.push(core);
+
+    const halo = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.8, 1.8),
+      new THREE.MeshBasicMaterial({
+        map: glowTexture,
+        color: 0xffb15c,
+        transparent: true,
+        opacity: 0.58,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    halo.position.copy(core.position);
+    bloomGroup.add(halo);
+    halos.push(halo);
+
+    const light = new THREE.PointLight(0xff9a4a, 5, 4.5);
+    light.position.copy(core.position);
+    scene.add(light);
+    lights.push(light);
+  });
+
+  const profiles = [
+    { colors: [0xffb45d, 0xffd28a, 0xff824e], intensity: 3.2, halo: 0.58 },
+    { colors: [0x68e5ff, 0xa4fff4, 0x4bb9ff], intensity: 3.6, halo: 0.66 },
+    { colors: [0xff6bc8, 0x78f0ff, 0xffe36b], intensity: 3.45, halo: 0.64 },
+  ];
+  let profile = profiles[0];
+  let activeMode = "final";
+
+  const applyBloomState = () => {
+    baseGroup.visible = activeMode !== "bloom-only";
+    halos.forEach((halo, index) => {
+      halo.visible = activeMode !== "base-only";
+      halo.material.color.set(profile.colors[index]);
+      halo.material.opacity = activeMode === "bloom-only" ? Math.min(0.92, profile.halo + 0.18) : profile.halo;
+    });
+    cores.forEach((core, index) => {
+      core.visible = activeMode !== "base-only" || activeMode === "bloom-only";
+      core.material.emissive.set(profile.colors[index]);
+      core.material.color.set(activeMode === "base-only" ? 0x33373c : 0xffffff);
+      core.material.emissiveIntensity = activeMode === "base-only" ? 0.0 : profile.intensity;
+    });
+    lights.forEach((light, index) => {
+      light.visible = activeMode === "final";
+      light.color.set(profile.colors[index]);
+      light.intensity = profile.intensity * 1.35;
+    });
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+      applyBloomState();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      applyBloomState();
+    },
+    update(time) {
+      const pulse = 1 + Math.sin(time * 2.2) * 0.06;
+      cores.forEach((core, index) => {
+        core.rotation.y += 0.004 + index * 0.001;
+        core.material.emissiveIntensity = activeMode === "base-only" ? 0 : profile.intensity * (0.9 + pulse * 0.1);
+      });
+      halos.forEach((halo, index) => {
+        halo.scale.setScalar((1.1 + index * 0.16) * pulse);
+        if (camera) halo.lookAt(camera.position);
+      });
+    },
+  };
+}
+
+async function createExposureScene(scene) {
+  scene.background = new THREE.Color(0x111215);
+  scene.fog = new THREE.Fog(0x111215, 8, 18);
+  scene.add(new THREE.HemisphereLight(0xc7d2e4, 0x1c1712, 1.1));
+  const key = new THREE.DirectionalLight(0xffe5c8, 2.6);
+  key.position.set(-2.5, 5.4, 4.0);
+  scene.add(key);
+
+  const exposed = [];
+  const makeTrackedMaterial = (color, options = {}) => {
+    const material = new THREE.MeshStandardMaterial({
+      color,
+      roughness: options.roughness ?? 0.62,
+      metalness: options.metalness ?? 0.0,
+      emissive: options.emissive ?? 0x000000,
+      emissiveIntensity: options.emissiveIntensity ?? 0,
+    });
+    exposed.push({
+      material,
+      base: new THREE.Color(color),
+      emissive: new THREE.Color(options.emissive ?? 0x000000),
+      emissiveIntensity: options.emissiveIntensity ?? 0,
+    });
+    return material;
+  };
+
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(6.8, 4.8, 18, 12),
+    makeTrackedMaterial(0x76736c, { roughness: 0.72 }),
+  );
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  const swatches = new THREE.Group();
+  scene.add(swatches);
+  const colors = [0xb84f4a, 0x54a66f, 0x4f77b8, 0xc6b75d, 0xb8b8b8, 0x303236];
+  colors.forEach((color, index) => {
+    const swatch = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.08), makeTrackedMaterial(color));
+    swatch.position.set(-1.75 + (index % 3) * 0.78, 1.25 - Math.floor(index / 3) * 0.7, -2.35);
+    swatches.add(swatch);
+  });
+
+  const grayCard = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.0, 0.08), makeTrackedMaterial(0x777777));
+  grayCard.position.set(1.35, 0.96, -2.35);
+  swatches.add(grayCard);
+
+  const windowMaterial = makeTrackedMaterial(0xffffff, {
+    emissive: 0xfff0c0,
+    emissiveIntensity: 2.4,
+    roughness: 0.16,
+  });
+  const brightWindow = new THREE.Mesh(new THREE.BoxGeometry(0.88, 1.35, 0.08), windowMaterial);
+  brightWindow.position.set(2.35, 1.05, -2.34);
+  scene.add(brightWindow);
+  const windowLight = new THREE.PointLight(0xffe1ae, 4.5, 7);
+  windowLight.position.set(2.2, 1.6, -1.0);
+  scene.add(windowLight);
+
+  const uiGroup = new THREE.Group();
+  scene.add(uiGroup);
+  for (let i = 0; i < 4; i += 1) {
+    const chip = new THREE.Mesh(
+      new THREE.BoxGeometry(0.36, 0.08, 0.03),
+      new THREE.MeshBasicMaterial({ color: i % 2 ? 0x7fd4c1 : 0xffb454 }),
+    );
+    chip.position.set(-2.25 + i * 0.46, 1.95, -1.72);
+    uiGroup.add(chip);
+  }
+
+  const meterGroup = new THREE.Group();
+  meterGroup.visible = false;
+  scene.add(meterGroup);
+  const meterMaterials = [0x64d6ff, 0xffcf6e, 0x9eff9a].map((color) => new THREE.MeshBasicMaterial({ color }));
+  const meterBars = meterMaterials.map((material, index) => {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1, 0.12), material);
+    bar.position.set(-0.35 + index * 0.35, 0.55, -1.45);
+    meterGroup.add(bar);
+    return bar;
+  });
+
+  const profiles = [
+    { baseLum: 0.18, bright: 0.35, grade: [1.04, 1.0, 0.92], compensation: 0.0, light: 3.8 },
+    { baseLum: 0.42, bright: 1.2, grade: [0.92, 1.0, 1.08], compensation: -0.18, light: 6.5 },
+    { baseLum: 0.08, bright: 1.65, grade: [1.12, 0.94, 0.86], compensation: 0.22, light: 8.0 },
+  ];
+  let activeProfile = profiles[0];
+  let activeMode = "final";
+  let exposureCurrent = 1.0;
+  let exposureTarget = 1.0;
+
+  const applyExposure = (exposure, grade) => {
+    exposed.forEach(({ material, base, emissive, emissiveIntensity }) => {
+      material.color.copy(base);
+      material.color.r = clampValue(material.color.r * exposure * grade[0], 0, 1);
+      material.color.g = clampValue(material.color.g * exposure * grade[1], 0, 1);
+      material.color.b = clampValue(material.color.b * exposure * grade[2], 0, 1);
+      material.emissive.copy(emissive);
+      material.emissiveIntensity = emissiveIntensity * exposure;
+    });
+  };
+
+  return {
+    setVariant(index) {
+      activeProfile = profiles[index] ?? profiles[0];
+      windowLight.intensity = activeProfile.light;
+    },
+    setMode(mode) {
+      activeMode = mode;
+      meterGroup.visible = mode === "meter-debug";
+      uiGroup.visible = mode !== "meter-debug";
+    },
+    update(time) {
+      const sweep = (Math.sin(time * 0.75) + 1) * 0.5;
+      brightWindow.position.x = 1.65 + sweep * 1.15;
+      windowLight.position.x = brightWindow.position.x;
+      const averageLum = activeProfile.baseLum + activeProfile.bright * (0.18 + sweep * 0.82);
+      exposureTarget = clampValue((0.18 / Math.max(0.001, averageLum)) * (2 ** activeProfile.compensation), 0.45, 1.85);
+      const speed = exposureTarget > exposureCurrent ? 3.2 : 1.1;
+      exposureCurrent += (exposureTarget - exposureCurrent) * (1 - Math.exp(-0.016 * speed));
+      const grade = activeMode === "identity-lut" || activeMode === "meter-debug" ? [1, 1, 1] : activeProfile.grade;
+      applyExposure(exposureCurrent, grade);
+      meterBars[0].scale.y = 0.18 + averageLum * 0.72;
+      meterBars[1].scale.y = exposureTarget;
+      meterBars[2].scale.y = exposureCurrent;
+      meterBars.forEach((bar) => {
+        bar.position.y = 0.15 + bar.scale.y * 0.5;
+      });
+      swatches.rotation.y = Math.sin(time * 0.18) * 0.04;
+    },
+  };
+}
+
+async function createImagePipelineScene(scene) {
+  scene.background = new THREE.Color(0x0b1016);
+  scene.fog = new THREE.Fog(0x0b1016, 8, 20);
+  scene.add(new THREE.HemisphereLight(0xb6cdf3, 0x18140f, 1.35));
+  const key = new THREE.DirectionalLight(0xffe4bf, 3.2);
+  key.position.set(-3.2, 5.8, 4.5);
+  scene.add(key);
+
+  const sourceGroup = new THREE.Group();
+  scene.add(sourceGroup);
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.4, 4.2, 24, 18),
+    new THREE.MeshStandardMaterial({
+      map: makeGroundTexture({ base: "#18222a", line: "rgba(127,212,193,0.14)" }),
+      color: 0x8da1aa,
+      roughness: 0.74,
+    }),
+  );
+  floor.rotation.x = -Math.PI / 2;
+  sourceGroup.add(floor);
+  const cube = new THREE.Mesh(
+    new THREE.BoxGeometry(0.9, 0.9, 0.9),
+    new THREE.MeshStandardMaterial({ color: 0xd69b58, roughness: 0.44, metalness: 0.08 }),
+  );
+  cube.position.set(-0.85, 0.48, -0.25);
+  sourceGroup.add(cube);
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(0.52, 48, 32),
+    new THREE.MeshStandardMaterial({
+      color: 0x6fa8d9,
+      emissive: 0x174f7d,
+      emissiveIntensity: 0.85,
+      roughness: 0.28,
+    }),
+  );
+  sphere.position.set(0.5, 0.56, 0.35);
+  sourceGroup.add(sphere);
+
+  const aoPatch = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.6, 1.9),
+    new THREE.MeshBasicMaterial({
+      map: makeDarkDiscTexture(),
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false,
+    }),
+  );
+  aoPatch.rotation.x = -Math.PI / 2;
+  aoPatch.position.set(-0.35, 0.025, 0.05);
+  sourceGroup.add(aoPatch);
+  const bloomPatch = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.6, 1.6),
+    new THREE.MeshBasicMaterial({
+      map: makeGlowDiscTexture("rgba(104, 229, 255, 0.96)", "rgba(104, 229, 255, 0)"),
+      color: 0x83f4ff,
+      transparent: true,
+      opacity: 0.46,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  bloomPatch.position.copy(sphere.position);
+  scene.add(bloomPatch);
+
+  const signalGroup = new THREE.Group();
+  scene.add(signalGroup);
+  const signalKinds = ["color", "depth", "normal", "emissive", "velocity", "ao"];
+  const signalPanels = signalKinds.map((kind, index) => {
+    const panel = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.82, 0.82),
+      new THREE.MeshBasicMaterial({ map: makeSignalTexture(kind) }),
+    );
+    panel.position.set(2.15 + (index % 2) * 0.96, 1.55 - Math.floor(index / 2) * 0.92, -1.05);
+    panel.rotation.y = -0.28;
+    signalGroup.add(panel);
+    return panel;
+  });
+
+  const profiles = [
+    { signalScale: 1.0, speed: 0.22, post: 1.0 },
+    { signalScale: 1.16, speed: 0.58, post: 0.9 },
+    { signalScale: 1.28, speed: 0.34, post: 1.2 },
+  ];
+  let profile = profiles[0];
+  let activeMode = "final";
+
+  const applyMode = () => {
+    const signals = activeMode === "signals";
+    const bypass = activeMode === "bypass-post";
+    signalGroup.visible = activeMode !== "bypass-post";
+    aoPatch.visible = !bypass && !signals;
+    bloomPatch.visible = !bypass;
+    sourceGroup.visible = true;
+    signalPanels.forEach((panel, index) => {
+      panel.scale.setScalar((signals ? 1.34 : 1.0) * profile.signalScale);
+      panel.position.x = signals ? -2.15 + (index % 3) * 1.35 : 2.15 + (index % 2) * 0.96;
+      panel.position.y = signals ? 1.35 - Math.floor(index / 3) * 1.2 : 1.55 - Math.floor(index / 2) * 0.92;
+      panel.position.z = signals ? -1.7 : -1.05;
+      panel.rotation.y = signals ? 0.18 : -0.28;
+    });
+    floor.material.color.set(bypass ? 0x87929a : 0x8da1aa);
+    bloomPatch.material.opacity = bypass ? 0 : 0.46 * profile.post;
+    aoPatch.material.opacity = bypass ? 0 : 0.34 * profile.post;
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+      applyMode();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      applyMode();
+    },
+    update(time) {
+      cube.rotation.set(0.22, time * profile.speed, -0.12);
+      sphere.position.y = 0.56 + Math.sin(time * 1.6) * 0.06;
+      bloomPatch.position.copy(sphere.position);
+      bloomPatch.scale.setScalar(1 + Math.sin(time * 2.0) * 0.05);
+      signalGroup.rotation.y = Math.sin(time * 0.18) * 0.03;
+    },
+  };
+}
+
+async function createShadowScene(scene, { renderer } = {}) {
+  scene.background = new THREE.Color(0x101318);
+  scene.fog = new THREE.Fog(0x101318, 8, 24);
+  if (renderer?.shadowMap) {
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  }
+  scene.add(new THREE.HemisphereLight(0xbbcadc, 0x282018, 1.2));
+  const sun = new THREE.DirectionalLight(0xffe8be, 5.2);
+  sun.position.set(-5, 7.5, 5);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.camera.near = 0.5;
+  sun.shadow.camera.far = 26;
+  scene.add(sun);
+  scene.add(sun.target);
+
+  const configureBounds = (extent) => {
+    const cam = sun.shadow.camera;
+    cam.left = -extent;
+    cam.right = extent;
+    cam.top = extent;
+    cam.bottom = -extent;
+    cam.updateProjectionMatrix();
+    sun.shadow.needsUpdate = true;
+  };
+  configureBounds(7.5);
+
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(13, 9, 40, 28),
+    new THREE.MeshStandardMaterial({
+      map: makeGroundTexture({ base: "#252923", line: "rgba(225,235,210,0.1)" }),
+      color: 0x8c947d,
+      roughness: 0.84,
+    }),
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  const casters = [];
+  const casterMaterial = new THREE.MeshStandardMaterial({ color: 0xbca46f, roughness: 0.52 });
+  for (let i = 0; i < 22; i += 1) {
+    const h = 0.45 + (i % 5) * 0.28;
+    const caster = new THREE.Mesh(new THREE.BoxGeometry(0.34, h, 0.34), casterMaterial);
+    caster.position.set((((i * 47) % 100) / 100 - 0.5) * 10.5, h / 2, -3.4 + (i % 6) * 1.25);
+    caster.castShadow = true;
+    caster.receiveShadow = true;
+    scene.add(caster);
+    casters.push(caster);
+  }
+
+  const hero = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(0.34, 0.11, 96, 16),
+    new THREE.MeshStandardMaterial({ color: 0x7bb9d6, roughness: 0.38, metalness: 0.08 }),
+  );
+  hero.position.set(0, 0.86, 0);
+  hero.castShadow = true;
+  hero.receiveShadow = true;
+  scene.add(hero);
+
+  const debugGroup = new THREE.Group();
+  scene.add(debugGroup);
+  [
+    [3.0, 2.3, 0x7fd4c1],
+    [6.0, 4.5, 0xffb454],
+    [10.5, 7.6, 0xd98cff],
+  ].forEach(([w, d, color], index) => {
+    const outline = makeRectOutline(w, d, color);
+    outline.position.y = 0.055 + index * 0.012;
+    debugGroup.add(outline);
+  });
+  const singleMapOutline = makeRectOutline(4.2, 3.2, 0xff6f5c);
+  singleMapOutline.position.y = 0.09;
+  scene.add(singleMapOutline);
+
+  const profiles = [
+    { extent: 4.2, visible: 10, sunX: -4.2, debugScale: 0.9 },
+    { extent: 7.5, visible: 22, sunX: -5.2, debugScale: 1.0 },
+    { extent: 10.0, visible: 22, sunX: -6.6, debugScale: 1.15 },
+  ];
+  let profile = profiles[1];
+  let activeMode = "final";
+
+  const applyShadowState = () => {
+    const extent = activeMode === "single-map" ? 3.2 : profile.extent;
+    configureBounds(extent);
+    debugGroup.visible = activeMode === "cascade-debug";
+    singleMapOutline.visible = activeMode === "single-map";
+    debugGroup.scale.setScalar(profile.debugScale);
+    sun.position.x = profile.sunX;
+    casters.forEach((caster, index) => {
+      caster.visible = index < profile.visible;
+    });
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[1];
+      applyShadowState();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      applyShadowState();
+    },
+    update(time) {
+      hero.rotation.set(time * 0.34, time * 0.56, 0);
+      hero.position.x = Math.sin(time * 0.35) * 0.55;
+      sun.target.position.set(Math.sin(time * 0.12) * 0.25, 0, -0.2);
+      sun.shadow.needsUpdate = true;
+    },
+  };
+}
+
+async function createSkyAtmosphereScene(scene) {
+  scene.background = new THREE.Color(0x102032);
+  scene.add(new THREE.HemisphereLight(0xc6e8ff, 0x1f1c22, 1.15));
+  const sunLight = new THREE.DirectionalLight(0xffe5af, 3.5);
+  sunLight.position.set(-4.5, 4.8, 4.2);
+  scene.add(sunLight);
+
+  const skyTextures = [
+    makeBandTexture([[0, "#07111e"], [0.32, "#1f5f92"], [0.7, "#9ac7d8"], [1, "#f0c38a"]]),
+    makeBandTexture([[0, "#050b16"], [0.36, "#245b87"], [0.72, "#b7d4de"], [1, "#f2d2a0"]]),
+    makeBandTexture([[0, "#02040a"], [0.42, "#111f4e"], [0.73, "#4a84b0"], [1, "#d8a875"]]),
+  ];
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(30, 64, 32),
+    new THREE.MeshBasicMaterial({ map: skyTextures[0], side: THREE.BackSide }),
+  );
+  scene.add(sky);
+
+  const terrain = new THREE.Group();
+  scene.add(terrain);
+  for (let i = 0; i < 9; i += 1) {
+    const ridge = new THREE.Mesh(
+      new THREE.ConeGeometry(0.8 + (i % 3) * 0.25, 1.4 + (i % 4) * 0.35, 4),
+      new THREE.MeshStandardMaterial({ color: i % 2 ? 0x354238 : 0x2b3330, roughness: 0.9 }),
+    );
+    ridge.position.set(-4.4 + i * 1.1, 0.28, -2.45 - (i % 2) * 0.25);
+    ridge.rotation.y = Math.PI / 4;
+    terrain.add(ridge);
+  }
+
+  const hazeGroup = new THREE.Group();
+  scene.add(hazeGroup);
+  const hazeMaterials = [
+    new THREE.MeshBasicMaterial({ color: 0xbadfff, transparent: true, opacity: 0.18, depthWrite: false }),
+    new THREE.MeshBasicMaterial({ color: 0xffd6aa, transparent: true, opacity: 0.14, depthWrite: false }),
+    new THREE.MeshBasicMaterial({ color: 0x8ac5ff, transparent: true, opacity: 0.12, depthWrite: false }),
+  ];
+  hazeMaterials.forEach((material, index) => {
+    const layer = new THREE.Mesh(new THREE.PlaneGeometry(13, 3.1), material);
+    layer.position.set(0, 1.0 + index * 0.35, -2.0 - index * 0.8);
+    hazeGroup.add(layer);
+  });
+
+  const sunDisc = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.72, 0.72),
+    new THREE.MeshBasicMaterial({
+      map: makeGlowDiscTexture("rgba(255, 235, 170, 0.96)", "rgba(255, 190, 80, 0)"),
+      color: 0xffe7aa,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  sunDisc.position.set(-2.7, 2.7, -2.0);
+  scene.add(sunDisc);
+
+  const debugGroup = new THREE.Group();
+  debugGroup.visible = false;
+  scene.add(debugGroup);
+  ["color", "depth", "emissive", "velocity"].forEach((kind, index) => {
+    const panel = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.05, 1.05),
+      new THREE.MeshBasicMaterial({ map: makeSignalTexture(kind) }),
+    );
+    panel.position.set(1.6 + (index % 2) * 1.2, 1.65 - Math.floor(index / 2) * 1.18, -1.75);
+    panel.rotation.y = -0.22;
+    debugGroup.add(panel);
+  });
+
+  const profiles = [
+    { texture: 0, haze: 1.0, terrainY: 0.0, sun: [-2.7, 2.7, -2.0], light: 3.5 },
+    { texture: 1, haze: 0.58, terrainY: -0.12, sun: [-1.4, 3.15, -2.2], light: 4.0 },
+    { texture: 2, haze: 0.28, terrainY: -0.52, sun: [0.4, 2.35, -2.5], light: 2.7 },
+  ];
+  let profile = profiles[0];
+  let activeMode = "final";
+
+  const applyAtmosphere = () => {
+    sky.material.map = skyTextures[profile.texture];
+    sky.material.needsUpdate = true;
+    terrain.position.y = profile.terrainY;
+    sunDisc.position.fromArray(profile.sun);
+    sunLight.intensity = profile.light;
+    hazeGroup.visible = activeMode !== "no-haze" && activeMode !== "lut-debug";
+    debugGroup.visible = activeMode === "lut-debug";
+    hazeMaterials.forEach((material, index) => {
+      material.opacity = profile.haze * (0.18 - index * 0.025);
+    });
+  };
+
+  return {
+    setVariant(index) {
+      profile = profiles[index] ?? profiles[0];
+      applyAtmosphere();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      applyAtmosphere();
+    },
+    update(time) {
+      sky.rotation.y = time * 0.01;
+      hazeGroup.children.forEach((layer, index) => {
+        layer.position.x = Math.sin(time * (0.09 + index * 0.03)) * (0.18 + index * 0.08);
+      });
+      sunDisc.scale.setScalar(1 + Math.sin(time * 0.7) * 0.035);
+    },
+  };
+}
+
 async function init() {
   const renderer = new THREE.WebGPURenderer({ canvas, antialias: true });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1056,7 +2076,7 @@ async function init() {
   controls.target.fromArray(config.target);
   controls.update();
 
-  const sceneApi = await config.factory(scene);
+  const sceneApi = await config.factory(scene, { renderer, camera, controls });
   sceneApi.setMode(state.mode);
   sceneApi.setVariant(state.variant);
   createModeButtons(sceneApi);

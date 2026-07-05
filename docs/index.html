@@ -298,6 +298,19 @@ footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wr
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 
+.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
+  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.live-visual:before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
+  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
+.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
+.live-visual>*{position:relative}
+.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
+.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
+.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
+.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
 header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
 header .kicker{animation:rise .7s ease both}
 h1{font-weight:700;font-size:clamp(40px,6.4vw,84px);line-height:1.04;letter-spacing:-.03em;max-width:15ch;animation:rise .7s .08s ease both}
@@ -651,6 +664,54 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       <a href="demos/water-integration-surface/"><figure>
         <img src="visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" loading="lazy" />
         <figcaption><strong>Water Integration Surface</strong><span>threejs-water-optics · The bounded-water core integrates into a host scene with presets, quality selection, buoyancy, spray probes, deterministic ticks, transparent ordering, and mask-gap evidence.</span></figcaption>
+      </figure></a>
+      <a href="demos/ambient-contact-shading-demo/"><figure>
+        <div class="live-visual live-visual--ao" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>AO.r + direct light separation</strong>
+        <span class="lv-m">final / no-ao / ao-debug</span>
+      </div>
+        <figcaption><strong>Ambient Contact Shading Lab</strong><span>threejs-ambient-contact-shading · Ambient contact visibility grounds nearby surfaces while direct light and emissive terms stay readable.</span></figcaption>
+      </figure></a>
+      <a href="demos/selective-bloom-demo/"><figure>
+        <div class="live-visual live-visual--bloom" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>emissive source + bloom contribution</strong>
+        <span class="lv-m">final / base-only / bloom-only</span>
+      </div>
+        <figcaption><strong>Selective HDR Bloom Bench</strong><span>threejs-bloom · Selective emissive signal is isolated from readable base materials before a bloom response is added back.</span></figcaption>
+      </figure></a>
+      <a href="demos/exposure-color-grading-demo/"><figure>
+        <div class="live-visual live-visual--exposure" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>HDR meter + adapted exposure state</strong>
+        <span class="lv-m">final / identity-lut / meter-debug</span>
+      </div>
+        <figcaption><strong>Scene-Referred Exposure Rig</strong><span>threejs-exposure-color-grading · A scene-referred meter drives asymmetric exposure adaptation before tone-map-domain grading.</span></figcaption>
+      </figure></a>
+      <a href="demos/image-pipeline-framegraph-demo/"><figure>
+        <div class="live-visual live-visual--pipeline" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>one pass feeding shared diagnostics</strong>
+        <span class="lv-m">final / signals / bypass-post</span>
+      </div>
+        <figcaption><strong>Shared Signal Framegraph</strong><span>threejs-image-pipeline · One scene frame feeds owned color, depth, normal, emissive, and velocity-style signal views.</span></figcaption>
+      </figure></a>
+      <a href="demos/shadow-cascade-demo/"><figure>
+        <div class="live-visual live-visual--shadow" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>coverage levels + bounded shadow map</strong>
+        <span class="lv-m">final / cascade-debug / single-map</span>
+      </div>
+        <figcaption><strong>Scalable Shadow Coverage</strong><span>threejs-scalable-real-time-shadows · Bounded, cascade-style, and cached-budget views expose coverage, update scope, and bias pressure.</span></figcaption>
+      </figure></a>
+      <a href="demos/sky-atmosphere-haze-demo/"><figure>
+        <div class="live-visual live-visual--sky" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>shared sky, sun, haze, and LUT views</strong>
+        <span class="lv-m">final / no-haze / lut-debug</span>
+      </div>
+        <figcaption><strong>Atmosphere And Haze Stack</strong><span>threejs-sky-atmosphere-and-haze · Shared sky, sun, depth haze, and LUT diagnostic views preserve one atmosphere parameter model.</span></figcaption>
       </figure></a>
       <a href="demos/water-generated-caustics/"><figure>
         <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" loading="lazy" />

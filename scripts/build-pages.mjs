@@ -247,9 +247,18 @@ const galleryHtml = GALLERY.map((g) => `
         <figcaption><strong>${esc(g.title)}</strong><span>${esc(g.note)}</span></figcaption>
       </figure></a>`).join('');
 
+const safeClass = (s) => String(s ?? 'runtime').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'runtime';
+const liveDemoVisual = (demo) => demo.poster
+  ? `<img src="${demo.poster}" alt="${esc(demo.title)}" loading="lazy" />`
+  : `<div class="live-visual live-visual--${safeClass(demo.visual?.kind)}" aria-hidden="true">
+        <span class="lv-k">Live WebGPU</span>
+        <strong>${esc(demo.visual?.label ?? demo.title)}</strong>
+        <span class="lv-m">${esc((demo.debugModes ?? []).join(' / '))}</span>
+      </div>`;
+
 const liveDemoHtml = PROVIDER_DEMOS.map((demo) => `
       <a href="${demo.livePath}"><figure>
-        <img src="${demo.poster}" alt="${esc(demo.title)}" loading="lazy" />
+        ${liveDemoVisual(demo)}
         <figcaption><strong>${esc(demo.title)}</strong><span>${esc(demo.skill)} · ${esc(demo.providerClaim)}</span></figcaption>
       </figure></a>`).join('');
 
@@ -320,6 +329,19 @@ ${JSON.stringify({
 <link href="${FONTS}" rel="stylesheet" />
 <style>
 ${baseCss}
+.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
+  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.live-visual:before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
+  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
+.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
+.live-visual>*{position:relative}
+.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
+.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
+.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
+.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
 header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
 header .kicker{animation:rise .7s ease both}
 h1{font-weight:700;font-size:clamp(40px,6.4vw,84px);line-height:1.04;letter-spacing:-.03em;max-width:15ch;animation:rise .7s .08s ease both}

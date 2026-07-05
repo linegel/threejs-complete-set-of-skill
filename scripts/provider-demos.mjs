@@ -21,6 +21,126 @@ export const PROVIDER_DEMOS = [
     debugModes: ["live", "preset-switch", "sync-tick"],
   },
   {
+    id: "ambient-contact-shading-demo",
+    skill: "threejs-ambient-contact-shading",
+    title: "Ambient Contact Shading Lab",
+    sceneId: "ambient-contact-shading-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier ambient-visibility scene",
+    livePath: "demos/ambient-contact-shading-demo/",
+    visual: { kind: "ao", label: "AO.r + direct light separation" },
+    sourceExample: "threejs-ambient-contact-shading/examples/webgpu-node-gtao",
+    validationCommand:
+      "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate",
+    providerClaim:
+      "Ambient contact visibility grounds nearby surfaces while direct light and emissive terms stay readable.",
+    limitations: [
+      "The docs page uses live contact-visibility geometry, not the production GTAONode path.",
+      "The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.",
+    ],
+    debugModes: ["final", "no-ao", "ao-debug"],
+  },
+  {
+    id: "selective-bloom-demo",
+    skill: "threejs-bloom",
+    title: "Selective HDR Bloom Bench",
+    sceneId: "selective-bloom-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier emissive-response scene",
+    livePath: "demos/selective-bloom-demo/",
+    visual: { kind: "bloom", label: "emissive source + bloom contribution" },
+    sourceExample: "threejs-bloom/examples/node-selective-bloom",
+    validationCommand:
+      "node threejs-bloom/examples/node-selective-bloom/validate-node-selective-bloom.mjs",
+    providerClaim:
+      "Selective emissive signal is isolated from readable base materials before a bloom response is added back.",
+    limitations: [
+      "The live page uses additive response geometry for interaction and mode switching.",
+      "The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.",
+    ],
+    debugModes: ["final", "base-only", "bloom-only"],
+  },
+  {
+    id: "exposure-color-grading-demo",
+    skill: "threejs-exposure-color-grading",
+    title: "Scene-Referred Exposure Rig",
+    sceneId: "exposure-color-grading-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier exposure-meter scene",
+    livePath: "demos/exposure-color-grading-demo/",
+    visual: { kind: "exposure", label: "HDR meter + adapted exposure state" },
+    sourceExample: "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline",
+    validationCommand:
+      "npm --prefix threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline run validate",
+    providerClaim:
+      "A scene-referred meter drives asymmetric exposure adaptation before tone-map-domain grading.",
+    limitations: [
+      "The docs page simulates the meter state in live scene controls for readability.",
+      "The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.",
+    ],
+    debugModes: ["final", "identity-lut", "meter-debug"],
+  },
+  {
+    id: "image-pipeline-framegraph-demo",
+    skill: "threejs-image-pipeline",
+    title: "Shared Signal Framegraph",
+    sceneId: "image-pipeline-framegraph-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier signal-ownership scene",
+    livePath: "demos/image-pipeline-framegraph-demo/",
+    visual: { kind: "pipeline", label: "one pass feeding shared diagnostics" },
+    sourceExample: "threejs-image-pipeline/examples/webgpu-image-pipeline",
+    validationCommand:
+      "npm --prefix threejs-image-pipeline/examples/webgpu-image-pipeline run validate",
+    providerClaim:
+      "One scene frame feeds owned color, depth, normal, emissive, and velocity-style signal views.",
+    limitations: [
+      "The docs page visualizes the signal contract with live panels rather than allocating production MRT targets.",
+      "The production skill remains one RenderPipeline, one pass/MRT producer, and one tone-map/output conversion owner.",
+    ],
+    debugModes: ["final", "signals", "bypass-post"],
+  },
+  {
+    id: "shadow-cascade-demo",
+    skill: "threejs-scalable-real-time-shadows",
+    title: "Scalable Shadow Coverage",
+    sceneId: "shadow-cascade-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier shadow-coverage scene",
+    livePath: "demos/shadow-cascade-demo/",
+    visual: { kind: "shadow", label: "coverage levels + bounded shadow map" },
+    sourceExample: "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow",
+    validationCommand:
+      "node threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/validate.js --allow-missing-gpu",
+    providerClaim:
+      "Bounded, cascade-style, and cached-budget views expose coverage, update scope, and bias pressure.",
+    limitations: [
+      "The live page uses a single real shadow map plus debug coverage overlays.",
+      "The production skill chooses one shadow, CSMShadowNode, TileShadowNode, or a measured custom cached clipmap from the target scene.",
+    ],
+    debugModes: ["final", "cascade-debug", "single-map"],
+  },
+  {
+    id: "sky-atmosphere-haze-demo",
+    skill: "threejs-sky-atmosphere-and-haze",
+    title: "Atmosphere And Haze Stack",
+    sceneId: "sky-atmosphere-haze-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier sky/haze scene",
+    livePath: "demos/sky-atmosphere-haze-demo/",
+    visual: { kind: "sky", label: "shared sky, sun, haze, and LUT views" },
+    sourceExample: "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
+    validationCommand:
+      "node threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/validation.js",
+    providerClaim:
+      "Shared sky, sun, depth haze, and LUT diagnostic views preserve one atmosphere parameter model.",
+    limitations: [
+      "The docs page uses procedural sky bands and haze layers for direct interaction.",
+      "The production skill remains compute-generated transmittance, multiscatter, sky-view, and aerial-perspective LUT/froxel products.",
+    ],
+    debugModes: ["final", "no-haze", "lut-debug"],
+  },
+  {
     id: "water-generated-caustics",
     skill: "threejs-water-optics",
     title: "Bounded Water Caustic Projection",
