@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,6 +19,18 @@ import {
   craterStamp,
   planetFields,
 } from "./planet-fields.js";
+import {
+  CPU_PLANET_FIELD_ALGORITHM,
+  TSL_PLANET_FIELD_ALGORITHM,
+  createPlanetFieldCpuBuilder,
+  createPlanetFieldTslBuilder,
+} from "./planet-field-contract.js";
+import {
+  NORMAL_QUERY_EVALUATION_COUNTS,
+  PLANET_FIELD_ALGORITHM,
+  PLANET_PARITY_CHANNELS,
+} from "./planet-field-constants.js";
+import { PLANET_FIELD_ALGORITHM as SHARED_PLANET_FIELD_ALGORITHM } from "./planet-field-constants.js";
 import {
   annotateNeighborLevels,
   assertAdjacentLevelDelta,
@@ -42,6 +54,22 @@ const here = dirname(fileURLToPath(import.meta.url));
 const manifestPath = resolve(here, GENERATED_VARIANT_MANIFEST_RELATIVE_PATH);
 const manifestDir = dirname(manifestPath);
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+const fixturePath = resolve(here, "planet-golden-fixtures.json");
+const fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
+
+function parseArgs(argv) {
+  const options = {
+    allowMissingGpu: false,
+    artifacts: null,
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--allow-missing-gpu") options.allowMissingGpu = true;
+    else if (arg === "--artifacts") options.artifacts = resolve(argv[++index]);
+    else throw new Error(`Unknown argument: ${arg}`);
+  }
+  return options;
+}
 
 function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -73,51 +101,179 @@ function validateAssetLedger() {
   }
 }
 
-function cpuMirrorPlanetFields(direction, options) {
-  return planetFields(direction, options);
-}
-
-function runParityHarness() {
-  const directions = [
-    [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1],
-    [0.577, 0.577, 0.577],
-    [-0.42, 0.71, 0.56],
-  ];
-  const seeds = [31.731, 41.125, 59.75];
-  const presetIds = Object.keys(BODY_PRESETS);
-  const samples = [];
-  for (const preset of presetIds) {
-    for (const seed of seeds) {
-      for (const direction of directions) {
-        const cpu = cpuMirrorPlanetFields(direction, {
-          preset: BODY_PRESETS[preset],
-          seed,
-        });
-        const tslMirror = planetFields(direction, {
-          preset: BODY_PRESETS[preset],
-          seed,
-        });
-        const error = Math.abs(cpu.height - tslMirror.height);
-        samples.push({ preset, seed, direction, error });
-      }
-    }
-  }
-  const max = samples.reduce((best, sample) => (sample.error > best.error ? sample : best));
-  const meanError =
-    samples.reduce((total, sample) => total + sample.error, 0) / samples.length;
+function sampleParityChannels(direction, options) {
+  const sample = planetFields(direction, options);
   return {
-    maxError: max.error,
-    meanError,
-    worstDirection: max.direction,
-    seed: max.seed,
-    preset: max.preset,
-    sampleCount: samples.length,
+    height: sample.height,
+    macroHeight: sample.macroHeight,
+    ridge: sample.ridge,
+    oceanDepth: sample.oceanDepth,
+    humidity: sample.humidity,
+    temperature: sample.temperature,
+    slope: sample.slope,
+    roughnessVariance: sample.roughnessVariance,
+    heightGradientX: sample.heightGradient[0],
+    heightGradientY: sample.heightGradient[1],
   };
 }
 
+function assertClose(actual, expected, tolerance, label) {
+  const error = Math.abs(actual - expected);
+  assert(
+    error <= tolerance,
+    `${label}: ${actual} differs from ${expected} by ${error}, tolerance ${tolerance}`,
+  );
+  return error;
+}
+
+function validateSharedAlgorithm() {
+  const cpuBuilder = createPlanetFieldCpuBuilder();
+  const tslBuilder = createPlanetFieldTslBuilder();
+  assert.equal(CPU_PLANET_FIELD_ALGORITHM, SHARED_PLANET_FIELD_ALGORITHM);
+  assert.equal(TSL_PLANET_FIELD_ALGORITHM, SHARED_PLANET_FIELD_ALGORITHM);
+  assert.equal(cpuBuilder.algorithm, SHARED_PLANET_FIELD_ALGORITHM);
+  assert.equal(tslBuilder.algorithm, SHARED_PLANET_FIELD_ALGORITHM);
+  assert.deepEqual(cpuBuilder.algorithm, tslBuilder.algorithm);
+  assert.deepEqual(cpuBuilder.channels, PLANET_PARITY_CHANNELS);
+  assert.deepEqual(tslBuilder.channels, PLANET_PARITY_CHANNELS);
+  assert.equal(
+    NORMAL_QUERY_EVALUATION_COUNTS.previousFullFieldEvaluations,
+    2 * 2,
+    "old normal query cost must be derived as 2 tangent axes * 2 central samples",
+  );
+  assert.equal(
+    NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations,
+    1,
+    "new normal query cost must be one fused planetFields() call",
+  );
+  assert(
+    NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations <
+      NORMAL_QUERY_EVALUATION_COUNTS.previousFullFieldEvaluations,
+    "fused gradient must reduce full field evaluations",
+  );
+  return {
+    pass: true,
+    sharedConstantsObject: true,
+    algorithmVersion: PLANET_FIELD_ALGORITHM.version,
+    normalQueryEvaluationCounts: NORMAL_QUERY_EVALUATION_COUNTS,
+  };
+}
+
+function validateGoldenFixtures() {
+  assert.equal(fixtures.version, 1);
+  assert.equal(fixtures.algorithmVersion, PLANET_FIELD_ALGORITHM.version);
+  assert.deepEqual(fixtures.channels, PLANET_PARITY_CHANNELS);
+
+  let maxAbsError = 0;
+  let meanAbsError = 0;
+  let count = 0;
+  const samples = fixtures.probes.map((entry, index) => {
+    assert(BODY_PRESETS[entry.preset], `fixture probe ${index} unknown preset ${entry.preset}`);
+    const actual = sampleParityChannels(entry.direction, {
+      preset: BODY_PRESETS[entry.preset],
+      seed: entry.seed,
+    });
+    const channelErrors = {};
+    for (const channel of PLANET_PARITY_CHANNELS) {
+      const error = assertClose(
+        actual[channel],
+        entry.values[channel],
+        PLANET_FIELD_ALGORITHM.fixtureTolerance,
+        `fixture probe ${index} ${channel}`,
+      );
+      channelErrors[channel] = error;
+      maxAbsError = Math.max(maxAbsError, error);
+      meanAbsError += error;
+      count += 1;
+    }
+    return {
+      preset: entry.preset,
+      seed: entry.seed,
+      direction: entry.direction,
+      maxAbsError: Math.max(...Object.values(channelErrors)),
+      channelErrors,
+    };
+  });
+
+  return {
+    pass: true,
+    fixtureTolerance: PLANET_FIELD_ALGORITHM.fixtureTolerance,
+    maxAbsError,
+    meanAbsError: count === 0 ? 0 : meanAbsError / count,
+    sampleCount: samples.length,
+    samples,
+  };
+}
+
+function readGpuReadback(artifactDir) {
+  const path = resolve(artifactDir, "planet-readback.json");
+  if (!existsSync(path)) {
+    throw new Error(`GPU parity artifact missing: ${path}`);
+  }
+  return JSON.parse(readFileSync(path, "utf8"));
+}
+
+function validateGpuReadback(artifactDir) {
+  const readback = readGpuReadback(artifactDir);
+  assert.equal(readback.version, 1);
+  assert.deepEqual(readback.channels, PLANET_PARITY_CHANNELS);
+  assert(Array.isArray(readback.samples), "GPU readback samples must be an array");
+
+  let maxAbsError = 0;
+  let meanAbsError = 0;
+  let count = 0;
+  let worstSample = null;
+  const samples = readback.samples.map((entry, index) => {
+    assert(BODY_PRESETS[entry.preset], `GPU sample ${index} unknown preset ${entry.preset}`);
+    assert(entry.direction, `GPU sample ${index} missing direction`);
+    assert(entry.values, `GPU sample ${index} missing values`);
+    const cpu = sampleParityChannels(entry.direction, {
+      preset: BODY_PRESETS[entry.preset],
+      seed: entry.seed,
+    });
+    const channelErrors = {};
+    for (const channel of PLANET_PARITY_CHANNELS) {
+      const actual = Number(entry.values[channel]);
+      assert(Number.isFinite(actual), `GPU sample ${index} ${channel} is not finite`);
+      const error = Math.abs(actual - cpu[channel]);
+      channelErrors[channel] = error;
+      meanAbsError += error;
+      count += 1;
+      if (error > maxAbsError) {
+        maxAbsError = error;
+        worstSample = { index, preset: entry.preset, seed: entry.seed, direction: entry.direction, channel };
+      }
+    }
+    return {
+      preset: entry.preset,
+      seed: entry.seed,
+      direction: entry.direction,
+      channelErrors,
+      maxAbsError: Math.max(...Object.values(channelErrors)),
+    };
+  });
+  meanAbsError = count === 0 ? 0 : meanAbsError / count;
+  if (maxAbsError > PLANET_FIELD_ALGORITHM.parityTolerance) {
+    throw new Error(
+      `GPU parity maxAbsError ${maxAbsError} exceeds tolerance ${PLANET_FIELD_ALGORITHM.parityTolerance}`,
+    );
+  }
+  return {
+    pass: true,
+    status: "passed",
+    artifactDir,
+    tolerance: PLANET_FIELD_ALGORITHM.parityTolerance,
+    maxAbsError,
+    meanAbsError,
+    worstSample,
+    samples,
+  };
+}
+
+const options = parseArgs(process.argv.slice(2));
+
 validateAssetLedger();
+const structuralParity = validateSharedAlgorithm();
 
 const config = createPlanetConfig();
 assert.equal(validatePlanetConfig(config).ok, true);
@@ -181,6 +337,7 @@ const gradient = heightGradient([0.2, 0.8, 0.4], {
   preset: BODY_PRESETS.pelagia,
 });
 assert.equal(gradient.analyticGradient.length, 2);
+assert.equal(gradient.evaluationCount, NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations);
 
 const registry = createPlanetDebugRegistry();
 assert.deepEqual(Object.keys(registry), REQUIRED_DEBUG_VIEWS);
@@ -209,6 +366,8 @@ for (const importPath of Object.values(NODE_POST_IMPORTS)) {
 
 const source = [
   "README.md",
+  "planet-field-constants.js",
+  "planet-field-contract.js",
   "planet-config.js",
   "planet-fields.js",
   "planet-quadtree.js",
@@ -217,6 +376,7 @@ const source = [
   "planet-material.js",
   "debug-views.js",
   "webgpu-quadtree-planet.js",
+  "validate-planet.mjs",
 ]
   .map((file) => readFileSync(resolve(here, file), "utf8"))
   .join("\n");
@@ -239,6 +399,7 @@ for (const required of [
   "transitionEdges",
   "analyticGradient",
   "heightGradient",
+  "NORMAL_QUERY_EVALUATION_COUNTS",
   "nearWeight",
   "midWeight",
   "farWeight",
@@ -248,6 +409,8 @@ for (const required of [
   "cube-face seam",
   "LOD crack",
   "CPU/GPU drift",
+  "planet-readback.json",
+  "--allow-missing-gpu",
 ]) {
   assert(source.includes(required), `missing ${required}`);
 }
@@ -259,11 +422,36 @@ for (const forbidden of [
 ]) {
   assert(!source.includes(forbidden), `canonical source contains ${forbidden}`);
 }
+assert(!source.includes(`TSL_${"PLANET_FIELDS_CONTRACT"}`), "dead TSL contract string must stay deleted");
 
-const parity = runParityHarness();
-assert(parity.maxError <= 1e-12, `max parity error ${parity.maxError}`);
+const fixtureParity = validateGoldenFixtures();
+let gpuParity;
+if (options.artifacts) {
+  gpuParity = validateGpuReadback(options.artifacts);
+} else {
+  gpuParity = {
+    pass: false,
+    status: "not-run",
+    requiredForBrowserAcceptance: true,
+    reason:
+      "Pass --artifacts <dir> containing planet-readback.json, or pass --allow-missing-gpu for Layer 1 only.",
+  };
+  if (!options.allowMissingGpu) {
+    process.exitCode = 1;
+  }
+}
+const report = {
+  structuralParity,
+  fixtureParity,
+  gpuParity,
+};
 const reportPath =
   process.env.PLANET_VALIDATION_REPORT ??
   resolve(tmpdir(), "webgpu-quadtree-planet-validation.json");
-writeFileSync(reportPath, `${JSON.stringify(parity, null, 2)}\n`);
+writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+if (process.exitCode) {
+  throw new Error(
+    `GPU parity ${gpuParity.status}; rerun with --artifacts <dir> or --allow-missing-gpu. Layer 1 report: ${reportPath}`,
+  );
+}
 console.log(`webgpu-quadtree-planet validation passed: ${reportPath}`);

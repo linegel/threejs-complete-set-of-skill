@@ -35,10 +35,18 @@ material applies a local display conversion.
 Run:
 
 ```sh
-node threejs-procedural-planets/examples/webgpu-quadtree-planet/validate-planet.mjs
+node threejs-procedural-planets/examples/webgpu-quadtree-planet/validate-planet.mjs --allow-missing-gpu
 ```
 
-The command writes a JSON summary with `maxError`, `meanError`,
-`worstDirection`, `seed`, and `preset`, and validates schema keys, crater
-outputs, quadtree neighbor levels, dirty patch bounds, debug registry coverage,
-asset ledger hashes, and WebGPU/TSL source sentinels.
+Without `--allow-missing-gpu`, the command requires `--artifacts <dir>` with
+`planet-readback.json` and exits non-zero when the browser readback artifact is
+absent. The always-run layer validates shared CPU/TSL field constants, golden
+`planetFields()` fixtures, schema keys, crater outputs, quadtree neighbor
+levels, dirty patch bounds, debug registry coverage, asset ledger hashes, and
+WebGPU/TSL source sentinels.
+
+Normal queries use the fused `heightGradient` returned by `planetFields()`.
+The old central-difference path cost `2 tangent axes * 2 samples = 4` full field
+evaluations per normal. The current path costs `1` full field evaluation because
+height and both tangent gradient components are produced together; the validator
+gates those counts through `NORMAL_QUERY_EVALUATION_COUNTS`.

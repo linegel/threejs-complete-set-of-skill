@@ -363,6 +363,14 @@ Apply those weights to contribution strength for:
 
 Frequency remains stable; only amplitude and channel participation fade.
 
+Normal queries must not central-difference the full planet field. The canonical
+example uses a fused analytic gradient: `planetFields()` returns height plus two
+tangent-space gradient components from the same FBM octave traversal, with
+geodesic crater derivatives accumulated in the same evaluation. Cost is gated
+by `validate-planet.mjs`: the old query was `2 tangent axes * 2 central samples
+= 4` full `planetFields()` evaluations per normal, while the fused query is
+`1` full `planetFields()` evaluation returning both gradient components.
+
 ## 9. Climate, Hydrology, And Biomes
 
 Biome classification is derived from causes:
@@ -539,7 +547,11 @@ Validation harness:
 - grazing light capture;
 - biome, crater, normal, roughness, and patch-error captures;
 - three seeds minimum per body preset;
-- parity report with max/mean error and worst sample direction;
+- always-run structural parity confirming CPU and TSL builders import the same
+  shared field constants object, plus golden `planetFields()` fixtures;
+- optional browser-readback parity from `planet-readback.json`, reporting
+  max/mean error and worst sample direction, with missing artifacts failing
+  unless the validator is run with `--allow-missing-gpu`;
 - GPU timestamp or frame-budget capture for each quality tier.
 
 ## 16. Replaced Sub-Best Techniques

@@ -1,4 +1,5 @@
-import { planetFields, normalize } from "./planet-fields.js";
+import { NORMAL_QUERY_EVALUATION_COUNTS } from "./planet-field-constants.js";
+import { planetFields } from "./planet-fields.js";
 
 const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
 const smoothstep = (edge0, edge1, value) => {
@@ -17,30 +18,15 @@ export function altitudeDetailWeights({ altitude, radius }) {
 }
 
 export function heightGradient(direction, options = {}) {
-  const radial = normalize(direction);
-  const epsilon = options.epsilon ?? 0.0025;
-  const xTangent = normalize([radial[2], 0, -radial[0]]);
-  const yTangent = normalize([
-    radial[1] * xTangent[2] - radial[2] * xTangent[1],
-    radial[2] * xTangent[0] - radial[0] * xTangent[2],
-    radial[0] * xTangent[1] - radial[1] * xTangent[0],
-  ]);
-  const sample = (offset) =>
-    planetFields(
-      normalize([
-        radial[0] + offset[0],
-        radial[1] + offset[1],
-        radial[2] + offset[2],
-      ]),
-      options,
-    ).height;
-  const hx =
-    (sample(xTangent.map((value) => value * epsilon)) -
-      sample(xTangent.map((value) => -value * epsilon))) /
-    (2 * epsilon);
-  const hy =
-    (sample(yTangent.map((value) => value * epsilon)) -
-      sample(yTangent.map((value) => -value * epsilon))) /
-    (2 * epsilon);
-  return { analyticGradient: [hx, hy], heightGradient: [hx, hy] };
+  const fields = planetFields(direction, options);
+  // Fused analytic gradient is preferred here because the height field is FBM-led:
+  // each octave contributes value and derivative in one traversal, so a normal query
+  // spends one full planetFields() call instead of 2 axes * 2 finite-difference calls.
+  return {
+    analyticGradient: fields.heightGradient,
+    heightGradient: fields.heightGradient,
+    height: fields.height,
+    evaluationCount: NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations,
+    previousEvaluationCount: NORMAL_QUERY_EVALUATION_COUNTS.previousFullFieldEvaluations,
+  };
 }
