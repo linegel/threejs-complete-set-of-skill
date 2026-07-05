@@ -170,21 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Surface history is a storage-texture ping-pong: touches write into a mask that decays and
-diffuses with correct time dependence, so behavior is identical at 30 and 144 fps:</p>
-$$m_{t+dt} = \operatorname{clamp}\Big(m_t\,k^{dt} + D\,\nabla^2 m_t\,dt + \sum_i T_i\Big)$$
-<p>where $k^{dt}$ (not a per-frame constant) gives exponential decay per <em>second</em>.
-Frost grows toward a static crystalline structure target $S(\mathbf p)$ — the mask reveals
-authored structure instead of accumulating mush:</p>
-$$f = \operatorname{smoothstep}(0, 1, m)\cdot S(\mathbf p)$$
-<p>Refraction reads the frost normal at two scales — coarse lensing plus fine crystal detail —
-offsetting the scene sample by $\Delta\mathbf{uv} = \eta\,(w_1 \mathbf n_{coarse} + w_2 \mathbf n_{fine})_{xy}$,
-with the blur radius driven by the same mask through a reduced-resolution node blur.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -471,6 +456,22 @@ anti-aliasing.</p>
     <a href="threejs-exposure-color-grading.html">Exposure and Color Grading →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Surface history is a storage-texture ping-pong: touches write into a mask that decays and
+diffuses with correct time dependence, so behavior is identical at 30 and 144 fps:</p>
+$$m_{t+dt} = \operatorname{clamp}\Big(m_t\,k^{dt} + D\,\nabla^2 m_t\,dt + \sum_i T_i\Big)$$
+<p>where $k^{dt}$ (not a per-frame constant) gives exponential decay per <em>second</em>.
+Frost grows toward a static crystalline structure target $S(\mathbf p)$ — the mask reveals
+authored structure instead of accumulating mush:</p>
+$$f = \operatorname{smoothstep}(0, 1, m)\cdot S(\mathbf p)$$
+<p>Refraction reads the frost normal at two scales — coarse lensing plus fine crystal detail —
+offsetting the scene sample by $\Delta\mathbf{uv} = \eta\,(w_1 \mathbf n_{coarse} + w_2 \mathbf n_{fine})_{xy}$,
+with the blur radius driven by the same mask through a reduced-resolution node blur.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

@@ -170,24 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>A creature is a spec-driven body: primitives (tapered capsules, spheres) blended by smooth
-minimum into one signed distance field:</p>
-$$d = \operatorname{smin}_k(d_1, \dots, d_P), \qquad
-\operatorname{smin}_k(a,b) = \operatorname{mix}(a, b, h) - k\,h(1-h),\; h = \tfrac12 + \tfrac{a-b}{2k}$$
-<p>The interior gradient of a tapered capsule tilts with the taper slope
-$s = (r_b - r_a)/L$: $\nabla d = \hat{\mathbf q} - s\,\hat{\mathbf a}$, $\|\nabla d\| = \sqrt{1+s^2}$.
-Skin vertices snap to the iso-surface by Newton iteration with the full gradient norm:</p>
-$$\Delta\mathbf p = -\,\frac{(d - d_{iso})}{\|\nabla d\|^2}\,\nabla d$$
-<p>Locomotion is procedural: gait phase drives foot targets, 2-bone IK solves knees by the law
-of cosines $\cos\theta = \frac{a^2 + b^2 - c^2}{2ab}$, feet plant in world space, and
-verlet chains ($\mathbf x' = 2\mathbf x - \mathbf x_{prev} + \mathbf a\,dt^2$ + length
-constraints) animate tails and ears. Squash-and-stretch preserves volume:
-scale $(s, 1/\sqrt s, 1/\sqrt s)$ has determinant exactly 1.</p></div>
-  </div></div>
-
 
 
 <div class="section" id="skill-text"><div class="wrap">
@@ -273,11 +255,20 @@ variant only — it re-runs the entire snap per vertex and doubles draws.</li>
 zero stance drift) + analytic 2-bone IK with a Gram-Schmidt bend hint;
 hopper state machine with volume-preserving squash
 (<code>sxz = 1/sqrt(squash)</code>); closed-form flight sampled from sim time;
-fixed-step verlet ropes; buoyancy-spring swim against an injected water
-   height. Rope-verlet writes its segment slots after base squash/yaw staging
-   and IK writes; the last stage touching a slot wins. Everything
-   deterministic: seeded LCG + sim clock only — <code>Math.random</code>/<code>Date.now</code>/
-   <code>performance.now</code> are banned in render code.</li>
+fixed-step verlet ropes; buoyancy-spring swim against an injected
+<code>getWaterHeight(x, z, timeSeconds)</code> provider. Open seas use
+<code>threejs-spectral-ocean/examples/webgpu-fft-ocean/createCpuWaterHeightSampler()</code>;
+bounded pools use
+<code>threejs-water-optics/examples/webgpu-bounded-water/createBoundedWaterHeightQuery()</code>
+for the analytic component. The water provider carries the parity-error
+obligation (<code>estimateTruncationError()</code> for spectral seas; zero analytic
+error plus a declared StorageTexture residual for bounded water). Creature
+locomotion treats the injected query as authoritative and never performs
+GPU readback. Rope-verlet writes its segment slots after base squash staging,
+after root-yaw target conversion, and after IK writes; the last stage
+touching a slot wins. Everything deterministic: seeded LCG + sim clock
+only — <code>Math.random</code>/<code>Date.now</code>/<code>performance.now</code> are banned in render
+code.</li>
 <li><strong>Boot.</strong> All heavy work is init-phase and budgeted: shell geometry once
 per tier (species-independent), rig compile + candidate sets once per
 species (time-sliced ≤ 4 ms/frame or in a worker), storage allocated at
@@ -454,6 +445,25 @@ pack — do not stretch this skill over them.</p>
     <a href="threejs-procedural-fields.html">Procedural Fields →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>A creature is a spec-driven body: primitives (tapered capsules, spheres) blended by smooth
+minimum into one signed distance field:</p>
+$$d = \operatorname{smin}_k(d_1, \dots, d_P), \qquad
+\operatorname{smin}_k(a,b) = \operatorname{mix}(a, b, h) - k\,h(1-h),\; h = \tfrac12 + \tfrac{a-b}{2k}$$
+<p>The interior gradient of a tapered capsule tilts with the taper slope
+$s = (r_b - r_a)/L$: $\nabla d = \hat{\mathbf q} - s\,\hat{\mathbf a}$, $\|\nabla d\| = \sqrt{1+s^2}$.
+Skin vertices snap to the iso-surface by Newton iteration with the full gradient norm:</p>
+$$\Delta\mathbf p = -\,\frac{(d - d_{iso})}{\|\nabla d\|^2}\,\nabla d$$
+<p>Locomotion is procedural: gait phase drives foot targets, 2-bone IK solves knees by the law
+of cosines $\cos\theta = \frac{a^2 + b^2 - c^2}{2ab}$, feet plant in world space, and
+verlet chains ($\mathbf x' = 2\mathbf x - \mathbf x_{prev} + \mathbf a\,dt^2$ + length
+constraints) animate tails and ears. Squash-and-stretch preserves volume:
+scale $(s, 1/\sqrt s, 1/\sqrt s)$ has determinant exactly 1.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

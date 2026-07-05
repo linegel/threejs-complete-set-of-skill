@@ -170,22 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Particles live on the GPU: a compute pass integrates state in storage buffers, instanced
-geometry reads it directly — zero CPU round trips:</p>
-$$\mathbf v' = \mathbf v + \big(\mathbf g + \mathbf F_{field}(\mathbf p)/m\big)dt, \qquad
-\mathbf p' = \mathbf p + \mathbf v'\,dt$$
-<p>Lifetimes drive everything through normalized age $u = t_{age}/t_{life}$: size, color ramp,
-and alpha are functions of $u$, and dead slots recycle through a dense-swap pool so the
-draw range stays tight. Reentry plasma conforms to the ship: emission points sample the hull
-surface, intensity follows a ram-pressure proxy
-$I \propto \rho\,v^2 \cdot \max(0, \hat{\mathbf n}\cdot\hat{\mathbf v})$.</p>
-<p>Emission is scene-relative HDR through MRT: a spark is bright <em>relative to the sun</em>, and
-bloom reveals that hierarchy rather than inventing one.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -450,6 +434,23 @@ primary task.</p>
     <a href="threejs-procedural-buildings-and-cities.html">Procedural Buildings and Cities →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Particles live on the GPU: a compute pass integrates state in storage buffers, instanced
+geometry reads it directly — zero CPU round trips:</p>
+$$\mathbf v' = \mathbf v + \big(\mathbf g + \mathbf F_{field}(\mathbf p)/m\big)dt, \qquad
+\mathbf p' = \mathbf p + \mathbf v'\,dt$$
+<p>Lifetimes drive everything through normalized age $u = t_{age}/t_{life}$: size, color ramp,
+and alpha are functions of $u$, and dead slots recycle through a dense-swap pool so the
+draw range stays tight. Reentry plasma conforms to the ship: emission points sample the hull
+surface, intensity follows a ram-pressure proxy
+$I \propto \rho\,v^2 \cdot \max(0, \hat{\mathbf n}\cdot\hat{\mathbf v})$.</p>
+<p>Emission is scene-relative HDR through MRT: a spark is bright <em>relative to the sun</em>, and
+bloom reveals that hierarchy rather than inventing one.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

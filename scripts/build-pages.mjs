@@ -352,9 +352,9 @@ for (const slug of slugs) {
     <h2>Validation gallery</h2>
     <p class="sub">Evidence frames produced by this skill's validation contract.</p>
     <div class="gallery">${validation.map(([img, note]) => `
-      <figure>
-        <img src="../${img}" alt="${esc(note)}" loading="lazy" />
-        <figcaption><span>${esc(note)}</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../${img}" alt="${esc(`${s.title} in Three.js WebGPU — ${note}`)}" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>${esc(note)}</span></figcaption>
       </figure>`).join('')}
     </div>
   </div></div>` : '';
@@ -463,7 +463,6 @@ ${navHtml('../')}
   </div>
 </header>
 
-${scienceHtml}
 ${validationHtml}
 ${examplesHtml}
 
@@ -476,6 +475,8 @@ ${examplesHtml}
     <a href="${next.slug}.html">${esc(next.title)} →</a>
   </div>
 </div></div>
+
+${scienceHtml}
 
 ${footerHtml}
 </body>

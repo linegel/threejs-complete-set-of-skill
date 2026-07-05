@@ -170,41 +170,25 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>The planet is a cube-sphere: six quadtree faces whose vertices project to the sphere,
-displaced by a height field composed of crater, mountain, and biome causes:</p>
-$$\mathbf p' = \hat{\mathbf p}\,\big(R + h(\hat{\mathbf p})\big)$$
-<p>Quadtree LOD splits a patch when its projected screen error exceeds a threshold — geometric
-error over distance:</p>
-$$\tau = \frac{e_{patch}}{d}\cdot\frac{w_{screen}}{2\tan(\phi/2)} > \tau_{max} \Rightarrow \text{split}$$
-<p>Normals come analytically from the height gradient in the tangent frame rather than
-post-hoc geometry differencing:
-$\mathbf n \propto \hat{\mathbf p} - \nabla_{\!s} h$, keeping shading stable across LOD seams.
-Craters are radial profiles $h_c(r) = f(r/r_c)$ with rim uplift and floor flattening, summed
-with amplitude-sorted dominance so overlaps read as impact history.</p></div>
-  </div></div>
-
   <div class="section" id="validation"><div class="wrap">
     <h2>Validation gallery</h2>
     <p class="sub">Evidence frames produced by this skill's validation contract.</p>
     <div class="gallery">
-      <figure>
-        <img src="../visual-validation/planet-generated-craters/final.design.png" alt="Final design frame — fixed-view visual contract" loading="lazy" />
-        <figcaption><span>Final design frame — fixed-view visual contract</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/planet-generated-craters/final.design.png" alt="Procedural Planets in Three.js WebGPU — Final design frame — fixed-view visual contract" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Final design frame — fixed-view visual contract</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/planet-generated-craters/no-post.design.png" alt="No-post baseline — the terrain cause without grading" loading="lazy" />
-        <figcaption><span>No-post baseline — the terrain cause without grading</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/planet-generated-craters/no-post.design.png" alt="Procedural Planets in Three.js WebGPU — No-post baseline — the terrain cause without grading" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>No-post baseline — the terrain cause without grading</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Per-signal diagnostics mosaic" loading="lazy" />
-        <figcaption><span>Per-signal diagnostics mosaic</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Procedural Planets in Three.js WebGPU — Per-signal diagnostics mosaic" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Per-signal diagnostics mosaic</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/planet-generated-craters/camera.near.png" alt="Close-approach camera probe" loading="lazy" />
-        <figcaption><span>Close-approach camera probe</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/planet-generated-craters/camera.near.png" alt="Procedural Planets in Three.js WebGPU — Close-approach camera probe" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Close-approach camera probe</span></figcaption>
       </figure>
     </div>
   </div></div>
@@ -385,6 +369,23 @@ and its LOD/parity architecture.</p>
     <a href="threejs-procedural-vegetation.html">Procedural Vegetation →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>The planet is a cube-sphere: six quadtree faces whose vertices project to the sphere,
+displaced by a height field composed of crater, mountain, and biome causes:</p>
+$$\mathbf p' = \hat{\mathbf p}\,\big(R + h(\hat{\mathbf p})\big)$$
+<p>Quadtree LOD splits a patch when its projected screen error exceeds a threshold — geometric
+error over distance:</p>
+$$\tau = \frac{e_{patch}}{d}\cdot\frac{w_{screen}}{2\tan(\phi/2)} > \tau_{max} \Rightarrow \text{split}$$
+<p>Normals come analytically from the height gradient in the tangent frame rather than
+post-hoc geometry differencing:
+$\mathbf n \propto \hat{\mathbf p} - \nabla_{\!s} h$, keeping shading stable across LOD seams.
+Craters are radial profiles $h_c(r) = f(r/r_c)$ with rim uplift and floor flattening, summed
+with amplitude-sorted dominance so overlaps read as impact history.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

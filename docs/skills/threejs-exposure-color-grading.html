@@ -170,22 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Exposure is metered on the GPU: a compute reduction averages log-luminance over the frame
-(log so that a bright sliver doesn't dominate):</p>
-$$\bar L = \exp\!\left(\frac{1}{N}\sum_i \log\big(\epsilon + L_i\big)\right), \qquad
-L_i = 0.2126R + 0.7152G + 0.0722B$$
-<p>Adaptation follows the eye asymmetrically — fast to light, slow to dark — as an exponential
-approach with split time constants:</p>
-$$E_{t+dt} = E_t + (E_{target} - E_t)\,\big(1 - e^{-dt/\tau}\big), \qquad \tau = \begin{cases}\tau_{up} & E_{target} > E_t\\ \tau_{down} & \text{otherwise}\end{cases}$$
-<p>Exposure state lives in a storage buffer — no CPU readback stall. One node owns tone
-mapping and output color transform; grading applies <em>after</em> tone mapping through a 3D LUT:
-$c' = \operatorname{LUT}_{3D}(\operatorname{tonemap}(E\cdot L))$. Two owners of the output
-transform is the classic double-transform bug.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -265,6 +249,23 @@ targets, and <code>$threejs-visual-validation</code> for exposure/LUT regression
     <a href="threejs-image-pipeline.html">Image Pipeline →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Exposure is metered on the GPU: a compute reduction averages log-luminance over the frame
+(log so that a bright sliver doesn't dominate):</p>
+$$\bar L = \exp\!\left(\frac{1}{N}\sum_i \log\big(\epsilon + L_i\big)\right), \qquad
+L_i = 0.2126R + 0.7152G + 0.0722B$$
+<p>Adaptation follows the eye asymmetrically — fast to light, slow to dark — as an exponential
+approach with split time constants:</p>
+$$E_{t+dt} = E_t + (E_{target} - E_t)\,\big(1 - e^{-dt/\tau}\big), \qquad \tau = \begin{cases}\tau_{up} & E_{target} > E_t\\ \tau_{down} & \text{otherwise}\end{cases}$$
+<p>Exposure state lives in a storage buffer — no CPU readback stall. One node owns tone
+mapping and output color transform; grading applies <em>after</em> tone mapping through a 3D LUT:
+$c' = \operatorname{LUT}_{3D}(\operatorname{tonemap}(E\cdot L))$. Two owners of the output
+transform is the classic double-transform bug.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

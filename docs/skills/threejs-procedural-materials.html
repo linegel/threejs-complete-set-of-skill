@@ -170,28 +170,13 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Materials are authored as PBR identity fields: albedo, roughness, and normal all derive
-from shared procedural causes. Surface normals come from height derivatives —
-screen-space derivatives give filtering for free:</p>
-$$\mathbf n = \operatorname{normalize}\!\big(\mathbf n_g - \partial_x h\,\mathbf t - \partial_y h\,\mathbf b\big)$$
-<p>Specular antialiasing widens roughness where the normal field varies inside a pixel
-(Kaplanyan-style variance from derivatives), preventing distant sparkle:</p>
-$$\alpha' = \sqrt{\alpha^2 + \operatorname{clamp}\!\big(\|\partial_x \mathbf n\|^2 + \|\partial_y \mathbf n\|^2\big)}$$
-<p>Triplanar projection blends three axis-aligned samples with a sharpened weight
-$w_i = |n_i|^k / \sum |n_j|^k$, and emissive surfaces (lava) map temperature through a
-blackbody-inspired ramp so brightness lives in scene-relative HDR units, not display units.</p></div>
-  </div></div>
-
   <div class="section" id="validation"><div class="wrap">
     <h2>Validation gallery</h2>
     <p class="sub">Evidence frames produced by this skill's validation contract.</p>
     <div class="gallery">
-      <figure>
-        <img src="../generated-asset-contact-sheet.png" alt="Generated texture asset contact sheet — deterministic PNG variants" loading="lazy" />
-        <figcaption><span>Generated texture asset contact sheet — deterministic PNG variants</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../generated-asset-contact-sheet.png" alt="Procedural Materials in Three.js WebGPU — Generated texture asset contact sheet — deterministic PNG variants" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Generated texture asset contact sheet — deterministic PNG variants</span></figcaption>
       </figure>
     </div>
   </div></div>
@@ -393,6 +378,22 @@ tone mapping, or final image ownership. Use <code>$threejs-scalable-real-time-sh
     <a href="threejs-procedural-motion-systems.html">Procedural Motion Systems →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Materials are authored as PBR identity fields: albedo, roughness, and normal all derive
+from shared procedural causes. Surface normals come from height derivatives —
+screen-space derivatives give filtering for free:</p>
+$$\mathbf n = \operatorname{normalize}\!\big(\mathbf n_g - \partial_x h\,\mathbf t - \partial_y h\,\mathbf b\big)$$
+<p>Specular antialiasing widens roughness where the normal field varies inside a pixel
+(Kaplanyan-style variance from derivatives), preventing distant sparkle:</p>
+$$\alpha' = \sqrt{\alpha^2 + \operatorname{clamp}\!\big(\|\partial_x \mathbf n\|^2 + \|\partial_y \mathbf n\|^2\big)}$$
+<p>Triplanar projection blends three axis-aligned samples with a sharpened weight
+$w_i = |n_i|^k / \sum |n_j|^k$, and emissive surfaces (lava) map temperature through a
+blackbody-inspired ramp so brightness lives in scene-relative HDR units, not display units.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

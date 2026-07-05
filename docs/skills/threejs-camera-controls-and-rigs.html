@@ -170,22 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Rigs are authored dynamical systems. Follow cameras track targets through damped springs —
-critically damped so they never oscillate:</p>
-$$\ddot{\mathbf x} = \omega^2(\mathbf x_{target} - \mathbf x) - 2\zeta\omega\,\dot{\mathbf x}, \qquad \zeta = 1$$
-<p>Frame-rate independence comes from exact exponential smoothing rather than per-frame lerp:</p>
-$$\mathbf x_{t+dt} = \mathbf x_{target} + (\mathbf x_t - \mathbf x_{target})\,e^{-\lambda\,dt}$$
-<p>Orientation blends on the quaternion manifold —
-$q(t) = \operatorname{slerp}(q_0, q_1, t)$ with hemisphere correction ($q \equiv -q$) — and
-body-relative up vectors keep orbits sane on planets: $\hat{\mathbf u} = \widehat{\mathbf p - \mathbf c}$.
-At planetary scale, floating origin subtracts a world offset from every position via storage
-buffer so camera-local coordinates stay in float32-safe range
-($|\mathbf p| < 10^4$ m keeps sub-millimeter precision).</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -331,6 +315,23 @@ or bloom details, keep links to the relevant sibling <code>$threejs-...</code> s
     <a href="threejs-choose-skills.html">Three.js WebGPU/TSL Choose Skills →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Rigs are authored dynamical systems. Follow cameras track targets through damped springs —
+critically damped so they never oscillate:</p>
+$$\ddot{\mathbf x} = \omega^2(\mathbf x_{target} - \mathbf x) - 2\zeta\omega\,\dot{\mathbf x}, \qquad \zeta = 1$$
+<p>Frame-rate independence comes from exact exponential smoothing rather than per-frame lerp:</p>
+$$\mathbf x_{t+dt} = \mathbf x_{target} + (\mathbf x_t - \mathbf x_{target})\,e^{-\lambda\,dt}$$
+<p>Orientation blends on the quaternion manifold —
+$q(t) = \operatorname{slerp}(q_0, q_1, t)$ with hemisphere correction ($q \equiv -q$) — and
+body-relative up vectors keep orbits sane on planets: $\hat{\mathbf u} = \widehat{\mathbf p - \mathbf c}$.
+At planetary scale, floating origin subtracts a world offset from every position via storage
+buffer so camera-local coordinates stay in float32-safe range
+($|\mathbf p| < 10^4$ m keeps sub-millimeter precision).</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

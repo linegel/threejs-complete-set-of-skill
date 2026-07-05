@@ -170,22 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>The final image is a graph with single ownership of every shared signal. One scene pass
-publishes MRT outputs — depth, normal, albedo, emissive, velocity — and every effect consumes
-the same copies:</p>
-$$\text{pass}(scene) \Rightarrow \{D, \mathbf N, A, E, \mathbf v\} \;\to\; \text{GTAO} \to \text{bloom} \to \text{exposure} \to \text{tonemap} \to \text{LUT} \to \text{output}$$
-<p>Velocity is the derivative of the reprojection chain — current clip position against
-previous-frame clip position through both model and camera history:</p>
-$$\mathbf v = \Pi\big(V_t M_t\, \mathbf p\big) - \Pi\big(V_{t-1} M_{t-1}\, \mathbf p\big)$$
-<p>Ordering is semantic, not aesthetic: AO modulates indirect light (pre-tonemap), bloom reads
-scene-linear HDR (pre-tonemap), grading reads display-referred color (post-tonemap). The
-validator's job is to enumerate the live pass graph and assert each signal has exactly one
-producer.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -515,6 +499,23 @@ skill without loading this coordinator.</p>
     <a href="threejs-particles-trails-and-effects.html">Particles, Trails, and Effects →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>The final image is a graph with single ownership of every shared signal. One scene pass
+publishes MRT outputs — depth, normal, albedo, emissive, velocity — and every effect consumes
+the same copies:</p>
+$$\text{pass}(scene) \Rightarrow \{D, \mathbf N, A, E, \mathbf v\} \;\to\; \text{GTAO} \to \text{bloom} \to \text{exposure} \to \text{tonemap} \to \text{LUT} \to \text{output}$$
+<p>Velocity is the derivative of the reprojection chain — current clip position against
+previous-frame clip position through both model and camera history:</p>
+$$\mathbf v = \Pi\big(V_t M_t\, \mathbf p\big) - \Pi\big(V_{t-1} M_{t-1}\, \mathbf p\big)$$
+<p>Ordering is semantic, not aesthetic: AO modulates indirect light (pre-tonemap), bloom reads
+scene-linear HDR (pre-tonemap), grading reads display-referred color (post-tonemap). The
+validator's job is to enumerate the live pass graph and assert each signal has exactly one
+producer.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

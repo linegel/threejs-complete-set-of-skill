@@ -170,22 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Bloom is a camera response to bright HDR signal: energy above a threshold scatters into a
-wide kernel. The signal chain is the contract — bloom samples <em>scene-linear</em> HDR before
-tone mapping:</p>
-$$L_{bloom} = K_{blur} * \max(L_{scene} - T, 0), \qquad
-L_{final} = \operatorname{tonemap}(L_{scene} + s\,L_{bloom})$$
-<p>The blur is a mip pyramid: progressive downsample + upsample accumulation approximates a
-large Gaussian at a fraction of the cost, with radius scaling per mip level. Selective bloom
-routes emissive contribution through an MRT channel so only authored emitters glow:</p>
-$$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relative units}$$
-<p>The skill's core rule: an object's brightness hierarchy is authored in scene units
-(sun ≫ plasma ≫ LED); bloom reveals that hierarchy, it must never <em>be</em> the object.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -275,6 +259,23 @@ fixed-view pass diagnostics and GPU timing evidence.</p>
     <a href="threejs-camera-controls-and-rigs.html">Camera Controls and Rigs →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Bloom is a camera response to bright HDR signal: energy above a threshold scatters into a
+wide kernel. The signal chain is the contract — bloom samples <em>scene-linear</em> HDR before
+tone mapping:</p>
+$$L_{bloom} = K_{blur} * \max(L_{scene} - T, 0), \qquad
+L_{final} = \operatorname{tonemap}(L_{scene} + s\,L_{bloom})$$
+<p>The blur is a mip pyramid: progressive downsample + upsample accumulation approximates a
+large Gaussian at a fraction of the cost, with radius scaling per mip level. Selective bloom
+routes emissive contribution through an MRT channel so only authored emitters glow:</p>
+$$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relative units}$$
+<p>The skill's core rule: an object's brightness hierarchy is authored in scene units
+(sun ≫ plasma ≫ LED); bloom reveals that hierarchy, it must never <em>be</em> the object.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

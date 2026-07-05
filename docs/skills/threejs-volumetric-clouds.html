@@ -170,21 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Clouds are a participating medium raymarched through a weather-shaped density field. Along a
-primary ray, transmittance obeys the exponential extinction integral:</p>
-$$T(s) = \exp\!\left(-\int_0^s \sigma_t\big(\mathbf x(u)\big)\,du\right)$$
-<p>Single scattering accumulates in-scattered sunlight attenuated toward the sun at each step,
-with the Henyey–Greenstein phase function controlling forward silver-lining:</p>
-$$L = \int_0^{s_{max}} T(s)\,\sigma_s\,p(\cos\theta)\,L_{sun}(s)\,ds, \qquad
-p(\cos\theta) = \frac{1-g^2}{4\pi\,(1+g^2-2g\cos\theta)^{3/2}}$$
-<p>Temporal reconstruction spreads the march over frames: a sub-pixel jitter sequence plus
-history reprojection $H_t = \alpha\,C_t + (1-\alpha)\,H_{t-1}(\mathbf{uv} - \Delta_{\mathbf{uv}})$
-— the history fetch must be motion-warped, or the amortization degenerates to screen-space smearing.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -377,6 +362,22 @@ temporal reconstruction, cloud lighting, and cloud optical-depth shadows.</p>
     <a href="threejs-water-optics.html">Water Optics →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Clouds are a participating medium raymarched through a weather-shaped density field. Along a
+primary ray, transmittance obeys the exponential extinction integral:</p>
+$$T(s) = \exp\!\left(-\int_0^s \sigma_t\big(\mathbf x(u)\big)\,du\right)$$
+<p>Single scattering accumulates in-scattered sunlight attenuated toward the sun at each step,
+with the Henyey–Greenstein phase function controlling forward silver-lining:</p>
+$$L = \int_0^{s_{max}} T(s)\,\sigma_s\,p(\cos\theta)\,L_{sun}(s)\,ds, \qquad
+p(\cos\theta) = \frac{1-g^2}{4\pi\,(1+g^2-2g\cos\theta)^{3/2}}$$
+<p>Temporal reconstruction spreads the march over frames: a sub-pixel jitter sequence plus
+history reprojection $H_t = \alpha\,C_t + (1-\alpha)\,H_{t-1}(\mathbf{uv} - \Delta_{\mathbf{uv}})$
+— the history fetch must be motion-warped, or the amortization degenerates to screen-space smearing.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

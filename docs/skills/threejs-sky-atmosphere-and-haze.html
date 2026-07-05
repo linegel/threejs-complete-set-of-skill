@@ -170,20 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>The sky is single-scattered sunlight through an exponentially falling atmosphere. Rayleigh
-(molecules) and Mie (aerosols) contributions integrate along the view ray:</p>
-$$L(\lambda) = \int_0^{s_{atm}} T(0,s)\,\big(\beta_R(\lambda)\,p_R(\theta) + \beta_M\,p_M(\theta)\big)\,T_{sun}(s)\,ds$$
-<p>with Rayleigh scattering's $\lambda^{-4}$ law giving the blue sky and red sunsets:</p>
-$$\beta_R(\lambda) \propto \lambda^{-4}, \qquad p_R(\theta) = \tfrac{3}{16\pi}(1+\cos^2\theta)$$
-<p>The skill precomputes transmittance and scattering into LUTs by compute pass (a function of
-altitude and sun angle), then applies depth-aware aerial perspective to scene geometry:
-distant objects blend toward in-scattered airlight as
-$L' = L\,T(d) + L_{air}(d)$.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -391,6 +377,21 @@ shadows, <code>$threejs-procedural-planets</code> for planet terrain/material fi
     <a href="threejs-spectral-ocean.html">Spectral Ocean →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>The sky is single-scattered sunlight through an exponentially falling atmosphere. Rayleigh
+(molecules) and Mie (aerosols) contributions integrate along the view ray:</p>
+$$L(\lambda) = \int_0^{s_{atm}} T(0,s)\,\big(\beta_R(\lambda)\,p_R(\theta) + \beta_M\,p_M(\theta)\big)\,T_{sun}(s)\,ds$$
+<p>with Rayleigh scattering's $\lambda^{-4}$ law giving the blue sky and red sunsets:</p>
+$$\beta_R(\lambda) \propto \lambda^{-4}, \qquad p_R(\theta) = \tfrac{3}{16\pi}(1+\cos^2\theta)$$
+<p>The skill precomputes transmittance and scattering into LUTs by compute pass (a function of
+altitude and sun angle), then applies depth-aware aerial perspective to scene geometry:
+distant objects blend toward in-scattered airlight as
+$L' = L\,T(d) + L_{air}(d)$.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

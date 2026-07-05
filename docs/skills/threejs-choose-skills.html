@@ -170,20 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Routing is set-cover under a budget: given request features $R$ and skills with coverage
-sets $C_i$ and load costs $c_i$, choose the smallest set that covers the request:</p>
-$$\min_{S} \sum_{i \in S} c_i \quad \text{s.t.} \quad R \subseteq \bigcup_{i\in S} C_i$$
-<p>The router also owns the composed frame-budget constraint — a tier assignment is feasible
-only if the per-skill budgets sum inside the frame:</p>
-$$\sum_{i \in scene} b_i(t_i) \le B_{frame} = \frac{1000}{f_{target}}\;\text{ms}$$
-<p>Preflight is a contract, not advice: it names the selected skills, the signal owners
-(depth, tone map, output transform), and the tier assignment before any code is written —
-so composition conflicts surface at plan time instead of debug time.</p></div>
-  </div></div>
-
 
 
 <div class="section" id="skill-text"><div class="wrap">
@@ -851,6 +837,21 @@ MRT signal owner, not a second outline graph.</li>
     <a href="threejs-compatibility-fallbacks.html">Three.js Compatibility Fallbacks →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Routing is set-cover under a budget: given request features $R$ and skills with coverage
+sets $C_i$ and load costs $c_i$, choose the smallest set that covers the request:</p>
+$$\min_{S} \sum_{i \in S} c_i \quad \text{s.t.} \quad R \subseteq \bigcup_{i\in S} C_i$$
+<p>The router also owns the composed frame-budget constraint — a tier assignment is feasible
+only if the per-skill budgets sum inside the frame:</p>
+$$\sum_{i \in scene} b_i(t_i) \le B_{frame} = \frac{1000}{f_{target}}\;\text{ms}$$
+<p>Preflight is a contract, not advice: it names the selected skills, the signal owners
+(depth, tone map, output transform), and the tier assignment before any code is written —
+so composition conflicts surface at plan time instead of debug time.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

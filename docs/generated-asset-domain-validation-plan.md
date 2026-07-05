@@ -182,8 +182,9 @@ The README must say:
 Current pass:
 
 - README catalog and contact sheet are present.
-- README marks water caustic fields, rain ripple normals, and planet crater
-  masks as screenshot-backed domain-covered families.
+- README marks water caustic fields, directional wave seeds, rain ripple
+  normals, and planet crater masks as screenshot-backed domain-covered
+  families.
 
 ## Shared Validator Architecture
 
@@ -220,15 +221,14 @@ All validators should reuse the visual-validation harness schema where possible:
 ## Skill Order
 
 The work should proceed from highest risk of misleading validation to lower
-risk. Water optics is complete; the remaining order is:
+risk. Water optics and spectral ocean are complete; the remaining order is:
 
-1. `threejs-spectral-ocean` directional wave seeds
-2. `threejs-volumetric-clouds` weather maps
-3. `threejs-dynamic-surface-effects` frost crystal maps
-4. `threejs-procedural-materials` lava cause maps
-5. `threejs-procedural-vegetation` meadow density masks
-6. `threejs-black-holes-and-space-effects` starfield tiles
-7. `threejs-procedural-fields` biome field maps
+1. `threejs-volumetric-clouds` weather maps
+2. `threejs-dynamic-surface-effects` frost crystal maps
+3. `threejs-procedural-materials` lava cause maps
+4. `threejs-procedural-vegetation` meadow density masks
+5. `threejs-black-holes-and-space-effects` starfield tiles
+6. `threejs-procedural-fields` biome field maps
 
 ## Per-Skill Plans
 
@@ -287,6 +287,13 @@ Acceptance metrics:
 - no color-space misuse.
 
 ### 2. Spectral Ocean: Directional Wave Seeds
+
+Status: complete. Validator:
+`threejs-spectral-ocean/examples/webgpu-fft-ocean/validate-generated-wave-seeds.mjs`.
+Evidence:
+`artifacts/visual-validation/ocean-generated-wave-seeds/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/ocean-generated-wave-seeds/`.
 
 Skill promise:
 

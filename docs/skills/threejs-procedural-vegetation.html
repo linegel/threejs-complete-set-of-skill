@@ -170,21 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Trees grow by recursive branching with authored distributions: each child branch takes a
-fraction of parent length and radius following the pipe-model area law:</p>
-$$r_{parent}^{\,\eta} = \sum_i r_{child,i}^{\,\eta}, \qquad \eta \approx 2\text{–}3$$
-<p>Wind is rooted: displacement grows from anchor to tip so plants bend instead of sliding.
-A branch point at normalized height $u$ sways as</p>
-$$\Delta \mathbf x(u, t) = u^2\, A\, \big(\sin(\omega t + \phi_{plant}) + n(t)\big)\,\hat{\mathbf w}$$
-<p>with per-plant phase from a position hash so a meadow never moves in lockstep. Grass runs as
-compute-updated instances; chunked LOD swaps blade geometry for cards by distance band, with
-the density field shared between placement (CPU) and shading (GPU) under the field-parity
-contract.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -285,7 +270,7 @@ route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead 
 a second path here.</p>
 <h2>Dense Grass Build Order</h2>
 <ol>
-<li>Choose patch size from culling, not from texture dimensions. A good default is 16-32 m patches with 8-20 k blades each; keep one <code>InstancedMesh</code> or batched draw per visible LOD band.</li>
+<li>Choose patch size from culling, not from texture dimensions. A good default is 16-32 m patches with 8-20 k blades each; keep one <code>InstancedMesh</code> per patch per LOD representation, and budget submitted draw objects as <code>visibleDraws = drawObjectsPerPatch * visiblePatches</code>.</li>
 <li>Allocate static storage attributes: origin/height/width/facing/bend, clump id/density/species, color variation, terrain normal, and packed material flags. Prefer 16-byte alignment and pack half-precision-like ranges into normalized fields when visual error is below one pixel.</li>
 <li>Run one initialization dispatch per chunk with <code>Fn().compute(count)</code> and deterministic hash seeds. Write to <code>StorageInstancedBufferAttribute</code> via <code>storage()</code> nodes or use <code>instancedArray()</code> then <code>toAttribute()</code> for render consumption.</li>
 <li>Use the same terrain field, density mask, path mask, and clump field for placement, material variation, and LOD thresholds. Do not let visual color clumps drift from density clumps.</li>
@@ -295,6 +280,41 @@ a second path here.</p>
 <li>Transition to impostors by patch, not by individual blade. Cross-fade density or alpha hash over a short distance band and keep shadow density matched to visible density.</li>
 </ol>
 <p>Use <code>renderer.compute()</code> when dispatch order can stay inside the frame graph; use <code>renderer.computeAsync()</code> for explicit initialization, streaming chunk generation, readback-free validation steps, or when the app needs a promise boundary.</p>
+<p>Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In <code>examples/webgpu-dense-grass/dense-grass-system.js</code>, each patch owns one blade <code>InstancedMesh</code> and one impostor-card <code>InstancedMesh</code>; <code>getStats().drawObjectsPerPatch</code> reports <code>2</code>, and <code>validateDenseGrassConfig()</code> uses <code>visibleDrawObjectCeiling = patchCount * 2</code>. Derive patch count as <code>visiblePatchesWorst = (2 * patchGridRadius + 1)^2</code>. The ultra preset comment cites <code>81</code> patches, <code>1.46M</code> visible blades, and <code>2</code> draw objects per visible patch; the high preset comment cites <code>49</code> patches, <code>588k</code> visible blades, and <code>2-12</code> submitted patch draws typical after frustum culling.</p>
+<table>
+<thead>
+<tr>
+<th>Preset</th>
+<th>Source parameters</th>
+<th align="right">Worst visible patches</th>
+<th align="right">Worst submitted draw objects</th>
+<th align="right">Allocated blades</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ultra</td>
+<td><code>patchGridRadius = 4</code>, <code>drawObjectsPerPatch = 2</code>, <code>bladesPerPatch = 18000</code></td>
+<td align="right"><code>(2 * 4 + 1)^2 = 81</code></td>
+<td align="right"><code>2 * 81 = 162</code></td>
+<td align="right"><code>81 * 18000 = 1458000</code></td>
+</tr>
+<tr>
+<td>High</td>
+<td><code>patchGridRadius = 3</code>, <code>drawObjectsPerPatch = 2</code>, <code>bladesPerPatch = 12000</code></td>
+<td align="right"><code>(2 * 3 + 1)^2 = 49</code></td>
+<td align="right"><code>2 * 49 = 98</code></td>
+<td align="right"><code>49 * 12000 = 588000</code></td>
+</tr>
+<tr>
+<td>Default runtime options</td>
+<td><code>normalizeOptions({})</code> selects <code>high</code></td>
+<td align="right"><code>(2 * 3 + 1)^2 = 49</code></td>
+<td align="right"><code>2 * 49 = 98</code></td>
+<td align="right"><code>49 * 12000 = 588000</code></td>
+</tr>
+</tbody></table>
+<h2>Creature Composition</h2>
+<p>Vegetation owns the wind field as an authored procedural field in the sense of <code>$threejs-procedural-fields</code>; creatures sample that same field for fur, feather, cloth, or antenna response, so there is no second wind system with an independent phase. For trampling, creature stance events must write world-space contact positions, radii, weights, and decay into the same touch/interaction channel consumed by grass displacement. The current WebGPU dense-grass example exposes wind uniforms and static density storage but no local trampling displacement channel, so this is a future contract: add a dynamic touch texture or compact storage buffer, sample it in the blade position node, and leave static blade storage immutable.</p>
 <h2>r185 Add-On Import Paths</h2>
 <p>Use these exact add-on paths when vegetation needs built-in post or shadow helpers:</p>
 <table>
@@ -357,7 +377,7 @@ a second path here.</p>
 <th align="right">Chunks submitted</th>
 <th align="right">Init compute</th>
 <th align="right">Per-frame compute</th>
-<th align="right">Draw calls</th>
+<th align="right">Submitted draw objects</th>
 <th align="right">Post budget</th>
 </tr>
 </thead>
@@ -367,7 +387,7 @@ a second path here.</p>
 <td align="right">64-128</td>
 <td align="right">under 8 ms per streamed region</td>
 <td align="right">under 0.8 ms</td>
-<td align="right">8-24</td>
+<td align="right"><code>2 * visiblePatches</code>; ultra worst <code>2 * 81 = 162</code></td>
 <td align="right">under 2.0 ms</td>
 </tr>
 <tr>
@@ -376,7 +396,7 @@ a second path here.</p>
 <td align="right">24-64</td>
 <td align="right">under 12 ms per streamed region</td>
 <td align="right">under 0.5 ms</td>
-<td align="right">4-16</td>
+<td align="right"><code>2 * visiblePatches</code>; high/default worst <code>2 * 49 = 98</code>; typical <code>2-12</code> after culling</td>
 <td align="right">under 1.2 ms</td>
 </tr>
 <tr>
@@ -385,7 +405,7 @@ a second path here.</p>
 <td align="right">8-32</td>
 <td align="right">amortized over frames</td>
 <td align="right">under 0.25 ms</td>
-<td align="right">2-8</td>
+<td align="right"><code>2 * visiblePatches</code>; derive worst from preset radius</td>
 <td align="right">under 0.8 ms</td>
 </tr>
 </tbody></table>
@@ -421,6 +441,22 @@ a second path here.</p>
     <a href="threejs-rain-snow-and-wet-surfaces.html">Rain, Snow, and Wet Surfaces →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Trees grow by recursive branching with authored distributions: each child branch takes a
+fraction of parent length and radius following the pipe-model area law:</p>
+$$r_{parent}^{\,\eta} = \sum_i r_{child,i}^{\,\eta}, \qquad \eta \approx 2\text{–}3$$
+<p>Wind is rooted: displacement grows from anchor to tip so plants bend instead of sliding.
+A branch point at normalized height $u$ sways as</p>
+$$\Delta \mathbf x(u, t) = u^2\, A\, \big(\sin(\omega t + \phi_{plant}) + n(t)\big)\,\hat{\mathbf w}$$
+<p>with per-plant phase from a position hash so a meadow never moves in lockstep. Grass runs as
+compute-updated instances; chunked LOD swaps blade geometry for cards by distance band, with
+the density field shared between placement (CPU) and shading (GPU) under the field-parity
+contract.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

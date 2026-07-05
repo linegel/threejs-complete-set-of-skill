@@ -170,25 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>The ocean surface is synthesized in the frequency domain (Tessendorf). A directional
-spectrum seeds complex amplitudes, which are evolved analytically and inverse-FFT'd per frame:</p>
-$$\tilde h(\mathbf k, t) = \tilde h_0(\mathbf k)\,e^{i\omega(k)t} + \tilde h_0^*(-\mathbf k)\,e^{-i\omega(k)t}$$
-<p>The conjugate pairing enforces $\tilde h(-\mathbf k,t) = \tilde h^*(\mathbf k,t)$, so the
-spatial height field is real. Dispersion uses the finite-depth gravity–capillary relation —
-the capillary term matters at the top of the finest cascade:</p>
-$$\omega^2 = \left(gk + \tfrac{\sigma}{\rho}k^3\right)\tanh(kh)$$
-<p>Choppy displacement is the horizontal gradient field
-$\hat{\mathbf D}(\mathbf k) = i\,(\mathbf k/k)\,\hat h(\mathbf k)$; whitecaps trigger where the
-deformation Jacobian folds the surface:</p>
-$$J = (1+\lambda\,\partial_x D_x)(1+\lambda\,\partial_z D_z) - (\lambda\,\partial_x D_z)^2 \;<\; J_{\min}$$
-<p>Because $\mathbf D$ derives from one scalar spectrum, $\partial_z D_x \equiv \partial_x D_z$ and the
-single cross term is exact. Multiple cascades cover wavelength bands with half-open masks
-$[k_{lo}, k_{hi})$ to avoid double-counting energy at handoffs.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -267,6 +248,26 @@ apply fallback when WebGPU is unavailable, route that teaching to
 <li>Share sun, sky, exposure, and output-conversion ownership across the sky, ocean reflection, underwater path, and post pipeline.</li>
 <li>Keep fixed seeds, fixed camera captures, no-post baselines, and GPU timing history for comparisons.</li>
 </ul>
+<h2>Cross-Skill Water Height Contract</h2>
+<p>When another skill needs water coupling, expose a CPU-evaluable query of the
+same authored cause rather than reading back the GPU simulation. The interface
+shape is:</p>
+<pre><code class="language-js">const sampler = createCpuWaterHeightSampler(oceanConfig);
+const y = sampler.getWaterHeight(x, z, timeSeconds);
+const parity = sampler.estimateTruncationError();
+</code></pre>
+<p>This is a one-way provider contract. The water provider carries the parity
+obligation; consumers treat <code>getWaterHeight(x, z, t)</code> as authoritative and do
+not perform GPU readback. For the canonical FFT ocean, the CPU query is a
+dominant-bin truncation of the same seeded spectrum and dispersion relation as
+the WebGPU kernels. Its error bound is the omitted coefficient budget:</p>
+<pre><code class="language-text">|height_full - height_truncated| &lt;= sum_{omitted bins} (|h0(k)| + |h0(-k)|)
+</code></pre>
+<p>Validators must compare the truncated query against a full pure-JS spectral
+mirror at fixed probe points/times and assert the measured error is within the
+reported bound plus numerical epsilon. Use this pattern for cross-skill
+interfaces: CPU-evaluable query of the same authored cause, stated parity
+error, one-way consumer, no hot-path readback.</p>
 <h2>Budgets</h2>
 <ul>
 <li>High desktop discrete: <code>512^2</code>, 3 cascades, 4 packed complex fields per cascade, about <code>3 * (8 evolve + 4 * 2 * log2(N) FFT + 4 assemble/history)</code> compute dispatch groups, about 102 MiB ocean storage with a 104 MiB tier gate, target 2.5-4.0 ms simulation and 1.5-3.0 ms ocean shading/post at 1440p.</li>
@@ -296,6 +297,26 @@ apply fallback when WebGPU is unavailable, route that teaching to
     <a href="threejs-visual-validation.html">Visual Validation →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>The ocean surface is synthesized in the frequency domain (Tessendorf). A directional
+spectrum seeds complex amplitudes, which are evolved analytically and inverse-FFT'd per frame:</p>
+$$\tilde h(\mathbf k, t) = \tilde h_0(\mathbf k)\,e^{i\omega(k)t} + \tilde h_0^*(-\mathbf k)\,e^{-i\omega(k)t}$$
+<p>The conjugate pairing enforces $\tilde h(-\mathbf k,t) = \tilde h^*(\mathbf k,t)$, so the
+spatial height field is real. Dispersion uses the finite-depth gravity–capillary relation —
+the capillary term matters at the top of the finest cascade:</p>
+$$\omega^2 = \left(gk + \tfrac{\sigma}{\rho}k^3\right)\tanh(kh)$$
+<p>Choppy displacement is the horizontal gradient field
+$\hat{\mathbf D}(\mathbf k) = i\,(\mathbf k/k)\,\hat h(\mathbf k)$; whitecaps trigger where the
+deformation Jacobian folds the surface:</p>
+$$J = (1+\lambda\,\partial_x D_x)(1+\lambda\,\partial_z D_z) - (\lambda\,\partial_x D_z)^2 \;<\; J_{\min}$$
+<p>Because $\mathbf D$ derives from one scalar spectrum, $\partial_z D_x \equiv \partial_x D_z$ and the
+single cross term is exact. Multiple cascades cover wavelength bands with half-open masks
+$[k_{lo}, k_{hi})$ to avoid double-counting energy at handoffs.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

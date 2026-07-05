@@ -170,19 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Fallback planning is explicit tier design, not silent degradation. Capability detection
-partitions devices into tiers, and each tier gets an authored (not merely reduced) target:</p>
-$$\text{tier} = f(\text{WebGPU}, \text{limits}, \text{bandwidth}) \in \{T_0, T_1, T_2\}$$
-<p>Cost scaling estimates how a pass responds to resolution and step count —
-raymarch cost scales as $O(N_{px}\cdot S)$, so half resolution plus half steps is a
-$4\times$ reduction that must be re-validated visually, never assumed. The skill's rule:
-a fallback is a smaller <em>authored</em> scene with its own validation contract, and tier
-switching is a hard gate (fail loudly), never a silent downgrade mid-session.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -331,6 +318,20 @@ cadence, screenshot names, and metric thresholds per tier;</li>
     <a href="threejs-dynamic-surface-effects.html">Dynamic Surface Effects →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Fallback planning is explicit tier design, not silent degradation. Capability detection
+partitions devices into tiers, and each tier gets an authored (not merely reduced) target:</p>
+$$\text{tier} = f(\text{WebGPU}, \text{limits}, \text{bandwidth}) \in \{T_0, T_1, T_2\}$$
+<p>Cost scaling estimates how a pass responds to resolution and step count —
+raymarch cost scales as $O(N_{px}\cdot S)$, so half resolution plus half steps is a
+$4\times$ reduction that must be re-validated visually, never assumed. The skill's rule:
+a fallback is a smaller <em>authored</em> scene with its own validation contract, and tier
+switching is a hard gate (fail loudly), never a silent downgrade mid-session.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

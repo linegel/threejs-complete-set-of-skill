@@ -170,41 +170,25 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Validation treats an image as a claim to be falsified. A fixed-view contract pins camera,
-seed, resolution, and time; comparison is perceptual error against a stored baseline:</p>
-$$E = \operatorname{quantile}_{0.99}\big(\Delta E_{pixel}\big) < \tau, \qquad
-\text{plus } \max_{region} \bar\Delta E < \tau_{region}$$
-<p>Determinism is tested by seed sweeps ($F(seed_1) \ne F(seed_2)$, but $F(seed_1)$ twice is
-byte-identical) and temporal pairs ($t_0, t_1$ frames must differ where motion exists, match
-where it doesn't). Performance claims bind to measurements:</p>
-$$\operatorname{median}_{30\,frames}(t_{GPU,pass}) \le b_{pass} \quad\text{for every budgeted pass}$$
-<p>The no-post baseline isolates cause from grade: every effect must be visible with
-post-processing off, or the effect is the post. Evidence ships as a stable JSON+PNG bundle —
-capability manifest, renderer.info counters, per-pass timings — so regressions diff cleanly.</p></div>
-  </div></div>
-
   <div class="section" id="validation"><div class="wrap">
     <h2>Validation gallery</h2>
     <p class="sub">Evidence frames produced by this skill's validation contract.</p>
     <div class="gallery">
-      <figure>
-        <img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Planet diagnostics — per-signal passes" loading="lazy" />
-        <figcaption><span>Planet diagnostics — per-signal passes</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Visual Validation in Three.js WebGPU — Planet diagnostics — per-signal passes" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Planet diagnostics — per-signal passes</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Water diagnostics — effect isolation" loading="lazy" />
-        <figcaption><span>Water diagnostics — effect isolation</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Visual Validation in Three.js WebGPU — Water diagnostics — effect isolation" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Water diagnostics — effect isolation</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/planet-generated-craters/seed-stress.final.png" alt="Seed-stress sweep frame" loading="lazy" />
-        <figcaption><span>Seed-stress sweep frame</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/planet-generated-craters/seed-stress.final.png" alt="Visual Validation in Three.js WebGPU — Seed-stress sweep frame" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Seed-stress sweep frame</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/water-generated-caustics/temporal.t001.png" alt="Temporal pair frame" loading="lazy" />
-        <figcaption><span>Temporal pair frame</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/temporal.t001.png" alt="Visual Validation in Three.js WebGPU — Temporal pair frame" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Temporal pair frame</span></figcaption>
       </figure>
     </div>
   </div></div>
@@ -441,6 +425,23 @@ protocol to decide whether the result is acceptable.</p>
     <a href="threejs-volumetric-clouds.html">Volumetric Clouds →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Validation treats an image as a claim to be falsified. A fixed-view contract pins camera,
+seed, resolution, and time; comparison is perceptual error against a stored baseline:</p>
+$$E = \operatorname{quantile}_{0.99}\big(\Delta E_{pixel}\big) < \tau, \qquad
+\text{plus } \max_{region} \bar\Delta E < \tau_{region}$$
+<p>Determinism is tested by seed sweeps ($F(seed_1) \ne F(seed_2)$, but $F(seed_1)$ twice is
+byte-identical) and temporal pairs ($t_0, t_1$ frames must differ where motion exists, match
+where it doesn't). Performance claims bind to measurements:</p>
+$$\operatorname{median}_{30\,frames}(t_{GPU,pass}) \le b_{pass} \quad\text{for every budgeted pass}$$
+<p>The no-post baseline isolates cause from grade: every effect must be visible with
+post-processing off, or the effect is the post. Evidence ships as a stable JSON+PNG bundle —
+capability manifest, renderer.info counters, per-pass timings — so regressions diff cleanly.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

@@ -170,36 +170,21 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Weather is one envelope driving many systems: precipitation intensity $\rho_w \in [0,1]$
-feeds particles, accumulation, and surface response so they can never disagree. Falling
-particles integrate gravity with terminal velocity and wind:</p>
-$$\mathbf v_{t+dt} = \mathbf v_t + \big(\mathbf g - k\,\mathbf v_t + \mathbf w(t)\big)\,dt$$
-<p>Wetness darkens albedo and sharpens specular response — a wet material interpolates:</p>
-$$\alpha' = \operatorname{lerp}(\alpha, \alpha_{wet}, w), \qquad
-c' = c\,(1 - 0.3\,w), \qquad F_0' = \operatorname{lerp}(F_0, 0.02\text{–}0.04, w_{film})$$
-<p>Snow accumulates by up-facing exposure $s = \operatorname{smoothstep}(c_0, c_1, \mathbf n\cdot\hat{\mathbf u})\cdot\rho_s$,
-and puddles fill height-field basins from the bottom up. Ripple normals advance phase per
-ring: $h(r,t) = A\,e^{-\gamma t}\cos(kr - \omega t)$, baked or generated as normal variants.</p></div>
-  </div></div>
-
   <div class="section" id="validation"><div class="wrap">
     <h2>Validation gallery</h2>
     <p class="sub">Evidence frames produced by this skill's validation contract.</p>
     <div class="gallery">
-      <figure>
-        <img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Final design frame — wet surface with generated ripples" loading="lazy" />
-        <figcaption><span>Final design frame — wet surface with generated ripples</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Final design frame — wet surface with generated ripples" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Final design frame — wet surface with generated ripples</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/rain-generated-ripples/no-post.design.png" alt="No-post baseline" loading="lazy" />
-        <figcaption><span>No-post baseline</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/rain-generated-ripples/no-post.design.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — No-post baseline" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>No-post baseline</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Diagnostics mosaic" loading="lazy" />
-        <figcaption><span>Diagnostics mosaic</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Diagnostics mosaic" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Diagnostics mosaic</span></figcaption>
       </figure>
     </div>
   </div></div>
@@ -404,6 +389,22 @@ precipitation events and the surfaces they visibly alter.</p>
     <a href="threejs-scalable-real-time-shadows.html">Scalable Real-Time Shadows →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Weather is one envelope driving many systems: precipitation intensity $\rho_w \in [0,1]$
+feeds particles, accumulation, and surface response so they can never disagree. Falling
+particles integrate gravity with terminal velocity and wind:</p>
+$$\mathbf v_{t+dt} = \mathbf v_t + \big(\mathbf g - k\,\mathbf v_t + \mathbf w(t)\big)\,dt$$
+<p>Wetness darkens albedo and sharpens specular response — a wet material interpolates:</p>
+$$\alpha' = \operatorname{lerp}(\alpha, \alpha_{wet}, w), \qquad
+c' = c\,(1 - 0.3\,w), \qquad F_0' = \operatorname{lerp}(F_0, 0.02\text{–}0.04, w_{film})$$
+<p>Snow accumulates by up-facing exposure $s = \operatorname{smoothstep}(c_0, c_1, \mathbf n\cdot\hat{\mathbf u})\cdot\rho_s$,
+and puddles fill height-field basins from the bottom up. Ripple normals advance phase per
+ring: $h(r,t) = A\,e^{-\gamma t}\cos(kr - \omega t)$, baked or generated as normal variants.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

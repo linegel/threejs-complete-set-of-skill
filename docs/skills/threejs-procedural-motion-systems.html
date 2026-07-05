@@ -170,23 +170,6 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Motion is simulated at a fixed timestep and rendered by interpolation — determinism and
-frame-rate independence by construction:</p>
-$$\mathbf x_{render} = \operatorname{lerp}(\mathbf x_{n-1}, \mathbf x_n, \alpha), \qquad
-\alpha = \frac{t_{acc}}{\Delta t_{fixed}}$$
-<p>Launch kinematics integrate thrust minus gravity with mass depletion (Tsiolkovsky in the
-limit), gravity turns pitch along the velocity vector:</p>
-$$\Delta v = v_e \ln\frac{m_0}{m_1}, \qquad
-\ddot{\mathbf x} = \frac{T(t)}{m(t)}\,\hat{\mathbf d}(t) - \frac{\mu}{r^2}\hat{\mathbf r}$$
-<p>Spring-follow responses use the exact exponential form $e^{-\lambda dt}$ (never bare lerp
-factors), rotating-frame alignment works in the target's frame via quaternion decomposition,
-and docking approaches decompose relative state into closing speed along the port axis plus
-lateral error — each channel driven to zero by its own critically damped controller.</p></div>
-  </div></div>
-
 
   <div class="section" id="examples"><div class="wrap">
     <h2>Runnable examples</h2>
@@ -372,6 +355,24 @@ or effect pooling rather than object transform motion.</p>
     <a href="threejs-procedural-planets.html">Procedural Planets →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Motion is simulated at a fixed timestep and rendered by interpolation — determinism and
+frame-rate independence by construction:</p>
+$$\mathbf x_{render} = \operatorname{lerp}(\mathbf x_{n-1}, \mathbf x_n, \alpha), \qquad
+\alpha = \frac{t_{acc}}{\Delta t_{fixed}}$$
+<p>Launch kinematics integrate thrust minus gravity with mass depletion (Tsiolkovsky in the
+limit), gravity turns pitch along the velocity vector:</p>
+$$\Delta v = v_e \ln\frac{m_0}{m_1}, \qquad
+\ddot{\mathbf x} = \frac{T(t)}{m(t)}\,\hat{\mathbf d}(t) - \frac{\mu}{r^2}\hat{\mathbf r}$$
+<p>Spring-follow responses use the exact exponential form $e^{-\lambda dt}$ (never bare lerp
+factors), rotating-frame alignment works in the target's frame via quaternion decomposition,
+and docking approaches decompose relative state into closing speed along the port axis plus
+lateral error — each channel driven to zero by its own critically damped controller.</p></div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>

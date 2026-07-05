@@ -170,41 +170,25 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 </header>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Bounded water couples a compute heightfield with physically-grounded shading. The simulation
-integrates the damped wave equation on a storage-texture ping-pong:</p>
-$$\frac{\partial^2 h}{\partial t^2} = c^2 \nabla^2 h - \beta\,\frac{\partial h}{\partial t}$$
-<p>Underwater light follows Beer–Lambert absorption along the refracted path length $d$,
-per RGB channel (red dies first):</p>
-$$L(d) = L_0\, e^{-\sigma_a d}, \qquad \sigma_a = (\sigma_r, \sigma_g, \sigma_b)$$
-<p>Caustics come from the differential-area ratio of a refracted beam — brightness is the inverse
-Jacobian of the ray-footprint map, and Fresnel splits reflection/refraction by angle
-(Schlick approximation):</p>
-$$I_c \propto \left|\det \frac{\partial \mathbf x_{floor}}{\partial \mathbf x_{surface}}\right|^{-1},
-\qquad F(\theta) = F_0 + (1-F_0)(1-\cos\theta)^5$$</div>
-  </div></div>
-
   <div class="section" id="validation"><div class="wrap">
     <h2>Validation gallery</h2>
     <p class="sub">Evidence frames produced by this skill's validation contract.</p>
     <div class="gallery">
-      <figure>
-        <img src="../visual-validation/water-generated-caustics/final.design.png" alt="Final design frame — generated caustics" loading="lazy" />
-        <figcaption><span>Final design frame — generated caustics</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/final.design.png" alt="Water Optics in Three.js WebGPU — Final design frame — generated caustics" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Final design frame — generated caustics</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/water-generated-caustics/no-post.design.png" alt="No-post baseline" loading="lazy" />
-        <figcaption><span>No-post baseline</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/no-post.design.png" alt="Water Optics in Three.js WebGPU — No-post baseline" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>No-post baseline</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Effect-isolation diagnostics mosaic" loading="lazy" />
-        <figcaption><span>Effect-isolation diagnostics mosaic</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Water Optics in Three.js WebGPU — Effect-isolation diagnostics mosaic" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Effect-isolation diagnostics mosaic</span></figcaption>
       </figure>
-      <figure>
-        <img src="../visual-validation/water-generated-caustics/camera.near.png" alt="Near camera probe" loading="lazy" />
-        <figcaption><span>Near camera probe</span></figcaption>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/camera.near.png" alt="Water Optics in Three.js WebGPU — Near camera probe" itemprop="contentUrl" loading="lazy" />
+        <figcaption itemprop="caption"><span>Near camera probe</span></figcaption>
       </figure>
     </div>
   </div></div>
@@ -257,7 +241,16 @@ same compute chain.</li>
 diagnostics.</li>
 <li>Evaluate authored multi-wave displacement and analytic normals once as TSL
 functions shared by vertex displacement, lighting normals, crest metrics,
-foam, CPU-side camera clearance approximations, and debug views.</li>
+foam, CPU-side camera clearance approximations, and debug views.
+Export the CPU coupling shape for the analytic component:
+<code>getWaterHeight(x, z, timeSeconds)</code>. This CPU evaluator imports the same
+<code>AUTHORED_WAVES</code> list used by the TSL displacement path and has zero
+analytic parity error. The compute <code>StorageTexture</code> heightfield residual is
+not read back; its coupling gap is bounded by the declared impulse budget
+<code>dropStrength + objectDisplacementScale</code> in
+<code>examples/webgpu-bounded-water/constants.js</code> and the
+<code>estimateWaterVerticalAmplitude()</code> mesh-bounds calculation in
+<code>examples/webgpu-bounded-water/webgpu-bounded-water.js</code>.</li>
 <li>Composite the water through a <code>RenderPipeline</code>: use <code>pass()</code>, <code>mrt()</code> where
 the scene needs shared color/depth/normal data, <code>PassNode.setResolutionScale()</code>
 for reduced-resolution effects, and one final <code>outputColorTransform</code> or
@@ -412,6 +405,23 @@ caustics, pool-volume optical cues, and bounded-water optics.</p>
     <a href="threejs-ambient-contact-shading.html">Ambient Contact Shading →</a>
   </div>
 </div></div>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Bounded water couples a compute heightfield with physically-grounded shading. The simulation
+integrates the damped wave equation on a storage-texture ping-pong:</p>
+$$\frac{\partial^2 h}{\partial t^2} = c^2 \nabla^2 h - \beta\,\frac{\partial h}{\partial t}$$
+<p>Underwater light follows Beer–Lambert absorption along the refracted path length $d$,
+per RGB channel (red dies first):</p>
+$$L(d) = L_0\, e^{-\sigma_a d}, \qquad \sigma_a = (\sigma_r, \sigma_g, \sigma_b)$$
+<p>Caustics come from the differential-area ratio of a refracted beam — brightness is the inverse
+Jacobian of the ray-footprint map, and Fresnel splits reflection/refraction by angle
+(Schlick approximation):</p>
+$$I_c \propto \left|\det \frac{\partial \mathbf x_{floor}}{\partial \mathbf x_{surface}}\right|^{-1},
+\qquad F(\theta) = F_0 + (1-F_0)(1-\cos\theta)^5$$</div>
+  </div></div>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
