@@ -311,7 +311,6 @@ const DEMOS = {
     variants: [
       ["caustic-field-a", asset("caustic-field-a.png")],
       ["caustic-field-b", asset("caustic-field-b.png")],
-      ["caustic-field-c", asset("caustic-field-c.png")],
     ],
     modes: [
       ["final", "Final"],
