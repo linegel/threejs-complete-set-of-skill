@@ -100,11 +100,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17p
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
 nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
 nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
 nav .links a:hover{color:var(--amber)}
-h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
@@ -126,27 +126,35 @@ code{font-family:var(--mono)}
 figure{background:var(--bg2);border:1px solid var(--line)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
-figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
+.skill-hero .wrap{position:relative;z-index:2}
+.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.46;filter:saturate(1.08) contrast(1.04)}
+.skill-hero:before{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
+  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
 .crumbs a:hover{color:var(--amber)}
-h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
-a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
+  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
+a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
+a.chip:active{transform:scale(.96)}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
 .science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
 .science .katex{font-size:1.05em;color:var(--ink)}
 .skilltext{max-width:78ch}
-.skilltext h1{display:none}
+.skilltext>h2:first-child{display:none}
 .skilltext h2{font-size:26px;margin:44px 0 14px}
 .skilltext h3{font-size:20px;margin:32px 0 10px}
 .skilltext p,.skilltext li{color:var(--dim);font-size:16px}
@@ -180,6 +188,11 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 .live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
+@media (max-width:720px){
+  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero-bg{opacity:.3}
+  .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
+}
 </style>
 </head>
 <body>
@@ -188,18 +201,21 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div>
 
-<header class="wrap">
-  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Vegetation</p>
-  <h1>Procedural Vegetation</h1>
-  <p class="lede">Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.</p>
-  <div class="meta-row">
-    <span class="chip a">$threejs-procedural-vegetation</span>
-    <span class="chip">1 browser demo</span>
-    <span class="chip">5 runnable examples</span>
-    <span class="chip">Latest skill update <time datetime="2026-07-05T05:30:33+03:00">2026-07-05</time></span>
+<header class="skill-hero">
+  <img class="skill-hero-bg" src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Procedural Vegetation validation preview" fetchpriority="high" decoding="async" />
+  <div class="wrap">
+    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Vegetation</p>
+    <h1>Procedural Vegetation</h1>
+    <p class="lede">Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.</p>
+    <div class="meta-row">
+      <span class="chip a">$threejs-procedural-vegetation</span>
+      <span class="chip">1 browser demo</span>
+      <span class="chip">5 runnable examples</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-05T05:30:33+03:00">2026-07-05</time></span>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3dcde64d2d817e9e74080ee4e2e002e7c1206283">commit 3dcde64 ↗</a>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md">SKILL.md on GitHub ↗</a>
-    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-vegetation/SKILL.md">raw (for agents) ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-vegetation/SKILL.md">raw (for agents) ↗</a>
+    </div>
   </div>
 </header>
 
@@ -268,7 +284,7 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
   <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h1>Procedural Vegetation</h1>
+  <div class="skilltext"><h2>Procedural Vegetation</h2>
 <p>Use this skill for vegetation that has botanical structure and scale discipline: dense grass, authored meadows, deciduous trees, recursive branches, roots, canopies, leaf cards, trellises, deterministic species variation, and rooted wind. Start every implementation with <code>$threejs-choose-skills</code> when the scene also needs atmosphere, terrain, water, shadows, post, or camera doctrine.</p>
 <p>The only taught implementation path is latest Three.js <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, <code>NodeMaterial</code> subclasses, node render pipelines, and compute/storage data. Legacy WebGL implementation (deprecated, do not extend): <code>examples/stylized-meadow-grass/grass-system.js</code>, <code>examples/gpu-computed-grass/gpu-grass-system.js</code>.</p>
 <p>Canonical WebGPU dense-grass example: <code>examples/webgpu-dense-grass/</code>.</p>

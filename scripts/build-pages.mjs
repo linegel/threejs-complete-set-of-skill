@@ -144,6 +144,18 @@ const latestSkillUpdate = (slug) => {
   }
 };
 
+const hasTrackedFiles = (relativePath) => {
+  try {
+    return execFileSync('git', ['ls-files', '--', relativePath], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim().length > 0;
+  } catch {
+    return true;
+  }
+};
+
 const skills = {};
 for (const d of readdirSync(root)) {
   const p = join(root, d, 'SKILL.md');
@@ -154,7 +166,9 @@ for (const d of readdirSync(root)) {
   const body = t.replace(/^---\n[\s\S]*?\n---\n/, '');
   const title = (t.split('\n').find((l) => l.startsWith('# ')) || `# ${d}`).slice(2).trim();
   const exDir = join(root, d, 'examples');
-  const examples = existsSync(exDir) ? readdirSync(exDir).filter((e) => !e.startsWith('.') && !e.includes('.')) : [];
+  const examples = existsSync(exDir) ? readdirSync(exDir)
+    .filter((e) => !e.startsWith('.') && !e.includes('.'))
+    .filter((e) => hasTrackedFiles(`${d}/examples/${e}`)) : [];
   skills[d] = { slug: d, title, desc, body, examples, update: latestSkillUpdate(d) };
 }
 
@@ -179,11 +193,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17p
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
 nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
 nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
 nav .links a:hover{color:var(--amber)}
-h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
@@ -205,7 +219,7 @@ code{font-family:var(--mono)}
 figure{background:var(--bg2);border:1px solid var(--line)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
-figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
@@ -364,12 +378,25 @@ ${baseCss}
 .live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
-header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
-header .kicker{animation:rise .7s ease both}
-h1{font-weight:700;font-size:clamp(40px,6.4vw,84px);line-height:1.04;letter-spacing:-.03em;max-width:15ch;animation:rise .7s .08s ease both}
+header.hero{min-height:min(620px,calc(100svh - 172px));padding:clamp(34px,5vw,58px) 0 clamp(28px,4vw,44px);position:relative;overflow:hidden;display:grid;align-items:end}
+.hero-bg-grid{position:absolute;z-index:0;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:1px;opacity:.78;filter:saturate(1.08) contrast(1.08)}
+.hero-bg-grid img{width:100%;height:100%;object-fit:cover;min-height:0;outline:1px solid rgba(255,255,255,.08);outline-offset:-1px}
+.hero:before{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(10,12,16,.98) 0%,rgba(10,12,16,.94) 42%,rgba(10,12,16,.5) 74%,rgba(10,12,16,.86) 100%),
+  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.38) 42%,rgba(10,12,16,.78) 100%);z-index:1}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.hero-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(34px,6vw,72px)}
+.hero .kicker{animation:rise .7s ease both}
+h1{font-weight:700;font-size:clamp(42px,6.3vw,84px);line-height:1.04;letter-spacing:0;max-width:15ch;animation:rise .7s .08s ease both}
 h1 em{font-style:normal;color:var(--amber)}
-.lede{margin-top:34px;max-width:62ch;color:var(--dim);animation:rise .7s .16s ease both}
-.stats{display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,72px);margin-top:56px;padding-top:28px;border-top:1px solid var(--line);animation:rise .7s .24s ease both}
+.lede{margin-top:28px;max-width:62ch;color:var(--dim);animation:rise .7s .16s ease both}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;animation:rise .7s .22s ease both}
+.hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:42px;display:inline-flex;align-items:center;padding:10px 16px;background:rgba(15,18,24,.72);
+  box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition:transform .2s,color .2s,box-shadow .2s}
+.hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}
+.hero-action:active{transform:scale(.96)}
+.stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.58)}
+.stats{display:flex;flex-wrap:wrap;gap:clamp(24px,4vw,54px);padding:18px 0}
 .stat b{display:block;font-family:var(--disp);font-weight:600;font-size:36px;color:var(--ink);font-variant-numeric:tabular-nums}
 .stat span{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -383,22 +410,52 @@ h1 em{font-style:normal;color:var(--amber)}
 .category-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 26px;margin-bottom:24px}
 .category-head h3{font-size:23px;color:var(--amber);font-weight:600}
 .category-head p{color:var(--dim);font-size:15px;max-width:60ch}
+@media (max-width:720px){
+  header.hero{min-height:min(610px,calc(100svh - 238px));padding:32px 0 30px}
+  .hero-bg-grid{grid-template-columns:repeat(2,minmax(0,1fr));opacity:.55}
+  .hero:before{background:linear-gradient(90deg,rgba(10,12,16,.99),rgba(10,12,16,.88)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.52) 54%,rgba(10,12,16,.9))}
+  .lede{margin-top:22px}
+  .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;padding:16px 0}
+  .stat b{font-size:31px}
+}
 </style>
 </head>
 <body>
 ${navHtml('')}
 
-<header class="wrap">
-  <p class="kicker">TSL-first · WebGPURenderer · Screenshot-backed validation</p>
-  <h1>${total} expert skills for <em>ambitious</em> Three.js WebGPU scenes.</h1>
-  <p class="lede">Not a tutorial. A skill pack for agents — Claude Code, Codex, and any shell that loads local skill folders — that need to design, implement, debug, and <strong>prove</strong> advanced real-time graphics: oceans, atmospheres, planets, volumetric clouds, water optics, particles, shadows, and full node post pipelines.</p>
+<header class="hero">
+  <div class="hero-bg-grid">
+    <img src="demos/shared/generated-variants/caustic-field-a.png" alt="Generated caustic field asset used by the Three.js WebGPU skill pack" fetchpriority="high" decoding="async" />
+    <img src="demos/shared/generated-variants/directional-wave-seed-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+    <img src="demos/shared/generated-variants/weather-map-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+    <img src="demos/shared/generated-variants/frost-crystal-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+    <img src="demos/shared/generated-variants/starfield-tile-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+    <img src="demos/shared/generated-variants/biome-field-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+  </div>
+  <div class="wrap">
+    <div class="hero-layout">
+      <div class="hero-copy">
+        <p class="kicker">TSL-first · WebGPURenderer · Screenshot-backed validation</p>
+        <h1>${total} expert skills for <em>ambitious</em> Three.js WebGPU scenes.</h1>
+        <p class="lede">Not a tutorial. A skill pack for agents — Claude Code, Codex, and any shell that loads local skill folders — that need to design, implement, debug, and <strong>prove</strong> advanced real-time graphics: oceans, atmospheres, planets, volumetric clouds, water optics, particles, shadows, and full node post pipelines.</p>
+        <div class="hero-actions">
+          <a class="hero-action" href="#skills">Browse skills</a>
+          <a class="hero-action" href="#gallery">View evidence</a>
+          <a class="hero-action" href="#demos">Launch demos</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="stats-band"><div class="wrap">
   <div class="stats">
     <div class="stat"><b>${total}</b><span>skills</span></div>
     <div class="stat"><b>${totalExamples}</b><span>runnable examples</span></div>
     <div class="stat"><b>TSL</b><span>node-first architecture</span></div>
     <div class="stat"><b>PNG+JSON</b><span>regression evidence</span></div>
   </div>
-</header>
+</div></div>
 
 <div class="section" id="quickstart"><div class="wrap">
   <h2>Usage</h2>
@@ -470,6 +527,10 @@ for (const slug of slugs) {
   const skillDemos = PROVIDER_DEMOS.filter((demo) => demo.skill === slug);
   const pageUrl = `${SITE}skills/${slug}.html`;
   const ogImg = validation ? `${SITE}${validation[0][0]}` : OG_IMAGE;
+  const skillHeroImg = validation ? validation[0][0] : null;
+  const skillBodyHtml = marked.parse(s.body)
+    .replace(/<h1([^>]*)>/g, '<h2$1>')
+    .replace(/<\/h1>/g, '</h2>');
   const updateHtml = s.update ? `<span class="chip">Latest skill update <time datetime="${esc(s.update.iso)}">${esc(s.update.date)}</time></span>
     <a class="chip" href="${esc(s.update.url)}">commit ${esc(s.update.shortHash)} ↗</a>` :
     '<span class="chip">Latest skill update unavailable</span>';
@@ -571,20 +632,28 @@ ${JSON.stringify({
 <style>
 ${baseCss}
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
+.skill-hero .wrap{position:relative;z-index:2}
+.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.46;filter:saturate(1.08) contrast(1.04)}
+.skill-hero:before{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
+  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
 .crumbs a:hover{color:var(--amber)}
-h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
-a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
+  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
+a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
+a.chip:active{transform:scale(.96)}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
 .science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
 .science .katex{font-size:1.05em;color:var(--ink)}
 .skilltext{max-width:78ch}
-.skilltext h1{display:none}
+.skilltext>h2:first-child{display:none}
 .skilltext h2{font-size:26px;margin:44px 0 14px}
 .skilltext h3{font-size:20px;margin:32px 0 10px}
 .skilltext p,.skilltext li{color:var(--dim);font-size:16px}
@@ -618,22 +687,30 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
 .live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
+@media (max-width:720px){
+  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero-bg{opacity:.3}
+  .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
+}
 </style>
 </head>
 <body>
 ${navHtml('../')}
 
-<header class="wrap">
-  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">${esc(cat ? cat.name : 'Skills')}</a> / ${esc(s.title)}</p>
-  <h1>${esc(s.title)}</h1>
-  <p class="lede">${esc(s.desc)}</p>
-  <div class="meta-row">
-    <span class="chip a">$${slug}</span>
-    ${demoChipHtml}
-    ${s.examples.length ? `<span class="chip">${s.examples.length} runnable example${s.examples.length > 1 ? 's' : ''}</span>` : ''}
-    ${updateHtml}
-    <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
-    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${slug}/SKILL.md">raw (for agents) ↗</a>
+<header class="${skillHeroImg ? 'skill-hero' : ''}">
+  ${skillHeroImg ? `<img class="skill-hero-bg" src="../${skillHeroImg}" alt="${esc(`${s.title} validation preview`)}" fetchpriority="high" decoding="async" />` : ''}
+  <div class="wrap">
+    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">${esc(cat ? cat.name : 'Skills')}</a> / ${esc(s.title)}</p>
+    <h1>${esc(s.title)}</h1>
+    <p class="lede">${esc(s.desc)}</p>
+    <div class="meta-row">
+      <span class="chip a">$${slug}</span>
+      ${demoChipHtml}
+      ${s.examples.length ? `<span class="chip">${s.examples.length} runnable example${s.examples.length > 1 ? 's' : ''}</span>` : ''}
+      ${updateHtml}
+      <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${slug}/SKILL.md">raw (for agents) ↗</a>
+    </div>
   </div>
 </header>
 
@@ -644,7 +721,7 @@ ${examplesHtml}
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
   <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext">${marked.parse(s.body)}</div>
+  <div class="skilltext">${skillBodyHtml}</div>
   <div class="pn">
     <a href="${prev.slug}.html">← ${esc(prev.title)}</a>
     <a href="${next.slug}.html">${esc(next.title)} →</a>
