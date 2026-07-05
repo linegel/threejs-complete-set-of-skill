@@ -1,0 +1,60 @@
+{
+  "name": "Swimmer Undulation Rope",
+  "seed": 5201,
+  "scale": 1,
+  "locomotion": {
+    "type": "swimmer",
+    "speed": 0.65,
+    "undulation": 0.3,
+    "buoyancy": 0.95
+  },
+  "parts": [
+    {
+      "id": "main",
+      "shape": "capsule",
+      "a": [0, 0.10, -0.10],
+      "b": [0, 0.38, 0.24],
+      "r": 0.22,
+      "color": "#5db4d1"
+    },
+    {
+      "id": "head",
+      "shape": "cone",
+      "parent": "main",
+      "a": [0, 0.22, 0.28],
+      "b": [0, 0.34, 0.52],
+      "r": 0.11,
+      "r2": 0.07,
+      "color": "#d8b58c"
+    },
+    {
+      "id": "dorsal-fin",
+      "shape": "capsule",
+      "parent": "main",
+      "a": [0, 0.35, 0.02],
+      "b": [0, 0.52, -0.16],
+      "r": 0.035,
+      "color": "#8e8e8e"
+    },
+    {
+      "id": "side-fin",
+      "shape": "capsule",
+      "parent": "main",
+      "a": [0.10, 0.18, 0.02],
+      "b": [0.48, 0.14, -0.12],
+      "r": 0.03,
+      "color": "#8e8e8e"
+    },
+    {
+      "id": "tail",
+      "shape": "rope",
+      "parent": "main",
+      "offset": [0, 0.15, -0.24],
+      "segments": 8,
+      "length": 0.72,
+      "r": 0.04,
+      "taper": 0.65,
+      "color": "#6f90a8"
+    }
+  ]
+}

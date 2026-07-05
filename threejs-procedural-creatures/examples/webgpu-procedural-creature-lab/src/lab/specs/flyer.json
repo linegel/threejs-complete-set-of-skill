@@ -1,0 +1,53 @@
+{
+  "name": "Flyer Flap Wings",
+  "seed": 5001,
+  "scale": 1,
+  "locomotion": {
+    "type": "flyer",
+    "speed": 1.1,
+    "altitude": 2.8,
+    "radius": 2.2
+  },
+  "parts": [
+    {
+      "id": "chassis",
+      "shape": "capsule",
+      "a": [0, 0.08, 0],
+      "b": [0, 0.55, 0],
+      "r": 0.18,
+      "color": "#6eb1d0"
+    },
+    {
+      "id": "wing-left",
+      "shape": "cone",
+      "parent": "chassis",
+      "a": [0.18, 0.36, 0.02],
+      "b": [0.72, 0.44, 0.07],
+      "r": 0.052,
+      "r2": 0.015,
+      "flap": 0.36,
+      "color": "#b5b5b5"
+    },
+    {
+      "id": "wing-right",
+      "shape": "cone",
+      "parent": "chassis",
+      "a": [-0.18, 0.36, 0.02],
+      "b": [-0.72, 0.44, 0.07],
+      "r": 0.052,
+      "r2": 0.015,
+      "flap": 0.36,
+      "color": "#b5b5b5"
+    },
+    {
+      "id": "tail-fin",
+      "shape": "cone",
+      "parent": "chassis",
+      "a": [0, 0.24, -0.08],
+      "b": [0, 0.15, -0.42],
+      "r": 0.035,
+      "r2": 0.012,
+      "color": "#8a8a8a"
+    }
+  ]
+}

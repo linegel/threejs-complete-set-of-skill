@@ -1,0 +1,117 @@
+{
+  "name": "Hexapod Thin Antennae",
+  "seed": 4601,
+  "scale": 1,
+  "locomotion": {
+    "type": "hexapod",
+    "speed": 0.85,
+    "stepLength": 0.42,
+    "stepHeight": 0.13
+  },
+  "parts": [
+    {
+      "id": "body",
+      "shape": "capsule",
+      "a": [0, 0.26, -0.26],
+      "b": [0, 0.74, 0.30],
+      "r": 0.19,
+      "color": "#7ca8d2"
+    },
+    {
+      "id": "head",
+      "shape": "sphere",
+      "parent": "body",
+      "offset": [0, 0.45, 0.48],
+      "r": 0.135,
+      "color": "#bf7f50"
+    },
+    {
+      "id": "antenna-left",
+      "shape": "cone",
+      "parent": "body",
+      "a": [0.10, 0.62, 0.84],
+      "b": [0.22, 0.80, 1.14],
+      "r": 0.018,
+      "r2": 0.012,
+      "kCap": 0.001,
+      "color": "#f0ece0"
+    },
+    {
+      "id": "antenna-right",
+      "shape": "cone",
+      "parent": "body",
+      "a": [-0.10, 0.62, 0.84],
+      "b": [-0.22, 0.80, 1.14],
+      "r": 0.018,
+      "r2": 0.012,
+      "kCap": 0.001,
+      "color": "#f0ece0"
+    },
+    {
+      "id": "leg-front-left",
+      "shape": "leg",
+      "parent": "body",
+      "hip": [0.18, 0.18, 0.22],
+      "upper": 0.28,
+      "lower": 0.26,
+      "phase": 0,
+      "r": 0.045,
+      "color": "#a2a2a2"
+    },
+    {
+      "id": "leg-front-right",
+      "shape": "leg",
+      "parent": "body",
+      "hip": [-0.18, 0.18, 0.22],
+      "upper": 0.28,
+      "lower": 0.26,
+      "phase": 0.5,
+      "r": 0.045,
+      "color": "#a2a2a2"
+    },
+    {
+      "id": "leg-mid-left",
+      "shape": "leg",
+      "parent": "body",
+      "hip": [0.22, 0.16, 0],
+      "upper": 0.27,
+      "lower": 0.24,
+      "phase": 0,
+      "r": 0.043,
+      "color": "#a2a2a2"
+    },
+    {
+      "id": "leg-mid-right",
+      "shape": "leg",
+      "parent": "body",
+      "hip": [-0.22, 0.16, 0],
+      "upper": 0.27,
+      "lower": 0.24,
+      "phase": 0.5,
+      "r": 0.043,
+      "color": "#a2a2a2"
+    },
+    {
+      "id": "leg-rear-left",
+      "shape": "leg",
+      "parent": "body",
+      "hip": [0.16, 0.16, -0.24],
+      "upper": 0.25,
+      "lower": 0.22,
+      "phase": 0,
+      "r": 0.042,
+      "color": "#a2a2a2"
+    },
+    {
+      "id": "leg-rear-right",
+      "shape": "leg",
+      "parent": "body",
+      "hip": [-0.16, 0.16, -0.24],
+      "upper": 0.25,
+      "lower": 0.22,
+      "phase": 0.5,
+      "r": 0.042,
+      "color": "#a2a2a2"
+    }
+  ]
+}
