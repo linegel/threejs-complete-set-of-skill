@@ -1,16 +1,22 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  CPU_FIELD_ALGORITHM,
+  FIELD_ALGORITHM,
   FIELD_CHANNELS,
+  FIELD_DERIVED_CHANNELS,
+  FIELD_PARITY_CHANNELS,
+  TSL_FIELD_ALGORITHM,
   coverage,
   fixedProbes,
   sampleFieldCPU,
 } from "./field-bundle.mjs";
+import { FIELD_ALGORITHM as SHARED_FIELD_ALGORITHM } from "./field-constants.mjs";
 import {
   createDirtyTileTracker,
   createFieldBakePlan,
@@ -21,8 +27,25 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const manifestPath = resolve(here, "../../assets/generated-variants/manifest.json");
 const manifestDir = dirname(manifestPath);
+const fixturePath = resolve(here, "field-golden-fixtures.json");
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+const fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
 const tolerance = manifest.parityTolerance;
+const fixtureTolerance = 1e-12;
+
+function parseArgs(argv) {
+  const options = {
+    allowMissingGpu: false,
+    artifacts: null,
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--allow-missing-gpu") options.allowMissingGpu = true;
+    else if (arg === "--artifacts") options.artifacts = resolve(argv[++index]);
+    else throw new Error(`Unknown argument: ${arg}`);
+  }
+  return options;
+}
 
 function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -59,104 +82,241 @@ function validateManifest() {
   }
 }
 
-function runParity() {
-  const samples = fixedProbes.map((probe) => {
-    const cpu = sampleFieldCPU(probe);
-    const directDiagnostic = sampleFieldCPU(probe);
-    const errors = Object.keys(FIELD_CHANNELS).map((channel) =>
-      Math.abs(cpu.packedChannels[channel] - directDiagnostic.packedChannels[channel]),
-    );
+function validateBakePlanning() {
+  assert.equal(decideBakeStrategy({ readCount: 1 }), "direct-evaluate");
+  assert.equal(decideBakeStrategy({ readCount: 8 }), "StorageTexture");
+
+  const tracker = createDirtyTileTracker({ tilesX: 8, tilesY: 8 });
+  tracker.invalidate(3, 4);
+  assert.deepEqual(tracker.allTiles(), ["3:4"]);
+  const bakePlan = createFieldBakePlan({ readCount: 8, dirtyTile: tracker.allTiles() });
+  assert.equal(bakePlan.strategy, "StorageTexture");
+  assert.equal(bakePlan.api, "renderer.computeAsync");
+  assert.equal(bakePlan.texture.colorSpace, "");
+  assert.equal(bakePlan.texture.mipmapsAutoUpdate, false);
+  assert.equal(bakePlan.texture.format, STORAGE_FORMATS.smoothRgba.format);
+  assert.equal(bakePlan.texture.type, STORAGE_FORMATS.smoothRgba.type);
+}
+
+function validateSharedAlgorithm() {
+  assert.equal(CPU_FIELD_ALGORITHM, SHARED_FIELD_ALGORITHM, "CPU constants must be the shared object");
+  assert.equal(TSL_FIELD_ALGORITHM, SHARED_FIELD_ALGORITHM, "TSL constants must be the shared object");
+  assert.equal(FIELD_ALGORITHM, SHARED_FIELD_ALGORITHM, "field bundle must re-export shared constants");
+  assert.deepEqual(CPU_FIELD_ALGORITHM, TSL_FIELD_ALGORITHM, "CPU and TSL constants must be identical");
+  assert.deepEqual(Object.keys(FIELD_CHANNELS), ["r", "g", "b", "a"]);
+  assert.deepEqual(Object.keys(FIELD_DERIVED_CHANNELS), ["r", "g", "b", "a"]);
+}
+
+function assertClose(actual, expected, maxError, label) {
+  const error = Math.abs(actual - expected);
+  assert(
+    error <= maxError,
+    `${label}: ${actual} differs from ${expected} by ${error}, tolerance ${maxError}`,
+  );
+  return error;
+}
+
+function validateGoldenFixtures() {
+  assert.equal(fixtures.version, 1);
+  assert.deepEqual(fixtures.channels, FIELD_PARITY_CHANNELS);
+  assert.deepEqual(
+    fixtures.probes.map((entry) => entry.probe),
+    fixedProbes,
+    "golden fixture probes must match fixedProbes",
+  );
+
+  let maxAbsError = 0;
+  const samples = fixtures.probes.map((entry, probeIndex) => {
+    const sample = sampleFieldCPU(entry.probe);
+    const channelErrors = {};
+    for (const channel of FIELD_PARITY_CHANNELS) {
+      const error = assertClose(
+        sample[channel],
+        entry.values[channel],
+        fixtureTolerance,
+        `fixture probe ${probeIndex} ${channel}`,
+      );
+      channelErrors[channel] = error;
+      maxAbsError = Math.max(maxAbsError, error);
+    }
     return {
-      probe,
-      maxAbsError: Math.max(...errors),
-      meanAbsError: errors.reduce((total, value) => total + value, 0) / errors.length,
-      macroHeight: cpu.macroHeight,
-      moisture: cpu.moisture,
+      probe: entry.probe,
+      maxAbsError: Math.max(...Object.values(channelErrors)),
+      channelErrors,
+      macroHeight: sample.macroHeight,
+      moisture: sample.moisture,
     };
   });
-  const maxAbsError = Math.max(...samples.map((sample) => sample.maxAbsError));
-  const meanAbsError =
-    samples.reduce((total, sample) => total + sample.meanAbsError, 0) / samples.length;
+
   return {
+    pass: true,
+    fixtureTolerance,
     maxAbsError,
-    meanAbsError,
     fixedProbes: samples.length,
+    samples,
     coverage: {
       macroHeight: coverage(samples.map((sample) => sample.macroHeight)),
       moisture: coverage(samples.map((sample) => sample.moisture)),
     },
-    gpuReadback: {
-      pass: null,
-      status: "pending-browser-webgpu",
-      requiredForBrowserAcceptance: true,
-      reason: "Node validation checks CPU parity fixtures and source contracts; StorageTexture readback must be captured in a browser WebGPU harness.",
-    },
   };
 }
 
-validateManifest();
-assert.equal(decideBakeStrategy({ readCount: 1 }), "direct-evaluate");
-assert.equal(decideBakeStrategy({ readCount: 8 }), "StorageTexture");
-
-const tracker = createDirtyTileTracker({ tilesX: 8, tilesY: 8 });
-tracker.invalidate(3, 4);
-assert.deepEqual(tracker.allTiles(), ["3:4"]);
-const bakePlan = createFieldBakePlan({ readCount: 8, dirtyTile: tracker.allTiles() });
-assert.equal(bakePlan.strategy, "StorageTexture");
-assert.equal(bakePlan.api, "renderer.computeAsync");
-assert.equal(bakePlan.texture.colorSpace, "");
-assert.equal(bakePlan.texture.mipmapsAutoUpdate, false);
-assert.equal(bakePlan.texture.format, STORAGE_FORMATS.smoothRgba.format);
-assert.equal(bakePlan.texture.type, STORAGE_FORMATS.smoothRgba.type);
-
-const parity = runParity();
-if (parity.maxAbsError > tolerance) {
-  process.exitCode = 1;
-  throw new Error(`maxAbsError ${parity.maxAbsError} exceeds tolerance ${tolerance}`);
+function readGpuReadback(artifactDir) {
+  const path = resolve(artifactDir, "field-readback.json");
+  if (!existsSync(path)) {
+    throw new Error(`GPU parity artifact missing: ${path}`);
+  }
+  return JSON.parse(readFileSync(path, "utf8"));
 }
 
-const reportPath =
-  process.env.FIELD_VALIDATION_REPORT ??
-  resolve(tmpdir(), "webgpu-field-bake-validation.json");
-writeFileSync(reportPath, `${JSON.stringify(parity, null, 2)}\n`);
+function validateGpuReadback(artifactDir) {
+  const readback = readGpuReadback(artifactDir);
+  assert.equal(readback.version, 1);
+  assert.deepEqual(readback.channels, FIELD_PARITY_CHANNELS);
+  assert(Array.isArray(readback.samples), "GPU readback samples must be an array");
 
-const source = [
-  "README.md",
-  "field-bundle.mjs",
-  "field-bake.mjs",
-  "validate-field-contract.mjs",
-]
-  .map((file) => readFileSync(resolve(here, file), "utf8"))
-  .join("\n");
+  let maxAbsError = 0;
+  let meanAbsError = 0;
+  let count = 0;
+  const samples = readback.samples.map((entry, index) => {
+    assert(entry.probe, `GPU readback sample ${index} is missing probe`);
+    assert(entry.values, `GPU readback sample ${index} is missing values`);
+    const cpu = sampleFieldCPU(entry.probe);
+    const channelErrors = {};
+    for (const channel of FIELD_PARITY_CHANNELS) {
+      const actual = Number(entry.values[channel]);
+      assert(Number.isFinite(actual), `GPU readback sample ${index} ${channel} is not finite`);
+      const error = Math.abs(actual - cpu[channel]);
+      channelErrors[channel] = error;
+      maxAbsError = Math.max(maxAbsError, error);
+      meanAbsError += error;
+      count += 1;
+    }
+    return {
+      probe: entry.probe,
+      channelErrors,
+      maxAbsError: Math.max(...Object.values(channelErrors)),
+    };
+  });
 
-for (const required of [
-  "Fn(",
-  "sampleField",
-  "sampleFieldCPU",
-  "tangentWarp",
-  "macroHeight",
-  "packedChannels",
-  "StorageTexture",
-  "textureStore",
-  "readCount",
-  "dirtyTile",
-  "invalidate",
-  "computeAsync",
-  "maxAbsError",
-  "meanAbsError",
-  "coverage",
-  "gpuReadback",
-  "fixedProbes",
-  "tolerance",
-  "process.exitCode",
-  "Checkpoint",
-  "must see",
-  "if you see",
-  "CPU-vs-TSL",
-  "direct-vs-baked",
-  "packed atlas",
-]) {
-  assert(source.includes(required), `missing ${required}`);
+  meanAbsError = count === 0 ? 0 : meanAbsError / count;
+  if (maxAbsError > tolerance) {
+    throw new Error(`GPU parity maxAbsError ${maxAbsError} exceeds tolerance ${tolerance}`);
+  }
+  return {
+    pass: true,
+    status: "passed",
+    artifactDir,
+    tolerance,
+    maxAbsError,
+    meanAbsError,
+    samples,
+  };
 }
 
-console.log(`webgpu-field-bake validation passed: ${reportPath}`);
+function validateSourceContract() {
+  const source = [
+    "README.md",
+    "field-constants.mjs",
+    "field-bundle.mjs",
+    "field-bake.mjs",
+    "browser-app.js",
+    "capture.mjs",
+    "validate-field-contract.mjs",
+  ]
+    .map((file) => readFileSync(resolve(here, file), "utf8"))
+    .join("\n");
+
+  for (const required of [
+    "Fn(",
+    "sampleField",
+    "sampleFieldCPU",
+    "sampleFieldDerived",
+    "FIELD_ALGORITHM",
+    "FIELD_PARITY_CHANNELS",
+    "trilinear",
+    "valueNoise3",
+    "valueNoise3Node",
+    "tangentWarp",
+    "macroHeight",
+    "packedChannels",
+    "derivedChannels",
+    "slope",
+    "biome",
+    "roughness",
+    "placementMask",
+    "StorageTexture",
+    "textureStore",
+    "readCount",
+    "dirtyTile",
+    "invalidate",
+    "computeAsync",
+    "maxAbsError",
+    "meanAbsError",
+    "coverage",
+    "gpuParity",
+    "fixedProbes",
+    "tolerance",
+    "process.exitCode",
+    "Checkpoint",
+    "must see",
+    "if you see",
+    "CPU-vs-TSL",
+    "direct-vs-baked",
+    "packed atlas",
+  ]) {
+    assert(source.includes(required), `missing ${required}`);
+  }
+}
+
+function main() {
+  const options = parseArgs(process.argv.slice(2));
+
+  validateManifest();
+  validateBakePlanning();
+  validateSharedAlgorithm();
+  const fixtureParity = validateGoldenFixtures();
+  validateSourceContract();
+
+  let gpuParity;
+  if (options.artifacts) {
+    gpuParity = validateGpuReadback(options.artifacts);
+  } else {
+    gpuParity = {
+      pass: false,
+      status: "not-run",
+      requiredForBrowserAcceptance: true,
+      reason:
+        "Run examples/webgpu-field-bake/capture.mjs to generate field-readback.json, or pass --allow-missing-gpu for Layer 1 only.",
+    };
+    if (!options.allowMissingGpu) {
+      process.exitCode = 1;
+    }
+  }
+
+  const report = {
+    structuralParity: {
+      pass: true,
+      sharedConstantsObject: true,
+      channelPack: FIELD_CHANNELS,
+      derivedChannelPack: FIELD_DERIVED_CHANNELS,
+    },
+    fixtureParity,
+    gpuParity,
+  };
+
+  const reportPath =
+    process.env.FIELD_VALIDATION_REPORT ??
+    resolve(tmpdir(), "webgpu-field-bake-validation.json");
+  writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+
+  if (process.exitCode) {
+    throw new Error(
+      `GPU parity ${gpuParity.status}; rerun with --artifacts <dir> or --allow-missing-gpu. Layer 1 report: ${reportPath}`,
+    );
+  }
+
+  console.log(`webgpu-field-bake validation passed: ${reportPath}`);
+}
+
+main();

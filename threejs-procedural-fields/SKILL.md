@@ -116,6 +116,17 @@ The contract must record:
 - CPU parity plan and tolerances;
 - debug output for every named field.
 
+For the canonical `examples/webgpu-field-bake/` contract, CPU and TSL must
+import the same `FIELD_ALGORITHM` object from `field-constants.mjs`. That object
+owns hash primes, seed wrapping, octave counts, lacunarity, gain, warp seed
+offsets, and derived-channel coefficients. Do not copy those numbers into CPU
+or TSL code. `validate-field-contract.mjs` enforces shared-object identity and
+CPU golden fixtures at `1e-12` absolute error; the value is the validator's
+fixture drift threshold for JavaScript double evaluation. Browser WebGPU
+artifacts are accepted only through `--artifacts <dir>` and must satisfy the
+manifest `parityTolerance` value, currently `0.001` in
+`assets/generated-variants/manifest.json`.
+
 ## Build Order
 
 1. Choose stable coordinates from the physical cause: radial planet kilometers,
@@ -124,7 +135,7 @@ The contract must record:
    of duplicating math in separate materials or compute jobs.
 3. Port the same math to CPU only for geometry generation, offline assets,
    parity tests, and reduced quality tiers. Keep constants, seeds, wrapping,
-   normalization, and remaps byte-for-byte intentional.
+   normalization, and remaps imported from one checked-in constants module.
 4. Decide bake versus direct evaluation from the table below before assigning
    material nodes.
 5. Pack baked channels by access pattern and precision, not by visual category.
@@ -230,6 +241,8 @@ restore full resolution only where inspection needs it.
 - TSL `Fn` field bundle and CPU parity port;
 - packed channel schema for direct material use or `StorageTexture` bakes;
 - debug views for every named field;
-- validation command: `node examples/webgpu-field-bake/validate-field-contract.mjs`;
+- validation command: `node examples/webgpu-field-bake/validate-field-contract.mjs --allow-missing-gpu`
+  for Layer 1 and `node examples/webgpu-field-bake/validate-field-contract.mjs
+  --artifacts <dir>` after browser readback;
 - sibling ownership notes for material response, planet bodies, weather,
   image-pipeline ownership, and visual validation.

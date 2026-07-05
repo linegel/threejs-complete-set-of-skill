@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "description": "Golden CPU field values for the shared procedural field algorithm. Regenerate only when the contract intentionally changes.",
+  "channels": [
+    "macroHeight",
+    "ridge",
+    "cavity",
+    "moisture",
+    "slope",
+    "biome",
+    "roughness",
+    "placementMask"
+  ],
+  "probes": [
+    {
+      "probe": {
+        "domain": "sphere",
+        "coordinate": [
+          1,
+          0,
+          0
+        ],
+        "seed": 17
+      },
+      "values": {
+        "macroHeight": 0.5312688564795642,
+        "ridge": 0.8052038703076048,
+        "cavity": 0.12122486622729269,
+        "moisture": 0.4836091632888498,
+        "slope": 0.31636371700759297,
+        "biome": 0.38425526998148335,
+        "roughness": 0.5437656379272487,
+        "placementMask": 0
+      },
+      "sourceCoordinates": [
+        1,
+        0,
+        0
+      ],
+      "tangentWarp": [
+        0,
+        -0.03286252795844119,
+        0.4254387770910907
+      ]
+    },
+    {
+      "probe": {
+        "domain": "sphere",
+        "coordinate": [
+          0.577,
+          0.577,
+          0.577
+        ],
+        "seed": 17
+      },
+      "values": {
+        "macroHeight": 0.5949249072012459,
+        "ridge": 0.7362734680066934,
+        "cavity": 0.22032828567122598,
+        "moisture": 0.5346376135626345,
+        "slope": 0.21846346079037654,
+        "biome": 0.4163425199792134,
+        "roughness": 0.5411650325332805,
+        "placementMask": 0
+      },
+      "sourceCoordinates": [
+        0.5773502691896258,
+        0.5773502691896258,
+        0.5773502691896258
+      ],
+      "tangentWarp": [
+        -0.20857829447553422,
+        0.02502772308230994,
+        0.18355057139322417
+      ]
+    },
+    {
+      "probe": {
+        "domain": "world",
+        "coordinate": [
+          12.5,
+          -4,
+          8.25
+        ],
+        "seed": 29
+      },
+      "values": {
+        "macroHeight": 0.46225951453614594,
+        "ridge": 0.7323575001157356,
+        "cavity": 0.003527888528268907,
+        "moisture": 0.5062305134771774,
+        "slope": 0.2713327465644838,
+        "biome": 0.3935683144230918,
+        "roughness": 0.4952131841609074,
+        "placementMask": 0
+      },
+      "sourceCoordinates": [
+        1.5625,
+        -0.5,
+        1.03125
+      ],
+      "tangentWarp": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "probe": {
+        "domain": "object",
+        "coordinate": [
+          0.125,
+          0.75,
+          0.5
+        ],
+        "seed": 43
+      },
+      "values": {
+        "macroHeight": 0.5065420049901611,
+        "ridge": 0.7250880002838697,
+        "cavity": 0.15005265103512866,
+        "moisture": 0.4316043239618862,
+        "slope": 0.2710644231560036,
+        "biome": 0.34601156130236227,
+        "roughness": 0.5328757909110233,
+        "placementMask": 0
+      },
+      "sourceCoordinates": [
+        0.125,
+        0.75,
+        0.5
+      ],
+      "tangentWarp": [
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

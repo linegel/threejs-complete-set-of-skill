@@ -2,7 +2,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "check": "node --check field-bundle.mjs && node --check field-bake.mjs && node --check validate-field-contract.mjs",
-    "validate": "node validate-field-contract.mjs"
+    "check": "node --check field-constants.mjs && node --check field-bundle.mjs && node --check field-bake.mjs && node --check browser-app.js && node --check capture.mjs && node --check validate-field-contract.mjs",
+    "validate": "node validate-field-contract.mjs --allow-missing-gpu",
+    "capture": "node capture.mjs"
   }
 }

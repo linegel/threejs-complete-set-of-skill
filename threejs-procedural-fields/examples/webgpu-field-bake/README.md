@@ -2,7 +2,10 @@
 
 Canonical Phase 1 field contract: one deterministic field bundle has a CPU
 parity port, a TSL `Fn` owner, direct material reuse, and a `StorageTexture`
-bake path when read count makes baking cheaper.
+bake path when read count makes baking cheaper. CPU and TSL import hash,
+octave, warp, and derived-channel coefficients from `field-constants.mjs`; the
+validator asserts object identity for those constants before any artifact
+checks run.
 
 ## Checkpoints
 
@@ -25,7 +28,11 @@ and the compute atlas. if you see stale tiles, dirty-tile invalidation is
 missing.
 
 Checkpoint `CPU-vs-TSL`: must see max and mean errors under tolerance. if you
-see seed-specific drift, constants or seed wrapping diverged.
+see seed-specific drift, constants or seed wrapping diverged. Layer 1 is the
+CPU golden fixture in `field-golden-fixtures.json`, checked at `1e-12` absolute
+error by `validate-field-contract.mjs`. Layer 2 is browser WebGPU readback in
+`field-readback.json`, checked at manifest `parityTolerance` (`0.001` in
+`assets/generated-variants/manifest.json`).
 
 Checkpoint `material consumer`: must see color, roughness, normals,
 displacement, and placement masks sharing the named fields. if you see
@@ -34,5 +41,7 @@ unrelated channels, the material skipped the field contract.
 Run:
 
 ```sh
-node threejs-procedural-fields/examples/webgpu-field-bake/validate-field-contract.mjs
+node threejs-procedural-fields/examples/webgpu-field-bake/validate-field-contract.mjs --allow-missing-gpu
+node threejs-procedural-fields/examples/webgpu-field-bake/capture.mjs --artifacts /tmp/webgpu-field-bake
+node threejs-procedural-fields/examples/webgpu-field-bake/validate-field-contract.mjs --artifacts /tmp/webgpu-field-bake
 ```

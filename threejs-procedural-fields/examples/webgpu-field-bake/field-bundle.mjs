@@ -4,13 +4,26 @@ import {
   clamp as clampNode,
   dot,
   float,
+  floor,
   fract as fractNode,
+  mix,
+  mod,
   normalize,
   pow,
   sin,
+  smoothstep as smoothstepNode,
   vec3,
   vec4,
 } from "three/tsl";
+
+import {
+  FIELD_ALGORITHM,
+  FIELD_CHANNELS,
+  FIELD_DERIVED_CHANNELS,
+  FIELD_PARITY_CHANNELS,
+  FIELD_SPECTRUM,
+  fixedProbes,
+} from "./field-constants.mjs";
 
 const fract = (value) => value - Math.floor(value);
 const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
@@ -20,42 +33,31 @@ const smoothstep = (edge0, edge1, value) => {
 };
 const lerp = (a, b, t) => a + (b - a) * t;
 
-export const FIELD_CHANNELS = Object.freeze({
-  r: "macroHeight",
-  g: "ridge",
-  b: "cavity",
-  a: "moisture",
-});
+export {
+  FIELD_ALGORITHM,
+  FIELD_CHANNELS,
+  FIELD_DERIVED_CHANNELS,
+  FIELD_PARITY_CHANNELS,
+  FIELD_SPECTRUM,
+  fixedProbes,
+};
 
-export const FIELD_SPECTRUM = Object.freeze({
-  hashFamily: "sin-dot value hash with deterministic seed wrapping",
-  outputRange: [0, 1],
-  normalization: "octave weights normalized by accumulated amplitude",
-  lacunarity: { min: 1.7, max: 2.35, default: 2.03 },
-  gain: { min: 0.42, max: 0.62, default: 0.5 },
-  spectralSlope: {
-    macro: "low frequency, silhouette/region support",
-    meso: "ridges, cavity, wear, shore breakup",
-    micro: "normal/roughness only; never geometry displacement",
-  },
-  validityRange: {
-    sphereRadiusKm: [1, 72000],
-    worldMeters: [0.001, 1000000],
-    objectUnits: [0.0001, 10000],
-  },
-});
+export const CPU_FIELD_ALGORITHM = FIELD_ALGORITHM;
+export const TSL_FIELD_ALGORITHM = FIELD_ALGORITHM;
 
-export const fixedProbes = Object.freeze([
-  { domain: "sphere", coordinate: [1, 0, 0], seed: 17 },
-  { domain: "sphere", coordinate: [0.577, 0.577, 0.577], seed: 17 },
-  { domain: "world", coordinate: [12.5, -4, 8.25], seed: 29 },
-  { domain: "object", coordinate: [0.125, 0.75, 0.5], seed: 43 },
-]);
+function wrapSeed(seed) {
+  const { seedWrap } = FIELD_ALGORITHM.hash;
+  return ((seed % seedWrap) + seedWrap) % seedWrap;
+}
 
 function hash3(x, y, z, seed) {
-  const wrappedSeed = ((seed % 65536) + 65536) % 65536;
-  const n = x * 127.1 + y * 311.7 + z * 74.7 + wrappedSeed * 19.1999;
-  return fract(Math.sin(n) * 43758.5453123);
+  const { primes, seedMultiplier, outputMultiplier } = FIELD_ALGORITHM.hash;
+  const n =
+    x * primes[0] +
+    y * primes[1] +
+    z * primes[2] +
+    wrapSeed(seed) * seedMultiplier;
+  return fract(Math.sin(n) * outputMultiplier);
 }
 
 function valueNoise3(x, y, z, seed) {
@@ -80,16 +82,22 @@ function valueNoise3(x, y, z, seed) {
   return lerp(lerp(nx00, nx10, ty), lerp(nx01, nx11, ty), tz);
 }
 
-function fbm(x, y, z, seed, octaves, lacunarity, gain) {
+function fbm(x, y, z, seed, config) {
   let value = 0;
-  let amplitude = 0.5;
-  let frequency = 1;
+  let amplitude = config.initialAmplitude;
+  let frequency = config.initialFrequency;
   let norm = 0;
-  for (let index = 0; index < octaves; index += 1) {
-    value += valueNoise3(x * frequency, y * frequency, z * frequency, seed + index * 17) * amplitude;
+  for (let index = 0; index < config.octaves; index += 1) {
+    value +=
+      valueNoise3(
+        x * frequency,
+        y * frequency,
+        z * frequency,
+        seed + index * FIELD_ALGORITHM.hash.octaveSeedStep,
+      ) * amplitude;
     norm += amplitude;
-    frequency *= lacunarity;
-    amplitude *= gain;
+    frequency *= config.lacunarity;
+    amplitude *= config.gain;
   }
   return value / norm;
 }
@@ -105,17 +113,20 @@ function dot3(a, b) {
 
 export function stableCoordinates({ domain, coordinate }) {
   if (domain === "sphere") return normalize3(coordinate);
-  if (domain === "world") return [coordinate[0] * 0.125, coordinate[1] * 0.125, coordinate[2] * 0.125];
+  if (domain === "world") {
+    return [coordinate[0] * 0.125, coordinate[1] * 0.125, coordinate[2] * 0.125];
+  }
   if (domain === "object") return [coordinate[0], coordinate[1], coordinate[2]];
   throw new Error(`Unknown field domain "${domain}"`);
 }
 
 export function tangentWarp(coordinate, seed) {
   const radial = normalize3(coordinate);
+  const { frequency, seedOffsets } = FIELD_ALGORITHM.warp;
   const warp = [
-    valueNoise3(radial[0] * 3.1, radial[1] * 3.1, radial[2] * 3.1, seed + 3) - 0.5,
-    valueNoise3(radial[0] * 3.1, radial[1] * 3.1, radial[2] * 3.1, seed + 7) - 0.5,
-    valueNoise3(radial[0] * 3.1, radial[1] * 3.1, radial[2] * 3.1, seed + 11) - 0.5,
+    valueNoise3(radial[0] * frequency, radial[1] * frequency, radial[2] * frequency, seed + seedOffsets[0]) - 0.5,
+    valueNoise3(radial[0] * frequency, radial[1] * frequency, radial[2] * frequency, seed + seedOffsets[1]) - 0.5,
+    valueNoise3(radial[0] * frequency, radial[1] * frequency, radial[2] * frequency, seed + seedOffsets[2]) - 0.5,
   ];
   const radialComponent = dot3(warp, radial);
   return [
@@ -125,31 +136,76 @@ export function tangentWarp(coordinate, seed) {
   ];
 }
 
-export function sampleFieldCPU({ domain, coordinate, seed = 17 }) {
-  const base = stableCoordinates({ domain, coordinate });
-  const warp = domain === "sphere" ? tangentWarp(base, seed) : [0, 0, 0];
+function sampleFieldFromStableCoordinatesCPU({
+  coordinate,
+  seed = FIELD_ALGORITHM.defaultSeed,
+  warpStrength = FIELD_ALGORITHM.warp.amplitude,
+}) {
+  const warp = warpStrength === 0 ? [0, 0, 0] : tangentWarp(coordinate, seed);
   const q = [
-    base[0] + warp[0] * 0.45,
-    base[1] + warp[1] * 0.45,
-    base[2] + warp[2] * 0.45,
+    coordinate[0] + warp[0] * warpStrength,
+    coordinate[1] + warp[1] * warpStrength,
+    coordinate[2] + warp[2] * warpStrength,
   ];
-  const macroHeight = fbm(q[0] * 1.4, q[1] * 1.4, q[2] * 1.4, seed + 13, 4, 2.03, 0.5);
-  const ridgeBase = fbm(q[0] * 3.6, q[1] * 3.6, q[2] * 3.6, seed + 29, 4, 2.08, 0.52);
+  const { bands, derived } = FIELD_ALGORITHM;
+  const macro = bands.macroHeight;
+  const ridgeConfig = bands.ridge;
+  const cavityConfig = bands.cavity;
+  const moistureConfig = bands.moisture;
+  const macroHeight = fbm(
+    q[0] * macro.scale,
+    q[1] * macro.scale,
+    q[2] * macro.scale,
+    seed + macro.seedOffset,
+    macro,
+  );
+  const ridgeBase = fbm(
+    q[0] * ridgeConfig.scale,
+    q[1] * ridgeConfig.scale,
+    q[2] * ridgeConfig.scale,
+    seed + ridgeConfig.seedOffset,
+    ridgeConfig,
+  );
   const ridge = 1 - Math.abs(ridgeBase * 2 - 1);
-  const cavity = Math.pow(1 - fbm(q[0] * 5.8, q[1] * 5.8, q[2] * 5.8, seed + 47, 3, 2.1, 0.48), 2.7);
-  const moisture = clamp(fbm(q[0] * 0.9, q[1] * 0.9, q[2] * 0.9, seed + 71, 3, 1.9, 0.55) * 0.7 + macroHeight * 0.2);
-  const slope = clamp(Math.abs(ridge - macroHeight) + cavity * 0.35);
-  const biome = clamp(moisture * 0.55 + macroHeight * 0.25 - cavity * 0.12);
-  const roughness = clamp(0.34 + ridge * 0.28 + cavity * 0.22 - moisture * 0.1);
-  const placementMask = smoothstep(0.45, 0.75, biome) * (1 - smoothstep(0.7, 0.95, slope));
-  const packedChannels = {
-    r: macroHeight,
-    g: ridge,
-    b: cavity,
-    a: moisture,
-  };
+  const cavity = Math.pow(
+    1 -
+      fbm(
+        q[0] * cavityConfig.scale,
+        q[1] * cavityConfig.scale,
+        q[2] * cavityConfig.scale,
+        seed + cavityConfig.seedOffset,
+        cavityConfig,
+      ),
+    cavityConfig.exponent,
+  );
+  const moisture = clamp(
+    fbm(
+      q[0] * moistureConfig.scale,
+      q[1] * moistureConfig.scale,
+      q[2] * moistureConfig.scale,
+      seed + moistureConfig.seedOffset,
+      moistureConfig,
+    ) *
+      moistureConfig.fieldWeight +
+      macroHeight * moistureConfig.macroWeight,
+  );
+  const slope = clamp(Math.abs(ridge - macroHeight) + cavity * derived.slopeCavityWeight);
+  const biome = clamp(
+    moisture * derived.biomeMoistureWeight +
+      macroHeight * derived.biomeMacroWeight +
+      cavity * derived.biomeCavityWeight,
+  );
+  const roughness = clamp(
+    derived.roughnessBase +
+      ridge * derived.roughnessRidgeWeight +
+      cavity * derived.roughnessCavityWeight +
+      moisture * derived.roughnessMoistureWeight,
+  );
+  const placementMask =
+    smoothstep(derived.placementBiomeLow, derived.placementBiomeHigh, biome) *
+    (1 - smoothstep(derived.placementSlopeLow, derived.placementSlopeHigh, slope));
+
   return {
-    sourceCoordinates: base,
     tangentWarp: warp,
     macroHeight,
     ridge,
@@ -159,52 +215,188 @@ export function sampleFieldCPU({ domain, coordinate, seed = 17 }) {
     biome,
     roughness,
     placementMask,
-    packedChannels,
+    packedChannels: {
+      r: macroHeight,
+      g: ridge,
+      b: cavity,
+      a: moisture,
+    },
+    derivedChannels: {
+      r: slope,
+      g: biome,
+      b: roughness,
+      a: placementMask,
+    },
   };
 }
 
+export function sampleFieldCPU({ domain, coordinate, seed = FIELD_ALGORITHM.defaultSeed }) {
+  const base = stableCoordinates({ domain, coordinate });
+  const warpStrength = domain === "sphere" ? FIELD_ALGORITHM.warp.amplitude : 0;
+  const fields = sampleFieldFromStableCoordinatesCPU({ coordinate: base, seed, warpStrength });
+  return {
+    sourceCoordinates: base,
+    ...fields,
+  };
+}
+
+function wrappedSeedNode(seed) {
+  const wrap = FIELD_ALGORITHM.hash.seedWrap;
+  return mod(mod(seed, wrap).add(wrap), wrap);
+}
+
 function hash3Node(position, seed) {
+  const { primes, seedMultiplier, outputMultiplier } = FIELD_ALGORITHM.hash;
   return fractNode(
-    sin(dot(position, vec3(127.1, 311.7, 74.7)).add(float(seed).mul(19.1999)))
-      .mul(43758.5453123),
+    sin(
+      dot(position, vec3(primes[0], primes[1], primes[2])).add(
+        wrappedSeedNode(seed).mul(seedMultiplier),
+      ),
+    ).mul(outputMultiplier),
   );
 }
 
-function fbmNode(position, seed) {
-  const octave0 = hash3Node(position, seed).mul(0.5);
-  const octave1 = hash3Node(position.mul(2.03), seed + 17).mul(0.25);
-  const octave2 = hash3Node(position.mul(4.1209), seed + 34).mul(0.125);
-  const octave3 = hash3Node(position.mul(8.3654), seed + 51).mul(0.0625);
-  return octave0.add(octave1).add(octave2).add(octave3).div(0.9375);
+function valueNoise3Node(position, seed) {
+  const cell = floor(position);
+  const f = smoothstepNode(float(0), float(1), fractNode(position));
+  const n000 = hash3Node(cell, seed);
+  const n100 = hash3Node(cell.add(vec3(1, 0, 0)), seed);
+  const n010 = hash3Node(cell.add(vec3(0, 1, 0)), seed);
+  const n110 = hash3Node(cell.add(vec3(1, 1, 0)), seed);
+  const n001 = hash3Node(cell.add(vec3(0, 0, 1)), seed);
+  const n101 = hash3Node(cell.add(vec3(1, 0, 1)), seed);
+  const n011 = hash3Node(cell.add(vec3(0, 1, 1)), seed);
+  const n111 = hash3Node(cell.add(vec3(1, 1, 1)), seed);
+  const nx00 = mix(n000, n100, f.x);
+  const nx10 = mix(n010, n110, f.x);
+  const nx01 = mix(n001, n101, f.x);
+  const nx11 = mix(n011, n111, f.x);
+  return mix(mix(nx00, nx10, f.y), mix(nx01, nx11, f.y), f.z);
 }
 
-export const sampleField = Fn(({ coordinate }) => {
+function fbmNode(position, seed, config) {
+  let value = float(0);
+  let norm = 0;
+  let amplitude = config.initialAmplitude;
+  let frequency = config.initialFrequency;
+
+  for (let index = 0; index < config.octaves; index += 1) {
+    value = value.add(
+      valueNoise3Node(
+        position.mul(frequency),
+        seed.add(index * FIELD_ALGORITHM.hash.octaveSeedStep),
+      ).mul(amplitude),
+    );
+    norm += amplitude;
+    frequency *= config.lacunarity;
+    amplitude *= config.gain;
+  }
+
+  return value.div(norm);
+}
+
+function fieldNodes({ coordinate, seed, warpStrength }) {
+  const fieldSeed = seed ?? float(FIELD_ALGORITHM.defaultSeed);
+  const strength = warpStrength ?? float(FIELD_ALGORITHM.warp.amplitude);
   const radial = normalize(coordinate);
-  const warpSeed = 17;
+  const { frequency, seedOffsets } = FIELD_ALGORITHM.warp;
+  const warpPosition = radial.mul(frequency);
   const warp = vec3(
-    hash3Node(radial.mul(3.1), warpSeed + 3).sub(0.5),
-    hash3Node(radial.mul(3.1), warpSeed + 7).sub(0.5),
-    hash3Node(radial.mul(3.1), warpSeed + 11).sub(0.5),
+    valueNoise3Node(warpPosition, fieldSeed.add(seedOffsets[0])).sub(0.5),
+    valueNoise3Node(warpPosition, fieldSeed.add(seedOffsets[1])).sub(0.5),
+    valueNoise3Node(warpPosition, fieldSeed.add(seedOffsets[2])).sub(0.5),
   );
   const tangent = warp.sub(radial.mul(dot(warp, radial)));
-  const q = radial.add(tangent.mul(0.45));
-  const macroHeight = fbmNode(q.mul(1.4), 30);
-  const ridgeBase = fbmNode(q.mul(3.6), 46);
+  const q = coordinate.add(tangent.mul(strength));
+  const { bands, derived } = FIELD_ALGORITHM;
+  const macroHeight = fbmNode(
+    q.mul(bands.macroHeight.scale),
+    fieldSeed.add(bands.macroHeight.seedOffset),
+    bands.macroHeight,
+  );
+  const ridgeBase = fbmNode(
+    q.mul(bands.ridge.scale),
+    fieldSeed.add(bands.ridge.seedOffset),
+    bands.ridge,
+  );
   const ridge = float(1).sub(abs(ridgeBase.mul(2).sub(1)));
-  const cavity = pow(float(1).sub(fbmNode(q.mul(5.8), 64)), 2.7);
-  const moisture = clampNode(fbmNode(q.mul(0.9), 88).mul(0.7).add(macroHeight.mul(0.2)), 0, 1);
+  const cavity = pow(
+    float(1).sub(fbmNode(q.mul(bands.cavity.scale), fieldSeed.add(bands.cavity.seedOffset), bands.cavity)),
+    bands.cavity.exponent,
+  );
+  const moisture = clampNode(
+    fbmNode(q.mul(bands.moisture.scale), fieldSeed.add(bands.moisture.seedOffset), bands.moisture)
+      .mul(bands.moisture.fieldWeight)
+      .add(macroHeight.mul(bands.moisture.macroWeight)),
+    0,
+    1,
+  );
+  const slope = clampNode(abs(ridge.sub(macroHeight)).add(cavity.mul(derived.slopeCavityWeight)), 0, 1);
+  const biome = clampNode(
+    moisture
+      .mul(derived.biomeMoistureWeight)
+      .add(macroHeight.mul(derived.biomeMacroWeight))
+      .add(cavity.mul(derived.biomeCavityWeight)),
+    0,
+    1,
+  );
+  const roughness = clampNode(
+    float(derived.roughnessBase)
+      .add(ridge.mul(derived.roughnessRidgeWeight))
+      .add(cavity.mul(derived.roughnessCavityWeight))
+      .add(moisture.mul(derived.roughnessMoistureWeight)),
+    0,
+    1,
+  );
+  const placementMask = smoothstepNode(
+    derived.placementBiomeLow,
+    derived.placementBiomeHigh,
+    biome,
+  ).mul(float(1).sub(smoothstepNode(derived.placementSlopeLow, derived.placementSlopeHigh, slope)));
 
-  return vec4(macroHeight, ridge, cavity, moisture);
+  return {
+    macroHeight,
+    ridge,
+    cavity,
+    moisture,
+    slope,
+    biome,
+    roughness,
+    placementMask,
+  };
+}
+
+export const sampleField = Fn(({ coordinate, seed, warpStrength }) => {
+  const fields = fieldNodes({ coordinate, seed, warpStrength });
+  return vec4(fields.macroHeight, fields.ridge, fields.cavity, fields.moisture);
+});
+
+export const sampleFieldDerived = Fn(({ coordinate, seed, warpStrength }) => {
+  const fields = fieldNodes({ coordinate, seed, warpStrength });
+  return vec4(fields.slope, fields.biome, fields.roughness, fields.placementMask);
 });
 
 export const TSL_FIELD_CONTRACT = `
-const sampleField = Fn(({ coordinate, seed }) => {
-  const warpedCoordinates = coordinate.add(tangentWarp(coordinate, seed));
-  const macroHeight = normalizedFbm(warpedCoordinates, seed);
-  const ridge = ridgedFbm(warpedCoordinates, seed);
-  const cavity = pow(1 - normalizedFbm(warpedCoordinates, seed + 34), 2.7);
-  const moisture = clamp(normalizedFbm(warpedCoordinates, seed + 58) * 0.7 + macroHeight * 0.2, 0, 1);
-  return vec4(macroHeight, ridge, cavity, moisture);
+import { FIELD_ALGORITHM } from "./field-constants.mjs";
+
+const sampleField = Fn(({ coordinate, seed, warpStrength }) => {
+  const fields = fieldNodes({
+    coordinate,
+    seed,
+    warpStrength,
+    algorithm: FIELD_ALGORITHM,
+  });
+  return vec4(fields.macroHeight, fields.ridge, fields.cavity, fields.moisture);
+});
+
+const sampleFieldDerived = Fn(({ coordinate, seed, warpStrength }) => {
+  const fields = fieldNodes({
+    coordinate,
+    seed,
+    warpStrength,
+    algorithm: FIELD_ALGORITHM,
+  });
+  return vec4(fields.slope, fields.biome, fields.roughness, fields.placementMask);
 });
 `;
 

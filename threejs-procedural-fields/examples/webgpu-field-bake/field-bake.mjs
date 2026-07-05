@@ -96,8 +96,8 @@ export const FIELD_BAKE_COMPUTE = Fn(({ outputTexture }) => {
 
 export const FIELD_BAKE_SOURCE = `
 const fieldBake = Fn(() => {
-  const fields = sampleField(coordinate, seed);
-  textureStore(fieldAtlas, pixelCoord, fields.packedChannels);
+  const packedChannels = sampleField({ coordinate, seed, warpStrength });
+  textureStore(fieldAtlas, pixelCoord, packedChannels);
 }).compute(width * height);
 await renderer.computeAsync(fieldBake);
 `;

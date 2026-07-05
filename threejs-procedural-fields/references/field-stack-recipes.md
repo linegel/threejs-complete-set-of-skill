@@ -371,6 +371,18 @@ TSL diagnostic path = bake or render packed fields for the same probes
 tolerance = per field, usually 1e-4 to 1e-3 for scalar masks
 ```
 
+The `examples/webgpu-field-bake/` implementation uses
+`field-constants.mjs` as the sole owner of hash primes, seed wrapping, octave
+parameters, warp offsets, and derived-channel coefficients. CPU and TSL import
+the same `FIELD_ALGORITHM` object. `validate-field-contract.mjs` first asserts
+that shared-object identity, then checks `field-golden-fixtures.json` at
+`1e-12` absolute error. Browser WebGPU readback writes `field-readback.json`;
+`validate-field-contract.mjs --artifacts <dir>` compares every channel against
+the CPU sampler at the manifest `parityTolerance`, currently `0.001` in
+`assets/generated-variants/manifest.json`. Without artifacts, the validator
+reports `gpuParity: "not-run"` and fails unless `--allow-missing-gpu` is
+explicit.
+
 Checks:
 
 - CPU and TSL match for primary fields and derived causes.
