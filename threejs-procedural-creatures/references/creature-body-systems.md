@@ -184,6 +184,14 @@ bounds the move where `|∇d| → 0` near the medial axis.
   flap amplitude) — validate at lab time by asserting the snapped
   candidate-set surface matches the full-field surface within the residual
   gate across a locomotion sweep.
+- K-candidate evaluation is an approximation of the canonical sequential,
+  order-dependent global smooth-min fold, not a bounded local rewrite of the
+  field. Rest-AABB adjacency is a heuristic candidate selector, not an error
+  bound: unsaturated `h` tails can reach in from every primitive, and pose
+  deformation invalidates rest-space adjacency. The only accepted bound is the
+  `candidate-set vs full-field surface` locomotion sweep gate in §10; if that
+  gate fails its threshold, reject the spec/tier or raise K, rebuild the
+  candidate sets, and rerun the sweep until it passes.
 - Cache compiled geometry by `schemaVersion | compilerVersion | tier | slot
   count and classes | strong digest of geometry-affecting fields`. A bare
   32-bit hash of the spec JSON is collision-prone at library scale and cannot
@@ -229,6 +237,13 @@ above it real animals stop walking, and a planted gait reads wrong. Gates:
 stance feet move `< 1e-9` while planted (stationary and moving); a biped
 never lifts both feet.
 
+Foot solve and storage chain: world-planted foot target --apply inverse root
+instance transform--> body-frame IK target --solve IK in body frame-->
+creature-local upper/lower leg slots --contiguous storage upload-->
+posed-AABB culling-bounds update. The root transform is applied exactly once,
+by the object/instance matrix after creature-local SoA upload; `rootTransformSingleApplication`
+checks that no slot endpoint already contains root translation or root yaw.
+
 **2-bone IK**: clamp reach to `[|l1-l2|+1e-4, l1+l2-1e-4]`;
 `a = (l1² - l2² + d²) / 2d`, `h = sqrt(max(l1² - a², 0))`; bend hint points
 sideways-out + 0.4 forward in the body frame, made perpendicular to hip→foot
@@ -255,6 +270,13 @@ seekable to any time for deterministic capture.
 reads calm at creature scale; use `9.81 * scale` for physical), damping keep
 `1 - 0.12`, 3 relaxation passes, ≤ 8 substeps per update, dt accumulation
 capped at 0.25 s. Anchor follows the posed body; taper radius toward the tip.
+Per fixed step, write order is: base body pose writes rest slots after
+volume-preserving squash staging; root yaw/translation remain in the instance
+transform and are not baked into SoA endpoints; body-frame IK writes leg slots
+from planted targets; rope-verlet then writes its consecutive `a.xyz|b.xyz`
+segment slots from the final particle chain. If stages target the same slot,
+the later stage wins; rope-verlet slot cost is
+`ropeSubsteps * ropeRelaxationPasses * ropeSegments`, not O(slots).
 
 **Swimmer**: buoyancy spring toward injected `getWaterHeight(x, z, t)`
 (stiffness clamped 1..80, response `clamp(stiffness * dt, 0, 1)`), body
@@ -270,8 +292,11 @@ undulation and roll from the swim phase. Gate: surface coupling error
   rig writes into one mapped `Float32Array`; one contiguous upload per frame.
 - **Bounded evaluation.** Loop over the candidate set (or at minimum a
   dynamic loop bounded by the actual part count `P`), never a masked
-  compile-time unroll over the full budget. **Vertex field cost model**
-  (count fused `d, grad` capsule evaluations per shell vertex):
+  compile-time unroll over the full budget. A K-candidate loop approximates
+  the sequential, order-dependent global fold defined in §3; it is accepted
+  only by the full-field locomotion sweep gate, so failed sweeps reject the
+  spec/tier or raise K before rebuild. **Vertex field cost model** (count
+  fused `d, grad` capsule evaluations per shell vertex):
 
   | Symbol | Meaning |
   | --- | --- |
@@ -304,9 +329,11 @@ undulation and roll from the swim phase. Gate: surface coupling error
   project's constants. Frame ms and population caps are lab measurements (§9),
   never asserted here.
 - **Culling.** Root motion in `Object3D`/instance matrix; per-instance
-  bounding sphere from posed primitive AABBs each fixed step; frustum-cull
-  instances into a compacted visible list (CPU per species cell, or a compute
-  pass at large counts).
+  bounding sphere from final creature-local SoA primitive AABBs each fixed
+  step, then transformed to world by the same instance matrix that renders the
+  creature. This is the last stage in the foot pipeline from §6 and is where
+  root placement affects visibility; frustum-cull instances into a compacted
+  visible list (CPU per species cell, or a compute pass at large counts).
 - **Material variants.** Cache by `{tier, outline, debugMode, K}`. Toon
   bands, outline width, sun direction, tint, warmth are uniforms — changing
   them must not rebuild node graphs or instances.
@@ -373,9 +400,9 @@ imports) is the proving ground; the shipping scene stays a thin adapter.
   last-frame ms), focus/tier/debug/toon controls, spec JSON editor with
   `part.field` errors, seeded generation grid, `renderOnce`, `dispose`.
 - **Evidence metrics**: foot-drift markers (planted-foot world delta per
-  frame; gate `< 1e-4`), snap residual sweep across a locomotion cycle, seed
-  sweeps for generated specs, tier switcher screenshots, hop apex sampling
-  (step the clock to the exact apex — temporal gaps are where QA lies).
+  frame over a stride; gate `< 1e-4`), snap residual sweep across a locomotion
+  cycle, seed sweeps for generated specs, tier switcher screenshots, hop apex
+  sampling (step the clock to the exact apex — temporal gaps are where QA lies).
 - Lab evidence proves the package, never the shipping scene: keep the claim
   boundary explicit in the lab README.
 
@@ -404,6 +431,14 @@ Wire evidence bundles per `$threejs-visual-validation`.
 | buffer reallocations after init | 0 — storage sized at population cap |
 | per-creature spawn main-thread cost | ≤ 0.25 ms; O(slots) write, zero alloc |
 | first revealed frame | ≤ 1.5× steady-state frame time |
+
+Stance-drift thresholds are not contradictory; they measure different frames:
+
+| Threshold | Gate row / evidence | Space and reference frame |
+| --- | --- | --- |
+| `< 1e-9` | stance foot drift | sim-step-local: per fixed step in creature space after inverse root conversion |
+| `< 1e-4` | foot-drift evidence markers | world-space marker displacement accumulated over a stride |
+| `< 1e-4` | platform-mounted foot slide | platform-relative displacement under a moving platform transform |
 
 ## 11. Boot, compile, and spawn contract
 

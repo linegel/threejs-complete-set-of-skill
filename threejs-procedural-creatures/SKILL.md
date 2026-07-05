@@ -40,14 +40,20 @@ this order; every step ends in something renderable or assertable.
    compile time. Canonicalize part order (sort by stable part id) so the
    sequential smooth-min cannot change with authoring order. Build the blend
    adjacency once from rest-pose capsule AABBs expanded by `r + k`, and store
-   a bounded per-vertex candidate set (owner + K neighbours, K = 4–8).
+   a bounded per-vertex candidate set (owner + K neighbours, K = 4–8). The
+   K-candidate fold approximates the canonical sequential, order-dependent
+   global smooth-min fold; rest-AABB adjacency is only a selection heuristic,
+   and the full-field locomotion sweep gate is the acceptance bound.
 4. **Pose runtime.** The runtime pose is a typed-array SoA buffer
    (`a.xyz|ra`, `b.xyz|rb`, `k|rgb` per slot), not object graphs re-copied
    into per-material vectors. Locomotion advances on a fixed-step accumulator
    (1/60 or 1/120, clamped input dt) and renders interpolated pose — feet
    never pop on frame hitches. Root motion lives in the object transform;
-   primitives stay creature-local; maintain a real per-instance bounding
-   sphere from posed primitive AABBs. Never ship `frustumCulled = false`.
+   primitives stay creature-local; world-planted feet convert through the
+   inverse root transform for body-frame IK, then write creature-local leg
+   slots before storage upload and posed-bounds update. Maintain a real
+   per-instance bounding sphere from posed primitive AABBs. Never ship
+   `frustumCulled = false`.
 5. **Field.** Tapered-capsule distance + pairwise polynomial smooth-min
    (Quilez form). Compute the analytic gradient fused into the same loop —
    per-primitive radial direction minus the cone taper term `s·û`, blended
@@ -82,8 +88,11 @@ this order; every step ends in something renderable or assertable.
     hopper state machine with volume-preserving squash
     (`sxz = 1/sqrt(squash)`); closed-form flight sampled from sim time;
     fixed-step verlet ropes; buoyancy-spring swim against an injected water
-    height. Everything deterministic: seeded LCG + sim clock only —
-    `Math.random`/`Date.now`/`performance.now` are banned in render code.
+    height. Rope-verlet writes its segment slots after base squash staging,
+    after root-yaw target conversion, and after IK writes; the last stage
+    touching a slot wins. Everything deterministic: seeded LCG + sim clock
+    only — `Math.random`/`Date.now`/`performance.now` are banned in render
+    code.
 11. **Boot.** All heavy work is init-phase and budgeted: shell geometry once
     per tier (species-independent), rig compile + candidate sets once per
     species (time-sliced ≤ 4 ms/frame or in a worker), storage allocated at
@@ -137,7 +146,9 @@ lab; do not copy population or slot-budget constants from any external codebase.
 | Mobile WebGPU | 5–30 creatures | 1–2 total | one storage write | 1.5–3.0 ms |
 
 CPU side: rig update writes straight into the mapped typed array; zero
-per-frame allocation; locomotion is O(slots) per creature per fixed step.
+per-frame allocation; ordinary locomotion is O(slots) per creature per fixed
+step, while rope-verlet CPU cost is
+`ropeSubsteps * ropeRelaxationPasses * ropeSegments`, not O(slots).
 
 Boot side: all shippable material variants `compileAsync`-warmed before
 reveal; species build work time-sliced (≤ 4 ms/frame) or off-thread; storage
