@@ -182,9 +182,10 @@ The README must say:
 Current pass:
 
 - README catalog and contact sheet are present.
-- README marks water caustic fields, directional wave seeds, rain ripple
-  normals, and planet crater masks as screenshot-backed domain-covered
-  families.
+- README marks water caustic fields, directional wave seeds, cloud weather
+  maps, frost crystal maps, lava cause maps, meadow density masks, biome field
+  maps, rain ripple normals, starfield tiles, and planet crater masks as
+  screenshot-backed domain-covered families.
 
 ## Shared Validator Architecture
 
@@ -221,14 +222,9 @@ All validators should reuse the visual-validation harness schema where possible:
 ## Skill Order
 
 The work should proceed from highest risk of misleading validation to lower
-risk. Water optics and spectral ocean are complete; the remaining order is:
-
-1. `threejs-volumetric-clouds` weather maps
-2. `threejs-dynamic-surface-effects` frost crystal maps
-3. `threejs-procedural-materials` lava cause maps
-4. `threejs-procedural-vegetation` meadow density masks
-5. `threejs-black-holes-and-space-effects` starfield tiles
-6. `threejs-procedural-fields` biome field maps
+risk. Water optics, spectral ocean, volumetric clouds, dynamic surface effects,
+procedural materials, procedural vegetation, black-hole starfields, and
+procedural fields are complete.
 
 ## Per-Skill Plans
 
@@ -342,6 +338,13 @@ Acceptance metrics:
 
 ### 3. Volumetric Clouds: Weather Maps
 
+Status: complete. Validator:
+`threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/validate-generated-weather-maps.mjs`.
+Evidence:
+`artifacts/visual-validation/cloud-generated-weather-maps/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/cloud-generated-weather-maps/`.
+
 Skill promise:
 
 - Weather-driven cloud density, cloud type/detail, vertical profiles, erosion,
@@ -390,6 +393,13 @@ Acceptance metrics:
 
 ### 4. Dynamic Surface Effects: Frost Crystal Maps
 
+Status: complete. Validator:
+`threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/validate-generated-frost-crystals.mjs`.
+Evidence:
+`artifacts/visual-validation/frost-generated-crystals/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/frost-generated-crystals/`.
+
 Skill promise:
 
 - Frost/thaw history, crystalline structure targets, blur/thickness masks,
@@ -436,6 +446,13 @@ Acceptance metrics:
 - no obvious tiling in stress view.
 
 ### 5. Procedural Materials: Lava Cause Maps
+
+Status: complete. Validator:
+`threejs-procedural-materials/examples/tsl-procedural-pbr/validate-generated-lava-causes.mjs`.
+Evidence:
+`artifacts/visual-validation/materials-generated-lava-causes/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/materials-generated-lava-causes/`.
 
 Skill promise:
 
@@ -487,6 +504,13 @@ Acceptance metrics:
 
 ### 6. Procedural Vegetation: Meadow Density Masks
 
+Status: complete. Validator:
+`threejs-procedural-vegetation/examples/webgpu-dense-grass/validate-generated-meadow-density.mjs`.
+Evidence:
+`artifacts/visual-validation/vegetation-generated-meadow-density/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/vegetation-generated-meadow-density/`.
+
 Skill promise:
 
 - Grass and meadow placement, path clearing, clumps, flower scatter, chunked
@@ -537,6 +561,13 @@ Acceptance metrics:
 
 ### 7. Black Holes And Space Effects: Starfield Tiles
 
+Status: complete. Validator:
+`threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-generated-starfields.mjs`.
+Evidence:
+`artifacts/visual-validation/space-generated-starfields/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/space-generated-starfields/`.
+
 Skill promise:
 
 - Curved-ray space backgrounds, starfield lookup direction, accretion/wormhole
@@ -583,6 +614,13 @@ Acceptance metrics:
 - validator does not pretend the tile is a physically modeled galaxy.
 
 ### 8. Procedural Fields: Biome Field Maps
+
+Status: complete. Validator:
+`threejs-procedural-fields/examples/webgpu-field-bake/validate-generated-biome-fields.mjs`.
+Evidence:
+`artifacts/visual-validation/fields-generated-biome-maps/r185/native-budgeted/seed-180185/`.
+Durable screenshots:
+`docs/visual-validation/fields-generated-biome-maps/`.
 
 Skill promise:
 
@@ -665,11 +703,18 @@ Do not move to the next skill if:
 The full goal is complete only when:
 
 - Phase 0 current-state repairs are done and verified;
-- all eight remaining families have skill-local validators;
-- all eight validators run through package `validate`;
+- all ten generated families have skill-local validators;
+- every generated-family validator runs through package `validate`;
 - every evidence bundle passes schema and nonblank checks;
 - screenshots for every family have been manually inspected;
 - docs and README accurately distinguish domain-covered families from
   preflight-only families;
 - no generated asset family is described as accepted without matching
   skill-local evidence.
+
+Current pass:
+
+- Complete. All ten generated families now have skill-local validators, package
+  validation coverage, schema-passing evidence bundles, durable README
+  screenshots, and manual inspection of `final.design.png` plus
+  `diagnostics.mosaic.png`.

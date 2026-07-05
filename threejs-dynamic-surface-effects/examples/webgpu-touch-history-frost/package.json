@@ -1,6 +1,12 @@
 {
   "type": "module",
   "scripts": {
-    "validate": "node validate-temporal-surface.js"
+    "check": "node --check *.js && node --check validate-generated-frost-crystals.mjs && node --check generated-frost-crystals-browser.mjs",
+    "validate": "node validate-temporal-surface.js && node validate-generated-frost-crystals.mjs",
+    "validate:generated-assets": "node validate-generated-frost-crystals.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
   }
 }

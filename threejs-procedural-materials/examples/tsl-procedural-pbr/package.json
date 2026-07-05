@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "check": "node --check *.js && node --check *.mjs",
-    "validate": "node validate-procedural-pbr.mjs"
+    "validate": "node validate-procedural-pbr.mjs && node validate-generated-lava-causes.mjs",
+    "validate:generated-assets": "node validate-generated-lava-causes.mjs"
   },
   "dependencies": {
+    "playwright": "^1.45.0",
     "three": "^0.185.1"
   }
 }

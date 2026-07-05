@@ -2,8 +2,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "check": "node --check field-constants.mjs && node --check field-bundle.mjs && node --check field-bake.mjs && node --check browser-app.js && node --check capture.mjs && node --check validate-field-contract.mjs",
-    "validate": "node validate-field-contract.mjs --allow-missing-gpu",
+    "check": "node --check field-constants.mjs && node --check field-bundle.mjs && node --check field-bake.mjs && node --check browser-app.js && node --check capture.mjs && node --check validate-field-contract.mjs && node --check validate-generated-biome-fields.mjs && node --check generated-biome-fields-browser.mjs",
+    "validate": "node validate-field-contract.mjs --allow-missing-gpu && node validate-generated-biome-fields.mjs",
+    "validate:generated-assets": "node validate-generated-biome-fields.mjs",
     "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
   }
 }

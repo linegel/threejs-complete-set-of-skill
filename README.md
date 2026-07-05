@@ -145,8 +145,9 @@ domain-specific look.
 
 The contact sheet is an overview index only. The validation screenshots below
 are the reviewable evidence for the families currently covered by skill-local
-domain gates: water caustic fields, rain ripple normal maps, and procedural
-planet crater masks.
+domain gates: water caustic fields, directional wave seeds, cloud weather maps,
+frost crystal maps, lava cause maps, meadow density masks, biome field maps,
+rain ripple normal maps, starfield tiles, and procedural planet crater masks.
 
 ![Contact sheet of 30 deterministic Three.js generated texture assets for water caustics, ocean wave seeds, cloud weather maps, rain ripple normals, frost crystals, lava cause maps, meadow density masks, star fields, biome fields, and planet crater masks](docs/generated-asset-contact-sheet.png)
 
@@ -193,6 +194,222 @@ all caustic variants.
 | Stress seed | [seed-stress.final.png](docs/visual-validation/water-generated-caustics/seed-stress.final.png) |
 | Temporal start | [temporal.t000.png](docs/visual-validation/water-generated-caustics/temporal.t000.png) |
 | Temporal response | [temporal.t001.png](docs/visual-validation/water-generated-caustics/temporal.t001.png) |
+
+### Three.js Spectral Ocean Wave Seed Validation Screenshots
+
+The spectral ocean pilot validates generated directional wave seeds as
+reduced-tier `NoColorSpace` data for ocean diagnostics. The screenshots prove
+height response, slope/Jacobian diagnostics, tiled stress, camera-distance
+checks, and phase progression while keeping the canonical FFT spectrum path as
+the production contract.
+
+![Three.js WebGPU spectral ocean wave seed validation final design showing flat baseline, directional wave variants, and slope/Jacobian diagnostics](docs/visual-validation/ocean-generated-wave-seeds/final.design.png)
+
+Final design: compares the flat ocean baseline with each generated directional
+wave seed and its slope/Jacobian diagnostic.
+
+![Three.js WebGPU spectral ocean wave seed validation diagnostics mosaic showing tiled wave stress and slope/Jacobian views](docs/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes tiled directional stress and slope/Jacobian response
+for every wave seed.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/ocean-generated-wave-seeds/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/ocean-generated-wave-seeds/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/ocean-generated-wave-seeds/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/ocean-generated-wave-seeds/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/ocean-generated-wave-seeds/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/ocean-generated-wave-seeds/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/ocean-generated-wave-seeds/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/ocean-generated-wave-seeds/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/ocean-generated-wave-seeds/temporal.t001.png) |
+
+### Three.js Volumetric Cloud Weather Map Validation Screenshots
+
+The volumetric cloud pilot validates generated weather maps as reduced-tier
+RGBA `NoColorSpace` data for cloud diagnostics. The screenshots prove coverage,
+cloud type/detail, vertical bias, and alpha erosion behavior while keeping the
+production promise focused on weather-driven cloud density, lighting, shadows,
+and temporal reconstruction.
+
+![Three.js volumetric cloud weather map validation final design showing no-weather baseline, generated weather-map variants, and density diagnostics](docs/visual-validation/cloud-generated-weather-maps/final.design.png)
+
+Final design: compares a no-weather density baseline with each generated
+weather-map variant and its applied cloud-density diagnostic.
+
+![Three.js volumetric cloud weather map validation diagnostics mosaic showing RGB weather fields and alpha erosion channels](docs/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes RGB weather fields and semantic alpha erosion for
+all weather-map variants.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/cloud-generated-weather-maps/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/cloud-generated-weather-maps/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/cloud-generated-weather-maps/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/cloud-generated-weather-maps/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/cloud-generated-weather-maps/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/cloud-generated-weather-maps/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/cloud-generated-weather-maps/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/cloud-generated-weather-maps/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/cloud-generated-weather-maps/temporal.t001.png) |
+
+### Three.js Dynamic Surface Frost Crystal Validation Screenshots
+
+The dynamic surface pilot validates generated frost crystal maps as reduced-tier
+RGBA `NoColorSpace` data for touch-history frost diagnostics. The screenshots
+prove crystal-driven mask/detail response, derived refraction normals, opaque
+alpha padding, and touch-history clearing while keeping the production promise
+focused on StorageTexture history, reduced blur, and TSL refraction.
+
+![Three.js dynamic surface frost crystal validation final design showing clear glass, generated frost crystal variants, and refraction diagnostics](docs/visual-validation/frost-generated-crystals/final.design.png)
+
+Final design: compares clear glass with each generated frost-crystal variant
+and its derived refraction diagnostic.
+
+![Three.js dynamic surface frost crystal validation diagnostics mosaic showing structure maps and normal/refraction response](docs/visual-validation/frost-generated-crystals/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes structure/detail/visible channels and
+normal/refraction response for every frost-crystal variant.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/frost-generated-crystals/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/frost-generated-crystals/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/frost-generated-crystals/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/frost-generated-crystals/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/frost-generated-crystals/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/frost-generated-crystals/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/frost-generated-crystals/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/frost-generated-crystals/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/frost-generated-crystals/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/frost-generated-crystals/temporal.t001.png) |
+
+### Three.js Procedural Material Lava Cause Validation Screenshots
+
+The procedural-materials pilot validates generated lava cause maps as
+reduced-tier RGBA `NoColorSpace` data for PBR material diagnostics. The
+screenshots prove crust coverage, fracture networks, heat exposure, semantic
+alpha thermal intensity, roughness/normal variation, and raw emissive separation
+from final material color.
+
+![Three.js procedural material lava cause validation final design showing default lava identity, generated PBR surfaces, and raw emissive diagnostics](docs/visual-validation/materials-generated-lava-causes/final.design.png)
+
+Final design: compares the default lava identity with each generated cause-map
+PBR surface and raw emissive diagnostic.
+
+![Three.js procedural material lava cause validation diagnostics mosaic showing RGB causes and alpha/emissive response](docs/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes RGB causes and semantic alpha/emissive response for
+all lava-cause variants.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/materials-generated-lava-causes/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/materials-generated-lava-causes/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/materials-generated-lava-causes/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/materials-generated-lava-causes/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/materials-generated-lava-causes/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/materials-generated-lava-causes/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/materials-generated-lava-causes/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/materials-generated-lava-causes/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/materials-generated-lava-causes/temporal.t001.png) |
+
+### Three.js Procedural Vegetation Meadow Density Validation Screenshots
+
+The procedural-vegetation pilot validates generated meadow density maps as
+reduced-tier RGBA `NoColorSpace` data for dense-grass placement diagnostics.
+The screenshots prove density-shaped placement, path clearing, clump/LOD
+variation, semantic alpha flower masks, and shared-mask consistency between
+diagnostics and final meadow color.
+
+![Three.js procedural vegetation meadow density validation final design showing uniform meadow baseline, generated meadow variants, and placement diagnostics](docs/visual-validation/vegetation-generated-meadow-density/final.design.png)
+
+Final design: compares the uniform meadow baseline with each generated
+meadow-density variant and placement diagnostic.
+
+![Three.js procedural vegetation meadow density validation diagnostics mosaic showing RGB density path clump masks and alpha flower response](docs/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes RGB density/path/clump masks and semantic alpha
+flower response for every meadow-density variant.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/vegetation-generated-meadow-density/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/vegetation-generated-meadow-density/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/vegetation-generated-meadow-density/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/vegetation-generated-meadow-density/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/vegetation-generated-meadow-density/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/vegetation-generated-meadow-density/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/vegetation-generated-meadow-density/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/vegetation-generated-meadow-density/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/vegetation-generated-meadow-density/temporal.t001.png) |
+
+### Three.js Curved-Ray Starfield Tile Validation Screenshots
+
+The black-holes and space-effects pilot validates generated starfield tiles as
+RGBA `SRGBColorSpace` environment color for curved-ray background diagnostics.
+The screenshots prove opaque alpha padding, raw star-tile lookup, final-direction
+lensing response, bent-direction diagnostics, and termination/opacity views.
+
+![Three.js curved-ray starfield tile validation final design showing unlensed baseline, lensed starfields, and bent-direction diagnostics](docs/visual-validation/space-generated-starfields/final.design.png)
+
+Final design: compares the unlensed star baseline with each generated
+starfield-tile variant after final-direction lookup and bent-direction
+diagnostics.
+
+![Three.js curved-ray starfield tile validation diagnostics mosaic showing raw SRGB tiles and termination opacity views](docs/visual-validation/space-generated-starfields/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes raw SRGB star tiles and termination/opacity views
+for every starfield variant.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/space-generated-starfields/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/space-generated-starfields/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/space-generated-starfields/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/space-generated-starfields/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/space-generated-starfields/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/space-generated-starfields/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/space-generated-starfields/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/space-generated-starfields/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/space-generated-starfields/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/space-generated-starfields/temporal.t001.png) |
+
+### Three.js Procedural Field Biome Map Validation Screenshots
+
+The procedural-fields pilot validates generated biome field maps as reduced-tier
+RGBA `NoColorSpace` data for field diagnostics. The screenshots prove macro
+height, ridge, cavity, semantic alpha moisture, field-shaped biome material
+response, and derived slope/place/roughness diagnostics.
+
+![Three.js procedural field biome map validation final design showing default baseline, generated biome field variants, and derived diagnostics](docs/visual-validation/fields-generated-biome-maps/final.design.png)
+
+Final design: compares the default field baseline with each generated biome
+field variant and derived-channel diagnostic.
+
+![Three.js procedural field biome map validation diagnostics mosaic showing RGB field channels and alpha moisture response](docs/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png)
+
+Diagnostics mosaic: exposes RGB height/ridge/cavity fields and semantic alpha
+moisture response for every biome variant.
+
+| Capture | Screenshot |
+| --- | --- |
+| Final design | [final.design.png](docs/visual-validation/fields-generated-biome-maps/final.design.png) |
+| No-post/baseline | [no-post.design.png](docs/visual-validation/fields-generated-biome-maps/no-post.design.png) |
+| Diagnostics mosaic | [diagnostics.mosaic.png](docs/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png) |
+| Near camera | [camera.near.png](docs/visual-validation/fields-generated-biome-maps/camera.near.png) |
+| Design camera | [camera.design.png](docs/visual-validation/fields-generated-biome-maps/camera.design.png) |
+| Far camera | [camera.far.png](docs/visual-validation/fields-generated-biome-maps/camera.far.png) |
+| Seed baseline | [seed-0001.final.png](docs/visual-validation/fields-generated-biome-maps/seed-0001.final.png) |
+| Stress seed | [seed-stress.final.png](docs/visual-validation/fields-generated-biome-maps/seed-stress.final.png) |
+| Temporal start | [temporal.t000.png](docs/visual-validation/fields-generated-biome-maps/temporal.t000.png) |
+| Temporal response | [temporal.t001.png](docs/visual-validation/fields-generated-biome-maps/temporal.t001.png) |
 
 ### Three.js Rain Ripple Normal Validation Screenshots
 

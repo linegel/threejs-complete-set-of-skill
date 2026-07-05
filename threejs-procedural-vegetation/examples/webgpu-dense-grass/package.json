@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "scripts": {
+    "check": "node --check *.js && node --check validate-generated-meadow-density.mjs && node --check generated-meadow-density-browser.mjs",
+    "validate": "node validation.js && node validate-generated-meadow-density.mjs",
+    "validate:generated-assets": "node validate-generated-meadow-density.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
+  }
+}
