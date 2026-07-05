@@ -716,7 +716,8 @@ export function createBoundedWaterMaterial({
     const viewDirection = normalize(cameraPosition.sub(positionWorld));
     const underwater = dot(normalValue, viewDirection).lessThan(0);
     const eta = select(underwater, float(parameters.waterIor / parameters.airIor), float(parameters.airIor / parameters.waterIor));
-    const f0 = pow(float(parameters.airIor).sub(parameters.waterIor).div(float(parameters.airIor).add(parameters.waterIor)), 2.0);
+    const f0Base = float(parameters.airIor).sub(parameters.waterIor).div(float(parameters.airIor).add(parameters.waterIor));
+    const f0 = f0Base.mul(f0Base);
     const nDotV = abs(dot(normalValue, viewDirection));
     const fresnel = clamp(f0.add(float(1).sub(f0).mul(pow(float(1).sub(nDotV), 5.0))), 0, 1);
     const refracted = refract(viewDirection.negate(), normalValue, eta);

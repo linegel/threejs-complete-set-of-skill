@@ -12,8 +12,10 @@ side-aware Fresnel, analytic sky reflection, and crest foam. Use
 - renderer, nodes, and capability gate
 - bounded heightfield compute chain
 - analytic multi-wave TSL contract
+- host integration contracts
 - depth-aware refraction and absorption
 - reflection, Fresnel, glints, foam, and energy
+- presets, quality, buoyancy, spray, masking, and deterministic ticks
 - normal filtering and normal-only limits
 - quality tiers and budgets
 - color and output rules
@@ -41,6 +43,55 @@ samples compact textures instead of re-solving water state per pixel.
 For authored open-water surfaces that do not need local interaction, use the
 same TSL wave functions without the heightfield. For large statistical oceans,
 route to `$threejs-spectral-ocean`.
+
+## Host Integration Contracts
+
+The skill integrates water into an existing Three.js project. It does not own
+the whole app.
+
+Host-owned systems:
+
+```text
+renderer and canvas sizing
+main scene and opaque refraction scene
+camera and controls
+asset loading
+transparent object policy
+physics and buoyancy bodies
+network tick/authority
+screen-space mask registry
+post-processing and final output transform
+```
+
+Water-owned systems:
+
+```text
+GPU height/velocity/slope/caustic state
+fixed-step compute updates
+surface material and debug modes
+scene color/depth input nodes from the host opaque pass
+surface query contract for CPU consumers
+drop/object/wake impulse ingress
+resource and timing diagnostics
+```
+
+Minimal frame order:
+
+```js
+fixedClock.step(deltaSeconds, (fixedDt, tick) => {
+  timeNode.value = tick * fixedDt;
+  buoyancy.update(waterQuery, fixedDt, tick);
+  spray.update(waterQuery, fixedDt, tick);
+  water.update(fixedDt);
+});
+
+water.pipeline.render(); // renders opaque scene without water
+renderer.render(scene, camera); // renders water and host transparent objects
+```
+
+The opaque pass must exclude the water mesh. Transparent objects normally stay
+out of the opaque pass and render after water unless the project explicitly
+implements order-independent transparency.
 
 ## Renderer, Nodes, And Capability Gate
 
@@ -217,6 +268,107 @@ dispersion = sqrt(9.8 * k)
 Use it only when silhouettes and geometric parallax are intentionally flat.
 Do not claim geometry/normal parity when the mesh is not displaced.
 
+## Presets, Quality, And Host-Owned Scene State
+
+Presets are data, not scene ownership. A preset can set simulation, optics,
+foam, spray defaults, and quality preference. It can include a sky/fog/lighting
+hint, but the host applies those through its own scene systems.
+
+Recommended shape:
+
+```ts
+type WaterPreset = {
+  simulation: {
+    worldSize: [number, number];
+    waveSpeed: number;
+    damping: number;
+    dropStrength: number;
+    objectDisplacementScale: number;
+  };
+  optics: {
+    absorptionPerMeter: [number, number, number];
+    refractionStrength: number;
+    roughness: number;
+    deepBodyColor: [number, number, number];
+    shallowScatterColor: [number, number, number];
+  };
+  foam: {
+    crestThreshold: number;
+    impulseGain: number;
+    decay: number;
+  };
+  sprayDefaults?: SprayDefaults;
+  qualityPreference?: "low" | "medium" | "high" | "ultra";
+  hostSkyHint?: unknown;
+};
+```
+
+Quality changes rebuild GPU resources. Preserve host state across rebuilds:
+authoritative tick, active preset, buoyancy registrations, spray emitters,
+masks, transparent ordering, and post output ownership.
+
+Four-tier WebGPU budgets:
+
+| Tier | Sim grid | Mesh segments | Fixed step | Max substeps | Bands | Refraction | Caustics |
+| --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| Low | 128 | 96-128 | 1/60 | 2 | 2-3 displaced | clamped depth-aware or body color | low-res compute |
+| Medium | 192-256 | 128-192 | 1/90 | 2-3 | 3-4 displaced + 1 micro | half-res depth-aware | compute |
+| High | 256-512 | 192-256 | 1/120 | 3 | 4 displaced + 3 micro | depth-aware or half-res | compute |
+| Ultra | 512-1024 | 256+ | 1/120-1/240 | 4 | 5 displaced + 4 micro | full-res depth-aware | compute |
+
+Every tier must satisfy:
+
+```text
+waveSpeed * fixedDt / minCellSize <= 1 / sqrt(2)
+```
+
+If the project requires JONSWAP spectra, directional spreading, spectral
+sharpness, standing-wave ratios, or persistent ocean foam, use
+`$threejs-spectral-ocean` as the surface provider and keep the host integration
+contract here.
+
+## Buoyancy, Spray, And Deterministic Networking
+
+Buoyancy belongs to host physics, but the water module must expose a stable
+query:
+
+```js
+const query = createBoundedWaterHeightQuery();
+const height = query.getWaterHeight(x, z, tick * stepSize);
+```
+
+Rules:
+
+- no per-frame GPU readback;
+- active sample budget defaults to 128;
+- multi-point hulls use stable object-local sample points;
+- single-point floats scale by object count;
+- query output documents residual from live GPU impulses;
+- object motion feeds the GPU through `setObjectImpulse()`.
+
+Spray is an emitter/probe system coupled to the same query:
+
+```text
+previousSignedDistance > 0
+currentSignedDistance <= 0
+abs(deltaSignedDistance / dt) >= velocityThreshold
+```
+
+Probes live in object-local space. Per-probe visual settings are frozen at
+spawn. Override order is system defaults, emitter values, then probe values.
+Disabled probes keep their index.
+
+Networked scenes use integer ticks:
+
+```js
+waterClock.syncToTick(authoritativeTick);
+water.update(fixedStepSeconds);
+```
+
+Shader time is `tick * fixedStepSeconds`, not wall-clock time. Cap catch-up
+steps per visual frame. Seed drops, spray jitter, and wakes from deterministic
+integer hashes. Document tick wrap.
+
 ## Depth-Aware Refraction And Absorption
 
 Scene color is owned by the node pipeline, not by a private capture path. Render
@@ -288,6 +440,52 @@ foam = smoothstep(threshold, 1, crest * noisy modulation)
 
 Persistent open-ocean foam belongs in `$threejs-spectral-ocean`; rain-driven
 surface foam and splashes belong in `$threejs-rain-snow-and-wet-surfaces`.
+
+## Transparent Objects, Masking, And Post
+
+Transparent host objects are excluded from the opaque refraction prepass and
+rendered after water by default:
+
+```text
+opaque scene/depth prepass -> water -> host transparent objects -> post stack
+```
+
+Alpha-tested cutouts may stay in the opaque pass. Physically transmitted glass
+or liquid materials need a separate pipeline design because they compete for
+depth/transmission ownership.
+
+Screen-space masking requires a mask texture and material hook:
+
+```js
+const mask = water.masking.add(maskMesh, {
+  space: "screen",
+  channel: "hullInterior",
+  dilationPixels: 1,
+});
+```
+
+Mask contract:
+
+- mask meshes are invisible in the main scene;
+- host renders masks to a `NoColorSpace` screen-space texture before water;
+- water material discards or fades fragments where the mask is set;
+- mask pass is skipped when no masks are registered;
+- validation includes a hull/interior camera where masked water is absent.
+
+A host-side registry without a mask texture and water material hook is not
+complete masking.
+
+Host post-processing order:
+
+1. opaque color/depth prepass;
+2. water refraction, absorption, reflection, caustics, and foam;
+3. depth-dependent underwater haze or fog;
+4. anti-aliasing;
+5. bloom/glints;
+6. grading and final output transform.
+
+Water materials output linear HDR. The host post stack owns final tone mapping
+and color conversion.
 
 ## Normal Filtering And Normal-Only Limits
 
@@ -363,6 +561,29 @@ CPU versus GPU surface height approximation at camera position
 Fail the validation harness if caustics produce NaN/Inf, refraction validity is
 unexpectedly low for a stable camera, output conversion happens twice, or fixed
 steps exceed the tier budget.
+
+Integration validation must also fail on:
+
+```text
+browser GPUValidationError
+blank page screenshot accepted as WebGPU evidence
+render-target readback with invalid row stride
+water mesh present in its own opaque refraction prepass
+transparent object present in the opaque depth inputs by default
+buoyancy sample count above the project budget
+spray probes that never fire under a forced crossing
+syncToTick() that does not land on the next fixed step
+screen-space masking claimed without mask texture and material hook
+```
+
+For WGSL validity, compute Fresnel `F0` with multiplication:
+
+```js
+const r = etaA.sub(etaB).div(etaA.add(etaB));
+const f0 = r.mul(r);
+```
+
+Do not emit `pow(negativeAbstractFloat, 2.0)`.
 
 ## Replaced Techniques
 

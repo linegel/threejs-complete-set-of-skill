@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "scripts": {
+    "check": "node --check integration-demo.js && node --check validate-integration-surface.mjs",
+    "validate": "node validate-integration-surface.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "three": "^0.185.1"
+  }
+}

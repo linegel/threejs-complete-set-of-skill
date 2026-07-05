@@ -10,8 +10,46 @@ scene stack. Treat water as simulated state, geometry motion, surface
 orientation, and optical transport. A blue transparent material is not a water
 system.
 
+Use this skill to integrate a WebGPU water module into an existing Three.js
+project. Do not replace the host app. The host owns scenes, camera, controls,
+assets, transparent ordering, post-processing, physics, networking, and masks.
+The water module owns GPU-resident simulation, surface shading, depth-aware
+refraction inputs, impulses, surface queries, and diagnostics.
+
 For large stochastic seas driven by directional spectra and GPU FFTs, use
 `$threejs-spectral-ocean` instead.
+
+## Host Integration Contract
+
+Minimum shape:
+
+```js
+const water = await createWebGPUBoundedWaterSystem(renderer, {
+  sceneColorScene: opaqueSceneWithoutWater,
+  camera,
+  tier: "high",
+  parameters: preset.simulation,
+  timeNode: fixedTickTimeNode,
+});
+
+scene.add(water.mesh);
+
+function frame(deltaSeconds) {
+  fixedClock.step(deltaSeconds, (fixedDt, tick) => {
+    water.update(fixedDt);
+    buoyancy.update(waterQuery, fixedDt, tick);
+    spray.update(waterQuery, fixedDt, tick);
+  });
+
+  water.pipeline?.render();
+  renderer.render(scene, camera);
+}
+```
+
+The water mesh must not be in the opaque prepass scene it samples for
+refraction. Transparent host objects are normally excluded from that prepass and
+rendered after water unless the project implements a separate
+order-independent-transparency path.
 
 ## Mandatory Architecture
 
@@ -52,6 +90,10 @@ render pipeline. Build the highest-throughput algorithm first:
    report the invalid fraction in diagnostics.
 7. Blend reflection, refraction, absorption, glints, caustics, and foam through
    side-aware Fresnel and an explicit energy budget.
+8. Expose integration contracts for presets, quality tiers, buoyancy queries,
+   deterministic ticks, spray probes, transparent ordering, screen-space masks,
+   and host-owned post-processing. These are host/module contracts, not a
+   monolithic library API.
 
 Legacy WebGL implementation (deprecated, do not extend): `examples/analytic-wave-optics/water-system.js`, `examples/interactive-pool-volume/water-volume-system.js`.
 
@@ -71,17 +113,66 @@ if (renderer.backend.isWebGPUBackend) {
 }
 ```
 
-Quality tiers:
+Quality tiers are resource and feature budgets inside the same WebGPU path:
 
 | Tier | Backend condition | Heightfield | Analytic bands | Refraction | Caustics |
 | --- | --- | ---: | ---: | --- | --- |
 | Ultra | WebGPU discrete | 512-1024 square | 5 displaced + 4 micro | full-res depth-aware | compute differential area |
-| High | WebGPU integrated | 256-512 square | 4 displaced + 3 micro | half-res depth-aware | compute differential area |
-| Budgeted | WebGPU mobile or low-power | 128-256 square | 2-3 bands | clamped screen offset or body color | lower-resolution computed caustics |
+| High | WebGPU integrated/discrete | 256-512 square | 4 displaced + 3 micro | depth-aware or half-res depth-aware | compute differential area |
+| Medium | WebGPU integrated | 192-256 square | 3-4 displaced + 1 micro | half-res depth-aware | compute differential area |
+| Low/Budgeted | WebGPU mobile or low-power | 128-256 square | 2-3 bands | clamped depth-aware or body color | lower-resolution computed caustics |
 
 If the user explicitly asks how to apply fallback when WebGPU is unavailable,
 route that teaching to `../threejs-compatibility-fallbacks/` instead of adding
 it to this flagship path.
+
+Runtime quality changes are resource rebuilds. Preserve host-level state across
+the rebuild: authoritative tick, active preset, registered buoyancy objects,
+spray emitters, masks, transparent ordering, and post-processing output owner.
+
+## Integration Features
+
+Presets are data bundles. They configure water simulation, optics, foam, spray
+defaults, and optional quality preference. Sky, lighting, fog, and grading stay
+host-owned; a preset may provide host hints, but it must not take scene
+ownership.
+
+Buoyancy is host/physics code using a stable surface query:
+
+```js
+const y = waterQuery.getWaterHeight(x, z, tick * stepSize);
+```
+
+Keep active buoyancy samples under 128 unless the project states another
+budget. Multi-point hulls use stable local-space samples; single-point floats
+scale by object count. Do not read GPU heightfield textures back each frame.
+Submit object motion back to the GPU with an impulse contract such as
+`setObjectImpulse({ oldCenter, newCenter, radius, strength })`.
+
+Deterministic multiplayer uses integer ticks:
+
+```js
+waterClock.syncToTick(authoritativeTick);
+water.update(fixedStepSeconds);
+```
+
+Shader time is `tick * fixedStepSeconds`. Cap catch-up steps, hash seeded drops
+and spray jitter from integers, and document tick wrap.
+
+Spray is an emitter/probe system coupled to the surface query. Probes live in
+object-local space and fire on signed-distance crossings whose impact speed
+exceeds `velocityThreshold`. System defaults are overridden by emitter values,
+then probe values. Probe indices stay stable when probes are disabled.
+
+Screen-space masking requires a host-owned mask registry and a water material
+mask sample. Mask meshes are invisible in the main scene, rendered into a
+`NoColorSpace` screen-space texture before water, and sampled by the water
+material to discard or fade masked fragments. A registry without a mask texture
+and material hook is not complete masking.
+
+Host-owned post-processing order is: opaque color/depth prepass, water
+refraction/absorption/reflection/foam, depth-dependent underwater haze or fog,
+anti-aliasing, bloom/glints, grading, final output transform.
 
 ## Performance Budgets
 
@@ -132,6 +223,14 @@ Canonical WebGPU/TSL example: [examples/webgpu-bounded-water](examples/webgpu-bo
 - approximate path length is presented as reconstructed scene thickness;
 - micro-waves alias into sparkling noise because derivative filtering is absent;
 - foam is a scrolling texture unrelated to the shared crest metric;
+- buoyancy uses per-frame GPU readback instead of an analytic or budgeted
+  surface query;
+- deterministic mode uses wall-clock time or uncapped catch-up instead of
+  authoritative integer ticks;
+- spray emitters are visual-only particles detached from surface crossings;
+- transparent objects are included in the opaque refraction prepass by default;
+- screen-space masks are claimed without a mask texture and water material hook;
+- post-processing lets water own the final output transform inside a host stack;
 - Fresnel is replaced by constant opacity;
 - reflection, refraction, glints, crest tint, transparency, and foam are added
   without an energy budget;

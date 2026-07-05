@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Water Integration Surface Experiment</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #061014;
+        color: #e9f5f7;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .hud {
+        position: fixed;
+        inset: 16px auto auto 16px;
+        width: min(420px, calc(100vw - 32px));
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid rgba(208, 239, 244, 0.22);
+        border-radius: 6px;
+        background: rgba(4, 14, 18, 0.74);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 96px 1fr;
+        align-items: center;
+        gap: 8px;
+        min-height: 28px;
+      }
+
+      .label {
+        color: rgba(233, 245, 247, 0.62);
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      select,
+      button {
+        height: 28px;
+        border: 1px solid rgba(202, 235, 241, 0.22);
+        border-radius: 4px;
+        background: rgba(12, 31, 38, 0.92);
+        color: #edf9fb;
+        font: inherit;
+        font-size: 12px;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .metric {
+        min-height: 36px;
+        padding: 7px 8px;
+        border: 1px solid rgba(202, 235, 241, 0.12);
+        border-radius: 4px;
+        background: rgba(11, 25, 31, 0.7);
+      }
+
+      .metric b {
+        display: block;
+        color: rgba(233, 245, 247, 0.58);
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1.1;
+      }
+
+      .metric span {
+        display: block;
+        margin-top: 3px;
+        color: #effcff;
+        font-size: 13px;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body.headless .hud {
+        display: none;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../../examples/webgpu-bounded-water/node_modules/three/build/three.webgpu.js",
+          "three/webgpu": "../../examples/webgpu-bounded-water/node_modules/three/build/three.webgpu.js",
+          "three/tsl": "../../examples/webgpu-bounded-water/node_modules/three/build/three.tsl.js",
+          "three/addons/": "../../examples/webgpu-bounded-water/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="hud" aria-label="Water integration controls">
+      <div class="row">
+        <div class="label">Preset</div>
+        <select id="preset-select"></select>
+      </div>
+      <div class="row">
+        <div class="label">Quality</div>
+        <select id="quality-select">
+          <option value="reduced">reduced</option>
+          <option value="high" selected>high</option>
+          <option value="ultra">ultra</option>
+        </select>
+      </div>
+      <div class="button-row">
+        <button id="drop-button" type="button">Drop</button>
+        <button id="sync-button" type="button">Sync Tick</button>
+        <button id="storm-button" type="button">Storm</button>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>Backend</b><span id="metric-backend">...</span></div>
+        <div class="metric"><b>Tick</b><span id="metric-tick">...</span></div>
+        <div class="metric"><b>Buoyancy</b><span id="metric-buoyancy">...</span></div>
+        <div class="metric"><b>Spray</b><span id="metric-spray">...</span></div>
+        <div class="metric"><b>Masks</b><span id="metric-mask">...</span></div>
+        <div class="metric"><b>Ordering</b><span id="metric-ordering">...</span></div>
+      </div>
+    </div>
+    <script type="module" src="./integration-demo.js"></script>
+  </body>
+</html>

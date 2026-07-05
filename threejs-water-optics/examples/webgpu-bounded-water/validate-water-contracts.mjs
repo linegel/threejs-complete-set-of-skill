@@ -19,6 +19,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "webgpu-bounded-water.js"), "utf8");
 const cpuHeightSource = readFileSync(join(here, "cpu-water-height.js"), "utf8");
 const readme = readFileSync(join(here, "README.md"), "utf8");
+const skill = readFileSync(join(here, "../../SKILL.md"), "utf8");
 const reference = readFileSync(join(here, "../../references/water-surface-system.md"), "utf8");
 
 function assert(condition, message) {
@@ -76,6 +77,8 @@ assert(source.includes("linearDepth(currentDepth)"), "Depth-aware refraction mus
 assert(!source.includes("viewportLinearDepth("), "Depth-aware refraction must not call viewportLinearDepth(...); it is not callable in r185.");
 assert(source.includes("perspectiveDepthToViewZ"), "Depth-aware refraction must convert raw depth to view-Z meters.");
 assert(!source.includes("mul(80.0)"), "Raw nonlinear depth deltas must not be scaled by a magic meter factor.");
+assert(source.includes("const f0Base") && source.includes("f0Base.mul(f0Base)"), "Fresnel F0 must square the eta ratio with multiplication for WGSL validity.");
+assert(!source.includes("pow(float(parameters.airIor)"), "Fresnel F0 must not emit pow(negativeAbstractFloat, 2.0).");
 assert(!source.includes("frustumCulled = false"), "Water mesh must use computed bounds instead of disabling frustum culling.");
 assert(source.includes("createBoundedWaterRenderPipeline(renderer, sceneColorScene, camera)"), "System must build refraction inputs from a separate sceneColorScene.");
 assert(source.includes("pass(opaqueScene, camera)"), "Render pipeline must render an opaque scene, not the live water scene.");
@@ -91,6 +94,18 @@ for (const row of ["`coord`", "`coordUv`", "`world`", "`height/velocity`", "`nor
   assert(reference.includes(row), `Reference interface-space table missing ${row}.`);
 }
 assert(reference.includes("linearDepth(value)") && reference.includes("view-Z meters"), "Reference must define raw depth to view-Z meter conversion.");
+for (const phrase of [
+  "Host Integration Contract",
+  "Presets are data",
+  "active sample budget defaults to 128",
+  "Networked scenes use integer ticks",
+  "Spray is an emitter/probe system",
+  "Transparent host objects are excluded",
+  "Screen-space masking requires a mask texture",
+  "Host post-processing order",
+]) {
+  assert(reference.includes(phrase) || skill.includes(phrase), `Water integration docs missing phrase: ${phrase}.`);
+}
 
 const checkpointCount = (readme.match(/You must see/g) ?? []).length;
 const mistakeCount = (readme.match(/if /g) ?? []).length;
