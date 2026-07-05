@@ -46,9 +46,10 @@ texture lookups, segment transmittance, and depth-aware composition.
 2. Define one atmosphere model shared by sky, aerial perspective, sun/moon
    discs, material irradiance, and lighting: radii, density profiles,
    coefficients, sun direction, exposure scale, and unit conversion.
-3. Initialize `WebGPURenderer`, call `await renderer.init()`, and choose a
-   quality tier through the capability gate. The reduced tier uses smaller or
-   precomputed LUTs, not a parallel renderer.
+3. Initialize `WebGPURenderer`, call `await renderer.init()`, and gate on
+   `renderer.backend.isWebGPUBackend === true`. Canonical flagship examples
+   throw on non-WebGPU; teaching how to apply fallback when WebGPU is
+   unavailable belongs in `$threejs-compatibility-fallbacks`.
 4. Generate LUTs with TSL `Fn().compute(count)` dispatches through
    `renderer.compute()` or `renderer.computeAsync()`. Write into
    `StorageTexture` resources with `textureStore()` and treat LUTs as
@@ -80,12 +81,13 @@ Any path using compute/storage/MRT must gate after renderer initialization:
 ```js
 await renderer.init();
 
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: compute-generated LUTs, storage textures, MRT/depth sharing.
-} else {
-  // Reduced tier: smaller grids, offline/precomputed LUT assets, static sky-view
-  // updates, or disabled material irradiance. Do not build a parallel path.
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error(
+    'threejs-sky-atmosphere-and-haze requires WebGPU for the flagship live LUT path; use threejs-compatibility-fallbacks when teaching how to apply fallback when WebGPU is unavailable.'
+  );
 }
+
+// Full tier: compute-generated LUTs, storage textures, MRT/depth sharing.
 ```
 
 Quality tiers:
@@ -95,7 +97,7 @@ Quality tiers:
 | Ultra desktop-discrete | WebGPU backend with generous storage budget | 256x64 transmittance, 64x32 multiscatter/irradiance, 192x108 sky-view, 32-64 aerial froxel slices, optional temporal update split |
 | High desktop-discrete/integrated | WebGPU backend with moderate storage budget | 256x64 transmittance, 128x64 sky-view, 24-32 froxel slices, update sky-view when sun/camera frame changes |
 | Default mobile/tiled | WebGPU backend with tight bandwidth | 128x32 transmittance, 96x48 sky-view, 16-24 froxel slices, lower-frequency multiscatter refresh |
-| Reduced backend tier | Non-WebGPU backend selected by `WebGPURenderer` | precomputed LUT assets, smaller grids, static sky-view, no live froxel compute |
+| Fallback route | Not part of this flagship skill | use `$threejs-compatibility-fallbacks` when fallback behavior is explicitly requested |
 
 ## Required Outputs
 
@@ -131,9 +133,9 @@ behavior.
 - Atmosphere radiance enters the image chain as scene-linear HDR. Use
   `HalfFloatType` working buffers until tone mapping.
 - Exactly one system owns tone mapping and one system owns output color
-  conversion. Prefer the host `RenderPipeline` `outputColorTransform`; use
-  `renderOutput()` only when display-referred nodes intentionally run after
-  conversion.
+  conversion. If `renderOutput()` owns final presentation, set
+  `RenderPipeline.outputColorTransform = false`; otherwise let the host
+  `RenderPipeline.outputColorTransform` own conversion.
 - Exposure can scale physically authored radiance, but it must not hide wrong
   units, coefficients, or transmittance.
 

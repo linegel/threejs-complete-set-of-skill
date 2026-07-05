@@ -80,24 +80,26 @@ const renderer = new WebGPURenderer( {
 
 await renderer.init();
 
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: live compute/storage LUT generation and RenderPipeline sharing.
-} else {
-  // Reduced-quality tier: precomputed LUT assets, smaller grids, static
-  // sky-view updates, fewer froxel slices, or disabled optional irradiance.
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error(
+    'threejs-sky-atmosphere-and-haze requires WebGPU for the flagship live LUT path; use threejs-compatibility-fallbacks when teaching how to apply fallback when WebGPU is unavailable.'
+  );
 }
+
+// Full tier: live compute/storage LUT generation and RenderPipeline sharing.
 ```
 
-Reduced quality is a content and resolution choice, not a second implementation.
-Load checked LUT assets when live compute/storage is unavailable, and keep the
-same runtime node composition.
+Canonical flagship examples do not silently downgrade when live compute/storage
+is unavailable. Keep fallback policy in `$threejs-compatibility-fallbacks`, so
+callers can opt into a smaller asset-backed path explicitly instead of getting
+a hidden quality and algorithm change.
 
 | Tier | Transmittance | Multiscatter / irradiance | Sky-view | Aerial froxels | Target |
 | --- | ---: | ---: | ---: | ---: | --- |
 | Ultra desktop-discrete | 256x64 | 64x32 or higher | 192x108 | 32-64 slices | 0.4-1.2 ms at 1440p |
 | High desktop/integrated | 256x64 | 32x32-64x32 | 128x64 | 24-32 slices | 0.7-1.8 ms at 1080p |
 | Mobile/tiled | 128x32 | 32x16-32x32 | 96x48 | 16-24 slices | 0.8-2.5 ms at 720p-900p |
-| Reduced backend | asset-provided | asset-provided | static or asset-provided | 8-16 slices or disabled | 0.3-1.2 ms |
+| Fallback route | outside this flagship contract | outside this flagship contract | outside this flagship contract | outside this flagship contract | use `$threejs-compatibility-fallbacks` |
 
 Every tier must publish dispatch counts, workgroup sizes, texture formats,
 texture dimensions, update cadence, pass count, draw calls, memory, and GPU
@@ -116,6 +118,12 @@ The canonical `examples/webgpu-lut-atmosphere/` schedule uses:
 Each product records dispatch dimensions, update cadence, byte cost, and tier
 budget in code. Browser/GPU runs must replace the starter budgets with measured
 GPU timings.
+
+The Phase 1 example executes real TSL compute nodes for the transmittance LUT
+and a single-scattering aerial-perspective froxel volume. Multiscatter,
+irradiance, and sky-view nodes are intentionally documented as out of scope
+until their algorithms are implemented; descriptor metadata must not be
+presented as executed compute.
 
 ## Shared Parameter Model
 
@@ -308,10 +316,10 @@ diagnostics.
 - Atmosphere radiance is scene-linear HDR until the app's single tone-map
   owner. Use `HalfFloatType` for HDR buffers unless a measured tier proves a
   smaller format is acceptable.
-- The atmosphere node must not apply display conversion. Let
+- The atmosphere node must not apply display conversion twice. Let
   `RenderPipeline.outputColorTransform` handle the normal final transform, or
-  disable it and call `renderOutput()` when display-referred nodes must execute
-  after conversion.
+  when `renderOutput()` owns final presentation set
+  `RenderPipeline.outputColorTransform = false`.
 - Exposure belongs to the host camera/image pipeline. It may scale physically
   authored radiance, but it must not compensate for broken units or LUTs.
 
@@ -335,7 +343,7 @@ Frame budget defaults:
 | Desktop discrete | 2-5 active dispatches after cache warmup | 1 scene pass + composition | 0.4-1.2 ms |
 | Desktop integrated | 1-4 active dispatches, staggered | 1 scene pass + composition | 0.7-1.8 ms |
 | Mobile/tiled | 0-3 active dispatches, many cached | 1 scene pass + composition | 0.8-2.5 ms |
-| Reduced backend | 0 live compute dispatches | 1 scene pass + composition | 0.3-1.2 ms |
+| Fallback route | outside this flagship contract | outside this flagship contract | use `$threejs-compatibility-fallbacks` |
 
 Warm profile changes may spend more time for transmittance/multiscatter
 regeneration, but camera-only movement should update only sky-view and aerial

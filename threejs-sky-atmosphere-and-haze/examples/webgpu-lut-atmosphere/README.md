@@ -22,7 +22,21 @@ Tier budgets start as measurements targets, not claims:
 | Ultra desktop-discrete | 0.4-1.2 ms | 8-24 MB | sky-view plus aerial froxel updates as needed |
 | High desktop/integrated | 0.7-1.8 ms | 4-14 MB | staggered LUT refresh, 24-32 froxel slices |
 | Mobile/tiled | 0.8-2.5 ms | 2-8 MB | static/precomputed base LUTs, 16-24 froxel slices |
-| Reduced backend | 0.3-1.2 ms | 2-4 MB | manifest LUTs, static sky-view, optional irradiance disabled |
+| Fallback route | outside this flagship example | outside this flagship example | use `threejs-compatibility-fallbacks` when fallback behavior is explicitly requested |
+
+## Executed Compute
+
+The example builds real TSL `ComputeNode`s with `Fn().compute(count)` for:
+
+- transmittance LUT: fixed-step numerical extinction integration from radius
+  and view/sun cosine to the top atmosphere boundary;
+- aerial froxel volume: fixed-step segment extinction and single-scattering
+  accumulation, written to a `Storage3DTexture`.
+
+Multiscatter, irradiance, and sky-view compute remain out of scope here until
+their algorithms are implemented. The aerial froxel alpha channel stores scalar
+single-scattering luminance; full spectral inscattering needs an additional
+packing target.
 
 ## Build Checkpoints
 
@@ -65,10 +79,11 @@ depth distribution. If near haze smears, allocate more near slices.
 
 ## Output Ownership
 
-The atmosphere outputs scene-linear HDR. The host image pipeline owns exactly
-one tone-map and output color conversion through `RenderPipeline.outputColorTransform`
-or an explicitly selected final output node. LUTs, optical-depth fields, depth,
-normals, weather masks, and diagnostic textures use `NoColorSpace`.
+The atmosphere outputs scene-linear HDR. When the final node is
+`renderOutput(...)`, `RenderPipeline.outputColorTransform` is `false`; otherwise
+the host image pipeline owns exactly one tone-map and output color conversion.
+LUTs, optical-depth fields, depth, normals, weather masks, and diagnostic
+textures use `NoColorSpace`.
 
 ## Validation
 
@@ -82,4 +97,7 @@ The validator checks the LUT manifest hashes and byte counts, texture upload
 policy, atmosphere parameter object, meter/kilometer unit fixtures, CPU
 equivalent ray/segment math, depth-mode helpers, WebGPU/TSL import contract,
 resource resize/dispose ownership, and source sentinels for compute and
-pipeline ownership.
+pipeline ownership. It also runs pure-JS transmittance integrand fixtures,
+asserts real TSL compute nodes instead of descriptor strings, checks the
+non-WebGPU error route, and verifies renderOutput-owned output transform
+ownership.
