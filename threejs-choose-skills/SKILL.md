@@ -172,6 +172,164 @@ Use these starting budgets unless the product target is stricter:
 
 Record measured `renderer.info`, draw calls, triangles, texture/render-target counts, dispatch sizes, storage sizes, and frame-time evidence before acceptance.
 
+## Composed-scene budget aggregation
+
+### Routing preflight
+
+Before composing a route, enumerate the actually available `threejs-*` skills in
+the live inventory. Compare that inventory against this roster from the current
+workspace:
+
+- `threejs-ambient-contact-shading`
+- `threejs-black-holes-and-space-effects`
+- `threejs-bloom`
+- `threejs-camera-controls-and-rigs`
+- `threejs-choose-skills`
+- `threejs-compatibility-fallbacks`
+- `threejs-dynamic-surface-effects`
+- `threejs-exposure-color-grading`
+- `threejs-image-pipeline`
+- `threejs-particles-trails-and-effects`
+- `threejs-procedural-buildings-and-cities`
+- `threejs-procedural-creatures`
+- `threejs-procedural-fields`
+- `threejs-procedural-geometry`
+- `threejs-procedural-materials`
+- `threejs-procedural-motion-systems`
+- `threejs-procedural-planets`
+- `threejs-procedural-vegetation`
+- `threejs-rain-snow-and-wet-surfaces`
+- `threejs-scalable-real-time-shadows`
+- `threejs-sky-atmosphere-and-haze`
+- `threejs-spectral-ocean`
+- `threejs-visual-validation`
+- `threejs-volumetric-clouds`
+- `threejs-water-optics`
+
+If the live inventory and roster differ, route only to the intersection and
+surface the divergence in `routeManifest.rejectionReason`. Do not guess renamed,
+deprecated, or missing siblings. If a required owner is absent from the
+intersection, mark the route blocked or reduce the scope to retained owners.
+
+### Aggregation rule
+
+A composed scene must declare one `frameBudgetMs` before skill selection. Use
+`16.6 ms` for `60 Hz`, `8.3 ms` for `120 Hz`, or `33.3 ms` for `30 Hz` unless
+the brief gives a stricter budget; these are `floor((1000 ms / Hz) * 10) / 10`.
+
+For every selected skill, the route manifest must cite the selected tier row and
+sum that row's published cost-range maximum. If one selected row publishes
+multiple required ranges, add the maxima. Add one fixed overhead line for shared
+composition work:
+
+```yaml
+budgetAggregation:
+  frameBudgetMs:
+  selectedSkillMaxima: []
+fixedOverhead:
+  scenePassMs: 0.5
+  sharedUpsamplesMs: 0.5
+  totalMs: 1.0 # 0.5 + 0.5
+aggregateMs:
+routeValid:
+```
+
+The composed route is invalid when:
+
+```text
+sum(selectedSkillPublishedMaxMs) + fixedOverhead.totalMs > frameBudgetMs
+```
+
+When invalid, downgrade deterministically and recompute after each step:
+
+1. post-effects internals: AO denoise/history, bloom scale, TAA/DoF, optional
+   grading/LUT cadence, and optional history branches;
+2. volumetrics: cloud march scale, step counts, shadow maps, update cadence;
+3. water: FFT grid, cascade count, spray, refraction, and shading tier;
+4. crowds: creature count, shell tier, outline, and update cadence.
+
+If a selected skill has no published cost row for the proposed downgrade, do
+not assign a cheaper number. Keep the previous maximum, record the missing table
+entry, and continue to the next downgrade owner.
+
+### Worked aggregation example
+
+Input route: top-tier horizon ocean, Ultra clouds, desktop creature crowd, and
+full post at `60 Hz`. The declared budget is `16.6 ms` because
+`floor((1000 / 60) * 10) / 10 = 16.6`.
+
+Published rows used:
+
+- `$threejs-spectral-ocean`, `Budgets`, row `High desktop discrete`: target
+  `2.5-4.0 ms simulation` and `1.5-3.0 ms ocean shading/post at 1440p`;
+  aggregate maximum `4.0 + 3.0 = 7.0 ms`.
+- `$threejs-volumetric-clouds`, `Quality Tiers And Budgets`, row
+  `Ultra desktop-discrete`: target cost `2.5-4.0 ms`; maximum `4.0 ms`.
+- `$threejs-procedural-creatures`, `Performance Budgets`, row
+  `Desktop discrete`: frame budget `0.5-1.5 ms`; maximum `1.5 ms`.
+- `$threejs-image-pipeline`, `Budgets`, row `Desktop discrete`: full post
+  frame cost `2.0-4.0 ms at 1440p`; maximum `4.0 ms`.
+- Router fixed overhead: `0.5 ms scene pass + 0.5 ms shared upsamples = 1.0 ms`.
+
+Initial aggregate:
+
+```text
+7.0 ocean + 4.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 17.5 ms
+17.5 ms > 16.6 ms, so the route is invalid.
+```
+
+Downgrade order check:
+
+1. Post-effects internals: `$threejs-image-pipeline` publishes no cheaper
+   named full-post tier in its `Budgets` table, so keep `4.0 ms` and record the
+   missing lower row.
+2. Volumetrics: downgrade `$threejs-volumetric-clouds` from
+   `Ultra desktop-discrete` to `High desktop-discrete`; the `Quality Tiers And
+   Budgets` row publishes `1.8-3.0 ms`, maximum `3.0 ms`.
+
+Valid aggregate after the first published downgrade:
+
+```text
+7.0 ocean + 3.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 16.5 ms
+16.5 ms <= 16.6 ms, so the route is valid.
+```
+
+### Tier-exclusion matrix at 16.6 ms
+
+These combinations are invalid at `60 Hz` with the fixed `1.0 ms` composition
+overhead because the sum of published maxima exceeds `16.6 ms`.
+
+| Combination | Published max sum | Status |
+| --- | ---: | --- |
+| `$threejs-spectral-ocean` High desktop discrete (`4.0 + 3.0 = 7.0`) + `$threejs-volumetric-clouds` Ultra desktop-discrete (`4.0`) + `$threejs-image-pipeline` Desktop discrete full post (`4.0`) + `$threejs-procedural-creatures` Desktop discrete crowd (`1.5`) + overhead (`1.0`) | `17.5 ms` | invalid |
+| `$threejs-spectral-ocean` High desktop discrete (`7.0`) + `$threejs-volumetric-clouds` Ultra desktop-discrete (`4.0`) + `$threejs-image-pipeline` Desktop discrete full post (`4.0`) + `$threejs-ambient-contact-shading` Desktop discrete denoise/temporal AO (`2.0`) + overhead (`1.0`) | `18.0 ms` | invalid |
+| `$threejs-spectral-ocean` High desktop discrete (`7.0`) + `$threejs-volumetric-clouds` Ultra desktop-discrete (`4.0`) + `$threejs-image-pipeline` Desktop discrete full post (`4.0`) + `$threejs-ambient-contact-shading` Desktop discrete scalar GTAO (`1.2`) + `$threejs-procedural-creatures` Desktop discrete crowd (`1.5`) + overhead (`1.0`) | `18.7 ms` | invalid |
+
+Source rows: `$threejs-spectral-ocean` `Budgets`, row
+`High desktop discrete`; `$threejs-volumetric-clouds`
+`Quality Tiers And Budgets`, rows `Ultra desktop-discrete` and
+`High desktop-discrete`; `$threejs-image-pipeline` `Budgets`, row
+`Desktop discrete`; `$threejs-procedural-creatures` `Performance Budgets`, row
+`Desktop discrete`; `$threejs-ambient-contact-shading` `Performance Budgets`,
+row `Desktop discrete`.
+
+### Fauna and ocean handoff
+
+For creature swimmers in a spectral ocean route:
+
+- `$threejs-spectral-ocean` owns water height, displacement derivative, foam,
+  and current queries. `$threejs-procedural-creatures` consumes a sampled
+  swimmer contact interface; it does not recompute FFT spectra or own wave
+  phase.
+- `$threejs-procedural-creatures` owns body shell, gait/swim locomotion, pose
+  storage, crowd tier, and species variant cache.
+- `$threejs-scalable-real-time-shadows` owns the shared shadow clipmap when
+  routed. Creatures cast into that clipmap; do not allocate per-creature shadow
+  maps.
+- `$threejs-image-pipeline` owns MRT, outline inputs, velocity, normal, history,
+  tone map, and output transform. Creature outlines use the shared post edge or
+  MRT signal owner, not a second outline graph.
+
 ## Color And Output Rules
 
 - Mark color textures as `SRGBColorSpace`; data maps such as normal, roughness, masks, noise, LUTs, weather, and simulation textures stay `NoColorSpace` or linear.
