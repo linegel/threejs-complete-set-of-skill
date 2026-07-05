@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Image Pipeline — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-image-pipeline.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Image Pipeline — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-image-pipeline.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Image Pipeline — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Image Pipeline — Three.js WebGPU agent skill",
+   "description": "Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-image-pipeline.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Image Pipeline"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Cameras, Lighting, and Final Image",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Image Pipeline",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-image-pipeline.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Image Pipeline</p>
+  <h1>Image Pipeline</h1>
+  <p class="lede">Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-image-pipeline</span>
+    <span class="chip">2 runnable examples</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-image-pipeline/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>The final image is a graph with single ownership of every shared signal. One scene pass
+publishes MRT outputs — depth, normal, albedo, emissive, velocity — and every effect consumes
+the same copies:</p>
+$$\text{pass}(scene) \Rightarrow \{D, \mathbf N, A, E, \mathbf v\} \;\to\; \text{GTAO} \to \text{bloom} \to \text{exposure} \to \text{tonemap} \to \text{LUT} \to \text{output}$$
+<p>Velocity is the derivative of the reprojection chain — current clip position against
+previous-frame clip position through both model and camera history:</p>
+$$\mathbf v = \Pi\big(V_t M_t\, \mathbf p\big) - \Pi\big(V_{t-1} M_{t-1}\, \mathbf p\big)$$
+<p>Ordering is semantic, not aesthetic: AO modulates indirect light (pre-tonemap), bloom reads
+scene-linear HDR (pre-tonemap), grading reads display-referred color (post-tonemap). The
+validator's job is to enumerate the live pass graph and assert each signal has exactly one
+producer.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-image-pipeline/examples/integration-shared-framegraph">
+        <h4>integration-shared-framegraph</h4>
+        <span class="card-meta">threejs-image-pipeline/examples/integration-shared-framegraph</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-image-pipeline/examples/webgpu-image-pipeline">
+        <h4>webgpu-image-pipeline</h4>
+        <span class="card-meta">threejs-image-pipeline/examples/webgpu-image-pipeline</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Image Pipeline</h1>
+<p>Use this skill only when several image-space systems must share buffers,
+ordering, temporal history, or final-output ownership. For one isolated effect,
+load its atomic skill instead.</p>
+<p>Route to companion skills only when needed:</p>
+<ul>
+<li><code>$threejs-ambient-contact-shading</code> for <code>GTAONode</code>, bent normals,
+AO denoising, or lighting application;</li>
+<li><code>$threejs-bloom</code> for <code>BloomNode</code>, emissive MRT extraction, and HDR bloom;</li>
+<li><code>$threejs-exposure-color-grading</code> for luminance metering, adaptation, tone
+mapping, LUTs, grading, and output conversion;</li>
+<li><code>$threejs-dynamic-surface-effects</code> for feature-local history targets and temporal
+surface effects.</li>
+</ul>
+<p>The pipeline must expose its signals, owners, resolution scales, memory cost,
+and disable paths before tuning any image.</p>
+<h2>Required Architecture</h2>
+<p>Lead with the highest-throughput architecture: one <code>WebGPURenderer</code> from
+<code>three/webgpu</code>, one node-based <code>RenderPipeline</code>, one primary scene <code>pass()</code>,
+and <code>mrt()</code> outputs for every shared gbuffer signal. Do not re-render the scene
+for AO, bloom masks, grading, or diagnostics when an MRT signal can feed the
+node graph.</p>
+<p>Canonical order:</p>
+<pre><code class="language-text">scene pass() with mrt(output, depth, normal, albedo, emissive, optional velocity)
+  -&gt; lighting-related screen nodes: GTAONode, bent normals, indirect tint
+  -&gt; atmosphere/transparency composition from the shared depth contract
+  -&gt; BloomNode from HDR emissive or HDR color
+  -&gt; optional temporal resolve from velocity/depth/history
+  -&gt; exposure meter and adapted exposure
+  -&gt; one tone-map owner
+  -&gt; scene-linear or tone-mapped grading, chosen by LUT domain
+  -&gt; one output color transform owner
+  -&gt; display-referred presentation nodes, UI-safe overlay, diagnostics
+</code></pre>
+<p>Use built-in nodes first. A custom node is justified only when it adds a
+measured capability the built-in node does not cover.</p>
+<p><code>PostProcessing</code> is the deprecated historical name for <code>RenderPipeline</code>; do not
+teach it as an implementation path.</p>
+<p>Legacy WebGL implementation (deprecated, do not extend): none in this folder.</p>
+<h2>Capability Gate</h2>
+<p>Initialize once, then choose quality tiers by capability. Do not teach a local
+WebGPU-unavailable path here. If, and only if, the user explicitly asks how to
+apply fallback when WebGPU is unavailable, route that teaching to
+<code>$threejs-compatibility-fallbacks</code>.</p>
+<pre><code class="language-js">import { WebGPURenderer, RenderPipeline, HalfFloatType } from &#39;three/webgpu&#39;;
+
+const renderer = new WebGPURenderer( { antialias: false, outputBufferType: HalfFloatType } );
+await renderer.init();
+const sharedGbufferOutputs = [ &#39;output&#39;, &#39;normal&#39;, &#39;emissive&#39; ];
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;WebGPU backend required for the canonical image pipeline. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.&#39; );
+}
+
+const tier = {
+  backend: &#39;WebGPU&#39;,
+  requiredMRT: sharedGbufferOutputs.length,
+  requiredStorage: false,
+  timestampQuery: renderer.hasFeature( &#39;timestamp-query&#39; ),
+  outputBufferType: renderer.getOutputBufferType(),
+  memoryBudget: 256 * 1024 * 1024,
+  budgetReason: []
+};
+
+// compute/storage/MRT path: live metering, temporal history, storage buffers.
+</code></pre>
+<p>Quality tiers:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Requirements</th>
+<th>Defaults</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full</td>
+<td>WebGPU backend with MRT, node passes, storage/compute where used</td>
+<td>HDR MRT, live exposure, <code>GTAONode</code>, <code>BloomNode</code>, optional <code>TRAANode</code>, diagnostics</td>
+</tr>
+<tr>
+<td>Reduced</td>
+<td>WebGPU exists but the frame or storage budget is tight</td>
+<td>no live compute history, AO/bloom at lower scale, fixed exposure, lower diagnostic cadence</td>
+</tr>
+<tr>
+<td>Debug</td>
+<td>WebGPU backend during authoring</td>
+<td>one diagnostic output at a time, pass timers, owner labels, forced disable paths</td>
+</tr>
+</tbody></table>
+<h2>Build Order</h2>
+<ol>
+<li>Write the signal table before code: producer, consumers, space, type, color
+space, resolution scale, history, disable path, and memory.
+Include world/view/clip/NDC/UV/texel spaces, Y-up, camera looks down <code>-Z</code>,
+UV origin, depth policy (<code>reversedDepthBuffer</code> or <code>logarithmicDepthBuffer</code>),
+normal encoding, velocity sign/current-to-previous convention, and whether a
+delta is in pixels or UV units.</li>
+<li>Create one scene <code>pass( scene, camera )</code>; attach <code>mrt()</code> for <code>output</code>,
+<code>normal</code>, <code>albedo</code>, <code>emissive</code>, and optional <code>velocity</code>. Read depth from the
+pass instead of adding an unmeasured duplicate scene render.</li>
+<li>Feed shared nodes from the pass textures with <code>getTextureNode()</code> and
+<code>getLinearDepthNode()</code> or <code>getViewZNode()</code> when a consumer needs linear
+depth. Use <code>PassNode.setResolutionScale()</code> or effect-node
+<code>setResolutionScale()</code> for bandwidth-heavy nodes.</li>
+<li>Compose the graph as a single <code>RenderPipeline.outputNode</code>. Use
+<code>renderPipeline.render()</code> in the frame loop.</li>
+<li>Decide output ownership once. Keep HDR <code>HalfFloatType</code> buffers until the
+tone-map owner. Leave <code>RenderPipeline.outputColorTransform</code> enabled only
+when the final node is still scene-linear HDR; set it to <code>false</code> and use
+<code>renderOutput()</code> when display-referred nodes must run after conversion.</li>
+<li>Add temporal history only when the velocity contract is complete. <code>TRAANode</code>
+needs current beauty, depth, velocity, camera jitter ownership, reset events,
+and diagnostics for rejected history.</li>
+<li>Use GPU compute for live reductions and history preparation only on the full
+tier: <code>renderer.compute()</code> / <code>renderer.computeAsync()</code>, <code>Fn().compute(count)</code>,
+<code>StorageTexture</code>, <code>StorageBufferAttribute</code>, <code>StorageInstancedBufferAttribute</code>,
+<code>storage()</code>, and <code>textureStore()</code>.</li>
+<li>Add diagnostics and budgets before visual tuning.</li>
+</ol>
+<p>Use <code>examples/webgpu-image-pipeline/</code> as the canonical shared-gbuffer example
+and <code>validateImagePipelineConfig.js</code> as the hard graph gate before browser
+render validation.</p>
+<p>Read <a href="references/production-image-pipeline.md">references/production-image-pipeline.md</a>
+for concrete contracts, pass graphs, replacement notes, budget targets, and
+failure checks.</p>
+<h2>Shared Signal Contracts</h2>
+<p>Add these rows to every project signal table; do not leave them implicit:</p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Producer</th>
+<th>Consumers</th>
+<th>Space/type</th>
+<th>Color space</th>
+<th>Resolution</th>
+<th>History</th>
+<th>Disable path</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>velocity</td>
+<td>scene <code>pass()</code> MRT <code>velocity</code> or a named <code>VelocityNode</code> path</td>
+<td><code>TRAANode</code>, clouds, frost/thaw, temporal denoise, motion vectors</td>
+<td>RG16F vec2 in NDC delta; three.js r185 sign is <code>currentNdc.xy - previousNdc.xy</code>; state whether jitter is included before resolve</td>
+<td>data/no-color</td>
+<td>1.0 unless every temporal consumer declares matching scale</td>
+<td>previous/current view-projection and object transforms</td>
+<td>disable temporal consumers, not velocity sign checks</td>
+</tr>
+<tr>
+<td>depth convention</td>
+<td>renderer depth plus one view-Z helper</td>
+<td><code>GTAONode</code>, fog, clouds, refraction, temporal rejection</td>
+<td>declare exactly one of <code>reversedDepthBuffer</code>, <code>logarithmicDepthBuffer</code>, standard perspective, or orthographic; reconstruct through the named helper before consumers compare distances</td>
+<td>data/no-color</td>
+<td>1.0 source; reduced effects sample through depth-aware upsample</td>
+<td>optional previous depth for rejection</td>
+<td>disable depth consumers or classify sky/background explicitly</td>
+</tr>
+</tbody></table>
+<p>Canonical velocity reprojection helper:</p>
+<pre><code class="language-js">import { uv } from &#39;three/tsl&#39;;
+
+export const velocityToPreviousUV = ( velocityTexel, currentUV = uv() ) =&gt; {
+	// three.js r185 VelocityNode stores currentNDC.xy - previousNDC.xy.
+	// currentUV = currentNDC.xy * 0.5 + 0.5.
+	// previousUV = previousNDC.xy * 0.5 + 0.5
+	//            = ( currentNDC.xy - velocity.xy ) * 0.5 + 0.5
+	//            = currentUV - velocity.xy * 0.5.
+	return currentUV.sub( velocityTexel.xy.mul( 0.5 ) );
+};
+</code></pre>
+<p>Consumers that reproject to previous history must call this helper or implement
+the same derivation verbatim. A sign flip is a correctness bug, not a tuning
+choice. For depth, publish one <code>viewZ</code> reconstruction contract next to the
+renderer flags; <code>GTAONode</code>, fog, volumetrics, and temporal rejection must not
+mix reversed-depth assumptions with renderer-defined depth labels.</p>
+<h2>Color And Output</h2>
+<ul>
+<li>Color textures are <code>SRGBColorSpace</code>; data maps, masks, normals, roughness,
+LUT indices, history, and diagnostic data are linear/no-color data.</li>
+<li>Keep working color in scene-linear HDR until the tone-map owner. Use
+<code>HalfFloatType</code> for HDR pipeline buffers unless a measured memory tier says
+otherwise.</li>
+<li>Tone-map once. Convert to output color space once. Individual materials,
+effects, and UI overlays must not double-convert.</li>
+<li>A scene-linear creative LUT belongs before tone mapping. A display-referred
+LUT belongs after <code>renderOutput()</code>, with <code>outputColorTransform = false</code>.</li>
+<li>Exclude UI and debug overlays from exposure metering and HDR bloom unless
+the product explicitly wants those pixels to affect camera response.</li>
+</ul>
+<h2>Budgets</h2>
+<p>Set budgets per enabled graph. Start here, then measure on target hardware:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th align="right">Frame cost for full post</th>
+<th align="right">Full-res HDR attachments</th>
+<th align="right">Reduced passes</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Desktop discrete</td>
+<td align="right">2.0-4.0 ms at 1440p</td>
+<td align="right">4-6</td>
+<td align="right">0.5x-0.75x</td>
+<td>temporal AO/AA allowed when stable</td>
+</tr>
+<tr>
+<td>Desktop integrated</td>
+<td align="right">3.0-5.5 ms at 1080p</td>
+<td align="right">3-4</td>
+<td align="right">0.5x</td>
+<td>prefer fewer MRT outputs and shared denoise</td>
+</tr>
+<tr>
+<td>Mobile/tiled</td>
+<td align="right">4.0-7.0 ms at 720p-900p</td>
+<td align="right">2-3</td>
+<td align="right">0.33x-0.5x</td>
+<td>disable optional history first</td>
+</tr>
+</tbody></table>
+<p>Memory estimate per 1920x1080 attachment:</p>
+<table>
+<thead>
+<tr>
+<th>Attachment type</th>
+<th align="right">Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RGBA16F HDR</td>
+<td align="right">about 16 MB</td>
+</tr>
+<tr>
+<td>RG16F velocity</td>
+<td align="right">about 8 MB</td>
+</tr>
+<tr>
+<td>R16F scalar</td>
+<td align="right">about 4 MB</td>
+</tr>
+<tr>
+<td>RGBA8 display/data</td>
+<td align="right">about 8 MB</td>
+</tr>
+</tbody></table>
+<p>Every enabled pass must state dispatch count if compute is used, render
+resolution, attachment count, target type, draw/scene render count, GPU time,
+and resize/disposal behavior.</p>
+<p>Derived internal effect rows are part of the same budget:</p>
+<table>
+<thead>
+<tr>
+<th>Derived node</th>
+<th>Internal targets</th>
+<th>Draw or dispatch count argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>BloomNode</code> 5-mip pyramid</td>
+<td>at scale <code>s</code>, pyramid pixels are <code>s^2 * (1 + 1/4 + 1/16 + 1/64 + 1/256)</code> of full resolution per chain; ping-pong or separate upsample targets roughly double that before final composite</td>
+<td>prefilter/threshold 1 + 5 downsample draws + 5 upsample/add draws + final composite = about 12 fullscreen draws</td>
+</tr>
+<tr>
+<td><code>GTAONode</code></td>
+<td>AO target is scalar at <code>resolutionScale^2</code>; denoise/temporal variants add their own scalar/history targets and must be counted separately</td>
+<td>one AO gather draw plus denoise/upsample/composite draws actually enabled; temporal filtering also counts TRAA/history work</td>
+</tr>
+<tr>
+<td><code>TRAANode</code></td>
+<td>current beauty input plus previous beauty, velocity, depth/rejection, and any neighborhood clamp targets</td>
+<td>one reprojection/resolve fullscreen draw per enabled history plus reset/clear work on resize, camera cut, or projection change</td>
+</tr>
+</tbody></table>
+<p>Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4, when the accounting
+unit is a double-buffered render-target slot or ping-pong allocation. State the
+unit before comparing bytes.</p>
+<h2>Rules</h2>
+<ul>
+<li>One scene render is the default. Extra scene renders require a measured reason.</li>
+<li>Use <code>mrt()</code> for shared depth-adjacent signals instead of duplicating passes.</li>
+<li>Use <code>GTAONode</code>, <code>BloomNode</code>, <code>TRAANode</code>, <code>DepthOfFieldNode</code>, and built-in sky,
+fog, and shadow nodes before custom nodes.</li>
+<li>Apply AO to the lighting component it represents; do not blindly multiply the
+final color.</li>
+<li>Use depth/normal-aware upsampling for reduced-resolution effects.</li>
+<li>Own camera jitter in one place; reset history on resize, cut, projection
+change, large exposure jump, material ID instability, or disocclusion.</li>
+<li>Keep pass toggles, effect-only views, and graph inspection available in
+production builds behind diagnostics.</li>
+<li>Do not load all atomic post skills by default. Route only the effects actually
+requested.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use this skill when multiple image-space systems must share buffers, ordering,
+history, budgets, or output ownership. For one isolated effect, use the atomic
+skill without loading this coordinator.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-exposure-color-grading.html">← Exposure and Color Grading</a>
+    <a href="threejs-particles-trails-and-effects.html">Particles, Trails, and Effects →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

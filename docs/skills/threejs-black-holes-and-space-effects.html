@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Black Holes and Space Effects — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-black-holes-and-space-effects.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Black Holes and Space Effects — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-black-holes-and-space-effects.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Black Holes and Space Effects — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Black Holes and Space Effects — Three.js WebGPU agent skill",
+   "description": "Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-black-holes-and-space-effects.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Black Holes and Space Effects"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Motion and Effects",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Black Holes and Space Effects",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-black-holes-and-space-effects.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Motion and Effects</a> / Black Holes and Space Effects</p>
+  <h1>Black Holes and Space Effects</h1>
+  <p class="lede">Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-black-holes-and-space-effects</span>
+    <span class="chip">2 runnable examples</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-black-holes-and-space-effects/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-black-holes-and-space-effects/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Lensing is a numerical integration problem, not a screen-space trick. Around a Schwarzschild
+mass, light bends with an effective potential; the skill integrates the ray ODE in the
+equatorial plane with a controlled step:</p>
+$$\frac{d^2 u}{d\phi^2} + u = \frac{3GM}{c^2}u^2, \qquad u = \frac{1}{r}$$
+<p>The photon sphere at $r = 3GM/c^2$ and the shadow radius
+$b_{crit} = 3\sqrt3\,GM/c^2$ anchor the visual scale. The accretion disk adds Doppler
+beaming and gravitational redshift — the approaching side brightens as</p>
+$$I_{obs} = \frac{I_{emit}}{(1+z)^4}, \qquad 1+z = \frac{1}{\sqrt{1 - r_s/r}}\cdot\gamma\,(1 - \beta\cos\theta)$$
+<p>Integration state (step count, termination reason, escape/capture classification) is a
+first-class diagnostic output — bounded step budgets and analytic far-field falloff keep the
+march deterministic and framerate-safe.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-black-holes-and-space-effects/examples/curved-ray-accretion-volume">
+        <h4>curved-ray-accretion-volume</h4>
+        <span class="card-meta">threejs-black-holes-and-space-effects/examples/curved-ray-accretion-volume</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-black-holes-and-space-effects/examples/tsl-curved-ray">
+        <h4>tsl-curved-ray</h4>
+        <span class="card-meta">threejs-black-holes-and-space-effects/examples/tsl-curved-ray</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Black Holes and Space Effects</h1>
+<p>Treat these effects as numerical renderers with explicit integration state. The
+implementation path is latest Three.js with <code>WebGPURenderer</code> from <code>three/webgpu</code>,
+TSL from <code>three/tsl</code>, <code>NodeMaterial</code> materials, <code>RenderPipeline</code>, node passes,
+and compute/storage where caching or diagnostics need GPU-written data.</p>
+<h2>Performance-First Build Order</h2>
+<ol>
+<li>Use <code>$threejs-choose-skills</code> preflight when the request also touches
+atmosphere, bloom, temporal reconstruction, shadows, or validation.</li>
+<li>Define a bounded effect volume in local space and intersect the camera ray
+with that volume before any march work.</li>
+<li>Run the raymarch as a TSL <code>Fn</code> attached to a <code>MeshBasicNodeMaterial</code> or a
+compute pass; keep the integrator and disk/throat/shell shading as separate
+node functions.</li>
+<li>Advance the ray exactly once per accepted iteration. Do not copy the
+historical double-advance defect from the legacy example.</li>
+<li>Choose step length from distance, density, curvature, or error estimators.
+Clamp by thin-structure crossing distance so disks and shells cannot be
+skipped.</li>
+<li>Accumulate radiance front-to-back with transmittance and terminate on escape,
+core absorption, saturated opacity, invalid state, or max-step cap.</li>
+<li>March the hero effect at half or quarter resolution by default, then use
+depth/velocity-aware temporal accumulation and upsample into the node post
+pipeline.</li>
+<li>Use <code>StorageTexture</code>, <code>StorageBufferAttribute</code>, or
+<code>StorageInstancedBufferAttribute</code> with <code>renderer.compute()</code> /
+<code>renderer.computeAsync()</code> for lens-map caches, per-tile bounds, temporal
+history, and diagnostics that are expensive to rebuild in a material node.</li>
+<li>Compose through <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>,
+<code>PassNode.setResolutionScale()</code>, <code>outputColorTransform</code>, and
+<code>renderOutput()</code>. <code>PostProcessing</code> is the renamed deprecated predecessor;
+use <code>RenderPipeline</code>.</li>
+</ol>
+<p>Algorithm class dominates this skill. A fixed full-budget ray loop is the slow
+baseline; bounded adaptive marching plus early termination and temporal
+amortization is the production architecture.</p>
+<h2>Capability Gate</h2>
+<p>Any compute, storage, MRT, or reduced-resolution path starts with an explicit
+backend gate:</p>
+<pre><code class="language-js">await renderer.init();
+
+if (renderer.backend.isWebGPUBackend) {
+  // Full path: TSL raymarch, compute/storage caches, MRT diagnostics.
+} else {
+  throw new Error(&quot;WebGPU backend unavailable for the canonical path.&quot;);
+}
+</code></pre>
+<p>Only when the user explicitly asks how to apply fallback when WebGPU is
+unavailable, route that teaching to <code>../threejs-compatibility-fallbacks/</code> after
+the canonical WebGPU/TSL owner and visual contract are known. Do not make
+fallback for unavailable WebGPU a default branch in this skill.</p>
+<h2>Quality Tiers And Budgets</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Resolution</th>
+<th>Steps</th>
+<th>Temporal frames</th>
+<th>Target cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hero</td>
+<td>half res, optional full-res center</td>
+<td>96-160 adaptive accepted steps</td>
+<td>8-16 with velocity/depth rejection</td>
+<td>1.8-2.8 ms desktop discrete, 4-6 ms integrated, 7-9 ms mobile</td>
+</tr>
+<tr>
+<td>Standard</td>
+<td>half res</td>
+<td>48-96 adaptive accepted steps</td>
+<td>8-12</td>
+<td>0.8-1.5 ms desktop discrete, 2-3 ms integrated, 4-5 ms mobile</td>
+</tr>
+<tr>
+<td>Background</td>
+<td>quarter res or cached lens map</td>
+<td>24-48 accepted steps or low-rate compute refresh</td>
+<td>12-24</td>
+<td>0.3-0.7 ms desktop discrete, 0.8-1.4 ms integrated, 1.5-3 ms mobile</td>
+</tr>
+<tr>
+<td>Distant</td>
+<td>impostor, cubemap, or precomputed <code>assets/generated-variants/</code> texture</td>
+<td>0-16</td>
+<td>optional</td>
+<td>under 0.25 ms desktop discrete, under 0.75 ms integrated/mobile</td>
+</tr>
+</tbody></table>
+<p>Budget storage explicitly: two half-resolution <code>HalfFloatType</code> history textures
+for radiance/transmittance, one reduced-resolution velocity/depth validity
+input, optional one-channel step-count/termination texture for diagnostics, and
+one bounded lens-map <code>StorageTexture</code> per cached view or probe.</p>
+<h2>Numerical Rules</h2>
+<ul>
+<li>Do not call a UV swirl gravitational lensing. Lensing changes the final lookup
+direction after numerical integration.</li>
+<li>Bound the domain first; never march the full camera range for a local space
+effect.</li>
+<li>Use continuous segment crossing tests for thin disks, shells, throats, and
+event boundaries.</li>
+<li>Keep integration independent from frame rate; animated fields are inputs, not
+variable time steps.</li>
+<li>Use deterministic star/environment data for validation, then replace only
+after fixed-camera tests pass.</li>
+<li>Track termination reason, accepted step count, accumulated opacity,
+remaining transmittance, final environment direction, and invalid-state mask.</li>
+<li>Run CPU reference rays for wormhole or physical-parity claims before treating
+the result as more than an artistic approximation.</li>
+</ul>
+<h2>Color And Output</h2>
+<ul>
+<li>Color textures such as star fields and environment maps use <code>SRGBColorSpace</code>.</li>
+<li>Noise, density, masks, lens maps, LUTs, step counts, and termination IDs use
+<code>NoColorSpace</code> or linear data settings.</li>
+<li>Accumulate radiance and transmittance in linear HDR buffers. Use
+<code>HalfFloatType</code> working targets until tone mapping.</li>
+<li>The app has exactly one tone-map owner and one output conversion owner. The
+node pipeline owns output conversion through <code>outputColorTransform</code> or an
+explicit <code>renderOutput()</code> node.</li>
+</ul>
+<h2>References</h2>
+<p>Read <a href="references/curved-ray-integrators.md">references/curved-ray-integrators.md</a>
+for the WebGPU/TSL architecture, RK4 wormhole state reduction, artistic
+curved-ray accretion integrator, continuous disk crossing, compute/storage
+caches, diagnostics, and validation requirements.</p>
+<p>Canonical WebGPU/TSL example: <code>examples/tsl-curved-ray/</code></p>
+<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/curved-ray-accretion-volume/curved-ray-effect.js</code></p>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-particles-trails-and-effects</code> for ordinary particles, trails, plasma, and event
+effects. Use <code>$threejs-volumetric-clouds</code> for weather-density volumes,
+<code>$threejs-sky-atmosphere-and-haze</code> for planetary scattering,
+<code>$threejs-bloom</code> and <code>$threejs-exposure-color-grading</code> for post effects, and
+<code>$threejs-visual-validation</code> for fixed-view visual contracts. This skill owns
+per-pixel numerical ray integration through curved or bounded space-effect
+domains.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-ambient-contact-shading.html">← Ambient Contact Shading</a>
+    <a href="threejs-bloom.html">Bloom →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spectral Ocean — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Spectral Ocean — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Spectral Ocean — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Spectral Ocean — Three.js WebGPU agent skill",
+   "description": "Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Spectral Ocean"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Worlds and Environments",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Spectral Ocean",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Worlds and Environments</a> / Spectral Ocean</p>
+  <h1>Spectral Ocean</h1>
+  <p class="lede">Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-spectral-ocean</span>
+    <span class="chip">4 runnable examples</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-spectral-ocean/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>The ocean surface is synthesized in the frequency domain (Tessendorf). A directional
+spectrum seeds complex amplitudes, which are evolved analytically and inverse-FFT'd per frame:</p>
+$$\tilde h(\mathbf k, t) = \tilde h_0(\mathbf k)\,e^{i\omega(k)t} + \tilde h_0^*(-\mathbf k)\,e^{-i\omega(k)t}$$
+<p>The conjugate pairing enforces $\tilde h(-\mathbf k,t) = \tilde h^*(\mathbf k,t)$, so the
+spatial height field is real. Dispersion uses the finite-depth gravity–capillary relation —
+the capillary term matters at the top of the finest cascade:</p>
+$$\omega^2 = \left(gk + \tfrac{\sigma}{\rho}k^3\right)\tanh(kh)$$
+<p>Choppy displacement is the horizontal gradient field
+$\hat{\mathbf D}(\mathbf k) = i\,(\mathbf k/k)\,\hat h(\mathbf k)$; whitecaps trigger where the
+deformation Jacobian folds the surface:</p>
+$$J = (1+\lambda\,\partial_x D_x)(1+\lambda\,\partial_z D_z) - (\lambda\,\partial_x D_z)^2 \;<\; J_{\min}$$
+<p>Because $\mathbf D$ derives from one scalar spectrum, $\partial_z D_x \equiv \partial_x D_z$ and the
+single cross term is exact. Multiple cascades cover wavelength bands with half-open masks
+$[k_{lo}, k_{hi})$ to avoid double-counting energy at handoffs.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/hybrid-clear-water-ocean">
+        <h4>hybrid-clear-water-ocean</h4>
+        <span class="card-meta">threejs-spectral-ocean/examples/hybrid-clear-water-ocean</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/spectral-cascade-ocean">
+        <h4>spectral-cascade-ocean</h4>
+        <span class="card-meta">threejs-spectral-ocean/examples/spectral-cascade-ocean</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/stylized-above-below-ocean">
+        <h4>stylized-above-below-ocean</h4>
+        <span class="card-meta">threejs-spectral-ocean/examples/stylized-above-below-ocean</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/webgpu-fft-ocean">
+        <h4>webgpu-fft-ocean</h4>
+        <span class="card-meta">threejs-spectral-ocean/examples/webgpu-fft-ocean</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Spectral Ocean</h1>
+<p>Treat an ocean as a sampled stochastic wave field whose highest-throughput implementation is owned in frequency space. Start from compute-shader FFT cascades, not analytic wave piles, scrolling textures, or a simplified renderer path.</p>
+<p>Run <code>$threejs-choose-skills</code> first when the request spans ocean simulation plus atmosphere, shadows, validation, or final-image treatment. Read <a href="references/spectral-cascade-ocean-system.md">references/spectral-cascade-ocean-system.md</a> before implementing or auditing this skill.</p>
+<p>Canonical WebGPU/TSL example: <a href="examples/webgpu-fft-ocean/">examples/webgpu-fft-ocean/</a>.</p>
+<h2>Build Order</h2>
+<ol>
+<li>Create a <code>WebGPURenderer</code> from <code>three/webgpu</code>, initialize it, and install the capability gate before allocating compute resources.</li>
+<li>Choose the quality tier from grid size, cascade count, dispatch budget, texture memory, and target GPU class.</li>
+<li>Build disjoint wavelength cascades from a deterministic directional spectrum.</li>
+<li>Generate coordinate-stable Gaussian seeds and conjugate-packed <code>h0(k)</code> for every cell before masking out-of-band energy.</li>
+<li>Evolve height, horizontal displacement, slopes, horizontal derivatives, and cross derivatives in frequency space with TSL <code>Fn().compute()</code> kernels.</li>
+<li>Pack derivative fields before the inverse transform; never derive slopes or Jacobians with finite differences after the IFFT.</li>
+<li>Run Stockham or Cooley-Tukey inverse FFT stages through <code>StorageTexture</code> ping-pongs, using <code>renderer.compute()</code> or <code>renderer.computeAsync()</code> with ordered stage boundaries.</li>
+<li>Assemble filterable displacement, derivative, Jacobian, and foam-history textures in the same compute dispatch chain.</li>
+<li>Shade the displaced mesh with a <code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code> graph driven by the resolved spectral maps.</li>
+<li>Compose reflections, underwater absorption, crest scatter, optional <code>BloomNode</code>/<code>GTAONode</code>/<code>TRAANode</code>, and output conversion in a <code>RenderPipeline</code>.</li>
+<li>Expose diagnostics for spectra, transformed fields, foam history, node-pass outputs, and GPU timings.</li>
+</ol>
+<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/spectral-cascade-ocean/</code>, <code>examples/hybrid-clear-water-ocean/</code>, <code>examples/stylized-above-below-ocean/</code>.</p>
+<h2>Capability Gate</h2>
+<p>Use one implementation path: WebGPU-backed TSL compute. If that canonical path
+is unavailable, report the missing backend as a blocker unless the user
+explicitly asks how to apply fallback when WebGPU is unavailable.</p>
+<pre><code class="language-js">import { WebGPURenderer } from &#39;three/webgpu&#39;;
+
+const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend ) {
+  await ocean.allocateStorageTextures();
+  await renderer.computeAsync( ocean.validateFftNodes );
+} else {
+  throw new Error( &#39;WebGPU backend required for the canonical FFT ocean path.&#39; );
+}
+</code></pre>
+<p>Budgeted WebGPU tiers use smaller grids, fewer cascades, or lower-resolution
+debug input fixtures inside the canonical architecture. They must not contain a second
+hand-written renderer backend. If, and only if, the user explicitly asks how to
+apply fallback when WebGPU is unavailable, route that teaching to
+<code>$threejs-compatibility-fallbacks</code>.</p>
+<h2>Non-Negotiable Gates</h2>
+<ul>
+<li>Require power-of-two grids, positive patch lengths, disjoint wavenumber intervals, finite depth/gravity values, and a supported storage texture format before construction.</li>
+<li>Validate DC, X-frequency, Y-frequency, horizontal-displacement direction, derivative sign, and Jacobian determinant before connecting the spectrum to the surface.</li>
+<li>Keep Gaussian samples coordinate-stable: hash by <code>(seed, cascade, x, y)</code> or consume random values for every cell before masking.</li>
+<li>Compute all displacement derivatives in frequency space: slopes, horizontal derivatives, and the cross derivative are transformed fields, not post-IFFT differences.</li>
+<li>Persist foam as simulation state in a ping-ponged storage texture; display thresholds are separate from history recovery.</li>
+<li>Submit FFT stages with ordered whole-grid boundaries verified against the active Three.js backend; batch independent fields at the same stage, then advance.</li>
+<li>Share sun, sky, exposure, and output-conversion ownership across the sky, ocean reflection, underwater path, and post pipeline.</li>
+<li>Keep fixed seeds, fixed camera captures, no-post baselines, and GPU timing history for comparisons.</li>
+</ul>
+<h2>Budgets</h2>
+<ul>
+<li>High desktop discrete: <code>512^2</code>, 3 cascades, 4 packed complex fields per cascade, about <code>3 * (8 evolve + 4 * 2 * log2(N) FFT + 4 assemble/history)</code> compute dispatch groups, about 102 MiB ocean storage with a 104 MiB tier gate, target 2.5-4.0 ms simulation and 1.5-3.0 ms ocean shading/post at 1440p.</li>
+<li>Standard desktop integrated: <code>256^2</code>, 3 cascades, half-float storage when validated, under 28 MiB ocean storage, target 1.5-3.0 ms simulation and 1.5-2.5 ms shading/post at 1080p.</li>
+<li>Mobile or budgeted WebGPU tier: <code>128^2</code>, 1-2 cascades and lower-resolution debug inputs, under 8 MiB ocean storage, target under 2.0 ms simulation-equivalent work and no spray.</li>
+<li>Draw calls: one ocean surface draw, one sky draw, optional spray/crest instancing only when routed through <code>$threejs-particles-trails-and-effects</code>.</li>
+<li>Post passes: one scene <code>pass()</code>, optional <code>mrt()</code> for normal/emissive outputs, reduced-resolution <code>BloomNode</code> or <code>GTAONode</code> only when visibly useful, one output transform.</li>
+</ul>
+<h2>Color And Output</h2>
+<ul>
+<li>Color textures use <code>SRGBColorSpace</code>; spectra, displacement, derivative, Jacobian, foam, normal, noise, LUT, and weather data use <code>NoColorSpace</code> or linear data semantics.</li>
+<li>Keep ocean simulation textures as data, with mipmaps disabled unless the compute chain writes them deliberately.</li>
+<li>Use HDR <code>HalfFloatType</code> working buffers until tone mapping.</li>
+<li>The <code>RenderPipeline</code> owns tone mapping and color conversion through <code>outputColorTransform</code> or an explicit <code>renderOutput()</code> node. Materials and custom nodes must not double-convert.</li>
+<li><code>PostProcessing</code> is only a renamed predecessor of <code>RenderPipeline</code>; do not use it for new work.</li>
+</ul>
+<h2>Route Elsewhere</h2>
+<ul>
+<li>Use <code>$threejs-water-optics</code> for bounded pools, screen-space refraction, local heightfield ripples, shoreline absorption, caustics, and analytic wave surfaces.</li>
+<li>Add <code>$threejs-particles-trails-and-effects</code> only when crest spray, splashes, foam particles, or interaction effects are required.</li>
+<li>Add <code>$threejs-visual-validation</code> for fixed-view contracts, cross-seed sweeps, temporal stability, pass diagnostics, and GPU evidence.</li>
+<li>Add <code>$threejs-image-pipeline</code> or <code>$threejs-exposure-color-grading</code> when the ocean must share a larger HDR, bloom, exposure, or grading stack.</li>
+</ul>
+</div>
+  <div class="pn">
+    <a href="threejs-sky-atmosphere-and-haze.html">← Sky, Atmosphere, and Haze</a>
+    <a href="threejs-visual-validation.html">Visual Validation →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

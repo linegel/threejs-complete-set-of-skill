@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ambient Contact Shading — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Ambient Contact Shading — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Ambient Contact Shading — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Ambient Contact Shading — Three.js WebGPU agent skill",
+   "description": "Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Ambient Contact Shading"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Cameras, Lighting, and Final Image",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Ambient Contact Shading",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Ambient Contact Shading</p>
+  <h1>Ambient Contact Shading</h1>
+  <p class="lede">Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-ambient-contact-shading</span>
+    <span class="chip">1 runnable example</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-ambient-contact-shading/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Ambient occlusion is ambient <em>visibility</em>: it attenuates indirect and environment
+light only, never direct light or emission. Ground-truth AO integrates hemisphere visibility:</p>
+$$A(\mathbf p) = \frac{1}{\pi}\int_\Omega V(\mathbf p, \omega)\,(\mathbf n\cdot\omega)\,d\omega$$
+<p>GTAO approximates this by scanning screen-space slices: for each direction it finds the
+maximum horizon angles and integrates the visible arc analytically:</p>
+$$A \approx \frac{1}{\pi}\int_0^\pi \Big(\cos\theta_1(\phi) + \cos\theta_2(\phi)\Big)\,\text{arc terms}\;d\phi$$
+<p>The pass runs at half resolution; bilateral upsampling rejects samples across depth
+discontinuities with weights
+$w = w_{spatial}\cdot\exp\!\big(-|z - z_c|/\sigma_z\big)$, and the result modulates only the
+indirect diffuse term of the lighting equation — the composition point is the contract.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-ambient-contact-shading/examples/webgpu-node-gtao">
+        <h4>webgpu-node-gtao</h4>
+        <span class="card-meta">threejs-ambient-contact-shading/examples/webgpu-node-gtao</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Ambient Contact Shading</h1>
+<p>AO is ambient visibility. It reduces indirect diffuse and environment response;
+it must not darken direct light, emission, or the final tone-mapped image.</p>
+<p>Use <code>$threejs-choose-skills</code> for preflight when AO interacts with a broader
+graphics stack. Use <code>$threejs-image-pipeline</code> when depth, normal, velocity,
+MRT ownership, tone mapping, or output color conversion must be coordinated
+with bloom, grading, shadows, SSGI, or other image-space systems.</p>
+<h2>Architecture First</h2>
+<p>Start with the highest-throughput path:</p>
+<ol>
+<li>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>,
+<code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, and the <code>NodeMaterial</code> family such as
+<code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code>.</li>
+<li>Render one scene pass with MRT output for color and view normals; consume
+the pass depth texture directly.</li>
+<li>Build AO with the official <code>ao()</code> / <code>GTAONode</code> baseline. It is the fastest
+correct default because Three.js owns the r185-era node integration,
+internal targets, depth/normal reconstruction behavior, and frame updates.</li>
+<li>Set AO to half linear resolution with <code>resolutionScale = 0.5</code> or
+<code>setResolutionScale(0.5)</code> where the pass owns scaling, then reconstruct at
+full resolution with depth- and normal-aware filtering.</li>
+<li>Enable <code>GTAONode.useTemporalFiltering</code> only when the app already uses
+<code>TRAANode</code> with valid depth and velocity. Otherwise prefer optional
+<code>DenoiseNode</code> or a cheaper spatial preset over unmanaged history.</li>
+<li>Apply scalar AO through material or node-pipeline ambient visibility before
+tone mapping. Keep HDR buffers as <code>HalfFloatType</code> until the single output
+transform.</li>
+<li>Add a custom TSL bent-normal/horizon extension only when directional
+ambient tint, diagnostics, or a proven scene-specific quality/performance
+win beats the built-in scalar <code>GTAONode</code>.</li>
+</ol>
+<p>Read <a href="references/gtao-bent-normal-pipeline.md">references/gtao-bent-normal-pipeline.md</a>.</p>
+<h2>Capability Gate</h2>
+<p>Every implementation initializes the renderer and gates features by backend
+capability.</p>
+<pre><code class="language-js">await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend ) {
+  // Full tier: GTAONode, MRT normals, TRAANode/DenoiseNode, optional storage extension.
+} else {
+  throw new Error( &#39;threejs-ambient-contact-shading requires WebGPU; route explicit fallback requests to threejs-compatibility-fallbacks.&#39; );
+}
+</code></pre>
+<p>Legacy WebGL implementation (deprecated, do not extend): none in this folder;
+explicit requests for how to apply fallback when WebGPU is unavailable route to
+<code>../threejs-compatibility-fallbacks/</code>.</p>
+<h2>WebGPU Quality Tiers</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Use</th>
+<th>Settings</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ultra</td>
+<td>Desktop discrete GPU, cinematic close inspection</td>
+<td><code>GTAONode</code>, MRT normals, temporal filtering through <code>TRAANode</code>, half-res AO, optional <code>DenoiseNode</code>, custom bent-normal extension only after validation</td>
+</tr>
+<tr>
+<td>High</td>
+<td>Desktop integrated GPU and normal production default</td>
+<td><code>GTAONode</code>, MRT normals, <code>resolutionScale = 0.5</code>, normal-aware bilateral reconstruction, no directional tint unless required</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>WebGPU mobile or thermally constrained devices</td>
+<td><code>GTAONode</code>, depth-reconstructed normals if MRT pressure is too high, fewer samples, half/quarter-res AO, no temporal history unless ghosting tests pass</td>
+</tr>
+</tbody></table>
+<h2>Performance Budgets</h2>
+<p>Target AO as a small part of the post stack:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th align="right">Full-resolution output</th>
+<th align="right">AO resolution</th>
+<th align="right">Budget</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Desktop discrete</td>
+<td align="right">2560x1440 DPR 1</td>
+<td align="right">1280x720</td>
+<td align="right">0.6-1.2 ms scalar GTAO, 1.2-2.0 ms with denoise/temporal</td>
+</tr>
+<tr>
+<td>Desktop integrated</td>
+<td align="right">1920x1080 DPR 1</td>
+<td align="right">960x540</td>
+<td align="right">0.8-1.8 ms scalar GTAO, &lt;= 2.5 ms with denoise</td>
+</tr>
+<tr>
+<td>Mobile/high-DPR tablet</td>
+<td align="right">1920x1080 effective</td>
+<td align="right">960x540 or 480x270</td>
+<td align="right">1.0-2.5 ms, dynamic scale down before sample count rises</td>
+</tr>
+</tbody></table>
+<p>Budgets include AO gather, denoise or reconstruction, and composite. Track pass
+count, draw calls, target size, texture formats, and disabled-AO bypass cost.
+Do not increase samples before proving half-resolution scaling, temporal
+filtering, and bilateral reconstruction are already exhausted.</p>
+<h2>Color And Output</h2>
+<ul>
+<li>Color textures use <code>SRGBColorSpace</code>; depth, normal, AO, bent-normal, velocity,
+mask, noise, and LUT data stay linear with <code>NoColorSpace</code> unless a specific
+node API owns conversion.</li>
+<li>Keep AO and intermediate post buffers in HDR-compatible linear targets;
+prefer <code>HalfFloatType</code> where range matters.</li>
+<li>The app has one tone-map owner and one output conversion owner. In the node
+post pipeline, <code>RenderPipeline.outputColorTransform</code> or <code>renderOutput()</code> owns
+final conversion; AO nodes never double-convert.</li>
+</ul>
+<h2>Failure Conditions</h2>
+<ul>
+<li>AO multiplies final scene color instead of indirect/environment visibility.</li>
+<li>Direct light, emissive materials, UI, or bloom-fed highlights become gray.</li>
+<li>Radius is specified only in pixels rather than projected from world units.</li>
+<li>Foreground silhouettes cast thick screen-space halos.</li>
+<li>Depth discontinuities are blurred together because normal-aware bilateral
+weights were omitted.</li>
+<li>AO remains strong at distances where its world radius is subpixel.</li>
+<li>Temporal filtering is enabled without valid velocity, depth rejection,
+history invalidation, and camera-cut reset.</li>
+<li>Bent normals are used for lighting before the one-wall validation proves the
+decoded direction turns away from the blocked hemisphere.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>This skill owns GTAO configuration, AO quality tiers, scalar ambient-visibility
+application, optional custom bent-normal gathering, denoising, and halo
+diagnosis. <code>$threejs-image-pipeline</code> owns shared depth/normal/velocity buffers,
+global pass order, tone mapping, output conversion, and multi-effect MRT reuse.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-water-optics.html">← Water Optics</a>
+    <a href="threejs-black-holes-and-space-effects.html">Black Holes and Space Effects →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three.js WebGPU/TSL Choose Skills — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Three.js WebGPU/TSL Choose Skills — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Three.js WebGPU/TSL Choose Skills — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Three.js WebGPU/TSL Choose Skills — Three.js WebGPU agent skill",
+   "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Three.js WebGPU/TSL Choose Skills"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Planning and Validation",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Three.js WebGPU/TSL Choose Skills",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Planning and Validation</a> / Three.js WebGPU/TSL Choose Skills</p>
+  <h1>Three.js WebGPU/TSL Choose Skills</h1>
+  <p class="lede">Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-choose-skills</span>
+    
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-choose-skills/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Routing is set-cover under a budget: given request features $R$ and skills with coverage
+sets $C_i$ and load costs $c_i$, choose the smallest set that covers the request:</p>
+$$\min_{S} \sum_{i \in S} c_i \quad \text{s.t.} \quad R \subseteq \bigcup_{i\in S} C_i$$
+<p>The router also owns the composed frame-budget constraint — a tier assignment is feasible
+only if the per-skill budgets sum inside the frame:</p>
+$$\sum_{i \in scene} b_i(t_i) \le B_{frame} = \frac{1000}{f_{target}}\;\text{ms}$$
+<p>Preflight is a contract, not advice: it names the selected skills, the signal owners
+(depth, tone map, output transform), and the tier assignment before any code is written —
+so composition conflicts surface at plan time instead of debug time.</p></div>
+  </div></div>
+
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Three.js WebGPU/TSL Choose Skills</h1>
+<p>This pack teaches one implementation path: latest Three.js r185-era <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, <code>NodeMaterial</code> families, node post pipelines, and compute/storage where the algorithm benefits. Route only after the renderer, backend, ownership, and performance architecture are known.</p>
+<p>Fallback for unavailable WebGPU is not part of this router&#39;s destination-skill
+guidance. If, and only if, the user explicitly asks how to apply fallback when
+WebGPU is unavailable, route that teaching to
+<code>$threejs-compatibility-fallbacks</code> after the canonical owner skill is known. Do
+not route unrelated target-support or tuning work there.</p>
+<h2>Mandatory WebGPU Preflight</h2>
+<p>Do this before loading any destination skill:</p>
+<ol>
+<li>Record the installed Three.js revision and check the matching migration guide for the release band.</li>
+<li>Initialize <code>WebGPURenderer</code> and record the backend, target browser/device/GPU class, canvas size, pixel ratio, and whether the authored feature uses TSL nodes, compute, storage textures/buffers, MRT, node post, or built-in nodes.<ul>
+<li>If the backend cannot support the canonical feature and the user explicitly asked how to apply fallback when WebGPU is unavailable, load <code>$threejs-compatibility-fallbacks</code>.</li>
+<li>If the user did not explicitly ask how to apply fallback when WebGPU is unavailable, keep the flagship route and report the missing requirement as a blocker.</li>
+</ul>
+</li>
+<li>Choose the highest-throughput architecture first: compute/storage for simulation or dense instance state, MRT to share depth/normal/velocity/albedo data, temporal/reduced-resolution passes for expensive screen effects, <code>BatchedMesh</code>/<code>InstancedMesh</code>/LOD/chunk culling for scale, adaptive DPR for pressure, and shader warmup with <code>renderer.compileAsync()</code>.</li>
+<li>Assign early ownership for shared resources: one depth source, one normal/velocity source, one history source, one tone-map owner, one output color conversion owner, and one place that adapts resolution.</li>
+<li>Define the performance budget before implementation: target frame time, pass count, draw calls, triangle/instance counts, dispatch counts, storage sizes, render-target memory, texture memory, and permitted quality tiers.</li>
+</ol>
+<h3>Pre-Route Cause Ledger</h3>
+<p>Write this ledger before selecting image or post-processing skills:</p>
+<pre><code class="language-yaml">physicalCause: &quot;&quot;                 # authored mechanism that creates the visible result
+missingSignal: &quot;&quot;                 # geometry/material/light/field/simulation signal not yet present
+noPostBaseline: &quot;&quot;                # what must remain readable with bloom/AO/grading disabled
+postProcessingRejectedBecause: &quot;&quot; # why a post effect would hide, not solve, the gap
+primaryVisualContract: &quot;&quot;         # one sentence that acceptance evidence must prove
+</code></pre>
+<p>Route image effects only after the source signal exists. If <code>physicalCause</code> or
+<code>missingSignal</code> is unknown, select the subject-generation owner first and defer
+post-processing.</p>
+<h3>Route Manifest</h3>
+<p>Every route decision must produce a structured manifest:</p>
+<pre><code class="language-yaml">selectedSkills: []
+omittedSkills: []
+primaryOwner: &quot;&quot;
+deferredSkills: []
+sharedResourceOwners:
+  gbuffer: &quot;&quot;
+  depth: &quot;&quot;
+  normal: &quot;&quot;
+  velocity: &quot;&quot;
+  history: &quot;&quot;
+  weatherEnvelope: &quot;&quot;
+  toneMap: &quot;&quot;
+  outputTransform: &quot;&quot;
+  adaptiveResolution: &quot;&quot;
+acceptanceEvidence:
+  requiredDebugViews: []
+  requiredMetrics: []
+  requiredCommands: []
+  requiredArtifacts: []
+</code></pre>
+<p><code>selectedSkills</code> must be the smallest expert set that can author the requested
+mechanism. <code>omittedSkills</code> records tempting but unnecessary skills and why they
+were not loaded. <code>primaryOwner</code> is the skill that owns the first non-post visual
+mechanism. <code>deferredSkills</code> are loaded only after their input signal exists.
+Every recipe and route manifest must carry the same <code>sharedResourceOwners</code> keys
+shown above, using an explicit empty or not-used value when the route does not
+consume that shared resource.</p>
+<h3>Preflight Checkpoint Outputs</h3>
+<p>Treat preflight as data, not prose:</p>
+<table>
+<thead>
+<tr>
+<th>Checkpoint</th>
+<th>Required output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>backendManifest</td>
+<td>Three.js revision, initialized backend, browser/device/GPU class, <code>getOutputBufferType()</code>, feature flags, and blocker if unavailable</td>
+</tr>
+<tr>
+<td>routeManifest</td>
+<td><code>selectedSkills</code>, <code>omittedSkills</code>, <code>primaryOwner</code>, <code>deferredSkills</code>, <code>sharedResourceOwners</code>, <code>acceptanceEvidence</code></td>
+</tr>
+<tr>
+<td>ownershipMap</td>
+<td>depth, normal, velocity, history, weather, tone-map, output-transform, and adaptive-resolution owners</td>
+</tr>
+<tr>
+<td>budgetTable</td>
+<td>frame ms, pass count, draw calls, triangles/instances, dispatches, storage bytes, render-target bytes</td>
+</tr>
+<tr>
+<td>debugViewList</td>
+<td>no-post baseline plus every field/pass needed to prove the mechanism</td>
+</tr>
+<tr>
+<td>capabilityBlocker</td>
+<td>missing backend/API/format/performance condition that blocks the canonical path</td>
+</tr>
+<tr>
+<td>rejectionReason</td>
+<td>why an attractive but wrong route was rejected</td>
+</tr>
+<tr>
+<td>assert</td>
+<td>executable grep, script, screenshot, or evidence-bundle check that proves the route contract</td>
+</tr>
+</tbody></table>
+<pre><code class="language-js">import * as THREE from &#39;three/webgpu&#39;;
+
+const renderer = new THREE.WebGPURenderer( {
+  antialias: false,
+  outputBufferType: THREE.HalfFloatType
+} );
+
+await renderer.init();
+
+const capabilities = {
+  revision: THREE.REVISION,
+  webgpu: renderer.backend.isWebGPUBackend,
+  outputBufferType: renderer.getOutputBufferType(),
+  rendererInfo: renderer.info
+};
+
+if ( renderer.backend.isWebGPUBackend ) {
+  // Canonical path: TSL + NodeMaterial + RenderPipeline + compute/storage as needed.
+} else {
+  throw new Error(
+    &#39;Canonical flagship route requires WebGPU; if fallback teaching was explicitly requested, route to $threejs-compatibility-fallbacks.&#39;
+  );
+}
+</code></pre>
+<p>Legacy WebGL implementation (deprecated, do not extend): none in this router folder.</p>
+<h2>Architecture Gates</h2>
+<ul>
+<li>Renderer and materials: use <code>WebGPURenderer</code>, TSL, and <code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>, <code>MeshBasicNodeMaterial</code>, <code>SpriteNodeMaterial</code>, or sibling node materials.</li>
+<li>Post stack: use <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>renderOutput()</code>, and <code>PassNode.setResolutionScale()</code>; plan shared MRT outputs before individual effects.</li>
+<li>Compute/storage: use <code>renderer.compute()</code> or <code>renderer.computeAsync()</code> with <code>Fn().compute(count)</code>, <code>StorageTexture</code>, <code>StorageBufferAttribute</code>, <code>StorageInstancedBufferAttribute</code>, <code>storage()</code> nodes, <code>textureStore()</code>, and barriers/atomics when the algorithm requires synchronization.</li>
+<li>Built-in nodes first: route to the owner skill with <code>GTAONode</code>, <code>BloomNode</code>, <code>TRAANode</code>, <code>DepthOfFieldNode</code>, <code>CSMShadowNode</code>, <code>TileShadowNode</code>, and sky/fog nodes as the first baseline when they cover the need.</li>
+<li>Scale primitives: choose <code>BatchedMesh</code> for many unique static meshes sharing compatible material state, <code>InstancedMesh</code> or storage-instanced attributes for repeated dynamic populations, chunked LOD/culling for fields, and adaptive DPR for sustained pressure.</li>
+</ul>
+<h3>r185 API Proof Table</h3>
+<p>Every named r18x API in a route needs <code>apiProof</code> from installed source or
+official docs before coding; do not guess current APIs.</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Import path / proof target</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>WebGPURenderer</code>, <code>RenderPipeline</code></td>
+<td><code>three/webgpu</code>; verify in installed source before use</td>
+</tr>
+<tr>
+<td><code>pass</code>, <code>mrt</code>, <code>renderOutput</code></td>
+<td><code>three/tsl</code>; verify in installed source before use</td>
+</tr>
+<tr>
+<td><code>ao</code> / <code>GTAONode</code></td>
+<td><code>three/addons/tsl/display/GTAONode.js</code></td>
+</tr>
+<tr>
+<td><code>bloom</code> / <code>BloomNode</code></td>
+<td><code>three/addons/tsl/display/BloomNode.js</code></td>
+</tr>
+<tr>
+<td><code>traa</code> / <code>TRAANode</code></td>
+<td><code>three/addons/tsl/display/TRAANode.js</code></td>
+</tr>
+<tr>
+<td><code>dof</code> / <code>DepthOfFieldNode</code></td>
+<td><code>three/addons/tsl/display/DepthOfFieldNode.js</code></td>
+</tr>
+<tr>
+<td><code>CSMShadowNode</code></td>
+<td><code>three/addons/csm/CSMShadowNode.js</code></td>
+</tr>
+<tr>
+<td><code>TileShadowNode</code></td>
+<td><code>three/addons/tsl/shadows/TileShadowNode.js</code></td>
+</tr>
+<tr>
+<td><code>PassNode.setResolutionScale()</code></td>
+<td>installed <code>PassNode</code> source or official docs</td>
+</tr>
+</tbody></table>
+<p>Record <code>apiProof</code> in the route manifest when an implementation depends on one
+of these APIs.</p>
+<h2>WebGPU Quality Tiers</h2>
+<p>Every routed implementation defines explicit tiers inside the canonical WebGPU/TSL architecture:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Use when</th>
+<th>Required degradation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full</td>
+<td><code>renderer.backend.isWebGPUBackend</code> is true and budgets hold</td>
+<td>All authored compute/storage, MRT, temporal history, and node post paths enabled.</td>
+</tr>
+<tr>
+<td>Budgeted</td>
+<td>Frame time or memory exceeds budget</td>
+<td>Lower DPR, lower pass resolution with <code>setResolutionScale()</code>, fewer raymarch steps/samples, smaller simulation grids, sparser LOD, and update amortization.</td>
+</tr>
+<tr>
+<td>Minimum viable</td>
+<td>WebGPU exists but the target GPU is below budget</td>
+<td>Keep the same architecture while reducing density, resolution, history length, update cadence, and optional passes.</td>
+</tr>
+</tbody></table>
+<p>Do not define alternate-renderer tiers here. Use
+<code>$threejs-compatibility-fallbacks</code> only for an explicit request to teach how to
+apply fallback when WebGPU is unavailable.</p>
+<h2>Performance Budgets</h2>
+<p>Use these starting budgets unless the product target is stricter:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Frame</th>
+<th>GPU budget</th>
+<th>Typical constraints</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Desktop discrete</td>
+<td>60 Hz</td>
+<td>10-12 ms GPU, 2-4 ms CPU submit</td>
+<td>3-6 full-res passes, 2-6 reduced passes, &lt;= 300 visible draws before batching, &lt;= 256 MB transient render targets.</td>
+</tr>
+<tr>
+<td>Desktop integrated</td>
+<td>60 Hz</td>
+<td>6-8 ms GPU, 2 ms CPU submit</td>
+<td>2-4 full-res passes, quarter/half-res expensive effects, &lt;= 120 visible draws, &lt;= 128 MB transient render targets.</td>
+</tr>
+<tr>
+<td>Mobile or thermally constrained</td>
+<td>30-60 Hz</td>
+<td>4-7 ms GPU, 1.5 ms CPU submit</td>
+<td>1-2 full-res passes, aggressive DPR, sparse updates, &lt;= 80 visible draws, &lt;= 64 MB transient render targets.</td>
+</tr>
+</tbody></table>
+<p>Record measured <code>renderer.info</code>, draw calls, triangles, texture/render-target counts, dispatch sizes, storage sizes, and frame-time evidence before acceptance.</p>
+<h2>Composed-scene budget aggregation</h2>
+<h3>Routing preflight</h3>
+<p>Before composing a route, enumerate the actually available <code>threejs-*</code> skills in
+the live inventory. Compare that inventory against this roster from the current
+workspace:</p>
+<ul>
+<li><code>threejs-ambient-contact-shading</code></li>
+<li><code>threejs-black-holes-and-space-effects</code></li>
+<li><code>threejs-bloom</code></li>
+<li><code>threejs-camera-controls-and-rigs</code></li>
+<li><code>threejs-choose-skills</code></li>
+<li><code>threejs-compatibility-fallbacks</code></li>
+<li><code>threejs-dynamic-surface-effects</code></li>
+<li><code>threejs-exposure-color-grading</code></li>
+<li><code>threejs-image-pipeline</code></li>
+<li><code>threejs-particles-trails-and-effects</code></li>
+<li><code>threejs-procedural-buildings-and-cities</code></li>
+<li><code>threejs-procedural-creatures</code></li>
+<li><code>threejs-procedural-fields</code></li>
+<li><code>threejs-procedural-geometry</code></li>
+<li><code>threejs-procedural-materials</code></li>
+<li><code>threejs-procedural-motion-systems</code></li>
+<li><code>threejs-procedural-planets</code></li>
+<li><code>threejs-procedural-vegetation</code></li>
+<li><code>threejs-rain-snow-and-wet-surfaces</code></li>
+<li><code>threejs-scalable-real-time-shadows</code></li>
+<li><code>threejs-sky-atmosphere-and-haze</code></li>
+<li><code>threejs-spectral-ocean</code></li>
+<li><code>threejs-visual-validation</code></li>
+<li><code>threejs-volumetric-clouds</code></li>
+<li><code>threejs-water-optics</code></li>
+</ul>
+<p>If the live inventory and roster differ, route only to the intersection and
+surface the divergence in <code>routeManifest.rejectionReason</code>. Do not guess renamed,
+deprecated, or missing siblings. If a required owner is absent from the
+intersection, mark the route blocked or reduce the scope to retained owners.</p>
+<h3>Aggregation rule</h3>
+<p>A composed scene must declare one <code>frameBudgetMs</code> before skill selection. Use
+<code>16.6 ms</code> for <code>60 Hz</code>, <code>8.3 ms</code> for <code>120 Hz</code>, or <code>33.3 ms</code> for <code>30 Hz</code> unless
+the brief gives a stricter budget; these are <code>floor((1000 ms / Hz) * 10) / 10</code>.</p>
+<p>For every selected skill, the route manifest must cite the selected tier row and
+sum that row&#39;s published cost-range maximum. If one selected row publishes
+multiple required ranges, add the maxima. Add one fixed overhead line for shared
+composition work:</p>
+<pre><code class="language-yaml">budgetAggregation:
+  frameBudgetMs:
+  selectedSkillMaxima: []
+fixedOverhead:
+  scenePassMs: 0.5
+  sharedUpsamplesMs: 0.5
+  totalMs: 1.0 # 0.5 + 0.5
+aggregateMs:
+routeValid:
+</code></pre>
+<p>The composed route is invalid when:</p>
+<pre><code class="language-text">sum(selectedSkillPublishedMaxMs) + fixedOverhead.totalMs &gt; frameBudgetMs
+</code></pre>
+<p>When invalid, downgrade deterministically and recompute after each step:</p>
+<ol>
+<li>post-effects internals: AO denoise/history, bloom scale, TAA/DoF, optional
+grading/LUT cadence, and optional history branches;</li>
+<li>volumetrics: cloud march scale, step counts, shadow maps, update cadence;</li>
+<li>water: FFT grid, cascade count, spray, refraction, and shading tier;</li>
+<li>crowds: creature count, shell tier, outline, and update cadence.</li>
+</ol>
+<p>If a selected skill has no published cost row for the proposed downgrade, do
+not assign a cheaper number. Keep the previous maximum, record the missing table
+entry, and continue to the next downgrade owner.</p>
+<h3>Worked aggregation example</h3>
+<p>Input route: top-tier horizon ocean, Ultra clouds, desktop creature crowd, and
+full post at <code>60 Hz</code>. The declared budget is <code>16.6 ms</code> because
+<code>floor((1000 / 60) * 10) / 10 = 16.6</code>.</p>
+<p>Published rows used:</p>
+<ul>
+<li><code>$threejs-spectral-ocean</code>, <code>Budgets</code>, row <code>High desktop discrete</code>: target
+<code>2.5-4.0 ms simulation</code> and <code>1.5-3.0 ms ocean shading/post at 1440p</code>;
+aggregate maximum <code>4.0 + 3.0 = 7.0 ms</code>.</li>
+<li><code>$threejs-volumetric-clouds</code>, <code>Quality Tiers And Budgets</code>, row
+<code>Ultra desktop-discrete</code>: target cost <code>2.5-4.0 ms</code>; maximum <code>4.0 ms</code>.</li>
+<li><code>$threejs-procedural-creatures</code>, <code>Performance Budgets</code>, row
+<code>Desktop discrete</code>: frame budget <code>0.5-1.5 ms</code>; maximum <code>1.5 ms</code>.</li>
+<li><code>$threejs-image-pipeline</code>, <code>Budgets</code>, row <code>Desktop discrete</code>: full post
+frame cost <code>2.0-4.0 ms at 1440p</code>; maximum <code>4.0 ms</code>.</li>
+<li>Router fixed overhead: <code>0.5 ms scene pass + 0.5 ms shared upsamples = 1.0 ms</code>.</li>
+</ul>
+<p>Initial aggregate:</p>
+<pre><code class="language-text">7.0 ocean + 4.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 17.5 ms
+17.5 ms &gt; 16.6 ms, so the route is invalid.
+</code></pre>
+<p>Downgrade order check:</p>
+<ol>
+<li>Post-effects internals: <code>$threejs-image-pipeline</code> publishes no cheaper
+named full-post tier in its <code>Budgets</code> table, so keep <code>4.0 ms</code> and record the
+missing lower row.</li>
+<li>Volumetrics: downgrade <code>$threejs-volumetric-clouds</code> from
+<code>Ultra desktop-discrete</code> to <code>High desktop-discrete</code>; the <code>Quality Tiers And Budgets</code> row publishes <code>1.8-3.0 ms</code>, maximum <code>3.0 ms</code>.</li>
+</ol>
+<p>Valid aggregate after the first published downgrade:</p>
+<pre><code class="language-text">7.0 ocean + 3.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 16.5 ms
+16.5 ms &lt;= 16.6 ms, so the route is valid.
+</code></pre>
+<h3>Tier-exclusion matrix at 16.6 ms</h3>
+<p>These combinations are invalid at <code>60 Hz</code> with the fixed <code>1.0 ms</code> composition
+overhead because the sum of published maxima exceeds <code>16.6 ms</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Combination</th>
+<th align="right">Published max sum</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$threejs-spectral-ocean</code> High desktop discrete (<code>4.0 + 3.0 = 7.0</code>) + <code>$threejs-volumetric-clouds</code> Ultra desktop-discrete (<code>4.0</code>) + <code>$threejs-image-pipeline</code> Desktop discrete full post (<code>4.0</code>) + <code>$threejs-procedural-creatures</code> Desktop discrete crowd (<code>1.5</code>) + overhead (<code>1.0</code>)</td>
+<td align="right"><code>17.5 ms</code></td>
+<td>invalid</td>
+</tr>
+<tr>
+<td><code>$threejs-spectral-ocean</code> High desktop discrete (<code>7.0</code>) + <code>$threejs-volumetric-clouds</code> Ultra desktop-discrete (<code>4.0</code>) + <code>$threejs-image-pipeline</code> Desktop discrete full post (<code>4.0</code>) + <code>$threejs-ambient-contact-shading</code> Desktop discrete denoise/temporal AO (<code>2.0</code>) + overhead (<code>1.0</code>)</td>
+<td align="right"><code>18.0 ms</code></td>
+<td>invalid</td>
+</tr>
+<tr>
+<td><code>$threejs-spectral-ocean</code> High desktop discrete (<code>7.0</code>) + <code>$threejs-volumetric-clouds</code> Ultra desktop-discrete (<code>4.0</code>) + <code>$threejs-image-pipeline</code> Desktop discrete full post (<code>4.0</code>) + <code>$threejs-ambient-contact-shading</code> Desktop discrete scalar GTAO (<code>1.2</code>) + <code>$threejs-procedural-creatures</code> Desktop discrete crowd (<code>1.5</code>) + overhead (<code>1.0</code>)</td>
+<td align="right"><code>18.7 ms</code></td>
+<td>invalid</td>
+</tr>
+</tbody></table>
+<p>Source rows: <code>$threejs-spectral-ocean</code> <code>Budgets</code>, row
+<code>High desktop discrete</code>; <code>$threejs-volumetric-clouds</code>
+<code>Quality Tiers And Budgets</code>, rows <code>Ultra desktop-discrete</code> and
+<code>High desktop-discrete</code>; <code>$threejs-image-pipeline</code> <code>Budgets</code>, row
+<code>Desktop discrete</code>; <code>$threejs-procedural-creatures</code> <code>Performance Budgets</code>, row
+<code>Desktop discrete</code>; <code>$threejs-ambient-contact-shading</code> <code>Performance Budgets</code>,
+row <code>Desktop discrete</code>.</p>
+<h3>Fauna and ocean handoff</h3>
+<p>For creature swimmers in a spectral ocean route:</p>
+<ul>
+<li><code>$threejs-spectral-ocean</code> owns water height, displacement derivative, foam,
+and current queries. <code>$threejs-procedural-creatures</code> consumes a sampled
+swimmer contact interface; it does not recompute FFT spectra or own wave
+phase.</li>
+<li><code>$threejs-procedural-creatures</code> owns body shell, gait/swim locomotion, pose
+storage, crowd tier, and species variant cache.</li>
+<li><code>$threejs-scalable-real-time-shadows</code> owns the shared shadow clipmap when
+routed. Creatures cast into that clipmap; do not allocate per-creature shadow
+maps.</li>
+<li><code>$threejs-image-pipeline</code> owns MRT, outline inputs, velocity, normal, history,
+tone map, and output transform. Creature outlines use the shared post edge or
+MRT signal owner, not a second outline graph.</li>
+</ul>
+<h2>Color And Output Rules</h2>
+<ul>
+<li>Mark color textures as <code>SRGBColorSpace</code>; data maps such as normal, roughness, masks, noise, LUTs, weather, and simulation textures stay <code>NoColorSpace</code> or linear.</li>
+<li>Keep HDR working buffers as <code>HalfFloatType</code> until the single tone-map step.</li>
+<li>The node pipeline owns final conversion through <code>renderOutput()</code> and <code>outputColorTransform</code>; individual materials and effects must not double-convert.</li>
+<li>Decide mipmap generation per data texture. Do not auto-generate mipmaps for storage outputs unless the sampling path actually needs them.</li>
+</ul>
+<h2>Route By Authored System</h2>
+<table>
+<thead>
+<tr>
+<th>Required result</th>
+<th>Load</th>
+<th>Tie-breaker</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>shot composition, chase/side/orbit rigs, camera handoffs, projection ownership, pointer look, floating origins</td>
+<td><code>$threejs-camera-controls-and-rigs</code></td>
+<td>Load before subject skills when framing changes silhouette, scale, or temporal validity.</td>
+</tr>
+<tr>
+<td>launch and docking timelines, procedural transform phases, springs, staging, rotating-frame alignment, debris motion</td>
+<td><code>$threejs-procedural-motion-systems</code></td>
+<td>Use for transform authorship; use effects only when the visible result is event energy, trails, or particles.</td>
+</tr>
+<tr>
+<td>reusable scalar/vector fields, domain warping, causal masks, procedural normals</td>
+<td><code>$threejs-procedural-fields</code></td>
+<td>Use when several outputs share one cause; use materials when the field only shades a surface.</td>
+</tr>
+<tr>
+<td>atlas-filtered blocks, planetary surfaces, terrain wetness, lava/emissive procedural surfaces, authored frame PBR, specular AA</td>
+<td><code>$threejs-procedural-materials</code></td>
+<td>Use for BRDF/material identity; pair with fields for shared masks and geometry for actual silhouette changes.</td>
+</tr>
+<tr>
+<td>sculpted rails/frames, branch rings, semantic mesh writers, material groups</td>
+<td><code>$threejs-procedural-geometry</code></td>
+<td>Use when vertices, normals, UV density, or material slots must be authored.</td>
+</tr>
+<tr>
+<td>trees, stylized grass, GPU-computed grass, branching organisms, roots, foliage, rooted wind deformation</td>
+<td><code>$threejs-procedural-vegetation</code></td>
+<td>Use for biological distribution/growth/wind; pair with fields only for terrain or biome control.</td>
+</tr>
+<tr>
+<td>procedural creatures, fauna, NPCs, spec-driven bodies, SDF blend-shell skins, capsule rigs, gait/hop/flight/swim locomotion, creature crowds, creature labs</td>
+<td><code>$threejs-procedural-creatures</code></td>
+<td>Use for living-actor bodies and locomotion; use motion systems for generic transform timelines, vegetation for plants; imported skinned-clip pipelines stay a declared gap.</td>
+</tr>
+<tr>
+<td>buildings, facade grammars, profiles, ornaments, modular mesh writers</td>
+<td><code>$threejs-procedural-buildings-and-cities</code></td>
+<td>Use for authored building grammar; use geometry for general mesh construction without architectural semantics.</td>
+</tr>
+<tr>
+<td>planets, terrain, craters, biome fields, coastlines, spherical detail</td>
+<td><code>$threejs-procedural-planets</code></td>
+<td>Use for planetary terrain/body ownership; pair with atmosphere only after body scale and horizon are fixed.</td>
+</tr>
+<tr>
+<td>sky scattering, planetary shells, depth-based aerial perspective</td>
+<td><code>$threejs-sky-atmosphere-and-haze</code></td>
+<td>Use for air/sky/light transport; use image pipeline only for final exposure and color ownership.</td>
+</tr>
+<tr>
+<td>weather-driven raymarched clouds and cloud shadows</td>
+<td><code>$threejs-volumetric-clouds</code></td>
+<td>Use for volumetric density and temporal march; use precipitation for particles or surface wetness.</td>
+</tr>
+<tr>
+<td>FFT oceans, hybrid FFT/Gerstner clear water, stylized above/below ocean optics, spectral cascades, choppy derivatives, Jacobian whitecaps</td>
+<td><code>$threejs-spectral-ocean</code></td>
+<td>Use for large-water wave spectra and horizon-scale water; use water optics for bounded pools or local interactions.</td>
+</tr>
+<tr>
+<td>authored analytic waves, bounded heightfield pools, object ripples, differential-area caustics, ray-traced pool volume optics, shared normals, heuristic refraction, absorption, crest foam</td>
+<td><code>$threejs-water-optics</code></td>
+<td>Use for local/bounded water and optical coupling; use temporal surfaces for screen-history masks without physical water.</td>
+</tr>
+<tr>
+<td>falling snow, snow accumulation, model snow caps, wet asphalt puddles, procedural ripple normals, splash flipbooks, rain streaks, shared weather envelopes, surface wetness</td>
+<td><code>$threejs-rain-snow-and-wet-surfaces</code></td>
+<td>Use for weather particles plus affected surfaces; route puddle optics to water when refraction/caustics dominate.</td>
+</tr>
+<tr>
+<td>curved-ray black holes, accretion disks, wormholes</td>
+<td><code>$threejs-black-holes-and-space-effects</code></td>
+<td>Use for bounded curved-ray integration; route exposure/bloom separately after HDR signal is correct.</td>
+</tr>
+<tr>
+<td>particles, trails, plasma, shockwaves, layered event effects</td>
+<td><code>$threejs-particles-trails-and-effects</code></td>
+<td>Use for time-local energy and particles; route motion mechanics to animation when object transforms drive the result.</td>
+</tr>
+<tr>
+<td>accumulated screen frost, touch clearing, reduced blur, and refraction masks</td>
+<td><code>$threejs-dynamic-surface-effects</code></td>
+<td>Use for screen-space history surfaces; use materials or precipitation when the effect is object/world anchored.</td>
+</tr>
+<tr>
+<td>real-time shadows for dynamic or large scenes, cascades, tiles, cached updates</td>
+<td><code>$threejs-scalable-real-time-shadows</code></td>
+<td>Use built-in <code>CSMShadowNode</code>/<code>TileShadowNode</code> first; custom cached clipmaps only for streaming worlds with invalidation budgets.</td>
+</tr>
+<tr>
+<td>GTAO, bent normals, bilateral reconstruction</td>
+<td><code>$threejs-ambient-contact-shading</code></td>
+<td>Use <code>GTAONode</code> baseline; route to image pipeline when depth/normal/MRT ownership is not yet planned.</td>
+</tr>
+<tr>
+<td>HDR bloom and selective emission contribution</td>
+<td><code>$threejs-bloom</code></td>
+<td>Use <code>BloomNode</code> baseline; route to exposure/color grading when bloom strength depends on tone-map/exposure policy.</td>
+</tr>
+<tr>
+<td>eye adaptation, tone mapping, LUT grading, output color</td>
+<td><code>$threejs-exposure-color-grading</code></td>
+<td>Use when the question changes luminance measurement, tone-map ownership, LUTs, or output conversion.</td>
+</tr>
+<tr>
+<td>shared depth/normal/velocity ownership, MRT, history, node pass ordering, final pipeline assembly</td>
+<td><code>$threejs-image-pipeline</code></td>
+<td>Plan early for shared buffers; load late again for final image treatment after the no-post baseline reads.</td>
+</tr>
+<tr>
+<td>fixed-view diagnostics, seed sweeps, temporal stability, GPU budgets, regression evidence</td>
+<td><code>$threejs-visual-validation</code></td>
+<td>Use for any ambitious scene before acceptance, especially compute, temporal, or adaptive-resolution work.</td>
+</tr>
+</tbody></table>
+<h2>Execution Order</h2>
+<p>For a new procedural scene:</p>
+<ol>
+<li>Run the mandatory WebGPU preflight, capability gate, quality-tier choice, performance budget, and color/output ownership.</li>
+<li>Define a visual contract: subject, scale, camera distance, motion, target devices, target frame time, and no-post readability.</li>
+<li>Load <code>$threejs-camera-controls-and-rigs</code> when framing, lens, camera frame, or mode transitions affect the target.</li>
+<li>Load the subject-generation skill and any required field/material/geometry owner.</li>
+<li>Add <code>$threejs-procedural-motion-systems</code> when object motion requires authored phases, moving frames, or spring convergence.</li>
+<li>Plan <code>$threejs-image-pipeline</code> early if depth, normal, velocity, MRT, history, tone mapping, or adaptive resolution will be shared.</li>
+<li>Add lighting, shadows, atmosphere, and weather only after silhouette and material masks read without effects.</li>
+<li>Add atomic image effects only when the authored scene emits the signal they need.</li>
+<li>Use <code>$threejs-image-pipeline</code> for final node pass ordering and <code>$threejs-visual-validation</code> for deterministic evidence.</li>
+</ol>
+<h2>Routing Constraints</h2>
+<ul>
+<li>Do not load a skill for generic API setup. The router itself owns the r185-era WebGPU/TSL baseline check, then destination skills own domain algorithms.</li>
+<li>Do not route &quot;make it beautiful&quot; directly to post processing. Find the missing authored system or missing physical signal.</li>
+<li>Prefer one strong, inspectable visual rule over several independent noise layers.</li>
+<li>When adapting a supplied reference, preserve the mechanism that creates its character. Do not reduce it to a generic effect category.</li>
+<li>Keep source-space, world-space, and screen-space systems separate unless the composition explicitly requires coupling.</li>
+<li>If no retained skill matches, state that the pack lacks expert coverage for that system and use official Three.js docs without inventing a pseudo-owner.</li>
+<li>Unsupported/common gaps unless a new skill is added: asset optimization pipelines, WebXR interaction design, deployment, UI overlays, editor tooling, physics engines, and generic app architecture.</li>
+<li>Teaching how to apply fallback when WebGPU is unavailable is not a general gap; it is owned by <code>$threejs-compatibility-fallbacks</code> and stays out of flagship destination skills unless the user explicitly asks for it.</li>
+</ul>
+<h2>Space And Owner Handoff</h2>
+<p>Every destination handoff must label:</p>
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Required label</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>source-space</td>
+<td>object/local/growth/field/simulation coordinates that authored the signal</td>
+</tr>
+<tr>
+<td>world-space</td>
+<td>Three.js Y-up world units and any floating-origin offset</td>
+</tr>
+<tr>
+<td>view-space</td>
+<td>camera-space convention, including camera <code>-Z</code> and normal encoding</td>
+</tr>
+<tr>
+<td>clip-space</td>
+<td>projection owner, jitter owner, and depth range</td>
+</tr>
+<tr>
+<td>NDC</td>
+<td>normalized device coordinates and screen origin assumption</td>
+</tr>
+<tr>
+<td>UV</td>
+<td>UV origin, wrap mode, and whether deltas are UV or pixels</td>
+</tr>
+<tr>
+<td>texel</td>
+<td>texel-center rule, physical pixel size, and DPR scaling</td>
+</tr>
+<tr>
+<td>depth convention</td>
+<td>standard, reversed, logarithmic, orthographic, or resolved MSAA depth</td>
+</tr>
+<tr>
+<td>color domain</td>
+<td><code>SRGBColorSpace</code>, scene-linear HDR, tone-mapped linear, display-referred sRGB, or data/no-color</td>
+</tr>
+<tr>
+<td>owner boundary</td>
+<td>which skill writes the signal and which skill may consume it</td>
+</tr>
+</tbody></table>
+<h2>Route-Away Ledger</h2>
+<p>Use route-away entries when the request is outside this pack&#39;s expert scope:</p>
+<table>
+<thead>
+<tr>
+<th>Request area</th>
+<th>Route-away decision</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>asset pipeline</td>
+<td>Use official Three.js/glTF/KTX2/Meshopt/DRACO docs or a future asset skill; do not stretch a visual skill into packaging ownership.</td>
+</tr>
+<tr>
+<td>WebXR</td>
+<td>Use official WebXR and Three.js docs unless a dedicated skill exists.</td>
+</tr>
+<tr>
+<td>UI overlays</td>
+<td>Keep DOM/app UI outside flagship graphics skills; only route UI-safe compositing to image-pipeline when it affects color/output ownership.</td>
+</tr>
+<tr>
+<td>deployment</td>
+<td>Use deployment/platform docs; do not load graphics skills for hosting or bundling.</td>
+</tr>
+<tr>
+<td>editor tooling</td>
+<td>Use editor/tooling docs or project conventions.</td>
+</tr>
+<tr>
+<td>physics engines</td>
+<td>Use a physics engine or project-local integration; route visual effects only after physical state is available.</td>
+</tr>
+<tr>
+<td>generic app architecture</td>
+<td>Keep framework/state/router decisions outside this visual skill pack.</td>
+</tr>
+<tr>
+<td>Teaching how to apply fallback when WebGPU is unavailable</td>
+<td>Use <code>$threejs-compatibility-fallbacks</code> only when the user explicitly asks how to apply fallback when WebGPU is unavailable.</td>
+</tr>
+</tbody></table>
+<h2>Acceptance Gate</h2>
+<p>A routed task is incomplete until the implementation exposes:</p>
+<ul>
+<li>installed Three.js revision, initialized backend, target browser/device/GPU class, and migration-guide check;</li>
+<li>deterministic seed or reproducible inputs;</li>
+<li>explicit Full/Budgeted/Minimum viable quality tiers and the condition that selects each tier;</li>
+<li>visual debug modes for controlling fields, intermediate buffers, and shared MRT/history outputs;</li>
+<li>parameters grouped by perceptual role;</li>
+<li>no-post baseline that still reads;</li>
+<li>color texture/data texture <code>colorSpace</code>, HDR buffer type, tone-map owner, output conversion owner, and proof of no double conversion;</li>
+<li><code>renderer.info</code>, draw calls, triangles, texture/render-target counts, dispatch counts, storage sizes, and measured frame-time evidence;</li>
+<li>validation screenshots or fixed-view captures for the target tiers.</li>
+</ul>
+</div>
+  <div class="pn">
+    <a href="threejs-camera-controls-and-rigs.html">← Camera Controls and Rigs</a>
+    <a href="threejs-compatibility-fallbacks.html">Three.js Compatibility Fallbacks →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

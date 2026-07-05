@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three.js Compatibility Fallbacks — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Three.js Compatibility Fallbacks — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Three.js Compatibility Fallbacks — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Three.js Compatibility Fallbacks — Three.js WebGPU agent skill",
+   "description": "Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Three.js Compatibility Fallbacks"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Planning and Validation",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Three.js Compatibility Fallbacks",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Planning and Validation</a> / Three.js Compatibility Fallbacks</p>
+  <h1>Three.js Compatibility Fallbacks</h1>
+  <p class="lede">Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-compatibility-fallbacks</span>
+    <span class="chip">1 runnable example</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-compatibility-fallbacks/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-compatibility-fallbacks/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Fallback planning is explicit tier design, not silent degradation. Capability detection
+partitions devices into tiers, and each tier gets an authored (not merely reduced) target:</p>
+$$\text{tier} = f(\text{WebGPU}, \text{limits}, \text{bandwidth}) \in \{T_0, T_1, T_2\}$$
+<p>Cost scaling estimates how a pass responds to resolution and step count —
+raymarch cost scales as $O(N_{px}\cdot S)$, so half resolution plus half steps is a
+$4\times$ reduction that must be re-validated visually, never assumed. The skill's rule:
+a fallback is a smaller <em>authored</em> scene with its own validation contract, and tier
+switching is a hard gate (fail loudly), never a silent downgrade mid-session.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-compatibility-fallbacks/examples/tier-planner">
+        <h4>tier-planner</h4>
+        <span class="card-meta">threejs-compatibility-fallbacks/examples/tier-planner</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Three.js Compatibility Fallbacks</h1>
+<p>This skill quarantines teaching on how to apply fallback when WebGPU is
+unavailable. Flagship Three.js skills teach the best r185-era WebGPU/TSL
+architecture first; load this skill only when the user explicitly asks for
+how to apply fallback when WebGPU is unavailable.</p>
+<h2>Non-Negotiable Rule</h2>
+<p>Do not weaken the flagship skill to make fallback easier.</p>
+<p>Fallback teaching is a derived plan from the canonical implementation:</p>
+<pre><code class="language-text">canonical algorithm and visual contract
+  -&gt; required engine capabilities
+  -&gt; missing capability on target
+  -&gt; cheapest acceptable degradation
+  -&gt; explicit lost features and validation deltas
+</code></pre>
+<p>Never hide a fallback inside the core skill as &quot;also works on WebGL&quot;. Name the
+downgrade and its cost, and keep it attached to the user&#39;s explicit request for
+how to apply fallback when WebGPU is unavailable.</p>
+<h2>Invariant Ledger</h2>
+<p>Every fallback answer must include an invariant ledger before implementation
+details. For each canonical physical, color, temporal, and space invariant,
+mark exactly one status:</p>
+<ul>
+<li><code>preserved</code>: canonical tests still apply unchanged;</li>
+<li><code>weakened</code>: name the visible wrongness and the metric/screenshot threshold;</li>
+<li><code>removed</code>: name the feature honestly as disabled, baked, approximate, or
+stylized.</li>
+</ul>
+<p>If the visible wrongness would be misleading, remove the feature before
+choosing a legacy branch.</p>
+<h2>Workflow</h2>
+<ol>
+<li>Record the canonical owner skill and the exact feature being downgraded.</li>
+<li>List the required canonical primitives: WebGPU, TSL, NodeMaterial, storage buffers/textures, MRT, node post, compute, timestamp queries, or specific built-in nodes.</li>
+<li>Record the exact WebGPU-unavailable constraint the user asked about:
+browser, GPU class, no storage, no MRT float, memory cap, thermal cap, or
+product requirement.</li>
+<li>Choose one downgrade axis first. Order of preference:<ul>
+<li>quality pressure inside WebGPU: lower resolution, update rate, samples,
+steps, cascades, blades, particles, or LOD rings;</li>
+<li>precomputed/static assets when interaction can be removed;</li>
+<li>CPU/offline bake for fields, geometry, LUTs, or impostors;</li>
+<li>feature removal when the degraded result would lie;</li>
+<li>legacy WebGL implementation only after the explicit WebGPU-unavailable
+request and explicit maintenance acceptance.
+Feature removal before legacy is mandatory when the degraded visual would
+misrepresent the canonical invariant.</li>
+</ul>
+</li>
+<li>Preserve the core physical/algorithmic invariant where possible. If the invariant cannot survive, state the new artifact honestly.</li>
+<li>Write a validation delta: which canonical tests still pass, which are weakened, and which screenshots/metrics prove the fallback is acceptable.</li>
+</ol>
+<h2>Capability Gate</h2>
+<p>Use the canonical owner first, then branch only from an explicit
+WebGPU-unavailable request:</p>
+<pre><code class="language-js">import { WebGPURenderer } from &#39;three/webgpu&#39;;
+
+const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend === true ) {
+  throw new Error( &#39;Use the canonical owner skill; fallback teaching is not active.&#39; );
+}
+
+if ( userExplicitlyAskedForWebGPUUnavailableFallback !== true ) {
+  throw new Error( &#39;Report WebGPU as a blocker instead of teaching fallback.&#39; );
+}
+
+const compatibilityRenderer = new WebGPURenderer( { forceWebGL: true } );
+</code></pre>
+<p><code>forceWebGL</code> is a compatibility branch or test branch, never the canonical
+architecture. Do not recommend <code>new WebGLRenderer()</code> from this skill.</p>
+<h2>Allowed Teaching Patterns</h2>
+<ul>
+<li><strong>Quality pressure inside WebGPU</strong>: reduce pass resolution, samples, raymarch steps, grid size, update cadence, or visible density while keeping the same architecture.</li>
+<li><strong>Precomputed fallback</strong>: replace dynamic compute with generated textures, LUTs, impostors, baked fields, or static variants when the interaction can be removed.</li>
+<li><strong>Legacy WebGL branch</strong>: use <code>ShaderMaterial</code>, <code>EffectComposer</code>, render-target ping-pong, <code>InstancedMesh</code>, or <code>onBeforeCompile</code> only as a named branch when the user explicitly asks how to apply fallback when WebGPU is unavailable.</li>
+<li><strong>CPU/offline fallback</strong>: generate geometry, fields, or lookup textures ahead of time when runtime compute/storage is unavailable.</li>
+<li><strong>Feature removal</strong>: turn off the feature rather than shipping a fake equivalent when the degraded result would mislead the scene.</li>
+</ul>
+<h2>Forbidden Patterns</h2>
+<ul>
+<li>Do not put fallback teaching into destination WebGPU/TSL skills.</li>
+<li>Do not present a fallback as the recommended architecture.</li>
+<li>Do not preserve visuals by breaking color/output ownership, double tone mapping, energy budgets, or shared field parity.</li>
+<li>Do not build a second full renderer-specific product unless the user explicitly
+asks how to apply fallback when WebGPU is unavailable and accepts the maintenance
+cost.</li>
+<li>Do not call reduced physics &quot;physically based&quot;; name it as approximate, stylized, baked, or disabled.</li>
+</ul>
+<h2>References And Planner</h2>
+<ul>
+<li><a href="references/canonical-loss-ledger.md">references/canonical-loss-ledger.md</a>:
+owner-by-owner invariant, forbidden fake, and validation delta table.</li>
+<li><a href="references/downgrade-decision-matrix.md">references/downgrade-decision-matrix.md</a>:
+ranked downgrade options by missing capability.</li>
+<li><a href="references/r185-api-map.md">references/r185-api-map.md</a>: current Three.js
+API anchors and legacy quarantine map.</li>
+<li><a href="references/checkpoints-and-traps.md">references/checkpoints-and-traps.md</a>:
+observable gates and exact traps.</li>
+<li><a href="examples/tier-planner/">examples/tier-planner/</a>: JSON-in/table-out planner
+with validation for exactly one downgrade axis per feature.</li>
+</ul>
+<h2>Output Contract</h2>
+<p>When this skill is used because the user explicitly asked how to apply fallback
+when WebGPU is unavailable, return a fallback teaching table:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Target</th>
+<th>Kept</th>
+<th>Lost</th>
+<th>Implementation</th>
+<th>Validation</th>
+</tr>
+</thead>
+</table>
+<p>Also include:</p>
+<ul>
+<li>capability gate code or pseudocode;</li>
+<li>exact files or skills that own the canonical path;</li>
+<li>target frame budget, pass count, memory cap, degraded resolution/update
+cadence, screenshot names, and metric thresholds per tier;</li>
+<li>data texture color-space rules for any precomputed maps;</li>
+<li>lifecycle/disposal changes, including dispose/recreate obligations;</li>
+<li>tests that must run separately from canonical WebGPU validation.</li>
+</ul>
+</div>
+  <div class="pn">
+    <a href="threejs-choose-skills.html">← Three.js WebGPU/TSL Choose Skills</a>
+    <a href="threejs-dynamic-surface-effects.html">Dynamic Surface Effects →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

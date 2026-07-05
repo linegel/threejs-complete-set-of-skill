@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procedural Fields — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-fields.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Procedural Fields — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-fields.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Procedural Fields — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Procedural Fields — Three.js WebGPU agent skill",
+   "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-fields.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Procedural Fields"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Procedural Content",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Procedural Fields",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-fields.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Fields</p>
+  <h1>Procedural Fields</h1>
+  <p class="lede">Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-procedural-fields</span>
+    <span class="chip">1 runnable example</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-fields/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>A field is a pure function $F:\mathbb R^3 \to \mathbb R^m$ from position to a bundle of
+channels (height, moisture, wear, mask…). Everything derives from shared causes, so channels
+correlate the way nature does. The workhorse is fractal Brownian motion over a noise basis:</p>
+$$F(\mathbf p) = \sum_{i=0}^{O-1} a^i\, n\big(f^i \mathbf p + \mathbf o_i\big), \qquad a < 1,\; f \approx 2$$
+<p>Domain warping feeds a field through itself to break up isotropy:
+$F'(\mathbf p) = F\big(\mathbf p + w\,\mathbf W(\mathbf p)\big)$. Derived surface data uses the
+gradient, e.g. slope masks $m = 1 - \hat{\mathbf n}\cdot\hat{\mathbf u}$ from</p>
+$$\nabla F \approx \frac{1}{2\epsilon}\big(F(\mathbf p + \epsilon\mathbf e_i) - F(\mathbf p - \epsilon\mathbf e_i)\big)_{i=1..3}$$
+<p>The contract the skill enforces: the CPU and TSL implementations are the <em>same function</em>
+(same basis, same seeds, same remaps), validated by GPU readback diff
+$\max|F_{CPU}-F_{GPU}| < \varepsilon$ — placement and shading must agree on the world.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-fields/examples/webgpu-field-bake">
+        <h4>webgpu-field-bake</h4>
+        <span class="card-meta">threejs-procedural-fields/examples/webgpu-field-bake</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Procedural Fields</h1>
+<p>The first implementation decision is the algorithm class. Do not begin with a
+simple material expression and later optimize it. Author the field once as a
+deterministic TSL <code>Fn</code>, reuse that exact function in material, vertex, and
+compute stages, and bake it to storage resources whenever repeated reads make
+evaluation the slower path.</p>
+<p>Use <code>$threejs-choose-skills</code> before this skill when the request spans multiple
+graphics systems. Use <code>$threejs-procedural-materials</code> when the task is channel
+assembly and material response, and <code>$threejs-procedural-planets</code> when the
+deliverable is a complete planetary body.</p>
+<p>Legacy WebGL implementation (deprecated, do not extend): <code>../threejs-procedural-planets/examples/procedural-planet-surface/planet-system.js</code>.</p>
+<h2>Mandatory Renderer Path</h2>
+<p>Use only latest Three.js WebGPU/TSL APIs:</p>
+<ul>
+<li><code>WebGPURenderer</code> from <code>three/webgpu</code>.</li>
+<li>TSL from <code>three/tsl</code>, with reusable <code>Fn</code> field functions.</li>
+<li><code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>, or the appropriate
+<code>NodeMaterial</code> family member for material consumers.</li>
+<li><code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
+<code>outputColorTransform</code>, and <code>renderOutput()</code> for node post pipelines.</li>
+<li><code>renderer.compute()</code> or <code>renderer.computeAsync()</code> with <code>Fn().compute(count)</code>,
+<code>StorageTexture</code>, <code>textureStore()</code>, <code>StorageBufferAttribute</code>,
+<code>StorageInstancedBufferAttribute</code>, <code>storage()</code>, barriers, and atomics when the
+field bake or placement algorithm needs them.</li>
+</ul>
+<p>Runnable import baseline:</p>
+<pre><code class="language-js">import {
+  RenderPipeline,
+  StorageBufferAttribute,
+  StorageInstancedBufferAttribute,
+  StorageTexture,
+  WebGPURenderer,
+} from &#39;three/webgpu&#39;;
+
+import {
+  Fn,
+  mrt,
+  pass,
+  renderOutput,
+  storageTexture,
+  textureStore,
+} from &#39;three/tsl&#39;;
+</code></pre>
+<p><code>outputColorTransform</code> is a <code>RenderPipeline</code> property, not a TSL export.</p>
+<h2>Capability Gate And Tiers</h2>
+<p>Initialize and branch once at system setup. The reduced tier is a quality tier,
+not a second implementation path.</p>
+<pre><code class="language-js">await renderer.init();
+
+const fieldTier = renderer.backend.isWebGPUBackend ? &#39;gpu-storage&#39; : &#39;reduced&#39;;
+
+if (fieldTier === &#39;gpu-storage&#39;) {
+  // Compute/storage path: bake reusable fields, update dynamic tiles, sample
+  // storage-backed outputs from NodeMaterials and node post passes.
+} else {
+  // Reduced quality: smaller CPU/offline grids, precomputed generated variants,
+  // lower octave counts, static LODs, and no custom low-level rewrite.
+}
+</code></pre>
+<p>Quality tiers:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Use when</th>
+<th>Field architecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>gpu-storage</code></td>
+<td>WebGPU backend with compute/storage available</td>
+<td>TSL <code>Fn</code> is source of truth; bake hot scalar/vector fields to <code>StorageTexture</code> or storage buffers; sample packed outputs many times.</td>
+</tr>
+<tr>
+<td><code>gpu-evaluate</code></td>
+<td>WebGPU backend, low read count, small field cost</td>
+<td>Call the same TSL <code>Fn</code> directly in material or vertex nodes; avoid bake memory and dispatch overhead.</td>
+</tr>
+<tr>
+<td><code>reduced</code></td>
+<td>Backend lacks compute/storage</td>
+<td>Use smaller precomputed maps from <code>assets/generated-variants/</code>, fewer bands, static geometry LODs, and CPU parity tests; do not author a parallel low-level renderer path.</td>
+</tr>
+</tbody></table>
+<h2>Field Contract</h2>
+<p>Before code, write a field bundle:</p>
+<pre><code class="language-text">coordinates
+  -&gt; macro form
+  -&gt; meso structure
+  -&gt; derived causes
+  -&gt; packed material and placement channels
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-text">sphereDirection
+  -&gt; tangentially warped direction
+  -&gt; elevation + ridges + craterDepth
+  -&gt; slope + cavity + latitude + moisture
+  -&gt; biome + color + roughness + bump + placementMask
+</code></pre>
+<p>The contract must record:</p>
+<ul>
+<li>coordinate domain and units;</li>
+<li>seed ownership and deterministic hash/noise family;</li>
+<li>primary fields and derived causes;</li>
+<li>consuming material, geometry, compute, placement, and post channels;</li>
+<li>filtering rule per frequency band;</li>
+<li>bake-vs-evaluate choice and expected read count;</li>
+<li>CPU parity plan and tolerances;</li>
+<li>debug output for every named field.</li>
+</ul>
+<p>For the canonical <code>examples/webgpu-field-bake/</code> contract, CPU and TSL must
+import the same <code>FIELD_ALGORITHM</code> object from <code>field-constants.mjs</code>. That object
+owns hash primes, seed wrapping, octave counts, lacunarity, gain, warp seed
+offsets, and derived-channel coefficients. Do not copy those numbers into CPU
+or TSL code. <code>validate-field-contract.mjs</code> enforces shared-object identity and
+CPU golden fixtures at <code>1e-12</code> absolute error; the value is the validator&#39;s
+fixture drift threshold for JavaScript double evaluation. Browser WebGPU
+artifacts are accepted only through <code>--artifacts &lt;dir&gt;</code> and must satisfy the
+manifest <code>parityTolerance</code> value, currently <code>0.001</code> in
+<code>assets/generated-variants/manifest.json</code>.</p>
+<h2>Build Order</h2>
+<ol>
+<li>Choose stable coordinates from the physical cause: radial planet kilometers,
+world XZ water/wetness, branch-local growth coordinates, or authored strata.</li>
+<li>Define one deterministic TSL <code>Fn</code> field bundle. Reuse it everywhere instead
+of duplicating math in separate materials or compute jobs.</li>
+<li>Port the same math to CPU only for geometry generation, offline assets,
+parity tests, and reduced quality tiers. Keep constants, seeds, wrapping,
+normalization, and remaps imported from one checked-in constants module.</li>
+<li>Decide bake versus direct evaluation from the table below before assigning
+material nodes.</li>
+<li>Pack baked channels by access pattern and precision, not by visual category.</li>
+<li>Wire <code>NodeMaterial</code> consumers from the shared function or baked texture.</li>
+<li>Add node-pass diagnostics through <code>RenderPipeline</code>, <code>pass()</code>, and <code>mrt()</code>.</li>
+<li>Validate parity and budgets before adding extra bands.</li>
+</ol>
+<h2>Bake-Vs-Evaluate Table</h2>
+<table>
+<thead>
+<tr>
+<th>Reads per frame per field</th>
+<th>Best path</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 read and &lt;= 4 cheap bands</td>
+<td>Evaluate the TSL <code>Fn</code> inline</td>
+<td>No dispatch, memory, or sampling overhead.</td>
+</tr>
+<tr>
+<td>2-4 reads or shared by several material channels</td>
+<td>Evaluate once in a local node bundle and reuse outputs</td>
+<td>Keeps causal structure coherent without allocating a texture.</td>
+</tr>
+<tr>
+<td>5-12 reads, expensive warp, or used by material plus post</td>
+<td>Bake to packed <code>StorageTexture</code> at the needed resolution</td>
+<td>One compute dispatch amortizes ALU over many filtered samples.</td>
+</tr>
+<tr>
+<td>12+ reads, placement/culling, or per-instance consumers</td>
+<td>Bake to storage texture plus storage buffers</td>
+<td>Compute owns compaction, placement, and field reuse without CPU readback.</td>
+</tr>
+<tr>
+<td>Static or slow-changing field</td>
+<td>Bake once or on targeted invalidation only</td>
+<td>Updating every frame wastes bandwidth and hides algorithm mistakes.</td>
+</tr>
+<tr>
+<td>Dynamic field with local edits</td>
+<td>Tile the bake and invalidate dirty tiles</td>
+<td>Avoid full-field dispatches when only a region changed.</td>
+</tr>
+</tbody></table>
+<p>Bake scalar fields into <code>rg16f</code>/<code>rgba16f</code>-class storage textures when precision
+matters. Pack categorical masks into integer-compatible lanes only when the
+consumer needs exact IDs. Never bake a field just because it is easy; bake when
+the read count or cross-system reuse pays for the dispatch and memory.</p>
+<h2>Required Field Rules</h2>
+<ul>
+<li>Shared causes first: color, roughness, normal, displacement, emission, masks,
+and scattering must derive from the same named fields.</li>
+<li>Domain-warp the coordinates, not every result.</li>
+<li>Warp spherical coordinates tangentially, then renormalize.</li>
+<li>Use separate frequency bands for silhouette, regions, surface breakup, and
+micro-normal.</li>
+<li>Do not displace geometry with frequencies above mesh Nyquist.</li>
+<li>Keep categorical masks broad enough to avoid isolated bubble regions.</li>
+<li>Parameter names must describe perception: <code>ridgeWidth</code>, <code>coastBlend</code>,
+<code>cavityDarkening</code>, not <code>noise3Amount</code>.</li>
+<li>Random placement starts with strata and semantic constraints; jitter only
+inside valid cells.</li>
+</ul>
+<h2>Filtering And Stability</h2>
+<p>Filter before the field aliases:</p>
+<ul>
+<li>Stop octave loops when projected wavelength falls below two pixels or two
+mesh edges, whichever is stricter for that consumer.</li>
+<li>Fade high-frequency contribution by camera altitude or projected footprint;
+keep the coordinates stable and fade amplitude only.</li>
+<li>Use mipmapped baked fields for repeated filtered samples.</li>
+<li>For procedural normals, lower detail energy and compensate roughness when
+normal variance would shimmer.</li>
+<li>For displacement, silhouette bands belong in geometry; micro bands belong in
+material normals or baked masks.</li>
+<li>World effects use world coordinates; planetary effects use radial physical
+coordinates; object-local ornament uses local coordinates.</li>
+</ul>
+<h2>Color And Output</h2>
+<ul>
+<li>Authored color textures use <code>SRGBColorSpace</code>.</li>
+<li>Scalar masks, vector fields, normal/roughness/wetness/noise/LUT/weather data,
+and baked field textures use <code>NoColorSpace</code> or explicit linear data handling.</li>
+<li>HDR working buffers stay <code>HalfFloatType</code> until tone mapping.</li>
+<li>The app has one tone-map owner and one output conversion owner. In node
+pipelines, <code>RenderPipeline.outputColorTransform</code> or <code>renderOutput()</code> owns the
+final conversion; individual fields and materials do not double-convert.</li>
+</ul>
+<h2>Budgets</h2>
+<p>Set budgets in the field contract and reject designs that exceed them:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Inline field cost</th>
+<th>Bake size</th>
+<th>Dispatches</th>
+<th>Field memory</th>
+<th>Frame budget</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Desktop discrete</td>
+<td>&lt;= 8 bands inline or baked when reused</td>
+<td>up to 2048^2 per hot field atlas</td>
+<td>1-3 targeted dispatches</td>
+<td>&lt;= 64 MB hot field data</td>
+<td>&lt;= 1.5 ms fields + bakes</td>
+</tr>
+<tr>
+<td>Desktop integrated</td>
+<td>&lt;= 5 bands inline</td>
+<td>up to 1024^2</td>
+<td>1-2 dispatches</td>
+<td>&lt;= 32 MB</td>
+<td>&lt;= 2.5 ms</td>
+</tr>
+<tr>
+<td>Mobile/lower tier</td>
+<td>&lt;= 3 bands inline</td>
+<td>512^2-1024^2, fewer lanes</td>
+<td>0-1 dispatch</td>
+<td>&lt;= 16 MB</td>
+<td>&lt;= 3.5 ms</td>
+</tr>
+</tbody></table>
+<p>Keep draw calls unchanged when adding a field. Avoid in-frame CPU readback.
+Use readback only in explicit diagnostics or parity tests. Static fields update
+once; slow fields update on a fixed cadence; edited fields update dirty tiles.</p>
+<h2>Diagnostics</h2>
+<p>Every field stack needs a debug route for:</p>
+<ul>
+<li>source coordinates;</li>
+<li>tangential warp vector;</li>
+<li>each frequency band;</li>
+<li>macro height versus material height;</li>
+<li>humidity, temperature, slope, cavity, and identity masks;</li>
+<li>near/mid/far or footprint weights;</li>
+<li>baked channel pack visualization;</li>
+<li>water normal and crest from the same evaluation;</li>
+<li>wetness by world height;</li>
+<li>seed and stratification cells;</li>
+<li>CPU versus TSL parity error.</li>
+</ul>
+<p>Use <code>mrt()</code> when the diagnostics share one scene pass. Use
+<code>PassNode.setResolutionScale()</code> for reduced-resolution field diagnostics and
+restore full resolution only where inspection needs it.</p>
+<h2>What This Skill Emits</h2>
+<ul>
+<li>field contract with coordinate owner, physical/perceptual units, seed owner,
+filtering rule, and bake-vs-evaluate decision;</li>
+<li>TSL <code>Fn</code> field bundle and CPU parity port;</li>
+<li>packed channel schema for direct material use or <code>StorageTexture</code> bakes;</li>
+<li>debug views for every named field;</li>
+<li>validation command: <code>node examples/webgpu-field-bake/validate-field-contract.mjs --allow-missing-gpu</code>
+for Layer 1 and <code>node examples/webgpu-field-bake/validate-field-contract.mjs --artifacts &lt;dir&gt;</code> after browser readback;</li>
+<li>sibling ownership notes for material response, planet bodies, weather,
+image-pipeline ownership, and visual validation.</li>
+</ul>
+</div>
+  <div class="pn">
+    <a href="threejs-procedural-creatures.html">← Procedural Creatures</a>
+    <a href="threejs-procedural-geometry.html">Procedural Geometry →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

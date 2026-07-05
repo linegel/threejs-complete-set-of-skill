@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procedural Materials — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-materials.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Procedural Materials — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-materials.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/generated-asset-contact-sheet.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Procedural Materials — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/generated-asset-contact-sheet.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Procedural Materials — Three.js WebGPU agent skill",
+   "description": "Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-materials.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/generated-asset-contact-sheet.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Procedural Materials"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Procedural Content",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Procedural Materials",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-materials.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Materials</p>
+  <h1>Procedural Materials</h1>
+  <p class="lede">Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-procedural-materials</span>
+    <span class="chip">2 runnable examples</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-materials/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-materials/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Materials are authored as PBR identity fields: albedo, roughness, and normal all derive
+from shared procedural causes. Surface normals come from height derivatives —
+screen-space derivatives give filtering for free:</p>
+$$\mathbf n = \operatorname{normalize}\!\big(\mathbf n_g - \partial_x h\,\mathbf t - \partial_y h\,\mathbf b\big)$$
+<p>Specular antialiasing widens roughness where the normal field varies inside a pixel
+(Kaplanyan-style variance from derivatives), preventing distant sparkle:</p>
+$$\alpha' = \sqrt{\alpha^2 + \operatorname{clamp}\!\big(\|\partial_x \mathbf n\|^2 + \|\partial_y \mathbf n\|^2\big)}$$
+<p>Triplanar projection blends three axis-aligned samples with a sharpened weight
+$w_i = |n_i|^k / \sum |n_j|^k$, and emissive surfaces (lava) map temperature through a
+blackbody-inspired ramp so brightness lives in scene-relative HDR units, not display units.</p></div>
+  </div></div>
+
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Validation gallery</h2>
+    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
+    <div class="gallery">
+      <figure>
+        <img src="../generated-asset-contact-sheet.png" alt="Generated texture asset contact sheet — deterministic PNG variants" loading="lazy" />
+        <figcaption><span>Generated texture asset contact sheet — deterministic PNG variants</span></figcaption>
+      </figure>
+    </div>
+  </div></div>
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-materials/examples/lava-flow-surface">
+        <h4>lava-flow-surface</h4>
+        <span class="card-meta">threejs-procedural-materials/examples/lava-flow-surface</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-materials/examples/tsl-procedural-pbr">
+        <h4>tsl-procedural-pbr</h4>
+        <span class="card-meta">threejs-procedural-materials/examples/tsl-procedural-pbr</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Procedural Materials</h1>
+<p>Build procedural materials as <code>WebGPURenderer</code> + TSL + <code>NodeMaterial</code> graphs.
+The only production lane is a <code>MeshStandardNodeMaterial</code> or
+<code>MeshPhysicalNodeMaterial</code> whose node slots preserve Three.js lighting,
+environment, shadow, transmission, clearcoat, sheen, anisotropy, and output
+upgrades while replacing only the material causes.</p>
+<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/lava-flow-surface/lava-surface.js</code>.</p>
+<p>Use <code>$threejs-choose-skills</code> preflight for scenes that also need atmosphere,
+clouds, oceans, shadows, post, or validation ownership.</p>
+<h2>Fastest Architecture First</h2>
+<p>Algorithm class dominates material throughput. Start from one shared TSL cause
+graph, not from independent texture/noise calls per PBR channel:</p>
+<pre><code class="language-text">stable coordinates
+  -&gt; structural fields
+  -&gt; material identity weights
+  -&gt; causal modifiers
+  -&gt; filtered microstructure
+  -&gt; derivative normals and specular AA
+  -&gt; NodeMaterial PBR slots
+  -&gt; node post/output
+</code></pre>
+<p>The target graph writes:</p>
+<ul>
+<li><code>colorNode</code> from linear authored identity colors or <code>SRGBColorSpace</code> color
+textures sampled through TSL.</li>
+<li><code>roughnessNode</code>, <code>metalnessNode</code>, <code>aoNode</code>, <code>opacityNode</code>, and physical slots
+from the same identity weights.</li>
+<li><code>normalNode</code> from <code>normalMap()</code>, <code>bumpMap(texture(...))</code> for texture height
+maps, or a derivative normal built from scalar procedural height using
+<code>dFdx()</code>, <code>dFdy()</code>, and <code>fwidth()</code>.</li>
+<li><code>emissiveNode</code> only for actual material emission; route glow through
+<code>$threejs-bloom</code> and <code>BloomNode</code> in the node render pipeline.</li>
+<li><code>positionNode</code>, <code>castShadowPositionNode</code>, and
+<code>receivedShadowPositionNode</code> when material displacement must match visible
+and shadowed geometry.</li>
+<li><code>maskNode</code>, <code>alphaTestNode</code>, <code>castShadowNode</code>, or <code>maskShadowNode</code> for
+dissolve and cutout behavior, driven by the same instance fields.</li>
+</ul>
+<p>Read <a href="references/procedural-pbr-system.md">references/procedural-pbr-system.md</a>
+for the WebGPU/TSL material system, quality tiers, budgets, atlas/triplanar
+costs, derivative normals, specular AA, planet fields, wetness, emissive
+ownership, per-instance dissolve, and validation.</p>
+<p>Canonical walnut, antique-gold, ebony, and lava TSL example:
+<a href="examples/tsl-procedural-pbr/">examples/tsl-procedural-pbr/</a>.</p>
+<p>Use the sibling examples as domain sources, not implementation recipes:</p>
+<ul>
+<li><code>$threejs-procedural-fields</code> for designing shared scalar/vector causes.</li>
+<li><code>$threejs-procedural-planets</code> for planet-space coordinates, altitude
+filtering, and orbit-to-close material/geometry parity.</li>
+<li><code>$threejs-water-optics</code> for coupled reflection, refraction, absorption,
+crest response, and water-surface diagnostics.</li>
+<li><code>$threejs-bloom</code> and <code>$threejs-image-pipeline</code> for HDR emissive extraction,
+tone mapping, output conversion, and node post ownership.</li>
+<li><code>$threejs-scalable-real-time-shadows</code> when material displacement, alpha, or projected
+environmental occlusion must remain shadow-consistent.</li>
+</ul>
+<h2>Capability Gate And Tiers</h2>
+<p>Initialize the renderer before selecting quality. This flagship skill teaches
+the native WebGPU path only; explicit requests for how to apply fallback when
+WebGPU is unavailable route to <code>$threejs-compatibility-fallbacks</code>.</p>
+<pre><code class="language-js">await renderer.init();
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    &quot;threejs-procedural-materials requires native WebGPU. For explicit fallback requests, route to threejs-compatibility-fallbacks.&quot;,
+  );
+}
+
+await renderer.computeAsync([buildMaterialFieldNode, buildInstanceStateNode]);
+</code></pre>
+<p>Quality tiers:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Material architecture</th>
+<th>Targets</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ultra</td>
+<td>TSL fields, <code>StorageTexture</code> generated cause maps, <code>StorageInstancedBufferAttribute</code> dissolve/state, triplanar only where UVs cannot carry scale</td>
+<td>desktop discrete, close inspection</td>
+</tr>
+<tr>
+<td>High</td>
+<td>TSL fields plus packed KTX2/BasisU maps, 2-axis or single-axis projection where possible, derivative normals, per-instance attributes</td>
+<td>desktop integrated</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>precomputed generated variants, lower field resolution, fewer octaves, static dissolve attributes, no triplanar beyond hero assets</td>
+<td>native WebGPU mobile tier</td>
+</tr>
+</tbody></table>
+<h2>Performance Budgets</h2>
+<p>Default targets for one hero procedural material family:</p>
+<ul>
+<li>Desktop discrete: &lt;= 0.8 ms material overhead at 1440p, &lt;= 2 full-rate node
+passes, &lt;= 1 initialization compute dispatch per generated field, &lt;= 128 MB
+total material textures/storage.</li>
+<li>Desktop integrated: &lt;= 1.4 ms material overhead at 1080p, &lt;= 1 full-rate
+pass plus reduced-resolution bloom/AO as needed, &lt;= 64 MB material
+textures/storage.</li>
+<li>Mobile: &lt;= 2.0 ms material overhead at 720p internal resolution, no dynamic
+triplanar on repeated props, &lt;= 32 MB material textures/storage.</li>
+</ul>
+<p>Per-material budgets:</p>
+<ul>
+<li>TSL noise/octaves: 3-5 octave bands for hero surfaces, 1-3 for repeats;
+cache or precompute anything shared across many draws.</li>
+<li>Triplanar: 3 texture samples per channel before filtering; reserve it for
+UV-less or hero surfaces. Prefer UVs, texture arrays, packed channels, or
+hex/texture bombing when they reach the same quality cheaper.</li>
+<li>Atlas/array sampling: use duplicated mip gutters or texture arrays before
+adding manual sample clamps. Manual anisotropic taps are a hero-tier cost.</li>
+<li>Derivative normals: one height evaluation plus derivative math where
+possible; do not reevaluate unrelated height fields for color, roughness, and
+normal.</li>
+<li>Instances: use one material graph and per-instance node attributes; never
+clone a material per object for color, dissolve, wetness, or variant choice.</li>
+</ul>
+<h2>Color And Output</h2>
+<ul>
+<li>Color textures use <code>SRGBColorSpace</code>; generated color fields stay linear until
+the output owner.</li>
+<li>Normal, roughness, metalness, masks, noise, height, LUT, weather, and
+generated variant textures use <code>NoColorSpace</code> unless the channel is explicitly
+color.</li>
+<li>HDR material and post buffers stay <code>HalfFloatType</code> until tone mapping.</li>
+<li>The app has one tone-map owner and one output conversion owner:
+<code>RenderPipeline.outputColorTransform</code> or one explicit <code>renderOutput()</code> node.</li>
+<li>Materials do not manually encode display color and do not hide unstable
+highlights with post.</li>
+</ul>
+<p><code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
+<code>outputColorTransform</code>, and <code>renderOutput()</code> are the current node post path.</p>
+<h2>Required Controls</h2>
+<ul>
+<li>coordinate mode: UV, object, world, planet radial, or generated texture space;</li>
+<li>real-world or perceptual texture scale, in meters or documented art units;</li>
+<li>material identity weights and authored response bundles;</li>
+<li>roughness range, micro-normal strength, and specular AA strength;</li>
+<li>causal fields for wetness, burn, erosion, lava exposure, climate, or dissolve;</li>
+<li>texture-array/atlas tile index, mip gutter status, anisotropy tier, and
+triplanar or hex-tiling cost mode;</li>
+<li>derivative filtering thresholds and height-to-normal scale;</li>
+<li>emissive intensity in HDR scene-linear units, plus bloom contribution debug;</li>
+<li>instance variant, wetness, dissolve threshold, and lifetime when instanced;</li>
+<li>channel, mask, footprint, roughness-before/after-AA, normal variance, and
+no-post debug views.</li>
+</ul>
+<h2>Failure Conditions</h2>
+<ul>
+<li>PBR channels sample unrelated noise or unrelated coordinate spaces;</li>
+<li>roughness is a scalar afterthought instead of identity-driven;</li>
+<li>high-frequency normals survive below one pixel;</li>
+<li>triplanar or hex tiling hides seams by spending samples everywhere;</li>
+<li>atlas padding is ignored under mipmapping;</li>
+<li>material displacement and shadow/collision position diverge;</li>
+<li>emissive color owns both lighting and bloom without a raw-emission debug;</li>
+<li>projected environmental occlusion darkens emission or all ambient response;</li>
+<li>output conversion is duplicated in material and post;</li>
+<li>per-instance material state creates cloned materials instead of node
+attributes or storage-backed attributes.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-procedural-fields</code> when the hard part is the shared scalar/vector
+cause design. Use <code>$threejs-procedural-planets</code> for complete planet bodies and
+geometry/material parity. Use <code>$threejs-water-optics</code> for physically coupled
+water. Use <code>$threejs-bloom</code>, <code>$threejs-image-pipeline</code>, and
+<code>$threejs-exposure-color-grading</code> when the material requires HDR extraction,
+tone mapping, or final image ownership. Use <code>$threejs-scalable-real-time-shadows</code> for
+<code>CSMShadowNode</code>, <code>TileShadowNode</code>, or material-aware shadow decisions.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-procedural-geometry.html">← Procedural Geometry</a>
+    <a href="threejs-procedural-motion-systems.html">Procedural Motion Systems →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

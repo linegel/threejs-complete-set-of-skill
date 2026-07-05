@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Visual Validation — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Visual Validation — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/diagnostics.mosaic.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Visual Validation — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/diagnostics.mosaic.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Visual Validation — Three.js WebGPU agent skill",
+   "description": "Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/diagnostics.mosaic.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Visual Validation"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Planning and Validation",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Visual Validation",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Planning and Validation</a> / Visual Validation</p>
+  <h1>Visual Validation</h1>
+  <p class="lede">Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-visual-validation</span>
+    <span class="chip">1 runnable example</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-visual-validation/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Validation treats an image as a claim to be falsified. A fixed-view contract pins camera,
+seed, resolution, and time; comparison is perceptual error against a stored baseline:</p>
+$$E = \operatorname{quantile}_{0.99}\big(\Delta E_{pixel}\big) < \tau, \qquad
+\text{plus } \max_{region} \bar\Delta E < \tau_{region}$$
+<p>Determinism is tested by seed sweeps ($F(seed_1) \ne F(seed_2)$, but $F(seed_1)$ twice is
+byte-identical) and temporal pairs ($t_0, t_1$ frames must differ where motion exists, match
+where it doesn't). Performance claims bind to measurements:</p>
+$$\operatorname{median}_{30\,frames}(t_{GPU,pass}) \le b_{pass} \quad\text{for every budgeted pass}$$
+<p>The no-post baseline isolates cause from grade: every effect must be visible with
+post-processing off, or the effect is the post. Evidence ships as a stable JSON+PNG bundle —
+capability manifest, renderer.info counters, per-pass timings — so regressions diff cleanly.</p></div>
+  </div></div>
+
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Validation gallery</h2>
+    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
+    <div class="gallery">
+      <figure>
+        <img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Planet diagnostics — per-signal passes" loading="lazy" />
+        <figcaption><span>Planet diagnostics — per-signal passes</span></figcaption>
+      </figure>
+      <figure>
+        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Water diagnostics — effect isolation" loading="lazy" />
+        <figcaption><span>Water diagnostics — effect isolation</span></figcaption>
+      </figure>
+      <figure>
+        <img src="../visual-validation/planet-generated-craters/seed-stress.final.png" alt="Seed-stress sweep frame" loading="lazy" />
+        <figcaption><span>Seed-stress sweep frame</span></figcaption>
+      </figure>
+      <figure>
+        <img src="../visual-validation/water-generated-caustics/temporal.t001.png" alt="Temporal pair frame" loading="lazy" />
+        <figcaption><span>Temporal pair frame</span></figcaption>
+      </figure>
+    </div>
+  </div></div>
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-visual-validation/examples/webgpu-validation-harness">
+        <h4>webgpu-validation-harness</h4>
+        <span class="card-meta">threejs-visual-validation/examples/webgpu-validation-harness</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Visual Validation</h1>
+<p>Validate the mechanism that creates the image, not a single polished frame.
+The only taught path is latest Three.js with <code>WebGPURenderer</code>, TSL,
+<code>NodeMaterial</code> materials, <code>RenderPipeline</code>, built-in post nodes, and
+compute/storage evidence where the implementation uses GPU simulation.</p>
+<h2>Build Order</h2>
+<ol>
+<li>Define the visual contract and measurable invariants before tuning.</li>
+<li>Initialize <code>WebGPURenderer</code>, call <code>await renderer.init()</code>, and record the
+actual backend and capability tier for the run.</li>
+<li>Build the fastest validation architecture first: deterministic runner,
+fixed camera bookmarks, no-post and final captures, diagnostic passes from
+the node pipeline, seed sweeps, temporal sweeps, GPU timing, <code>renderer.info</code>,
+render-target and storage-resource inventories, and dispose/recreate loops.</li>
+<li>Capture a stable artifact bundle: JSON manifests and PNGs with deterministic
+names, one directory per scene, quality tier, backend, seed, and camera.</li>
+<li>Reject the implementation when evidence contradicts the declared mechanism,
+even if the final frame is attractive.</li>
+</ol>
+<h2>Required Architecture</h2>
+<p>The validation surface must use:</p>
+<ul>
+<li><code>WebGPURenderer</code> from <code>three/webgpu</code>;</li>
+<li>TSL nodes from <code>three/tsl</code>;</li>
+<li><code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>,
+<code>MeshBasicNodeMaterial</code>, <code>SpriteNodeMaterial</code>, or the matching
+<code>NodeMaterial</code> family for debug views;</li>
+<li><code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
+<code>outputColorTransform</code>, and <code>renderOutput()</code> for post and diagnostic output;</li>
+<li>built-in nodes first where they exist: <code>GTAONode</code>, <code>BloomNode</code>, <code>TRAANode</code>,
+<code>DepthOfFieldNode</code>, <code>CSMShadowNode</code>, <code>TileShadowNode</code>, fog, sky, and related
+node outputs;</li>
+<li><code>renderer.compute()</code> / <code>renderer.computeAsync()</code> plus TSL
+<code>Fn().compute(count)</code>, <code>StorageTexture</code>, <code>StorageBufferAttribute</code>,
+<code>StorageInstancedBufferAttribute</code>, <code>storage()</code> nodes, <code>textureStore()</code>,
+<code>workgroupBarrier</code>, and <code>atomic*</code> evidence when the subject system uses GPU
+simulation, culling, compaction, histories, or generated instance data.</li>
+</ul>
+<p>Use <a href="references/graphics-validation-protocol.md">references/graphics-validation-protocol.md</a>
+for the full contract schema, artifact layout, capability tiers, timing
+protocol, render-target inventory, color/output rules, mechanism-specific
+evidence, and rejection criteria.</p>
+<h2>Capability Gate</h2>
+<p>Every validation run records its actual tier. Compute/storage/MRT validation
+uses this gate and stays on native WebGPU tiers:</p>
+<pre><code class="language-js">await renderer.init();
+
+const capabilities = {
+  threeRevision: THREE.REVISION,
+  renderer: &#39;WebGPURenderer&#39;,
+  isPrimaryBackend: renderer.backend.isWebGPUBackend === true,
+  outputColorSpace: renderer.outputColorSpace,
+  toneMapping: renderer.toneMapping,
+  samples: renderer.samples,
+  reversedDepthBuffer: renderer.reversedDepthBuffer,
+  outputBufferType: renderer.getOutputBufferType(),
+  compatibilityMode: renderer.backend?.compatibilityMode ?? null,
+  trackTimestamp: renderer.backend?.trackTimestamp ?? null,
+  limits: renderer.backend?.device?.limits ?? null,
+  features: renderer.backend?.device?.features ? [ ...renderer.backend.device.features ] : null,
+  unavailableReason: renderer.backend?.device ? null : &#39;renderer.backend.device unavailable&#39;
+};
+
+if (renderer.backend.isWebGPUBackend === true) {
+  qualityTier = &#39;native-compute&#39;;
+} else {
+  throw new Error(&#39;WebGPU backend required for canonical visual validation. If the user explicitly asked how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.&#39;);
+}
+</code></pre>
+<p>Budgeted WebGPU tiers keep the same visual contract but use smaller grids,
+fewer temporal samples, lower diagnostic resolution, or other named quality
+settings inside the WebGPU architecture. They are not second implementation
+recipes.</p>
+<h2>Required Evidence</h2>
+<ul>
+<li><code>visual-contract.json</code> binding every invariant to <code>requiredImages</code>,
+<code>requiredDiagnostics</code>, <code>requiredMetrics</code>, and <code>blockingFailures</code>; a contract
+that requires only <code>images/final.design.png</code> is invalid evidence;</li>
+<li><code>evidence-manifest.json</code> with renderer/backend, capabilities, browser/GPU,
+camera, seed, time, viewport, DPR, quality tier, assets, color pipeline,
+post stack, stochastic masks, thresholds, and known compromises;</li>
+<li>final, no-post, diagnostic mosaic, near/design/far, representative seed
+sweep, stress seed, and temporal checkpoints or clip frames as PNGs;</li>
+<li>node pipeline graph summary: <code>RenderPipeline</code> output owner, MRT outputs,
+built-in effect nodes, resolution scales, and tone/output transform owner;</li>
+<li>render-target inventory with dimensions, DPR scale, format, type, color
+space, samples, depth/stencil/depth texture, MRT count, lifetime, and owner;</li>
+<li>storage-resource inventory with buffer/texture dimensions, formats, byte
+sizes, dispatch sizes, workgroup assumptions, ping-pong ownership, barriers,
+atomics, and readback policy;</li>
+<li>timing evidence: warm-up window, compile/readback excluded from steady state,
+CPU frame time, GPU timestamp time when exposed, median and p95 over a fixed
+window, plus an explicit <code>SKIP</code> verdict when GPU timing is unavailable;</li>
+<li><code>renderer.info</code> metrics, manual target/storage memory estimates, draw calls,
+triangles/points/instances, pass count, dispatch count, and dispose/recreate
+leak-loop results.</li>
+</ul>
+<p>Use <code>examples/webgpu-validation-harness/</code> as the canonical artifact layout and
+schema implementation before adding skill-specific validation. Its budget and
+pixel-diff gates are not presence checks: CPU/GPU median frame timings and
+target/storage memory are compared to the selected manifest budget profile, and
+<code>perViewPixelDiff</code> records decode manifest-named baseline/candidate PNG pairs
+and fail when the differing-pixel ratio exceeds the declared threshold.</p>
+<h2>Budgets</h2>
+<p>State explicit budgets before acceptance:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th align="right">Desktop discrete</th>
+<th align="right">Desktop integrated</th>
+<th align="right">Mobile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>steady final frame</td>
+<td align="right">&lt;= 8 ms GPU</td>
+<td align="right">&lt;= 16 ms GPU</td>
+<td align="right">&lt;= 24 ms GPU</td>
+</tr>
+<tr>
+<td>validation capture frame</td>
+<td align="right">&lt;= 12 ms GPU</td>
+<td align="right">&lt;= 24 ms GPU</td>
+<td align="right">&lt;= 33 ms GPU</td>
+</tr>
+<tr>
+<td>CPU frame orchestration</td>
+<td align="right">&lt;= 3 ms</td>
+<td align="right">&lt;= 5 ms</td>
+<td align="right">&lt;= 8 ms</td>
+</tr>
+<tr>
+<td>readback/capture overhead</td>
+<td align="right">excluded, measured separately</td>
+<td align="right">excluded, measured separately</td>
+<td align="right">excluded, measured separately</td>
+</tr>
+</tbody></table>
+<p>Also budget pass count, draw calls, dispatches, render-target memory, storage
+memory, history buffers, screenshot count, seed count, and leak-loop iterations.
+If a subject skill gives stricter budgets, use the stricter number.</p>
+<h2>Creature Mechanism Evidence</h2>
+<p>When validating <code>$threejs-procedural-creatures</code>, the standalone creature lab
+produces the mechanism metrics and this skill owns their artifact-bundle gates.
+Use the creature vocabulary exactly: creature-local SDF field and shell,
+world-space planted feet, candidate set versus full field, and display/shadow
+snapped-position parity.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence row</th>
+<th>Producing harness</th>
+<th>Gate threshold</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SDF snap residual over the locomotion sweep</td>
+<td>creature lab <code>snap residual sweep</code> export in the visual-validation bundle</td>
+<td>max <code>abs(d - iso) &lt; 0.02</code> of body scale after bounded Newton snap</td>
+</tr>
+<tr>
+<td>stance drift, space named <code>world</code></td>
+<td>creature lab planted-foot telemetry and foot-drift markers</td>
+<td>planted foot world delta <code>&lt; 1e-9</code> per frame for stationary and moving gait</td>
+</tr>
+<tr>
+<td>candidate-set vs full-field sweep</td>
+<td>creature lab candidate-set parity sweep over the same locomotion clocks and tier <code>K</code></td>
+<td>snapped candidate-set surface remains within the snap residual gate, <code>&lt; 0.02</code> of body scale, against full-field evaluation</td>
+</tr>
+<tr>
+<td>silhouette-vs-shadow parity</td>
+<td>creature lab fixed-camera silhouette/shadow mask export consumed by the visual-validation PNG/diff gate</td>
+<td>same snapped position path: mask IoU <code>&gt;= 0.98</code> and directed edge distance <code>&lt;= 1 px</code>; any divergent display/depth position node is a blocking failure</td>
+</tr>
+</tbody></table>
+<h2>Color And Output</h2>
+<ul>
+<li>Color textures use <code>SRGBColorSpace</code>.</li>
+<li>Data maps, normal/roughness/mask/noise/LUT/weather textures, and diagnostic
+storage use <code>NoColorSpace</code> or linear data semantics.</li>
+<li>HDR working targets stay <code>HalfFloatType</code> until the single tone-map owner.</li>
+<li>The node pipeline owns the one output conversion through
+<code>outputColorTransform</code> or an explicit <code>renderOutput()</code> stage.</li>
+<li>Screenshots record the encoding path and must not double-convert material,
+target, or presentation output.</li>
+</ul>
+<h2>Replaced Techniques</h2>
+<ul>
+<li>Single-frame approval was replaced by fixed-camera contracts plus final,
+no-post, diagnostic, temporal, and seed-sweep artifacts.</li>
+<li>CPU-only timing was replaced by timestamp-query GPU timing when exposed,
+with CPU timing retained only as labelled proxy evidence.</li>
+<li>Informal render-target notes were replaced by a typed target and storage
+inventory tied to <code>renderer.info</code> and manual byte estimates.</li>
+<li>One stress seed was replaced by representative seed sweeps plus at least one
+stress seed.</li>
+<li>Manual leak judgment was replaced by resize, tier-switch, reset, teardown,
+and dispose/recreate loops with before/after resource metrics.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>This skill evaluates an implementation; it does not supply the subject
+mechanism. Load <code>$threejs-choose-skills</code> first, then the subject or image-effect
+skill such as <code>$threejs-procedural-planets</code>, <code>$threejs-volumetric-clouds</code>,
+<code>$threejs-spectral-ocean</code>, <code>$threejs-water-optics</code>, <code>$threejs-bloom</code>,
+<code>$threejs-ambient-contact-shading</code>, <code>$threejs-scalable-real-time-shadows</code>,
+<code>$threejs-dynamic-surface-effects</code>, <code>$threejs-procedural-vegetation</code>,
+<code>$threejs-procedural-creatures</code>,
+<code>$threejs-procedural-geometry</code>, <code>$threejs-procedural-materials</code>,
+<code>$threejs-particles-trails-and-effects</code>, or <code>$threejs-black-holes-and-space-effects</code>. Use this
+protocol to decide whether the result is acceptable.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-spectral-ocean.html">← Spectral Ocean</a>
+    <a href="threejs-volumetric-clouds.html">Volumetric Clouds →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

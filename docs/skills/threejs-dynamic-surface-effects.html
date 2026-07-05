@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dynamic Surface Effects — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-dynamic-surface-effects.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Dynamic Surface Effects — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-dynamic-surface-effects.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Dynamic Surface Effects — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Dynamic Surface Effects — Three.js WebGPU agent skill",
+   "description": "Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-dynamic-surface-effects.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Dynamic Surface Effects"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Motion and Effects",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Dynamic Surface Effects",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-dynamic-surface-effects.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Motion and Effects</a> / Dynamic Surface Effects</p>
+  <h1>Dynamic Surface Effects</h1>
+  <p class="lede">Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-dynamic-surface-effects</span>
+    <span class="chip">2 runnable examples</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-dynamic-surface-effects/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-dynamic-surface-effects/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Surface history is a storage-texture ping-pong: touches write into a mask that decays and
+diffuses with correct time dependence, so behavior is identical at 30 and 144 fps:</p>
+$$m_{t+dt} = \operatorname{clamp}\Big(m_t\,k^{dt} + D\,\nabla^2 m_t\,dt + \sum_i T_i\Big)$$
+<p>where $k^{dt}$ (not a per-frame constant) gives exponential decay per <em>second</em>.
+Frost grows toward a static crystalline structure target $S(\mathbf p)$ — the mask reveals
+authored structure instead of accumulating mush:</p>
+$$f = \operatorname{smoothstep}(0, 1, m)\cdot S(\mathbf p)$$
+<p>Refraction reads the frost normal at two scales — coarse lensing plus fine crystal detail —
+offsetting the scene sample by $\Delta\mathbf{uv} = \eta\,(w_1 \mathbf n_{coarse} + w_2 \mathbf n_{fine})_{xy}$,
+with the blur radius driven by the same mask through a reduced-resolution node blur.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-dynamic-surface-effects/examples/touch-history-frost">
+        <h4>touch-history-frost</h4>
+        <span class="card-meta">threejs-dynamic-surface-effects/examples/touch-history-frost</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost">
+        <h4>webgpu-touch-history-frost</h4>
+        <span class="card-meta">threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Dynamic Surface Effects</h1>
+<p>Use this skill for screen-space surface effects whose visible mask, thaw/clear
+state, or refractive response depends on persistent history. The only taught
+implementation path is latest Three.js with <code>WebGPURenderer</code>, TSL,
+<code>NodeMaterial</code>, <code>RenderPipeline</code>, <code>pass()</code>, storage textures, and compute.</p>
+<p>Run <code>$threejs-choose-skills</code> before implementation when the request could also
+involve world-space residue, weather accumulation, object paint, water, or a
+larger post stack.</p>
+<h2>Best Architecture First</h2>
+<p>Build the high-throughput frame graph first. Do not start from a simple
+per-frame visual mask and later &quot;upgrade&quot; to history.</p>
+<pre><code class="language-text">input events for this frame
+  -&gt; compute pointer deposit into next history StorageTexture
+  -&gt; swap history read/write
+  -&gt; scene pass via pass(scene, camera)
+  -&gt; reduced-resolution vertical blur pass, setResolutionScale(0.35-0.5)
+  -&gt; reduced-resolution horizontal blur pass, setResolutionScale(0.35-0.5)
+  -&gt; static crystalline fields, generated once or loaded from assets
+  -&gt; full-resolution frost/thaw composite node
+  -&gt; two-scale TSL normal refraction node
+  -&gt; RenderPipeline output node with one output transform owner
+</code></pre>
+<p>History update comes before the frost composite so visible response can include
+the current frame&#39;s input. If a product deliberately wants a one-frame delayed
+feel, document that as a UX choice and keep the diagnostic contract identical.</p>
+<p>The top-tier representation is a full-resolution RGBA <code>StorageTexture</code>
+ping-pong:</p>
+<ul>
+<li><code>R</code>: accumulated visible touch/thaw mask.</li>
+<li><code>A</code>: accumulated tilt/refraction response mask.</li>
+<li><code>G/B</code>: optional duplicate or debug channels, never hidden state.</li>
+</ul>
+<p>Use <code>Fn().compute(count)</code> with <code>renderer.compute()</code> or <code>renderer.computeAsync()</code>
+to write history using <code>storageTexture()</code> or <code>textureStore()</code>. Keep the path
+read-back-free. Use <code>PassNode.getPreviousTextureNode()</code> only for temporal pass
+feedback that is naturally owned by a node pass; use storage textures when the
+history must be written from pointer/event data or compute.</p>
+<h2>Capability Gate</h2>
+<p>Compute and storage are required for the full-quality path.</p>
+<pre><code class="language-js">import { WebGPURenderer, RenderPipeline, StorageTexture } from &#39;three/webgpu&#39;;
+import { Fn, pass, storageTexture, textureStore } from &#39;three/tsl&#39;;
+
+const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
+
+const tier = renderer.backend.isWebGPUBackend ? &#39;full&#39; : &#39;degraded&#39;;
+
+if (tier === &#39;full&#39;) {
+  // StorageTexture ping-pong, compute deposit/decay, node post pipeline.
+} else {
+  // Reduced-quality tier: static frost mask, lower-resolution precomputed
+  // structures, no custom parallel renderer path.
+}
+</code></pre>
+<p>Quality tiers:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Required capability</th>
+<th>History</th>
+<th>Blur</th>
+<th>Refraction</th>
+<th>Intended use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full</td>
+<td>WebGPU backend with storage texture compute</td>
+<td>full-res RGBA16F ping-pong</td>
+<td>0.35-0.5 scale separable</td>
+<td>two-scale normals, height weighting, Fresnel/source inset</td>
+<td>shipping target</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>WebGPU backend with tighter budget</td>
+<td>half-res history or RG8/RG16F after measurement</td>
+<td>0.25-0.4 scale separable</td>
+<td>one full normals plus half detail</td>
+<td>integrated GPUs</td>
+</tr>
+<tr>
+<td>Budgeted</td>
+<td>WebGPU backend with minimal storage budget</td>
+<td>quarter-res RG8/RG16F or sparse updates</td>
+<td>lower-scale separable blur</td>
+<td>tint plus single offset</td>
+<td>low-power WebGPU devices</td>
+</tr>
+</tbody></table>
+<p>If the user explicitly asks how to apply fallback when WebGPU is unavailable,
+route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead of adding
+a non-WebGPU path here.</p>
+<h2>Implementation Rules</h2>
+<ul>
+<li>Keep persistent history, scene color, and static structure textures separate.</li>
+<li>Use exponential time behavior: <code>survival = pow(k, dtSeconds)</code> for decay, and
+scale deposits with <code>1 - pow(1 - depositPerSecond, dtSeconds)</code>. Clamp invalid
+or suspended-tab deltas to a documented maximum such as <code>1 / 15</code>.</li>
+<li>Preserve separate visible-mask and tilt-response channels. The tilt channel
+should use smoother/noise-reduced deposit than the visible channel.</li>
+<li>Update history with aspect from the history texture dimensions, not from a
+reduced blur target.</li>
+<li>Use <code>HalfFloatType</code>/RGBA16F-equivalent history unless a measured cheaper
+format matches at 30, 60, and 120 FPS and through resize/reset cases.</li>
+<li>Optional diffusion must be stable and explicit: apply a small Laplacian term
+to the R/A history after decay/deposit only when the visible signature
+improves edge cohesion without same-UV smearing. Validate disabled diffusion
+and enabled diffusion at 30, 60, and 120 FPS.</li>
+<li>Use reduced-resolution separable blur with <code>PassNode.setResolutionScale()</code> or
+an equivalent node blur whose resolution scale is owned by the pass. Normalize
+alpha separately from RGB and guard zero-weight neighborhoods with an epsilon.</li>
+<li>Generate static crystalline fields once at startup or on resize/quality
+change. Asset/data textures are <code>NoColorSpace</code>, repeat or mirrored-repeat
+wrap as authored, and only generate mipmaps when the sampling path needs them.</li>
+<li>Build the final surface as TSL nodes feeding <code>RenderPipeline.outputNode</code>.
+Node materials for any helper meshes use the <code>NodeMaterial</code> family.</li>
+<li>Screen-period uniforms must be named as periods, not texture sizes. Derive
+real texel dimensions from texture metadata when needed.</li>
+<li>Define resize policy explicitly: clear, preserve by remapping, or preserve by
+reprojection. The default safe policy is to clear history and regenerate static
+structure textures.</li>
+</ul>
+<h2>Color And Output</h2>
+<ul>
+<li>Scene color entering the surface pipeline stays linear/HDR until the final
+output transform. Working buffers use <code>HalfFloatType</code> where precision matters.</li>
+<li>Color textures use <code>SRGBColorSpace</code>. Data textures, normal maps, masks, noise,
+and LUTs use <code>NoColorSpace</code>.</li>
+<li>The app has exactly one tone-map owner and one output conversion owner.
+Prefer <code>RenderPipeline.outputColorTransform = true</code>; if disabled, end the node
+graph with <code>renderOutput()</code>. Do not output-convert inside the effect.</li>
+<li>Frost tint, brightness, saturation, blur mix, and normal-refraction math are
+all linear-light operations before final output conversion.</li>
+</ul>
+<h2>Budgets</h2>
+<p>Set budgets before tuning visuals:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Full tier budget</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pass count</td>
+<td>1 scene pass, 2 reduced blur passes, 1 composite/refraction output, 1 compute dispatch</td>
+</tr>
+<tr>
+<td>History storage</td>
+<td>2 full-res RGBA16F storage textures, about 33 MB at 1920x1080</td>
+</tr>
+<tr>
+<td>Static storage</td>
+<td>1-3 data textures, preferably generated once and shared</td>
+</tr>
+<tr>
+<td>Dispatch size</td>
+<td><code>ceil(width / 8) * ceil(height / 8)</code> workgroups for 8x8 history compute, or equivalent measured tile size</td>
+</tr>
+<tr>
+<td>Draw calls</td>
+<td>no extra scene redraws beyond the source pass</td>
+</tr>
+<tr>
+<td>Desktop discrete</td>
+<td>&lt;= 1.2 ms at 1080p after scene pass</td>
+</tr>
+<tr>
+<td>Desktop integrated</td>
+<td>&lt;= 2.5 ms at 1080p balanced tier</td>
+</tr>
+<tr>
+<td>Mobile/low power</td>
+<td>&lt;= 4 ms at 720p degraded or balanced tier</td>
+</tr>
+</tbody></table>
+<p>Raise blur/refraction quality only after the history update and reduced blur are
+inside budget. Algorithm changes beat micro-optimizing node expressions.</p>
+<h2>Diagnostics And Validation</h2>
+<p>Expose debug outputs for:</p>
+<pre><code class="language-text">scene color
+vertical blur
+horizontal blur
+each static structure field
+previous history R/A
+current deposit R/A
+next history R/A
+frost mask before pointer application
+frost mask after pointer application
+sharp/blur mix
+main refraction offset
+detail refraction offset
+final without refraction
+final
+</code></pre>
+<p>Add pause and single-step controls. Validate:</p>
+<ul>
+<li>The same pointer path produces matching accumulated masks at 30, 60, and
+120 FPS.</li>
+<li>Resize follows the documented clear/preserve policy.</li>
+<li>Repeat or mirrored-repeat normal sampling is visible at boundaries.</li>
+<li><code>RenderPipeline.render()</code> owns presentation when the node pipeline is active.</li>
+<li>Output screenshots are neither double-converted nor left in linear display
+space.</li>
+</ul>
+<p>Interface anchors:</p>
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Contract</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pointer NDC</td>
+<td>Convert <code>[-1, 1]</code> input to history UV explicitly.</td>
+</tr>
+<tr>
+<td>Texel center</td>
+<td>Compute dispatches address storage texel centers, not CSS pixels.</td>
+</tr>
+<tr>
+<td>Drawing-buffer size</td>
+<td>Storage dimensions use physical drawing-buffer pixels after DPR.</td>
+</tr>
+<tr>
+<td>CSS size / DPR</td>
+<td>CSS size and DPR are metadata for resize policy, never hidden scale factors.</td>
+</tr>
+<tr>
+<td>Screen period</td>
+<td><code>mainScreenPeriod</code> and <code>detailScreenPeriod</code> are screen periods, not texture dimensions.</td>
+</tr>
+<tr>
+<td>UV origin</td>
+<td>Name Y-up/Y-down assumptions before sampling history or normal maps.</td>
+</tr>
+</tbody></table>
+<h2>Replaced Techniques</h2>
+<ul>
+<li>Replaced time-only procedural masks with storage-backed history because
+accumulation is stateful and must survive visual noise changes.</li>
+<li>Replaced per-frame decay constants with exponential dt-correct survival so
+30/60/120 FPS behavior matches.</li>
+<li>Replaced full-resolution broad blur with reduced-resolution separable blur
+because it preserves the same broad frost feel at far lower bandwidth.</li>
+<li>Replaced single-scale offset refraction with two-scale TSL normal refraction
+using height-weighted detail, Fresnel/source inset, and mask gating because it
+gives better frozen-surface structure per sample.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-particles-trails-and-effects</code> for world- or object-space residue, particles, and
+dissolves. Use <code>$threejs-rain-snow-and-wet-surfaces</code> for rain wetness, puddles,
+snow accumulation, and weather-surface coupling. Use <code>$threejs-water-optics</code>
+for physically bounded water refraction/ripples. Use <code>$threejs-image-pipeline</code>
+when the work is mostly full-frame post ownership, tone mapping, bloom, GTAO, or
+anti-aliasing.</p>
+<p>This skill owns screen-space persistent surface history and its composite.</p>
+<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/touch-history-frost/frost-surface-effect.js</code>.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-compatibility-fallbacks.html">← Three.js Compatibility Fallbacks</a>
+    <a href="threejs-exposure-color-grading.html">Exposure and Color Grading →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

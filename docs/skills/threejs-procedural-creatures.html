@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procedural Creatures — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Procedural Creatures — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Procedural Creatures — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Procedural Creatures — Three.js WebGPU agent skill",
+   "description": "Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Procedural Creatures"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Procedural Content",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Procedural Creatures",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Creatures</p>
+  <h1>Procedural Creatures</h1>
+  <p class="lede">Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-procedural-creatures</span>
+    
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-creatures/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>A creature is a spec-driven body: primitives (tapered capsules, spheres) blended by smooth
+minimum into one signed distance field:</p>
+$$d = \operatorname{smin}_k(d_1, \dots, d_P), \qquad
+\operatorname{smin}_k(a,b) = \operatorname{mix}(a, b, h) - k\,h(1-h),\; h = \tfrac12 + \tfrac{a-b}{2k}$$
+<p>The interior gradient of a tapered capsule tilts with the taper slope
+$s = (r_b - r_a)/L$: $\nabla d = \hat{\mathbf q} - s\,\hat{\mathbf a}$, $\|\nabla d\| = \sqrt{1+s^2}$.
+Skin vertices snap to the iso-surface by Newton iteration with the full gradient norm:</p>
+$$\Delta\mathbf p = -\,\frac{(d - d_{iso})}{\|\nabla d\|^2}\,\nabla d$$
+<p>Locomotion is procedural: gait phase drives foot targets, 2-bone IK solves knees by the law
+of cosines $\cos\theta = \frac{a^2 + b^2 - c^2}{2ab}$, feet plant in world space, and
+verlet chains ($\mathbf x' = 2\mathbf x - \mathbf x_{prev} + \mathbf a\,dt^2$ + length
+constraints) animate tails and ears. Squash-and-stretch preserves volume:
+scale $(s, 1/\sqrt s, 1/\sqrt s)$ has determinant exactly 1.</p></div>
+  </div></div>
+
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Procedural Creatures</h1>
+<p>Start with <code>$threejs-choose-skills</code> preflight when creatures live inside a
+larger scene stack. A creature here is an authored JSON spec compiled into a
+posed-primitive control rig whose smooth-min SDF field both skins the body and
+drives shading. The render body stays ordinary merged geometry — the TSL vertex
+stage snaps a canonical shell onto the field iso-surface. No raymarching, no
+imported skinned assets, no <code>AnimationMixer</code>: pose is a small primitive buffer
+written per fixed simulation step. The skeleton is a semantic control rig
+(animation, IK, physics proxies, attachments); the visible skin may be an SDF
+blend-shell, a generated mesh, or a hybrid.</p>
+<p>For plants and foliage use <code>$threejs-procedural-vegetation</code>. For generic
+transform timelines, springs, and staging use
+<code>$threejs-procedural-motion-systems</code>. Imported glTF skinned-clip pipelines
+(retargeting, blend trees, VAT crowds) are outside this pack — say so rather
+than stretching this skill over them.</p>
+<h2>Mandatory Architecture</h2>
+<p>The production path is latest Three.js <code>WebGPURenderer</code> from <code>three/webgpu</code>,
+TSL from <code>three/tsl</code>, storage-buffer pose data, and node materials. Build in
+this order; every step ends in something renderable or assertable.</p>
+<ol>
+<li><strong>Layering.</strong> Pure core (spec, field math, rig compiler, locomotion) with
+zero <code>three</code> imports; a Three/TSL adapter package; a thin scene adapter that
+only feeds world <code>RigPose</code> values; a standalone deterministic creature lab
+that imports the package and never the app.</li>
+<li><strong>Spec.</strong> A creature is a small JSON <code>CharacterSpec</code> (~15–250 lines) of
+round primitives: tapered capsules, spheres, cones, verlet <code>rope</code> chains,
+IK <code>leg</code> parts. One validation gate; every error names <code>part.field</code>,
+because specs are meant to be generated, including by AI.</li>
+<li><strong>Rig compile.</strong> Parts map to primitive slots (capsule/cone/sphere = 1,
+rope = <code>segments</code>, leg = 2). Fold blend radius <code>k</code>/<code>kCap</code> per part at
+compile time. Canonicalize part order (sort by stable part id) so the
+sequential smooth-min cannot change with authoring order. Build the blend
+adjacency once from rest-pose capsule AABBs expanded by <code>r + k</code>, and store
+a bounded per-vertex candidate set (owner + K neighbours, K = 4–8). The
+K-candidate fold approximates the canonical sequential, order-dependent
+global smooth-min fold; rest-AABB adjacency is only a selection heuristic,
+and the full-field locomotion sweep gate is the acceptance bound.</li>
+<li><strong>Pose runtime.</strong> The runtime pose is a typed-array SoA buffer
+(<code>a.xyz|ra</code>, <code>b.xyz|rb</code>, <code>k|rgb</code> per slot), not object graphs re-copied
+into per-material vectors. Locomotion advances on a fixed-step accumulator
+(1/60 or 1/120, clamped input dt) and renders interpolated pose — feet
+never pop on frame hitches. Root motion lives in the object transform;
+primitives stay creature-local; world-planted feet convert through the
+inverse root transform for body-frame IK, then write creature-local leg
+slots before storage upload and posed-bounds update. Maintain a real
+per-instance bounding sphere from posed primitive AABBs. Never ship
+<code>frustumCulled = false</code>.</li>
+<li><strong>Field.</strong> Tapered-capsule distance + pairwise polynomial smooth-min
+(Quilez form). Compute the analytic gradient fused into the same loop —
+per-primitive radial direction minus the cone taper term <code>s·û</code>, blended
+<code>grad = mix(gradA, gradB, h)</code> through each smin (the exact gradient of the
+polynomial smooth-min, not an approximation) — instead of 6-tap finite
+differences (a ~7× field-evaluation saving); keep central differences only
+as a CPU verification tap. PARITY CONTRACT: the CPU sampler and the TSL
+emitter implement the same formulas and change in the same commit.</li>
+<li><strong>Shell.</strong> Canonical capsule geometry per slot per tier with <code>aPart</code>,
+<code>aAxial</code>, and a radial-angle attribute as stable surface coordinates;
+CPU-verified outward winding; bounded Newton snap onto <code>d = iso</code> with a
+residual gate (<code>&lt; 0.02</code> of body scale) and early-out when
+<code>abs(d - iso) &lt; epsilon</code>.</li>
+<li><strong>Rendering at scale.</strong> One shared geometry + material per species/tier.
+Pose lives in storage (<code>instancedArray</code> / storage buffer) indexed by
+<code>instanceIndex * maxParts + slot</code>; evaluate the field over the bounded
+candidate set, with a dynamic loop bounded by the actual part count, never
+a masked full-budget unroll. Cache material variants by
+<code>{tier, outline, debugMode, K}</code>; scalar controls (toon bands, outline
+width, sun, warmth) stay uniform writes, never graph rebuilds.</li>
+<li><strong>Shading.</strong> Normals from the field gradient; albedo from proximity-blended
+part colors over the same candidate set; banded toon ramp; SDF self-AO
+(few taps along the normal) so blended limbs read grounded, not inflated.
+Prove shadow parity: the shadow/depth path must consume the same snapped
+position function, verified by a silhouette-vs-shadow test, not assumed.
+Decode authored sRGB colors to linear before any uniform/storage upload.</li>
+<li><strong>Outline.</strong> For crowds, one post-process ID/normal edge pass over the
+whole population. The per-creature iso-offset back-face hull is a hero-shot
+variant only — it re-runs the entire snap per vertex and doubles draws.</li>
+<li><strong>Locomotion.</strong> Reactive planted gait (feet world-planted, step on lag,
+zero stance drift) + analytic 2-bone IK with a Gram-Schmidt bend hint;
+hopper state machine with volume-preserving squash
+(<code>sxz = 1/sqrt(squash)</code>); closed-form flight sampled from sim time;
+fixed-step verlet ropes; buoyancy-spring swim against an injected water
+   height. Rope-verlet writes its segment slots after base squash/yaw staging
+   and IK writes; the last stage touching a slot wins. Everything
+   deterministic: seeded LCG + sim clock only — <code>Math.random</code>/<code>Date.now</code>/
+   <code>performance.now</code> are banned in render code.</li>
+<li><strong>Boot.</strong> All heavy work is init-phase and budgeted: shell geometry once
+per tier (species-independent), rig compile + candidate sets once per
+species (time-sliced ≤ 4 ms/frame or in a worker), storage allocated at
+population cap. <code>await renderer.compileAsync(...)</code> every shippable
+material variant — display, depth/shadow, outline — behind the load
+screen. Spawning a creature is validation plus an O(slots) buffer write;
+it never builds geometry, materials, or pipelines.</li>
+<li><strong>Lab.</strong> A strict-port standalone lab app with a deterministic driver
+(<code>seek(t)</code> must equal <code>step(t * 60, 1000/60)</code>), machine-readable
+telemetry, debug modes, foot-drift markers, and seed sweeps. Lab evidence
+proves the package, never the shipping scene.</li>
+</ol>
+<h2>Capability Gate</h2>
+<pre><code class="language-js">const renderer = new WebGPURenderer({ antialias: true });
+await renderer.init();
+if (!renderer.backend.isWebGPUBackend) {
+  throw new Error(&#39;WebGPU backend unavailable for the canonical creature path.&#39;);
+}
+</code></pre>
+<p>Quality tiers inside the one canonical architecture:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Use for</th>
+<th>Shell</th>
+<th align="right">Snap steps</th>
+<th align="right">Candidate K</th>
+<th>Normals</th>
+<th>Outline</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hero</td>
+<td>close-ups, protagonists</td>
+<td>12 radial, 3 cap rings/slot</td>
+<td align="right">2 + residual early-out</td>
+<td align="right">8</td>
+<td>analytic gradient, optional fragment-stage</td>
+<td>iso-offset hull or post edge</td>
+</tr>
+<tr>
+<td>Crowd</td>
+<td>populated scenes</td>
+<td>10 radial, 2 cap rings</td>
+<td align="right">1–2</td>
+<td align="right">4–6</td>
+<td>analytic gradient, vertex varying</td>
+<td>shared post edge pass</td>
+</tr>
+<tr>
+<td>Background</td>
+<td>distant fauna</td>
+<td>8 radial, 2 cap rings</td>
+<td align="right">1</td>
+<td align="right">2–4</td>
+<td>analytic gradient, vertex varying</td>
+<td>none</td>
+</tr>
+</tbody></table>
+<p>If the user explicitly asks how to apply fallback when WebGPU is unavailable,
+route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead of adding
+it here.</p>
+<h2>Performance Budgets</h2>
+<p>Budget the population before styling it. Per-slot shell vertices (§5):
+<code>V_slot = (2 + 2·capRings)·radialSegments + 2</code> (hero 98, crowd 62, background
+50). Per creature: <code>V_shell = P · V_slot</code> where <code>P</code> = compiled primitive count
+from the spec. Vertex-stage fused field queries per shell vertex (analytic
+gradient): <code>E_vertex = (snapSteps + 1) · K</code>, plus optional color/self-AO passes
+over the same candidate set — never <code>E_vertex = (snapSteps + 1) · 7 · P</code> from a
+masked full-budget unroll with finite-difference normals. Parameter ratio vs
+that forbidden path: <code>(7 · P) / K</code> at equal snap depth. Prove ms budgets in the
+lab; do not copy population or slot-budget constants from any external codebase.</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Population</th>
+<th align="right">Draws</th>
+<th>Pose upload</th>
+<th align="right">Frame budget</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Desktop discrete</td>
+<td>50–200 creatures, 3–6 species</td>
+<td align="right">1 per species/tier (+1 shared outline pass)</td>
+<td>one contiguous storage write per frame</td>
+<td align="right">0.5–1.5 ms</td>
+</tr>
+<tr>
+<td>Desktop integrated</td>
+<td>20–80 creatures</td>
+<td align="right">1 per species/tier</td>
+<td>one storage write</td>
+<td align="right">1.0–2.5 ms</td>
+</tr>
+<tr>
+<td>Mobile WebGPU</td>
+<td>5–30 creatures</td>
+<td align="right">1–2 total</td>
+<td>one storage write</td>
+<td align="right">1.5–3.0 ms</td>
+</tr>
+</tbody></table>
+<p>CPU side: rig update writes straight into the mapped typed array; zero
+per-frame allocation; ordinary locomotion is O(slots) per creature per fixed
+step, while rope-verlet CPU cost is
+<code>ropeSubsteps * ropeRelaxationPasses * ropeSegments</code>, not O(slots).</p>
+<p>Boot side: all shippable material variants <code>compileAsync</code>-warmed before
+reveal; species build work time-sliced (≤ 4 ms/frame) or off-thread; storage
+allocated at population cap. Per-creature spawn ≤ 0.25 ms with zero
+allocations and zero pipeline compiles; first revealed frame ≤ 1.5× the
+steady-state frame time.</p>
+<h2>Color And Output</h2>
+<ul>
+<li>Authored part colors are sRGB hex; decode to linear
+(<code>c &lt;= 0.04045 ? c/12.92 : ((c+0.055)/1.055)^2.4</code>) before upload. Storage
+and uniform pose data is <code>NoColorSpace</code> linear data.</li>
+<li>Genome/color mutation operates in perceptual space (OKLab/HSL on the sRGB
+hex), never on decoded linear floats.</li>
+<li>The scene node pipeline owns tone mapping and output conversion; creature
+materials must not double-convert.</li>
+</ul>
+<h2>Reference</h2>
+<p>Read <a href="references/creature-body-systems.md">references/creature-body-systems.md</a>
+for the exact build contract: spec schema, field formulas and constants, rig
+compiler rules, locomotion constants and gates, scale architecture, the
+quality ladder toward skinned-look results, the creature-lab contract, the
+boot/compile/spawn contract, and the numeric gate table.</p>
+<p>Canonical runnable example: not yet included. The next required artifact is a
+self-verifying <code>examples/</code> lab that proves CPU/TSL parity, determinism,
+culling, snap residuals, stance drift, boot gates, and tier budgets against
+the reference&#39;s numeric gate table.</p>
+<h2>Failure Conditions</h2>
+<ul>
+<li>the field is evaluated with masked full-budget unrolled loops over the slot budget instead of
+bounded candidate sets and a part-count loop;</li>
+<li>normals come from 6-tap finite differences in the shader when the analytic
+gradient is available in the same loop;</li>
+<li>pose is per-creature material uniforms (one material per creature instead of per-species), so same-species creatures cannot
+batch and every creature is its own draw call;</li>
+<li><code>frustumCulled = false</code> instead of per-instance posed bounds;</li>
+<li>locomotion consumes raw render dt, so foot plants and hop phases pop under
+frame hitches;</li>
+<li>smooth-min result depends on authoring order of parts and nobody
+canonicalized or made the blend topology explicit;</li>
+<li>shadows silently use a different position path than the visible snapped
+surface;</li>
+<li>the outline doubles the full snap cost per creature in a crowd scene;</li>
+<li>debug/tier/band changes rebuild materials and meshes per creature instead of
+hitting a variant cache and uniforms;</li>
+<li>geometry cache keys omit schema/compiler versions or rely on a 32-bit hash
+alone;</li>
+<li>sRGB hex is uploaded as-is (washed-out creatures) or decoded twice (dark
+creatures);</li>
+<li>snap residual, stance drift, and CPU/GPU parity are eyeballed instead of
+gated numerically;</li>
+<li>creature motion calls <code>Math.random</code> or wall-clock time anywhere in the
+render path.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-procedural-motion-systems</code> for generic transform timelines,
+springs, staging, and rotating frames; this skill owns creature bodies, rigs,
+and creature locomotion. Use <code>$threejs-procedural-geometry</code> for general
+semantic mesh writers; this skill owns the canonical snapped shell. Use
+<code>$threejs-procedural-vegetation</code> for plants. Use <code>$threejs-visual-validation</code>
+for evidence bundles the creature lab emits. Imported skinned-asset character
+pipelines (glTF clips, retargeting, VAT crowds) are an explicit gap in this
+pack — do not stretch this skill over them.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-procedural-buildings-and-cities.html">← Procedural Buildings and Cities</a>
+    <a href="threejs-procedural-fields.html">Procedural Fields →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

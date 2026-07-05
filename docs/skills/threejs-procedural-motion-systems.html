@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procedural Motion Systems — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-motion-systems.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Procedural Motion Systems — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-motion-systems.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Procedural Motion Systems — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Procedural Motion Systems — Three.js WebGPU agent skill",
+   "description": "Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-motion-systems.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Procedural Motion Systems"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Motion and Effects",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Procedural Motion Systems",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-motion-systems.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Motion and Effects</a> / Procedural Motion Systems</p>
+  <h1>Procedural Motion Systems</h1>
+  <p class="lede">Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-procedural-motion-systems</span>
+    <span class="chip">1 runnable example</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-motion-systems/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Motion is simulated at a fixed timestep and rendered by interpolation — determinism and
+frame-rate independence by construction:</p>
+$$\mathbf x_{render} = \operatorname{lerp}(\mathbf x_{n-1}, \mathbf x_n, \alpha), \qquad
+\alpha = \frac{t_{acc}}{\Delta t_{fixed}}$$
+<p>Launch kinematics integrate thrust minus gravity with mass depletion (Tsiolkovsky in the
+limit), gravity turns pitch along the velocity vector:</p>
+$$\Delta v = v_e \ln\frac{m_0}{m_1}, \qquad
+\ddot{\mathbf x} = \frac{T(t)}{m(t)}\,\hat{\mathbf d}(t) - \frac{\mu}{r^2}\hat{\mathbf r}$$
+<p>Spring-follow responses use the exact exponential form $e^{-\lambda dt}$ (never bare lerp
+factors), rotating-frame alignment works in the target's frame via quaternion decomposition,
+and docking approaches decompose relative state into closing speed along the port axis plus
+lateral error — each channel driven to zero by its own critically damped controller.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-motion-systems/examples/webgpu-procedural-timelines">
+        <h4>webgpu-procedural-timelines</h4>
+        <span class="card-meta">threejs-procedural-motion-systems/examples/webgpu-procedural-timelines</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Procedural Motion Systems</h1>
+<p>Animate semantic state, not unrelated transform curves. The default architecture
+is latest Three.js <code>WebGPURenderer</code> from <code>three/webgpu</code>, <code>THREE.Timer</code>,
+<code>renderer.setAnimationLoop()</code>, analytic transform timelines, TSL node
+materials, and scale routing to instanced attributes or compute-updated storage
+buffers before per-object updates become the bottleneck.</p>
+<p>Number labels: Gated values are validation limits, quality tiers, or budget
+ceilings. Derived values come from actor count, authored scene scale, preset
+equations, or measured hardware. Do not present a number as universal unless it
+is labeled by one of those contracts.</p>
+<h2>Build order</h2>
+<p>Throughput decision table:</p>
+<table>
+<thead>
+<tr>
+<th>Actor count / shape</th>
+<th>Route</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&lt;200 Object3D</code> semantic actors</td>
+<td>ordinary transforms</td>
+<td>hero launch/docking actors, exact phase state, no per-frame allocations</td>
+</tr>
+<tr>
+<td><code>200-10k</code> repeated actors</td>
+<td><code>InstancedMesh</code> or <code>BatchedMesh</code></td>
+<td>chunk bounds, stable material buckets, half-rate distant updates</td>
+</tr>
+<tr>
+<td><code>10k+</code> independent actors</td>
+<td><code>StorageInstancedBufferAttribute</code> / compute storage</td>
+<td>compact only when removed work exceeds dispatch cost</td>
+</tr>
+</tbody></table>
+<ol>
+<li>Choose the throughput class first: hero actors use a small CPU phase state;
+repeated actors use <code>InstancedMesh</code> plus node attributes; particle-scale or
+debris-scale motion uses <code>StorageInstancedBufferAttribute</code>,
+<code>StorageBufferAttribute</code>, <code>storage()</code> nodes, and <code>renderer.compute()</code>.</li>
+<li>Create one renderer loop with <code>await renderer.init()</code>,
+<code>timer.connect(document)</code>, <code>timer.update(timestamp)</code>, fixed-step
+accumulation for deterministic simulation, previous/current fixed-state
+slots, <code>alpha = accumulator / fixedStep</code>, and presentation transforms
+interpolated from previous/current state rather than frame count.</li>
+<li>Define phase contracts, event boundaries, seed ownership, phase-local time,
+replay reset/disposal, and a <code>DeltaPolicy</code> with raw delta, clamped delta,
+fixed step, max substeps, simulation time, and presentation time.</li>
+<li>Derive target position/orientation analytically from named coordinate
+frames: world, subject local, orbital radial/tangent, docking axis, rotating
+hull frame, or camera-authored presentation frame.</li>
+<li>Encode high-count transforms as compact state: previous position, current
+position, velocity, base quaternion, angular velocity, phase id, seed, and
+flags in storage buffers; dispatch compute from the fixed-step loop and
+evaluate render pose in vertex TSL from previous/current storage plus alpha
+instead of walking thousands of <code>Object3D</code> transforms.</li>
+<li>Use frame-rate-independent smoothing with <code>alpha = 1 - pow(k, dt)</code> for
+perceptual response, and use bounded second-order springs only when velocity
+is part of the authored motion.</li>
+<li>Preserve world matrices when detaching semantic children; prefer
+<code>Object3D.attach()</code> only for uniform-scale hierarchies. For manual or
+<code>matrixAutoUpdate=false</code> graphs, set <code>matrixWorldNeedsUpdate</code>, call
+<code>updateWorldMatrix( true, true, true )</code>, then capture and restore world
+matrices explicitly.</li>
+<li>Render with <code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>, or other
+<code>NodeMaterial</code> family materials; drive animated vertex/instance state with
+TSL attributes/storage, and use <code>RenderPipeline</code> for node post output.
+Node-post apps call <code>renderPipeline.render()</code>, not renderer.render(), and
+keep <code>outputColorTransform</code> as the single output owner.</li>
+</ol>
+<p>Read <a href="references/procedural-motion-and-docking-systems.md">references/procedural-motion-and-docking-systems.md</a>
+for the WebGPU/TSL launch, staging, docking, debris, spring, quaternion,
+compute/storage, replay, and validation contracts.</p>
+<h2>Capability gate and quality tiers</h2>
+<p>Initialize once, then branch only by quality tier. Explicit requests for
+compatibility strategies route to <code>../threejs-compatibility-fallbacks/</code>; this
+skill keeps one flagship architecture.</p>
+<pre><code class="language-js">await renderer.init();
+if ( renderer.backend.isWebGPUBackend ) {
+  // Full tier: compute/storage motion, high-count instancing, node post.
+} else {
+  // Compatibility handoff: use the dedicated compatibility-fallbacks skill.
+}
+</code></pre>
+<p>Do not write a parallel renderer implementation in this skill.</p>
+<p>Quality tiers use Gated counts and rates unless a preset explicitly labels a
+number as Derived from authored scene scale, actor count, or measured hardware.</p>
+<p>Quality tiers:</p>
+<ul>
+<li>Full: compute-updated storage buffers, 50k-250k animated instances, 60-120 Hz
+fixed simulation, node post, and GPU timing validation.</li>
+<li>Balanced: 10k-50k instances, fewer active debris phases, half-rate compute
+for distant chunks, and static far LODs.</li>
+<li>Compatibility handoff: use <code>../threejs-compatibility-fallbacks/</code> for
+explicit non-primary backend teaching.</li>
+</ul>
+<h2>Performance budgets</h2>
+<ul>
+<li>Hero actors: under 200 semantic <code>Object3D</code> updates, under 0.25 ms CPU
+animation on desktop-discrete, under 0.6 ms on integrated/mobile.</li>
+<li>Instanced actor fields: one draw per geometry/material bucket, one storage
+update dispatch per active system, no per-instance CPU matrix uploads after
+initialization.</li>
+<li>Compute motion: 64-256 invocations per workgroup, one to three dispatches per
+frame for integration, culling/compaction only when it removes more work than
+it costs, and no readback in the frame loop.</li>
+<li>Memory: keep hot state to 48-96 bytes per instance; split static parameters
+from dynamic state so static buffers are uploaded once.</li>
+<li>Frame targets: animation/update budget below 1 ms desktop-discrete, 2 ms
+desktop-integrated, 3-4 ms mobile; shed quality by count, update rate, and
+active phase windows before lowering visual correctness.</li>
+</ul>
+<h2>Color and output</h2>
+<ul>
+<li>Color textures use <code>SRGBColorSpace</code>; data maps, pose textures, noise,
+masks, lookup tables, and generated animation data use <code>NoColorSpace</code>.</li>
+<li>Keep HDR buffers as <code>HalfFloatType</code> until tone mapping.</li>
+<li>The node post pipeline has one tone-map owner and one output conversion owner:
+<code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code>, not
+duplicated in materials or effects.</li>
+<li>Prefer built-in node passes where relevant to animated scenes:
+<code>TRAANode</code> for temporal reprojection, <code>BloomNode</code> for emissive events,
+<code>GTAONode</code> for contact grounding, and <code>CSMShadowNode</code>/<code>TileShadowNode</code> for
+scalable directional shadows before custom code.</li>
+</ul>
+<h2>Non-negotiable rules</h2>
+<ul>
+<li>Use elapsed seconds, fixed simulation seconds, and presentation seconds; never
+make motion frame-count based.</li>
+<li>Derive orientation from a declared frame, then apply authored roll/spin as a
+separate quaternion with explicit multiplication order.</li>
+<li>Normalize input axes, guard zero-length vectors and antiparallel unit-vector
+cases, and periodically normalize accumulated quaternions.</li>
+<li>Decompose docking error into axial and radial components in the current
+docking frame.</li>
+<li>Switch from spring convergence to an exact terminal pose at the end of a
+sequence; terminal locks must zero residual velocity.</li>
+<li>Use seeded randomness with stored seed, stream/counter, and event flags when
+motion must be reproducible.</li>
+<li>Keep visual shake in a bounded envelope and separate it from trajectory,
+camera shake, and physics state.</li>
+</ul>
+<h2>Replaced techniques</h2>
+<ul>
+<li>Replaced repeated endpoint lerps with analytic transform timelines because
+they provide continuous position/speed, deterministic replay, and direct
+phase seeking.</li>
+<li>Replaced per-object matrix updates for high-count debris with instanced node
+attributes or compute-updated storage buffers because CPU scene traversal and
+matrix uploads lose one to two orders of magnitude at scale.</li>
+<li>Replaced plain <code>exp(-lambda * dt)</code> smoothing spelling with
+<code>1 - pow(k, dt)</code> half-life/retention contracts because authored retention is
+easier to tune consistently across frame rates.</li>
+<li>Replaced unconstrained semi-implicit springs as a default with fixed-step
+substepped springs plus terminal snap, and with analytic timelines whenever
+inertia is not part of the visible motion.</li>
+</ul>
+<h2>Routing boundary</h2>
+<p>Use <code>$threejs-choose-skills</code> for preflight when a procedural animation request
+also spans rendering, geometry, materials, shadows, atmosphere, or post.
+Use <code>$threejs-camera-controls-and-rigs</code> for shot composition and camera handoffs.
+Use <code>$threejs-particles-trails-and-effects</code> when the deliverable is primarily plasma, sparks,
+or effect pooling rather than object transform motion.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-procedural-materials.html">← Procedural Materials</a>
+    <a href="threejs-procedural-planets.html">Procedural Planets →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procedural Buildings and Cities — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-buildings-and-cities.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Procedural Buildings and Cities — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-buildings-and-cities.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Procedural Buildings and Cities — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Procedural Buildings and Cities — Three.js WebGPU agent skill",
+   "description": "Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-buildings-and-cities.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Procedural Buildings and Cities"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Procedural Content",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Procedural Buildings and Cities",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-buildings-and-cities.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Buildings and Cities</p>
+  <h1>Procedural Buildings and Cities</h1>
+  <p class="lede">Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-procedural-buildings-and-cities</span>
+    <span class="chip">2 runnable examples</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-buildings-and-cities/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Buildings compile from a massing grammar: boxes join into a footprint, exposed-edge analysis
+decides where facades, cornices, and trims may exist. Facade subdivision solves an integer
+bay-count problem per wall:</p>
+$$n_{bays} = \operatorname{round}\!\left(\frac{W - 2m}{w_{bay}}\right), \qquad
+w' = \frac{W - 2m}{n_{bays}}$$
+<p>so openings stay near their authored width while filling the wall exactly. Ornament profiles
+are 2D polylines lofted along edges; arches parameterize as circular or elliptic segments
+$y = r\sin\theta$ over the opening span. Determinism is a contract: every variant derives
+from a seed through hash chains $s_{child} = H(s_{parent}, \text{tag})$, so a city block
+regenerates identically. Output compiles into material-slot batches — facade, glass, trim,
+roof — for a handful of draw calls per district.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-buildings-and-cities/examples/authored-financial-tower">
+        <h4>authored-financial-tower</h4>
+        <span class="card-meta">threejs-procedural-buildings-and-cities/examples/authored-financial-tower</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler">
+        <h4>webgpu-material-slot-compiler</h4>
+        <span class="card-meta">threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Procedural Buildings and Cities</h1>
+<p>Build the fastest architecture first: a deterministic grammar produces a
+validated plan, then the compiler emits one material-slot <code>BatchedMesh</code> or
+merged indexed <code>BufferGeometry</code> package per building or city chunk. Do not
+start from per-primitive instance placement and try to optimize it later.</p>
+<p>Use latest Three.js with <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from
+<code>three/tsl</code>, <code>MeshStandardNodeMaterial</code> / <code>MeshPhysicalNodeMaterial</code> material
+identities, node post through <code>RenderPipeline</code>, and storage/compute APIs only
+where they beat CPU chunking for city-scale state. Built-in node effects are
+the fastest correct baseline.</p>
+<h2>Required Build Order</h2>
+<pre><code class="language-text">settings + seed
+  -&gt; mass grammar
+  -&gt; plan validation
+  -&gt; exposed-surface graph
+  -&gt; facade / roof / trim placements
+  -&gt; module registry validation
+  -&gt; per-material-slot mesh compilation
+  -&gt; one compiled building object or chunk batch
+  -&gt; WebGPU/TSL materials and node pipeline integration
+</code></pre>
+<p>Read
+<a href="references/grammar-and-mesh-compiler.md">references/grammar-and-mesh-compiler.md</a>
+before implementing the generator.</p>
+<p>Legacy implementation (deprecated, do not extend):
+<code>examples/authored-financial-tower/</code>.</p>
+<h2>Architecture Rules</h2>
+<ul>
+<li>Keep grammar, validation, placement, and mesh emission as separate phases.</li>
+<li>Resolve exposed edges before facade placement. Do not decorate hidden
+internal faces.</li>
+<li>Treat exposed-edge analysis as trim and ornament authority: cornices, corner
+joints, parapets, pilasters, plinths, and roof ownership follow surviving
+intervals, not whole-tier rectangles.</li>
+<li>Modules own semantic anchors, local frames, construction depth, UV density,
+and material slots; they do not own global side orientation.</li>
+<li>Compile by material slot. The default output is one compiled building object
+with stable slot membership, not an <code>InstancedMesh</code> soup of primitive boxes.</li>
+<li>Use <code>BatchedMesh</code> when many local module geometries share one material and
+still need per-part visibility, transforms, sorting, or replacement. Use a
+merged indexed <code>BufferGeometry</code> per slot when the building is static and
+only chunk-level culling is needed.</li>
+<li>Use <code>InstancedMesh</code> only for large counts of identical repeated objects
+whose unique geometry count is small and whose per-instance identity is
+meaningful. It is not the default compiler architecture for authored facades.</li>
+<li>Preserve real dimensions for floor height, bay width, trim projection, tile
+scale, and texture density.</li>
+<li>Randomness may select among valid designs; it must not repair invalid
+geometry.</li>
+<li>Provide topology, exposed-edge, placement, ownership, material-slot, UV
+density, bounds, draw-call, and triangle diagnostics.</li>
+</ul>
+<h2>Public API Shape</h2>
+<pre><code class="language-ts">type BuildingQualityTier = &quot;hero&quot; | &quot;city&quot; | &quot;distant&quot;;
+
+function createBuildingPlan(settings: BuildingSettings): BuildingPlan;
+function validateBuildingPlan(plan: BuildingPlan): BuildingDiagnostics;
+function compileBuilding(
+  plan: BuildingPlan,
+  materials: BuildingNodeMaterials,
+  options: {
+    qualityTier: BuildingQualityTier;
+    chunkId?: string;
+    preferBatchedMesh?: boolean;
+  },
+): CompiledBuilding;
+function disposeCompiledBuilding(compiled: CompiledBuilding): void;
+</code></pre>
+<p><code>BuildingPlan</code> stays serializable. It must include tiers, footprint pieces,
+exposed intervals, placements, module usage, ownership rectangles, missing and
+unused module IDs, overlap pairs, material slot counts, UV meters per repeat,
+and per-slot triangle budgets.</p>
+<h2>WebGPU Capability Gate</h2>
+<p>Architecture generation is CPU deterministic; city-scale visibility,
+regeneration, LOD masks, and animated signs may use storage buffers or compute.
+Gate those paths once after renderer initialization:</p>
+<pre><code class="language-js">import { WebGPURenderer } from &quot;three/webgpu&quot;;
+
+const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend ) {
+  // Full path: StorageBufferAttribute / StorageInstancedBufferAttribute,
+  // storage() nodes, renderer.compute(), city chunk visibility, high
+  // material-slot budgets, full node post stack.
+} else {
+  // Reduced-quality tier only: precompiled static chunks, lower ornament
+  // density, smaller visibility grids, no custom shader rewrite.
+}
+</code></pre>
+<p>Quality tiers are asset and budget tiers:</p>
+<pre><code class="language-text">hero:
+  full exposed-edge diagnostics, roofs, trim, ornaments, physical UV scale,
+  glass separated, close-inspection geometry
+
+city:
+  same grammar and validation, fewer ornament rewrites, chunked material-slot
+  batches, coarser roof equipment, no tiny one-off geometry
+
+distant:
+  serialized precompiled shells, simplified cornice/roof profiles, baked
+  color variation, no dynamic per-building recompute
+</code></pre>
+<h2>Materials, Color, and Output</h2>
+<ul>
+<li>Use <code>MeshStandardNodeMaterial</code> for masonry, metals, roof, and ornament;
+use <code>MeshPhysicalNodeMaterial</code> for glass when transmission, IOR, thickness,
+or clearcoat matters.</li>
+<li>Keep one material identity per semantic slot: limestone, granite,
+terra-cotta, glass, bronze, black-metal, ornament, and roof.</li>
+<li>Color textures use <code>SRGBColorSpace</code>. Normal, roughness, metalness, masks,
+IDs, atlas selectors, and diagnostics use <code>NoColorSpace</code> / linear data.</li>
+<li>Keep HDR buffers as <code>HalfFloatType</code> until tone mapping.</li>
+<li>The node pipeline owns the only tone-map and output conversion through
+<code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code> node.
+Materials and effects must not double-convert.</li>
+<li>Use <code>pass(scene, camera)</code>, <code>mrt()</code> only when several nodes share scene data,
+and <code>PassNode.setResolutionScale()</code> for reduced-resolution post effects.</li>
+<li>For image treatment, prefer built-in nodes first: <code>GTAONode</code> for contact
+grounding, <code>BloomNode</code> for authored emissive signs or interiors, <code>TRAANode</code>
+for temporal anti-aliasing, and <code>CSMShadowNode</code> / <code>TileShadowNode</code> for large
+architecture shadows. Use sibling skills for deep rendering systems.</li>
+</ul>
+<h2>Performance Budgets</h2>
+<p>Target budgets for a compiled building:</p>
+<pre><code class="language-text">hero building:
+  draw calls: 6-10 opaque/alpha-separated slot draws
+  triangles: 80k-250k
+  CPU compile: &lt; 8 ms amortized after seed/settings change
+  GPU frame cost: &lt; 0.8 ms desktop-discrete, &lt; 1.6 ms integrated, &lt; 3.0 ms mobile
+
+city block chunk:
+  draw calls: &lt;= 48 for 24-80 buildings
+  triangles: 400k-1.5M visible after LOD/chunk culling
+  storage buffers: &lt;= 8 MB visibility/LOD/material metadata
+  compute dispatch: &lt;= 1 visibility/compaction dispatch per moving camera frame
+  StorageTexture: only for generated ID/LOD/debug masks that need textureStore()
+  GPU frame cost: &lt; 2.5 ms desktop-discrete, &lt; 5 ms integrated, &lt; 8 ms mobile
+
+distant skyline:
+  draw calls: &lt;= 16 per skyline sector
+  triangles: &lt;= 120k per sector
+  material slots: packed to opaque masonry, glass, roof, emissive
+</code></pre>
+<p>Chunk by spatial bounds before city-scale batching. Compute bounds after
+compilation and after every regeneration. Pool reusable arrays and dispose
+generated geometries, <code>BatchedMesh</code> objects, textures, and node effects when
+replacing a district.</p>
+<h2>Acceptance</h2>
+<p>The generated building must survive:</p>
+<ul>
+<li>silhouette-only view;</li>
+<li>flat untextured material;</li>
+<li>grazing light and contact shadowing;</li>
+<li>close inspection of corners, portals, setbacks, roofs, and exposed-edge
+trim transitions;</li>
+<li>fixed-seed fixtures for single tower, compound footprint, courtyard, twin
+towers, bridge, high ornament density, and minimum-span tiers;</li>
+<li>seed variation without broken bays, overlapping ownership, hidden-wall
+decoration, floating ornament, or sliver tiers;</li>
+<li>triangle, draw-call, material-slot, module-count, bounds, and UV-density
+reporting.</li>
+</ul>
+<h2>Replaced Techniques</h2>
+<ul>
+<li>Replaced per-primitive <code>InstancedMesh</code> placement as the default with
+material-slot <code>BatchedMesh</code> or merged indexed <code>BufferGeometry</code> compilation,
+because authored buildings need many module shapes, stable material
+identities, exposed-edge ownership, and city-scale draw-call control.</li>
+<li>Replaced whole-tier rectangle decoration with exposed-interval ownership,
+because compound footprints otherwise decorate hidden walls and break trim at
+inner and outer corners.</li>
+<li>Replaced post-compile visual debugging only with serializable plan
+diagnostics before mesh emission, because invalid massing and ownership must
+fail before geometry exists.</li>
+<li>Replaced custom renderer-era material hacks with TSL <code>NodeMaterial</code>
+identities and node post, because the modern renderer path keeps materials,
+post, color, and compute in one pipeline.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-choose-skills</code> for broad graphics preflight when the work spans
+materials, shadows, post, validation, and city-scale performance.</p>
+<p>Use <code>$threejs-procedural-geometry</code> for reusable profiles, sweeps, rings,
+arches, frames, or low-level mesh writers without a building grammar.</p>
+<p>Use <code>$threejs-procedural-materials</code> for procedural masonry, atlas filtering,
+derivative normals, weathering, and per-slot material fields.</p>
+<p>Use <code>$threejs-scalable-real-time-shadows</code> for CSM/tiled shadow budgets and diagnostics.</p>
+<p>Use <code>$threejs-ambient-contact-shading</code>,
+<code>$threejs-exposure-color-grading</code>, and <code>$threejs-image-pipeline</code> for node
+post stack ownership beyond architecture-specific guidance.</p>
+<p>This skill owns massing, facade semantics, architectural modules, validation,
+and building-plan compilation.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-particles-trails-and-effects.html">← Particles, Trails, and Effects</a>
+    <a href="threejs-procedural-creatures.html">Procedural Creatures →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>

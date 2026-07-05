@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scalable Real-Time Shadows — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-scalable-real-time-shadows.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Scalable Real-Time Shadows — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-scalable-real-time-shadows.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Scalable Real-Time Shadows — Three.js WebGPU agent skill" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Scalable Real-Time Shadows — Three.js WebGPU agent skill",
+   "description": "Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-scalable-real-time-shadows.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Scalable Real-Time Shadows"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Cameras, Lighting, and Final Image",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Scalable Real-Time Shadows",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-scalable-real-time-shadows.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:-.02em}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;transition:color .2s,border-color .2s}
+a.chip:hover{color:var(--amber);border-color:var(--amber)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext h1{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="wrap">
+  <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Scalable Real-Time Shadows</p>
+  <h1>Scalable Real-Time Shadows</h1>
+  <p class="lede">Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity.</p>
+  <div class="meta-row">
+    <span class="chip a">$threejs-scalable-real-time-shadows</span>
+    <span class="chip">1 runnable example</span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/SKILL.md">SKILL.md on GitHub ↗</a>
+    <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-scalable-real-time-shadows/SKILL.md">raw (for agents) ↗</a>
+  </div>
+</header>
+
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Shadow scale is a budget problem: texel density where the camera looks, amortization
+everywhere else. Cascade splits blend logarithmic and uniform schemes:</p>
+$$z_i = \lambda\, z_n\Big(\tfrac{z_f}{z_n}\Big)^{i/N} + (1-\lambda)\Big(z_n + \tfrac{i}{N}(z_f - z_n)\Big)$$
+<p>Texel stabilization snaps the light-space origin to whole texels so shadows don't shimmer
+under camera motion:</p>
+$$\mathbf o' = \Big\lfloor \frac{\mathbf o}{\Delta_{texel}} \Big\rfloor \Delta_{texel}, \qquad
+\Delta_{texel} = \frac{2\,r_{cascade}}{N_{shadowmap}}$$
+<p>Cached clipmaps re-render a level only when its content or coverage is invalidated —
+the per-frame cost is the sum over dirty levels, not all levels. The parity contract: any
+vertex displacement in the visible pass must run identically in the caster pass
+(<code>castShadowPositionNode</code>), or silhouettes and shadows disagree.</p></div>
+  </div></div>
+
+
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Runnable examples</h2>
+    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow">
+        <h4>webgpu-cached-clipmap-shadow</h4>
+        <span class="card-meta">threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow</span>
+      </a>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h1>Scalable Real-Time Shadows</h1>
+<p>Start by choosing the cheapest architecture that matches the spatial problem. Caching and update budgeting are the order-of-magnitude lever; do not re-render wide shadow coverage every frame unless the scene truly changes every frame.</p>
+<table>
+<thead>
+<tr>
+<th>Scene shape</th>
+<th>First implementation path</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bounded receiver/caster region</td>
+<td>One <code>DirectionalLight</code> with its normal <code>DirectionalLightShadow</code></td>
+<td>One shadow render pass, one map, lowest binding pressure.</td>
+</tr>
+<tr>
+<td>Camera-frustum cascades</td>
+<td>Built-in <code>CSMShadowNode</code> from <code>three/addons/csm/CSMShadowNode.js</code></td>
+<td>Official WebGPU cascade implementation; tune splits before custom code.</td>
+</tr>
+<tr>
+<td>Huge mostly static projection split into independent squares</td>
+<td>Built-in <code>TileShadowNode</code> from <code>three/addons/tsl/shadows/TileShadowNode.js</code></td>
+<td>Tiled shadow maps avoid one overlarge projection without custom cache ownership.</td>
+</tr>
+<tr>
+<td>Streaming open world with persistent coarse coverage</td>
+<td>Custom cached clipmap by extending <code>ShadowNode</code>/<code>ShadowBaseNode</code> behavior</td>
+<td>Reuses coarse maps across frames, refreshes only dirty levels, and targets invalidation to changed chunks.</td>
+</tr>
+</tbody></table>
+<p>Legacy WebGL implementation (deprecated, do not extend): <code>../threejs-procedural-buildings-and-cities/examples/authored-financial-tower/shadow-clipmaps.js</code>.</p>
+<h2>Required Baseline</h2>
+<p>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, NodeMaterial-family materials, and node shadow hooks. Do not hand-author a parallel renderer path.</p>
+<p>Capability gate for custom clipmaps, compute-generated caster lists, storage-backed dirty masks, or other WebGPU-only resources:</p>
+<pre><code class="language-js">await renderer.init();
+
+const fullShadowTier = renderer.backend?.isWebGPUBackend === true;
+
+if (fullShadowTier) {
+  // Full tier: CSMShadowNode, TileShadowNode, or custom cached clipmap.
+} else {
+  // Reduced tier: fewer levels, smaller maps, static/precomputed casters, no custom compute queue.
+}
+</code></pre>
+<p>Quality tiers are algorithmic, not alternate implementations:</p>
+<ul>
+<li><code>ultra</code>: <code>CSMShadowNode</code> or custom clipmap, 4-6 levels, dynamic near levels, cached coarse levels, GPU-timed update budget.</li>
+<li><code>high</code>: 3-4 levels or 2x2 <code>TileShadowNode</code>, reduced far distance, targeted invalidation.</li>
+<li><code>reduced</code>: one shadow or two near levels, static far receivers, precomputed terrain/structure caster sets.</li>
+</ul>
+<p>For custom clipmaps, treat those level counts as authoring starts only:
+<code>examples/webgpu-cached-clipmap-shadow/clipmap-config.js</code> derives the actual
+<code>levelCount</code>, and <code>validate.js</code> enforces the resulting resource count.</p>
+<h2>Custom Clipmap Contract</h2>
+<p>Use a custom cached clipmap only after built-in nodes fail the open-world requirement. The implementation must:</p>
+<ol>
+<li>Define concentric light-space square levels.</li>
+<li>Snap every committed level center to that level&#39;s world texel grid.</li>
+<li>Publish material-facing centers only after the corresponding map render completes.</li>
+<li>Sample all level comparison textures in uniform control flow, then apply weights.</li>
+<li>Refresh near dynamic levels every frame and update coarse levels under a hard budget.</li>
+<li>Let explicit invalidation bypass the ordinary coarse-level budget.</li>
+<li>Scale normal bias by world texel width and use <code>LightShadow.biasNode</code> when the bias varies by level/material.</li>
+<li>Dispose cloned shadows, level lights, targets, shadow nodes, storage buffers, and debug textures.</li>
+</ol>
+<p>Read <a href="references/cached-clipmap-shadows.md">references/cached-clipmap-shadows.md</a> before implementing custom cached directional shadows.</p>
+<p>Use <code>examples/webgpu-cached-clipmap-shadow/</code> as the canonical Phase 1 contract
+for custom clipmaps. It includes the decision record, <code>CachedClipmapShadowNode</code>
+hook boundary, per-level <code>DepthTexture</code> render targets, fitted orthographic
+level cameras, per-level <code>inverseMapSize</code> gates, targeted invalidation,
+displaced-caster node identity checks, dispose counters, and
+<code>node examples/webgpu-cached-clipmap-shadow/validate.js --allow-missing-gpu</code>.</p>
+<h2>Budgets</h2>
+<p>Set budgets before tuning visuals:</p>
+<ul>
+<li>Shadow passes: bounded scene <code>1</code>; cascades <code>2-4</code>; tiles <code>tilesX * tilesY</code>; custom clipmap <code>dynamicLevels + cachedBudget + forcedInvalidations</code>. The example validator asserts one renderer draw per selected custom level.</li>
+<li>Map memory: <code>sum(width * height * bytesPerDepthTexel)</code> plus any debug/variance maps. The default custom profile is computed by <code>estimateShadowMemoryBytes()</code> and checked by <code>validateClipmapConfig()</code>.</li>
+<li>Sampled shadow textures per material: stay under the target backend limit. The example validator checks custom level count against <code>sampledTextureLimit</code>; prefer fewer validated levels before raising map count.</li>
+<li>Draw calls: count per shadow pass. The custom example validator spies on the renderer and fails if scheduled levels do not draw.</li>
+<li>GPU timing claims must come from a browser artifact capture for the target device. The Node validator enforces the executable count/memory/resource contracts and reports GPU artifacts as <code>not-run</code> unless <code>--allow-missing-gpu</code> is supplied.</li>
+<li>Compute/storage: dirty-mask and caster-compaction dispatches should stay below one dispatch per changed chunk class plus one prefix/compaction dispatch; no CPU readback in the frame loop.</li>
+</ul>
+<h2>Color And Output</h2>
+<p>Shadows are data, not color. Shadow maps, masks, dirty textures, and debug numeric overlays use linear/no-color data handling. App color output remains owned by the node pipeline: one tone-map owner, one output transform owner through <code>RenderPipeline.outputColorTransform</code> or <code>renderOutput()</code>, and HDR buffers stay <code>HalfFloatType</code> until tone mapping.</p>
+<h2>Failure Conditions</h2>
+<ul>
+<li>The decision table is skipped and a custom clipmap is built for a bounded scene.</li>
+<li>Projection centers move by fractions of a texel.</li>
+<li>Shader containment uses desired centers instead of committed rendered centers.</li>
+<li>Coarse levels refresh every frame without measured need.</li>
+<li>Explicit invalidation waits behind the ordinary coarse update budget.</li>
+<li>Comparison sampling is placed behind per-pixel conditionals.</li>
+<li>The same normal bias is used across radically different texel sizes.</li>
+<li>Visible materials and shadow casters do not share alpha, displacement, morph, skinning, or instancing logic in their node graphs.</li>
+<li>Level boundaries become visible under slow camera motion.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use this skill for light-space directional shadow maps. Use <code>$threejs-ambient-contact-shading</code> for view-dependent ambient visibility; AO is not a replacement for cast shadows. Use <code>$threejs-image-pipeline</code> when shadow output must coordinate with the node post pipeline, and <code>$threejs-visual-validation</code> for fixed-view shimmer, cache, and budget regression tests.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-rain-snow-and-wet-surfaces.html">← Rain, Snow, and Wet Surfaces</a>
+    <a href="threejs-sky-atmosphere-and-haze.html">Sky, Atmosphere, and Haze →</a>
+  </div>
+</div></div>
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.</span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>
