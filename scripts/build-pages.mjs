@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = 'https://github.com/linegel/threejs-complete-set-of-skill';
+const SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
+const OG_IMAGE = `${SITE}visual-validation/planet-generated-craters/final.design.png`;
 
 const CATEGORIES = [
   { name: 'Planning and Validation', blurb: 'Route requests to the right experts and prove the result with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
@@ -67,13 +69,67 @@ const gallery = GALLERY.map((g) => `
         <figcaption><strong>${esc(g.title)}</strong><span>${esc(g.note)}</span></figcaption>
       </figure>`).join('');
 
+const HARNESSES = [
+  { name: 'Claude Code', how: 'Symlink (or copy) the skill folders into your personal or project skills directory; they appear in the Skill tool automatically.', code: `git clone ${REPO}.git\nln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/` },
+  { name: 'Codex CLI', how: 'Point Codex at the folders via AGENTS.md: list each skill name + path and instruct it to read the SKILL.md when the task matches.', code: `git clone ${REPO}.git\n# in AGENTS.md: "For Three.js WebGPU work, read the matching\n# threejs-*/SKILL.md from ./threejs-complete-set-of-skill/"` },
+  { name: 'Cursor / other IDEs', how: 'Add the repo as a workspace folder and reference skills in rules (.cursor/rules or equivalent) so the agent loads SKILL.md on demand.', code: `git submodule add ${REPO}.git skills/threejs\n# rule: "Before Three.js WebGPU tasks, read skills/threejs/<skill>/SKILL.md"` },
+  { name: 'Gemini CLI & generic agents', how: 'Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, and examples/. A machine-readable index lives at skills.json; a plain-text overview at llms.txt.', code: `curl -s ${SITE}skills.json | jq '.skills[].name'\ncurl -s ${SITE}llms.txt` },
+];
+
+const harnessSection = HARNESSES.map((h, i) => `
+    <div class="step"><span class="n">${String(i + 1).padStart(2, '0')}</span><h3>${esc(h.name)}</h3>
+      <p>${esc(h.how)}</p>
+      <pre><code>${esc(h.code)}</code></pre></div>`).join('');
+
 const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Three.js WebGPU Skill Pack — TSL, Procedural Graphics, Visual Validation</title>
-<meta name="description" content="${total} specialized agent skills for ambitious Three.js WebGPU/TSL scenes: oceans, clouds, planets, water optics, image pipelines, and screenshot-backed visual validation." />
+<meta name="description" content="${total} specialized agent skills for ambitious Three.js WebGPU/TSL scenes: oceans, clouds, planets, water optics, image pipelines, and screenshot-backed visual validation. Works with Claude Code, Codex, Cursor, Gemini CLI, and any agent that loads local skill folders." />
+<meta name="keywords" content="three.js, threejs, webgpu, TSL, three shading language, NodeMaterial, agent skills, claude code skills, codex skills, procedural graphics, spectral ocean, volumetric clouds, procedural planets, visual validation, RenderPipeline" />
+<link rel="canonical" href="${SITE}" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Three.js WebGPU Skill Pack — ${total} expert agent skills for TSL scenes" />
+<meta property="og:description" content="Agent skills for ambitious Three.js WebGPU/TSL graphics: oceans, atmospheres, planets, clouds, water optics, image pipelines, and screenshot-backed validation." />
+<meta property="og:url" content="${SITE}" />
+<meta property="og:image" content="${OG_IMAGE}" />
+<meta property="og:image:alt" content="Procedural planet crater field rendered with the skill pack" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Three.js WebGPU Skill Pack — ${total} expert agent skills" />
+<meta name="twitter:description" content="TSL-first Three.js WebGPU skills for Claude Code, Codex, Cursor, Gemini CLI, and any skill-aware agent." />
+<meta name="twitter:image" content="${OG_IMAGE}" />
+<script type="application/ld+json">
+${JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareSourceCode',
+      name: 'Three.js WebGPU Skill Pack',
+      description: `${total} specialized agent skills for Three.js WebGPU/TSL: procedural graphics, image pipelines, and visual validation.`,
+      codeRepository: REPO,
+      url: SITE,
+      programmingLanguage: ['JavaScript', 'TSL'],
+      runtimePlatform: 'Three.js WebGPURenderer',
+      keywords: 'three.js, webgpu, TSL, agent skills, procedural graphics, visual validation',
+      license: 'https://opensource.org/licenses/MIT',
+      image: OG_IMAGE,
+    },
+    {
+      '@type': 'ItemList',
+      name: 'Skill catalog',
+      numberOfItems: total,
+      itemListElement: Object.values(skills).map((s, i) => ({
+        '@type': 'ListItem', position: i + 1, name: s.title,
+        url: `${REPO}/blob/main/${s.slug}/SKILL.md`, description: s.desc,
+      })),
+    },
+  ],
+}, null, 1)}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
@@ -148,7 +204,7 @@ footer a:hover{text-decoration:underline}
 <body>
 <div class="wrap"><nav>
   <a class="brand" href="#">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="#quickstart">Usage</a><a href="#skills">Skills</a><a href="#gallery">Gallery</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="#quickstart">Usage</a><a href="#install">Install</a><a href="#skills">Skills</a><a href="#gallery">Gallery</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
 </nav></div>
 
 <header class="wrap">
@@ -183,6 +239,13 @@ $threejs-visual-validation to verify the frame.</code></pre></div>
   </div>
 </div></div>
 
+<div class="section" id="install"><div class="wrap">
+  <h2>Install for your harness</h2>
+  <p class="sub">Every skill is a plain folder — SKILL.md with YAML frontmatter, references/, agents/, and runnable examples/ — so any agent that reads local files can use the pack. Machine-readable index: <a href="skills.json" style="color:var(--cyan)">skills.json</a> · plain-text overview for LLMs: <a href="llms.txt" style="color:var(--cyan)">llms.txt</a>.</p>
+  <div class="steps">${harnessSection}
+  </div>
+</div></div>
+
 <div class="section" id="skills"><div class="wrap">
   <h2>Skill catalog</h2>
   <p class="sub">One owner for depth, tone mapping, and output color. Build the visual cause first; use post to preserve it. Validate with evidence, not one attractive screenshot. Every card links to the full SKILL.md.</p>
@@ -205,4 +268,48 @@ ${catalog}
 `;
 
 writeFileSync(join(root, 'docs', 'index.html'), html);
-console.log(`Wrote docs/index.html — ${total} skills, ${CATEGORIES.length} categories.`);
+
+// llms.txt — https://llmstxt.org convention: concise, plain-text entry point for LLMs.
+const llms = `# Three.js WebGPU Skill Pack
+
+> ${total} specialized agent skills for ambitious Three.js WebGPU/TSL scenes: procedural oceans, volumetric clouds, planets, water optics, particles, shadows, image pipelines, and screenshot-backed visual validation. Works with Claude Code, Codex, Cursor, Gemini CLI, and any agent that loads local skill folders.
+
+Repository: ${REPO}
+Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/
+Install (any agent): clone the repo; each skill is a self-contained folder with SKILL.md (YAML frontmatter: name, description), references/, agents/, and runnable examples/.
+Machine-readable index: ${SITE}skills.json
+Routing: start broad requests with threejs-choose-skills; it selects the smallest useful skill set.
+
+## Skills
+
+${CATEGORIES.map((c) => `### ${c.name}\n\n${c.slugs.filter((s) => skills[s]).map((s) => `- [${skills[s].title}](${REPO}/blob/main/${s}/SKILL.md): ${skills[s].desc}`).join('\n')}`).join('\n\n')}
+
+## Hard rules the pack teaches
+
+- Start from current Three.js WebGPU APIs (WebGPURenderer from three/webgpu, TSL from three/tsl), not legacy WebGL examples.
+- One owner for depth, normals, velocity, history, tone mapping, and output color conversion.
+- Build the visual cause first; use post-processing to preserve or reveal it.
+- Validate with reproducible evidence (fixed-view contracts, diagnostics, seed sweeps), not a single attractive screenshot.
+`;
+writeFileSync(join(root, 'docs', 'llms.txt'), llms);
+
+// skills.json — machine-readable manifest for tooling and agent installers.
+writeFileSync(join(root, 'docs', 'skills.json'), JSON.stringify({
+  name: 'threejs-webgpu-skill-pack',
+  description: `${total} agent skills for Three.js WebGPU/TSL procedural graphics and visual validation`,
+  repository: REPO,
+  homepage: SITE,
+  skillFormat: 'SKILL.md with YAML frontmatter (name, description) per folder',
+  router: 'threejs-choose-skills',
+  categories: CATEGORIES.map((c) => ({ name: c.name, skills: c.slugs.filter((s) => skills[s]) })),
+  skills: Object.values(skills).map((s) => ({
+    name: s.slug, title: s.title, description: s.desc, examples: s.examples,
+    skillMd: `${REPO}/blob/main/${s.slug}/SKILL.md`,
+    raw: `https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${s.slug}/SKILL.md`,
+  })),
+}, null, 2) + '\n');
+
+writeFileSync(join(root, 'docs', 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}sitemap.xml\n`);
+writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE}</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n`);
+
+console.log(`Wrote docs/{index.html,llms.txt,skills.json,robots.txt,sitemap.xml} — ${total} skills, ${CATEGORIES.length} categories.`);
