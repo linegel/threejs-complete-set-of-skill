@@ -40,6 +40,12 @@ const VALIDATION = {
     ['visual-validation/water-generated-caustics/diagnostics.mosaic.png', 'Effect-isolation diagnostics mosaic'],
     ['visual-validation/water-generated-caustics/camera.near.png', 'Near camera probe'],
   ],
+  'threejs-spectral-ocean': [
+    ['visual-validation/ocean-generated-wave-seeds/final.design.png', 'Final design frame — spectral cascade ocean'],
+    ['visual-validation/ocean-generated-wave-seeds/no-post.design.png', 'No-post baseline — the wave cause without grading'],
+    ['visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png', 'Per-signal diagnostics mosaic'],
+    ['visual-validation/ocean-generated-wave-seeds/seed-stress.final.png', 'Seed-stress sweep frame'],
+  ],
   'threejs-rain-snow-and-wet-surfaces': [
     ['visual-validation/rain-generated-ripples/final.design.png', 'Final design frame — wet surface with generated ripples'],
     ['visual-validation/rain-generated-ripples/no-post.design.png', 'No-post baseline'],
@@ -57,6 +63,7 @@ const VALIDATION = {
 };
 
 const GALLERY = [
+  { img: 'visual-validation/ocean-generated-wave-seeds/final.design.png', title: 'Spectral ocean — generated wave seeds', note: 'threejs-spectral-ocean · FFT cascade ocean from the fixed-view visual contract', link: 'threejs-spectral-ocean' },
   { img: 'visual-validation/planet-generated-craters/final.design.png', title: 'Procedural planet — crater field', note: 'threejs-procedural-planets · final design frame from the fixed-view visual contract', link: 'threejs-procedural-planets' },
   { img: 'visual-validation/water-generated-caustics/final.design.png', title: 'Bounded water — generated caustics', note: 'threejs-water-optics · differential-area caustics with depth-aware refraction', link: 'threejs-water-optics' },
   { img: 'visual-validation/rain-generated-ripples/final.design.png', title: 'Rain — generated ripple normals', note: 'threejs-rain-snow-and-wet-surfaces · wet-surface ripples from generated normal variants', link: 'threejs-rain-snow-and-wet-surfaces' },
