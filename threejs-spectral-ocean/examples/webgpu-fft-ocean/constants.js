@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 export const TAU = Math.PI * 2;
+export const CAPILLARY_SURFACE_TENSION_OVER_DENSITY = 7.28e-5;
 export const OCEAN_STORAGE_TEXTURES_PER_CASCADE = 17;
 
 export const OCEAN_QUALITY_TIERS = Object.freeze( {
@@ -70,6 +71,7 @@ export const DEFAULT_OCEAN_CONFIG = Object.freeze( {
 	boundaryFactor: 6,
 	depthMeters: 500,
 	gravity: 9.81,
+	capillarySurfaceTensionOverDensity: CAPILLARY_SURFACE_TENSION_OVER_DENSITY,
 	choppiness: 1.3,
 	foamRecovery: 0.22,
 	foamThreshold: 0.4,
@@ -183,6 +185,10 @@ export function validateOceanConfig( config ) {
 		errors.push( 'gravity must be finite and positive' );
 	}
 
+	if ( ! Number.isFinite( config.capillarySurfaceTensionOverDensity ) || config.capillarySurfaceTensionOverDensity < 0 ) {
+		errors.push( 'capillarySurfaceTensionOverDensity must be finite and non-negative' );
+	}
+
 	if ( ! Number.isFinite( config.choppiness ) || config.choppiness < 0 ) {
 		errors.push( 'choppiness must be finite and non-negative' );
 	}
@@ -228,6 +234,7 @@ export function createCascadeDescriptors( config ) {
 		cutoffHigh: index === patchLengths.length - 1 ? 9999 : handoff( index + 1 ),
 		seed: ( config.seed + index * 1013 ) >>> 0,
 		gravity: config.gravity,
+		capillarySurfaceTensionOverDensity: config.capillarySurfaceTensionOverDensity,
 		depthMeters: config.depthMeters,
 		choppiness: config.choppiness,
 		foamRecovery: config.foamRecovery,

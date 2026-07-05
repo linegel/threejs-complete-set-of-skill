@@ -56,6 +56,11 @@ function complexI( a ) {
 	return vec2( a.y.negate(), a.x );
 }
 
+function packTwoRealFields( a, b ) {
+	// Pack G(k)=A(k)+i*B(k); .zw is spare capacity in the current four-texture layout.
+	return vec4( a.x.sub( b.y ), a.y.add( b.x ), 0.0, 0.0 );
+}
+
 function spectrumParameters( lobe, gravity ) {
 	return {
 		...lobe,
@@ -76,6 +81,7 @@ function scalarUniformsFromCascade( cascade ) {
 		cutoffHigh: cascade.cutoffHigh,
 		seed: cascade.seed,
 		gravity: cascade.gravity,
+		capillarySurfaceTensionOverDensity: cascade.capillarySurfaceTensionOverDensity,
 		depthMeters: cascade.depthMeters,
 		choppiness: cascade.choppiness,
 		foamRecovery: cascade.foamRecovery,
@@ -113,16 +119,21 @@ function gaussianPair( cell, seed ) {
 	return vec2( radius.mul( cos( phase ) ), radius.mul( sin( phase ) ) );
 }
 
-function dispersion( k, gravity, depthMeters ) {
-	return sqrt( gravity.mul( k ).mul( min( k.mul( depthMeters ), 20.0 ).tanh() ) );
+function dispersion( k, gravity, depthMeters, capillarySurfaceTensionOverDensity ) {
+	const gravityCapillary = gravity.mul( k ).add( capillarySurfaceTensionOverDensity.mul( k ).mul( k ).mul( k ) );
+	return sqrt( gravityCapillary.mul( min( k.mul( depthMeters ), 20.0 ).tanh() ) );
 }
 
-function dispersionDerivative( k, gravity, depthMeters ) {
+function dispersionDerivative( k, gravity, depthMeters, capillarySurfaceTensionOverDensity ) {
 	const kh = min( k.mul( depthMeters ), 20.0 );
 	const tanhKh = kh.tanh();
 	const coshKh = kh.cosh();
-	const omega = max( dispersion( k, gravity, depthMeters ), 1e-6 );
-	return gravity.mul( tanhKh.add( depthMeters.mul( k ).div( coshKh.mul( coshKh ) ) ) ).div( omega.mul( 2.0 ) );
+	const gravityCapillary = gravity.mul( k ).add( capillarySurfaceTensionOverDensity.mul( k ).mul( k ).mul( k ) );
+	const gravityCapillaryDerivative = gravity.add( capillarySurfaceTensionOverDensity.mul( 3.0 ).mul( k ).mul( k ) );
+	const omega = max( dispersion( k, gravity, depthMeters, capillarySurfaceTensionOverDensity ), 1e-6 );
+	return gravityCapillaryDerivative.mul( tanhKh )
+		.add( gravityCapillary.mul( depthMeters ).div( coshKh.mul( coshKh ) ) )
+		.div( omega.mul( 2.0 ) );
 }
 
 function tmaCorrection( omega, gravity, depthMeters ) {
@@ -193,14 +204,14 @@ export function createSpectrumInitNode( cascade, targets ) {
 		const kVec = centered.mul( deltaK );
 		const kLength = length( kVec );
 		const kSafe = max( kLength, constants.cutoffLow );
-		const inBand = step( constants.cutoffLow, kLength ).mul( step( kLength, constants.cutoffHigh ) );
+		const inBand = step( constants.cutoffLow, kLength ).mul( select( kLength.lessThan( constants.cutoffHigh ), 1.0, 0.0 ) );
 		const uniforms = Object.fromEntries( Object.entries( constants ).map( ( [ key, value ] ) => [ key, float( value ) ] ) );
-		const omega = dispersion( kSafe, uniforms.gravity, uniforms.depthMeters );
+		const omega = dispersion( kSafe, uniforms.gravity, uniforms.depthMeters, uniforms.capillarySurfaceTensionOverDensity );
 		const theta = atan( kVec.y, kVec.x );
 		const localEnergy = jonswapEnergy( omega, kSafe, theta, lobeParams( 'local', uniforms ), uniforms );
 		const swellEnergy = jonswapEnergy( omega, kSafe, theta, lobeParams( 'swell', uniforms ), uniforms );
 		const energy = localEnergy.add( swellEnergy );
-		const derivative = abs( dispersionDerivative( kSafe, uniforms.gravity, uniforms.depthMeters ) );
+		const derivative = abs( dispersionDerivative( kSafe, uniforms.gravity, uniforms.depthMeters, uniforms.capillarySurfaceTensionOverDensity ) );
 		const amplitude = sqrt( max( energy.mul( 2.0 ).mul( derivative ).mul( deltaK ).mul( deltaK ).div( kSafe ), 0.0 ) ).mul( inBand );
 		const gaussian = gaussianPair( cell, constants.seed );
 		const h = gaussian.mul( amplitude );
@@ -214,13 +225,13 @@ export function createSpectrumInitNode( cascade, targets ) {
 		const mirroredKVec = mirroredCentered.mul( deltaK );
 		const mirroredKLength = length( mirroredKVec );
 		const mirroredKSafe = max( mirroredKLength, constants.cutoffLow );
-		const mirroredInBand = step( constants.cutoffLow, mirroredKLength ).mul( step( mirroredKLength, constants.cutoffHigh ) );
-		const mirroredOmega = dispersion( mirroredKSafe, uniforms.gravity, uniforms.depthMeters );
+		const mirroredInBand = step( constants.cutoffLow, mirroredKLength ).mul( select( mirroredKLength.lessThan( constants.cutoffHigh ), 1.0, 0.0 ) );
+		const mirroredOmega = dispersion( mirroredKSafe, uniforms.gravity, uniforms.depthMeters, uniforms.capillarySurfaceTensionOverDensity );
 		const mirroredTheta = atan( mirroredKVec.y, mirroredKVec.x );
 		const mirroredLocalEnergy = jonswapEnergy( mirroredOmega, mirroredKSafe, mirroredTheta, lobeParams( 'local', uniforms ), uniforms );
 		const mirroredSwellEnergy = jonswapEnergy( mirroredOmega, mirroredKSafe, mirroredTheta, lobeParams( 'swell', uniforms ), uniforms );
 		const mirroredEnergy = mirroredLocalEnergy.add( mirroredSwellEnergy );
-		const mirroredDerivative = abs( dispersionDerivative( mirroredKSafe, uniforms.gravity, uniforms.depthMeters ) );
+		const mirroredDerivative = abs( dispersionDerivative( mirroredKSafe, uniforms.gravity, uniforms.depthMeters, uniforms.capillarySurfaceTensionOverDensity ) );
 		const mirroredAmplitude = sqrt( max( mirroredEnergy.mul( 2.0 ).mul( mirroredDerivative ).mul( deltaK ).mul( deltaK ).div( mirroredKSafe ), 0.0 ) ).mul( mirroredInBand );
 		const mirroredGaussian = gaussianPair( mirrored, constants.seed );
 		const mirroredH = mirroredGaussian.mul( mirroredAmplitude );
@@ -253,29 +264,38 @@ export function createEvolutionNode( cascade, fieldIndex, targets ) {
 		const centered = vec2( cell ).sub( constants.resolution * 0.5 );
 		const kVec = centered.mul( TAU / constants.patchLength );
 		const kLength = max( length( kVec ), 1e-4 );
-		const omega = dispersion( kLength, float( constants.gravity ), float( constants.depthMeters ) );
+		const omega = dispersion( kLength, float( constants.gravity ), float( constants.depthMeters ), float( constants.capillarySurfaceTensionOverDensity ) );
 		const phase = vec2( cos( omega.mul( time ) ), sin( omega.mul( time ) ) );
 		const h = complexMul( initial.xy, phase ).add( complexMul( initial.zw, complexConjugate( phase ) ) );
 		const ih = complexI( h );
 		const kx = kVec.x;
 		const kz = kVec.y;
-		const dx = ih.mul( kx.div( kLength ) );
-		const dz = ih.mul( kz.div( kLength ) );
-		const slopeX = ih.mul( kx );
-		const slopeZ = ih.mul( kz );
-		const dxx = h.mul( kx.mul( kx ).div( kLength ).negate() );
-		const dzz = h.mul( kz.mul( kz ).div( kLength ).negate() );
-		const cross = h.mul( kx.mul( kz ).div( kLength ).negate() );
+		// Nyquist bins (cell 0 in either axis, centered k = -N/2*deltaK) have no +k
+		// partner on the grid, so k-multiplier fields are non-Hermitian there and would
+		// leak imaginary residue into the packed partner lane; zero derivative spectra
+		// on those bins. h itself is self-conjugate at Nyquist and stays.
+		const derivativeNyquistMask = select(
+			int( cell.x ).equal( 0 ).or( int( cell.y ).equal( 0 ) ),
+			float( 0.0 ),
+			float( 1.0 )
+		);
+		const dx = ih.mul( kx.div( kLength ) ).mul( derivativeNyquistMask );
+		const dz = ih.mul( kz.div( kLength ) ).mul( derivativeNyquistMask );
+		const slopeX = ih.mul( kx ).mul( derivativeNyquistMask );
+		const slopeZ = ih.mul( kz ).mul( derivativeNyquistMask );
+		const dxx = h.mul( kx.mul( kx ).div( kLength ).negate() ).mul( derivativeNyquistMask );
+		const dzz = h.mul( kz.mul( kz ).div( kLength ).negate() ).mul( derivativeNyquistMask );
+		const cross = h.mul( kx.mul( kz ).div( kLength ).negate() ).mul( derivativeNyquistMask );
 		const packed = vec4().toVar();
 
 		If( int( fieldIndex ).equal( PACKED_FIELD_LAYOUT.horizontalDisplacement ), () => {
-			packed.assign( vec4( dx.x, dz.x, dx.y, dz.y ) );
+			packed.assign( packTwoRealFields( dx, dz ) );
 		} ).ElseIf( int( fieldIndex ).equal( PACKED_FIELD_LAYOUT.heightAndCrossDerivative ), () => {
-			packed.assign( vec4( h.x, cross.x, h.y, cross.y ) );
+			packed.assign( packTwoRealFields( h, cross ) );
 		} ).ElseIf( int( fieldIndex ).equal( PACKED_FIELD_LAYOUT.heightSlopes ), () => {
-			packed.assign( vec4( slopeX.x, slopeZ.x, slopeX.y, slopeZ.y ) );
+			packed.assign( packTwoRealFields( slopeX, slopeZ ) );
 		} ).Else( () => {
-			packed.assign( vec4( dxx.x, dzz.x, dxx.y, dzz.y ) );
+			packed.assign( packTwoRealFields( dxx, dzz ) );
 		} );
 
 		textureStore( outputTex, cell, packed ).toWriteOnly();

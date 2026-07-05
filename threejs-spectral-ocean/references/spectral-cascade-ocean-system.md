@@ -116,10 +116,11 @@ Evaluate safe inputs before applying the in-band mask:
 
 ```ts
 const kSafe = max( kLength, cutoffLow );
-const inBand = step( cutoffLow, kLength ).mul( step( kLength, cutoffHigh ) );
+const inBand = step( cutoffLow, kLength ).mul( kLength < cutoffHigh ? 1 : 0 );
 ```
 
 Never rely on multiplication by zero to hide singular values. Debug every cascade as a centered spectrum heatmap. Adjacent bands may touch at a boundary; they must not broadly overlap or leave visible holes.
+Treat bands as half-open `[low, high)` intervals so a Fourier bin exactly on a cascade boundary contributes to only one cascade.
 
 ## 4. Directional Spectrum And Stable Seeds
 
@@ -129,8 +130,16 @@ For each centered grid coordinate:
 
 ```text
 k = (gridIndex - N/2) * deltaK
-omega(k) = sqrt(g * |k| * tanh(min(|k| * depth, 20)))
+omega(k) = sqrt((g * |k| + sigma/rho * |k|^3) * tanh(min(|k| * depth, 20)))
 ```
+
+For water near 20 C, use `sigma/rho = 7.28e-5 m^3/s^2`. The capillary-gravity crossover is:
+
+```text
+k_sigma = sqrt(g * rho / sigma) = sqrt(g / (sigma/rho))
+```
+
+For a 5 m patch at `N = 512`, `k_max = pi * N / L ~= 322 rad/m` and `k_sigma ~= 364 rad/m`. At the band top, the capillary/gravity ratio is `(sigma/rho) * k_max^2 / g ~= 0.8`, so the capillary-gravity phase speed is about 34% higher than the gravity-only value and omitting the term incurs that scale of phase-speed error. This is not a `>> 1` regime, but it is large enough to decorrelate short-wave phase.
 
 The sea state sums local wind sea and swell:
 
@@ -210,6 +219,26 @@ field 2: height slope X + i height slope Z
 field 3: horizontal derivative XX + i horizontal derivative ZZ
 ```
 
+For each pair `(A, B)` of Hermitian complex spectra, pack the complex IFFT input as:
+
+```text
+G(k) = A(k) + i * B(k)
+G.re = A.re - B.im
+G.im = A.im + B.re
+```
+
+After the 2D inverse FFT, `out.re = a(x)` and `out.im = b(x)`. Component-interleaving as `[A.re, B.re, A.im, B.im]` is wrong for this assembly path: the sine/odd half of each real field remains in the second complex lane and is discarded if assembly reads only `.xy`.
+
+The lane separation `out.re = a`, `out.im = b` holds only while both packed spectra are
+Hermitian on the grid. The k-multiplier fields (displacement, slopes, second derivatives,
+cross derivative) break Hermitian symmetry on Nyquist bins — cell 0 in either axis carries
+`k = -N/2 * deltaK` with no `+N/2` partner on the grid, so an odd-in-k multiplier cannot pair
+with its conjugate there. Zero derivative spectra on those bins (`derivativeNyquistMask` in
+the evolve kernel); the height spectrum is self-conjugate at Nyquist and needs no mask.
+Skipping the mask leaks each field's imaginary residual into its packing partner's lane —
+a few percent of RMS height that a zero-partner parity test cannot see. The validator's
+non-zero-partner parity gate (`dftPartnerParity`) exists to catch exactly this class.
+
 Document unpacking algebra next to the field contract. A swapped real/imaginary sign can look plausible while rotating or mirroring the sea.
 
 ## 6. Compute Inverse FFT Schedule
@@ -263,18 +292,22 @@ Ping-pong between a field texture and scratch texture. Never let two logical fie
 Stage ordering:
 
 ```js
-for ( let stage = 0; stage < logN; stage++ ) {
-  await renderer.computeAsync( horizontalNodesForStage[ stage ] );
-}
+const orderedNodes = [
+  ...evolutionNodes,
+  ...bitReverseXNodes,
+  ...horizontalStage0Nodes,
+  ...horizontalStage1Nodes,
+  ...bitReverseYNodes,
+  ...verticalStage0Nodes,
+  ...verticalStage1Nodes,
+  ...centeringAndAssemblyNodes,
+];
 
-for ( let stage = 0; stage < logN; stage++ ) {
-  await renderer.computeAsync( verticalNodesForStage[ stage ] );
-}
-
-await renderer.computeAsync( centeringAndAssemblyNodes );
+await renderer.computeAsync( orderedNodes );
 ```
 
 Batch independent fields at the same stage when resource ownership is clear. Advance to the next stage only after the whole-grid writes for the current stage are visible. Use `workgroupBarrier()` only for synchronization inside a workgroup; it is not a substitute for ordered whole-grid stage boundaries.
+With Three.js `computeAsync()` arrays, nodes are iterated in array order inside the compute pass. This allows one ordered submission per cascade while preserving the ping-pong dependency chain between adjacent FFT stages.
 
 ## 7. Hard Validation Gate
 
@@ -356,6 +389,12 @@ jzz = 1 + lambda * dDz/dz
 jxz = lambda * dDz/dx
 J = jxx * jzz - jxz²
 ```
+
+The single stored cross derivative is exact. In frequency space,
+`D_x_hat = i * (kx / k) * h_hat` and `D_z_hat = i * (kz / k) * h_hat`, so
+`dDx/dz = F^-1[-kx * kz / k * h_hat] = dDz/dx`. Therefore
+`det = jxx * jzz - (lambda * dDzdx)^2` is exact per cascade and remains exact
+after summing cascades.
 
 Low or negative `J` identifies real fold/compression regions. Store persistent per-texel history in ping-ponged storage initialized to `1`.
 

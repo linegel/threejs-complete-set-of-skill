@@ -351,16 +351,21 @@ export class WebGPUFftOcean {
 		const logResolution = Math.log2( this.config.resolution );
 
 		for ( const cascade of this.cascades ) {
-			await submitCompute( this.renderer, cascade.evolutionNodes );
-			await submitCompute( this.renderer, cascade.fftPlans.map( ( plan ) => plan.bitReverseX ) );
+			const orderedNodes = [
+				...cascade.evolutionNodes,
+				...cascade.fftPlans.map( ( plan ) => plan.bitReverseX )
+			];
 			for ( let stage = 0; stage < logResolution; stage += 1 ) {
-				await submitCompute( this.renderer, cascade.fftPlans.map( ( plan ) => plan.horizontalStages[ stage ] ) );
+				orderedNodes.push( ...cascade.fftPlans.map( ( plan ) => plan.horizontalStages[ stage ] ) );
 			}
-			await submitCompute( this.renderer, cascade.fftPlans.map( ( plan ) => plan.bitReverseY ) );
+			orderedNodes.push( ...cascade.fftPlans.map( ( plan ) => plan.bitReverseY ) );
 			for ( let stage = 0; stage < logResolution; stage += 1 ) {
-				await submitCompute( this.renderer, cascade.fftPlans.map( ( plan ) => plan.verticalStages[ stage ] ) );
+				orderedNodes.push( ...cascade.fftPlans.map( ( plan ) => plan.verticalStages[ stage ] ) );
 			}
-			await submitCompute( this.renderer, cascade.assemblyNodes[ cascade.currentFoamHistory ] );
+			orderedNodes.push( cascade.assemblyNodes[ cascade.currentFoamHistory ] );
+			// Three.js iterates compute-node arrays in order inside one compute pass; each FFT
+			// stage reads only the prior stage's texture and writes the ping-pong target.
+			await submitCompute( this.renderer, orderedNodes );
 			cascade.currentFoamHistory = 1 - cascade.currentFoamHistory;
 		}
 	}

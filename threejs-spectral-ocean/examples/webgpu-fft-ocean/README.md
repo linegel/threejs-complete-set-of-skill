@@ -24,12 +24,13 @@ WebGPURenderer.init() + backend gate
   -> create disjoint cascade descriptors
   -> compute h0 + debug seed/spectrum/mask textures
   -> per frame:
-       evolve four packed frequency fields
-       bit-reverse X for all fields
-       horizontal FFT stages 0..log2(N)-1
-       bit-reverse Y for all fields
-       vertical FFT stages 0..log2(N)-1
-       center spectrum, assemble displacement/derivatives/Jacobian/foam
+       submit one ordered compute-node array per cascade:
+         evolve four packed frequency fields
+         bit-reverse X for all fields
+         horizontal FFT stages 0..log2(N)-1
+         bit-reverse Y for all fields
+         vertical FFT stages 0..log2(N)-1
+         center spectrum, assemble displacement/derivatives/Jacobian/foam
        render MeshStandardNodeMaterial through RenderPipeline
 ```
 
@@ -115,4 +116,4 @@ cascades * (
 )
 ```
 
-The `high` tier at 256² and 3 cascades submits 3 * (4 + 4 * (2 + 16) + 1) = 231 compute nodes before the render pipeline. Independent field stages are batched by `renderer.computeAsync()` arrays to keep stage ordering explicit.
+The `high` tier at 256² and 3 cascades runs 3 * (4 + 4 * (2 + 16) + 1) = 231 compute nodes before the render pipeline. Each cascade submits those nodes as one ordered `renderer.computeAsync()` array; Three.js iterates the array in order, so ping-pong FFT dependencies are preserved without per-stage awaits.
