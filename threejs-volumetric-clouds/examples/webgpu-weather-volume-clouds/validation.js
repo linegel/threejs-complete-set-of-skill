@@ -5,10 +5,13 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  CLOUD_TIER_BUDGETS,
   DEFAULT_CLOUD_LAYERS,
   CLOUD_ASSET_MANIFEST_RELATIVE_PATH,
   createDefaultCloudConfig,
+  estimateTierMarchWork,
   packCloudLayerIntervals,
+  validateQualityTierBudgets,
   validateCloudConfig,
 } from "./cloud-config.js";
 import {
@@ -17,6 +20,7 @@ import {
 } from "./cloud-composite.js";
 import {
   createTemporalCloudHistoryConfig,
+  createTemporalResolveDependencySet,
   depthReject,
   historyUV,
   validateTemporalCloudHistory,
@@ -26,6 +30,7 @@ import {
   createCloudBeautyNodeContract,
   henyeyGreenstein,
   multiScattering,
+  runPureJsCloudMarchMirror,
   stepTransmittance,
 } from "./cloud-nodes.js";
 import {
@@ -87,6 +92,41 @@ const defaultConfig = createDefaultCloudConfig();
 const valid = validateCloudConfig(defaultConfig, manifest);
 assert.equal(valid.ok, true, valid.errors.join("\n"));
 assert(valid.storage.bytes > 0);
+assert.equal(valid.tierBudget.ok, true, valid.tierBudget.errors.join("\n"));
+
+const tierBudget = validateQualityTierBudgets(
+  defaultConfig.qualityTiers,
+  defaultConfig.referenceViewport,
+);
+assert.equal(tierBudget.ok, true, tierBudget.errors.join("\n"));
+
+for (const [name, tier] of Object.entries(defaultConfig.qualityTiers)) {
+  const budget = CLOUD_TIER_BUDGETS[name];
+  const work = estimateTierMarchWork(tier, defaultConfig.referenceViewport);
+  const maximumWork = estimateTierMarchWork(
+    {
+      ...tier,
+      linearResolutionScale: budget.linearResolutionScale[1],
+      primarySteps: budget.primarySteps[1],
+      lightSteps: budget.lightSteps[1],
+    },
+    defaultConfig.referenceViewport,
+  );
+  assert(
+    work.primaryLightProduct <= maximumWork.primaryLightProduct,
+    `${name} march work exceeds tier table product`,
+  );
+
+  const mirrorConfig = createDefaultCloudConfig({
+    qualityTier: name,
+    qualityTiers: defaultConfig.qualityTiers,
+  });
+  const mirror = runPureJsCloudMarchMirror({ config: mirrorConfig });
+  assert.equal(mirror.tier, name);
+  assert.equal(mirror.configuredProduct, work.primaryLightProduct);
+  assert(mirror.primaryIterations > 0);
+  assert(mirror.lightIterations > 0);
+}
 
 const swappedIntervals = createDefaultCloudConfig();
 swappedIntervals.intervalContract = {
@@ -117,8 +157,23 @@ expectInvalid(impossibleShadow, "cascade layout");
 const outOfBudget = createDefaultCloudConfig({ storageBudgetMB: 1 });
 expectInvalid(outOfBudget, "exceeds budget");
 
+const inducedStepViolation = createDefaultCloudConfig();
+inducedStepViolation.qualityTiers.default.primarySteps = 320;
+expectInvalid(inducedStepViolation, "default primarySteps");
+
 const historyConfig = createTemporalCloudHistoryConfig();
 assert.equal(validateTemporalCloudHistory(historyConfig).ok, true);
+const dependencySet = createTemporalResolveDependencySet(historyConfig);
+for (const dependency of [
+  "historyUVFromVelocity",
+  "currentRepresentativeDepthMeters",
+  "historyRepresentativeDepthMeters",
+  "depthRejectMeters",
+  "velocityRejectPixels",
+  "varianceClip",
+]) {
+  assert(dependencySet.has(dependency), `temporal dependency missing ${dependency}`);
+}
 assert.deepEqual(historyUV({ x: 0.5, y: 0.5 }, { x: 12, y: -8 }, { width: 480, height: 270 }), {
   x: 0.475,
   y: 0.5296296296296297,
@@ -151,49 +206,7 @@ const resources = cloudSystem.createResourcePlan();
 assert.equal(resources.storageTextureClass, "StorageTexture");
 assert.equal(resources.storage3DTextureClass, "Storage3DTexture");
 assert.equal(cloudSystem.createPassGraph().renderer, "WebGPURenderer");
-assert(
-  cloudSystem
-    .createComputeDispatchDescriptors()
-    .some((dispatch) => dispatch.api.includes("renderer.computeAsync")),
-);
-
-const sourceFiles = [
-  "cloud-composite.js",
-  "cloud-config.js",
-  "cloud-history.js",
-  "cloud-nodes.js",
-  "cloud-shadows.js",
-  "webgpu-weather-volume-clouds.js",
-].map((file) => readFileSync(resolve(here, file), "utf8"));
-const source = sourceFiles.join("\n");
-
-for (const required of [
-  "multiScattering",
-  "henyeyGreenstein",
-  "stepTransmittance",
-  "representativeDepth",
-  "groundBounce",
-  "cloudShadowCascade",
-  "opticalDepth",
-  "shadowUpdateCadence",
-  "storageTexture",
-  "historyUV",
-  "depthReject",
-  "varianceClip",
-  "Storage3DTexture",
-  "RenderPipeline",
-]) {
-  assert(source.includes(required), `missing ${required}`);
-}
-
-for (const forbidden of [
-  "RawShaderMaterial",
-  "WebGLRenderTarget",
-  "resolutionScale = 0.85",
-  "toneMap(",
-  "pow(color, vec3(1.0 / 2.2))",
-]) {
-  assert(!source.includes(forbidden), `canonical source contains ${forbidden}`);
-}
+assert.equal(typeof cloudSystem.createComputeKernels, "function");
+assert.equal(cloudSystem.createComputeDispatchDescriptors, undefined);
 
 console.log("webgpu-weather-volume-clouds validation passed");

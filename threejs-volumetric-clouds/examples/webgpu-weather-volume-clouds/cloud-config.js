@@ -183,6 +183,29 @@ export const CLOUD_QUALITY_TIERS = Object.freeze({
   },
 });
 
+export const CLOUD_TIER_BUDGETS = Object.freeze({
+  ultra: {
+    linearResolutionScale: [0.5, 0.5],
+    primarySteps: [96, 160],
+    lightSteps: [6, 8],
+  },
+  high: {
+    linearResolutionScale: [0.5, 0.5],
+    primarySteps: [72, 120],
+    lightSteps: [4, 6],
+  },
+  default: {
+    linearResolutionScale: [0.25, 0.25],
+    primarySteps: [48, 80],
+    lightSteps: [3, 4],
+  },
+  reduced: {
+    linearResolutionScale: [0.125, 0.25],
+    primarySteps: [24, 48],
+    lightSteps: [1, 2],
+  },
+});
+
 export const DEFAULT_TEMPORAL_SETTINGS = Object.freeze({
   temporalAlpha: 0.12,
   depthRejectMeters: 120,
@@ -329,6 +352,79 @@ export function estimateCloudStorageBytes(
   };
 }
 
+export function estimateTierMarchWork(
+  tier,
+  viewport = { width: 1920, height: 1080 },
+) {
+  const low = computeCloudTargetSize(viewport, tier);
+  return {
+    lowResolution: low,
+    pixels: low.width * low.height,
+    primaryLightProduct: low.width * low.height * tier.primarySteps * tier.lightSteps,
+  };
+}
+
+export function validateQualityTierBudgets(
+  qualityTiers = CLOUD_QUALITY_TIERS,
+  viewport = { width: 1920, height: 1080 },
+) {
+  const errors = [];
+  const products = {};
+
+  for (const [name, tier] of Object.entries(qualityTiers)) {
+    const budget = CLOUD_TIER_BUDGETS[name];
+    if (!budget) {
+      errors.push(`unknown tier budget ${name}`);
+      continue;
+    }
+
+    const checks = [
+      ["linearResolutionScale", tier.linearResolutionScale],
+      ["primarySteps", tier.primarySteps],
+      ["lightSteps", tier.lightSteps],
+    ];
+
+    for (const [field, value] of checks) {
+      const [minimum, maximum] = budget[field];
+      if (value < minimum || value > maximum) {
+        errors.push(
+          `${name} ${field} ${value} outside tier table ${minimum}-${maximum}`,
+        );
+      }
+    }
+
+    const work = estimateTierMarchWork(tier, viewport);
+    const maximumTier = {
+      ...tier,
+      linearResolutionScale: budget.linearResolutionScale[1],
+      primarySteps: budget.primarySteps[1],
+      lightSteps: budget.lightSteps[1],
+    };
+    const maximumWork = estimateTierMarchWork(maximumTier, viewport);
+    products[name] = {
+      configured: work.primaryLightProduct,
+      maximum: maximumWork.primaryLightProduct,
+      lowResolution: work.lowResolution,
+    };
+
+    if (work.primaryLightProduct > maximumWork.primaryLightProduct) {
+      errors.push(
+        `${name} march work ${work.primaryLightProduct} exceeds tier table product ${maximumWork.primaryLightProduct}`,
+      );
+    }
+  }
+
+  return { ok: errors.length === 0, errors, products };
+}
+
+export function getCloudQualityTier(config) {
+  const tier = config.qualityTiers?.[config.qualityTier];
+  if (!tier) {
+    throw new Error(`unknown quality tier ${config.qualityTier}`);
+  }
+  return tier;
+}
+
 function sameIntervals(a, b) {
   if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
     return false;
@@ -424,6 +520,12 @@ export function validateCloudConfig(config, manifest) {
     errors.push("temporal reconstruction must define camera-cut reset");
   }
 
+  const tierBudget = validateQualityTierBudgets(
+    config.qualityTiers,
+    config.referenceViewport,
+  );
+  errors.push(...tierBudget.errors);
+
   const requiredShadowChannels = DEFAULT_CLOUD_SHADOW_SETTINGS.channelLayout;
   if (
     !sameStringSet(config.cloudShadow?.channelLayout, requiredShadowChannels)
@@ -459,6 +561,7 @@ export function validateCloudConfig(config, manifest) {
     warnings,
     intervals,
     storage,
+    tierBudget,
   };
 }
 

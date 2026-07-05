@@ -298,13 +298,13 @@ density =
 Height-dependent detail:
 
 ```text
-topModifier = detail^6
-bottomModifier = 1 - detail
+baseErosionModifier = detail^6
+crestModifier = 1 - detail
 
 modifier =
   mix(
-    topModifier,
-    bottomModifier,
+    baseErosionModifier,
+    crestModifier,
     remapClamped(heightFraction, 0.2, 0.4)
   )
 
@@ -316,6 +316,9 @@ density =
     1
   )
 ```
+
+This keeps strong detail erosion near the layer base and billowy inverted-detail
+shaping near the crest.
 
 Final density:
 
@@ -520,8 +523,8 @@ Per-frame targets at 1920x1080:
 Memory targets:
 
 ```text
-quarter 1920x1080 RGBA16F buffer: ~4 MB
-half 1920x1080 RGBA16F buffer: ~16 MB
+quarter-linear 1920x1080 RGBA16F buffer: 480 x 270 x 8 B = 1,036,800 B, about 1.0 MB
+half-linear 1920x1080 RGBA16F buffer: 960 x 540 x 8 B = 4,147,200 B, about 4.15 MB
 512x512 RGBA16F shadow cascade: ~2 MB
 128^3 single-channel 8-bit volume: ~2 MB
 128^3 RGBA8 volume: ~8 MB

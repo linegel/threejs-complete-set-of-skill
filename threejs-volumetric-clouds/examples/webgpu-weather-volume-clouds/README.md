@@ -1,10 +1,11 @@
 # WebGPU Weather Volume Clouds
 
 This is the canonical Phase 1 contract for `threejs-volumetric-clouds`. The
-legacy `../weather-volume-clouds/` sample remains a deprecated WebGL baseline;
-new work targets `WebGPURenderer`, TSL, storage textures, reduced-resolution
-temporal reconstruction, compact cloud-shadow cascades, and linear HDR output
-into the host image pipeline.
+legacy `../deprecated-weather-volume-clouds/` sample is quarantined because it
+violates active step-count, same-UV history, and local tone-map rules; new work
+targets `WebGPURenderer`, TSL, storage textures, reduced-resolution temporal
+reconstruction, compact cloud-shadow cascades, and linear HDR output into the
+host image pipeline.
 
 ## Checkpointed Build Order
 

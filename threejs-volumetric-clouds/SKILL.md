@@ -20,7 +20,8 @@ for new work, includes `validateCloudConfig()`, asset-manifest checks, cloud
 shadow/temporal/composite ownership modules, and must pass
 `node examples/webgpu-weather-volume-clouds/validation.js` after edits.
 
-Legacy WebGL implementation (deprecated, do not extend): `examples/weather-volume-clouds/`.
+Legacy WebGL implementation (quarantined, do not extend or use as a pattern):
+`examples/deprecated-weather-volume-clouds/`.
 
 ## Build Order
 
@@ -86,10 +87,12 @@ if (renderer.backend.isWebGPUBackend) {
 
 Budgets assume one cloud layer stack, one depth-aware upsample, one temporal
 resolve, and one shadow update amortized over 2-8 frames. Keep storage memory
-explicit: quarter-linear 1920x1080 current+history RGBA16F is about 4 MB per
-buffer; representative depth/velocity and rejection masks should stay below the
-cloud color history footprint. Shadow cascades are the largest fixed cost: a
-512x512 RGBA16F cascade is about 2 MB.
+explicit and derived: quarter-linear 1920x1080 RGBA16F is
+480 x 270 x 8 B = 1,036,800 B, about 1.0 MB per buffer; half-linear is
+960 x 540 x 8 B = 4,147,200 B, about 4.15 MB per buffer. Representative
+depth/velocity and rejection masks should stay below the cloud color history
+footprint. Shadow cascades are the largest fixed cost: a 512x512 RGBA16F
+cascade is about 2 MB.
 
 ## Required Controls
 

@@ -19,9 +19,18 @@ import {
   validateCloudConfig,
 } from "./cloud-config.js";
 import { createCloudCompositeContract } from "./cloud-composite.js";
-import { createTemporalCloudHistoryConfig } from "./cloud-history.js";
-import { createCloudBeautyNodeContract } from "./cloud-nodes.js";
-import { createCloudShadowCascadeConfig } from "./cloud-shadows.js";
+import {
+  createTemporalCloudHistoryConfig,
+  createTemporalResolveNode,
+} from "./cloud-history.js";
+import {
+  createCloudBeautyMarchNode,
+  createCloudBeautyNodeContract,
+} from "./cloud-nodes.js";
+import {
+  createCloudShadowCascadeConfig,
+  createCloudShadowMarchNode,
+} from "./cloud-shadows.js";
 
 const tslRuntimeSymbols = {
   Fn,
@@ -102,6 +111,9 @@ export class WebGPUWeatherVolumeClouds {
       linearResolutionScale:
         this.config.qualityTiers[this.config.qualityTier].linearResolutionScale,
       temporalAlpha: this.config.temporal.temporalAlpha,
+      depthRejectMeters: this.config.temporal.depthRejectMeters,
+      velocityRejectPixels: this.config.temporal.velocityRejectPixels,
+      varianceClipSigma: this.config.temporal.varianceClipSigma,
       representativeDepthTarget: this.config.temporal.representativeDepthTarget,
       velocityTarget: this.config.temporal.velocityTarget,
     });
@@ -154,35 +166,39 @@ export class WebGPUWeatherVolumeClouds {
     return this.renderer.compute(computeNode);
   }
 
-  createComputeDispatchDescriptors() {
-    return [
-      {
-        name: "field-generation",
-        api: "Fn().compute(count) + renderer.computeAsync",
-        writes: ["storageTexture3D(shape)", "storageTexture3D(shapeDetail)"],
-        cadence: "only when recipes or seeds change",
-      },
-      {
-        name: "cloud-shadow",
-        api: "Fn().compute(count) + renderer.computeAsync",
-        writes: ["storageTexture(cloudShadowCascade RGBA16F)"],
-        cadence: `every ${this.config.cloudShadow.shadowUpdateCadence} frames`,
-      },
-      {
-        name: "cloud-beauty",
-        api: "Fn().compute(count) + renderer.computeAsync",
-        writes: [
-          "storageTexture(radiance/transmittance)",
-          "storageTexture(representativeDepth/velocity)",
-        ],
-        cadence: "every frame at half/quarter linear resolution",
-      },
-      {
-        name: "temporal-resolve",
-        api: "Fn().compute(count) + renderer.computeAsync",
-        writes: ["storageTexture(history write)", "storageTexture(rejection)"],
-        cadence: "every frame after beauty pass",
-      },
-    ];
+  createComputeKernels({ targets, frame = 0 } = {}) {
+    if (!targets) {
+      throw new Error("targets are required to create cloud compute kernels");
+    }
+
+    const temporal = createTemporalCloudHistoryConfig({
+      fullWidth: this.viewport.width,
+      fullHeight: this.viewport.height,
+      linearResolutionScale:
+        this.config.qualityTiers[this.config.qualityTier].linearResolutionScale,
+      temporalAlpha: this.config.temporal.temporalAlpha,
+      depthRejectMeters: this.config.temporal.depthRejectMeters,
+      velocityRejectPixels: this.config.temporal.velocityRejectPixels,
+      varianceClipSigma: this.config.temporal.varianceClipSigma,
+      representativeDepthTarget: this.config.temporal.representativeDepthTarget,
+      velocityTarget: this.config.temporal.velocityTarget,
+    });
+
+    return {
+      cloudShadow: createCloudShadowMarchNode({
+        shadowConfig: this.config.cloudShadow,
+        targets: targets.cloudShadow,
+      }),
+      cloudBeauty: createCloudBeautyMarchNode({
+        config: this.config,
+        viewport: this.viewport,
+        targets: targets.cloudBeauty,
+        frame,
+      }),
+      temporalResolve: createTemporalResolveNode({
+        historyConfig: temporal,
+        targets: targets.temporalResolve,
+      }),
+    };
   }
 }
