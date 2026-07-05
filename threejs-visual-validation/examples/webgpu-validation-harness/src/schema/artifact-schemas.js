@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { assertNonBlankGeneratedPng } from '../png.js';
+import { assertNonBlankGeneratedPng, compareGeneratedRgbaPngs } from '../png.js';
 
 export const artifactSchemas = {
 	'visual-contract.json': {
@@ -219,6 +219,8 @@ function assertMetricTriplet( value, label ) {
 
 	requireObject( value, label );
 	requireKeys( value, [ 'median', 'p95', 'unit' ], label );
+	requireFiniteNumber( value.median, `${ label }.median` );
+	requireFiniteNumber( value.p95, `${ label }.p95` );
 
 	if ( value.unit !== 'ms' ) {
 
@@ -263,6 +265,7 @@ function validateThresholds( thresholds ) {
 	requireObject( thresholds, 'evidence-manifest.json.thresholds' );
 	requireObject( thresholds.nonblank, 'evidence-manifest.json.thresholds.nonblank' );
 	requireFiniteNumber( thresholds.nonblank.minRange, 'evidence-manifest.json.thresholds.nonblank.minRange' );
+	requireObject( thresholds.perViewPixelDiff, 'evidence-manifest.json.thresholds.perViewPixelDiff' );
 
 	if ( thresholds.nonblank.minRange <= 0 ) {
 
@@ -273,6 +276,34 @@ function validateThresholds( thresholds ) {
 	if ( thresholds.cameraMatrixRequired !== true ) {
 
 		throw new Error( 'evidence-manifest.json.thresholds.cameraMatrixRequired must be true.' );
+
+	}
+
+	if ( Object.hasOwn( thresholds, 'budgetProfile' ) ) {
+
+		requireString( thresholds.budgetProfile, 'evidence-manifest.json.thresholds.budgetProfile' );
+
+	}
+
+	if ( Object.keys( thresholds.perViewPixelDiff ).length === 0 ) {
+
+		throw new Error( 'evidence-manifest.json.thresholds.perViewPixelDiff must declare at least one PNG comparison.' );
+
+	}
+
+	for ( const [ view, record ] of Object.entries( thresholds.perViewPixelDiff ) ) {
+
+		requireObject( record, `evidence-manifest.json.thresholds.perViewPixelDiff.${ view }` );
+		requireKeys( record, [ 'baseline', 'candidate', 'maxRatio' ], `evidence-manifest.json.thresholds.perViewPixelDiff.${ view }` );
+		requireString( record.baseline, `evidence-manifest.json.thresholds.perViewPixelDiff.${ view }.baseline` );
+		requireString( record.candidate, `evidence-manifest.json.thresholds.perViewPixelDiff.${ view }.candidate` );
+		requireFiniteNumber( record.maxRatio, `evidence-manifest.json.thresholds.perViewPixelDiff.${ view }.maxRatio` );
+
+		if ( record.maxRatio < 0 || record.maxRatio > 1 ) {
+
+			throw new Error( `evidence-manifest.json.thresholds.perViewPixelDiff.${ view }.maxRatio must be in [0, 1].` );
+
+		}
 
 	}
 
@@ -482,6 +513,28 @@ export function validateVisualContract( contract ) {
 
 	}
 
+	requireObject( contract.frameBudgetMs, 'visual-contract.json.frameBudgetMs' );
+
+	for ( const key of [ 'desktopDiscrete', 'desktopIntegrated', 'mobile' ] ) {
+
+		requireFiniteNumber( contract.frameBudgetMs[ key ], `visual-contract.json.frameBudgetMs.${ key }` );
+
+		if ( contract.frameBudgetMs[ key ] <= 0 ) {
+
+			throw new Error( `visual-contract.json.frameBudgetMs.${ key } must be positive.` );
+
+		}
+
+	}
+
+	requireFiniteNumber( contract.memoryBudgetMB, 'visual-contract.json.memoryBudgetMB' );
+
+	if ( contract.memoryBudgetMB <= 0 ) {
+
+		throw new Error( 'visual-contract.json.memoryBudgetMB must be positive.' );
+
+	}
+
 	for ( const invariant of contract.invariants ) {
 
 		const binding = contract.invariantArtifacts[ invariant ];
@@ -497,6 +550,115 @@ export function validateVisualContract( contract ) {
 	}
 
 	return true;
+
+}
+
+function getBudgetProfile( manifest, contract ) {
+
+	const profile = manifest.thresholds.budgetProfile ?? 'desktopDiscrete';
+
+	if ( Object.hasOwn( contract.frameBudgetMs, profile ) === false ) {
+
+		throw new Error( `Budget profile "${ profile }" is not present in visual-contract.json.frameBudgetMs.` );
+
+	}
+
+	return profile;
+
+}
+
+function makeBudgetResult( name, state, measured, budget, detail ) {
+
+	return { name, state, measured, budget, detail };
+
+}
+
+function assertPassOrThrow( result, strict ) {
+
+	if ( result.state === 'FAIL' ) {
+
+		throw new Error( `${ result.name } exceeded budget: measured ${ result.measured } > budget ${ result.budget }. ${ result.detail }` );
+
+	}
+
+	if ( strict === true && result.state === 'SKIP' ) {
+
+		throw new Error( `${ result.name } is SKIP under --strict. ${ result.detail }` );
+
+	}
+
+}
+
+function evaluateBudgetSummary( contract, manifest, timings, renderTargets, storageResources, strict = false ) {
+
+	const profile = getBudgetProfile( manifest, contract );
+	const frameBudget = contract.frameBudgetMs[ profile ];
+	const memoryBudgetBytes = contract.memoryBudgetMB * 1024 * 1024;
+	const results = [];
+
+	if ( timings.cpuFrameMs !== null && typeof timings.cpuFrameMs === 'object' && Number.isFinite( timings.cpuFrameMs.median ) ) {
+
+		const measured = timings.cpuFrameMs.median;
+		results.push( makeBudgetResult(
+			'cpuFrameMs.median',
+			measured <= frameBudget ? 'PASS' : 'FAIL',
+			measured,
+			frameBudget,
+			`profile=${ profile }`
+		) );
+
+	}
+
+	if ( timings.gpuTimingUnavailable === true ) {
+
+		results.push( makeBudgetResult(
+			'gpuFrameMs.median',
+			'SKIP',
+			null,
+			frameBudget,
+			'GPU timestamp timing unavailable; CPU-only proxy cannot prove GPU headroom.'
+		) );
+
+	} else if ( timings.gpuFrameMs !== null && typeof timings.gpuFrameMs === 'object' && Number.isFinite( timings.gpuFrameMs.median ) ) {
+
+		const measured = timings.gpuFrameMs.median;
+		results.push( makeBudgetResult(
+			'gpuFrameMs.median',
+			measured <= frameBudget ? 'PASS' : 'FAIL',
+			measured,
+			frameBudget,
+			`profile=${ profile }`
+		) );
+
+	}
+
+	const renderTargetMemoryBytes = Number.isFinite( timings.renderTargetMemoryBytes ) ? timings.renderTargetMemoryBytes : renderTargets.totalBytes;
+	const storageMemoryBytes = Number.isFinite( timings.storageMemoryBytes ) ? timings.storageMemoryBytes : storageResources.totalBytes;
+
+	if ( Number.isFinite( renderTargetMemoryBytes ) || Number.isFinite( storageMemoryBytes ) ) {
+
+		const measured = ( Number.isFinite( renderTargetMemoryBytes ) ? renderTargetMemoryBytes : 0 ) + ( Number.isFinite( storageMemoryBytes ) ? storageMemoryBytes : 0 );
+		results.push( makeBudgetResult(
+			'totalGpuMemoryBytes',
+			measured <= memoryBudgetBytes ? 'PASS' : 'FAIL',
+			measured,
+			memoryBudgetBytes,
+			`memoryBudgetMB=${ contract.memoryBudgetMB }`
+		) );
+
+	}
+
+	for ( const result of results ) {
+
+		assertPassOrThrow( result, strict );
+
+	}
+
+	return {
+		strict,
+		profile,
+		results
+	};
 
 }
 
@@ -599,6 +761,54 @@ export function validateTimings( timings ) {
 	}
 
 	return true;
+
+}
+
+function resolveBundlePath( artifactDir, relativePath, label ) {
+
+	if ( relativePath.startsWith( '/' ) || relativePath.includes( '..' ) ) {
+
+		throw new Error( `${ label } must be a bundle-relative path without "..".` );
+
+	}
+
+	return join( artifactDir, relativePath );
+
+}
+
+async function evaluatePixelDiffSummary( artifactDir, manifest ) {
+
+	const records = manifest.thresholds.perViewPixelDiff;
+	const results = [];
+
+	for ( const [ view, record ] of Object.entries( records ) ) {
+
+		const baseline = await readFile( resolveBundlePath( artifactDir, record.baseline, `perViewPixelDiff.${ view }.baseline` ) );
+		const candidate = await readFile( resolveBundlePath( artifactDir, record.candidate, `perViewPixelDiff.${ view }.candidate` ) );
+		const diff = compareGeneratedRgbaPngs( baseline, candidate );
+		const result = {
+			view,
+			state: diff.ratio <= record.maxRatio ? 'PASS' : 'FAIL',
+			ratio: diff.ratio,
+			maxRatio: record.maxRatio,
+			differingPixels: diff.differingPixels,
+			totalPixels: diff.totalPixels,
+			maxChannelDelta: diff.maxChannelDelta,
+			baseline: record.baseline,
+			candidate: record.candidate
+		};
+
+		if ( result.state === 'FAIL' ) {
+
+			throw new Error( `perViewPixelDiff.${ view } exceeded threshold: ratio ${ result.ratio } > ${ result.maxRatio }.` );
+
+		}
+
+		results.push( result );
+
+	}
+
+	return { results };
 
 }
 
@@ -750,7 +960,7 @@ export async function readJson( path ) {
 
 }
 
-export async function validateArtifactBundle( artifactDir ) {
+export async function validateArtifactBundle( artifactDir, options = {} ) {
 
 	const contract = await readJson( join( artifactDir, 'visual-contract.json' ) );
 	const manifest = await readJson( join( artifactDir, 'evidence-manifest.json' ) );
@@ -767,6 +977,9 @@ export async function validateArtifactBundle( artifactDir ) {
 	validateTimings( timings );
 	validateLeakLoop( leakLoop );
 
+	const budgetSummary = evaluateBudgetSummary( contract, manifest, timings, renderTargets, storageResources, options.strict === true );
+	const pixelDiffSummary = await evaluatePixelDiffSummary( artifactDir, manifest );
+
 	const nonblankImages = {};
 	for ( const imagePath of contract.requiredImages ) {
 
@@ -779,7 +992,11 @@ export async function validateArtifactBundle( artifactDir ) {
 		sceneId: manifest.sceneId,
 		requiredArtifacts: Object.keys( artifactSchemas ),
 		requiredImages: contract.requiredImages,
-		nonblankImages
+		nonblankImages,
+		summary: {
+			budgets: budgetSummary,
+			perViewPixelDiff: pixelDiffSummary
+		}
 	};
 
 }

@@ -16,12 +16,29 @@ function getOutputDirectory() {
 
 }
 
+function hasFlag( name ) {
+
+	return process.argv.includes( name );
+
+}
+
+function getOptionValue( name ) {
+
+	const index = process.argv.indexOf( name );
+	return index !== -1 ? process.argv[ index + 1 ] : null;
+
+}
+
 const artifactDir = getOutputDirectory();
-const result = await writeDefaultEvidenceBundle( artifactDir );
+const result = await writeDefaultEvidenceBundle( artifactDir, {
+	strict: hasFlag( '--strict' ),
+	fixture: getOptionValue( '--fixture' )
+} );
 
 console.log( JSON.stringify( {
 	artifactDir,
 	sceneId: result.sceneId,
 	requiredArtifacts: result.requiredArtifacts,
-	requiredImages: result.requiredImages
+	requiredImages: result.requiredImages,
+	summary: result.summary
 }, null, 2 ) );

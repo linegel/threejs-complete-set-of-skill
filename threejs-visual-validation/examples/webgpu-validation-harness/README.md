@@ -11,6 +11,10 @@ Run:
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate -- --out /tmp/threejs-validation-demo
 ```
 
+Use `--strict` when GPU timestamp skips must fail the run. Use
+`--fixture over-budget` or `--fixture pixel-diff-fail` to exercise the
+committed negative fixtures.
+
 Expected result: `/tmp/threejs-validation-demo` contains
 `visual-contract.json`, `evidence-manifest.json`, `renderer-info.json`,
 `render-targets.json`, `storage-resources.json`, `timings.json`,
@@ -19,10 +23,11 @@ Expected result: `/tmp/threejs-validation-demo` contains
 The validation script runs `src/validate.js`, which writes the bundle and then
 executes `src/self-test.js`. The self-test corrupts generated bundles and proves
 that final-only contracts, blank no-post PNGs, unlabelled CPU-only GPU timing,
-GPU timing without a render timestamp, missing manifest `browser` / `os` /
-`assets`, stale reduced-tier labels, manual camera evidence, leak deltas over
-threshold, missing lifecycle loops, and fractional WebGPU readback strides are
-rejected.
+GPU timing without a render timestamp, strict GPU timing skips, over-budget
+timing fixtures, pixel-diff fixtures above threshold, missing manifest
+`browser` / `os` / `assets`, stale reduced-tier labels, manual camera evidence,
+leak deltas over threshold, missing lifecycle loops, and fractional WebGPU
+readback strides are rejected.
 
 ## Step 1 — Backend Manifest
 
@@ -76,7 +81,10 @@ Inspect `images/temporal.t000.png`, `images/temporal.t001.png`, and
 `timings.json`.
 
 Expected: timing records either GPU timestamp metrics or the exact label
-`CPU-only proxy`. Missing GPU timing is not zero GPU cost.
+`CPU-only proxy`. Missing GPU timing is reported as an explicit `SKIP` budget
+verdict, not zero GPU cost; `--strict` turns that skip into a failure. Supplied
+CPU/GPU medians and target/storage memory are compared to the selected manifest
+budget profile and `memoryBudgetMB`.
 
 ## Step 7 — Leak Loop
 

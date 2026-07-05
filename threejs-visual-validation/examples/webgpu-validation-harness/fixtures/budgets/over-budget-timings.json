@@ -1,0 +1,31 @@
+{
+  "required": true,
+  "warmupFrames": 16,
+  "sampleFrames": 120,
+  "cpuFrameMs": {
+    "median": 9.5,
+    "p95": 12.25,
+    "unit": "ms"
+  },
+  "gpuFrameMs": {
+    "median": 9.25,
+    "p95": 11.75,
+    "unit": "ms"
+  },
+  "gpuTimingUnavailable": false,
+  "gpuTimingLabel": "GPU timestamp",
+  "renderTimestampMs": 9.25,
+  "computeTimestampMs": null,
+  "readbackCaptureMs": {
+    "median": 0.3,
+    "p95": 0.5,
+    "unit": "ms"
+  },
+  "drawCalls": 1,
+  "triangles": 2,
+  "passCount": 1,
+  "dispatchCount": 0,
+  "renderTargetMemoryBytes": 147456,
+  "storageMemoryBytes": 0,
+  "qualityTierChanges": []
+}

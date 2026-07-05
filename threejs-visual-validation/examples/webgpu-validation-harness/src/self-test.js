@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -39,6 +39,13 @@ async function makeBundle() {
 	const dir = await mkdtemp( join( tmpdir(), 'threejs-visual-validation-' ) );
 	await writeDefaultEvidenceBundle( dir );
 	return dir;
+
+}
+
+async function copyFixture( dir, name ) {
+
+	await mkdir( join( dir, 'fixtures/pixel-diff' ), { recursive: true } );
+	await copyFile( new URL( `../fixtures/pixel-diff/${ name }`, import.meta.url ), join( dir, 'fixtures/pixel-diff', name ) );
 
 }
 
@@ -133,6 +140,118 @@ async function testGpuTimingTimestampRejects() {
 			'GPU timing without render timestamp',
 			() => validateArtifactBundle( dir ),
 			/renderTimestampMs/,
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
+async function testStrictGpuTimingUnavailableRejects() {
+
+	const dir = await makeBundle();
+
+	try {
+
+		return await expectRejects(
+			'strict GPU timing unavailable',
+			() => validateArtifactBundle( dir, { strict: true } ),
+			/SKIP under --strict/,
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
+async function testOverBudgetRejects() {
+
+	const dir = await makeBundle();
+
+	try {
+
+		const timings = JSON.parse( await readFile( new URL( '../fixtures/budgets/over-budget-timings.json', import.meta.url ), 'utf8' ) );
+		await writeJson( join( dir, 'timings.json' ), timings );
+
+		return await expectRejects(
+			'over-budget fixture',
+			() => validateArtifactBundle( dir ),
+			/cpuFrameMs\.median exceeded budget/,
+		);
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
+async function testPixelDiffIdenticalPasses() {
+
+	const dir = await makeBundle();
+
+	try {
+
+		await copyFixture( dir, 'identical-a.png' );
+		await copyFixture( dir, 'identical-b.png' );
+
+		const manifestPath = join( dir, 'evidence-manifest.json' );
+		const manifest = await readJson( manifestPath );
+		manifest.thresholds.perViewPixelDiff.final = {
+			baseline: 'fixtures/pixel-diff/identical-a.png',
+			candidate: 'fixtures/pixel-diff/identical-b.png',
+			maxRatio: 0
+		};
+		await writeJson( manifestPath, manifest );
+
+		const result = await validateArtifactBundle( dir );
+		const diff = result.summary.perViewPixelDiff.results.find( ( entry ) => entry.view === 'final' );
+
+		if ( diff?.state !== 'PASS' || diff.ratio !== 0 ) {
+
+			throw new Error( 'identical pixel-diff fixture did not pass at ratio 0.' );
+
+		}
+
+		return { label: 'identical pixel-diff fixture', passed: true, ratio: diff.ratio };
+
+	} finally {
+
+		await rm( dir, { recursive: true, force: true } );
+
+	}
+
+}
+
+async function testPixelDiffRejects( label, baseline, candidate ) {
+
+	const dir = await makeBundle();
+
+	try {
+
+		await copyFixture( dir, baseline );
+		await copyFixture( dir, candidate );
+
+		const manifestPath = join( dir, 'evidence-manifest.json' );
+		const manifest = await readJson( manifestPath );
+		manifest.thresholds.perViewPixelDiff.final = {
+			baseline: `fixtures/pixel-diff/${ baseline }`,
+			candidate: `fixtures/pixel-diff/${ candidate }`,
+			maxRatio: 0.01
+		};
+		await writeJson( manifestPath, manifest );
+
+		return await expectRejects(
+			label,
+			() => validateArtifactBundle( dir ),
+			/perViewPixelDiff\.final exceeded threshold/,
 		);
 
 	} finally {
@@ -304,6 +423,11 @@ export async function runSelfTest() {
 			await testBlankPngRejects(),
 			await testGpuTimingLabelRejects(),
 			await testGpuTimingTimestampRejects(),
+			await testStrictGpuTimingUnavailableRejects(),
+			await testOverBudgetRejects(),
+			await testPixelDiffIdenticalPasses(),
+			await testPixelDiffRejects( 'one-pixel diff fixture forward', 'identical-a.png', 'one-pixel-off.png' ),
+			await testPixelDiffRejects( 'one-pixel diff fixture reverse', 'one-pixel-off.png', 'identical-a.png' ),
 			await testManifestRequiredFieldRejects( 'browser' ),
 			await testManifestRequiredFieldRejects( 'os' ),
 			await testManifestRequiredFieldRejects( 'assets' ),

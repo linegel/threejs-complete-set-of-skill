@@ -17,10 +17,26 @@ function getOutputDirectory() {
 
 }
 
+function hasFlag( name ) {
+
+	return process.argv.includes( name );
+
+}
+
+function getOptionValue( name ) {
+
+	const index = process.argv.indexOf( name );
+	return index !== -1 ? process.argv[ index + 1 ] : null;
+
+}
+
 try {
 
 	const artifactDir = getOutputDirectory();
-	const bundle = await writeDefaultEvidenceBundle( artifactDir );
+	const bundle = await writeDefaultEvidenceBundle( artifactDir, {
+		strict: hasFlag( '--strict' ),
+		fixture: getOptionValue( '--fixture' )
+	} );
 	const selfTest = await runSelfTest();
 
 	console.log( JSON.stringify( {
@@ -28,6 +44,7 @@ try {
 		sceneId: bundle.sceneId,
 		requiredArtifacts: bundle.requiredArtifacts,
 		requiredImages: bundle.requiredImages,
+		summary: bundle.summary,
 		selfTest,
 	}, null, 2 ) );
 

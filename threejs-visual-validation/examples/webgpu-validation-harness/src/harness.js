@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import * as THREE from 'three';
 
@@ -152,7 +152,14 @@ export function createEvidenceManifest( artifactDir ) {
 		},
 		thresholds: {
 			nonblank: { minRange: 8 },
-			perViewPixelDiff: { final: 0.01, diagnostics: 0.02 },
+			budgetProfile: 'desktopDiscrete',
+			perViewPixelDiff: {
+				final: {
+					baseline: 'images/final.design.png',
+					candidate: 'images/final.design.png',
+					maxRatio: 0
+				}
+			},
 			cameraMatrixRequired: true
 		},
 		stochasticMasks: [
@@ -318,16 +325,54 @@ async function writeJson( path, data ) {
 
 }
 
+async function readFixtureJson( path ) {
+
+	const url = new URL( `../fixtures/${ path }`, import.meta.url );
+	return JSON.parse( await readFile( url, 'utf8' ) );
+
+}
+
+async function copyPixelDiffFixture( artifactDir, name ) {
+
+	const targetDir = join( artifactDir, 'fixtures/pixel-diff' );
+	await mkdir( targetDir, { recursive: true } );
+	await copyFile( new URL( `../fixtures/pixel-diff/${ name }`, import.meta.url ), join( targetDir, name ) );
+
+}
+
 export async function writeDefaultEvidenceBundle( artifactDir, options = {} ) {
 
 	await mkdir( join( artifactDir, 'images' ), { recursive: true } );
 
+	const manifest = createEvidenceManifest( artifactDir );
+	let timings = createTimingRecord( options.timestampEvidence );
+
+	if ( options.fixture === 'over-budget' ) {
+
+		timings = await readFixtureJson( 'budgets/over-budget-timings.json' );
+
+	} else if ( options.fixture === 'pixel-diff-fail' ) {
+
+		await copyPixelDiffFixture( artifactDir, 'identical-a.png' );
+		await copyPixelDiffFixture( artifactDir, 'one-pixel-off.png' );
+		manifest.thresholds.perViewPixelDiff.final = {
+			baseline: 'fixtures/pixel-diff/identical-a.png',
+			candidate: 'fixtures/pixel-diff/one-pixel-off.png',
+			maxRatio: 0.01
+		};
+
+	} else if ( options.fixture !== undefined && options.fixture !== null ) {
+
+		throw new Error( `Unknown fixture "${ options.fixture }"; valid fixtures: over-budget, pixel-diff-fail. A silently ignored fixture name would turn a negative test into a false pass.` );
+
+	}
+
 	await writeJson( join( artifactDir, 'visual-contract.json' ), createDefaultVisualContract() );
-	await writeJson( join( artifactDir, 'evidence-manifest.json' ), createEvidenceManifest( artifactDir ) );
+	await writeJson( join( artifactDir, 'evidence-manifest.json' ), manifest );
 	await writeJson( join( artifactDir, 'renderer-info.json' ), createRendererInfoRecord() );
 	await writeJson( join( artifactDir, 'render-targets.json' ), createTargetInventory() );
 	await writeJson( join( artifactDir, 'storage-resources.json' ), createStorageInventory() );
-	await writeJson( join( artifactDir, 'timings.json' ), createTimingRecord( options.timestampEvidence ) );
+	await writeJson( join( artifactDir, 'timings.json' ), timings );
 	await writeJson( join( artifactDir, 'leak-loop.json' ), createLeakLoopRecord() );
 
 	for ( const imagePath of getRequiredImagePaths() ) {
@@ -336,6 +381,6 @@ export async function writeDefaultEvidenceBundle( artifactDir, options = {} ) {
 
 	}
 
-	return validateArtifactBundle( artifactDir );
+	return validateArtifactBundle( artifactDir, { strict: options.strict === true } );
 
 }

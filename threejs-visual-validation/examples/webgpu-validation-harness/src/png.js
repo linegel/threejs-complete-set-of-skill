@@ -244,6 +244,54 @@ export function decodeGeneratedRgbaPixels( buffer ) {
 
 }
 
+export function compareGeneratedRgbaPngs( baselineBuffer, candidateBuffer ) {
+
+	const baseline = decodeGeneratedRgbaPixels( baselineBuffer );
+	const candidate = decodeGeneratedRgbaPixels( candidateBuffer );
+
+	if ( baseline.width !== candidate.width || baseline.height !== candidate.height ) {
+
+		throw new Error( `PNG dimensions differ: ${ baseline.width }x${ baseline.height } !== ${ candidate.width }x${ candidate.height }.` );
+
+	}
+
+	let differingPixels = 0;
+	let maxChannelDelta = 0;
+
+	for ( let index = 0; index < baseline.pixels.length; index += 4 ) {
+
+		let pixelDiffers = false;
+
+		for ( let channel = 0; channel < 4; channel ++ ) {
+
+			const delta = Math.abs( baseline.pixels[ index + channel ] - candidate.pixels[ index + channel ] );
+			maxChannelDelta = Math.max( maxChannelDelta, delta );
+
+			if ( delta > 0 ) {
+
+				pixelDiffers = true;
+
+			}
+
+		}
+
+		if ( pixelDiffers ) differingPixels ++;
+
+	}
+
+	const totalPixels = baseline.width * baseline.height;
+
+	return {
+		width: baseline.width,
+		height: baseline.height,
+		totalPixels,
+		differingPixels,
+		ratio: differingPixels / totalPixels,
+		maxChannelDelta
+	};
+
+}
+
 export function assertNonBlankGeneratedPng( buffer, pathLabel = 'PNG' ) {
 
 	const { width, height, raw } = decodeGeneratedRgbaPng( buffer );

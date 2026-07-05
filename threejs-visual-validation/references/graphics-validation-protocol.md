@@ -163,8 +163,11 @@ Required images include `images/final.design.png`,
 camera captures, seed sweep captures, and temporal checkpoints. PNG captures
 must pass a nonblank assertion. Regression comparisons use fixed camera matrix
 and projection matrix records, named mask files for stochastic regions, and
-per-view thresholds. Reproducing a comparison by manually orbiting the view is
-invalid evidence.
+manifest `thresholds.perViewPixelDiff` records with bundle-relative
+`baseline`, `candidate`, and `maxRatio` fields. The harness decodes both PNGs,
+computes the differing-pixel ratio, and rejects ratios above the per-view
+threshold. Reproducing a comparison by manually orbiting the view is invalid
+evidence.
 
 ### `evidence-manifest.json`
 
@@ -205,6 +208,19 @@ type EvidenceManifest = {
   thresholds: ThresholdRecord
   stochasticMasks: MaskRecord[]
   knownCompromises: string[]
+}
+```
+
+```ts
+type ThresholdRecord = {
+  nonblank: { minRange: number }
+  budgetProfile: 'desktopDiscrete' | 'desktopIntegrated' | 'mobile' | string
+  perViewPixelDiff: Record<string, {
+    baseline: string
+    candidate: string
+    maxRatio: number
+  }>
+  cameraMatrixRequired: true
 }
 ```
 
@@ -415,7 +431,12 @@ Use these default budgets unless the subject skill is stricter:
 | storage memory | <= 256 MB | <= 192 MB | <= 128 MB |
 
 CPU-only timing is proxy evidence. Label it as such and do not use it to claim
-GPU headroom.
+GPU headroom. The harness reports GPU frame budget as `SKIP` when
+`gpuTimingUnavailable` is true. Normal validation may pass with that explicit
+skip; `--strict` turns every skip into a failure for CI runs that require
+timestamp-backed GPU timing. CPU median, GPU median when present, and
+render-target plus storage memory are compared to the manifest-selected budget
+profile and `memoryBudgetMB`; exceeded medians are blocking failures.
 
 ## Color And Output
 
@@ -636,6 +657,20 @@ targeted invalidation causes
 For post nodes such as `GTAONode`, `BloomNode`, `TRAANode`, and
 `DepthOfFieldNode`, inspect input signal, contribution, intermediate target
 resolution, temporal history when present, and final composite.
+
+### SDF blend-shell creatures
+
+For `$threejs-procedural-creatures`, the creature lab emits mechanism rows and
+the visual-validation bundle gates them. Preserve the creature skill's spaces:
+SDF sampling and snap are creature-local; planted-foot drift is world-space;
+candidate sets are tier-`K` approximations of the full field.
+
+| Evidence row | Producing harness | Gate threshold |
+| --- | --- | --- |
+| SDF snap residual over the locomotion sweep | standalone creature lab `snap residual sweep` export | max `abs(d - iso) < 0.02` of body scale after bounded Newton snap |
+| stance drift, space named `world` | creature lab planted-foot telemetry and foot-drift markers | planted foot world delta `< 1e-9` per frame for stationary and moving gait |
+| candidate-set vs full-field sweep | creature lab candidate-set parity sweep using the same locomotion clocks and tier `K` | snapped candidate-set surface remains within the snap residual gate, `< 0.02` of body scale, against full-field evaluation |
+| silhouette-vs-shadow parity | creature lab fixed-camera silhouette/shadow mask export consumed by this harness' PNG/diff gate | same snapped position path: mask IoU `>= 0.98` and directed edge distance `<= 1 px`; divergent display/depth position nodes block acceptance |
 
 ## No-Post And Isolation Gates
 

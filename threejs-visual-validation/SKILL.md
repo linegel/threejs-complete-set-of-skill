@@ -104,13 +104,17 @@ recipes.
   atomics, and readback policy;
 - timing evidence: warm-up window, compile/readback excluded from steady state,
   CPU frame time, GPU timestamp time when exposed, median and p95 over a fixed
-  window, plus a CPU-only label when GPU timing is unavailable;
+  window, plus an explicit `SKIP` verdict when GPU timing is unavailable;
 - `renderer.info` metrics, manual target/storage memory estimates, draw calls,
   triangles/points/instances, pass count, dispatch count, and dispose/recreate
   leak-loop results.
 
 Use `examples/webgpu-validation-harness/` as the canonical artifact layout and
-schema implementation before adding skill-specific validation.
+schema implementation before adding skill-specific validation. Its budget and
+pixel-diff gates are not presence checks: CPU/GPU median frame timings and
+target/storage memory are compared to the selected manifest budget profile, and
+`perViewPixelDiff` records decode manifest-named baseline/candidate PNG pairs
+and fail when the differing-pixel ratio exceeds the declared threshold.
 
 ## Budgets
 
@@ -126,6 +130,21 @@ State explicit budgets before acceptance:
 Also budget pass count, draw calls, dispatches, render-target memory, storage
 memory, history buffers, screenshot count, seed count, and leak-loop iterations.
 If a subject skill gives stricter budgets, use the stricter number.
+
+## Creature Mechanism Evidence
+
+When validating `$threejs-procedural-creatures`, the standalone creature lab
+produces the mechanism metrics and this skill owns their artifact-bundle gates.
+Use the creature vocabulary exactly: creature-local SDF field and shell,
+world-space planted feet, candidate set versus full field, and display/shadow
+snapped-position parity.
+
+| Evidence row | Producing harness | Gate threshold |
+| --- | --- | --- |
+| SDF snap residual over the locomotion sweep | creature lab `snap residual sweep` export in the visual-validation bundle | max `abs(d - iso) < 0.02` of body scale after bounded Newton snap |
+| stance drift, space named `world` | creature lab planted-foot telemetry and foot-drift markers | planted foot world delta `< 1e-9` per frame for stationary and moving gait |
+| candidate-set vs full-field sweep | creature lab candidate-set parity sweep over the same locomotion clocks and tier `K` | snapped candidate-set surface remains within the snap residual gate, `< 0.02` of body scale, against full-field evaluation |
+| silhouette-vs-shadow parity | creature lab fixed-camera silhouette/shadow mask export consumed by the visual-validation PNG/diff gate | same snapped position path: mask IoU `>= 0.98` and directed edge distance `<= 1 px`; any divergent display/depth position node is a blocking failure |
 
 ## Color And Output
 
