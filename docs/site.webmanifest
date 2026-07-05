@@ -1,0 +1,22 @@
+{
+  "name": "Three.js WebGPU Skill Pack",
+  "short_name": "Three.js Skills",
+  "description": "25 expert agent skills for Three.js WebGPU/TSL procedural graphics and visual validation.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#0a0c10",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -19,6 +19,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = 'https://github.com/linegel/threejs-complete-set-of-skill';
 const SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const OG_IMAGE = `${SITE}visual-validation/planet-generated-craters/final.design.png`;
+const OG_IMAGE_WIDTH = 1200;
+const OG_IMAGE_HEIGHT = 760;
+const THEME_COLOR = '#0a0c10';
 
 const CATEGORIES = [
   { name: 'Planning and Validation', blurb: 'Route requests to the right experts and prove the result with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
@@ -211,7 +214,7 @@ footer a:hover{text-decoration:underline}
 
 const navHtml = (depth) => `<div class="wrap"><nav>
   <a class="brand" href="${depth}index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="${depth}index.html#quickstart">Usage</a><a href="${depth}index.html#install">Install</a><a href="${depth}index.html#skills">Skills</a><a href="${depth}index.html#gallery">Gallery</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="${depth}index.html#quickstart">Usage</a><a href="${depth}index.html#install">Install</a><a href="${depth}index.html#skills">Skills</a><a href="${depth}index.html#gallery">Gallery</a><a href="${depth}index.html#demos">Demos</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
 </nav></div>`;
 
 const footerHtml = `<div class="wrap"><footer>
@@ -219,6 +222,21 @@ const footerHtml = `<div class="wrap"><footer>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="${REPO}">Repository</a> · <a href="${SITE}llms.txt">llms.txt</a> · <a href="${SITE}skills.json">skills.json</a></span>
 </footer></div>`;
+
+const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" />
+<link rel="icon" href="${depth}favicon.ico" sizes="any" />
+<link rel="icon" href="${depth}favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="${depth}favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="${depth}apple-touch-icon.png" />
+<link rel="manifest" href="${depth}site.webmanifest" />`;
+
+const socialImageMeta = (image, alt) => `<meta property="og:image" content="${image}" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />
+<meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />
+<meta property="og:image:alt" content="${esc(alt)}" />
+<meta name="twitter:image" content="${image}" />
+<meta name="twitter:image:alt" content="${esc(alt)}" />`;
 
 /* ---------------------------- index page ---------------------------- */
 
@@ -284,17 +302,16 @@ const indexHtml = `<!doctype html>
 <meta name="keywords" content="three.js, threejs, webgpu, TSL, three shading language, NodeMaterial, agent skills, claude code skills, codex skills, procedural graphics, spectral ocean, volumetric clouds, procedural planets, visual validation, RenderPipeline" />
 <link rel="canonical" href="${SITE}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
+${assetHead('')}
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Three.js WebGPU Skill Pack — ${total} expert agent skills for TSL scenes" />
 <meta property="og:description" content="Agent skills for ambitious Three.js WebGPU/TSL graphics: oceans, atmospheres, planets, clouds, water optics, image pipelines, and screenshot-backed validation." />
 <meta property="og:url" content="${SITE}" />
-<meta property="og:image" content="${OG_IMAGE}" />
-<meta property="og:image:alt" content="Procedural planet crater field rendered with the skill pack" />
+${socialImageMeta(OG_IMAGE, 'Procedural planet crater field rendered with the skill pack')}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Three.js WebGPU Skill Pack — ${total} expert agent skills" />
 <meta name="twitter:description" content="TSL-first Three.js WebGPU skills for Claude Code, Codex, Cursor, Gemini CLI, and any skill-aware agent." />
-<meta name="twitter:image" content="${OG_IMAGE}" />
 <script type="application/ld+json">
 ${JSON.stringify({
   '@context': 'https://schema.org',
@@ -509,15 +526,16 @@ for (const slug of slugs) {
 <meta name="description" content="${esc(s.desc)}" />
 <link rel="canonical" href="${pageUrl}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
+${assetHead('../')}
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="${esc(s.title)} — Three.js WebGPU agent skill" />
 <meta property="og:description" content="${esc(s.desc)}" />
 <meta property="og:url" content="${pageUrl}" />
-<meta property="og:image" content="${ogImg}" />
+${socialImageMeta(ogImg, `${s.title} visual validation frame from the Three.js WebGPU Skill Pack`)}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${esc(s.title)} — Three.js WebGPU agent skill" />
-<meta name="twitter:image" content="${ogImg}" />
+<meta name="twitter:description" content="${esc(s.desc)}" />
 <script type="application/ld+json">
 ${JSON.stringify({
   '@context': 'https://schema.org',
@@ -699,6 +717,20 @@ writeFileSync(join(root, 'docs', 'skills.json'), JSON.stringify({
 }, null, 2) + '\n');
 
 writeFileSync(join(root, 'docs', 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}sitemap.xml\n`);
+writeFileSync(join(root, 'docs', 'site.webmanifest'), JSON.stringify({
+  name: 'Three.js WebGPU Skill Pack',
+  short_name: 'Three.js Skills',
+  description: `${total} expert agent skills for Three.js WebGPU/TSL procedural graphics and visual validation.`,
+  start_url: './',
+  scope: './',
+  display: 'standalone',
+  background_color: THEME_COLOR,
+  theme_color: THEME_COLOR,
+  icons: [
+    { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+    { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+  ],
+}, null, 2) + '\n');
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE}</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
