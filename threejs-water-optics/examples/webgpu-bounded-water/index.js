@@ -13,6 +13,13 @@ export {
 } from "./constants.js";
 
 export {
+  createBoundedWaterHeightQuery,
+  estimateAnalyticParityError,
+  estimateHeightfieldResidualBound,
+  getWaterHeight,
+} from "./cpu-water-height.js";
+
+export {
   WebGPUBoundedWaterHeightfield,
   createBoundedWaterMaterial,
   createBoundedWaterMesh,

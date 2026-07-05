@@ -168,6 +168,7 @@ function validateSourceContracts() {
 	const systemSource = readFileSync( new URL( './ocean-system.js', import.meta.url ), 'utf8' );
 	const nodesSource = readFileSync( new URL( './ocean-nodes.js', import.meta.url ), 'utf8' );
 	const validationSource = readFileSync( new URL( './validation.js', import.meta.url ), 'utf8' );
+	const cpuWaterHeightSource = readFileSync( new URL( './cpu-water-height.js', import.meta.url ), 'utf8' );
 	const readmeSource = readFileSync( new URL( './README.md', import.meta.url ), 'utf8' );
 
 	assert( ! constantsSource.includes( 'fallback-teaching-static' ), 'constants.js must not construct fallback-teaching tiers.' );
@@ -181,6 +182,10 @@ function validateSourceContracts() {
 	assert( nodesSource.includes( 'transformNormal( resolvedNormalLocal, modelWorldMatrix )' ), 'Reflection must use a world-space transformed normal.' );
 	assert( ! validationSource.includes( 'const amplitudesA = cells.map' ), 'Energy-invariance test must not compare duplicate amplitude arrays.' );
 	assert( validationSource.includes( 'partitionA' ) && validationSource.includes( 'partitionB' ), 'Energy-invariance test must move cutoff partitions.' );
+	assert( cpuWaterHeightSource.includes( "from './constants.js'" ), 'CPU water-height sampler must import the authored ocean constants.' );
+	assert( cpuWaterHeightSource.includes( 'createCascadeDescriptors' ) && cpuWaterHeightSource.includes( 'mergeOceanConfig' ), 'CPU water-height sampler must consume authored cascade descriptors.' );
+	assert( ! cpuWaterHeightSource.includes( 'copyTextureToBuffer' ) && ! cpuWaterHeightSource.includes( 'readRenderTargetPixels' ), 'CPU water-height sampler must not depend on GPU readback.' );
+	assert( validationSource.includes( 'cpuWaterHeightSamplerParity' ), 'Validation must include the CPU water-height parity gate.' );
 	assert( systemSource.includes( 'runBrowserGpuReadbackFixtures' ), 'Runtime must expose browser WebGPU readback fixtures.' );
 	assert(
 		systemSource.indexOf( 'this.gpuReadback = await this.runBrowserGpuReadbackFixtures()' ) > - 1 &&
@@ -193,6 +198,7 @@ function validateSourceContracts() {
 		noNullDiagnosticPlaceholders: true,
 		worldSpaceSampling: true,
 		nonTautologicalEnergyTest: true,
+		cpuWaterHeightSamplerContract: true,
 		gpuReadbackBeforeInitialized: true
 	};
 

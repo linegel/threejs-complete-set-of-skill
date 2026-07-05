@@ -6,13 +6,18 @@ import { float, linearDepth, viewportLinearDepth } from "three/tsl";
 import {
   DEFAULT_WATER_PARAMETERS,
   WATER_QUALITY_TIERS,
+  analyticSurfaceHeightAt,
+  createBoundedWaterHeightQuery,
   createWebGPUBoundedWaterSystem,
+  estimateHeightfieldResidualBound,
+  getWaterHeight,
   validateWaterConfig,
   waterCourantNumber,
 } from "./index.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "webgpu-bounded-water.js"), "utf8");
+const cpuHeightSource = readFileSync(join(here, "cpu-water-height.js"), "utf8");
 const readme = readFileSync(join(here, "README.md"), "utf8");
 const reference = readFileSync(join(here, "../../references/water-surface-system.md"), "utf8");
 
@@ -51,6 +56,16 @@ assert(waterCourantNumber({
   waveSpeed: DEFAULT_WATER_PARAMETERS.waveSpeed,
   worldSize: DEFAULT_WATER_PARAMETERS.worldSize,
 }) === tiers.high.courant, "waterCourantNumber must match validateWaterConfig output.");
+
+const analyticProbe = { x: 1.25, z: -0.75, time: 2.5 };
+const query = createBoundedWaterHeightQuery();
+const directHeight = getWaterHeight(analyticProbe.x, analyticProbe.z, analyticProbe.time);
+const queryHeight = query.getWaterHeight(analyticProbe.x, analyticProbe.z, analyticProbe.time);
+const existingHeight = analyticSurfaceHeightAt(analyticProbe.x, analyticProbe.z, analyticProbe.time);
+assert(Math.abs(directHeight - existingHeight) < 1e-12, "getWaterHeight must exactly match the authored analytic wave evaluator.");
+assert(Math.abs(queryHeight - existingHeight) < 1e-12, "createBoundedWaterHeightQuery must expose the same getWaterHeight contract.");
+assert(estimateHeightfieldResidualBound() === DEFAULT_WATER_PARAMETERS.dropStrength + DEFAULT_WATER_PARAMETERS.objectDisplacementScale, "Heightfield residual bound must match the declared drop/object amplitude budget.");
+assert(!cpuHeightSource.includes("copyTextureToBuffer") && !cpuHeightSource.includes("readRenderTargetPixels"), "Bounded CPU water-height contract must not use GPU readback.");
 
 const linearDepthProbe = linearDepth(float(0.5));
 assert(typeof viewportLinearDepth !== "function", "viewportLinearDepth is a const node in Three.js r185, not a callable function.");
@@ -109,6 +124,7 @@ console.log(JSON.stringify({
     "pipeline-owned scene color/depth",
     "computed culling bounds",
     "refracted ray-bundle caustics",
+    "CPU analytic getWaterHeight contract",
     "interface-space table",
     "checkpointed README",
     "WebGPU-unavailable routing to compatibility fallbacks",

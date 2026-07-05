@@ -64,6 +64,34 @@ apply fallback when WebGPU is unavailable, route that teaching to
 - Share sun, sky, exposure, and output-conversion ownership across the sky, ocean reflection, underwater path, and post pipeline.
 - Keep fixed seeds, fixed camera captures, no-post baselines, and GPU timing history for comparisons.
 
+## Cross-Skill Water Height Contract
+
+When another skill needs water coupling, expose a CPU-evaluable query of the
+same authored cause rather than reading back the GPU simulation. The interface
+shape is:
+
+```js
+const sampler = createCpuWaterHeightSampler(oceanConfig);
+const y = sampler.getWaterHeight(x, z, timeSeconds);
+const parity = sampler.estimateTruncationError();
+```
+
+This is a one-way provider contract. The water provider carries the parity
+obligation; consumers treat `getWaterHeight(x, z, t)` as authoritative and do
+not perform GPU readback. For the canonical FFT ocean, the CPU query is a
+dominant-bin truncation of the same seeded spectrum and dispersion relation as
+the WebGPU kernels. Its error bound is the omitted coefficient budget:
+
+```text
+|height_full - height_truncated| <= sum_{omitted bins} (|h0(k)| + |h0(-k)|)
+```
+
+Validators must compare the truncated query against a full pure-JS spectral
+mirror at fixed probe points/times and assert the measured error is within the
+reported bound plus numerical epsilon. Use this pattern for cross-skill
+interfaces: CPU-evaluable query of the same authored cause, stated parity
+error, one-way consumer, no hot-path readback.
+
 ## Budgets
 
 - High desktop discrete: `512^2`, 3 cascades, 4 packed complex fields per cascade, about `3 * (8 evolve + 4 * 2 * log2(N) FFT + 4 assemble/history)` compute dispatch groups, about 102 MiB ocean storage with a 104 MiB tier gate, target 2.5-4.0 ms simulation and 1.5-3.0 ms ocean shading/post at 1440p.

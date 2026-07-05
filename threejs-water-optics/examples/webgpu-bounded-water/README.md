@@ -31,6 +31,24 @@ normalCaustic.a = validity
 
 Caustics are computed from local area compression with `max(area, epsilon)`, finite intensity clamps, and an atomic invalid-cell counter in `diagnostics.invalidCausticCounter`. There is no CPU readback in the frame path.
 
+## CPU Height Coupling
+
+For buoyancy, camera clearance, or other cross-skill consumers, use the
+analytic CPU query:
+
+```js
+import { createBoundedWaterHeightQuery } from './index.js';
+
+const waterHeight = createBoundedWaterHeightQuery();
+const y = waterHeight.getWaterHeight(x, z, timeSeconds);
+```
+
+The query imports the same `AUTHORED_WAVES` list used by the TSL displacement
+path, so analytic parity error is zero except floating-point roundoff. The live
+StorageTexture heightfield is not read back. Its residual coupling gap is
+bounded by the declared drop/object impulse amplitude budget:
+`abs(dropStrength) + abs(objectDisplacementScale)`.
+
 ## Quality Tiers
 
 | Tier | Grid | Fixed Step | Max Steps | Bands | Storage |

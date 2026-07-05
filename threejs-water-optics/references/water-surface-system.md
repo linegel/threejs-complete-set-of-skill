@@ -185,6 +185,25 @@ This exact parameter sharing is non-negotiable. If a wave changes, vertex
 displacement, lighting normal, crest metric, foam, glints, and CPU clearance
 approximations change together.
 
+CPU coupling contract for bounded water:
+
+```js
+const query = createBoundedWaterHeightQuery();
+const y = query.getWaterHeight(x, z, timeSeconds);
+```
+
+`getWaterHeight(x, z, t)` evaluates only the authored analytic component from
+the same `AUTHORED_WAVES` list used by the TSL displacement path, so its
+analytic parity error is exactly zero up to floating-point roundoff. The live
+compute heightfield remains GPU-resident. Its residual is the declared parity
+gap for consumers and is bounded by the simulation impulse amplitude budget:
+`abs(dropStrength) + abs(objectDisplacementScale)`, with those defaults in
+`examples/webgpu-bounded-water/constants.js`. The mesh bounds path cites the
+same budget in `estimateWaterVerticalAmplitude()` inside
+`examples/webgpu-bounded-water/webgpu-bounded-water.js`, where analytic
+amplitude is summed separately from drop/object displacement. Do not use GPU
+readback to close this gap in the frame path.
+
 Use additional micro bands only as derivative-filtered normal detail. A useful
 normal-only bundle for close bounded water is:
 

@@ -280,8 +280,17 @@ the later stage wins; rope-verlet slot cost is
 
 **Swimmer**: buoyancy spring toward injected `getWaterHeight(x, z, t)`
 (stiffness clamped 1..80, response `clamp(stiffness * dt, 0, 1)`), body
-undulation and roll from the swim phase. Gate: surface coupling error
-`< 0.09` world units across a seeded run.
+undulation and roll from the swim phase. The injected provider is a water-skill
+contract, not a creature-side sampler. Open seas use
+`threejs-spectral-ocean/examples/webgpu-fft-ocean/createCpuWaterHeightSampler()`,
+which evaluates a dominant-bin truncation of the same authored FFT spectrum and
+publishes `estimateTruncationError()`. Bounded pools use
+`threejs-water-optics/examples/webgpu-bounded-water/createBoundedWaterHeightQuery()`,
+which evaluates the exact authored analytic wave list and declares the live
+StorageTexture heightfield residual as a separate budget. The provider owns the
+parity-error obligation; creature locomotion treats the query as authoritative,
+does not blend in GPU readback, and must keep buoyancy response error against
+that injected surface `< 0.09` world units across a seeded run.
 
 ## 7. Scale architecture
 

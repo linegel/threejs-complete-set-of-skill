@@ -16,6 +16,10 @@ export {
 	createWebGPUFftOcean
 } from './ocean-system.js';
 export {
+	createCpuWaterHeightSampler,
+	createFullSpectrumWaterHeightMirror
+} from './cpu-water-height.js';
+export {
 	createOceanMesh,
 	createOceanRenderPipeline,
 	createOceanSkyMaterial,

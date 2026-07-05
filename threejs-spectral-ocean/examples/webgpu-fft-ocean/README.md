@@ -59,10 +59,37 @@ npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate
 
 This validates FFT fixtures, spectrum physics checks, the `[5,17,250]` cascade
 counterexample, missing-requirement reasons, source-level contract rails, and
-storage accounting against the declared tier budget. In Node, GPU readback
-reports `pending-browser-webgpu`; in a WebGPU browser, small readback fixtures
-for `createBitReverseNode()`, `createFftStageNode()`, and assembly run before
-`initialized = true`.
+storage accounting against the declared tier budget. It also validates the
+CPU water-height sampler against a full pure-JS spectral mirror at fixed probe
+points/times. In Node, GPU readback reports `pending-browser-webgpu`; in a
+WebGPU browser, small readback fixtures for `createBitReverseNode()`,
+`createFftStageNode()`, and assembly run before `initialized = true`.
+
+## CPU Coupling Query
+
+Use `createCpuWaterHeightSampler(config)` when another skill needs a water
+height, such as creature buoyancy. The sampler consumes the same authored
+cascade descriptors, seeded Gaussian `h0`, local/swell spectrum lobes, and
+capillary-gravity dispersion as the GPU kernels, then keeps the dominant
+frequency bins per cascade:
+
+```js
+import { createCpuWaterHeightSampler } from './examples/webgpu-fft-ocean/index.js';
+
+const sampler = createCpuWaterHeightSampler({ quality: 'high', dominantBinCount: 32 });
+const surfaceY = sampler.getWaterHeight(worldX, worldZ, timeSeconds);
+const parity = sampler.estimateTruncationError();
+```
+
+The parity model is a coefficient truncation bound:
+
+```text
+|height_full - height_truncated| <= sum_{omitted bins} (|h0(k)| + |h0(-k)|)
+```
+
+This is the pack coupling-interface template: expose a CPU-evaluable query of
+the same authored cause, state the parity error, keep the data flow one-way,
+and never use hot-path GPU readback for cross-skill coupling.
 
 ## Debug Modes
 

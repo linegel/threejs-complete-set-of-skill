@@ -34,6 +34,15 @@ render pipeline. Build the highest-throughput algorithm first:
 4. Evaluate authored multi-wave displacement and analytic normals once as TSL
    functions shared by vertex displacement, lighting normals, crest metrics,
    foam, CPU-side camera clearance approximations, and debug views.
+   Export the CPU coupling shape for the analytic component:
+   `getWaterHeight(x, z, timeSeconds)`. This CPU evaluator imports the same
+   `AUTHORED_WAVES` list used by the TSL displacement path and has zero
+   analytic parity error. The compute `StorageTexture` heightfield residual is
+   not read back; its coupling gap is bounded by the declared impulse budget
+   `dropStrength + objectDisplacementScale` in
+   `examples/webgpu-bounded-water/constants.js` and the
+   `estimateWaterVerticalAmplitude()` mesh-bounds calculation in
+   `examples/webgpu-bounded-water/webgpu-bounded-water.js`.
 5. Composite the water through a `RenderPipeline`: use `pass()`, `mrt()` where
    the scene needs shared color/depth/normal data, `PassNode.setResolutionScale()`
    for reduced-resolution effects, and one final `outputColorTransform` or

@@ -87,8 +87,16 @@ this order; every step ends in something renderable or assertable.
     zero stance drift) + analytic 2-bone IK with a Gram-Schmidt bend hint;
     hopper state machine with volume-preserving squash
     (`sxz = 1/sqrt(squash)`); closed-form flight sampled from sim time;
-    fixed-step verlet ropes; buoyancy-spring swim against an injected water
-    height. Rope-verlet writes its segment slots after base squash staging,
+    fixed-step verlet ropes; buoyancy-spring swim against an injected
+    `getWaterHeight(x, z, timeSeconds)` provider. Open seas use
+    `threejs-spectral-ocean/examples/webgpu-fft-ocean/createCpuWaterHeightSampler()`;
+    bounded pools use
+    `threejs-water-optics/examples/webgpu-bounded-water/createBoundedWaterHeightQuery()`
+    for the analytic component. The water provider carries the parity-error
+    obligation (`estimateTruncationError()` for spectral seas; zero analytic
+    error plus a declared StorageTexture residual for bounded water). Creature
+    locomotion treats the injected query as authoritative and never performs
+    GPU readback. Rope-verlet writes its segment slots after base squash staging,
     after root-yaw target conversion, and after IK writes; the last stage
     touching a slot wins. Everything deterministic: seeded LCG + sim clock
     only — `Math.random`/`Date.now`/`performance.now` are banned in render

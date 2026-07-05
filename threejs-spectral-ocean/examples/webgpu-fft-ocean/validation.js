@@ -4,6 +4,9 @@ import {
 	createCascadeDescriptors,
 	mergeOceanConfig
 } from './constants.js';
+import {
+	createCpuWaterHeightSampler
+} from './cpu-water-height.js';
 
 function finiteDepthDispersion( k, depthMeters, gravity, capillarySurfaceTensionOverDensity = CAPILLARY_SURFACE_TENSION_OVER_DENSITY ) {
 	return Math.sqrt( ( gravity * k + capillarySurfaceTensionOverDensity * k ** 3 ) * Math.tanh( Math.min( k * depthMeters, 20 ) ) );
@@ -556,11 +559,157 @@ function capillarySpotCheck() {
 	};
 }
 
+function authoredSpectrumParameters( lobe, gravity ) {
+	return {
+		...lobe,
+		angle: lobe.directionDegrees * Math.PI / 180,
+		alpha: 0.076 * ( gravity * lobe.fetchMeters / ( lobe.windSpeed * lobe.windSpeed ) ) ** - 0.22,
+		peakOmega: 22 * ( lobe.windSpeed * lobe.fetchMeters / ( gravity * gravity ) ) ** - 0.33
+	};
+}
+
+function authoredNormalizationFactor( power ) {
+	const s2 = power * power;
+	const s3 = s2 * power;
+	const s4 = s3 * power;
+	if ( power < 5 ) return - 0.000564 * s4 + 0.00776 * s3 - 0.044 * s2 + 0.192 * power + 0.163;
+	return - 4.8e-8 * s4 + 1.07e-5 * s3 - 9.53e-4 * s2 + 5.9e-2 * power + 0.393;
+}
+
+function authoredDirectionalSpread( theta, omega, peakOmega, directionAngle, directionality, swell ) {
+	const ratio = Math.max( omega / peakOmega, 1e-4 );
+	const below = 6.97 * ratio ** 5;
+	const above = 9.77 * ratio ** - 2.5;
+	const power = ( ratio <= 1 ? below : above ) + 16 * Math.tanh( Math.min( ratio, 20 ) ) * swell * swell;
+	const broad = ( 2 / Math.PI ) * Math.cos( theta ) ** 2;
+	const directed = authoredNormalizationFactor( power ) * Math.abs( Math.cos( ( theta - directionAngle ) * 0.5 ) ) ** ( power * 2 );
+	return broad * ( 1 - directionality ) + directed * directionality;
+}
+
+function authoredJonswapEnergy( omega, k, theta, params, cascade ) {
+	const safeOmega = Math.max( omega, 1e-4 );
+	const sigma = safeOmega <= params.peakOmega ? 0.07 : 0.09;
+	const normalized = ( safeOmega - params.peakOmega ) / Math.max( sigma * params.peakOmega * Math.SQRT2, 1e-5 );
+	const peakShape = Math.exp( - normalized * normalized );
+	const peakRatio = params.peakOmega / safeOmega;
+	const fade = Math.exp( - params.shortWaveFade * params.shortWaveFade * k * k );
+
+	return params.scale
+		* tmaFiniteDepthCorrection( safeOmega, cascade.depthMeters, cascade.gravity )
+		* params.alpha
+		* cascade.gravity * cascade.gravity
+		* safeOmega ** - 5
+		* Math.exp( - 1.25 * peakRatio ** 4 )
+		* params.peakEnhancement ** peakShape
+		* authoredDirectionalSpread( theta, omega, params.peakOmega, params.angle, params.directionality, params.swell )
+		* fade;
+}
+
+function authoredSpectrumAmplitude( cascade, k, theta, deltaK ) {
+	const kSafe = Math.max( k, cascade.cutoffLow );
+	const omega = finiteDepthDispersion( kSafe, cascade.depthMeters, cascade.gravity, cascade.capillarySurfaceTensionOverDensity );
+	const local = authoredSpectrumParameters( cascade.local, cascade.gravity );
+	const swell = authoredSpectrumParameters( cascade.swell, cascade.gravity );
+	const energy = authoredJonswapEnergy( omega, kSafe, theta, local, cascade )
+		+ authoredJonswapEnergy( omega, kSafe, theta, swell, cascade );
+	const derivative = Math.abs( finiteDepthDispersionDerivative( kSafe, cascade.depthMeters, cascade.gravity, cascade.capillarySurfaceTensionOverDensity ) );
+	const inBand = halfOpenBandMask( k, cascade.cutoffLow, cascade.cutoffHigh );
+	return Math.sqrt( Math.max( energy * 2 * derivative * deltaK * deltaK / kSafe, 0 ) ) * inBand;
+}
+
+function authoredH0ForCell( cascade, x, y, deltaK ) {
+	const centeredX = x - cascade.resolution / 2;
+	const centeredY = y - cascade.resolution / 2;
+	const kx = centeredX * deltaK;
+	const kz = centeredY * deltaK;
+	const k = Math.hypot( kx, kz );
+	const amplitude = authoredSpectrumAmplitude( cascade, k, Math.atan2( kz, kx ), deltaK );
+	const gaussian = gaussianPairCpu( x, y, cascade.seed );
+	return [ gaussian[ 0 ] * amplitude, gaussian[ 1 ] * amplitude ];
+}
+
+function authoredEvolvedHeightBin( cascade, x, y, timeSeconds ) {
+	const deltaK = TAU / cascade.patchLength;
+	const centeredX = x - cascade.resolution / 2;
+	const centeredY = y - cascade.resolution / 2;
+	const kx = centeredX * deltaK;
+	const kz = centeredY * deltaK;
+	const k = Math.max( Math.hypot( kx, kz ), 1e-4 );
+	const h0 = authoredH0ForCell( cascade, x, y, deltaK );
+	const mirrorX = ( cascade.resolution - x ) % cascade.resolution;
+	const mirrorY = ( cascade.resolution - y ) % cascade.resolution;
+	const mirroredH0 = authoredH0ForCell( cascade, mirrorX, mirrorY, deltaK );
+	const omega = finiteDepthDispersion( k, cascade.depthMeters, cascade.gravity, cascade.capillarySurfaceTensionOverDensity );
+	const phase = [ Math.cos( omega * timeSeconds ), Math.sin( omega * timeSeconds ) ];
+	const h = complexAdd(
+		complexMul( h0, phase ),
+		complexMul( [ mirroredH0[ 0 ], - mirroredH0[ 1 ] ], [ phase[ 0 ], - phase[ 1 ] ] )
+	);
+
+	return { h, kx, kz };
+}
+
+function authoredFullSpectrumHeightAt( cascades, x, z, timeSeconds ) {
+	let height = 0;
+	for ( const cascade of cascades ) {
+		for ( let y = 0; y < cascade.resolution; y += 1 ) {
+			for ( let cellX = 0; cellX < cascade.resolution; cellX += 1 ) {
+				const bin = authoredEvolvedHeightBin( cascade, cellX, y, timeSeconds );
+				const phase = bin.kx * x + bin.kz * z;
+				const spatial = complexMul( bin.h, [ Math.cos( phase ), Math.sin( phase ) ] );
+				height += spatial[ 0 ];
+			}
+		}
+	}
+	return height;
+}
+
+function testCpuWaterHeightSamplerParity() {
+	const options = {
+		quality: 'low',
+		resolution: 16,
+		cascadeCount: 3,
+		patchLengthsMeters: [ 250, 17, 5 ],
+		// Use a near-full validation spectrum so dispersion/phase bugs cannot hide
+		// under the looser default 32-bin runtime truncation budget.
+		dominantBinCount: 255
+	};
+	const sampler = createCpuWaterHeightSampler( options );
+	const mirrorCascades = createCascadeDescriptors( mergeOceanConfig( options ) );
+	const probes = [
+		{ x: - 14.25, z: 3.5, time: 0.0 },
+		{ x: 0.0, z: 0.0, time: 1.25 },
+		{ x: 19.75, z: - 6.125, time: 4.5 },
+		{ x: 61.0, z: 27.5, time: 8.0 }
+	];
+	const truncation = sampler.estimateTruncationError();
+	const epsilon = 1e-9;
+	let maxError = 0;
+
+	for ( const probe of probes ) {
+		const sampled = sampler.getWaterHeight( probe.x, probe.z, probe.time );
+		const reference = authoredFullSpectrumHeightAt( mirrorCascades, probe.x, probe.z, probe.time );
+		maxError = Math.max( maxError, Math.abs( sampled - reference ) );
+	}
+
+	return {
+		maxError,
+		truncationErrorBound: truncation.bound,
+		epsilon,
+		allowedError: truncation.bound + epsilon,
+		dominantBinCount: sampler.dominantBinCount,
+		probeCount: probes.length,
+		formula: truncation.formula,
+		byCascade: truncation.byCascade
+	};
+}
+
 export function validateFftOceanSelfTests( {
 	resolution = 16,
 	tolerance = 1e-3
 } = {} ) {
 	const dftParity = testDftParityAndHermitianResidual( resolution );
+	const cpuWaterHeightSamplerParity = testCpuWaterHeightSamplerParity();
 	const errors = {
 		dc: testDc( resolution ),
 		oneBinX: testOneBinX( resolution ),
@@ -577,13 +726,15 @@ export function validateFftOceanSelfTests( {
 		dftParity: dftParity.correctRelativeError,
 		dftPartnerParity: dftParity.partnerRelativeError,
 		hermitianHeightResidual: dftParity.hermitianResidualRelative,
-		brokenPackWouldFail: dftParity.brokenRelativeError > dftParity.tolerance ? 0 : 1
+		brokenPackWouldFail: dftParity.brokenRelativeError > dftParity.tolerance ? 0 : 1,
+		cpuWaterHeightSamplerParity: cpuWaterHeightSamplerParity.maxError
 	};
 	const tolerances = {
 		dftParity: dftParity.tolerance,
 		dftPartnerParity: dftParity.tolerance,
 		hermitianHeightResidual: dftParity.tolerance,
-		brokenPackWouldFail: 0
+		brokenPackWouldFail: 0,
+		cpuWaterHeightSamplerParity: cpuWaterHeightSamplerParity.allowedError
 	};
 	const pass = Object.entries( errors ).every( ( [ key, value ] ) => value <= ( tolerances[ key ] ?? tolerance ) );
 
@@ -595,6 +746,7 @@ export function validateFftOceanSelfTests( {
 		errors,
 		metrics: {
 			dftParity,
+			cpuWaterHeightSamplerParity,
 			capillarySpotCheck: capillarySpotCheck()
 		}
 	};

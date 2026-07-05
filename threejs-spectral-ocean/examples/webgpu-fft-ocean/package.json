@@ -3,10 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check *.js",
-    "validate": "node validate-ocean-contracts.js"
+    "check": "node --check *.js && node --check validate-generated-wave-seeds.mjs && node --check generated-wave-seeds-browser.mjs",
+    "validate": "node validate-ocean-contracts.js && node validate-generated-wave-seeds.mjs",
+    "validate:generated-assets": "node validate-generated-wave-seeds.mjs"
   },
   "dependencies": {
+    "playwright": "^1.45.0",
     "three": "^0.185.1"
   }
 }
