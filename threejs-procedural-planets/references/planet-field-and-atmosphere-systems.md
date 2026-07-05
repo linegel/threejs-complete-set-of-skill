@@ -288,6 +288,14 @@ least three seeds. Report max error, mean error, and the worst direction. Any
 change to field constants, crater stamps, or biome thresholds updates the
 parity baseline deliberately.
 
+Parity-bearing scalar fields use integer lattice value noise, not a
+transcendental hash. The canonical family is `lowbias32-u32-lattice`: CPU
+corner hashes use `Math.imul` plus `>>> 0` wrapping, and TSL corner hashes use
+`uint` arithmetic, `bitXor`, shifts, and the same lowbias32 finalizer. The
+`u32 -> f32` conversion is the shared corner-value generator, so hash parity is
+bit-exact by construction and the remaining tolerance is derived from f32
+interpolation, fBm accumulation, crater shaping, and tangent-gradient algebra.
+
 ## 7. Crater Stamps And Geological Structures
 
 Replace crater-like noise with geodesic crater stamps for bodies where craters
@@ -549,7 +557,8 @@ Validation harness:
 - three seeds minimum per body preset;
 - always-run structural parity confirming CPU and TSL builders import the same
   shared field constants object, plus golden `planetFields()` fixtures;
-- optional browser-readback parity from `planet-readback.json`, reporting
+- browser-readback parity from `planet-readback.json`, produced by
+  `examples/webgpu-quadtree-planet/capture-planet-readback.mjs`, reporting
   max/mean error and worst sample direction, with missing artifacts failing
   unless the validator is run with `--allow-missing-gpu`;
 - GPU timestamp or frame-budget capture for each quality tier.

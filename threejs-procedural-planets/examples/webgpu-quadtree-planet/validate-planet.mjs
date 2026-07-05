@@ -28,7 +28,9 @@ import {
 import {
   NORMAL_QUERY_EVALUATION_COUNTS,
   PLANET_FIELD_ALGORITHM,
+  PLANET_FIXED_DIRECTIONS,
   PLANET_PARITY_CHANNELS,
+  PLANET_PARITY_SEEDS,
 } from "./planet-field-constants.js";
 import { PLANET_FIELD_ALGORITHM as SHARED_PLANET_FIELD_ALGORITHM } from "./planet-field-constants.js";
 import {
@@ -55,17 +57,19 @@ const manifestPath = resolve(here, GENERATED_VARIANT_MANIFEST_RELATIVE_PATH);
 const manifestDir = dirname(manifestPath);
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const fixturePath = resolve(here, "planet-golden-fixtures.json");
-const fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
+let fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
 
 function parseArgs(argv) {
   const options = {
     allowMissingGpu: false,
     artifacts: null,
+    updateFixtures: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--allow-missing-gpu") options.allowMissingGpu = true;
     else if (arg === "--artifacts") options.artifacts = resolve(argv[++index]);
+    else if (arg === "--update-fixtures") options.updateFixtures = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
   return options;
@@ -114,6 +118,31 @@ function sampleParityChannels(direction, options) {
     roughnessVariance: sample.roughnessVariance,
     heightGradientX: sample.heightGradient[0],
     heightGradientY: sample.heightGradient[1],
+  };
+}
+
+function createGoldenFixtures() {
+  const probes = [];
+  for (const presetName of Object.keys(BODY_PRESETS)) {
+    for (const seed of PLANET_PARITY_SEEDS) {
+      for (const direction of PLANET_FIXED_DIRECTIONS) {
+        probes.push({
+          preset: presetName,
+          seed,
+          direction,
+          values: sampleParityChannels(direction, {
+            preset: BODY_PRESETS[presetName],
+            seed,
+          }),
+        });
+      }
+    }
+  }
+  return {
+    version: 1,
+    algorithmVersion: PLANET_FIELD_ALGORITHM.version,
+    channels: PLANET_PARITY_CHANNELS,
+    probes,
   };
 }
 
@@ -236,6 +265,13 @@ function validateGpuReadback(artifactDir) {
       const actual = Number(entry.values[channel]);
       assert(Number.isFinite(actual), `GPU sample ${index} ${channel} is not finite`);
       const error = Math.abs(actual - cpu[channel]);
+      const tolerance =
+        PLANET_FIELD_ALGORITHM.parityToleranceByChannel?.[channel] ??
+        PLANET_FIELD_ALGORITHM.parityTolerance;
+      assert(
+        error <= tolerance,
+        `GPU sample ${index} ${channel} error ${error} exceeds derived tolerance ${tolerance}`,
+      );
       channelErrors[channel] = error;
       meanAbsError += error;
       count += 1;
@@ -263,6 +299,8 @@ function validateGpuReadback(artifactDir) {
     status: "passed",
     artifactDir,
     tolerance: PLANET_FIELD_ALGORITHM.parityTolerance,
+    toleranceByChannel: PLANET_FIELD_ALGORITHM.parityToleranceByChannel,
+    toleranceDerivation: PLANET_FIELD_ALGORITHM.parityToleranceDerivation,
     maxAbsError,
     meanAbsError,
     worstSample,
@@ -271,6 +309,11 @@ function validateGpuReadback(artifactDir) {
 }
 
 const options = parseArgs(process.argv.slice(2));
+
+if (options.updateFixtures) {
+  fixtures = createGoldenFixtures();
+  writeFileSync(fixturePath, `${JSON.stringify(fixtures, null, 2)}\n`);
+}
 
 validateAssetLedger();
 const structuralParity = validateSharedAlgorithm();
@@ -377,6 +420,8 @@ const source = [
   "debug-views.js",
   "webgpu-quadtree-planet.js",
   "validate-planet.mjs",
+  "capture-planet-readback.mjs",
+  "planet-readback-browser.js",
 ]
   .map((file) => readFileSync(resolve(here, file), "utf8"))
   .join("\n");

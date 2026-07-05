@@ -2,6 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "capture": "node capture-planet-readback.mjs",
     "validate": "node validate-planet.mjs && node validate-generated-craters.mjs",
     "validate:generated-assets": "node validate-generated-craters.mjs"
   },

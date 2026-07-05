@@ -27,6 +27,10 @@ Legacy WebGL implementation (deprecated, do not extend): `examples/procedural-pl
 4. Evaluate shared TSL `Fn` field functions for displacement, material causes,
    and diagnostics. Reuse the same functions in vertex displacement, surface
    material nodes, and compute passes.
+   Parity-bearing value-noise corners use the `lowbias32-u32-lattice` integer
+   hash family: CPU uses `Math.imul`/`>>> 0` wrapping, and TSL uses `uint`
+   arithmetic plus the same bit shifts and multipliers. Do not use
+   transcendental hashes for CPU/GPU parity paths.
 5. Run compute passes through `renderer.compute()` or `renderer.computeAsync()`
    to fill `StorageBufferAttribute` patch data, parity sample buffers, optional
    indirect dispatch data, and cached min/max bounds.

@@ -38,12 +38,30 @@ Run:
 node threejs-procedural-planets/examples/webgpu-quadtree-planet/validate-planet.mjs --allow-missing-gpu
 ```
 
-Without `--allow-missing-gpu`, the command requires `--artifacts <dir>` with
-`planet-readback.json` and exits non-zero when the browser readback artifact is
-absent. The always-run layer validates shared CPU/TSL field constants, golden
+For full CPU/GPU parity, produce the readback artifact and run the validator in
+one command:
+
+```sh
+cd threejs-procedural-planets/examples/webgpu-quadtree-planet
+node capture-planet-readback.mjs
+```
+
+`capture-planet-readback.mjs` serves `planet-readback.html`, launches Chromium
+with WebGPU flags, renders the TSL `planetFields()` parity packs through
+`MeshBasicNodeMaterial.fragmentNode` into a 1x1 `FloatType` target, writes
+`artifacts/planet-readback.json`, and invokes
+`node validate-planet.mjs --artifacts artifacts`. Without `--allow-missing-gpu`,
+`validate-planet.mjs` exits non-zero when that artifact is absent. The
+always-run layer validates shared CPU/TSL field constants, golden
 `planetFields()` fixtures, schema keys, crater outputs, quadtree neighbor
 levels, dirty patch bounds, debug registry coverage, asset ledger hashes, and
 WebGPU/TSL source sentinels.
+
+The parity-bearing noise uses the same `lowbias32-u32-lattice` integer hash
+family as the procedural-fields contract. CPU code uses `Math.imul` and `>>> 0`
+wraps; TSL code uses `uint` arithmetic and bitwise mixing. The validator gates
+scalar channels at `1e-4` and tangent-gradient channels at `0.005`, with the
+operation-depth derivation recorded in `PLANET_FIELD_ALGORITHM`.
 
 Normal queries use the fused `heightGradient` returned by `planetFields()`.
 The old central-difference path cost `2 tangent axes * 2 samples = 4` full field
