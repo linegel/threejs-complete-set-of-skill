@@ -26,6 +26,7 @@
    "description": "Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.",
    "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-vegetation.html",
    "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-05T05:01:16+03:00",
    "isPartOf": {
     "@type": "SoftwareSourceCode",
     "name": "Three.js WebGPU Skill Pack",
@@ -164,6 +165,8 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="meta-row">
     <span class="chip a">$threejs-procedural-vegetation</span>
     <span class="chip">5 runnable examples</span>
+    <span class="chip">Latest skill update <time datetime="2026-07-05T05:01:16+03:00">2026-07-05</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/e8bca402ee705d702103c5bc3c04e40ca80a03e9">commit e8bca40 ↗</a>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-vegetation/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -270,7 +273,7 @@ route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead 
 a second path here.</p>
 <h2>Dense Grass Build Order</h2>
 <ol>
-<li>Choose patch size from culling, not from texture dimensions. A good default is 16-32 m patches with 8-20 k blades each; keep one <code>InstancedMesh</code> per patch per LOD representation, and budget submitted draw objects as <code>visibleDraws = drawObjectsPerPatch * visiblePatches</code>.</li>
+<li>Choose patch size from culling, not from texture dimensions. An authored starting point (not a gated value — tune it against your own scene&#39;s culling and density budget) is 16-32 m patches with 8-20 k blades each; keep one <code>InstancedMesh</code> per patch per LOD representation, and budget submitted draw objects as <code>visibleDraws = drawObjectsPerPatch * visiblePatches</code>.</li>
 <li>Allocate static storage attributes: origin/height/width/facing/bend, clump id/density/species, color variation, terrain normal, and packed material flags. Prefer 16-byte alignment and pack half-precision-like ranges into normalized fields when visual error is below one pixel.</li>
 <li>Run one initialization dispatch per chunk with <code>Fn().compute(count)</code> and deterministic hash seeds. Write to <code>StorageInstancedBufferAttribute</code> via <code>storage()</code> nodes or use <code>instancedArray()</code> then <code>toAttribute()</code> for render consumption.</li>
 <li>Use the same terrain field, density mask, path mask, and clump field for placement, material variation, and LOD thresholds. Do not let visual color clumps drift from density clumps.</li>
@@ -280,7 +283,7 @@ a second path here.</p>
 <li>Transition to impostors by patch, not by individual blade. Cross-fade density or alpha hash over a short distance band and keep shadow density matched to visible density.</li>
 </ol>
 <p>Use <code>renderer.compute()</code> when dispatch order can stay inside the frame graph; use <code>renderer.computeAsync()</code> for explicit initialization, streaming chunk generation, readback-free validation steps, or when the app needs a promise boundary.</p>
-<p>Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In <code>examples/webgpu-dense-grass/dense-grass-system.js</code>, each patch owns one blade <code>InstancedMesh</code> and one impostor-card <code>InstancedMesh</code>; <code>getStats().drawObjectsPerPatch</code> reports <code>2</code>, and <code>validateDenseGrassConfig()</code> uses <code>visibleDrawObjectCeiling = patchCount * 2</code>. Derive patch count as <code>visiblePatchesWorst = (2 * patchGridRadius + 1)^2</code>. The ultra preset comment cites <code>81</code> patches, <code>1.46M</code> visible blades, and <code>2</code> draw objects per visible patch; the high preset comment cites <code>49</code> patches, <code>588k</code> visible blades, and <code>2-12</code> submitted patch draws typical after frustum culling.</p>
+<p>Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In <code>examples/webgpu-dense-grass/dense-grass-system.js</code>, each patch owns one blade <code>InstancedMesh</code> and one impostor-card <code>InstancedMesh</code>; <code>getStats().drawObjectsPerPatch</code> reports <code>2</code>, and <code>validateDenseGrassConfig()</code> uses <code>visibleDrawObjectCeiling = patchCount * 2</code>. Derive patch count as <code>visiblePatchesWorst = (2 * patchGridRadius + 1)^2</code>. The ultra preset comment cites <code>81</code> patches, <code>1.46M</code> visible blades, and <code>2</code> draw objects per visible patch; the high preset comment cites <code>49</code> patches, <code>588k</code> visible blades, and <code>2-12</code> submitted patch draws typical after frustum culling. The worst-case counts are Derived (the <code>(2r+1)^2</code> grid arithmetic above) and the ceiling is Gated by <code>validateDenseGrassConfig()</code>; the <code>2-12</code> typical range is an observed after-culling figure from the example scene, not a gate — only the ceiling is enforced.</p>
 <table>
 <thead>
 <tr>

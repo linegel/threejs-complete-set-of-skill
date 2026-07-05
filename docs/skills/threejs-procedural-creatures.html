@@ -26,6 +26,7 @@
    "description": "Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.",
    "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html",
    "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-05T05:01:16+03:00",
    "isPartOf": {
     "@type": "SoftwareSourceCode",
     "name": "Three.js WebGPU Skill Pack",
@@ -164,6 +165,8 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="meta-row">
     <span class="chip a">$threejs-procedural-creatures</span>
     
+    <span class="chip">Latest skill update <time datetime="2026-07-05T05:01:16+03:00">2026-07-05</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/e8bca402ee705d702103c5bc3c04e40ca80a03e9">commit e8bca40 ↗</a>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-creatures/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -211,7 +214,9 @@ adjacency once from rest-pose capsule AABBs expanded by <code>r + k</code>, and 
 a bounded per-vertex candidate set (owner + K neighbours, K = 4–8). The
 K-candidate fold approximates the canonical sequential, order-dependent
 global smooth-min fold; rest-AABB adjacency is only a selection heuristic,
-and the full-field locomotion sweep gate is the acceptance bound.</li>
+and the full-field locomotion sweep gate is the acceptance bound (that gate
+runs in the Wave B creature lab — pending, <code>HANDOFF.md</code> §3 item 3.9e; until
+it lands, K is an authored default with no passed-evidence claim).</li>
 <li><strong>Pose runtime.</strong> The runtime pose is a typed-array SoA buffer
 (<code>a.xyz|ra</code>, <code>b.xyz|rb</code>, <code>k|rgb</code> per slot), not object graphs re-copied
 into per-material vectors. Locomotion advances on a fixed-step accumulator
@@ -245,6 +250,8 @@ width, sun, warmth) stay uniform writes, never graph rebuilds.</li>
 <li><strong>Shading.</strong> Normals from the field gradient; albedo from proximity-blended
 part colors over the same candidate set; banded toon ramp; SDF self-AO
 (few taps along the normal) so blended limbs read grounded, not inflated.
+For toon hatching or paint-stroke stability that wants texture-space
+evaluation, read <a href="../threejs-image-pipeline/references/production-image-pipeline.md#considered-alternative-texture-space--decoupled-shading">the image-pipeline note</a>; it is an exception path, not a default creature lighting cache.
 Prove shadow parity: the shadow/depth path must consume the same snapped
 position function, verified by a silhouette-vs-shadow test, not assumed.
 Decode authored sRGB colors to linear before any uniform/storage upload.</li>

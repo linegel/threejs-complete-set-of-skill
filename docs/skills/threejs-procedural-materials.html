@@ -26,6 +26,7 @@
    "description": "Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.",
    "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-materials.html",
    "image": "https://linegel.github.io/threejs-complete-set-of-skill/generated-asset-contact-sheet.png",
+   "dateModified": "2026-07-05T04:55:12+03:00",
    "isPartOf": {
     "@type": "SoftwareSourceCode",
     "name": "Three.js WebGPU Skill Pack",
@@ -164,6 +165,8 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="meta-row">
     <span class="chip a">$threejs-procedural-materials</span>
     <span class="chip">2 runnable examples</span>
+    <span class="chip">Latest skill update <time datetime="2026-07-05T04:55:12+03:00">2026-07-05</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/32fd5583a6c3728cc57d13104f2c5fbb9e78ae10">commit 32fd558 ↗</a>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-materials/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-materials/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -220,6 +223,8 @@ graph, not from independent texture/noise calls per PBR channel:</p>
   -&gt; NodeMaterial PBR slots
   -&gt; node post/output
 </code></pre>
+<p>Texture-space/decoupled shading is a considered alternative, not the default
+specular-stability path; read <a href="../threejs-image-pipeline/references/production-image-pipeline.md#considered-alternative-texture-space--decoupled-shading">the image-pipeline note</a> before replacing derivative normals, specular AA, or TRAA with cached radiance.</p>
 <p>The target graph writes:</p>
 <ul>
 <li><code>colorNode</code> from linear authored identity colors or <code>SRGBColorSpace</code> color

@@ -26,6 +26,7 @@
    "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
    "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html",
    "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-05T05:01:16+03:00",
    "isPartOf": {
     "@type": "SoftwareSourceCode",
     "name": "Three.js WebGPU Skill Pack",
@@ -164,6 +165,8 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="meta-row">
     <span class="chip a">$threejs-choose-skills</span>
     
+    <span class="chip">Latest skill update <time datetime="2026-07-05T05:01:16+03:00">2026-07-05</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/e8bca402ee705d702103c5bc3c04e40ca80a03e9">commit e8bca40 ↗</a>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-choose-skills/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -502,7 +505,11 @@ aggregate maximum <code>4.0 + 3.0 = 7.0 ms</code>.</li>
 <code>Desktop discrete</code>: frame budget <code>0.5-1.5 ms</code>; maximum <code>1.5 ms</code>.</li>
 <li><code>$threejs-image-pipeline</code>, <code>Budgets</code>, row <code>Desktop discrete</code>: full post
 frame cost <code>2.0-4.0 ms at 1440p</code>; maximum <code>4.0 ms</code>.</li>
-<li>Router fixed overhead: <code>0.5 ms scene pass + 0.5 ms shared upsamples = 1.0 ms</code>.</li>
+<li>Router fixed overhead: <code>0.5 ms scene pass + 0.5 ms shared upsamples = 1.0 ms</code>.
+Both <code>0.5 ms</code> inputs are authored planning placeholders, not measured or
+validator-gated costs: replace them with the composed scene&#39;s own measured
+scene-pass and upsample timings (from <code>$threejs-visual-validation</code> GPU timing
+evidence) before trusting any aggregate within <code>1 ms</code> of the budget line.</li>
 </ul>
 <p>Initial aggregate:</p>
 <pre><code class="language-text">7.0 ocean + 4.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 17.5 ms

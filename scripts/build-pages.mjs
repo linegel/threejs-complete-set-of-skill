@@ -8,6 +8,7 @@
 //   docs/sitemap.xml, robots.txt
 // Re-run after adding or renaming skills: node scripts/build-pages.mjs
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
@@ -72,6 +73,27 @@ const GALLERY = [
   { img: 'generated-asset-contact-sheet.png', title: 'Generated texture asset contact sheet', note: 'deterministic PNG variants shipped under assets/generated-variants/', link: 'threejs-procedural-materials' },
 ];
 
+const latestSkillUpdate = (slug) => {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%H%x00%cI%x00%cs', '--', slug], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    const [hash, iso, date] = out.split('\0');
+    if (!hash || !iso) return null;
+    return {
+      hash,
+      shortHash: hash.slice(0, 7),
+      iso,
+      date: date || iso.slice(0, 10),
+      url: `${REPO}/commit/${hash}`,
+    };
+  } catch {
+    return null;
+  }
+};
+
 const skills = {};
 for (const d of readdirSync(root)) {
   const p = join(root, d, 'SKILL.md');
@@ -83,7 +105,7 @@ for (const d of readdirSync(root)) {
   const title = (t.split('\n').find((l) => l.startsWith('# ')) || `# ${d}`).slice(2).trim();
   const exDir = join(root, d, 'examples');
   const examples = existsSync(exDir) ? readdirSync(exDir).filter((e) => !e.startsWith('.') && !e.includes('.')) : [];
-  skills[d] = { slug: d, title, desc, body, examples };
+  skills[d] = { slug: d, title, desc, body, examples, update: latestSkillUpdate(d) };
 }
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -234,6 +256,7 @@ ${JSON.stringify({
       itemListElement: Object.values(skills).map((s, i) => ({
         '@type': 'ListItem', position: i + 1, name: s.title,
         url: `${SITE}skills/${s.slug}.html`, description: s.desc,
+        dateModified: s.update?.iso,
       })),
     },
   ],
@@ -342,6 +365,9 @@ for (const slug of slugs) {
   const validation = VALIDATION[slug];
   const pageUrl = `${SITE}skills/${slug}.html`;
   const ogImg = validation ? `${SITE}${validation[0][0]}` : OG_IMAGE;
+  const updateHtml = s.update ? `<span class="chip">Latest skill update <time datetime="${esc(s.update.iso)}">${esc(s.update.date)}</time></span>
+    <a class="chip" href="${esc(s.update.url)}">commit ${esc(s.update.shortHash)} ↗</a>` :
+    '<span class="chip">Latest skill update unavailable</span>';
 
   const examplesHtml = s.examples.length ? `
   <div class="section" id="examples"><div class="wrap">
@@ -401,6 +427,7 @@ ${JSON.stringify({
       description: s.desc,
       url: pageUrl,
       image: ogImg,
+      dateModified: s.update?.iso,
       isPartOf: { '@type': 'SoftwareSourceCode', name: 'Three.js WebGPU Skill Pack', codeRepository: REPO, url: SITE },
       about: ['Three.js', 'WebGPU', 'TSL', s.title],
     },
@@ -466,6 +493,7 @@ ${navHtml('../')}
   <div class="meta-row">
     <span class="chip a">$${slug}</span>
     ${s.examples.length ? `<span class="chip">${s.examples.length} runnable example${s.examples.length > 1 ? 's' : ''}</span>` : ''}
+    ${updateHtml}
     <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${slug}/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -537,6 +565,12 @@ writeFileSync(join(root, 'docs', 'skills.json'), JSON.stringify({
   categories: CATEGORIES.map((c) => ({ name: c.name, skills: c.slugs.filter((s) => skills[s]) })),
   skills: Object.values(skills).map((s) => ({
     name: s.slug, title: s.title, description: s.desc, examples: s.examples,
+    latestUpdate: s.update ? {
+      date: s.update.date,
+      datetime: s.update.iso,
+      commit: s.update.hash,
+      commitUrl: s.update.url,
+    } : null,
     page: `${SITE}skills/${s.slug}.html`,
     skillMd: `${REPO}/blob/main/${s.slug}/SKILL.md`,
     raw: `https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${s.slug}/SKILL.md`,
@@ -547,7 +581,10 @@ writeFileSync(join(root, 'docs', 'robots.txt'), `User-agent: *\nAllow: /\n\nSite
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE}</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-${slugs.map((s) => `  <url><loc>${SITE}skills/${s}.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`).join('\n')}
+${slugs.map((s) => {
+  const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
+  return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`;
+}).join('\n')}
 </urlset>
 `);
 

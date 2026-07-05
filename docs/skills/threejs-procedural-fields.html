@@ -26,6 +26,7 @@
    "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
    "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-fields.html",
    "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-05T05:16:30+03:00",
    "isPartOf": {
     "@type": "SoftwareSourceCode",
     "name": "Three.js WebGPU Skill Pack",
@@ -164,6 +165,8 @@ a.chip:hover{color:var(--amber);border-color:var(--amber)}
   <div class="meta-row">
     <span class="chip a">$threejs-procedural-fields</span>
     <span class="chip">1 runnable example</span>
+    <span class="chip">Latest skill update <time datetime="2026-07-05T05:16:30+03:00">2026-07-05</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8855aa77720248708c0f876dc022dab52dd76bcc">commit 8855aa7 ↗</a>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md">SKILL.md on GitHub ↗</a>
     <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-fields/SKILL.md">raw (for agents) ↗</a>
   </div>
@@ -297,14 +300,20 @@ if (fieldTier === &#39;gpu-storage&#39;) {
 </ul>
 <p>For the canonical <code>examples/webgpu-field-bake/</code> contract, CPU and TSL must
 import the same <code>FIELD_ALGORITHM</code> object from <code>field-constants.mjs</code>. That object
-owns hash primes, seed wrapping, octave counts, lacunarity, gain, warp seed
-offsets, and derived-channel coefficients. Do not copy those numbers into CPU
-or TSL code. <code>validate-field-contract.mjs</code> enforces shared-object identity and
-CPU golden fixtures at <code>1e-12</code> absolute error; the value is the validator&#39;s
-fixture drift threshold for JavaScript double evaluation. Browser WebGPU
-artifacts are accepted only through <code>--artifacts &lt;dir&gt;</code> and must satisfy the
-manifest <code>parityTolerance</code> value, currently <code>0.001</code> in
-<code>assets/generated-variants/manifest.json</code>.</p>
+owns the integer lattice hash multipliers, lowbias32 mix constants, seed
+wrapping convention, octave counts, lacunarity, gain, warp seed offsets, and
+derived-channel coefficients. Do not copy those numbers into CPU or TSL code.
+The canonical hash floors the lattice coordinate, converts i32 cell bits to
+u32, mixes with <code>Math.imul</code>/TSL <code>uint</code> wrapping arithmetic, and scales the final
+u32 by <code>2^-32</code>; no sin-dot hash is allowed in the parity path.
+<code>validate-field-contract.mjs</code> enforces shared-object identity and CPU golden
+fixtures at <code>1e-12</code> absolute error; the value is the validator&#39;s fixture drift
+threshold for JavaScript double evaluation. Browser WebGPU artifacts are
+accepted only through <code>--artifacts &lt;dir&gt;</code> and must satisfy the derived
+per-channel <code>1e-4</code> tolerance. The derivation is <code>u=2^-24</code>,
+<code>gamma_384 ~= 2.29e-5</code>, with a 4.4x margin for warp/channel arithmetic and
+driver pow decomposition; placement-mask threshold consumers use a <code>1e-4</code>
+guard band around threshold <code>0.5</code>.</p>
 <h2>Build Order</h2>
 <ol>
 <li>Choose stable coordinates from the physical cause: radial planet kilometers,
