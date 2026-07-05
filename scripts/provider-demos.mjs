@@ -221,6 +221,106 @@ export const PROVIDER_DEMOS = [
     debugModes: ["final", "groups", "wire"],
   },
   {
+    id: "skill-router-manifest-demo",
+    skill: "threejs-choose-skills",
+    title: "Skill Router Manifest Bench",
+    sceneId: "skill-router-manifest-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier WebGPU preflight and routing manifest scene",
+    livePath: "demos/skill-router-manifest-demo/",
+    visual: { kind: "route", label: "route manifest + shared owners" },
+    sourceExample: "threejs-choose-skills/examples/router-contract.test.mjs",
+    validationCommand:
+      "node threejs-choose-skills/examples/router-contract.test.mjs",
+    providerClaim:
+      "A WebGPU preflight routes one brief into selected, omitted, deferred, and shared-owner skill contracts.",
+    limitations: [
+      "The docs page visualizes routing contracts and budget ownership, not a generated application scene.",
+      "The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
+    ],
+    debugModes: ["final", "budget", "ownership"],
+  },
+  {
+    id: "compatibility-fallback-planner-demo",
+    skill: "threejs-compatibility-fallbacks",
+    title: "Fallback Loss Ledger",
+    sceneId: "compatibility-fallback-planner-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier explicit-fallback planning scene",
+    livePath: "demos/compatibility-fallback-planner-demo/",
+    visual: { kind: "fallback", label: "explicit fallback + loss ledger" },
+    sourceExample: "threejs-compatibility-fallbacks/examples/tier-planner",
+    validationCommand:
+      "node threejs-compatibility-fallbacks/examples/tier-planner/validate-tier-plan.mjs",
+    providerClaim:
+      "Explicit fallback requests produce a capability ledger with preserved, weakened, removed, and blocked invariants.",
+    limitations: [
+      "The docs page is a teaching visualization and intentionally shows a blocked mode when no explicit fallback request exists.",
+      "The canonical skill must not weaken flagship WebGPU guidance or silently route to WebGL-compatible behavior.",
+    ],
+    debugModes: ["final", "loss-ledger", "blocked"],
+  },
+  {
+    id: "procedural-building-compiler-demo",
+    skill: "threejs-procedural-buildings-and-cities",
+    title: "Material-Slot Building Compiler",
+    sceneId: "procedural-building-compiler-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier deterministic massing and material-slot scene",
+    livePath: "demos/procedural-building-compiler-demo/",
+    visual: { kind: "building", label: "massing + exposed edges + slots" },
+    sourceExample: "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler",
+    validationCommand:
+      "node threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/validate-fixtures.mjs",
+    providerClaim:
+      "Deterministic massing, exposed edges, placement ownership, and material-slot batches compile into inspectable city geometry.",
+    limitations: [
+      "The docs page uses compact runtime geometry instead of the full fixture compiler and BatchedMesh capacity accounting.",
+      "The production skill remains plan validation, interval overlap checks, physical UV scale, material-slot mesh compilation, and city-chunk budget evidence.",
+    ],
+    debugModes: ["final", "exposed-edges", "material-slots"],
+  },
+  {
+    id: "procedural-creature-lab-demo",
+    skill: "threejs-procedural-creatures",
+    title: "Reduced Creature Lab",
+    sceneId: "procedural-creature-lab-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier procedural rig and field-shell scene",
+    livePath: "demos/procedural-creature-lab-demo/",
+    visual: { kind: "creature", label: "rig + gait + candidate fields" },
+    sourceExample: "threejs-procedural-creatures/SKILL.md",
+    validationCommand:
+      "node --check docs/demos/shared/provider-demo.mjs",
+    providerClaim:
+      "A spec-driven procedural creature exposes rig, gait, candidate field shells, and planted-foot diagnostics.",
+    limitations: [
+      "The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract.",
+      "The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.",
+    ],
+    debugModes: ["final", "rig-debug", "field-debug"],
+  },
+  {
+    id: "visual-validation-harness-demo",
+    skill: "threejs-visual-validation",
+    title: "Validation Evidence Harness",
+    sceneId: "visual-validation-harness-demo",
+    purpose: "live directional provider demo",
+    tier: "reduced-tier evidence-bundle inspection scene",
+    livePath: "demos/visual-validation-harness-demo/",
+    visual: { kind: "validation", label: "contract images + manifest evidence" },
+    sourceExample: "threejs-visual-validation/examples/webgpu-validation-harness",
+    validationCommand:
+      "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
+    providerClaim:
+      "Fixed-camera contracts expose final, no-post, diagnostic, seed, resource, and sign-off evidence as a first-class artifact.",
+    limitations: [
+      "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract.",
+      "Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
+    ],
+    debugModes: ["final", "diagnostics", "bundle"],
+  },
+  {
     id: "water-generated-caustics",
     skill: "threejs-water-optics",
     title: "Bounded Water Caustic Projection",

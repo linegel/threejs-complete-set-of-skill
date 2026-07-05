@@ -344,6 +344,9 @@ ${baseCss}
 .live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
 .live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
 .live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
+.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
+.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
+.live-visual--validation{--accent:#b8a4ff}
 header{padding:clamp(70px,11vw,140px) 0 clamp(50px,7vw,90px);position:relative}
 header .kicker{animation:rise .7s ease both}
 h1{font-weight:700;font-size:clamp(40px,6.4vw,84px);line-height:1.04;letter-spacing:-.03em;max-width:15ch;animation:rise .7s .08s ease both}

@@ -204,6 +204,106 @@ const DEMOS = {
     evidenceHref: "../../skills/threejs-procedural-geometry.html",
     evidenceLabel: "Skill Contract",
   },
+  "skill-router-manifest-demo": {
+    title: "Skill Router Manifest Bench",
+    skill: "$threejs-choose-skills",
+    claim: "Live directional demo: a WebGPU preflight routes one brief into selected, omitted, deferred, and shared-owner skill contracts.",
+    variants: [
+      ["ocean-planet"],
+      ["rainy-city"],
+      ["black-hole-shot"],
+    ],
+    modes: [
+      ["final", "Route"],
+      ["budget", "Budget"],
+      ["ownership", "Ownership"],
+    ],
+    camera: [0.0, 3.0, 8.2],
+    target: [0, 0.85, 0],
+    factory: createSkillRouterScene,
+    evidenceHref: "../../skills/threejs-choose-skills.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "compatibility-fallback-planner-demo": {
+    title: "Fallback Loss Ledger",
+    skill: "$threejs-compatibility-fallbacks",
+    claim: "Live directional demo: explicit fallback requests produce a capability ledger with preserved, weakened, removed, and blocked invariants.",
+    variants: [
+      ["no-webgpu"],
+      ["no-storage"],
+      ["memory-cap"],
+    ],
+    modes: [
+      ["final", "Plan"],
+      ["loss-ledger", "Loss Ledger"],
+      ["blocked", "Blocked"],
+    ],
+    camera: [0.0, 3.1, 8.6],
+    target: [0, 0.75, 0],
+    factory: createCompatibilityFallbackScene,
+    evidenceHref: "../../skills/threejs-compatibility-fallbacks.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "procedural-building-compiler-demo": {
+    title: "Material-Slot Building Compiler",
+    skill: "$threejs-procedural-buildings-and-cities",
+    claim: "Live directional demo: deterministic massing, exposed edges, placement ownership, and material-slot batches compile into inspectable city geometry.",
+    variants: [
+      ["single-tower"],
+      ["courtyard"],
+      ["twin-bridge"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["exposed-edges", "Edges"],
+      ["material-slots", "Slots"],
+    ],
+    camera: [6.4, 4.4, 7.0],
+    target: [0, 1.35, 0],
+    factory: createBuildingCompilerScene,
+    evidenceHref: "../../skills/threejs-procedural-buildings-and-cities.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "procedural-creature-lab-demo": {
+    title: "Reduced Creature Lab",
+    skill: "$threejs-procedural-creatures",
+    claim: "Live directional demo: a spec-driven procedural creature exposes rig, gait, candidate field shells, and planted-foot diagnostics.",
+    variants: [
+      ["hopper"],
+      ["quadruped"],
+      ["flyer"],
+    ],
+    modes: [
+      ["final", "Final"],
+      ["rig-debug", "Rig"],
+      ["field-debug", "Field"],
+    ],
+    camera: [5.2, 3.2, 6.3],
+    target: [0, 0.9, 0],
+    factory: createCreatureLabScene,
+    evidenceHref: "../../skills/threejs-procedural-creatures.html",
+    evidenceLabel: "Skill Contract",
+  },
+  "visual-validation-harness-demo": {
+    title: "Validation Evidence Harness",
+    skill: "$threejs-visual-validation",
+    claim: "Live directional demo: fixed-camera contracts expose final, no-post, diagnostic, seed, resource, and sign-off evidence as a first-class artifact.",
+    variants: [
+      ["planet-contract"],
+      ["water-contract"],
+      ["city-contract"],
+    ],
+    modes: [
+      ["final", "Evidence"],
+      ["diagnostics", "Diagnostics"],
+      ["bundle", "Bundle"],
+    ],
+    camera: [0.0, 3.0, 8.0],
+    target: [0, 0.95, 0],
+    factory: createVisualValidationScene,
+    evidenceHref: "../../skills/threejs-visual-validation.html",
+    evidenceLabel: "Skill Contract",
+  },
   "water-generated-caustics": {
     title: "Bounded Water Caustic Projection",
     skill: "$threejs-water-optics",
@@ -2725,6 +2825,742 @@ async function createProceduralGeometryScene(scene) {
       mesh.rotation.y = Math.sin(time * 0.25) * 0.16;
       normalDebug.rotation.copy(mesh.rotation);
       backing.rotation.y = mesh.rotation.y;
+    },
+  };
+}
+
+function disposeMaterial(material) {
+  if (Array.isArray(material)) {
+    material.forEach(disposeMaterial);
+    return;
+  }
+  if (!material) return;
+  for (const key of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "alphaMap"]) {
+    material[key]?.dispose?.();
+  }
+  material.dispose?.();
+}
+
+function clearGroup(group) {
+  const children = [...group.children];
+  for (const child of children) {
+    child.traverse((node) => {
+      node.geometry?.dispose?.();
+      disposeMaterial(node.material);
+    });
+    group.remove(child);
+  }
+}
+
+function createTextPanel(lines, width, height, {
+  background = "rgba(11, 16, 22, 0.92)",
+  accent = "#7fd4c1",
+  text = "#edf7ff",
+  dim = "#91a0ad",
+  fontSize = 28,
+  title = false,
+} = {}) {
+  const list = Array.isArray(lines) ? lines : [lines];
+  const canvas = document.createElement("canvas");
+  canvas.width = 768;
+  canvas.height = 384;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = title ? 8 : 4;
+  ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+  ctx.fillStyle = accent;
+  ctx.fillRect(28, 28, title ? 140 : 96, 8);
+  ctx.font = `${title ? 700 : 600} ${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+  ctx.textBaseline = "top";
+  list.forEach((line, index) => {
+    ctx.fillStyle = index === 0 ? text : dim;
+    ctx.fillText(line, 34, 52 + index * (fontSize + 18));
+  });
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+  });
+  return new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+}
+
+function addPanel(group, lines, position, size, options) {
+  const panel = createTextPanel(lines, size[0], size[1], options);
+  panel.position.fromArray(position);
+  group.add(panel);
+  return panel;
+}
+
+function addBox(group, size, position, material) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), material);
+  mesh.position.fromArray(position);
+  group.add(mesh);
+  return mesh;
+}
+
+function createLineSegments(points, color, opacity = 0.86) {
+  const geometry = new THREE.BufferGeometry().setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(points.flat(Infinity), 3),
+  );
+  return new THREE.LineSegments(
+    geometry,
+    new THREE.LineBasicMaterial({ color, transparent: opacity < 1, opacity }),
+  );
+}
+
+function addBar(group, label, value, position, color) {
+  const clamped = clampValue(value, 0, 1);
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(1.55, 0.12, 0.06),
+    new THREE.MeshBasicMaterial({ color: 0x18212b }),
+  );
+  base.position.fromArray(position);
+  group.add(base);
+  const fill = new THREE.Mesh(
+    new THREE.BoxGeometry(1.55 * clamped, 0.12, 0.08),
+    new THREE.MeshBasicMaterial({ color }),
+  );
+  fill.position.set(position[0] - 0.775 + (1.55 * clamped) / 2, position[1], position[2] + 0.02);
+  group.add(fill);
+  addPanel(group, [label, `${Math.round(clamped * 100)}% budget`], [position[0], position[1] + 0.28, position[2] + 0.03], [1.7, 0.42], {
+    accent: `#${color.toString(16).padStart(6, "0")}`,
+    fontSize: 24,
+  });
+}
+
+async function createSkillRouterScene(scene) {
+  scene.background = new THREE.Color(0x090d12);
+  scene.fog = new THREE.Fog(0x090d12, 8, 18);
+  addLights(scene);
+  const root = new THREE.Group();
+  scene.add(root);
+  const routeVariants = [
+    {
+      brief: "ocean planet",
+      selected: ["planets", "spectral ocean", "sky/haze", "image pipeline"],
+      deferred: ["volumetric clouds"],
+      omitted: ["cities", "creatures"],
+      owner: "image pipeline owns MRT + tone map",
+      blockers: "none after WebGPU init",
+      budgets: [
+        ["LOD quadtree", 0.82, 0x8fd3ff],
+        ["FFT cascades", 0.72, 0x5dd6c8],
+        ["atmos LUT", 0.58, 0xb8e08f],
+      ],
+    },
+    {
+      brief: "rainy city",
+      selected: ["buildings", "rain/wet", "shadows", "bloom"],
+      deferred: ["vegetation"],
+      omitted: ["black holes", "creatures"],
+      owner: "rain owns wetness, shadows own coverage",
+      blockers: "transparent pane sort policy",
+      budgets: [
+        ["material slots", 0.66, 0xd6bd84],
+        ["wet normal", 0.74, 0x8fd3ff],
+        ["shadow tiles", 0.61, 0xd5c182],
+      ],
+    },
+    {
+      brief: "black-hole shot",
+      selected: ["space effects", "bloom", "exposure", "image pipeline"],
+      deferred: ["particles"],
+      omitted: ["water", "buildings"],
+      owner: "space owns ray bounds; exposure owns output",
+      blockers: "iteration pressure stress seed",
+      budgets: [
+        ["ray steps", 0.88, 0xb8a4ff],
+        ["HDR bloom", 0.52, 0xffb454],
+        ["meter state", 0.47, 0x8fb7ff],
+      ],
+    },
+  ];
+  let activeMode = "final";
+  let activeVariant = 0;
+
+  const rebuild = () => {
+    clearGroup(root);
+    const data = routeVariants[activeVariant] ?? routeVariants[0];
+    addPanel(root, ["backendManifest", "WebGPU: required", "fallback: not routed"], [-3.15, 1.75, 0], [2.1, 1.05], {
+      accent: "#7fd4c1",
+      fontSize: 28,
+      title: true,
+    });
+    addPanel(root, ["input brief", data.brief, data.blockers], [-3.15, 0.25, 0], [2.1, 1.05], {
+      accent: "#f0c36a",
+      fontSize: 28,
+    });
+    const center = addBox(root, [0.56, 0.56, 0.56], [-0.82, 0.98, -0.08], new THREE.MeshStandardMaterial({
+      color: 0x27384a,
+      roughness: 0.36,
+      metalness: 0.12,
+      emissive: 0x112638,
+    }));
+    center.rotation.set(0.35, 0.55, 0.2);
+
+    const selectedMaterial = new THREE.MeshStandardMaterial({ color: 0x58c9ac, roughness: 0.44, metalness: 0.08 });
+    const deferredMaterial = new THREE.MeshStandardMaterial({ color: 0xd5c182, roughness: 0.5, metalness: 0.05 });
+    const omittedMaterial = new THREE.MeshStandardMaterial({ color: 0x764653, roughness: 0.62, metalness: 0.02 });
+    const allNodes = [
+      ...data.selected.map((name) => [name, "selected", selectedMaterial]),
+      ...data.deferred.map((name) => [name, "deferred", deferredMaterial]),
+      ...data.omitted.map((name) => [name, "omitted", omittedMaterial]),
+    ];
+    allNodes.forEach(([name, kind, material], index) => {
+      const x = 1.0 + (index % 2) * 2.15;
+      const y = 2.0 - Math.floor(index / 2) * 0.8;
+      const node = addBox(root, [0.32, 0.32, 0.32], [x - 0.92, y, -0.06], material);
+      node.rotation.set(index * 0.17, index * 0.23, 0.12);
+      addPanel(root, [name, kind], [x, y, 0], [1.48, 0.42], {
+        accent: kind === "selected" ? "#58c9ac" : kind === "deferred" ? "#d5c182" : "#b86b79",
+        fontSize: 23,
+      });
+      root.add(createLineSegments([[[-0.82, 0.98, -0.08], [x - 0.92, y, -0.06]]], kind === "omitted" ? 0x8b4a56 : 0x7fd4c1, 0.68));
+    });
+
+    if (activeMode === "budget") {
+      addPanel(root, ["budgetTable", data.owner], [-0.2, -1.2, 0], [2.45, 0.78], { accent: "#8fb7ff", fontSize: 24 });
+      data.budgets.forEach(([label, value, color], index) => addBar(root, label, value, [1.95, -0.65 - index * 0.52, 0.02], color));
+    } else if (activeMode === "ownership") {
+      const owners = [
+        ["gbuffer", "image pipeline"],
+        ["depth", "shared pass"],
+        ["history", "temporal owner"],
+        ["toneMap", data.owner.split(" owns ")[0]],
+      ];
+      owners.forEach(([space, owner], index) => {
+        addPanel(root, [space, owner], [-1.2 + index * 1.45, -1.1, 0.02], [1.25, 0.78], {
+          accent: index % 2 ? "#8fb7ff" : "#7fd4c1",
+          fontSize: 22,
+        });
+      });
+    } else {
+      addPanel(root, ["routeManifest", `selectedSkills: ${data.selected.length}`, `deferredSkills: ${data.deferred.length}`], [-0.25, -1.25, 0.02], [2.35, 0.9], {
+        accent: "#7fd4c1",
+        fontSize: 26,
+      });
+      addPanel(root, ["debugViewList", "no-post / signals / budget", data.owner], [2.45, -1.25, 0.02], [2.35, 0.9], {
+        accent: "#b8a4ff",
+        fontSize: 24,
+      });
+    }
+  };
+
+  rebuild();
+  return {
+    setVariant(index) {
+      activeVariant = index;
+      rebuild();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      rebuild();
+    },
+    update(time) {
+      root.rotation.y = Math.sin(time * 0.18) * 0.05;
+      root.position.y = Math.sin(time * 0.6) * 0.025;
+    },
+  };
+}
+
+async function createCompatibilityFallbackScene(scene) {
+  scene.background = new THREE.Color(0x100b0c);
+  scene.fog = new THREE.Fog(0x100b0c, 8, 18);
+  addLights(scene);
+  const root = new THREE.Group();
+  scene.add(root);
+  const variants = [
+    {
+      label: "no WebGPU",
+      missing: ["WebGPU backend", "storage buffers"],
+      axes: [
+        ["precomputed-static", 0.68, 0xd5c182, "weakened"],
+        ["labelled-proxy", 0.42, 0xff938a, "removed"],
+      ],
+    },
+    {
+      label: "no storage",
+      missing: ["storage buffers", "compute compaction"],
+      axes: [
+        ["webgpu-budget", 0.78, 0x7fd4c1, "preserved"],
+        ["feature-removal", 0.36, 0xff938a, "removed"],
+      ],
+    },
+    {
+      label: "memory cap",
+      missing: ["target memory", "history count"],
+      axes: [
+        ["adaptive budget", 0.74, 0x8fb7ff, "weakened"],
+        ["lower resolution", 0.56, 0xd5c182, "weakened"],
+      ],
+    },
+  ];
+  let activeMode = "final";
+  let activeVariant = 0;
+
+  const rebuild = () => {
+    clearGroup(root);
+    const data = variants[activeVariant] ?? variants[0];
+    addPanel(root, ["canonical owner", "$threejs-image-pipeline", "WebGPU path remains primary"], [-2.9, 1.55, 0], [2.25, 1.0], {
+      accent: "#7fd4c1",
+      fontSize: 25,
+      title: true,
+    });
+    addPanel(root, ["capability manifest", data.label, `missing: ${data.missing.join(", ")}`], [0.0, 1.55, 0], [2.45, 1.0], {
+      accent: "#ff938a",
+      fontSize: 25,
+    });
+    addPanel(root, ["explicit request gate", "required before fallback teaching", activeMode === "blocked" ? "status: BLOCKED" : "status: allowed"], [2.9, 1.55, 0], [2.35, 1.0], {
+      accent: activeMode === "blocked" ? "#ff5f6d" : "#d5c182",
+      fontSize: 24,
+    });
+
+    if (activeMode === "blocked") {
+      addBox(root, [4.9, 0.16, 0.16], [0, 0.35, 0.02], new THREE.MeshBasicMaterial({ color: 0xff4058 }));
+      addPanel(root, ["no automatic fallback", "canonical WebGPU demo is withheld", "ask explicitly to teach degradation"], [0, -0.55, 0.04], [3.8, 1.25], {
+        accent: "#ff5f6d",
+        fontSize: 30,
+        title: true,
+      });
+      return;
+    }
+
+    const laneZ = activeMode === "loss-ledger" ? 0.06 : 0;
+    data.axes.forEach(([axis, value, color, stateName], index) => {
+      const y = 0.55 - index * 0.92;
+      addPanel(root, [axis, stateName], [-2.45, y, laneZ], [1.8, 0.62], {
+        accent: `#${color.toString(16).padStart(6, "0")}`,
+        fontSize: 24,
+      });
+      addBar(root, stateName === "preserved" ? "invariant kept" : "validation delta", value, [0.2, y - 0.08, laneZ], color);
+      addPanel(root, [
+        stateName === "removed" ? "lost feature disclosed" : "contract row",
+        stateName === "preserved" ? "evidence unchanged" : "acceptance threshold changes",
+      ], [2.65, y, laneZ], [2.1, 0.62], {
+        accent: stateName === "removed" ? "#ff938a" : "#8fb7ff",
+        fontSize: 22,
+      });
+    });
+
+    if (activeMode === "loss-ledger") {
+      addPanel(root, ["invariant ledger", "preserved / weakened / removed", "one downgrade axis per row"], [0, -1.6, 0.06], [3.9, 0.82], {
+        accent: "#f0c36a",
+        fontSize: 25,
+      });
+    } else {
+      addPanel(root, ["fallback branch", "quarantined implementation", "canonical path not diluted"], [0, -1.55, 0.02], [3.5, 0.78], {
+        accent: "#7fd4c1",
+        fontSize: 25,
+      });
+    }
+  };
+
+  rebuild();
+  return {
+    setVariant(index) {
+      activeVariant = index;
+      rebuild();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      rebuild();
+    },
+    update(time) {
+      root.rotation.y = Math.sin(time * 0.16) * 0.045;
+    },
+  };
+}
+
+function addBuildingWindows(group, block, materials, mode) {
+  const { x, z, w, d, h, floors, baysX, baysZ } = block;
+  const yStep = h / Math.max(1, floors + 1);
+  const edgeMat = materials.edge;
+  const glass = mode === "material-slots" ? materials.slotGlass : materials.glass;
+  const trim = mode === "material-slots" ? materials.slotBronze : materials.trim;
+  const sides = [
+    ["north", 0, -d / 2 - 0.018, baysX, w, true],
+    ["south", 0, d / 2 + 0.018, baysX, w, true],
+    ["east", w / 2 + 0.018, 0, baysZ, d, false],
+    ["west", -w / 2 - 0.018, 0, baysZ, d, false],
+  ];
+  for (const [side, ox, oz, bays, span, xAxis] of sides) {
+    const exposed = !block.blocked?.includes(side);
+    if (!exposed) continue;
+    for (let floor = 1; floor <= floors; floor += 1) {
+      for (let bay = 0; bay < bays; bay += 1) {
+        const offset = -span / 2 + (bay + 0.5) * (span / bays);
+        const size = xAxis ? [span / bays * 0.45, yStep * 0.34, 0.035] : [0.035, yStep * 0.34, span / bays * 0.45];
+        const pos = xAxis
+          ? [x + offset, floor * yStep + 0.18, z + oz]
+          : [x + ox, floor * yStep + 0.18, z + offset];
+        addBox(group, size, pos, glass);
+      }
+    }
+    if (mode === "exposed-edges") {
+      const line = xAxis
+        ? createLineSegments([
+          [[x - w / 2, 0.08, z + oz], [x + w / 2, 0.08, z + oz]],
+          [[x - w / 2, h + 0.12, z + oz], [x + w / 2, h + 0.12, z + oz]],
+        ], 0xffe38a, 0.95)
+        : createLineSegments([
+          [[x + ox, 0.08, z - d / 2], [x + ox, 0.08, z + d / 2]],
+          [[x + ox, h + 0.12, z - d / 2], [x + ox, h + 0.12, z + d / 2]],
+        ], 0xffe38a, 0.95);
+      group.add(line);
+      addBox(group, xAxis ? [w, 0.055, 0.055] : [0.055, 0.055, d], [x + ox, h + 0.18, z + oz], edgeMat);
+    } else {
+      addBox(group, xAxis ? [w, 0.08, 0.06] : [0.06, 0.08, d], [x + ox, h + 0.16, z + oz], trim);
+    }
+  }
+}
+
+async function createBuildingCompilerScene(scene) {
+  scene.background = new THREE.Color(0x10100d);
+  scene.fog = new THREE.Fog(0x10100d, 9, 20);
+  addLights(scene);
+  const root = new THREE.Group();
+  scene.add(root);
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(9, 7, 1, 1),
+    new THREE.MeshStandardMaterial({ map: makeGroundTexture({ base: "#212720", line: "rgba(222,201,150,0.18)" }), roughness: 0.84 }),
+  );
+  ground.rotation.x = -Math.PI / 2;
+  scene.add(ground);
+  const plans = [
+    {
+      name: "single tower",
+      blocks: [
+        { x: 0, z: 0, w: 2.4, d: 2.0, h: 3.6, floors: 8, baysX: 5, baysZ: 4 },
+        { x: 0, z: 0, w: 3.2, d: 2.8, h: 0.8, floors: 1, baysX: 5, baysZ: 4 },
+      ],
+      note: "8 draw-call slot target",
+    },
+    {
+      name: "courtyard",
+      blocks: [
+        { x: -1.1, z: 0, w: 1.2, d: 3.4, h: 2.8, floors: 6, baysX: 3, baysZ: 7, blocked: ["east"] },
+        { x: 1.1, z: 0, w: 1.2, d: 3.4, h: 2.8, floors: 6, baysX: 3, baysZ: 7, blocked: ["west"] },
+        { x: 0, z: -1.1, w: 3.4, d: 1.0, h: 2.4, floors: 5, baysX: 7, baysZ: 2, blocked: ["south"] },
+        { x: 0, z: 1.1, w: 3.4, d: 1.0, h: 2.4, floors: 5, baysX: 7, baysZ: 2, blocked: ["north"] },
+      ],
+      note: "blocked intervals removed",
+    },
+    {
+      name: "twin bridge",
+      blocks: [
+        { x: -1.15, z: 0, w: 1.45, d: 1.7, h: 3.4, floors: 7, baysX: 3, baysZ: 4 },
+        { x: 1.15, z: 0, w: 1.45, d: 1.7, h: 3.4, floors: 7, baysX: 3, baysZ: 4 },
+        { x: 0, z: 0, w: 1.3, d: 0.78, h: 0.48, floors: 1, baysX: 2, baysZ: 1, y: 2.15 },
+      ],
+      note: "bridge owns roof/deck caps",
+    },
+  ];
+  let activeMode = "final";
+  let activeVariant = 0;
+
+  const makeMaterials = () => ({
+    stone: new THREE.MeshStandardMaterial({ color: activeMode === "material-slots" ? 0xcfbf8c : 0xb7aa83, roughness: 0.68 }),
+    roof: new THREE.MeshStandardMaterial({ color: activeMode === "material-slots" ? 0x8fb7ff : 0x343b42, roughness: 0.58 }),
+    glass: new THREE.MeshStandardMaterial({ color: 0x8fb7c5, roughness: 0.2, metalness: 0.02, transparent: true, opacity: 0.78 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0x6f5a38, roughness: 0.45, metalness: 0.22 }),
+    edge: new THREE.MeshBasicMaterial({ color: 0xffe38a }),
+    slotGlass: new THREE.MeshBasicMaterial({ color: 0x4dd5ff }),
+    slotBronze: new THREE.MeshBasicMaterial({ color: 0xffb454 }),
+  });
+
+  const rebuild = () => {
+    clearGroup(root);
+    const plan = plans[activeVariant] ?? plans[0];
+    const materials = makeMaterials();
+    for (const block of plan.blocks) {
+      const yOffset = block.y ?? 0;
+      const body = addBox(root, [block.w, block.h, block.d], [block.x, yOffset + block.h / 2, block.z], materials.stone);
+      body.userData.slot = "limestone";
+      addBox(root, [block.w + 0.12, 0.13, block.d + 0.12], [block.x, yOffset + block.h + 0.08, block.z], materials.roof);
+      addBuildingWindows(root, { ...block, h: yOffset + block.h }, materials, activeMode);
+    }
+    const labels = activeMode === "material-slots"
+      ? ["materialSlotCounts", "stone / glass / bronze / roof", plan.note]
+      : activeMode === "exposed-edges"
+        ? ["exposedEdges", "blockers subtracted before placement", plan.note]
+        : ["BuildingPlan", plan.name, plan.note];
+    addPanel(root, labels, [0, 4.05, -0.1], [3.3, 0.9], {
+      accent: activeMode === "exposed-edges" ? "#ffe38a" : activeMode === "material-slots" ? "#4dd5ff" : "#d6bd84",
+      fontSize: 27,
+      title: true,
+    });
+  };
+
+  rebuild();
+  return {
+    setVariant(index) {
+      activeVariant = index;
+      rebuild();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      rebuild();
+    },
+    update(time) {
+      root.rotation.y = Math.sin(time * 0.18) * 0.11;
+    },
+  };
+}
+
+function setCylinderBetween(mesh, start, end) {
+  const direction = new THREE.Vector3().subVectors(end, start);
+  const length = Math.max(0.001, direction.length());
+  mesh.position.copy(start).add(end).multiplyScalar(0.5);
+  mesh.scale.y = length;
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+}
+
+async function createCreatureLabScene(scene) {
+  scene.background = new THREE.Color(0x0b120d);
+  scene.fog = new THREE.Fog(0x0b120d, 8, 18);
+  addLights(scene);
+  const root = new THREE.Group();
+  scene.add(root);
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(8, 5, 1, 1),
+    new THREE.MeshStandardMaterial({ map: makeGroundTexture({ base: "#1d261f", line: "rgba(142,230,165,0.16)" }), roughness: 0.86 }),
+  );
+  ground.rotation.x = -Math.PI / 2;
+  scene.add(ground);
+  const species = [
+    { name: "hopper", legs: [[-0.48, 0.18], [0.48, 0.18]], wings: 0, tail: true, speed: 2.4 },
+    { name: "quadruped", legs: [[-0.55, -0.42], [0.55, -0.42], [-0.55, 0.42], [0.55, 0.42]], wings: 0, tail: true, speed: 1.65 },
+    { name: "flyer", legs: [[-0.32, 0.18], [0.32, 0.18]], wings: 2, tail: false, speed: 2.1 },
+  ];
+  let activeMode = "final";
+  let activeVariant = 0;
+  let parts = null;
+
+  const rebuild = () => {
+    clearGroup(root);
+    const spec = species[activeVariant] ?? species[0];
+    const skin = new THREE.MeshStandardMaterial({ color: 0x79c58a, roughness: 0.52, metalness: 0.02 });
+    const belly = new THREE.MeshStandardMaterial({ color: 0xb8e08f, roughness: 0.56 });
+    const boneMat = new THREE.MeshBasicMaterial({ color: 0xe8ffd7 });
+    const footMat = new THREE.MeshStandardMaterial({ color: 0x2e4a35, roughness: 0.62 });
+    const fieldMat = new THREE.MeshBasicMaterial({ color: 0x8ee6a5, transparent: true, opacity: 0.18, wireframe: true });
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.72, 32, 18), skin);
+    body.scale.set(spec.name === "flyer" ? 1.18 : 1.35, 0.62, spec.name === "quadruped" ? 0.72 : 0.54);
+    body.position.y = 1.14;
+    root.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.34, 24, 14), belly);
+    head.scale.set(1.0, 0.9, 0.82);
+    head.position.set(0, 1.28, -0.72);
+    root.add(head);
+    const fieldGroup = new THREE.Group();
+    const bodyField = new THREE.Mesh(new THREE.SphereGeometry(0.78, 24, 12), fieldMat.clone());
+    bodyField.scale.copy(body.scale).multiplyScalar(1.08);
+    bodyField.position.copy(body.position);
+    fieldGroup.add(bodyField);
+    const headField = new THREE.Mesh(new THREE.SphereGeometry(0.38, 20, 10), fieldMat.clone());
+    headField.position.copy(head.position);
+    fieldGroup.add(headField);
+    root.add(fieldGroup);
+    const limbs = spec.legs.map(([x, z], index) => {
+      const upper = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.075, 1, 10), skin);
+      const lower = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 1, 10), skin);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.105, 16, 8), footMat);
+      foot.scale.set(1.35, 0.38, 0.7);
+      const line = createLineSegments([[[0, 0, 0], [0, 0, 0]], [[0, 0, 0], [0, 0, 0]]], 0xe8ffd7, 0.92);
+      root.add(upper, lower, foot, line);
+      return { x, z, index, upper, lower, foot, line };
+    });
+    const wings = [];
+    if (spec.wings) {
+      for (const side of [-1, 1]) {
+        const wing = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.45, 0.58, 1, 1),
+          new THREE.MeshStandardMaterial({ color: 0x8fd3ff, roughness: 0.36, transparent: true, opacity: 0.72, side: THREE.DoubleSide }),
+        );
+        wing.position.set(side * 0.75, 1.22, 0.0);
+        wing.rotation.z = side * 0.35;
+        root.add(wing);
+        wings.push({ wing, side });
+      }
+    }
+    let tail = null;
+    if (spec.tail) {
+      tail = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.11, 1, 12), skin);
+      root.add(tail);
+    }
+    addPanel(root, [
+      activeMode === "field-debug" ? "candidate field shells" : activeMode === "rig-debug" ? "semantic control rig" : "CharacterSpec",
+      spec.name,
+      "fixed gait clock + planted feet",
+    ], [0, 2.55, -0.1], [3.25, 0.82], {
+      accent: activeMode === "field-debug" ? "#8fd3ff" : "#8ee6a5",
+      fontSize: 25,
+      title: true,
+    });
+    parts = { spec, body, head, limbs, wings, tail, fieldGroup };
+  };
+
+  const updateVisibility = () => {
+    if (!parts) return;
+    const rigVisible = activeMode === "rig-debug";
+    const fieldVisible = activeMode === "field-debug";
+    parts.fieldGroup.visible = fieldVisible;
+    for (const limb of parts.limbs) {
+      limb.line.visible = rigVisible;
+      limb.upper.visible = !fieldVisible;
+      limb.lower.visible = !fieldVisible;
+      limb.foot.visible = !fieldVisible || rigVisible;
+    }
+  };
+
+  rebuild();
+  updateVisibility();
+  return {
+    setVariant(index) {
+      activeVariant = index;
+      rebuild();
+      updateVisibility();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      rebuild();
+      updateVisibility();
+    },
+    update(time) {
+      if (!parts) return;
+      const phaseBase = time * parts.spec.speed;
+      parts.body.position.y = 1.14 + Math.sin(phaseBase) * 0.045;
+      parts.head.position.y = 1.28 + Math.sin(phaseBase + 0.4) * 0.035;
+      for (const limb of parts.limbs) {
+        const phase = phaseBase + limb.index * Math.PI * 0.85;
+        const hip = new THREE.Vector3(limb.x * 0.82, parts.body.position.y - 0.2, limb.z);
+        const knee = new THREE.Vector3(limb.x * 1.05, 0.68 + Math.max(0, Math.sin(phase)) * 0.16, limb.z + Math.cos(phase) * 0.14);
+        const foot = new THREE.Vector3(limb.x * 1.18, 0.12, limb.z + Math.sin(phase) * 0.22);
+        setCylinderBetween(limb.upper, hip, knee);
+        setCylinderBetween(limb.lower, knee, foot);
+        limb.foot.position.copy(foot);
+        const attr = limb.line.geometry.attributes.position;
+        attr.setXYZ(0, hip.x, hip.y, hip.z);
+        attr.setXYZ(1, knee.x, knee.y, knee.z);
+        attr.setXYZ(2, knee.x, knee.y, knee.z);
+        attr.setXYZ(3, foot.x, foot.y, foot.z);
+        attr.needsUpdate = true;
+      }
+      for (const item of parts.wings) {
+        item.wing.rotation.y = item.side * (0.55 + Math.sin(time * 5.2) * 0.34);
+        item.wing.rotation.z = item.side * 0.35;
+      }
+      if (parts.tail) {
+        setCylinderBetween(parts.tail, new THREE.Vector3(0, parts.body.position.y, 0.58), new THREE.Vector3(Math.sin(time * 1.6) * 0.22, 0.82, 1.42));
+      }
+      parts.fieldGroup.position.y = Math.sin(time * 1.1) * 0.025;
+      root.rotation.y = Math.sin(time * 0.18) * 0.08;
+    },
+  };
+}
+
+async function createVisualValidationScene(scene) {
+  scene.background = new THREE.Color(0x0d0b13);
+  scene.fog = new THREE.Fog(0x0d0b13, 8, 18);
+  addLights(scene);
+  const root = new THREE.Group();
+  scene.add(root);
+  const contracts = [
+    {
+      label: "planet contract",
+      frames: ["final.design", "no-post", "normal-depth", "near-detail", "far-silhouette", "seed-sweep"],
+      metrics: [["field parity", 0.91, 0x8fb7ff], ["LOD crack", 0.76, 0x7fd4c1], ["atmos hide", 0.34, 0xff938a]],
+      color: 0x8fb7ff,
+    },
+    {
+      label: "water contract",
+      frames: ["final.design", "no-caustic", "heightfield", "normal-slope", "stress-drop", "leak-loop"],
+      metrics: [["history reset", 0.82, 0x7fd4c1], ["caustic delta", 0.68, 0xd5c182], ["target bytes", 0.52, 0x8fb7ff]],
+      color: 0x6ad7e3,
+    },
+    {
+      label: "city contract",
+      frames: ["final.design", "slot-debug", "edge-debug", "near-facade", "far-chunk", "fixture-sweep"],
+      metrics: [["slot drawcalls", 0.78, 0xd6bd84], ["edge owners", 0.94, 0x8ee6a5], ["uv scale", 0.61, 0xb8a4ff]],
+      color: 0xd6bd84,
+    },
+  ];
+  let activeMode = "final";
+  let activeVariant = 0;
+
+  const rebuild = () => {
+    clearGroup(root);
+    const contract = contracts[activeVariant] ?? contracts[0];
+    addPanel(root, ["visual-contract.json", contract.label, "fixed camera + seed + DPR"], [-2.9, 1.9, 0], [2.25, 0.86], {
+      accent: `#${contract.color.toString(16).padStart(6, "0")}`,
+      fontSize: 25,
+      title: true,
+    });
+    addPanel(root, ["evidence-manifest.json", "targets / storage / timings", "renderer.info + sign-off"], [2.9, 1.9, 0], [2.35, 0.86], {
+      accent: "#b8a4ff",
+      fontSize: 24,
+    });
+
+    if (activeMode === "bundle") {
+      const resources = [
+        ["RenderTarget", "beauty/history/diagnostic"],
+        ["Storage", "pose/field/timing"],
+        ["Leak Loop", "resize + tier switch"],
+        ["Decision", "accepted or withheld"],
+      ];
+      resources.forEach(([name, value], index) => {
+        addPanel(root, [name, value], [-2.3 + index * 1.55, 0.35, 0.05], [1.35, 0.82], {
+          accent: index % 2 ? "#8fb7ff" : "#7fd4c1",
+          fontSize: 22,
+        });
+      });
+      contract.metrics.forEach(([label, value, color], index) => addBar(root, label, value, [-1.6 + index * 1.6, -1.15, 0.05], color));
+      return;
+    }
+
+    const frames = activeMode === "diagnostics"
+      ? contract.frames.map((name, index) => `${index % 2 ? "diagnostic" : "isolation"}:${name}`)
+      : contract.frames;
+    frames.forEach((name, index) => {
+      const col = index % 3;
+      const row = Math.floor(index / 3);
+      const panel = addPanel(root, [name, row === 0 ? "required PNG" : "stress capture"], [-2.3 + col * 2.3, 0.75 - row * 1.28, 0.05], [1.72, 0.92], {
+        accent: index === 0 ? "#7fd4c1" : activeMode === "diagnostics" ? "#ffb454" : "#8fb7ff",
+        fontSize: 22,
+      });
+      panel.rotation.y = (col - 1) * 0.06;
+    });
+    if (activeMode === "diagnostics") {
+      addPanel(root, ["node-pipeline diagnostics", "no-post / contribution / masks", "single owner per signal"], [0, -1.75, 0.08], [3.8, 0.72], {
+        accent: "#ffb454",
+        fontSize: 24,
+      });
+    } else {
+      addPanel(root, ["sign-off record", "backend + camera + color + metrics", "publish only accepted examples"], [0, -1.75, 0.08], [3.8, 0.72], {
+        accent: "#7fd4c1",
+        fontSize: 24,
+      });
+    }
+  };
+
+  rebuild();
+  return {
+    setVariant(index) {
+      activeVariant = index;
+      rebuild();
+    },
+    setMode(mode) {
+      activeMode = mode;
+      rebuild();
+    },
+    update(time) {
+      root.rotation.y = Math.sin(time * 0.15) * 0.045;
     },
   };
 }
