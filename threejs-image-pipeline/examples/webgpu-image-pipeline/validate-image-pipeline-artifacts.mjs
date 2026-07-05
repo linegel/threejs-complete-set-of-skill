@@ -234,18 +234,22 @@ async function meanRgbDifference( pathA, pathB ) {
 async function validateSourceContracts() {
 
 	const mainSource = await readFile( resolve( here, 'main.js' ), 'utf8' );
+	const composeSource = await readFile( resolve( here, 'composeFinalGraph.js' ), 'utf8' );
 	const skillSource = await readFile( resolve( here, '../../SKILL.md' ), 'utf8' );
 	const readmeSource = await readFile( resolve( here, 'README.md' ), 'utf8' );
 
 	assert( ! mainSource.includes( 'options.temporal === true ? traa' ), 'main.js still enables TRAA directly from options.temporal.' );
-	assert( mainSource.includes( 'config.temporal.enabled === true ? traa' ), 'main.js must drive TRAA from validated config.temporal.enabled.' );
+	assert( mainSource.includes( 'composeFinalGraph' ), 'main.js must use the shared final graph composer.' );
+	assert( composeSource.includes( 'config.temporal.enabled === true' ), 'composeFinalGraph.js must drive TRAA from validated config.temporal.enabled.' );
+	assert( composeSource.includes( 'const lightingAwareAoComposite = directLightingEstimate.add( indirectLightingEstimate );' ), 'composeFinalGraph.js must preserve the lighting-aware AO composite.' );
+	assert( composeSource.includes( 'const hdrComposite = lightingAwareAoComposite.add( bloomPass.getTextureNode() );' ), 'composeFinalGraph.js must feed the AO composite into bloom before final output.' );
 	assert( ! mainSource.includes( "getTextureNode( 'albedo' )" ), 'main.js still reads albedo from the production MRT.' );
 	assert( mainSource.includes( 'Debug-only albedo capture' ), 'main.js must label albedo as a debug-only diagnostic pass.' );
 	assert( mainSource.includes( 'scenePass.dispose?.()' ), 'main.js disposal must call scenePass.dispose?.().' );
 	assert( mainSource.includes( 'debugAlbedoPass.dispose?.()' ), 'main.js disposal must call debugAlbedoPass.dispose?.().' );
 	assert( mainSource.includes( 'gtao.dispose?.()' ), 'main.js disposal must call gtao.dispose?.().' );
 	assert( mainSource.includes( 'bloomPass.dispose?.()' ), 'main.js disposal must call bloomPass.dispose?.().' );
-	assert( mainSource.includes( 'temporal?.dispose?.()' ), 'main.js disposal must call temporal?.dispose?.().' );
+	assert( mainSource.includes( 'graph.temporal?.dispose?.()' ), 'main.js disposal must call graph.temporal?.dispose?.().' );
 	assert( ! skillSource.includes( 'requiredMRT: 3' ), 'SKILL.md still documents requiredMRT: 3.' );
 	assert( skillSource.includes( 'Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4' ), 'SKILL.md must document the rgba8unorm byte-cost trap.' );
 	assert( ! skillSource.includes( 'precomputed LUTs, static variants' ), 'SKILL.md still teaches reduced-tier fallback assets inside the flagship skill.' );

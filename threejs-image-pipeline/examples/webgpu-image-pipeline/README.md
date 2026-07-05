@@ -5,6 +5,11 @@ This example is the canonical shared-gbuffer frame graph for
 one scene `pass( scene, camera )`, and shared `mrt()` outputs for color,
 normal, and emissive contribution.
 
+Velocity diagnostics follow three.js r185 `VelocityNode` semantics:
+current-minus-previous NDC, i.e. `velocity.xy = currentNdc.xy - previousNdc.xy`.
+History reprojection converts this to previous UV with
+`previousUV = currentUV - velocity.xy * 0.5`.
+
 Run static checks:
 
 ```bash
@@ -76,3 +81,6 @@ node threejs-image-pipeline/examples/webgpu-image-pipeline/validateImagePipeline
 
 Each command must exit nonzero. If an invalid graph reaches rendering, the
 diagnostics are not trustworthy.
+
+Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4, when the accounting
+unit is a double-buffered render-target slot or ping-pong allocation.

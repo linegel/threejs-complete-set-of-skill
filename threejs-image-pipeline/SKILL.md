@@ -65,6 +65,7 @@ import { WebGPURenderer, RenderPipeline, HalfFloatType } from 'three/webgpu';
 
 const renderer = new WebGPURenderer( { antialias: false, outputBufferType: HalfFloatType } );
 await renderer.init();
+const sharedGbufferOutputs = [ 'output', 'normal', 'emissive' ];
 
 if ( renderer.backend.isWebGPUBackend !== true ) {
   throw new Error( 'WebGPU backend required for the canonical image pipeline. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.' );
@@ -72,7 +73,7 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
 
 const tier = {
   backend: 'WebGPU',
-  requiredMRT: 3,
+  requiredMRT: sharedGbufferOutputs.length,
   requiredStorage: false,
   timestampQuery: renderer.hasFeature( 'timestamp-query' ),
   outputBufferType: renderer.getOutputBufferType(),
@@ -88,7 +89,7 @@ Quality tiers:
 | Tier | Requirements | Defaults |
 | --- | --- | --- |
 | Full | WebGPU backend with MRT, node passes, storage/compute where used | HDR MRT, live exposure, `GTAONode`, `BloomNode`, optional `TRAANode`, diagnostics |
-| Reduced | WebGPU exists but the frame or storage budget is tight | no live compute history, AO/bloom at lower scale, precomputed LUTs, static variants |
+| Reduced | WebGPU exists but the frame or storage budget is tight | no live compute history, AO/bloom at lower scale, fixed exposure, lower diagnostic cadence |
 | Debug | WebGPU backend during authoring | one diagnostic output at a time, pass timers, owner labels, forced disable paths |
 
 ## Build Order
@@ -129,6 +130,36 @@ Read [references/production-image-pipeline.md](references/production-image-pipel
 for concrete contracts, pass graphs, replacement notes, budget targets, and
 failure checks.
 
+## Shared Signal Contracts
+
+Add these rows to every project signal table; do not leave them implicit:
+
+| Signal | Producer | Consumers | Space/type | Color space | Resolution | History | Disable path |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| velocity | scene `pass()` MRT `velocity` or a named `VelocityNode` path | `TRAANode`, clouds, frost/thaw, temporal denoise, motion vectors | RG16F vec2 in NDC delta; three.js r185 sign is `currentNdc.xy - previousNdc.xy`; state whether jitter is included before resolve | data/no-color | 1.0 unless every temporal consumer declares matching scale | previous/current view-projection and object transforms | disable temporal consumers, not velocity sign checks |
+| depth convention | renderer depth plus one view-Z helper | `GTAONode`, fog, clouds, refraction, temporal rejection | declare exactly one of `reversedDepthBuffer`, `logarithmicDepthBuffer`, standard perspective, or orthographic; reconstruct through the named helper before consumers compare distances | data/no-color | 1.0 source; reduced effects sample through depth-aware upsample | optional previous depth for rejection | disable depth consumers or classify sky/background explicitly |
+
+Canonical velocity reprojection helper:
+
+```js
+import { uv } from 'three/tsl';
+
+export const velocityToPreviousUV = ( velocityTexel, currentUV = uv() ) => {
+	// three.js r185 VelocityNode stores currentNDC.xy - previousNDC.xy.
+	// currentUV = currentNDC.xy * 0.5 + 0.5.
+	// previousUV = previousNDC.xy * 0.5 + 0.5
+	//            = ( currentNDC.xy - velocity.xy ) * 0.5 + 0.5
+	//            = currentUV - velocity.xy * 0.5.
+	return currentUV.sub( velocityTexel.xy.mul( 0.5 ) );
+};
+```
+
+Consumers that reproject to previous history must call this helper or implement
+the same derivation verbatim. A sign flip is a correctness bug, not a tuning
+choice. For depth, publish one `viewZ` reconstruction contract next to the
+renderer flags; `GTAONode`, fog, volumetrics, and temporal rejection must not
+mix reversed-depth assumptions with renderer-defined depth labels.
+
 ## Color And Output
 
 - Color textures are `SRGBColorSpace`; data maps, masks, normals, roughness,
@@ -165,6 +196,18 @@ Memory estimate per 1920x1080 attachment:
 Every enabled pass must state dispatch count if compute is used, render
 resolution, attachment count, target type, draw/scene render count, GPU time,
 and resize/disposal behavior.
+
+Derived internal effect rows are part of the same budget:
+
+| Derived node | Internal targets | Draw or dispatch count argument |
+| --- | --- | --- |
+| `BloomNode` 5-mip pyramid | at scale `s`, pyramid pixels are `s^2 * (1 + 1/4 + 1/16 + 1/64 + 1/256)` of full resolution per chain; ping-pong or separate upsample targets roughly double that before final composite | prefilter/threshold 1 + 5 downsample draws + 5 upsample/add draws + final composite = about 12 fullscreen draws |
+| `GTAONode` | AO target is scalar at `resolutionScale^2`; denoise/temporal variants add their own scalar/history targets and must be counted separately | one AO gather draw plus denoise/upsample/composite draws actually enabled; temporal filtering also counts TRAA/history work |
+| `TRAANode` | current beauty input plus previous beauty, velocity, depth/rejection, and any neighborhood clamp targets | one reprojection/resolve fullscreen draw per enabled history plus reset/clear work on resize, camera cut, or projection change |
+
+Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4, when the accounting
+unit is a double-buffered render-target slot or ping-pong allocation. State the
+unit before comparing bytes.
 
 ## Rules
 

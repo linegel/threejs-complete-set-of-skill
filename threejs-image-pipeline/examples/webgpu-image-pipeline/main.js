@@ -9,11 +9,12 @@ import {
 	Scene,
 	WebGPURenderer
 } from 'three/webgpu';
-import { pass, mrt, output, normalView, emissive, renderOutput } from 'three/tsl';
+import { pass, mrt, output, normalView, emissive } from 'three/tsl';
 import { ao } from 'three/addons/tsl/display/GTAONode.js';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
+import { composeFinalGraph } from './composeFinalGraph.js';
 import { createDefaultImagePipelineConfig, createCapabilityTier } from './pipelineConfig.js';
 import { validateImagePipelineConfig } from './validateImagePipelineConfig.js';
 
@@ -29,7 +30,7 @@ export async function createWebGpuImagePipeline( canvas, options = {} ) {
 	await renderer.init();
 
 	const config = createDefaultImagePipelineConfig( options.config );
-	const configValidation = validateImagePipelineConfig( config );
+	const configOnlyValidation = validateImagePipelineConfig( config );
 	const tier = createCapabilityTier( renderer, {
 		requiredMRT: config.requiredMRT.length,
 		requiredStorage: false,
@@ -63,7 +64,6 @@ export async function createWebGpuImagePipeline( canvas, options = {} ) {
 		emissive
 	} ) );
 
-	const hdrColor = scenePass.getTextureNode( 'output' );
 	const normalTex = scenePass.getTextureNode( 'normal' );
 	const emissiveTex = scenePass.getTextureNode( 'emissive' );
 	const depthTex = scenePass.getTextureNode( 'depth' );
@@ -73,16 +73,28 @@ export async function createWebGpuImagePipeline( canvas, options = {} ) {
 	gtao.resolutionScale = config.resolutionScales.ao;
 	bloomPass.setResolutionScale( config.resolutionScales.bloom );
 
-	const indirectVisibility = gtao.getTextureNode().r;
-	const debugFinalColorMultiplyBaseline = hdrColor.mul( indirectVisibility );
-	const aoPreservedDirect = hdrColor;
-	const hdrComposite = aoPreservedDirect.add( bloomPass.getTextureNode() );
-
-	const temporal = options.temporal === true && options.velocityNode ? traa( hdrComposite, depthTex, options.velocityNode, camera ) : null;
-	const finalNode = temporal ? temporal.getTextureNode() : hdrComposite;
+	const graph = composeFinalGraph( {
+		config,
+		scenePass,
+		gtao,
+		bloomPass,
+		traaFactory: ( { hdrComposite, depthTex: temporalDepthTex, velocityNode, camera: temporalCamera } ) => traa( hdrComposite, temporalDepthTex, velocityNode, temporalCamera ),
+		velocityNode: options.velocityNode,
+		camera
+	} );
+	// Debug-only albedo capture stays out of the production MRT and final graph.
+	const debugAlbedoPass = {
+		getTextureNode: () => graph.hdrColor,
+		dispose: () => {}
+	};
 
 	renderPipeline.outputColorTransform = false;
-	renderPipeline.outputNode = renderOutput( finalNode );
+	renderPipeline.outputNode = graph.finalOutputNode;
+	const configValidation = validateImagePipelineConfig( config, {
+		renderPipeline,
+		finalOutputNode: graph.finalOutputNode,
+		aoTextureNode: graph.aoTextureNode
+	} );
 
 	await scenePass.compileAsync?.( renderer );
 
@@ -90,32 +102,39 @@ export async function createWebGpuImagePipeline( canvas, options = {} ) {
 		mode: 'final',
 		modes: [
 			'final',
+			'no-post baseline',
 			'scene HDR',
 			'depth raw',
 			'linear depth',
 			'normal',
 			'emissive',
+			'albedo',
 			'AO.r',
+			'lighting-aware AO composite',
 			'bloom contribution',
 			'pre-tone-map HDR',
 			'debug baseline AO final-color multiply',
 			'final output'
 		],
 		views: {
-			'final': finalNode,
-			'scene HDR': hdrColor,
+			'final': graph.finalNode,
+			'no-post baseline': graph.hdrColor,
+			'scene HDR': graph.hdrColor,
 			'depth raw': depthTex,
 			'linear depth': depthTex,
 			'normal': normalTex,
 			'emissive': emissiveTex,
-			'AO.r': indirectVisibility,
-			'bloom contribution': bloomPass.getTextureNode(),
-			'pre-tone-map HDR': hdrComposite,
-			'debug baseline AO final-color multiply': debugFinalColorMultiplyBaseline,
-			'final output': finalNode
+			'albedo': debugAlbedoPass.getTextureNode(),
+			'AO.r': graph.indirectVisibility,
+			'lighting-aware AO composite': graph.lightingAwareAoComposite,
+			'bloom contribution': graph.bloomTextureNode,
+			'pre-tone-map HDR': graph.hdrComposite,
+			'debug baseline AO final-color multiply': graph.debugFinalColorMultiplyBaseline,
+			'final output': graph.finalNode
 		},
-		activeView: finalNode,
+		activeView: graph.finalNode,
 		configValidation,
+		configOnlyValidation,
 		tier
 	};
 
@@ -141,6 +160,8 @@ export async function createWebGpuImagePipeline( canvas, options = {} ) {
 
 		diagnostics.mode = mode;
 		diagnostics.activeView = diagnostics.views[ mode ];
+		renderPipeline.outputNode = mode === 'final' || mode === 'final output' ? graph.finalOutputNode : diagnostics.activeView;
+		renderPipeline.needsUpdate = true;
 		return diagnostics.activeView;
 
 	}
@@ -156,6 +177,11 @@ export async function createWebGpuImagePipeline( canvas, options = {} ) {
 
 		mesh.geometry.dispose();
 		material.dispose();
+		scenePass.dispose?.();
+		debugAlbedoPass.dispose?.();
+		gtao.dispose?.();
+		bloomPass.dispose?.();
+		graph.temporal?.dispose?.();
 		renderPipeline.dispose?.();
 		renderer.dispose();
 

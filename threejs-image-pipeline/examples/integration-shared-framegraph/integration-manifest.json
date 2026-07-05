@@ -41,7 +41,7 @@
       "writers": [
         "threejs-image-pipeline"
       ],
-      "convention": "previous/current clip-to-NDC velocity in data/no-color MRT",
+      "convention": "current-minus-previous NDC velocity in data/no-color MRT; velocity.xy = currentNdc.xy - previousNdc.xy",
       "consumers": [
         "threejs-procedural-motion-systems",
         "threejs-camera-controls-and-rigs",

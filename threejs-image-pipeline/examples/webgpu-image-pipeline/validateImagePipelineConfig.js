@@ -3,6 +3,12 @@ import {
 	createDefaultImagePipelineConfig,
 	evaluateLightingAwareAoComposite
 } from './pipelineConfig.js';
+import { PerspectiveCamera, Scene } from 'three/webgpu';
+import { pass, mrt, output, normalView, emissive, renderOutput } from 'three/tsl';
+import { ao } from 'three/addons/tsl/display/GTAONode.js';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+
+import { composeFinalGraph } from './composeFinalGraph.js';
 
 function fail( message ) {
 
@@ -10,7 +16,68 @@ function fail( message ) {
 
 }
 
-export function validateImagePipelineConfig( config = createDefaultImagePipelineConfig() ) {
+function collectReachableNodes( rootNode ) {
+
+	if ( ! rootNode || typeof rootNode.traverse !== 'function' ) {
+
+		fail( 'Live graph validation requires a RenderPipeline.outputNode with node.traverse().' );
+
+	}
+
+	const reachable = new Set();
+
+	rootNode.traverse( ( node ) => {
+
+		reachable.add( node );
+
+	} );
+
+	return reachable;
+
+}
+
+export function validateImagePipelineGraph( config, graph ) {
+
+	const outputNode = graph?.renderPipeline?.outputNode ?? graph?.outputNode;
+	const finalOutputNode = graph?.finalOutputNode ?? outputNode;
+	const aoTextureNode = graph?.aoTextureNode;
+	const reachable = collectReachableNodes( outputNode );
+	const finalReachable = finalOutputNode === outputNode ? reachable : collectReachableNodes( finalOutputNode );
+	const passNodes = [ ...reachable ].filter( ( node ) => node?.isPassNode === true );
+
+	if ( passNodes.length !== 1 ) {
+
+		fail( `Live output node graph must reach exactly one PassNode, got ${ passNodes.length }.` );
+
+	}
+
+	if ( config.sceneRenderCount !== passNodes.length ) {
+
+		fail( `Config sceneRenderCount ${ config.sceneRenderCount } disagrees with live graph PassNode count ${ passNodes.length }.` );
+
+	}
+
+	if ( ! aoTextureNode ) {
+
+		fail( 'Live graph validation requires the GTAO texture node used by the final composite.' );
+
+	}
+
+	if ( ! finalReachable.has( aoTextureNode ) ) {
+
+		fail( 'Final non-debug output graph must consume the GTAO texture node.' );
+
+	}
+
+	return {
+		pass: true,
+		scenePassCount: passNodes.length,
+		aoTextureReachableFromFinal: true
+	};
+
+}
+
+export function validateImagePipelineConfig( config = createDefaultImagePipelineConfig(), graph = null ) {
 
 	if ( config.sceneRenderCount !== 1 ) {
 
@@ -122,7 +189,8 @@ export function validateImagePipelineConfig( config = createDefaultImagePipeline
 
 	}
 
-	validateAoCompositeContract();
+	const aoComposite = validateAoCompositeContract();
+	const liveGraph = graph ? validateImagePipelineGraph( config, graph ) : null;
 
 	return {
 		pass: true,
@@ -130,7 +198,9 @@ export function validateImagePipelineConfig( config = createDefaultImagePipeline
 		toneMapOwner: config.toneMapOwner,
 		outputTransformOwner: config.outputTransformOwner,
 		requiredMRT: config.requiredMRT,
-		estimatedBytes
+		estimatedBytes,
+		aoComposite,
+		liveGraph
 	};
 
 }
@@ -179,17 +249,19 @@ export function validateAoCompositeContract() {
 }
 
 const fixtureFactories = {
-	valid: () => createDefaultImagePipelineConfig(),
-	'duplicate-scene-render': () => createDefaultImagePipelineConfig( { sceneRenderCount: 2 } ),
-	'duplicate-output-owner': () => createDefaultImagePipelineConfig( {
+	valid: () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture() } ),
+	'duplicate-scene-render': () => ( { config: createDefaultImagePipelineConfig( { sceneRenderCount: 2 } ), graph: createLiveGraphFixture() } ),
+	'duplicate-scene-pass-graph': () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture( { duplicateScenePass: true } ) } ),
+	'missing-final-ao-graph': () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture( { omitAoFromFinal: true } ) } ),
+	'duplicate-output-owner': () => ( { config: createDefaultImagePipelineConfig( {
 		toneMapOwner: 'RenderPipeline',
 		outputTransformOwner: 'renderOutput',
 		outputColorTransform: true
-	} ),
-	'double-output-transform': () => createDefaultImagePipelineConfig( {
+	} ) } ),
+	'double-output-transform': () => ( { config: createDefaultImagePipelineConfig( {
 		outputColorTransform: true
-	} ),
-	'missing-velocity-convention': () => createDefaultImagePipelineConfig( {
+	} ) } ),
+	'missing-velocity-convention': () => ( { config: createDefaultImagePipelineConfig( {
 		requiredMRT: [ 'output', 'normal', 'emissive', 'velocity' ],
 		producers: {
 			output: 'scene-pass',
@@ -219,16 +291,100 @@ const fixtureFactories = {
 			jitterOwner: null,
 			resetEvents: [ 'resize' ]
 		}
-	} ),
-	'undeclared-mrt-consumer': () => createDefaultImagePipelineConfig( {
+	} ) } ),
+	'undeclared-mrt-consumer': () => ( { config: createDefaultImagePipelineConfig( {
 		consumers: {
 			output: [ 'lighting-composite' ],
 			normal: [],
 			emissive: [ 'BloomNode' ],
 			depth: [ 'GTAONode' ]
 		}
-	} )
+	} ) } )
 };
+
+function createLiveGraphFixture( options = {} ) {
+
+	const scene = new Scene();
+	const camera = new PerspectiveCamera();
+	const scenePass = pass( scene, camera );
+	const hdrColor = scenePass.getTextureNode( 'output' );
+	const aoTextureNode = scenePass.getTextureNode( 'depth' );
+	const indirectVisibility = aoTextureNode.r;
+	let composite = options.omitAoFromFinal === true ? hdrColor : hdrColor.mul( indirectVisibility );
+
+	if ( options.duplicateScenePass === true ) {
+
+		const duplicatePass = pass( new Scene(), new PerspectiveCamera() );
+		composite = composite.add( duplicatePass.getTextureNode( 'output' ) );
+
+	}
+
+	const finalOutputNode = renderOutput( composite );
+
+	return {
+		renderPipeline: { outputNode: finalOutputNode },
+		finalOutputNode,
+		aoTextureNode
+	};
+
+}
+
+export function createRealImagePipelineGraph( config = createDefaultImagePipelineConfig() ) {
+
+	const scene = new Scene();
+	const camera = new PerspectiveCamera( 50, 1, 0.1, 100 );
+	const scenePass = pass( scene, camera );
+	scenePass.setResolutionScale( config.resolutionScales.scene );
+
+	scenePass.setMRT( mrt( {
+		output,
+		normal: normalView,
+		emissive
+	} ) );
+
+	const normalTex = scenePass.getTextureNode( 'normal' );
+	const emissiveTex = scenePass.getTextureNode( 'emissive' );
+	const depthTex = scenePass.getTextureNode( 'depth' );
+	const gtao = ao( depthTex, normalTex, camera );
+	const bloomPass = bloom( emissiveTex );
+
+	gtao.resolutionScale = config.resolutionScales.ao;
+	bloomPass.setResolutionScale( config.resolutionScales.bloom );
+
+	const graph = composeFinalGraph( {
+		config,
+		scenePass,
+		gtao,
+		bloomPass,
+		camera
+	} );
+
+	return {
+		renderPipeline: { outputNode: graph.finalOutputNode },
+		finalOutputNode: graph.finalOutputNode,
+		aoTextureNode: graph.aoTextureNode,
+		scene,
+		camera,
+		scenePass,
+		gtao,
+		bloomPass,
+		graph
+	};
+
+}
+
+export function runRealGraphValidation() {
+
+	const config = createDefaultImagePipelineConfig();
+	const realGraph = createRealImagePipelineGraph( config );
+	const validation = validateImagePipelineConfig( config, realGraph );
+
+	return {
+		validation,
+		constructorEscape: null
+	};
+
+}
 
 export function runValidationFixture( fixtureName ) {
 
@@ -240,7 +396,8 @@ export function runValidationFixture( fixtureName ) {
 
 	}
 
-	return validateImagePipelineConfig( factory() );
+	const fixture = factory();
+	return validateImagePipelineConfig( fixture.config, fixture.graph ?? null );
 
 }
 
@@ -250,6 +407,8 @@ export function runSelfTest() {
 	const aoComposite = validateAoCompositeContract();
 	const invalidFixtures = [
 		'duplicate-scene-render',
+		'duplicate-scene-pass-graph',
+		'missing-final-ao-graph',
 		'duplicate-output-owner',
 		'double-output-transform',
 		'missing-velocity-convention',
@@ -295,6 +454,7 @@ if ( import.meta.url === `file://${ process.argv[ 1 ] }` ) {
 
 	const fixtureIndex = process.argv.indexOf( '--fixture' );
 	const expectInvalidIndex = process.argv.indexOf( '--expect-invalid' );
+	const realGraph = process.argv.includes( '--real-graph' );
 
 	try {
 
@@ -314,7 +474,9 @@ if ( import.meta.url === `file://${ process.argv[ 1 ] }` ) {
 				}
 
 			} )
-			: fixtureIndex === -1
+			: realGraph === true
+				? runRealGraphValidation()
+				: fixtureIndex === -1
 				? runSelfTest()
 				: runValidationFixture( process.argv[ fixtureIndex + 1 ] );
 

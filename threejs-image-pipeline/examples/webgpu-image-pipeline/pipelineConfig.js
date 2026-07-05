@@ -39,6 +39,11 @@ export function createDefaultImagePipelineConfig( overrides = {} ) {
 			bloom: 0.5,
 			diagnostics: 1
 		},
+		// Authored estimate of the indirect share of hdrColor for AO modulation.
+		// This example has no separated lighting terms, so the split is a declared
+		// scene parameter, not a derived constant; production scenes replace the
+		// estimate with their true indirect buffer and delete this knob.
+		aoIndirectFraction: 0.25,
 		temporal: {
 			enabled: false,
 			velocityConvention: null,
