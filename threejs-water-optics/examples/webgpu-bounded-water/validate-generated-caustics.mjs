@@ -179,7 +179,14 @@ function createEvidence({ assets, rendererInfo, metrics }) {
         screenshotEncoding: "Browser Canvas2D domain render after WebGPU backend gate",
       },
       postStack: { renderPipeline: "domain validation surface", outputColorTransform: true, renderOutputOwner: true, scenePasses: 1, mrtOutputs: [], diagnostics: ["caustic-only", "source channels", "tile stress"] },
-      thresholds: { nonblank: { minRange: 8 }, perViewPixelDiff: { final: 0.01, diagnostics: 0.02 }, cameraMatrixRequired: true },
+      thresholds: {
+        nonblank: { minRange: 8 },
+        perViewPixelDiff: {
+          finalStable: { baseline: "images/final.design.png", candidate: "images/camera.design.png", maxRatio: 0.01 },
+          diagnosticsStable: { baseline: "images/diagnostics.mosaic.png", candidate: "images/seed-stress.final.png", maxRatio: 0.01 },
+        },
+        cameraMatrixRequired: true,
+      },
       stochasticMasks: [{ name: "none", path: null, reason: "fixed generated assets and deterministic floor projection" }],
       knownCompromises: ["Generated caustic fields are reduced-tier sources/diagnostics, not live differential-area compute caustics."],
       domainMetrics: metrics,
