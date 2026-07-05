@@ -78,8 +78,15 @@ Historical state: installed copies routed `threejs-image-pipeline` to `$threejs-
 `threejs-raymarched-space-effects`) while the workspace used the current names. Verified 2026-07-05 late
 session: the live installed inventory now matches workspace names — the sync landed. **Residual [V] gap:**
 `threejs-procedural-creatures` is absent from the installed inventory entirely, so it is unroutable from a
-live session until installed. *Remaining fix:* install the creatures skill; add a divergence check to the
-choose-skills preflight so this class of drift is caught mechanically next time.
+live session until installed. **Update 2026-07-05 ~03:30 [V]:** creatures installed (byte-identical copy);
+additionally 11 stale old-name copies (`threejs-skill-router`, `threejs-shadow-systems`,
+`threejs-screen-space-ambient-occlusion`, `threejs-camera-direction`, `threejs-atmosphere-aerial-perspective`,
+`threejs-precipitation-surfaces`, `threejs-procedural-animation`, `threejs-procedural-architecture`,
+`threejs-procedural-vfx`, `threejs-raymarched-space-effects`, `threejs-temporal-surfaces`) were still present
+alongside the synced names — archived (not deleted) to `~/.claude/skills-deprecated-threejs-20260705/`;
+install manifest rewritten to the 25 current skills (v0.4.0). Installed inventory now equals the workspace
+exactly. *Remaining fix:* add a divergence check to the choose-skills preflight so this class of drift is
+caught mechanically next time.
 
 ### Tier 2: contained correctness / physics defects
 
@@ -95,9 +102,16 @@ per-stage await where ordering is already enforced by resource dependencies.
 `renderOutput()`-style path — composition with image-pipeline risks double conversion; align with the
 one-owner rule. (b) Cascade band mask `step(low,k)·step(k,high)` is closed on both ends — a bin landing
 exactly on a handoff double-counts; make intervals half-open `[low, high)` (P2; exact coincidence is
-measure-zero across differing patch lengths, so severity is low). (c) **Open allegation, neither confirmed
-nor struck:** IFFT packing of two real fields may discard `.zw` outputs at assembly
-(`compute-kernels.js` pack vs assembly unpack) — verify at kernel level before filing or dismissing.
+measure-zero across differing patch lengths, so severity is low). (c) **CONFIRMED at kernel level
+2026-07-05 [V], upgraded to the top ocean defect:** `createEvolutionNode` (compute-kernels.js:271–279) packs
+each spectra pair COMPONENT-INTERLEAVED — e.g. `vec4(dx.x, dz.x, dx.y, dz.y)` = (Re dx, Re dz, Im dx, Im dz) —
+while `createFftStageNode` (:330–332) butterflies `.xy` and `.zw` as two independent complex numbers and
+`createCenterAndAssembleNode` (:355–372) consumes ONLY `.x/.y` of every field texture. With Hermitian spectra,
+the `.xy` lane (Re dx + i·Re dz) transforms to the EVEN spatial part of each field only; the odd/sine half
+lives in the discarded `.zw` transform. Net: every output field is its even projection — half the wave content
+is lost and the surface is point-symmetric. The assembly's read pattern matches the standard two-Hermitian-
+spectra-in-one-complex-FFT trick (G = A + i·B ⇒ out.x = a(n), out.y = b(n)); the PACK is what's wrong (it
+never does the complex combine `(A.x − B.y, A.y + B.x)`). Fix in the pack; assembly stands.
 
 **3.6 `threejs-volumetric-clouds` — legacy example is unbounded; validation is token-grep. [V]**
 `examples/weather-volume-clouds/cloud-system.js:83` `PRIMARY_STEPS = 320` with LIGHT_STEPS=5–6 per step;
@@ -106,11 +120,20 @@ history sampled at `vUv` (same-UV — no velocity/depth rejection), violating th
 tone-map ownership. WebGPU "canonical" path returns descriptor/contract strings; `validation.js` accepts
 token presence (`Fn().compute`, `Storage3DTexture`) without executing a march. *Fix:* quarantine or delete
 the legacy example; implement the real TSL march kernel; make validation execute it and assert step-count ×
-resolution products against the tier table. Re-check the reference's memory table at HEAD: the "~4 MB
-quarter-res" claim was corrected in SKILL.md (quarter-linear 480×270 RGBA16F = 480·270·8 B ≈ 1.0 MB;
-4.1 MB is half-linear 960×540) but reportedly persisted in `weather-volume-and-reconstruction.md` ~:523. [A]
+resolution products against the tier table. **Memory table re-checked 2026-07-05 [V] — worse than filed:**
+the reference's table (weather-volume-and-reconstruction.md:521–527) is systematically 4× off: `quarter …
+~4 MB` (true quarter-linear 480×270 RGBA16F = 1.04 MB; 4.15 MB is half-linear) AND `half … ~16 MB` (true
+half-linear = 4.15 MB; 16.6 MB is full-res). SKILL.md:89 ("quarter-linear … about 4 MB per buffer") is also
+still wrong at HEAD — the claimed earlier SKILL.md correction did not land. The volume rows (128³ lines) are
+correct. **Also [V]:** the height-mix at reference:304–309 `mix(topModifier, bottomModifier,
+remapClamped(h, 0.2, 0.4))` applies `topModifier` at the layer bottom — the VALUES match the standard
+orientation (detail-erosion low, 1−detail high), so this is a naming swap, not a physics bug; rename the
+variables rather than reordering the mix.
 
-**3.7 `threejs-sky-atmosphere-and-haze` — double output transform; scaffold kernels. [A]**
+**3.7 `threejs-sky-atmosphere-and-haze` — double output transform; scaffold kernels. [V 2026-07-05 — all
+three confirmed: `webgpu-lut-atmosphere.js:70–71` template AND live `:159` set `outputColorTransform = true`
+with a `renderOutput()`-owning composite; kernels are template-string scaffolds (`TSL_COMPUTE_SCAFFOLD` :50,
+`PIPELINE_SCAFFOLD` :63); `:157` silently downgrades `backendTier` to "reduced" on !WebGPU.]**
 `webgpu-lut-atmosphere.js:70–71` sets `outputNode = renderOutput(...)` **and** `outputColorTransform = true`
 (image-pipeline contract requires `false` when `renderOutput()` owns the transform). LUT kernels are
 descriptors without executed integration. Silent tier downgrade on !WebGPU instead of throwing.
@@ -138,9 +161,15 @@ enforced; Node fixture reports `cpuFrameMs.median: 0.1`, `gpuTimingUnavailable: 
 creature mechanism section despite bidirectional routing with the creatures skill. [V]
 **3.11 `threejs-image-pipeline`** — largely remediated at baseline (the 0.78/0.22 AO split and the second
 `pass(scene,camera)` are gone from `main.js` — do **not** re-file them; deleted runner/validator files were
-restored in `2f09258`). Residual: validator counts a config scalar (`sceneRenderCount`) instead of
-enumerating live PassNodes in the reachable graph; integration-manifest velocity/tone-map conventions need
-re-verification against the current example. [V/A]
+restored in `2f09258`). Residual, re-verified 2026-07-05 [V]: validator still counts a config scalar
+(`validateImagePipelineConfig.js:15` — `config.sceneRenderCount !== 1`) instead of enumerating live PassNodes;
+GTAO is computed but multiplies nothing in the final composite (`main.js:76–79` — `aoPreservedDirect =
+hdrColor`, `indirectVisibility` reaches only the debug baseline); the pre-bloom-metering allegation is
+**struck** (no metering exists in this example at all — exposure lives in exposure-color-grading);
+integration-manifest tone-map owner is already consistent (`"outputTransformOwner": "renderOutput"` matches
+the example's `outputColorTransform = false` + `renderOutput`), but the velocity row (:44) states
+"previous/current clip-to-NDC" with no explicit sign — needs the r185 current−previous convention spelled
+out.
 **3.12 `threejs-procedural-motion-systems`** — presentation interpolation documented (SKILL.md:29–31) but
 absent (no accumulator α, renders last fixed step); GPU compute kernel writes only `simTime`, never
 dispatched by the demo. Implement or re-scope the claims. [V]
@@ -153,9 +182,15 @@ coupling contract — each water owner exposes a CPU truncated dominant-wave sum
 spectrum/waves* with a stated parity error vs the GPU field (bounded → water-optics; open sea →
 spectral-ocean). This is also the template for any future physics coupling.
 
-Clean on current evidence (no action): bloom, exposure-color-grading, procedural-geometry,
-procedural-materials, water-optics, procedural-vegetation (one [A]: per-patch `InstancedMesh` may exceed
-the SKILL draw table — re-check), black-holes, camera rigs, temporal surfaces, precipitation.
+Clean on current evidence (no action): bloom, procedural-geometry, procedural-materials, water-optics,
+black-holes, camera rigs, temporal surfaces, precipitation. Exposure-color-grading and
+ambient-contact-shading re-checked 2026-07-05 [V]: clean — validators throw on double output conversion and
+carry pass/fail fixtures (`validate-exposure.js:153–156, 437–457`); config-level checking noted, folded into
+the systemic validator-upgrade rule. Procedural-vegetation [V]: the doctrine/example mismatch is real —
+SKILL.md:60 says "one `InstancedMesh` or batched draw per visible LOD band" while
+`dense-grass-system.js:83–84` budgets "81 patches … 2 draw objects per visible patch" (≤162 draws before
+culling, 2–12 typical after); reconcile in the Tier-3 pass (doc fix: per-patch draws with culling bound, or
+merge per band).
 
 ---
 
