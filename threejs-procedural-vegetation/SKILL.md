@@ -57,7 +57,7 @@ a second path here.
 
 ## Dense Grass Build Order
 
-1. Choose patch size from culling, not from texture dimensions. A good default is 16-32 m patches with 8-20 k blades each; keep one `InstancedMesh` or batched draw per visible LOD band.
+1. Choose patch size from culling, not from texture dimensions. A good default is 16-32 m patches with 8-20 k blades each; keep one `InstancedMesh` per patch per LOD representation, and budget submitted draw objects as `visibleDraws = drawObjectsPerPatch * visiblePatches`.
 2. Allocate static storage attributes: origin/height/width/facing/bend, clump id/density/species, color variation, terrain normal, and packed material flags. Prefer 16-byte alignment and pack half-precision-like ranges into normalized fields when visual error is below one pixel.
 3. Run one initialization dispatch per chunk with `Fn().compute(count)` and deterministic hash seeds. Write to `StorageInstancedBufferAttribute` via `storage()` nodes or use `instancedArray()` then `toAttribute()` for render consumption.
 4. Use the same terrain field, density mask, path mask, and clump field for placement, material variation, and LOD thresholds. Do not let visual color clumps drift from density clumps.
@@ -67,6 +67,18 @@ a second path here.
 8. Transition to impostors by patch, not by individual blade. Cross-fade density or alpha hash over a short distance band and keep shadow density matched to visible density.
 
 Use `renderer.compute()` when dispatch order can stay inside the frame graph; use `renderer.computeAsync()` for explicit initialization, streaming chunk generation, readback-free validation steps, or when the app needs a promise boundary.
+
+Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In `examples/webgpu-dense-grass/dense-grass-system.js`, each patch owns one blade `InstancedMesh` and one impostor-card `InstancedMesh`; `getStats().drawObjectsPerPatch` reports `2`, and `validateDenseGrassConfig()` uses `visibleDrawObjectCeiling = patchCount * 2`. Derive patch count as `visiblePatchesWorst = (2 * patchGridRadius + 1)^2`. The ultra preset comment cites `81` patches, `1.46M` visible blades, and `2` draw objects per visible patch; the high preset comment cites `49` patches, `588k` visible blades, and `2-12` submitted patch draws typical after frustum culling.
+
+| Preset | Source parameters | Worst visible patches | Worst submitted draw objects | Allocated blades |
+| --- | --- | ---: | ---: | ---: |
+| Ultra | `patchGridRadius = 4`, `drawObjectsPerPatch = 2`, `bladesPerPatch = 18000` | `(2 * 4 + 1)^2 = 81` | `2 * 81 = 162` | `81 * 18000 = 1458000` |
+| High | `patchGridRadius = 3`, `drawObjectsPerPatch = 2`, `bladesPerPatch = 12000` | `(2 * 3 + 1)^2 = 49` | `2 * 49 = 98` | `49 * 12000 = 588000` |
+| Default runtime options | `normalizeOptions({})` selects `high` | `(2 * 3 + 1)^2 = 49` | `2 * 49 = 98` | `49 * 12000 = 588000` |
+
+## Creature Composition
+
+Vegetation owns the wind field as an authored procedural field in the sense of `$threejs-procedural-fields`; creatures sample that same field for fur, feather, cloth, or antenna response, so there is no second wind system with an independent phase. For trampling, creature stance events must write world-space contact positions, radii, weights, and decay into the same touch/interaction channel consumed by grass displacement. The current WebGPU dense-grass example exposes wind uniforms and static density storage but no local trampling displacement channel, so this is a future contract: add a dynamic touch texture or compact storage buffer, sample it in the blade position node, and leave static blade storage immutable.
 
 ## r185 Add-On Import Paths
 
@@ -108,11 +120,11 @@ Read [references/structured-ash-growth-system.md](references/structured-ash-grow
 
 State budgets before implementation:
 
-| Device tier | Visible blades | Chunks submitted | Init compute | Per-frame compute | Draw calls | Post budget |
+| Device tier | Visible blades | Chunks submitted | Init compute | Per-frame compute | Submitted draw objects | Post budget |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Desktop discrete | 1-4 M | 64-128 | under 8 ms per streamed region | under 0.8 ms | 8-24 | under 2.0 ms |
-| Desktop integrated | 250 k-1 M | 24-64 | under 12 ms per streamed region | under 0.5 ms | 4-16 | under 1.2 ms |
-| Mobile/low power | 50-250 k | 8-32 | amortized over frames | under 0.25 ms | 2-8 | under 0.8 ms |
+| Desktop discrete | 1-4 M | 64-128 | under 8 ms per streamed region | under 0.8 ms | `2 * visiblePatches`; ultra worst `2 * 81 = 162` | under 2.0 ms |
+| Desktop integrated | 250 k-1 M | 24-64 | under 12 ms per streamed region | under 0.5 ms | `2 * visiblePatches`; high/default worst `2 * 49 = 98`; typical `2-12` after culling | under 1.2 ms |
+| Mobile/low power | 50-250 k | 8-32 | amortized over frames | under 0.25 ms | `2 * visiblePatches`; derive worst from preset radius | under 0.8 ms |
 
 Storage budget targets:
 
