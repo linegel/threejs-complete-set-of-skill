@@ -101,3 +101,21 @@
   K=1..11, passes at 13; capped at 2 it produces the named REJECT error.
 - `gate-coverage-index` was vacuous (unconditional pass with a hardcoded list); now
   dynamically imports every gate module and fails on any missing required id.
+
+## Stage 6 — real WebGPU TSL snapped-shell path (this session)
+
+- **Expected** (reference §7/§10 boot rows): pipeline counting "via renderer.info / GPU capture".
+  **Observed**: renderer.info has no pipeline counter (plan §9 fact confirmed live); wrapping
+  GPUDevice.createRenderPipeline/Async/createComputePipeline/createBuffer after renderer.init()
+  works headless and yields countersAtInit / countersAtReveal (7+7 pipelines, 76 buffers at
+  reveal for the 6-species scene). Doctrine delta candidate: reference §11 should name the
+  device-wrap mechanism, not renderer.info, for gates 16-17.
+- **Headless screenshot caveat**: page.screenshot() of the WebGPU canvas is presentation-blank
+  in headless Chromium (known pack caveat). Stage 7 must capture via in-page render-target
+  readback (readRenderTargetPixelsAsync) + CPU PNG encode (visual-validation png.js pattern),
+  not compositor screenshots.
+- **Parity-order hazard checked**: CPU field sorts candidate indices ascending; the compiler
+  stores candidate sets ascending (verified for all 16 quadruped slots), so the TSL as-stored
+  loop matches the CPU fold order. The stage-7 f32 parity artifact remains the executable bound.
+- Fragment SDF self-AO deliberately skipped at this stage (cost); toon ramp + analytic
+  gradient normals implemented; documented in material.userData.selfAO.

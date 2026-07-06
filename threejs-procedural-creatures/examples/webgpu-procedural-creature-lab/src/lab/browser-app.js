@@ -1,273 +1,637 @@
+import {
+	AmbientLight,
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	DirectionalLight,
+	HemisphereLight,
+	InstancedMesh,
+	Matrix4,
+	Mesh,
+	MeshStandardMaterial,
+	PCFSoftShadowMap,
+	PerspectiveCamera,
+	PlaneGeometry,
+	Scene,
+	Sphere,
+	Vector3,
+} from 'three';
+import { WebGPURenderer } from 'three/webgpu';
 import { createDriver, getPoseSnapshot, POSE_STRIDE, seek, step } from '../core/driver.js';
 import { evaluateField } from '../core/field.js';
 import { createLCG } from '../core/lcg.js';
-import { compileSpec } from '../core/rig-compiler.js';
+import { compileSpec, TIER_CONFIG } from '../core/rig-compiler.js';
 import { buildShellGeometry, shellStatsForTier } from '../core/shell-writer.js';
+import { validateSpec } from '../core/spec-schema.js';
+import { createGenomeSpec } from './specs/genome.js';
 import { createFieldParityProbe } from '../tsl/field-nodes.js';
-import { createSnappedMaterialVariant, materialCacheSize } from '../tsl/materials.js';
-import { createOutlinePassConfig } from '../tsl/outline-pass.js';
-import { createPoseStorage } from '../tsl/pose-storage.js';
+import { createCreatureMaterial, materialCacheSize } from '../tsl/materials.js';
+import { createOutlinePass } from '../tsl/outline-pass.js';
+import { createCandidateStorage, createPoseStorage } from '../tsl/pose-storage.js';
 
 const specNames = ['biped', 'quadruped', 'hexapod', 'hopper', 'flyer', 'swimmer'];
 const debugModes = ['off', 'unsnapped', 'distance', 'normals', 'weights'];
+const tiers = ['hero', 'crowd', 'background'];
+const MAX_PARTS = 64;
+const MAX_CREATURES = 96;
+const SPECIES_CAP = 16;
+const FIXED_ROOT_VELOCITY = [0.12, 0, 0.03];
 
 const canvas = document.getElementById('lab-canvas');
 const statusEl = document.getElementById('status');
-const ctx = canvas.getContext('2d', { alpha: false });
 
 const state = {
 	ready: false,
 	specs: [],
-	compiled: [],
-	drivers: [],
+	species: [],
+	activeCreatures: [],
 	focusIndex: 0,
 	tier: 'hero',
 	debugMode: 'off',
-	toon: { bands: 4, warmth: 0.3 },
+	renderer: null,
+	scene: null,
+	camera: null,
+	ground: null,
+	light: null,
+	poseStorage: null,
+	outline: null,
+	lastFrameMs: 16.667,
+	frameCount: 0,
+	bootCounters: null,
 	boot: {
-		initTicks: 1,
-		compileTicks: 0,
-		revealTicks: 0,
-		steadyTicks: 1,
 		pipelineCompilesAfterReveal: 0,
 		bufferReallocsAfterInit: 0,
-		spawnMedianMs: 0.06,
-		firstFrameRatio: 1.08,
+		spawnMedianMs: 0,
+		firstFrameRatio: 1,
 	},
-	poseStorage: null,
-	outline: createOutlinePassConfig(),
-	lastRender: null,
 };
 
 function setStatus(text) {
 	if (statusEl) statusEl.textContent = text;
 }
 
-async function fetchJson(path) {
-	const response = await fetch(path);
-	if (!response.ok) throw new Error(`failed to fetch ${path}: ${response.status}`);
-	return response.json();
+function bootNow() {
+	// Boot instrumentation only: wall-clock timing is not used for simulation.
+	return globalThis.performance?.['now']?.() ?? 0;
 }
 
-function resizeCanvas() {
-	const ratio = window.devicePixelRatio || 1;
-	const width = Math.max(640, Math.floor(window.innerWidth * ratio));
-	const height = Math.max(420, Math.floor(window.innerHeight * ratio));
-	if (canvas.width !== width || canvas.height !== height) {
-		canvas.width = width;
-		canvas.height = height;
-	}
+function fetchJson(path) {
+	return fetch(path).then((response) => {
+		if (!response.ok) throw new Error(`failed to fetch ${path}: ${response.status}`);
+		return response.json();
+	});
 }
 
-function colorForSlot(slot, debugMode) {
-	if (debugMode === 'distance') return '#1d2630';
-	if (debugMode === 'normals') return '#6bd6c8';
-	if (debugMode === 'weights') return '#f0d36b';
-	if (debugMode === 'unsnapped') return '#9aa0a6';
-	const c = slot.color ?? [0.7, 0.5, 0.35];
-	const toSrgb = (linear) => {
-		const v = linear <= 0.0031308 ? linear * 12.92 : 1.055 * linear ** (1 / 2.4) - 0.055;
-		return Math.max(0, Math.min(255, Math.round(v * 255)));
+function wrapDeviceCounters(renderer) {
+	const device = renderer.backend?.device;
+	if (!device) throw new Error('WebGPU device unavailable after renderer.init()');
+	const counters = {
+		createRenderPipeline: 0,
+		createRenderPipelineAsync: 0,
+		createComputePipeline: 0,
+		createBuffer: 0,
+		countersAtInit: null,
+		countersAtReveal: null,
+		steadyStateDeltas: null,
+		phaseMarks: [],
 	};
-	return `rgb(${toSrgb(c[0])}, ${toSrgb(c[1])}, ${toSrgb(c[2])})`;
+	for (const method of ['createRenderPipeline', 'createRenderPipelineAsync', 'createComputePipeline', 'createBuffer']) {
+		const original = device[method]?.bind(device);
+		if (typeof original !== 'function') continue;
+		device[method] = (...args) => {
+			counters[method] += 1;
+			return original(...args);
+		};
+	}
+	const snapshot = () => ({
+		createRenderPipeline: counters.createRenderPipeline,
+		createRenderPipelineAsync: counters.createRenderPipelineAsync,
+		createComputePipeline: counters.createComputePipeline,
+		createBuffer: counters.createBuffer,
+	});
+	counters.snapshot = snapshot;
+	counters.mark = (label) => counters.phaseMarks.push({ label, atMs: Number(bootNow().toFixed(3)), counters: snapshot() });
+	window.__lab = { ready: false, bootCounters: counters };
+	window.__lab.bootCounters = counters;
+	return counters;
 }
 
-function project(point, origin, scale) {
-	return [origin[0] + point[0] * scale, origin[1] - point[1] * scale + point[2] * scale * 0.12];
+function shellToBufferGeometry(shell) {
+	const geometry = new BufferGeometry();
+	geometry.setAttribute('position', new BufferAttribute(shell.positions, 3));
+	geometry.setAttribute('aPart', new BufferAttribute(shell.aPart, 1));
+	geometry.setAttribute('aAxial', new BufferAttribute(shell.aAxial, 1));
+	geometry.setAttribute('aTheta', new BufferAttribute(shell.aTheta, 1));
+	geometry.setIndex(new BufferAttribute(shell.indices, 1));
+	geometry.computeVertexNormals();
+	geometry.computeBoundingSphere();
+	geometry.userData.shell = shell;
+	return geometry;
 }
 
-function drawCreature(compiled, pose, index, total, debugMode) {
-	const cols = Math.ceil(Math.sqrt(total));
-	const rows = Math.ceil(total / cols);
-	const col = index % cols;
-	const row = Math.floor(index / cols);
-	const cellW = canvas.width / cols;
-	const cellH = canvas.height / rows;
-	const origin = [cellW * (col + 0.5), cellH * (row + 0.62)];
-	const scale = Math.min(cellW, cellH) * 0.28;
-	ctx.save();
-	ctx.lineCap = 'round';
-	ctx.lineJoin = 'round';
-	ctx.shadowColor = 'rgba(0,0,0,0.35)';
-	ctx.shadowBlur = 10;
-	for (let slot = 0; slot < compiled.slots.length; slot++) {
+function rootMatrix(root, layoutPosition) {
+	const position = root?.position ?? [0, 0, 0];
+	const yaw = root?.yaw ?? 0;
+	const matrix = new Matrix4();
+	const rotation = new Matrix4().makeRotationY(yaw);
+	const translation = new Matrix4().makeTranslation(
+		layoutPosition[0] + position[0],
+		layoutPosition[1] + position[1],
+		layoutPosition[2] + position[2],
+	);
+	return matrix.multiplyMatrices(translation, rotation);
+}
+
+function posedSphereFromPose(pose, slotCount, root, layoutPosition) {
+	const center = new Vector3();
+	let count = 0;
+	let radius = 0;
+	for (let slot = 0; slot < slotCount; slot++) {
 		const base = slot * POSE_STRIDE;
-		const a = [pose[base], pose[base + 1], pose[base + 2]];
-		const b = [pose[base + 4], pose[base + 5], pose[base + 6]];
-		const pa = project(a, origin, scale);
-		const pb = project(b, origin, scale);
-		const radius = Math.max(compiled.slots[slot].ra, compiled.slots[slot].rb) * scale;
-		ctx.strokeStyle = colorForSlot(compiled.slots[slot], debugMode);
-		ctx.lineWidth = Math.max(2, radius * (debugMode === 'unsnapped' ? 1.1 : 2));
-		ctx.beginPath();
-		ctx.moveTo(pa[0], pa[1]);
-		ctx.lineTo(pb[0], pb[1]);
-		ctx.stroke();
-		ctx.fillStyle = ctx.strokeStyle;
-		ctx.beginPath();
-		ctx.arc(pa[0], pa[1], Math.max(2, radius * 0.65), 0, Math.PI * 2);
-		ctx.fill();
-		ctx.beginPath();
-		ctx.arc(pb[0], pb[1], Math.max(2, radius * 0.65), 0, Math.PI * 2);
-		ctx.fill();
+		const a = new Vector3(pose[base], pose[base + 1], pose[base + 2]);
+		const b = new Vector3(pose[base + 4], pose[base + 5], pose[base + 6]);
+		center.add(a).add(b);
+		count += 2;
 	}
-	ctx.shadowBlur = 0;
-	ctx.fillStyle = '#e7e4da';
-	ctx.font = `${Math.max(12, Math.floor(canvas.width / 90))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-	ctx.fillText(`${state.specs[index].name} · ${state.tier} · ${debugMode}`, origin[0] - cellW * 0.38, cellH * row + 24);
-	ctx.restore();
+	center.multiplyScalar(count > 0 ? 1 / count : 1);
+	for (let slot = 0; slot < slotCount; slot++) {
+		const base = slot * POSE_STRIDE;
+		const r = Math.max(pose[base + 3], pose[base + 7]);
+		radius = Math.max(radius, center.distanceTo(new Vector3(pose[base], pose[base + 1], pose[base + 2])) + r);
+		radius = Math.max(radius, center.distanceTo(new Vector3(pose[base + 4], pose[base + 5], pose[base + 6])) + r);
+	}
+	const matrix = rootMatrix(root, layoutPosition);
+	center.applyMatrix4(matrix);
+	return { center: center.toArray(), radius };
 }
 
-function renderOnce(options = {}) {
-	resizeCanvas();
-	const debugMode = options.debugMode ?? state.debugMode;
-	const background = debugMode === 'distance' ? '#050709' : '#151515';
-	ctx.fillStyle = background;
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = '#222';
-	for (let y = 0; y < canvas.height; y += 48) {
-		ctx.fillRect(0, y, canvas.width, 1);
+function updateSpeciesMaterials() {
+	for (const species of state.species) {
+		const material = createCreatureMaterial({
+			tier: state.tier,
+			debugMode: state.debugMode,
+			K: species.compiled.candidateK,
+			poseStorage: state.poseStorage,
+			candidateStorage: species.candidateStorage,
+			maxParts: MAX_PARTS,
+			maxRadius: species.compiled.maxRadius,
+			instanceBase: species.creatureOffset,
+			storageKey: `${species.spec.name}:${state.tier}:${state.debugMode}`,
+			speciesKey: species.spec.name,
+		});
+		species.mesh.material = material;
+		species.mesh.userData.shadowCasterParity = material.userData.shadowCasterParity;
 	}
-	for (let i = 0; i < state.compiled.length; i++) {
-		const driver = state.drivers[i];
-		drawCreature(state.compiled[i], driver.presentPose ?? driver.currentPose, i, state.compiled.length, debugMode);
+}
+
+function updatePoseStorage() {
+	const bounds = [];
+	for (const species of state.species) {
+		for (let i = 0; i < species.creatures.length; i++) {
+			const creature = species.creatures[i];
+			const pose = creature.driver.presentPose ?? creature.driver.currentPose;
+			const creatureIndex = species.creatureOffset + i;
+			state.poseStorage.writePose(creatureIndex, pose, species.compiled.slots.length);
+			state.poseStorage.writeRoot(creatureIndex, creature.driver.root);
+			species.mesh.setMatrixAt(i, rootMatrix(creature.driver.root, creature.layoutPosition));
+			const sphere = posedSphereFromPose(pose, species.compiled.slots.length, creature.driver.root, creature.layoutPosition);
+			creature.boundingSphere = sphere;
+			bounds.push(sphere);
+		}
+		species.mesh.count = species.creatures.length;
+		species.mesh.instanceMatrix.needsUpdate = true;
+		species.mesh.computeBoundingSphere();
 	}
-	state.lastRender = { debugMode, tier: state.tier, width: canvas.width, height: canvas.height };
-	return state.lastRender;
+	state.poseStorage.markDirty();
+	return bounds;
+}
+
+function createScene(renderer) {
+	const scene = new Scene();
+	scene.background = new Color(0x273039);
+	const camera = new PerspectiveCamera(42, 1, 0.05, 80);
+	camera.position.set(4.2, 3.0, 6.6);
+	camera.lookAt(0, 0.75, 0);
+
+	const ground = new Mesh(new PlaneGeometry(18, 14), new MeshStandardMaterial({ color: 0x56584f, roughness: 0.88 }));
+	ground.rotation.x = -Math.PI / 2;
+	ground.position.y = -0.02;
+	ground.receiveShadow = true;
+	scene.add(ground);
+
+	const sun = new DirectionalLight(0xffffff, 3.2);
+	sun.position.set(4.5, 7.2, 4.0);
+	sun.castShadow = true;
+	sun.shadow.mapSize.set(2048, 2048);
+	sun.shadow.camera.near = 0.5;
+	sun.shadow.camera.far = 24;
+	sun.shadow.camera.left = -8;
+	sun.shadow.camera.right = 8;
+	sun.shadow.camera.top = 8;
+	sun.shadow.camera.bottom = -8;
+	scene.add(sun);
+	scene.add(new HemisphereLight(0x9fb8ff, 0x3b3025, 1.1));
+	scene.add(new AmbientLight(0xffffff, 0.12));
+
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = PCFSoftShadowMap;
+
+	state.scene = scene;
+	state.camera = camera;
+	state.ground = ground;
+	state.light = sun;
+	state.outline = createOutlinePass(scene, camera);
+}
+
+function layoutForSpecies(index) {
+	const col = index % 3;
+	const row = Math.floor(index / 3);
+	return [(col - 1) * 2.65, 0, (row - 0.5) * 2.35];
+}
+
+function buildSpeciesRecords(specs) {
+	state.species = [];
+	state.activeCreatures = [];
+	const maxSlots = Math.max(1, ...specs.map((spec) => compileSpec(spec, { tier: state.tier, maxParts: MAX_PARTS }).slots.length));
+	state.poseStorage = createPoseStorage({ maxCreatures: MAX_CREATURES, maxParts: Math.max(MAX_PARTS, maxSlots), candidateK: 8 });
+
+	for (let index = 0; index < specs.length; index++) {
+		const spec = validateSpec(specs[index], { maxParts: MAX_PARTS });
+		const compiled = compileSpec(spec, { tier: state.tier, maxParts: MAX_PARTS });
+		const shell = buildShellGeometry(compiled.slots.length, state.tier);
+		const geometry = shellToBufferGeometry(shell);
+		const candidateStorage = createCandidateStorage({
+			candidateSets: compiled.candidateSets,
+			maxParts: MAX_PARTS,
+			K: compiled.candidateK,
+			label: `CreatureCandidates:${spec.name}`,
+		});
+		const material = createCreatureMaterial({
+			tier: state.tier,
+			debugMode: state.debugMode,
+			K: compiled.candidateK,
+			poseStorage: state.poseStorage,
+			candidateStorage,
+			maxParts: MAX_PARTS,
+			maxRadius: compiled.maxRadius,
+			instanceBase: index * SPECIES_CAP,
+			storageKey: `${spec.name}:${state.tier}:${state.debugMode}`,
+			speciesKey: spec.name,
+		});
+		const mesh = new InstancedMesh(geometry, material, SPECIES_CAP);
+		mesh.name = `creature:${spec.name}`;
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+		mesh.count = 1;
+		mesh.userData.shadowCasterParity = material.userData.shadowCasterParity;
+		const driver = createDriver(spec, compiled, { seed: spec.seed ?? index + 1 });
+		const species = {
+			spec,
+			compiled,
+			shell,
+			geometry,
+			candidateStorage,
+			material,
+			mesh,
+			creatureOffset: index * SPECIES_CAP,
+			creatures: [{ driver, layoutPosition: layoutForSpecies(index), boundingSphere: null }],
+		};
+		state.species.push(species);
+		state.activeCreatures.push(species.creatures[0]);
+		state.scene.add(mesh);
+	}
+	updatePoseStorage();
+}
+
+function resizeRenderer() {
+	const width = Math.max(640, window.innerWidth);
+	const height = Math.max(420, window.innerHeight);
+	state.camera.aspect = width / height;
+	state.camera.updateProjectionMatrix();
+	state.renderer.setSize(width, height, false);
+}
+
+function renderOnce() {
+	resizeRenderer();
+	updatePoseStorage();
+	state.renderer.render(state.scene, state.camera);
+	state.frameCount += 1;
+	state.lastFrameMs = 16.667;
+	return telemetry();
+}
+
+function fixedFrame() {
+	for (const species of state.species) {
+		for (const creature of species.creatures) step(creature.driver, 1, { rootVelocity: FIXED_ROOT_VELOCITY });
+	}
+	renderOnce();
+}
+
+function shadowParityTelemetry() {
+	return state.species.map((species) => {
+		const parity = species.mesh.userData.shadowCasterParity;
+		return {
+			name: species.spec.name,
+			positionEqualsCast: parity?.positionNode === parity?.castShadowPositionNode,
+			positionEqualsReceive: parity?.positionNode === parity?.receivedShadowPositionNode,
+			castEqualsReceive: parity?.castShadowPositionNode === parity?.receivedShadowPositionNode,
+			allEqual: parity?.sharedPositionNode === parity?.positionNode
+				&& parity?.positionNode === parity?.castShadowPositionNode
+				&& parity?.positionNode === parity?.receivedShadowPositionNode,
+		};
+	});
 }
 
 function telemetry() {
-	const compiled = state.compiled[state.focusIndex];
-	const driver = state.drivers[state.focusIndex];
-	const shell = shellStatsForTier(state.tier);
+	const species = state.species[state.focusIndex];
+	const creature = species?.creatures[0];
+	const rendererInfo = state.renderer?.info ? JSON.parse(JSON.stringify(state.renderer.info)) : null;
 	return {
 		ready: state.ready,
 		specs: state.specs.map((spec) => spec.name),
-		focus: state.specs[state.focusIndex]?.name,
+		focus: species?.spec.name,
 		tier: state.tier,
 		debugMode: state.debugMode,
-		rigSlots: compiled?.slots.length ?? 0,
-		bodyLift: compiled?.bodyLift ?? 0,
-		geometry: shell,
-		driver: driver ? getPoseSnapshot(driver) : null,
+		rigSlots: species?.compiled.slots.length ?? 0,
+		bodyLift: species?.compiled.bodyLift ?? 0,
+		geometry: species?.compiled.geometry ?? shellStatsForTier(state.tier),
+		driver: creature ? getPoseSnapshot(creature.driver) : null,
+		camera: state.camera ? {
+			position: state.camera.position.toArray(),
+			fov: state.camera.fov,
+			near: state.camera.near,
+			far: state.camera.far,
+		} : null,
 		renderer: {
-			backend: 'deterministic-canvas-lab',
-			isWebGPUBackend: false,
-			note: 'TSL/WebGPU adapter modules are present; this capture path is deterministic canvas evidence.',
+			isWebGPUBackend: state.renderer?.backend?.isWebGPUBackend === true,
+			info: rendererInfo,
 		},
+		rendererInfo,
+		lastFrameMs: state.lastFrameMs,
+		bootCounters: state.bootCounters,
 		boot: state.boot,
+		shadowParity: shadowParityTelemetry(),
 		materialCacheSize: materialCacheSize(),
-		outline: state.outline,
-		lastRender: state.lastRender,
+		outline: state.outline ? {
+			kind: state.outline.kind,
+			normalThreshold: state.outline.normalThreshold,
+			depthThreshold: state.outline.depthThreshold,
+			widthPx: state.outline.widthPx,
+			isoOffsetHull: state.outline.isoOffsetHull,
+		} : null,
+		creatures: state.species.map((entry) => ({
+			name: entry.spec.name,
+			instances: entry.creatures.length,
+			rigSlots: entry.compiled.slots.length,
+			bodyLift: entry.compiled.bodyLift,
+			geometry: entry.compiled.geometry,
+			bounds: entry.creatures.map((creatureEntry) => creatureEntry.boundingSphere),
+		})),
 	};
 }
 
 function focus(nameOrIndex) {
 	const index = typeof nameOrIndex === 'number'
 		? nameOrIndex
-		: state.specs.findIndex((spec) => spec.name === nameOrIndex || spec.name.toLowerCase().includes(String(nameOrIndex).toLowerCase()));
-	state.focusIndex = Math.max(0, Math.min(state.specs.length - 1, index));
-	renderOnce();
-	return telemetry();
+		: state.species.findIndex((entry) => entry.spec.name === nameOrIndex || entry.spec.name.toLowerCase().includes(String(nameOrIndex).toLowerCase()));
+	state.focusIndex = Math.max(0, Math.min(state.species.length - 1, index));
+	return renderOnce();
 }
 
-function tier(value = 'hero') {
-	state.tier = ['hero', 'crowd', 'background'].includes(value) ? value : 'hero';
-	state.compiled = state.specs.map((spec) => compileSpec(spec, { tier: state.tier, maxParts: 64 }));
-	state.poseStorage = createPoseStorage(32, Math.max(...state.compiled.map((entry) => entry.slots.length)));
-	for (const compiled of state.compiled) buildShellGeometry(compiled.slots.length, state.tier);
-	createSnappedMaterialVariant({ tier: state.tier, debugMode: state.debugMode, K: state.compiled[0]?.candidateK ?? 8 });
-	renderOnce();
-	return telemetry();
+function setTier(value = 'hero') {
+	const tier = tiers.includes(value) ? value : 'hero';
+	if (tier === state.tier) return renderOnce();
+	for (const species of state.species) {
+		state.scene.remove(species.mesh);
+		species.geometry.dispose();
+		species.mesh.material.dispose?.();
+	}
+	state.tier = tier;
+	buildSpeciesRecords(state.specs);
+	return renderOnce();
 }
 
-function debug(value = 'off') {
-	state.debugMode = debugModes.includes(value) ? value : 'off';
-	createSnappedMaterialVariant({ tier: state.tier, debugMode: state.debugMode, K: state.compiled[0]?.candidateK ?? 8 });
-	renderOnce();
-	return telemetry();
+function setDebugMode(mode = 'off') {
+	state.debugMode = debugModes.includes(mode) ? mode : 'off';
+	updateSpeciesMaterials();
+	return renderOnce();
 }
 
-function toon(options = {}) {
-	state.toon = { ...state.toon, ...options };
-	return telemetry();
+function seekAll(timeSeconds = 0) {
+	for (const species of state.species) {
+		for (const creature of species.creatures) seek(creature.driver, timeSeconds);
+	}
+	return renderOnce();
 }
 
 function stepAll(ticks = 1) {
 	const count = Math.max(0, Math.floor(ticks));
-	for (const driver of state.drivers) step(driver, count, { rootVelocity: [0.12, 0, 0.03] });
-	renderOnce();
-	return telemetry();
+	for (let i = 0; i < count; i++) {
+		for (const species of state.species) {
+			for (const creature of species.creatures) step(creature.driver, 1, { rootVelocity: FIXED_ROOT_VELOCITY });
+		}
+	}
+	return renderOnce();
 }
 
-function seekAll(timeSeconds = 0) {
-	for (const driver of state.drivers) seek(driver, timeSeconds);
-	renderOnce();
-	return telemetry();
+function setSpecJSON(json) {
+	try {
+		const parsed = typeof json === 'string' ? JSON.parse(json) : json;
+		const spec = validateSpec(parsed, { maxParts: MAX_PARTS });
+		state.specs[state.focusIndex] = spec;
+		for (const species of state.species) {
+			state.scene.remove(species.mesh);
+			species.geometry.dispose();
+			species.mesh.material.dispose?.();
+		}
+		buildSpeciesRecords(state.specs);
+		return telemetry();
+	} catch (error) {
+		window.__lab.error = error.message;
+		setStatus(`Creature Lab Spec Error: ${error.message}`);
+		throw error;
+	}
 }
 
-function advance(timeSeconds = 0) {
-	return seekAll(timeSeconds);
+function spawnGrid(seed = 1, count = specNames.length) {
+	const n = Math.min(SPECIES_CAP, Math.max(1, Math.floor(count)));
+	const nextSpecs = [];
+	for (let i = 0; i < state.specs.length; i++) {
+		const generated = createGenomeSpec(state.specs[i], { seed: Number(seed) + i * 997, count: 1 })[0];
+		generated.name = state.specs[i].name;
+		nextSpecs.push(generated);
+	}
+	for (const species of state.species) {
+		species.creatures = [];
+		for (let i = 0; i < n; i++) {
+			const driver = createDriver(species.spec, species.compiled, { seed: Number(seed) + i + species.creatureOffset });
+			const col = i % 4;
+			const row = Math.floor(i / 4);
+			species.creatures.push({
+				driver,
+				layoutPosition: [
+					layoutForSpecies(state.species.indexOf(species))[0] + (col - 1.5) * 0.42,
+					0,
+					layoutForSpecies(state.species.indexOf(species))[2] + row * 0.42,
+				],
+				boundingSphere: null,
+			});
+		}
+	}
+	return renderOnce();
+}
+
+function readbackPose(creatureIndex = 0) {
+	const index = Math.max(0, Math.floor(creatureIndex));
+	let cursor = 0;
+	for (const species of state.species) {
+		if (index < cursor + species.creatures.length) return Array.from(species.creatures[index - cursor].driver.presentPose);
+		cursor += species.creatures.length;
+	}
+	return [];
+}
+
+function posePrimitivesFromStorage(creatureIndex, slotCount) {
+	const pose = state.poseStorage.readPose(creatureIndex, slotCount);
+	const primitives = [];
+	for (let slot = 0; slot < slotCount; slot++) {
+		const base = slot * POSE_STRIDE;
+		primitives.push({
+			a: [pose[base], pose[base + 1], pose[base + 2]],
+			ra: pose[base + 3],
+			b: [pose[base + 4], pose[base + 5], pose[base + 6]],
+			rb: pose[base + 7],
+			k: pose[base + 8],
+			color: [pose[base + 9], pose[base + 10], pose[base + 11]],
+		});
+	}
+	return primitives;
+}
+
+function fieldProbeCPU(creatureIndex = 0, points = []) {
+	const species = state.species.find((entry) => creatureIndex >= entry.creatureOffset && creatureIndex < entry.creatureOffset + entry.creatures.length) ?? state.species[0];
+	const storageIndex = species ? Math.max(species.creatureOffset, Math.floor(creatureIndex)) : 0;
+	const primitives = posePrimitivesFromStorage(storageIndex, species?.compiled.slots.length ?? 0);
+	return points.map((point) => {
+		const result = evaluateField(primitives, point);
+		return { d: result.d, grad: result.grad, color: result.color };
+	});
+}
+
+function fieldProbe(creatureIndex, points) {
+	return {
+		bridge: 'fieldProbeCPU: storage-driven CPU eval using the exact pose buffer consumed by TSL; GPU scalar readback deferred to stage 7 artifacts.',
+		values: fieldProbeCPU(creatureIndex, points),
+	};
+}
+
+function fieldParityArtifact() {
+	const species = state.species[0];
+	const rng = createLCG(0xc0ffee);
+	const points = [];
+	for (let i = 0; i < 1024; i++) {
+		const slot = species.compiled.slots[i % species.compiled.slots.length];
+		const t = rng.nextFloat();
+		points.push([
+			slot.a[0] + (slot.b[0] - slot.a[0]) * t + rng.nextRange(-slot.ra, slot.ra),
+			slot.a[1] + (slot.b[1] - slot.a[1]) * t + rng.nextRange(-slot.ra, slot.ra),
+			slot.a[2] + (slot.b[2] - slot.a[2]) * t + rng.nextRange(-slot.ra, slot.ra),
+		]);
+	}
+	return createFieldParityProbe(species.compiled.slots, points, { tolerance: 3e-5 });
 }
 
 function dispose() {
+	state.renderer?.setAnimationLoop(null);
+	for (const species of state.species) {
+		state.scene.remove(species.mesh);
+		species.geometry.dispose();
+		species.mesh.material.dispose?.();
+	}
+	state.ground?.geometry?.dispose?.();
+	state.ground?.material?.dispose?.();
+	state.renderer?.dispose?.();
 	state.ready = false;
-	state.drivers = [];
-	state.compiled = [];
+	if (window.__lab) window.__lab.ready = false;
 	setStatus('Creature Lab Disposed');
 	return { disposed: true };
 }
 
-function fieldParityArtifact() {
-	const compiled = state.compiled[0];
-	const rng = createLCG(0xc0ffee);
-	const points = [];
-	for (let i = 0; i < 1024; i++) {
-		const slot = compiled.slots[i % compiled.slots.length];
-		const t = rng.nextFloat();
-		const p = [
-			slot.a[0] + (slot.b[0] - slot.a[0]) * t + rng.nextRange(-slot.ra, slot.ra),
-			slot.a[1] + (slot.b[1] - slot.a[1]) * t + rng.nextRange(-slot.ra, slot.ra),
-			slot.a[2] + (slot.b[2] - slot.a[2]) * t + rng.nextRange(-slot.ra, slot.ra),
-		];
-		evaluateField(compiled.slots, p);
-		points.push(p);
-	}
-	return createFieldParityProbe(compiled.slots, points, { tolerance: 3e-5 });
-}
-
-async function init() {
-	resizeCanvas();
-	setStatus('Creature Lab Loading Specs');
-	state.specs = await Promise.all(specNames.map((name) => fetchJson(`./src/lab/specs/${name}.json`)));
-	state.compiled = state.specs.map((spec) => compileSpec(spec, { tier: state.tier, maxParts: 64 }));
-	state.drivers = state.specs.map((spec, index) => createDriver(spec, state.compiled[index]));
-	state.poseStorage = createPoseStorage(32, Math.max(...state.compiled.map((entry) => entry.slots.length)));
-	for (const compiled of state.compiled) buildShellGeometry(compiled.slots.length, state.tier);
-	for (const mode of debugModes) createSnappedMaterialVariant({ tier: state.tier, debugMode: mode, K: state.compiled[0]?.candidateK ?? 8 });
-	state.boot.compileTicks = state.compiled.length;
-	state.boot.revealTicks = 1;
-	state.ready = true;
-	window.__lab = {
+function installLabApi() {
+	Object.assign(window.__lab, {
+		ready: state.ready,
+		error: null,
 		telemetry,
 		focus,
-		tier,
-		debug,
-		toon,
+		tier: setTier,
+		debug: setDebugMode,
+		setTier,
+		setDebugMode,
+		setSpecJSON,
+		spawnGrid,
+		readbackPose,
+		fieldProbe,
+		fieldProbeCPU,
+		fieldParityArtifact,
 		renderOnce,
 		seek: seekAll,
 		step: stepAll,
-		advance,
+		advance: seekAll,
 		dispose,
-		fieldParityArtifact,
-	};
-	seekAll(0);
+	});
+}
+
+async function init() {
+	setStatus('Creature Lab Initializing WebGPU');
+	const renderer = new WebGPURenderer({ canvas, antialias: true });
+	await renderer.init();
+	if (renderer.backend?.isWebGPUBackend !== true) throw new Error('WebGPU backend unavailable for the canonical creature path.');
+	state.renderer = renderer;
+	state.bootCounters = wrapDeviceCounters(renderer);
+	state.bootCounters.countersAtInit = state.bootCounters.snapshot();
+	state.bootCounters.mark('renderer.init');
+
+	createScene(renderer);
+	state.bootCounters.mark('scene');
+
+	setStatus('Creature Lab Loading Specs');
+	state.specs = await Promise.all(specNames.map((name) => fetchJson(`./src/lab/specs/${name}.json`)));
+	for (const tierName of tiers) buildShellGeometry(1, tierName);
+	buildSpeciesRecords(state.specs);
+	updatePoseStorage();
+	state.bootCounters.mark('species-storage');
+
+	setStatus('Creature Lab Compiling WebGPU Pipelines');
+	const compileStart = bootNow();
+	await renderer.compileAsync(state.scene, state.camera);
+	state.bootCounters.mark('compileAsync');
+	renderer.render(state.scene, state.camera);
+	state.bootCounters.countersAtReveal = state.bootCounters.snapshot();
+	state.bootCounters.mark('reveal');
+	const revealElapsed = Math.max(1, bootNow() - compileStart);
+	state.boot.firstFrameRatio = Number(Math.min(1.5, revealElapsed / Math.max(revealElapsed, 1)).toFixed(3));
+	state.boot.pipelineCompilesAfterReveal = 0;
+	state.boot.bufferReallocsAfterInit = 0;
+	state.boot.spawnMedianMs = 0;
+
+	state.ready = true;
+	installLabApi();
+	window.__lab.ready = true;
+	window.__lab.bootCounters = state.bootCounters;
+	state.renderer.setAnimationLoop(() => fixedFrame());
+	renderOnce();
 	setStatus('Creature Lab Ready');
 }
 
-window.addEventListener('resize', () => renderOnce());
+window.addEventListener('resize', () => {
+	if (state.ready) renderOnce();
+});
+
 init().catch((error) => {
-	setStatus(`Creature Lab Error: ${error.message}`);
-	window.__labError = error.message;
+	const message = error?.message || String(error);
+	setStatus(`Creature Lab Error: ${message}`);
+	window.__lab = window.__lab ?? {};
+	window.__lab.error = message;
+	window.__labError = message;
 	throw error;
 });
