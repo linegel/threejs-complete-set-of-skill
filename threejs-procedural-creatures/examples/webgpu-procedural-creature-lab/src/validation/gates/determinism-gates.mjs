@@ -86,8 +86,29 @@ async function runGateCoverage() {
 		'cpu-pose-determinism',
 		'determinism-source-ban',
 		'capture-artifacts',
+		'raise-k-policy-fixture',
 	];
-	return { status: 'pass', details: { expectedIds } };
+	// Real assertion, not a vacuous pass: dynamically import every gate module and
+	// require the expected-id list to be a subset of what actually registered.
+	const { pathToFileURL } = await import('node:url');
+	const gatesDir = resolve(here, '.');
+	const files = (await readdir(gatesDir, { withFileTypes: true }))
+		.filter((entry) => entry.isFile() && entry.name.endsWith('.mjs'))
+		.map((entry) => entry.name)
+		.sort();
+	const registered = new Set();
+	for (const file of files) {
+		const module = await import(pathToFileURL(join(gatesDir, file)).href);
+		const moduleGates = Array.isArray(module.gates) ? module.gates : Array.isArray(module.default) ? module.default : [];
+		for (const gate of moduleGates) {
+			if (gate && typeof gate.id === 'string') registered.add(gate.id);
+		}
+	}
+	const missing = expectedIds.filter((id) => !registered.has(id));
+	if (missing.length > 0) {
+		return { status: 'fail', details: { message: `required gate ids missing from the registered suite: ${missing.join(', ')}`, missing } };
+	}
+	return { status: 'pass', details: { expected: expectedIds.length, registered: registered.size } };
 }
 
 export const gates = [

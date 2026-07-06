@@ -85,3 +85,19 @@
   (row 12) had no platform; IK gate was 10x looser than the 4-decimals contract; swim gate
   sampled one instant. All four now match the §10 table; mutations (raw-dt bypass, dropped
   Gram-Schmidt Y) demonstrated failing.
+
+## Stage 4/5 — locomotion sweep gate + executable raise-K policy (this session)
+
+- **Expected** (SKILL.md tier table): hero candidate K = 8.
+  **Observed** (candidate-set-sweep gate details): the swimmer spec (8-segment rope tail)
+  FAILS the full-field locomotion sweep at K=8 and passes at kRequired=10; the raise-K
+  policy fired on a real authored spec, not just the fixture. The quadruped passes at K=8
+  with maxDelta 0.0294 vs threshold 0.0298 — 98.7% of the bound, driven by the posed rope
+  tail. Evidence: `npm run validate` gate `candidate-set-sweep` perSpec table.
+  **Proposed delta (stage 9/10)**: the tier-table K column should carry the sweep-gate
+  qualifier explicitly ("authored default; the sweep gate may raise K per spec — measured:
+  swimmer needs 10 at hero") — K=8 is not universally sufficient and the lab now proves it.
+- Raise/reject policy is itself gated: under-connected 13-capsule star fixture fails at
+  K=1..11, passes at 13; capped at 2 it produces the named REJECT error.
+- `gate-coverage-index` was vacuous (unconditional pass with a hardcoded list); now
+  dynamically imports every gate module and fails on any missing required id.
