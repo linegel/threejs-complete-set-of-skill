@@ -410,12 +410,12 @@ h1 em{font-style:normal;color:var(--amber)}
 
 <div class="section" id="quickstart"><div class="wrap">
   <h2>Usage</h2>
-  <p class="sub">Install the pack with <code>npx skills@latest add linegel/threejs-complete-set-of-skill</code>, or clone the repo where your agent can see it and invoke skills by name. The router picks the smallest useful set; each skill carries its own references, agents, and runnable examples.</p>
+  <p class="sub">Install the complete pack with <code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code>, or clone the repo where your agent can see it and invoke skills by name. Broad scene requests should use the in-pack router after the pack is installed; each skill carries its own references, agents, and runnable examples.</p>
   <div class="steps">
     <div class="step"><span class="n">01</span><h3>Install</h3>
-      <p>List available skills first, then install the router or the full pack to the agents you use.</p>
+      <p>List available skills first, then install the whole pack as one coherent graphics toolkit.</p>
       <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -g -a codex -y</code></pre></div>
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code></pre></div>
     <div class="step"><span class="n">02</span><h3>Route</h3>
       <p>Start broad requests with the router so only the relevant experts are loaded into context.</p>
       <pre><code>Use $threejs-choose-skills to plan a WebGPU/TSL
@@ -434,10 +434,9 @@ $threejs-visual-validation to verify the frame.</code></pre></div>
   <p class="sub">Every skill is a plain folder — SKILL.md with YAML frontmatter, references/, agents/, and runnable examples/ — so skills CLI, skills.sh, and any agent that reads local files can use the pack. Machine-readable index: <a href="skills.json" style="color:var(--cyan)">skills.json</a> · plain-text overview for LLMs: <a href="llms.txt" style="color:var(--cyan)">llms.txt</a>.</p>
   <div class="steps">
     <div class="step"><span class="n">01</span><h3>skills CLI</h3>
-      <p>Use the open skills installer to list, select, or install every top-level threejs-* skill folder. The source is the GitHub slug used by skills.sh and npx skills.</p>
+      <p>Use the open skills installer to list the pack, then install every top-level threejs-* skill folder as one coherent graphics skill pack for your selected agent.</p>
       <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -g -a codex -y
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' --agent '*' -y</code></pre></div>
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code></pre></div>
     <div class="step"><span class="n">02</span><h3>Claude Code</h3>
       <p>Install through skills CLI, or symlink/copy the skill folders into a personal or project skills directory.</p>
       <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -a claude-code -g -y
@@ -445,8 +444,8 @@ npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' --agent 
 git clone https://github.com/linegel/threejs-complete-set-of-skill.git
 ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/</code></pre></div>
     <div class="step"><span class="n">03</span><h3>Codex CLI</h3>
-      <p>Install through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local threejs-*/SKILL.md files as the authoritative source.</p>
-      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -a codex -g -y
+      <p>Install the whole pack through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local threejs-*/SKILL.md files as the authoritative source.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -a codex -g -y
 # local checkout fallback: read ./threejs-*/SKILL.md when a task matches</code></pre></div>
     <div class="step"><span class="n">04</span><h3>Cursor / Gemini / generic agents</h3>
       <p>Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, agents/, and examples/. The machine-readable index lives at skills.json; a plain-text overview at llms.txt.</p>

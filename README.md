@@ -20,14 +20,14 @@ The preferred install path is the open skills CLI:
 
 ```bash
 npx skills@latest add linegel/threejs-complete-set-of-skill --list
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -g -a codex -y
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' --agent '*' -y
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'
 ```
 
-You can also select a skill directly:
+For a specific agent in non-interactive setup:
 
 ```bash
-npx skills@latest add linegel/threejs-complete-set-of-skill@threejs-spectral-ocean
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -g -a codex -y
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -g -a claude-code -y
 ```
 
 For runtimes that do not support `npx skills@latest add` yet:
@@ -41,7 +41,10 @@ For runtimes that do not support `npx skills@latest add` yet:
 - **Cursor / other IDE agents**: add as a submodule and point a rule at the
   skill folders.
 - **Gemini CLI / generic agents**: clone and instruct the agent to load the
-  relevant `SKILL.md`; start broad requests with `threejs-choose-skills`.
+  relevant `SKILL.md`.
+
+After installing the whole pack, use `threejs-choose-skills` as the in-pack
+router for broad requests. It is not the recommended standalone install target.
 
 Discovery metadata is available at [`skills.json`](skills.json) in the repo
 root and at <https://linegel.github.io/threejs-complete-set-of-skill/skills.json>.

@@ -70,10 +70,6 @@ for (const skill of manifest.skills) {
   const fm = frontmatterByDir.get(skill.name);
   if (!fm) fail(`manifest includes unknown skill ${skill.name}`);
   if (skill.description !== fm.description) fail(`${skill.name} manifest description differs from SKILL.md frontmatter`);
-  if (skill.install?.selector !== `${repoSlug}@${skill.name}`) fail(`${skill.name} install selector is incorrect`);
-  if (skill.install?.command !== `npx skills@latest add ${repoSlug} --skill ${skill.name}`) {
-    fail(`${skill.name} install command is incorrect`);
-  }
   if (!skill.raw?.endsWith(`/${skill.name}/SKILL.md`)) fail(`${skill.name} raw SKILL.md URL is missing`);
 }
 
