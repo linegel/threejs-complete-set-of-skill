@@ -1,6 +1,6 @@
 ---
 name: threejs-choose-skills
-description: Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.
+description: Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work and diagnose version-specific Three.js/WebGPU API or renderer failures. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, known-issue debugging, upgrade triage, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.
 ---
 
 # Three.js WebGPU/TSL Choose Skills
@@ -145,6 +145,53 @@ official docs before coding; do not guess current APIs.
 
 Record `apiProof` in the route manifest when an implementation depends on one
 of these APIs.
+
+### Known-Issue Debugging
+
+Use this only when the task is debugging, auditing a suspicious behavior, or
+deciding whether a Three.js upgrade is the right fix. Do not load known-issue
+lore into ordinary visual design requests such as building a sun, moon, land,
+water, creature, or atmosphere system.
+
+1. Capture the local facts first: installed `THREE.REVISION`, package version,
+   import path, renderer class, initialized backend, browser/GPU, failing API
+   name, console error, and the smallest local repro or fixture.
+2. Inspect installed source and official docs for that revision before
+   searching upstream. Many "bugs" are stale API names, wrong import paths,
+   missing `await renderer.init()`, duplicated output conversion, or a mismatch
+   between WebGPU and legacy WebGL examples.
+3. Search upstream only with the concrete symptom and API names, not a generic
+   list of traps. Use GitHub issues, PRs, release notes, and migration guides to
+   classify candidates as `active`, `fixed-after-installed-revision`,
+   `not-reproduced`, `intentional-api-change`, or `unrelated`.
+4. For each credible hit, verify the issue/PR state, merge commit or release,
+   affected revision range, first fixed release, and whether the local repro
+   matches the upstream repro. A closed issue is not proof the installed build
+   contains the fix.
+5. Decide from evidence: recommend upgrade when the project is behind a fixed
+   release; recommend a local workaround only when upgrade risk or project
+   constraints are stronger; report a blocker when neither path is proven.
+6. Output a compact investigation note, not a cheat sheet:
+
+```yaml
+knownIssueInvestigation:
+  installedRevision:
+  latestRevisionChecked:
+  symptom:
+  localRepro:
+  localSourceFinding:
+  upstreamCandidates:
+    - url:
+      status:
+      affectedRange:
+      firstFixedRelease:
+      matchesLocalRepro:
+  decision:
+```
+
+Never call a GitHub issue a current Three.js trap unless this investigation
+proves it against the installed revision. Never carry issue IDs forward as
+ambient context for unrelated feature work.
 
 ## WebGPU Quality Tiers
 

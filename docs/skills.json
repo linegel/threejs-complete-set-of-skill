@@ -145,7 +145,7 @@
     {
       "name": "threejs-choose-skills",
       "title": "Three.js WebGPU/TSL Choose Skills",
-      "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
+      "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work and diagnose version-specific Three.js/WebGPU API or renderer failures. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, known-issue debugging, upgrade triage, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
       "examples": [],
       "latestUpdate": {
         "date": "2026-07-05",
