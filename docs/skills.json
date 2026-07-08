@@ -148,10 +148,10 @@
       "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work and diagnose version-specific Three.js/WebGPU API or renderer failures. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, known-issue debugging, upgrade triage, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
       "examples": [],
       "latestUpdate": {
-        "date": "2026-07-05",
-        "datetime": "2026-07-05T05:01:16+03:00",
-        "commit": "e8bca402ee705d702103c5bc3c04e40ca80a03e9",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/e8bca402ee705d702103c5bc3c04e40ca80a03e9"
+        "date": "2026-07-09",
+        "datetime": "2026-07-09T01:18:48+03:00",
+        "commit": "a8bd0fefba4a5821eacefdd55a41732cc4020309",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/a8bd0fefba4a5821eacefdd55a41732cc4020309"
       },
       "page": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
