@@ -427,11 +427,12 @@ Wire evidence bundles per `$threejs-visual-validation`.
 
 ## 10. Numeric gates
 
-Pending gate: the lab that executes this table is not yet built (`HANDOFF.md`
-§3 item 3.9e — the register's one open item). Every threshold below is the
-contract that lab must enforce; until it exists, none of these rows may be
-cited as passed evidence. CPU-derivable rows (smin, gradient, taper) are
-additionally checked by the settled-math derivations in §2–§4.
+Pending gate: the lab that executes this table is under construction in-tree
+(`examples/webgpu-procedural-creature-lab`; `HANDOFF.md` §3 item 3.9e — the
+register's one open item). Until its full gate table runs green and that run
+is recorded in `HANDOFF.md` §6, none of these rows may be cited as passed
+evidence. CPU-derivable rows (smin, gradient, taper) are additionally checked
+by the settled-math derivations in §2–§4.
 
 | Gate | Threshold |
 | --- | --- |

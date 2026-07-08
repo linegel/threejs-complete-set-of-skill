@@ -7,10 +7,11 @@ replace canonical proof.
 
 Pending gate on the creature rows: the numeric thresholds and tier constants
 they cite (`< 0.02` residual, `K` per tier, the `seek(t)` equality) are the
-creature skill's lab-gate contract, and that lab is not yet built (`HANDOFF.md`
-§3 item 3.9e). Until it lands, "Preserved tiers rerun tests" means rerunning
-the contract once the lab exists — no creature row may cite passed evidence
-today.
+creature skill's lab-gate contract; the lab is under construction in-tree
+(`threejs-procedural-creatures/examples/webgpu-procedural-creature-lab`,
+`HANDOFF.md` §3 item 3.9e) and has not yet run its full gate table green.
+Until that run is recorded, "Preserved tiers rerun tests" is a forward
+obligation — no creature row may cite passed evidence today.
 
 | owner skill | canonical invariant | permitted downgrade | forbidden fake | validation delta |
 | --- | --- | --- | --- | --- |

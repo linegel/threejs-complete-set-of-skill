@@ -146,10 +146,13 @@ snapped-position parity.
 | candidate-set vs full-field sweep | creature lab candidate-set parity sweep over the same locomotion clocks and tier `K` | snapped candidate-set surface remains within the snap residual gate, `< 0.02` of body scale, against full-field evaluation |
 | silhouette-vs-shadow parity | creature lab fixed-camera silhouette/shadow mask export consumed by the visual-validation PNG/diff gate | same snapped position path: mask IoU `>= 0.98` and directed edge distance `<= 1 px`; any divergent display/depth position node is a blocking failure |
 
-Pending gate: the standalone creature lab named as the producing harness is not
-yet built (`HANDOFF.md` §3 item 3.9e, the register's one open item). Until it
-lands, these thresholds are contract targets the lab must enforce, not enforced
-gates — no creature work may cite this table as passed evidence.
+Pending gate: the standalone creature lab named as the producing harness is
+under construction in-tree
+(`threejs-procedural-creatures/examples/webgpu-procedural-creature-lab`;
+`HANDOFF.md` §3 item 3.9e, the register's one open item). Until its full gate
+table runs green and that run is recorded in `HANDOFF.md` §6, these thresholds
+are contract targets, not enforced gates — no creature work may cite this
+table as passed evidence.
 
 ## Color And Output
 

@@ -303,7 +303,10 @@ pending-gate notes, authored-constant provenance) — all fixed, all touched val
 green. Spot-verification of the five prior self-reported commits (`31e7f18`, `a20dfa2`,
 `41a7e9a`, `cb95d9e`, `4bca3bd`): all five hold with real validator runs.
 
-**Open items:** Wave B creature lab (3.9e) — gated on explicit owner go-ahead (its thresholds
-are annotated as pending gates pack-wide). `GROK_BUILD_PROBLEMS.v1-15k.md` — proposed for
+**Open items:** Wave B creature lab (3.9e) — under active construction in-tree
+(`threejs-procedural-creatures/examples/webgpu-procedural-creature-lab`, stage 6 landed,
+stage 7 capture/artifact gates in progress by a concurrent session per its SESSION_LOCK.md);
+its thresholds stay annotated as pending gates pack-wide until the full gate table runs green
+and is recorded here. `GROK_BUILD_PROBLEMS.v1-15k.md` — proposed for
 deletion as a superseded duplicate (this table now carries the record); owner approves or
 vetoes; not deleted unilaterally.

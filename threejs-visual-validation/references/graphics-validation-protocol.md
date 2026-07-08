@@ -672,10 +672,12 @@ candidate sets are tier-`K` approximations of the full field.
 | candidate-set vs full-field sweep | creature lab candidate-set parity sweep using the same locomotion clocks and tier `K` | snapped candidate-set surface remains within the snap residual gate, `< 0.02` of body scale, against full-field evaluation |
 | silhouette-vs-shadow parity | creature lab fixed-camera silhouette/shadow mask export consumed by this harness' PNG/diff gate | same snapped position path: mask IoU `>= 0.98` and directed edge distance `<= 1 px`; divergent display/depth position nodes block acceptance |
 
-Pending gate: the creature lab that produces every row above is not yet built
-(`HANDOFF.md` §3 item 3.9e). These thresholds are the contract the lab must
-implement; until it exists they gate nothing, and citing them as passed
-evidence is a validation-protocol violation.
+Pending gate: the creature lab that produces every row above is under
+construction in-tree (`threejs-procedural-creatures/examples/webgpu-procedural-creature-lab`,
+`HANDOFF.md` §3 item 3.9e) and has not yet run its full gate table green.
+Until that run is recorded in `HANDOFF.md` §6, these thresholds are the
+contract the lab must implement — citing them as passed evidence is a
+validation-protocol violation.
 
 ## No-Post And Isolation Gates
 
