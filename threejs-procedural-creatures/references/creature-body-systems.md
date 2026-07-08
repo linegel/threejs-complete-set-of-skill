@@ -247,8 +247,15 @@ checks that no slot endpoint already contains root translation or root yaw.
 **2-bone IK**: clamp reach to `[|l1-l2|+1e-4, l1+l2-1e-4]`;
 `a = (l1² - l2² + d²) / 2d`, `h = sqrt(max(l1² - a², 0))`; bend hint points
 sideways-out + 0.4 forward in the body frame, made perpendicular to hip→foot
-by full 3D Gram-Schmidt (dropping the Y term bends limb lengths off by
-~2e-4). Gate: reconstructed limb lengths match spec to 4 decimals.
+by full 3D Gram-Schmidt. Derived: with a fully orthogonalized unit hint, the
+joint at `hip + dir·a + perp·h` reconstructs both limb lengths EXACTLY
+(`a² + h² = l1²`; `(d−a)² + h² = l2²` algebraically), so residual error is
+f32/f64 rounding only. A partial Gram-Schmidt that drops the Y term leaves a
+non-perpendicular component and DOES corrupt lengths — observed ~2e-4 in the
+lab's seeded poses (pose-dependent, grows with the hint's Y content; not a
+bound). Gate: reconstructed limb lengths match spec to 4 decimals — a loose
+ceiling relative to the exact solve, sized to catch exactly that
+orthogonalization-bug class (2e-4 fails a 4-decimal match).
 
 **Hopper**: state machine `idle → crouch → air → land`. Physics: air height
 is the normalized ballistic parabola `4 t (1 - t) * hopHeight` (`t ∈ [0,1]`;
