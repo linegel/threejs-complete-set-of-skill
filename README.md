@@ -4,6 +4,8 @@ Specialized agent skills for building ambitious Three.js WebGPU scenes with a
 TSL-first architecture, procedural graphics systems, generated texture assets,
 and screenshot-backed visual validation.
 
+[![skills.sh](https://skills.sh/b/linegel/threejs-complete-set-of-skill)](https://skills.sh/linegel/threejs-complete-set-of-skill)
+
 **Website:** <https://linegel.github.io/threejs-complete-set-of-skill/> ·
 **LLM overview:** [llms.txt](https://linegel.github.io/threejs-complete-set-of-skill/llms.txt) ·
 **Machine-readable index:** [skills.json](https://linegel.github.io/threejs-complete-set-of-skill/skills.json)
@@ -14,15 +16,35 @@ Each skill is a self-contained folder (`SKILL.md` with YAML frontmatter,
 `references/`, `agents/`, runnable `examples/`), so any agent that reads local
 files can use the pack.
 
-- **Claude Code**: `git clone` this repo, then symlink or copy the
-  `threejs-*` folders into `~/.claude/skills/` (or your project's
-  `.claude/skills/`).
-- **Codex CLI**: clone the repo and reference it from `AGENTS.md` — "for
-  Three.js WebGPU work, read the matching `threejs-*/SKILL.md`".
+The preferred install path is the open skills CLI:
+
+```bash
+npx skills@latest add linegel/threejs-complete-set-of-skill --list
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -g -a codex -y
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' --agent '*' -y
+```
+
+You can also select a skill directly:
+
+```bash
+npx skills@latest add linegel/threejs-complete-set-of-skill@threejs-spectral-ocean
+```
+
+For runtimes that do not support `npx skills@latest add` yet:
+
+- **Claude Code**: install with `-a claude-code`, or `git clone` this repo and
+  symlink/copy the `threejs-*` folders into `~/.claude/skills/` or a project
+  `.claude/skills/` directory.
+- **Codex CLI**: install with `-a codex`, or clone the repo and reference it
+  from `AGENTS.md`: "for Three.js WebGPU work, read the matching
+  `threejs-*/SKILL.md`".
 - **Cursor / other IDE agents**: add as a submodule and point a rule at the
   skill folders.
 - **Gemini CLI / generic agents**: clone and instruct the agent to load the
   relevant `SKILL.md`; start broad requests with `threejs-choose-skills`.
+
+Discovery metadata is available at [`skills.json`](skills.json) in the repo
+root and at <https://linegel.github.io/threejs-complete-set-of-skill/skills.json>.
 
 This is not a generic Three.js tutorial. It is a practical skill pack for
 agents that need to design, implement, debug, and validate advanced real-time

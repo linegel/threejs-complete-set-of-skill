@@ -99,7 +99,7 @@
      "name": "Three.js Compatibility Fallbacks",
      "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html",
      "description": "Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.",
-     "dateModified": "2026-07-05T05:01:16+03:00"
+     "dateModified": "2026-07-08T21:57:49+03:00"
     },
     {
      "@type": "ListItem",
@@ -147,7 +147,7 @@
      "name": "Procedural Creatures",
      "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html",
      "description": "Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.",
-     "dateModified": "2026-07-05T05:01:16+03:00"
+     "dateModified": "2026-07-08T21:57:49+03:00"
     },
     {
      "@type": "ListItem",
@@ -235,7 +235,7 @@
      "name": "Visual Validation",
      "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html",
      "description": "Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.",
-     "dateModified": "2026-07-05T05:01:16+03:00"
+     "dateModified": "2026-07-08T21:57:49+03:00"
     },
     {
      "@type": "ListItem",
@@ -402,7 +402,7 @@ h1 em{font-style:normal;color:var(--amber)}
 <div class="stats-band"><div class="wrap">
   <div class="stats">
     <div class="stat"><b>25</b><span>skills</span></div>
-    <div class="stat"><b>44</b><span>runnable examples</span></div>
+    <div class="stat"><b>45</b><span>runnable examples</span></div>
     <div class="stat"><b>TSL</b><span>node-first architecture</span></div>
     <div class="stat"><b>PNG+JSON</b><span>regression evidence</span></div>
   </div>
@@ -410,11 +410,12 @@ h1 em{font-style:normal;color:var(--amber)}
 
 <div class="section" id="quickstart"><div class="wrap">
   <h2>Usage</h2>
-  <p class="sub">Clone the repo where your agent can see it, then invoke skills by name. The router picks the smallest useful set; each skill carries its own references, agents, and runnable examples.</p>
+  <p class="sub">Install the pack with <code>npx skills@latest add linegel/threejs-complete-set-of-skill</code>, or clone the repo where your agent can see it and invoke skills by name. The router picks the smallest useful set; each skill carries its own references, agents, and runnable examples.</p>
   <div class="steps">
     <div class="step"><span class="n">01</span><h3>Install</h3>
-      <p>Clone next to your project, or symlink the skill folders into your agent's skills directory (e.g. <code>~/.claude/skills/</code>).</p>
-      <pre><code>git clone https://github.com/linegel/threejs-complete-set-of-skill.git</code></pre></div>
+      <p>List available skills first, then install the router or the full pack to the agents you use.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -g -a codex -y</code></pre></div>
     <div class="step"><span class="n">02</span><h3>Route</h3>
       <p>Start broad requests with the router so only the relevant experts are loaded into context.</p>
       <pre><code>Use $threejs-choose-skills to plan a WebGPU/TSL
@@ -430,24 +431,27 @@ $threejs-visual-validation to verify the frame.</code></pre></div>
 
 <div class="section" id="install"><div class="wrap">
   <h2>Install for your harness</h2>
-  <p class="sub">Every skill is a plain folder — SKILL.md with YAML frontmatter, references/, agents/, and runnable examples/ — so any agent that reads local files can use the pack. Machine-readable index: <a href="skills.json" style="color:var(--cyan)">skills.json</a> · plain-text overview for LLMs: <a href="llms.txt" style="color:var(--cyan)">llms.txt</a>.</p>
+  <p class="sub">Every skill is a plain folder — SKILL.md with YAML frontmatter, references/, agents/, and runnable examples/ — so skills CLI, skills.sh, and any agent that reads local files can use the pack. Machine-readable index: <a href="skills.json" style="color:var(--cyan)">skills.json</a> · plain-text overview for LLMs: <a href="llms.txt" style="color:var(--cyan)">llms.txt</a>.</p>
   <div class="steps">
-    <div class="step"><span class="n">01</span><h3>Claude Code</h3>
-      <p>Symlink (or copy) the skill folders into your personal or project skills directory; they appear in the Skill tool automatically.</p>
-      <pre><code>git clone https://github.com/linegel/threejs-complete-set-of-skill.git
+    <div class="step"><span class="n">01</span><h3>skills CLI</h3>
+      <p>Use the open skills installer to list, select, or install every top-level threejs-* skill folder. The source is the GitHub slug used by skills.sh and npx skills.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -g -a codex -y
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' --agent '*' -y</code></pre></div>
+    <div class="step"><span class="n">02</span><h3>Claude Code</h3>
+      <p>Install through skills CLI, or symlink/copy the skill folders into a personal or project skills directory.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -a claude-code -g -y
+# manual fallback:
+git clone https://github.com/linegel/threejs-complete-set-of-skill.git
 ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/</code></pre></div>
-    <div class="step"><span class="n">02</span><h3>Codex CLI</h3>
-      <p>Point Codex at the folders via AGENTS.md: list each skill name + path and instruct it to read the SKILL.md when the task matches.</p>
-      <pre><code>git clone https://github.com/linegel/threejs-complete-set-of-skill.git
-# in AGENTS.md: "For Three.js WebGPU work, read the matching
-# threejs-*/SKILL.md from ./threejs-complete-set-of-skill/"</code></pre></div>
-    <div class="step"><span class="n">03</span><h3>Cursor / other IDEs</h3>
-      <p>Add the repo as a workspace folder and reference skills in rules (.cursor/rules or equivalent) so the agent loads SKILL.md on demand.</p>
+    <div class="step"><span class="n">03</span><h3>Codex CLI</h3>
+      <p>Install through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local threejs-*/SKILL.md files as the authoritative source.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill threejs-choose-skills -a codex -g -y
+# local checkout fallback: read ./threejs-*/SKILL.md when a task matches</code></pre></div>
+    <div class="step"><span class="n">04</span><h3>Cursor / Gemini / generic agents</h3>
+      <p>Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, agents/, and examples/. The machine-readable index lives at skills.json; a plain-text overview at llms.txt.</p>
       <pre><code>git submodule add https://github.com/linegel/threejs-complete-set-of-skill.git skills/threejs
-# rule: "Before Three.js WebGPU tasks, read skills/threejs/&lt;skill&gt;/SKILL.md"</code></pre></div>
-    <div class="step"><span class="n">04</span><h3>Gemini CLI &amp; generic agents</h3>
-      <p>Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, and examples/. A machine-readable index lives at skills.json; a plain-text overview at llms.txt.</p>
-      <pre><code>curl -s https://linegel.github.io/threejs-complete-set-of-skill/skills.json | jq '.skills[].name'
+curl -s https://linegel.github.io/threejs-complete-set-of-skill/skills.json | jq '.install.source, .skills[].name'
 curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code></pre></div>
   </div>
 </div></div>
@@ -613,7 +617,7 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
         <span class="card-index">21</span>
         <h4>Procedural Creatures</h4>
         <p>Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.</p>
-        <span class="card-meta">$threejs-procedural-creatures</span>
+        <span class="card-meta">$threejs-procedural-creatures · 1 example</span>
       </a>
       </div>
     </section>

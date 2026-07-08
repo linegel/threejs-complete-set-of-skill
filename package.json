@@ -1,13 +1,34 @@
 {
-  "name": "threejs",
+  "name": "threejs-webgpu-skill-pack",
   "version": "1.0.0",
-  "description": "",
+  "description": "Agent skill pack for Three.js WebGPU/TSL procedural graphics, image pipelines, and visual validation.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:pages": "node scripts/build-pages.mjs",
+    "skills:list": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
+    "test": "node scripts/validate-skills-manifest.mjs"
   },
-  "keywords": [],
+  "keywords": [
+    "skills",
+    "agent-skills",
+    "codex",
+    "claude-code",
+    "threejs",
+    "three.js",
+    "webgpu",
+    "tsl",
+    "procedural-graphics",
+    "visual-validation"
+  ],
   "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linegel/threejs-complete-set-of-skill.git"
+  },
+  "homepage": "https://linegel.github.io/threejs-complete-set-of-skill/",
+  "bugs": {
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill/issues"
+  },
   "license": "ISC",
   "dependencies": {
     "three": "^0.185.1"
