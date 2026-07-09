@@ -13,6 +13,7 @@ import { TileShadowNode } from "three/addons/tsl/shadows/TileShadowNode.js";
 import { Fn, positionLocal, sin, uniform, vec3 } from "three/tsl";
 
 import {
+  CLIPMAP_IMPLEMENTATION_STATUS,
   DEFAULT_CLIPMAP_CONFIG,
   SHADOW_ARCHITECTURE_DECISIONS,
   clampClipmapConfig,
@@ -28,6 +29,10 @@ void addonSymbols;
 export async function createShadowRenderer(options = {}) {
   const renderer = new WebGPURenderer(options);
   await renderer.init();
+  if (renderer.backend.isWebGPUBackend !== true) {
+    renderer.dispose();
+    throw new Error("Cached clipmap shadow validation requires the WebGPU backend");
+  }
   return renderer;
 }
 
@@ -35,13 +40,11 @@ export function createShadowArchitectureDecisionRecord({
   receiverBounded = false,
   needsCameraCascades = false,
   needsTiledProjection = false,
-  streamingPersistentCoverage = false,
-  measuredGpuTimes = {},
+  persistentLocalizedCoverage = false,
+  measurementEvidence = {},
 } = {}) {
   let selected = SHADOW_ARCHITECTURE_DECISIONS[0];
-  if (streamingPersistentCoverage) {
-    selected = SHADOW_ARCHITECTURE_DECISIONS[3];
-  } else if (needsTiledProjection) {
+  if (needsTiledProjection) {
     selected = SHADOW_ARCHITECTURE_DECISIONS[2];
   } else if (needsCameraCascades) {
     selected = SHADOW_ARCHITECTURE_DECISIONS[1];
@@ -49,22 +52,32 @@ export function createShadowArchitectureDecisionRecord({
     selected = SHADOW_ARCHITECTURE_DECISIONS[1];
   }
 
+  const customCandidate = persistentLocalizedCoverage
+    ? SHADOW_ARCHITECTURE_DECISIONS[3]
+    : null;
+
   return {
     selected,
+    customCandidate,
+    decisionStatus: customCandidate
+      ? "phase-1-custom-candidate-not-production-selectable"
+      : "built-in-path-selected",
+    productionClipmapProof: CLIPMAP_IMPLEMENTATION_STATUS.productionClipmapProof,
     compared: SHADOW_ARCHITECTURE_DECISIONS.map((decision) => ({
       ...decision,
-      measuredGpuTimeMs: measuredGpuTimes[decision.use] ?? null,
+      measurementEvidence: measurementEvidence[decision.use] ?? null,
     })),
     requirement:
-      "custom cached clipmap wins only when persistent coarse coverage or targeted invalidation lowers measured GPU time",
+      "custom cached clipmap selection requires a complete receiver implementation plus same-workload Measured evidence against built-in paths",
   };
 }
 
 export function createCachedClipmapShadowSystem({
   config = DEFAULT_CLIPMAP_CONFIG,
   light = new DirectionalLight(0xffffff, 1),
+  attachPhase1Scaffold = false,
   architecture = createShadowArchitectureDecisionRecord({
-    streamingPersistentCoverage: true,
+    persistentLocalizedCoverage: true,
   }),
 } = {}) {
   const validation = validateClipmapConfig(config);
@@ -79,23 +92,41 @@ export function createCachedClipmapShadowSystem({
   light.shadow.needsUpdate = false;
 
   const node = new CachedClipmapShadowNode(light, light.shadow, validation.config);
-  node.attachToLight(light);
+  if (attachPhase1Scaffold) {
+    node.attachToLight(light);
+  }
   const { scene: casterScene, caster: displacedCaster } = createRenderableShadowCasterScene();
+  let disposed = false;
 
   return {
     light,
     node,
+    implementationStatus: CLIPMAP_IMPLEMENTATION_STATUS,
     architecture,
     config: validation.config,
     levels: node.levels,
     scene: createDeterministicValidationScene(),
     casterScene,
     displacedCaster,
+    get attachedToLight() {
+      return light.shadow.shadowNode === node;
+    },
+    get disposed() {
+      return disposed;
+    },
+    attachForValidation() {
+      node.attachToLight(light);
+      return node;
+    },
     debugSnapshot() {
       return createDebugSnapshot({
         levels: node.levels,
         selection: node.lastSelection,
-        memoryBytes: estimateShadowMemoryBytes(node.levels, validation.config.bytesPerDepthTexel),
+        memoryBytes: estimateShadowMemoryBytes(
+          node.levels,
+          validation.config.bytesPerDepthTexel,
+          validation.config.bytesPerColorTexel,
+        ),
         architecture,
       });
     },
@@ -121,10 +152,16 @@ export function createCachedClipmapShadowSystem({
         lightDirection: frame.lightDirection,
         lightBasis: frame.lightBasis,
         lightSpaceToWorld: frame.lightSpaceToWorld,
+        shadowDepthInterval: frame.shadowDepthInterval,
       });
     },
     dispose() {
+      if (disposed) return;
+      disposed = true;
       node.dispose();
+      casterScene.remove(displacedCaster.mesh);
+      displacedCaster.mesh.geometry.dispose();
+      displacedCaster.material.dispose();
     },
   };
 }
@@ -154,7 +191,10 @@ export function createSharedDisplacedCaster({
   const material = new MeshStandardNodeMaterial();
   material.positionNode = sharedPositionNode;
   material.castShadowPositionNode = sharedPositionNode;
-  material.receivedShadowPositionNode = sharedPositionNode;
+  // r185 space contract: positionNode/castShadowPositionNode are local-space
+  // geometry hooks. receivedShadowPositionNode is a world-space receiver
+  // lookup hook, so the default derived positionWorld path must remain active.
+  material.receivedShadowPositionNode = null;
 
   const mesh = new Mesh(new PlaneGeometry(24, 24, 32, 32), material);
   mesh.name = "shared-position-node-displaced-caster";

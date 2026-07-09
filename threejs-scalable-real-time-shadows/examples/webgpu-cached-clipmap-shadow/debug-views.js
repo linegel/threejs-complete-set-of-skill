@@ -1,26 +1,18 @@
 export const SHADOW_DEBUG_VIEWS = Object.freeze([
   "architectureDecision",
-  "levelHalfWidths",
-  "texelGrid",
-  "desiredVsCommittedCenter",
-  "crossFadeWeights",
-  "unshadowedWeight",
-  "dynamicCachedClassification",
-  "dirtyReasonBits",
-  "budgetBeforeAfter",
-  "directionEpsilon",
-  "biasNodeNormalBias",
-  "shadowMapPreview",
-  "invalidationSphere",
-  "sampledTextureLimits",
-  "disposeCounters",
+  "levelState",
+  "updateSelection",
+  "nominalMemoryEstimate",
 ]);
 
 export function createDebugSnapshot({ levels, selection, memoryBytes, architecture }) {
   return {
     architecture,
     levelCount: levels.length,
-    textureCount: levels.length,
+    targetCount: levels.length,
+    colorAttachmentCount: levels.length,
+    depthAttachmentCount: levels.length,
+    receiverSampledTextureCount: 0,
     levels: levels.map((level) => ({
       index: level.index,
       halfWidth: level.halfWidth,
@@ -28,7 +20,7 @@ export function createDebugSnapshot({ levels, selection, memoryBytes, architectu
       mapSize: level.mapSize,
       inverseMapSize: level.inverseMapSize,
       texelWidth: level.texelWidth,
-      desiredVsCommittedCenter: {
+      committedCenter: {
         committedX: level.centerX,
         committedY: level.centerY,
         committedZ: level.centerZ,
@@ -37,10 +29,16 @@ export function createDebugSnapshot({ levels, selection, memoryBytes, architectu
       forceDirty: level.forceDirty,
       age: level.age,
       normalBias: level.normalBias,
+      normalBiasHypothesis: level.normalBiasHypothesis,
     })),
     budgetBefore: selection?.budgetBefore,
     budgetAfter: selection?.budgetAfter,
-    memoryBytes,
+    correctionBudgetBefore: selection?.correctionBudgetBefore,
+    correctionBudgetAfter: selection?.correctionBudgetAfter,
+    updateSelection: selection?.diagnostics ?? [],
+    selectedLevelIndices:
+      selection?.selected?.map((entry) => entry.level.index) ?? [],
+    nominalTargetBytes: memoryBytes,
     debugViews: SHADOW_DEBUG_VIEWS,
   };
 }
@@ -53,8 +51,8 @@ export function createDeterministicValidationScene(seed = 1234) {
       { id: "far-tower-a", position: [-420, 0, -760] },
       { id: "far-tower-b", position: [640, 0, 910] },
     ],
-    movingHero: {
-      id: "movingHero",
+    movingCaster: {
+      id: "movingCaster",
       path: "crosses near and cached coarse levels",
       invalidation: "invalidateSphere on each committed motion segment",
     },
@@ -64,7 +62,7 @@ export function createDeterministicValidationScene(seed = 1234) {
     },
     wind: {
       id: "windDisplacedCaster",
-      casterParity: "positionNode, castShadowPositionNode, and receivedShadowPositionNode are the same object",
+      casterParity: "positionNode and castShadowPositionNode share one local-space node; receivedShadowPositionNode remains world-space/default",
     },
     invalidate: {
       id: "streamedChunkInvalidation",

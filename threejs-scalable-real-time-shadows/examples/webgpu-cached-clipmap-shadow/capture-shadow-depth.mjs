@@ -155,7 +155,7 @@ async function main() {
 
     const validationCode = await validateArtifacts(options.artifacts);
     if (validationCode === 0) {
-      console.log(`Cached clipmap shadow artifacts written to ${options.artifacts}`);
+      console.log(`Phase-1 clipmap scaffold artifacts written to ${options.artifacts}`);
     }
     process.exitCode = validationCode;
   } finally {

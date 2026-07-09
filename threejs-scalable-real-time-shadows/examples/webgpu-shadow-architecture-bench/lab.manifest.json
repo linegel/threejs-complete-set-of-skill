@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-shadow-architecture-bench",
+  "title": "WebGPU Directional Shadow Architecture Bench",
+  "skill": "threejs-scalable-real-time-shadows",
+  "threeRevision": "0.185.1",
+  "kind": "mechanism-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/main.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical-lab.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
+  ],
+  "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
+  "publishPath": "/demos/webgpu-shadow-architecture-bench/",
+  "scenarios": [
+    {
+      "id": "bounded",
+      "title": "One bounded directional shadow",
+      "startup": { "scenario": "bounded", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "csm",
+      "title": "r185 cascade shadow map",
+      "startup": { "scenario": "csm", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "tiled",
+      "title": "r185 tiled directional shadow",
+      "startup": { "scenario": "tiled", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "cached",
+      "title": "Receiver-backed cached clipmap",
+      "startup": { "scenario": "cached", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "bounded-shadow",
+      "route": "/demos/webgpu-shadow-architecture-bench/?scenario=bounded",
+      "startup": { "scenario": "bounded", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "csm",
+      "route": "/demos/webgpu-shadow-architecture-bench/?scenario=csm",
+      "startup": { "scenario": "csm", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "tiled-shadow",
+      "route": "/demos/webgpu-shadow-architecture-bench/?scenario=tiled",
+      "startup": { "scenario": "tiled", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "cached-clipmap",
+      "route": "/demos/webgpu-shadow-architecture-bench/?scenario=cached",
+      "startup": { "scenario": "cached", "tier": "high", "mode": "final" },
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "high",
+      "targetClass": "current WebGPU adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "width": 1200, "height": 800, "dpr": 1 },
+      "mechanismLimits": { "architectureCount": 4, "fixedTier": "high" },
+      "resourceLimits": { "inventorySource": "runtime-owned shadow targets" },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "identical seeded receiver/caster scene",
+        "normal depth for the stock r185 tile comparison",
+        "one directional illumination owner"
+      ],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "shadow-depth", "owner-graph"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "comparison-depth-textures", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "timestamp-query", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "same-scene-architecture-comparison", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "actual-shadow-resource-inventory", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run validate:unit",
+  "commands": {
+    "check": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run check",
+    "test": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run validate:unit",
+    "mutations": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run test:mutations",
+    "capture": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run capture",
+    "validateArtifacts": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run validate:quick",
+    "validateFull": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "Measured current-adapter comparison evidence is pending; timing values must remain unavailable rather than synthetic."
+  ]
+}

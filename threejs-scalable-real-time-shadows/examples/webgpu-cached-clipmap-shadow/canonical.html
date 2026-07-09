@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Native WebGPU Directional Shadow Architecture Lab</title>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0a0d12; color: #e8edf4; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      canvas { display: block; width: 100%; height: 100%; }
+      pre { position: fixed; top: 12px; left: 12px; max-width: min(48rem, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; margin: 0; padding: 12px; background: rgb(5 8 12 / 84%); border: 1px solid #334155; pointer-events: none; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../../../node_modules/three/build/three.webgpu.js",
+          "three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
+          "three/tsl": "../../../node_modules/three/build/three.tsl.js",
+          "three/": "../../../node_modules/three/",
+          "three/addons/": "../../../node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas></canvas>
+    <pre data-status>initializing native WebGPU…</pre>
+    <script type="module">
+      import { createCanonicalShadowLab } from "./canonical-lab.js";
+      import { mechanismIdForShadowScenario } from "./routes.js";
+
+      const status = document.querySelector("[data-status]");
+      const query = new URLSearchParams(location.search);
+      const mechanism = query.get("mechanism");
+      const tier = query.get("tier");
+      const requestedScenario = query.get("scenario");
+      const requestedMode = query.get("mode");
+      const requestedCamera = query.get("camera");
+      const requestedSeedText = query.get("seed");
+      const requestedTimeText = query.get("time");
+      const page = { ready: false, error: null, controller: null };
+      globalThis.shadowLab = page;
+      globalThis.__LAB_ERROR__ = null;
+
+      try {
+        const scenarioMechanism = requestedScenario === null
+          ? null
+          : mechanismIdForShadowScenario(requestedScenario);
+        const lockedMechanism = mechanism ?? scenarioMechanism;
+        const lockedPath = lockedMechanism !== null
+          ? `/demos/webgpu-cached-clipmap-shadow/mechanism/${lockedMechanism}/`
+          : tier !== null
+            ? `/demos/webgpu-cached-clipmap-shadow/tier/${tier}/`
+            : location.pathname;
+        const controller = await createCanonicalShadowLab({
+          canvas: document.querySelector("canvas"),
+          pathname: lockedPath,
+          width: Math.max(1, innerWidth),
+          height: Math.max(1, innerHeight),
+          dpr: Math.min(devicePixelRatio, 2),
+        });
+        if (requestedScenario !== null && requestedScenario !== controller.route.scenario) {
+          throw new Error(`locked route rejects scenario override ${requestedScenario}`);
+        }
+        if (tier !== null && tier !== controller.route.tierId) {
+          throw new Error(`locked route rejects tier override ${tier}`);
+        }
+        if (requestedMode !== null && requestedMode !== controller.route.mode) {
+          throw new Error(`locked route rejects mode override ${requestedMode}`);
+        }
+        await controller.ready();
+        if (requestedCamera !== null) await controller.setCamera(requestedCamera);
+        if (requestedSeedText !== null) {
+          if (!/^\d+$/.test(requestedSeedText)) {
+            throw new RangeError(`seed must be an unsigned 32-bit integer: ${requestedSeedText}`);
+          }
+          await controller.setSeed(Number(requestedSeedText));
+        }
+        if (requestedTimeText !== null) {
+          if (requestedTimeText.trim().length === 0) {
+            throw new RangeError("time must be a nonempty finite number");
+          }
+          const requestedTime = Number(requestedTimeText);
+          if (!Number.isFinite(requestedTime)) {
+            throw new RangeError(`time must be finite: ${requestedTimeText}`);
+          }
+          await controller.setTime(requestedTime);
+        }
+        controller.renderOnce();
+        page.controller = controller;
+        page.ready = true;
+        globalThis.labController = controller;
+        globalThis.__LAB_CONTROLLER__ = controller;
+        globalThis.__LAB_READY__ = Promise.resolve(controller);
+        page.describePipeline = () => controller.describePipeline();
+        page.describeResources = () => controller.describeResources();
+        page.getMetrics = () => controller.getMetrics();
+        page.capturePixels = (target, options) => controller.capturePixels(target, options);
+        status.textContent = JSON.stringify({
+          acceptance: "INCOMPLETE — runtime implemented; current-adapter v2 evidence pending",
+          route: controller.route,
+          pipeline: controller.describePipeline(),
+          resources: controller.describeResources(),
+        }, null, 2);
+
+        const onResize = () => {
+          controller.resize(Math.max(1, innerWidth), Math.max(1, innerHeight), Math.min(devicePixelRatio, 2));
+          controller.renderOnce();
+        };
+        addEventListener("resize", onResize);
+        const disposeController = controller.dispose.bind(controller);
+        controller.dispose = async () => {
+          removeEventListener("resize", onResize);
+          await disposeController();
+        };
+      } catch (error) {
+        page.error = error.stack ?? error.message;
+        globalThis.__LAB_ERROR__ = page.error;
+        status.textContent = page.error;
+        console.error(error);
+      }
+    </script>
+  </body>
+</html>

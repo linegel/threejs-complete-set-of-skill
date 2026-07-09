@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-cached-clipmap-shadow",
+  "title": "Native WebGPU Cached Clipmap Shadow Lab",
+  "skill": "threejs-scalable-real-time-shadows",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
+  ],
+  "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical.html",
+  "publishPath": "/demos/webgpu-cached-clipmap-shadow/",
+  "scenarios": [
+    { "id": "bounded-baseline", "startup": { "scenario": "bounded-baseline", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "depth-span", "startup": { "scenario": "depth-span", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "fixed-footprint", "startup": { "scenario": "fixed-footprint", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "persistent-coverage", "startup": { "scenario": "persistent-coverage", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "slow-subtexel-pan", "startup": { "scenario": "slow-subtexel-pan", "tier": "high", "mode": "level-centers" }, "acceptanceStatus": "incomplete" },
+    { "id": "bias-sweep", "startup": { "scenario": "bias-sweep", "tier": "high", "mode": "shadow-contribution" }, "acceptanceStatus": "incomplete" },
+    { "id": "swept-caster-invalidation", "startup": { "scenario": "swept-caster-invalidation", "tier": "high", "mode": "level-validity" }, "acceptanceStatus": "incomplete" },
+    { "id": "age-priority-round-robin", "startup": { "scenario": "age-priority-round-robin", "tier": "high", "mode": "scheduler" }, "acceptanceStatus": "incomplete" },
+    { "id": "alpha-displaced-instanced-morph", "startup": { "scenario": "alpha-displaced-instanced-morph", "tier": "high", "mode": "silhouette-parity" }, "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "bounded-shadow", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/bounded-shadow/", "startup": { "scenario": "bounded-baseline", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "csm", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/csm/", "startup": { "scenario": "depth-span", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "tiled-shadow", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/tiled-shadow/", "startup": { "scenario": "fixed-footprint", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "cached-clipmap", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/cached-clipmap/", "startup": { "scenario": "persistent-coverage", "tier": "high", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "texel-snap-and-pan", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/texel-snap-and-pan/", "startup": { "scenario": "slow-subtexel-pan", "tier": "high", "mode": "level-centers" }, "acceptanceStatus": "incomplete" },
+    { "id": "bias-sweep", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/bias-sweep/", "startup": { "scenario": "bias-sweep", "tier": "high", "mode": "shadow-contribution" }, "acceptanceStatus": "incomplete" },
+    { "id": "targeted-invalidation", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/targeted-invalidation/", "startup": { "scenario": "swept-caster-invalidation", "tier": "high", "mode": "level-validity" }, "acceptanceStatus": "incomplete" },
+    { "id": "scheduler-fairness", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/scheduler-fairness/", "startup": { "scenario": "age-priority-round-robin", "tier": "high", "mode": "scheduler" }, "acceptanceStatus": "incomplete" },
+    { "id": "caster-position-parity", "route": "/demos/webgpu-cached-clipmap-shadow/mechanism/caster-position-parity/", "startup": { "scenario": "alpha-displaced-instanced-morph", "tier": "high", "mode": "silhouette-parity" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "ultra",
+      "targetClass": "current high-end WebGPU adapter",
+      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "Authored 60 Hz frame allowance; current-adapter timing evidence pending" },
+      "resolutionPolicy": { "width": 1920, "height": 1080, "dprCap": 2 },
+      "mechanismLimits": { "dynamicLevels": 2, "updateBudget": 3, "correctionBudget": 3, "maxCacheAgeFrames": 48 },
+      "resourceLimits": { "mapSizes": [2048, 2048, 1024, 1024, 512, 512, 512], "nominalMemoryGateBytes": 134217728 },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["receiver-backed child shadow nodes", "stable light basis", "correctness invalidation before age refresh", "one directional illumination owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "high",
+      "targetClass": "current general-purpose WebGPU adapter",
+      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "Authored 60 Hz frame allowance; current-adapter timing evidence pending" },
+      "resolutionPolicy": { "width": 1920, "height": 1080, "dprCap": 1.5 },
+      "mechanismLimits": { "dynamicLevels": 2, "updateBudget": 2, "correctionBudget": 2, "maxCacheAgeFrames": 64 },
+      "resourceLimits": { "mapSizes": [1024, 1024, 1024, 512, 512, 512, 512], "nominalMemoryGateBytes": 67108864 },
+      "degradationFromPrevious": ["reduce the two finest map dimensions", "reduce ordinary and correction update budgets"],
+      "preservedInvariants": ["receiver-backed child shadow nodes", "stable light basis", "correctness invalidation before age refresh", "one directional illumination owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "reduced",
+      "targetClass": "binding and memory constrained WebGPU adapter",
+      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "Authored 60 Hz frame allowance; target-adapter timing evidence pending" },
+      "resolutionPolicy": { "width": 1280, "height": 720, "dprCap": 1 },
+      "mechanismLimits": { "dynamicLevels": 1, "updateBudget": 1, "correctionBudget": 1, "maxCacheAgeFrames": 96 },
+      "resourceLimits": { "mapSizes": [512, 512, 512, 256, 256, 256, 256], "nominalMemoryGateBytes": 33554432 },
+      "degradationFromPrevious": ["halve shadow map dimensions", "update one dynamic and one queued level at a time"],
+      "preservedInvariants": ["receiver-backed child shadow nodes", "stable light basis", "correctness invalidation before age refresh", "one directional illumination owner"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "shadow-contribution", "shadow-depth", "level-centers", "level-validity", "scheduler", "silhouette-parity", "owner-graph"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "comparison-depth-textures", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "receiver-consumes-committed-levels", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "actual-depth-resource-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "sequential-child-shadow-submissions", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "scheduler-fairness", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "caster-visible-shadow-parity", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "node threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/validate-v2.js",
+  "commands": {
+    "check": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run check",
+    "test": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run validate:unit",
+    "mutations": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run test:mutations",
+    "capture": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run capture",
+    "validateArtifacts": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run validate:quick",
+    "validateFull": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "The receiver-backed runtime and a real candidate native-WebGPU capture adapter are implemented; accepted numeric ROI, timing, complete resource, and lifecycle evidence is pending.",
+    "The retained browser.html subject is a Phase-1 contract fixture and cannot satisfy canonical acceptance."
+  ]
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>WebGPU Shadow Pipeline Integration</title>
+<style>html,body,canvas{margin:0;width:100%;height:100%;display:block;background:#0b0e12}pre{position:fixed;top:8px;left:8px;color:#eef;background:#000b;padding:10px;max-width:44rem;white-space:pre-wrap}</style>
+<script type="importmap">
+{"imports":{"three":"../../../node_modules/three/build/three.webgpu.js","three/webgpu":"../../../node_modules/three/build/three.webgpu.js","three/tsl":"../../../node_modules/three/build/three.tsl.js","three/":"../../../node_modules/three/","three/addons/":"../../../node_modules/three/examples/jsm/"}}
+</script>
+<canvas></canvas><pre>initializing…</pre>
+<script type="module">
+  import { createShadowPipelineIntegration, resolveShadowPipelineIntegrationRoute } from "./main.js";
+  const selection = resolveShadowPipelineIntegrationRoute(location.search);
+  const page = { ready: false, error: null };
+  globalThis.shadowPipelineIntegration = page;
+  globalThis.__LAB_ERROR__ = null;
+  try {
+    const controller = await createShadowPipelineIntegration({ selection, canvas: document.querySelector("canvas"), width: innerWidth, height: innerHeight, dpr: Math.min(devicePixelRatio, 2) });
+    controller.renderOnce();
+    Object.assign(page, { ready: true, controller });
+    globalThis.labController = controller;
+    globalThis.__LAB_CONTROLLER__ = controller;
+    globalThis.__LAB_READY__ = Promise.resolve(controller);
+    document.querySelector("pre").textContent = JSON.stringify({ acceptance: "INCOMPLETE — WebGPU evidence pending", selection: controller.getMetrics().routeSelection, graph: controller.describePipeline(), resources: controller.describeResources() }, null, 2);
+  } catch (error) {
+    page.error = error.stack ?? error.message;
+    globalThis.__LAB_ERROR__ = page.error;
+    document.querySelector("pre").textContent = page.error;
+  }
+</script>

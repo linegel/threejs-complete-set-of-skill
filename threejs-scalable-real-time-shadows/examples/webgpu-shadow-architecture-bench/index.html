@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>WebGPU Directional Shadow Architecture Bench</title>
+<style>html,body,canvas{margin:0;width:100%;height:100%;display:block;background:#0b0e12}pre{position:fixed;top:8px;left:8px;color:#eef;background:#000b;padding:10px;max-width:44rem;white-space:pre-wrap}</style>
+<script type="importmap">
+{"imports":{"three":"../../../node_modules/three/build/three.webgpu.js","three/webgpu":"../../../node_modules/three/build/three.webgpu.js","three/tsl":"../../../node_modules/three/build/three.tsl.js","three/":"../../../node_modules/three/","three/addons/":"../../../node_modules/three/examples/jsm/"}}
+</script>
+<canvas></canvas><pre>initializing…</pre>
+<script type="module">
+  import { createShadowArchitectureBench, resolveArchitectureBenchRoute } from "./main.js";
+  const selection = resolveArchitectureBenchRoute(location.search);
+  const output = document.querySelector("pre");
+  const page = { ready: false, error: null };
+  globalThis.shadowArchitectureBench = page;
+  globalThis.__LAB_ERROR__ = null;
+  try {
+    const subject = await createShadowArchitectureBench({ canvas: document.querySelector("canvas"), selection, width: innerWidth, height: innerHeight, dpr: Math.min(devicePixelRatio, 2) });
+    subject.controller.renderOnce();
+    const controller = subject.controller;
+    Object.assign(page, { ready: true, subject, controller });
+    globalThis.labController = controller;
+    globalThis.__LAB_CONTROLLER__ = controller;
+    globalThis.__LAB_READY__ = Promise.resolve(controller);
+    output.textContent = JSON.stringify({ selection: controller.getMetrics().routeSelection, pipeline: controller.describePipeline(), resources: controller.describeResources(), evidence: subject.evidence }, null, 2);
+  } catch (error) {
+    page.error = error.stack ?? error.message;
+    globalThis.__LAB_ERROR__ = page.error;
+    output.textContent = page.error;
+  }
+</script>

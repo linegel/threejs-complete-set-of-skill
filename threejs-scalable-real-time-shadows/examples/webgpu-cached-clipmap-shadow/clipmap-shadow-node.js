@@ -1,16 +1,18 @@
-import ShadowNode from "three/src/nodes/lighting/ShadowNode.js";
 import {
   DepthFormat,
   DepthTexture,
   NoColorSpace,
   OrthographicCamera,
+  RenderTarget,
+  RendererUtils,
+  ShadowNode,
   UnsignedIntType,
   Vector3,
-  WebGLRenderTarget,
 } from "three/webgpu";
 import { Fn, abs, float, max, select, smoothstep, uniform, vec2, vec3, vec4 } from "three/tsl";
 
 import {
+  CLIPMAP_IMPLEMENTATION_STATUS,
   DIRTY_REASON_BITS,
   commitLevelRender,
   computeSelectionWeights,
@@ -36,30 +38,40 @@ const tslHookSymbols = {
 
 void tslHookSymbols;
 
+const lightUpParallelGate = 0.999999; // Gated deterministic-fixture singularity check.
+
 export class CachedClipmapShadowNode extends ShadowNode {
   constructor(light, shadow, config) {
     super(light, shadow);
     this.config = config;
+    this.implementationStatus = CLIPMAP_IMPLEMENTATION_STATUS;
     this.levels = createClipmapLevels(config);
     this.pendingRenders = [];
     this.disposeCounters = {
-      shadowNodes: 0,
-      clonedShadows: 0,
-      levelLights: 0,
+      attachmentDetaches: 0,
       levelTargets: 0,
-      storageBuffers: 0,
-      debugTextures: 0,
     };
     this.levelResources = this.levels.map((level) =>
       createLevelShadowResource(level, this.config),
     );
     this.deformationFieldVersions = new Map();
+    this.disposed = false;
     this.diagnostics = {
-      comparisonSampling: "unconditional comparison samples before weighting",
+      comparisonSampling: "all child nodes statically reachable; stock r185 child comparison is frustum-gated before weighting",
       setupShadowFilter: "per-level filter calls use inverseMapSize/mapSize",
       setupShadowCoord: "committed light-space centers only",
-      biasNode: "LightShadow.biasNode or per-level normalBias scales by texel width",
+      biasNode:
+        "unwired Phase-1 hypothesis; production bias needs receiver-plane gradients, filter support, depth span, and detachment caps",
     };
+  }
+
+  setup(builder) {
+    if (builder && this.implementationStatus.receiverBlendImplemented !== true) {
+      throw new Error(
+        "CachedClipmapShadowNode is a Phase-1 scheduler scaffold; production receiver setup is not implemented",
+      );
+    }
+    return super.setup(builder);
   }
 
   attachToLight(light = this.light) {
@@ -131,30 +143,26 @@ export class CachedClipmapShadowNode extends ShadowNode {
       frame,
     });
 
-    const previousTarget = renderer.getRenderTarget?.();
-    renderer.setRenderTarget?.(resource.renderTarget);
-    renderer.clearDepth?.();
-    renderer.clear?.(false, true, false);
+    let rendererState;
 
-    const finish = () => {
-      renderer.setRenderTarget?.(previousTarget ?? null);
-      resource.lastFrame = frame?.frameId ?? 0;
-      render.level.shadowCamera = resource.camera;
-      render.level.shadowTarget = resource.renderTarget;
-      render.level.depthTexture = resource.depthTexture;
-      commitLevelRender(render.level, render.desired);
-      render.level.lastFrame = frame?.frameId ?? 0;
-    };
-
-    const output = typeof renderer.renderAsync === "function"
-      ? renderer.renderAsync(casterScene, resource.camera)
-      : renderer.render(casterScene, resource.camera);
-
-    if (output && typeof output.then === "function") {
-      return output.then(finish);
+    // The renderer is initialized by the owner. r185 deprecates renderAsync();
+    // RendererUtils resets autoClear to true, so render() performs exactly one
+    // target clear while preserving target face/mip, MRT, clear, and callback
+    // state for the owner.
+    try {
+      rendererState = RendererUtils.resetRendererState(renderer, rendererState);
+      renderer.setRenderTarget(resource.renderTarget);
+      renderer.render(casterScene, resource.camera);
+    } finally {
+      if (rendererState) RendererUtils.restoreRendererState(renderer, rendererState);
     }
 
-    finish();
+    resource.lastFrame = frame?.frameId ?? 0;
+    render.level.shadowCamera = resource.camera;
+    render.level.shadowTarget = resource.renderTarget;
+    render.level.depthTexture = resource.depthTexture;
+    commitLevelRender(render.level, render.desired);
+    render.level.lastFrame = frame?.frameId ?? 0;
     return undefined;
   }
 
@@ -163,21 +171,33 @@ export class CachedClipmapShadowNode extends ShadowNode {
     for (const field of fields) {
       const id = field.id ?? "deformation";
       const version = field.version ?? field.time ?? field.uniform?.value;
+      const currentBounds = cloneLightSpaceSphere(field.boundsLightSpace);
       const previous = this.deformationFieldVersions.get(id);
-      this.deformationFieldVersions.set(id, version);
+      this.deformationFieldVersions.set(id, { version, bounds: currentBounds });
 
-      if (previous === undefined || Object.is(previous, version)) {
+      if (previous === undefined || Object.is(previous.version, version)) {
         continue;
       }
 
-      const touched = field.boundsLightSpace
-        ? invalidateSphere(this.levels, field.boundsLightSpace, `deformation:${id}`)
+      const sweptBounds = previous.bounds && currentBounds
+        ? encloseLightSpaceSpheres(previous.bounds, currentBounds)
+        : null;
+      const touched = sweptBounds
+        ? invalidateSphere(this.levels, sweptBounds, `deformation:${id}`)
         : invalidateAllLevels(
           this.levels,
           DIRTY_REASON_BITS.forceDirty | DIRTY_REASON_BITS.deformationChanged,
           `deformation:${id}`,
         );
-      invalidations.push({ id, previous, version, touched });
+      invalidations.push({
+        id,
+        previous: previous.version,
+        version,
+        previousBounds: previous.bounds,
+        currentBounds,
+        sweptBounds,
+        touched,
+      });
     }
     return invalidations;
   }
@@ -195,7 +215,7 @@ export class CachedClipmapShadowNode extends ShadowNode {
 
   setupShadowFilter(builder, inputs) {
     if (!builder) {
-      return createUnconditionalSamplingPlan(this.levels);
+      return createStaticChildSamplingPlan(this.levels);
     }
     return super.setupShadowFilter(builder, inputs);
   }
@@ -209,26 +229,59 @@ export class CachedClipmapShadowNode extends ShadowNode {
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    const wasAttached = this.light?.shadow?.shadowNode === this;
     this.detachFromLight();
-    this.disposeCounters.shadowNodes += this.levels.length;
-    this.disposeCounters.clonedShadows += this.levels.length;
-    this.disposeCounters.levelLights += this.levels.length;
-    this.disposeCounters.levelTargets += this.levels.length;
-    this.disposeCounters.storageBuffers += 1;
-    this.disposeCounters.debugTextures += this.levels.length;
+    if (wasAttached) this.disposeCounters.attachmentDetaches += 1;
     for (const level of this.levels) {
       level.disposed = true;
     }
     for (const resource of this.levelResources ?? []) {
       resource.renderTarget.dispose?.();
-      resource.depthTexture.dispose?.();
+      this.disposeCounters.levelTargets += 1;
     }
+    this.pendingRenders.length = 0;
+    this.deformationFieldVersions.clear();
     super.dispose?.();
   }
 }
 
+function cloneLightSpaceSphere(sphere) {
+  if (!sphere) return null;
+  if (
+    ![sphere.x, sphere.y, sphere.radius].every(Number.isFinite) ||
+    sphere.radius < 0
+  ) {
+    throw new RangeError("deformation bounds require finite x/y and radius >= 0");
+  }
+  return {
+    x: sphere.x,
+    y: sphere.y,
+    radius: sphere.radius,
+  };
+}
+
+function encloseLightSpaceSpheres(a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const distance = Math.hypot(dx, dy);
+  if (a.radius >= distance + b.radius) return { ...a };
+  if (b.radius >= distance + a.radius) return { ...b };
+  if (distance === 0) {
+    return { x: a.x, y: a.y, radius: Math.max(a.radius, b.radius) };
+  }
+  const radius = 0.5 * (distance + a.radius + b.radius);
+  const t = (radius - a.radius) / distance;
+  return {
+    x: a.x + dx * t,
+    y: a.y + dy * t,
+    radius,
+  };
+}
+
 export function createLevelShadowResource(level, config) {
-  const renderTarget = new WebGLRenderTarget(level.mapSize, level.mapSize, {
+  const renderTarget = new RenderTarget(level.mapSize, level.mapSize, {
     depthBuffer: true,
     stencilBuffer: false,
   });
@@ -262,17 +315,32 @@ export function fitLevelShadowCamera({ level, desired, config, camera, light, fr
   camera.right = halfWidth;
   camera.top = halfWidth;
   camera.bottom = -halfWidth;
-  camera.near = config.shadowNear;
-  camera.far = computeShadowFar(level, config);
+  const depthInterval = frame.shadowDepthInterval ?? {
+    near: config.shadowNear,
+    far: config.shadowFarCap,
+  };
+  if (
+    !Number.isFinite(depthInterval.near) ||
+    !Number.isFinite(depthInterval.far) ||
+    !(depthInterval.near > 0 && depthInterval.far > depthInterval.near)
+  ) {
+    throw new Error("shadowDepthInterval must satisfy 0 < near < far");
+  }
+  camera.near = depthInterval.near;
+  camera.far = depthInterval.far;
 
   const center = resolveLightSpaceToWorld(desired, frame);
   const lightDirection = resolveLightDirection(light, frame);
-  const position = center.clone().sub(lightDirection.multiplyScalar(config.lightMargin));
+  const position = center.clone().addScaledVector(lightDirection, -config.lightMargin);
 
   camera.position.copy(position);
-  if (frame.lightUp) {
-    camera.up.copy(toVector3(frame.lightUp).normalize());
+  const lightUp = frame.lightUp
+    ? requireFiniteNonzeroVector(toVector3(frame.lightUp), "lightUp").normalize()
+    : leastAlignedAxis(lightDirection);
+  if (Math.abs(lightUp.dot(lightDirection)) >= lightUpParallelGate) {
+    throw new RangeError("lightUp must not be parallel to lightDirection");
   }
+  camera.up.copy(lightUp);
   camera.lookAt(center);
   camera.updateProjectionMatrix();
   camera.updateMatrixWorld(true);
@@ -281,43 +349,71 @@ export function fitLevelShadowCamera({ level, desired, config, camera, light, fr
 }
 
 export function computeShadowFar(level, config) {
-  return Math.max(
-    config.shadowNear + 1,
-    Math.min(config.shadowFarCap, config.lightMargin + 2 * level.halfWidth),
-  );
+  void level;
+  return config.shadowFarCap;
 }
 
 function resolveLightSpaceToWorld(point, frame) {
   const target = new Vector3(point.x, point.y, point.z);
   if (typeof frame.lightSpaceToWorld === "function") {
-    return frame.lightSpaceToWorld(point, target) ?? target;
+    return requireFiniteVector(
+      frame.lightSpaceToWorld(point, target) ?? target,
+      "lightSpaceToWorld result",
+    );
   }
   if (frame.lightBasis) {
     const origin = toVector3(frame.lightBasis.origin ?? { x: 0, y: 0, z: 0 });
     const right = toVector3(frame.lightBasis.right ?? { x: 1, y: 0, z: 0 });
     const up = toVector3(frame.lightBasis.up ?? { x: 0, y: 1, z: 0 });
     const forward = toVector3(frame.lightBasis.forward ?? { x: 0, y: 0, z: 1 });
-    return origin
+    return requireFiniteVector(origin
       .add(right.multiplyScalar(point.x))
       .add(up.multiplyScalar(point.y))
-      .add(forward.multiplyScalar(point.z));
+      .add(forward.multiplyScalar(point.z)), "lightBasis transform");
   }
-  return target;
+  return requireFiniteVector(target, "light-space point");
 }
 
 function resolveLightDirection(light, frame) {
   if (frame.lightDirection) {
-    return toVector3(frame.lightDirection).normalize();
+    return requireFiniteNonzeroVector(
+      toVector3(frame.lightDirection),
+      "lightDirection",
+    ).normalize();
   }
-  const target = light?.target?.position;
-  const position = light?.position;
+  const target = light?.target?.getWorldPosition
+    ? light.target.getWorldPosition(new Vector3())
+    : light?.target?.position;
+  const position = light?.getWorldPosition
+    ? light.getWorldPosition(new Vector3())
+    : light?.position;
   if (target && position) {
     const direction = new Vector3().subVectors(target, position);
-    if (direction.lengthSq() > 0) {
-      return direction.normalize();
-    }
+    return requireFiniteNonzeroVector(direction, "light world direction").normalize();
   }
-  return new Vector3(0, -1, 0);
+  throw new RangeError("a finite nonzero lightDirection or world-space light/target is required");
+}
+
+function requireFiniteVector(value, label) {
+  if (![value.x, value.y, value.z].every(Number.isFinite)) {
+    throw new RangeError(`${label} must be finite`);
+  }
+  return value;
+}
+
+function requireFiniteNonzeroVector(value, label) {
+  requireFiniteVector(value, label);
+  if (value.lengthSq() === 0) throw new RangeError(`${label} must be nonzero`);
+  return value;
+}
+
+function leastAlignedAxis(direction) {
+  const ax = Math.abs(direction.x);
+  const ay = Math.abs(direction.y);
+  const az = Math.abs(direction.z);
+  if (ax <= ay && ax <= az) return new Vector3(1, 0, 0);
+  if (ay <= az) return new Vector3(0, 1, 0);
+  return new Vector3(0, 0, 1);
 }
 
 function toVector3(value) {
@@ -330,21 +426,27 @@ function toVector3(value) {
   return new Vector3(value?.x ?? 0, value?.y ?? 0, value?.z ?? 0);
 }
 
-export function createUnconditionalSamplingPlan(levels) {
+export function createStaticChildSamplingPlan(levels) {
   return levels.map((level) => ({
     index: level.index,
     mapSize: level.mapSize,
     inverseMapSize: inverseMapSize(level),
-    sample: "comparison texture sample is evaluated unconditionally",
+    sample: "child node remains statically reachable; stock r185 comparison is frustum-gated",
     weight: "containment weight is multiplied after setupShadowFilter sampling",
   }));
 }
 
+// Backward-compatible Phase-1 API name. The returned contract is intentionally
+// truthful about r185 child-node frustum gating.
+export const createUnconditionalSamplingPlan = createStaticChildSamplingPlan;
+
 export function createBiasNodePlan(levels) {
   return levels.map((level) => ({
     index: level.index,
-    biasNode: "LightShadow.biasNode",
-    normalBias: level.normalBias,
+    status: "unwired-hypothesis",
+    biasNode: null,
+    normalBias: null,
+    normalBiasHypothesis: level.normalBiasHypothesis,
     texelWidth: level.texelWidth,
   }));
 }
@@ -352,19 +454,13 @@ export function createBiasNodePlan(levels) {
 export function validateDisposeCounters(node) {
   const expected = node.levels.length;
   const errors = [];
-  for (const key of [
-    "shadowNodes",
-    "clonedShadows",
-    "levelLights",
-    "levelTargets",
-    "debugTextures",
-  ]) {
-    if (node.disposeCounters[key] !== expected) {
-      errors.push(`${key} disposed ${node.disposeCounters[key]} expected ${expected}`);
-    }
+  if (node.disposeCounters.levelTargets !== expected) {
+    errors.push(
+      `levelTargets disposed ${node.disposeCounters.levelTargets} expected ${expected}`,
+    );
   }
-  if (node.disposeCounters.storageBuffers !== 1) {
-    errors.push("storageBuffers disposed counter must be 1");
+  if (node.disposeCounters.attachmentDetaches !== 1) {
+    errors.push("the attached custom node must detach exactly once");
   }
   return { ok: errors.length === 0, errors };
 }

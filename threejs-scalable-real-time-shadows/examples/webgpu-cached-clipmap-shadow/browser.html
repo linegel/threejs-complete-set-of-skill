@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>WebGPU Cached Clipmap Shadow Artifact Page</title>
+<title>WebGPU Phase-1 Clipmap Scaffold Artifact Page</title>
 <style>
   html,
   body {
@@ -32,7 +32,9 @@
     MeshBasicNodeMaterial,
     NoColorSpace,
     PerspectiveCamera,
-    RenderTarget
+    RenderTarget,
+    RendererUtils,
+    REVISION
   } from "three/webgpu";
   import {
     color,
@@ -79,11 +81,17 @@
     camera.position.set(0, 28, 42);
     camera.lookAt(0, 0, 0);
     artifact.stage = "rendering-caster-scene";
-    await renderer.renderAsync(system.casterScene, camera);
+    renderer.render(system.casterScene, camera);
 
     artifact.stage = "capturing-artifacts";
     const level = system.levels[0];
     const metadata = {
+      threeRevision: REVISION,
+      isWebGPUBackend: renderer.backend.isWebGPUBackend === true,
+      implementationPhase: system.implementationStatus.phase,
+      productionClipmapProof: system.implementationStatus.productionClipmapProof,
+      receiverBlendImplemented: system.implementationStatus.receiverBlendImplemented,
+      attachedToLight: system.attachedToLight,
       firstDepthTexture: level.depthTexture?.name,
       renderedLevels: system.levels.filter((entry) => entry.renderCount > 0).length,
       sharedPositionNode:
@@ -96,6 +104,7 @@
       minimumCaptureSize,
       Math.floor(level.mapSize / clipmapPreviewDownsample),
     );
+    metadata.captureSize = captureSize;
 
     Object.assign(artifact, {
       ...metadata,
@@ -174,7 +183,7 @@
     }
   }
 
-  function mapLevelDepthPixel({ x, y, alpha, width, height }) {
+  function mapLevelDepthPixel({ red, green, blue, alpha }) {
     const empty = 0; // Derived: uncovered light-view texels are black.
     const maxChannel = 255; // Derived: PNG canvas export stores 8-bit channels.
     const alphaThreshold = 0; // Gated: any GPU coverage alpha marks a caster texel.
@@ -182,13 +191,10 @@
       return [empty, empty, empty, maxChannel];
     }
 
-    const denominatorBias = 1; // Gated: avoids division by zero for degenerate one-pixel captures.
-    const horizontalWeight = 0.72; // Derived: lightDirection has stronger x/z screen contribution than vertical caster displacement.
-    const verticalWeight = 1 - horizontalWeight;
-    const xRamp = x / Math.max(denominatorBias, width - denominatorBias);
-    const yRamp = (height - denominatorBias - y) / Math.max(denominatorBias, height - denominatorBias);
-    const channel = Math.round(maxChannel * (xRamp * horizontalWeight + yRamp * verticalWeight));
-    return [channel, channel, channel, maxChannel];
+    // Preserve the actual normalized view-depth color emitted by depthMaterial.
+    // Synthesizing a screen-space ramp here would make byte-difference checks
+    // pass without proving that caster depth reached the readback.
+    return [red, green, blue, maxChannel];
   }
 
   function mapSilhouettePixel({ alpha }) {
@@ -208,15 +214,15 @@
     target.texture.colorSpace = NoColorSpace;
     target.texture.generateMipmaps = false;
 
-    const previousTarget = renderer.getRenderTarget?.();
+    let rendererState;
     try {
+      rendererState = RendererUtils.resetRendererState(renderer, rendererState);
       renderer.setRenderTarget(target);
-      renderer.clear?.(true, true, true);
-      await renderer.renderAsync(scene, camera);
+      renderer.render(scene, camera);
       const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, width, height);
       return rgbaPixelsToDataUrl(pixels, width, height, mapPixel);
     } finally {
-      renderer.setRenderTarget(previousTarget ?? null);
+      if (rendererState) RendererUtils.restoreRendererState(renderer, rendererState);
       target.dispose();
     }
   }
