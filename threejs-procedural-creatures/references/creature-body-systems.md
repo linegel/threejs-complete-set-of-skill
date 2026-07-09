@@ -401,6 +401,57 @@ accumulator (clamp input dt, e.g. accumulate ≤ 0.25 s; step at 1/60; keep
 previous+current pose; render interpolated). Variable render dt straight into
 gait/hop is a known visual bug: one hitch completes half a swing in one frame.
 
+### Environment-query boundary
+
+The creature compiler and locomotion system do not own terrain, coastline,
+bathymetry, vegetation, or fluid state. They consume explicit providers from
+the world-generation/data layer. Keep three semantics separate:
+
+```text
+queryHabitat(worldPoint, tick) -> {
+  validity, fieldVersion, sourceResolution, errorBound,
+  signedCoastDistance, waterColumnDepth, slope,
+  substrateIdOrWeights, moisture, exposure, domainChannels...
+}
+
+querySupport(worldProbe, tick) -> {
+  point, normal, frameId, supportCoord, worldFromSupport,
+  velocityAtPoint, angularVelocity, validity, errorBound
+}
+
+queryWaterState(worldPoint, timeSeconds, footprint) -> {
+  surfacePoint, surfaceNormal, surfacePointVelocity,
+  materialCurrentVelocity, waterDepth,
+  representedFootprint, frameId, validity, errorBound, fieldVersion
+}
+```
+
+The consumer declares which habitat channels and units it requires; unspecified
+domain channels are absent, not zero. `queryHabitat` is for deterministic
+placement, route selection, and behavior policy. `querySupport` owns contact
+geometry and moving-frame kinematics. `queryWaterState` owns the instantaneous
+free-surface sample. A field revision invalidates cached placements/routes
+through an explicit policy; render-patch LOD and material-detail changes must
+not move a physical habitat boundary.
+
+`surfacePointVelocity` is the time derivative of the sampled geometric surface
+point under the provider's parameterization. `materialCurrentVelocity` is
+Eulerian/Lagrangian fluid transport as declared by the water model. Wave phase
+velocity, group velocity, vertical `partial(eta)/partial(t)`, and material
+current are not interchangeable. A simple visual-float tier may omit current,
+but must mark it `not used`; a behavior or force model requiring current is
+blocked when that channel is unavailable.
+
+The water footprint is set by the body/contact response scale. Its normal is a
+filtered physical free-surface normal, never a material/shading normal; otherwise
+micro-normal detail can inject macroscopic roll and steering.
+
+Providers may use an analytic CPU mirror, a deterministic shared field, or a
+batched asynchronous query service with a declared latency contract. They may
+not perform frame-critical GPU readback. Placement and locomotion acceptance
+include provider spatial/temporal error; a precise IK solve against an
+under-resolved coast or water sample is not precise world coupling.
+
 Legged locomotion consumes
 `querySupport(worldProbe, tick) -> {point, normal, frameId, supportCoord,
 worldFromSupport, velocityAtPoint, angularVelocity}`. The query may represent terrain, a sloped
@@ -487,8 +538,10 @@ segment slots from the final particle chain. If stages target the same slot,
 the later stage wins; rope-verlet slot cost is
 `ropeSubsteps * ropeRelaxationPasses * ropeSegments`, not O(slots).
 
-**Swimmer**: buoyancy response targets an injected
-`getWaterSurface(x, z, t) -> {height, normal, velocity?}`. Do not call a
+**Swimmer**: buoyancy response targets the injected water-state contract above;
+legacy scalar providers may expose
+`getWaterSurface(x, z, t) -> {height, normal, surfacePointVelocity?}` only for
+tiers that explicitly omit material current and depth. Do not call a
 first-order lerp a spring. For a critically damped vertical response with
 piecewise-constant target per fixed step, `e = y-h`, `c = v+omega*e`, then
 `eNew = (e+c*dt)*exp(-omega*dt)` and
@@ -505,8 +558,9 @@ which evaluates the exact authored analytic wave list and declares the live
 StorageTexture heightfield residual as a separate budget. The provider owns the
 parity-error obligation; creature locomotion treats the query as authoritative
 and does not blend in asynchronous GPU readback. Gate normalized surface
-tracking error, phase lag, and stability across the declared wave-frequency
-band and fixed-step convergence sweep.
+tracking error, phase lag, normal error, and, when consumed, material-current
+error across the declared wave-frequency/current band and fixed-step
+convergence sweep.
 
 ## 7. Scale architecture
 
@@ -697,8 +751,9 @@ the shared projected-error contract linked in §0.
 | skin weights/deformation | Finite nonnegative partition of unity after capped-influence pruning; barrier leakage, bend/twist volume/radius, joint collapse, normal continuity, and DQ bulge/antipodality or CoR error as applicable |
 | planted-foot drift | Gated platform-relative displacement normalized by leg length per stance interval; tolerance must exceed the implementation's declared f32/f64 roundoff floor |
 | support-surface locomotion | Sloped, translating, and rotating supports; contact-normal continuity, support-relative plant drift, landing position/velocity residual, and explicit frame-change/loss behavior |
+| habitat query | Required-channel/unit/schema validation, field-version invalidation, deterministic placement under equal inputs, and placement/classification error including provider source resolution |
 | IK reconstruction | Relative upper/lower length residual plus reach-clamp classification, not decimal-string equality |
-| water coupling | Gated height/normal/phase residual against the injected provider, normalized by body or wave scale |
+| water coupling | Gated height/normal/phase residual and, when consumed, surface-point/material-current velocity residual against the injected provider, normalized by body or wave/current scale |
 | shadow/depth parity | Gated silhouette distance in pixels for display, cast shadow, received-shadow lookup, and depth output |
 | geometry counts | Derived exactly from the selected compiler/topology/geometry signature; preview-shell counts are not shipping-mesh counts |
 | determinism | `seekTick(n) == stepTicks(n)` state hash for equal seed, tick, inputs, and declared numeric implementation; array permutation/consistent id rename are additional field invariants; cross-device tolerance is separate |

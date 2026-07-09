@@ -519,24 +519,27 @@ reason-specific counters.
 
 ### Absorption, scattering, and energy partition
 
-For absorption coefficient `sigma_a` in inverse metres and path `ell` in
-metres:
+For absorption `sigma_a`, scattering `sigma_s`, extinction
+`sigma_t=sigma_a+sigma_s` in inverse metres, and path `ell` in metres:
 
 ```text
-T_rgb = exp(-sigma_a_rgb ell).                                  [D]
+T_rgb = exp(-sigma_t_rgb ell),
+omega_0 = sigma_s/max(sigma_t,epsilon_sigma).                   [D]
 ```
 
-For a bounded single-scattering approximation with authored source radiance
-`L_s` **[A]**:
+For a bounded single-scattering approximation with authored phase-weighted
+source radiance `L_s` **[A]**:
 
 ```text
 L_water = F L_reflection
-        + (1-F) [T L_background + (1-T) L_s].                   [D]
+        + (1-F) [T L_background + (1-T) omega_0 L_s].           [D]
 ```
 
-The coefficients form a nonnegative partition when `F,T` lie in the unit
-interval **[D]**. More complex scattering may replace `L_s`, but it must retain
-an explicit extinction/source model. Do not add deep color, crest tint,
+The represented coefficients are nonnegative when `F,T,omega_0` lie in the
+unit interval; `(1-T)(1-omega_0)` is absorbed rather than re-emitted **[D]**.
+Handle `sigma_t=0` explicitly. More complex scattering may replace `L_s`, but
+it must retain an explicit extinction, phase, and source model. An empirical
+fog coefficient is not a physical absorption/scattering partition. Do not add deep color, crest tint,
 caustics, and glints independently.
 
 Sun glint belongs to the reflected specular BRDF. If the node material already

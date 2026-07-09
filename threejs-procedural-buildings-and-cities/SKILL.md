@@ -1,6 +1,6 @@
 ---
 name: threejs-procedural-buildings-and-cities
-description: Build authored procedural buildings, facades, and city kits in Three.js r185 WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.
+description: Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.
 ---
 
 # Procedural Buildings and Cities
@@ -35,6 +35,10 @@ Read
 [references/grammar-and-mesh-compiler.md](references/grammar-and-mesh-compiler.md)
 before implementing the generator.
 
+For generated terrain, islands, coasts, ruins, docks, boats, rocks, pebbles,
+flowers, or small scene assemblies, also read
+[references/semantic-site-asset-kits.md](references/semantic-site-asset-kits.md).
+
 Legacy implementation (deprecated, do not extend):
 `examples/authored-financial-tower/`.
 
@@ -68,6 +72,55 @@ Legacy implementation (deprecated, do not extend):
   geometry.
 - Provide topology, exposed-edge, placement, ownership, material-slot, UV
   density, bounds, draw-call, and triangle diagnostics.
+
+## Semantic Site And Coastal Asset Kits
+
+Use the same plan-before-emission architecture for small site assets. The site
+plan consumes versioned terrain/coast fields plus a registry of semantic asset
+manifests; it emits placements with stable IDs, explicit anchors, support and
+exclusion volumes, material slots, LOD representations, and diagnostics. It
+does not infer meaning from arbitrary mesh bounds after placement.
+
+Required reference families must resolve to a licensed compact asset kit or a
+tested procedural module/generator. A missing ruin, dock, boat, rock/reef,
+vegetation, cloud-silhouette, or other identity-bearing family is a blocker,
+not permission to fabricate boxes, billboard blobs, or unrelated noise.
+
+```text
+environment snapshot + seed + authored anchors
+  -> candidate/support regions
+  -> constraint and clearance validation
+  -> deterministic asset/variant selection
+  -> semantic placements and adjacency/attachment graph
+  -> per-material/per-representation compilation
+  -> serialized site plan + runtime package
+```
+
+Place required landmarks and their reservations first, then dependent
+supports/attachments, then ecology, then optional filler clusters or decals.
+Every streamed phase uses stable candidate sorting and a conflict/filter halo;
+generation or chunk load order must not alter owned placements.
+
+Required environment inputs declare units, sign, coordinate frame, filtering,
+revision, and missing-data behavior for terrain elevation/normal/slope,
+substrate and semantic regions, signed coast distance and coast frame,
+still-water depth or bathymetry where relevant, exposure, paths, and authored
+exclusions. Site assets consume dynamic water/motion hooks but do not solve
+them.
+
+| Asset family | Required semantic contract | Causal owner outside this compiler |
+| --- | --- | --- |
+| ruin/wall/foundation | module graph, corners/openings, support footprint, collapse state, material slots, vegetation sockets | low-level profiles/mesh writers route to geometry; materials route to procedural materials |
+| dock/pier/bridge | land root, coast tangent/outward normal, deck datum, pile/bed contacts, berth/mooring frames, clearance prism | water surface/depth from water; optional motion from motion systems |
+| boat/floating prop | hull/waterline frame, conservative swept bound, berth/free-water mode, material slots, wake/interaction emitter metadata | buoyancy/wave/current state from water or domain solver; transform motion from motion systems |
+| rock/boulder/pebble/debris | ground/embed anchor, support normal policy, footprint, cluster group, substrate/coast eligibility | topology from procedural geometry; PBR identity from procedural materials |
+| flower/grass/shrub/tree | root anchor, ecology/species response, crown/wind bounds, clearance, growth/LOD package | placement/growth/wind from procedural vegetation |
+
+Do not promote each pebble, flower, plank, or rubble fragment to a scene
+object. Compile immutable identical topology through spatially paged instancing;
+merge compatible static unique pieces by material slot; retain `BatchedMesh`
+only when replacement, per-part visibility, or identity justifies its measured
+r185 multi-draw entries. Authored landmark assets preserve individual IDs.
 
 Choose the runtime package from mutability and visibility:
 
@@ -186,6 +239,12 @@ city block chunk:
   attachment/overdraw cost
   StorageTexture: only for generated ID/LOD/debug masks that need textureStore()
 
+site asset chunk:
+  accepted/rejected placements by constraint, stable asset/variant IDs,
+  anchor/clearance/support violations, visible/submitted instances and V/T,
+  material/representation buckets, transition overlap, metadata/asset bytes,
+  compile/upload/cull p50/p95 and composed paired-marginal evidence
+
 distant skyline:
   sector bounds, projected silhouette error, visible V/T, draws/material slots,
   baked texture bytes and transition hysteresis
@@ -219,6 +278,13 @@ The generated building must survive:
 - triangle, draw-call, material-slot, module-count, bounds, and UV-density
   reporting.
 
+A semantic site kit must additionally survive chunk-order permutations,
+terrain/coast revision invalidation, rotated coast-frame fixtures, missing asset
+and anchor failures, overlap/support/clearance assertions, LOD population and
+identity checks, waterline/deck/berth diagnostics, and low-end/mobile composed
+measurement. A visually plausible pile of untracked props is not an accepted
+site plan.
+
 ## Replaced Techniques
 
 - Replaced per-primitive `InstancedMesh` placement as the default with
@@ -247,6 +313,14 @@ arches, frames, or low-level mesh writers without a building grammar.
 
 Use `$threejs-procedural-materials` for procedural masonry, atlas filtering,
 derivative normals, weathering, and per-slot material fields.
+
+Use `$threejs-procedural-fields` for terrain/coast/support/exposure fields,
+`$threejs-procedural-vegetation` for plant ecology and growth, and
+`$threejs-water-optics` or `$threejs-procedural-motion-systems` for dynamic
+water and transform state consumed by docks/boats. This compiler owns semantic
+assembly, anchors, attachments, exclusions, stable asset selection, and the
+site-plan package; it does not own water simulation, buoyancy physics, plant
+growth, or generic rock mesh generation.
 
 Use `$threejs-scalable-real-time-shadows` for CSM/tiled shadow budgets and diagnostics.
 

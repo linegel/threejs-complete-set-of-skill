@@ -13,6 +13,15 @@ views; a hybrid hands it to the global quadtree. The same planet-space causes
 must drive geometry, normals, material identity, scientific/query outputs,
 diagnostics, and atmosphere handoff.
 
+Do not load this skill merely because a scene contains islands. A bounded
+archipelago, coastal site, bathymetric model, or isometric land tile whose
+planetary curvature, horizon, global geodesy, and orbit-to-ground transition are
+outside the visual/error contract belongs to `$threejs-procedural-fields` plus
+`$threejs-procedural-geometry`, with `$threejs-procedural-materials` and the
+appropriate water skill as consumers. Use this skill only when the body-scale
+surface map, curvature, global LOD, georeference, or atmosphere handoff is an
+observable cause.
+
 Canonical implementation contract: `examples/webgpu-quadtree-planet/`.
 Run `node examples/webgpu-quadtree-planet/validate-planet.mjs` after edits.
 
@@ -53,7 +62,10 @@ Legacy WebGL implementation (deprecated, do not extend): `examples/procedural-pl
    ordered-integer encoding.
 6. Build crater, biome, hydrology, snow/ice, volcanic, ridge, humidity, and
    temperature fields as coupled causes. Do not author isolated color noise
-   after terrain.
+   after terrain. When planetary coastlines feed a water system, export the
+   mean-surface, bathymetry, metric coast-distance/frame, material, version,
+   and uncertainty contract from the fixed body analysis field; do not make
+   the water renderer rediscover coast topology from a transient render LOD.
 7. Filter detail by represented vertex spacing and pixel footprint. Camera
    altitude may choose policy but is not a frequency filter. Fade contribution
    strength before aliasing; do not change procedural frequency abruptly.
@@ -191,7 +203,9 @@ Validate at fixed cameras and **[Authored]** at least three seeds:
 ## Routing Boundary
 
 Use `$threejs-choose-skills` for multi-system preflight when planets are part of
-a larger scene. Use `$threejs-procedural-fields` for reusable field bundles
+a larger scene. Local islands and coastal scenes without observable planetary
+curvature/global LOD route to `$threejs-procedural-fields` and
+`$threejs-procedural-geometry`, not here. Use `$threejs-procedural-fields` for reusable field bundles
 without a complete body, `$threejs-procedural-materials` for standalone
 material authoring, `$threejs-ambient-contact-shading` for custom GTAO
 work beyond the built-in node, `$threejs-scalable-real-time-shadows` for
@@ -202,4 +216,7 @@ ownership, `$threejs-water-optics` for water volume optics, `$threejs-volumetric
 for cloud volumes, `$threejs-rain-snow-and-wet-surfaces` for weather envelopes
 and precipitation masks, and `$threejs-sky-atmosphere-and-haze` for scattering
 independent of planet generation. This skill owns the coupled planetary surface
-and its LOD/parity architecture.
+and its LOD/parity architecture. For a planetary ocean, it owns the static
+reference surface, coastline, bathymetry, seabed classes, and their error
+metadata; the water skill owns the time-varying free surface, flow/wave state,
+foam, and optics.

@@ -74,6 +74,17 @@ Throughput decision table:
    Node-post apps call `renderPipeline.render()`, not renderer.render(), and
    keep `outputColorTransform` as the single output owner.
 
+Environment-coupled motion is an explicit algorithm boundary. Boats, buoys,
+floating debris, and swimmers consume a versioned water-state provider whose
+surface-point velocity and material current are distinct. Declare one-way
+coupling (water drives the actor but receives no load) or two-way coupling
+(equal-and-opposite actor loads enter the water solver in an ordered fixed-step
+graph). A visual wake does not make a one-way model two-way. Never obtain the
+state through frame-critical GPU readback; use a shared analytic/CPU query,
+GPU-resident coupled state, or an explicitly latency-bounded service. Route
+metric six-degree-of-freedom hydrodynamics to a domain solver and consume its
+pose here.
+
 Read [references/procedural-motion-and-docking-systems.md](references/procedural-motion-and-docking-systems.md)
 for the WebGPU/TSL launch, staging, docking, debris, spring, quaternion,
 compute/storage, replay, and validation contracts.
@@ -156,6 +167,12 @@ Quality tiers:
   motion must be reproducible.
 - Keep visual shake in a bounded envelope and separate it from trajectory,
   camera shake, and physics state.
+- Do not call wave phase velocity, group velocity, or the vertical rate of a
+  height field a material current. Every water velocity channel names its
+  frame and meaning.
+- One-way and two-way water coupling are different contracts. Two-way requires
+  an ordered load-scatter/water-step/body-correction schedule and a
+  conservation/error gate; a foam trail is not feedback.
 
 ## Replaced techniques
 
@@ -179,3 +196,8 @@ also spans rendering, geometry, materials, shadows, atmosphere, or post.
 Use `$threejs-camera-controls-and-rigs` for shot composition and camera handoffs.
 Use `$threejs-particles-trails-and-effects` when the deliverable is primarily plasma, sparks,
 or effect pooling rather than object transform motion.
+Use `$threejs-water-optics` for bounded/coastal free-surface state and
+`$threejs-spectral-ocean` for open-ocean wave state. Those skills own the water
+query, solver, and coupling error; this skill owns actor pose integration from
+that contract. Full rigid-body hydrodynamics, collision, and control remain
+domain-physics ownership.

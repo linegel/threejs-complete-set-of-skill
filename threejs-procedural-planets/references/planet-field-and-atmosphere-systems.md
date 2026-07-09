@@ -32,6 +32,7 @@ algebra are derived.
 8. Crater stamps and geological structures
 9. Altitude-filtered detail
 10. Climate, hydrology, and biomes
+10a. Planetary coast and water handoff
 11. Solid-body material assembly
 12. Gas and ice giants
 13. Analytic gradients and specular anti-aliasing
@@ -680,6 +681,79 @@ sharper physical land/water edge for material classification. Use the physical
 edge for water shading and atmosphere humidity masks. Derive visual width from
 pixel footprint and cache resolution; a fixed normalized threshold changes
 apparent coastline width across LOD.
+
+### 10a. Planetary coast and water handoff
+
+This interface exists only when body curvature, global geodesy, or
+orbit-to-ground LOD is observable. A bounded archipelago or coastal site whose
+working domain is adequately planar uses the procedural-fields/geometry path;
+wrapping it around a planet adds cube-face seams, global cache traffic, and LOD
+state without improving the accepted image or data contract.
+
+Make “adequately planar” an error test. For a spherical reference of radius
+`R` and maximum tangent-plane radial extent `r<R`, the omitted curvature has
+**[Derived]** sagitta `s = R - sqrt(R^2-r^2)` and normal rotation
+`theta = asin(r/R)`. Project `s` with the actual camera and gate world/physical-
+pixel position error, normal error, horizon visibility, geodesic-distance error,
+and any atmosphere coupling. For an ellipsoid, use the local principal radii
+of curvature over the complete domain rather than substituting one global
+radius. If all gates pass, the planet route is rejected even when the subject
+is narratively an island on a planet.
+
+For a planetary ocean, the body owner publishes an immutable/versioned mean
+surface and seabed query. A minimal sample is:
+
+```text
+planetCoastSample(direction, analysisVersion) -> {
+  referencePointMeters, referenceNormal,
+  terrainHeightMeters, meanSeaSurfaceHeightMeters,
+  signedWaterColumnMeters,                 # positive below mean sea surface
+  coastGeodesicDistanceMeters,             # land-positive, water-negative
+  coastLandwardTangent, coastSeawardTangent, coastAlongTangent,
+  bathymetryGradientPerMeter,
+  seabedMaterialWeights, hydrologyRegionId,
+  sourceResolutionMeters, maxHeightErrorMeters,
+  maxCoastDistanceErrorMeters, validityMask, version
+}
+```
+
+`signedWaterColumn = meanSeaSurfaceHeight - terrainHeight` is vertical/reference-
+normal clearance; it is not coast distance. `coastGeodesicDistance` is
+land-positive/water-negative distance along the declared sphere/ellipsoid
+metric to the zero set and therefore remains
+stable when render patches split. Compute it on the fixed analysis graph/raster
+or from a separately validated distance field, including cross-face propagation;
+normalizing the height gradient does not turn height into a metric distance.
+`coastLandwardTangent` is the normalized intrinsic gradient of that distance,
+`coastSeawardTangent=-coastLandwardTangent`, and
+`coastAlongTangent=normalize(cross(referenceNormal,coastSeawardTangent))`
+fixes the handed frame. At cusps, medial axes, tiny islands below source resolution, and invalid
+dataset regions, return an invalid/ambiguous frame rather than a fabricated
+direction.
+
+The query declares whether the mean sea surface is constant reference altitude,
+an equipotential/geoid, a dataset, or another unit-bearing model. The water
+system adds time-varying displacement about that mean and consumes bathymetry at
+its own solver/sample footprint. It must not change the body coastline by
+sampling a lower render LOD, and the planet material must not add a second wave
+displacement to the seabed. A local water tile records the planet-field version,
+input footprint, and resampling/error bound; a body-field or sea-level revision
+invalidates only overlapping tiles.
+
+Ownership is explicit:
+
+- planet: reference surface, land/seabed height, physical coast zero set,
+  metric coast frame, hydrology regions, seabed classes, and uncertainty;
+- water: free-surface state, waves/currents, wet/dry dynamics, breaking/foam,
+  refraction/absorption, and water-side temporal history;
+- material/vegetation/building consumers: placement and appearance masks only;
+  they never redefine the physical land/water partition.
+
+Validate the handoff with cross-face coast loops, island/strait fixtures near
+the analysis resolution, sea-level perturbations, finite-difference bathymetry
+gradients, coast-frame orientation, direct-versus-resampled depth error, and
+render-LOD invariance. Report any unresolved sub-cell island or channel as an
+error/coverage limit rather than preserving it with material color alone.
 
 ## 11. Solid-Body Material Assembly
 

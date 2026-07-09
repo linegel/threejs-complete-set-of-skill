@@ -248,7 +248,7 @@
     {
       "name": "threejs-procedural-buildings-and-cities",
       "title": "Procedural Buildings and Cities",
-      "description": "Build authored procedural buildings, facades, and city kits in Three.js r185 WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.",
+      "description": "Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.",
       "examples": [
         "authored-financial-tower",
         "webgpu-material-slot-compiler"
@@ -283,7 +283,7 @@
     {
       "name": "threejs-procedural-fields",
       "title": "Procedural Fields",
-      "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
+      "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
       "examples": [
         "webgpu-field-bake"
       ],
@@ -300,7 +300,7 @@
     {
       "name": "threejs-procedural-geometry",
       "title": "Procedural Geometry",
-      "description": "Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.",
+      "description": "Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.",
       "examples": [
         "sculpted-gallery-frame",
         "semantic-mesh-writer"
@@ -318,7 +318,7 @@
     {
       "name": "threejs-procedural-materials",
       "title": "Procedural Materials",
-      "description": "Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.",
+      "description": "Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for coupled terrain/coast/seabed response bundles, grass, rock, dry/wet sand and reef identities, NodeMaterial PBR fields, atlas and triplanar filtering, footprint filtering, specular AA, terrain wetness, stylized palette/facet policies, emissive or raymarched fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.",
       "examples": [
         "lava-flow-surface",
         "tsl-procedural-pbr"
@@ -371,7 +371,7 @@
     {
       "name": "threejs-procedural-vegetation",
       "title": "Procedural Vegetation",
-      "description": "Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, optional compute/storage, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.",
+      "description": "Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.",
       "examples": [
         "gpu-computed-grass",
         "structured-ash-growth",
@@ -446,7 +446,7 @@
     {
       "name": "threejs-spectral-ocean",
       "title": "Spectral Ocean",
-      "description": "Build broad-band procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, and falsifiable GPU evidence.",
+      "description": "Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.",
       "examples": [
         "hybrid-clear-water-ocean",
         "spectral-cascade-ocean",
@@ -501,7 +501,7 @@
     {
       "name": "threejs-water-optics",
       "title": "Water Optics",
-      "description": "Build workload-selected analytic and bounded water in Three.js r185 WebGPU/TSL. Use for StorageTexture heightfield simulation, exact parametric displacement and normals, local disturbances, receiver-space caustics, depth-aware refraction, Beer-Lambert absorption, side-aware Fresnel, filtered normal bands, reflection, and foam.",
+      "description": "Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.",
       "examples": [
         "analytic-wave-optics",
         "interactive-pool-volume",

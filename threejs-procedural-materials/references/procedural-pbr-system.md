@@ -21,6 +21,7 @@ widths, channel counts, and API-version digits are structural.
 - Atlas, texture array, triplanar, and hex tiling
 - Derivative normals and specular AA
 - Authored PBR response bundles
+- Coupled terrain, coast, and seabed materials
 - Planet, terrain wetness, lava, and emissive surfaces
 - Per-instance dissolve and variants
 - Node post, color, and output
@@ -401,6 +402,173 @@ Visible correctness signatures:
 | Lava crust/heat | Visible signature: crust remains PBR while exposed heat emits scene-linear HDR into bloom | classic wrong: gray emission, display-space glow, crushed lava with no raw emissive debug |
 | Wet rock | Visible signature: wetness lowers roughness, darkens color, and changes normal response together | classic wrong: wetness as a washed overlay or roughness-only scalar |
 | Wetness fields | Visible signature: waterline/cavity/slope causes align across color, roughness, normal, and clearcoat | classic wrong: washed fields, sRGB-as-data masks, material-owned display encoding |
+
+## Coupled Terrain, Coast, And Seabed Materials
+
+### Provider interface
+
+An archipelago or shoreline material consumes a single versioned surface-field
+record. The field owner may generate it analytically, rasterize it into a
+texture hierarchy, or stream it by chunk; the material interface is unchanged:
+
+```yaml
+surfaceFieldContract:
+  revision: ""
+  coordinateFrame: ""
+  sceneUnitsPerMeter: ""
+  sampleToWorld: ""
+  coastDistance:
+    units: meters
+    sign: land-positive-water-negative
+    filter: signed-distance-preserving
+  terrainElevation: { units: meters, datum: "" }
+  waterRestElevation: { units: meters, datum: "" }
+  waterColumnDepth: { units: meters, derivation: "max(waterRest-terrain,0)" }
+  coastFrame: { channels: [nearestCoastNormal, nearestCoastTangent] }
+  geomorphology: { channels: [slope, curvature, cavity, drainage, exposure] }
+  surfaceState: { channels: [moisture, saltExposure, runupEnvelope, wetness] }
+  identity: { channels: [substrateId, semanticRegionId, authoredExclusion] }
+  encoding: ""
+  extentAndTexelSize: ""
+  mipOrLodPolicy: ""
+  updateCadence: ""
+  invalidationKey: ""
+  missingDataPolicy: ""
+```
+
+All numerical values in a produced manifest use the repository evidence labels.
+The **Derived** still-water depth is
+`h0(x)=max(zWaterRest-zTerrain(x),0)` only when both elevations share datum,
+units, and position. A dynamic water owner may expose instantaneous depth or a
+run-up envelope separately; never overwrite the static bathymetry lane with a
+temporally filtered visual mask.
+
+Signed distance must remain monotone through its required transition support.
+If a mip chain averages signed distances across disconnected coasts, nearest-
+coast direction and band width become invalid. Either re-distance the
+downsampled zero set, retain conservative min/max distance bounds, or sample a
+level whose texel support cannot merge distinct shore components. Expose
+distance, nearest-coast direction, and selected level as diagnostics.
+
+### Identity synthesis
+
+Separate semantic membership from visual transition. Let `H_i` be hard
+eligibility for material identity `i` and `R_i` be its continuous response from
+coast distance, slope, elevation, drainage, moisture, salt, and substrate. The
+normalized **Derived** blend is:
+
+```text
+q_i = H_i * max(R_i, 0)
+s = sum_j(q_j)
+w_i = q_i/s                  when s > epsilon
+w_fallback = oneHot(fallbackIdentity) when s <= epsilon.       [D]
+```
+
+`epsilon` and every response length are **Authored** until fitted to reference
+or source data. Dividing by `max(s,epsilon)` would produce weights summing below
+one for `0<s<epsilon`; the explicit fallback keeps the bundle normalized and
+emits a diagnostic bit. Preserve `H_i` for semantic IDs,
+placement exclusions, and picking. Filter `w_i` by footprint for shading, but
+never blur a hard water/land ownership boundary into a false third material.
+
+Typical response bundles are causal, not universal presets:
+
+| Identity | Required causes | Response bundle constraints | Common invalid shortcut |
+| --- | --- | --- | --- |
+| grass or organic cap | land, low/moderate slope, substrate, moisture, disturbance, ecology coverage | dielectric endpoint; organic macro color, fiber/leaf micro-normal, soil exposure in sparse cover | green height-only band independent of ecology |
+| cliff or exposed rock | slope/exposed-face semantics, strata/fracture, weather exposure | rock palette family, broad roughness, facet-preserving resolved normals, filtered strata detail | triplanar noise that rounds every cliff edge |
+| dry beach sand | coast distance, low slope, sediment eligibility, dry side of run-up | dielectric granular response, broad filtered micro-normal, dry value family | constant yellow shoreline ring |
+| wet sand/waterline substrate | run-up/wetness history, drainage, substrate | darker absorption, lower micro-normal contrast, roughness/film response changed together | dark color stripe with dry roughness |
+| submerged sand/silt | bathymetry, substrate, current/deposition cause if available | substrate remains non-emissive; microstructure filtered by projected seabed footprint | cyan emission used to fake shallow water |
+| reef or submerged rock | substrate/geology or ecology eligibility, depth/light envelope, exposure | discrete rock/biogenic identities, stable macro breakup, filtered close detail | arbitrary colored noise visible only through water |
+
+Use a material palette table containing linear reflectance families, not sampled
+display colors from a tone-mapped screenshot. If the reference is the only
+source, record its unknown illumination, camera response, and compression as
+uncertainty; fit palette and lighting jointly against no-post diagnostic
+renders instead of declaring the screenshot pixels to be base color.
+
+For deliberate low-poly or illustrated styling:
+
+- geometric face normals or authored weighted normals own the large faceted
+  response; the material may add a separately filtered micro-normal but may not
+  average away the facet normal;
+- palette family selection is stable by semantic patch or deterministic cell,
+  then filtered only where subpixel transitions require it; do not choose a new
+  swatch per fragment from white noise;
+- roughness and micro-normal amplitude remain coupled to the chosen identity,
+  so palette quantization does not create glittering response discontinuities;
+- baked cavity can modulate the material's ambient/cavity term, but directional
+  illumination, cast shadows, water foam, and caustic illumination retain their
+  actual owners.
+
+### Coast-band filtering and wet-line state
+
+For a coast-distance threshold `d0`, a fragment transition half-width may be
+estimated from derivatives as **Derived**
+`b=max(abs(dFdx(d)),abs(dFdy(d)),bMin)` in the same distance units. `bMin` is an
+**Authored** stability floor. Use a monotone smooth transition over this support
+instead of `step(d,d0)`. This filters the visual boundary; it does not replace
+semantic land/water classification or an actual shoreline solver.
+
+Persistent wet sand needs state or a supplied history, not a symmetric color
+band around the instantaneous waterline. Its provider contract distinguishes:
+
+```text
+inundation/run-up source -> wetting event
+drainage/evaporation model -> asymmetric drying
+terrain permeability/cavity -> spatial retention
+material wetness -> color, roughness, micro-normal, and optional film response
+```
+
+If no history is required by the visual contract, a static authored run-up
+envelope is the cheaper valid approximation. Label it as such. Do not allocate
+history because the term "wet" appears in the brief.
+
+### Seabed handoff to water optics
+
+The material and water graphs meet at explicit signals:
+
+| Producer | Signal | Consumer |
+| --- | --- | --- |
+| terrain/fields | seabed position, normal, static depth, substrate and semantic IDs | seabed material, water optics, placement |
+| seabed material | scene-linear reflected radiance under ordinary lighting | water transmission/refraction path |
+| water | dynamic surface position/normal, optical path length, transmittance, in-scatter, caustic irradiance, foam coverage | water composition and optionally seabed direct-light modulation |
+| wetness provider | wetting age or retained wetness, invalidation key | terrain material |
+
+Caustics modulate incident illumination on submerged surfaces; they do not
+change seabed albedo. Foam attenuates the view of the seabed in the water path;
+it is not copied into the beach identity. If the water implementation cannot
+provide a valid underwater transport path, report the limitation rather than
+compensating with emissive substrate or painted turquoise rings.
+
+### Supplemental material assets
+
+A production surface pack may include authored or generated macro-albedo,
+height/normal, roughness/cone-variance, and semantic masks for rock, sand,
+soil, reef, wood, masonry, and vegetation. Each asset manifest records:
+
+```text
+stable asset/version ID and provenance
+physical texel scale or documented art-unit scale
+color versus data encoding
+channel semantics, units, range, neutral value, and invalid value
+source and runtime formats, mip policy, gutters, and compression error
+allowed projection/UV modes and directional symmetry
+material response-bundle ID and legal substrate IDs
+close/mid/far representation and projected-error evidence
+generation seed/tool revision when generated
+```
+
+Assets lacking scale, channel meaning, or color-space metadata are not accepted
+into the procedural response graph. A collection of visually compatible maps
+without semantic IDs and shared causes does not close the terrain system.
+Every material family required by the composition resolves to a licensed
+source pack with validated metadata or a tested procedural generator with
+reference/error fixtures. Missing grass/soil, cliff/rock, dry/wet sand,
+seabed/reef, wood, masonry, vegetation, or hull identities are blockers. A
+flat color plus unrelated noise is a diagnostic placeholder, not a completed
+response bundle.
 
 ## Planet, Terrain Wetness, Lava, And Emissive Surfaces
 

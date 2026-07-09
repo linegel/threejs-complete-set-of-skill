@@ -10,6 +10,7 @@ geometry-level diagnostics in pinned Three.js r185 WebGPU/TSL.
 - Architecture first
 - Capability gate and quality tiers
 - Semantic writer contract
+- Local terrain and coast mesh compiler
 - Sculpted frame profile
 - Rail mesh emission
 - Oriented branch rings
@@ -157,6 +158,328 @@ Attribute lifecycle:
 Groups are a correctness contract: every index belongs to exactly one group,
 groups do not overlap, groups do not leave holes, and material indices remain
 stable across LOD tiers.
+
+## Local Terrain And Coast Mesh Compiler
+
+This compiler turns the local coastal bundle from
+`$threejs-procedural-fields` into reusable land, beach, cliff, shallow-seabed,
+and placement geometry. It applies to scientific exhibits, architectural
+context, data scenes, product backdrops, cinematic scenes, and stylized
+archipelagos. The camera style does not weaken topology, error, or mobile
+performance gates.
+
+### Input and algorithm decision
+
+Freeze an input manifest before capacity planning:
+
+```text
+coastFieldVersion, seedVersion, waterLevel
+coordinate origin, physical units, global sample-lattice key
+dCoast, closestCoastId, coast frame, zRaw, zBed
+terrace levels, cliffTop/cliffToe, beach and wet-line bands
+surface identities, placement suitability, exclusion regions
+protected component/hole identities and semantic anchors
+```
+
+Select the representation from the required surface class:
+
+| Surface/view contract | Compiler | Reject when |
+| --- | --- | --- |
+| bounded, single-valued continuous terrain | indexed regular/adaptive height grid | vertical faces, overhangs, or contour identity are observable |
+| hard terraces and explicit cliffs | iso-contour regions, constrained cap triangulation, wall extrusion | a screen-space color band is being used to fake silhouette/topology |
+| large continuous navigable domain | balanced quadtree or clipmap over a global dyadic lattice | working-set/culling measurements favor whole patches or topology cannot survive seams |
+| moderate isolated landforms | whole-island discrete LOD meshes | one island exceeds culling, update, or residency gates |
+| visible caves/arches/overhangs | bounded volumetric SDF with marching cubes or feature-preserving dual contouring | voxel memory, non-manifold risk, or generation cost buys no visible topology |
+
+A static seed catalogue should compile offline or during a noninteractive load.
+Runtime compute meshing is eligible only for genuinely edited/simulated
+topology after measuring dispatch, storage, readback-free consumption, and peak
+transition memory. Compute is not required merely because the renderer is
+WebGPU.
+
+### Deterministic contour extraction
+
+For threshold `tau`, sample `f(p)-tau` on a global lattice. Marching squares
+visits exactly **Derived** `(Nx-1)*(Nz-1)` cells for an `Nx*Nz` sample tile.
+For a crossing edge with endpoint values `f_a` and `f_b`, the bilinear-edge
+intersection parameter is **Derived** as
+
+```text
+t = f_a / (f_a - f_b)
+```
+
+after shifting `tau` to zero. Evaluate generation predicates in f64 with
+scale-aware error bounds and escalate uncertain orientation/intersection cases
+to adaptive exact predicates; quantize only when writing the final attribute.
+If the denominator or either sign lies inside its propagated **Gated**
+uncertainty, refine/evaluate the authoritative field rather than choosing from
+rounded noise. A deterministic global-cell tie-break is permitted only when
+topology at that exact contact is explicitly unconstrained.
+
+Refinement cannot resolve an edge or plateau that is identically on the
+iso-level. Define the superlevel set globally as `f>=tau`. Extract only the
+boundary separating its connected zero/positive plateau from strictly negative
+cells; internal zero edges emit no contour. Assign a plateau boundary segment
+to one global edge/cell owner so neighboring chunks agree. A symbolic
+perturbation keyed by global lattice identity is allowed only when exact-contact
+topology is explicitly unconstrained, and the perturbation/order becomes part
+of the compiler signature and adversarial fixtures.
+
+Required extraction rules:
+
+- resolve checkerboard cells with the asymptotic decider applied to the
+  bilinear interpolant, not a seed-dependent diagonal;
+- identify an intersection by `(globalEdgeId, isoLevelId)`, so neighboring
+  cells and chunks reuse one position and topological vertex;
+- orient loops by evaluating the positive-inside field and verify the emitted
+  top face cross product points toward `+Y`; never infer winding from a picture;
+- assemble closed loops, reject open chains except at a declared domain
+  boundary, classify nesting, and represent holes explicitly;
+- remove duplicate consecutive points and zero-length edges before
+  triangulation; use robust segment predicates to reject self-intersections;
+- preserve closest-coast IDs, extrema, cliff/beach transitions, anchors, and
+  chunk-boundary vertices during simplification.
+
+Simplify only against a **Gated** world-space Hausdorff bound projected through
+the shared physical-pixel contract. Douglas-Peucker or area-based removal is a
+candidate, not proof: recheck self-intersection, nesting, minimum neck width,
+protected topology, and coast-frame angular error after every simplification
+tier. A visually small neck can still carry a stable entity, path, drainage
+divide, or selected object and therefore be topologically protected.
+
+### Terraces, cliffs, beaches, and seabed
+
+For hard terrace levels `L_k`, define superlevel regions
+
+```text
+Omega_k = { p : zRaw(p) >= L_k }
+R_k = Omega_k minus Omega_(k+1)
+```
+
+Triangulate `R_k` as a horizontal cap at `L_k`. Extrude every loop bounding
+`Omega_(k+1)` from `L_k` to `L_(k+1)` to form the next vertical wall. This
+construction tolerates islands splitting, merging, appearing, or disappearing
+between levels; pairing nearest vertices on two unrelated contour loops does
+not.
+
+Use constrained Delaunay triangulation with robust predicates, or another
+validated constrained polygon triangulator, for regions with holes. Simple ear
+clipping has **Derived** quadratic candidate work in loop vertex count and is
+eligible only for small validated simple polygons. Use robust orientation and
+in-circle predicates. Add Steiner/interior samples only where a nonflat cap or
+band needs them to meet height/normal error; a flat terrace does not need a
+decorative grid.
+
+For a closed contour with `m` segments, one top/bottom wall quad per segment is
+**Derived** `2m` triangles before material, UV, or hard-normal duplication.
+Emit walls from semantic boundary records:
+
+```text
+boundary id
+ordered coast/terrace positions
+bottom and top elevation functions
+outward/inward side
+material slot and smoothing group
+arc-length origin and UV chart
+```
+
+An outer cliff wall joins the field's `cliffTop` to `cliffToe`. A sloped beach
+or wet-sand band is the implicit annulus between declared `dCoast` thresholds;
+triangulate that region with holes and evaluate the shared cross-shore height at
+its vertices. Do not assume corresponding samples exist on inner and outer
+loops when a band changes topology. The visible shallow seabed may use the same
+clipped/adaptive grid or band triangulation with `zBed`; preserve the exact
+shoreline vertex keys where it meets the beach. Deep or optically hidden bed
+geometry is omitted by projected/visibility evidence, not generated at maximum
+density and hidden with color.
+
+### Rendering topology, normals, UVs, and groups
+
+Keep two identities:
+
+```text
+topological vertex/edge id
+  proves adjacency, manifold closure, contour and chunk continuity
+
+render vertex id
+  may duplicate the same position for hard normals, tangent handedness,
+  material groups, UV charts, or independently filtered attributes
+```
+
+Do not weld render vertices across a semantic boundary to make an edge-count
+test pass. Conversely, do not report a crack because correct render duplicates
+share a topological position. Build a half-edge or equivalent adjacency ledger
+before expanding render vertices.
+
+Surface rules:
+
+- terrace caps use analytic `+Y` normals and world-distance XZ UVs;
+- continuous land/beach/seabed height `h(x,z)` uses
+  `normalize(vec3(-dh/dx, 1, -dh/dz))` from the authoritative gradient;
+- cliff/terrace walls use segment or deliberately smoothed coast normals and
+  remain hard against caps;
+- cap UVs are physical XZ distance/repeat coordinates; wall `u` is coast arc
+  length and wall `v` is physical height/repeat distance;
+- stable material slots include the required subset of `terrain-cap`,
+  `cliff-wall`, `dry-beach`, `wet-beach`, `visible-seabed`, and authored
+  substrate identities; slots remain stable across LODs even when empty;
+- every index belongs to exactly one contiguous group or to a documented set of
+  nonoverlapping groups emitted by the writer.
+
+Recompute bounds from every cap, wall, beach, and seabed vertex. A land-only
+height bound omits vertical toes and shallow-bed extent and invalidates culling.
+
+### Chunk seams and LOD
+
+Prefer whole-island LOD for bounded isolated landforms when its residency and
+submission measurements pass. It removes internal crack classes and preserves
+component identity. Account for both meshes, overdraw, and materials during a
+cross-fade; hysteretic popping control is not free memory.
+
+When chunking is required:
+
+- sample a global dyadic lattice and make adjacent chunks share boundary
+  sample/intersection IDs;
+- use a balanced quadtree with a declared neighbor-level difference and
+  explicit stitch index patterns, or force matching boundary refinement;
+- preserve a ghost ring wide enough for every gradient/filter/contour decision;
+- choose one owner for each shared boundary and copy/reference its emitted
+  positions, rather than averaging independently generated borders;
+- record neighbor residency during transitions and verify all mixed-LOD pairs;
+- treat skirts as an occlusion-only last resort. They do not repair metric
+  continuity, waterline identity, shadows, section cuts, or underside views.
+
+Every LOD reports:
+
+```text
+maximum projected cap-height error
+shoreline and terrace-contour Hausdorff error
+maximum protected coast-frame/normal angular error
+component/hole and semantic-boundary preservation
+maximum mixed-LOD seam gap and T-junction count
+vertex/index/group/attribute bytes
+simultaneous transition bytes and draw/backend-entry counts
+```
+
+Pin semantic anchors and contour extrema before simplification. A topology
+change is legal only if every removed component/hole is below its projected
+error/identity gates for the complete view envelope and has no selection,
+placement, drainage, or data identity. Triangle-count ratios are not an LOD
+contract.
+
+### Placement anchors and exclusions
+
+Emit placement data beside the mesh, not by later raycasting an arbitrary LOD:
+
+```text
+anchorId, sourceFieldVersion, sourceBoundaryId
+positionWorld, normalWorld, tangentWorld, coastInwardWorld
+surfaceIdentity, terraceId, dCoast, slope, exposure, moisture
+clearanceRadius, footprintClass, exclusionRevision, deterministicSeed
+binding = topological feature id or per-LOD barycentric map
+```
+
+Generate candidate anchors from the authoritative field/contours before
+decimation. Pin required anchors in all LODs or provide a verified barycentric
+binding per LOD. Nearest-display-vertex snapping causes trees, rocks, ruins, and
+measurement glyphs to move as LOD changes.
+
+Specialized consumers add constraints rather than new shorelines:
+
+- a dock anchor needs coast tangent, inward/sea directions, a land approach
+  footprint, a water corridor, and depth samples along the sea direction;
+- a cliff prop needs wall segment ID, height interval, outward normal, and toe
+  clearance;
+- vegetation needs cap/soil identity, slope, coast/salt distance, moisture,
+  exposure, and infrastructure exclusion;
+- a building or ruin needs a connected support footprint, height/slope
+  variation gate, access orientation, and a reserved exclusion polygon;
+- rocks and reef assets need substrate, depth/elevation band, clearance, and
+  stable candidate IDs.
+
+Rasterize accepted footprints back into the shared exclusion field or maintain
+a spatial index whose version is recorded. Order-dependent "place then reject"
+loops are not deterministic when generation order or threading changes; use
+stable candidate priorities and a declared conflict rule.
+
+### Bounded complexity and low-end/mobile policy
+
+For an unclipped regular grid, counts are **Derived**:
+
+```text
+V = Nx * Nz
+T = 2 * (Nx - 1) * (Nz - 1)
+indexBytes = 3 * T * bytesPerIndex
+attributeBytes = V * sum(attributeStrideBytes)
+```
+
+Add contour intersections, wall vertices/triangles, boundary duplication,
+groups, anchors, chunk tables, and simultaneous LODs explicitly; do not quote
+the grid formula as total mesh cost. Record peak compiler memory separately
+from resident GPU geometry because contour graphs and triangulation workspaces
+may dominate a load-time build.
+
+The target evidence decides among:
+
+```text
+precomputed mesh asset
+runtime CPU compiler with immutable upload
+dirty-tile CPU rebuild and component-range upload
+GPU field evaluation with CPU topology compiler
+fully GPU-resident meshing/indirect consumption
+```
+
+Prefer the earliest path that passes generation latency, resident/peak bytes,
+upload, CPU submit, GPU vertex/fragment, and sustained thermal gates. Static
+land has zero steady per-frame geometry mutation. On low-end/mobile targets,
+precomputed deterministic variants, whole-island LOD, compressed attributes
+whose error is proven, and omission of invisible deep seabed are primary
+candidates; a wide compute/storage architecture is not automatically cheaper.
+
+### Topology and degeneracy validation
+
+Run validation on topological identities before render-vertex expansion and on
+the final `BufferGeometry` afterward.
+
+Topological checks:
+
+- contour loops are closed, simple, correctly nested, and consistently
+  oriented; protected component/hole counts match the field manifest;
+- every interior topological edge has exactly two oppositely oriented incident
+  faces; declared open domain/waterline/chunk edges are enumerated;
+- there are no T-junctions, bow-tie vertices, duplicate faces, non-manifold
+  edges, or unbound holes;
+- after collapsing deliberate render duplicates, Euler characteristic
+  `chi=V-E+F` matches the **Derived** identity `2-2g-b` per connected
+  orientable component with genus `g` and boundary count `b`;
+- closed components have consistent signed volume/winding and wall normals;
+- all mixed-LOD neighbor pairs preserve shared topological boundary keys.
+
+Numerical/geometry checks:
+
+- robust-predicate source coordinates and final f32 positions are finite;
+- quantization does not collapse distinct contour vertices or flip triangle
+  orientation;
+- every index is in range and every triangle has distinct indices;
+- doubled triangle area exceeds a **Gated** scale/quantization-conditioned
+  bound, not a hard-coded world epsilon;
+- triangle aspect/angle bounds pass where interpolation, shadows, or normals
+  require them; constrained triangulation is not self-validating;
+- cap heights, wall top/toe, beach, and seabed agree with authoritative fields
+  within their propagated bounds;
+- shoreline/terrace Hausdorff error, seam gap, normal-angle error, UV density,
+  group coverage, bounds, and projected LOD error pass simultaneously;
+- anchor positions, frames, clearances, and exclusion conflicts remain stable
+  over seed, rebuild, and LOD sweeps.
+
+The adversarial corpus includes an iso-level through a grid vertex, an entire
+edge on a level, an ambiguous checkerboard cell, a one-cell island and hole,
+two nearly touching components, a narrow isthmus, nested holes, terrace
+split/merge events, a coast crossing a chunk corner, large rebased coordinates,
+and every mixed-LOD edge orientation. Capture cap/wall ownership, topological
+edge incidence, winding, normals, UV density, material groups, anchors,
+exclusions, and seam-error overlays. A pretty final frame cannot replace these
+proof views.
 
 ## Sculpted Frame Profile
 

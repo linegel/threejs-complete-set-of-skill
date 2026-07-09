@@ -474,6 +474,14 @@ roof
 finial
 ```
 
+For ruins, docks, boats, rocks, pebbles, vegetation sockets, and other
+terrain/coast assemblies, keep this registry discipline but use the broader
+[semantic site asset contract](semantic-site-asset-kits.md). Its manifests add
+support footprints, ground/waterline/berth anchors, exclusion and swept bounds,
+interaction tags, projected-error representations, and deterministic
+environment-range placement. Do not overload a facade module with those site
+semantics or infer them from its render bounds.
+
 ## 7. Material-Slot Compilation
 
 The material slots are:

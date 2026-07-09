@@ -26,6 +26,7 @@ a reason to choose a lower tier, not to silently change the motion contract.
 - Spin-docking timeline
 - Docking-frame decomposition
 - Spring convergence and terminal lock
+- Water-surface, current, and floating-body coupling
 - Peeling and released debris
 - Quaternion frame contracts
 - Animation clip interop
@@ -683,6 +684,102 @@ spin-down reaches `0.995` or error is below the snap epsilon, copy target
 exactly, copy the terminal quaternion exactly, and zero linear/angular velocity.
 A spring alone can retain imperceptible but destabilizing residual motion.
 
+## Water-surface, current, and floating-body coupling
+
+Water is an injected causal system, not a transform curve. The water owner
+publishes a sample with named spaces, units, time, validity, version, and error:
+
+```text
+sampleWaterState(worldPoint, timeSeconds, footprint) -> {
+  freeSurfacePoint,
+  freeSurfaceNormal,
+  surfacePointVelocity,
+  materialCurrentVelocity,
+  waterColumnDepth,
+  densityOrNotUsed,
+  frameId,
+  validity,
+  spatialTemporalError,
+  representedFootprint,
+  fieldVersion
+}
+```
+
+`surfacePointVelocity` is the time derivative of the geometric surface sample.
+`materialCurrentVelocity` is fluid transport. Phase velocity, group velocity,
+Stokes drift, Eulerian current, and `partial(eta)/partial(t)` are different
+quantities; the provider states which it supplies. Immersion/heave may consume
+the geometric surface rate, while drag consumes material-relative velocity.
+An unlabelled `velocity` is rejected.
+
+The footprint is the actor/hull response scale, not a shading-texel footprint.
+A point-sampled micro-normal can roll a large boat on capillary detail that
+should average out. The provider returns a footprint-filtered state or the
+motion system integrates a declared distributed sample set; neither consumes a
+material normal or foam texture as geometry.
+
+Choose the cheapest coupling class that satisfies the observable:
+
+| Required behavior | Motion route | Water feedback |
+| --- | --- | --- |
+| kinematic boat/buoy presentation | sample height/normal, evaluate authored heave/roll response around a scripted horizontal path | none; one-way and explicitly nonphysical |
+| passive floating actor with visible inertia/current drift | fixed-step rigid pose with distributed buoyancy/drag samples; refine sample layout until pose/force error passes | none; the prescribed water is unchanged |
+| visible displacement, object-generated waves, or load-dependent wake | coupled water/body solver with ordered load scatter, water advance, and body correction | two-way; equal-and-opposite source terms and conservation/error ledger required |
+| metric hull loads, slamming, planing, added mass, radiation/diffraction, or control design | dedicated hydrodynamics/FSI solver | outside this motion skill; consume timestamped pose/load data |
+
+For the one-way dynamic middle tier, a distributed hydrostatic approximation
+can partition the hull into quadrature cells. For cell `i`, compute signed
+immersion along the effective-gravity up direction, evaluate a prevalidated
+submerged-volume function `V_i(d_i)`, and place that volume at a corresponding
+submerged centroid `x_b,i(d_i)`. Then, under the declared gravity frame,
+
+```text
+g_up = -g / |g|
+d_i = dot(freeSurfacePoint_i - x_i, g_up)
+F_b,i = rho * |g| * V_i(d_i) * g_up
+v_body,i = v_com + omega_body cross (x_i - x_com)
+v_rel,i = v_body,i - materialCurrentVelocity_i
+F_d,i = -0.5 * rho * C_d,i * A_i * |v_rel,i| * v_rel,i
+tau_i = (x_b,i - x_com) cross F_b,i
+      + (x_i - x_com) cross F_d,i
+```
+
+This is an authored quadrature/drag model, not a general wave-body solution.
+`V_i`, `A_i`, and `C_d,i` carry units and are calibrated or derived from the
+hull partition; `area * penetration` is accepted only when its volume error is
+gated. Integrate translation and rotation at a fixed step, normalize
+quaternions, and run step-halving plus quadrature-refinement sweeps. Do not use
+surface-point velocity as current in the drag term. A simpler critically damped
+heave/normal-follow response is presentation-authored and must not be reported
+as buoyancy physics. Wave radiation/diffraction, slamming, and dynamic pressure
+are absent from this hydrostatic model and route to the final row of the table.
+
+Two-way coupling is a single ordered simulation graph. A valid partitioned
+schedule names, for each fixed step, whether it performs body prediction,
+water sampling, load/volume/impulse scatter, water advance, and body correction,
+and whether those stages are explicit, semi-implicit, or iterated. The water
+receives the negative of the actor impulse/source under the same units and
+frame; momentum/volume residual and coupling-iteration error are reported.
+Workgroup barriers do not order global water and body stages. Use dispatch/pass
+boundaries and ping-pong state. If one system is CPU-owned and the other
+GPU-owned, do not insert synchronous frame-loop readback; move the coupled hot
+state to one side, use a shared analytic mirror where valid, or declare a
+latency model whose phase/error gate passes.
+
+Wake ownership follows physics ownership. A foam ribbon or particle trail may
+visualize a one-way kinematic wake, but it cannot be cited as displaced water or
+two-way momentum exchange. When the water solver accepts wake/vorticity/height
+sources, the water skill owns their discretization, stability, wet/dry masking,
+and history; motion supplies timestamped hull/source records only.
+
+Validation includes flat-water equilibrium, phase-locked monochromatic waves,
+constant-current drift, asymmetric hull torque, surface-normal discontinuities,
+water-field version changes, fixed-step convergence, and provider-error
+propagation. One-way tests assert that actor motion leaves water state bitwise or
+tolerance-equivalent. Two-way tests gate equal-and-opposite impulse, volume/mass
+balance appropriate to the selected solver, wake causality, coupling stability,
+and deterministic replay. Record zero frame-critical GPU readbacks.
+
 ## Peeling and released debris
 
 Endurance debris has two states.
@@ -865,6 +962,10 @@ Observed boundaries:
   recomputing later event boundaries.
 - Storage layouts must be versioned when validation snapshots depend on byte
   offsets.
+- Water coupling must declare one-way or two-way. A visual wake, height-follow
+  spring, or actor-side ripple does not prove fluid feedback.
+- Surface-point velocity and material current must remain separate; conflating
+  them injects wave phase motion into drag and produces nonphysical drift.
 
 Expose:
 
@@ -882,6 +983,9 @@ dock port, axis, parallel error, radial error, and snap epsilon
 spring target, velocity, stiffness, damping, and terminal lock state
 spin rates and accumulated angles
 debris inherited tangential/outward/axial velocity
+water provider version/error, free-surface point/normal/rate, material current
+water coupling class, sample/quadrature residual, actor loads and reaction sources
+two-way stage order, impulse/volume residual, coupling iterations, and readback count
 active instance count, dispatch count, workgroup size, storage bytes
 node post passes and output transform owner
 ```
@@ -900,6 +1004,8 @@ zero NaNs in radial fallback and quaternion helpers
 quaternion norm drift below threshold
 storage buffer snapshot for selected frames outside the frame loop
 GPU timing for compute dispatches and render pass count
+one-way water invariance or two-way impulse/volume/coupling-convergence evidence
+water-query phase/current separation and zero frame-critical readback
 ```
 
 Use `$threejs-camera-controls-and-rigs` for camera validation, `$threejs-particles-trails-and-effects`

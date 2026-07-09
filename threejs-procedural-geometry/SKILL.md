@@ -1,6 +1,6 @@
 ---
 name: threejs-procedural-geometry
-description: Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.
+description: Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.
 ---
 
 # Procedural Geometry
@@ -72,6 +72,52 @@ after edits.
 | debug `(s,t)` | diagnostics only | stored in `debugUv`, never production material UV |
 | winding | writer | outward quads use `a, b, c / b, d, c` |
 | writer input | generator module | semantic dimensions, material slot, smoothing group, UV chart, boundary reason |
+
+## Local Terrain And Coast Representation Gate
+
+For local islands, archipelagos, reservoirs, river margins, and coastal sites,
+consume one versioned field contract from `$threejs-procedural-fields`:
+positive-inside shoreline distance, coast frame, raw elevation, bathymetry,
+terrace levels, cliff top/toe, material identities, and placement exclusions.
+Do not independently regenerate a shoreline in the terrain, seabed, material,
+and placement paths.
+
+Choose the mesh class from the observable:
+
+| Contract | Representation |
+| --- | --- |
+| single-valued continuous relief under free close inspection | indexed adaptive grid, quadtree, or clipmap with explicit error and seam policy |
+| hard stylized terraces, beaches, and vertical cliffs | contour-derived 2.5D caps plus explicit wall strips and band meshes |
+| fixed set of moderate isolated landforms | compile each island into whole-object LODs before considering chunks |
+| caves, arches, or overhangs whose topology is visible | bounded volumetric SDF meshing; marching cubes or dual contouring only after its memory/topology cost passes |
+| static seed catalogue | precompute meshes and anchors when runtime regeneration has no product value |
+
+The terraced compiler operates on superlevel regions
+`Omega_k={p:zRaw(p)>=L_k}`. The horizontal cap at level `L_k` is the polygonal
+region `Omega_k minus Omega_(k+1)`; the boundary of `Omega_(k+1)` owns the wall
+from `L_k` to `L_(k+1)`. This handles split/merge topology without attempting
+to pair unrelated contour vertices. Extract contours with marching squares and
+an asymptotic decider for ambiguous cells; key intersections by global grid
+edge plus iso-level so adjacent cells and chunks reuse the same result.
+
+Use constrained triangulation for polygons with holes and robust predicates.
+Ear clipping is eligible only for validated simple loops. Duplicate render
+vertices across cap/wall, material, UV, and hard-normal boundaries, but retain
+a separate topological edge/vertex identity so manifold validation still knows
+the surfaces meet. A closed land body requires every topological edge to have
+two incident faces; explicitly declared waterline or chunk boundaries are the
+only exceptions.
+
+Emit semantic slots such as `terrain-cap`, `cliff-wall`, `dry-beach`,
+`wet-beach`, and `visible-seabed`. Caps use world-distance XZ UVs; walls use
+coast arc length and physical height. Export stable shoreline/terrace boundary
+IDs plus placement anchors carrying position, surface frame, coast distance,
+slope, terrace ID, clearance, and seed. Buildings, docks, paths, vegetation,
+and rocks consume those records and an explicit exclusion field; they must not
+re-sample an approximate display mesh and invent new identities.
+
+Read the full compiler, LOD, seam, and adversarial-validation contract in
+[profile-sweeps-and-mesh-writers.md](references/profile-sweeps-and-mesh-writers.md#local-terrain-and-coast-mesh-compiler).
 
 ## Build Order
 

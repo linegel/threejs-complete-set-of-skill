@@ -238,6 +238,95 @@ and aggregation rule. Report spatial error maps and worst-case captures, not
 only a scene-wide scalar. A stochastic mask must be authored before capture and
 cannot hide deterministic failure.
 
+## Coastal Archipelago Validation Profile
+
+Use this profile for procedural island, coast, reef, beach, and shallow-water
+scenes such as the supplied isometric archipelago reference family. Read the
+[coastal archipelago system](../threejs-water-optics/references/coastal-archipelago-system.md)
+to identify the selected water branch and its invariants, then apply the
+[coastal evidence protocol](references/graphics-validation-protocol.md#coupled-coastal-archipelago).
+
+Treat the reference as a causal feature ledger, not a color thumbnail. Record
+and independently validate:
+
+- island outline and negative-water channels;
+- grass cap, terrace, cliff, beach, wet-line, and seabed ordering;
+- bathymetry-visible shallow water and deep-water transition;
+- shore/breaker-aligned foam, local obstruction response, and any persistent
+  foam history;
+- vegetation, ruin, dock, boat, reef, and rock placement constraints;
+- orthographic/isometric projection, overview-to-detail scale hierarchy,
+  semantic-region palette/value separation, far-water minification, and
+  optional cloud occlusion.
+
+The evidence bundle must prove one shared coast/bathymetry transform. Capture
+the coast level set, terrain elevation and semantic regions, bathymetry, coast
+frame, compiled land boundary, rendered water intersection, foam source, foam
+history, wetness, and asset support/exclusion masks. A visually close frame
+fails when those signals are independently authored and merely happen to align
+at the design camera.
+
+Freeze exact cameras for `archipelago-overview`, `island-design`, `coast-near`,
+and `grazing-water`. At each applicable view capture final, no-post, semantic
+terrain groups, land/coast field, bathymetry/depth, water state and normals,
+optical thickness, foam source/history, asset constraints, LOD/chunk seams,
+camera/framing overlay, and output ownership. Add an underwater or
+water-crossing view only when the contract claims underwater rendering or a
+camera transition.
+
+Use native-domain gates fixed before candidate inspection:
+
+- world-space and physical-pixel boundary distance between the authored coast
+  level set, compiled land edge, and rendered land-water intersection;
+- classified land-water gap/overlap area, shoreline seam residual, and
+  hard-edge normal disagreement;
+- bathymetry continuity plus monotonic depth/optical-thickness ordering under a
+  fixed lighting/output transform;
+- camera projection/framing residual plus semantic-region scene-linear
+  luminance and output-referred perceptual-color error against the declared
+  reference features;
+- foam-source precision/recall against the declared coast/breaker mask,
+  on-land leakage, history reset residual, flicker energy, and detached-foam
+  lifetime;
+- solver positivity, mass/boundary residual, spectrum, or dispersion error only
+  when the selected algorithm claims those invariants;
+- asset support penetration/floating distance, slope/exclusion violations,
+  spacing or distribution residual, stable-ID correspondence, and rejected-
+  placement accounting.
+
+Run deterministic representative and stress seeds selected before inspection.
+Exercise reset, steady forcing, stronger forcing, local disturbance, camera
+motion, resize/DPR, quality transition, and long sustained evolution when the
+selected mechanism makes them relevant. A still frame cannot sign off foam
+advection, simulation boundaries, LOD registration, history decay, or
+frame-rate-independent evolution.
+
+Validate `Full`, `Budgeted`, and `Minimum viable` states as separate visual
+contracts. Every state preserves coastline identity, semantic terrain order,
+bathymetric ordering, water/normal state agreement, foam causality, landmark
+support, and the single output owner. Lower states may reduce projected-error
+detail, local-water or foam resolution/cadence, sub-pixel wave bands,
+secondary asset population, caustics, or clouds only after the corresponding
+error gate passes. Never bind a state to “desktop,” “integrated,” or “mobile”
+by label; select the stable state from sustained measurements on a named
+physical target.
+
+For each physical desktop-discrete, integrated, and low-power/mobile target,
+record simulation executions per presented frame, compute and render pass
+cadence, storage and history layouts, per-step reads/writes, uploads,
+attachment load/store/resolve behavior, logical live bytes, peak simultaneous
+transients, and `p50 [Measured]`/`p95 [Measured]` CPU, GPU, and presentation
+distributions. A device-class name or a universal millisecond table is not an
+acceptance envelope. If GPU timing required by the claim is unavailable, keep
+the visual verdict separate and return insufficient GPU-performance evidence.
+
+Reject the coastal claim on a visible land-water gap or overlap, coast or foam
+swimming, shallow/deep response that contradicts bathymetry, refracted geometry
+crossing an occluder, non-finite water state, invalid normal, solver boundary
+leak, unbounded foam history, floating/buried landmarks, forbidden vegetation
+support, unstable seed identity, or any quality transition that changes the
+primary composition or crosses a frozen error gate.
+
 ## Color And Output
 
 - Color textures use `SRGBColorSpace`.

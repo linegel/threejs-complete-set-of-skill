@@ -1,6 +1,6 @@
 ---
 name: threejs-choose-skills
-description: Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, procedural worlds, and version-specific renderer debugging. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.
+description: "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, procedural worlds, and version-specific renderer debugging. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance."
 ---
 
 # Three.js WebGPU/TSL Choose Skills
@@ -123,6 +123,7 @@ no-post baseline are already proven.
 | Decision | Select from evidence | Reject when |
 | --- | --- | --- |
 | Imported, procedural, or hybrid subject | Preserve authoritative CAD/BIM/scientific/glTF data; generate only missing semantics or scalable detail. | A procedural replacement would violate identity, dimensions, topology, or measured data. |
+| Local terrain/coast or planetary body | Use fields + semantic geometry for a local height/bathymetry domain; use the planet skill only when curvature, horizon, spherical continuity, or planet-scale precision is observable. | A cube-sphere/quadtree adds no visible contract, or a planar domain cannot satisfy the required horizon/precision error. |
 | Geometry, displacement, material normal/parallax, or screen-space cue | Use geometry for silhouette, intersections, section cuts, cast shadows, and close parallax; use cheaper representations only when the view/error contract permits. | The representation cannot reproduce the observable it is supposed to cause. |
 | Analytic, sampled-data, numerical simulation, or stochastic model | Match the required conservation law, controllability, uncertainty, and update cadence. | A more complex solver adds no observable contract or a shortcut violates the error bound. |
 | CPU update, vertex/fragment evaluation, or compute/storage | Compare state volume, reuse across passes, synchronization, upload/readback, and target-device timings. | Compute merely moves small or rarely reused work behind dispatch and storage overhead. |
@@ -688,6 +689,7 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | Camera composition, orbit/free navigation, multi-scale framing, projection/depth ownership, handoffs, floating origins | `$threejs-camera-controls-and-rigs` | Load when camera policy changes scale, silhouette, precision, temporal validity, or interaction. |
 | Authored transform phases, kinematics, rotating frames, springs, staging, analytic motion | `$threejs-procedural-motion-systems` | Use for transform authorship; keep live-data interpolation in the application data layer unless procedural motion is the missing cause. |
 | Reusable scalar/vector fields, causal masks, domain warping, derived normals | `$threejs-procedural-fields` | Use when outputs share a field cause; external scientific/data ingestion remains outside the pack. |
+| Local terrain, islands, beaches, cliffs, seabed, and coastline semantics | `$threejs-procedural-fields` + `$threejs-procedural-geometry` + `$threejs-procedural-materials` | Fields own the common land/bathymetry cause, geometry owns silhouette/topology/material groups, and materials consume the same semantic bundle. Add water only when a water surface or transport is visible. |
 | BRDF/material identity, filtered atlases, frame fields, surface masks, emissive/thermal appearance, specular AA | `$threejs-procedural-materials` | Pair with fields for shared causes and geometry for silhouette/section changes. |
 | Semantic mesh writers, profiles, rails/frames, generated glyphs, material groups | `$threejs-procedural-geometry` | Use when vertices, indices, normals, UVs, groups, or generated topology are owned here; not for generic CAD/glTF optimization. |
 | Trees, grass, roots, canopies, rooted wind, biological distribution | `$threejs-procedural-vegetation` | Use for plant growth/distribution/deformation, including architectural and scientific contexts. |
@@ -696,8 +698,8 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | Planetary bodies, terrain, craters, biomes, coastlines, spherical LOD | `$threejs-procedural-planets` | Pair with atmosphere only after body scale/horizon and precision policy are fixed. |
 | Sky scattering, atmospheric shells, aerial perspective, haze | `$threejs-sky-atmosphere-and-haze` | Use image pipeline only for final exposure/color ownership. |
 | Weather-driven volumetric clouds and cloud shadows | `$threejs-volumetric-clouds` | Use only for volumetric density/transport; generic scientific volume rendering remains a gap. |
-| Horizon-scale spectral waves, ocean derivatives, whitecaps, above/below-water optics | `$threejs-spectral-ocean` | Use bounded water for local domains/interactions. |
-| Bounded/analytic water, local heightfields, object ripples, caustics, refraction/absorption | `$threejs-water-optics` | Use screen-history surfaces only for screen-anchored effects. |
+| Horizon-scale, statistically specified directional sea over multiple wavelength decades | `$threejs-spectral-ocean` | Keep periodic homogeneous FFT synthesis in deep/open water; hand coastal bathymetry, run-up, and wet/dry behavior to the coastal-water contract. |
+| Bounded/analytic/coastal water, local heightfields, shoreline transformation, object ripples, caustics, refraction/absorption | `$threejs-water-optics` | Select the least complex solver that reproduces the required shoreline observable; use screen-history surfaces only for screen-anchored effects. |
 | Rain/snow particles, accumulation, surface wetness, puddles/splashes, shared weather envelope | `$threejs-rain-snow-and-wet-surfaces` | Route optical water coupling only when refraction/caustics are causal. |
 | Curved-ray black holes, accretion disks, wormholes | `$threejs-black-holes-and-space-effects` | Exposure/bloom are consumers after the HDR transport signal is correct. |
 | Particles, trails, plasma, shockwaves, transient event layers | `$threejs-particles-trails-and-effects` | Route object transforms to motion systems; preserve stable data identity in data/digital-twin scenes. |
@@ -710,6 +712,15 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | Fixed-view/trajectory evidence, seed/data sweeps, temporal stability, budgets, regression artifacts | `$threejs-visual-validation` | Required for ambitious compute, temporal, adaptive, quantitative, or sustained-performance work. |
 
 See `references/router-recipes.md` for general-purpose domain routes.
+
+For a local archipelago, the default primary owner is procedural fields, not
+planets or water. One deterministic field bundle must provide land support,
+elevation, bathymetry, coast distance/frame, slope/exposure, material regions,
+and placement validity. Geometry, materials, vegetation, structures, and water
+consume that bundle; none may regenerate a private coastline. Spectral ocean is
+optional and owns only the deep/open-water incident sea. The detailed route and
+fixed-view evidence contract live in the `stylized archipelago / coastal scene`
+recipe.
 
 ## Color, Data, And Output Rules
 
@@ -779,6 +790,7 @@ Every handoff labels:
 | WebXR | Use official WebXR/Three.js guidance unless a dedicated skill exists. |
 | Deployment/editor/tooling | Use platform and project conventions. |
 | Physics engines | Use the selected physics/domain solver; route visual state only after physical data exists. |
+| General authored prop libraries, mesh repair, UV unwrapping, texture baking, compression, and source-asset LOD production | Treat these as an explicit asset-pipeline input. Procedural skills may define anchors, variants, and runtime compilation, but they do not make an unvalidated source asset production-ready. |
 | Generic app architecture | Keep framework/state/router decisions outside visual skills. |
 | Teaching fallback when WebGPU is unavailable | Use `$threejs-compatibility-fallbacks` only for an explicit fallback-teaching request. |
 

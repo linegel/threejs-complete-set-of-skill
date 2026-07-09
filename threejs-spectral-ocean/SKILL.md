@@ -1,6 +1,6 @@
 ---
 name: threejs-spectral-ocean
-description: Build broad-band procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, and falsifiable GPU evidence.
+description: Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.
 ---
 
 # Spectral Ocean
@@ -8,12 +8,16 @@ description: Build broad-band procedural oceans in Three.js r185 WebGPU/TSL usin
 Use this skill when a large, unbounded-looking water surface must span several
 wavelength scales with directional wind sea or swell. The canonical state is a
 sampled random field in wavevector space, evolved by dispersion and transformed
-on the GPU. Use `$threejs-water-optics` for bounded interaction grids or a small
-authored wave set.
+on the GPU. It assumes a horizontally homogeneous, periodic patch with one
+dispersion relation per cascade. It is not a coastline, bathymetry, inundation,
+or obstacle-flow solver. Use `$threejs-water-optics` for bounded interaction
+grids, coastal coupling, or a small authored wave set.
 
 Read
 [references/spectral-cascade-ocean-system.md](references/spectral-cascade-ocean-system.md)
-before implementation or review.
+before implementation or review. For any island, coast, shoal, reef, harbor, or
+moving waterline, also read the
+[coastal archipelago contract](../threejs-water-optics/references/coastal-archipelago-system.md).
 
 ## Numeric Provenance
 
@@ -41,8 +45,73 @@ sustained storage bandwidth.
 | Few art-directed modes or exact cheap CPU queries | Parametric waves in `$threejs-water-optics` | Cost grows with component count. |
 | Bounded disturbances | Compute heightfield in `$threejs-water-optics` | CFL and domain-boundary error. |
 | Broad stochastic directional sea | Multi-cascade FFT | Periodic patches, spectral quadrature, FFT precision. |
+| Spatially varying depth; phase-resolved shoaling/refraction matters | Coastal dispersive or phase-resolving solver selected by `$threejs-water-optics` | Local depth, boundary, and breaking-model error; FFT is only the offshore forcing. |
+| Wet/dry fronts, run-up, bores, or hydraulic jumps matter | Positivity-preserving depth-averaged coastal solver selected by `$threejs-water-optics` | Conservation, wet/dry, and numerical-dissipation error; a heightfield or FFT is invalid. |
+| Shoreline motion is sub-pixel and only wave statistics matter | Phase-averaged wave-action transport plus analytic display bands | No instantaneous phase contract; validate action/energy and image error. |
 
 Do not disguise scrolling normals or a wave pile as a low FFT tier.
+
+### Offshore/coastal handoff
+
+A spatially varying bottom destroys the global Fourier diagonalization used by
+the FFT. The spectral patch cannot, without a different solver, produce
+bathymetric refraction, shoaling, depth-induced breaking, diffraction around
+islands, reflection from cliffs, porous-reef loss, wave setup, run-up, or
+wetting/drying. Do not fade an unchanged deep-water FFT through the beach and
+label the result coastal simulation.
+
+Choose exactly one handoff semantics:
+
+- **Phase-resolved.** At an offshore coupling curve, evaluate the same seeded
+  spectral coefficients into surface elevation `eta_b` in metres and
+  depth-integrated wave-discharge perturbation `q'_b` in square metres per
+  second **[D]**; mean-current discharge remains a separate signal.
+  For a matching finite-depth Airy mode,
+  `q'_hat=(omega_int/|k|^2) k eta_hat` **[D]**, from linearized continuity
+  `-i omega_int eta_hat+i k dot q'_hat=0` **[D]**. With uniform current,
+  `omega_abs=omega_int+k dot U` **[D]**: intrinsic frequency owns orbital
+  flux; absolute frequency owns the shared phase clock. The coastal boundary
+  injects only the incoming characteristic and retains the outgoing one. Record
+  phase, elevation, discharge, and reflected-wave residuals **[M]**.
+- **Phase-averaged.** Convert height-variance density `P_eta(k)` to physical
+  wavevector energy density
+  `E(k)=[rho g+sigma_surface |k|^2]P_eta(k)`, where
+  `sigma_surface` is surface tension, and
+  transport wave action `N=E/omega_int` when currents vary **[D]**. Transfer
+  `N`, intrinsic frequency, group velocity, mean current, and dimensioned band
+  quadrature. The near-shore model owns refraction, shoaling, breaking loss,
+  and local phase synthesis. It makes no instantaneous phase-parity claim.
+  Record incoming, dissipated, reflected, and transmitted band energy/action
+  in one unit convention **[M]**.
+
+A one-way FFT donor cannot display coastal reflection that propagates back
+through the coupling curve. If that outgoing field is observable, extend the
+phase-resolving domain or implement an explicit two-way modal projection with
+phase, energy, localization, and periodic-copy residuals **[G,M]**. An
+absorbing layer is valid only when the rejected reflection is below its gate.
+
+Both modes use one world frame, water datum, bathymetry convention, seed or
+band identity, and monotonic timebase. A current `U` changes absolute frequency
+by `k dot U` **[D]**; if `U` varies materially within a periodic patch, route
+that region out of the FFT instead of freezing an inconsistent dispersion.
+
+Partition ownership in every transition band. Only disjoint Fourier bins or
+fields proven to have zero cross-covariance may use power windows that sum to
+one **[D,G]** and square-root amplitude weights. Coherent offshore/coastal
+copies have a covariance cross-term: a phase-resolved wave crosses the coupling
+curve at full amplitude and has one spatial render owner. If a render-only
+spatial blend is unavoidable, its coherent amplitude weights sum to one and
+displacement, tangents, normals, and velocity come from the same phase-matched
+composite field, including blend-weight gradients. Independently lerping final
+normals or adding both foam histories violates parity.
+
+Foam crosses the handoff as one declared coverage/source transport contract:
+coverage, carrier velocity, source rate, decay state, coordinate space, and
+timestamp. Attribute whitecap and depth-breaking dissipation to exactly one
+owner, combine the disjoint dissipation terms, then map them once into one foam
+source/history. Never partition or saturated-add evolved coverage histories.
+Conservative remap or measured coverage loss is required when atlas or solver
+coordinates change.
 
 ## Pinned Three.js r185 Architecture
 
@@ -224,7 +293,36 @@ different and stricter error case than storing only resolved maps in half-float.
 - fixed-camera multi-time captures, no-foam/no-detail/no-post baselines, and
   one final output transform.
 
+For every coastal composition also require:
+
+- bathymetry, wet mask, coast distance/frame, obstacle, current, and coupling-
+  band diagnostics with units and owners;
+- single-mode normal- and oblique-incidence tests measuring elevation,
+  discharge, phase, transmitted power, and reflection across the handoff;
+- bidirectional spectral continuity residual, omitted elevation/discharge
+  bounds, incoming-characteristic proof, and discharge-producer cost;
+- outgoing absorption or two-way modal-projection phase/energy/localization
+  residuals whenever reflected waves cross the coupling curve;
+- no-breaking/no-current conservation, breaking-loss accounting, and foam-
+  source closure **[M]**;
+- overlap-band variance/power closure and composite tangent-normal parity;
+- fixed-flight seam captures over seed, tide/datum, time, and quality-tier
+  sweeps; and
+- sustained composed-frame, live-memory, and thermal evidence on each named
+  low-end/mobile target **[M]**.
+
 Fail the implementation if any coefficient has ambiguous units, FFT
 normalization is implicit, a Nyquist parity rule is missing, half precision is
 assumed accurate, the normal is not the cross product of displaced tangents,
-foam has no transport semantics, or a performance number lacks provenance.
+foam has no transport semantics, a homogeneous periodic FFT is treated as a
+coastal solver, handoff power is double-counted, coherent copies are square-
+root weighted as if independent, or a performance number lacks provenance.
+
+## Routing Boundary
+
+This skill owns offshore homogeneous spectral synthesis, exact spectral
+derivatives, displaced-surface geometry, and deep-water whitecap state. The
+coastal owner supplies bathymetry-aware propagation, boundaries, interaction,
+breaking, wet/dry state, and shore foam. The spectral implementation remains a
+forcing producer and render contributor outside that domain; it does not gain
+coastal ownership by sampling a depth texture in its material.

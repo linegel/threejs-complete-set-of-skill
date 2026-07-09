@@ -1,6 +1,6 @@
 ---
 name: threejs-procedural-vegetation
-description: Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, optional compute/storage, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.
+description: Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.
 ---
 
 # Procedural Vegetation
@@ -42,6 +42,52 @@ For dense grass and meadow vegetation, use this architecture before considering 
 6. Use node post only after the geometry budget is under control: `RenderPipeline`, `pass()`, conditional `mrt()` only for consumed signals, `GTAONode` for contact, full-scene `BloomNode` when HDR vegetation emission/lighting requires glare, and `TRAANode` when alpha shimmer needs temporal stabilization. Selective emissive MRT remains a separately proven exception.
 
 The replaced sub-best path is full-field per-frame parameter regeneration. Static blade and clump data are immutable after spawn; only dynamic fields should be refreshed.
+
+## Terrain And Coastal Ecology Contract
+
+Vegetation placement consumes the shared terrain/coast field provider; it does
+not synthesize private height, shoreline, slope, moisture, or salt noise. The
+provider declares coordinate frame, units, generation revision, filtering,
+chunk halo, and invalidation for:
+
+```text
+terrain height and geometric normal/slope
+signed coast distance and coast tangent/normal
+substrate/semantic region, cliff/beach/water and authored exclusions
+drainage, cavity, soil moisture, disturbance, and canopy/light exposure
+prevailing wind, directional terrain shelter, and salt/spray exposure
+run-up/inundation envelope and persistent wetness when supplied
+```
+
+Keep hard eligibility separate from ecological preference. Water, active
+run-up, unstable cliff, built footprint, path, and authored clearance volumes
+are hard exclusions when the species contract says so. Moisture, slope,
+salinity, wind exposure, sun, substrate, and elevation feed smooth species
+response curves. A stable hashed priority or blue-noise/variable-radius Poisson
+process turns suitability into candidates. Independent color noise and density
+noise are forbidden.
+
+Windward/leeward distribution is directional. Derive static shelter from the
+terrain/obstacle field along the prevailing-wind direction, then combine it
+with coast exposure and elevation. Distance from water alone cannot distinguish
+an exposed windward headland from a protected leeward hollow. Recompute this
+coarse field only when terrain, obstacles, or climate policy changes; the
+per-frame wind deformation field is a separate dynamic consumer.
+
+Each plant asset carries a root/ground frame, conservative crown and wind-swept
+bounds, clearance radius or footprint, material slots, shadow proxy,
+species-response table, growth/age variant, LOD/impostor representations, and
+stable semantic ID. Flowers, grass clumps, palms, shrubs, and trees are selected
+by species identity first and varied within that identity second. Placement
+around ruins, paths, rocks, docks, or instruments consumes their exclusion
+volumes and optional colonization sockets; it never infers clearance from the
+render mesh at runtime.
+
+Read
+[references/coastal-ecology-and-placement.md](references/coastal-ecology-and-placement.md)
+for suitability equations, windward/leeward and salt fields, order-independent
+placement, chunk seams, succession/asset manifests, LOD population invariants,
+and coastal diagnostics.
 
 ## Capability Gate And Tiers
 
@@ -180,6 +226,12 @@ shadowed instances, dynamic-field texels, dirty interactions, draw objects,
 storage stride, and post attachments. Instance count without projected alpha
 coverage is not a vegetation cost model.
 
+For terrain/coastal placement also record accepted/rejected candidates by
+cause, species suitability distributions, overlap/clearance violations, chunk
+halo work, coast/slope/moisture/salt field samples, static shelter-bake cost,
+LOD population change, and resident bytes for species/asset manifests. These
+are compile/update costs unless the placement actually changes every frame.
+
 Storage budget targets:
 
 - Static grass attributes: derive `instanceCount * alignedStrideBytes` from the
@@ -198,7 +250,7 @@ preserving the primary silhouette/species contract.
 
 ## Diagnostics And Failure Conditions
 
-Capture diagnostics as first-class views: patch bounds, density LOD, impostor transitions, static versus dynamic storage fields, clump ids, terrain height/normal fit, wind displacement magnitude, alpha coverage, shadow parity, leaf origins, branch-level colors, bark UV checker, and final composition.
+Capture diagnostics as first-class views: patch bounds, density LOD, impostor transitions, static versus dynamic storage fields, clump ids, terrain height/normal fit, signed coast distance, hard exclusions, species suitability, wind exposure/shelter, salt exposure, moisture, accepted candidate priority, clearance conflicts, wind displacement magnitude, alpha coverage, shadow parity, leaf origins, branch-level colors, bark UV checker, and final composition.
 
 Visual failures:
 
@@ -213,9 +265,14 @@ Visual failures:
 - visible vegetation and shadow vegetation deform differently;
 - different seeds change species identity rather than controlled variation;
 - geometry cost grows without per-level, per-chunk, and named-target evidence.
+- coast-distance rings replace a real ecology response, windward and leeward
+  sides receive identical populations despite a directional exposure contract,
+  or vegetation occupies active run-up/unstable cliff/building exclusions;
+- chunk generation order changes accepted plants, neighboring chunks disagree
+  at seams, or density LOD causes the apparent biome boundary to migrate;
 
 ## Routing Boundary
 
-Use `$threejs-procedural-geometry` for generic branch-ring emission without a growth model. Use `$threejs-procedural-fields` for shared terrain, density, weather, and biome fields. Use `$threejs-procedural-materials` for authored bark/leaf/grass PBR identities. Use `$threejs-scalable-real-time-shadows` for custom shadow clipmaps beyond `CSMShadowNode` or `TileShadowNode`. Use `$threejs-image-pipeline` when the vegetation scene owns the final HDR, AO, bloom, temporal AA, and output-transform stack.
+Use `$threejs-procedural-geometry` for generic branch-ring emission without a growth model. Use `$threejs-procedural-fields` for shared terrain, coast, exposure, density, weather, and biome fields. Use `$threejs-procedural-materials` for authored bark/leaf/grass PBR identities. Use `$threejs-water-optics` for run-up/inundation/shore signals when water is their causal owner; vegetation consumes those signals but does not solve water. Use `$threejs-scalable-real-time-shadows` for custom shadow clipmaps beyond `CSMShadowNode` or `TileShadowNode`. Use `$threejs-image-pipeline` when the vegetation scene owns the final HDR, AO, bloom, temporal AA, and output-transform stack.
 
 This skill owns species tables, topology, child placement, foliage, grass fields, roots, chunked dense vegetation, static/dynamic storage separation, and hierarchical/rooted wind.

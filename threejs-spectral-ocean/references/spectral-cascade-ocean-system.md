@@ -4,6 +4,12 @@ This reference defines a directional random sea from dimensional spectrum to
 final WebGPU image. It fixes the transform, derivative, geometry, foam, and CPU
 coupling conventions that most often produce plausible but wrong oceans.
 
+For islands, shoals, reefs, harbors, cliffs, or moving shorelines, this
+reference is only the offshore producer. Read the
+[coastal archipelago contract](../../threejs-water-optics/references/coastal-archipelago-system.md)
+for bathymetry, coastal-solver selection, terrain/water data, and wet/dry
+ownership.
+
 ## Quantitative provenance
 
 Use **[D] Derived**, **[G] Gated**, **[M] Measured**, and **[A] Authored** for
@@ -44,6 +50,284 @@ combine both from copied recipes.
 Direct wave summation is superior when few modes satisfy the visual spectrum;
 a bounded compute heightfield is superior when local disturbance and domain
 boundaries dominate. FFT is not automatically the cheapest water algorithm.
+
+## Validity domain and coastal handoff
+
+### What the FFT does not solve
+
+The plane-wave basis diagonalizes the linear free-surface operator only for the
+declared horizontally homogeneous patch. In this reference, each cascade has a
+single periodic patch, scalar mean depth, dispersion relation, and stationary
+spectral statistics. A uniform mean current may Doppler-shift all modes. A
+spatially varying bottom or current couples modes and invalidates independent
+per-bin evolution.
+
+Consequently, sampling a bathymetry texture in the final material does not make
+the spectral solution coastal. The FFT alone cannot produce:
+
+- refraction or shoaling caused by depth gradients;
+- depth-induced breaking, bottom friction, porous-reef loss, or wave setup;
+- diffraction and reflection at islands, harbor walls, cliffs, or obstacles;
+- bores, hydraulic jumps, run-up, inundation, or wet/dry fronts; or
+- mass-conserving flow around terrain and moving bodies.
+
+The choppy horizontal map is render geometry. Its determinant is a compression
+diagnostic, not a conservation-law solution, and clipping that map against land
+does not create a boundary condition. Place the offshore/coastal coupling curve
+`Gamma` inside an overlap where both models satisfy predeclared dispersion,
+depth, and resolution error gates **[G]**. Do not put it at the wet/dry front.
+
+### Shared coupling manifest
+
+The producer and consumer serialize one manifest before allocating either
+solver:
+
+```yaml
+coastalHandoff:
+  mode: phase-resolved | phase-averaged
+  worldFrame: "Y-up frame, handedness, metres-per-unit, floating-origin owner"
+  waterDatum: "mean free-surface elevation in metres"
+  bathymetrySign: "bed elevation or positive-down depth; never implicit"
+  couplingGeometry: "oriented world-space curve or tile boundary Gamma"
+  coastNormal: "orientation and tangent convention"
+  timebase: "clock, timestamp, fixed-step owner, reset rule"
+  spectralBands: "frequency/direction support and stable IDs"
+  currentField: "metres per second, sampling space, cadence, owner"
+  incomingOwner: spectral-ocean
+  outgoingOwner: coastal-solver | absorbing-layer
+  renderSurfaceOwner: "one mesh/material in every overlap sample"
+  foamHistoryOwner: "one state, coordinate space, transport, and remap rule"
+```
+
+The full coastal data set includes bed elevation, positive water depth, coast
+distance/frame, wet mask, obstacle/porosity fields, bottom roughness, currents,
+and invalid/unknown regions. The linked coastal contract defines their
+generation and filtering. Spectral code consumes these only to locate and
+validate the handoff; it must not silently reinterpret them.
+
+### Phase-resolved boundary forcing
+
+Use this route when instantaneous wave phase, interference, reflection, or
+time-domain interaction is observable. For a linear component at the coupling
+curve,
+
+```text
+eta_m(x,t) = Re{ A_m exp[i(k_m dot x - omega_abs,m t)] }
+
+omega_abs,m = omega_int,m + k_m dot U                         [D]
+
+q'_m(x,t) = Re{ (omega_int,m / |k_m|^2) k_m A_m
+                 exp[i(k_m dot x - omega_abs,m t)] }.          [D]
+```
+
+`eta_m` is surface elevation in metres; `q'_m` is the depth-integrated wave
+discharge in square metres per second **[D]**; `U` is the separately declared
+uniform mean current. The discharge follows from the linear kinematic boundary
+condition for the matching finite-depth Airy mode at the constant-depth
+offshore side. Derive it from the elevation coefficients and intrinsic
+frequency, not from the art-directed choppy displacement. Sum components only
+after applying the same cascade power partition used by the rendered surface.
+
+The evolved Hermitian height coefficient contains both propagation senses. For
+that assembled coefficient `H_k(t)`, the longitudinal discharge perturbation is
+
+```text
+Q'_k = i k / |k|^2 [partial_t H_k + i(k dot U) H_k],           [D]
+Q'_0 = 0.                                                       [D]
+```
+
+This is the Fourier form of
+`(partial_t+U dot grad)eta+div(q')=0` **[D]**. Do not multiply the whole
+assembled `H_k` by one positive `omega_int`: the counter-propagating term has
+the opposite intrinsic time sign. Evaluate traveling coefficients separately
+or use the time derivative above, then verify the continuity residual **[M]**.
+
+Discharge synthesis is not free. Select one measured path:
+
+- directly evaluate the transferred directional coefficients at the coupling-
+  curve samples when the product of retained modes and boundary samples is the
+  cheaper workload; if this truncates the donor, report omitted elevation,
+  discharge, and energy bounds rather than silently narrowing the sea state;
+- pack the two real Hermitian fields `Q'_x` and `Q'_z` as one complex transform
+  and add its IFFT/resource cost when a dense boundary samples most of the
+  periodic patch; or
+- precompute a repeatable boundary record only when bathymetry, current, donor
+  statistics, and time semantics are immutable.
+
+For omitted directional coefficients `K_o`, fixed-coordinate triangle bounds
+are
+
+```text
+B_eta = sum_(k in K_o) (|a_k| + |a_-k|),                      [D]
+B_q   = sum_(k in K_o) [omega_int(k)/|k|]
+                      (|a_k| + |a_-k|),                       [D]
+```
+
+with DC excluded. `B_eta` bounds elevation error in metres and `B_q` bounds the
+magnitude of depth-integrated discharge error in square metres per second
+**[D]**. Keep these separate from measured transform and boundary-interpolation
+error **[M]**.
+
+The global Stockham path adds `2 log2(N)` whole-grid stage dispatches per
+cascade for one additional packed complex discharge transform **[D]**, before
+assembly/sampling. A nominally unused second complex lane still consumes its
+RGBA storage traffic unless the kernel/resource layout changes. Compare direct
+boundary synthesis against the added transform on the named target **[M]**;
+do not allocate a full velocity atlas merely because phase-resolved coupling
+was requested.
+
+Transfer `eta_b`, normal and tangential components of `q'_b`, surface slope,
+timestamp, and stable mode/band identity. The coastal boundary converts them to
+the incoming characteristic or a verified internal wavemaker. It leaves the
+outgoing characteristic to the coastal solution or an absorbing layer. Strongly
+prescribing both elevation and discharge while deleting outgoing information
+overconstrains the boundary and manufactures reflection.
+
+A one-way spectral donor has no mechanism to display an outgoing reflected
+field beyond `Gamma`. If that field is observable, either extend the phase-
+resolving spatial domain or project the outgoing boundary signal into admissible
+offshore modes. Such a projection must report phase, energy, localization,
+truncation, and periodic-image residuals **[G,M]**; injecting localized
+reflection into global periodic coefficients without that proof is invalid. An
+absorbing layer is an authored model component **[A]** whose reflected-
+amplitude curve over frequency and incidence angle is measured **[M]**.
+
+If the coastal model does not share the offshore dispersion relation over the
+coupling band, derive and gate its phase and group-velocity mismatch **[G]**.
+Do not conceal the mismatch with a broad visual crossfade. At each single-mode
+test, measure amplitude, phase, normal discharge, group delay, and reflected-
+to-incident amplitude **[M]**.
+
+### Phase-averaged action handoff
+
+Use this route when near-shore statistics, direction, and breaking envelope are
+observable but instantaneous offshore phase parity is not. From the height
+wavevector variance density `P_eta(k)` with units `m^4` **[D]**, define a
+spectral wave-energy density
+
+```text
+E(k) = [rho g + sigma_surface |k|^2] P_eta(k),                 [D]
+N(k) = E(k) / omega_int(k),                                    [D]
+```
+
+where `sigma_surface` is surface tension, not intrinsic frequency. Integrating
+`E(k) d^2k` yields energy per horizontal area **[D]** under the linear
+capillary-gravity model. For gravity-only coastal models, set the capillary
+term to `not represented` and quantify discarded band energy **[M]** instead of
+quietly changing units.
+
+The near-shore owner advances a declared action balance such as
+
+```text
+partial_t N
+  + div_x[(U + c_g) N]
+  + div_k[k_dot N]
+  = S_total / omega_int,                                      [D]
+```
+
+with depth/current refraction in `k_dot` and named source terms for wind input,
+whitecapping, bottom loss, depth breaking, and numerical dissipation. The exact
+discretization and source models are coastal-owner decisions. Transfer
+dimensioned frequency/direction bins or wavevector cells, `N`, `omega_int`,
+group velocity, `U`, and band IDs. The coastal renderer may synthesize local
+phases, but must label them statistically consistent rather than phase exact.
+
+For an oriented coupling curve whose normal points from the coastal domain to
+offshore, the incoming action and energy fluxes are integrals over modes with
+`(U+c_g) dot n_Gamma < 0` **[D]**. Record incoming, reflected, transmitted,
+bottom-dissipated, breaking-dissipated, and numerically lost flux in one unit
+system **[M]**. When currents vary, action rather than absolute wave energy is
+the conserved transport variable; a frozen per-tile Doppler shift is accepted
+only after cumulative phase and refraction errors pass gates **[G,M]**.
+
+### Band, render, and derivative ownership
+
+Do not let both solvers independently represent the same stochastic energy.
+Only disjoint Fourier bins or fields proven to have zero cross-covariance may
+use power windows
+
+```text
+w_offshore(k) + w_coastal(k) = 1,    w >= 0,                  [D,G]
+A_owner(k) = sqrt(w_owner(k)) A(k).                            [D]
+```
+
+This is a partition of uncorrelated represented power, not attenuation of a
+physical wave as it crosses `Gamma`. Coherent copies have a covariance cross-
+term and square-root weights generally amplify their variance. If a phase-
+resolved coastal solve receives the same component, preserve its full incoming
+phase and amplitude, assign one spatial render owner, and do not reseed it. If
+the two coherent approximations need a render-only transition with scalar
+coastal weight `beta(x)`, use amplitude weights whose sum is one, phase-match
+them, form one composite field, and differentiate that field:
+
+```text
+eta = (1-beta) eta_o + beta eta_c,                             [D]
+
+grad eta = (1-beta) grad eta_o + beta grad eta_c
+         + (eta_c-eta_o) grad beta.                            [D]
+```
+
+Apply the same product rule to horizontal displacement and velocity. Build the
+normal from the resulting displaced tangents. Omitting the weight-gradient
+term creates a slope seam even when heights meet; lerping already-normalized
+normals cannot repair it. Prefer one clipped surface/material owner through the
+transition. Two coincident transparent water meshes double refraction and
+Fresnel energy and have unstable ordering.
+
+### Current contract
+
+The FFT may include one uniform current `U_0` by evolving phase with
+`omega_abs=omega_int+k dot U_0` **[D]**. Its wavevector amplitudes and
+directions remain those of the homogeneous patch. A current gradient changes
+wavevector, action density, and ray path; route that region to action transport
+or a phase-resolving spatial solver. Never advect the final displacement
+texture over a varying current and claim refraction. The handoff records mean
+current, wave-induced discharge, and render displacement as separate signals.
+
+### Foam transfer
+
+There is one foam-history owner at each world point. Transfer:
+
+```text
+coverage [1], sourceRate [s^-1], carrierVelocity [m s^-1],
+diffusion [m^2 s^-1], decayRate [s^-1], coordinateSpace,
+timestamp [s], validity.                                       [D]
+```
+
+Attribute offshore whitecap and depth-breaking dissipation to exactly one owner
+per band and world region. Combine those disjoint dissipation terms, then apply
+one calibrated conversion into one bounded foam source/reaction update.
+Saturating-addition or partitioning of two evolved histories double counts
+persistence. When spectral history in parameter space is handed to an Eulerian
+coastal atlas, conservatively remap covered area using the displaced-map
+Jacobian and report remap loss, clamp loss, and invalid cells **[M]**. Breaking
+energy loss and foam coverage have different units; their source conversion is
+an authored calibrated model **[A]** with measured coverage and decay evidence
+**[M]**.
+
+### Mobile and low-end architecture
+
+All tiers remain WebGPU implementations and preserve the same water datum,
+coast geometry, energy/band ownership, and single-output contract:
+
+- **Full.** Offshore FFT plus visible/active phase-resolved coastal tiles when
+  interference, reflection, or run-up is required.
+- **Budgeted.** Reduce FFT bands from measured variance/slope/image error;
+  propagate near-shore action at an independently gated cadence; synthesize a
+  bounded analytic phase field for display; activate interaction grids only
+  around observable events.
+- **Minimum viable.** If displacement and instantaneous phase project below
+  their gates, replace the FFT with a few direct modes or filtered normal bands
+  owned by `$threejs-water-optics`, and use precomputed bathymetry/coast-distance
+  data plus causal shoreline foam. Record spectral-ocean, phase-resolved solve,
+  and unused history buffers as `not used` in the route manifest.
+
+Precompute stationary bathymetry pyramids, coast distance/frame, obstacle masks,
+and bottom classes. Stream sparse coastal tiles by projected error and solver
+support, not viewport resolution. Reduce storage traffic and active domain
+before arithmetic. A lower action/foam update cadence requires transport and
+reprojection error evidence **[G,M]**. No tier receives a generic device-class
+grid, cascade, cadence, or timing budget.
 
 ## Pinned Three.js r185 WebGPU/TSL contract
 
@@ -593,12 +877,16 @@ exact reaction update is
 
 ```text
 r = s + 1/tau_f
-f_eq = s/r
-f_next = f_eq + (f_advected-f_eq) exp(-r dt).                   [D]
+if r > 0:
+  f_eq = s/r
+  f_next = f_eq + (f_advected-f_eq) exp(-r dt)
+else:
+  f_next = f_advected.                                          [D]
 ```
 
 This makes source and decay timestep-correct. When `s=0`, it reduces to
-`f_next=f_advected exp(-dt/tau_f)` **[D]**.
+`f_next=f_advected exp(-dt/tau_f)` for finite `tau_f`; zero source with
+infinite decay time takes the explicit `r=0` identity branch **[D]**.
 
 Declare the transport space:
 
@@ -647,9 +935,15 @@ An energy-auditable composition is
 
 ```text
 L_water = F L_reflection
-        + (1-F) [T L_background + (1-T) L_scatter]
+        + (1-F) [T L_background + (1-T) omega_0 L_source]
 L_final = (1-f) L_water + f L_foam.                             [D]
 ```
+
+Here `T=exp[-(sigma_absorb+sigma_scatter) ell]` and
+`omega_0=sigma_scatter/(sigma_absorb+sigma_scatter)` use the
+zero-extinction branch and source/
+phase convention from the bounded-water reference. Absorption is not an
+in-scattering source.
 
 Caustics in shallow scenes require receiver-space flux deposition; a bright
 projected texture is not sufficient. Use the bounded-water reference's
@@ -854,7 +1148,35 @@ Optimize in this order:
 - fixed-camera multi-time final, no-foam, no-detail, and no-post images;
 - leak/rebuild loop and sustained mobile thermal run **[M]**.
 
+### Offshore/coastal composition
+
+- serialized coupling manifest plus bathymetry, coast frame, wet/obstacle mask,
+  current, solver ownership, and overlap-band diagnostic views;
+- phase-resolved constant-depth single-mode tests at normal and oblique
+  incidence: `eta`, wave discharge, phase, group delay, reflection, and
+  transmitted power, plus the spectral continuity residual for bidirectional
+  fields **[M]**;
+- discharge-producer inventory and paired direct-boundary versus packed-IFFT
+  timing/storage evidence when both are eligible **[M]**;
+- phase-averaged no-source/no-current action-flux closure, followed by separate
+  bottom-loss, breaking-loss, and current-work cases **[M]**;
+- uniform-current Doppler test and a spatial-current case compared with an
+  independent action/ray or phase-resolved reference **[M]**;
+- bathymetric-slope shoaling and refraction compared with an independent
+  convergence/reference solution over the represented band **[M]**;
+- outgoing-mode projection reconstruction, localization, and periodic-image
+  residuals when two-way coupling is claimed **[M]**;
+- offshore/coastal band-power closure, no duplicated modes, and render-
+  transition tangent/normal finite-difference parity **[M]**;
+- foam covered-area remap, source partition, decay, and invalid/clamp loss
+  **[M]**; and
+- fixed-view and flight-path captures across the transition over seed, time,
+  water datum, current, and every quality tier, plus sustained composed mobile
+  timing and memory evidence **[M]**.
+
 Reject the system if a plausible image masks dimensional inconsistency,
 implicit FFT scale, Nyquist leakage, wrong displacement sign, inexact normals,
-stateless foam, undocumented coordinate semantics, or a timing number without a
-named measurement context.
+stateless foam, undocumented coordinate semantics, duplicated offshore/coastal
+power, square-root power weights applied to coherent copies, an overconstrained
+coupling boundary, a homogeneous FFT presented as bathymetry-aware flow, or a
+timing number without a named measurement context.

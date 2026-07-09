@@ -1,14 +1,15 @@
 ---
 name: threejs-water-optics
-description: Build workload-selected analytic and bounded water in Three.js r185 WebGPU/TSL. Use for StorageTexture heightfield simulation, exact parametric displacement and normals, local disturbances, receiver-space caustics, depth-aware refraction, Beer-Lambert absorption, side-aware Fresnel, filtered normal bands, reflection, and foam.
+description: Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.
 ---
 
 # Water Optics
 
-Use this skill for bounded interactive water, authored analytic surfaces, shallow
-transparent volumes, and local optical effects. Use `$threejs-spectral-ocean`
-when the required spatial range is a stochastic directional sea synthesized by
-FFT cascades.
+Use this skill for generated coastlines and archipelagos, bounded interactive
+water, authored analytic surfaces, shallow transparent volumes, wet/dry flow,
+and local optical effects. Use `$threejs-spectral-ocean` when the offshore
+spatial range is a stochastic directional sea synthesized by FFT cascades; its
+periodic field does not own transformation around islands or the shoreline.
 
 This is a simulation-and-transport contract, not a blue-material recipe. The
 module owns water state, displacement, derivatives, optical evaluation, and
@@ -34,13 +35,47 @@ coefficient, iteration count, memory limit, or millisecond target.
 
 | Requirement | Surface algorithm | Error and cost boundary |
 | --- | --- | --- |
+| Fixed/perceptual island shot; prescribed waterline; no interactive flow | Coast SDF plus phase-locked analytic shoreline bands | No mass, momentum, diffraction, run-up, or wake claim; nearest-coast ambiguity and crest aliasing are gated. |
 | Small authored wave set; no local disturbance | Parametric Gerstner-style map with exact tangents | Cost is linear in component count; CPU parity requires inversion of horizontal displacement. |
 | Bounded local interaction; mild non-breaking waves | GPU linear wave equation in ping-ponged storage textures | CFL-limited; cannot represent overturning, hydraulic jumps, or shoreline topology changes. |
+| Fixed bathymetry needs shoaling/refraction but not nonlinear flow | Frequency/direction wave-action or ray transport | Geometric rays do not model diffraction/interference and require phase/energy regularization. |
+| Fixed islands need linear diffraction/interference | Frequency-domain mild-slope solution, normally precomputed | Invalid for strong nonlinearity, breaking/run-up, moving bathymetry, or broad live spectra. |
+| Long waves over permanently wet variable bathymetry | Conservative linearized shallow-water elevation/discharge system | Cannot own moving wet/dry fronts, breaking, or finite-amplitude bores. |
+| Run-up, bores, bulk current, obstacle wakes, or changing wet/dry topology | Well-balanced positivity-preserving finite-volume shallow water | Hydrostatic and nondispersive; requires conservative fluxes, wet/dry gates, and fixed-step evidence. |
+| Visible finite-depth dispersion beyond shallow water | Validated Boussinesq-family nearshore solver | Higher derivatives/state and fragile boundaries are unjustified unless phase/run-up error is observable. |
 | Flat or distant surface where silhouette motion is sub-pixel | Derivative-filtered normal bands only | Lowest geometry cost; explicitly no geometry/normal parity. |
 | Large stochastic sea over decades of wavelength | `$threejs-spectral-ocean` | FFT cascades and spectral derivatives. |
+| Overturning breakers, entrained air, jets, or three-dimensional vortices | External free-surface/particle/VOF solver | This skill consumes its visual state; a single-valued or depth-averaged model cannot own the phenomenon. |
 
 Choose from spatial scale, smallest resolved wavelength, interaction radius,
-allowed phase error, and sustained GPU budget. Do not select by visual style.
+allowed phase/error, wet/dry topology, conservation needs, bathymetric variation,
+and sustained GPU budget. Do not select by visual style. Do not stack every row
+as quality; use the least complex valid model and explicit handoffs only.
+
+### Coastal archipelago preflight
+
+Before selecting a water algorithm, define:
+
+```text
+z_b(x,z) = upward-positive bed elevation in metres,
+eta(x,z,t) = free-surface elevation in metres,
+h = max(eta-z_b,0),
+phi > 0 on land, phi = 0 at the authored still-water coast,
+phi < 0 in water.                                             [D]
+```
+
+Record one owner for bathymetry, water datum, coast SDF/nearest-coast ID,
+substrate IDs, obstacle boundaries, offshore wave record, water state, foam,
+wetness, optical depth, and final geometry. Horizontal SDF distance is not
+vertical water depth. The SDF zero contour and `z_b=eta_0` contour must agree
+within a declared gate **[G,M]**.
+
+For reference-like generated islands, prove the causes separately: continuous
+deep-to-shallow bathymetry; sand/reef/rock receivers; incident phase transformed
+by coast/depth; causal breaking or prescribed crest arrival; transported foam;
+wet-sand history; water-column absorption/scatter; and one surface/normal cause.
+A cyan halo, radial island gradient, or unrelated scrolling foam texture does
+not satisfy the contract.
 
 ## Pinned Three.js r185 WebGPU Architecture
 
@@ -102,6 +137,94 @@ Boundary mode is part of the model:
 - absorbing: use a spatial damping sponge and measure reflection over the
   active frequency band;
 - fixed-height: a deliberate phase-inverting wall, never a generic clamp.
+
+### Coastal wave transformation
+
+For local depth `h`, wavenumber `k`, current `U`, and intrinsic frequency
+`sigma_i`, use the declared finite-depth dispersion model:
+
+```text
+sigma_i^2 = (g k + tau k^3) tanh(k h),
+omega_abs = sigma_i + k dot U,
+grad(theta) = k,
+partial_t(theta) = -omega_abs.                                [D]
+```
+
+Wave-action transport uses `N=E/sigma_i` and ray velocity
+`dx/dt=U+partial sigma_i/partial k` **[D]**. Record incident, outgoing,
+dissipated, clipped, and regularized energy by frequency/direction band
+**[M]**. A ray field must report phase-loop/curl residual and cannot claim
+diffraction or interference. Use a converged mild-slope solution when those
+linear phenomena are required over fixed bathymetry.
+
+At an offshore/nearshore handoff, choose one contract. A phase-resolved handoff
+transfers frequency, direction, complex surface-elevation amplitude, wavenumber,
+intrinsic frequency, energy, and time origin. A phase-averaged handoff transfers
+action/energy quadrature and direction with no crest-phase claim; local phase is
+a separate owner. Match model validity before blending. Do not alpha-crossfade
+independently phased geometric surfaces; one owner supplies height and
+derivatives at each location. Measure reflection by frequency and incidence
+angle **[M]**. If a coherent display overlap is unavoidable, amplitude weights
+sum to one and derivatives include their spatial gradients; square-root power
+weights apply only to proven independent/orthogonal fields, not two
+representations of one wave.
+
+### Nonlinear shallow water
+
+For wet/dry flow, conservative state is `q=(h,m_x,m_z)^T`, `m=h u`:
+
+```text
+partial_t q + partial_x F(q) + partial_z G(q) = S,
+F = (m_x, m_x^2/h + g h^2/2, m_x m_z/h)^T,
+G = (m_z, m_x m_z/h, m_z^2/h + g h^2/2)^T,
+S_momentum = -g h grad(z_b) + S_friction + S_external.        [D]
+```
+
+Use one canonical numerical flux per face, well-balanced bathymetry treatment,
+a positivity-preserving update, and an explicit dry-state policy before any
+division by `h`. The invariant `u=0`, `h+z_b=constant` must remain a lake at
+rest **[G,M]**. A post-update depth clamp that loses unreported mass is a
+failure.
+
+For an explicit unsplit rectangular-grid update, derive and enforce
+
+```text
+dt <= C_CFL min_cells 1 /
+      [ (|u_x|+sqrt(g h))/dx + (|u_z|+sqrt(g h))/dz ].         [D,G]
+```
+
+Select Rusanov, HLL, HLLC, reconstruction order, and friction integration from
+positivity, diffusion, conservation, convergence, and target-GPU evidence—not
+algorithm prestige. Compare shallow-water dispersion
+`omega=sqrt(g h_0) k` against `omega^2=g k tanh(k h_0)` over the injected band
+**[G,M]**. Load a dispersive model only when this error is observable and its
+extra boundary/stability/state cost passes.
+
+### Foam, wetness, and shoreline state
+
+Use modeled breaking dissipation, calibrated shock/entropy loss, surface
+compression, exact Jacobian/curvature, or prescribed crest arrival—in that
+priority order—as the foam source. Raw numerical entropy loss changes with
+flux/grid and is not physical dissipation without convergence calibration.
+Declare whether state is dimensionless coverage transported by a material
+derivative or conserved areal density transported by a divergence flux; do not
+mix their equations. Apply timestep-correct source/decay, optional diffusion,
+and bounds. Noise may alter microstructure; it cannot create source coverage.
+Partition breaking dissipation once at a model handoff and drive one foam
+history; foam coverage is not conserved wave energy.
+
+Store exposed-bed wetness separately. For a phase-only/no-solver branch,
+`m_wash` is an explicit prescribed beach-inundation mask; static water depth
+cannot wet exposed bed:
+
+```text
+I_wet = (h >= h_wet) or (m_wash >= m_wet),
+w_next = 1                         when I_wet,
+w_next = w exp(-dt/tau_dry)        otherwise.                 [D]
+```
+
+`h_wet`, `m_wet`, and `tau_dry` are authored inputs **[A]**. Wetness changes
+the bed material response, not water mass or geometric shoreline.
 
 ### Parametric waves
 
@@ -167,11 +290,16 @@ unpolarized dielectric Fresnel near total internal reflection; Schlick is
 allowed only behind a recorded error gate **[G]** and comparison **[M]**.
 
 ```text
-T_rgb = exp(-sigma_a_rgb * pathLengthMeters)                  [D]
-L = F L_reflected + (1 - F) (T L_refracted + L_scatter)       [D]
+sigma_t = sigma_a + sigma_s                                   [D]
+T_rgb = exp(-sigma_t_rgb * pathLengthMeters)                  [D]
+omega_0 = sigma_s / max(sigma_t, epsilon_sigma)               [D]
+L = F L_reflected
+  + (1-F) [T L_refracted + (1-T) omega_0 L_source]            [D]
 ```
 
-`sigma_a` has units `m^-1` **[D]**. Reconstruct positions from scene depth,
+`sigma_a`, `sigma_s`, and `sigma_t` have units `m^-1` **[D]**; `L_source`
+contains the declared phase/source-light approximation. Absorbed energy does
+not become in-scattering. Reconstruct positions from scene depth,
 reject foreground/off-viewport samples, and validate that the reconstructed
 point lies on the forward refracted ray before calling its distance a path
 length. A specular BRDF already contains the sun glint; do not add a second
@@ -195,6 +323,13 @@ peak live bytes, allocation churn, and thermal drift on the named target
 For tile/mobile GPUs:
 
 - keep simulation resolution independent of viewport resolution;
+- restrict nearshore simulation to persistent causal-influence tiles, not
+  merely currently visible tiles;
+- use a separate halo/boundary pass before any whole-tile stencil and a later
+  dispatch for each global producer/consumer dependency;
+- retain one canonical face flux when claiming shallow-water conservation;
+- account for tile halos, inactive retained state, activation transitions,
+  face-flux storage, and simultaneous quality states;
 - fuse kernels only when read/write hazards remain explicit;
 - prefer `textureLoad` for stencil state and filtered sampling only for resolved
   display fields;
@@ -207,8 +342,17 @@ For tile/mobile GPUs:
 ## Required Evidence
 
 Read [references/water-surface-system.md](references/water-surface-system.md)
-before implementation. Validation must include:
+and
+[references/coastal-archipelago-system.md](references/coastal-archipelago-system.md)
+before coastal or archipelago implementation. Validation must include the
+applicable subset below and every algorithm-specific gate from those references:
 
+- bathymetry/datum/shoreline agreement, SDF eikonal and nearest-coast ambiguity;
+- crest phase/direction/filtering and coastwise continuity for prescribed bands;
+- wave-action energy/direction, separately owned crest phase, shoaling/
+  refraction, and handoff reflection when depth transformation is used;
+- lake-at-rest, positivity, mass/flux residual, wet/dry run-up, convergence,
+  and boundary reflection when shallow water is used;
 - analytic single-mode phase/amplitude error and the CFL margin;
 - boundary reflection and mean/volume drift;
 - finite-value scan of all state and derivative outputs;
@@ -218,16 +362,27 @@ before implementation. Validation must include:
 - receiver-space caustic energy before/after deposition and clamp;
 - exact Fresnel versus approximation error, TIR classification, refraction-ray
   residual, and invalid-sample fraction;
+- foam source/transport/reaction coverage plus bed wetness/inundation history;
+- close beach/cliff, whole-island, multi-island, and rock/pier fixed views at
+  multiple times, with bathymetry/depth/phase/flow/foam/optics diagnostics;
 - final/no-optics/no-caustics/no-foam fixed views;
 - renderer info, allocation ledger, dispatch count, and sustained GPU timings.
 
 Fail the build on an unstable stencil, stale derivative state, invalid values,
 double output conversion, source-space caustics presented as receiver-space
-light, or any unlabeled quantitative claim.
+light, two geometric surface owners at a handoff, negative/unbalanced shallow
+water, unexplained mass/energy loss, a cache without units/datum/channel
+semantics, or any unlabeled quantitative claim.
 
 ## Routing Boundary
 
-This skill owns bounded wave grids, exact small-wave parametric surfaces,
+This skill consumes the versioned coast SDF, bathymetry, obstacle, and substrate
+contract from the terrain/data owner. It owns shoreline phase, bathymetry-aware
+nearshore transformation, water boundary/state, bounded wave grids,
+depth-averaged shallow-water wet/dry state, sparse coastal tiles, exact
+small-wave parametric surfaces, transported foam/wetness,
 depth-aware refraction, water-volume attenuation, and bounded caustics. Use
-`$threejs-spectral-ocean` for directional spectra and FFT cascades; use the
-weather-water skill for precipitation-driven surface accumulation.
+`$threejs-spectral-ocean` for offshore directional spectra and FFT cascades,
+then hand off explicitly; use the weather-water skill for precipitation-driven
+surface accumulation. Route overturning/three-dimensional free-surface physics
+to an external solver and consume its visual state here.

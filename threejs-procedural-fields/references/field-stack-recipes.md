@@ -32,6 +32,7 @@ desktop API assumptions.
 
 - Architecture first
 - Stable coordinate ownership
+- Local coastal land field bundle
 - Spherical terrain field bundle
 - Altitude and projected-footprint filtering
 - Terrain wetness field coupling
@@ -208,6 +209,327 @@ Do not sample displaced positions for geology. That stretches noise over steep
 relief and breaks orbit-to-close filtering. World wetness and water phase use
 world coordinates because the physical cause is world height or a shared water
 plane.
+
+## Local Coastal Land Field Bundle
+
+This recipe covers local islands, archipelagos, reservoirs, river margins, and
+coastal sites. It is not a planetary-surface substitute and it does not assume
+a game camera. Fixed isometric presentation, free inspection, mobile delivery,
+and metric analysis use the same causal fields but select different
+representations and error gates.
+
+### Source-of-truth boundary
+
+Use world XZ or integer-tile plus tile-local XZ in physical units. Adopt one
+sign convention throughout:
+
+```text
+d(p) > 0    dry-land support
+d(p) = 0    authored waterline
+d(p) < 0    water support
+nIn = grad(d) / |grad(d)|
+tCoast = (-nIn.z, nIn.x)
+nSea = -nIn
+kappa = divergence(nIn)
+```
+
+`nIn` points toward the land interior. The frame is defined only where the
+closest boundary is unique and `|grad(d)|` exceeds the field's **Gated**
+conditioning floor. At medial axes and equidistant corners, preserve the
+closest-feature ID/vector returned by the distance algorithm or mark the frame
+invalid; normalizing a zero gradient produces arbitrary placement and lighting
+directions. Estimate curvature only after filtering the boundary at the
+physical scale consumed by the asset. Grid-scale second differences of a noisy
+SDF are not coast curvature.
+
+Select the support representation before adding relief:
+
+| Boundary contract | Algorithm | Complexity record | Failure gate |
+| --- | --- | --- | --- |
+| supplied polygon with holes | robust winding/sign test plus closest-segment query; accelerate many segments with a BVH or uniform bins | query count, candidate segments, acceleration bytes | loop orientation/nesting, segment-distance, and shoreline Hausdorff bounds |
+| small procedural set | union of ellipses, capsules, rounded polygons, or other bounded implicits | naive work is **Derived** `Q * P` primitive evaluations for `Q` queries and `P` primitives | component/hole count and minimum-neck width survive the seed sweep |
+| raster-painted, simulated, or frequently edited support | binary classification plus signed Euclidean distance transform; jump flooding is a GPU candidate | separable exact sampled-grid EDT has **Derived** linear sample work per dimension; jump flooding has **Derived** logarithmic pass count in maximum extent but target-specific error and traffic | exact or refined narrow band meets distance, frame-angle, and zero-contour bounds |
+| height-is-waterline shortcut | `dImplicit = zRaw - waterLevel` | one shared scalar evaluation | only legal when topology and metric coast-distance errors are explicitly tolerated |
+
+A procedural-island support should begin from an explicit component grammar,
+not a thresholded high-octave noise image:
+
+```text
+authored domain and component-count contract
+  -> deterministic component centers and stable IDs
+  -> per-component skeleton of discs/capsules/rounded polygons
+  -> union land lobes and subtract declared lagoons/channels
+  -> bounded silhouette-scale coordinate warp
+  -> classify, metric re-distance, and reject invalid topology
+```
+
+Use stratified or blue-noise center candidates when spacing is observable; use
+an authored graph when island adjacency, channels, or narrative/data identity
+is prescribed. Record allowed component/hole count, area/perimeter interval,
+minimum dry neck, inter-island water gap, and domain clearance as **Gated** or
+**Authored** product constraints. Seed rejection follows a stable candidate
+order and has an explicit failure result; an unbounded retry loop is neither
+deterministic latency nor a topology guarantee. Keep silhouette warp below the
+scale at which it creates unplanned necks, then verify topology after warp
+rather than trusting the amplitude parameter.
+
+For positive-inside primitive distances, `max_i(d_i)` preserves the union zero
+set but is generally not a metric signed distance near overlaps. Smooth maximum
+can also move the zero set. A coordinate warp changes the metric by its
+Jacobian. Use these results as support implicits, then re-distance whenever a
+consumer interprets `d` as length, computes a coast frame, or allocates a band
+in meters. Record a **Gated** sweep of `abs(|grad(d)|-1)` in the valid narrow
+band and a separate zero-contour Hausdorff error; one cannot replace the other.
+
+For raster distance, a jump-flood nearest-site result is approximate. Refine
+the winning site against neighboring boundary segments/cells in the coast band,
+or compare with an exact CPU distance transform at deterministic probes. The
+field contract records texel spacing, site encoding, tie-breaking, refinement
+radius, and worst accepted distance/frame error. Repeating edge samples must
+use global lattice coordinates so adjacent tiles choose the same site and sign.
+
+### Cross-shore elevation and bathymetry
+
+Land and visible seabed derive from the same boundary. Write
+
+```text
+zBase(p) = zw + C(d(p))
+         + L(d(p)) * rLand(p)
+         + S(-d(p)) * rBed(p)
+```
+
+where `zw` is water level, `C` is an authored cross-shore profile, `L` and `S`
+are nonnegative envelopes, and `rLand`/`rBed` are bounded signed residual
+relief fields. Require `L(s)=S(s)=0` for `s<=0`; each residual therefore acts
+only on its side of the coast. The **Gated** continuous-beach conditions are:
+
+```text
+C(0) = 0
+L(0) = 0
+S(0) = 0
+left and right C' satisfy the authored slope-continuity gate
+```
+
+Require `C(d)` to have the sign of `d` in the protected nearshore band unless
+an authored tidal-flat interval deliberately stays at water level. Sign alone
+is insufficient because a residual can overpower `C` near zero. If
+`|rLand|<=R_L(d)` and `|rBed|<=R_B(-d)`, require a positive propagated margin
+`m_z(d)`:
+
+```text
+d > 0: C(d) - L(d) R_L(d) >=  m_z(d)
+d < 0: C(d) + S(-d) R_B(-d) <= -m_z(d).                       [D,G]
+```
+
+The inequalities cannot hold arbitrarily close to `d=0` while all terms vanish.
+Define an uncertainty tube
+
+```text
+deltaCoast >= epsilon_d + (epsilon_z + z_waterline_gate)/s_min, [D,G]
+```
+
+where `epsilon_d` is coast-distance error, `epsilon_z` is combined vertical
+direct/sample/store error, and `s_min` is a proven lower bound on `|C'|` over
+the protected crossing. Inside `|d|<=deltaCoast`, the authoritative coast
+contour owns classification and residual envelopes are zero or their complete
+range is retained as uncertain; do not infer land/water from rounded height.
+Apply the residual inequalities only outside that tube with
+`m_z>=epsilon_z`. These conditions guarantee that changing a bounded relief
+seed does not tear the accepted waterline. The profile
+may encode a dry berm, wet-sand runout, shallow shelf, reef shoulder, and basin
+transition in physical cross-shore distance. Each breakpoint, slope, and
+elevation is **Authored** or source-data-driven; none is a device tier.
+Keep high-frequency bed relief out of waterline classification by forcing its
+envelope to zero at the coast.
+
+A cliff needs a multi-surface contract:
+
+```text
+shoreContour = { p : d(p) = 0 }
+cliffTop(p)   = zw + hCliff(p)
+cliffToe(p)   = zw + hToe(p)
+```
+
+The geometry owner closes `cliffTop` to `cliffToe` with a wall. Do not emulate
+a vertical face with an unbounded derivative or a screen-space dark band. A
+mixed coast exposes a broad `cliffIdentity` field so beach and cliff segments
+cannot alternate at single-cell frequency.
+
+For hard stylized terraces, retain continuous relief `zRaw` as the causal
+field and emit:
+
+```text
+u = (zRaw - zRef) / deltaZ
+terraceIndex = floor(u)
+terracePhase = u - floor(u)
+Gamma_k = { p : zRaw(p) = zRef + k * deltaZ }
+```
+
+`deltaZ` is **Authored** in physical units. The mesh compiler constructs flat
+caps and explicit walls from `Gamma_k`; the material consumes the same index
+and phase. A smoothed quantizer is a different visual contract and cannot prove
+hard terrace topology. At every threshold `tau`, classify only if
+`|zRaw-tau|` exceeds the propagated direct/sample/store error; otherwise refine,
+evaluate a higher-precision CPU path, or retain an explicit uncertain cell.
+
+### Drainage, exposure, and ecological causes
+
+Slope and aspect come from the analytic or validated stored gradient of
+`zRaw`, not the faceted display mesh. If drainage is visible in vegetation,
+erosion, sediment, wetness, or structure placement, establish a depression
+policy before routing flow:
+
+1. retain closed basins when they are authored water bodies;
+2. otherwise fill or breach them with a deterministic Priority-Flood-class
+   algorithm;
+3. route D8 for a single discrete receiver or D-infinity/multiple-flow for
+   distributed flow;
+4. resolve flats explicitly, build an acyclic receiver graph, and accumulate
+   from upstream to downstream.
+
+For cell source area `a_i` and routing weights whose outgoing sum is one,
+
+```text
+A_i = a_i + sum_(j routes to i)(w_ji * A_j)
+```
+
+is **Derived** from area conservation. Validate total outlet area plus retained
+basin area against total domain area within the **Gated** numerical bound.
+Hydraulic or stream-power erosion is not the default: add it only when the
+resulting relief/drainage change is observable and can be run offline or inside
+the measured update budget. A common optional incision model is
+`E = K A^m |grad(z)|^n`; `K,m,n`, timestep, boundary conditions, and stability
+must be source-backed or **Authored**, never inferred from appearance alone.
+
+For an incident horizontal direction `q_j` pointing from water toward land,
+define a coast exposure candidate:
+
+```text
+X(p) = sum_j E_j * Fhat(fetch_j(p))
+                  * max(0, dot(q_j, nIn(p)))^pExp
+```
+
+`E_j`, the normalized fetch response `Fhat`, and exponent `pExp` are
+**Authored** or source-driven. `fetch_j` is the unobstructed water distance
+opposite the incident path until land or the declared open-domain boundary.
+Bake exposure on shoreline samples or a narrow atlas when ray work amortizes;
+do not evaluate long fetch rays per fragment. Separate wind and wave direction
+distributions when they differ. This field can drive cliff weathering,
+windward vegetation, sediment, and a water owner's breaking source, but it does
+not itself simulate water.
+
+An environmental placement-factor bundle should be causal:
+
+```text
+moisture = f(flowAccumulation, distanceToDrainage, aspect, exposure, substrate)
+suitability = product or ruled blend of
+  landSign, surfaceIdentity, slope, terraceCap, coastDistance,
+  moisture, exposure, clearance, and authored inclusion regions
+```
+
+Avoid multiplying many narrow smooth masks until almost every value is zero.
+Inspect each factor and measure eligible area. This field owner emits named
+environmental factors, hard-validity/exclusion data, and authoritative contour
+anchors; it does not choose species/assets, resolve inter-asset conflicts, or
+own final placement IDs. `$threejs-procedural-vegetation` and the semantic site
+asset compiler consume these factors and own their acceptance process. Asset
+clearance and infrastructure footprints enter as explicit exclusion geometry
+or a distance field; they are not negative noise.
+
+Downstream placement compilers select sampling deliberately:
+
+| Distribution contract | Candidate | Required proof |
+| --- | --- | --- |
+| authored rows, bays, plots, or ecological strata | one or more candidates per semantic cell with bounded jitter | stable cell ID, accepted-area coverage, and no cross-cell collision |
+| minimum-separation natural scatter | oversampled deterministic candidates plus stable-priority conflict resolution in a spatial hash | pairwise clearance, density error, and invariance to thread/chunk order |
+| density proportional to a smooth suitability field | stratified weighted rejection or hierarchical inverse-mass sampling | accepted density versus target and bounded rejection/work |
+| coast-, path-, contour-, or drainage-bound assets | arc-length stratification on the authoritative polyline plus normal/tangent offsets | arc-length spacing, frame validity, and junction/endpoint policy |
+
+Classic sequential dart throwing is acceptable only when its ordering is part
+of the deterministic contract and generation latency passes. A GPU-parallel
+scatter needs a deterministic winner key for every conflict; atomic arrival
+order is not an asset identity.
+
+### Sampling, tiles, and complexity gates
+
+For a scalar classifier `g` with value error `epsilon_g` and a proven lower
+gradient magnitude `m` across the crossing, the **Derived** boundary-position
+error is
+
+```text
+epsilon_boundary <= epsilon_g / m
+```
+
+Use this for waterline, terrace, beach-band, and exclusion contours, then
+project it through the shared physical-pixel contract. Where `m` approaches
+zero, the contour is ill-conditioned; refine, change the field, or declare the
+topology unstable. For a sampled heightfield, also apply the bilinear Hessian
+bound and mesh-projection bound already defined in this reference.
+
+Tile invariants:
+
+- evaluate all border and ghost samples from integer global lattice keys;
+- include a halo at least as wide as the largest filter, derivative, drainage,
+  or distance-refinement stencil used by the tile;
+- derive dirty work from the union of edited support plus that halo;
+- share edge sample/site IDs across neighbors rather than reconciling two
+  independently rounded boundaries;
+- version the seed, algorithm constants, water level, and quantization schema;
+  any change invalidates dependent contours, anchors, and storage.
+
+For `Nx * Nz` samples and stored channels `c` with `b_c` bytes each, base
+payload is **Derived** `Nx * Nz * sum_c(b_c)` before row alignment, mips,
+ping-pong, and halos. Record query count, primitive/segment candidates,
+distance-transform passes, drainage sort/queue work, exposure rays, dirty
+samples, and consumer reads separately. These counts choose what to measure;
+they are not milliseconds. Static seed variants should be precomputed when
+runtime generation provides no product value, especially on low-end/mobile
+targets.
+
+Quality tiers preserve the causal boundary:
+
+```text
+full
+  metric coast frame, required relief bands, drainage/exposure, and all
+  placement identities at their Gated spatial errors
+
+budgeted
+  same waterline and stable IDs; coarser/precomputed relief, fewer exposure
+  directions, lower drainage or bake update cadence after measured selection
+
+minimum-native
+  precomputed support/coast/height/bathymetry and only identity-critical masks;
+  no procedural recomputation whose result is static
+```
+
+Never lower a tier by independently simplifying land and bathymetry. They must
+sample the same coast version or the shallow-water/wet-line handoff tears.
+
+### Local-coast diagnostics and adversarial corpus
+
+Required views:
+
+```text
+support sign and component/hole IDs
+dCoast in physical units and abs(|grad d|-1)
+closest-coast ID, nIn, tCoast, filtered curvature, invalid-frame mask
+cross-shore profile, zRaw, zBed, cliffTop/toe
+terrace index/phase and threshold-uncertainty cells
+beach/wet-line bands, slope/aspect/cavity
+flow receivers, accumulation, retained basins, outlet conservation error
+wind/wave exposure and fetch
+each placement constraint, accepted-area density, and exclusion distance
+tile-border difference and CPU/TSL/store error
+```
+
+The deterministic corpus must include tangent water-level contact, a threshold
+through a lattice vertex, a narrow isthmus, two nearly touching islands, nested
+holes, a flat plateau, a one-cell basin, a coastline crossing a tile corner,
+large rebased coordinates, seed extremes, and a water-level sweep through a
+topology event. Gate component/hole count where topology is protected;
+shoreline Hausdorff distance; coast-frame angular error away from singular
+sets; `C(0)` continuity; outlet-area conservation; tile-edge equality; and
+repeatability after rebuild and LOD changes.
 
 ## Spherical Terrain Field Bundle
 

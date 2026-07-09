@@ -15,6 +15,309 @@ manifest expands each key into the canonical view-scoped `passRecord`, supplies
 `costRecords`, and instantiates the hysteretic `qualityController`; a key is
 counted once regardless of how many skills consume it.
 
+## stylized coastal archipelago
+
+Input brief: the supplied isometric archipelago reference family: compact
+islands with grass caps, terraced rock cliffs, beaches, shallow turquoise
+bathymetry, deep-blue open water, shore-aligned foam, reefs and rocks, plus
+constrained vegetation, ruins, docks, boats, and optional foreground clouds.
+
+This is one coupled land-water-asset problem. It is not “terrain plus a blue
+material.” The land field owns the coastline and seabed; semantic geometry
+compiles that field; water consumes the same coast and bathymetry; asset
+grammars consume support, slope, exposure, and exclusion fields. See the
+[coastal archipelago system](../../threejs-water-optics/references/coastal-archipelago-system.md)
+for the solver and data-interface decision tree.
+
+### Reference decomposition and route variants
+
+| Observable in the reference family | Earliest owner | Required causal signal |
+| --- | --- | --- |
+| recognizable island outline and negative-water channels | `$threejs-procedural-fields` | signed land/coast field with deterministic seed and world-unit support |
+| stepped cliffs, grass cap, beach shelf, exposed rock faces | `$threejs-procedural-geometry` | elevation, terrace ID, coast distance, slope, curvature, and semantic boundary loops |
+| grass, sand, dry/wet rock, seabed and reef separation | `$threejs-procedural-materials` | material-region IDs plus continuous moisture, depth, exposure, and roughness causes |
+| shoal color, depth attenuation, refraction, local ripples and shore response | `$threejs-water-optics` | bathymetric depth, land mask, coast frame, surface state, optical thickness, and foam state |
+| horizon-scale stochastic wave spectrum | `$threejs-spectral-ocean`, conditional | disjoint open-water spectra and a declared nearshore handoff; never force a periodic deep-water FFT through land |
+| orthographic/isometric composition and overview-to-coast scale hierarchy | `$threejs-camera-controls-and-rigs` | exact projection, immutable bookmarks, depth convention, framing envelope, and transition policy |
+| palms, conifers, flowers and grass clusters | `$threejs-procedural-vegetation`, conditional | support height/normal, coast distance, slope, salt exposure, moisture, wind exposure, and exclusion masks |
+| ruins, docks and authored landmark kits | `$threejs-procedural-buildings-and-cities`, conditional | stable parcel/anchor frames, sockets, access direction, support footprint, material slots, and clearance masks |
+| framing clouds or horizon haze | cloud/atmosphere owner, conditional | only when the shot contract includes volumetric depth; a blurred screen sprite is not atmosphere evidence |
+
+For a bounded isometric shot, select analytic multi-band open water plus a
+coast-aware bounded response in `$threejs-water-optics`; defer
+`$threejs-spectral-ocean`. Select the spectral owner only when the viewing
+envelope actually exposes horizon-scale stochastic wave statistics. For a
+local archipelago, omit `$threejs-procedural-planets`; load it only when body
+curvature, spherical LOD, or orbit-to-surface continuity is observable.
+
+The skill route does not manufacture a coherent prop library from nothing.
+Provide tested procedural modules or a licensed compact kit for the asset
+families the composition requires:
+
+| Supplemental family | Minimum production contract |
+| --- | --- |
+| coast geology | terrace/cliff profiles, boulders, shoreline rocks, pebbles, submerged shelf and reef modules with compatible material regions |
+| ecology | species silhouettes for palms/conifers/grass/flowers or the requested biome, plus growth anchors and accepted coast/slope/exposure ranges |
+| landmarks | ruin wall/corner/arch/cap modules, dock deck/post/ladder modules, boats/wreckage, and authored hero variants where reference identity matters |
+| surface detail | filtered water micro-normal or spectrum inputs, foam breakup only as modulation of a causal foam field, caustic pattern or generator, wet-line/detail decals, and compressed material textures when procedural evaluation loses the target-device A/B |
+| framing | lighting/environment source and, only for the shown foreground occlusion, low-cost cloud cards or a justified volumetric cloud setup |
+
+Every asset or generator variant carries a stable ID and schema/generator
+version; bounds and pivot; support footprint; anchors/sockets; keep-out volume;
+accepted semantic surfaces and environmental ranges; material slots;
+projected-error LODs or impostors; culling, shadow, collision/picking policy;
+and water interactions such as obstacle, foam source, wake source, wetness
+receiver, or caustic receiver. Missing required families are blockers, not
+permission to substitute arbitrary boxes or independent noise.
+
+Analytic-phase route variant for the supplied fixed/perceptual reference family:
+
+```yaml
+backendManifest: "populate required [Gated] and observed [Measured] fields from canonical preflight"
+workloadProfile:
+  domain: cinematic-art
+  intent: present
+  truthContract: perceptual-style
+  representation: hybrid
+  interaction: fixed-view
+  temporal: deterministic-animation
+  scale: city-terrain
+  topology: procedural-unique
+  viewPattern: overview-to-detail
+  deployment: "named physical desktop-discrete, integrated, and low-power/mobile WebGPU targets"
+causeLedger:
+  sourceOfTruth: deterministic island/coast/bathymetry field graph, water-state policy, asset grammars, and supplied reference feature ledger
+  primaryObservable: coherent island silhouettes and shallow-to-deep water whose bathymetry, foam, and assets remain registered at every accepted view and quality state
+  earliestMissingLayer: field
+  selectedAlgorithm: shared coastal fields compiled to semantic land geometry; $threejs-water-optics owns build-time bathymetry-conditioned travel-time phase, resolved displacement, derivative-filtered unresolved normal bands, coast-registered foam, and depth-aware compositing; vegetation and site owners compile constrained asset populations
+  rejectedAlgorithms:
+    - independent terrain and water noise: cannot keep shoreline, seabed, foam, and placement registered
+    - unconstrained blue transparent plane: cannot produce bathymetric color, coast response, wet line, or local obstruction
+    - periodic deep-water FFT across islands: has the wrong boundary and depth model for the nearshore domain
+    - full fluid simulation everywhere: spends state and bandwidth outside observable active water and is not justified by a perceptual fixed-view contract
+    - post-painted foam and caustics: cannot follow world-space coast geometry, depth, occluders, or temporal flow
+  noPostBaseline: island silhouette, semantic terrain bands, water depth ordering, coast registration, and asset placement read without bloom, grading, AO, or depth blur
+selectedSkills:
+  - $threejs-procedural-fields
+  - $threejs-procedural-geometry
+  - $threejs-procedural-materials
+  - $threejs-water-optics
+  - $threejs-procedural-vegetation
+  - $threejs-procedural-buildings-and-cities
+  - $threejs-camera-controls-and-rigs
+  - $threejs-image-pipeline
+  - $threejs-visual-validation
+primaryOwner: $threejs-procedural-fields
+deferredSkills:
+  - $threejs-spectral-ocean: load only for an accepted horizon/open-water spectrum branch
+  - $threejs-sky-atmosphere-and-haze: load only when aerial depth is observable
+  - $threejs-volumetric-clouds: load only when clouds are volumetric scene subjects
+  - $threejs-procedural-motion-systems: load for authored boat or prop trajectories, not for water evolution
+omittedSkills:
+  - $threejs-procedural-planets: local planar islands do not require a spherical body
+  - $threejs-bloom: no causal HDR-emission requirement in the reference family
+  - $threejs-ambient-contact-shading: ordinary lighting/material separation is proven first; AO remains an evidence-gated consumer
+owners:
+  sourceOfTruth: $threejs-procedural-fields
+  representation: semantic terrain plus vegetation/building grammars
+  spatialFrame: project world frame with one shared coast/bathymetry transform plus $threejs-camera-controls-and-rigs projection ownership
+  timebase: one deterministic analytic phase clock; no simulation interpolation
+  semanticIds: terrain region, water regime, island, prop, vegetation, and landmark registries
+  selectionPicking: not used unless the product contract requests it
+  clipSection: not used
+  presentation: $threejs-image-pipeline
+  validation: $threejs-visual-validation
+requiredSignals:
+  sceneColorRegistry:
+    design-view: { producer: shared opaque scene pass, consumers: [water optics, presentation] }
+  depthRegistry:
+    design-view: { producer: shared opaque scene pass, consumers: [water thickness/occlusion, diagnostics] }
+  normalRegistry: not used by post until a named consumer is accepted
+  velocityRegistry: not used unless a temporal image estimator is accepted; water simulation velocity remains a domain signal
+  objectIdRegistry: not used unless picking or semantic outlines are requested
+  historyRegistry: not used
+domainSignals:
+  landSignedDistance: { producer: $threejs-procedural-fields, consumers: [terrain compiler, beach bands, water boundary, foam source, asset exclusion] }
+  terrainElevationAndRegions: { producer: $threejs-procedural-fields, consumers: [terrain geometry, materials, anchor compilation, placement-factor consumers] }
+  bathymetryAndCoastFrame: { producer: $threejs-procedural-fields, consumers: [water regime selection, optics, breaking/foam, validation] }
+  terrainMesh: { producer: $threejs-procedural-geometry, consumers: [scene pass, geometry validation] }
+  terrainAnchors: { producer: $threejs-procedural-geometry, consumers: [vegetation/site placement compilers, validation] }
+  waterState: { producer: $threejs-water-optics, consumers: [water geometry, normals, optics, foam, validation] }
+  assetPlacement: { producer: vegetation/building grammar owners, consumers: [scene pass, validation] }
+outputOwnersByPresentationTarget:
+  main: { toneMap: $threejs-image-pipeline, outputTransform: $threejs-image-pipeline, adaptiveQuality: $threejs-image-pipeline }
+sharedResourceOwners:
+  gbuffer: not used unless named consumers pass the MRT A/B gate
+  depth: $threejs-image-pipeline
+  normal: not used
+  velocity: not used
+  history: not used
+  weatherEnvelope: not used
+  toneMap: $threejs-image-pipeline
+  outputTransform: $threejs-image-pipeline
+  adaptiveResolution: $threejs-image-pipeline
+coverageStatus: partial
+coverageBlockers: general prop-kit generation, lighting/environment authorship, and asset preparation/compression remain project or dedicated-skill inputs unless the required modules and metadata are supplied
+```
+
+If run-up, conservative flow, interaction, or persistent transported foam is
+required, emit a separate persistent-state manifest. Do not place alternatives
+inside one workload-profile enum:
+
+```yaml
+routeVariant: persistent-water-state
+workloadProfile:
+  temporal: simulation
+causeLedger:
+  selectedAlgorithm: shared coastal fields plus sparse active-tile, well-balanced, positivity-preserving nonlinear Saint-Venant nearshore dynamics with one declared wet/dry policy; $threejs-water-optics owns water state, boundaries, foam transport, optics, and presentation interpolation
+owners:
+  timebase: fixed-step water/foam clock plus explicit presentation interpolation
+requiredSignals:
+  historyRegistry:
+    foam: { producer: water foam update, consumers: [water shading, validation], reset: seed/shoreline/tier/extent changes }
+domainSignals:
+  waterState: { producer: $threejs-water-optics, consumers: [water geometry, normals, optics, foam, validation] }
+sharedResourceOwners:
+  history: $threejs-water-optics
+```
+
+### Unique work and target-quality contract
+
+The manifest lists only the branch actually selected. Alternative analytic,
+spectral, and depth-averaged candidates never appear as additive costs. A
+selected hybrid lists its open-water and nearshore producers once each and
+proves their handoff.
+
+```yaml
+uniqueWorkLedger:
+  generationOrRegeneration:
+    - coast.field-build
+    - terrain.semantic-mesh-build
+    - assets.constraint-scatter
+  simulationStep: not used
+  presentedFrame:
+    - design-view.opaque-scene
+    - design-view.water-composite
+    - main.present
+  accounting: generation/startup, simulation cadence, and presented-frame cost remain separate; shared coast/depth data is counted once
+performanceContract:
+  routeStatus: provisional
+  frameInterval: { value: "", unit: ms, label: Derived, source: "1000 ms / [Gated] frozen target refresh" }
+  targetMatrix:
+    - named physical desktop-discrete target
+    - named physical integrated target
+    - named physical low-power/mobile target
+  targetRule: device-class labels carry no timing or memory implication; each target gets measured viewport, DPR, refresh, sustained state, and frozen gates
+  passKeys: [design-view.opaque-scene, design-view.water-composite, main.present]
+  mobileGate: compare the minimal forward color/depth path with every additional stored attachment and with any scene-color/depth refraction copy; derive grid/history/target bytes and per-step traffic, then validate sustained cadence and quality drift on the physical target
+  qualityAdaptation: one hysteretic controller changes only the measured pressure source and resets/resizes dependent water histories atomically
+qualityStates:
+  Full:
+    contract: highest accepted terrain/coast detail, water branch, foam continuity, bathymetric optics, and asset population
+    candidates: finer projected-error terrain/shore detail; accepted nearshore state; higher water/foam resolution or cadence; richer constrained assets; optional caustics/clouds
+  Budgeted:
+    contract: same coast, land regions, bathymetric ordering, water/normal state, foam cause, and landmark identity
+    candidates: coarser projected-error chunks; lower local-water/foam resolution or cadence; fewer sub-pixel wave bands; reduced secondary vegetation; optional caustics/clouds removed
+  Minimum viable:
+    contract: deterministic island silhouette and terrain bands, the selected core water branch at its cheapest valid state, coast-registered foam, shallow/deep separation, and landmark support correctness
+    candidates: coarsest accepted extent/resolution/cadence of a claimed solver, or shared-state analytic water when the route made no solver claim; no temporal caustics; sparse repeated assets; minimal forward attachments
+  assignmentRule: choose a stable state from measured composed evidence; never preassign Full to desktop or Minimum viable to mobile
+```
+
+The persistent nearshore-plus-foam variant replaces only the steady-work fields
+below; its keys are real selected work, not optional entries in the analytic
+ledger.
+
+```yaml
+routeVariant: persistent-water-state
+uniqueWorkLedger:
+  simulationStep:
+    - water.nearshore-update: "accepted dynamics require local state"
+    - water.foam-update: "one source/advection/decay owner"
+performanceContract:
+  passKeys: [water.nearshore-update, water.foam-update, design-view.opaque-scene, design-view.water-composite, main.present]
+```
+
+A spectral offshore donor is a third, separately emitted manifest. It selects
+the spectral skill instead of leaving it deferred, names one combined coastal
+state owner, and adds the donor update explicitly:
+
+```yaml
+routeVariant: spectral-offshore-plus-persistent-nearshore
+workloadProfile:
+  temporal: simulation
+selectedSkills:
+  - $threejs-procedural-fields
+  - $threejs-procedural-geometry
+  - $threejs-procedural-materials
+  - $threejs-spectral-ocean
+  - $threejs-water-optics
+  - $threejs-procedural-vegetation
+  - $threejs-procedural-buildings-and-cities
+  - $threejs-camera-controls-and-rigs
+  - $threejs-image-pipeline
+  - $threejs-visual-validation
+deferredSkills:
+  - $threejs-sky-atmosphere-and-haze: load only when aerial depth is observable
+  - $threejs-volumetric-clouds: load only when clouds are volumetric scene subjects
+  - $threejs-procedural-motion-systems: load for authored boat or prop trajectories, not for water evolution
+causeLedger:
+  selectedAlgorithm: $threejs-spectral-ocean owns the homogeneous periodic offshore directional-spectrum donor; $threejs-water-optics owns covariance-aware boundary reconstruction, the sparse well-balanced nonlinear Saint-Venant nearshore state, the single partition-of-unity spatial handoff, and the sole foam/optics history
+domainSignals:
+  offshoreSpectrum: { producer: $threejs-spectral-ocean, consumers: [$threejs-water-optics coastal boundary adapter, validation] }
+  waterState: { producer: $threejs-water-optics, contributors: [$threejs-spectral-ocean], consumers: [water geometry, normals, optics, foam, validation] }
+owners:
+  timebase: one fixed-step spectral/nearshore/foam clock plus explicit presentation interpolation
+uniqueWorkLedger:
+  simulationStep:
+    - water.open-update: "selected spectral donor evolution"
+    - water.nearshore-update: "accepted nonlinear nearshore dynamics"
+    - water.foam-update: "one source/advection/decay owner"
+performanceContract:
+  passKeys: [water.open-update, water.nearshore-update, water.foam-update, design-view.opaque-scene, design-view.water-composite, main.present]
+```
+
+### Required acceptance evidence
+
+```yaml
+acceptanceEvidence:
+  fixedViews:
+    - archipelago-overview: island distribution, negative-water channels, deep/shallow composition, and far minification
+    - island-design: full island silhouette, terrace/beach hierarchy, reef field, vegetation and landmark composition
+    - coast-near: waterline, cliff/beach join, wet band, foam, stones, and support contact
+    - grazing-water: normal filtering, Fresnel, horizon/minification, and foam stability
+  requiredDebugViews:
+    - land signed distance, elevation, terrace/region ID, slope/curvature, beach band, bathymetry, coast tangent/normal
+    - semantic terrain groups, hard-edge normals, LOD/chunk seams, material IDs, support and exclusion masks
+    - water height/displacement, normal, thickness, absorption, regime ID, boundary state, foam source/history, and wet line
+    - asset anchors, support normals, footprint clearance, ecological weights, occupancy, stable IDs, and rejected placements
+    - no-post, water contribution, opaque depth, final output, and every active history
+  requiredMetrics:
+    - coastline zero-contour versus rendered land-water intersection boundary error in world and physical-pixel domains
+    - overlap/gap occupancy, bathymetry continuity and depth-order agreement, terrain seam and normal error
+    - foam source precision/recall against the coast/breaker mask, on-land leakage, temporal flicker, and reset residual
+    - water-state stability plus positivity/conservation/boundary residual only for solvers claiming those invariants
+    - asset support penetration/floating error, slope/exclusion violations, placement-distribution error, and seed stability
+    - "p50/p95 [Measured] composed CPU/GPU/presentation timing, deadline misses, simulation executions per presented frame, uploads, logical live bytes, per-step traffic model, and sustained quality drift"
+  requiredSweeps:
+    - deterministic representative and stress seeds selected before candidate inspection
+    - still-water/reset, steady wind, stronger forcing, camera motion, disturbance, resize/DPR, and quality-transition trajectories as applicable
+    - Full, Budgeted, and Minimum viable captures on every target where that state is eligible
+  blockingFailures:
+    - visible land-water gap, overlap, coast swimming, shoreline LOD crack, or foam detached from its declared source
+    - shallow/deep color that contradicts bathymetry or refracted geometry that crosses an occluder
+    - non-finite water state, invalid normal, solver boundary leak, unbounded foam history, or failed deterministic reset
+    - floating or buried landmark, vegetation on forbidden support, unstable IDs, or seed-dependent loss of the primary composition
+    - quality transition changes coastline identity, bathymetric ordering, landmark support, output ownership, or crosses a frozen visual-error gate
+    - required target GPU timing unavailable for a GPU-performance verdict
+  requiredArtifacts:
+    - reference-feature ledger and declared divergences
+    - coastal field/data contract and selected water-algorithm proof
+    - supplemental asset/generator inventory with hashes, semantic metadata, LOD/impostor policy, and missing-family blockers
+    - fixed-view/diagnostic/seed/temporal/quality image bundle
+    - unique pass/resource ledger, target and storage inventories, traffic model, governor trace, lifecycle loop, and sustained physical-target traces
+```
+
 ## ocean planet
 
 Input brief: orbit-to-horizon procedural planet with spectral ocean,

@@ -1,6 +1,6 @@
 ---
 name: threejs-procedural-fields
-description: Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.
+description: Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.
 ---
 
 # Procedural Fields
@@ -136,6 +136,86 @@ The contract must record:
 - CPU parity plan with per-channel conditioning, storage quantization, and
   threshold guard bands;
 - debug output for every named field.
+
+### Local terrain and coast field contract
+
+For a local island, archipelago, reservoir edge, river reach, or coastal
+architectural site, do not let an arbitrary height threshold independently
+define terrain, beach, seabed, placement, and foam inputs. One signed coastal
+field owns the shared boundary:
+
+```text
+stable world/tile-local XZ
+  -> land-support implicit field
+  -> metric shoreline distance + closest-feature identity
+  -> coast normal/tangent/curvature
+  -> cross-shore land height + bathymetry
+  -> terrace, cliff, beach, wet-line, drainage, exposure, and placement fields
+```
+
+Use the sign convention `dCoast > 0` on land, `dCoast = 0` at the waterline,
+and `dCoast < 0` in water. If primitive union, coordinate warp, or raster
+filtering makes `|grad(dCoast)|` differ materially from one, treat that result
+as an implicit support function and re-distance it before using values as
+meters. Never normalize a near-zero gradient at a medial axis; retain a
+closest-boundary feature/vector or mark the frame invalid there.
+
+Choose the boundary algorithm from the contract:
+
+| Required property | Candidate | Gate |
+| --- | --- | --- |
+| exact supplied outline, holes, or legal/site boundary | winding classification plus closest polygon-segment distance | robust predicates, loop orientation, and closest-segment distance error pass |
+| few deterministic organic supports | analytic ellipse/capsule/polygon implicits, then metric re-distance when distance is consumed | zero-set topology and `abs(|grad d|-1)` sweep pass |
+| many, painted, eroded, or edited supports | signed Euclidean distance transform, or jump flooding plus exact narrow-band refinement | shoreline Hausdorff and coast-frame angular errors pass |
+| height threshold only | shared scalar `h - waterLevel` | use only when topology drift under seed, resolution, and water-level sweeps is explicitly permitted |
+
+Couple dry elevation and bathymetry through a cross-shore profile:
+
+```text
+zBase(p) = waterLevel + C(dCoast(p))
+         + Wland(dCoast) * rLand(p)
+         + Wsea(-dCoast) * rBed(p)
+```
+
+`rLand` and `rBed` are signed residual reliefs; their envelopes vanish outside
+their side of the coast and at zero. Treat `C(0)=0` and matching one-sided
+derivatives as **Gated** when the authored shore is smooth. A vertical cliff is
+not a single-valued heightfield singularity: emit `cliffTop`, `cliffToe`, and
+the shore contour for the geometry compiler to build an explicit wall. Expose
+the unquantized relief and
+`terraceIndex=floor((zRaw-zRef)/terraceStep)` separately; hard terrace caps and
+walls are topology, not a fragment-color effect. Guard every terrace/coast
+classification by its propagated CPU/TSL/storage error.
+
+The bundle must also expose the fields actually needed downstream, not a
+generic noise atlas:
+
+```text
+dCoast, closestCoastId, coastNormal, coastTangent, coastCurvature
+zRaw, zBed, cliffTop, cliffToe, terraceIndex, terracePhase
+beachBand, wetLineBand, slope, aspect, cavity
+flowDirection, flowAccumulation, moisture
+windExposure, waveExposure, fetch
+surfaceIdentity, placementFactorBundle, hardValidityMask, exclusionMask
+```
+
+Fields own these causal factors and validity masks. Vegetation and semantic
+site-asset compilers own asset/species selection, candidate identity, conflict
+resolution, and final accepted placements; geometry owns topology-derived
+anchors. Do not turn a generic field bake into a second placement authority.
+
+Compute drainage from a depression policy, then an acyclic receiver graph;
+for cells `i`, accumulation is **Derived** as
+`A_i = a_i + sum_(j -> i)(w_ji A_j)` once routing weights and source areas are
+fixed. Priority-Flood plus D8 or D-infinity is
+a compile-time candidate for static land; an erosion solver is eligible only
+when changed drainage/relief is an observable. Compute coast exposure from
+declared incident directions, coast orientation, and fetch; do not use another
+noise sample as a windward or surf proxy.
+
+Read the local-coast recipe in
+[field-stack-recipes.md](references/field-stack-recipes.md#local-coastal-land-field-bundle)
+before implementing terrain, beaches, shallow seabeds, or coastal placement.
 
 For the canonical `examples/webgpu-field-bake/` contract, CPU and TSL must
 import the same `FIELD_ALGORITHM` object from `field-constants.mjs`. That object

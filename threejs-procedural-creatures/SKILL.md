@@ -132,30 +132,42 @@ this order; every step ends in something renderable or assertable.
    albedo/roughness or a scientific scalar palette. Optional field self-AO uses
    a measured number of taps and only describes intra-body occlusion.
    For toon hatching or paint-stroke stability that wants texture-space
-   evaluation, read [the image-pipeline note](../threejs-image-pipeline/references/production-image-pipeline.md#considered-alternative-texture-space--decoupled-shading); it is an exception path, not a default creature lighting cache.
+   evaluation, treat a decoupled texture-space cache as an exception with an
+   explicit UV, update, filtering, memory, and visible/shadow parity contract;
+   it is not a default creature lighting cache.
    Prove shadow parity: the shadow/depth path must consume the same deformed
    position function, verified by a silhouette-vs-shadow test, not assumed.
    Decode authored sRGB colors to linear before any uniform/storage upload.
 9. **Outline.** For repeated populations, one post-process ID/normal edge pass over the
    whole population. The per-creature iso-offset back-face hull is a hero-shot
    variant only — it re-runs the entire snap per vertex and doubles draws.
-10. **Locomotion when requested.** Reactive planted gait consumes an injected
+10. **Locomotion when requested.** Habitat selection, spawn placement, and
+    route choice consume an injected, versioned world-field query with declared
+    units, validity, and error; they never infer coast, substrate, slope, or
+    water depth from rendered color or read a GPU render target back to the
+    CPU. Reactive planted gait consumes an injected
     support-surface query returning contact point, normal, frame identity, and
     linear/angular surface velocity. Plant feet in that moving support frame;
     derive homes and swing arcs in its tangent plane, including slopes. Then
     use analytic 2-bone IK with a Gram-Schmidt bend hint;
     hopper state machine with volume-preserving squash
     (`sxz = 1/sqrt(squash)`); closed-form flight sampled from sim time;
-    fixed-step verlet ropes; buoyancy response against an injected
-    `getWaterSurface(x, z, timeSeconds)` provider. Open seas use
+    fixed-step verlet ropes; buoyancy response against an injected water-state
+    provider. Its surface-point velocity and material current are distinct
+    channels; a provider that exposes only height/normal declares the omitted
+    dynamics and the creature tier cannot silently invent them. An injected
+    open-sea adapter may wrap
     `threejs-spectral-ocean/examples/webgpu-fft-ocean/createCpuWaterHeightSampler()`;
-    bounded pools use
+    a bounded-water adapter may wrap
     `threejs-water-optics/examples/webgpu-bounded-water/createBoundedWaterHeightQuery()`
-    for the analytic component. The water provider carries the parity-error
-    obligation (`estimateTruncationError()` for spectral seas; zero analytic
-    error plus a declared StorageTexture residual for bounded water). Creature
-    locomotion treats the injected query as authoritative and never performs
-    GPU readback. Rope-verlet writes its segment slots after base squash staging,
+    for its analytic component. The raw spectral sampler supplies truncation
+    and per-sample inversion residuals; the provider adapter adds any measured
+    floating-point/GPU-probe discrepancy or marks it unavailable. The bounded
+    adapter reports analytic inversion/residual error plus either a proven
+    live-grid residual bound, a converged surrogate error, or `null`. Missing
+    error fields block locomotion tiers that require them. Creature locomotion
+    never hides those errors behind frame-critical GPU readback. Rope-verlet
+    writes its segment slots after base squash staging,
     after root-yaw target conversion, and after IK writes; the last stage
     touching a slot wins. Everything deterministic: seeded LCG + sim clock
     only — `Math.random`/`Date.now`/`performance.now` are banned in render
@@ -304,6 +316,11 @@ snapped shell remains diagnostic even after that closure.
   surface coordinates;
 - gait assumes a static horizontal plane instead of querying the moving/sloped
   support frame;
+- habitat or spawn logic samples rendered albedo/noise, transient terrain LOD,
+  or a frame-critical GPU readback instead of a versioned causal world query;
+- a swimmer treats wave phase/surface-height velocity as material current, or
+  consumes an unlabelled `velocity` channel whose frame and meaning are
+  undefined;
 - creature scale is multiplied into physical gravity while world units and
   seconds remain fixed;
 - shadows silently use a different position path than the visible deformed
@@ -327,7 +344,9 @@ snapped shell remains diagnostic even after that closure.
 
 Use `$threejs-procedural-motion-systems` for generic transform timelines,
 springs, staging, and rotating frames; this skill owns creature bodies, rigs,
-and creature locomotion. Use `$threejs-procedural-geometry` for general
+and creature locomotion. Terrain, planetary, and water skills own environment
+fields and their query error; this skill only consumes their support, habitat,
+and water-state interfaces. Use `$threejs-procedural-geometry` for general
 semantic mesh writers; this skill owns field-derived reference skins and its
 diagnostic shell. Use
 `$threejs-procedural-vegetation` for plants. Use `$threejs-visual-validation`

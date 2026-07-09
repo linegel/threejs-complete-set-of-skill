@@ -23,6 +23,7 @@ stability so that evidence for one claim cannot be substituted for another.
 - Color and output
 - Inspection controls
 - Mechanism-specific evidence
+- Coupled coastal archipelago
 - Determinism and temporal validation
 - Resource lifetime validation
 - Rejection and sign-off
@@ -694,6 +695,337 @@ normal, Fresnel, reflection, refraction, absorption/thickness, caustics when
 present, crest response, foam, simulation boundaries, and shared parameter
 ownership. Test grazing views, far-horizon minification, high-DPR output,
 resizes, disturbances, and sustained state.
+
+### Coupled coastal archipelago
+
+Apply this section when land generation, bathymetry, water, shoreline response,
+and procedural asset placement jointly create the result. The supplied
+isometric island references require this coupled profile. Read the
+[coastal archipelago system](../../threejs-water-optics/references/coastal-archipelago-system.md)
+for the algorithm and interface definitions; this section specifies the proof.
+
+#### Reference feature and ownership record
+
+Before implementation, decompose the reference family into falsifiable causes:
+
+```ts
+type CoastalEvidenceRecord = {
+  referenceImages: {
+    id: string
+    hash: string
+    cropAndScalePolicy: string
+    encoding: string
+  }[]
+  referenceFeatures: {
+    islandSilhouettes: string[]
+    terrainBands: string[]
+    waterDepthAndColorFeatures: string[]
+    shorelineAndFoamFeatures: string[]
+    assetAndEcologyFeatures: string[]
+    cameraProjectionAndCompositionFeatures: string[]
+    lightingPaletteFeatures: string[]
+    framingAndAtmosphereFeatures: string[]
+    deliberateDivergences: string[]
+  }
+  fieldContract: {
+    coordinateFrame: string
+    units: string
+    coastLevel: NumericDatum
+    meanWaterLevel: NumericDatum
+    landFieldHash: string
+    elevationFieldHash: string
+    bathymetryFieldHash: string
+    coastFrameDefinition: string
+    terrainRegionDefinition: string
+  }
+  waterBranch: {
+    algorithmId: 'analytic-phase' | 'linear-heightfield' | 'spectral-open-water' | 'depth-averaged-flow' | 'hybrid'
+    linearVariant?: 'constant-speed-height-grid' | 'fixed-wet-linear-shallow-water'
+    coastalTransformId: 'none' | 'coast-sdf-eikonal' | 'wave-action' | 'mild-slope'
+    claimedInvariants: string[]
+    openWaterOwner: string
+    nearshoreOwner: string
+    boundaryPolicy: string
+    handoffPolicy: string
+    simulationExtent: string
+    simulationCadence: NumericDatum
+    presentationInterpolation: string
+    resetConditions: string[]
+  }
+  assetContract: {
+    supportOwner: string
+    supportAndExclusionFields: string[]
+    stableIdPolicy: string
+    placementDistributionTruth: string
+    rejectedPlacementAccounting: string
+  }
+  qualityState: 'Full' | 'Budgeted' | 'Minimum viable'
+}
+```
+
+The land signed-distance/elevation graph owns the mean coastline and seabed.
+Geometry, materials, water boundaries, foam sources, and asset constraints
+reference that graph or an explicitly versioned derivative. Independently
+painted masks may be accepted only when their registration transform,
+resampling policy, provenance, and measured error are recorded. “Looks aligned”
+at one camera is not an ownership proof.
+
+Record terrain semantic groups for grass cap, terraces, cliffs, beach, wet
+band, submerged shelf, seabed, and reef where present. Record stable island,
+terrain-region, water-regime, vegetation, prop, and landmark IDs. Imported
+landmark meshes remain asset inputs; the procedural grammar owns their anchor,
+orientation, footprint support, clearance, and exclusion—not their authored
+vertices.
+
+#### Fixed-view contract
+
+Use immutable matrices and the unjittered projection for geometric error:
+
+| Bookmark | Must expose | Failure-sensitive diagnostics |
+| --- | --- | --- |
+| `archipelago-overview` | island distribution, negative-water channels, deep/shallow composition, far-water minification | island IDs, bathymetry bands, open/nearshore regime, far normal/foam aliasing |
+| `island-design` | complete silhouette, terrace/beach hierarchy, reef, vegetation and landmark composition | coast field, semantic terrain groups, material IDs, support/exclusion occupancy |
+| `coast-near` | waterline, cliff/beach join, wet band, stones, shore foam and refraction | predicted instantaneous waterline, rendered boundary, thickness, foam source/history, opaque depth |
+| `grazing-water` | Fresnel, normal filtering, reflection/refraction ordering, horizon or far-field stability | resolved normal footprint, regime seam, optical thickness, minification and temporal residual |
+
+Add underwater and water-crossing bookmarks only when those views are claimed.
+At every applicable bookmark capture final, no-post, water contribution,
+semantic terrain, controlling fields, boundary diagnostics, and the active
+history state under the same color/output transform.
+
+For supplied-reference matching, record the projection family, exact matrix,
+view direction, crop, subject occupancy, island/landmark screen anchors, and
+semantic-region masks. Gate silhouette/landmark boundary and anchor residuals
+without free manual image warping. Compare scene-linear luminance/material
+response before presentation and output-referred perceptual color after the
+same transform, stratified by grass, dry/wet rock, sand, shallow/deep water,
+foam, vegetation, and landmark regions. A global palette score may not let the
+ocean background hide a failed island or foam region.
+
+#### Land-water registration metrics
+
+Measure both the source contract and the rendered consequence:
+
+- Sample the authored coast level set in world space and compare it with the
+  corresponding mean-water intersection of compiled terrain. Store symmetric
+  boundary-distance distributions, component/hole disagreement, and worst
+  island. The coast iso value and all thresholds are frozen `Gated` or authored
+  inputs; the errors are `Measured`.
+- For animated water, compute the predicted instantaneous waterline from the
+  terrain surface and the same water state used for displacement. Project that
+  line with the exact unjittered camera and compare it with a diagnostic raster
+  of the rendered land-water boundary in physical pixels. Do not compare a
+  moving waterline with only the mean coast contour.
+- Within a predeclared coastal mask, classify dry land, submerged land, visible
+  water, gap/background, and invalid overlap. Report confusion area, connected
+  leak components, and worst-case boundary distance. Exclude true occluders
+  with a separately captured depth/ID mask; never hand-edit the error mask.
+- Across terrain chunks and LODs, measure positional seam residual, normal-angle
+  residual, material-region mismatch, and coast-level mismatch under a frozen
+  camera trajectory and forced transition sweep.
+
+For bathymetry, define water depth from the selected surface state and seabed
+in one coordinate frame. Capture raw seabed elevation, depth, regime ID,
+optical thickness, absorption/transmittance, and output color. Gate field
+continuity at chunk/regime boundaries, depth-order monotonicity under the fixed
+optical model, and raw clearance `c=eta-z_b` classification:
+`c>epsilon_h` is wet and `c<-epsilon_h` is dry outside the frozen wet/dry
+hysteresis and uncertainty band. Also report disagreement between
+visible shallow/deep bands and the depth field. Color similarity alone cannot
+prove bathymetry.
+
+#### Water-branch numerical evidence
+
+Apply only the row corresponding to the declared branch; do not impose a
+conservation law on a perceptual analytic surface or excuse a physical claim
+from its numerical invariants.
+
+| Branch | Required native-domain evidence | Blocking numerical failure |
+| --- | --- | --- |
+| analytic phase bands | coast-SDF/eikonal residual, phase-speed and crest-spacing error, displacement-normal agreement, footprint filtering, deterministic time | unrelated normal noise, medial-axis direction failure, far-field aliasing above its gate, frame-rate-dependent phase |
+| bounded linear heightfield | explicit constant-speed-grid or fixed-wet elevation/discharge variant; update-equation residual against analytic modes, boundary response, stability, reset, and the variant's energy/volume behavior | variant ambiguity, non-finite state, unstable growth, unexplained boundary energy/volume, reset mismatch, hydrodynamic claim from the constant-speed grid |
+| spectral open water | offshore-donor-only declaration, target versus realized spectrum, cascade support/disjointness, inverse-transform tests, derivative agreement, repeat/tiling diagnostics | energy outside declared bands, transform/derivative error, periodic pattern visible above its gate, FFT clipped around land and called coastal propagation |
+| depth-averaged flow | well-balanced positivity-preserving Saint-Venant finite-volume contract; non-negative wet depth, lake-at-rest balance, mass versus boundary/source flux, wet/dry-front location, Courant record, and boundary residual | negative depth outside tolerance, non-finite state, lake-at-rest waves, unbounded conservation drift, shoreline leak, unstable wet/dry chatter |
+| hybrid | donor, coast-phase/wave-action/mild-slope transform, and optional sparse active-tile evidence; height, slope/normal, energy/statistics, foam-source, and temporal residual across every handoff | visible seam, double-counted energy, phase jump, divergent clocks, two geometric owners, transform stage hidden inside an FFT or shallow-water label |
+
+Store the residual field and its distribution, not only a pass flag. If a
+solver step is decoupled from presentation, record step timestamps, executions
+per presented frame, interpolation state, dropped/capped steps, and the effect
+of a presentation-rate sweep. A lower update cadence passes only if both the
+native numerical gate and the rendered temporal-error gate pass.
+
+For a `hybrid`, validate the declared coastal transform independently:
+
+| Coastal transform | Required evidence | Claim boundary |
+| --- | --- | --- |
+| coast-SDF/eikonal phase | coast-distance and eikonal residual, travel-time/crest-speed error, coast-ID/medial-axis ambiguity, footprint-filtered crest width | prescribed phase only; no diffraction, reflection, mass, momentum, or wave-action conservation claim |
+| wave action/rays | finite-depth dispersion and group velocity by band, phase curl/loop closure, refraction against analytic cases, incident/outgoing/dissipated/clipped action balance, ray-density/caustic regularization | no diffraction or standing interference unless another wave solver owns it |
+| mild slope | manufactured/analytic convergence, radiation-boundary residual, phase/amplitude, reflection and diffraction/interference error over the accepted fixed bathymetry | no breaking, nonlinear run-up, moving bathymetry, or wet/dry conservation claim |
+
+For an offshore-to-coastal hybrid, validate the transfer representation rather
+than only its blended image:
+
+- A phase-resolved boundary stores frequency, physical wavevector, complex
+  phase/amplitude, depth/current/time origin, and finite-depth dispersion. Gate
+  the elevation-to-wave-discharge relation and prescribe only the incoming
+  characteristic; measure reflected outgoing energy instead of overwriting it.
+- A phase-averaged boundary converts surface-elevation variance to physical wave
+  energy, transports action `N = E / omega_intrinsic` under the declared current,
+  and reports incident, outgoing, dissipated, and clipped action/energy by band.
+- The same coherent mode has one full-amplitude owner. If a render-only overlap
+  is unavoidable, coherent amplitude weights sum to unity as a `Gated`
+  invariant, and position, velocity, and tangents include spatial weight-
+  derivative terms. Square-root power windows are eligible only for disjoint or
+  measured zero-covariance bands.
+- Breaking/whitecap dissipation has one ledger owner and maps once into one foam
+  source/history. Two independently blended foam histories fail ownership even
+  when their final opacity looks continuous.
+
+#### Foam, wet line, and obstruction evidence
+
+Separate foam generation, transport/history, and shading. Capture source
+probability or impulse, coast/breaker/obstacle masks, current or transport
+field, previous history, next history, age/decay, and final opacity. Evaluate:
+
+- source precision/recall against the declared coast-distance, breaker, impact,
+  wake, or obstruction rule using thresholds frozen before inspection;
+- foam occupancy on dry land, across excluded geometry, or outside the maximum
+  admissible source/transport envelope;
+- source-to-visible response latency, advection residual along the declared
+  transport field, decay-law residual, detached-component lifetime, temporal
+  flicker energy, and reset residue;
+- continuity and width distributions along shoreline arcs in world space and
+  physical pixels, stratified by beach, cliff, rock, dock, and open-water
+  segments rather than averaged across the whole image;
+- wet-line distance and hysteresis relative to the instantaneous/mean waterline,
+  with tide or run-up ownership declared when present.
+
+Decorrelated screen-space noise does not pass as shore foam. A static coast
+ribbon may be valid for `Minimum viable` perceptual output, but it must be
+declared static, remain registered through camera/LOD changes, and must not be
+described as simulated transport or breaking.
+
+#### Asset and ecology evidence
+
+For every generated or placed asset, record stable ID, grammar/species, island
+and chunk owner, support sample, support normal, footprint samples, coast
+distance, slope, exposure/moisture/salt inputs where used, exclusion results,
+orientation frame, scale/variant, LOD, and rejection reason. Validate:
+
+- support penetration and floating distance over the whole footprint, not only
+  the pivot;
+- normal/up alignment, slope and coast-distance gates, footprint clearance,
+  dock/water access direction, and landmark exclusion zones;
+- empirical placement distributions against the authored conditional density,
+  including empty islands and overcrowded stress seeds;
+- stable-ID and deterministic-seed correspondence across rebuild, chunk order,
+  culling, LOD transition, and quality changes;
+- retained landmark composition and readable population hierarchy at every
+  accepted quality state.
+
+Capture both accepted and rejected candidates. Silently discarding failed
+placements biases the distribution and hides impossible grammar constraints.
+
+#### Seed, trajectory, and quality matrix
+
+Choose representative and stress seeds before candidate inspection. The seed
+set must cover coastline complexity, narrow channels, tiny islands, steep
+cliffs, broad beaches, dense/sparse asset populations, near-touching exclusion
+regions, and the selected water branch's boundary stress. Report the selection
+rule and population statistics; do not replace a failed seed after viewing it.
+
+Run deterministic trajectories for reset/still water, steady forcing, stronger
+forcing, local disturbance, camera motion, LOD crossing, resize/DPR,
+`Full`/`Budgeted`/`Minimum viable` transitions, and sustained evolution as
+applicable. Validate state immediately before, during, and after each change.
+Tier transitions update simulation extents, texel metrics, interpolation,
+history allocation/reset, coastline transforms, and diagnostic metadata as one
+transaction.
+
+Every quality state preserves island/coast identity, terrain-region ordering,
+bathymetric depth order, displacement-normal agreement, foam cause, landmark
+support, deterministic IDs, and output-transform ownership. Allowed reductions
+must name their visible consequence and pass the associated frozen error gate.
+Do not assume `Full` for desktop or `Minimum viable` for mobile; measure each
+eligible state on each named physical target.
+
+#### Coastal work, memory, and bandwidth ledger
+
+Separate generation, simulation, and presentation scopes:
+
+```text
+field/mesh/scatter regeneration: invocation cause, CPU/GPU time, uploads, output bytes
+water step: algorithm branch, active extent, state layout, dispatches, reads/writes, step timestamp
+foam step: source/transport/decay layout, history ping-pong, update cadence
+opaque scene: visible chunks/assets, draw and backend multi-draw entries, attachments
+water composite: opaque color/depth inputs, water targets, load/store/resolve, overdraw
+presentation: tone map, output transform, upsample when present
+```
+
+Derive state and traffic records from labelled inputs:
+
+```text
+state bytes [Derived]
+  = sum over resources(active elements * bytes per element * simultaneously live slots)
+
+step traffic lower bound [Derived]
+  = sum over resources(active elements * compulsory accesses per element * bytes per access)
+
+presented-frame simulation traffic [Derived]
+  = sum over update keys(step traffic * measured executions per presented frame)
+```
+
+Inventory bathymetry/coast fields, water state, spectral intermediates when
+selected, foam histories, caustic fields, opaque scene color/depth copies,
+water targets, asset instance data, terrain/asset geometry, staging, and
+readback. Record active versus allocated extents, dirty/update regions, pass
+breaks, attachment stores/resolves, transient overlap, upload churn, and
+quality-transition allocation spikes.
+
+For each named physical desktop-discrete, integrated, and low-power/mobile
+target, record viewport, DPR, actual refresh, frozen presentation rate, cold
+and sustained CPU/GPU/presentation distributions, simulation and foam cadence,
+deadline misses, settled quality state, logical live bytes, peak transients,
+traffic model, and quality drift. Device-class labels imply no universal
+millisecond, grid, memory, or bandwidth budget. A GPU-performance verdict
+without required timestamp coverage is `INSUFFICIENT_EVIDENCE_GPU_TIMING`.
+
+#### Bundle additions and rejection gates
+
+Add these artifacts under the normal evidence-bundle path when applicable:
+
+```text
+coastal-fields.json
+coastal-water-branch.json
+coastal-alignment-errors.json
+coastal-asset-inventory.json
+asset-placement-evidence.json
+images/reference.camera-and-anchors.png
+images/reference.semantic-region-color-error.png
+images/coast.field.png
+images/coast.predicted-waterline.png
+images/coast.rendered-boundary.png
+images/coast.alignment-error.png
+images/bathymetry.depth.png
+images/bathymetry.optical-thickness.png
+images/water.regime-and-boundary.png
+images/foam.source.png
+images/foam.history.png
+images/foam.leakage-and-temporal-error.png
+images/assets.support-and-exclusion.png
+images/quality.full.png
+images/quality.budgeted.png
+images/quality.minimum-viable.png
+```
+
+Reject or narrow the coastal claim on any required field/owner mismatch;
+visible gap, overlap, coast swimming, or LOD crack; bathymetry/optics
+contradiction; foam detached from its declared source; refracted geometry
+crossing an opaque occluder; non-finite/invalid water state or normal; failed
+branch-specific invariant; unbounded history; unstable reset; floating/buried
+landmark; forbidden vegetation support; seed instability; quality transition
+outside a visual gate; omitted active-state/traffic resource; or insufficient
+timing evidence for the performance claim.
 
 ### Terrain, planetary bodies, and atmosphere
 

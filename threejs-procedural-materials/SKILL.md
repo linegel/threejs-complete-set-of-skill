@@ -1,6 +1,6 @@
 ---
 name: threejs-procedural-materials
-description: Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.
+description: Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for coupled terrain/coast/seabed response bundles, grass, rock, dry/wet sand and reef identities, NodeMaterial PBR fields, atlas and triplanar filtering, footprint filtering, specular AA, terrain wetness, stylized palette/facet policies, emissive or raymarched fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.
 ---
 
 # Procedural Materials
@@ -94,6 +94,62 @@ Use the sibling examples as domain sources, not implementation recipes:
   tone mapping, output conversion, and node post ownership.
 - `$threejs-scalable-real-time-shadows` when material displacement, alpha, or projected
   environmental occlusion must remain shadow-consistent.
+
+## Coupled Terrain, Coast, And Seabed Contract
+
+For generated islands, coasts, riverbanks, reefs, or exposed terrain, consume
+one versioned field contract from `$threejs-procedural-fields`. Do not recreate
+coast, slope, moisture, or substrate noise inside each material. At minimum,
+the contract declares units, sign conventions, coordinate frame, generation
+revision, filtering policy, and update cadence for:
+
+```text
+signed coast distance and nearest-coast tangent/normal
+terrain/seabed elevation, water-rest elevation, and water-column depth
+geometric slope, curvature/cavity, drainage/moisture, and exposure
+substrate/material identity and terrace/cliff/beach semantic masks
+salt/spray exposure, run-up or inundation envelope, and persistent wetness
+reef/rock/sand/organic-cover eligibility and authored exclusion masks
+```
+
+`water-column depth` is **Derived** from compatible elevations; it is not a
+second painted shallow-water mask. Water owns dynamic free-surface, foam, and
+optical transport. This skill owns the dry/wet terrain and submerged substrate
+responses that those optics reveal. A white shoreline stripe painted into
+terrain albedo is not foam, and cyan seabed emission is not shallow-water
+transport.
+
+Build normalized identity weights for grass/organic cover, dry rock or cliff,
+dry sand, wet sand or waterline substrate, submerged sand, reef/rock, and any
+project-specific identity. Preserve hard semantic exclusions separately, then
+filter only the visible transition width from the projected footprint. Every
+identity is a response bundle:
+
+```text
+linear base reflectance + roughness-alpha + metalness endpoint
+resolved height/normal spectrum + removed-slope variance
+porosity/absorption or wet-film approximation
+macro color variation + microstructure scale
+material-slot/semantic ID + diagnostic color
+```
+
+Blend `alpha = roughness^2`, not unrelated roughness scalars. Filter the same
+weights into color, roughness, height/normal, AO/cavity, and wetness; otherwise
+the grass edge, cliff normal, and sand response detach under motion. Terrain
+geometry owns silhouettes and intentionally faceted normals. Material normals
+add only footprint-valid detail and must not smooth away authored cliff facets.
+
+Stylization is an authored identity transform, not license to violate material
+causality. Quantize a controlled palette, macro-value families, roughness
+families, and geometric facet normals before lighting while retaining
+scene-linear PBR and one output transform. Do not bake light-facing highlights,
+ambient occlusion, foam, or turquoise water into terrain base color. Under
+shallow water, seabed color and roughness remain substrate properties; the
+water owner supplies depth-dependent attenuation, refraction, surface Fresnel,
+caustics, and foam.
+
+The detailed response, filtering, and asset-channel contract is in
+[references/procedural-pbr-system.md](references/procedural-pbr-system.md).
 
 ## Capability Gate And Tiers
 
@@ -256,6 +312,10 @@ and update cadence agree.
 - roughness range, micro-normal strength, specular-variance mapping calibration,
   and clamp;
 - causal fields for wetness, burn, erosion, lava exposure, climate, or dissolve;
+- terrain/coast input revision, coast-distance sign, water-rest elevation,
+  substrate IDs, wet-line/run-up envelope, and missing-data behavior;
+- per-identity grass, cliff, dry/wet sand, submerged substrate, and reef
+  response bundles plus palette family and facet-normal policy;
 - texture-array/atlas tile index, mip gutter status, anisotropy tier, and
   triplanar or hex-tiling cost mode;
 - static-map device transcode format, mip bytes, and per-channel compression
@@ -284,6 +344,11 @@ and update cadence agree.
   attributes or storage-backed attributes.
 - broad fractional metalness is used for tarnish, dirt, or coating instead of
   separate conductor/dielectric identities;
+- shallow-water color is faked with emissive/cyan terrain, foam is baked into
+  shore albedo, or material-local noise produces a second coastline;
+- terrain identity transitions disagree across color, roughness, normals,
+  semantic IDs, and wetness, or authored cliff facets are erased by material
+  normal blending;
 
 ## Routing Boundary
 
