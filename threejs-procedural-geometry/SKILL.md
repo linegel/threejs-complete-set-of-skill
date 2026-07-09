@@ -1,6 +1,6 @@
 ---
 name: threejs-procedural-geometry
-description: Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.
+description: Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.
 ---
 
 # Procedural Geometry
@@ -31,26 +31,27 @@ mesh-writer mechanisms inside those subject skills.
   `renderer.compute()` / `renderer.computeAsync()`, with `StorageBufferAttribute`,
   `StorageInstancedBufferAttribute`, `storage()` nodes, and indirect draw buffers
   where culling or compaction is compute-owned.
-- Color: color textures use `SRGBColorSpace`; geometry data, normals, masks,
+- Color: LDR color assets encoded as sRGB use `SRGBColorSpace`; HDR/EXR
+  radiance remains loader-declared linear. Geometry data, normals, masks,
   LUTs, and procedural lookup textures use `NoColorSpace`/linear. Keep HDR
   buffers as `HalfFloatType` until the single tone-map and output conversion
   owner in the node pipeline via `outputColorTransform` or `renderOutput()`.
 
+After initialization, use `renderer.compute()` for ordinary submission. r185
+`computeAsync()` only initializes on demand before enqueueing and is not a
+GPU-completion fence.
+
 ## Capability Gate
 
-Use one renderer path and degrade quality, not implementation model:
+Use one native renderer path and degrade geometry quality, not backend:
 
 ```js
 await renderer.init();
 
-const tier = renderer.backend.isWebGPUBackend ? "gpu-storage" : "static-lod";
-
-if (tier === "gpu-storage") {
-  // Full tier: compute-generated dynamic attributes, storage buffers,
-  // indirect draw compaction, and full mesh validation overlays.
-} else {
-  // Reduced tier: precomputed meshes, smaller grids, static LODs, and fewer
-  // material diagnostics. No alternate low-level renderer recipe.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical procedural-geometry path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
@@ -67,7 +68,7 @@ after edits.
 | world space | Three.js Y-up scene | app/camera owns view convention |
 | rail-local | rail orientation | top/bottom/left/right map `s` along rail and profile width outward |
 | profile-local | sculpted profile | `t` travels inner-to-outer, profile arc length owns production V |
-| production UV | material sampler | real-distance `s` and profile arc length times texels/world unit |
+| production UV | material sampler | store physical distance or repeats: `u=distance/metersPerRepeat=distance*texelsPerWorld/textureAxisTexels`; never pass raw texel coordinates as normalized UV |
 | debug `(s,t)` | diagnostics only | stored in `debugUv`, never production material UV |
 | winding | writer | outward quads use `a, b, c / b, d, c` |
 | writer input | generator module | semantic dimensions, material slot, smoothing group, UV chart, boundary reason |
@@ -81,7 +82,10 @@ after edits.
    attributes, and storage/indirect buffers only when visibility or deformation
    is hot enough to justify GPU-side generation.
 2. Define semantic dimensions, named regions, material slots, smoothing groups,
-   UV charts, and LOD tiers before allocating buffers.
+   UV charts, and LOD tiers before allocating buffers. Each LOD declares a
+   projected geometric-error threshold using the
+   [shared physical-pixel contract](../threejs-choose-skills/references/projected-error-contract.md);
+   triangle-count ratios alone do not bound silhouette or shading error.
 3. Precompute exact vertex/index capacity per tier; allocate typed arrays once;
    select `Uint16Array` indices only when every referenced vertex fits, otherwise
    use `Uint32Array`.
@@ -92,40 +96,63 @@ after edits.
    normals or tangents.
 6. Generate UVs from real distance for production materials. Reserve normalized
    `(s,t)` coordinates for local debug views or analytic node masks.
-7. Prefer analytic normals and tangents from the generator. Use
+7. Sweep curves with a rotation-minimizing parallel-transport frame: project an
+   authored initial normal off the first tangent, apply the minimal tangent-to-
+   tangent rotation with an explicit antiparallel fallback, re-orthonormalize,
+   and apply authored twist separately. Closed loops distribute residual
+   holonomy by arc length. Frenet frames are invalid at zero curvature and
+   inflections.
+8. Prefer analytic normals and tangents from the generator. Use
    `computeVertexNormals()` only for intentionally smooth shared-vertex regions;
-   use `BufferGeometryUtils.computeMikkTSpaceTangents()` for normal-mapped
-   surfaces and validate mirrored seams.
-8. Assign `BufferGeometry` groups exactly: every index belongs to one group, no
+   for Mikk parity, await `MikkTSpace.ready` and call
+   `computeMikkTSpaceTangents(geometry,MikkTSpace,negateSign)`. r185 de-indexes
+   indexed input, so treat it as a separate representation and recompute
+   counts/groups/bounds/bytes; prefer analytic tangents when valid.
+9. Assign `BufferGeometry` groups exactly: every index belongs to one group, no
    group overlaps, and material index order is stable across LODs.
-9. Set attribute usage before first render. Static meshes can release CPU arrays
+10. Set attribute usage before first render. Static meshes can release CPU arrays
    with `onUpload()` when no rebuild is needed; dynamic sections use
    `addUpdateRange()`, `needsUpdate`, and targeted bounds recomputation.
-10. Validate finite attributes, index bounds, degenerate triangles, winding,
+11. Validate finite attributes, index bounds, degenerate triangles, winding,
     normal length, tangent handedness, UV density, bounding box/sphere, group
     coverage, byte cost, draw calls, and renderer stats.
+12. For large sets, partition by the smallest useful culling/streaming unit.
+    Compare CPU chunk submission, `BatchedMesh`, and compute-filled indirect
+    visibility using submitted-work measurements. A shader mask that still
+    executes every hidden vertex is not culling.
 
 Read [references/profile-sweeps-and-mesh-writers.md](references/profile-sweeps-and-mesh-writers.md)
 for the profile sweep, rail emission, branch-ring, semantic writer, batching
 decision table, quality tiers, and validation budgets.
 
-## Performance Budgets
+## Performance Contract
 
-- Static hero profile: <= 35k vertices, <= 70k triangles, <= 6 material groups,
-  one mesh draw per material group, no per-frame allocation, rebuild only when
-  dimensions change.
-- Repeated unique modules: `BatchedMesh` per material, one draw per material
-  batch, reserve vertex/index capacity up front, keep per-object culling enabled
-  unless a measured scene proves otherwise.
-- Repeated identical topology: `InstancedMesh` with instance attributes; move hot
-  transforms/colors into `StorageInstancedBufferAttribute` when compute updates
-  replace CPU uploads.
+- Static profile: record `V`, `T`, index width, attribute stride, material
+  groups, projected geometric error, and compile bytes/time. It performs no
+  per-frame allocation or mutation and rebuilds only when geometry inputs
+  change.
+- Repeated unique modules: `BatchedMesh` can reduce scene objects/state churn
+  while preserving per-object culling/replacement, but r185 WebGPU emits one
+  backend draw item per visible multi-draw entry. Measure `renderer.info` and
+  GPU submission; merge static compatible geometry when draw collapse is the
+  actual requirement.
+- Repeated identical topology with CPU-owned matrices: `InstancedMesh` and its
+  `instanceMatrix`. When storage owns the complete transform, use a matrix-free
+  `Mesh` with `InstancedBufferGeometry` plus storage-backed position/quaternion/
+  scale (or required affine state); otherwise r185 still allocates/applies the
+  redundant **[Derived]** 64-byte `mat4<f32>` `instanceMatrix`.
 - Dynamic edits: update only changed component ranges; target zero full-buffer
   uploads during interaction and zero geometry object churn per frame.
-- Frame targets for geometry work: <= 0.25 ms CPU update on desktop discrete,
-  <= 0.75 ms desktop integrated, <= 1.5 ms mobile for routine edits; rebuilds
-  may exceed this only on explicit user actions and must report vertex/index
-  counts, bytes, group count, draw calls, and update ranges.
+- Dynamic updates report changed ranges and bytes, CPU encode/submission
+  p50/p95, GPU consumption p50/p95, and allocation count. Rebuilds are a
+  separate cold/interaction class and must report vertices, indices, groups,
+  peak transient bytes, and time to first correct frame.
+
+The scene router allocates the actual ceiling. Accept with target-device
+whole-frame and paired-marginal p50/p95, update/submission timing, peak upload
+bytes, and sustained behavior. Static scenes have no per-frame geometry
+mutation. Choose tessellation from projected error; no universal triangle cap
+separates mobile from desktop.
 
 ## Failure Conditions
 
@@ -137,7 +164,8 @@ decision table, quality tiers, and validation budgets.
   material boundaries;
 - generated dimensions are hidden in magic multipliers;
 - `InstancedMesh` is used despite per-instance topology differences;
-- `BatchedMesh` is skipped for many same-material unique geometries;
+- `BatchedMesh` is claimed to collapse r185 WebGPU GPU draws without inspecting
+  visible multi-draw entries/backend commands;
 - attribute `usage` is changed after upload instead of rebuilding the attribute;
 - dynamic geometry uploads whole buffers when only subranges changed;
 - triangle count is the only reported complexity metric.

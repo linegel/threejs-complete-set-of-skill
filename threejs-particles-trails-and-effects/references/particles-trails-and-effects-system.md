@@ -1,7 +1,7 @@
 # Layered Particle, Trail, and Effect Systems
 
-Use this reference for ship-conforming reentry plasma, generated capsule wakes,
-compute-updated analytic sparks, dissolving debris, dense-swap pools, and
+Use this reference for flow-conforming reentry plasma, generated capsule wakes,
+analytic or compute-updated sparks, dissolving debris, GPU pools, and
 scene-relative HDR contribution in the WebGPU/TSL path.
 
 ## Contents
@@ -24,20 +24,22 @@ scene-relative HDR contribution in the WebGPU/TSL path.
 
 ## System Shape
 
-The highest-throughput real-time effect architecture is not a set of independent emitters.
-It is a fixed-capacity, GPU-resident effect graph:
+For recurrent high-count state that passes the CPU/upload crossover, use a
+fixed-capacity, GPU-resident effect graph rather than independent emitters:
 
 ```text
 event packet buffer
-  -> seeded spawn compute
-  -> hot state storage attributes
-  -> expire + dense-swap compaction
+  -> seeded spawn compute or immutable analytic spawn records
+  -> hot state storage only for genuinely evolving state
+  -> stable alive slots or mark/scan/scatter compaction
   -> dense InstancedMesh or sprite draw
-  -> MRT output/emissive
-  -> RenderPipeline selective bloom
+  -> scene-linear HDR beauty
+  -> full-scene bloom by default, or a proven selective MRT contribution
 ```
 
-Each visual class owns one pool and one draw path:
+Each compatible visual class owns fixed-capacity spatial pages and a bounded
+draw path; a single global pool is allowed only when its conservative bounds
+and submitted invisible work pass:
 
 | Class | Representation | Dynamic state |
 | --- | --- | --- |
@@ -58,27 +60,34 @@ Initialize the renderer before allocating backend-dependent resources:
 ```js
 await renderer.init();
 
-const effectTier = renderer.backend.isWebGPUBackend ? "ultra" : "compat";
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical particle/effect path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
+}
 ```
 
-The `compat` tier uses lower caps and reduced static LOD layers. It does not
-introduce a second renderer recipe; explicit WebGPU-unavailable teaching routes
-to `../threejs-compatibility-fallbacks/`.
+All tiers below are native WebGPU workloads. Explicit WebGPU-unavailable
+teaching routes to `../threejs-compatibility-fallbacks/`.
 
-Recommended tier cuts:
+Quality tiers change representation under a visual-error contract:
 
-| Tier | Live particles | Shell/wake detail | Procedural field cost |
-| --- | ---: | --- | --- |
-| `ultra` | 64k-256k | 3-5 transparent layers, 2-3 wake families | 3 octaves, temporal post allowed |
-| `high` | 24k-64k | 2-4 layers, 1-2 wake families | 2 octaves |
-| `medium` | 8k-24k | 1-2 layers, 1 wake family | 1-2 octaves |
-| `compat` | 1k-8k | reduced static LOD layers | no per-frame procedural field updates |
+| Tier | State | Shell/wake detail | Field/post policy |
+| --- | --- | --- | --- |
+| `full` | analytic or recurrent as required by the effect | all visible mechanism layers | retain field bands below pixel Nyquist; post only when its signal is authored |
+| `balanced` | same dynamics with bounded active windows/cadence | merge layers whose isolated removal stays below the image-error gate | lower field/history extent after temporal and silhouette tests |
+| `budgeted` | prefer analytic state and stable slots | one primary shell/wake mechanism plus necessary transients | omit optional recurrent fields/post |
+| `minimum` | immutable/analytic where possible | primary silhouette/emission cue only | no optional per-frame field update |
+
+Live count, layers, octaves, and resolution are workload outputs. Store them as
+Authored trial values until target-context measurement and the complete visual
+contract promote them; never infer a device tier from those counts.
 
 ## Exact r185 Import Table
 
 | Need | Import |
 | --- | --- |
-| Renderer and pipeline | `WebGPURenderer`, `RenderPipeline`, `StorageInstancedBufferAttribute` from `three/webgpu` |
+| Renderer and pipeline | `WebGPURenderer`, `RenderPipeline`, `StorageInstancedBufferAttribute`, `IndirectStorageBufferAttribute` from `three/webgpu` |
 | TSL compute/storage | `Fn`, `storage`, `instancedArray`, `pass`, `mrt`, `renderOutput`, `workgroupBarrier`, `atomicAdd`, `atomicSub`, `atomicMax`, `atomicMin` from `three/tsl` |
 | Bloom | `bloom` from `three/addons/tsl/display/BloomNode.js` |
 | Temporal AA | `traa` from `three/addons/tsl/display/TRAANode.js` |
@@ -91,35 +100,48 @@ Recommended tier cuts:
 | Space | Owner | Convention |
 | --- | --- | --- |
 | local hull | source mesh | hull samples, normals, and UV shell coordinates before world transform |
-| world flow | event packet | normalized `flowDirectionWorld`, Y-up scene, gravity in meters per second squared |
+| world flow | event packet | normalized downstream fluid-relative-to-body direction `flowDirectionWorld = normalize(vFluidWorld - vBodyWorld)`; a body moving through still fluid therefore supplies one negation; convert physical acceleration with `sceneUnitsPerMeter`, or declare authored world-length-units/s² |
 | event frame | effect pool | wake forward from world flow, projected up, right-handed basis |
 | camera-facing sprite frame | renderer | camera -Z forward, sprite axes derived after world position |
 | UV shell | shell material | `u` around hull or capsule, `v` normalized head-to-tail age |
 | depth texture | image pipeline | non-color depth texture in camera clip/depth space with depth-to-meters conversion owned by the shared pipeline |
-| scene-linear HDR | material output | beauty and MRT `emissive` remain linear until the one tone-map/output owner |
+| scene-linear HDR | material output | beauty and any explicitly selected MRT `emissive` contribution remain linear until the one tone-map/output owner |
 
-## Storage Pool Contract
+## State And Compaction Contract
 
-Allocate once:
+Do not allocate writable hot state for an analytic trajectory. If position,
+rotation, size, and color are pure functions of immutable spawn data and time,
+evaluate them in vertex TSL; this removes integration dispatches and hot-buffer
+writes. Use recurrent compute state only for collisions, stochastic forcing,
+constraints, or feedback.
+
+For recurrent state, allocate only the lanes read by that visual/solver class.
+There is no universal superset:
 
 ```text
-startPosition: vec4  // xyz + spawn time
-velocity: vec4       // xyz + decay
-accelAge: vec4       // xyz acceleration + normalized age
-render0: vec4        // radius, brightness, seed, flags
-transform: mat4      // debris or shell instances only
-entityToIndex: uint storage buffer
-indexToEntity: uint storage buffer
-liveCount: atomic uint
-freeCursor: atomic uint
+common immutable spawn: startPosition+spawnTime, seed, class parameters
+analytic sprite: no writable motion state
+recurrent sprite: position+age, velocity, only required force/appearance lanes
+rigid debris: position, normalized quaternion, scale, velocity/angular velocity
+affine/sheared instance: mat4 only when the consumer truly needs general affine state
+identity maps: only when stable external identity must survive compaction
+occupancy/free-list/scan state: only for the selected allocation/compaction policy
 ```
 
+Synthesize rigid transforms from position/quaternion/scale in the vertex path.
+A hot `mat4<f32>` costs **Derived** 64 payload bytes per instance before other state and is not a
+default for sparks or ordinary rigid debris.
+
 Spawn packets contain event transform, flow vector, seed range, count, emission
-scale, and visual class. The spawn compute node expands packets into free slots,
-using deterministic integer hashing from the event seed. Regression captures
+scale, and visual class. Deterministic spawning uses ordered packet-count prefix
+sums to assign ranges and a declared overflow policy. A free cursor alone cannot
+reclaim arbitrary stable holes; use a deterministic free-list/bitset protocol,
+append after dense compaction, or explicitly accept scheduling-dependent slot
+identity outside regression paths. The spawn node uses specified integer
+hashing from the event seed. Regression captures
 must record seed, elapsed time, camera, exposure, quality tier, and backend.
 
-Dense-swap invariant:
+Serialized dense-swap invariant:
 
 ```text
 remove dead index i
@@ -130,38 +152,71 @@ update entityToIndex[movedEntity] = i
 liveCount--
 ```
 
-For many expirations in one frame, batch removals in compute and preserve the
-same invariant for every swapped slot. Never update only a draw count while
-leaving custom state behind; that attaches stale age, color, or dissolve data
-to the moved instance.
+Do not run that pseudocode independently for many expirations. Concurrent tail
+claims can duplicate sources, overwrite live destinations, and race both index
+maps. Parallel compaction uses:
 
-TSL compute uses `Fn().compute(count)` and dispatches through
-`renderer.compute()` or `renderer.computeAsync()`. Use `workgroupBarrier` and
-atomics only when spawn/compact phases share counters inside a workgroup. Avoid
-readback in the frame loop; expose readback only in diagnostics builds.
+```text
+mark[i] = alive(state[i])
+exclusiveScan(mark) -> destination
+if mark[i]: scatter every persistent simulation/render lane to next[destination]
+               write nextIndexToEntity[destination]
+               rebuild nextEntityToIndex[entity] = destination
+publish liveCount/indirect instanceCount = scanTotal
+swap current/next
+```
+
+Mark, each hierarchical scan level, scatter, and final-count publication are
+separate ordered dispatch phases; workgroup barriers do not synchronize global
+phases. Keep stable slots when scan/scatter bandwidth costs more than dead work.
+Stable slots draw capacity or a maintained last-occupied range and reject
+inactive records in the shader. Dense compaction writes an r185 indexed or
+non-indexed indirect command to `IndirectStorageBufferAttribute`, attached with
+`geometry.setIndirect()`. Never update only a draw count while leaving custom
+state or identity maps behind.
+
+Initialize every invariant indirect word before GPU publication. Non-indexed
+layout is `[vertexCount:u32, instanceCount:u32, firstVertex:u32,
+firstInstance:u32]`; indexed layout is `[indexCount:u32, instanceCount:u32,
+firstIndex:u32, baseVertex:i32, firstInstance:u32]`. The Three attribute stores
+`Uint32Array` words, so encode negative `baseVertex` as its i32 two's-complement
+bit pattern or gate it to zero. After ordered scan/scatter, publish only the
+validated `instanceCount`. Gate byte length, command alignment, signed range,
+and `firstInstance` capability before drawing.
+
+TSL compute uses `Fn().compute(count)` and enqueues through
+`renderer.compute()`. In r185 `computeAsync()` only awaits renderer
+initialization before calling `compute()`; it is not a GPU-completion fence.
+Use workgroup/storage barriers only for dependencies in their valid scope and
+dispatch boundaries for global phases. Avoid readback in the frame loop; an
+actual async readback/map operation is required for CPU-visible completion.
 
 ## Physics Contract
 
-Use semi-implicit integration in scene meters and seconds unless an art-directed
-trajectory is explicitly named:
+Use an analytic trajectory when acceleration and drag permit exact seeking;
+otherwise use a named integrator in declared scene length units and seconds.
+For `dv/dt = a - gamma*v` with constant `a` over a step, use the exponential
+update rather than attenuating a newly added acceleration impulse:
 
 ```text
-velocity += acceleration * dt
-velocity *= exp(-drag * dt)
-position += velocity * dt
+x = gamma * dt; require gamma >= 0
+phi1(x) = -expm1(-x)/x
+phi2(x) = (x + expm1(-x))/x^2
+for small |x|:
+  phi1 = 1 - x/2 + x^2/6 - ...
+  phi2 = 1/2 - x/6 + x^2/24 - ...
+velocityNext = exp(-x)*velocity + acceleration*dt*phi1(x)
+positionNext = position + velocity*dt*phi1(x)
+              + acceleration*dt^2*phi2(x)
 normalizedAge = (time - spawnTime) / lifetime
 ```
 
-Gravity is world-space meters per second squared. Lateral spawn velocity is in
-the event frame and then converted to world flow. Validity ranges are:
-
-```text
-dt: 1/240 -> 1/20 s per step, subdivide above that
-spark lifetime: 0.15 -> 2.5 s
-debris lifetime: 0.5 -> 8.0 s
-drag: 0 -> 32 1/s
-normalized lifetime: 0 -> 1, clamp only for shading
-```
+For position/velocity-dependent forces, collision, or constraints, choose and
+name an integrator, fixed step, event solve, and convergence gate. Gravity is
+world-space length units per second squared under the project's declared unit
+convention. Lateral spawn velocity is in the event frame and then converted to
+world flow. Lifetime and drag ranges are authored per effect; gate them by
+trajectory/energy/error envelopes rather than copying fixture constants.
 
 Visible wrongness signatures:
 
@@ -189,8 +244,10 @@ The front shell uses hull topology or a hull-derived shell mesh so the plasma
 follows the authored silhouette. Scale or displace along normals only enough to
 avoid depth fighting; large separation reads as an unrelated aura.
 
-Find the wake origin from sampled hull vertices. For the current local fall or
-flow direction, choose the support point with the greatest dot product:
+Find the wake origin from sampled hull vertices. `flowDirectionWorld` always
+means downstream fluid motion relative to the body; convert body velocity or
+an upstream wind vector once at the event boundary, never inside individual
+shell/wake formulas. Choose the support point with the greatest dot product:
 
 ```text
 wake forward = normalized flow direction
@@ -234,13 +291,16 @@ Use `heatToColor(heat, role)` for radiometry instead of guessed emissive values.
 The input heat domain is normalized but unclamped during composition:
 
 ```text
-0.00 -> 0.15: dark red residue, 0.5-2 scene-linear nits
-0.15 -> 0.55: orange plasma body, 2-12 scene-linear nits
-0.55 -> 0.85: yellow-white shock, 12-40 scene-linear nits
-0.85 -> 1.25: white-blue ion edge, 40-80 scene-linear nits
+0.00 -> 0.15: dark red residue, 0.5-2 relative scene-linear units
+0.15 -> 0.55: orange plasma body, 2-12 relative scene-linear units
+0.55 -> 0.85: yellow-white shock, 12-40 relative scene-linear units
+0.85 -> 1.25: white-blue ion edge, 40-80 relative scene-linear units
 ```
 
-`heatToColor` returns scene-linear HDR RGB and an alpha recommendation. Bloom is
+These are authored relative exposure units, not physical nits. Use `nit` only
+when the entire renderer, light transport, exposure calibration, and display
+target share an absolute photometric scale. `heatToColor` returns scene-linear
+HDR RGB and an alpha recommendation. Bloom is
 disabled while calibrating the LUT. The bloom-disabled expected look is readable
 silhouette, flow bands, and wake role separation without halo support. Wrongness
 cases: bloom-only shape, guessed emissive magnitudes copied from another scene,
@@ -305,7 +365,7 @@ Spawn uses deterministic event-seeded variation, including lateral velocity in
 the event frame. Keep the useful visual hierarchy from historical scenes:
 
 ```text
-spark flash > projectile > laser > ordinary surface
+short transient flash > powered emitter core > persistent emitter > ordinary surface
 ```
 
 If an effect intentionally needs the old nonphysical spark arc, label it as an
@@ -348,33 +408,43 @@ Depth policy is part of the effect contract:
 | Layer | Depth test | Depth write | Sort/render policy | Notes |
 | --- | --- | --- | --- | --- |
 | Opaque debris | on | on | normal scene order | casts/receives according to scene budget |
-| Dissolving debris | on | usually off while dissolving | stable render order by pool class | avoid stale depth silhouettes |
-| Hull plasma shell | on | off | after hull, before large haze | validate occluders and near-hull offsets |
-| Wake core | on | off | behind shell | should not draw through unrelated geometry |
-| Haze/lobes | on unless deliberately camera-local | off | late transparent class | tier down before disabling occlusion |
-| Sparks/flecks | on | off | dense sprite class | use soft depth fade when available; do not rely on WebGPU point-size primitives for large particles |
+| Dissolving debris | on | usually off while dissolving | premultiplied depth sort/bin, accepted weighted OIT, or alpha-hash contract | avoid stale depth silhouettes |
+| Hull plasma shell | on | off | additive if its energy model is order-independent; otherwise sorted/OIT | validate occluders and near-hull offsets |
+| Wake core | on | off | same declared blend owner as shell | should not draw through unrelated geometry |
+| Haze/lobes | on unless deliberately camera-local | off | premultiplied depth bins/radix sort or accepted weighted OIT | tier down before disabling occlusion |
+| Sparks/flecks | on | off | additive emission or alpha-hash/temporal cutout contract | use soft depth fade when available; do not rely on WebGPU point-size primitives for large particles |
+
+Pool-class order alone does not solve ordinary alpha transparency and will pop
+as records cross depths/classes. Additive emission is order-independent only
+when its energy model permits it; otherwise use sorting/binning, weighted OIT
+with an approximation gate, or alpha hash plus temporal stability.
 
 Only disable depth testing for a camera-local diagnostic or an authored effect
 that is explicitly allowed to ignore occluders. Record that decision in the
-debug panel. Compute per-class bounds with `computeBounds` or chunked bounds
-instead of blanket `frustumCulled = false`; the canonical fixture also exposes
+debug panel. `computeBounds` is not an r185 API. CPU instance matrices may use
+`InstancedMesh.computeBoundingBox()`/`computeBoundingSphere()`; storage/TSL
+motion needs analytic per-chunk emission envelopes or a GPU reduction. Use
+chunked bounds instead of blanket `frustumCulled = false`; the canonical fixture also exposes
 `softDepthFade` for occluder intersections.
 
 ## HDR And Color Pipeline
 
-Use MRT so materials write beauty and `emissive` once. `BloomNode` reads the
-emissive texture; the main color path remains readable when bloom is bypassed.
+Default optical bloom consumes full-scene HDR radiance. Allocate an MRT
+`emissive` signal only when selective inclusion/exclusion is an authored
+requirement and its transparent blending plus tile-traffic contract is proven.
+The main color path remains readable when bloom is bypassed.
 
 ```text
 beauty target: scene color
-emissive target: selective effect/light contribution
-bloom input: emissive target
+optional emissive target: selective effect/light contribution
+bloom input: full HDR beauty, or the proven selective target
 final: beauty + bloom, then one output transform
 ```
 
 Rules:
 
-- Color textures use `SRGBColorSpace`.
+- LDR color textures encoded as sRGB use `SRGBColorSpace`; HDR/EXR radiance
+  remains loader-declared linear.
 - Data maps, masks, noise, LUTs, storage fields, and generated variants use
   `NoColorSpace`/linear.
 - HDR working buffers use `HalfFloatType` until tone mapping.
@@ -382,23 +452,26 @@ Rules:
 - Luminance constants are scene-relative. Validate in raw HDR, bloom-only, and
   bloom-disabled views.
 
-## Budgets
+## Performance contract
 
-Per-frame budgets for the particle and effect subsystem:
+Account unique work rather than assigning a universal tier table:
 
-| Metric | Ultra | High | Medium | Compat |
-| --- | ---: | ---: | ---: | ---: |
-| GPU time | 0.8-1.5 ms | 1.5-3.0 ms | 3.0-5.0 ms | feature budget, not visual parity |
-| Compute dispatches | 3-5 | 2-4 | 1-3 | 0-1 |
-| Visual-class draws | 4-8 | 3-6 | 2-4 | 1-3 |
-| Storage hot writes | <= 64 B/live | <= 48 B/live | <= 32 B/live | minimized |
-| Shell/wake triangles | 80k-180k | 35k-90k | 10k-40k | static LOD |
-| Transparent overdraw | 4-8 local layers | 3-6 | 2-4 | 1-2 |
-| Bloom scale | 0.5 | 0.5 | 0.25-0.5 | optional |
+| Work | Cost expression / evidence |
+| --- | --- |
+| analytic trajectory | immutable parameter bytes and vertex ALU; zero hot-state write |
+| recurrent solver | `N_active * dynamicStrideBytes` plus invocations for each named stage |
+| stable-slot draw | capacity versus live count and hole ratio; accept only if wasted vertex/fragment work fits |
+| scan compaction | mark/scan/scatter reads+writes and moved records; compare against stable slots under identical occupancy |
+| effect draw | submitted/visible instances, triangles, covered pixels, mean/p95 transparent layers |
+| post | exact formats/extents/history slots and attachment read/write lower bound |
 
-If the budget is missed, first reduce algorithmic cost: live cap, layer count,
-field octaves, dispatch count, and post resolution. Do not hide cost by moving
-simulation to the CPU or allocating transient objects.
+Allocate a ceiling from the complete frame, then measure contemporaneous
+full-frame p50/p95 and paired marginal A/B cost with the complete workload
+tuple. If the budget is missed, first remove unnecessary writable state or
+compaction, then reduce active count, layer count, field bandwidth, and post
+resolution subject to the visual contract. Do not hide cost by moving a dense
+solver to per-object CPU work; do not move sparse branch-heavy authoritative
+events to compute without an A/B result either.
 
 ## Diagnostics
 
@@ -416,7 +489,7 @@ shell facing/core/envelope/shock masks
 coarse and fine wake fields
 wake profile distance and tail fade
 raw HDR emission by layer
-MRT emissive contribution
+optional selective MRT contribution when that route is active
 bloom contribution by layer
 bloom-disabled baseline
 depth-test and soft-depth modes
@@ -435,13 +508,15 @@ Diagnostics may use readback, but never on the normal frame path.
 - CPU-updated instance state for large bursts is replaced by GPU-resident
   compute updates into `StorageInstancedBufferAttribute`. This avoids per-frame
   upload bandwidth as the effect scales.
-- Per-burst mesh allocation is replaced by fixed-capacity pools and dense-swap
-  compaction. This stabilizes memory and keeps draw ranges dense.
+- Per-burst mesh allocation is replaced by fixed-capacity pools with stable
+  slots or deterministic mark/scan/scatter compaction. A parallel tail-swap is
+  rejected unless unique ownership is serialized or proven atomic.
 - Generic reentry spheres/cones are replaced by hull-conforming shell meshes
   with TSL displacement and flow-facing masks. This preserves the authored
   ship silhouette at similar or lower overdraw.
-- Bloom-only shaping is replaced by authored HDR emission into MRT `emissive`
-  plus a bloom-disabled readability baseline.
+- Bloom-only shaping is replaced by authored HDR emission plus a bloom-disabled
+  readability baseline. Full-scene bloom consumes beauty directly; allocate an
+  MRT `emissive` contribution only for an explicitly proven selective contract.
 - Global unculled fields are replaced by per-class or per-patch bounds with a
   documented exception only for validated camera-attached effects.
 - Nondeterministic spawn randomness is replaced by event-seeded integer hashing

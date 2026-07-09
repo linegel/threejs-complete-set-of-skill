@@ -1,246 +1,233 @@
 ---
 name: threejs-water-optics
-description: Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.
+description: Build workload-selected analytic and bounded water in Three.js r185 WebGPU/TSL. Use for StorageTexture heightfield simulation, exact parametric displacement and normals, local disturbances, receiver-space caustics, depth-aware refraction, Beer-Lambert absorption, side-aware Fresnel, filtered normal bands, reflection, and foam.
 ---
 
 # Water Optics
 
-Start with `$threejs-choose-skills` preflight when water interacts with a larger
-scene stack. Treat water as simulated state, geometry motion, surface
-orientation, and optical transport. A blue transparent material is not a water
-system.
+Use this skill for bounded interactive water, authored analytic surfaces, shallow
+transparent volumes, and local optical effects. Use `$threejs-spectral-ocean`
+when the required spatial range is a stochastic directional sea synthesized by
+FFT cascades.
 
-Use this skill to integrate a WebGPU water module into an existing Three.js
-project. Do not replace the host app. The host owns scenes, camera, controls,
-assets, transparent ordering, post-processing, physics, networking, and masks.
-The water module owns GPU-resident simulation, surface shading, depth-aware
-refraction inputs, impulses, surface queries, and diagnostics.
+This is a simulation-and-transport contract, not a blue-material recipe. The
+module owns water state, displacement, derivatives, optical evaluation, and
+diagnostics. The host owns the renderer, scene partition, camera, lighting,
+transparent ordering, and final image pipeline.
 
-For large stochastic seas driven by directional spectra and GPU FFTs, use
-`$threejs-spectral-ocean` instead.
+## Numeric Provenance
 
-## Host Integration Contract
+Every quantitative choice must carry one of these tags in implementation notes,
+presets, and validation artifacts:
 
-Minimum shape:
+- **[D] Derived**: follows from stated equations, dimensions, resource formats,
+  or a reproducible calculation.
+- **[G] Gated**: a pass/fail limit selected before measurement.
+- **[M] Measured**: captured on a named device, viewport, and workload.
+- **[A] Authored**: a visual or application input with no universality claim.
 
-```js
-const water = await createWebGPUBoundedWaterSystem(renderer, {
-  sceneColorScene: opaqueSceneWithoutWater,
-  camera,
-  tier: "high",
-  parameters: preset.simulation,
-  timeNode: fixedTickTimeNode,
-});
+Unlabelled integers inside exact equations, vector dimensions, byte identities,
+and API names are [D]. Do not publish an unlabelled resolution, timestep,
+coefficient, iteration count, memory limit, or millisecond target.
 
-scene.add(water.mesh);
+## Choose The Algorithm First
 
-function frame(deltaSeconds) {
-  fixedClock.step(deltaSeconds, (fixedDt, tick) => {
-    water.update(fixedDt);
-    buoyancy.update(waterQuery, fixedDt, tick);
-    spray.update(waterQuery, fixedDt, tick);
-  });
+| Requirement | Surface algorithm | Error and cost boundary |
+| --- | --- | --- |
+| Small authored wave set; no local disturbance | Parametric Gerstner-style map with exact tangents | Cost is linear in component count; CPU parity requires inversion of horizontal displacement. |
+| Bounded local interaction; mild non-breaking waves | GPU linear wave equation in ping-ponged storage textures | CFL-limited; cannot represent overturning, hydraulic jumps, or shoreline topology changes. |
+| Flat or distant surface where silhouette motion is sub-pixel | Derivative-filtered normal bands only | Lowest geometry cost; explicitly no geometry/normal parity. |
+| Large stochastic sea over decades of wavelength | `$threejs-spectral-ocean` | FFT cascades and spectral derivatives. |
 
-  water.pipeline?.render();
-  renderer.render(scene, camera);
-}
-```
+Choose from spatial scale, smallest resolved wavelength, interaction radius,
+allowed phase error, and sustained GPU budget. Do not select by visual style.
 
-The water mesh must not be in the opaque prepass scene it samples for
-refraction. Transparent host objects are normally excluded from that prepass and
-rendered after water unless the project implements a separate
-order-independent-transparency path.
+## Pinned Three.js r185 WebGPU Architecture
 
-## Mandatory Architecture
+The API contract below is verified against the repository's installed
+`three@0.185.1` **[G]**:
 
-The production path is latest Three.js `WebGPURenderer` from `three/webgpu`,
-TSL from `three/tsl`, `MeshPhysicalNodeMaterial` or
-`MeshStandardNodeMaterial`, `StorageTexture` compute ping-pong, and the node
-render pipeline. Build the highest-throughput algorithm first:
-
-1. Simulate bounded water in ping-ponged `StorageTexture` state with
-   `Fn().compute(count)` and `renderer.compute()` or
-   `renderer.computeAsync()`. Use a fixed timestep, no CPU readback, no
-   render-pass simulation.
-2. Store height, previous height or velocity, packed normal/slope, validity,
-   and caustic intensity in storage textures. Run drops, object impulses,
-   propagation, normal reconstruction, and differential-area caustics in the
-   same compute chain.
-3. Compute caustics from the local Jacobian/differential area with
-   `max(area, epsilon)`, finite intensity clamps, and invalid-value
-   diagnostics.
-4. Evaluate authored multi-wave displacement and analytic normals once as TSL
-   functions shared by vertex displacement, lighting normals, crest metrics,
-   foam, CPU-side camera clearance approximations, and debug views.
-   Export the CPU coupling shape for the analytic component:
-   `getWaterHeight(x, z, timeSeconds)`. This CPU evaluator imports the same
-   `AUTHORED_WAVES` list used by the TSL displacement path and has zero
-   analytic parity error. The compute `StorageTexture` heightfield residual is
-   not read back; its coupling gap is bounded by the declared impulse budget
-   `dropStrength + objectDisplacementScale` in
-   `examples/webgpu-bounded-water/constants.js` and the
-   `estimateWaterVerticalAmplitude()` mesh-bounds calculation in
-   `examples/webgpu-bounded-water/webgpu-bounded-water.js`.
-5. Composite the water through a `RenderPipeline`: use `pass()`, `mrt()` where
-   the scene needs shared color/depth/normal data, `PassNode.setResolutionScale()`
-   for reduced-resolution effects, and one final `outputColorTransform` or
-   `renderOutput()` owner.
-6. Refract against scene color plus depth in TSL. Reject foreground samples,
-   clamp screen UVs, fade invalid refraction to analytic sky/body color, and
-   report the invalid fraction in diagnostics.
-7. Blend reflection, refraction, absorption, glints, caustics, and foam through
-   side-aware Fresnel and an explicit energy budget.
-8. Expose integration contracts for presets, quality tiers, buoyancy queries,
-   deterministic ticks, spray probes, transparent ordering, screen-space masks,
-   and host-owned post-processing. These are host/module contracts, not a
-   monolithic library API.
-
-Legacy WebGL implementation (deprecated, do not extend): `examples/analytic-wave-optics/water-system.js`, `examples/interactive-pool-volume/water-volume-system.js`.
-
-## Capability Gate
-
-Use one renderer path and degrade by quality tier, not by alternate shader
-stacks:
+- `WebGPURenderer`, `RenderPipeline`, `StorageTexture`, and node materials come
+  from `three/webgpu`.
+- TSL nodes come from `three/tsl`.
+- Call `await renderer.init()` before inspecting
+  `renderer.backend.isWebGPUBackend` or `renderer.hasFeature()`.
+- Build kernels with `Fn(...).compute(...)`; after initialization submit an
+  ordered node or node array with `renderer.compute(...)`. `computeAsync()` is
+  the initialization-safe wrapper, not a GPU-completion fence.
+- Set `StorageTexture.colorSpace = NoColorSpace`,
+  `generateMipmaps = false`, and `mipmapsAutoUpdate = false` for simulation
+  state unless a compute kernel deliberately writes every sampled mip.
+- Use `pass(scene, camera)`, optional `mrt(...)`, and one `RenderPipeline`.
+  `PassNode.setResolutionScale()` is current. If `renderOutput()` is explicit,
+  set `pipeline.outputColorTransform = false`; otherwise leave the pipeline as
+  the sole output-transform owner.
 
 ```js
-const renderer = new WebGPURenderer({ antialias: false });
+const renderer = new WebGPURenderer( { antialias: false } );
 await renderer.init();
 
-if (renderer.backend.isWebGPUBackend) {
-  await renderer.computeAsync([dropNode, propagateNode, normalCausticNode]);
-} else {
-  throw new Error('WebGPU backend unavailable for the canonical water optics path.');
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( 'WebGPU is required for this water system.' );
 }
+
+renderer.compute( [ impulseNode, propagateNode, derivativeNode ] );
+pipeline.render();
 ```
 
-Quality tiers are resource and feature budgets inside the same WebGPU path:
+The opaque color/depth pass sampled by water must exclude the water surface.
+Transparent objects need an explicit ordering policy; do not silently include
+them in opaque refraction inputs.
 
-| Tier | Backend condition | Heightfield | Analytic bands | Refraction | Caustics |
-| --- | --- | ---: | ---: | --- | --- |
-| Ultra | WebGPU discrete | 512-1024 square | 5 displaced + 4 micro | full-res depth-aware | compute differential area |
-| High | WebGPU integrated/discrete | 256-512 square | 4 displaced + 3 micro | depth-aware or half-res depth-aware | compute differential area |
-| Medium | WebGPU integrated | 192-256 square | 3-4 displaced + 1 micro | half-res depth-aware | compute differential area |
-| Low/Budgeted | WebGPU mobile or low-power | 128-256 square | 2-3 bands | clamped depth-aware or body color | lower-resolution computed caustics |
+## Scientific Gates
 
-If the user explicitly asks how to apply fallback when WebGPU is unavailable,
-route that teaching to `../threejs-compatibility-fallbacks/` instead of adding
-it to this flagship path.
+### Bounded heightfield
 
-Runtime quality changes are resource rebuilds. Preserve host-level state across
-the rebuild: authoritative tick, active preset, registered buoyancy objects,
-spray emitters, masks, transparent ordering, and post-processing output owner.
+For cell sizes `dx`, `dz`, wave speed `c`, and fixed step `dt`, the explicit
+second-order wave stencil must satisfy the derived stability condition
 
-## Integration Features
-
-Presets are data bundles. They configure water simulation, optics, foam, spray
-defaults, and optional quality preference. Sky, lighting, fog, and grading stay
-host-owned; a preset may provide host hints, but it must not take scene
-ownership.
-
-Buoyancy is host/physics code using a stable surface query:
-
-```js
-const y = waterQuery.getWaterHeight(x, z, tick * stepSize);
+```text
+C_x^2 + C_z^2 <= 1,   C_x = c dt / dx,   C_z = c dt / dz.       [D]
 ```
 
-Keep active buoyancy samples under 128 unless the project states another
-budget. Multi-point hulls use stable local-space samples; single-point floats
-scale by object count. Do not read GPU heightfield textures back each frame.
-Submit object motion back to the GPU with an impulse contract such as
-`setObjectImpulse({ oldCenter, newCenter, radius, strength })`.
+For square cells this becomes `c dt / dx <= 1/sqrt(2)` **[D]**. Damping does
+not legalize a CFL violation. Record the selected CFL margin **[G]**, phase and
+amplitude error against an analytic mode **[M]**, and the boundary reflection
+coefficient **[M]**.
 
-Deterministic multiplayer uses integer ticks:
+Boundary mode is part of the model:
 
-```js
-waterClock.syncToTick(authoritativeTick);
-water.update(fixedStepSeconds);
+- periodic: wrap neighbors and conserve the periodic mean;
+- reflecting: mirrored ghost samples implement zero normal derivative;
+- absorbing: use a spatial damping sponge and measure reflection over the
+  active frequency band;
+- fixed-height: a deliberate phase-inverting wall, never a generic clamp.
+
+### Parametric waves
+
+For each normalized direction `d_i`, amplitude `a_i`, horizontal ratio `Q_i`,
+`k_i = 2 pi / wavelength_i`, and phase `theta_i`, use
+
+```text
+P(q,t) = (q_x, 0, q_z)
+       + sum_i (Q_i a_i d_ix cos(theta_i),
+                a_i sin(theta_i),
+                Q_i a_i d_iz cos(theta_i)).                    [D]
 ```
 
-Shader time is `tick * fixedStepSeconds`. Cap catch-up steps, hash seeded drops
-and spray jitter from integers, and document tick wrap.
+Compute both parametric tangents by differentiation and the upward normal as
+`normalize(cross(P_qz, P_qx))`. The shortcut
+`normalize((-height_x, 1, -height_z))` is exact only when horizontal
+displacement is absent. Require positive horizontal Jacobian for a
+single-valued surface. The conservative no-fold gate
+`sum_i abs(Q_i a_i k_i) < 1` is **[D]**; the actual minimum determinant over the
+authored domain is **[M]**.
 
-Spray is an emitter/probe system coupled to the surface query. Probes live in
-object-local space and fire on signed-distance crossings whose impact speed
-exceeds `velocityThreshold`. System defaults are overridden by emitter values,
-then probe values. Probe indices stay stable when probes are disabled.
+### CPU surface queries
 
-Screen-space masking requires a host-owned mask registry and a water material
-mask sample. Mask meshes are invisible in the main scene, rendered into a
-`NoColorSpace` screen-space texture before water, and sampled by the water
-material to discard or fade masked fragments. A registry without a mask texture
-and material hook is not complete masking.
+`getWaterHeight(x,z,t)` cannot obtain Eulerian parity by evaluating analytic
+phases directly at `(x,z)` when horizontal displacement is nonzero. It must
+invert the horizontal map with a bounded fixed-point or Newton solve, then
+evaluate height at the recovered parameter coordinate. Report iteration limit
+**[G]**, residual tolerance **[G]**, and observed residual **[M]**.
 
-Host-owned post-processing order is: opaque color/depth prepass, water
-refraction/absorption/reflection/foam, depth-dependent underwater haze or fog,
-anti-aliasing, bloom/glints, grading, final output transform.
+The GPU heightfield residual is not bounded by the sum of impulse controls.
+Choose one honest contract:
 
-## Performance Budgets
+- enforce a hard height envelope `H_grid` **[G]**, giving a derived analytic-
+  only query interval of `+/- H_grid` **[D]**;
+- maintain a CPU surrogate and report convergence/probe error **[M]**; or
+- declare the query analytic-only and unbounded with respect to live GPU
+  disturbances.
 
-Budget the water before styling it:
+Never hide readback latency in a per-frame query.
 
-| Target | Simulation | Storage | Passes | Draws | Frame budget |
-| --- | --- | --- | --- | ---: | ---: |
-| Desktop discrete | 512 square, 2-4 compute dispatches, 8x8 or 16x16 workgroups | 3-5 RGBA half-float storage textures, about 6-10 MiB at 512 | scene MRT + water + caustic/lighting + output | 1-3 | 0.6-1.5 ms |
-| Desktop integrated | 256-384 square, 2-3 dispatches | 3-4 RGBA half-float storage textures, about 1.5-4.5 MiB | half-res refraction/caustics where possible | 1-3 | 1.0-2.5 ms |
-| Mobile WebGPU | 128-256 square | 2-3 compact textures | reduced refraction, lower-resolution caustics | 1-2 | 1.5-3.5 ms |
+### Caustics
 
-Keep simulation resolution independent of canvas resolution. Update static
-parameters once, then update only drops, object impulses, propagation, normals,
-and caustics per fixed step. Prefer fewer, fused compute dispatches over many
-single-purpose passes when storage hazards allow it.
+Map each surface differential through Snell refraction to a stated receiver.
+For receiver-plane coordinates `F(q)`, use
 
-## Color And Output
+```text
+A_receiver = abs(det(dF/dq)) dq_x dq_z                       [D]
+P_cell = E_incident max(0, -l dot n) A_surface
+         (1 - F_dielectric) T_light                         [D]
+E_receiver = P_cell / max(A_receiver, A_epsilon).            [D]
+```
 
-- Color textures and environment maps use `SRGBColorSpace`.
-- Height, velocity, normals, slope, caustic fields, masks, LUTs, and noise use
-  `NoColorSpace`/linear data.
-- Keep HDR working buffers as `HalfFloatType` until tone mapping.
-- The node pipeline owns the only tone mapping and output conversion through
-  `outputColorTransform` or a final `renderOutput()` node.
-- Water materials and caustic nodes must not apply their own output conversion.
-- Generate mipmaps only for sampled color/environment or prefiltered caustic
-  variants; storage state used by compute normally keeps mipmaps disabled or
-  explicitly generated by compute.
+`length(dFdx) * length(dFdy)` is not an area; it omits the sine of the angle
+between derivatives. Use a determinant in a receiver basis or a cross-product
+magnitude. Deposit energy conservatively into receiver texels or solve an
+inverse map; merely displaying the ratio at source texels misplaces light.
+Clamp only after recording pre-clamp energy and invalid/TIR counts.
 
-## Reference
+### Optical transport
+
+Classify the incident medium before evaluating Snell and Fresnel. Use exact
+unpolarized dielectric Fresnel near total internal reflection; Schlick is
+allowed only behind a recorded error gate **[G]** and comparison **[M]**.
+
+```text
+T_rgb = exp(-sigma_a_rgb * pathLengthMeters)                  [D]
+L = F L_reflected + (1 - F) (T L_refracted + L_scatter)       [D]
+```
+
+`sigma_a` has units `m^-1` **[D]**. Reconstruct positions from scene depth,
+reject foreground/off-viewport samples, and validate that the reconstructed
+point lies on the forward refracted ray before calling its distance a path
+length. A specular BRDF already contains the sun glint; do not add a second
+unbudgeted glint lobe. Foam replaces an energy-conserving fraction of the water
+response instead of adding white radiance.
+
+## Sustained Performance Contract
+
+Quality is a target-specific measured envelope, not a device-class label. Do
+not publish generic mobile/integrated/discrete timing tables. For each named
+target, declare the scene, viewport, DPR, grid, fixed cadence, precision,
+active effects, warm-up, sample window, power state, and pass/fail threshold
+**[G]** before measuring **[M]**.
+
+An `RGBA16F` texture consumes `8 N^2` bytes **[D]**; enumerate every
+persistent, ping-pong, transient, scene-color, depth, geometry, and pipeline
+allocation. Measure warm percentile frame time, each bandwidth-sensitive pass,
+peak live bytes, allocation churn, and thermal drift on the named target
+**[M]**. Derive tiers only from those measurements.
+
+For tile/mobile GPUs:
+
+- keep simulation resolution independent of viewport resolution;
+- fuse kernels only when read/write hazards remain explicit;
+- prefer `textureLoad` for stencil state and filtered sampling only for resolved
+  display fields;
+- reduce storage traffic before reducing arithmetic;
+- update caustics less often only if reprojection error remains below a stated
+  screen-space gate **[G]**;
+- exclude diagnostic textures and timestamp queries from production budgets,
+  but include their separate measured overhead **[M]**.
+
+## Required Evidence
 
 Read [references/water-surface-system.md](references/water-surface-system.md)
-for the exact WebGPU/TSL build contract: storage heightfields, analytic
-multi-wave functions, normal filtering, differential-area caustics,
-depth-aware refraction, quality tiers, diagnostics, and replacement notes.
+before implementation. Validation must include:
 
-Canonical WebGPU/TSL example: [examples/webgpu-bounded-water](examples/webgpu-bounded-water).
+- analytic single-mode phase/amplitude error and the CFL margin;
+- boundary reflection and mean/volume drift;
+- finite-value scan of all state and derivative outputs;
+- exact tangent-normal versus finite-difference normal error;
+- minimum horizontal Jacobian and fold count;
+- CPU query residual plus its declared live-grid error contract;
+- receiver-space caustic energy before/after deposition and clamp;
+- exact Fresnel versus approximation error, TIR classification, refraction-ray
+  residual, and invalid-sample fraction;
+- final/no-optics/no-caustics/no-foam fixed views;
+- renderer info, allocation ledger, dispatch count, and sustained GPU timings.
 
-## Failure Conditions
-
-- simulation state is read back to the CPU each frame;
-- normal texture motion does not agree with displaced crests;
-- bounded caustics are decorative projections detached from simulated height
-  normals and differential area;
-- caustic area division lacks epsilon clamps and finite-value diagnostics;
-- refraction samples foreground objects without rejection and a documented
-  invalid-sample policy;
-- approximate path length is presented as reconstructed scene thickness;
-- micro-waves alias into sparkling noise because derivative filtering is absent;
-- foam is a scrolling texture unrelated to the shared crest metric;
-- buoyancy uses per-frame GPU readback instead of an analytic or budgeted
-  surface query;
-- deterministic mode uses wall-clock time or uncapped catch-up instead of
-  authoritative integer ticks;
-- spray emitters are visual-only particles detached from surface crossings;
-- transparent objects are included in the opaque refraction prepass by default;
-- screen-space masks are claimed without a mask texture and water material hook;
-- post-processing lets water own the final output transform inside a host stack;
-- Fresnel is replaced by constant opacity;
-- reflection, refraction, glints, crest tint, transparency, and foam are added
-  without an energy budget;
-- tone mapping or color conversion is applied more than once.
+Fail the build on an unstable stencil, stale derivative state, invalid values,
+double output conversion, source-space caustics presented as receiver-space
+light, or any unlabeled quantitative claim.
 
 ## Routing Boundary
 
-Use `$threejs-spectral-ocean` for stochastic directional spectra, FFT cascades,
-Jacobian breaking, and persistent ocean foam. Use
-`$threejs-rain-snow-and-wet-surfaces` for rain-driven puddle wetness, ripple masks,
-and weather-coupled splashes on ground surfaces. This skill owns authored
-analytic waves, bounded compute heightfield simulation, differential-area
-caustics, pool-volume optical cues, and bounded-water optics.
+This skill owns bounded wave grids, exact small-wave parametric surfaces,
+depth-aware refraction, water-volume attenuation, and bounded caustics. Use
+`$threejs-spectral-ocean` for directional spectra and FFT cascades; use the
+weather-water skill for precipitation-driven surface accumulation.

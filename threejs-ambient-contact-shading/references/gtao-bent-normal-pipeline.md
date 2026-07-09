@@ -1,67 +1,72 @@
 # GTAO and bent-normal pipeline
 
-Use this reference for production ambient visibility in latest Three.js with
-`WebGPURenderer`, TSL, `RenderPipeline`, built-in `GTAONode`, optional
-`TRAANode` temporal filtering, and a narrowly justified custom bent-normal
-extension.
+This reference specifies a WebGPU/TSL ambient-visibility graph for Three.js
+r185. It covers the forward-lighting dependency, GTAO cost model, spatial and
+temporal reconstruction, mobile bandwidth, and the narrow case for bent
+normals.
 
-## Contents
+## Numeric provenance
 
-1. Build order
-2. Integration contract
-3. Capability gate and quality tiers
-4. Built-in GTAO baseline
-5. Temporal and denoise integration
-6. Custom bent-normal extension
-7. Reversed-depth and reconstruction rules
-8. Application to lighting
-9. Performance budgets
-10. Validation and diagnostics
-11. Replaced techniques
+- **[Derived]**: obtained from the installed r185 source or a displayed
+  equation.
+- **[Gated]**: a branch threshold that must pass validation.
+- **[Measured]**: evidence from the target scene/device.
+- **[Authored]**: a starting value or planning ceiling.
 
-## 1. Build order
+Version numbers and list ordering are identifiers rather than tuning claims.
 
-Algorithm class comes first. For this domain the fastest correct architecture
-is the official node GTAO path:
+## Forward-lighting dependency
 
-1. One `RenderPipeline` owns the frame.
-2. One `pass(scene, camera)` is the depth/normal prepass and exposes depth plus
-   view normals through MRT when available.
-3. `ao(depthNode, normalNode, camera)` creates the `GTAONode` scalar
-   visibility pass.
-4. AO runs at half linear resolution unless a fixed-view benchmark proves full
-   resolution is required.
-5. Temporal filtering is integrated through `TRAANode` only when the pipeline
-   has valid velocity, depth rejection, and camera-cut reset.
-6. `DenoiseNode` is an optional quality setting when temporal filtering is not
-   active or when the scene cannot tolerate temporal artifacts.
-7. A second lit scene pass receives `builtinAOContext(visibility)` through
-   `scenePass.contextNode`, so `NodeMaterial.setupAmbientOcclusion()` applies
-   AO during material lighting rather than after color output.
-8. A custom TSL bent-normal/horizon path is an extension, not the default. It
-   must beat the built-in path for a documented use case such as directional
-   ambient tint or specialized diagnostics.
+The stock forward graph has this dependency:
 
-This replaces the old custom-first RGBA16F horizon pass. The old path was
-useful for bent-normal experiments, but it paid extra bandwidth and carried
-known risks: scalar projection reach, scalar texel offsets, depth-only upsample,
-uncertain bent-normal sign, and no managed temporal integration.
+```text
+current depth/normal -> GTAO visibility -> NodeMaterial indirect lighting
+```
 
-## 2. Integration contract
+`builtinAOContext()` is evaluated while materials are shaded, so visibility
+must already exist. r185 `pass(scene, camera)` produces depth/normal only after
+rendering the scene. Therefore correct current-frame material-context AO needs
+two scene renders:
 
-Use the node pipeline and node materials throughout:
+```text
+input scene pass -> GTAO/reconstruction -> context-lit scene pass
+```
+
+The input pass is not a free depth prepass: stock `PassNode` renders the normal
+scene materials, creates an HDR color target, and optionally adds normal and
+velocity MRT targets. If the application already has a deferred/indirect-light
+buffer, apply AO there and avoid the second forward render. Otherwise, screen
+AO is accepted only when the complete measured delta fits the declared budget
+**[Gated]**. A final-color multiply is not an acceptable cost reduction.
+
+The stock skeleton below disables transparent draws and MSAA on the AO input
+pass. Transparent surfaces are neither reliable solid occluders nor receivers
+of `builtinAOContext()` in r185. A custom depth/normal-only prepass can remove
+the unused HDR color write, but it is accepted only after deformation,
+instancing, alpha-test/discard, sidedness, and depth parity match the lit pass
+**[Gated]**. A generic override material does not prove that parity.
+
+## Source-verified r185 diagnostic scaffold
+
+The following skeleton uses APIs present in installed `three@0.185.1`
+**[Measured]**. Static source proof does not establish WebGPU graph compilation,
+R8 renderability on the target, visual correctness, or speed. Treat it as a
+diagnostic scaffold until the runtime gates pass. It shows the expensive,
+lighting-correct forward dependency; do not copy it before passing the budget
+gate.
 
 ```js
 import * as THREE from 'three/webgpu';
 import {
-  ambientOcclusion,
   builtinAOContext,
-  materialAO,
   mrt,
   normalView,
   output,
   pass,
-  vec4
+  renderOutput,
+  rtt,
+  screenUV,
+  velocity
 } from 'three/tsl';
 import { ao } from 'three/addons/tsl/display/GTAONode.js';
 import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
@@ -69,365 +74,342 @@ import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 const renderer = new THREE.WebGPURenderer( {
   antialias: false,
+  reversedDepthBuffer: false,
   outputBufferType: THREE.HalfFloatType
 } );
 
 await renderer.init();
 
-const renderPipeline = new THREE.RenderPipeline( renderer );
-const gbufferPass = pass( scene, camera );
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( 'WebGPU is required.' );
+}
 
-gbufferPass.setMRT( mrt( {
+const pipeline = new THREE.RenderPipeline( renderer );
+pipeline.outputColorTransform = false;
+
+const inputPass = pass( scene, camera, { samples: 0 } ); // [Authored] no MSAA
+inputPass.transparent = false;
+inputPass.setMRT( mrt( {
   output,
-  normal: normalView
+  normal: normalView,
+  velocity
 } ) );
 
-const sceneDepth = gbufferPass.getTextureNode( 'depth' );
-const sceneNormal = gbufferPass.getTextureNode( 'normal' );
+const depthTexture = inputPass.getTextureNode( 'depth' );
+const normalTexture = inputPass.getTextureNode( 'normal' );
+const velocityTexture = inputPass.getTextureNode( 'velocity' );
 
-const gtao = ao( sceneDepth, sceneNormal, camera );
-gtao.resolutionScale = 0.5;
-gtao.radius.value = 0.5;
-gtao.distanceExponent.value = 1.6;
-gtao.distanceFallOff.value = 0.35;
-gtao.thickness.value = 0.35;
+const gtao = ao( depthTexture, normalTexture, camera );
+gtao.resolutionScale = 0.5; // [Authored] starting scale
+gtao.samples.value = 16; // [Authored] -> 36 depth taps [Derived]
+gtao.radius.value = contactRadius;
+gtao.thickness.value = acceptedDepthThickness;
 
-const visibility = gtao.getTextureNode().r;
-const litScenePass = pass( scene, camera );
-litScenePass.contextNode = builtinAOContext( visibility );
-const materialContextOutput = litScenePass.getTextureNode( 'output' );
+const rawVisibility = gtao.getTextureNode();
+const reconstructedNode = denoise(
+  rawVisibility,
+  depthTexture,
+  normalTexture,
+  camera
+);
 
-// Keep the material AO slot and ambientOcclusion lighting property in the graph.
-// PassNode merges contextNode into renderer.contextNode during its scene render;
-// builtinAOContext multiplies existing materialAO by screen-space visibility
-// before the lighting model applies ambientOcclusion to indirect energy.
-const lightingContract = {
-  contextNode: materialContextOutput,
-  materialSlot: materialAO,
-  lightingProperty: ambientOcclusion
-};
+// Materialize the 17-sample [Derived] denoise once, at full output scale.
+const visibilityTexture = rtt( reconstructedNode, null, null, {
+  colorSpace: THREE.NoColorSpace,
+  depthBuffer: false,
+  format: THREE.RedFormat,
+  type: THREE.UnsignedByteType
+} );
 
-renderPipeline.outputNode = materialContextOutput;
-```
+// Critical: material graphs otherwise resolve TextureNode coordinates to mesh UVs.
+const visibility = visibilityTexture.sample( screenUV ).r;
 
-The canonical path is material-context AO: `builtinAOContext()` lets
-`NodeMaterial.setupAmbientOcclusion()` combine material AO with screen-space
-visibility, and the physical lighting model applies `ambientOcclusion` to
-indirect diffuse and indirect specular occlusion before output conversion.
-Direct lights and emission are not multiplied.
+const litPass = pass( scene, camera );
+litPass.contextNode = builtinAOContext( visibility );
+const hdrBeauty = litPass.getTextureNode( 'output' );
 
-Use `renderPipeline.render()` in the animation loop. Dispose `RenderPipeline`,
-`PassNode`, `GTAONode`, `DenoiseNode`, `TRAANode`, and any custom storage
-resources when the effect is removed.
+const temporalEnabled = false; // [Authored] enable only after the gates below
+let finalHDR = hdrBeauty;
 
-## 3. Capability gate and quality tiers
-
-Gate once after renderer initialization:
-
-```js
-await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: MRT normals, GTAONode, TRAANode/DenoiseNode, optional storage extension.
-} else {
-  throw new Error( 'threejs-ambient-contact-shading requires WebGPU; route explicit fallback requests to threejs-compatibility-fallbacks.' );
+if ( temporalEnabled ) {
+  gtao.useTemporalFiltering = true;
+  finalHDR = traa( hdrBeauty, depthTexture, velocityTexture, camera );
 }
+
+pipeline.outputNode = renderOutput( finalHDR );
+pipeline.needsUpdate = true;
 ```
 
-Legacy WebGL implementation (deprecated, do not extend): none in this folder;
-explicit requests for how to apply fallback when WebGPU is unavailable route to
-`../threejs-compatibility-fallbacks/`.
+`inputPass.compileAsync(renderer)` warms scene variants only. It does not prove
+that `GTAONode`, reconstruction RTT, TRAA, or the final pipeline graph is
+compiled; warm and time the complete graph on the target device.
 
-Quality tiers inside the canonical WebGPU architecture:
+When denoise is disabled, use
+`rawVisibility.sample(screenUV).r`. `rawVisibility.r` is wrong inside a mesh
+material graph because its implicit coordinate is the mesh UV attribute.
 
-| Tier | Inputs | AO path | Temporal | Output |
-| --- | --- | --- | --- | --- |
-| Ultra | MRT color, depth, normal, velocity | `GTAONode` at 0.5 scale, optional custom bent-normal extension | `TRAANode` with AO temporal filtering | scalar visibility plus validated directional ambient tint |
-| High | MRT color, depth, normal | `GTAONode` at 0.5 scale | optional `DenoiseNode` | scalar visibility |
-| Medium | depth plus reconstructed normal or reduced MRT | `GTAONode` at 0.5 or 0.25 scale, lower samples | off by default | scalar visibility |
+## Depth convention gate
 
-If a setting disables AO, bypass the AO node in the pipeline. Setting intensity
-or scale to zero while still rendering the pass is not a performance win.
+Installed r185 `GTAONode`:
 
-## 4. Built-in GTAO baseline
+- samples its depth texture directly;
+- converts logarithmic depth;
+- discards `depth >= 1` **[Derived]**;
+- contains no `renderer.reversedDepthBuffer` branch **[Derived]**.
 
-The baseline uses `GTAONode` because it is already integrated with the current
-Three.js node post stack:
+Stock GTAO is therefore gated to standard depth. Reversed depth clears to the
+opposite end and invalidates the sky test and reconstruction semantics. Do not
+pass a reversed depth texture and claim support. A custom adapter must prove
+sky classification, near/far reconstruction, occluder ordering, and the full
+fixture suite before it replaces this gate.
 
-- `ao(depthNode, normalNode, camera)` consumes pass depth and normals.
-- If MRT normals are unavailable, the node can reconstruct normals from depth,
-  but MRT normals are preferred for quality and stability.
-- `resolutionScale = 0.5` is the default production setting; full resolution is
-  an ultra-quality override only after measurement.
-- Tune radius in world units. Do not replace world radius with fixed pixel
-  radius.
-- Prefer reducing radius and samples over running a large-radius gather at full
-  resolution.
+For standard depth, validate:
 
-Initial presets:
+- sky/background resolves to visibility `1` **[Derived physical bound]**;
+- a fronto-parallel plane reconstructs monotonic negative view Z;
+- orthographic and asymmetric projections preserve the intended world radius;
+- DPR/resize changes update every target before the next accepted capture.
 
-| Setting | Medium | High | Ultra |
-| --- | ---: | ---: | ---: |
-| `resolutionScale` | 0.25-0.5 | 0.5 | 0.5-1.0 after benchmark |
-| `radius` | 0.25-0.45 m | 0.45-0.75 m | scene-scaled, validated in meters |
-| `distanceExponent` | 1.2-1.6 | 1.4-1.8 | art-directed, measured |
-| `distanceFallOff` | 0.35-0.65 | 0.25-0.5 | radius-dependent |
-| `thickness` | 0.2-0.4 m | 0.3-0.6 m | scene-scaled |
-| `samples` | 8-12 | 16 | 24-32 only after budget proof |
+## GTAO sampling cost
 
-Use depth MIP/prefiltering only in a custom extension where large radii demand
-it. The built-in node remains the default comparison point.
-
-The scalar baseline breaks when a large projected radius covers broad flat
-walls, foliage or thin silhouettes dominate the view, temporal ghosting appears
-around moving occluders, a depth-MIP hierarchy is needed for distant reach, or
-MRT bandwidth pressure makes normal/velocity targets too expensive. Record the
-break condition before increasing samples or enabling a custom extension.
-
-## 5. Temporal and denoise integration
-
-`GTAONode.useTemporalFiltering = true` requires `TRAANode`. Treat temporal AO
-as a whole-pipeline feature:
-
-1. Disable MSAA when using `TRAANode`.
-2. Provide valid beauty, depth, velocity, and camera inputs to `traa()`.
-3. Let TRAA set the camera jitter/view offset for the frame.
-4. Invalidate history on camera cuts, projection changes, resolution/DPR
-   changes, material ID discontinuities when available, and large velocity.
-5. Test moving thin geometry, foliage, particles, and skinned meshes for
-   ghosting before shipping temporal AO.
-
-When temporal filtering is off, use `DenoiseNode` as an optional quality tier:
-
-```js
-const gtaoOutput = gtao.getTextureNode();
-const denoisedAO = denoise( gtaoOutput, sceneDepth, sceneNormal, camera );
-```
-
-Tune denoise as a costed option. It can improve raw AO but adds post overhead;
-do not enable it blindly on mobile or integrated GPUs.
-
-## 6. Custom bent-normal extension
-
-Only build a custom TSL path when scalar `GTAONode` is insufficient. Valid
-reasons:
-
-- directional ambient tint from less-occluded directions;
-- debug views for horizon, visibility, radius, and bent direction;
-- a scene-specific extension that benchmarks faster or better than the built-in
-  node at the same visual target.
-
-Implementation rules:
-
-- Use TSL `Fn()` nodes and node render targets or `StorageTexture` only where
-  the extension genuinely needs custom storage.
-- Use `textureStore()` and `renderer.compute()` / `renderer.computeAsync()` for
-  compute-side prefiltering, depth MIP construction, or history maintenance.
-- Output scalar AO in a single-channel target when no direction is needed.
-- Use `RGBA16F` only for bent direction plus scalar visibility:
-  RGB stores decoded/encoded direction, A stores scalar visibility where 1 is
-  open.
-- Run the gather at half linear resolution by default; quarter resolution is a
-  low tier, full resolution is a measured ultra tier.
-- Use `vec2` projection reach from both projection axes and `vec2(1 / width,
-  1 / height)` texel offsets. Scalar X-only reach and width-derived Y offsets
-  are bug signatures.
-- Bilateral reconstruction must weight depth and normal similarity; depth-only
-  reconstruction is a debug simplification, not production.
-- Bent-normal lighting is hard-gated by the one-wall receiver test.
-- A bent normal is the mean unoccluded direction in the chosen view or world
-  convention, coupled to scalar visibility. Always normalize bent directions
-  after decode and filtering before comparison or lighting. Keep disabled directional
-  tint until the one-wall fixture proves the direction turns away from the
-  blocked hemisphere.
-
-Preserved GTAO math for custom horizon integration:
+r185 converts the exposed `samples` control into directions and steps:
 
 ```text
-resolution scale     0.5 x 0.5 by default
-slices               2 minimum, increase only after temporal/filter tests
-steps per side       4 baseline for bounded cost
-sides per slice      2
-depth taps           16 per half-resolution pixel at the baseline
+D = samples < 30 ? 3 : 5                              [Derived]
+S = floor((samples + D - 1) / D)                     [Derived]
+horizon depth taps = 2 * D * S                       [Derived]
 ```
 
-For each sample:
+Examples:
 
-```text
-delta = sampleViewPosition - centerViewPosition
-distance = max(length(delta), 0.0001)
-falloff = saturate(1 - distance / max(radius, 0.0001))
-accept when abs(delta.z) < thickness
-horizon = mix(-1, dot(delta, viewDirection) / distance, falloff)
-```
+| `samples` | directions | steps | depth taps | Provenance |
+| ---: | ---: | ---: | ---: | --- |
+| `8` | `3` | `3` | `18` | **[Derived]** |
+| `16` | `3` | `6` | `36` | **[Derived]** |
+| `32` | `5` | `7` | `70` | **[Derived]** |
 
-Keep horizon angle and distance falloff separate. Mixing toward `-1` weakens a
-distant occluder without corrupting the angle of a nearby one.
+If `normalNode` is `null`, the center normal costs `9` additional depth loads
+per GTAO pixel **[Derived]**. This is often preferable to storing a full normal
+attachment for a small raw AO pass, but not automatically. Compare measured
+attachment delta against measured reconstruction delta.
 
-Custom horizon math is debug-only unless it ports the current r185 baseline:
-project the normal into each slice plane with `projNRaw`, use the two-sided
-horizon mapping, and evaluate the Activision GTAO cosine-weighted closed-form
-integral. compare every custom result against official `GTAONode` on the
-fixture manifest before using it for production lighting.
+The radius is in scene units, not pixels or assumed meters. Let `g` be the
+largest visible separation that should still read as contact. Start with
+`radius in [g, 2g]` and `thickness in [0.1 radius, 0.5 radius]` **[Authored]**,
+then reject any value that creates occlusion across a known open gap
+**[Gated]**. `distanceExponent` is documented in `[1, 2]` and
+`distanceFallOff` in `[0, 1]` by r185 **[Derived API domain]**; choose them only
+after radius and thickness are fixed.
 
-Bent-normal acceptance:
+## Reconstruction choice
 
-```text
-place a flat receiver beside one vertical wall
-show geometric normal
-show decoded bent direction
-show environment sample direction
-verify the direction turns away from the blocked hemisphere
-```
+Half-scale GTAO reduces AO pixels to `0.25 * width * height` **[Derived]**.
+Sampling that texture at full resolution invokes ordinary texture filtering;
+it does not inspect depth or normals.
 
-If the decoded direction turns toward the wall, the accumulator sign or basis
-is wrong. Do not enable ambient tint until this passes.
+Decision table:
 
-## 7. Reversed-depth and reconstruction rules
-
-Do not hard-code a single depth convention. Current renderer setup can use
-standard, reversed, or logarithmic depth. Build a small compatibility matrix in
-the implementation notes for the project:
-
-| Mode | Required check |
+| Condition | Choice |
 | --- | --- |
-| Standard depth | sky/background clear value, far-plane behavior, linearization curve |
-| Reversed depth | near/far interpretation, sky threshold, maximum reconstruction clamp |
-| Logarithmic depth | verify linearization before AO; disable custom reconstruction if uncertain |
-| Depth-reconstructed normals | compare against MRT normal debug on hard edges and thin geometry |
-| MRT normals | confirm view-space convention and normalize before AO |
+| Raw half/quarter AO passes edge-error fixtures | Sample raw visibility with `screenUV`; pay no denoise. |
+| Edge halos or block structure fail | Materialize `rtt(denoise(...))` once, then sample its texture with `screenUV`. |
+| Denoise is active | Prefer MRT normals. With MRT normals the expression performs about `17` AO, `17` depth, `17` normal, and `1` noise fetch, or `52` fetches per output pixel **[Derived shader count]**. With reconstructed normals, center plus `16` neighbors add `17 * 9 = 153` normal-reconstruction depth loads, raising the approximate total to `188` **[Derived shader count]**. |
+| Full-resolution material overdraw is high | Never inline `denoise()` in `builtinAOContext()`; the `17` evaluations repeat per shaded fragment **[Derived]**. |
+| Thin/alpha-masked surfaces still fail | Reduce radius/thickness, use MRT normals, or omit screen AO for those surfaces/tier. More blur is not a fix. |
 
-For custom reconstruction, verify:
+The r185 denoiser weights luma, projected depth difference, and normal
+similarity. It is an edge-aware spatial filter, not a temporal accumulator.
+Tune it with a raw-AO and bilateral-weight view; a smooth final beauty image is
+insufficient evidence.
 
-- camera-facing plane produces stable view Z;
-- sky/background pixels early-out to visibility 1;
-- non-square viewport keeps circular world radius after projection;
-- asymmetric projection uses both projection axes;
-- resizing and DPR changes resize all AO targets and update texel sizes.
+## Normal input decision
 
-## 8. Application to lighting
+Stock `PassNode` clones its half-float output texture for MRT attachments. A
+normal attachment therefore occupies `8 * width * height` bytes **[Derived]**
+before MSAA, padding, and tile scratch.
 
-AO should modulate ambient visibility:
+Use MRT normal when any gate passes:
 
-- material ambient occlusion slot or TSL `ambientOcclusion` when the material
-  node graph can consume scalar visibility;
-- indirect diffuse and environment response before tone mapping;
-- optional bent-direction environment sampling only after the one-wall test.
+- another selected effect already owns it;
+- reconstruction is materialized at full resolution;
+- smooth or thin geometry fails depth-normal reconstruction;
+- measured MRT delta is lower than measured reconstruction delta.
 
-Avoid final color darkening. Do not present a scene-color residual split as the
-canonical path in this flagship skill; if a project explicitly asks how to apply
-fallback when WebGPU or the required material-lighting context is unavailable,
-route that discussion to `../threejs-compatibility-fallbacks/` and name the
-lost guarantees.
+Use depth reconstruction when all gates pass:
 
-## 9. Performance budgets
+- AO is the only normal consumer;
+- raw AO runs at reduced resolution;
+- silhouettes/hard edges pass;
+- the target tile GPU shows a net win after attachment stores are included.
 
-Benchmark with fixed camera paths, disabled-pass bypass, and GPU timings:
+On tile-based GPUs, adding a full-resolution attachment can lower tile
+occupancy or cause external-memory stores. Conversely, repeated depth reads can
+defeat texture cache locality. Architecture is selected by paired measurements,
+not by the discrete-GPU result.
 
-| Hardware tier | Output | AO work | Target |
-| --- | ---: | ---: | ---: |
-| Desktop discrete | 2560x1440 DPR 1 | 0.5-scale scalar `GTAONode` | 0.6-1.2 ms |
-| Desktop discrete ultra | 2560x1440 DPR 1 | scalar AO plus temporal or denoise | 1.2-2.0 ms |
-| Desktop integrated | 1920x1080 DPR 1 | 0.5-scale scalar AO | 0.8-1.8 ms |
-| Mobile/tablet | 1920x1080 effective | 0.5 or 0.25 scale, reduced samples | 1.0-2.5 ms |
+Keep the AO input pass single-sampled. If renderer-wide antialiasing selects
+`4` samples **[Derived r185 default WebGPU MSAA count when enabled]**, an
+unqualified `pass(scene, camera)` inherits that count; color, normal, and depth
+then pay multisample tile storage and resolve traffic. Pass `{ samples: 0 }`
+**[Authored gate]** explicitly, or prove a different count by target-device
+timing.
 
-Track:
+## Temporal contract
 
-- AO target dimensions and format;
-- count of scene, AO, denoise, temporal, and composite passes;
-- MRT bandwidth;
-- storage texture or storage buffer sizes for custom extensions;
-- compute dispatch dimensions when using storage;
-- disabled-AO frame cost;
-- resize/DPR allocation churn.
+`GTAONode.useTemporalFiltering = true` changes the sampling rotation over a
+cycle of `6` authored source rotations **[Derived from r185 array length]**. It
+does not allocate AO history or reproject visibility. `TRAANode` performs the
+actual full-image temporal resolve.
 
-## 10. Validation and diagnostics
+Enable temporal GTAO only when all gates pass:
 
-Checkpointed build order:
+- MSAA is disabled, as required by `TRAANode` **[Gated]**;
+- beauty, depth, and velocity have identical dimensions **[Gated]**;
+- velocity includes camera, rigid, skinned/deforming, instanced, and relevant
+  alpha-masked motion **[Gated]**;
+- moving occluder, disocclusion, camera rotation, and resize fixtures pass
+  **[Gated]**;
+- TRAA was already selected or its entire marginal time/memory is charged to AO
+  **[Gated]**.
 
-1. Checkpoint: MRT normal and pass depth are visible.
-   Expected: flat receiver shows stable view normals and monotonic view Z.
-   If you see black normals or inverted depth, fix pass/MRT ownership first.
-2. Checkpoint: raw `GTAONode` scalar visibility is visible.
-   Expected: contact darkening appears only near occluding geometry.
-   If you see full-screen gray, radius units or depth mode are wrong.
-3. Checkpoint: denoise or reconstruction is enabled.
-   Expected: thin silhouettes keep clean edges without thick halos.
-   If you see cross-edge blur, add normal-aware weights or lower thickness.
-4. Checkpoint: temporal AO is enabled only with velocity.
-   Expected: moving occluders reject stale history.
-   If you see ghost trails, disable temporal AO or fix velocity/rejection.
-5. Checkpoint: bent-normal decode is inspected.
-   Expected: one-wall bent direction turns away from the blocked hemisphere.
-   If you see tint into the wall, keep directional lighting disabled.
-6. Checkpoint: material-context AO is active.
-   Expected: indirect contact grounds objects while hard sun and emission stay bright.
-   If you see sunlit or emissive surfaces turn gray, a final color multiply is active.
-7. Checkpoint: disabled AO bypass is measured.
-   Expected: disabled mode removes the AO node from the active pipeline.
-   If you see unchanged pass cost, intensity was zeroed without bypassing work.
+r185 TRAA automatically restarts history after a size change but exposes no
+public camera-cut reset **[Derived]**. On a camera cut, projection-mode change,
+or teleport, create a new TRAA node, replace the pipeline output, set
+`needsUpdate = true`, and dispose the old node. Do not mutate private history
+targets.
 
-Expose debug views for:
+Two full-resolution RGBA16F TRAA color targets account for
+`16 * width * height` bytes, excluding depth/history implementation details
+**[Derived lower bound]**. This is not a cheap AO-only history path.
+
+## Lighting application
+
+`builtinAOContext(visibility)` multiplies the material AO term. r185 physical
+lighting applies it to indirect diffuse and computes specular occlusion for
+indirect reflection; direct light and emission remain outside the multiply.
+
+The context deliberately returns the unmodified AO input for transparent
+materials **[Derived]**. For transparency, declare one policy:
+
+- no screen AO for the surface;
+- an authored `aoNode` appropriate to the transparent medium;
+- a custom lighting model with validated transmittance/indirect visibility.
+
+Do not silently darken transparent final color.
+
+## Bent-normal extension
+
+Scalar visibility is sufficient unless directional environment response is a
+declared visual requirement. A bent normal is the normalized mean direction of
+unoccluded incident radiance under the chosen weighting; it is not the
+geometric normal and not merely the least-occluded sample.
+
+Build a custom bent-normal gather only when all gates pass:
+
+- the scalar baseline already passes contact and halo tests;
+- directional environment tint is visible and required;
+- the custom gather beats the scalar baseline at the same target quality
+  **[Measured]**;
+- view/world-space ownership is explicit;
+- the one-wall sign fixture passes **[Gated]**.
+
+Implementation requirements:
+
+- Accumulate visibility-weighted directions in view space, normalize after
+  filtering, and transform to world space exactly once.
+- Preserve scalar visibility separately; direction is undefined near zero
+  visibility and must not drive an unbounded environment lookup.
+- Use independent projection axes and texel size
+  `(1 / width, 1 / height)` **[Derived]**. X-only projection or width-derived Y
+  offsets fail non-square/asymmetric views.
+- Use depth and normal weights during reconstruction. Renormalize the direction
+  after filtering.
+- Port the current r185 cosine-weighted horizon integral and compare it against
+  `GTAONode`; a simplified dot-product horizon heuristic is diagnostic only.
+- Use RGBA16F only when RGB direction plus scalar visibility are needed. Its
+  reduced-resolution storage is `8 * scale^2 * width * height` bytes
+  **[Derived]**.
+
+One-wall sign fixture:
+
+```text
+receiver beside one vertical wall
+  -> display geometric normal
+  -> display decoded bent direction
+  -> verify bent direction points away from the blocked hemisphere [Gated]
+```
+
+If environment tint points into the wall, disable directional use. More samples
+cannot repair a sign or basis error.
+
+## Composable cost ledger
+
+Measure the complete graph and each shareable delta:
+
+```yaml
+ambientContactBudget:
+  declaredMarginalMs: <Authored>
+  inputScenePassMs: <Measured; zero only when genuinely shared>
+  normalAttachmentDeltaMs: <Measured>
+  velocityAttachmentDeltaMs: <Measured>
+  gtaoMs: <Measured>
+  reconstructionMs: <Measured>
+  secondLitScenePassMs: <Measured>
+  traaMarginalMs: <Measured; zero only when already selected>
+  totalMarginalMs: <Derived sum of charged rows>
+  valid: <Gated totalMarginalMs <= declaredMarginalMs>
+```
+
+Memory equations for r185 defaults:
+
+| Resource | Bytes | Provenance |
+| --- | ---: | --- |
+| Each full-resolution half-float PassNode color/normal/velocity target | `8WH` | **[Derived]** |
+| Built-in scalar GTAO R8 target | approximately `s^2 WH` | **[Derived]** |
+| Materialized full-resolution R8 visibility | approximately `WH` | **[Derived]** |
+| Reduced bent normal plus visibility RGBA16F | `8s^2 WH` | **[Derived]** |
+
+`W` and `H` are physical drawing-buffer dimensions and `s` is AO linear scale.
+MSAA storage, depth, alignment, backend padding, and tile scratch are additional.
+
+Gather/reconstruction rejection ceilings excluding the second scene pass are
+`1.2 ms` at `2560x1440` half scale on discrete desktop, `1.8 ms` at
+`1920x1080` half scale on integrated desktop, and `2.0 ms` at `1280x720`
+quarter-to-third scale on mobile **[Authored]**. Add every charged row above;
+never compare the gather alone with the frame budget.
+
+## Fixed-view validation
+
+Required views:
 
 ```text
 raw depth and linear view Z
-sky/background classification
-view normal or depth-reconstructed normal
-projected radius in pixels on both axes
-AO resolution scale
-GTAONode scalar visibility
-denoised visibility
-temporal history validity and rejected pixels
-velocity length
-bilateral depth and normal weights
-custom horizon positive/negative cosine
-custom thickness acceptance
-custom distance falloff
-custom encoded and decoded bent direction
-one-wall bent-direction test
-indirect contribution before and after AO
-direct residual
-GPU time per pass
+sky classification
+MRT and reconstructed normals
+raw GTAO
+reconstructed visibility
+screenUV mapping test on meshes with incompatible UV layouts
+history-valid/rejected pixels and velocity magnitude
+indirect contribution before/after AO
+direct and emissive residuals
+bent direction in view and world space
+per-pass GPU time and attachment inventory
 ```
 
-Required fixtures:
+Required fixtures and failure signatures:
 
-- `wall-receiver`: wall plus receiver for bent-normal direction;
-- `thin-silhouette`: thin foreground silhouette over far background;
-- `sky-edge`: sky/background edge;
-- `emissive-object`: emissive object beside occluder;
-- `hard-sun`: hard direct sun over contact shadow;
-- `non-square-viewport`: non-square viewport;
-- `asymmetric-projection`: asymmetric projection;
-- `camera-rotation`: camera rotation with static geometry;
-- `moving-occluder`: moving geometry under temporal filtering;
-- `resize-dpr`: resize and DPR change;
-- `disabled-ao`: disabled-AO timing.
-
-Failure diagnosis:
-
-| Symptom | Likely cause |
-| --- | --- |
-| AO radius changes incorrectly with distance | world radius was replaced by pixel radius |
-| Far contact vanishes | projected radius has no minimum or samples are too low |
-| Thick silhouettes | thickness too high or bilateral weights cross discontinuities |
-| Vertical blur differs from horizontal blur | scalar texel size used for both axes |
-| Bent tint points into a wall | accumulator sign or view/world basis failed validation |
-| Sunlit or emissive surfaces become gray | AO is multiplying final scene color |
-| Disabled AO still costs the pass | node was left in the active pipeline |
-| Camera rotation changes tint twice or not at all | bent direction transform semantics are wrong |
-| Temporal AO ghosts moving objects | invalid velocity, missing rejection, or stale history |
-
-## 11. Replaced techniques
-
-The rewritten doctrine intentionally replaces:
-
-| Old technique | Replacement | Reason |
+| Fixture | Failure signature | Decision |
 | --- | --- | --- |
-| Custom half-resolution RGBA16F GTAO as the first path | Built-in `GTAONode` scalar AO first | The built-in node is the fastest correct r185-era baseline and owns current node integration |
-| Depth-only bilateral upsample as production default | Depth- and normal-aware reconstruction or `DenoiseNode` | Depth-only filtering leaks across hard normal discontinuities |
-| Scalar X projection reach | `vec2` reach from both projection axes | Non-square and asymmetric projections need independent axes |
-| Width-derived scalar texel offset | `vec2(1 / width, 1 / height)` | Prevents vertical blur errors |
-| Unverified bent-normal accumulator sign | One-wall validation before lighting use | Directional ambient tint is wrong if the vector points into blocked space |
-| Intensity-zero disable | Pipeline bypass | Zero intensity can still pay pass cost |
-| Unmanaged temporal claims | `TRAANode` integration with velocity/depth rejection | Temporal AO without reprojection and rejection ghosts |
+| UV-seam meshes | AO stretches or follows each object's UV islands | Sample visibility with `screenUV`. |
+| Thin foreground silhouette | dark exterior halo | Reconstruction crossed depth/normal discontinuity. |
+| Transparent surface crossing opaque geometry | glass/smoke becomes a solid occluder or unexpectedly receives AO | Keep the input pass opaque-only and declare a transparent lighting policy. |
+| Hard direct light beside emitter | either turns gray | AO is multiplying final color. |
+| Screen-edge occluder | contact pops as it leaves view | Screen-space limitation; accept or use authored visibility. |
+| Smooth curved surface | faceted/crawling contact | Reconstructed normal failed. |
+| Moving/deforming occluder | history trail | Velocity/rejection failed; temporal mode is rejected. |
+| Non-square and asymmetric projection | elliptical radius or unequal blur | Projection axes/texel size were collapsed. |
+| One-wall bent normal | direction points into wall | Sign/basis error; directional tint stays disabled. |
+| AO disabled | unchanged GPU time | AO remains reachable in the active node graph. |
+
+Acceptance requires target-device timings, the complete marginal sum, fixed
+captures with AO on/off, and proof that direct light and emission are invariant.

@@ -1,373 +1,426 @@
-# HDR bloom systems
+# HDR bloom system
 
-Use this reference to build bloom as a WebGPU/TSL node-pipeline effect with
-MRT selective contribution, explicit HDR ordering, resolution-scale budgets,
-and scene-relative emissive ranges. Bloom should enhance an already readable
-form; it must not carry the underlying object silhouette by itself.
+This reference defines bloom for Three.js r185 WebGPU/TSL. It separates
+optically motivated scene-radiance bloom from art-directed selective bloom,
+then makes the built-in pyramid, transparent MRT behavior, and marginal cost
+explicit.
 
-## Physics contract
+## Numeric provenance
 
-Bloom approximates PSF scatter of above-threshold scene-linear HDR energy in a
-camera/display imaging chain. The base image must remain readable when bloom is
-disabled; bloom is valid for lens/display glare, not for volumetric light,
-opaque silhouettes, fog shafts, or hidden geometry.
+- **[Derived]**: inspected r185 source or an equation shown here.
+- **[Gated]**: a branch threshold that must pass on the target.
+- **[Measured]**: target-scene/device evidence.
+- **[Authored]**: a tuning start or planning ceiling.
 
-Wrong signature examples:
+Version numbers and list ordering are identifiers, not tuning claims.
 
-- display-space thresholding after tone mapping;
-- clamped gray highlights with no scene-linear HDR headroom;
-- glow-as-silhouette where bloom is the only visible object form.
+## Imaging contract
 
-## Contents
+An optical PSF convolves all sensor-reaching radiance. Real-time bloom instead
+uses a bright-pass and a small multi-resolution blur pyramid. Consequently:
 
-- physics contract
-- highest-throughput architecture
-- r185-era implementation skeleton
-- capability gate and quality tiers
-- signal order and color ownership
-- emissive contribution authoring
-- controls and lifecycle
-- performance budgets
-- replaced techniques
-- diagnostics and acceptance
+- full-scene HDR input is the closest built-in approximation to optical glare;
+- threshold and soft knee are sparsification/art controls, not properties of a
+  lens;
+- an emissive-only MRT is an explicit membership override and will miss bright
+  reflections, transmission, or direct radiance unless authored into it;
+- bloom cannot replace geometry, volumetric scattering, occlusion, fog shafts,
+  or readable base lighting.
 
-## Highest-throughput architecture
+## Signal-source decision
 
-For production selective bloom, lead with one `RenderPipeline` scene pass that
-writes both final scene color and bloom contribution through MRT:
+Stabilize exposure and capture scene-linear luminance before choosing a source.
+Let `D(p)` be the authored desired-contributor mask and `B_T(p)` the pixels
+accepted by a candidate scene-luminance threshold `T`.
 
 ```text
-WebGPURenderer
-  -> RenderPipeline
-  -> pass(scene, camera).setMRT(mrt({ output, emissive }))
-  -> output texture node
-  -> emissive texture node
-  -> bloom(emissive).setResolutionScale(quality.bloomScale)
-  -> output + bloom
-  -> renderOutput(...) as the only output transform
+falsePositiveEnergy(T) = sum(Y(p) * B_T(p) * (1 - D(p))) / sum(Y(p))  [Derived]
+falseNegativeEnergy(T) = sum(Y(p) * D(p) * (1 - B_T(p))) / sum(Y(p))  [Derived]
 ```
 
-This replaces prior two-pass selection designs and temporary whole-scene
-material overrides. The replacement matters because algorithm class dominates
-throughput: the MRT path pays one scene traversal and one material evaluation,
-while repeated selection renders multiply culling, draw submission,
-skinning/morph work, material binding, transparency sorting, and render-target
-writes. On large scenes the difference can be an order of magnitude before any
-shader-level tuning.
+Use full-scene bloom when some `T` and soft knee satisfy the product's declared
+error limits **[Gated]**. Use selective MRT only when the desired mask cannot be
+represented by luminance within those limits **[Gated]**, or when a deliberate
+boost must diverge from visible emission.
 
-Use built-in `BloomNode` first. The winning algorithm class is MRT selective
-input, high-pass extraction, then a five-mip separable blur/composite pyramid
-owned by `BloomNode`. Cost is O(bloom pixels times mip stack and blur kernel),
-so it scales primarily with bloom resolution and mip work, not with a second
-scene traversal. A custom bloom is justified only when it extends the built-in
-effect in a measured way, such as a specialized anamorphic high-pass through
-`highPassFn`, and still preserves the same MRT-fed signal ordering.
+This test avoids two common errors: allocating an emissive attachment before
+proving selectivity is required, and forcing ordinary bright radiance out of an
+effect that is supposed to look optical.
 
-## r185-era implementation skeleton
+## Verified full-scene path
 
-Current Three.js docs show `WebGPURenderer`, `RenderPipeline`, `pass()`,
-`mrt()`, `output`, `emissive`, `bloom()`, `renderOutput()`,
-`setResolutionScale()`, `setSize()`, and `dispose()` for this path.
+The following APIs exist in installed `three@0.185.1` **[Measured]**:
 
 ```js
 import * as THREE from 'three/webgpu';
-import { emissive, mrt, output, pass, renderOutput } from 'three/tsl';
+import { pass, renderOutput, vec4 } from 'three/tsl';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 const renderer = new THREE.WebGPURenderer( {
-  antialias: true,
+  antialias: false,
   outputBufferType: THREE.HalfFloatType
 } );
 
 await renderer.init();
 
-const renderPipeline = new THREE.RenderPipeline( renderer );
-renderPipeline.outputColorTransform = false;
-
-const scenePass = pass( scene, camera );
-scenePass.setMRT( mrt( {
-  output,
-  emissive
-} ) );
-
-const sceneColor = scenePass.getTextureNode( 'output' );
-const bloomInput = scenePass.getTextureNode( 'emissive' );
-const bloomPass = bloom( bloomInput, 0.55, 0.35, 0.9 );
-
-bloomPass.smoothWidth.value = 0.08;
-bloomPass.setResolutionScale( 0.5 );
-
-const hdrComposite = sceneColor.add( bloomPass );
-renderPipeline.outputNode = renderOutput( hdrComposite );
-
-function resize( width, height, pixelRatio ) {
-  renderer.setPixelRatio( Math.min( pixelRatio, 2 ) );
-  renderer.setSize( width, height, false );
-  scenePass.setSize( width, height );
-  bloomPass.setSize( width, height );
-}
-
-function frame() {
-  renderPipeline.render();
-}
-
-function disposeBloomPipeline() {
-  bloomPass.dispose();
-  scenePass.dispose();
-  renderPipeline.dispose();
-}
-```
-
-Set `renderPipeline.needsUpdate = true` after replacing the output node graph.
-Call `scenePass.compileAsync( renderer )` after `setMRT()` and texture-node
-lookups when shader compilation stutter matters.
-
-## Capability gate and quality tiers
-
-Gate after initialization because the full architecture depends on the modern
-backend path:
-
-```js
-await renderer.init();
-
 if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error(
-    'WebGPU backend required for threejs-bloom. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.'
-  );
+  throw new Error( 'WebGPU is required.' );
 }
 
-const quality = {
-  name: 'full',
-  bloomScale: 0.5,
-  contributionMode: 'mrt-emissive',
-  dynamicContribution: true
-};
+const pipeline = new THREE.RenderPipeline( renderer );
+pipeline.outputColorTransform = false;
+
+const scenePass = pass( scene, camera, { samples: sceneSampleCount } );
+const sceneHDR = scenePass.getTextureNode( 'output' );
+
+const bloomPass = bloom(
+  sceneHDR,
+  0.55, // [Authored] strength start
+  0.35, // [Authored] cross-mip spread start
+  sceneThreshold
+);
+bloomPass.smoothWidth.value = softKnee;
+bloomPass.setResolutionScale( 0.5 ); // [Authored] scale start
+
+const hdrComposite = vec4( sceneHDR.rgb.add( bloomPass.rgb ), sceneHDR.a );
+pipeline.outputNode = renderOutput( hdrComposite );
+pipeline.needsUpdate = true;
 ```
 
-Quality tiers:
+This path captures emissive surfaces, bright direct response, specular
+reflection, and visible transparent/transmitted radiance after the scene pass.
+It allocates no bloom-membership attachment.
 
-```text
-full:
-  MRT output + emissive, dynamic emissive NodeMaterial authoring,
-  bloomScale 0.5-0.67, live diagnostics enabled on demand.
+## Verified selective MRT path
 
-balanced:
-  same MRT path, bloomScale 0.33-0.5, tighter threshold,
-  fewer transparent contribution surfaces.
-
-reduced:
-  same WebGPU renderer and readable base scene,
-  bloomScale 0.25-0.33, fewer transparent contributors, optional bloom disable.
-```
-
-Reduced is a WebGPU quality tier, not a non-WebGPU recipe. Prefer lower
-resolution, smaller transparent effect counts, or a disabled bloom node with
-the base scene still readable. If the user explicitly asks how to apply
-fallback when WebGPU is unavailable, route to `../threejs-compatibility-fallbacks/`.
-
-## Signal order and color ownership
-
-Keep HDR until final output:
-
-```text
-scene MRT output + emissive
-  -> optional built-in GTAONode / atmosphere / image-pipeline systems
-  -> BloomNode from emissive contribution
-  -> HDR add to scene color
-  -> exposure and grading ownership
-  -> one renderOutput / outputColorTransform owner
-```
-
-Rules:
-
-- working buffers stay `HalfFloatType` until tone mapping;
-- color textures use `SRGBColorSpace`;
-- data maps, masks, LUT data, noise, and contribution-control textures use
-  `NoColorSpace` or other linear data treatment;
-- decide mipmaps per texture role instead of enabling them globally;
-- `RenderPipeline` owns the final output transform through either its default
-  `outputColorTransform` or one explicit `renderOutput(...)`, never both;
-- material nodes and effects must not apply display conversion internally;
-- `toneMapped = false` is a narrow display-like material choice and is not
-  bloom membership. Membership is the authored emissive contribution target.
-
-Use `$threejs-exposure-color-grading` when exposure adaptation, LUTs, or display
-looks are part of the frame. Use `$threejs-image-pipeline` when bloom shares
-depth, normals, AO, TAA, or other post resources.
-
-## Emissive contribution authoring
-
-Author contribution as scene-relative luminance:
-
-```text
-short spark flash
-  > projectile core
-  > persistent laser
-  > practical lamp filament
-  > ordinary lit surface
-```
-
-The hierarchy matters more than raw multipliers. Calibrate values against the
-actual camera exposure and pre-tone-map false-color luminance view.
-
-Use `MeshStandardNodeMaterial`, `MeshPhysicalNodeMaterial`,
-`MeshBasicNodeMaterial`, `SpriteNodeMaterial`, or another `NodeMaterial` family
-member. Route bloom contribution through material emissive nodes so MRT writes a
-clean `emissive` target. For sprites, particles, instanced meshes, batched
-meshes, skinned meshes, and morphed meshes, keep contribution data in the same
-material or per-instance attributes that drive the visible object so bloom
-cannot diverge from animation state.
-
-Transparent emitters need explicit validation because sorting and blending can
-make contribution look correct in the final frame while the emissive target is
-wrong. Inspect the `emissive` texture node directly before tuning bloom.
-
-For material-level visible-emissive versus bloom-contribution divergence, use
-`NodeMaterial.mrtNode` as a narrow override instead of a second render:
+Use this only after the source decision rejects full-scene bloom:
 
 ```js
-import { color, emissive, mrt, output, vec4 } from 'three/tsl';
+import * as THREE from 'three/webgpu';
+import { emissive, mrt, output, pass, renderOutput, vec4 } from 'three/tsl';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
-const material = new THREE.MeshStandardNodeMaterial();
-material.colorNode = color( 0x223344 );
-material.emissiveNode = color( 0x66ccff ).mul( 2.0 ); // visible emissive
-material.mrtNode = mrt( {
-  output,
-  emissive: vec4( color( 0x66ccff ).mul( 12.0 ), 1 )
+const pipeline = new THREE.RenderPipeline( renderer );
+pipeline.outputColorTransform = false;
+
+const scenePass = pass( scene, camera, { samples: sceneSampleCount } );
+
+const sceneMRT = mrt( { output, emissive } );
+sceneMRT.setBlendMode(
+  'emissive',
+  new THREE.BlendMode( THREE.MaterialBlending )
+);
+scenePass.setMRT( sceneMRT );
+
+const sceneHDR = scenePass.getTextureNode( 'output' );
+const contribution = scenePass.getTextureNode( 'emissive' );
+const bloomPass = bloom( contribution, strength, spread, threshold );
+bloomPass.smoothWidth.value = softKnee;
+bloomPass.setResolutionScale( bloomScale );
+
+const hdrComposite = vec4( sceneHDR.rgb.add( bloomPass.rgb ), sceneHDR.a );
+pipeline.outputNode = renderOutput( hdrComposite );
+pipeline.needsUpdate = true;
+```
+
+The explicit blend mode matters. r185 `MRTNode` assigns material blending only
+to output named `output`; every other MRT output defaults to no blending
+**[Derived]**. Opaque emissive writes are correct either way under depth test,
+but overlapping transparent writes otherwise replace one another.
+
+Do not combine this with a material-level `mrtNode` in installed r185.
+`MRTNode.merge()` computes the merged mode map but assigns it to `blendings`
+instead of the operative `blendModes` property **[Derived source finding]**;
+the merged node therefore falls back to no blending for `emissive`. The
+canonical transparent path uses the regular `emissiveNode` so no MRT merge is
+invoked.
+
+The scene MRT stays linear HDR. `renderOutput()` is the only tone-map/output
+conversion owner, so `RenderPipeline.outputColorTransform` is disabled.
+
+## Transparent contributors
+
+For a transparent material, the visible and contribution outputs must share
+depth, sorting, blend family, alpha convention, and animation state. For an
+additive premultiplied emitter, use the regular material path:
+
+```js
+import { color, float } from 'three/tsl';
+
+const alpha = float( authoredOpacity );
+const radiance = color( authoredColor ).mul( float( authoredIntensity ) );
+
+const material = new THREE.SpriteNodeMaterial( {
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  premultipliedAlpha: true
 } );
+
+material.colorNode = color( 0x000000 );
+material.opacityNode = alpha;
+material.emissiveNode = radiance.mul( alpha );
 ```
 
-This material-level bloom contribution recipe is for exceptional cases where
-the object should appear modestly emissive but contribute stronger HDR bloom.
-Keep the default path as regular emissive authoring.
+With `BlendMode(MaterialBlending)`, both visible output and emissive target use
+the material's additive premultiplied blend state; the regular emissive value
+is accumulated in the contribution target. For normal alpha/transmittance or
+custom factors, derive the contribution from the same alpha convention and
+verify order/occlusion explicitly.
 
-## Controls and lifecycle
+If visible emission must differ from bloom contribution, stock r185 cannot
+safely combine a material `mrtNode` override with the required emissive blend
+mode. Use a separately costed contribution pass or a source-verified custom
+MRT merge implementation. Do not conceal that added pass in the BloomNode
+budget.
 
-Expose controls against `BloomNode`:
+Transparent acceptance fixtures:
+
+- one layer over opaque geometry;
+- two overlapping layers in both insertion orders;
+- additive and alpha-blended policies tested separately;
+- depth intersection and offscreen clipping;
+- contribution texture compared with visible animation/deformation.
+
+For physically motivated transparent glare, prefer full-scene input: it uses
+the already composited result and avoids duplicating the transparency model in
+an emissive attachment.
+
+## What BloomNode actually computes
+
+Installed r185 performs:
 
 ```text
-strength: artistic bloom energy, default authored from scene exposure
-radius: blur spread in [0, 1]
-threshold: pre-tone-map luminance cutoff
-smoothWidth: soft knee around threshold
-resolutionScale: pass cost and radius stability control
+bright pass
+  -> five progressive mip levels
+  -> horizontal + vertical Gaussian blur at every level
+  -> weighted five-level composite
 ```
 
-Starting points for authored scenes:
+Source constants:
+
+| Property | r185 value | Meaning |
+| --- | ---: | --- |
+| mip count | `5` | fixed **[Derived]** |
+| kernel radii | `[6, 10, 14, 18, 22]` | fixed per level **[Derived]** |
+| base level weights | `[1.0, 0.8, 0.6, 0.4, 0.2]` | fixed **[Derived]** |
+| mirrored weights | `1.2 - baseWeight` | mixed by `radius` **[Derived]** |
+| default internal scale | `0.5` | source default **[Derived]** |
+| default smooth width | `0.01` | source default **[Derived]** |
+
+High-pass extraction is:
 
 ```text
-strength = 0.35-0.75
-radius = 0.25-0.45
-threshold = 0.8-1.2
-smoothWidth = 0.05-0.12
-resolutionScale = 0.5 desktop, 0.33 integrated, 0.25-0.33 mobile
+a = smoothstep(threshold, threshold + smoothWidth, luminance(input.rgb))
+bright = mix(0, input, a)                                           [Derived]
 ```
 
-These are not portable defaults. They are a tuning bracket after exposure,
-emissive hierarchy, and display transform are already stable.
+`radius` is therefore a cross-mip weight interpolation. It broadens or narrows
+the relative tail by moving energy between fixed levels, but it is not a PSF
+sigma and does not change the per-level kernel support. `strength` multiplies
+the final five-level sum.
 
-Lifecycle requirements:
+Every blur shader writes alpha `1`, and the composite includes those alpha
+channels **[Derived]**. Preserve `sceneHDR.a` explicitly when adding bloom. A
+plain vec4 add is acceptable only when the output alpha is provably discarded.
 
-- resize the renderer, scene pass, and bloom node together;
-- cap pixel ratio by quality tier before allocating pass targets;
-- call `setResolutionScale()` before measuring GPU time;
-- call `dispose()` on bloom, pass, and pipeline resources when replacing the
-  pipeline;
-- precompile after MRT configuration when first-frame stutter matters.
+`highPassFn` can replace extraction. It cannot create an anamorphic or
+diffraction PSF because the subsequent blur remains the same isotropic fixed
+pyramid. Anamorphic streaks, starbursts, chromatic scatter, calibrated energy
+conservation, or resolution-invariant physical kernels require a custom blur/
+composite implementation.
 
-## Performance budgets
+## PSF and resolution gate
 
-Budget from algorithm and pixel count first:
+BloomNode's apparent footprint depends on drawing-buffer dimensions, linear
+scale, fixed kernels, and five-level mip weighting. A DPR or resolution change
+does not guarantee constant CSS-pixel, angular, or sensor-space width.
+
+Validate at minimum and maximum target DPR/aspect. If the footprint error
+exceeds the authored tolerance **[Gated]**:
+
+- choose a tier-specific scale/spread pair and remeasure; or
+- implement a custom PSF whose sigma/support is expressed in the required
+  coordinate domain.
+
+The deepest target receives approximately base size divided by `16`
+**[Derived]**. Require:
 
 ```text
-scene render count: 1
-MRT targets: output + emissive
-extra scene traversals for bloom: 0
-temporary whole-scene overrides per frame: 0
-HDR output target format: RGBA16F-equivalent HalfFloatType
-bloom resolution: 0.25-0.67 of renderer size by tier
-draw-call multiplier from bloom selection: 1x, never 2x+
+floor(bloomScale * min(drawingBufferWidth, drawingBufferHeight)) >= 16
+                                                                    [Derived/Gated]
 ```
 
-At 1920x1080, two RGBA16F full-resolution MRT targets are about 31.6 MiB
-before depth and internal bloom levels. Keep total bloom-related transient
-targets under about 64 MiB at 1080p by using half-resolution bloom on desktop
-and lower scales on integrated or mobile devices.
+This prevents a zero-sized level in the fixed chain. Thumbnails and tiny
+embedded views frequently hit this gate.
 
-Target bloom GPU time, measured with the app's GPU timing tooling:
+## Exact fixed-pyramid budget model
+
+Let:
 
 ```text
-desktop-discrete: <= 0.8 ms at 1440p with bloomScale 0.5
-desktop-integrated: <= 1.5 ms at 1080p with bloomScale 0.33-0.5
-mobile: <= 2.0 ms at 720p-1080p with bloomScale 0.25-0.33
+W, H = physical drawing-buffer dimensions
+s = BloomNode linear resolution scale
+A = s^2 * W * H                                                     [Derived]
+K = [6, 10, 14, 18, 22]                                             [Derived]
+w[i] = floor(floor(s W) / 2^i), h[i] likewise                       [Derived]
+A[i] = w[i] h[i]                                                     [Derived]
 ```
 
-If a target misses budget, reduce algorithmic cost first: lower bloom
-resolution, narrow the contribution target, reduce transparent emitters, or
-disable bloom in reduced tier. Do not add a second scene render to regain
-selectivity.
-
-## Replaced techniques
-
-Replaced prior two-pass selection with MRT emissive-output bloom because MRT
-keeps selectivity in the primary scene pass and avoids repeat traversal, draw
-submission, material evaluation, animation deformation, and transparency
-sorting.
-
-Replaced temporary whole-scene material overrides with authored emissive
-contribution because overrides are fragile around material arrays, dynamic
-objects, sprites, particles, instancing, batching, skinning, morphing, and
-render errors. The restoration invariant remains useful only as historical
-context; do not teach it as a build step.
-
-Replaced custom bloom pyramids and pass wrappers with built-in `BloomNode`
-because the current node pipeline already owns resolution scaling, size
-updates, disposal, and TSL integration. Add custom logic only through measured
-extensions such as `highPassFn`.
-
-Replaced low-threshold whole-scene bloom calibration with an explicit emissive
-hierarchy because ordinary bright albedo should not become bloom membership.
-
-## Diagnostics and acceptance
-
-Checkpointed build order:
-
-1. Checkpoint: MRT output and emissive contribution.
-   must see only authored lamps, laser, projectile, sparks, and transparent emitter in emissive.
-   if you see bright metal or white floor contribution, mistake: threshold is being used as membership.
-2. Checkpoint: high-pass and bloom-only.
-   must see high-pass rejection of low-energy pixels and a five-mip separable blur footprint.
-   if you see hard silhouettes or no halo falloff, mistake: high-pass or blur pyramid is bypassed.
-3. Checkpoint: final HDR composite before output.
-   must see base readability preserved with bloom disabled and one output transform owner.
-   if you see gray highlights or washed base color, mistake: output conversion or HDR clamp happened too early.
-4. Checkpoint: reduced mode.
-   must see `dynamicMrt:false` and no live MRT-dependent bloom path.
-   if you see reduced mode calling the emissive MRT texture, mistake: quality downgrade still depends on full-tier resources.
-
-Expose fixed diagnostic views:
+BloomNode allocates one RGBA16F bright target and two RGBA16F blur targets at
+each of five levels. With `8` bytes per RGBA16F texel **[Derived]**:
 
 ```text
-MRT output scene color
-MRT emissive contribution
-false-color pre-tone-map luminance
-bloom-only texture node
+internalBytes exact = 8 * (A[0] + 2 * sum(i=0..4, A[i]))            [Derived]
+sumMipArea approaches 1.33203125 A[0] at large dimensions           [Derived]
+internalBytes approaches 29.3125 A[0]                               [Derived]
+```
+
+It submits:
+
+```text
+1 high-pass + 2 * 5 blur + 1 composite = 12 fullscreen draws       [Derived]
+```
+
+Approximate shader texture samples, excluding cache effects:
+
+```text
+blurSamples exact = 2 * sum(i=0..4, (2 K[i] - 1) * A[i])           [Derived]
+blurSamples approaches 36.3046875 A[0]                              [Derived]
+totalSamples = A[0] high-pass + blurSamples + 5 A[0] composite
+totalSamples approaches 42.3046875 A[0]                             [Derived]
+```
+
+Pixel writes are:
+
+```text
+totalWrites exact = 2 A[0] + 2 * sum(i=0..4, A[i])                 [Derived]
+totalWrites approaches 4.6640625 A[0]                               [Derived]
+```
+
+These are shader-operation counts, not DRAM transactions: texture cache,
+tiling, fusion, blend reads, and backend scheduling determine measured time.
+
+At `1920x1080` and `s = 0.5`, internal allocation is `14.49 MiB`
+**[Derived]**. Selective bloom adds one full-resolution PassNode-cloned RGBA16F
+emissive target: `8WH = 15.82 MiB` **[Derived]**. The selective incremental
+image allocation is therefore `30.31 MiB` before scene output, depth, MSAA,
+alignment, and tile scratch **[Derived]**.
+
+## Tile and mobile architecture
+
+The selective attachment is a full-resolution store even when bloom itself is
+quarter resolution. On a tile renderer it can reduce tile occupancy or force a
+store/resolve. With multisample count `q`, resolved emissive storage remains
+`8WH`, while transient sample storage can approach `8qWH` before backend
+optimizations **[Derived accounting bound]**.
+
+Decision order:
+
+- Remove selective MRT if full-scene input passes the source test.
+- Lower bloom scale; pixel-bound work scales approximately with `s^2`
+  **[Derived]**.
+- Bound transparent screen coverage and overdraw; count covered fragments, not
+  objects.
+- Compare scene MSAA against a single-sampled scene plus the selected AA owner.
+- Disable bloom when the base scene remains readable and the marginal budget
+  still fails.
+
+For a pixel-bound miss:
+
+```text
+sNext = sCurrent * sqrt(declaredBudgetMs / measuredBloomMs)         [Derived]
+```
+
+Clamp to the quality and deepest-level gates, then remeasure. The estimate is
+rejected when fixed submission, MRT store, or transparency dominates
+**[Gated]**.
+
+## Composable marginal ledger
+
+```yaml
+bloomBudget:
+  declaredMarginalMs: <Authored>
+  sourceMode: <full-scene | selective | hybrid>
+  sceneMrtAttachmentDeltaMs: <Measured; zero for full-scene or genuinely shared>
+  bloomHighPassMs: <Measured>
+  bloomBlurPyramidMs: <Measured>
+  bloomCompositeMs: <Measured>
+  transparentContributionDeltaMs: <Measured>
+  totalMarginalMs: <Derived sum of charged rows>
+  valid: <Gated totalMarginalMs <= declaredMarginalMs>
+```
+
+Do not double-charge a contribution attachment already owned by the image
+pipeline. Do not credit a pass that merely might be shared later.
+
+Planning rejection ceilings are `0.8 ms` at `2560x1440`, scale `0.5` on
+discrete desktop; `1.5 ms` at `1920x1080`, scale `0.33-0.5` on integrated
+desktop; and `2.0 ms` at `1280x720`, scale `0.25-0.33` on mobile
+**[Authored]**. They are product planning limits, not measured promises.
+
+## Exposure and color ownership
+
+- Decode color assets according to their source color space. Scene/post render
+  targets and contribution buffers remain scene-linear; they are not sRGB
+  textures.
+- Run high-pass and bloom addition before the single tone-map/output conversion.
+- Threshold is evaluated in the BloomNode input domain. If exposure adapts
+  while threshold remains in fixed scene units, apparent membership can change.
+  The exposure owner must specify whether threshold tracks exposure or remains
+  scene-referred.
+- Clamp or robustly reject pathological fireflies at their source. Early HDR
+  clamp to display range destroys legitimate highlight hierarchy.
+- `toneMapped = false` is a material display choice, not bloom membership.
+
+## Lifecycle and graph mutation
+
+- Set pixel ratio before renderer allocation and validate the resulting physical
+  drawing-buffer size.
+- `BloomNode.updateBefore()` derives size from the drawing buffer each frame
+  **[Derived]**; explicit `setSize()` is not required for an ordinary renderer
+  resize, though it is a valid public method.
+- Set resolution scale before timing.
+- Dispose BloomNode, PassNode, RenderPipeline, materials, and scene resources
+  when replaced.
+- After changing the output node, set `RenderPipeline.needsUpdate = true`.
+- `scenePass.compileAsync(renderer)` warms scene material variants after MRT
+  setup; it does not compile the bloom fullscreen graph. Warm the complete
+  pipeline before collecting timings.
+
+## Diagnostic contract
+
+Required fixed views:
+
+```text
+scene-linear HDR
+false-color pre-tone luminance
+desired contributor mask
+candidate full-scene bright pass
+selective emissive contribution, when used
+transparent contribution and overlap-order fixture
+bloom-only output
 base without bloom
 final output
-transparent-emitter contribution
-resolution-scale overlay
-GPU time per pass
+resolution/DPR endpoint comparison
+per-stage GPU time and attachment inventory
 ```
 
-Acceptance checks:
+Required fixtures:
 
-- disabling bloom leaves the scene form, material hierarchy, and effects readable;
-- emissive contribution contains only authored bloom members;
-- ordinary sunlit, white, or metallic surfaces do not bloom unless explicitly
-  authored to contribute;
-- threshold and smooth width are tuned before tone mapping;
-- radius remains visually stable across resize and pixel-ratio caps;
-- the full tier meets the scene-render multiplier of 1x;
-- reduced tiers degrade gracefully through resolution or bloom disable, not
-  a parallel renderer;
-- final output has exactly one tone-map and output color conversion owner.
+| Fixture | Wrong signature | Architecture response |
+| --- | --- | --- |
+| Bright mirror beside emitter | mirror stays sharp only in selective mode | Use full-scene or hybrid source if optical response is required. |
+| Bright transmissive pane | transmitted highlight absent from emissive target | Prefer scene-color input. |
+| Overlapping transparent layers | contribution disappears or changes with insertion order unexpectedly | Fix emissive MRT blend mode and alpha convention. |
+| Exposure sweep | membership pops while displayed hierarchy is stable | Couple threshold policy to the exposure owner. |
+| DPR/resize sweep | halo width shifts beyond tolerance | Tier-specific scale/spread or custom PSF. |
+| Tiny viewport | black/invalid deepest level | Enforce the `16`-texel base-dimension gate **[Derived/Gated]**. |
+| Sparse subpixel highlight | huge unstable halo | Repair/cap firefly source; do not hide it with threshold. |
+| Bloom disabled | form or material hierarchy disappears | Base scene is invalid; defer bloom. |
+| Bloom disabled timing | cost remains | Bloom is still reachable; replace graph and mark pipeline dirty. |
+| Transparent-canvas composite | opaque rectangle or inflated edge alpha | Add bloom RGB only and preserve scene alpha. |
+
+Acceptance requires the source-decision error metrics, fixed captures, target-
+device marginal timings, attachment bytes, thermal evidence for mobile, and
+exactly one output conversion owner.

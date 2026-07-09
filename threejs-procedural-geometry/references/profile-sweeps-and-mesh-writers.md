@@ -3,7 +3,7 @@
 Use this reference for reusable profile sweeps, rail skins and caps, oriented
 branch rings, semantic indexed `BufferGeometry` writers, explicit material
 slots, `BatchedMesh` / `InstancedMesh` selection, dynamic update ranges, and
-geometry-level diagnostics in latest Three.js WebGPU/TSL.
+geometry-level diagnostics in pinned Three.js r185 WebGPU/TSL.
 
 ## Contents
 
@@ -52,7 +52,8 @@ many repeated objects, identical topology
   -> InstancedMesh with instance attributes
 
 many repeated objects with GPU-updated transforms, visibility, or deformation
-  -> StorageInstancedBufferAttribute plus TSL compute
+  -> matrix-free Mesh + InstancedBufferGeometry + storage-backed transform
+     reconstruction in TSL compute/vertex nodes
 
 large visibility-compacted procedural set
   -> compute-filled storage buffers plus indirect draw data on the full tier
@@ -72,39 +73,42 @@ large visibility-compacted procedural set
 
 ## Capability Gate and Quality Tiers
 
-Initialize once, then choose a quality tier:
+Initialize once, then choose a native WebGPU quality tier:
 
 ```js
 await renderer.init();
 
-const quality = renderer.backend.isWebGPUBackend
-  ? "full-storage"
-  : "static-compat";
-
-if (quality === "full-storage") {
-  // TSL compute, storage buffers, indirect draw compaction, full diagnostics.
-} else {
-  // Precomputed meshes, smaller LODs, disabled live deformation,
-  // and static diagnostic overlays.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical procedural-geometry path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
-Quality tiers:
+Quality tiers are error contracts; sample counts are outputs of adaptive or
+offline refinement, not copied ranges:
 
 ```text
 hero
-  profile samples 72-96, length segments 96-160, all beads/grooves preserved
+  close-view positional, silhouette, profile-feature, normal-angle, and UV
+  distortion gates all pass
 
 standard
-  profile samples 40-56, length segments 48-96, extrema pinned explicitly
+  the same gates at the declared ordinary view envelope; semantic extrema and
+  material boundaries remain pinned
 
-crowd
-  profile samples 18-32, length segments 16-48, silhouette extrema retained
+distant
+  projected silhouette/normal gates pass while sub-pixel profile structure is
+  represented in filtered material response or removed
 
-static-compat
-  precomputed hero/standard/crowd meshes selected by screen size;
-  no compute-generated dynamic attributes
+minimum
+  cheapest precomputed representation that preserves the primary silhouette
+  and semantic boundaries; native WebGPU, no unnecessary dynamic attributes
 ```
+
+Every tier follows the shared physical-pixel projected-error contract. Any
+initial segment count is **Authored** for a named fixture and is refined until
+the gates pass; it is never a device-class default.
 
 ## Semantic Writer Contract
 
@@ -187,8 +191,11 @@ terminal depths so the crown does not meet the artwork or wall with an
 accidental vertical edge.
 
 The old `92` sample profile is a hero-tier choice for close inspection. For
-standard and crowd tiers, resample by preserving all lobe extrema first, then
-space the remaining samples by curvature and projected screen size.
+standard and crowd tiers, preserve all lobe extrema, then bound the projected
+deviation of each piecewise segment over the target camera envelope. A segment
+count without the
+[physical-pixel projected-error contract](../../threejs-choose-skills/references/projected-error-contract.md)
+is only an authored guess.
 
 ## Rail Mesh Emission
 
@@ -210,7 +217,10 @@ For every profile sample and length sample, compute:
 ```text
 top position at profile depth
 bottom position at fixed backing depth
-production UV = realDistanceAlongRail, realDistanceAcrossProfile
+store physical distance or repeats explicitly
+u = distanceAlong * texelsPerWorldU / textureWidthTexels
+v = distanceAcross * texelsPerWorldV / textureHeightTexels
+# equivalently distance/metersPerRepeat
 debug UV = optional normalized (s, t)
 semantic id = rail orientation + surface kind
 ```
@@ -227,8 +237,11 @@ Normals:
 - use analytic normals for the smooth top profile when possible;
 - duplicate vertices for backing, walls, caps, material edges, and UV seams;
 - use `computeVertexNormals()` only within intentionally smooth shared regions;
-- for normal-mapped NodeMaterial surfaces, compute MikkTSpace tangents after
-  final UVs and hard-edge duplication.
+- prefer analytic tangents from the parameterization. If a baked normal map
+  requires Mikk parity, await `MikkTSpace.ready`, then call
+  `computeMikkTSpaceTangents(geometry,MikkTSpace,negateSign)` with the asset's
+  sign convention. r185 de-indexes indexed input; this is a distinct output
+  representation, so recompute counts, groups, bounds, and byte budgets.
 
 Frame dimensions remain semantically coupled:
 
@@ -251,12 +264,20 @@ resolved topology and LOD:
 ```text
 section:
   center
-  tangent frame or quaternion orientation
+  rotation-minimizing frame or quaternion orientation
   radius
   longitudinal fraction
   branch level
   material slot
 ```
+
+Construct sweep frames by parallel transport: project an authored initial
+normal off `t0`; apply the minimal quaternion taking `t(i-1)` to `t(i)` with a
+deterministic antiparallel axis; re-orthonormalize `n,b`; then apply authored
+twist separately. Frenet frames are rejected at zero curvature/inflexions.
+For closed loops, measure residual holonomy and distribute its inverse by arc
+length so the seam closes. Gate tangent/frame angular change, sign continuity,
+closed-seam orientation, and positional chord error.
 
 Ring vertices use branch-local radial angle and an explicit seam. Bark UV
 length follows branch length and circumference, not normalized branch index.
@@ -292,10 +313,18 @@ creasing after import-like conversion     explicit duplication first; utility
                                           unrecoverable
 ```
 
-`BatchedMesh` is the default scale tool for many varied same-material procedural
-geometries. Reserve vertex and index capacity when adding geometry that may be
+`BatchedMesh` is a candidate container for many varied same-material procedural
+geometries when per-object culling/replacement matters. Reserve vertex and index capacity when adding geometry that may be
 replaced later, compute batch bounds, keep per-object frustum culling enabled,
 and call `optimize()` only during noninteractive maintenance windows.
+
+Installed r185 WebGPU does not issue one native multi-draw for the batch:
+`WebGPUBackend` loops `drawIndexed`/`draw` over visible `_multiDrawCount`
+entries and updates renderer draw statistics per entry. Use `BatchedMesh` for
+object/state management, storage reuse, culling, sorting, and replacement—not
+as a draw-collapse proof. For fewer GPU draw items use static compatible
+merging, identical-topology instancing, or a capability-proven indirect route,
+then measure submitted work.
 
 `InstancedMesh` is correct only when topology is identical. Per-instance matrix,
 color, scalar parameters, material selection bucket, and deformation phase are
@@ -326,15 +355,19 @@ recompute changed chunk bounds
 update group draw range only if topology count changed
 ```
 
-Hot per-frame transforms or attributes:
+Hot per-frame transforms or attributes use one transform owner:
 
 ```text
 StorageInstancedBufferAttribute
   -> storage() node
   -> Fn().compute(instanceCount)
-  -> renderer.compute() or renderer.computeAsync()
-  -> NodeMaterial reads updated attribute/storage data
+  -> renderer.compute() before its consuming render
+  -> matrix-free Mesh + InstancedBufferGeometry reads storage in NodeMaterial
 ```
+
+Keep `InstancedMesh` when its `instanceMatrix` is the actual transform owner.
+Do not add a storage-owned transform on top of it: r185 allocates/binds the
+matrix and applies it before `positionNode`, duplicating payload and work.
 
 Visibility compaction or procedural draw commands on the full tier:
 
@@ -345,8 +378,30 @@ input chunks / instances
   -> IndirectStorageBufferAttribute drives BufferGeometry.setIndirect(indirect, indirectOffset)
 ```
 
+In r185 an indirect non-indexed command is four `u32`
+`{vertexCount,instanceCount,firstVertex,firstInstance}`. Indexed is
+`{indexCount:u32,instanceCount:u32,firstIndex:u32,baseVertex:i32,firstInstance:u32}`.
+`IndirectStorageBufferAttribute` exposes `Uint32Array` words, so a negative
+`baseVertex` must be written as its signed two's-complement bit pattern (for
+example `baseVertex >>> 0`) and remain inside the i32 range; otherwise gate it
+to zero. Offsets are
+CPU-known byte offsets and each produces one `drawIndirect`/
+`drawIndexedIndirect`; r185 exposes no GPU-generated indirect-count multi-draw.
+One GPU-written command therefore compacts a homogeneous geometry/material
+bucket by changing its `instanceCount`. Varied topology needs fixed CPU-known
+buckets/offsets or ordinary static chunk submission.
+
 Avoid CPU readback in the frame loop. Use readback only for validation tooling or
 offline capture.
+
+`computeAsync()` is not a GPU-completion fence in r185; it only awaits renderer
+initialization before enqueueing compute. Use an actual async readback/map for
+CPU-visible completion.
+
+The indirect count must actually control submitted primitives or instances.
+Masking hidden records in the vertex shader preserves submission and vertex
+cost and must not be reported as GPU culling. Compare scan/compaction cost with
+ordinary CPU chunk submission before selecting the compute path.
 
 The canonical fixture is
 `examples/semantic-mesh-writer/indirect-fixture.js`; it names
@@ -371,13 +426,15 @@ For inspection scenes, use built-in node passes first:
 pass(scene, camera)
   -> mrt({ output, normal, emissive, viewZ/depth as needed })
   -> GTAONode for contact readability
-  -> BloomNode only from emissive output
+  -> BloomNode from full-scene HDR by default; selective emissive only when proven
   -> TRAANode when temporal stability matters and MSAA is disabled
   -> renderOutput() or outputColorTransform as the single output owner
 ```
 
-Use `CSMShadowNode` or `TileShadowNode` for production directional shadows in
-large inspection scenes before designing a custom shadow system.
+Start from an ordinary fitted directional shadow. Select CSM, tiled arrays, or
+custom caching only when coverage, texel error, invalidation behavior, and
+measured target cost reject the simpler path. `TileShadowNode` is not a generic
+large-scene or tile-GPU optimization.
 
 ## Budgets
 
@@ -395,30 +452,37 @@ storage buffer bytes
 compute dispatch count
 updated component ranges per frame
 bounding volume update cost
-desktop-discrete / desktop-integrated / mobile ms targets
+named target/browser/adapter/workload CPU and GPU p50/p95 gates
 ```
 
-Default targets:
+Evidence record:
 
 ```text
-static hero mesh
-  <= 35k vertices, <= 70k triangles, <= 6 groups, <= 2.5 MB geometry data
+static mesh
+  record V, T, index width, attribute stride, groups, allocation bytes,
+  projected geometric error, compile p50/p95, and peak transient bytes
 
 standard repeated module
-  <= 8k vertices per unique geometry, BatchedMesh draw per material family
+  record unique geometry bytes, BatchedMesh material families, visible
+  multi-draw entries/backend draw items, culling cost, and submission p50/p95
 
 interactive edit frame
-  zero allocation, <= 4 update ranges per changed attribute, no full upload
+  zero steady allocation, dirty range count/bytes, no full upload unless the
+  edited topology requires it
 
 compute-updated instance field
   one dispatch per independent field group; pack scalars to vec4 lanes when
   it reduces storage fetches without obscuring validation
 
-CPU update budget
-  <= 0.25 ms desktop discrete
-  <= 0.75 ms desktop integrated
-  <= 1.5 ms mobile
+acceptance
+  product-gated whole-frame and paired-marginal p50/p95 on the named target;
+  projected error and semantic topology gates pass simultaneously
 ```
+
+Allocate the geometry/update ceiling from the complete scene and validate
+sustained p50/p95 timing, peak upload bytes, and draw submission on each target.
+Counts are outputs of the representation and projected-error contract, not
+portable device-tier constants.
 
 ## Validation
 

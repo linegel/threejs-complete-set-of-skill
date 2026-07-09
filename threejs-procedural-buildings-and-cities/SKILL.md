@@ -1,20 +1,21 @@
 ---
 name: threejs-procedural-buildings-and-cities
-description: Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.
+description: Build authored procedural buildings, facades, and city kits in Three.js r185 WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.
 ---
 
 # Procedural Buildings and Cities
 
-Build the fastest architecture first: a deterministic grammar produces a
-validated plan, then the compiler emits one material-slot `BatchedMesh` or
-merged indexed `BufferGeometry` package per building or city chunk. Do not
-start from per-primitive instance placement and try to optimize it later.
+Choose the compiler package before emission: a deterministic grammar produces
+a validated plan, then emits material-slot `BatchedMesh` containers or merged
+indexed `BufferGeometry` per building/chunk. Do not start from per-primitive
+scene objects and try to recover semantics later.
 
-Use latest Three.js with `WebGPURenderer` from `three/webgpu`, TSL from
+Use the pinned Three.js r185 with `WebGPURenderer` from `three/webgpu`, TSL from
 `three/tsl`, `MeshStandardNodeMaterial` / `MeshPhysicalNodeMaterial` material
 identities, node post through `RenderPipeline`, and storage/compute APIs only
 where they beat CPU chunking for city-scale state. Built-in node effects are
-the fastest correct baseline.
+the first revision-matched comparison baseline; retain them only when their
+measured quality and cost pass the workload contract.
 
 ## Required Build Order
 
@@ -53,6 +54,11 @@ Legacy implementation (deprecated, do not extend):
   still need per-part visibility, transforms, sorting, or replacement. Use a
   merged indexed `BufferGeometry` per slot when the building is static and
   only chunk-level culling is needed.
+- In installed r185 WebGPU, `BatchedMesh` loops one backend draw item per
+  visible multi-draw entry; it reduces scene-object/state management but does
+  not prove draw-call collapse. Merge compatible static slot geometry or
+  instance identical topology when fewer GPU draw items are required, and
+  record actual renderer/backend counts.
 - Use `InstancedMesh` only for large counts of identical repeated objects
   whose unique geometry count is small and whose per-instance identity is
   meaningful. It is not the default compiler architecture for authored facades.
@@ -62,6 +68,22 @@ Legacy implementation (deprecated, do not extend):
   geometry.
 - Provide topology, exposed-edge, placement, ownership, material-slot, UV
   density, bounds, draw-call, and triangle diagnostics.
+
+Choose the runtime package from mutability and visibility:
+
+| Workload | Package | Visibility policy |
+| --- | --- | --- |
+| One static close-inspection building | Merged indexed geometry per material slot | Object/part bounds; no runtime grammar work |
+| Editable building with varied modules | `BatchedMesh` per compatible material family | Per-object batch visibility and targeted replacement |
+| Repeated identical modules | `InstancedMesh` or storage-instanced attributes | Spatial pages; never one city-wide uncullable batch |
+| Large district | Serialized spatial chunks with projected-error LOD and optional occlusion/compute compaction | Submit only visible chunks; impostor/proxy far field |
+
+GPU visibility is justified only when its scan/compaction plus indirect draw
+actually removes more submission/vertex work than CPU chunk culling.
+Every LOD/packing transition uses the
+[shared physical-pixel projected-error contract](../threejs-choose-skills/references/projected-error-contract.md),
+including nearest support depth, unjittered projection, hysteresis/dwell, and
+simultaneous transition memory.
 
 ## Public API Shape
 
@@ -99,13 +121,10 @@ import { WebGPURenderer } from "three/webgpu";
 const renderer = new WebGPURenderer( { antialias: false } );
 await renderer.init();
 
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full path: StorageBufferAttribute / StorageInstancedBufferAttribute,
-  // storage() nodes, renderer.compute(), city chunk visibility, high
-  // material-slot budgets, full node post stack.
-} else {
-  // Reduced-quality tier only: precompiled static chunks, lower ornament
-  // density, smaller visibility grids, no custom shader rewrite.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical architecture compiler path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
@@ -130,10 +149,16 @@ distant:
 - Use `MeshStandardNodeMaterial` for masonry, metals, roof, and ornament;
   use `MeshPhysicalNodeMaterial` for glass when transmission, IOR, thickness,
   or clearcoat matters.
+- Do not put physical transmission on every distant pane. Hero panes may use
+  transmission; mid/far facades use reflection probes/environment response,
+  opaque layered-window materials, or baked interiors selected by projected
+  pane size. Transparent sorting and background capture are part of the cost.
 - Keep one material identity per semantic slot: limestone, granite,
   terra-cotta, glass, bronze, black-metal, ornament, and roof.
-- Color textures use `SRGBColorSpace`. Normal, roughness, metalness, masks,
-  IDs, atlas selectors, and diagnostics use `NoColorSpace` / linear data.
+- LDR base-color/emissive textures encoded as sRGB use `SRGBColorSpace`;
+  HDR/EXR radiance remains loader-declared linear. Normal, roughness,
+  metalness, masks, IDs, atlas selectors, and diagnostics use
+  `NoColorSpace` / linear data.
 - Keep HDR buffers as `HalfFloatType` until tone mapping.
 - The node pipeline owns the only tone-map and output conversion through
   `RenderPipeline.outputColorTransform` or an explicit `renderOutput()` node.
@@ -142,38 +167,41 @@ distant:
   and `PassNode.setResolutionScale()` for reduced-resolution post effects.
 - For image treatment, prefer built-in nodes first: `GTAONode` for contact
   grounding, `BloomNode` for authored emissive signs or interiors, `TRAANode`
-  for temporal anti-aliasing, and `CSMShadowNode` / `TileShadowNode` for large
-  architecture shadows. Use sibling skills for deep rendering systems.
+  for temporal anti-aliasing. Start shadows from an ordinary fitted directional
+  map; route CSM, tiled arrays, or caching through the shadow skill only when
+  coverage/error/invalidation and measured cost require them.
 
-## Performance Budgets
+## Performance Contract
 
-Target budgets for a compiled building:
+Record a workload ledger for every compiled representation:
 
 ```text
 hero building:
-  draw calls: 6-10 opaque/alpha-separated slot draws
-  triangles: 80k-250k
-  CPU compile: < 8 ms amortized after seed/settings change
-  GPU frame cost: < 0.8 ms desktop-discrete, < 1.6 ms integrated, < 3.0 ms mobile
+  semantic/material slots, V/T, projected facade/profile error,
+  compile p50/p95, peak transient bytes, draws after material batching
 
 city block chunk:
-  draw calls: <= 48 for 24-80 buildings
-  triangles: 400k-1.5M visible after LOD/chunk culling
-  storage buffers: <= 8 MB visibility/LOD/material metadata
-  compute dispatch: <= 1 visibility/compaction dispatch per moving camera frame
+  source buildings, visible chunks/instances, submitted and culled V/T,
+  metadata bytes, CPU culling/submission or compute-compaction work IDs,
+  attachment/overdraw cost
   StorageTexture: only for generated ID/LOD/debug masks that need textureStore()
-  GPU frame cost: < 2.5 ms desktop-discrete, < 5 ms integrated, < 8 ms mobile
 
 distant skyline:
-  draw calls: <= 16 per skyline sector
-  triangles: <= 120k per sector
-  material slots: packed to opaque masonry, glass, roof, emissive
+  sector bounds, projected silhouette error, visible V/T, draws/material slots,
+  baked texture bytes and transition hysteresis
 ```
 
 Chunk by spatial bounds before city-scale batching. Compute bounds after
 compilation and after every regeneration. Pool reusable arrays and dispose
 generated geometries, `BatchedMesh` objects, textures, and node effects when
 replacing a district.
+
+Allocate architecture cost from the complete frame and measure contemporaneous
+whole-frame and paired-marginal p50/p95 GPU time, CPU compile/cull/submission,
+overdraw, visible/culled triangles, upload traffic, peak resident/transient
+bytes, and sustained thermal behavior. Geometry/detail levels are selected by
+projected error and semantic requirements; no building/triangle/draw count is a
+portable device-class guarantee.
 
 ## Acceptance
 
@@ -196,7 +224,9 @@ The generated building must survive:
 - Replaced per-primitive `InstancedMesh` placement as the default with
   material-slot `BatchedMesh` or merged indexed `BufferGeometry` compilation,
   because authored buildings need many module shapes, stable material
-  identities, exposed-edge ownership, and city-scale draw-call control.
+  identities, exposed-edge ownership, and explicit mutability/culling policy.
+  Only merged static geometry or identical-topology instancing is presumed to
+  collapse r185 WebGPU draw items; BatchedMesh counts are measured.
 - Replaced whole-tier rectangle decoration with exposed-interval ownership,
   because compound footprints otherwise decorate hidden walls and break trim at
   inner and outer corners.

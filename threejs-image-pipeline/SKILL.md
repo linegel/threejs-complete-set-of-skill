@@ -1,232 +1,302 @@
 ---
 name: threejs-image-pipeline
-description: Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.
+description: Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.
 ---
 
 # Image Pipeline
 
-Use this skill only when several image-space systems must share buffers,
-ordering, temporal history, or final-output ownership. For one isolated effect,
-load its atomic skill instead.
+Use this coordinator when several image-space systems share a scene pass,
+depth, color attachments, history, ordering, or final output. For one isolated
+effect, load its atomic skill.
 
-Route to companion skills only when needed:
+Route only what the graph needs:
 
-- `$threejs-ambient-contact-shading` for `GTAONode`, bent normals,
-  AO denoising, or lighting application;
-- `$threejs-bloom` for `BloomNode`, emissive MRT extraction, and HDR bloom;
-- `$threejs-exposure-color-grading` for luminance metering, adaptation, tone
-  mapping, LUTs, grading, and output conversion;
-- `$threejs-dynamic-surface-effects` for feature-local history targets and temporal
-  surface effects.
+- `$threejs-ambient-contact-shading` for `GTAONode` and indirect-light use;
+- `$threejs-bloom` for `BloomNode` and emissive policy;
+- `$threejs-exposure-color-grading` for metering, EV adaptation, tone mapping,
+  LUT domains, and output conversion;
+- `$threejs-dynamic-surface-effects` for feature-local screen history;
+- `$threejs-visual-validation` for fixed-view, timing, and leak evidence.
 
-The pipeline must expose its signals, owners, resolution scales, memory cost,
-and disable paths before tuning any image.
+Read
+[references/production-image-pipeline.md](references/production-image-pipeline.md)
+before implementation.
+
+## Numeric Evidence Rule
+
+Tag every number:
+
+- `[Derived]`: formula, dimensions, format, or verified API consequence;
+- `[Gated]`: enabled only after a named capability/correctness gate;
+- `[Measured]`: captured on a named target and complete graph;
+- `[Authored]`: a deliberate quality/look/controller starting point.
+
+This applies to attachment counts, formats, byte costs, resolution scales,
+workgroup sizes, history lengths, timing thresholds, DPR limits, hysteresis,
+and frame budgets.
 
 ## Required Architecture
 
-Lead with the highest-throughput architecture: one `WebGPURenderer` from
-`three/webgpu`, one node-based `RenderPipeline`, one primary scene `pass()`,
-and `mrt()` outputs for every shared gbuffer signal. Do not re-render the scene
-for AO, bloom masks, grading, or diagnostics when an MRT signal can feed the
-node graph.
+Lead with one `WebGPURenderer`, one `RenderPipeline`, and one primary
+`pass(scene, camera)` `[Authored: baseline architecture]`. Add only the MRT
+outputs whose measured alternative is worse. "One pass plus every possible
+gbuffer" is not a performance rule, especially on a tile GPU.
 
-Canonical order:
+Depth is the pass depth texture; it is not a color output in `mrt()`.
+
+Default order:
 
 ```text
-scene pass() with mrt(output, depth, normal, albedo, emissive, optional velocity)
-  -> lighting-related screen nodes: GTAONode, bent normals, indirect tint
-  -> atmosphere/transparency composition from the shared depth contract
-  -> BloomNode from HDR emissive or HDR color
-  -> optional temporal resolve from velocity/depth/history
-  -> exposure meter and adapted exposure
-  -> one tone-map owner
-  -> scene-linear or tone-mapped grading, chosen by LUT domain
-  -> one output color transform owner
-  -> display-referred presentation nodes, UI-safe overlay, diagnostics
+primary scene pass: HDR output + depth + selected MRT outputs
+  -> effect-local lighting histories, such as temporal AO
+  -> lighting-aware AO / atmosphere and layers admitted to temporal history
+  -> temporal reconstruction of stable scene radiance, when complete
+  -> transparent/refractive layers excluded from that history
+  -> exposure meter tap from resolved pre-bloom HDR by default
+  -> bloom / glare and other scene-linear optical effects
+  -> adapted exposure
+  -> tone map
+  -> grade in its declared domain
+  -> one output conversion
+  -> display-domain antialiasing / dither / UI
 ```
 
-Use built-in nodes first. A custom node is justified only when it adds a
-measured capability the built-in node does not cover.
+Temporal resolve precedes exposure by default so history remains in stable
+scene radiance. Bloom follows temporal resolve by default to avoid reprojecting
+broad depthless glare. Deviations require a named history/exposure contract.
 
-`PostProcessing` is the deprecated historical name for `RenderPipeline`; do not
-teach it as an implementation path.
+Use built-in nodes first. A custom pass must add a measured capability, not
+duplicate a private built-in target.
 
-Legacy WebGL implementation (deprecated, do not extend): none in this folder.
-
-## Capability Gate
-
-Initialize once, then choose quality tiers by capability. Do not teach a local
-WebGPU-unavailable path here. If, and only if, the user explicitly asks how to
-apply fallback when WebGPU is unavailable, route that teaching to
-`$threejs-compatibility-fallbacks`.
+## Native WebGPU Gate And r185 Surface
 
 ```js
-import { WebGPURenderer, RenderPipeline, HalfFloatType } from 'three/webgpu';
+// Numeric/API literals: [Gated: installed three@0.185.1 source]
+import {
+  HalfFloatType,
+  RenderPipeline,
+  WebGPURenderer
+} from 'three/webgpu';
 
-const renderer = new WebGPURenderer( { antialias: false, outputBufferType: HalfFloatType } );
+const renderer = new WebGPURenderer( {
+  antialias: false,
+  outputBufferType: HalfFloatType,
+  trackTimestamp: true
+} );
+
 await renderer.init();
-const sharedGbufferOutputs = [ 'output', 'normal', 'emissive' ];
-
 if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error( 'WebGPU backend required for the canonical image pipeline. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.' );
+  throw new Error( 'Native WebGPU is required for this image pipeline.' );
 }
 
-const tier = {
-  backend: 'WebGPU',
-  requiredMRT: sharedGbufferOutputs.length,
-  requiredStorage: false,
-  timestampQuery: renderer.hasFeature( 'timestamp-query' ),
-  outputBufferType: renderer.getOutputBufferType(),
-  memoryBudget: 256 * 1024 * 1024,
-  budgetReason: []
-};
-
-// compute/storage/MRT path: live metering, temporal history, storage buffers.
+const canTimeGpu = renderer.hasFeature( 'timestamp-query' );
+const renderPipeline = new RenderPipeline( renderer );
 ```
 
-Quality tiers:
+Verified r185 APIs used by this skill:
 
-| Tier | Requirements | Defaults |
-| --- | --- | --- |
-| Full | WebGPU backend with MRT, node passes, storage/compute where used | HDR MRT, live exposure, `GTAONode`, `BloomNode`, optional `TRAANode`, diagnostics |
-| Reduced | WebGPU exists but the frame or storage budget is tight | no live compute history, AO/bloom at lower scale, fixed exposure, lower diagnostic cadence |
-| Debug | WebGPU backend during authoring | one diagnostic output at a time, pass timers, owner labels, forced disable paths |
+- `RenderPipeline.render()`, `outputColorTransform`, `needsUpdate`;
+- `pass()`, `mrt()`, `PassNode.setResolutionScale()`, `setMRT()`,
+  `getTextureNode()`, `getViewZNode()`, `getLinearDepthNode()`,
+  `compileAsync(renderer)`;
+- `ao(depth, normalOrNull, camera)` with the public
+  `GTAONode.resolutionScale` property;
+- `bloom(input)` with `BloomNode.setResolutionScale()`;
+- `traa(beauty, depth, velocity, camera)` and `TRAANode.setViewOffset()`;
+- `renderOutput()` and TSL `toneMapping()`.
+
+`PostProcessing` is the deprecated historical name for `RenderPipeline`; do
+not teach it. Do not teach a WebGPU-unavailable route here. If the user
+explicitly asks how to apply fallback when WebGPU is unavailable, route to
+`$threejs-compatibility-fallbacks`.
 
 ## Build Order
 
-1. Write the signal table before code: producer, consumers, space, type, color
-   space, resolution scale, history, disable path, and memory.
-   Include world/view/clip/NDC/UV/texel spaces, Y-up, camera looks down `-Z`,
-   UV origin, depth policy (`reversedDepthBuffer` or `logarithmicDepthBuffer`),
-   normal encoding, velocity sign/current-to-previous convention, and whether a
-   delta is in pixels or UV units.
-2. Create one scene `pass( scene, camera )`; attach `mrt()` for `output`,
-   `normal`, `albedo`, `emissive`, and optional `velocity`. Read depth from the
-   pass instead of adding an unmeasured duplicate scene render.
-3. Feed shared nodes from the pass textures with `getTextureNode()` and
-   `getLinearDepthNode()` or `getViewZNode()` when a consumer needs linear
-   depth. Use `PassNode.setResolutionScale()` or effect-node
-   `setResolutionScale()` for bandwidth-heavy nodes.
-4. Compose the graph as a single `RenderPipeline.outputNode`. Use
-   `renderPipeline.render()` in the frame loop.
-5. Decide output ownership once. Keep HDR `HalfFloatType` buffers until the
-   tone-map owner. Leave `RenderPipeline.outputColorTransform` enabled only
-   when the final node is still scene-linear HDR; set it to `false` and use
-   `renderOutput()` when display-referred nodes must run after conversion.
-6. Add temporal history only when the velocity contract is complete. `TRAANode`
-   needs current beauty, depth, velocity, camera jitter ownership, reset events,
-   and diagnostics for rejected history.
-7. Use GPU compute for live reductions and history preparation only on the full
-   tier: `renderer.compute()` / `renderer.computeAsync()`, `Fn().compute(count)`,
-   `StorageTexture`, `StorageBufferAttribute`, `StorageInstancedBufferAttribute`,
-   `storage()`, and `textureStore()`.
-8. Add diagnostics and budgets before visual tuning.
+- Declare physical canvas pixels, target frame time, target browser/GPU,
+  primary visual contract, and no-post baseline.
+- Write the signal table: producer, consumers, coordinate/color domain,
+  physical format, resolution, first write, last read, history, disable path,
+  and bytes.
+- Create the primary `pass(scene, camera)` and request depth.
+- Compare each candidate MRT output against reconstruction or a narrow rerender
+  on the target device. Add only winners.
+- Compose lighting, atmosphere, and only the layers with valid temporal signals
+  before temporal color history.
+- Add temporal reconstruction only after velocity, jitter, rejection, and reset
+  contracts pass diagnostics.
+- Composite transparent/refractive layers excluded from history after the
+  temporal resolve and before the photographed meter tap.
+- Tap exposure before bloom by default; apply exposure after temporal history.
+- Assign tone-map, LUT-domain, and output-conversion ownership once.
+- Compute peak live resident bytes and bandwidth separately. Do not claim
+  aliasing for built-in private targets.
+- Add adaptive DPR only after fixed-DPR graph timings exist.
 
-Use `examples/webgpu-image-pipeline/` as the canonical shared-gbuffer example
-and `validateImagePipelineConfig.js` as the hard graph gate before browser
-render validation.
+Use `examples/webgpu-image-pipeline/` as a public-API baseline and
+`validateImagePipelineConfig.js` as a graph gate before browser validation.
 
-Read [references/production-image-pipeline.md](references/production-image-pipeline.md)
-for concrete contracts, pass graphs, replacement notes, budget targets, and
-failure checks.
+## Conditional MRT Rule
 
-## Shared Signal Contracts
+For candidate attachment `a`, compare:
 
-Add these rows to every project signal table; do not leave them implicit:
-
-| Signal | Producer | Consumers | Space/type | Color space | Resolution | History | Disable path |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| velocity | scene `pass()` MRT `velocity` or a named `VelocityNode` path | `TRAANode`, clouds, frost/thaw, temporal denoise, motion vectors | RG16F vec2 in NDC delta; three.js r185 sign is `currentNdc.xy - previousNdc.xy`; state whether jitter is included before resolve | data/no-color | 1.0 unless every temporal consumer declares matching scale | previous/current view-projection and object transforms | disable temporal consumers, not velocity sign checks |
-| depth convention | renderer depth plus one view-Z helper | `GTAONode`, fog, clouds, refraction, temporal rejection | declare exactly one of `reversedDepthBuffer`, `logarithmicDepthBuffer`, standard perspective, or orthographic; reconstruct through the named helper before consumers compare distances | data/no-color | 1.0 source; reduced effects sample through depth-aware upsample | optional previous depth for rejection | disable depth consumers or classify sky/background explicitly |
-
-Canonical velocity reprojection helper:
-
-```js
-import { uv } from 'three/tsl';
-
-export const velocityToPreviousUV = ( velocityTexel, currentUV = uv() ) => {
-	// three.js r185 VelocityNode stores currentNDC.xy - previousNDC.xy.
-	// currentUV = currentNDC.xy * 0.5 + 0.5.
-	// previousUV = previousNDC.xy * 0.5 + 0.5
-	//            = ( currentNDC.xy - velocity.xy ) * 0.5 + 0.5
-	//            = currentUV - velocity.xy * 0.5.
-	return currentUV.sub( velocityTexel.xy.mul( 0.5 ) );
-};
+```text
+costMRT(a) = fragment export + attachment store + later reads        [Measured]
+costAlt(a) = reconstruction or narrow rerender + its memory traffic  [Measured]
 ```
 
-Consumers that reproject to previous history must call this helper or implement
-the same derivation verbatim. A sign flip is a correctness bug, not a tuning
-choice. For depth, publish one `viewZ` reconstruction contract next to the
-renderer flags; `GTAONode`, fog, volumetrics, and temporal rejection must not
-mix reversed-depth assumptions with renderer-defined depth labels.
+Keep `a` only when `costMRT(a) < costAlt(a)` and peak resident memory stays
+inside the declared budget. On tile GPUs, an attachment sampled by a later pass
+must normally leave tile memory; an MRT can save scene traversal yet still lose
+to bandwidth.
 
-## Color And Output
+Practical candidates:
 
-- Color textures are `SRGBColorSpace`; data maps, masks, normals, roughness,
-  LUT indices, history, and diagnostic data are linear/no-color data.
-- Keep working color in scene-linear HDR until the tone-map owner. Use
-  `HalfFloatType` for HDR pipeline buffers unless a measured memory tier says
-  otherwise.
-- Tone-map once. Convert to output color space once. Individual materials,
-  effects, and UI overlays must not double-convert.
-- A scene-linear creative LUT belongs before tone mapping. A display-referred
-  LUT belongs after `renderOutput()`, with `outputColorTransform = false`.
-- Exclude UI and debug overlays from exposure metering and HDR bloom unless
-  the product explicitly wants those pixels to affect camera response.
+- normal: omit and pass `null` to `ao()` when depth reconstruction is cheaper;
+  retain when several consumers need stable geometric normals;
+- emissive: retain only for selective bloom; otherwise bloom from HDR color;
+- velocity: retain only while temporal consumers are enabled;
+- albedo/base color: r185 exports `diffuseColor`, not `albedo`; use a named MRT
+  mapping such as `albedo: diffuseColor.rgb` only when a real composite consumes
+  it;
+- material/object IDs: add only with a concrete rejection or classification
+  consumer.
 
-## Budgets
+r185 `PassNode` creates additional named attachments by cloning the output
+texture. Do not budget compact `RG16F` velocity or `RGBA8` normals unless the
+physical texture format is explicitly configured, compiled, and verified; the
+default HDR pass can otherwise allocate all named attachments at its HDR output
+format.
 
-Set budgets per enabled graph. Start here, then measure on target hardware:
+## Temporal Contract
 
-| Target | Frame cost for full post | Full-res HDR attachments | Reduced passes | Notes |
-| --- | ---: | ---: | ---: | --- |
-| Desktop discrete | 2.0-4.0 ms at 1440p | 4-6 | 0.5x-0.75x | temporal AO/AA allowed when stable |
-| Desktop integrated | 3.0-5.5 ms at 1080p | 3-4 | 0.5x | prefer fewer MRT outputs and shared denoise |
-| Mobile/tiled | 4.0-7.0 ms at 720p-900p | 2-3 | 0.33x-0.5x | disable optional history first |
+Three.js r185 `VelocityNode` writes:
 
-Memory estimate per 1920x1080 attachment:
+```text
+velocityNDC = currentNDC.xy - previousNDC.xy            [Derived: r185 source]
+```
 
-| Attachment type | Cost |
-| --- | ---: |
-| RGBA16F HDR | about 16 MB |
-| RG16F velocity | about 8 MB |
-| R16F scalar | about 4 MB |
-| RGBA8 display/data | about 8 MB |
+Its built-in `TRAANode` converts that to texture UV with a Y flip:
 
-Every enabled pass must state dispatch count if compute is used, render
-resolution, attachment count, target type, draw/scene render count, GPU time,
-and resize/disposal behavior.
+```js
+// Constants are [Derived: r185 TRAANode source].
+const offsetUV = velocityTexel.xy.mul( vec2( 0.5, - 0.5 ) );
+const previousUV = currentUV.sub( offsetUV );
+```
 
-Derived internal effect rows are part of the same budget:
+Do not use `currentUV - velocity * 0.5` for both axes. The sign mismatch ghosts
+vertical motion.
 
-| Derived node | Internal targets | Draw or dispatch count argument |
-| --- | --- | --- |
-| `BloomNode` 5-mip pyramid | at scale `s`, pyramid pixels are `s^2 * (1 + 1/4 + 1/16 + 1/64 + 1/256)` of full resolution per chain; ping-pong or separate upsample targets roughly double that before final composite | prefilter/threshold 1 + 5 downsample draws + 5 upsample/add draws + final composite = about 12 fullscreen draws |
-| `GTAONode` | AO target is scalar at `resolutionScale^2`; denoise/temporal variants add their own scalar/history targets and must be counted separately | one AO gather draw plus denoise/upsample/composite draws actually enabled; temporal filtering also counts TRAA/history work |
-| `TRAANode` | current beauty input plus previous beauty, velocity, depth/rejection, and any neighborhood clamp targets | one reprojection/resolve fullscreen draw per enabled history plus reset/clear work on resize, camera cut, or projection change |
+Before enabling temporal output, declare:
 
-Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4, when the accounting
-unit is a double-buffered render-target slot or ping-pong allocation. State the
-unit before comparing bytes.
+- velocity producer for rigid, instanced, skinned, and procedurally deformed
+  geometry actually present;
+- jitter owner and whether velocity includes jitter;
+- depth convention and rejection domain;
+- history color domain and exposure used to create it;
+- reset events: resize/DPR, cut, projection change, scene load, discontinuous
+  deformation, format change, and invalid velocity;
+- current/history/rejection/velocity diagnostics.
+
+`traa()` requires a texture input. Passing a composite node causes r185 to
+materialize an additional full-resolution `RTTNode` (color target and fullscreen
+draw, with default depth unless explicitly disabled). Account, own, and dispose
+that target. Stock TRAA also requires scene color/depth/velocity/input extents to
+match the drawing buffer; a scaled scene pass is not a silent TAAU path.
+
+`TRAANode` requires MSAA disabled `[Gated: r185 source]`. r185 exposes no public
+general `reset()` method; resize is handled internally, while cuts and other
+discontinuities need a validated wrapper policy or node rebuild/disposal.
+
+## Output Ownership
+
+- source color textures tagged with an sRGB transfer use `SRGBColorSpace`;
+- linear HDR sources and working render targets remain in the registered
+  working space;
+- normals, masks, velocity, depth, LUT transform data, and histories that are
+  not colors use `NoColorSpace`/data semantics;
+- choose the HDR working format from required range, precision, filtering,
+  blending, target support, and measured bandwidth. `HalfFloatType` is a common
+  candidate, not a universal requirement `[Gated]`;
+- one tone-map owner, one working-to-output conversion owner;
+- a scene-linear LUT needs a shaper for unbounded HDR;
+- a tone-mapped-linear LUT sits after `toneMapping()` and before
+  `renderOutput(..., NoToneMapping, outputColorSpace)`;
+- a display-encoded LUT sits after `renderOutput()` and receives no second
+  conversion;
+- explicit `renderOutput()` requires
+  `RenderPipeline.outputColorTransform = false`.
+
+## Lifetime And Adaptive Resolution
+
+r185 has no public transient render-graph alias allocator. Built-in
+`BloomNode`, `GTAONode`, and `TRAANode` own persistent private render targets.
+Count all of those allocations. Custom target reuse is legal only for
+non-overlapping lifetimes with identical dimensions, format, sample count, and
+usage; history and diagnostic pins never alias.
+
+Adaptive DPR uses sustained GPU pressure, asymmetric hysteresis, and a cooldown.
+It must distinguish scalable pixel work from fixed work, quantize changes to an
+authored step, and reset/reseed every affected history. The complete controller
+and formulas live in the reference.
+
+## Composable Budget Contract
+
+Never add a coordinator's full-post cost to the absolute costs of effects it
+already contains. Use:
+
+```text
+fullGraph = measured end-to-end GPU frame                            [Measured]
+marginal(effect | graph) = graphWithEffect - identicalGraphWithout  [Measured]
+```
+
+For planning only:
+
+```text
+estimatedGraph = measuredBase + sum(measuredMarginals) + interactionReserve
+```
+
+`interactionReserve` is `[Authored]` until the assembled full graph is
+`[Measured]`; then the full-graph measurement wins. Every result states canvas
+physical pixels, DPR, enabled graph, warmup, statistic, browser, and GPU.
+
+r185 render/compute timestamp pools sum instrumented pass durations. They do
+not automatically include copies, barriers, submission gaps, or presentation;
+do not label their sum end-to-end `fullGraph` without an independent scope gate.
+
+For parent physical extent `W * H`, scale `s`, texel bytes `b`, sample count
+`m`, array layers `l`, and retained allocation slots `k`, the uncompressed
+payload lower bound is:
+
+```text
+Wp = floor(W * s)                                         [Derived: r185 PassNode]
+Hp = floor(H * s)                                         [Derived: r185 PassNode]
+bytes >= Wp * Hp * b * m * l * k                          [Derived]
+```
+
+Use the dimensions actually reported by the target; backend alignment,
+compression, resolves, allocator granularity, and private targets are outside
+that payload equation. Count resident bytes and peak live bytes separately;
+sum bandwidth only for actual reads/writes.
 
 ## Rules
 
-- One scene render is the default. Extra scene renders require a measured reason.
-- Use `mrt()` for shared depth-adjacent signals instead of duplicating passes.
-- Use `GTAONode`, `BloomNode`, `TRAANode`, `DepthOfFieldNode`, and built-in sky,
-  fog, and shadow nodes before custom nodes.
-- Apply AO to the lighting component it represents; do not blindly multiply the
-  final color.
-- Use depth/normal-aware upsampling for reduced-resolution effects.
-- Own camera jitter in one place; reset history on resize, cut, projection
-  change, large exposure jump, material ID instability, or disocclusion.
-- Keep pass toggles, effect-only views, and graph inspection available in
-  production builds behind diagnostics.
-- Do not load all atomic post skills by default. Route only the effects actually
-  requested.
+- the primary scene pass is the baseline; extra scene renders need a measured
+  reason;
+- depth is shared from the pass, not duplicated as an MRT color attachment;
+- MRT is conditional, not a completeness checklist;
+- apply AO only to the indirect-light term it models;
+- use depth/normal-aware reconstruction for reduced effects;
+- keep temporal history in a stable pre-exposure domain by default;
+- exclude UI/debug from exposure and HDR bloom unless intentionally authored;
+- call `scenePass.compileAsync(renderer)` only after MRT and texture-node
+  requests are complete;
+- set `renderPipeline.needsUpdate = true` after output-graph changes;
+- expose disable paths, effect-only views, physical formats, peak bytes, and
+  timings in production diagnostics;
+- dispose removed node effects and their targets.
 
 ## Routing Boundary
 
-Use this skill when multiple image-space systems must share buffers, ordering,
-history, budgets, or output ownership. For one isolated effect, use the atomic
-skill without loading this coordinator.
+Use this skill for shared buffers, ordering, history, lifetimes, adaptive DPR,
+budgets, or final output. Use an atomic skill for one isolated effect and return
+here only when it joins the shared graph.

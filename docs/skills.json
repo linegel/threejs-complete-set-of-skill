@@ -76,7 +76,7 @@
     {
       "name": "threejs-ambient-contact-shading",
       "title": "Ambient Contact Shading",
-      "description": "Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.",
+      "description": "Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.",
       "examples": [
         "webgpu-node-gtao"
       ],
@@ -111,7 +111,7 @@
     {
       "name": "threejs-bloom",
       "title": "Bloom",
-      "description": "Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics.",
+      "description": "Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid costs, transparent blending rules, PSF limits, and mobile/tile-GPU gates.",
       "examples": [
         "node-selective-bloom"
       ],
@@ -128,7 +128,7 @@
     {
       "name": "threejs-camera-controls-and-rigs",
       "title": "Camera Controls and Rigs",
-      "description": "Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration.",
+      "description": "Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.",
       "examples": [
         "webgpu-camera-rig"
       ],
@@ -145,7 +145,7 @@
     {
       "name": "threejs-choose-skills",
       "title": "Three.js WebGPU/TSL Choose Skills",
-      "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work and diagnose version-specific Three.js/WebGPU API or renderer failures. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, known-issue debugging, upgrade triage, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
+      "description": "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, procedural worlds, and version-specific renderer debugging. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.",
       "examples": [],
       "latestUpdate": {
         "date": "2026-07-09",
@@ -160,7 +160,7 @@
     {
       "name": "threejs-compatibility-fallbacks",
       "title": "Three.js Compatibility Fallbacks",
-      "description": "Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.",
+      "description": "Use only for teaching how to apply fallback when WebGPU is unavailable after the user explicitly requests it. Never activate for canonical WebGPU/TSL work, low-end tuning, mobile optimization, capability preflight, or general target support.",
       "examples": [
         "tier-planner"
       ],
@@ -177,7 +177,7 @@
     {
       "name": "threejs-dynamic-surface-effects",
       "title": "Dynamic Surface Effects",
-      "description": "Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
+      "description": "Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
       "examples": [
         "touch-history-frost",
         "webgpu-touch-history-frost"
@@ -195,7 +195,7 @@
     {
       "name": "threejs-exposure-color-grading",
       "title": "Exposure and Color Grading",
-      "description": "Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading.",
+      "description": "Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.",
       "examples": [
         "webgpu-exposure-color-pipeline"
       ],
@@ -212,7 +212,7 @@
     {
       "name": "threejs-image-pipeline",
       "title": "Image Pipeline",
-      "description": "Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.",
+      "description": "Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.",
       "examples": [
         "integration-shared-framegraph",
         "webgpu-image-pipeline"
@@ -230,7 +230,7 @@
     {
       "name": "threejs-particles-trails-and-effects",
       "title": "Particles, Trails, and Effects",
-      "description": "Author production WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for ship-conforming reentry plasma, generated capsule wakes, compute-updated instanced sparks, timed dissolving debris, dense-swap effect pools, and MRT-driven scene-relative HDR emission hierarchy.",
+      "description": "Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced sparks, timed dissolves, GPU particle pools, deterministic compaction, and conditional scene-relative HDR emission signals.",
       "examples": [
         "reentry-plasma",
         "webgpu-pooled-effects"
@@ -248,7 +248,7 @@
     {
       "name": "threejs-procedural-buildings-and-cities",
       "title": "Procedural Buildings and Cities",
-      "description": "Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.",
+      "description": "Build authored procedural buildings, facades, and city kits in Three.js r185 WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.",
       "examples": [
         "authored-financial-tower",
         "webgpu-material-slot-compiler"
@@ -266,7 +266,7 @@
     {
       "name": "threejs-procedural-creatures",
       "title": "Procedural Creatures",
-      "description": "Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.",
+      "description": "Build workload-selected procedural and generated creatures in Three.js r185 WebGPU/TSL. Use for spec-driven bodies, semantic rigs, field-extracted skinned reference meshes, diagnostic SDF shells, procedural gait/hop/flight/swim locomotion, support-relative foot planting, 2-bone IK, verlet appendages, repeated populations, deterministic creature labs, and genetic variation. Not for imported glTF skinned-clip pipelines.",
       "examples": [
         "webgpu-procedural-creature-lab"
       ],
@@ -300,7 +300,7 @@
     {
       "name": "threejs-procedural-geometry",
       "title": "Procedural Geometry",
-      "description": "Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.",
+      "description": "Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.",
       "examples": [
         "sculpted-gallery-frame",
         "semantic-mesh-writer"
@@ -318,7 +318,7 @@
     {
       "name": "threejs-procedural-materials",
       "title": "Procedural Materials",
-      "description": "Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.",
+      "description": "Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.",
       "examples": [
         "lava-flow-surface",
         "tsl-procedural-pbr"
@@ -336,7 +336,7 @@
     {
       "name": "threejs-procedural-motion-systems",
       "title": "Procedural Motion Systems",
-      "description": "Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
+      "description": "Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
       "examples": [
         "webgpu-procedural-timelines"
       ],
@@ -353,7 +353,7 @@
     {
       "name": "threejs-procedural-planets",
       "title": "Procedural Planets",
-      "description": "Author high-performance procedural planetary bodies in latest Three.js with WebGPURenderer, TSL, NodeMaterial, cube-sphere quadtree LOD, GPU displacement, coupled crater/biome/climate fields, analytic normals, altitude LOD, and atmosphere handoff from orbit through close approach.",
+      "description": "Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.",
       "examples": [
         "procedural-planet-surface",
         "webgpu-quadtree-planet"
@@ -371,7 +371,7 @@
     {
       "name": "threejs-procedural-vegetation",
       "title": "Procedural Vegetation",
-      "description": "Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.",
+      "description": "Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, optional compute/storage, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.",
       "examples": [
         "gpu-computed-grass",
         "structured-ash-growth",
@@ -411,7 +411,7 @@
     {
       "name": "threejs-scalable-real-time-shadows",
       "title": "Scalable Real-Time Shadows",
-      "description": "Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity.",
+      "description": "Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached clipmaps, stable texel snapping, filter/bias footprints, cache invalidation, caster parity, binding pressure, and sustained mobile budgets.",
       "examples": [
         "webgpu-cached-clipmap-shadow"
       ],
@@ -428,7 +428,7 @@
     {
       "name": "threejs-sky-atmosphere-and-haze",
       "title": "Sky, Atmosphere, and Haze",
-      "description": "Implement maximum-performance sky, atmosphere, and haze systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, RenderPipeline, compute-generated scattering LUTs, depth-aware aerial perspective, sun/moon discs, and atmosphere-aware lighting.",
+      "description": "Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.",
       "examples": [
         "lut-aerial-perspective",
         "webgpu-lut-atmosphere"
@@ -446,7 +446,7 @@
     {
       "name": "threejs-spectral-ocean",
       "title": "Spectral Ocean",
-      "description": "Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.",
+      "description": "Build broad-band procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, and falsifiable GPU evidence.",
       "examples": [
         "hybrid-clear-water-ocean",
         "spectral-cascade-ocean",
@@ -466,7 +466,7 @@
     {
       "name": "threejs-visual-validation",
       "title": "Visual Validation",
-      "description": "Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.",
+      "description": "Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.",
       "examples": [
         "webgpu-validation-harness"
       ],
@@ -483,7 +483,7 @@
     {
       "name": "threejs-volumetric-clouds",
       "title": "Volumetric Clouds",
-      "description": "Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers.",
+      "description": "Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and error-bounded quality tiers.",
       "examples": [
         "deprecated-weather-volume-clouds",
         "webgpu-weather-volume-clouds"
@@ -501,7 +501,7 @@
     {
       "name": "threejs-water-optics",
       "title": "Water Optics",
-      "description": "Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.",
+      "description": "Build workload-selected analytic and bounded water in Three.js r185 WebGPU/TSL. Use for StorageTexture heightfield simulation, exact parametric displacement and normals, local disturbances, receiver-space caustics, depth-aware refraction, Beer-Lambert absorption, side-aware Fresnel, filtered normal bands, reflection, and foam.",
       "examples": [
         "analytic-wave-optics",
         "interactive-pool-volume",

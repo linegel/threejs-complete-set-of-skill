@@ -1,18 +1,20 @@
 ---
 name: threejs-sky-atmosphere-and-haze
-description: Implement maximum-performance sky, atmosphere, and haze systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, RenderPipeline, compute-generated scattering LUTs, depth-aware aerial perspective, sun/moon discs, and atmosphere-aware lighting.
+description: Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.
 ---
 
 # Sky, Atmosphere, and Haze
 
-Throughput is won by architecture before code. The taught path is latest
-Three.js `WebGPURenderer` from `three/webgpu`, TSL from `three/tsl`,
-`NodeMaterial` materials, node `RenderPipeline`, and compute-generated
-Hillaire/Bruneton-family scattering LUTs sampled by cheap nodes per pixel.
+Throughput is won by architecture before code. The taught path is native
+WebGPU on Three.js r185, `WebGPURenderer` from `three/webgpu`, TSL from
+`three/tsl`, node materials, one `RenderPipeline`, and compute-generated
+Hillaire/Bruneton-family scattering products sampled by bounded nodes per
+pixel. A WebGL backend is a hard blocker for this skill; there is no alternate
+renderer branch here.
 
 Read [references/atmosphere-system-contract.md](references/atmosphere-system-contract.md)
-before implementation. It defines the LUT contracts, capability gate, quality
-tiers, budgets, color/output ownership, depth contract, diagnostics, and the
+before implementation. It defines the LUT contracts, capability gate, authored
+workload trials, measurement obligations, color/output ownership, depth contract, diagnostics, and the
 techniques replaced by the WebGPU/TSL architecture.
 
 Canonical implementation contract: `examples/webgpu-lut-atmosphere/`.
@@ -29,7 +31,8 @@ atmosphere parameters + planet/ellipsoid transform
   -> compute transmittance LUT
   -> compute multiscatter / irradiance LUTs
   -> compute sky-view LUT for the active camera/sun frame
-  -> compute aerial-perspective froxel volume for view depth ranges
+  -> compute aerial inscattering plus RGB optical-depth froxels, or prove an
+     endpoint-transmittance reconstruction
   -> scene pass() with shared color/depth ownership
   -> TSL sky and aerial-perspective nodes sample LUTs
   -> one HDR RenderPipeline output path
@@ -44,35 +47,50 @@ texture lookups, segment transmittance, and depth-aware composition.
 1. Run `$threejs-choose-skills` preflight when atmosphere touches terrain,
    clouds, shadows, exposure, or post ownership.
 2. Define one atmosphere model shared by sky, aerial perspective, sun/moon
-   discs, material irradiance, and lighting: radii, density profiles,
-   coefficients, sun direction, exposure scale, and unit conversion.
-3. Initialize `WebGPURenderer`, call `await renderer.init()`, and gate on
-   `renderer.backend.isWebGPUBackend === true`. Canonical flagship examples
-   throw on non-WebGPU; teaching how to apply fallback when WebGPU is
-   unavailable belongs in `$threejs-compatibility-fallbacks`.
-4. Generate LUTs with TSL `Fn().compute(count)` dispatches through
-   `renderer.compute()` or `renderer.computeAsync()`. Write into
-   `StorageTexture` resources with `textureStore()` and treat LUTs as
-   `NoColorSpace` data.
-5. Use `RenderPipeline`, `pass()`, `mrt()` when the host image chain needs
-   shared color/depth/normal/velocity signals, and `PassNode.getLinearDepthNode()`
-   or `getViewZNode()` for the aerial-perspective depth contract.
+   discs, material irradiance, and lighting. Declare the integration length
+   unit and coefficient unit together: `beta [length^-1] * ds [length]` must be
+   dimensionless. Never combine meter radii with per-kilometer coefficients.
+3. Initialize `WebGPURenderer`, call `await renderer.init()`, and require
+   `renderer.backend.isWebGPUBackend === true` before allocating resources.
+4. Generate 2D LUTs with TSL `Fn().compute(count)` dispatches through
+   `renderer.compute()` or `renderer.computeAsync()`. Write 2D products with
+   `StorageTexture` plus `textureStore()`; write volume products with r185
+   `Storage3DTexture` plus `storageTexture3D()`. Treat all products as
+   `NoColorSpace` data. Set r185 2D `StorageTexture.generateMipmaps = false`
+   and `mipmapsAutoUpdate = false` unless a measured path consumes authored
+   mips. Set `Storage3DTexture.generateMipmaps = false` as well when only its
+   base level is written; it has no `mipmapsAutoUpdate` property.
+   After initialization use `renderer.compute()` for normal submission. In
+   r185 `computeAsync()` only initializes on demand before enqueueing; it is
+   not a GPU-completion fence. Later GPU submissions are queue-ordered, but CPU
+   readback, timestamp resolution, resource reuse, and lifetime decisions need
+   an explicit completion/readback mechanism.
+5. Use `RenderPipeline`, `pass()`, and `mrt()` when the image chain needs
+   shared signals. In r185, `PassNode.getViewZNode()` is the standard/reversed
+   **perspective** helper and `getLinearDepthNode()` returns normalized depth,
+   not metric ray distance. Orthographic and logarithmic depth require their
+   explicit TSL conversions and fixed projection tests.
 6. Compose sky radiance and surface-segment transmittance/inscattering with
    TSL nodes. Keep output scene-linear HDR until the single tone-map and output
    color transform owner.
-7. Validate LUT dimensions, units, byte counts for imported assets, depth mode,
-   planet intersections, camera altitude, and fixed sun/camera screenshot cases
-   before tuning color.
+7. Validate inverse LUT mappings at texel centers, quadrature convergence,
+   invalidation hashes, units, payload byte counts, energy bounds, depth mode,
+   planet intersections, camera altitude, and fixed sun/camera cases before
+   tuning color.
 
-Use the canonical validation module for Phase 1 hard gates:
+Use the canonical validation module for Phase 1 structural/equation gates:
 
 ```sh
 node examples/webgpu-lut-atmosphere/validation.js
 ```
 
 It verifies the LUT manifest, RGBA16F upload policy, unit conversion fixtures,
-CPU segment/intersection math, depth-mode helpers, WebGPU/TSL API ownership,
-and resource resize/dispose contracts.
+manifest/live-model equality, CPU segment/intersection math, transmittance
+mapping, HG normalization through the accepted `|g| <= 0.99` interval, and
+projection-specific depth reconstruction including nearest-covered-sample MSAA
+resolve. It also builds the TSL graphs. It does not initialize a GPU, submit
+compute, render a scene, or measure full-frame performance; those remain
+browser-harness obligations.
 
 ## Capability Gate
 
@@ -83,7 +101,7 @@ await renderer.init();
 
 if ( renderer.backend.isWebGPUBackend !== true ) {
   throw new Error(
-    'threejs-sky-atmosphere-and-haze requires WebGPU for the flagship live LUT path; use threejs-compatibility-fallbacks when teaching how to apply fallback when WebGPU is unavailable.'
+    'threejs-sky-atmosphere-and-haze requires a native WebGPU backend.'
   );
 }
 
@@ -92,12 +110,16 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
 
 Quality tiers:
 
-| Tier | Requirements | Defaults |
+Numeric labels used here and in the reference: **[Derived]** follows from an
+equation or representation; **[Gated]** is an acceptance ceiling/floor;
+**[Measured]** must come from a named device capture; **[Authored]** is a
+starting quality or appearance choice, never a hardware fact.
+
+| Tier | Requirements | Authored starting dimensions |
 | --- | --- | --- |
-| Ultra desktop-discrete | WebGPU backend with generous storage budget | 256x64 transmittance, 64x32 multiscatter/irradiance, 192x108 sky-view, 32-64 aerial froxel slices, optional temporal update split |
-| High desktop-discrete/integrated | WebGPU backend with moderate storage budget | 256x64 transmittance, 128x64 sky-view, 24-32 froxel slices, update sky-view when sun/camera frame changes |
-| Default mobile/tiled | WebGPU backend with tight bandwidth | 128x32 transmittance, 96x48 sky-view, 16-24 froxel slices, lower-frequency multiscatter refresh |
-| Fallback route | Not part of this flagship skill | use `$threejs-compatibility-fallbacks` when fallback behavior is explicitly requested |
+| Full-detail trial | Native WebGPU; two RGB aerial payloads or proven endpoint reconstruction | **[Authored]** 256x64 transmittance, 64x32 multiscatter/irradiance, 192x108 sky-view, 192x108x32-48 aerial |
+| Budgeted trial | Native WebGPU; cached static LUTs and staggered view products | **[Authored]** 192x48 transmittance, 128x64 sky-view, 160x90x24-32 aerial |
+| Minimum-resident trial | Native WebGPU; one scene pass, compact view products, no hidden full refresh | **[Authored]** 128x32 transmittance, 96x48 sky-view, 96x54x16-24 aerial |
 
 ## Required Outputs
 
@@ -108,22 +130,41 @@ Quality tiers:
   `MeshPhysicalNodeMaterial` lighting integration;
 - explicit conversion between render units and atmosphere meters/kilometers;
 - diagnostics for LUT coordinates, slices, intersections, depth class, and
-  shell/post blend.
+  shell/post blend;
+- a dependency hash and last-update reason for every LUT;
+- reference-integrator errors for optical depth, radiance, horizon, and energy;
+- a declared aerial payload: RGB inscattering plus RGB optical depth, or a
+  validated method that reconstructs chromatic segment transmittance. Packing
+  RGB scattering and only scalar opacity into one RGBA volume is not silently
+  equivalent.
 
-## Budgets
+## Workload And Performance Evidence
 
-Start with these budgets, then measure on target hardware:
+Do not inherit a device-class millisecond or memory table. Derive the workload:
 
-| Target | Atmosphere cost | LUT memory target | Per-frame work |
-| --- | ---: | ---: | --- |
-| Desktop discrete 1440p | 0.4-1.2 ms | 8-24 MB | sky-view plus aerial froxel updates as needed |
-| Desktop integrated 1080p | 0.7-1.8 ms | 4-14 MB | staggered LUT refresh, 24-32 froxel slices |
-| Mobile/tiled 720p-900p | 0.8-2.5 ms | 2-8 MB | static/precomputed base LUTs, 16-24 froxel slices |
+```text
+payloadBytes = sum(width * height * depth * bytesPerTexel * residentCopies)
+invocations = width * height * depth
+workgroupInvocations = wgX * wgY * wgZ
+r185FlattenedGroups = ceil(invocations / workgroupInvocations)
+integratorSamples = updatedTexels * samplesPerTexel
+```
+
+This formula matches a numeric r185 `Fn().compute(count, [wgX,wgY,wgZ])`:
+the backend dispatches `[r185FlattenedGroups,1,1]`, wrapping into Y only when
+the adapter's `maxComputeWorkgroupsPerDimension` is exceeded. Count unique
+kernels, not output textures; one aerial kernel may write both RGB
+inscattering and RGB optical depth.
+
+The product supplies its own full-frame GPU p95, CPU-submit p95, presented-frame
+p95, and peak-live-byte budgets. Acceptance uses contemporaneous full-frame
+captures on the named adapter/browser/viewport/DPR/pass graph. Quality-table
+dimensions are **[Authored] trials**, not memory gates or timing evidence.
 
 Do not spend full-resolution nested optical-depth marches per pixel. Every
 enabled tier must state texture dimensions, storage formats, dispatch counts,
-render resolution, update cadence, draw calls, GPU time, and resize/disposal
-behavior.
+render resolution, update cadence, draw calls, peak live bytes, full-frame
+p50/p95, and resize/disposal behavior.
 
 ## Color And Output
 
@@ -149,8 +190,19 @@ behavior.
   motion;
 - depth reconstruction ignores standard, reversed, logarithmic, orthographic,
   MSAA-resolved, or sky-pixel cases used by the host renderer;
+- reversed depth is manually flipped before an r185 conversion that already
+  handles `renderer.reversedDepthBuffer`, or `getLinearDepthNode()` is treated
+  as a metric distance;
 - direct sun, sky irradiance, segment transmittance, and inscattering are
   collapsed into one color;
+- a single scalar alpha is presented as chromatic RGB transmittance without an
+  error gate;
+- an imported LUT is sampled without proving that radii, coefficients, density
+  layers, phase convention, and solar/spectral basis equal the live model;
+- HG `g` approaches its singular `|g|=1` limit without a declared accepted
+  interval, stable denominator, and normalization/extreme-direction tests;
+- camera rotation, temporal projection jitter, or a floating-origin shift
+  invalidates body-frame LUTs that are unchanged;
 - tone mapping or output color conversion happens more than once;
 - atmosphere fades abruptly at shell entry or switches ownership without a
   validated transition.

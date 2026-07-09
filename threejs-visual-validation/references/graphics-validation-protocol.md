@@ -1,843 +1,825 @@
 # Graphics Validation Protocol
 
-Use this protocol to validate authored Three.js graphics on the current
-WebGPU/TSL path: deterministic final frames, mechanism-isolation views,
-temporal evidence, seed sweeps, renderer/backend manifests, GPU timing,
-resource inventories, leak loops, and explicit budgets.
+Use this protocol to validate authored Three.js graphics on the canonical
+WebGPU/TSL path. It separates visual correctness, mechanism correctness,
+deadline compliance, GPU attribution, resource pressure, and lifecycle
+stability so that evidence for one claim cannot be substituted for another.
 
 ## Contents
 
-- Acceptance principle
-- Fastest validation architecture
-- Capability gate and quality tiers
-- Evidence bundle
+- Acceptance model
+- Numeric evidence labels
 - Visual contract
-- Automation contract
-- Renderer and backend manifest
-- Node pipeline evidence
-- Target and storage inventories
-- Timing and budgets
+- Capability gate
+- Evidence bundle
+- Automation and renderer manifests
+- Node-pipeline evidence
+- Visual-error protocol
+- Refresh-derived budgets
+- Sustained and thermal protocol
+- Quality-governor protocol
+- GPU timing sufficiency
+- Resource, tile-memory, and bandwidth protocol
 - Color and output
-- Required inspection controls
+- Inspection controls
 - Mechanism-specific evidence
-- No-post and isolation gates
-- Determinism and captures
-- Temporal validation
+- Determinism and temporal validation
 - Resource lifetime validation
-- Rejection criteria
-- Sign-off record
+- Rejection and sign-off
 
-## Acceptance Principle
+## Acceptance Model
 
-Accept an implementation only when all four layers agree:
+Accept an implementation only when this chain is complete:
 
 ```text
-declared visual mechanism
-  -> inspectable WebGPU/TSL implementation
-  -> machine-readable diagnostic evidence
-  -> final image that satisfies the visual contract
+declared physical and visual invariant
+  -> inspectable implementation and ownership
+  -> diagnostic that isolates the invariant
+  -> metric in the invariant's native domain
+  -> frozen acceptance gate
+  -> fixed-view and temporal evidence
+  -> sustained target-device cost
 ```
 
-Code plausibility is insufficient. A visually weak result means the mechanism
-is incomplete, misweighted, under-sampled, or badly presented. A beautiful final
-frame is also insufficient when it hides field instability, broken depth,
-temporal failure, bad color ownership, or dependence on presentation treatment.
+Code plausibility and a polished frame are insufficient. A weak result exposes
+an incomplete, badly weighted, unstable, or under-sampled mechanism. A strong
+frame can still conceal invalid depth, radiometric error, temporal ghosting,
+resource churn, output-transform duplication, or a quality governor that
+silently discards the authored result.
 
-## Fastest Validation Architecture
+Keep claim classes independent:
 
-Build validation as an authored contract bundle from the start:
+- visual correctness: appearance inside the declared camera, lighting, and
+  temporal envelope;
+- mechanism correctness: physical, geometric, field, radiometric, and state
+  invariants;
+- performance compliance: sustained deadline and resource gates on a named
+  device/browser/display configuration;
+- GPU attribution: timestamp-backed GPU and pass/dispatch cost;
+- lifecycle stability: bounded resources across resize, reset, and teardown.
 
-1. Deterministic runner: fixed seed, fixed time, fixed camera matrices, fixed
-   viewport, DPR, quality tier, asset revisions, and explicit stochastic masks.
-2. WebGPU/TSL pipeline: `WebGPURenderer`, TSL node materials, `RenderPipeline`,
-   `pass()`, `mrt()`, built-in post nodes, and compute/storage resources where
-   the subject system uses GPU-side simulation or generated data.
-3. Evidence capture: final, no-post, diagnostic mosaic, near/design/far camera
-   views, representative seed sweep, stress seeds, temporal checkpoints or
-   clip frames, and failure-sensitive debug views.
-4. Metrics capture: `renderer.info`, target inventory, storage inventory,
-   dispatch count, pass count, draw calls, primitives, CPU frame time, GPU
-   timestamp timing when exposed, median, p95, and readback/capture overhead.
-5. Stability capture: resize, tier switch, reset, history clear, device-error
-   surfacing, teardown, dispose/recreate loops, and before/after resource
-   metrics.
+A bundle may pass one class and be `INSUFFICIENT_EVIDENCE` or fail another.
+Never collapse these into a single unqualified pass.
 
-This replaces informal screenshot review. Algorithm class dominates validation
-quality: machine-readable contracts and direct GPU evidence catch failure modes
-that a final image can hide.
+## Numeric Evidence Labels
 
-## Capability Gate And Quality Tiers
+Every numeric value in artifacts, prose conclusions, plots, tables, and image
+captions carries exactly one label:
 
-Every validation surface records the actual backend and chooses a quality tier.
-Compute/storage/MRT evidence must use this gate:
+- `Authored`: input or policy declared before candidate inspection;
+- `Derived`: result of a recorded formula over labelled inputs;
+- `Measured`: observation from the named run and sample scope;
+- `Gated`: acceptance bound frozen before candidate inspection.
+
+Use this record everywhere:
+
+```ts
+type NumericDatum = {
+  value: number
+  unit: string
+  label: 'Authored' | 'Derived' | 'Measured' | 'Gated'
+  source: string
+  uncertainty?: string
+}
+
+type NumericArray = {
+  values: number[]
+  unit: string
+  label: 'Authored' | 'Derived' | 'Measured' | 'Gated'
+  source: string
+  uncertainty?: string
+}
+```
+
+Bare frame budgets, refresh rates, DPRs, resolutions, durations, sample counts,
+percentiles, memory caps, quality constants, and error thresholds invalidate
+the bundle. `p50 [Measured]` and `p95 [Measured]` are estimator names; their
+reported values are still `NumericDatum` records. A derived value used for
+acceptance is retained as `Derived`, then copied to a separately frozen
+`Gated` record that cites it. This preserves calculation provenance and gate
+immutability.
+
+API revisions and identifiers are strings, not numeric evidence. Normative
+alignment or limit values obtained from an API are `Gated` and cite that API.
+
+## Visual Contract
+
+Write the contract before tuning or capturing:
+
+```ts
+type VisualContract = {
+  subject: string
+  identity: string[]
+  invariants: InvariantContract[]
+  cameraEnvelope: {
+    bookmarks: string[]
+    near: NumericDatum
+    design: NumericDatum
+    far: NumericDatum
+  }
+  lightingEnvelope: string[]
+  temporalEnvelope: string[]
+  requiredImages: string[]
+  requiredDiagnostics: string[]
+  requiredMetrics: string[]
+  blockingFailures: string[]
+  allowedDivergences: string[]
+  performanceClaims: PerformanceClaims
+  performanceEnvelope: PerformanceEnvelope
+  resourceGates: ResourceGates
+}
+
+type InvariantContract = {
+  id: string
+  statement: string
+  domain: 'geometry' | 'field' | 'radiometry' | 'image' | 'temporal' | 'resource' | string
+  truthSource: string
+  diagnostic: string
+  metric: string
+  mask?: string
+  gate: NumericDatum | NumericDatum[]
+  requiredArtifacts: string[]
+  blockingFailure: string
+}
+```
+
+Each invariant must be directly observable. State a falsifiable relation such
+as silhouette continuity, field conservation, depth ordering, radiance ratio,
+history rejection, root anchoring, or horizon closure. Do not use adjectives
+as tests. A contract requiring only the final image is invalid because it
+cannot prove mechanism, no-post signal, timing, ownership, or lifecycle.
+
+When matching a supplied reference, record the causal features that define its
+identity and every deliberate divergence in backend, asset, scale, camera,
+lighting, output transform, or composition. A category-level resemblance is
+not reference matching.
+
+## Capability Gate
+
+When `gpuTimingRequirement` is `required`, construct `WebGPURenderer` with
+`trackTimestamp: true`; the request must precede initialization. Initialize
+before reading backend truth:
 
 ```js
 await renderer.init();
 
-const capabilities = {
-  threeRevision: THREE.REVISION,
-  renderer: 'WebGPURenderer',
-  isPrimaryBackend: renderer.backend.isWebGPUBackend === true,
-  outputColorSpace: renderer.outputColorSpace,
-  toneMapping: renderer.toneMapping,
-  toneMappingExposure: renderer.toneMappingExposure,
-  samples: renderer.samples,
-  reversedDepthBuffer: renderer.reversedDepthBuffer,
-  logarithmicDepthBuffer: renderer.logarithmicDepthBuffer,
-  outputBufferType: renderer.getOutputBufferType(),
-  coordinateSystem: renderer.coordinateSystem,
-  compatibilityMode: renderer.backend?.compatibilityMode ?? null,
-  trackTimestamp: renderer.backend?.trackTimestamp ?? null,
-  limits: renderer.backend?.device?.limits ?? null,
-  features: renderer.backend?.device?.features ? [ ...renderer.backend.device.features ] : null,
-  unavailableReason: renderer.backend?.device ? null : 'renderer.backend.device unavailable',
-  initialized: renderer.initialized
-};
-
-if (renderer.backend.isWebGPUBackend === true) {
-  qualityTier = 'native-compute';
-} else {
-  throw new Error('WebGPU backend required for canonical visual validation.');
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error('WebGPU backend required for canonical visual validation. Report the blocker; do not teach fallback unless the user explicitly requested teaching how to apply fallback when WebGPU is unavailable.');
 }
 ```
 
-Quality tiers are native WebGPU evidence tiers, not separate recipes:
+After the gate, record revision, renderer/backend identity, output color space,
+tone map and exposure, sample count, depth mode, output buffer type, coordinate
+system, compatibility mode, timestamp support, adapter features/limits,
+initialization state, device loss, and uncaptured errors. Every numeric
+capability, enum, matrix, and limit is a `NumericDatum` or `NumericArray`; never
+serialize raw numeric fields.
 
-| Tier | Use when | Expected evidence | Allowed reduction |
-| --- | --- | --- | --- |
-| `native-compute` | primary backend exposes compute/storage path | full compute, MRT, timing, storage, and temporal evidence | none beyond declared quality settings |
-| `native-budgeted` | primary backend is present but budget is exceeded | same architecture with smaller grids, fewer passes, lower diagnostic resolution, or fewer temporal samples | visible loss must be named |
-
-Do not silently lower quality until a frame looks fast enough. Record the
-preserved mechanism and the expected visual loss for every native WebGPU
-budget setting. The Node harness may emit `node-schema-fixture` only for schema
-self-tests; browser validation must replace fixture PNGs and unavailable
-backend fields with WebGPU evidence.
+Canonical quality states retain WebGPU, TSL, the ownership graph, and the
+mechanism. Reduced resolution, sample count, update rate, or population must
+be named, measured, and visual-error gated. A lower state is not a second
+renderer recipe and cannot activate compatibility guidance.
 
 ## Evidence Bundle
 
-Write artifacts to a stable directory:
+Use stable paths so CI and reviewers compare identical fields:
 
 ```text
-artifacts/visual-validation/<scene-id>/<three-revision>/<tier>/<seed>/
+artifacts/visual-validation/<scene>/<revision>/<target>/<quality>/<seed>/
+  visual-contract.json
   evidence-manifest.json
   renderer-info.json
+  pipeline-graph.json
+  performance-envelope.json
+  frame-trace.json
+  quality-governor.json
   render-targets.json
   storage-resources.json
-  timings.json
+  resident-resources.json
+  bandwidth-model.json
+  visual-errors.json
   leak-loop.json
   images/
     final.design.png
     no-post.design.png
+    contribution.design.png
     diagnostics.mosaic.png
     camera.near.png
     camera.design.png
     camera.far.png
-    seed-0001.final.png
-    seed-stress.final.png
-    temporal.t000.png
-    temporal.t001.png
+    seed.representative.png
+    seed.stress.png
+    temporal.reset.png
+    temporal.response.png
+    temporal.steady.png
+    temporal.disocclusion.png
+    temporal.recovery.png
 ```
 
-The bundle must be reviewable without rerunning the scene. Paths are stable so
-CI and human review can diff the same fields and PNGs.
+Omit only artifacts irrelevant to a contract, and record why. The bundle must
+be reviewable without rerunning the scene. Presence and nonblank checks are
+transport checks, not visual validation.
 
-## Machine-Readable Artifact Schemas
+### Required file semantics
 
-`examples/webgpu-validation-harness/src/schema/artifact-schemas.js` is the
-canonical schema implementation for Phase 1. Every bundle must validate these
-required files before success:
-
-| File | Required fields |
+| File | Required semantics |
 | --- | --- |
-| `visual-contract.json` | `subject`, `identity`, `invariants`, `invariantArtifacts`, `requiredImages`, `requiredDiagnostics`, `requiredMetrics`, `blockingFailures`, `frameBudgetMs`, `memoryBudgetMB` |
-| `evidence-manifest.json` | `skill`, `sceneId`, `threeRevision`, `browser`, `os`, `gpuAdapter`, `renderer`, `backend`, `qualityTier`, `viewport`, `camera`, `seed`, `time`, `assets`, `colorPipeline`, `postStack`, `thresholds`, `stochasticMasks`, `knownCompromises` |
-| `renderer-info.json` | `threeRevision`, `renderer`, `isPrimaryBackend`, `coordinateSystem`, `initialized`, `outputBufferType`, `compatibilityMode`, `trackTimestamp`, `features`, `limits`, `unavailableReason`, `info` |
-| `render-targets.json` | `required`, `targets`, `totalBytes` |
-| `storage-resources.json` | `required`, `resources`, `totalBytes` |
-| `timings.json` | `required`, `warmupFrames`, `sampleFrames`, `cpuFrameMs`, `gpuFrameMs`, `gpuTimingUnavailable`, `gpuTimingLabel`, `renderTimestampMs`, `computeTimestampMs`, `qualityTierChanges` |
-| `leak-loop.json` | `required`, `loops`, `summary`, `allowedCacheNotes` |
+| `visual-contract.json` | claim classes, invariant mappings, labelled numeric policy, visual gates, performance envelope, resource gates, blocking failures |
+| `evidence-manifest.json` | scene and asset identity, target device/browser/display, viewport, camera, seed, time, quality state, color/output graph, stochastic masks, compromises |
+| `renderer-info.json` | initialized renderer/backend truth, adapter when exposed, features, limits, timestamp capability, device errors, `renderer.info` snapshots |
+| `pipeline-graph.json` | pass and dispatch DAG, MRT outputs, history edges, resolution scales, output owner, diagnostic and no-post routes |
+| `performance-envelope.json` | target refresh, browser/compositor reserves, safety reserves, derived stage envelopes, frozen gates, claim requirements |
+| `frame-trace.json` | per-frame CPU/GPU/presentation metrics, active quality, misses, excluded phases, cold and sustained segmentation |
+| `quality-governor.json` | inputs, filtering, gates, hysteresis, residence policy, transitions, settled state, per-state visual error |
+| `render-targets.json` | target descriptors, attachment semantics, liveness, aliasing, memory, load/store/resolve behavior |
+| `storage-resources.json` | buffers/textures, layouts, dispatch ownership, synchronization, read/write volumes, reset policy |
+| `resident-resources.json` | textures, geometry, buffers, histories, staging, readback, pipeline estimate, peak live set, upload churn |
+| `bandwidth-model.json` | per-pass lower/upper traffic, assumptions, pass breaks, resolves, bytes per frame and per second, counter evidence if exposed |
+| `visual-errors.json` | per-invariant metric domain, truth source, alignment, mask, measured distribution, frozen gate, worst-case artifact |
+| `leak-loop.json` | operations, before/after resources, trend test, allowed cache plateaus, device errors |
 
-Required images include `images/final.design.png`,
-`images/no-post.design.png`, `images/diagnostics.mosaic.png`, near/design/far
-camera captures, seed sweep captures, and temporal checkpoints. PNG captures
-must pass a nonblank assertion. Regression comparisons use fixed camera matrix
-and projection matrix records, named mask files for stochastic regions, and
-manifest `thresholds.perViewPixelDiff` records with bundle-relative
-`baseline`, `candidate`, and `maxRatio` fields. The harness decodes both PNGs,
-computes the differing-pixel ratio, and rejects ratios above the per-view
-threshold. Reproducing a comparison by manually orbiting the view is invalid
-evidence.
+The checked-in validation harness may provide transport and schema scaffolding,
+but a bundle is conformant only when it implements every required semantic
+above. Do not treat an older harness pass as proof of this protocol.
 
-### `evidence-manifest.json`
+## Evidence Manifest
+
+Record:
 
 ```ts
 type EvidenceManifest = {
   skill: 'threejs-visual-validation'
   sceneId: string
   threeRevision: string
+  targetId: string
+  device: string
   browser: string
   os: string
   gpuAdapter?: string | null
+  displayRefresh: NumericDatum
+  targetPresentationRate: NumericDatum
   renderer: 'WebGPURenderer'
   backend: {
-    isPrimaryBackend: boolean | null
-    coordinateSystem: string | number | null
+    isPrimaryBackend: boolean
     initialized: boolean
+    coordinateSystem: string | NumericDatum | null
     deviceLostObserved: boolean
     uncapturedErrors: string[]
     features: string[] | null
-    limits: Record<string, number | string | boolean> | null
+    limits: Record<string, NumericDatum | string | boolean> | null
+    timestampAvailable: boolean
     unavailableReason: string | null
   }
-  qualityTier: 'native-compute' | 'native-budgeted' | 'node-schema-fixture'
-  viewport: { width: number; height: number; dpr: number }
-  camera: {
-    bookmark: 'near' | 'design' | 'far' | string
-    matrixWorld: number[]
-    projectionMatrix: number[]
-    near: number
-    far: number
-    fov?: number
+  qualityState: string
+  viewport: {
+    width: NumericDatum
+    height: NumericDatum
+    dpr: NumericDatum
   }
-  seed: string | number
-  time: { fixed: boolean; seconds: number; frame: number }
+  camera: {
+    bookmark: string
+    matrixWorld: NumericArray
+    projectionMatrix: NumericArray
+    near: NumericDatum
+    far: NumericDatum
+    fov?: NumericDatum
+  }
+  seed: string
+  time: {
+    fixed: boolean
+    seconds: NumericDatum
+    frame: NumericDatum
+  }
   assets: { id: string; url?: string; hash?: string }[]
   colorPipeline: ColorPipelineRecord
-  postStack: PostStackRecord
-  thresholds: ThresholdRecord
-  stochasticMasks: MaskRecord[]
+  stochasticMasks: string[]
   knownCompromises: string[]
 }
 ```
 
-```ts
-type ThresholdRecord = {
-  nonblank: { minRange: number }
-  budgetProfile: 'desktopDiscrete' | 'desktopIntegrated' | 'mobile' | string
-  perViewPixelDiff: Record<string, {
-    baseline: string
-    candidate: string
-    maxRatio: number
-  }>
-  cameraMatrixRequired: true
-}
-```
-
-## Visual Contract
-
-Write this before tuning:
-
-```ts
-type VisualContract = {
-  subject: string
-  identity: string[]
-  silhouette: string[]
-  materialSeparation: string[]
-  motion: string[]
-  cameraEnvelope: {
-    near: number
-    design: number
-    far: number
-  }
-  lightingEnvelope: string[]
-  invariants: string[]
-  invariantArtifacts: Record<string, {
-    requiredImages: string[]
-    requiredDiagnostics: string[]
-    requiredMetrics: string[]
-    blockingFailures: string[]
-  }>
-  requiredImages: string[]
-  requiredDiagnostics: string[]
-  requiredMetrics: string[]
-  blockingFailures: string[]
-  allowedDivergences: string[]
-  frameBudgetMs: {
-    desktopDiscrete: number
-    desktopIntegrated: number
-    mobile: number
-  }
-  memoryBudgetMB: number
-}
-```
-
-Each invariant must be observable. Replace vague statements with concrete
-checks such as:
-
-```text
-the primary rim remains visible in the no-post capture
-the water horizon does not reveal the mesh boundary
-tree card roots remain attached under maximum wind
-planet coast width is stable from orbit to mid approach
-cloud history rejects across a foreground disocclusion
-```
-
-Each invariant must also map to required artifacts before rendering. A contract
-that requires only `images/final.design.png` is rejected because it cannot prove
-no-post signal, diagnostics, timing, or lifecycle ownership.
-
-When matching a supplied visual reference, record the mechanisms that create
-its identity and every deliberate divergence in backend, resolution, asset,
-scale, or composition. Do not substitute a generic category match for the
-specific visual contract.
+Unavailable backend fields are `null` with a reason. An unavailable timestamp
+is not a numeric zero.
 
 ## Automation Contract
 
-Browser automation should set:
+Automation controls the actual pipeline and records:
 
 ```text
-viewport width and height
-DPR
-fixed seed
-fixed time or frame index
-camera bookmark
-quality tier
-debug mode
-overlay visibility off for captures
-capture path
+physical viewport and DPR
+display refresh and presentation mode
+fixed seed and deterministic sequence
+fixed time or deterministic step index
+exact camera matrices or immutable bookmark
+quality state and governor mode
+debug output node
+capture path and output encoding
+overlay exclusion
+warm-up, cold, sustained, and capture phases
 ```
 
-Use deterministic frame stepping for stills and temporal checkpoints. For
-stochastic pixels, freeze the sequence or compare an accumulated stable result.
-Use masks only for known stochastic regions and keep thresholds tight enough to
-catch real regressions.
+Freeze stochastic state or compare a converged distribution. Masks are authored
+before capture and restricted to known stochastic pixels. Manual camera
+repositioning invalidates comparisons.
 
 ## Renderer And Backend Manifest
 
-Record:
+Record the Three.js revision, initialized renderer class, backend flag, browser,
+OS, adapter identity when exposed, features, limits, coordinate and depth mode,
+sample count, output buffer type, compatibility mode, timestamp capability,
+output color space, tone map, exposure, device-loss result, and uncaptured
+errors. Include viewport, DPR, display refresh, power state when exposed, and
+whether the tab was foreground, visible, and free of automation throttling.
+
+## Node-Pipeline Evidence
+
+Record the graph that produced each capture:
 
 ```text
-THREE.REVISION
-renderer class
-actual backend flag
-browser and version
-OS
-GPU adapter when exposed
-backend features and limits
-coordinate system
-depth mode
-MSAA sample count
-output buffer type
-compatibility mode
-timestamp tracking flag
-output color space
-tone mapping and exposure
-initialization status
-device-lost callback result
-uncaptured backend errors
-```
-
-The manifest must distinguish unavailable GPU timing from zero GPU cost.
-Unavailable backend fields such as `features`, `limits`, `compatibilityMode`,
-and `trackTimestamp` are `null` with `unavailableReason`.
-
-## Node Pipeline Evidence
-
-Record the node graph that produced every capture:
-
-```text
-RenderPipeline output node owner
-outputColorTransform setting
-explicit renderOutput stage if used
-pass() nodes and cameras
-mrt() outputs and consumers
-PassNode.setResolutionScale() values
-GTAONode / BloomNode / TRAANode / DepthOfFieldNode use
-CSMShadowNode / TileShadowNode use
-fog and sky nodes
-diagnostic override node materials
+RenderPipeline output owner
+outputColorTransform state
+explicit renderOutput stage when present
+scene pass and camera ownership
+MRT attachment names and consumers
+pass resolution scales
+built-in node types and inputs
+history producer, consumer, and reset edges
+compute dispatch dependencies and barriers
+diagnostic override materials
 no-post bypass route
 final composite route
 ```
 
-For post effects, inspect the pre-effect signal, contribution, and final
-composite. Tone mapping and output conversion must have one owner.
+Inspect the pre-effect signal, contribution, and final composite. Changing only
+a diagnostic label is a blocking false diagnostic. A graph change requires
+pipeline invalidation before capture.
 
-## Target And Storage Inventories
+## Visual-Error Protocol
 
-### Render targets
+Select a metric in the invariant's native domain. Global differing-pixel ratio
+is permitted only for deterministic exact-output contracts; it is not a
+general visual-quality metric.
 
-Every render target row must include:
+| Invariant | Required metric family | Required diagnostic |
+| --- | --- | --- |
+| silhouette and topology | mask overlap, boundary-distance distribution, component or hole mismatch | binary silhouette and boundary error map |
+| depth and visibility | relative depth error, occlusion disagreement, disocclusion classification | linear depth and error map |
+| surface orientation | angular normal error distribution, invalid-normal count | world- or view-space normal and angular error map |
+| scene-linear light | relative radiance/luminance error, energy ratio, clipped or non-finite count | pre-tone-map reference, candidate, and signed error |
+| display color | perceptual color-difference distribution under the same transform | output-referred reference, candidate, and difference map |
+| material separation | class confusion, channel residual, highlight-width or roughness-response error | channel and lighting-isolation views |
+| motion | transform, velocity, trajectory, or phase error | velocity and trajectory overlays |
+| temporal reconstruction | reprojected residual, ghost occupancy, flicker energy, rejection classification | history, confidence, disocclusion, and residual views |
+| procedural or simulated field | analytic/sample residual, conservation drift, spectrum or distribution error | raw field and signed residual |
+| stochastic output | distribution-distance and confidence interval over frozen conditions | sample aggregate, variance, and worst seed |
 
-| Field | Requirement |
-| --- | --- |
-| name | stable logical name |
-| role | beauty, normal, depth, history, diagnostic, effect, final |
-| owner | pass or node that writes it |
-| width / height | physical pixels |
-| DPR scale | full, half, quarter, custom |
-| format / type | exact Three.js texture format and type |
-| color space | `SRGBColorSpace`, `NoColorSpace`, or linear semantics |
-| samples | MSAA sample count |
-| depth/stencil/depth texture | present/absent and format when known |
-| MRT count | number and names of outputs |
-| lifetime | transient, persistent, history, capture-only |
-| memory estimate | bytes and formula |
-| readback layout | `rowBytes`, 256-byte-aligned `bytesPerRow`, and padded `byteLength` when pixels are copied from WebGPU |
+For every metric, store domain, units, truth-source hash, camera and output
+transform, alignment, mask, estimator, aggregation, `p50 [Measured]`,
+`p95 [Measured]`, worst case, spatial error map, `Gated` limit, and pass/fail. Use
+area-weighted or perceptually justified aggregation where screen resolution
+changes. Do not let a large background dilute subject error.
 
-### Storage resources
+Thresholds come from an analytic error bound, perceptual study, reference
+uncertainty, or authored product requirement. Record which. Tuning against the
+candidate and then declaring its error as the threshold is invalid.
 
-Every storage row must include:
+## Refresh-Derived Budgets
 
-| Field | Requirement |
-| --- | --- |
-| name | stable logical name |
-| kind | `StorageTexture`, `StorageBufferAttribute`, `StorageInstancedBufferAttribute` |
-| dimensions/count | texture dimensions or element count |
-| format/type | texture format or buffer element layout |
-| bytes | estimated total bytes |
-| owner dispatch | TSL compute node name |
-| dispatch size | scalar count or `[x, y, z]` |
-| workgroup assumptions | workgroup size, local memory, barriers |
-| synchronization | `workgroupBarrier`, atomics, ping-pong, or none |
-| readback policy | none, metrics-only, capture-only |
-| reset policy | when and how it is cleared |
+### Target declaration
 
-GPU simulations, histories, culling, compaction, and generated instance data
-must be validated from storage evidence, not inferred from the final image.
+Each performance claim names the exact target device, OS, browser, adapter,
+display mode, viewport, DPR, power source, thermal starting condition,
+foreground state, scene path, requested presentation rate `Authored`, actual
+display refresh `Measured`, and feasible target presentation rate `Gated`.
+Device-class names alone are not budgets.
 
-## Timing And Budgets
-
-Run a warm-up window before recording. Separate initialization, shader
-compilation, asset upload, screenshot readback, and steady-state rendering.
-
-Record:
+For deadline-driven presentation:
 
 ```text
-warm-up frame count
-sample frame count
-CPU frame median and p95
-GPU timestamp median and p95 when exposed
-readback/capture time separately
-draw calls
-triangles / points / instances
-pass count
-dispatch count
-render-target memory
-storage memory
-cache updates this frame
-active quality tier
+refresh period [Derived]
+  = dimensional reciprocal of target presentation rate [Gated]
+
+CPU scene envelope [Derived]
+  = refresh period [Derived]
+  - browser/main-thread reserve [Measured or provisional Authored]
+  - CPU safety reserve [Authored]
+
+GPU scene envelope [Derived]
+  = refresh period [Derived]
+  - compositor/GPU reserve [Measured or provisional Authored]
+  - GPU safety reserve [Authored]
 ```
 
-Use these default budgets unless the subject skill is stricter:
+Measure reserves with a pass-through host shell using the same page structure,
+browser, device, display mode, viewport, DPR, canvas composition, event load,
+and presentation cadence. The browser reserve covers non-scene main-thread
+work; the compositor reserve covers presentation work not attributable to the
+scene pipeline. Report reserve `p50 [Measured]` and `p95 [Measured]`, use the
+quantile consistent with each frozen tail gate, and record the subtraction
+policy. When only a combined host reserve is observable, subtract it once and
+mark CPU/GPU attribution unavailable. Never double-subtract overlapping or
+correlated reserves.
 
-| Target | Desktop discrete | Desktop integrated | Mobile |
-| --- | ---: | ---: | ---: |
-| steady final frame | <= 8 ms GPU | <= 16 ms GPU | <= 24 ms GPU |
-| validation capture frame | <= 12 ms GPU | <= 24 ms GPU | <= 33 ms GPU |
-| CPU frame orchestration | <= 3 ms | <= 5 ms | <= 8 ms |
-| render-target memory | <= 256 MB | <= 192 MB | <= 128 MB |
-| storage memory | <= 256 MB | <= 192 MB | <= 128 MB |
+If a reserve cannot be measured, mark it provisional `Authored`. The resulting
+envelope remains `Derived`, but the conclusion must state that device headroom
+is conditional. Do not hide browser or compositor work in a generic safety
+margin.
 
-CPU-only timing is proxy evidence. Label it as such and do not use it to claim
-GPU headroom. The harness reports GPU frame budget as `SKIP` when
-`gpuTimingUnavailable` is true. Normal validation may pass with that explicit
-skip; `--strict` turns every skip into a failure for CI runs that require
-timestamp-backed GPU timing. CPU median, GPU median when present, and
-render-target plus storage memory are compared to the manifest-selected budget
-profile and `memoryBudgetMB`; exceeded medians are blocking failures.
+CPU and GPU can overlap. Gate each stage against its own deadline and record
+end-to-end presentation intervals. Add stage times only when a timestamped
+dependency proves serialization. For non-deadline rendering, replace refresh
+with an authored throughput or latency service-level objective and retain the
+same label discipline.
+
+### Frozen gates
+
+Before candidate capture, freeze as `Gated`:
+
+- CPU and GPU `p95 [Gated]` limits sourced from the derived envelopes;
+- presentation-interval `p95 [Gated]` and deadline-miss ratio;
+- startup and first-stable-frame latency when claimed;
+- memory, traffic, upload, and allocation-churn limits;
+- sustained degradation and quality-transition limits;
+- visual-error limits for every quality state.
+
+Medians describe central cost; they do not gate tail latency alone. A passing
+`p50 [Measured]` with a failing `p95 [Measured]` is a failure. Capture/readback,
+shader compilation, asset upload, and automation are measured separately and
+included only in claims whose user-visible path contains them.
+
+### Sampling and aggregation
+
+Keep contemporaneous raw frame samples. Record clock source, timestamp scope,
+quantile estimator, warm-up policy, sample count, outlier policy, and excluded
+phase. Policy values are `Authored`; minimum evidence requirements are `Gated`;
+reported statistics are `Measured`.
+
+Compute full-frame `p50 [Measured]` and `p95 [Measured]` from full-frame samples.
+Never sum subsystem percentiles, copied skill budgets, or timings recorded on
+different frames. Timestamp scopes may overlap or nest; account from their DAG
+rather than summing labels. For a subsystem's marginal cost, run interleaved,
+matched baseline/candidate blocks and compute the distribution of paired frame
+differences. Do not subtract independently measured percentiles. A planning
+estimate remains `Derived` and cannot replace measured full-frame acceptance.
+
+## Sustained And Thermal Protocol
+
+Run the same deterministic workload path through distinct cold, transition,
+and sustained segments. Segment durations, sample cadence, repetitions,
+foreground policy, power condition, and stabilization rule are `Authored`.
+Minimum samples, minimum stable residence, and allowed drift are `Gated`.
+
+For each segment record:
+
+- CPU and GPU `p50 [Measured]` and `p95 [Measured]`;
+- presentation-interval `p50 [Measured]` and `p95 [Measured]`;
+- deadline misses and long-frame cluster lengths;
+- active quality state, transition cause, and residence;
+- resident and transient memory, upload traffic, and allocation churn;
+- temperature, clocks, power, and hardware counters when exposed;
+- browser visibility, background throttling, garbage collection, and device
+  errors when observable.
+
+The acceptance segment is the final stable sustained segment. Never average an
+early fast segment with a late throttled segment. Report the slope and
+step-change between segments. If temperature or clock telemetry is unavailable,
+describe only observed time, cadence, memory, and quality drift. That evidence
+can reveal degradation but cannot prove its thermal cause or prove the absence
+of throttling.
+
+If the authored stabilization rule is not reached within the run, return
+`INSUFFICIENT_EVIDENCE_SUSTAINED` rather than selecting the last arbitrary
+window.
+
+Run low-power targets on physical devices. Desktop emulation, reduced browser
+viewport, or user-agent substitution does not reproduce mobile tile memory,
+bandwidth, scheduling, or thermal behavior.
+
+## Quality-Governor Protocol
+
+Record the governor as a deterministic state machine:
+
+```text
+input metric and sampling domain
+filter and window definition
+degrade gate and recovery gate
+hysteresis and minimum residence
+state transition table
+resource rebuild and history-reset behavior
+visual-error gate per state
+performance envelope per state
+```
+
+All numeric policy inputs are `Authored`; transition thresholds and residence
+requirements are `Gated`; filtered values and transitions are `Measured`;
+derived state budgets are `Derived`. Store every transition with time, prior
+state, next state, cause, filtered metric, resource delta, history reset, and
+visible discontinuity metric.
+
+Acceptance requires a stable final state that passes both sustained performance
+and visual-error gates. The following fail:
+
+- oscillation between states;
+- repeated emergency degradation;
+- recovery that violates the residence policy;
+- timing compliance obtained by crossing the visual-error gate;
+- hidden DPR or resolution changes absent from the manifest;
+- state changes that leak or duplicate persistent resources;
+- averaging results across states instead of reporting each state.
+
+## GPU Timing Sufficiency
+
+Set `gpuTimingRequirement` in the contract before the run:
+
+- `required`: GPU envelope compliance, GPU headroom, pass/dispatch cost,
+  GPU-side thermal degradation, bandwidth limitation, or optimization claims;
+- `not-claimed`: visual, deterministic, resource-layout, or lifecycle evidence
+  with no GPU performance conclusion.
+
+When required timestamps are unavailable, return
+`INSUFFICIENT_EVIDENCE_GPU_TIMING`. Do not emit `SKIP`, infer GPU cost from CPU
+duration, substitute animation-frame cadence, shorten the window, or claim zero
+cost. End-to-end presentation metrics remain valid `Measured` evidence for
+deadline behavior but cannot attribute the cause or establish GPU headroom.
+
+Record timestamp support, query scope, render and compute coverage, conversion
+method, calibration if applicable, query-readback latency, disjoint/error state,
+and whether timing perturbs the workload. Resolve render and compute timestamp
+scopes separately; keep resolution/readback outside the steady-state window.
+If a browser omits timestamps, rerun on a target configuration that exposes
+them or narrow the signed-off claim.
+
+## Resource, Tile-Memory, And Bandwidth Protocol
+
+### Resident and transient memory
+
+Inventory all material GPU-visible resources, not only render targets:
+
+| Resource class | Required fields |
+| --- | --- |
+| texture | dimensions, layers, mips, format, compression, color domain, owner, lifetime, byte formula, upload source |
+| geometry | vertex/index layouts, counts, usage, variants, owner, lifetime, byte formula |
+| uniform/storage buffer | element layout, count, usage, owner, update cadence, byte formula |
+| render attachment | dimensions, format, samples, load/store/resolve, lifetime, alias group, byte formula |
+| history | producer/consumer, ping-pong count, reset, lifetime, byte formula |
+| staging/readback | allocation policy, padded layout, cadence, peak live bytes |
+| pipeline/cache | owner, variant key, count, estimate method, cache plateau |
+
+Compute resident bytes and peak simultaneously live transient bytes separately.
+Do not sum mutually aliased resources as if concurrent; do not omit temporary
+resolves or readbacks because they are short-lived. Compare manual formulas to
+`renderer.info`, but do not treat `renderer.info` as complete device-memory
+telemetry.
+
+WebGPU texture-copy rows record logical row bytes, API-aligned row pitch, and
+padded byte length. The required alignment is `Gated` from the active API
+contract. Reject fractional, under-sized, or assumed-tight row layouts.
+
+### Tile attachment pressure
+
+For each render pass derive:
+
+```text
+attachment bytes per pixel [Derived]
+  = sum(format bytes per sample * sample count * layer count)
+  + depth/stencil bytes per sample
+
+full attachment footprint [Derived]
+  = physical pixel count * attachment bytes per pixel
+```
+
+Record every load, clear, discard, store, resolve, subpass-equivalent reuse,
+and pass break. The per-pixel attachment footprint is a portable pressure
+indicator; it is not an on-chip tile-memory measurement. Tile dimensions,
+hidden compression, cache capacity, and internal resolve strategy are
+`Measured` only with hardware counters or authoritative device data.
+
+On tile GPUs, unnecessary stored intermediates, multisample resolves,
+full-resolution MRT attachments, and pass fragmentation can dominate external
+traffic even when total allocation appears acceptable. Prefer discardable
+transients, resolution reduction justified by visual-error gates, compatible
+attachment reuse, and fewer pass breaks.
+
+### Traffic model
+
+For each pass or dispatch derive lower and upper traffic bounds:
+
+```text
+attachment traffic
+  = loads + stores + resolves + explicit copies
+
+sampled-texture traffic
+  = covered fragments * samples per fragment * bytes per sample
+    adjusted only by declared cache/compression bounds
+
+storage traffic
+  = invocations * declared reads/writes * element bytes
+
+per-frame traffic
+  = sum(per-execution traffic * measured executions per presented frame)
+
+per-second traffic
+  = per-frame traffic * measured presentation rate
+```
+
+Inputs and assumptions are individually labelled. Include overdraw, trilinear
+or anisotropic sampling, mip choice, texture compression, cache reuse,
+atomics, ping-pong histories, compute intermediates, uploads, readbacks, and
+resolve copies. Separate compulsory lower-bound traffic from a conservative
+upper model.
+
+Only hardware counters make traffic or achieved bandwidth `Measured`. Without
+counters, publish a `Derived` model with uncertainty. A derived model can gate
+an authored traffic budget, but it cannot prove that the workload is physically
+bandwidth-bound. Attribute a bottleneck only when timing changes under an
+isolating perturbation or counters support it.
 
 ## Color And Output
 
-Record a `ColorPipelineRecord`:
+Record:
 
 ```ts
 type ColorPipelineRecord = {
-  rendererOutputColorSpace: 'SRGBColorSpace' | string
-  rendererToneMapping: string | number
-  rendererToneMappingExposure: number
-  outputBufferType: string | number
-  toneMapOwner: 'RenderPipeline' | 'renderOutput' | string
-  outputTransformOwner: 'RenderPipeline' | 'renderOutput' | string
-  hdrWorkingType: 'HalfFloatType' | string
-  colorTextures: { name: string; colorSpace: 'SRGBColorSpace' | string }[]
-  dataTextures: { name: string; colorSpace: 'NoColorSpace' | 'linear' | string }[]
+  rendererOutputColorSpace: string
+  rendererToneMapping: string | NumericDatum
+  rendererToneMappingExposure: NumericDatum
+  outputBufferType: string | NumericDatum
+  toneMapOwner: string
+  outputTransformOwner: string
+  hdrWorkingType: string
+  colorTextures: { name: string; colorSpace: string }[]
+  dataTextures: { name: string; colorSpace: string }[]
   screenshotEncoding: string
 }
 ```
 
-Rules:
-
-- Color textures use `SRGBColorSpace`.
-- Data maps, normal/roughness/mask/noise/LUT/weather textures, and diagnostic
-  storage use `NoColorSpace` or linear data semantics.
-- HDR working buffers use `HalfFloatType` until tone mapping.
-- The node pipeline owns exactly one tone-map stage and one output conversion.
-- Individual materials, effects, captures, and PNG encoders must not apply a
-  second output transform.
+Color textures use `SRGBColorSpace`. Data maps, normals, roughness, masks,
+noise, LUT data, weather data, and diagnostic storage use `NoColorSpace` or
+explicit linear semantics. HDR working buffers remain scene-linear until one
+tone-map owner. Materials, effects, capture paths, and encoders cannot apply a
+second output transform. Visual comparisons use the same transform, exposure,
+encoding, and alpha/compositing policy.
 
 ## Required Inspection Controls
 
-Any runnable inspection surface should expose:
-
-```text
-pause / resume
-fixed time or time scale
-fixed seed
-fixed camera bookmarks
-viewport and DPR
-quality tier
-debug mode
-canvas capture
-runtime metrics
-renderer/backend manifest
-reset history
-recreate resources
-clear timings
-```
-
-At minimum, provide:
-
-- one design camera;
-- near and far camera bookmarks;
-- final and no-post views;
-- every controlling field or pass needed to prove the mechanism;
-- deterministic reset;
-- visible runtime errors and performance metrics;
-- JSON export for the current evidence bundle.
-
-Controls must alter the actual pipeline. A debug dropdown that only changes a
-label is worse than no diagnostic because it creates false confidence.
+A runnable inspection surface exposes pause/resume, deterministic stepping,
+fixed seed, fixed cameras, viewport and DPR, quality state, governor lock,
+debug mode, final/no-post/contribution views, history reset, resource recreate,
+timing reset, runtime errors, manifests, and bundle export. Controls must alter
+the real pipeline and report the resulting graph and resource state.
 
 ## Mechanism-Specific Evidence
 
-### Procedural growth
+### Generated geometry, vegetation, and structures
 
-Report topology separately from final composition:
-
-```text
-branch jobs by level
-terminal continuations by level
-lateral children by level
-ring and leaf-card counts
-branch and leaf bounds
-compute-generated or CPU-generated ownership
-seed sweep
-storage or geometry memory
-```
-
-Inspect hierarchy-only, continuation branches, foliage roots, rounded normals,
-final composition, maximum wind, representative seeds, and one stress seed.
-The species identity must survive the sweep.
+Report semantic element counts, topology groups, material slots, exposed-edge
+logic, bounds, LOD ownership, instance/batch ownership, seed identity, geometry
+and storage bytes, upload volume, culling result, and deformation root. Inspect
+topology, hard edges, UV density, normals, hierarchy, silhouettes, deformation
+extremes, representative seeds, and a stress seed. A final composition cannot
+prove topology or batching.
 
 ### Spectral water
 
-Require:
+Require disjoint cascade spectra, transform tests, frequency-space derivatives,
+height and horizontal displacement, breaking measure, foam history, shared sky
+parameters, storage ping-pong ownership, dispatch dependencies, and workgroup
+assumptions. Inspect each cascade, resolved normals, breaking state, history,
+and final shading. A plausible surface cannot prove spectrum, derivatives, or
+history.
 
-```text
-disjoint wavelength ownership per cascade
-independent FFT impulse and frequency tests
-height and horizontal displacement fields
-derivatives computed in frequency space
-Jacobian or breaking metric
-persistent foam history
-shared sky/reflection parameters
-StorageTexture ping-pong inventory
-dispatch chain and workgroup assumptions
-```
+### Analytic and simulated water
 
-Inspect individual cascades, resolved normals, breaking/foam state, temporal
-history, and final shading. A plausible ocean frame does not prove that the
-FFT, derivatives, or history are correct.
+Displacement and normals derive from the same state. Inspect displacement,
+normal, Fresnel, reflection, refraction, absorption/thickness, caustics when
+present, crest response, foam, simulation boundaries, and shared parameter
+ownership. Test grazing views, far-horizon minification, high-DPR output,
+resizes, disturbances, and sustained state.
 
-### Analytic water
+### Terrain, planetary bodies, and atmosphere
 
-Require displacement and normals to derive from the same wave bundle. Inspect:
+Inspect undeformed coordinates, height, region or biome cause, coast or
+boundary masks, normals, roughness, surface lighting without atmosphere,
+atmosphere alone, aerial perspective, and combined output. Share body center,
+radius, sun direction, and unit conversion. Test far, middle, and close camera
+envelopes plus face/patch boundaries. Background contrast cannot substitute
+for ground-to-distance continuity.
 
-```text
-displacement only
-resolved normals
-Fresnel
-reflection
-refraction
-absorption or thickness estimate
-crest response and foam
-shared wave parameter source
-```
+### Volumetric media and clouds
 
-Test near-grazing views, far-horizon minification, and a high-DPR capture.
-Reject sparkling micro-bands that survive below one pixel.
+Expose density inputs, bounded integration interval, transmittance, lighting,
+early exit, step pressure, temporal confidence/rejection, reduced-resolution
+march, reconstruction, and shadowing when claimed. Test camera translation,
+foreground disocclusion, lighting changes, and quality transitions. Still
+frames cannot validate temporal reconstruction.
 
-### Planet fields and atmosphere
+### Curved-ray and bounded iterative effects
 
-Require:
+Expose integration bounds, step count, accumulated steering, contribution,
+transmittance, lookup direction, invalid/non-finite pixels, capped pixels,
+early exits, and quality state. Use a stress view near the highest-curvature or
+worst-conditioned region. Reject unbounded iteration, hidden non-finite values,
+or error concealed by bloom or grading.
 
-```text
-undeformed sphere direction
-macro height
-continents and coast
-climate or biome causes
-resolved normals and roughness
-surface lighting without atmosphere
-atmosphere only
-combined final
-shared body center, radius, sun direction, and scale conversion
-```
+### Temporal surfaces, particles, trails, and histories
 
-Inspect orbit, mid approach, and close approach. A shell that looks acceptable
-only against black space is not sufficient evidence of ground-to-space
-continuity.
-
-### Volumetric clouds
-
-Require:
-
-```text
-weather channels
-base-shape density
-detail erosion
-bounded ray interval
-beauty transmittance
-lighting contribution
-history confidence or rejection
-cloud shadow
-reprojection velocity/depth rejection
-reduced-resolution march and depth-aware upsample evidence
-```
-
-Test camera translation, foreground disocclusion, sun-angle changes, and
-quality-tier transitions. Still frames cannot validate temporal reconstruction.
-
-### Curved-ray and volumetric effects
-
-Expose:
-
-```text
-integration bounds
-step or iteration count
-accumulated steering
-density contribution
-remaining transmittance
-background lookup direction
-capped or invalid pixels
-early-exit count
-step-budget quality tier
-```
-
-Use a stress camera that approaches the singular or highest-curvature region.
-Reject NaNs, persistent capped bands, unexplained asymmetry, and unbounded
-iteration pressure.
-
-### Temporal surfaces
-
-Expose the complete state transition:
-
-```text
-previous history
-current deposit or erase input
-next history
-blurred scene
-static structure
-composite mask
-resolved normal/refraction
-StorageTexture history ownership
-frame-rate-independent response constants
-```
-
-Test reset, resize, pointer release, repeated deposition, frame-rate changes,
-and long idle decay.
+Expose previous state, current input, next state, reconstruction, composite,
+resolved geometry/normal, identity mapping, pool occupancy when used, reset,
+and storage ownership. Test reset, resize, input release, repeated interaction,
+frame-rate changes, long idle evolution, birth/death/reuse, and tier changes.
+Use frame-rate-independent response and identity-safe pooling metrics.
 
 ### Shadows and post nodes
 
-For `CSMShadowNode` or `TileShadowNode`, inspect:
+For shadows inspect coverage ownership, committed light-space state, texel
+stability, refreshed regions, blend weights, bias in scene units, outside-
+coverage behavior, invalidation causes, target memory, and update traffic. For
+AO, bloom, temporal AA, depth of field, exposure, or grading inspect input,
+contribution, intermediate resolution, history, error, and final composite.
 
-```text
-level or tile ownership
-committed light-space centers
-texel grid
-levels or tiles refreshed this frame
-cross-level blend weights
-normal bias in world units
-unshadowed outside-coverage weight
-update budget
-targeted invalidation causes
-```
+### Instanced deformation and procedural motion
 
-For post nodes such as `GTAONode`, `BloomNode`, `TRAANode`, and
-`DepthOfFieldNode`, inspect input signal, contribution, intermediate target
-resolution, temporal history when present, and final composite.
-
-### SDF blend-shell creatures
-
-For `$threejs-procedural-creatures`, the creature lab emits mechanism rows and
-the visual-validation bundle gates them. Preserve the creature skill's spaces:
-SDF sampling and snap are creature-local; planted-foot drift is world-space;
-candidate sets are tier-`K` approximations of the full field.
-
-| Evidence row | Producing harness | Gate threshold |
-| --- | --- | --- |
-| SDF snap residual over the locomotion sweep | standalone creature lab `snap residual sweep` export | max `abs(d - iso) < 0.02` of body scale after bounded Newton snap |
-| stance drift, space named `world` | creature lab planted-foot telemetry and foot-drift markers | planted foot world delta `< 1e-9` per frame for stationary and moving gait |
-| candidate-set vs full-field sweep | creature lab candidate-set parity sweep using the same locomotion clocks and tier `K` | snapped candidate-set surface remains within the snap residual gate, `< 0.02` of body scale, against full-field evaluation |
-| silhouette-vs-shadow parity | creature lab fixed-camera silhouette/shadow mask export consumed by this harness' PNG/diff gate | same snapped position path: mask IoU `>= 0.98` and directed edge distance `<= 1 px`; divergent display/depth position nodes block acceptance |
-
-Pending gate: the creature lab that produces every row above is under
-construction in-tree (`threejs-procedural-creatures/examples/webgpu-procedural-creature-lab`,
-`HANDOFF.md` §3 item 3.9e) and has not yet run its full gate table green.
-Until that run is recorded in `HANDOFF.md` §6, these thresholds are the
-contract the lab must implement — citing them as passed evidence is a
-validation-protocol violation.
+Inspect shared geometry/material ownership, per-instance state indexing,
+posed bounds, upload layout, draw and dispatch counts, transform-space
+invariants, deterministic clocks, interpolation, quaternion continuity, and
+shadow/visible position parity. Validate trajectory and deformation error over
+the authored motion envelope; do not substitute a representative still.
 
 ## No-Post And Isolation Gates
 
-Every image-effect example must expose:
-
-```text
-final
-no presentation treatment
-effect contribution only
-controlling field or mask
-normal / depth / velocity / history when relevant
-```
-
-Reject when:
-
-- bloom supplies the only readable silhouette;
-- atmosphere hides flat planet fields;
-- post blur hides aliasing;
-- a normal map implies waves absent from displaced geometry;
-- temporal output cannot show previous state, deposit, and next state;
-- a raymarch cannot reveal iteration pressure or capped pixels;
-- shadows are judged only in the final graded image.
+Every effect-bearing scene exposes final output, no presentation treatment,
+effect contribution, controlling field/mask, and depth/normal/velocity/history
+as applicable. Reject when presentation treatment supplies missing silhouette,
+atmosphere hides flat fields, blur conceals aliasing, normals imply absent
+geometry, a temporal result cannot expose its state transition, iteration
+pressure is hidden, or shadows are judged only after grading.
 
 ## Determinism And Captures
 
-Freeze:
+Freeze seed, camera matrices, projection, viewport, DPR, time, quality state,
+governor state, backend, asset versions, color pipeline, and stochastic sequence.
+Capture design, near/detail, far/silhouette, no-post, contribution, diagnostic
+mosaic, a controlling diagnostic, a failure-sensitive diagnostic,
+representative seeds, and stress conditions required by the contract.
 
-```text
-seed
-camera transform and projection
-viewport
-DPR
-time or paused state
-quality tier
-backend flag
-asset versions
-color pipeline
-```
-
-Capture:
-
-```text
-design view
-near/detail view
-far/silhouette view
-no-post baseline
-diagnostic mosaic
-one controlling diagnostic
-one failure-sensitive diagnostic
-representative seed sweep
-stress condition
-```
-
-Use exact camera matrices or named camera bookmarks. Reproducing a comparison
-by manually orbiting until it looks close invalidates image evidence.
+Use exact matrices or immutable bookmarks. Manual repositioning invalidates
+image evidence. When exact output is not expected, compare labelled metrics and
+distributions rather than relaxing an arbitrary pixel threshold.
 
 ## Temporal Validation
 
-Use fixed-duration clips or sampled checkpoints for:
+Use deterministic clips or checkpoints spanning reset, first response, steady
+state, disocclusion/invalidation, and recovery. Cover camera and object motion,
+history accumulation, shadow refresh, simulation persistence, deformation,
+particle lifecycle, governor transitions, resolution changes, and resource
+rebuilds as applicable. Inspect at presentation speed and frame-by-frame.
 
-- camera motion;
-- object motion;
-- history accumulation and rejection;
-- shadow-cache refresh;
-- ocean foam persistence;
-- cloud reconstruction;
-- wind deformation;
-- particle birth, death, and pool reuse;
-- tier switches and resolution changes.
-
-Record at least:
-
-```text
-t = 0 reset
-t = first visible response
-t = steady state
-t = disocclusion or invalidation
-t = recovery
-```
-
-Inspect at normal playback speed and frame-by-frame. Still captures cannot
-prove the absence of shimmer, swimming, stale history, or lifetime pops.
+Report temporal metric distributions, worst intervals, state transitions, and
+error maps. Still captures cannot prove absence of shimmer, swimming, stale
+history, phase error, or lifetime discontinuities.
 
 ## Resource Lifetime Validation
 
-Run leak loops for:
+Loop resize, DPR change, quality transition, debug transition, history reset,
+asset reload, scene teardown, and renderer dispose/recreate. Loop counts and
+settling policy are `Authored`; plateau and trend limits are `Gated`; observed
+counts and slopes are `Measured`.
 
-```text
-resize
-DPR change
-quality tier switch
-debug mode switch
-history reset
-asset reload
-scene teardown
-renderer dispose/recreate
-```
-
-For each loop, record before/after `renderer.info`, target inventory, storage
-inventory, live texture count, live buffer count when known, JS heap when
-available, and uncaptured backend errors. Failing to release persistent targets,
-histories, storage buffers, generated geometry, or pipeline resources blocks
-acceptance.
+Record before/after `renderer.info`, resident and transient inventories, live
+textures/buffers when observable, JS heap when exposed, upload/readback pools,
+pipeline/cache counts, and uncaptured backend errors. Distinguish bounded cache
+warm-up from monotonic growth. Unreleased histories, targets, storage,
+geometry, staging buffers, or pipeline variants block lifecycle acceptance.
 
 ## Rejection Criteria
 
-Delete or withhold an example when any applies:
+Reject or narrow the claim when any applies:
 
-- it is visually weaker than the supplied reference in the target feature;
-- its code is mostly generic material or noise boilerplate;
-- mechanism-defining constants or ownership were replaced by guesses;
-- it has no diagnostic mode proving the claimed mechanism;
-- it relies on presentation treatment to manufacture missing form;
-- it contains undisclosed backend, algorithm, asset, scale, or color
-  divergences;
-- deterministic reset or fixed-camera capture is impossible;
-- the implementation cannot meet its declared performance envelope;
-- GPU timing is claimed from CPU frame time alone;
-- storage, target, or history ownership cannot be inventoried;
-- leak loops show unreleased resources;
-- available evidence is too weak to support excellence-level guidance.
-
-## Replaced Techniques
-
-- Subjective screenshot approval was replaced by authored visual contracts and
-  stable JSON+PNG evidence bundles.
-- CPU-only performance claims were replaced by GPU timestamp timing when
-  exposed, with labelled proxy timing when unavailable.
-- One stress seed was replaced by representative seed sweeps plus stress seeds.
-- Informal target and memory notes were replaced by render-target and storage
-  inventories tied to `renderer.info` and byte estimates.
-- Manual resource confidence was replaced by repeatable resize, tier-switch,
-  teardown, and dispose/recreate leak loops.
-- Presentation-dependent approval was replaced by no-post and contribution-only
-  gates from the node pipeline.
+- an invariant lacks a native-domain diagnostic, metric, and frozen gate;
+- the final is weaker than the declared visual contract or reference feature;
+- post treatment manufactures form absent from no-post evidence;
+- backend, asset, algorithm, scale, color, or quality divergence is undisclosed;
+- deterministic reset or fixed-view capture is impossible;
+- sustained `p95 [Measured]`, deadline, visual-error, memory, or traffic gates
+  fail;
+- the quality governor oscillates or settles outside the visual contract;
+- required GPU timing is unavailable;
+- tile/resource costs omit material attachments, histories, resolves, uploads,
+  readbacks, or transient peaks;
+- a derived bandwidth model is presented as measured hardware bandwidth;
+- ownership cannot be reconstructed from the pass, target, and storage graphs;
+- lifecycle loops show unbounded growth or backend errors;
+- evidence is too weak for the stated conclusion.
 
 ## Sign-Off Record
 
-Record:
+Record the skill and scene identity, contract revision, Three.js revision,
+target device/browser/display, initialized backend, camera/viewport/DPR, seed,
+time, quality state, governor state, mechanisms, divergences, diagnostics,
+visual errors, cold and sustained timing, GPU timing sufficiency, presentation
+cadence, performance envelope, target/storage/resident inventories, tile and
+bandwidth model, color/output graph, lifecycle result, unsupported claims,
+known defects, decision, and bundle path.
 
-```text
-skill and example ID
-visual contract and invariants
-Three.js revision
-renderer/backend manifest
-viewport, DPR, camera bookmark, seed, and time
-quality tier and reductions
-mechanisms exercised
-deliberate divergences
-debug modes inspected
-temporal cases inspected
-performance and memory metrics
-render-target inventory
-storage-resource inventory
-color pipeline
-known defects
-review decision
-artifact bundle path
-```
-
-Publish only accepted examples. Repeat the same evidence set whenever
-mechanism code, Three.js revision, backend, camera, quality tier, color
-pipeline, or target/storage layout changes.
+Repeat the evidence whenever mechanism code, Three.js revision, target,
+backend, browser, display mode, camera, quality policy, color pipeline, or
+resource graph changes.

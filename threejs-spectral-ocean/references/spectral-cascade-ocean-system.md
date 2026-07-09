@@ -1,643 +1,860 @@
-# Spectral cascade ocean system
+# Spectral-cascade ocean system
 
-Use this reference for a large, unbounded-looking ocean whose identity comes from directional spectral synthesis, compute inverse FFT cascades, frequency-space derivative maps, Jacobian whitecaps, persistent foam history, and coherent node-based optical shading.
+This reference defines a directional random sea from dimensional spectrum to
+final WebGPU image. It fixes the transform, derivative, geometry, foam, and CPU
+coupling conventions that most often produce plausible but wrong oceans.
 
-## Contents
+## Quantitative provenance
 
-1. Architecture contract
-2. Capability gate and quality tiers
-3. Cascade partition
-4. Directional spectrum and stable seeds
-5. Packed frequency fields
-6. Compute inverse FFT schedule
-7. Hard validation gate
-8. Spatial map assembly
-9. Jacobian foam history
-10. NodeMaterial surface shading
-11. RenderPipeline, post, color, and output
-12. Runtime order
-13. Geometry, camera, fog, and budgets
-14. Required diagnostics
-15. Failure diagnosis
-16. Replaced techniques
+Use **[D] Derived**, **[G] Gated**, **[M] Measured**, and **[A] Authored** for
+every quantitative claim. Unlabelled integers inside exact equations, tensor
+dimensions, byte identities, and API names are [D]. Grid sizes, patch lengths,
+physical/model constants, cutoffs, tolerances, timing targets, and memory
+limits require an explicit tag.
 
-## 1. Architecture Contract
+## Architecture and algorithm choice
 
-The best throughput-per-quality architecture is a compute-side multi-cascade FFT ocean:
+The core dataflow is:
 
 ```text
-validated renderer + capability tier
-  -> sea-state parameters
-  -> coordinate-stable Gaussian field
-  -> initial directional spectrum h0(k)
-  -> conjugate packing h0(k), conj(h0(-k))
-  -> time-evolved packed frequency fields
-  -> frequency-space displacement, slopes, horizontal derivatives, cross derivative
-  -> Stockham or Cooley-Tukey inverse FFT in StorageTexture ping-pongs
-  -> centered-spectrum permutation
-  -> displacement, derivative, Jacobian, and foam-history storage textures
-  -> NodeMaterial displaced surface and optical shading
-  -> RenderPipeline node post and one output transform
+dimensional directional spectrum
+  -> cascade power windows and coordinate-stable Gaussian coefficients
+  -> Hermitian time evolution and frequency-space derivatives
+  -> four complex transforms packed into two RGBA lane groups
+  -> inverse FFT with an explicit sign and normalization
+  -> summed displacement/derivatives
+  -> exact tangents, Jacobian, normal, and foam source
+  -> transported foam state and filterable display maps
+  -> node-material optical transport
+  -> one RenderPipeline output transform
 ```
 
-Algorithm class is the first decision. A compute FFT cascade with packed frequency derivatives is the default because it amortizes the expensive transform across many physically coupled fields. A raster-pass transform pipeline or post-transform finite differencing spends more work for less stable normals and weaker foam signals.
+Choose the transform architecture from target limits and evidence:
 
-One cascade owns one patch length and one disjoint wavenumber interval. Shared sea-state uniforms and deterministic seeds keep cascades statistically related; separate storage textures prevent write aliasing.
+| FFT architecture | Select when | Main cost/error |
+| --- | --- | --- |
+| Global Stockham autosort ping-pong | Correctness reference; arbitrary supported power-of-two grid; workgroup storage is tight. | One whole-grid read/write per stage; dispatch and storage bandwidth dominate. |
+| Workgroup-resident row FFT plus transpose | A row or row tile fits workgroup storage/invocation limits and occupancy passes. | Fewer global round trips; shared-memory pressure and transpose traffic. |
+| Cooley-Tukey with explicit permutation | An existing verified butterfly/index table is retained. | Bit-reversal/permutation correctness and less regular access. |
 
-The validated starting preset is:
+Stockham autosort does not also need bit reversal. A Cooley-Tukey schedule may
+need input or output permutation depending on decimation convention. Never
+combine both from copied recipes.
 
-```ts
-const oceanPreset = {
-  resolution: 256,
-  patchLengthsMeters: [250, 17, 5],
-  boundaryFactor: 6,
-  depthMeters: 500,
-  gravity: 9.81,
-  choppiness: 1.3,
-};
-```
+Direct wave summation is superior when few modes satisfy the visual spectrum;
+a bounded compute heightfield is superior when local disturbance and domain
+boundaries dominate. FFT is not automatically the cheapest water algorithm.
 
-Treat the preset as a scale anchor. Pick the actual tier from capability, memory, and frame budget.
+## Pinned Three.js r185 WebGPU/TSL contract
 
-## 2. Capability Gate And Quality Tiers
-
-Create one renderer path with `WebGPURenderer` and TSL. If WebGPU compute/storage is present but tight, reduce native WebGPU quality or use debug inputs; do not write a second shader backend.
+The API statements here were checked against installed `three@0.185.1`
+**[G]**.
 
 ```js
-import * as THREE from 'three/webgpu';
+import {
+  FloatType,
+  HalfFloatType,
+  MeshPhysicalNodeMaterial,
+  NoColorSpace,
+  RenderPipeline,
+  StorageTexture,
+  WebGPURenderer,
+} from 'three/webgpu';
 
-const renderer = new THREE.WebGPURenderer( {
-  antialias: false,
-  outputBufferType: THREE.HalfFloatType,
-} );
-
-await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend ) {
-  oceanTier = chooseOceanTier( renderer, 'dynamic-compute' );
-} else {
-  throw new Error( 'WebGPU backend required for the canonical FFT ocean path.' );
-}
-```
-
-Only when the user explicitly asks how to apply fallback when WebGPU is
-unavailable should a static fallback-teaching branch be discussed, and that
-teaching routes to `../threejs-compatibility-fallbacks/`.
-
-Quality tiers:
-
-```text
-ultra: 512², 3 cascades, 4 packed complex fields, persistent foam, optional spray
-high: 256², 3 cascades, 4 packed complex fields, persistent foam
-medium: 256², 2 cascades, 4 packed complex fields, persistent foam
-low: 128², 1-2 cascades, no spray, reduced native WebGPU detail
-```
-
-Every tier keeps the same representation: spectra, FFT, frequency-space derivatives, and foam history. Do not label analytic waves or scrolling normal detail as a low FFT tier; route bounded or analytic water to `$threejs-water-optics`.
-
-## 3. Cascade Partition
-
-For cascade `i`, define:
-
-```text
-deltaK(i) = 2π / patchLength(i)
-handoff(i) = 2π / patchLength(i) * boundaryFactor
-```
-
-Use three disjoint bands for the default tier:
-
-```text
-cascade 0: [epsilon, handoff(1)]
-cascade 1: [handoff(1), handoff(2)]
-cascade 2: [handoff(2), largeUpperBound]
-```
-
-Evaluate safe inputs before applying the in-band mask:
-
-```ts
-const kSafe = max( kLength, cutoffLow );
-const inBand = step( cutoffLow, kLength ).mul( kLength < cutoffHigh ? 1 : 0 );
-```
-
-Never rely on multiplication by zero to hide singular values. Debug every cascade as a centered spectrum heatmap. Adjacent bands may touch at a boundary; they must not broadly overlap or leave visible holes.
-Treat bands as half-open `[low, high)` intervals so a Fourier bin exactly on a cascade boundary contributes to only one cascade.
-
-## 4. Directional Spectrum And Stable Seeds
-
-Generate two independent standard-normal values per grid cell once. Seed by `(baseSeed, cascadeIndex, x, y)` or consume values for every cell before masking so cutoff edits do not shift the random field.
-
-For each centered grid coordinate:
-
-```text
-k = (gridIndex - N/2) * deltaK
-omega(k) = sqrt((g * |k| + sigma/rho * |k|^3) * tanh(min(|k| * depth, 20)))
-```
-
-For water near 20 C, use `sigma/rho = 7.28e-5 m^3/s^2`. The capillary-gravity crossover is:
-
-```text
-k_sigma = sqrt(g * rho / sigma) = sqrt(g / (sigma/rho))
-```
-
-For a 5 m patch at `N = 512`, `k_max = pi * N / L ~= 322 rad/m` and `k_sigma = sqrt(9.81 / 7.28e-5) ~= 367 rad/m`. At the band top, the capillary/gravity ratio is `(sigma/rho) * k_max^2 / g ~= 0.77`, so the capillary-gravity phase speed is about 33% higher than the gravity-only value (`sqrt(1 + 0.77) - 1 ~= 0.33`) and omitting the term incurs that scale of phase-speed error. This is not a `>> 1` regime, but it is large enough to decorrelate short-wave phase.
-
-The sea state sums local wind sea and swell:
-
-```text
-energy =
-  localWindSea(omega, direction)
-  + swell(omega, direction)
-```
-
-Each lobe combines:
-
-```text
-JONSWAP frequency energy
-* TMA finite-depth correction
-* directional spreading
-* exp(-shortWaveFade² * |k|²)
-```
-
-Compute the JONSWAP peak terms from wind speed and fetch:
-
-```text
-alpha = 0.076 * (g * fetch / windSpeed²)^(-0.22)
-peakOmega = 22 * (windSpeed * fetch / g²)^(-0.33)
-```
-
-Use the standard JONSWAP sigma split around the peak (`0.07` below, `0.09` above), peak enhancement `gamma`, and explicit lobe scales. Directional spreading rotates around the configured angle and tightens near the energetic range. Blend a broad cosine-squared base with a Donelan-Banner-style powered cosine lobe.
-
-Initial complex amplitude:
-
-```text
-amplitude =
-  sqrt(
-    energy
-    * 2
-    * abs(dOmega/dk)
-    / kSafe
-    * deltaK²
-  )
-
-h0(k) = gaussianComplex(k) * amplitude * inBand
-```
-
-Expose local-only spectrum, swell-only spectrum, combined spectrum, in-band mask, frequency derivative, and Gaussian seed fields.
-
-## 5. Packed Frequency Fields
-
-Real spatial fields require conjugate symmetry:
-
-```text
-packedH0(k) = [h0(k), conjugate(h0(-k))]
-```
-
-At time `t`:
-
-```text
-h(k,t) =
-  h0(k) * exp(i * omega * t)
-  + conjugate(h0(-k)) * exp(-i * omega * t)
-```
-
-Compute all derivatives before the inverse transform:
-
-```text
-height: h
-horizontal displacement: i * k / |k| * h
-height slopes: i * [kx, kz] * h
-horizontal derivatives: -[kx², kz²] / |k| * h
-cross derivative: -kx * kz / |k| * h
-```
-
-Pack two real spatial fields into one complex IFFT input. A strong four-field layout is:
-
-```text
-field 0: horizontal displacement X + i horizontal displacement Z
-field 1: height + i cross derivative
-field 2: height slope X + i height slope Z
-field 3: horizontal derivative XX + i horizontal derivative ZZ
-```
-
-For each pair `(A, B)` of Hermitian complex spectra, pack the complex IFFT input as:
-
-```text
-G(k) = A(k) + i * B(k)
-G.re = A.re - B.im
-G.im = A.im + B.re
-```
-
-After the 2D inverse FFT, `out.re = a(x)` and `out.im = b(x)`. Component-interleaving as `[A.re, B.re, A.im, B.im]` is wrong for this assembly path: the sine/odd half of each real field remains in the second complex lane and is discarded if assembly reads only `.xy`.
-
-The lane separation `out.re = a`, `out.im = b` holds only while both packed spectra are
-Hermitian on the grid. The k-multiplier fields (displacement, slopes, second derivatives,
-cross derivative) break Hermitian symmetry on Nyquist bins — cell 0 in either axis carries
-`k = -N/2 * deltaK` with no `+N/2` partner on the grid, so an odd-in-k multiplier cannot pair
-with its conjugate there. Zero derivative spectra on those bins (`derivativeNyquistMask` in
-the evolve kernel); the height spectrum is self-conjugate at Nyquist and needs no mask.
-Skipping the mask leaks each field's imaginary residual into its packing partner's lane —
-a few percent of RMS height that a zero-partner parity test cannot see. The validator's
-non-zero-partner parity gate (`dftPartnerParity`) exists to catch exactly this class.
-
-Document unpacking algebra next to the field contract. A swapped real/imaginary sign can look plausible while rotating or mirroring the sea.
-
-## 6. Compute Inverse FFT Schedule
-
-Use TSL compute nodes and storage textures:
-
-```js
 import {
   Fn,
   instanceIndex,
-  textureStore,
-} from 'three/tsl';
-import * as THREE from 'three/webgpu';
-
-const source = new THREE.StorageTexture( N, N );
-const scratch = new THREE.StorageTexture( N, N );
-
-source.colorSpace = THREE.NoColorSpace;
-scratch.colorSpace = THREE.NoColorSpace;
-source.mipmapsAutoUpdate = false;
-scratch.mipmapsAutoUpdate = false;
-
-const butterflyStage = Fn( ( { stage, axis, inputTex, outputTex } ) => {
-  const cell = computeCellFromLinearIndex( instanceIndex, N );
-  // Read two source samples, apply precomputed twiddle/index data, then write output.
-  textureStore( outputTex, cell, packedResult );
-} )().compute( N * N );
-```
-
-`computeCellFromLinearIndex()` is a small project helper that returns an integer `x/y` cell from the TSL compute invocation index.
-
-Precompute butterfly twiddles and source indices once per `N`:
-
-```ts
-type ButterflyEntry = {
-  twiddleReal: number;
-  twiddleImaginary: number;
-  inputA: number;
-  inputB: number;
-};
-```
-
-For each packed complex field:
-
-1. execute `log2(N)` horizontal stages;
-2. execute `log2(N)` vertical stages;
-3. multiply by `(-1)^(x+y)` to reconcile centered frequency coordinates.
-
-Ping-pong between a field texture and scratch texture. Never let two logical fields write the same scratch storage during a stage.
-
-Stage ordering:
-
-```js
-const orderedNodes = [
-  ...evolutionNodes,
-  ...bitReverseXNodes,
-  ...horizontalStage0Nodes,
-  ...horizontalStage1Nodes,
-  ...bitReverseYNodes,
-  ...verticalStage0Nodes,
-  ...verticalStage1Nodes,
-  ...centeringAndAssemblyNodes,
-];
-
-await renderer.computeAsync( orderedNodes );
-```
-
-Batch independent fields at the same stage when resource ownership is clear. Advance to the next stage only after the whole-grid writes for the current stage are visible. Use `workgroupBarrier()` only for synchronization inside a workgroup; it is not a substitute for ordered whole-grid stage boundaries.
-With Three.js `computeAsync()` arrays, nodes are iterated in array order inside the compute pass. This allows one ordered submission per cascade while preserving the ping-pong dependency chain between adjacent FFT stages.
-
-## 7. Hard Validation Gate
-
-Validate the transform before connecting the spectrum:
-
-```text
-test A:
-  centered DC impulse
-  expected spatial result = constant complex (1, 0)
-
-test B:
-  centered one-bin X-frequency impulse
-  expected spatial result =
-    cos(2πx/N) + i sin(2πx/N)
-
-test C:
-  centered one-bin Y-frequency impulse
-  expected spatial result =
-    cos(2πy/N) + i sin(2πy/N)
-
-test D:
-  analytic horizontal displacement direction
-  expected packed X/Z orientation and signs
-
-test E:
-  analytic derivative signs and Jacobian determinant
-```
-
-Measure maximum absolute error over every texel. A practical half- or single-precision gate is `1e-3`, adjusted only with captured evidence.
-
-If any test fails, stop. Do not tune spectrum amplitude, choppiness, or shading around a broken transform.
-
-Diagnostic causes:
-
-```text
-constant test alternates signs:
-  missing or duplicated centering permutation
-
-sine direction reversed:
-  inverse twiddle sign is wrong
-
-frequency appears on the wrong axis:
-  horizontal/vertical indexing is swapped
-
-every other stage corrupts:
-  ping-pong source/destination parity is wrong
-
-random blocks:
-  missing ordered stage boundary or aliased scratch storage
-
-foam rotates relative to waves:
-  packed derivative signs or cross derivative unpacking are wrong
-```
-
-## 8. Spatial Map Assembly
-
-Assemble filterable repeating data textures after the IFFT:
-
-```text
-displacement.rgba =
-  [lambda * Dx, height, lambda * Dz, foamHistory]
-
-derivatives.rgba =
-  [dHeight/dx, dHeight/dz, lambda * dDx/dx, lambda * dDz/dz]
-
-crossAndJacobian.rgba =
-  [lambda * dDz/dx, jacobian, foamCoverage, debugMask]
-```
-
-Use half-float storage for bandwidth when the target validates storage writes and filtered sampling for the chosen format. Keep data textures in linear/no-color semantics. Generate mipmaps only when a compute pass writes them deliberately.
-
-## 9. Jacobian Foam History
-
-Choppy horizontal displacement can fold. Build the 2x2 horizontal mapping Jacobian from transformed derivatives:
-
-```text
-jxx = 1 + lambda * dDx/dx
-jzz = 1 + lambda * dDz/dz
-jxz = lambda * dDz/dx
-J = jxx * jzz - jxz²
-```
-
-The single stored cross derivative is exact. In frequency space,
-`D_x_hat = i * (kx / k) * h_hat` and `D_z_hat = i * (kz / k) * h_hat`, so
-`dDx/dz = F^-1[-kx * kz / k * h_hat] = dDz/dx`. Therefore
-`det = jxx * jzz - (lambda * dDzdx)^2` is exact per cascade and remains exact
-after summing cascades.
-
-Low or negative `J` identifies real fold/compression regions. Store persistent per-texel history in ping-ponged storage initialized to `1`.
-
-One effective update shape:
-
-```text
-historyNext =
-  min(
-    currentJacobian,
-    historyPrevious
-      + dt * recoveryRate / max(currentJacobian, 0.5)
-  )
-```
-
-Keep simulation history separate from display threshold:
-
-```text
-foamCoverage =
-  smoothstep(lowCoverage, highCoverage,
-    sum(saturate((foamThreshold - history) * foamScale)))
-```
-
-Do not let the finest cascade produce constant speckle merely because it exists. Validate each cascade's foam contribution independently.
-
-## 10. NodeMaterial Surface Shading
-
-Use a `MeshStandardNodeMaterial` or `MeshPhysicalNodeMaterial` graph for the ocean surface. Vertex position samples the displacement storage textures by world `xz` and patch length. Normals come from summed derivative maps:
-
-```text
-slopeX = sum(dHeight/dx) / (1 + sum(lambda * dDx/dx))
-slopeZ = sum(dHeight/dz) / (1 + sum(lambda * dDz/dz))
-normal = normalize([-slopeX, 1, -slopeZ])
-```
-
-Horizontal compression changes the height-slope denominator; height-only normals miss fold behavior. Add sub-grid normal detail only after the resolved normal exists, at low enough strength that it cannot rewrite the swell direction.
-
-Use one sky-radiance node graph for both the visible sky and reflected ray:
-
-```text
-sky(direction) =
-  horizon-to-zenith gradient
-  + narrow sun disc
-  + broad sun halo
-```
-
-Water-air Fresnel:
-
-```text
-F = 0.02 + 0.98 * (1 - saturate(N dot V))^5
-```
-
-Build the body term from deep color plus crest scatter. Use a view/sun/normal half-vector response weighted by crest height:
-
-```text
-water = mix(body, sky(reflect(-V, N)), F)
-```
-
-Foam changes the final response rather than adding a detached white mask. Shade it with sun/sky incidence and modulate brightness with a separate bubbly detail field.
-
-Above/below and clear-water variants preserve the same spectral displacement and derivative maps. Underwater absorption uses Beer-Lambert depth, shared sun/sky, and scene depth/thickness from the node pass. Sand-bed caustics and shallow refraction belong in the node graph or in `$threejs-water-optics` when the water is bounded.
-
-## 11. RenderPipeline, Post, Color, And Output
-
-Create a single node render pipeline:
-
-```js
-import * as THREE from 'three/webgpu';
-import {
   mrt,
   normalView,
   output,
   pass,
   renderOutput,
+  textureLoad,
+  textureStore,
+  velocity,
+  workgroupArray,
+  workgroupBarrier,
 } from 'three/tsl';
-import { bloom } from 'three/addons/tsl/display/BloomNode.js';
-import { ao } from 'three/addons/tsl/display/GTAONode.js';
-import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
-const pipeline = new THREE.RenderPipeline( renderer );
-const scenePass = pass( scene, camera );
+const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
 
-scenePass.setMRT( mrt( {
-  output,
-  normal: normalView,
-} ) );
-
-const colorNode = scenePass.getTextureNode( 'output' );
-const normalNode = scenePass.getTextureNode( 'normal' );
-const depthNode = scenePass.getTextureNode( 'depth' );
-
-const bloomNode = bloom( colorNode, 0.25, 0.2, 1.4 ).setResolutionScale( 0.5 );
-const aoNode = ao( depthNode, normalNode, camera );
-aoNode.resolutionScale = 0.5;
-
-pipeline.outputColorTransform = true;
-pipeline.outputNode = colorNode.add( bloomNode );
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( 'WebGPU is required for the spectral transform.' );
+}
 ```
 
-Use built-in nodes first when they are needed: `BloomNode` for sun glints or crest sparkle, `GTAONode` for scene contact around hulls/shore objects, and `TRAANode` for temporal anti-aliasing when velocity/depth rejection is available. Do not add post effects to hide simulation errors.
+After initialization, `renderer.compute(nodeOrArray)` records one compute pass
+and iterates an array in order. `renderer.computeAsync()` guarantees renderer
+initialization before the same submission; it does not await GPU completion.
+`workgroupBarrier()` synchronizes invocations within one workgroup only. A
+whole-grid producer/consumer dependency needs a later dispatch.
 
-Color and output rules:
+Set every FFT and simulation texture to `NoColorSpace`, disable generated
+mipmaps, and use integer `textureLoad` during transforms. `FloatType` storage is
+the precision reference **[A]**. `HalfFloatType` is retained only after measured
+error gates **[M]**. If a resolved float texture must be filtered, check
+`renderer.hasFeature('float32-filterable')`; otherwise resolve to a validated
+filterable representation.
+
+Device choices use the initialized `renderer.backend.device.limits`. Record
+the exact limits that selected workgroup size, shared storage, and dispatch
+shape **[M]**.
+
+Use `RenderPipeline`, `pass()`, optional `mrt()`, and one output transform. When
+using `renderOutput()` explicitly, set `pipeline.outputColorTransform=false`.
+Set `pipeline.needsUpdate=true` after replacing the output graph.
+
+## Wavevector grid and transform convention
+
+For a square periodic patch of length `L`, even power-of-two resolution `N`,
+and centered integer indices `s_x,s_z`:
 
 ```text
-color textures: SRGBColorSpace
-simulation/data textures: NoColorSpace or linear semantics
-HDR working buffers: HalfFloatType until tone map
-tone-map owner: RenderPipeline
-output conversion owner: RenderPipeline outputColorTransform or renderOutput()
+Delta k = 2 pi / L
+k = Delta k (s_x,s_z)
+s_axis in {-N/2, ..., N/2-1}.                                  [D]
 ```
 
-Never double-convert in a material node and the pipeline. If an effect must run after tone mapping, disable `outputColorTransform` and place `renderOutput()` explicitly at the correct point.
+The axis Nyquist magnitude is `pi N/L` **[D]**. Grid corners have larger radial
+magnitude but anisotropic angular support. A circular upper mask
+`|k| < pi N/L` is the clean isotropic bound **[D]**; reserve a transition guard
+band selected by an alias/leakage gate **[G]**.
 
-## 12. Runtime Order
+DC is exactly zero for a zero-mean surface. Compute a finite `kSafe` before any
+division and branch/select DC away before evaluating inverse powers. Multiplying
+an already generated NaN by a zero window does not remove it.
 
-Use this order each frame:
+This reference uses the unnormalized inverse discrete transform
 
 ```text
-update time and dt uniforms
-update sea-state changes only when settled
-compute time-evolved packed frequency fields
-submit horizontal FFT stage 0..logN-1
-submit vertical FFT stage 0..logN-1
-submit centering, assembly, Jacobian, and foam-history nodes
-update optional spray or interaction effects
-render scene through RenderPipeline
-resolve GPU timing asynchronously
+f[j_x,j_z] = sum_(n_x,n_z) F[n_x,n_z]
+             exp(+i 2 pi (n_x j_x+n_z j_z)/N).                 [D]
 ```
 
-Sea-state changes that alter `h0` should recompute the initial spectrum on interaction release, not continuously while dragging a control.
-
-## 13. Geometry, Camera, Fog, And Budgets
-
-Baseline presentation:
+Consequences:
 
 ```text
-camera FOV: 55 degrees
-camera: (0, 16, 68)
-target: (0, 0, -20)
-surface: 400 m square
-fog: horizon-colored exponential fog
+unit DC coefficient -> unit constant field
+unit axis bin -> unit complex sinusoid
+sum_j |f_j|^2 = N^2 sum_n |F_n|^2
+mean_j |f_j|^2 = sum_n |F_n|^2.                                [D]
 ```
 
-Use enough mesh density that vertex displacement resolves the smallest visible cascade near the camera. Scale tessellation with camera distance and the shortest active patch length. Fog must hide the finite mesh edge before the plane ends.
+If a kernel normalizes by `1/N` per axis or `1/N^2` overall, initial
+coefficients must be scaled by the inverse factor. State the choice once in
+kernel code, CPU reference, tests, and spectrum initialization.
 
-Budgets:
+Centered storage requires exactly one reconciliation with the FFT's unshifted
+index convention: either apply an `ifftshift` permutation before the transform
+or multiply the spatial output by `(-1)^(j_x+j_z)` **[D]**. Doing both restores
+the wrong checkerboard; doing neither modulates the result.
+
+## Dispersion and dimensional spectrum
+
+### Capillary-gravity finite-depth dispersion
+
+For wavenumber magnitude `k`, gravity `g`, depth `d`, surface tension `sigma`,
+and density `rho`, define `tau=sigma/rho`:
 
 ```text
-ultra desktop discrete:
-  512², 3 cascades, about 102 MiB ocean storage with a 104 MiB gate
-  2.5-4.0 ms simulation, 1.5-3.0 ms ocean shading/post at 1440p
-
-standard desktop integrated:
-  256², 3 cascades, under 28 MiB ocean storage
-  1.5-3.0 ms simulation, 1.5-2.5 ms ocean shading/post at 1080p
-
-mobile or reduced tier:
-  128², 1-2 cascades, debug inputs when needed, under 8 MiB ocean storage
-  under 2.0 ms simulation-equivalent work, no spray
+omega^2(k) = (g k + tau k^3) tanh(k d).                         [D]
 ```
 
-Dispatch count estimate for one frame:
+Units are:
 
 ```text
-cascades * (
-  evolve packed fields
-  + packedFields * (2 * log2(N)) FFT stages
-  + centering/assembly/Jacobian/foam
-)
+[g k] = s^-2
+[tau k^3] = s^-2
+[omega] = s^-1.                                                 [D]
 ```
 
-Keep draw calls to one ocean surface, one sky, and optional routed effects. Keep post to one scene pass, optional MRT outputs, reduced-resolution built-in effects, and one output conversion.
-
-## 14. Required Diagnostics
-
-Expose:
+The radial group-speed factor required for a spectrum conversion is
 
 ```text
-capability tier and selected format
-FFT test errors
-Gaussian seed field
-per-cascade in-band spectrum
-local-only and swell-only spectra
-time-evolved frequency magnitude
-packed field real/imaginary views
-spatial height
-horizontal displacement
-height slopes
-horizontal derivatives
-cross derivative
-Jacobian determinant
-foam history
-foam display coverage
-resolved normal
-sub-grid normal contribution
-final without foam
-final without detail
-node pass outputs
-GPU milliseconds by evolve, FFT, assembly, render, and post phase
+d omega/dk = {
+  (g+3 tau k^2) tanh(kd)
+  + (gk+tau k^3) d sech^2(kd)
+} / (2 omega).                                                  [D]
 ```
 
-Capture a fixed camera at multiple times. A single attractive frame cannot prove temporal stability, transform correctness, or foam persistence.
+Evaluate it with a safe small-`k` branch. Any saturation of `kd` in `tanh` or
+`sech` is a numerical approximation whose maximum error is **[G]** and measured
+against the unsaturated CPU expression **[M]**.
 
-## 15. Failure Diagnosis
+As a scale check only: using `tau=7.28e-5 m^3 s^-2` **[A]**, `g=9.81 m s^-2`
+**[A]**, `L=5 m` **[A]**, and `N=512` **[A]** gives isotropic
+`k_max=321.70 rad m^-1` **[D]**, capillary/gravity ratio
+`tau k_max^2/g=0.768` **[D]**, and deep-water phase-speed multiplier
+`sqrt(1+0.768)=1.330` **[D]** relative to gravity-only dispersion. Omitting
+capillarity there is not a small phase error.
+
+### Frequency spectrum to wavevector density
+
+Let `S_omega(omega,theta)` be directional angular-frequency variance density:
 
 ```text
-periodic square tiles:
-  cascade lengths or camera coverage expose repetition; add disjoint scales
-
-all waves travel in one artificial line:
-  directional spread is too narrow or wind/swell angles are identical
-
-energy explodes near the center:
-  DC/small-k singularities are evaluated before masking
-
-surface moves but normals lag:
-  derivative maps are stale or sampled with different coordinates
-
-surface normals rotate relative to swell:
-  packed field signs or cross derivative unpacking are wrong
-
-white noise foam:
-  thresholding finest-cascade compression without temporal filtering
-
-foam disappears instantly:
-  history is not persistent or recovery is interpreted as decay-to-zero
-
-foam never clears:
-  recovery sign or Jacobian denominator clamp is wrong
-
-glitter detached from sun:
-  visible sky and reflection use different sun direction or color
-
-GPU corruption after increasing N:
-  FFT stage count, butterfly table, index type, or scratch allocation is wrong
-
-slow frame at identical visual quality:
-  wrong algorithm class, missing packed fields, excess cascades, full-resolution post, or no reduced-resolution node effects
+integral S_omega d omega d theta = variance(h),
+[S_omega] = m^2 s.                                              [D]
 ```
 
-## 16. Replaced Techniques
+Let the directional distribution `D(omega,theta)` satisfy
+`integral D dtheta=1` **[D,G]**. Convert to two-dimensional Cartesian
+wavevector density using polar area `d^2k=k dk dtheta`:
 
-- Raster-pass transform pipelines are replaced by TSL compute kernels writing `StorageTexture` ping-pongs because compute dispatches avoid screen-quad pass overhead and match the data-parallel FFT schedule.
-- Post-transform finite differences are replaced by frequency-space derivative fields because the transformed slopes, horizontal derivatives, and cross derivative are more accurate and share the same FFT work.
-- Fresh per-frame foam inference is replaced by persistent Jacobian history because whitecaps are temporal events with recovery, not a stateless color threshold.
-- Detached material shading is replaced by `NodeMaterial` graphs fed by the same displacement and derivative textures because normals, foam, reflection, and underwater absorption must remain coupled.
-- Ad hoc post stacks are replaced by `RenderPipeline` nodes with one tone-map and output-conversion owner because the ocean must stay HDR until the final output transform.
+```text
+P(k_x,k_z)
+  = S_omega(omega(k),theta) |d omega/dk| / k,
+[P] = m^4,
+integral P d k_x d k_z = variance(h).                           [D]
+```
+
+This `1/k` Jacobian and the discrete `Delta k_x Delta k_z` cell area are both
+required. Validate the numerical directional normalization at each frequency
+**[M]**, because a powered-cosine lobe's normalization changes with exponent.
+
+A JONSWAP model may be used as an authored empirical sea-state family:
+
+```text
+S_J(omega) = alpha g^2 omega^-5
+  exp[-5/4 (omega_p/omega)^4]
+  gamma^r,
+
+r = exp[-(omega-omega_p)^2/(2 sigma_J^2 omega_p^2)].            [A]
+```
+
+The conventional split `sigma_J=0.07` below the peak and `0.09` above it is
+**[A]**. One fetch-limited parameterization is
+
+```text
+alpha = 0.076 (g F/U_10^2)^(-0.22)
+omega_p = 22 (g^2/(U_10 F))^(1/3),                              [A]
+```
+
+whose dimensionless fetch group and `s^-1` peak units are explicit **[D]**.
+The coefficients `0.076`, `0.22`, and `22` are empirical **[A]**, not universal
+constants. Record the selected spectrum family, wind-height convention, fetch,
+peak enhancement, swell model, and directional model as authored inputs.
+
+A TMA finite-depth shape factor is dimensionless **[D]**. If used, apply it
+once to the variance spectrum while still using the finite-depth dispersion and
+its group-speed Jacobian. Document the exact formulation so finite-depth energy
+corrections are not accidentally duplicated.
+
+## Cascade quadrature and deterministic coefficients
+
+### Power partition
+
+For conceptual cascade power windows `w_c(k)`:
+
+```text
+w_c(k) >= 0,
+sum_c w_c(k) = 1 over the target band.                           [D,G]
+```
+
+Two valid choices are:
+
+- hard half-open bands `[k_low,k_high)`, with exact single ownership;
+- smooth overlapping windows, assigning `P_c=w_c P` and therefore amplitude
+  multiplier `sqrt(w_c)` **[D]**.
+
+Amplitude windows that sum to one do not conserve expected power; power windows
+must sum to one. Each window support must lie inside that cascade's representable
+isotropic band, including guard bins. Numerically integrate every cascade and
+the sum, then compare realized variance to the target **[M]**.
+
+Patch length sets both `Delta k` and exact spatial repetition. Choose the large
+patch from the visible footprint/repetition gate **[G]**, not from a fixed
+preset. Choose smaller patches so their coarser `Delta k` does not leave a
+quadrature hole at handoff. Sharp cutoffs can ring in correlation space; smooth
+power windows trade a controlled overlap for reduced ringing.
+
+### Gaussian coefficient normalization
+
+Generate coordinate-stable independent normal variates from
+`(seed,cascade,index_x,index_z)`. Masking or changing a cutoff must not consume a
+different random sequence.
+
+Let
+
+```text
+zeta_k = (xi_1 + i xi_2)/sqrt(2),
+xi_1,xi_2 ~ N(0,1),
+E|zeta_k|^2 = 1.                                                [D]
+```
+
+For unnormalized inverse synthesis, initialize
+
+```text
+a_k = sqrt( P_c(k) Delta k_x Delta k_z / 2 ) zeta_k.           [D]
+```
+
+Evolve height coefficients as
+
+```text
+H_k(t) = a_k exp(-i omega_k t)
+       + conjugate(a_-k) exp(+i omega_k t).                     [D]
+```
+
+Then `H_-k=conjugate(H_k)` **[D]**, and expected spatial variance sums to the
+quadrature of `P_c` under the stated transform convention **[D]**. Directional
+asymmetry between `P(k)` and `P(-k)` controls propagation while the instantaneous
+height remains real.
+
+At self-conjugate cells, construct a real `H` explicitly. Set DC to zero. Store
+the Gaussian convention next to the amplitude equation; using unnormalized
+real and imaginary normals without the `1/sqrt(2)` changes variance by a derived
+factor of two **[D]**.
+
+## Frequency-space displacement and derivatives
+
+### Sign convention and fields
+
+With the positive-exponent inverse transform above, define positive choppiness
+`chi` by
+
+```text
+D_x_hat = +i (k_x/k) H
+D_z_hat = +i (k_z/k) H.                                        [D]
+```
+
+For the one-dimensional mode `h=a cos(kx)`, this yields
+`D_x=-a sin(kx)` and `X=x-chi a sin(kx)` **[D]**, so a positive `chi` compresses
+the height crest. This one-mode result is a mandatory sign test.
+
+Compute all required fields before the IFFT:
+
+```text
+height:                 H
+horizontal D_x:        +i k_x/k H
+horizontal D_z:        +i k_z/k H
+height slope h_x:      +i k_x H
+height slope h_z:      +i k_z H
+D_xx:                   -k_x^2/k H
+D_zz:                   -k_z^2/k H
+D_xz = D_zx:            -k_x k_z/k H.                           [D]
+```
+
+The cross derivatives are equal because the displacement is generated by one
+scalar spectral potential **[D]**. Set every divided field to zero at DC.
+
+### Hermitian projection and Nyquist lines
+
+On an even grid, the represented Nyquist value in an axis has no distinct
+positive-frequency partner. A multiplier odd in that axis breaks discrete
+Hermitian symmetry unless its Nyquist line is zero.
+
+Apply field-specific rules:
+
+```text
+D_x and h_x: zero the k_x Nyquist line
+D_z and h_z: zero the k_z Nyquist line
+D_xz:        zero either Nyquist line
+D_xx,D_zz:   even multipliers; no blanket line mask
+height:      preserve, with self-conjugate cells real.          [D]
+```
+
+After construction, validate `F(-k)=conjugate(F(k))` for every field. A
+pairwise projection
+
+```text
+F_p(k) = [F(k)+conjugate(F(-k))]/2                              [D]
+```
+
+is a useful validation/reference operation; a production kernel should
+construct the same result without an unnecessary pass. Record post-IFFT
+imaginary leakage for every packed lane **[M]**.
+
+## Packing four complex transforms
+
+Pair two Hermitian spectra `A` and `B` into one complex transform:
+
+```text
+G = A + i B
+G_re = A_re - B_im
+G_im = A_im + B_re.                                             [D]
+```
+
+After the IFFT, `real(g)=a` and `imag(g)=b` **[D]**. A complete layout is:
+
+```text
+G_0 = D_x  + i D_z
+G_1 = h    + i D_xz
+G_2 = h_x  + i h_z
+G_3 = D_xx + i D_zz.                                           [D]
+```
+
+Store `G_0,G_1` as two complex lanes in one RGBA texture and `G_2,G_3` in a
+second. Thus eight real spatial fields require four complex IFFTs but only two
+RGBA lane groups **[D]**. `[A.re,B.re,A.im,B.im]` is not this packing and cannot
+be unpacked by simply reading real/imaginary output lanes.
+
+## Inverse FFT implementation
+
+### Global Stockham reference
+
+A global Stockham autosort implementation uses `log2(N)` stages per axis
+**[D]**, ping-ponging source and destination. It performs the permutation as
+part of the stages and has no separate bit reversal.
+
+For each stage:
+
+- every output texel has exactly one invocation/writer;
+- both butterfly inputs come from the read texture;
+- both complex lanes use identical indices/twiddles;
+- the next stage is a later dispatch;
+- source and destination swap only after the whole stage.
+
+Two separately dispatched RGBA lane groups cost
+`4 log2(N)` whole-grid stage dispatches per cascade across both axes **[D]**.
+A kernel that processes both lane groups together can reduce dispatch count but
+increases bindings, registers, and storage traffic per invocation; accept it
+only from measured occupancy/timing **[M]**.
+
+### Workgroup-resident rows
+
+When one row or row tile fits initialized device limits, load it into
+`workgroupArray`, execute radix stages with `workgroupBarrier()` between shared
+memory dependencies, write a transposed intermediate, and repeat for the second
+axis. Shared storage must be computed from the WGSL element type, not the
+storage-texture bit depth: loading half-float storage into `vec4<f32>` consumes
+full float workgroup bytes **[D]**.
+
+Gate:
+
+- workgroup storage and invocation limits **[G]**;
+- no bank/pathological access pattern under the target implementation **[M]**;
+- occupancy and register pressure **[M]**;
+- transform error identical to the global reference gate **[G,M]**;
+- transpose traffic and total GPU time **[M]**.
+
+Large rows can use multiple workgroups only with a mathematically valid
+decomposition and a dispatch boundary between cross-workgroup stages. A
+workgroup barrier cannot synchronize two workgroups.
+
+### Ordered submission
+
+After initialization:
+
+```js
+renderer.compute( [
+  ...evolutionNodes,
+  ...horizontalTransformNodes,
+  ...verticalTransformNodes,
+  ...assemblyNodes,
+  foamNode,
+] );
+```
+
+The array order is an r185 API property verified in this repository **[G]**.
+Do not `await computeAsync()` every frame expecting a GPU fence. Use timestamp
+queries or explicit readback APIs only in asynchronous diagnostics.
+
+## Transform validation gate
+
+Before using a random spectrum, compare GPU output against a pure CPU DFT for a
+small power-of-two grid selected as a test fixture **[A]**. Gates are chosen by
+storage precision **[G]** and results are **[M]**.
+
+Required cases:
+
+```text
+DC:
+  F(0,0)=1 -> f=1
+
+positive x bin:
+  f=exp(+i 2 pi j_x/N)
+
+positive z bin:
+  f=exp(+i 2 pi j_z/N)
+
+oblique bin:
+  detects axis swap and transposition
+
+conjugate pair:
+  expected real cosine and near-zero imaginary residue
+
+Nyquist lines:
+  checks every field-specific mask and packing partner
+
+random complex field:
+  maximum, RMS, relative L2, and Parseval error.                [D]
+```
+
+Diagnose by symptom:
+
+| Symptom | Likely fault |
+| --- | --- |
+| Alternating sign on DC | centered-order correction missing or duplicated |
+| Sine travels backward | inverse twiddle sign or time-evolution sign |
+| Axes exchanged | row/column index or transpose fault |
+| Every later stage corrupts | ping-pong parity or missing dispatch boundary |
+| Real fields leak into packing partners | broken Hermitian/Nyquist rule or packing algebra |
+| Correct shape, wrong amplitude | IFFT normalization or Gaussian/cell-area factor |
+
+Do not compensate a failed transform by changing spectrum amplitude,
+choppiness, foam threshold, or exposure.
+
+## Spatial assembly and exact surface geometry
+
+Binding topology is part of the algorithm. Gate the initialized device's
+`maxStorageTexturesPerShaderStage` before creating assembly kernels. The fused
+reference assembly binds seven storage textures and is only a candidate when
+that limit and the compiled layout admit it. The portable path splits the same
+dependency graph into ordered dispatches using at most three storage textures
+per dispatch, with distinct intermediate resources across global dependencies.
+Measure both where available; fusion is not automatically faster on a
+bandwidth- or occupancy-limited target.
+
+Sum all cascades at the same parameter coordinate before nonlinear operations:
+
+```text
+h     = sum_c h_c
+D_x   = sum_c D_x,c
+D_z   = sum_c D_z,c
+h_x   = sum_c h_x,c
+h_z   = sum_c h_z,c
+D_xx  = sum_c D_xx,c
+D_zz  = sum_c D_zz,c
+D_xz  = sum_c D_xz,c.                                         [D]
+```
+
+For
+
+```text
+P(q) = (q_x + chi D_x, h, q_z + chi D_z),                     [D]
+```
+
+define
+
+```text
+A = 1 + chi D_xx
+B =     chi D_xz
+C = 1 + chi D_zz.                                              [D]
+```
+
+Then
+
+```text
+P_qx = (A, h_x, B)
+P_qz = (B, h_z, C)
+
+J = A C - B^2
+
+n_unnormalized = cross(P_qz,P_qx)
+  = (h_z B - C h_x,
+     J,
+     B h_x - h_z A).                                           [D]
+```
+
+The exact upward normal is `normalize(n_unnormalized)` while `J>0` **[D]**.
+The shortcut
+
+```text
+(-h_x/A, 1, -h_z/C)
+```
+
+is wrong when `B != 0` and even its same-axis division does not reproduce the
+cross product. Validate analytic normals against central differences of the
+displaced map **[M]**.
+
+Compute the determinant from the summed derivative matrix. Determinants do not
+sum across cascades. Gate minimum `J` **[G]**, report its distribution and fold
+count **[M]**, and treat `J<=0` as a representational failure/breaking event.
+Flipping the normal hides the fold but does not restore a single-valued map.
+
+Resolved maps may pack:
+
+```text
+displacement = (chi D_x, h, chi D_z, validity)
+tangentA     = (h_x, h_z, chi D_xx, chi D_zz)
+tangentB     = (chi D_xz, J, foamSource, diagnostic).           [D]
+```
+
+Foam history belongs to its own ping-pong state unless a packed channel's
+read/write lifetime is proven non-conflicting.
+
+## Foam source, transport, and decay
+
+Jacobian compression is a visual breaking proxy, not a complete breaking-wave
+model. Derive a bounded source `s>=0` from combined-cascade compression,
+negative material derivative of `J`, curvature, or a calibrated combination.
+Thresholds and gains are **[A]**; source-versus-reference agreement is **[M]**.
+
+The state equation is
+
+```text
+D f/Dt = s(1-f) - f/tau_f + kappa Laplacian(f),
+0 <= f <= 1.                                                     [D]
+```
+
+With source held constant during a step and diffusion handled separately, the
+exact reaction update is
+
+```text
+r = s + 1/tau_f
+f_eq = s/r
+f_next = f_eq + (f_advected-f_eq) exp(-r dt).                   [D]
+```
+
+This makes source and decay timestep-correct. When `s=0`, it reduces to
+`f_next=f_advected exp(-dt/tau_f)` **[D]**.
+
+Declare the transport space:
+
+**Lagrangian parameter history.** A texel is attached to `q` and therefore
+moves with the spectral horizontal map. This is the cheapest coherent option,
+but it does not add wind drift or exchange after folds.
+
+**Eulerian/world history.** Backtrace with surface transport velocity and
+sample a world or camera-relative atlas. Semi-Lagrangian transport is stable
+for large steps but diffusive; gate backtrace distance in texels and mass loss
+**[G,M]**. A bounded MacCormack/BFECC correction costs more and must clamp to
+the source neighborhood to avoid negative/overshoot coverage.
+
+**Conservative finite-volume transport.** Use when coverage mass matters. For
+an unsplit first-order upwind update, a sufficient positivity CFL is
+
+```text
+|u_x| dt/dx + |u_z| dt/dz <= 1.                                [D]
+```
+
+For explicit central diffusion, stability requires
+
+```text
+kappa dt (1/dx^2 + 1/dz^2) <= 1/2.                             [D]
+```
+
+Do not maintain independent foam histories per cascade and then saturating-add
+them without a power/coverage model. Form one combined breaking source first,
+then evolve one declared history representation. Diagnose source, pre-advection
+state, transported state, reaction result, and display coverage separately.
+
+## Optical transport and final material
+
+The ocean material consumes the exact displacement, tangents, normal,
+Jacobian, and foam state. It must not reconstruct a different wave cause from
+unrelated normal textures.
+
+Use one sky-radiance function for the visible sky and reflected ray. Evaluate
+side-aware dielectric Fresnel and Beer-Lambert attenuation as specified in
+`../../threejs-water-optics/references/water-surface-system.md`. For water-side
+views use exact Fresnel near total internal reflection. A specular node material
+already contains direct-light glint; do not add another sun lobe without
+removing or budgeting the first.
+
+An energy-auditable composition is
+
+```text
+L_water = F L_reflection
+        + (1-F) [T L_background + (1-T) L_scatter]
+L_final = (1-f) L_water + f L_foam.                             [D]
+```
+
+Caustics in shallow scenes require receiver-space flux deposition; a bright
+projected texture is not sufficient. Use the bounded-water reference's
+differential-area mapping.
+
+Use one `RenderPipeline`. Simulation/data textures use `NoColorSpace`; input
+color textures use their actual color space; intermediate radiance remains
+linear HDR; tone mapping and output conversion occur once. Add bloom, ambient
+occlusion, or temporal reconstruction only when their input signals and cost
+pass explicit gates **[G,M]**.
+
+## CPU coupling and rigorous truncation error
+
+### Parameter-coordinate query
+
+Retain a deterministic subset `K_r` of seeded coefficients on CPU. For omitted
+set `K_o`, define
+
+```text
+B_0 = sum_(k in K_o) (|a_k|+|a_-k|)
+B_1 = sum_(k in K_o) |k| (|a_k|+|a_-k|).                       [D]
+```
+
+At any time and fixed parameter coordinate:
+
+```text
+|h_full-h_reduced| <= B_0
+||grad h_full-grad h_reduced|| <= B_1
+||chi D_full-chi D_reduced|| <= chi B_0.                        [D]
+```
+
+Sort retained modes for the queried quantity: amplitude controls height,
+whereas `|k|`-weighted amplitude controls slopes/normals. A single
+"dominant-bin" list is not optimal for both.
+
+### World-horizontal query
+
+For world horizontal coordinate `x`, solve
+
+```text
+X(q) = q + chi D(q) = x.                                       [D]
+```
+
+Let
+
+```text
+G = sum_all |k| (|a_k|+|a_-k|)
+L = chi G.                                                       [D]
+```
+
+If `L<1`, the horizontal map is globally a contraction perturbation of the
+identity under this conservative bound. The reduced/full inverse-coordinate
+error obeys
+
+```text
+||q_full-q_reduced|| <= chi B_0/(1-L),                          [D]
+```
+
+and the Eulerian height error obeys
+
+```text
+|h_full(q_full)-h_reduced(q_reduced)|
+  <= B_0 + G chi B_0/(1-L).                                    [D]
+```
+
+This bound is conservative. When `L>=1` or folds are allowed, do not claim a
+global world-coordinate bound; return parametric results or measured local
+probe error **[M]**. Add CPU solver tolerance **[G]**, floating-point/FFT probe
+discrepancy **[M]**, and omitted-coefficient bound **[D]** as separate fields.
+
+Do not read full GPU displacement maps back in the frame path. Asynchronous
+diagnostic readback is allowed and must include WebGPU padded-row stride rather
+than assuming tight rows.
+
+## Geometry sampling and repetition
+
+The mesh must resolve the smallest geometrically displaced wavelength visible
+at its projected distance. The absolute alias condition is
+
+```text
+k_geometry,max Delta_mesh <= pi,                               [D]
+```
+
+but select a stricter position/normal error gate **[G]**. Use distance-adaptive
+patches, projected-grid geometry, or concentric meshes when one uniform plane
+would oversample the horizon and undersample the foreground. Avoid cracks by
+sharing boundary samples or using skirts whose visibility is gated **[G]**.
+
+Each cascade repeats every patch length. Hide repetition by choosing the large
+patch from maximum visible water footprint, using physically justified haze,
+and checking autocorrelation/fixed-flight captures **[M]**. Random phase does
+not remove periodicity. Rotating cascades changes directional statistics and
+must be reflected in derivatives and the spectrum model.
+
+## Performance, memory, and mobile/tile GPUs
+
+### Exact accounting
+
+For square resolution `N`, channels `C`, and bytes per channel `B`:
+
+```text
+textureBytes = N^2 C B.                                        [D]
+```
+
+Therefore:
+
+```text
+RGBA16F: 8 N^2 bytes
+RGBA32F: 16 N^2 bytes.                                         [D]
+```
+
+The ledger includes initial coefficients/seeds retained on GPU, two packed
+complex lane groups, every ping-pong scratch partner, resolved maps, foam
+ping-pong, optional transpose buffers, scene pass attachments, and post
+transients. Report allocated bytes and peak simultaneously live bytes **[M]**.
+
+For the global Stockham layout with two separately transformed RGBA lane groups:
+
+```text
+stage dispatches/cascade = 4 log2(N),                           [D]
+```
+
+before evolution, centered correction/assembly, Jacobian, and foam. Report the
+actual graph count; fused lane groups or workgroup-local rows change it.
+
+### Precision placement
+
+Repeated half-float stores at every FFT stage quantize after each butterfly.
+Using half-float only for resolved displacement maps quantizes once. Treat these
+as different tiers and measure:
+
+- transform relative `L2`, maximum error, and Parseval drift;
+- imaginary leakage and Hermitian partner error;
+- phase/slope error over time;
+- Jacobian/fold classification changes;
+- final-image temporal shimmer.
+
+Use float FFT storage when half-float changes any gate, then reduce bandwidth
+elsewhere. Float storage sampling need not be filterable inside the FFT because
+all butterfly reads are integer loads.
+
+### Sustained targets
+
+The compiled workload contract supplies target-specific resolution candidates
+**[A]** and predeclared error/time/memory gates **[G]**; this reference supplies
+no device-class defaults. Accept a tier only after warm steady-state percentile
+timings on a named device **[M]**. For mobile/tile hardware also record long-run clock/thermal
+drift, power mode, viewport, device-pixel ratio, active cascades, texture
+formats, and post passes.
+
+Optimize in this order:
+
+- remove redundant fields or transforms while preserving exact tangents;
+- pack complex lanes correctly;
+- select workgroup-local rows when limits and occupancy support them;
+- reduce global storage round trips and transposes;
+- reduce cascade count from a quantified spectral-energy/error gate;
+- reduce resolution from slope/Jacobian/image error, not a GPU-name heuristic;
+- decimate foam or optical updates only with temporal/reprojection evidence;
+- keep diagnostics out of production timings but measure their overhead
+  separately.
+
+## Required diagnostic and validation bundle
+
+### Spectrum
+
+- all input units and authored sea-state parameters;
+- `S_omega`, directional normalization, `P(k_x,k_z)`, and `d omega/dk`;
+- Gaussian mean/variance and coordinate stability;
+- per-cascade power window, represented support, and quadrature variance;
+- target versus realized significant statistics **[M]**.
+
+### Transform
+
+- declared sign, normalization, centered-order correction, and FFT family;
+- DC, axis, oblique, conjugate-pair, Nyquist, and random DFT tests;
+- maximum/RMS/relative error, Parseval drift, and imaginary leakage **[M]**;
+- float reference versus every reduced-precision tier **[M]**.
+
+### Geometry
+
+- each frequency-space field and each unpacked spatial field;
+- one-mode travel direction and crest-compression sign;
+- analytic versus finite-difference tangents/normals **[M]**;
+- per-cascade fields, summed fields, `A`, `B`, `C`, `J`, and fold count;
+- mesh sampling error and repetition/autocorrelation captures **[M]**.
+
+### Foam and optics
+
+- combined source, transport velocity, pre/post-advection state, reaction
+  result, diffusion, and display coverage;
+- coverage conservation/loss and decay half-life comparison **[M]**;
+- reflection, transmission, scattering, foam, and final energy terms;
+- exact Fresnel/TIR and scene-depth refraction validity where applicable.
+
+### Runtime
+
+- renderer/backend identity, relevant device limits, texture formats;
+- allocation and peak-live ledger;
+- dispatch and draw inventory;
+- GPU time by evolution, transforms, assembly, foam, surface, and post **[M]**;
+- fixed-camera multi-time final, no-foam, no-detail, and no-post images;
+- leak/rebuild loop and sustained mobile thermal run **[M]**.
+
+Reject the system if a plausible image masks dimensional inconsistency,
+implicit FFT scale, Nyquist leakage, wrong displacement sign, inexact normals,
+stateless foam, undocumented coordinate semantics, or a timing number without a
+named measurement context.

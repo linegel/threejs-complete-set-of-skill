@@ -8,19 +8,36 @@ description: Build coherent WebGPU/TSL procedural scalar and vector fields for T
 The first implementation decision is the algorithm class. Do not begin with a
 simple material expression and later optimize it. Author the field once as a
 deterministic TSL `Fn`, reuse that exact function in material, vertex, and
-compute stages, and bake it to storage resources whenever repeated reads make
-evaluation the slower path.
+compute stages, and bake only when an invocation-weighted ALU, update, and
+bandwidth model predicts a win over direct evaluation.
+
+Keep the shared field core stage-portable: coordinates, deterministic field,
+analytic derivatives, and causal outputs only. Fragment footprint derivatives,
+vertex patch-error policy, and compute tile invalidation are consumer adapters;
+do not place `dFdx`/`dFdy` inside a function also called from vertex or compute.
 
 Use `$threejs-choose-skills` before this skill when the request spans multiple
 graphics systems. Use `$threejs-procedural-materials` when the task is channel
 assembly and material response, and `$threejs-procedural-planets` when the
 deliverable is a complete planetary body.
 
-Legacy WebGL implementation (deprecated, do not extend): `../threejs-procedural-planets/examples/procedural-planet-surface/planet-system.js`.
+## Numerical Provenance
+
+Every numerical claim emitted from this skill carries one label:
+
+- **Derived**: follows from a stated equation, format, or byte count.
+- **Gated**: an acceptance threshold or device/API capability that must pass.
+- **Measured**: captured on the named browser, GPU, resolution, and workload;
+  never transfer it to another target without remeasurement.
+- **Authored**: a look-development or planning starting point, not a physical
+  constant or performance fact.
+
+Unlabelled integers in API names, vector widths, channel counts, or source code
+are structural, not budget claims.
 
 ## Mandatory Renderer Path
 
-Use only latest Three.js WebGPU/TSL APIs:
+Use the repository's pinned Three.js r185 WebGPU/TSL APIs:
 
 - `WebGPURenderer` from `three/webgpu`.
 - TSL from `three/tsl`, with reusable `Fn` field functions.
@@ -32,6 +49,11 @@ Use only latest Three.js WebGPU/TSL APIs:
   `StorageTexture`, `textureStore()`, `StorageBufferAttribute`,
   `StorageInstancedBufferAttribute`, `storage()`, barriers, and atomics when the
   field bake or placement algorithm needs them.
+
+After renderer initialization, prefer `renderer.compute()` for ordinary
+submission. In r185 `computeAsync()` only initializes on demand before
+enqueueing; it is not a GPU-completion fence. Await an actual readback/map or
+use GPU timestamps when completion or timing evidence is required.
 
 Runnable import baseline:
 
@@ -56,32 +78,29 @@ import {
 
 `outputColorTransform` is a `RenderPipeline` property, not a TSL export.
 
-## Capability Gate And Tiers
+## Native-WebGPU Gate And Tiers
 
-Initialize and branch once at system setup. The reduced tier is a quality tier,
-not a second implementation path.
+Initialize and reject any non-WebGPU backend before selecting quality. CPU
+ports remain offline/geometry/parity tools; they are not a runtime renderer
+branch.
 
 ```js
 await renderer.init();
 
-const fieldTier = renderer.backend.isWebGPUBackend ? 'gpu-storage' : 'reduced';
-
-if (fieldTier === 'gpu-storage') {
-  // Compute/storage path: bake reusable fields, update dynamic tiles, sample
-  // storage-backed outputs from NodeMaterials and node post passes.
-} else {
-  // Reduced quality: smaller CPU/offline grids, precomputed generated variants,
-  // lower octave counts, static LODs, and no custom low-level rewrite.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error('threejs-procedural-fields requires a native WebGPU backend.');
 }
+
+const { features, limits } = renderer.backend.device;
 ```
 
 Quality tiers:
 
 | Tier | Use when | Field architecture |
 | --- | --- | --- |
-| `gpu-storage` | WebGPU backend with compute/storage available | TSL `Fn` is source of truth; bake hot scalar/vector fields to `StorageTexture` or storage buffers; sample packed outputs many times. |
-| `gpu-evaluate` | WebGPU backend, low read count, small field cost | Call the same TSL `Fn` directly in material or vertex nodes; avoid bake memory and dispatch overhead. |
-| `reduced` | Backend lacks compute/storage | Use smaller precomputed maps from `assets/generated-variants/`, fewer bands, static geometry LODs, and CPU parity tests; do not author a parallel low-level renderer path. |
+| `full` | **Measured** full-resolution field plan is inside the target frame and memory budgets | TSL `Fn` is source of truth; use direct evaluation or compute-baked storage according to the cost model; retain required gradients and filtered mips. |
+| `budgeted` | **Measured** full tier misses time or bandwidth | Same WebGPU graph with fewer active spectral bands, smaller/dirty-tiled bakes, lower update cadence, and packed access-local channels. |
+| `minimum-native` | **Gated** WebGPU exists but the budgeted tier still misses | Same WebGPU consumer contract with precomputed generated data, coarser native-WebGPU textures, and only silhouette/identity-critical fields. |
 
 ## Field Contract
 
@@ -112,8 +131,10 @@ The contract must record:
 - primary fields and derived causes;
 - consuming material, geometry, compute, placement, and post channels;
 - filtering rule per frequency band;
-- bake-vs-evaluate choice and expected read count;
-- CPU parity plan and tolerances;
+- bake-vs-evaluate equation with invocation counts, operation inventory, dirty
+  texels, reuse interval, bytes/texel, sampling footprint, and measured timing;
+- CPU parity plan with per-channel conditioning, storage quantization, and
+  threshold guard bands;
 - debug output for every named field.
 
 For the canonical `examples/webgpu-field-bake/` contract, CPU and TSL must
@@ -123,52 +144,132 @@ wrapping convention, octave counts, lacunarity, gain, warp seed offsets, and
 derived-channel coefficients. Do not copy those numbers into CPU or TSL code.
 The canonical hash floors the lattice coordinate, converts i32 cell bits to
 u32, mixes with `Math.imul`/TSL `uint` wrapping arithmetic, and scales the final
-u32 by `2^-32`; no sin-dot hash is allowed in the parity path.
-`validate-field-contract.mjs` enforces shared-object identity and CPU golden
-fixtures at `1e-12` absolute error; the value is the validator's fixture drift
-threshold for JavaScript double evaluation. Browser WebGPU artifacts are
-accepted only through `--artifacts <dir>` and must satisfy the derived
-per-channel `1e-4` tolerance. The derivation is `u=2^-24`,
-`gamma_384 ~= 2.29e-5`, with a 4.4x margin for warp/channel arithmetic and
-driver pow decomposition; placement-mask threshold consumers use a `1e-4`
-guard band around threshold `0.5`.
+u32 by **Derived** `2^-32`; no sin-dot hash is allowed in the parity path.
+`validate-field-contract.mjs` enforces shared-object identity and uses an
+**Authored** `1e-12` CPU fixture-drift gate for JavaScript double evaluation.
+Its `FIELD_PARITY_ERROR_MANIFEST` labels the direct-WGSL-f32 per-channel limits
+and threshold guard **Gated**; it does not claim that an operation count proves
+them. The manifest separately records the **Derived**, conditional
+`rgba16float` nearest-rounding term and marks interpolation/total stored error
+unvalidated. A production field contract derives or measures each channel's
+f32 conditioning, built-in allowance, interpolation/finite-difference error,
+storage quantization, and threshold guard rather than copying fixture limits.
+
+The example is a canonical validation lab, not production acceptance. It
+exercises invocation/update/bandwidth algebra, one
+`createFieldNodeBundle()` owner with named `.toVar()` intermediates, direct-f32
+parity, explicit `rgba16float` base writes, dependent box-filter mips, and
+structured-placement storage. Artifacts gate three declared texels per base
+texture, three per packed mip, and every placement record. They do not prove
+filtered consumption, full-domain stored parity, dirty-region GPU execution,
+or production performance.
 
 ## Build Order
 
 1. Choose stable coordinates from the physical cause: radial planet kilometers,
    world XZ water/wetness, branch-local growth coordinates, or authored strata.
-2. Define one deterministic TSL `Fn` field bundle. Reuse it everywhere instead
-   of duplicating math in separate materials or compute jobs.
+2. Define one deterministic stage-portable TSL `Fn` field bundle. Reuse it
+   everywhere instead of duplicating math in separate materials or compute
+   jobs; wrap it with stage-specific filtering/LOD adapters.
 3. Port the same math to CPU only for geometry generation, offline assets,
-   parity tests, and reduced quality tiers. Keep constants, seeds, wrapping,
-   normalization, and remaps imported from one checked-in constants module.
-4. Decide bake versus direct evaluation from the table below before assigning
-   material nodes.
-5. Pack baked channels by access pattern and precision, not by visual category.
+   parity tests, and precomputed data used by native-WebGPU quality tiers. Keep
+   constants, seeds, wrapping, normalization, and remaps imported from one
+   checked-in constants module.
+4. Decide bake versus direct evaluation from the cost equation below and an A/B
+   GPU timing before assigning material nodes.
+5. Pack baked channels by access pattern, update cadence, filter mode, and
+   precision, not by visual category.
 6. Wire `NodeMaterial` consumers from the shared function or baked texture.
 7. Add node-pass diagnostics through `RenderPipeline`, `pass()`, and `mrt()`.
 8. Validate parity and budgets before adding extra bands.
 
-## Bake-Vs-Evaluate Table
+## Bake-Vs-Evaluate Cost Gate
 
-| Reads per frame per field | Best path | Reason |
-| --- | --- | --- |
-| 1 read and <= 4 cheap bands | Evaluate the TSL `Fn` inline | No dispatch, memory, or sampling overhead. |
-| 2-4 reads or shared by several material channels | Evaluate once in a local node bundle and reuse outputs | Keeps causal structure coherent without allocating a texture. |
-| 5-12 reads, expensive warp, or used by material plus post | Bake to packed `StorageTexture` at the needed resolution | One compute dispatch amortizes ALU over many filtered samples. |
-| 12+ reads, placement/culling, or per-instance consumers | Bake to storage texture plus storage buffers | Compute owns compaction, placement, and field reuse without CPU readback. |
-| Static or slow-changing field | Bake once or on targeted invalidation only | Updating every frame wastes bandwidth and hides algorithm mistakes. |
-| Dynamic field with local edits | Tile the bake and invalidate dirty tiles | Avoid full-field dispatches when only a region changed. |
+For one amortization interval, compare:
 
-Bake scalar fields into `rg16f`/`rgba16f`-class storage textures when precision
-matters. Pack categorical masks into integer-compatible lanes only when the
-consumer needs exact IDs. Never bake a field just because it is easy; bake when
-the read count or cross-system reuse pays for the dispatch and memory.
+```text
+Tinline = sum_i(Q_i * E_i)
+
+Tbake = (D * (E_bake + Wstore) + Tdispatch + Tmips) / U
+      + sum_i(Q_i * (S_i + B_i / BW_effective))
+```
+
+- `Q_i`: dispatch and vertex workloads are **Derived** from explicit counts.
+  Fragment workload is a **Measured** target model using resolution scale,
+  coverage, MSAA, helper invocations, and an overdraw proxy because WebGPU does
+  not expose a portable fragment-invocation counter.
+- `E_i`, `E_bake`: **Measured** field-evaluation cost inferred by controlled A/B
+  timing at fixed workload. Inventory dependent add/multiply/FMA, integer hash,
+  transcendental, branch, register, and octave costs separately; a scalar
+  operation count is not a timing model.
+- `D`: **Measured** dirty texels per update; `U`: **Measured** frames between
+  updates. A static bake amortizes over its observed reuse lifetime.
+- `S_i`: **Measured** filtered/load sample cost. `B_i/BW_effective` is effective
+  cache/DRAM traffic, not `formatBytes * nominal taps`; determine it by A/B
+  timing because locality, footprints, and cache reuse dominate.
+- `Tdispatch`, `Tmips`, `Wstore`: **Measured** dispatch, mip generation, and
+  store costs on the target.
+
+Choose the lower measured path subject to memory and latency gates. Within one
+shader invocation, materialize the shared field bundle once (`toVar()` or an
+equivalent explicit local) before considering a texture. Across passes, stages,
+draws, or frames, include every actual consumer in `sum_i`. A full-domain bake
+usually loses when only a small visible region is shaded; a static expensive
+field can win with a single consumer because `U` is large. Fixed read-count
+cutoffs are forbidden.
+
+Do not call two packed-output `Fn`s that each rebuild the same warp/noise core.
+Hoist shared intermediates in the caller, or return/materialize one packed
+bundle supported by the installed TSL revision, then inspect generated WGSL for
+duplicate hash/octave chains. Source-level reuse is not proof of shader CSE.
+
+### Storage format and precision gate
+
+- `RGBAFormat + HalfFloatType` maps to `rgba16float` in installed Three.js
+  `0.185.1` and is the portable writable half-float storage baseline:
+  **Derived** `8 B/texel`, fp16 unit roundoff `2^-11 ~= 4.883e-4` for normal
+  values, and maximum absolute rounding for values below one of
+  `2^-12 ~= 2.441e-4`. fp16's **Derived** largest finite value is `65504`,
+  smallest positive normal is `2^-14 ~= 6.104e-5`, and smallest subnormal is
+  `2^-24 ~= 5.960e-8`; do not make a visual contract depend on subnormals.
+- `RGFormat + HalfFloatType` maps to `rg16float`, which is **Gated** by the
+  WebGPU `texture-formats-tier1` feature. Check
+  `renderer.backend.device.features.has('texture-formats-tier1')` before use;
+  otherwise use `rgba16float` or another baseline format.
+- `RedFormat + FloatType` maps to baseline-storage `r32float`.
+  `RGFormat + FloatType` maps to `rg32float`, whose storage use is **Gated** by
+  non-compatibility/core WebGPU (`core-features-and-limits`); compatibility mode
+  forbids `rg32float` storage. Linear filtering of either float32 format is
+  separately **Gated** by `float32-filterable`; use exact loads/manual
+  reconstruction or another format when absent.
+- `RGBAFormat + UnsignedByteType` is `rgba8unorm`, not an integer-ID texture:
+  **Derived** normalized quantization is at most `1/(2*255) ~= 1.961e-3` before
+  filtering. Use nearest/exact loads plus explicit encode/decode, an r32uint
+  representation, or a storage buffer for exact categories.
+- Never store large absolute coordinates or unscaled world heights in fp16.
+  Store tile-local/normalized values plus an origin and scale; require the
+  **Derived** decoded quantization term
+  `(decodeMax - decodeMin) * 0.5 * ulp(encodedValue)` plus mip/interpolation
+  error to fit the channel's propagated error budget.
+
+The writer uses `storageTexture()`/`textureStore()` in a compute pass; a later
+filtered consumer samples the same resource through `texture()`. Do not bind a
+subresource for storage and sampling in the same usage scope. Keep
+`mipmapsAutoUpdate = true` only when automatic generation is required and
+verified for the chosen filterable format; `false` means the application must
+write the complete required mip chain. Ping-pong when a compute update needs to
+read and write the same logical field.
 
 ## Required Field Rules
 
 - Shared causes first: color, roughness, normal, displacement, emission, masks,
   and scattering must derive from the same named fields.
+- Carry hash seeds/IDs through `u32` uniforms, attributes, or storage. Never
+  pass a parity seed through f32: it cannot represent every 32-bit integer and
+  silently changes hash identity before the cast.
+- Before the lattice i32-to-u32 bitcast, **Gate** floored cell coordinates to
+  the i32 domain and the f32 phase-error budget. Rebase/split coordinates when
+  either condition fails.
 - Domain-warp the coordinates, not every result.
 - Warp spherical coordinates tangentially, then renormalize.
 - Use separate frequency bands for silhouette, regions, surface breakup, and
@@ -184,13 +285,23 @@ the read count or cross-system reuse pays for the dispatch and memory.
 
 Filter before the field aliases:
 
-- Stop octave loops when projected wavelength falls below two pixels or two
-  mesh edges, whichever is stricter for that consumer.
-- Fade high-frequency contribution by camera altitude or projected footprint;
-  keep the coordinates stable and fade amplitude only.
+- For a band with effective post-remap support `f_support` and post-warp
+  coordinate footprint Jacobian `J' = (I + J_w)[dPdx dPdy]`, use **Derived**
+  `q = f_support * sigmaMax(J')`. Nyquist requires `q <= 0.5`; begin an
+  **Authored** smooth energy fade below that boundary and record its interval.
+  A two-pixel wavelength is only the limiting inequality, not an adequate
+  reconstruction filter.
+- Geometry displacement also requires **Derived** `f * maxProjectedEdge <=
+  0.5`; use the stricter screen- or mesh-sampling bound. Vertex/compute stages
+  have no fragment derivatives, so pass a patch footprint or choose bands on
+  CPU/compute from projected patch error.
+- Keep coordinates stable and attenuate band amplitude/energy. Transfer
+  removed micro-normal energy into a measured roughness/cone-variance term
+  rather than letting highlights sharpen with distance.
 - Use mipmapped baked fields for repeated filtered samples.
-- For procedural normals, lower detail energy and compensate roughness when
-  normal variance would shimmer.
+- For procedural normals, prefilter height/gradient or normal mean plus
+  variance; renormalizing an averaged normal without retaining its lost length
+  erases the variance needed for specular filtering.
 - For displacement, silhouette bands belong in geometry; micro bands belong in
   material normals or baked masks.
 - World effects use world coordinates; planetary effects use radial physical
@@ -208,13 +319,36 @@ Filter before the field aliases:
 
 ## Budgets
 
-Set budgets in the field contract and reject designs that exceed them:
+There is no universal desktop/mobile band count, atlas extent, dispatch count,
+millisecond cap, or MiB cap. The product field contract supplies whole-frame
+**Gated** GPU p95, CPU p95, peak-live-byte, quality-error, and sustained-thermal
+limits for named workloads. A device label is not a workload.
 
-| Target | Inline field cost | Bake size | Dispatches | Field memory | Frame budget |
-| --- | --- | --- | --- | --- | --- |
-| Desktop discrete | <= 8 bands inline or baked when reused | up to 2048^2 per hot field atlas | 1-3 targeted dispatches | <= 64 MB hot field data | <= 1.5 ms fields + bakes |
-| Desktop integrated | <= 5 bands inline | up to 1024^2 | 1-2 dispatches | <= 32 MB | <= 2.5 ms |
-| Mobile/lower tier | <= 3 bands inline | 512^2-1024^2, fewer lanes | 0-1 dispatch | <= 16 MB | <= 3.5 ms |
+For every measured case record:
+
+- output extent, DPR, view coverage, overdraw/MSAA/helper-invocation estimate;
+- active bands with hash/noise/transcendental operations and longest dependent
+  chains;
+- tile dimensions, total/dirty tile count, dirty texels, dispatch geometry,
+  update cadence, and reuse `U`;
+- per-stage sampled-texture, sampler, storage-texture, and storage-buffer
+  bindings from the compiled layout;
+- executed loads/filtered samples on each hot path, bytes/texel, mip levels,
+  producer writes, consumer reads, and measured cache/effective-bandwidth
+  behavior;
+- base, candidate, and interleaved paired-delta GPU p50/p95; contemporaneous
+  whole-frame GPU/CPU p50/p95; peak live bytes; mobile-class thermal interval.
+
+Compute each resource exactly from format bytes, aligned extents, mip sum,
+layers, ping-pong/history count, and simultaneous lifetime. For example, a full
+2D mip chain approaches the **Derived** geometric factor `4/3` before alignment;
+this is arithmetic, not a memory allowance.
+
+For marginal evidence, interleave matched frames and form
+`delta_k=tGPU_k(graph+field)-tGPU_k(graph)` before taking p50/p95. Never
+subtract independent quantiles. Architecture still comes from the cost model;
+acceptance comes from the contemporaneous whole-frame gates. Without GPU
+timestamps, report GPU cost unmeasured rather than substituting CPU intervals.
 
 Keep draw calls unchanged when adding a field. Avoid in-frame CPU readback.
 Use readback only in explicit diagnostics or parity tests. Static fields update
@@ -236,6 +370,10 @@ Every field stack needs a debug route for:
 - seed and stratification cells;
 - CPU versus TSL parity error.
 
+Parity views must separate direct-f32 error from post-store/read error and show
+the per-channel **Gated** bound. A single max/min image or one global tolerance
+does not establish parity.
+
 Use `mrt()` when the diagnostics share one scene pass. Use
 `PassNode.setResolutionScale()` for reduced-resolution field diagnostics and
 restore full resolution only where inspection needs it.
@@ -248,7 +386,11 @@ restore full resolution only where inspection needs it.
 - packed channel schema for direct material use or `StorageTexture` bakes;
 - debug views for every named field;
 - validation command: `node examples/webgpu-field-bake/validate-field-contract.mjs --allow-missing-gpu`
-  for Layer 1 and `node examples/webgpu-field-bake/validate-field-contract.mjs
-  --artifacts <dir>` after browser readback;
+  for CPU-only fixture diagnostics (never final acceptance) and `node
+  examples/webgpu-field-bake/validate-field-contract.mjs --artifacts <dir>`
+  after native-WebGPU readback; record the exact sampled storage/mip and
+  full-record placement scope, and keep `productionReady: false` until
+  filtered consumption, full-domain parity, dirty updates, and target timing
+  are validated;
 - sibling ownership notes for material response, planet bodies, weather,
   image-pipeline ownership, and visual validation.

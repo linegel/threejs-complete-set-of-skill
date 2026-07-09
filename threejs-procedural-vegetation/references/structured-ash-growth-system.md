@@ -1,6 +1,6 @@
 # Structured Ash Growth System
 
-Use this reference when the target is a natural deciduous Ash with a stable species identity. Preserve the species table, continuation model, branch geometry, foliage placement, rooted wind, composition contract, diagnostics, and numeric gates before tuning. Implement the rendering side with latest Three.js `WebGPURenderer`, TSL, `NodeMaterial`, node post, and storage attributes where the instance count is high.
+Use this reference when the target is a natural deciduous Ash with a stable species identity. It contains two explicit modes: a legacy-fidelity fixture whose exact counts reproduce the historical generator, and an improved workload-selected path. Do not preserve a casing bug, alternating-ring UV artifact, or incorrect per-card normal merely to satisfy the fixture. Any correction updates its own deterministic gates and is compared visually against the fixture. Implement rendering with pinned Three.js r185 `WebGPURenderer`, TSL, `NodeMaterial`, node post, and storage attributes only where their measured access pattern wins.
 
 ## Contents
 
@@ -11,7 +11,7 @@ Use this reference when the target is a natural deciduous Ash with a stable spec
 5. Composition, budgets, and diagnostics
 6. Numeric contract gate
 
-## 1. Preserve The Exact Species Table Before Tuning
+## 1. Preserve The Species Table Before Tuning
 
 The Ash Medium species contract is:
 
@@ -64,7 +64,7 @@ The inherited section/segment counts differ from ordinary lateral children, whic
 
 ## 3. Match Section Evolution
 
-The authored generator contains:
+The legacy-fidelity generator contains:
 
 ```text
 sectionLength =
@@ -79,9 +79,14 @@ but guards the divisor with a comparison against the string `'Deciduous'`. The p
 sectionLength = branchLength / sectionCount
 ```
 
-For Ash Medium this doubles the height relative to the apparent intent. The complete build produces branch bounds reaching roughly `y=80.30` and leaf bounds reaching `y=83.69`. Preserve the actual behavior. Do not infer behavior from one line without executing the complete growth path.
+For Ash Medium this doubles the height relative to the apparent intent. The
+legacy fixture produces branch bounds near `y=80.30` and leaf bounds near
+`y=83.69`; preserve those only in fidelity mode. Production mode normalizes the
+species tag, uses one explicitly documented section-length equation, and
+regenerates its height/bounds gates. A string-case accident is not botanical
+authorship.
 
-At every section:
+The following Euler/force law is fidelity-only. At every legacy section:
 
 1. emit an XZ ring through the current Euler orientation;
 2. store origin, orientation, and radius;
@@ -105,6 +110,26 @@ forceStrength / sectionRadius
 ```
 
 clamped to the full angle between current local up and the target direction. Thin branches therefore respond more strongly than the trunk.
+
+Production mode does not inherit these singular laws. It parallel-transports a
+rotation-minimizing quaternion frame, applies authored twist separately,
+re-orthonormalizes, and bounds curvature change by arc length and local feature
+scale. Tropism is a dimensioned curvature/torque input, not
+`forceStrength/radius`. Enforce a species-calibrated pipe/allometry constraint
+
+```text
+rParent^p >= rContinuation^p + sum(rLateral_i^p)
+```
+
+with `p` Authored/Measured for the species, rescaling or rejecting children
+when violated. Gate frame continuity, curvature, silhouette, and branch-volume
+ratios across generated seeds.
+
+Production junctions are explicit. Hero branches cut the child tube at the
+parent surface and stitch a collar/zipper patch, or extract the local junction
+implicitly at load. Mid/far tubes may overlap only after hidden caps/internal
+faces are removed and projected seam error passes. Gate watertightness,
+self-intersection, signed area, junction normal continuity, and UV policy.
 
 For one foreground Ash, CPU generation into typed arrays is acceptable because it is a one-time compile step. For forests, batch species-compatible tree instances by preset and move per-tree transform, crown tint, wind phase, and LOD state into storage instance attributes; do not rebuild branch topology per frame.
 
@@ -163,7 +188,10 @@ parent orientation
   x emergence angle around local X
 ```
 
-Do not derive child orientation from a newly constructed tangent frame; that changes the characteristic branch roll and twist.
+In fidelity mode, do not replace that reversed interpolation: it changes the
+historical roll/twist. Production mode instead uses the transported parent
+frame with explicit emergence and twist; it does not preserve a legacy
+interpolation artifact.
 
 ## 6. Match Ring And Bark UV Construction
 
@@ -179,7 +207,10 @@ v = sectionIndex is even ? 0 : 1
 
 The texture's runtime Y repeat is `1 / barkTextureScaleY`.
 
-This is not a real-distance longitudinal UV. If adapting the visual exactly, retain the alternating ring V pattern. If improving it, record the change as an intentional divergence and re-evaluate bark scale across trunk and twigs.
+This is not a real-distance longitudinal UV. Retain it only for fidelity
+captures. Production bark uses accumulated branch arc length for V and
+circumference for U, with a stable seam and texel-density gate across trunk,
+branches, and LODs.
 
 ## 7. Match Leaf Placement, Card Geometry, And Normals
 
@@ -187,13 +218,18 @@ Leaves are emitted along every final-level branch, not in synthetic clusters at 
 
 Each leaf is a square card extending from local base `y=0` to tip `y=L`, with width `W`. The double-card mode emits a second card rotated 90 deg around local Y.
 
-Rounded vertex normal:
+Rounded vertex normal in the fidelity fixture:
 
 ```text
 normalize(cardNormal + (vertexPosition - leafOrigin))
 ```
 
-Use the same unrotated card normal for both perpendicular cards before adding the vertex direction. Preserve that quirk when reproducing the contract. A corrected per-card normal is a legitimate extension but changes canopy lighting and must be documented.
+The expression is dimensionally invalid because it adds a unit normal to a
+length vector, and the fidelity fixture also uses one unrotated normal for both
+cards. Production mode uses a dimensionless authored blend such as
+`normalize(nCard + beta*(p-leafOrigin)/leafLength)` or blends `nCard` with a
+normalized crown/leaf radial normal. Rotate every term by the card basis and
+gate lighting invariance under uniform scale.
 
 Use the bundled `ash.png` alpha silhouette. Replacing it with an ellipse or analytic lozenge changes crown porosity and edge frequency enough to invalidate visual comparison.
 
@@ -206,17 +242,20 @@ The WebGPU/TSL material target is:
 - bark: `MeshStandardNodeMaterial` with bark color texture in `SRGBColorSpace`, bark roughness/noise data in `NoColorSpace`, and the contract UV pattern above;
 - leaves: double-sided `MeshStandardNodeMaterial` or `MeshPhysicalNodeMaterial` with `alphaTest = 0.5`, optional `alphaHash` for temporal stability, leaf color in `SRGBColorSpace`, alpha/data masks in `NoColorSpace`, and `forceSinglePass` when the double-sided card does not need separate back-face lighting;
 - output: `RenderPipeline` owns tone mapping and output conversion through `outputColorTransform` or a single explicit `renderOutput()` node;
-- shadows: `CSMShadowNode` for the sunlit foreground and mid-ground trees; use `TileShadowNode` when the forest spans large world tiles.
+- shadows: start from an ordinary fitted directional shadow; select CSM, tiled
+  arrays, or custom caching only when coverage/texel-error/invalidation and
+  measured target cost reject the simpler path. `TileShadowNode` is not a
+  generic large-world or tile-GPU optimization.
 
 Exact r185 add-on imports for this scene family:
 
 | Helper | Import path |
 | --- | --- |
-| `GTAONode` / `ao` | `three/examples/jsm/tsl/display/GTAONode.js` |
-| `BloomNode` / `bloom` | `three/examples/jsm/tsl/display/BloomNode.js` |
-| `TRAANode` / `traa` | `three/examples/jsm/tsl/display/TRAANode.js` |
-| `CSMShadowNode` | `three/examples/jsm/csm/CSMShadowNode.js` |
-| `TileShadowNode` | `three/examples/jsm/tsl/shadows/TileShadowNode.js` |
+| `GTAONode` / `ao` | `three/addons/tsl/display/GTAONode.js` |
+| `BloomNode` / `bloom` | `three/addons/tsl/display/BloomNode.js` |
+| `TRAANode` / `traa` | `three/addons/tsl/display/TRAANode.js` |
+| `CSMShadowNode` | `three/addons/csm/CSMShadowNode.js` |
+| `TileShadowNode` | `three/addons/tsl/shadows/TileShadowNode.js` |
 
 The contract wind deforms leaf vertices only:
 
@@ -231,16 +270,21 @@ displacement = leafUvY * windStrength * wind
 
 Express this as TSL node math on the leaf material position path. `leafUvY` roots the card base and moves the tip. The demonstrated branch geometry is static; do not describe this mechanism as hierarchy-weighted trunk/branch wind.
 
-If extending it with branch motion:
+Production branch motion uses a reduced-order hierarchy of damped trunk/branch
+angular modes driven by the shared wind field, plus higher-frequency leaf
+flutter. Remove high modes with LOD and keep display/shadow deformation
+identical. For the legacy fixture only, an extension follows these minimum
+rules:
 
 1. keep the leaf-root weighting;
 2. add branch-level or per-tree storage attributes separately;
 3. deform color and shadow geometry with the same node function;
 4. label the result as an extension to the contract.
 
-## 9. Match Composition Before Judging The Generator
+## 9. Legacy Ash Composition Fixture
 
-Present the tree in a complete environment:
+For regression against the historical Ash scene, use this named composition
+fixture:
 
 ```text
 startup camera: (100, 20, 0)
@@ -257,11 +301,19 @@ daylight sky and sun
 
 The exact startup camera clips the leaf bound slightly because its upper vertical coverage is approximately `y=82.7` while the leaf maximum is approximately `y=83.69`. For a fixed 3:2 evaluation frame, move the camera along the same target ray to approximately `x=115`; do not alter the tree to solve a framing problem.
 
-A black-background isolated tree is not a valid quality test. It removes foliage edge contrast, atmospheric depth, ground contact, and scale cues.
+Isolated silhouette, alpha-coverage, card-normal, and branch-topology views are
+valid mechanism diagnostics, but are insufficient alone for composition,
+atmospheric depth, ground contact, or scale. They complement rather than
+invalidate the named environment fixture.
 
 Use `$threejs-procedural-fields` for the grass/dirt/flower density fields and `$threejs-image-pipeline` when the scene owns GTAO, bloom, temporal AA, tone mapping, and output conversion.
 
-## 10. Budgets
+## 10. Named-fixture workload contract
+
+All counts in this section are **Gated** only for this Ash reference fixture;
+they are not general tree/forest/mobile budgets. A production-improvement
+variant records measured compile/render p50/p95, projected silhouette error,
+alpha coverage, hot bytes, and the exact target context separately.
 
 Ash foreground contract:
 
@@ -273,13 +325,17 @@ Ash foreground contract:
 
 Ash forest contract:
 
-- 100 background trees as instanced or batched assets with per-instance transform, tint, wind phase, LOD, and impostor state in storage attributes;
+- 100 background trees as identical-topology instanced assets, merged static
+  pages, or `BatchedMesh` containers with per-object draw cost explicitly
+  recorded; transforms, tint, wind phase, LOD, and impostor state live in
+  compatible attributes;
 - impostor transition before background trees exceed the stated foreground cost multiplied by visible count;
 - one sun-shadow strategy selected up front, with update frequency budgeted by camera movement and wind amplitude.
 
 Composition target:
 
-- background trees: under 4 draw calls per LOD band;
+- background trees: the fixture's under-4 draw-item gate requires instancing or
+  merged pages; `BatchedMesh` alone does not satisfy it on r185 WebGPU;
 - meadow grass: 5k visible contract blades for reference, higher counts only through the dense storage-buffer architecture in `SKILL.md`;
 - node post: one scene pass with shared normal/depth data when AO or temporal filtering is enabled.
 
@@ -330,4 +386,8 @@ branch bounds max Y: approximately 80.2981
 leaf bounds max Y: approximately 83.6902
 ```
 
-Matching only counts is insufficient; the earlier half-height implementation matched all counts while violating runtime section-length behavior.
+These exact counts/bounds gate legacy-fidelity mode only. Production mode owns a
+separate versioned gate after section-length, UV, or normal corrections.
+Matching only counts is insufficient; silhouette, branch-level topology,
+texel density, card-normal orientation, bounds, and fixed-camera captures must
+agree with the selected mode.

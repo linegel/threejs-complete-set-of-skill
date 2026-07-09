@@ -37,25 +37,55 @@ a reason to choose a lower tier, not to silently change the motion contract.
 
 ## Architecture contract
 
-The top-tier architecture is:
+Select the time model first:
+
+```text
+closed-form / seekable motion -> sample authoritative time directly
+event-driven analytic phases -> direct curves + discrete event log
+ODE / constraints / collision -> fixed-step state + interpolated presentation
+perceptual follow only -> dt-correct exponential response at presentation time
+```
+
+Fixed stepping adds state, dispatches, and one-step presentation latency. Use
+it only when the next state depends on the previous state; a closed-form
+timeline sampled through a fixed-step accumulator is more work and less
+seekable than direct evaluation.
+
+For closed-form segments, choose interpolation from boundary conditions:
+
+| Contract | Representation |
+| --- | --- |
+| prescribed endpoint position and velocity | cubic Hermite |
+| rest-to-rest C2 position/acceleration continuity | quintic/minimum-jerk |
+| constant speed on a curved path | arc-length table plus monotone inversion, with table error gated |
+| constant angular speed between orientations | quaternion `slerp` with shortest/declared long arc |
+| C1 multi-key orientation | `squad` with sign-continuous controls |
+| physically coupled rotation and translation | screw/SE(3) interpolation with an explicit frame convention |
+
+The complete architecture is:
 
 ```text
 WebGPURenderer + THREE.Timer + renderer.setAnimationLoop()
-+ fixed-step accumulation for deterministic state
-+ analytic transform timelines for authored motion
++ direct analytic transform timelines for authored motion
++ fixed-step accumulation only for recurrent deterministic state
 + pow(k, dt) smoothing for perceptual response
 + instanced node attributes or compute-updated storage buffers at scale
 + explicit quaternion frame contracts
 ```
 
-Use `Object3D` transforms only for a small number of semantic hero actors. When
+Use `Object3D` transforms for a small number of heterogeneous semantic objects. When
 counts grow, keep authoring state in arrays/storage and render it with
 `InstancedMesh`, `BatchedMesh`, or storage-driven nodes. Thousands of per-object
 updates are a CPU scene-graph problem, not a procedural animation feature.
+Use `InstancedMesh` for identical topology. r185 WebGPU submits one backend
+draw item per visible `BatchedMesh` multi-draw entry, so BatchedMesh may reduce
+object/state-management cost but is not an instanced one-draw bucket.
 
 ## Renderer loop and delta policy
 
-Create one animation loop and one timing policy:
+Create one animation loop and one timing policy. The following loop is the
+recurrent-simulation branch; analytic objects are sampled once from the same
+authoritative `policy.timelineTime` outside the fixed-step loop:
 
 ```ts
 import * as THREE from 'three/webgpu';
@@ -72,7 +102,9 @@ const policy = {
   maxSubsteps: 8,
   accumulator: 0,
   simulationTime: 0,
-  presentationTime: 0
+  timelineTime: 0,
+  wallTime: 0,
+  droppedTime: 0
 };
 
 const fixedState = {
@@ -86,34 +118,51 @@ renderer.setAnimationLoop( ( timestamp ) => {
 
   const rawDelta = timer.getDelta();
   const clampedDelta = Math.min( rawDelta, policy.maxFrameDelta );
+  policy.wallTime += rawDelta;
   policy.accumulator += clampedDelta;
-  policy.presentationTime = timer.getElapsed();
 
   let substeps = 0;
+  const firstGpuStepTime = policy.simulationTime + policy.fixedStep;
   while ( policy.accumulator >= policy.fixedStep && substeps < policy.maxSubsteps ) {
     copyProceduralState( fixedState.previous, fixedState.current );
     stepProceduralAnimation( fixedState.current, policy.fixedStep, policy.simulationTime + policy.fixedStep );
-    stepGpuAnimation( policy.fixedStep, policy.simulationTime + policy.fixedStep );
     policy.simulationTime += policy.fixedStep;
     policy.accumulator -= policy.fixedStep;
     substeps ++;
   }
 
-  if ( substeps === policy.maxSubsteps ) policy.accumulator = 0;
+  if ( substeps > 0 ) {
+    submitGpuSteps( policy.fixedStep, firstGpuStepTime, substeps );
+  }
+
+  if ( substeps === policy.maxSubsteps && policy.accumulator >= policy.fixedStep ) {
+    policy.droppedTime += policy.accumulator;
+    policy.accumulator = 0;
+  }
 
   const alpha = policy.accumulator / policy.fixedStep;
+  // previous is at simulationTime-fixedStep and current is at simulationTime.
+  // Couple analytic motion to the same deliberately one-step-late presentation.
+  policy.timelineTime = Math.max(
+    0,
+    policy.simulationTime - policy.fixedStep + policy.accumulator
+  );
   interpolateProceduralState( fixedState.render, fixedState.previous, fixedState.current, alpha );
+  sampleAnalyticMotion( policy.timelineTime );
   renderProceduralFrame( fixedState.render, alpha );
 } );
 ```
 
 The policy owns raw delta, clamped delta, fixed step, max substeps, simulation
-time, presentation time, replay time, and pause/resume behavior. The
+time, authoritative timeline time, wall telemetry, replay time, and pause/resume behavior. The
 spiral-of-death clamp is Gated by `maxSubsteps`; when the gate is hit, discard
 the remainder and record the drop for diagnostics instead of executing an
 unbounded backlog. Mixers,
 compute dispatches, springs, and presentation-only effects consume this policy
-rather than sampling their own clocks.
+rather than sampling their own clocks. If a product chooses analytic catch-up
+instead of dropped time, recurrent systems must be resynchronized by an exact
+state transition or bounded backlog before analytic motion samples wall time;
+never let analytic and recurrent paths silently diverge after a clamp.
 
 ## Capability gate and quality tiers
 
@@ -123,18 +172,19 @@ this flagship reference keeps one architecture:
 
 ```js
 await renderer.init();
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: storage buffers, compute dispatch, node materials, node post.
-} else {
-  // Compatibility handoff: use the dedicated compatibility-fallbacks skill.
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error(
+    'WebGPU is required for the canonical procedural-motion path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
 Do not write a parallel renderer implementation in this skill.
 
-Full tier uses compute/storage and node post. Balanced tier reduces active
-counts and update frequency for distant chunks. Compatibility strategy details
-belong in the compatibility-fallbacks skill.
+Full tier uses compute/storage when recurrent state needs it. Balanced and
+minimum tiers reduce active recurrent counts and update frequency; analytic
+motion remains directly sampled. Compatibility strategy details belong in the
+compatibility-fallbacks skill.
 
 ## Exact r185 Import Table
 
@@ -153,7 +203,8 @@ belong in the compatibility-fallbacks skill.
 Use one scene scale:
 
 ```text
-sceneUnits = meters * sceneScaleMeters
+sceneUnits = meters * sceneUnitsPerMeter
+# equivalently: sceneUnits = meters / metersPerSceneUnit
 ```
 
 Recommended validity ranges:
@@ -184,7 +235,7 @@ Visible signature and wrongness checks:
 
 ## State layout and replay
 
-Use explicit persistent state. For hero actors this can live in TypeScript:
+Use explicit persistent state. For a few semantic objects this can live in TypeScript:
 
 ```ts
 type ProceduralAnimationState = {
@@ -214,6 +265,7 @@ dynamicState:
 
 staticState:
   localAnchor.xyz, scale
+  springOmega, springPhase, springAmplitude, springZeta
   localAxis.xyz, presetId
   startTime, duration, massOrSize, materialVariant
 ```
@@ -255,29 +307,39 @@ const instanceCount = derivedVisibleInstanceCount;
 const previousPose = new THREE.StorageInstancedBufferAttribute( instanceCount, 4 );
 const currentPose = new THREE.StorageInstancedBufferAttribute( instanceCount, 4 );
 const velocityState = new THREE.StorageInstancedBufferAttribute( instanceCount, 4 );
-const staticMotion = new THREE.StorageBufferAttribute( instanceCount, 4 );
+const anchorScale = new THREE.StorageBufferAttribute( instanceCount, 4 );
+const springParams = new THREE.StorageBufferAttribute( instanceCount, 4 );
 
 const previousPoseNode = storage( previousPose, 'vec4', instanceCount );
 const currentPoseNode = storage( currentPose, 'vec4', instanceCount );
 const velocityNode = storage( velocityState, 'vec4', instanceCount );
-const staticNode = storage( staticMotion, 'vec4', instanceCount );
+const anchorNode = storage( anchorScale, 'vec4', instanceCount );
+const springNode = storage( springParams, 'vec4', instanceCount );
 const fixedStep = uniform( 1 / 120 );
 const simTime = uniform( 0 );
 const alpha = uniform( 0 );
 
-const integratePose = Fn( ( { previousPose, currentPose, velocity, staticMotion } ) => {
+const integratePose = Fn( ( { previousPose, currentPose, velocity, anchorScale, springParams } ) => {
   const i = instanceIndex;
   const current = currentPose.element( i );
   const v = velocity.element( i );
-  const anchor = staticMotion.element( i );
-  const target = anchor.xyz.add( vec3( 0, anchor.w.sin().mul( 0.25 ), 0 ) );
-  const acceleration = target.sub( current.xyz ).mul( anchor.w.mul( anchor.w ) ).sub( v.xyz.mul( anchor.w.mul( 1.85 ) ) );
+  const anchor = anchorScale.element( i );
+  const spring = springParams.element( i );
+  const omega = spring.x;
+  const phase = spring.y;
+  const amplitude = spring.z;
+  const zeta = spring.w;
+  const target = anchor.xyz.add(
+    vec3( 0, omega.mul( simTime ).add( phase ).sin().mul( amplitude ), 0 )
+  );
+  const acceleration = target.sub( current.xyz ).mul( omega.mul( omega ) )
+    .sub( v.xyz.mul( zeta.mul( omega ).mul( 2 ) ) );
   const nextVelocity = v.xyz.add( acceleration.mul( fixedStep ) );
 
   previousPose.element( i ).assign( current );
   currentPose.element( i ).assign( vec4( current.xyz.add( nextVelocity.mul( fixedStep ) ), current.w ) );
   velocity.element( i ).assign( vec4( nextVelocity, v.w ) );
-} )( { previousPose: previousPoseNode, currentPose: currentPoseNode, velocity: velocityNode, staticMotion: staticNode } )
+} )( { previousPose: previousPoseNode, currentPose: currentPoseNode, velocity: velocityNode, anchorScale: anchorNode, springParams: springNode } )
   .compute( instanceCount, [ 64 ] )
   .setName( 'motion:integrate-instance-spring' );
 
@@ -289,10 +351,20 @@ material.positionNode = positionLocal.add(
   )
 );
 
-function stepGpuAnimation( dt: number, time: number ) {
+function submitGpuSteps( dt: number, firstTime: number, stepCount: number ) {
   fixedStep.value = dt;
-  simTime.value = time;
-  renderer.compute( integratePose );
+  simTime.value = firstTime;
+  pendingStepCount.value = stepCount;
+
+  // integratePoseBatch uses a per-invocation TSL Loop to advance exactly
+  // stepCount independent fixed steps and retain the final previous/current
+  // pair. Global collision/constraint stages instead require their ordered
+  // dispatch graph once per step; workgroup barriers are not global barriers.
+  renderer.compute(
+    dependencyClass === 'independent'
+      ? integratePoseBatch
+      : orderedGlobalStagesForEachStep
+  );
 }
 
 function renderGpuAnimation( presentationAlpha: number ) {
@@ -301,21 +373,30 @@ function renderGpuAnimation( presentationAlpha: number ) {
 }
 ```
 
+`orderedGlobalStagesForEachStep` above denotes a CPU-built node array with the
+required stage sequence repeated per step, not one shader with a fictitious
+global barrier. Record fixed steps advanced, compute submissions, dispatches,
+and hot bytes separately. Fusing independent catch-up steps is a command/
+traffic candidate and must pass the same convergence and presentation gates.
+
 Derived/Gated labels for the snippet: `instanceCount` is Derived from visible
 actor count and LOD; `fixedStep` is Derived from the delta policy; workgroup
-size `64` is an authored default chosen as a whole multiple of the common GPU
-subgroup widths (32 and 64) — the compute contract records it, but no validator
-asserts it as a device gate; spring stiffness `omega^2` is Derived from the
-per-instance frequency `anchor.w` stored in `staticMotion`, and the damping
-factor `1.85` is Derived as `2 * zeta * omega` with authored damping ratio
-`zeta = 0.925` (slightly under-critical, so arrivals settle with one soft
-overshoot instead of creeping in); the `0.25` bob amplitude is an authored
-demo constant with no gate.
+size `64` is an authored starting point, not a portable optimum — adapter
+limits, register pressure, memory access, and measured occupancy select the
+target value. `springParams={omega,phase,amplitude,zeta}` is separate from
+`anchorScale`; require `omega>0`, `zeta>=0`, and derive the fixed step from a
+stability analysis plus step-halving convergence over the authored parameter
+envelope. The semi-implicit snippet is a recurrent demonstrator, not an exact
+spring solver.
 
-Use one dispatch for simple analytic timelines, two to three dispatches when
-you also compact active actors or update chunk bounds. Avoid readback in the
-frame loop. Use `renderer.computeAsync()` for setup, validation snapshots, or
-explicit synchronization points, not as a per-frame habit.
+Simple analytic timelines evaluate directly in CPU transforms or vertex TSL
+with zero simulation dispatch. Materialize them in compute only when multiple
+downstream consumers reuse the result and a paired A/B proves the write traffic
+is cheaper. Recurrent integration, compaction, and bounds are separate ordered
+dispatches when their dependencies are global. Avoid readback in the frame
+loop. In r185 `computeAsync()` only awaits renderer initialization before
+enqueueing compute; an async readback/map operation is required for CPU-visible
+GPU completion.
 
 When pose data is texture-shaped, use `StorageTexture` plus `textureStore()`.
 Use `workgroupBarrier()` or storage barriers only when invocations within a
@@ -338,9 +419,9 @@ terminal deceleration = 4 s
 ```
 
 `computeAscentKinematics()` solves a normalized distance curve whose position
-and speed remain continuous across ascent phases. This stays best-in-class for
-authored launch because it is exact, seekable, deterministic, and cheap enough
-to evaluate per instance.
+and speed remain continuous across ascent phases. Select it for authored launch
+when its exact, seekable, deterministic piecewise curve satisfies the declared
+acceleration and jerk gates more cheaply than a recurrent solver.
 
 For slow phase:
 
@@ -385,18 +466,19 @@ groundArcDistance =
 arcAngle = groundArcDistance / planetRadius
 ```
 
-Example preset constants:
+Example **Authored** preset constants:
 
 ```text
-target altitude = 420 km converted through sceneScaleMeters
-max ground arc = 2200 km converted through sceneScaleMeters
-max crossrange = 26 km converted through sceneScaleMeters
+target altitude = 420 km converted through sceneUnitsPerMeter
+max ground arc = 2200 km converted through sceneUnitsPerMeter
+max crossrange = 26 km converted through sceneUnitsPerMeter
 ```
 
 Declare one unit contract:
 
 ```text
-sceneUnits = meters * sceneScaleMeters
+sceneUnits = meters * sceneUnitsPerMeter
+# or sceneUnits = meters / metersPerSceneUnit
 all authored km/m constants convert before entering simulation/storage
 ```
 
@@ -412,14 +494,21 @@ position.x += crossrange
 Orientation:
 
 ```text
-flightDirection = normalize(lerp(radial, tangent, gravityTurn * 0.9))
+velocity = planetCenterVelocity
+         + altitudeDot * radial
+         + (planetRadius + altitude) * arcAngleDot * tangent
+         + crossrangeDot * xHat
+flightDirection = normalizeOrFallback(velocity, previousFlightDirection)
 base = fromUnitVectorsSafe(rocketLocalUp, flightDirection)
 roll = rotationAroundUnitAxis(flightDirection, rollAmount)
 orientation = base then roll in the model's local contract
 ```
 
-This separates trajectory direction from authored roll/vibration. Verify the
-model axis contract before choosing multiplication order.
+Differentiate the actual authored trajectory; a radial/tangent lerp is not its
+velocity and can point visibly off-path. If an independent pitch program is
+intentional, name it separately and gate its angle from velocity. This
+separates trajectory direction from authored roll/vibration. Verify the model
+axis contract before choosing multiplication order.
 
 ## Camera-independent shake and roll
 
@@ -454,11 +543,16 @@ call updateWorldMatrix( true, true, true )
 capture world matrix, position, quaternion, and scale
 detach semantic child
 add to scene or detached actor owner
-restore captured world matrix
+M_local_new = inverse(M_world_newParent) * M_world_old
+assign M_local_new under an explicit matrix/TRS policy
 ```
 
 `Object3D.attach()` is acceptable only when the hierarchy has no non-uniform
-scale. Otherwise capture and restore the world matrix explicitly.
+scale. Decompose `M_local_new` only when it is representable as TRS within a
+declared residual. Non-uniform ancestry can introduce shear; then retain the
+full local matrix with `matrixAutoUpdate=false`, bake the affine transform into
+geometry/another wrapper, or reject the handoff. Assigning the old world matrix
+as new local state is wrong for a non-identity parent.
 
 The detached stage receives readable separation:
 
@@ -718,22 +812,20 @@ CSMShadowNode or TileShadowNode: scalable directional shadows
 
 ## Budgets
 
-Targets for the animation system alone:
+The router allocates a marginal motion ceiling from the complete frame. Record
+p50/p95 CPU update and GPU dispatch time, simulation rate, dropped time, and
+presentation error on each target. A subsystem-local timing is not an
+automatic low-power allowance; it must fit the declared refresh budget.
+
+Routing evidence:
 
 ```text
-desktop-discrete: <= 1.0 ms update/dispatch, 60-120 Hz simulation
-desktop-integrated: <= 2.0 ms update/dispatch, 60 Hz simulation
-mobile: <= 3-4 ms update/dispatch, 30-60 Hz simulation tier
-```
-
-Routing budgets:
-
-```text
-hero actors: <= 200 Object3D updates, <= 0.25 ms CPU desktop-discrete
-instanced fields: one draw per geometry/material bucket
-compute motion: one to three dispatches per active system per frame
-workgroup size: usually 64-256 invocations
-hot state: 48-96 bytes per instance
+semantic transforms: active count, hierarchy depth, changed matrices, upload bytes
+instanced fields: one draw per identical-topology/material spatial page after culling
+BatchedMesh fields: visible multi-draw entries and backend draw items measured separately
+compute motion: named dispatch stages and invocations derived from active recurrent state
+workgroup size: target-tuned with occupancy and timing evidence
+hot state: active capacity * aligned dynamic stride + history/scan slots
 draw calls: stable and bucketed by material/geometry, not by actor
 readback: zero in the frame loop
 ```

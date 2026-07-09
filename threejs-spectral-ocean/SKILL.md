@@ -1,116 +1,230 @@
 ---
 name: threejs-spectral-ocean
-description: Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.
+description: Build broad-band procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, and falsifiable GPU evidence.
 ---
 
 # Spectral Ocean
 
-Treat an ocean as a sampled stochastic wave field whose highest-throughput implementation is owned in frequency space. Start from compute-shader FFT cascades, not analytic wave piles, scrolling textures, or a simplified renderer path.
+Use this skill when a large, unbounded-looking water surface must span several
+wavelength scales with directional wind sea or swell. The canonical state is a
+sampled random field in wavevector space, evolved by dispersion and transformed
+on the GPU. Use `$threejs-water-optics` for bounded interaction grids or a small
+authored wave set.
 
-Run `$threejs-choose-skills` first when the request spans ocean simulation plus atmosphere, shadows, validation, or final-image treatment. Read [references/spectral-cascade-ocean-system.md](references/spectral-cascade-ocean-system.md) before implementing or auditing this skill.
+Read
+[references/spectral-cascade-ocean-system.md](references/spectral-cascade-ocean-system.md)
+before implementation or review.
 
-Canonical WebGPU/TSL example: [examples/webgpu-fft-ocean/](examples/webgpu-fft-ocean/).
+## Numeric Provenance
 
-## Build Order
+Every quantitative statement uses one tag:
 
-1. Create a `WebGPURenderer` from `three/webgpu`, initialize it, and install the capability gate before allocating compute resources.
-2. Choose the quality tier from grid size, cascade count, dispatch budget, texture memory, and target GPU class.
-3. Build disjoint wavelength cascades from a deterministic directional spectrum.
-4. Generate coordinate-stable Gaussian seeds and conjugate-packed `h0(k)` for every cell before masking out-of-band energy.
-5. Evolve height, horizontal displacement, slopes, horizontal derivatives, and cross derivatives in frequency space with TSL `Fn().compute()` kernels.
-6. Pack derivative fields before the inverse transform; never derive slopes or Jacobians with finite differences after the IFFT.
-7. Run Stockham or Cooley-Tukey inverse FFT stages through `StorageTexture` ping-pongs, using `renderer.compute()` or `renderer.computeAsync()` with ordered stage boundaries.
-8. Assemble filterable displacement, derivative, Jacobian, and foam-history textures in the same compute dispatch chain.
-9. Shade the displaced mesh with a `MeshStandardNodeMaterial` or `MeshPhysicalNodeMaterial` graph driven by the resolved spectral maps.
-10. Compose reflections, underwater absorption, crest scatter, optional `BloomNode`/`GTAONode`/`TRAANode`, and output conversion in a `RenderPipeline`.
-11. Expose diagnostics for spectra, transformed fields, foam history, node-pass outputs, and GPU timings.
+- **[D] Derived** from equations, dimensions, formats, or reproducible counts;
+- **[G] Gated** as a predeclared pass/fail limit;
+- **[M] Measured** on a named device, viewport, and workload;
+- **[A] Authored** as a visual/application input.
 
-Legacy WebGL implementation (deprecated, do not extend): `examples/spectral-cascade-ocean/`, `examples/hybrid-clear-water-ocean/`, `examples/stylized-above-below-ocean/`.
+Unlabelled integers inside exact equations, tensor dimensions, byte identities,
+and API names are [D]. Resolutions, patch lengths, sea-state constants,
+thresholds, format choices, timings, and memory limits must be tagged.
 
-## Capability Gate
+## Algorithm Gate
 
-Use one implementation path: WebGPU-backed TSL compute. If that canonical path
-is unavailable, report the missing backend as a blocker unless the user
-explicitly asks how to apply fallback when WebGPU is unavailable.
+Choose FFT cascades only when the visible band contains enough independent
+modes that direct summation is more expensive or visibly repetitive. The
+decision variables are visible wavelength interval, directional statistics,
+periodic-repeat distance, tolerated phase/slope error, interaction needs, and
+sustained storage bandwidth.
+
+| Requirement | Algorithm | Boundary |
+| --- | --- | --- |
+| Few art-directed modes or exact cheap CPU queries | Parametric waves in `$threejs-water-optics` | Cost grows with component count. |
+| Bounded disturbances | Compute heightfield in `$threejs-water-optics` | CFL and domain-boundary error. |
+| Broad stochastic directional sea | Multi-cascade FFT | Periodic patches, spectral quadrature, FFT precision. |
+
+Do not disguise scrolling normals or a wave pile as a low FFT tier.
+
+## Pinned Three.js r185 Architecture
+
+The API contract is verified against installed `three@0.185.1` **[G]**:
+
+- `WebGPURenderer`, `RenderPipeline`, `StorageTexture`, and node materials come
+  from `three/webgpu`; TSL comes from `three/tsl`.
+- Initialize before checking `renderer.backend.isWebGPUBackend`, device limits,
+  or `renderer.hasFeature()`.
+- Build compute with `Fn(...).compute(...)`. After initialization,
+  `renderer.compute(nodeOrArray)` records ordered dispatches.
+  `computeAsync()` is initialization-safe but is not a GPU-completion fence.
+- `StorageTexture` simulation data uses `NoColorSpace`, no generated mipmaps,
+  and explicit `HalfFloatType` or `FloatType` selected by validation.
+- Gate each kernel against the initialized device's
+  `maxStorageTexturesPerShaderStage` and compiled binding layout. The reference
+  fused physical assembly requires seven storage-texture bindings; use its
+  ordered split path with at most three per dispatch on portable four-binding
+  targets. Never allocate or compile the fused path before this gate.
+- Use `pass()`, optional `mrt()`, and one `RenderPipeline`; use
+  `PassNode.setResolutionScale()`. Use exactly one output transform.
 
 ```js
-import { WebGPURenderer } from 'three/webgpu';
-
 const renderer = new WebGPURenderer( { antialias: false } );
 await renderer.init();
 
-if ( renderer.backend.isWebGPUBackend ) {
-  await ocean.allocateStorageTextures();
-  await renderer.computeAsync( ocean.validateFftNodes );
-} else {
-  throw new Error( 'WebGPU backend required for the canonical FFT ocean path.' );
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( 'WebGPU is required for the spectral ocean.' );
+}
+
+renderer.compute( orderedOceanNodes );
+pipeline.render();
+```
+
+## Non-Negotiable Numerical Contract
+
+### Spectrum dimensions and cascades
+
+Start from a directional angular-frequency variance density
+`S_omega(omega,theta)` with units `m^2 s` **[D]**, normalized directional
+distribution, and finite-depth capillary-gravity dispersion. Convert it to the
+two-dimensional wavevector density
+
+```text
+P(k_x,k_z) = S_omega(omega(k),theta)
+             |d omega/d k| / k,        [P] = m^4.              [D]
+```
+
+Discrete coefficient variance includes `Delta k_x Delta k_z` **[D]**. A
+missing Jacobian, cell area, or Gaussian normalization invalidates sea-state
+amplitude.
+
+Cascade power windows must satisfy `sum_i w_i(k)=1` over the represented band
+**[D,G]**. Hard half-open bands are valid; smooth overlap uses amplitude
+`sqrt(w_i)` so expected power is not doubled. Each cascade declares patch
+length, grid spacing in `k`, isotropic upper cutoff, and repeat distance.
+
+### Transform convention
+
+Write the transform pair in code and tests. This skill uses the unnormalized
+inverse convention
+
+```text
+f[j] = sum_n F[n] exp(+i 2 pi n dot j / N).                     [D]
+```
+
+With this convention a unit DC coefficient produces a unit constant field.
+Any normalized IFFT must rescale initial coefficients consistently. Never tune
+spectrum amplitude around an undocumented FFT scale.
+
+Pack the eight real fields required for height, horizontal displacement,
+slopes, and horizontal derivatives into four complex transforms, preferably as
+two complex lanes in each of two RGBA textures **[D]**. Validate the algebra
+`G=A+iB`, not component interleaving.
+
+### Hermitian and Nyquist rules
+
+The evolved height spectrum must satisfy
+`H(-k)=conjugate(H(k))` **[D]**. DC and self-conjugate Nyquist cells are real.
+Derivative multipliers receive parity-specific masks:
+
+- fields odd in `k_x` are zero on the `k_x` Nyquist line;
+- fields odd in `k_z` are zero on the `k_z` Nyquist line;
+- the mixed derivative is zero on either Nyquist line;
+- even second derivatives need no blanket Nyquist removal, but the final
+  spectrum must still pass Hermitian projection and imaginary-leakage gates.
+
+Zero `k=0` before every division by `|k|`. Do not multiply a singular result by
+a zero mask and call it safe.
+
+### Exact choppy geometry
+
+For the declared inverse-transform sign, choose the horizontal displacement
+sign by a one-mode test. This skill defines positive choppiness `chi` so
+`h=a cos(kx)` maps to `X=x-chi a sin(kx)`, compressing the crest **[D]**.
+
+Sum displacement and derivatives across cascades before forming the horizontal
+Jacobian. For
+
+```text
+P(q) = (q_x + chi D_x, h, q_z + chi D_z),
+```
+
+compute `P_qx`, `P_qz`, the determinant, and
+`normalize(cross(P_qz,P_qx))` exactly. Do not divide each height slope by only
+its same-axis stretch; that omits cross coupling. A nonpositive determinant is
+a fold, not a normal-map detail.
+
+### Foam state
+
+Compression may source foam, but a thresholded Jacobian is not persistent foam.
+Use a bounded, timestep-correct source/decay update and declare whether the
+history lives in Lagrangian parameter coordinates or is advected in an
+Eulerian/world atlas. Include transport, dissipation, and source terms in
+diagnostics. Display thresholding is separate from state evolution.
+
+## CPU Coupling Contract
+
+Expose parametric sampling separately from world-horizontal sampling. A
+dominant-bin CPU sum approximates the same seeded coefficients and dispersion;
+its omitted-coefficient triangle bound applies at fixed parameter coordinate.
+When choppy horizontal displacement is nonzero, a world `(x,z)` query must also
+invert the horizontal map. The reference derives the additional inversion
+error and the condition under which it is bounded.
+
+Return:
+
+```ts
+{
+  height,
+  normal,
+  horizontalResidual,
+  omittedCoefficientBound,
+  numericalErrorMeasured,
+  status,
 }
 ```
 
-Budgeted WebGPU tiers use smaller grids, fewer cascades, or lower-resolution
-debug input fixtures inside the canonical architecture. They must not contain a second
-hand-written renderer backend. If, and only if, the user explicitly asks how to
-apply fallback when WebGPU is unavailable, route that teaching to
-`$threejs-compatibility-fallbacks`.
+The omitted bound **[D]**, solver tolerance **[G]**, and GPU-versus-CPU probe
+error **[M]** are distinct fields. Do not read the full FFT maps back in the
+frame path.
 
-## Non-Negotiable Gates
+## Sustained Performance Contract
 
-- Require power-of-two grids, positive patch lengths, disjoint wavenumber intervals, finite depth/gravity values, and a supported storage texture format before construction.
-- Validate DC, X-frequency, Y-frequency, horizontal-displacement direction, derivative sign, and Jacobian determinant before connecting the spectrum to the surface.
-- Keep Gaussian samples coordinate-stable: hash by `(seed, cascade, x, y)` or consume random values for every cell before masking.
-- Compute all displacement derivatives in frequency space: slopes, horizontal derivatives, and the cross derivative are transformed fields, not post-IFFT differences.
-- Persist foam as simulation state in a ping-ponged storage texture; display thresholds are separate from history recovery.
-- Submit FFT stages with ordered whole-grid boundaries verified against the active Three.js backend; batch independent fields at the same stage, then advance.
-- Share sun, sky, exposure, and output-conversion ownership across the sky, ocean reflection, underwater path, and post pipeline.
-- Keep fixed seeds, fixed camera captures, no-post baselines, and GPU timing history for comparisons.
+Do not publish generic mobile/integrated/discrete timing tables. For each named
+target, declare the scene, viewport, DPR, resolution, cascade bands, precision
+placement, active foam/optics, warm-up, sample window, power state, and
+pass/fail threshold **[G]** before measuring **[M]**.
 
-## Cross-Skill Water Height Contract
+Keep a complete resource ledger and report warm percentile timings, per-stage
+bandwidth, peak live bytes, allocation churn, and thermal drift **[M]**. One
+`RGBA16F` texture consumes `8 N^2` bytes **[D]** and one `RGBA32F` texture
+consumes `16 N^2` bytes **[D]**. Derive quality tiers only from named-target
+measurements.
 
-When another skill needs water coupling, expose a CPU-evaluable query of the
-same authored cause rather than reading back the GPU simulation. The interface
-shape is:
+For bandwidth-constrained tile GPUs, prefer a workgroup-resident one-dimensional FFT plus
+transpose when device workgroup storage and invocation limits admit the chosen
+row representation. Otherwise use the global Stockham reference path. The
+accepted kernel is the fastest one that passes the same transform, precision,
+and occupancy gates; algorithm names alone are not evidence.
 
-```js
-const sampler = createCpuWaterHeightSampler(oceanConfig);
-const y = sampler.getWaterHeight(x, z, timeSeconds);
-const parity = sampler.estimateTruncationError();
-```
+Resolved display maps may use half-float only after comparison with the float
+FFT reference **[M]**. Repeated half-float quantization at every FFT stage is a
+different and stricter error case than storing only resolved maps in half-float.
 
-This is a one-way provider contract. The water provider carries the parity
-obligation; consumers treat `getWaterHeight(x, z, t)` as authoritative and do
-not perform GPU readback. For the canonical FFT ocean, the CPU query is a
-dominant-bin truncation of the same seeded spectrum and dispersion relation as
-the WebGPU kernels. Its error bound is the omitted coefficient budget:
+## Required Evidence
 
-```text
-|height_full - height_truncated| <= sum_{omitted bins} (|h0(k)| + |h0(-k)|)
-```
+- dimensional spectrum integral and target-versus-realized variance **[M]**;
+- cascade power-sum, holes/overlap, and repeat-distance diagnostics;
+- DC, axis-frequency, oblique-frequency, partner-pair, and Nyquist FFT tests;
+- maximum transform error, imaginary leakage, and Parseval error **[M]**;
+- one-mode propagation direction, displacement sign, every derivative sign,
+  exact normal, and determinant;
+- per-cascade and combined displacement/slope/Jacobian views;
+- foam source, transported state, decay, and display coverage over time;
+- CPU omitted bound, inversion residual, and GPU probe error;
+- allocation ledger, dispatch inventory, warm sustained timings, and mobile
+  thermal behavior;
+- fixed-camera multi-time captures, no-foam/no-detail/no-post baselines, and
+  one final output transform.
 
-Validators must compare the truncated query against a full pure-JS spectral
-mirror at fixed probe points/times and assert the measured error is within the
-reported bound plus numerical epsilon. Use this pattern for cross-skill
-interfaces: CPU-evaluable query of the same authored cause, stated parity
-error, one-way consumer, no hot-path readback.
-
-## Budgets
-
-- High desktop discrete: `512^2`, 3 cascades, 4 packed complex fields per cascade, about `3 * (8 evolve + 4 * 2 * log2(N) FFT + 4 assemble/history)` compute dispatch groups, about 102 MiB ocean storage with a 104 MiB tier gate, target 2.5-4.0 ms simulation and 1.5-3.0 ms ocean shading/post at 1440p.
-- Standard desktop integrated: `256^2`, 3 cascades, half-float storage when validated, under 28 MiB ocean storage, target 1.5-3.0 ms simulation and 1.5-2.5 ms shading/post at 1080p.
-- Mobile or budgeted WebGPU tier: `128^2`, 1-2 cascades and lower-resolution debug inputs, under 8 MiB ocean storage, target under 2.0 ms simulation-equivalent work and no spray.
-- Draw calls: one ocean surface draw, one sky draw, optional spray/crest instancing only when routed through `$threejs-particles-trails-and-effects`.
-- Post passes: one scene `pass()`, optional `mrt()` for normal/emissive outputs, reduced-resolution `BloomNode` or `GTAONode` only when visibly useful, one output transform.
-
-## Color And Output
-
-- Color textures use `SRGBColorSpace`; spectra, displacement, derivative, Jacobian, foam, normal, noise, LUT, and weather data use `NoColorSpace` or linear data semantics.
-- Keep ocean simulation textures as data, with mipmaps disabled unless the compute chain writes them deliberately.
-- Use HDR `HalfFloatType` working buffers until tone mapping.
-- The `RenderPipeline` owns tone mapping and color conversion through `outputColorTransform` or an explicit `renderOutput()` node. Materials and custom nodes must not double-convert.
-- `PostProcessing` is only a renamed predecessor of `RenderPipeline`; do not use it for new work.
-
-## Route Elsewhere
-
-- Use `$threejs-water-optics` for bounded pools, screen-space refraction, local heightfield ripples, shoreline absorption, caustics, and analytic wave surfaces.
-- Add `$threejs-particles-trails-and-effects` only when crest spray, splashes, foam particles, or interaction effects are required.
-- Add `$threejs-visual-validation` for fixed-view contracts, cross-seed sweeps, temporal stability, pass diagnostics, and GPU evidence.
-- Add `$threejs-image-pipeline` or `$threejs-exposure-color-grading` when the ocean must share a larger HDR, bloom, exposure, or grading stack.
+Fail the implementation if any coefficient has ambiguous units, FFT
+normalization is implicit, a Nyquist parity rule is missing, half precision is
+assumed accurate, the normal is not the cross product of displaced tangents,
+foam has no transport semantics, or a performance number lacks provenance.

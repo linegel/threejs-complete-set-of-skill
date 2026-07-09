@@ -7,37 +7,55 @@ description: Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Thr
 
 Treat weather as one coupled GPU system: a shared weather envelope drives
 precipitation particles, surface masks, normals, roughness, residue, lighting,
-and diagnostics. The first design decision is algorithm class, because a
-compute/storage architecture can be orders of magnitude faster than per-object
-or per-frame CPU mutation at the same visual quality.
+and diagnostics. The first design decision is algorithm class: immutable
+analytic motion, sparse CPU-updated events, and dense GPU-resident recurrence
+have different asymptotic and bandwidth costs.
 
 Run `threejs-choose-skills` preflight for backend, budget, and resource owner
-decisions when precipitation joins a larger scene.
+decisions when precipitation joins a larger scene. Dense recurrent state can
+benefit from GPU residency; analytic or sparse branch-heavy work can be faster
+without a compute dispatch. The target measurement decides.
 
 ## Required Architecture
 
-Build new work on latest Three.js with `WebGPURenderer` from `three/webgpu`,
+Build new work on pinned Three.js r185 with `WebGPURenderer` from `three/webgpu`,
 TSL from `three/tsl`, `NodeMaterial` classes such as
 `MeshStandardNodeMaterial`, `MeshPhysicalNodeMaterial`, and
 `SpriteNodeMaterial`, and the node post stack with `RenderPipeline`, `pass()`,
 `mrt()`, `PassNode.setResolutionScale()`, `outputColorTransform`, and
 `renderOutput()`.
 
-The highest-throughput architecture for this domain is:
+The canonical frame graph exposes the selected state path:
 
 ```text
 shared weather envelope
-  -> compute-updated StorageInstancedBufferAttribute precipitation volume
-  -> camera-wrapped instance positions and per-instance random/static fields
+  -> immutable analytic seeds OR compute-updated recurrent precipitation
+  -> domain-selected world cells: unbounded streamed, or localized bounded
   -> TSL surface masks for snow, wetness, puddles, roughness, and normals
   -> GPU impact/splash event buffers or generated ripple-normal quality tier
   -> node presentation with one tone-map and one output transform owner
 ```
 
+Choose the precipitation update before allocating dynamic storage:
+
+| Required behavior | Default algorithm |
+| --- | --- |
+| Constant ballistic fall/wind, no collisions | Immutable seeds; derive world-cell position analytically from time in vertex TSL; stream/wrap only for unbounded visual weather |
+| Authored time-varying wind with analytic integral | Immutable seeds plus accumulated/integrated wind displacement `integral v_wind(t) dt`; never multiply the current wind by total elapsed time |
+| Turbulence, collisions, or recurrent particle state | Compute-updated storage instances |
+| World impacts/accumulation | World-stable precipitation cells plus a compact impact/coverage field; camera-wrapped visual particles may not author physical contacts |
+| Sparse close splashes | Event pool over impacted tiles/receivers, not a global particle scan |
+
+Analytic precipitation removes hot-buffer writes and a dispatch. Camera wrapping
+is a presentation optimization; hash cells in world space so camera motion does
+not make rain/snow phase or impact locations jump.
+
 Legacy WebGL implementations (deprecated, do not extend): `examples/snow-accumulation/snow-system.js`, `examples/wet-puddle-rain/rain-puddle-system.js`.
 
-Canonical Phase 1 WebGPU/TSL contract:
-`examples/webgpu-rain-snow-and-wet-surfaces/`. Run
+Diagnostic/source scaffold:
+`examples/webgpu-rain-snow-and-wet-surfaces/`. Its descriptor and token checks
+do not prove renderer initialization, shader compilation, GPU execution,
+readback, images, or timing. Run
 `node examples/webgpu-rain-snow-and-wet-surfaces/validate.js` after edits.
 
 Read
@@ -54,37 +72,40 @@ envelope and switch quality, not implementation doctrine.
 ```js
 await renderer.init();
 
-if (renderer.backend.isWebGPUBackend) {
-  // High tier: compute/storage precipitation and dynamic surface fields.
-} else {
-  // Reduced tier: fewer instances, static masks, and generated ripple normals.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical weather path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
-Quality tiers:
+Native WebGPU quality tiers preserve the shared weather cause:
 
-- `high`: compute-updated rain or snow positions in storage instanced buffers;
-  dynamic TSL wetness, snow, puddle, and ripple fields; GPU event buffers for
-  impact residue when needed.
-- `medium`: same storage-instanced precipitation with lower counts and cheaper
-  material field octaves; ripple normals come from preloaded variants in
-  `assets/generated-variants/`.
-- `reduced`: no custom backend rewrite; keep shared weather uniforms, use lower
-  instance counts or static precipitation, static coverage masks, and generated
-  ripple-normal variants.
+- `full`: analytic or recurrent motion as required, world-stable sparse
+  impacts, integrated receiver fields, and measured reconstruction/post.
+- `balanced`: lower projected density/history extent and fewer field bands,
+  with response conservation and image-error gates intact.
+- `budgeted`: analytic precipitation where possible, bounded event pools,
+  lower-rate/reduced receiver state, and optional explicitly stylized generated
+  ripple normals.
 
 ## Build Order
 
-1. Define one shared weather envelope with time, delta time, wind, coverage,
-   wetness, precipitation rate, and debug mode. Particles and surfaces must
-   read the same nodes or uniform references.
-2. Allocate static per-instance seeds once. Update only dynamic particle state
-   with `renderer.compute()` or `renderer.computeAsync()` into
-   `StorageInstancedBufferAttribute` or storage nodes created with
-   `instancedArray()`.
-3. Keep precipitation in a camera-wrapped volume. Wrap positions in compute or
-   TSL from camera position, volume size, wind, fall speed, and seed; never let
-   an emitter edge enter the shot.
+1. Define one shared weather state with time, delta time, wind, temperature,
+   world-space precipitation flux, and debug mode. Rendered particle count is a
+   sampling/appearance choice: each accepted impact carries exposed-area flux
+   times elapsed time divided by the deterministic sample count. Wetness and snow coverage are integrated
+   state with deposition, drainage/evaporation, or melt terms; they consume the
+   same forcing but are not aliases of instantaneous precipitation progress.
+2. Allocate static per-instance seeds once. Evaluate ballistic/domain motion
+   analytically when possible. Update only recurrent particle state with
+   queued `renderer.compute()` into storage; r185 `computeAsync()` is not a
+   GPU-completion fence.
+3. Choose the visual domain. Unbounded precipitation uses camera-centred
+   world-cell streaming with stable world hashes. Localized weather uses a
+   world-anchored bounded volume whose boundary is physically hidden or softly
+   modelled. Impacts/accumulation always use an independent world-stable
+   receiver field.
 4. Author surfaces as `MeshStandardNodeMaterial` or
    `MeshPhysicalNodeMaterial`. Drive color, roughness, metalness, normal,
    opacity, and displacement through node slots, not string patching.
@@ -93,8 +114,8 @@ Quality tiers:
    normals, splash intensity, and debug output.
 6. For rain surfaces, split early wetness from heavy-rain ripple response.
    Roughness should change before ripple normals appear.
-7. For splashes, generate or compact impact candidates on the GPU when counts
-   are high. Weight by world-space upward normals, reject hidden/downward
+7. For splashes, generate or compact impact candidates on the GPU only past the
+   measured CPU/dirty-upload crossover. Weight by world-space upward normals, reject hidden/downward
    surfaces, and animate flipbook progress without per-splash CPU rewrites.
 8. Present with `RenderPipeline`. Use built-in nodes first: `GTAONode` or
    `ao()` for contact grounding, `BloomNode` or `bloom()` only for bright
@@ -105,41 +126,50 @@ Quality tiers:
 
 - precipitation density, rate, speed, and quality tier;
 - wind direction, strength, and gust phase;
-- shared weather coverage or wetness progress;
-- wrapped volume size and camera-follow offset;
+- shared weather forcing plus independently integrated wetness/snow state;
+- visual domain bounds, cell-streaming/wrapping policy, and receiver-field extent;
 - wetness, snow, or puddle mask threshold and softness;
 - ripple source: dynamic field, generated variant A/B/C, or disabled;
 - ripple or drift normal strength;
 - surface roughness and color response;
 - particle, residue, and splash opacity;
-- debug modes for masks, normals, particles, event buffers, and weather
-  progress.
+- debug modes for masks, normals, particles, event buffers, forcing, and
+  integrated surface state.
 
-## Performance Budgets
+## Performance Contract
 
-Target these as starting budgets, then tighten for the product scene:
+Derive particle count from projected coverage and overdraw, not a device-class
+lookup table. An analytic camera-relative precipitation field can render with
+immutable seeds and no simulation dispatch. A recurrent particle solver pays
+storage plus compute only when interaction, collision, or persistent state is
+visible. Sparse world impacts use a bounded event pool; do not update a dense
+world grid merely because precipitation is dense on screen.
 
-- Desktop discrete GPU: 100k to 300k precipitation instances, one compute
-  dispatch per precipitation family, one optional event dispatch, 1 to 2 weather
-  surface fields, 1.5 ms precipitation, 1.0 ms material overhead, 0.8 ms post.
-- Desktop integrated GPU: 40k to 100k instances, one dispatch per family,
-  generated ripple-normal variants for medium rain, 2.5 ms precipitation,
-  1.5 ms material overhead, 1.0 ms post.
-- Mobile or reduced tier: 8k to 40k instances, static or lower-rate compute,
-  generated ripple-normal variants, <= 2 dynamic field octaves, 3.0 ms total
-  weather budget.
-- Storage: keep dynamic instance buffers packed to position, velocity/life, and
-  seed/flags. A 100k instance system with three `vec4` storage records is about
-  4.8 MB before alignment and render-target overhead.
+- Storage: keep recurrent instance buffers packed to the fields actually read.
+  For an **Authored** example capacity of 100,000 instances with three
+  `vec4<f32>` records, the **Derived** payload is
+  `100000 * 3 * 16 = 4,800,000 B = 4.58 MiB`, excluding allocator padding,
+  render targets, and duplicate/history slots.
 - Passes: one beauty pass, optional MRT only when later nodes reuse depth,
   normals, wetness, or velocity; reduced-resolution post effects must use
   `PassNode.setResolutionScale()`.
-- Draw calls: one draw per precipitation family, one draw per splash pool, and
-  no per-drop or per-splash object allocation.
+- Draw calls: one draw per visible spatial page and compatible precipitation
+  or splash material class; never trade submission savings for one uncullable
+  world-wide batch. Use no per-drop or per-splash object allocation.
+
+Record `{visibleInstances, pixelsCovered, mean/max layersPerPixel, streakQuadPx,
+solverKind, storageBytes, dirtyImpactTiles, renderExtent, sampleCount}`. The
+router assigns a whole-frame allocation; report contemporaneous full-frame
+p50/p95 and a paired marginal A/B result for precipitation. Gate sustained GPU
+and CPU p50/p95, hot bytes/frame, transparent overdraw, impact-field work, peak
+live memory, and thermal behavior on the named target. On tile GPUs compare
+analytic/no-history, reduced field, and recurrent tiers under the same visual
+error contract; instance count alone says nothing about mobile suitability.
 
 ## Color And Output
 
-- Color textures use `SRGBColorSpace`.
+- LDR albedo/emissive textures encoded as sRGB use `SRGBColorSpace`; HDR/EXR
+  radiance remains loader-declared linear.
 - Data textures, normal maps, roughness maps, masks, noise, LUTs, and weather
   fields use `NoColorSpace` or linear treatment.
 - Decide mipmaps per use: pregenerated ripple-normal variants should have
@@ -151,9 +181,10 @@ Target these as starting budgets, then tighten for the product scene:
 
 ## Replacement Doctrine
 
-- Replace per-frame CPU attribute and instance-matrix rewrites with
-  compute-updated storage instance data. This removes upload bandwidth and
-  scales to high particle counts.
+- For dense recurrent state, replace per-frame CPU instance rewrites with
+  GPU-resident compute/storage only after the state remains resident and the
+  measured dispatch is cheaper. Analytic seeds need neither path; sparse,
+  branch-heavy authoritative events may remain CPU-updated dirty ranges.
 - Replace disconnected particle clocks and surface clocks with one weather
   envelope. This prevents rain, splashes, puddles, and snow coverage from
   drifting apart.
@@ -170,8 +201,8 @@ Target these as starting budgets, then tighten for the product scene:
 
 - falling precipitation ignores the wind, time, or progress used by surfaces;
 - instance positions or splash progress are rewritten on the CPU every frame;
-- the precipitation volume exposes emitter edges instead of wrapping around the
-  camera;
+- an unbounded streamed volume exposes emitter edges, or a localized volume
+  hides an unexplained hard boundary;
 - snow height and snow normals come from different fields;
 - model snow slides in world space or sticks to vertical faces;
 - puddles only lower roughness without a mask, normal response, or ripple tier;

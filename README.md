@@ -1,8 +1,9 @@
 # Three.js WebGPU Skill Pack for TSL, Procedural Graphics, and Visual Validation
 
-Specialized agent skills for building ambitious Three.js WebGPU scenes with a
-TSL-first architecture, procedural graphics systems, generated texture assets,
-and screenshot-backed visual validation.
+Specialized agent skills for building general-purpose Three.js WebGPU scenes
+with a TSL-first architecture, workload-driven algorithm selection, procedural
+graphics systems, explicit low-power/mobile accounting, and falsifiable visual
+validation.
 
 [![skills.sh](https://skills.sh/b/linegel/threejs-complete-set-of-skill)](https://skills.sh/linegel/threejs-complete-set-of-skill)
 
@@ -51,9 +52,11 @@ root and at <https://linegel.github.io/threejs-complete-set-of-skill/skills.json
 
 This is not a generic Three.js tutorial. It is a practical skill pack for
 agents that need to design, implement, debug, and validate advanced real-time
-graphics systems: atmospheres, oceans, procedural worlds, particles, camera
-rigs, post-processing pipelines, shadows, water, clouds, and GPU-backed surface
-effects.
+graphics systems: scientific or explanatory views, inspected products and
+assemblies, environments, procedural worlds, particles, cameras, post
+pipelines, shadows, water, clouds, and GPU-backed surface effects. The router
+must report a missing owner rather than stretch a domain skill over unsupported
+data, semantic-scene, or lighting work.
 
 Use this repository when an agent needs current Three.js WebGPU guidance for
 procedural oceans, volumetric clouds, wet surfaces, cratered planets, procedural
@@ -76,9 +79,10 @@ The pack is built around a few hard rules:
 
 - Start from current Three.js WebGPU APIs, not legacy WebGL examples.
 - Use TSL, NodeMaterial, RenderPipeline, compute, storage, MRT, and node post
-  pipelines where they are the right architecture.
-- Keep one owner for depth, normals, velocity, history, tone mapping, output
-  color conversion, and adaptive resolution.
+  only where the representation, workload, and measured target justify them.
+- Allocate only consumed depth, normal, velocity, ID, and history signals; keep
+  one owner for every allocated signal, tone map, output conversion, and
+  adaptive-resolution decision.
 - Build the visual cause first, then use post-processing to preserve or reveal
   it.
 - Validate with reproducible evidence, not a single attractive screenshot.
@@ -115,18 +119,18 @@ system with HDR emission and bloom ownership.
 | --- | --- |
 | [`threejs-choose-skills`](threejs-choose-skills/SKILL.md) | Route a broad visual request to the smallest useful set of skills. |
 | [`threejs-visual-validation`](threejs-visual-validation/SKILL.md) | Fixed-view contracts, diagnostics, timing evidence, seed sweeps, leak loops, and regression bundles. |
-| [`threejs-compatibility-fallbacks`](threejs-compatibility-fallbacks/SKILL.md) | Explicitly requested WebGL, old-browser, low-end-device, or non-WebGPU fallback plans. |
+| [`threejs-compatibility-fallbacks`](threejs-compatibility-fallbacks/SKILL.md) | Only an explicit current-user request for teaching how to apply fallback when WebGPU is unavailable. Low-end/mobile tuning remains native WebGPU work. |
 
 ### Cameras, Lighting, and Final Image
 
 | Skill | Use it for |
 | --- | --- |
-| [`threejs-camera-controls-and-rigs`](threejs-camera-controls-and-rigs/SKILL.md) | Chase, side, orbit, and authored-shot camera rigs, controls, projection ownership, floating origins, and lifecycle restoration. |
+| [`threejs-camera-controls-and-rigs`](threejs-camera-controls-and-rigs/SKILL.md) | Inspection, navigation, follow/orbit, data framing, large-coordinate, and authored-shot cameras with projection/depth ownership and lifecycle restoration. |
 | [`threejs-scalable-real-time-shadows`](threejs-scalable-real-time-shadows/SKILL.md) | Real-time shadows for dynamic and large scenes, cascades, tiled projections, cached clipmaps, texel snapping, and invalidation budgets. |
 | [`threejs-ambient-contact-shading`](threejs-ambient-contact-shading/SKILL.md) | Ambient contact shading, AO/GTAO, bent normals, bilateral reconstruction, and depth-grounded indirect visibility. |
-| [`threejs-bloom`](threejs-bloom/SKILL.md) | HDR bloom, selective emissive contribution, BloomNode controls, resolution-scale budgets, and effect isolation. |
+| [`threejs-bloom`](threejs-bloom/SKILL.md) | HDR optical glare from full-scene radiance by default, selectively masked bloom only when its signal/error/traffic contract is proven. |
 | [`threejs-exposure-color-grading`](threejs-exposure-color-grading/SKILL.md) | GPU luminance metering, eye adaptation, tone mapping, LUT grading, and output color ownership. |
-| [`threejs-image-pipeline`](threejs-image-pipeline/SKILL.md) | Shared depth, normals, albedo, emissive, velocity, history, pass ordering, and final RenderPipeline assembly. |
+| [`threejs-image-pipeline`](threejs-image-pipeline/SKILL.md) | Conditional shared signals, pass/history ownership, attachment traffic, color/output ordering, and final RenderPipeline assembly. |
 
 ### Worlds and Environments
 
@@ -148,13 +152,14 @@ system with HDR emission and bloom ownership.
 | [`threejs-procedural-buildings-and-cities`](threejs-procedural-buildings-and-cities/SKILL.md) | Building grammars, facades, profiles, ornaments, roofs, city chunks, and material-slot mesh compilation. |
 | [`threejs-procedural-planets`](threejs-procedural-planets/SKILL.md) | Cube-sphere quadtree planets, crater fields, biome/climate masks, GPU displacement, analytic normals, and atmosphere handoff. |
 | [`threejs-procedural-vegetation`](threejs-procedural-vegetation/SKILL.md) | Trees, grass, foliage, roots, branches, leaf cards, rooted wind, species presets, chunked LOD, and vegetation diagnostics. |
+| [`threejs-procedural-creatures`](threejs-procedural-creatures/SKILL.md) | Generated bodies and rigs with workload-selected SDF, extracted/skinned, hybrid, repeated, or impostor representations. |
 
 ### Motion and Effects
 
 | Skill | Use it for |
 | --- | --- |
-| [`threejs-procedural-motion-systems`](threejs-procedural-motion-systems/SKILL.md) | Launches, staging, spin docking, springs, rotating frames, detachments, transform timelines, and quaternion control. |
-| [`threejs-particles-trails-and-effects`](threejs-particles-trails-and-effects/SKILL.md) | Particles, trails, plasma, wakes, sparks, debris, dense-swap effect pools, and scene-relative HDR emission. |
+| [`threejs-procedural-motion-systems`](threejs-procedural-motion-systems/SKILL.md) | Analytic timelines, event phases, fixed-step recurrent state, constraints, rotating frames, instanced motion, and quaternion control. |
+| [`threejs-particles-trails-and-effects`](threejs-particles-trails-and-effects/SKILL.md) | Analytic or recurrent particles, trails, wakes, bounded pools, race-safe stable/scan compaction, and scene-relative HDR emission. |
 | [`threejs-dynamic-surface-effects`](threejs-dynamic-surface-effects/SKILL.md) | Frost, thaw, touch clearing, history ping-pong, decay/diffusion masks, reduced blur, and refraction surfaces. |
 | [`threejs-black-holes-and-space-effects`](threejs-black-holes-and-space-effects/SKILL.md) | Black holes, accretion disks, wormholes, curved-ray integration, procedural star fields, and bounded space effects. |
 
@@ -162,17 +167,19 @@ system with HDR emission and bloom ownership.
 
 Several skills include deterministic generated PNG texture variants under
 `assets/generated-variants/`. These Three.js texture assets are repeatable
-starting points for examples, diagnostics, and low-cost fallback demos; they are
+starting points for examples, diagnostics, and low-cost preview fixtures; they are
 not final art direction. Agents can use these generated assets directly from the
 skill folder when that keeps a demo simple, or replace/regenerate them on
 request when the user wants a different style, resolution, channel contract, or
 domain-specific look.
 
-The contact sheet is an overview index only. The validation screenshots below
-are the reviewable evidence for the families currently covered by skill-local
-domain gates: water caustic fields, directional wave seeds, cloud weather maps,
-frost crystal maps, lava cause maps, meadow density masks, biome field maps,
-rain ripple normal maps, starfield tiles, and procedural planet crater masks.
+The contact sheet is an overview index only. The screenshots below are
+asset-preview evidence for generated texture families and their channel-level
+gates: water caustic fields, directional wave seeds, cloud weather maps, frost
+crystal maps, lava cause maps, meadow density masks, biome field maps, rain
+ripple normals, starfield tiles, and crater masks. They are not evidence for
+the corresponding simulation, geometry, transport, WebGPU execution, or
+performance contracts.
 
 ![Contact sheet of 30 deterministic Three.js generated texture assets for water caustics, ocean wave seeds, cloud weather maps, rain ripple normals, frost crystals, lava cause maps, meadow density masks, star fields, biome fields, and planet crater masks](docs/generated-asset-contact-sheet.png)
 
@@ -181,7 +188,7 @@ rain ripple normal maps, starfield tiles, and procedural planet crater masks.
 | [`threejs-water-optics`](threejs-water-optics/SKILL.md) | `caustic-field-{a,b,c}.png` | Caustic floor projection, shallow-water intensity fields, and diagnostics. |
 | [`threejs-spectral-ocean`](threejs-spectral-ocean/SKILL.md) | `directional-wave-seed-{a,b,c}.png` | Preview height/slope seeds and ocean normal-debug experiments. |
 | [`threejs-volumetric-clouds`](threejs-volumetric-clouds/SKILL.md) | `weather-map-{a,b,c}.png` | Packed RGBA coverage, cloud type/detail, vertical bias, and erosion inputs. |
-| [`threejs-rain-snow-and-wet-surfaces`](threejs-rain-snow-and-wet-surfaces/SKILL.md) | `ripple-normal-{a,b,c}.png` | RGBA `NoColorSpace` ripple normals for wet asphalt, puddles, and fallback rain tiers. |
+| [`threejs-rain-snow-and-wet-surfaces`](threejs-rain-snow-and-wet-surfaces/SKILL.md) | `ripple-normal-{a,b,c}.png` | RGBA `NoColorSpace` ripple normals for wet-surface diagnostics and explicitly stylized static tiers. |
 | [`threejs-dynamic-surface-effects`](threejs-dynamic-surface-effects/SKILL.md) | `frost-crystal-{a,b,c}.png` | Frost/thaw masks, crystalline structure targets, and refraction-normal derivation. |
 | [`threejs-procedural-materials`](threejs-procedural-materials/SKILL.md) | `lava-cause-{a,b,c}.png` | Packed rock, crack, emission, and grain cause maps for material-channel debugging. |
 | [`threejs-procedural-vegetation`](threejs-procedural-vegetation/SKILL.md) | `meadow-density-{a,b,c}.png` | Packed density, path, clump, and flower masks for grass and meadow placement. |
@@ -222,11 +229,11 @@ all caustic variants.
 
 ### Three.js Spectral Ocean Wave Seed Validation Screenshots
 
-The spectral ocean pilot validates generated directional wave seeds as
-reduced-tier `NoColorSpace` data for ocean diagnostics. The screenshots prove
+The spectral ocean pilot checks generated directional wave seeds as
+reduced-tier `NoColorSpace` data for ocean diagnostics. The screenshots show
 height response, slope/Jacobian diagnostics, tiled stress, camera-distance
-checks, and phase progression while keeping the canonical FFT spectrum path as
-the production contract.
+checks, and phase progression; they do not validate the separate FFT spectrum
+renderer.
 
 ![Three.js WebGPU spectral ocean wave seed validation final design showing flat baseline, directional wave variants, and slope/Jacobian diagnostics](docs/visual-validation/ocean-generated-wave-seeds/final.design.png)
 
@@ -253,11 +260,10 @@ for every wave seed.
 
 ### Three.js Volumetric Cloud Weather Map Validation Screenshots
 
-The volumetric cloud pilot validates generated weather maps as reduced-tier
-RGBA `NoColorSpace` data for cloud diagnostics. The screenshots prove coverage,
-cloud type/detail, vertical bias, and alpha erosion behavior while keeping the
-production promise focused on weather-driven cloud density, lighting, shadows,
-and temporal reconstruction.
+The volumetric cloud pilot checks generated weather maps as reduced-tier RGBA
+`NoColorSpace` data for cloud diagnostics. The screenshots show coverage,
+cloud type/detail, vertical bias, and alpha erosion behavior; they do not prove
+the separate volumetric lighting, shadow, or temporal renderer.
 
 ![Three.js volumetric cloud weather map validation final design showing no-weather baseline, generated weather-map variants, and density diagnostics](docs/visual-validation/cloud-generated-weather-maps/final.design.png)
 
@@ -284,11 +290,11 @@ all weather-map variants.
 
 ### Three.js Dynamic Surface Frost Crystal Validation Screenshots
 
-The dynamic surface pilot validates generated frost crystal maps as reduced-tier
+The dynamic surface pilot checks generated frost crystal maps as reduced-tier
 RGBA `NoColorSpace` data for touch-history frost diagnostics. The screenshots
-prove crystal-driven mask/detail response, derived refraction normals, opaque
-alpha padding, and touch-history clearing while keeping the production promise
-focused on StorageTexture history, reduced blur, and TSL refraction.
+show crystal-driven mask/detail response, derived refraction normals, opaque
+alpha padding, and touch-history clearing; they do not prove the separate
+StorageTexture update, reconstruction, or TSL refraction graph.
 
 ![Three.js dynamic surface frost crystal validation final design showing clear glass, generated frost crystal variants, and refraction diagnostics](docs/visual-validation/frost-generated-crystals/final.design.png)
 
@@ -315,11 +321,11 @@ normal/refraction response for every frost-crystal variant.
 
 ### Three.js Procedural Material Lava Cause Validation Screenshots
 
-The procedural-materials pilot validates generated lava cause maps as
-reduced-tier RGBA `NoColorSpace` data for PBR material diagnostics. The
-screenshots prove crust coverage, fracture networks, heat exposure, semantic
-alpha thermal intensity, roughness/normal variation, and raw emissive separation
-from final material color.
+The procedural-materials pilot checks generated lava cause maps as reduced-tier
+RGBA `NoColorSpace` data for PBR material diagnostics. The screenshots show
+crust coverage, fracture networks, heat exposure, semantic alpha thermal
+intensity, roughness/normal variation, and raw emissive separation from final
+material color inside this fixture.
 
 ![Three.js procedural material lava cause validation final design showing default lava identity, generated PBR surfaces, and raw emissive diagnostics](docs/visual-validation/materials-generated-lava-causes/final.design.png)
 
@@ -346,11 +352,11 @@ all lava-cause variants.
 
 ### Three.js Procedural Vegetation Meadow Density Validation Screenshots
 
-The procedural-vegetation pilot validates generated meadow density maps as
+The procedural-vegetation pilot checks generated meadow density maps as
 reduced-tier RGBA `NoColorSpace` data for dense-grass placement diagnostics.
-The screenshots prove density-shaped placement, path clearing, clump/LOD
+The screenshots show density-shaped placement, path clearing, clump/LOD
 variation, semantic alpha flower masks, and shared-mask consistency between
-diagnostics and final meadow color.
+diagnostics and final meadow color inside this fixture.
 
 ![Three.js procedural vegetation meadow density validation final design showing uniform meadow baseline, generated meadow variants, and placement diagnostics](docs/visual-validation/vegetation-generated-meadow-density/final.design.png)
 
@@ -377,10 +383,11 @@ flower response for every meadow-density variant.
 
 ### Three.js Curved-Ray Starfield Tile Validation Screenshots
 
-The black-holes and space-effects pilot validates generated starfield tiles as
+The black-holes and space-effects pilot checks generated starfield tiles as
 RGBA `SRGBColorSpace` environment color for curved-ray background diagnostics.
-The screenshots prove opaque alpha padding, raw star-tile lookup, final-direction
-lensing response, bent-direction diagnostics, and termination/opacity views.
+The screenshots show opaque alpha padding, raw star-tile lookup,
+final-direction lens response, bent-direction diagnostics, and
+termination/opacity views inside this artistic fixture.
 
 ![Three.js curved-ray starfield tile validation final design showing unlensed baseline, lensed starfields, and bent-direction diagnostics](docs/visual-validation/space-generated-starfields/final.design.png)
 
@@ -408,10 +415,10 @@ for every starfield variant.
 
 ### Three.js Procedural Field Biome Map Validation Screenshots
 
-The procedural-fields pilot validates generated biome field maps as reduced-tier
-RGBA `NoColorSpace` data for field diagnostics. The screenshots prove macro
+The procedural-fields pilot checks generated biome field maps as reduced-tier
+RGBA `NoColorSpace` data for field diagnostics. The screenshots show macro
 height, ridge, cavity, semantic alpha moisture, field-shaped biome material
-response, and derived slope/place/roughness diagnostics.
+response, and derived slope/place/roughness diagnostics inside this fixture.
 
 ![Three.js procedural field biome map validation final design showing default baseline, generated biome field variants, and derived diagnostics](docs/visual-validation/fields-generated-biome-maps/final.design.png)
 
@@ -452,8 +459,8 @@ asphalt with each generated ripple-normal variant, and normal-map diagnostics.
 
 ![Three.js WebGPU rain ripple normal validation no-post baseline showing wetness gating before and after ripple-normal contribution](docs/visual-validation/rain-generated-ripples/no-post.design.png)
 
-No-post baseline: proves the wet-surface response exists without relying on
-post-processing or a single final beauty frame.
+No-post baseline: isolates the fixture's wet-surface response from
+post-processing and the final beauty framing.
 
 ![Three.js WebGPU rain ripple normal validation diagnostics mosaic showing tiled seam stress and normal-field views for all ripple variants](docs/visual-validation/rain-generated-ripples/diagnostics.mosaic.png)
 

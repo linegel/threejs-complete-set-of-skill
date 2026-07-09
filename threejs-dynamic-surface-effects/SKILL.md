@@ -1,20 +1,38 @@
 ---
 name: threejs-dynamic-surface-effects
-description: Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.
+description: Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.
 ---
 
 # Dynamic Surface Effects
 
 Use this skill for screen-space surface effects whose visible mask, thaw/clear
 state, or refractive response depends on persistent history. The only taught
-implementation path is latest Three.js with `WebGPURenderer`, TSL,
+implementation path is pinned Three.js r185 with `WebGPURenderer`, TSL,
 `NodeMaterial`, `RenderPipeline`, `pass()`, storage textures, and compute.
 
 Run `$threejs-choose-skills` before implementation when the request could also
 involve world-space residue, weather accumulation, object paint, water, or a
 larger post stack.
 
-## Best Architecture First
+## Choose The State Update First
+
+The history representation follows the state transition, not the visual theme:
+
+| Workload | Required path | Reject |
+| --- | --- | --- |
+| Global decay/diffusion changes most texels every step | Full-field ping-pong compute at the lowest history resolution that passes edge tests | Dirty rectangles that leave untouched texels at the wrong age |
+| Deposits are sparse and untouched texels are invariant | Event bounding boxes or dirty tiles; dispatch only covered tiles | A full-screen dispatch for one small mark |
+| Many events overlap | Bin events into screen tiles, prefix/compact bounded tile lists, then process dirty tiles or rasterize an aggregate deposit field | Claiming `O(pixels + events)` when overlap still costs `sum(P_t * E_t)` |
+| The effect is fixed for long intervals | Bake the static structure once and stop history dispatches while idle | Paying a nominally disabled compute pass |
+
+The full-field path is the canonical frost/thaw case when state must be
+materialized every frame. A lazy-decay tile stores `lastUpdateTime` and applies
+analytic catch-up on every visible/filter sample, not only on the next touch;
+otherwise old visible tiles remain stale. Diffusion couples neighbours and
+requires a global step or halo-expanded active domain—independent timestamped
+tiles are not equivalent.
+
+## Select Architecture From Update Topology
 
 Build the high-throughput frame graph first. Do not start from a simple
 per-frame visual mask and later "upgrade" to history.
@@ -24,8 +42,8 @@ input events for this frame
   -> compute pointer deposit into next history StorageTexture
   -> swap history read/write
   -> scene pass via pass(scene, camera)
-  -> reduced-resolution vertical blur pass, setResolutionScale(0.35-0.5)
-  -> reduced-resolution horizontal blur pass, setResolutionScale(0.35-0.5)
+  -> reduced-resolution vertical blur pass at a scale selected by edge/error gates
+  -> reduced-resolution horizontal blur pass at the same measured scale
   -> static crystalline fields, generated once or loaded from assets
   -> full-resolution frost/thaw composite node
   -> two-scale TSL normal refraction node
@@ -36,16 +54,20 @@ History update comes before the frost composite so visible response can include
 the current frame's input. If a product deliberately wants a one-frame delayed
 feel, document that as a UX choice and keep the diagnostic contract identical.
 
-The top-tier representation is a full-resolution RGBA `StorageTexture`
-ping-pong:
+When close-inspection error and target measurements require it, the top tier
+uses a full-resolution RGBA `StorageTexture` ping-pong:
 
 - `R`: accumulated visible touch/thaw mask.
 - `A`: accumulated tilt/refraction response mask.
 - `G/B`: optional duplicate or debug channels, never hidden state.
 
-Use `Fn().compute(count)` with `renderer.compute()` or `renderer.computeAsync()`
-to write history using `storageTexture()` or `textureStore()`. Keep the path
-read-back-free. Use `PassNode.getPreviousTextureNode()` only for temporal pass
+Use a declared dispatch shape: linear
+`.compute(width * height, [64])` with `instanceIndex`, or explicit 2D
+`.compute([gx, gy, 1], [wx, wy, 1])` with `globalId.xy` and extent guards.
+In the latter, `[gx,gy,1]` is workgroup count. Enqueue through
+`renderer.compute()`; `computeAsync()` only awaits renderer initialization in
+r185 and is not a GPU-completion fence. Keep the path read-back-free. Use
+`PassNode.getPreviousTextureNode()` only for temporal pass
 feedback that is naturally owned by a node pass; use storage textures when the
 history must be written from pointer/event data or compute.
 
@@ -60,23 +82,23 @@ import { Fn, pass, storageTexture, textureStore } from 'three/tsl';
 const renderer = new WebGPURenderer( { antialias: false } );
 await renderer.init();
 
-const tier = renderer.backend.isWebGPUBackend ? 'full' : 'degraded';
-
-if (tier === 'full') {
-  // StorageTexture ping-pong, compute deposit/decay, node post pipeline.
-} else {
-  // Reduced-quality tier: static frost mask, lower-resolution precomputed
-  // structures, no custom parallel renderer path.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical dynamic-surface path; route an explicit request for teaching fallback to threejs-compatibility-fallbacks.'
+  );
 }
+
+// Native WebGPU tiers vary history resolution, format, event binning, blur,
+// and refraction while preserving the same state transition.
 ```
 
 Quality tiers:
 
 | Tier | Required capability | History | Blur | Refraction | Intended use |
 | --- | --- | --- | --- | --- | --- |
-| Full | WebGPU backend with storage texture compute | full-res RGBA16F ping-pong | 0.35-0.5 scale separable | two-scale normals, height weighting, Fresnel/source inset | shipping target |
-| Balanced | WebGPU backend with tighter budget | half-res history or RG8/RG16F after measurement | 0.25-0.4 scale separable | one full normals plus half detail | integrated GPUs |
-| Budgeted | WebGPU backend with minimal storage budget | quarter-res RG8/RG16F or sparse updates | lower-scale separable blur | tint plus single offset | low-power WebGPU devices |
+| Full | WebGPU backend with storage texture compute | full-res RGBA16F ping-pong when close inspection proves it necessary | highest measured scale required by edge/error gates | two-scale normals, height weighting, Fresnel/source inset | close inspection |
+| Balanced | WebGPU backend with tighter budget | half-res history or RG8/RG16F after measurement | measured reduced scale | one full normals plus reduced detail | ordinary inspection distance |
+| Budgeted | WebGPU backend with minimal storage budget | quarter-res RG8/RG16F or sparse updates | minimum scale that passes edge gates | tint plus single offset | small projected footprint or strict traffic budget |
 
 If the user explicitly asks how to apply fallback when WebGPU is unavailable,
 route that teaching to `../threejs-compatibility-fallbacks/` instead of adding
@@ -85,15 +107,25 @@ a non-WebGPU path here.
 ## Implementation Rules
 
 - Keep persistent history, scene color, and static structure textures separate.
-- Use exponential time behavior: `survival = pow(k, dtSeconds)` for decay, and
-  scale deposits with `1 - pow(1 - depositPerSecond, dtSeconds)`. Clamp invalid
-  or suspended-tab deltas to a documented maximum such as `1 / 15`.
+- Record `eventCount`, dirty-tile count, texels dispatched, and the asymptotic
+  update cost. A storage dispatch over the complete drawing buffer is not
+  automatically efficient merely because it runs on the GPU.
+- Integrate decay and saturating deposition together. For channel state `x`,
+  brush coverage `b`, decay rate `lambda=-log(survivalPerSecond)`, and fill rate
+  `r=-log(1-depositPerSecond)`, use
+  `a=lambda+r*b`, `xEq=r*b/a`,
+  `xNext=xEq+(x-xEq)*exp(-a*dt)` (with the zero-rate limit handled explicitly).
+  Consume timestamped pointer segments and rasterize a swept capsule; one
+  endpoint stamp per render frame is not frame-rate invariant. Suspension
+  policy is explicit rather than silently clamping away elapsed state.
 - Preserve separate visible-mask and tilt-response channels. The tilt channel
   should use smoother/noise-reduced deposit than the visible channel.
 - Update history with aspect from the history texture dimensions, not from a
   reduced blur target.
-- Use `HalfFloatType`/RGBA16F-equivalent history unless a measured cheaper
-  format matches at 30, 60, and 120 FPS and through resize/reset cases.
+- Use `HalfFloatType`/RGBA16F-equivalent history when accumulated precision
+  needs it. Before selecting `RG8`, `RGBA8`, or another compact storage format,
+  prove that the exact format is storage-writable and filterable on the target
+  adapter and that quantization/decay remain stable at 30, 60, and 120 Hz.
 - Optional diffusion must be stable and explicit: apply a small Laplacian term
   to the R/A history after decay/deposit only when the visible signature
   improves edge cohesion without same-UV smearing. Validate disabled diffusion
@@ -116,31 +148,36 @@ a non-WebGPU path here.
 
 - Scene color entering the surface pipeline stays linear/HDR until the final
   output transform. Working buffers use `HalfFloatType` where precision matters.
-- Color textures use `SRGBColorSpace`. Data textures, normal maps, masks, noise,
-  and LUTs use `NoColorSpace`.
+- LDR color assets encoded as sRGB use `SRGBColorSpace`; HDR/EXR radiance
+  remains loader-declared linear. Data textures, normal maps, masks, noise, and
+  LUTs use `NoColorSpace`.
 - The app has exactly one tone-map owner and one output conversion owner.
   Prefer `RenderPipeline.outputColorTransform = true`; if disabled, end the node
   graph with `renderOutput()`. Do not output-convert inside the effect.
 - Frost tint, brightness, saturation, blur mix, and normal-refraction math are
   all linear-light operations before final output conversion.
 
-## Budgets
+## Performance Contract
 
 Set budgets before tuning visuals:
 
-| Target | Full tier budget |
+| Work item | Accounted cost |
 | --- | --- |
-| Pass count | 1 scene pass, 2 reduced blur passes, 1 composite/refraction output, 1 compute dispatch |
-| History storage | 2 full-res RGBA16F storage textures, about 33 MB at 1920x1080 |
-| Static storage | 1-3 data textures, preferably generated once and shared |
-| Dispatch size | `ceil(width / 8) * ceil(height / 8)` workgroups for 8x8 history compute, or equivalent measured tile size |
+| Pass graph | one existing scene input, one state update when dirty/decaying, two separable blur passes only when enabled, one composite/refraction output |
+| History storage | Derived: `2 * width * height * bytesPerTexel`; full-res RGBA16F is about 31.6 MiB at 1920x1080, before alignment |
+| Static storage | exact sum of selected data textures; generate once and share by content hash |
+| Dispatch | `ceil(activeWidth / wx) * ceil(activeHeight / wy)` workgroups; record active texels and measured workgroup choice |
 | Draw calls | no extra scene redraws beyond the source pass |
-| Desktop discrete | <= 1.2 ms at 1080p after scene pass |
-| Desktop integrated | <= 2.5 ms at 1080p balanced tier |
-| Mobile/low power | <= 4 ms at 720p degraded or balanced tier |
+| Bandwidth lower bound | bytes read + written by state, blur, and composite, including both ping-pong slots and any resolve/copy |
 
-Raise blur/refraction quality only after the history update and reduced blur are
-inside budget. Algorithm changes beat micro-optimizing node expressions.
+The subsystem ceiling is allocated by `$threejs-choose-skills` from the whole
+frame; these rows are not permission to consume the entire mobile frame.
+Start native low-power trials at reduced history scale, but select the scale
+from projected feature error, peak-live memory, tile attachment behavior, and
+sustained p50/p95 target timing—not a universal pixel count. Report
+contemporaneous full-frame timing and paired marginal cost; raise
+blur/refraction quality only after state update and reconstruction fit the
+allocation.
 
 ## Diagnostics And Validation
 

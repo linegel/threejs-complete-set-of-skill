@@ -1,22 +1,34 @@
-# Three.js r185 API Map
+# Three.js Compatibility API Map
 
-Anchors are from the checked-in `node_modules/three` source. Use them to avoid
-invented compatibility APIs.
+The filename's revision identifier is a `Gated` source-revision string for this
+map, not transferable numeric evidence. Reverify every symbol against the
+checked-in Three.js source before use. Source paths are intentionally used
+without unstable line-number anchors.
 
-| API | Status | Import/source proof | Compatibility note |
+This map remains inactive unless the current user explicitly requests teaching
+how to apply fallback when WebGPU is unavailable. Canonical skills must not
+import its legacy recommendations.
+
+| API | Classification | Checked-in source | Compatibility rule |
 | --- | --- | --- | --- |
-| `WebGPURenderer` | canonical gate owner | `node_modules/three/src/renderers/webgpu/WebGPURenderer.js:28` | Use `await renderer.init()` before reading backend truth. |
-| `renderer.backend.isWebGPUBackend` | canonical backend flag | `node_modules/three/src/renderers/webgpu/WebGPUBackend.js:88` | If false and user did not explicitly ask for fallback, report blocker. |
-| `WebGPURenderer({ forceWebGL: true })` | quarantined branch/test | `node_modules/three/src/renderers/webgpu/WebGPURenderer.js:41,57` | Use only for explicit fallback teaching, never as canonical. |
-| `RenderPipeline` | canonical post graph | `node_modules/three/src/renderers/common/RenderPipeline.js:22` | Keep one tone/output owner. |
-| `RenderPipeline.outputColorTransform` | output ownership switch | `node_modules/three/src/renderers/common/RenderPipeline.js:66,208` | Do not double-convert in fallback tiers. |
-| `pass()` | canonical pass node | `node_modules/three/src/nodes/display/PassNode.js:1024`, `node_modules/three/src/Three.TSL.js:433` | Prefer host pass graph over per-effect renderers. |
-| `mrt()` | canonical multi-output node | `node_modules/three/src/nodes/core/MRTNode.js:201`, `node_modules/three/src/Three.TSL.js:335` | If unavailable, validation evidence must say which diagnostic is lost. |
-| `renderOutput()` | explicit output conversion node | `node_modules/three/src/nodes/display/RenderOutputNode.js:157`, `node_modules/three/src/Three.TSL.js:474` | Only one owner. |
-| `ShaderMaterial` | legacy/quarantined | `node_modules/three/src/materials/ShaderMaterial.js:45` | Allowed only inside the requested compatibility branch. |
-| `EffectComposer` | legacy/quarantined | `node_modules/three/examples/jsm/postprocessing/EffectComposer.js:42` | Do not reintroduce as flagship post path. |
-| `WebGLRenderTarget` | legacy/quarantined | `node_modules/three/src/renderers/WebGLRenderTarget.js:8` | Use only for explicit fallback branch inventories. |
-| `InstancedMesh` | neutral primitive | `node_modules/three/src/objects/InstancedMesh.js:28` | Valid for static/baked fallback data; not a compute substitute by itself. |
-| `HalfFloatType` | data/target constant | `node_modules/three/src/constants.js:698` | Record precision loss when downgraded. |
-| `NoColorSpace` | data texture domain | `node_modules/three/src/constants.js:1300` | Required for fields, masks, normals, LUT data unless explicitly color. |
-| `SRGBColorSpace` | color texture domain | `node_modules/three/src/constants.js:1308` | Use for color/albedo/emissive input maps only. |
+| `WebGPURenderer` | canonical gate owner | `node_modules/three/src/renderers/webgpu/WebGPURenderer.js` | Call `await renderer.init()` before reading backend truth. |
+| `renderer.backend.isWebGPUBackend` | canonical backend flag | `node_modules/three/src/renderers/webgpu/WebGPUBackend.js` | If false, report a blocker unless the user explicitly activated unavailable-WebGPU fallback. |
+| `WebGPURenderer({ forceWebGL: true })` | quarantined branch/test | `node_modules/three/src/renderers/webgpu/WebGPURenderer.js` | Construct only after explicit activation; never use as the canonical path. |
+| `WebGPURenderer({ trackTimestamp: true })` | timing opt-in | `node_modules/three/src/renderers/common/Backend.js`, `node_modules/three/src/renderers/webgpu/WebGPUBackend.js` | Request before initialization when GPU timing is required; feature absence leaves the GPU claim insufficient. |
+| `renderer.resolveTimestampsAsync()` | timestamp resolution | `node_modules/three/src/renderers/common/Renderer.js` | Resolve render and compute scopes separately and outside the steady-state timing window. |
+| `RenderPipeline` | canonical post owner | `node_modules/three/src/renderers/common/RenderPipeline.js` | Preserve one pass graph and one output owner. |
+| `RenderPipeline.outputColorTransform` | output ownership switch | `node_modules/three/src/renderers/common/RenderPipeline.js` | Do not duplicate conversion in a compatibility branch. |
+| `pass()` | canonical pass node | `node_modules/three/src/nodes/display/PassNode.js`, `node_modules/three/src/Three.TSL.js` | Prefer the canonical shared graph; a compatibility branch documents every serialized or removed signal. |
+| `mrt()` | canonical multi-output node | `node_modules/three/src/nodes/core/MRTNode.js`, `node_modules/three/src/Three.TSL.js` | If absent in the authorized branch, narrow diagnostics or inventory serial passes; never imply equivalent cost. |
+| `renderOutput()` | canonical explicit output node | `node_modules/three/src/nodes/display/RenderOutputNode.js`, `node_modules/three/src/Three.TSL.js` | Retain exactly one tone-map/output-conversion owner. |
+| `ShaderMaterial` | legacy, quarantined | `node_modules/three/src/materials/ShaderMaterial.js` | Allowed only inside the explicitly requested compatibility branch. |
+| `EffectComposer` | legacy, quarantined | `node_modules/three/examples/jsm/postprocessing/EffectComposer.js` | Never reintroduce into canonical WebGPU/TSL guidance. |
+| `WebGLRenderTarget` | legacy, quarantined | `node_modules/three/src/renderers/WebGLRenderTarget.js` | Inventory lifetime, attachment traffic, resolves, and disposal inside the branch. |
+| `InstancedMesh` | representation primitive | `node_modules/three/src/objects/InstancedMesh.js` | Valid for static/baked branch data; not evidence of compute or storage parity. |
+| `HalfFloatType` | data/target constant | `node_modules/three/src/constants.js` | Record precision and radiance error when replaced. |
+| `NoColorSpace` | data-domain constant | `node_modules/three/src/constants.js` | Required for fields, masks, normals, and LUT data unless the datum is explicitly color. |
+| `SRGBColorSpace` | color-domain constant | `node_modules/three/src/constants.js` | Use for color/albedo/emissive input maps, not computational data. |
+
+Numeric limits read from adapters, APIs, or target contracts use
+`{ value, unit, label, source }`. API-mandated values are `Gated`; runtime
+observations are `Measured`. Do not copy limits between devices or revisions.

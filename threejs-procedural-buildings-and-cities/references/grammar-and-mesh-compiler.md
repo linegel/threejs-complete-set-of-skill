@@ -2,7 +2,7 @@
 
 Use this reference when a procedural architectural generator must retain
 deliberate massing, facade rhythm, construction depth, semantic placement,
-inspectable ownership, and city-scale throughput in latest Three.js
+inspectable ownership, and city-scale throughput in pinned Three.js r185
 `WebGPURenderer` + TSL.
 
 ## Contents
@@ -59,9 +59,11 @@ large city district:
   visibility/LOD masks and compaction
 ```
 
-`BufferGeometry.groups` may preserve material partitions inside one geometry,
-but it is not a draw-call reduction mechanism. Prefer material-slot batches
-when draw-call budgets matter.
+`BufferGeometry.groups` preserves material partitions but each group normally
+draws. On r185 WebGPU, `BatchedMesh` also loops visible multi-draw entries.
+When GPU draw-item count matters, prefer merged compatible static slot geometry
+or identical-topology instancing; use BatchedMesh for editable object/state
+management and measure its actual entries.
 
 The critical intermediate representation is `BuildingPlan`:
 
@@ -129,6 +131,11 @@ Validation errors are data, not console prose. Store them in the plan and fail
 before geometry when the plan violates invariants.
 
 ## 3. Use Dimensional Constants as Grammar Anchors
+
+The dimensions below define the canonical fixture, not universal architecture.
+A project first records units, occupancy/use assumptions, structural module,
+and facade system; its grammar constants then replace this preset. Never claim
+code-compliant or structurally valid architecture from visual grammar alone.
 
 The dimensional contract fixes:
 
@@ -230,20 +237,24 @@ courtyard block:
 The free-court path clamps the inner court so every bar retains at least
 `1.8 * BAY_WIDTH`, then applies bounded X/Z offsets.
 
-Do not union the pieces before facade planning. Keep pieces and compute
-exposed intervals per rectangle. This is the algorithm that prevents hidden
-decorations and drives trim ownership.
+The interval method below requires interior-disjoint, axis-aligned rectangles
+whose contacts lie on a shared quantized lattice. Assert every pair has empty
+interior intersection. If arbitrary pieces overlap/interpenetrate, first build
+a robust 2D Boolean union/planar arrangement and extract its boundary; the
+side-touch shortcut otherwise emits internal facades.
 
 ### Exposed-Edge Subtraction
 
 For each rectangle side:
 
 1. Create its full one-dimensional interval.
-2. Find rectangles touching that side within `0.001`.
+2. Find rectangles touching that side within a tolerance derived from the
+   coordinate lattice/scene scale and numeric precision.
 3. Project touching rectangles into blocker intervals.
-4. Subtract blockers sequentially.
+4. Sort and merge blocker intervals, then subtract their union.
 5. Preserve which endpoint was clipped.
-6. Discard segments shorter than `0.25`.
+6. Discard segments only below a semantic/product minimum expressed in the
+   same lattice; do not copy a universal world-unit epsilon.
 7. Emit one `FacadeEdge` per surviving segment.
 
 ```ts
@@ -283,19 +294,26 @@ shaft/bridge -> createShaftPlacements
 
 Roof placements attach only to the highest crowns. Without crowns, they attach
 to highest shaft or bridge tiers. "Highest" means matching maximum
-`y0 + height` within `0.001`, so both twin towers can receive roofs.
+`y0 + height` within the same lattice/scale-derived equality tolerance, so both
+twin towers can receive roofs.
 
 ### Bay Quantization
 
 ```text
-count = max(minimum, round(edge.length / 3.2))
-bayWidth = edge.length / count
+nMin = ceil(edge.length / bayWidthMax)
+nMax = floor(edge.length / bayWidthMin)
+if nMin <= nMax:
+  count = argmin over integer n in [nMin,nMax]
+          rhythm/corner/targetWidthPenalty(n)
+  bayWidth = edge.length / count
+else:
+  emit semantic blank/infill region or reject the plan
 bayCenter(i) =
   edge.center - edge.length / 2 + bayWidth * (i + 0.5)
 ```
 
-The effective bay width adapts to the exact exposed segment. Do not append a
-narrow remainder bay.
+The feasible interval prevents a minimum-count rule from creating unusably
+narrow modules on short edges. Do not append a narrow remainder bay.
 
 ### Podium
 
@@ -483,7 +501,10 @@ batched slot:
 ```
 
 This separates glass from opaque stone, metals from masonry, and ornament from
-base limestone while bounding draw calls by semantic material roles.
+base limestone while bounding material/state families. It does not by itself
+bound r185 WebGPU draw items: the backend loops visible `BatchedMesh`
+multi-draw entries. Report those entries/backend draws, and merge compatible
+static slot geometry when GPU draw collapse is required.
 
 For static buildings, merge into compact slot geometries, compute bounding
 boxes and spheres, and keep a mapping from triangle ranges back to module IDs
@@ -501,15 +522,14 @@ atlas = 3 columns x 2 rows
 padding = 0.004 UV
 ```
 
-Large quads are bilinearly subdivided at `ceil(length / 1.45)` along each
-axis. Each subquad maps no more than one atlas-cell span:
-
-```text
-uSpan = min(1, subquadWorldWidth / 1.45)
-vSpan = min(1, subquadWorldHeight / 1.45)
-```
-
-This prevents one stone sample stretching across a tower wall.
+Planar walls keep coarse geometry and physical repeat coordinates
+`uv=worldDistance/metersPerRepeat`. Prefer standalone repeating textures or
+texture-array layers. Atlas-local repetition needs derivative-correct
+cell-local wrapping, mip-safe gutters for the full chain, and an anisotropic
+footprint policy; coarse macro patches are another option. Subdivide only when
+silhouette, displacement, curvature, or lighting geometry needs vertices—not
+to repeat shading detail. Gate texel density/atlas bleed separately from
+projected geometric error.
 
 Atlas cell choice must be deterministic from seed, module ID, slot, and
 coarse facade coordinates. If a project deliberately uses one coherent stone
@@ -561,10 +581,13 @@ RenderPipeline
 ```
 
 Use `GTAONode` for contact grounding under trim, ledges, and roof equipment.
-Use `BloomNode` only from authored emissive material signal. Use `TRAANode`
+Use `BloomNode` from full-scene HDR by default; allocate a selective emissive
+signal only when its membership and traffic contract is proven. Use `TRAANode`
 for temporal anti-aliasing when shimmer from dense facade detail is visible.
-Use `CSMShadowNode` or `TileShadowNode` for large architectural shadows before
-custom shadow systems.
+Start from an ordinary fitted directional shadow. Select CSM, tiled arrays, or
+custom caching only when coverage, texel error, invalidation, and target
+measurement reject the simpler map; `TileShadowNode` is not a generic
+large-scene or tile-GPU optimization.
 
 Keep HDR working buffers as `HalfFloatType` until tone mapping. Do not apply
 per-material output conversion.
@@ -579,18 +602,15 @@ import { WebGPURenderer } from "three/webgpu";
 const renderer = new WebGPURenderer( { antialias: false } );
 await renderer.init();
 
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: renderer.compute(), StorageBufferAttribute,
-  // StorageInstancedBufferAttribute, storage() nodes, per-chunk visibility,
-  // and optional StorageTexture + textureStore() for ID/LOD/debug masks.
-} else {
-  // Reduced tier: precompiled static chunks, lower ornament density,
-  // smaller grids, and serialized distant variants.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    'WebGPU is required for the canonical architecture compiler path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.'
+  );
 }
 ```
 
-The reduced tier is a quality tier, not a second implementation. It keeps the
-same plan/compiler contract and swaps budgets:
+All rows are native WebGPU quality tiers. They keep the same plan/compiler
+contract and swap budgets:
 
 ```text
 hero:
@@ -606,38 +626,45 @@ distant:
   packed material slots
 ```
 
-Budgets:
+Performance evidence:
 
 ```text
 hero building:
-  draw calls: 6-10
-  triangles: 80k-250k
-  CPU compile after settings change: < 8 ms amortized
-  GPU frame cost: < 0.8 ms desktop-discrete, < 1.6 ms integrated, < 3.0 ms mobile
+  semantic/material slots, V/T, projected facade/profile error,
+  compile p50/p95, peak transient bytes, draws after material batching
 
 city block chunk:
-  draw calls: <= 48 for 24-80 buildings
-  visible triangles: 400k-1.5M after LOD/chunk culling
-  storage metadata: <= 8 MB
-  compute dispatches: <= 1 visibility/compaction dispatch per moving-camera frame
-  GPU frame cost: < 2.5 ms desktop-discrete, < 5 ms integrated, < 8 ms mobile
+  source/visible/culled object counts, visible/submitted V/T, metadata bytes,
+  CPU chunk culling or named compute/scan work, draw/material buckets,
+  whole-frame and paired-marginal p50/p95
 
 distant skyline sector:
-  draw calls: <= 16
-  triangles: <= 120k
-  material slots: opaque masonry, glass, roof, emissive
+  projected silhouette error, transition dwell, visible V/T,
+  draw/material buckets, baked texture bytes
 ```
 
-Only move city visibility or repeated-detail transforms to
-`renderer.compute()` / `renderer.computeAsync()` after CPU chunking and
-material-slot compilation are already measured. The fastest building compiler
-is still plan cache plus static slot geometry; compute is for hot city-scale
+Every numeric gate is product `Gated`, formula `Derived`, or target-context
+`Measured`; authored fixture values cannot establish route validity.
+
+Only move city visibility or repeated-detail transforms to queued
+`renderer.compute()` after CPU chunking and
+material-slot compilation are already measured. The lowest-runtime baseline is
+plan cache plus static slot geometry; compute is for hot city-scale
 state, not for replacing deterministic grammar.
+In r185 `computeAsync()` is not a GPU-completion fence; use an actual async
+readback/map operation only when the CPU must observe GPU completion.
 
 Use `workgroupBarrier` or `atomic*` only for measured compaction, counters, or
 visibility prefix work that needs synchronization. Do not add synchronized
 compute stages to deterministic building grammar when CPU plan caching is
 already cheaper.
+
+For facade glass, budget transparency separately. Physical transmission is a
+hero-pane choice; large mid/far window fields use opaque layered-window
+materials, environment/reflection proxies, or baked interiors unless measured
+transmission visibly wins. LOD is selected by projected pane/profile error,
+not distance labels alone; use the
+[shared physical-pixel contract](../../threejs-choose-skills/references/projected-error-contract.md).
 
 ## 10. Close the Mass Independently
 
@@ -672,7 +699,11 @@ slot geometry exceeding quality-tier budget
 ```
 
 The ownership key includes side, tier, edge, X/Z offsets, horizontal interval,
-vertical interval, and normal offset, rounded to `0.01`.
+vertical interval, and normal offset. Canonicalize exact grammar-derived
+rational/integer coordinates when possible. Otherwise derive a quantization or
+overlap tolerance from declared scene units, input uncertainty, and the
+smallest legal module separation; a fixed `0.01` silently merges valid details
+at one scale and misses duplicates at another.
 
 Exact duplicate-key detection is not enough. Perform interval-overlap
 validation whenever modules can have independent widths, projection depths, or
@@ -759,7 +790,9 @@ cornices stop at compound corners:
   trim was generated per whole tier instead of per exposed edge
 
 stone scale changes across walls:
-  quads were not subdivided at the physical tile scale
+  UV distance/meters-per-repeat changed across charts or LODs; geometry
+  subdivision is required only for geometric displacement or interpolation
+  error, not to make an ordinary texture repeat
 
 holes appear under setbacks:
   mass caps/soffits were delegated to facade modules
@@ -779,3 +812,8 @@ transparent panes sort incorrectly:
 city chunks cull incorrectly:
   bounds were not recomputed after regeneration or batch population
 ```
+
+The numeric budgets in this reference are authored fixture ceilings. A scene
+allocates its real ceiling from the complete frame and records sustained
+p50/p95 GPU time, CPU submission, visible versus culled primitives, transparent
+overdraw, and resident bytes on target hardware.

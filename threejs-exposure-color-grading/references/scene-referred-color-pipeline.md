@@ -1,45 +1,40 @@
 # Scene-Referred Exposure And Color Pipeline
 
-Use this reference for a latest Three.js WebGPU/TSL measured HDR-to-display
-path: compute-reduced luminance metering, shader-side asymmetric adaptation,
-single tone-map/output ownership, and post-tone-map `lut3D()` grading.
+This reference defines a native-WebGPU/TSL path for global exposure, tone
+mapping, and color grading. The optimization target is the *marginal* cost of
+the meter inside the actual image graph, not a universal metering algorithm.
 
-## Fastest Architecture
+## Numeric Evidence Convention
 
-The primary path is a GPU reduction, not a small render target. Render the HDR
-scene once through a node `RenderPipeline`, meter the actual HDR signal with
-compute, keep exposure state in a storage buffer, and read back only compact
-telemetry when needed.
+Every numeric value has one provenance tag:
 
-```text
-scene NodeMaterial family
-  -> pass(scene, camera) / mrt({ output, normal, emissive }) as needed
-  -> depth from scenePass.getTextureNode('depth')
-  -> HDR effects such as BloomNode from sibling pipeline
-  -> compute reduction of HDR luminance into partial storage buffer
-  -> compute final weighted log average / optional histogram percentiles
-  -> compute adapted exposure state
-  -> TSL post node applies exposure
-  -> toneMapping(mapping, 1, exposedHdr)
-  -> lut3D(vec4(saturate(postToneMapLinear), 1), texture3D(lutTexture), lutSize, lutIntensity)
-  -> optional gamut compression / dithering / FXAA in documented domain
-  -> renderOutput(graded, NoToneMapping, renderer.outputColorSpace)
-```
+- `[Derived]`: algebra, byte size, API semantics, or format consequence;
+- `[Gated]`: enabled only after a named capability/correctness check;
+- `[Measured]`: recorded on a named browser/device/resolution/graph;
+- `[Authored]`: a deliberate look or controller starting value.
 
-`RenderPipeline.outputColorTransform = false` for this graph. `toneMapping()`
-owns tone mapping before the LUT. The final `renderOutput()` uses
-`NoToneMapping` and owns only conversion to `renderer.outputColorSpace`.
-Do not place `renderOutput()` before a LUT that claims linear display-domain
-input, because `RenderOutputNode` can apply both tone mapping and color-space
-conversion.
+A tag on a table row or code-block heading applies to every numeric literal in
+that row or block. Replace `[Authored]` performance placeholders with
+`[Measured]` target evidence before acceptance.
 
-Use `WebGPURenderer` from `three/webgpu`, TSL from `three/tsl`, and the
-`NodeMaterial` family for scene materials. Use `renderer.compute()` when the
-dispatch remains in the frame graph; use `renderer.computeAsync()` for warmup,
-validation, or scheduled metering boundaries. Use `renderer.getArrayBufferAsync()`
-only for compact telemetry readback, not to drive the current frame.
+## r185 API Proof
 
-Complete r185 import/API skeleton:
+The local package resolved to `three@0.185.1` `[Measured: local package]`.
+
+| Contract | Local proof | Consequence |
+| --- | --- | --- |
+| `RenderPipeline`, `outputColorTransform`, `needsUpdate`, synchronous `render()` | `node_modules/three/src/renderers/common/RenderPipeline.js` | Explicit `renderOutput()` requires `outputColorTransform = false`; changing the output graph requires `needsUpdate = true`. |
+| `pass`, `setMRT`, `getTextureNode`, `getViewZNode`, `getLinearDepthNode`, `compileAsync` | `node_modules/three/src/nodes/display/PassNode.js` | Configure MRT outputs and request texture nodes before `scenePass.compileAsync(renderer)`. Depth is the pass depth texture, not an MRT color output. |
+| `toneMapping(mapping, exposure, color)` | `node_modules/three/src/nodes/display/ToneMappingNode.js` | The first argument is a numeric Three.js tone-mapping constant, not a lower-case tone-map function. |
+| `renderOutput(color, toneMapping, outputColorSpace)` | `node_modules/three/src/nodes/display/RenderOutputNode.js` | It can own both tone mapping and working-to-output conversion. |
+| `lut3D(input, texture3DNode, size, intensity)` | `node_modules/three/examples/jsm/tsl/display/Lut3DNode.js` | It samples a 3D texture with the texture sampler; there is no public shaper or tetrahedral interpolation option. |
+| `Fn().compute`, `renderer.compute`, `renderer.computeAsync` | `node_modules/three/src/renderers/common/Renderer.js` | `computeAsync()` initializes on demand but does not provide a GPU-completion fence in r185. |
+| `getArrayBufferAsync(attribute, target, offset, count)` | `node_modules/three/src/renderers/common/Renderer.js` | Offset and positive count are multiples of `4` bytes `[Derived: r185 validation]`; use only for diagnostics. |
+| `workgroupArray`, `workgroupBarrier` | `node_modules/three/src/Three.TSL.js` and `nodes/gpgpu/WorkgroupInfoNode.js` | Hierarchical local reductions are expressible in TSL. The verified r185 workgroup-array helper does not declare atomic element storage. |
+| `atomicAdd`, `atomicStore`, `StorageBufferNode.toAtomic()` | `node_modules/three/src/nodes/gpgpu/AtomicFunctionNode.js` and `nodes/accessors/StorageBufferNode.js` | Global atomic storage histograms are expressible. Do not claim a workgroup-local atomic histogram without a compiled custom implementation. |
+| built-in color spaces | `node_modules/three/src/math/ColorManagement.js` | r185 registers linear-sRGB working and sRGB output spaces. Wider primaries require a custom registered space and an output/canvas capability gate. |
+
+Verified import skeleton. Numeric literals are `[Gated: r185 API]`:
 
 ```js
 import {
@@ -57,14 +52,18 @@ import {
 } from 'three/webgpu';
 import {
   Fn,
+  atomicAdd,
+  atomicStore,
   mrt,
   pass,
+  premultiplyAlpha,
   renderOutput,
+  saturate,
   storage,
   texture3D,
   toneMapping,
+  unpremultiplyAlpha,
   vec4,
-  saturate,
   workgroupArray,
   workgroupBarrier
 } from 'three/tsl';
@@ -72,431 +71,494 @@ import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';
 
 const renderer = new WebGPURenderer( {
   antialias: false,
-  outputBufferType: HalfFloatType
+  outputBufferType: HalfFloatType,
+  trackTimestamp: true
 } );
 renderer.toneMapping = NoToneMapping;
+renderer.toneMappingExposure = 1;
 
-const toneMappingModes = {
-  neutral: NeutralToneMapping,
-  agx: AgXToneMapping,
-  aces: ACESFilmicToneMapping
-};
-
-const lutTexture = new Data3DTexture();
-lutTexture.colorSpace = NoColorSpace;
-
-const luminanceCoefficients =
-  ColorManagement.getLuminanceCoefficients(
-    new Vector3(),
-    LinearSRGBColorSpace
-  );
-```
-
-## Capability Gate And Tiers
-
-```js
 await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend ) {
-  await renderer.computeAsync( exposureWarmupNodes );
-  quality.exposure = 'compute-histogram';
-} else {
-  throw new Error( 'WebGPU backend unavailable for the canonical exposure path.' );
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( 'Native WebGPU is required for this exposure path.' );
 }
+
+const canTimeGpu = renderer.hasFeature( 'timestamp-query' );
+const luminanceCoefficients = ColorManagement.getLuminanceCoefficients(
+  new Vector3(),
+  LinearSRGBColorSpace
+);
 ```
 
-Quality tiers:
-
-| Tier | Metering | Adaptation | LUT | Use |
-| --- | --- | --- | --- | --- |
-| Budgeted WebGPU | Lower metering cadence, coarser histogram, or authored shot table inside WebGPU | Storage-buffer state, lower update cadence, or fixed calibration | `16^3` or `32^3` RGBA8 | Native WebGPU with very low budget |
-| Standard | Workgroup parallel weighted-log reduction | Storage-buffer state updated by compute | `32^3` RGBA8 | Default native path |
-| Filmic | Weighted-log plus center weighting, UI/sky masks, and 64-128 bin percentile histogram | Storage-buffer state with stale-data hold | `32^3` RGBA8 or `48^3` RGBA16F | Bright skies, windows, emissive highlights |
-| Wide gamut | Filmic meter plus gamut diagnostics | Same | `48^3`/`64^3` RGBA16F with gamut compression and dither | P3/HDR display work |
-
-Budgeted tiers are quality tiers inside the WebGPU architecture, not a second
-implementation path. If, and only if, the user explicitly asks how to apply
-fallback when WebGPU is unavailable, route that teaching to
+Do not teach a WebGPU-unavailable path here. If the user explicitly asks how to
+apply fallback when WebGPU is unavailable, route that teaching to
 `../threejs-compatibility-fallbacks/`.
 
-## Compute Meter
+## Signal Order And Tap Points
 
-Meter the HDR texture that feeds the exposure stage, after ambient occlusion,
-atmosphere, and HDR bloom contribution if bloom should affect perceived scene
-brightness. Exclude UI overlays unless the art direction explicitly wants UI to
-drive adaptation.
-
-The meter source is scene-linear working color before tone map, LUT, output
-conversion, and UI overlays. The default luminance coefficients are linear sRGB:
+Default ordering:
 
 ```text
-LinearSRGBColorSpace coefficients = [0.2126, 0.7152, 0.0722]
+scene-linear direct + indirect + emissive + atmosphere
+  -> effect-local temporal filters, such as temporal AO
+  -> stable scene-linear composite
+  -> TRAA, when enabled
+  -> exposure meter tap (resolved, pre-bloom HDR)
+  -> bloom / glare and other scene-linear optical contributions
+  -> multiply by exp2(adaptedExposureEV)
+  -> toneMapping(...)
+  -> tone-mapped-linear grade
+  -> renderOutput(..., NoToneMapping, outputColorSpace)
+  -> display-encoded effects and UI, if their contracts require that domain
 ```
 
-For registered custom spaces, derive luminance coefficients with
-`ColorManagement.getLuminanceCoefficients(target, colorSpace)` and record the
-color space beside the exposure telemetry. Do not meter display-encoded sRGB,
-tone-mapped color, or graded output.
+Why this order:
 
-The standard reduction keeps the old weighted-log estimator because it is still
-robust and cheap, but moves it fully to GPU compute:
+- Temporal color history remains independent of exposure. An exposed history
+  requires previous-to-current exposure-ratio compensation and stricter reset
+  logic.
+- The meter sees temporally stable radiance instead of stochastic shimmer.
+- The default meter excludes bloom because bloom is a downstream redistribution
+  of radiance; feeding it back into exposure makes bloom strength alter camera
+  response. Metering a bounded bloom contribution is `[Authored]`, not default.
+- UI and diagnostic overlays are outside the photographed signal unless the
+  brief explicitly defines them as scene light.
+
+If a temporal effect consumes post-bloom color, document why its rejection can
+handle broad, depthless glare. If exposure must precede temporal resolve, store
+the exposure used by each history and rescale history before comparison.
+
+The compute dispatch must sample the intended frame of the meter source. Make
+the pass/temporal texture a real node dependency and expose both source and
+exposure-state frame indices. An intentionally delayed meter is `[Authored]`;
+an accidental previous-frame sample is a scheduling bug.
+
+A robust delayed schedule is:
 
 ```text
-for each source pixel:
-  luminance = luminance(hdr.rgb)
-  mask = sceneMask * uiMask * skyMask
-  center = smooth radial center weight, usually 0.35..1.0
-  lowWeight = luminance > 0.002 ? 1.0 : 0.15
-  weight = mask * center * lowWeight
-  partial.logSum += log(max(luminance, 0.0001)) * weight
-  partial.weightSum += weight
+adapt currentEV from the last completed target
+  -> render the scene and present with that currentEV
+  -> reduce the newly rendered meter source
+  -> publish targetEV for a later frame
 ```
 
-Implementation shape:
+This order is `[Derived: producer-before-consumer dependency]`. The delay and
+meter cadence are `[Authored]`. Running the reduction before the first scene
+pass without a cleared/initialized source is invalid.
 
-1. First compute dispatch samples the HDR texture directly and writes one
-   partial struct per workgroup into a `StorageBufferAttribute` wrapped by
-   `storage()`. Use `Fn().compute(pixelCount, [128])` or `[256]` depending on
-   target device. Use `workgroupArray()` plus `workgroupBarrier()` for local
-   reductions.
-2. One or more hierarchical compute dispatches reduce partial structs until one
-   aggregate remains. For histogram tiers, write luminance bins to a separate
-   integer storage buffer and use atomics only for the bin counter path.
-3. The final compute dispatch resolves the aggregate:
+## Meter Selection: Re-Derivation
+
+Let the source contain `N = width * height` pixels `[Derived]`, use `W` compute
+lanes per workgroup `[Gated]`, and let a stratified meter request `S` samples
+`[Authored then Measured]`.
+
+| Meter | Source reads | Intermediate traffic | Select when | Reject when |
+| --- | --- | --- | --- | --- |
+| fixed/authored EV | none `[Derived]` | none `[Derived]` | calibrated shot, product view, or strict consistency | lighting range is uncontrolled |
+| stratified grid/tile samples | `S` `[Derived]` | approximately `ceil(S/W)` partial records `[Derived]` | default global adaptation; lowest marginal bandwidth | small/high-energy features are missed or masks are undersampled |
+| exact direct reduction | `N` `[Derived]` | approximately `ceil(N/W)` partial records plus hierarchical reads `[Derived]` | every pixel/mask must contribute exactly | bandwidth exceeds the measured budget |
+| explicit reduction pyramid | fewer pixels per level but about `4N/3` total texel reads across source and levels, plus `N/3` writes, for an ideal repeated two-by-two reduction `[Derived]` | a texture chain | levels are reused by local exposure, diagnostics, or another authored feature | exposure is its only consumer |
+| local histogram + global merge | sampled or exact source count `[Derived]` | histogram clear, local bins, and merge | percentile clipping fixes verified outlier/bimodal failures | weighted-log/key value already passes validation |
+
+For one exact global mean, direct workgroup reduction has less traffic than
+materializing a pyramid. A pyramid wins only through reuse or spatial output.
+For ordinary auto exposure, a stratified estimator is usually cheaper than
+either exact method.
+
+### Stratified Meter
+
+Partition the screen into cells in display UV, sample each cell at a
+frame-varying low-discrepancy offset, and sample the mask at the same location.
+The sample count is:
 
 ```text
-average = exp(logSum / max(weightSum, 0.0001))
-target = clamp(middleGray / average * exp2(exposureCompensationEv),
-               minExposure, maxExposure)
+S = cellsX * cellsY                                      [Derived]
+partialCount = ceil(S / W)                              [Derived]
 ```
 
-4. Store `average`, `target`, `current`, `staleSeconds`, and validity flags in a
-   small exposure-state storage buffer.
+The checked-in example uses a `64 * 36 = 2304` sample grid and a workgroup size
+of `128` `[Authored: example baseline; product is Derived]`. Those are not
+device truths. Validate at least these failure cases before retaining them:
 
-Optional telemetry readback copies only the final state or histogram bins at a
-   wall-clock cadence such as 5-10 Hz. If a readback is late or fails, hold the
-   last valid measurement, mark telemetry stale, and optionally ease toward neutral
-   after a timeout. Never reset target exposure directly to `1` on a failed
-   readback.
+- a sub-cell emitter traverses cell boundaries;
+- thin windows, text, and particles move across the grid;
+- a UI/sky mask edge occupies less than one cell;
+- camera motion changes the sampled phase;
+- temporal jitter produces visible exposure pumping.
 
-Concrete compute-meter contract:
+One bilinear sample per cell is not a box-filtered downsample. If tiny emitters
+must carry energy, use multiple stratified samples per cell, an exact tile sum,
+or a separate emitter-coverage term. Do not silently replace energy integration
+with a maximum; maxima are deliberately highlight-biased `[Authored]`.
+
+### Weighted Log Statistic
+
+The meter assumes scene-linear radiance proxies with a consistent exposure
+scale. If lights, emissive materials, and environment maps use incompatible
+units or arbitrary compensating gains, auto exposure only hides the error.
+Calibrate that scale before choosing a key value.
+
+For sample luminance `Y_i` and nonnegative weight `w_i`:
+
+```text
+l_i = log2(max(Y_i, epsilon))                            [Derived]
+L_key = exp2(sum(w_i * l_i) / max(sum(w_i), epsilon))  [Derived]
+```
+
+`epsilon`, center weighting, sky inclusion, and any shadow suppression are
+`[Authored]`. Record them in telemetry. The r185 linear-sRGB coefficients are
+`[0.2126, 0.7152, 0.0722]` `[Derived: ColorManagement source]`; obtain them
+through `ColorManagement.getLuminanceCoefficients()` instead of duplicating the
+literal when the working space can change.
+
+Weights may encode:
+
+```text
+w = validity * photographedLayer * uiExclusion * shotMask * centerPolicy
+```
+
+Do not name a sky mask without defining whether zero excludes or includes sky.
+If `sum(w_i)` is invalid or effectively empty, keep the last valid GPU target;
+CPU telemetry state is irrelevant to this decision.
+
+### Exact Direct Reduction
+
+Use a first compute dispatch that reads the HDR source and writes one partial
+per workgroup, then reduce partials until one remains. A binary local reduction
+requires a compatible workgroup shape `[Gated]`; choose the lane count from
+device compilation plus `[Measured]` timings rather than desktop convention.
 
 ```wgsl
+// Field counts and byte sizes: [Derived]
 struct ExposurePartial {
-  logSum: f32,
+  weightedLogSum: f32,
   weightSum: f32,
   minLogLuminance: f32,
   maxLogLuminance: f32,
 };
+```
 
-struct ExposureState {
-  average: f32,
-  target: f32,
-  current: f32,
-  staleSeconds: f32,
+One partial is `4 * 4 = 16` bytes `[Derived]`. Dispatch counts are:
+
+```text
+firstGroups = ceil(N / W)                                [Derived]
+nextGroups  = ceil(previousGroups / W)                   [Derived]
+repeat until one aggregate remains                       [Derived]
+```
+
+Accumulate in `f32`. Validate finite sums and empty masks. Full-resolution
+readback is never part of this path.
+
+### Explicit Log-Luminance Pyramid
+
+Store two moments per texel: weighted mean log luminance and mean coverage.
+For four equal-area children `[Derived]`:
+
+```text
+parentWeight = sum(childWeight) / 4                      [Derived]
+parentMean   = sum(childMean * childWeight)
+             / max(sum(childWeight), epsilon)            [Derived]
+```
+
+Mean coverage avoids a half-float weight sum growing with image area. If exact
+large sums or unequal-area edge tiles are required, use `f32` and explicit
+sample counts `[Gated]`. Do not assume `BloomNode` shares this pyramid: its r185
+targets are private.
+
+### Histogram
+
+Map log luminance over an authored EV window into `B` bins:
+
+```text
+binWidthEV = (maxLog2Y - minLog2Y) / B                   [Derived]
+bin = clamp(floor((log2Y - minLog2Y) / binWidthEV),
+            0, B - 1)                                    [Derived]
+```
+
+A conventional GPU algorithm is a workgroup-local atomic `u32` histogram followed
+by a global merge, but the verified r185 `workgroupArray()` surface emits an
+ordinary workgroup array and exposes no atomic-element declaration. Therefore
+choose one of these explicit implementation paths:
+
+- for a small stratified meter, use a global storage histogram configured with
+  `storage(...).toAtomic()` and prove contention cost `[Measured]`;
+- assign bins to invocations/workgroups and scan the sampled set without
+  atomics, accepting the derived extra reads when that variant wins
+  `[Measured]`;
+- use a compiled custom WGSL/node implementation for local atomic bins, with an
+  r185 integration test `[Gated]`.
+
+Clearing costs `B` stores `[Derived]`. Direct global atomics per full-resolution
+source sample are allowed only with `[Measured]` proof on every target GPU.
+
+A `u32` count histogram defines percentiles over accepted samples, not arbitrary
+float weights. If weighted percentiles are required, use a bounded fixed-point
+weight with a derived overflow proof or a separate per-bin reduction; state the
+quantization. Do not label an unweighted percentile as center-weighted.
+
+Percentile cutoffs and bin count are `[Authored]`; bin memory is `4B` bytes
+`[Derived]`. A robust default estimator is the weighted log mean *inside* the
+chosen percentile interval, not the percentile midpoint. Resolve the cutoff
+bins, then run a second sampled reduction that applies the original float
+weights only to samples inside that interval. That second pass costs `S` source
+or cached-sample reads `[Derived]`. Using bin centers instead has a maximum
+single-bin quantization uncertainty of half `binWidthEV` `[Derived]` and is
+legal only when that error passes the authored EV tolerance `[Authored then
+Measured]`. Report underflow and overflow counts so the EV window cannot
+silently clip the scene.
+
+## GPU Exposure State And Adaptation
+
+Keep float and integer state in typed storage records:
+
+```wgsl
+// Two four-lane records, 32 bytes total: [Derived]
+struct ExposureFloatState {
+  keyLuminance: f32,
+  targetEV: f32,
+  currentEV: f32,
+  invalidSeconds: f32,
+};
+
+struct ExposureUintState {
   valid: u32,
-  histogramOffset: u32,
-  frameIndex: u32,
+  sourceFrameIndex: u32,
+  stateFrameIndex: u32,
   flags: u32,
 };
 ```
 
-Both structs are 16-byte aligned. `ExposurePartial` is one `vec4<f32>`.
-`ExposureState` is two `vec4<u32/f32>` storage slots or one packed 32-byte
-record, depending on the app's storage helper.
+Compute target exposure in stops:
 
 ```text
-workgroupSize = 128 or 256
-pixelCount = sourceWidth * sourceHeight
-dispatchCount = ceil(pixelCount / workgroupSize)
-partialCount = dispatchCount
-reducePassCount = ceil-log(partialCount, workgroupSize) until one aggregate remains
-histogramBins = 64 or 128 unsigned integer counters
-readback byte ranges:
-  ExposureState = 0..32
-  histogramBins = histogramOffset..histogramOffset + histogramBins * 4
-telemetry readback:
-  renderer.getArrayBufferAsync(exposureStateAttribute, null, 0, 32)
+targetEV = clamp(log2(keyCalibration / max(L_key, epsilon))
+                 + compensationEV,
+                 minEV,
+                 maxEV)                                  [Derived]
+exposure = exp2(currentEV)                                [Derived]
 ```
 
-`getArrayBufferAsync` readback is telemetry. It must not block or drive the
-current frame. Failed or late readback holds the last valid target/current,
-increments `staleSeconds`, and records a stale telemetry flag.
+`keyCalibration`, compensation, and EV clamps are `[Authored]`. A calibration
+of `0.18` with a full-frame scene-linear `0.18` card yields `targetEV = 0` and
+exposure `1` `[Derived from the authored calibration]`; it is not a universal
+camera law.
 
-## Shader-Side Adaptation
-
-Adapt exposure in compute or in a TSL node that reads/writes exposure state.
-The response remains frame-rate independent and asymmetric:
+Adapt EV, not linear exposure:
 
 ```text
-speed = target > current ? speedUp : speedDown
-amount = 1 - exp(-max(deltaSeconds, 0) * speed)
-current = current + (target - current) * amount
+tau = targetEV < currentEV ? tauBrightScene : tauDarkScene [Authored]
+alpha = 1 - exp(-max(dt, 0) / max(tau, epsilon))           [Derived]
+currentEV += (targetEV - currentEV) * alpha                [Derived]
 ```
 
-Defaults:
+For camera-like behavior, reducing exposure after a bright intrusion is
+usually authored faster than raising it in darkness. The actual time constants,
+pause `dt` clamp, and cut behavior remain `[Authored]` and require trajectory
+captures.
 
-```text
-minimum exposure = 0.45
-maximum exposure = 1.85
-middle gray = 0.18
-compensation = 0 EV
-speed up = 3.2
-speed down = 1.1
-stale telemetry timeout = 1.0 s before optional neutral ease
+The meter may update less often than rendering; adaptation still advances every
+frame toward the last valid target. A failed diagnostic readback marks the
+*telemetry* stale and does not touch GPU state. Invalid GPU aggregates hold the
+last valid target and set a GPU validity flag.
+
+## Tone Mapping And LUT Domains
+
+There are three distinct LUT contracts. Never identify a LUT only as
+"display LUT."
+
+| Contract | Input | Required metadata | Placement |
+| --- | --- | --- | --- |
+| scene-linear shaper + LUT | unbounded scene-linear working color | working primaries, log/shaper equation, EV range, output domain | before tone map |
+| tone-mapped-linear LUT | bounded tone-mapped color in working primaries with linear transfer | tone mapper/version, primaries, legal range, interpolation | after `toneMapping()`, before output conversion |
+| display-encoded LUT | exact output primaries and transfer | output color space, transfer, legal/code range, display target | after `renderOutput()`; no later conversion |
+
+Canonical tone-mapped-linear path. Code literals are
+`[Gated: r185 API]`; clamp bounds are `[Derived: LUT legal domain]`:
+
+```js
+const straightHdr = unpremultiplyAlpha( hdrColor );
+const exposedStraightHdr = vec4(
+  straightHdr.rgb.mul( adaptedExposure ),
+  straightHdr.a
+);
+const postToneMapLinear = toneMapping( mapping, 1, exposedStraightHdr );
+const lutInput = vec4(
+  saturate( postToneMapLinear.rgb ),
+  hdrColor.a.clamp( 0, 1 )
+);
+const gradedStraight = lut3D(
+  lutInput,
+  texture3D( lutTexture ),
+  lutSize,
+  lutIntensity
+);
+const final = renderOutput(
+  premultiplyAlpha( gradedStraight ),
+  NoToneMapping,
+  renderer.outputColorSpace
+);
+
+renderPipeline.outputColorTransform = false;
+renderPipeline.outputNode = final;
+renderPipeline.needsUpdate = true;
 ```
 
-Exposure ownership invariant:
+The scene pass is treated as premultiplied. Exposure, tone mapping, and LUT
+grading are nonlinear RGB operations, so the canonical path unpremultiplies
+first and repremultiplies before `RenderOutputNode` performs output conversion.
+Exposure never changes alpha `[Derived]`.
 
-```text
-dynamic exposure owner = exposure storage buffer current
-renderer.toneMappingExposure = fixed calibration, normally 1
-```
+Tone-map constants verified in r185:
 
-Do not animate both. If an art preset needs a fixed calibration such as `0.72`,
-fold it into the target formula or document it as a constant multiplier before
-the tone-mapping node.
-
-## Tone Mapping And LUT Domain
-
-The LUT recipes are authored for this domain:
-
-```text
-input: bounded post-tone-map linear working color, normally linear sRGB in [0, 1]
-output: bounded post-tone-map linear working color
-placement: after toneMapping(), before final output conversion
-```
-
-Use TSL tone mapping nodes for the tone-map stage when a LUT or other effect
-must run after tone mapping but before output conversion:
-
-```text
-exposed = hdrColor * adaptedExposure
-postToneMapLinear = toneMapping(mapping, 1, exposed)
-graded = lut3D(vec4(saturate(postToneMapLinear), 1), lutNode, lutSize, intensity)
-final = renderOutput(graded, NoToneMapping, renderer.outputColorSpace)
-```
-
-Tone-mapper selection:
-
-| Mapping | Use |
+| Mapping | Selection rule |
 | --- | --- |
-| `NeutralToneMapping` | Product/PBR color fidelity and stable swatch validation |
-| `AgXToneMapping` | Neutral filmic rolloff with fewer hue surprises |
-| `ACESFilmicToneMapping` | Cinematic contrast with known hue/saturation tradeoffs |
-| `linearToneMapping`, `reinhardToneMapping`, `cineonToneMapping` | Only when the project has an explicit look target or prior calibration |
+| `NeutralToneMapping` | `[Authored]` product/PBR fidelity baseline; validate reference swatches |
+| `AgXToneMapping` | `[Authored]` filmic roll-off baseline; validate saturated highlights |
+| `ACESFilmicToneMapping` | `[Authored]` contrast/look choice; validate hue and saturation shifts |
 
-If the LUT must move before tone mapping, rebuild it for a scene-linear or log
-scene domain and rename the domain in file metadata. A display-domain LUT cannot
-be moved upstream by changing only sampling coordinates.
+The mapping is a look/encoding decision, not a performance tier. A LUT bound to
+one mapping must be rebuilt when the mapping changes.
 
-## 3D LUT Construction
-
-Build LUTs as `Data3DTexture` assets and sample them through `texture3D()` or
-`lut3D()` nodes. Required setup:
+For an unbounded scene-linear LUT, apply a declared shaper before cube lookup.
+For each channel, one possible log shaper is:
 
 ```text
-size: 32^3 default, 48^3/64^3 for wide-gamut or heavy grades
-format: RGBAFormat
-type: UnsignedByteType for compact display looks; HalfFloatType for wide-gamut/HDR-grade precision
-colorSpace: NoColorSpace
-minFilter/magFilter: LinearFilter
-wrapS/wrapT/wrapR: ClampToEdgeWrapping
-generateMipmaps: false
-unpackAlignment: 1
-domain metadata: input/output color space, transfer, tone-map dependency, intensity default
+u = saturate((log2(max(x, epsilon)) - minEV) / (maxEV - minEV)) [Derived]
 ```
 
-Recipe controls preserved from the previous skill because they remain useful:
+The cube's output and inverse-shaper/tone-map handoff must be explicit. Merely
+clamping HDR to the cube is not a scene-linear grade.
+
+## LUT Storage And Precision
+
+Required r185 texture state:
 
 ```text
-contrast
-saturation
-vibrance
-black/white point
-per-channel gamma
-shadow/midtone/highlight tint
-strength for each tonal range
+texture class: Data3DTexture                              [Gated: r185]
+colorSpace: NoColorSpace                                 [Derived: transform data]
+min/mag filter: LinearFilter                             [Gated: chosen trilinear path]
+wrap S/T/R: ClampToEdgeWrapping                          [Derived: legal cube edge]
+generateMipmaps: false                                   [Derived: one cube level]
+unpackAlignment: 1                                       [Gated: Data3DTexture default]
 ```
 
-Recipe order for display-domain looks:
+For cube edge `D`, channel count `C`, and bytes per channel `b`:
 
 ```text
-normalize black/white range
-S-curve blend
-contrast around 0.5
-shadow tint
-midtone tint
-highlight tint
-per-channel gamma
-saturation
-vibrance
-highlight bias only if documented as a creative look
-clamp to [0, 1]
+bytes = D^3 * C * b                                      [Derived]
 ```
 
-Tonal weights are calculated from pre-grade post-tone-map luminance:
+Examples:
+
+| Cube | Storage | Resident bytes |
+| --- | --- | ---: |
+| `16^3` RGBA8 `[Authored: compact baseline]` | `C=4`, `b=1` `[Derived]` | `16 KiB` `[Derived]` |
+| `32^3` RGBA8 `[Authored: standard baseline]` | `C=4`, `b=1` `[Derived]` | `128 KiB` `[Derived]` |
+| `32^3` RGBA16F `[Gated: precision validation]` | `C=4`, `b=2` `[Derived]` | `256 KiB` `[Derived]` |
+| `64^3` RGBA16F `[Gated: strong-gradient validation]` | `C=4`, `b=2` `[Derived]` | `2 MiB` `[Derived]` |
+
+Choose the smallest cube whose fixed swatch/ramp validation passes. `lut3D()`
+uses texture interpolation; if tetrahedral interpolation is required, r185 has
+no public helper in `Lut3DNode.js`, so a custom node must justify its marginal
+cost with `[Measured]` banding/error evidence.
+
+r185 only registers linear-sRGB and sRGB in `ColorManagement` by default.
+Display-P3, custom wide-gamut, or HDR presentation is `[Gated]` on a registered
+space, canvas/device support, and captured output evidence; a larger or float
+LUT alone does not create a wide-gamut pipeline.
+
+## Budget Contract
+
+Do not use a device-class millisecond table as evidence. Measure the meter as a
+marginal graph delta after shader warmup:
 
 ```text
-shadow = 1 - smoothstep(0.12, 0.54, luma)
-highlight = smoothstep(0.48, 0.92, luma)
-midtone = max(0, 1 - abs(luma - 0.5) * 2)
+meterMarginal = fullGraphWithMeter - identicalGraphWithFixedExposure [Measured]
+gradeMarginal = fullGraphWithLutSample - identicalGraphWithTrueLutBypass [Measured]
 ```
 
-Memory budgets:
+An identity cube still performs the 3D texture sample and mix, so it is a
+correctness oracle, not the performance baseline for grading cost.
+
+Interleave deterministic paired variants and report a distribution plus the
+chosen statistic; one frame cannot separate the meter from thermal drift,
+shader compilation, or changing scene phase.
+
+Record:
+
+```yaml
+evidence: Measured
+threeRevision:
+browserVersion:
+gpuAdapter:
+canvasPhysicalPixels:
+meterMode:
+meterSamples:
+meterCadenceHz:
+workgroupSize:
+dispatches:
+partialBytes:
+histogramBytes:
+lutBytes:
+fullGraphGpuMs:
+meterMarginalGpuMs:
+gradeMarginalGpuMs:
+timestampSource:
+```
+
+Use `renderer.hasFeature('timestamp-query')` only after `await renderer.init()`.
+If timestamps are unavailable, CPU frame intervals are a coarse gate and must
+not be presented as pass GPU time.
+
+## Diagnostics And Acceptance
+
+Required stable views:
 
 ```text
-32^3 RGBA8       ~= 128 KiB
-32^3 RGBA16F     ~= 256 KiB
-48^3 RGBA16F     ~= 864 KiB
-64^3 RGBA16F     ~= 2 MiB
+meter source before bloom
+meter sample positions / exact-pixel coverage
+combined meter weight and each authored mask
+partial weightedLogSum / weightSum
+histogram with underflow, overflow, and chosen interval
+key luminance, target EV, current EV, validity, and meter cadence
+temporal source before exposure
+HDR after exposure
+tone-mapped-linear LUT input
+LUT output and out-of-domain mask
+output conversion only
+final output with UI exclusion visible
 ```
 
-## Performance Budgets
+Acceptance scenes:
 
-Targets for 1920x1080:
+- calibration card at the authored key: expected target EV is zero `[Derived]`;
+- sub-cell emitter sweep: stratified and exact meters differ within the
+  authored tolerance `[Authored, then Measured]`;
+- bright emitter entering/leaving frame: target/current EV are monotone in the
+  expected direction `[Derived]`;
+- window/sky-dominant and bimodal interiors: selected estimator has no pumping
+  or percentile-window saturation `[Measured]`;
+- temporal jitter on/off: meter variance stays within the authored tolerance
+  `[Authored, then Measured]`;
+- UI overlay on/off: GPU meter state is unchanged `[Derived from mask policy]`;
+- identity LUT ramps and saturated swatches: error is reported in the declared
+  domain `[Measured]`;
+- output-transform isolation: exactly one tone-map owner and one conversion
+  owner `[Derived]`.
 
-| Device class | Meter dispatches | Storage | Readback | Target cost |
-| --- | --- | --- | --- | --- |
-| Desktop discrete | first pass + 1-2 reduce + adaptation | <= 256 KiB partials, <= 4 KiB state/histogram | 16-1024 bytes at 5-10 Hz | <= 0.10 ms GPU, no frame stall |
-| Desktop integrated | same, lower workgroup size if needed | <= 192 KiB partials | same | <= 0.25 ms GPU |
-| Mobile/tile GPU | quarter/half-rate metering or coarser dispatch | <= 128 KiB partials | <= 64 bytes at 2-5 Hz | <= 0.60 ms GPU |
+## Rejected Architectures
 
-Targets for 3840x2160:
-
-```text
-desktop discrete: <= 0.25 ms
-desktop integrated: <= 0.70 ms
-mobile/tile GPU: use half-rate metering or static tier
-```
-
-The post stack should add no extra scene render. Use the existing scene pass or
-MRT output from `$threejs-image-pipeline`; do not re-render the scene just to
-meter exposure.
-
-## Color And Output Rules
-
-- Color textures use `SRGBColorSpace`.
-- Data maps, masks, noise, LUTs, histograms, and exposure buffers use
-  `NoColorSpace` or linear data semantics.
-- HDR working buffers stay `HalfFloatType` until tone mapping.
-- One dynamic exposure owner: the exposure storage buffer.
-- One tone-map owner: the explicit `toneMapping()` node before a post-tone-map
-  LUT, or `renderOutput()` only when no post-tone-map effect needs linear input.
-- One output conversion owner: final `renderOutput(..., NoToneMapping,
-  renderer.outputColorSpace)` in the LUT graph.
-- UI overlays should render after exposure and tone mapping unless explicitly
-  authored as part of the photographed scene.
-
-## Diagnostics
-
-Expose these debug views and telemetry:
-
-```text
-meter source HDR
-meter mask: center, UI, sky, and combined masks
-per-workgroup partial logSum / weightSum heatmap
-histogram bins and chosen percentiles
-measured average luminance
-target/current exposure over time
-stale telemetry flag and readback cadence
-HDR before exposure
-post exposure before tone map
-post tone-map before LUT
-identity LUT versus selected LUT
-per-recipe tonal weights
-out-of-domain mask before LUT
-gamut compression and dither toggles
-final with exposure, tone mapping, LUT, and output conversion isolated one at a time
-```
-
-Validation scenes:
-
-```text
-18% gray card
-bright emitter entering/leaving frame
-saturated RGB/skin/product swatches
-sky or window occupying most of the frame
-UI overlay that must not affect exposure
-identity LUT round trip
-LUT disabled
-exposure disabled
-output conversion isolated
-```
-
-## Visible Correctness Signatures
-
-Visible correctness means the numeric exposure state explains what the user sees
-without relying on display-encoded metering or hidden output conversion.
-
-- 18% gray convergence: a full-frame 0.18 scene-linear gray card resolves to
-  target exposure `1.0` and stays neutral through identity LUT validation.
-- Bright-emitter adaptation curve: when an HDR emitter enters the frame, target
-  exposure moves down monotonically and current exposure follows with the
-  configured asymmetric response.
-- Sky/window dominance: sky or window-heavy frames use the authored sky mask or
-  percentile policy instead of crushing the whole scene from one bright region.
-- UI exclusion: UI overlays do not change average luminance, target exposure, or
-  histogram bins unless explicitly flagged as scene light.
-- Identity LUT neutrality: an identity `32^3` LUT changes no swatch by more
-  than 1/255 in the post-tone-map linear domain.
-
-Wrongness signatures:
-
-- double exposure: `renderer.toneMappingExposure` animates while the exposure
-  storage buffer current value also animates;
-- graded or tonemapped metering: exposure changes when LUT intensity changes or
-  tone-mapper selection changes without changing the HDR source;
-- display-encoded metering: 18% gray does not converge to exposure `1.0` and
-  bright values lose HDR contrast before the meter;
-- symmetric adaptation: brightening and darkening travel the same fraction for
-  the same `deltaSeconds`, ignoring `speedUp` and `speedDown`.
-
-## Checkpointed Build Order
-
-Checkpoint 1 — HDR source: expected scene-linear HDR before exposure, tone map,
-LUT, or UI. if you see display-referred values, you made the mistake of metering
-after output conversion.
-
-Checkpoint 2 — meter mask: expected center, UI, sky, and combined masks. If UI
-changes exposure, you made the mistake of metering overlays.
-
-Checkpoint 3 — partial sums: expected finite `logSum` and `weightSum` per
-workgroup. If all partials are zero while the source is visible, you made the
-mistake of sampling the wrong texture or mask.
-
-Checkpoint 4 — aggregate average: expected 18% gray resolves to target exposure
-`1.0`. If it does not, you made the mistake of using display-encoded metering,
-wrong luminance coefficients, or double exposure.
-
-Checkpoint 5 — adapted exposure: expected monotonic asymmetric response toward
-target. If you see symmetric adaptation, you made the mistake of using one speed
-for both light-to-dark and dark-to-light transitions.
-
-Checkpoint 6 — post-tone-map linear: expected bounded linear color before LUT
-sampling. If you see sRGB encoded values, you made the mistake of placing
-`renderOutput()` before the LUT.
-
-Checkpoint 7 — LUT output: expected identity LUT neutrality within tolerance. If
-neutral swatches shift, you made the mistake of assigning the LUT a color
-texture domain or wrong 3D layout.
-
-Checkpoint 8 — final output: expected one output conversion owner. If final
-looks double-encoded, you made the mistake of enabling both
-`RenderPipeline.outputColorTransform` and final `renderOutput()`.
-
-## Replaced Techniques
-
-- Replaced tiny render-target metering plus CPU reduction with compute-side
-  hierarchical reduction into storage buffers. This removes quantization,
-  avoids per-frame CPU work, and scales with the source signal instead of a
-  hand-picked proxy resolution.
-- Replaced encoded byte luminance with direct HDR texture sampling and float
-  partial sums. This preserves bright emitters and dark-room precision.
-- Replaced frame-count readback cadence with wall-clock telemetry cadence.
-- Replaced failed-readback reset-to-neutral with hold-last-valid plus stale
-  telemetry.
-- Replaced dual dynamic exposure controls with one storage-buffer exposure
-  owner and fixed renderer calibration.
-- Replaced ambiguous `renderOutput()` before LUT with explicit `toneMapping()`
-  before `lut3D()` and final `renderOutput(..., NoToneMapping, outputColorSpace)`.
+- tiny render target plus per-frame CPU reduction: unnecessary readback and
+  synchronization;
+- unconditional full-pixel metering: exactness paid for without a correctness
+  requirement;
+- exposure-only luminance pyramid: more traffic than a direct exact statistic;
+- global histogram atomics per full-resolution pixel: contention without a
+  local-aggregation proof;
+- post-bloom feedback meter by accident: bloom strength changes exposure;
+- adapting linear exposure with direction names such as "up/down" left
+  ambiguous: use EV and name the scene transition;
+- interpreting stale CPU telemetry as stale GPU exposure;
+- assigning `SRGBColorSpace` to LUT transform data;
+- moving a tone-mapped-linear LUT before tone mapping without rebuilding its
+  domain;
+- claiming wide gamut from float storage without output-space support.

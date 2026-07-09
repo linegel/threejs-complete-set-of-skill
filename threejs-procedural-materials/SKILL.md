@@ -1,22 +1,33 @@
 ---
 name: threejs-procedural-materials
-description: Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.
+description: Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.
 ---
 
 # Procedural Materials
 
 Build procedural materials as `WebGPURenderer` + TSL + `NodeMaterial` graphs.
-The only production lane is a `MeshStandardNodeMaterial` or
+The canonical physically lit lane is a `MeshStandardNodeMaterial` or
 `MeshPhysicalNodeMaterial` whose node slots preserve Three.js lighting,
 environment, shadow, transmission, clearcoat, sheen, anisotropy, and output
 upgrades while replacing only the material causes.
 
-Legacy WebGL implementation (deprecated, do not extend): `examples/lava-flow-surface/lava-surface.js`.
+## Numerical Provenance
+
+Every numerical claim emitted from this skill carries one label:
+
+- **Derived**: follows from a stated equation, format, or byte count.
+- **Gated**: a capability or acceptance threshold that must pass.
+- **Measured**: captured on the named browser, GPU, resolution, material,
+  lights, camera coverage, and workload; it does not transfer automatically.
+- **Authored**: a tunable appearance or planning starting point.
+
+Unlabelled vector widths, channel counts, and API-version digits are structural,
+not performance or physics claims.
 
 Use `$threejs-choose-skills` preflight for scenes that also need atmosphere,
 clouds, oceans, shadows, post, or validation ownership.
 
-## Fastest Architecture First
+## Select Architecture From Invocation Topology
 
 Algorithm class dominates material throughput. Start from one shared TSL cause
 graph, not from independent texture/noise calls per PBR channel:
@@ -32,8 +43,10 @@ stable coordinates
   -> node post/output
 ```
 
-Texture-space/decoupled shading is a considered alternative, not the default
-specular-stability path; read [the image-pipeline note](../threejs-image-pipeline/references/production-image-pipeline.md#considered-alternative-texture-space--decoupled-shading) before replacing derivative normals, specular AA, or TRAA with cached radiance.
+Texture-space/decoupled shading is a separate architecture, not the default
+specular-stability path. It requires an explicit radiance-cache owner, update
+and visibility model, and measured bandwidth/error contract; do not silently
+replace derivative normals or specular AA with cached radiance.
 
 The target graph writes:
 
@@ -42,13 +55,16 @@ The target graph writes:
 - `roughnessNode`, `metalnessNode`, `aoNode`, `opacityNode`, and physical slots
   from the same identity weights.
 - `normalNode` from `normalMap()`, `bumpMap(texture(...))` for texture height
-  maps, or a derivative normal built from scalar procedural height using
-  `dFdx()`, `dFdy()`, and `fwidth()`.
+  maps, or a surface-gradient normal built from the same scalar procedural
+  height. Fragment derivatives must execute in derivative-uniform control flow;
+  vertex/compute displacement uses analytic or stored gradients.
 - `emissiveNode` only for actual material emission; route glow through
   `$threejs-bloom` and `BloomNode` in the node render pipeline.
-- `positionNode`, `castShadowPositionNode`, and
-  `receivedShadowPositionNode` when material displacement must match visible
-  and shadowed geometry.
+- `positionNode` and `castShadowPositionNode` consume the same local-space
+  displacement node when material displacement must match visible and caster
+  geometry. `receivedShadowPositionNode` is a separate world-space receiver
+  override in r185; leave it `null` unless a world-space replacement is
+  derived and validated explicitly.
 - `maskNode`, `alphaTestNode`, `castShadowNode`, or `maskShadowNode` for
   dissolve and cutout behavior, driven by the same instance fields.
 
@@ -59,6 +75,13 @@ ownership, per-instance dissolve, and validation.
 
 Canonical walnut, antique-gold, ebony, and lava TSL example:
 [examples/tsl-procedural-pbr/](examples/tsl-procedural-pbr/).
+
+The example now enforces dielectric/conductor metalness endpoints, meter-valued
+height through `sceneUnitsPerMeter`, footprint-filtered structural bands, and
+removed material slope-energy transfer so r185 geometry roughness is not
+counted twice. Its spectral-support/variance multipliers and identity ranges
+remain **Authored** trial values. The Node construction validator is structural
+evidence, not an energy, visual-reference, timing, or thermal acceptance proof.
 
 Use the sibling examples as domain sources, not implementation recipes:
 
@@ -74,56 +97,140 @@ Use the sibling examples as domain sources, not implementation recipes:
 
 ## Capability Gate And Tiers
 
-Initialize the renderer before selecting quality. This flagship skill teaches
-the native WebGPU path only; explicit requests for how to apply fallback when
-WebGPU is unavailable route to `$threejs-compatibility-fallbacks`.
+Initialize the renderer before selecting quality. This skill has one production
+path: native WebGPU.
 
 ```js
 await renderer.init();
 if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(
-    "threejs-procedural-materials requires native WebGPU. For explicit fallback requests, route to threejs-compatibility-fallbacks.",
-  );
+  throw new Error("threejs-procedural-materials requires native WebGPU.");
 }
-
-await renderer.computeAsync([buildMaterialFieldNode, buildInstanceStateNode]);
 ```
+
+Call `renderer.compute()`/`computeAsync()` only for a cause-map or instance
+update selected by the procedural-fields amortized cost gate.
+After initialization, `computeAsync()` provides no GPU-completion fence in
+r185; use `compute()` for submission and an actual readback/map or timestamps
+for completion evidence.
 
 Quality tiers:
 
 | Tier | Material architecture | Targets |
 | --- | --- | --- |
-| Ultra | TSL fields, `StorageTexture` generated cause maps, `StorageInstancedBufferAttribute` dissolve/state, triplanar only where UVs cannot carry scale | desktop discrete, close inspection |
-| High | TSL fields plus packed KTX2/BasisU maps, 2-axis or single-axis projection where possible, derivative normals, per-instance attributes | desktop integrated |
-| Mobile | precomputed generated variants, lower field resolution, fewer octaves, static dissolve attributes, no triplanar beyond hero assets | native WebGPU mobile tier |
+| Full | TSL fields, cost-gated `StorageTexture` cause maps, storage-backed instance state, filtered normals/specular AA, projection only where UVs cannot preserve scale | **Measured** close-inspection target inside budget |
+| Budgeted | same graph with packed sampled data, single-/two-axis projection where valid, fewer filtered bands, lower update cadence | **Measured** full tier misses the named target's traffic, thermal, or frame gate |
+| Minimum native | precomputed generated variants, lower field resolution, filtered UV/array sampling, static instance attributes | **Gated** WebGPU exists; Budgeted still misses target |
 
 ## Performance Budgets
 
-Default targets for one hero procedural material family:
+There is no universal desktop/mobile millisecond, map-extent, band-count, or
+MiB row. The application declares whole-frame **Gated** GPU p95, CPU p95,
+peak-live-byte, quality-error, and sustained-thermal limits for named workloads.
+Select a tier only from **Measured** evidence for that workload.
 
-- Desktop discrete: <= 0.8 ms material overhead at 1440p, <= 2 full-rate node
-  passes, <= 1 initialization compute dispatch per generated field, <= 128 MB
-  total material textures/storage.
-- Desktop integrated: <= 1.4 ms material overhead at 1080p, <= 1 full-rate
-  pass plus reduced-resolution bloom/AO as needed, <= 64 MB material
-  textures/storage.
-- Mobile: <= 2.0 ms material overhead at 720p internal resolution, no dynamic
-  triplanar on repeated props, <= 32 MB material textures/storage.
+Record output extent/DPR, covered fragments, overdraw/MSAA/helper estimate,
+active procedural operations, tile extent and dirty/update cadence, per-stage
+bindings, executed texture operations, producer/consumer bytes, mip/layer/
+ping-pong lifetimes, and cache/effective-bandwidth evidence. Report base,
+candidate, and interleaved paired-delta GPU p50/p95 plus contemporaneous
+whole-frame GPU/CPU p50/p95 and peak live bytes. Mobile-class evidence includes
+warmup, sustained interval, power state, and throttling result.
 
-Per-material budgets:
+Interleave matched frames and compute
+`delta_k=tGPU_k(graph+material)-tGPU_k(graph)` before taking p50/p95; never
+subtract independent quantiles. Marginal evidence diagnoses the material;
+whole-frame gates accept it. CPU frame intervals are not GPU timings.
 
-- TSL noise/octaves: 3-5 octave bands for hero surfaces, 1-3 for repeats;
-  cache or precompute anything shared across many draws.
-- Triplanar: 3 texture samples per channel before filtering; reserve it for
-  UV-less or hero surfaces. Prefer UVs, texture arrays, packed channels, or
-  hex/texture bombing when they reach the same quality cheaper.
+The material integration is **Gated** to avoid an undeclared extra full-scene
+render. Reuse the scene owner's MRT and account for every attachment byte, or
+declare and budget the additional scene pass at application level. Bloom, AO,
+grading, and other post passes retain sibling ownership and separate ledgers.
+
+Per-material accounting:
+
+- TSL noise/octaves: retain only bands passing the projected-footprint and
+  quality-error gates; choose direct versus cached evaluation with the
+  procedural-fields cost equation, not an octave count.
+- Installed r185 `triplanarTexture()` issues **Derived** three filtered samples
+  per texture and uses simple absolute-normal weights. Two separately bound
+  color/data textures therefore add six samples; a separate normal texture adds
+  three more before any manual taps. Reserve this path for UV-less surfaces
+  after measuring it. Arrays/atlases reduce bindings, not sample operations;
+  custom hex tiling has its own measured sample count and does not solve seams.
 - Atlas/array sampling: use duplicated mip gutters or texture arrays before
-  adding manual sample clamps. Manual anisotropic taps are a hero-tier cost.
+  adding manual sample clamps. Manual anisotropic taps require measured
+  close-inspection value.
 - Derivative normals: one height evaluation plus derivative math where
   possible; do not reevaluate unrelated height fields for color, roughness, and
   normal.
 - Instances: use one material graph and per-instance node attributes; never
   clone a material per object for color, dissolve, wetness, or variant choice.
+
+### Mobile sample and binding ledger
+
+Count bindings and executed sample operations separately. WebGPU device
+defaults are **Gated** at `16` sampled textures, `16` samplers, and `4` storage
+textures per shader stage; query `renderer.backend.device.limits` because the
+actual device may expose more and Three.js lighting, environment, shadows, and
+other bindings in the same material pipeline spend from those stage limits.
+Post passes have separate pipeline layouts and need separate ledgers; they do
+not reduce the material pipeline's binding limit. Compatibility-mode devices
+can expose zero vertex-stage storage resources, so query the stage-specific
+limits rather than the aggregate compute limit. The material allowance is:
+
+```text
+B_material = B_device - B_renderer - B_scene_shared
+S_material = sum(active-path projectionCount * textureLookups * manualTaps)
+```
+
+`B_*` comes from the compiled pipeline layout; `S_material` comes from generated
+WGSL/graph inspection and includes the worst hot branch. As an **Authored**
+trial, teams may record a candidate sample ceiling in the workload manifest,
+but it has no portable acceptance status. Any sample count requires **Measured**
+A/B, whole-frame, traffic, and thermal evidence on the target.
+Pack lanes only when color space, coordinates, derivatives, precision, filter,
+and update cadence agree.
+
+## PBR Energy And Normal-Filtering Contract
+
+- Dielectric normal-incidence Fresnel is **Derived**
+  `F0 = ((n2 - n1) / (n2 + n1))^2`; against air (`n1 = 1`), `ior = n2 = 1.5`
+  gives `F0 = 0.04`, and water at `ior ~= 1.333` gives `F0 ~= 0.0204`. Drive
+  `MeshPhysicalNodeMaterial` IOR/specular slots and let Three.js retain its GGX
+  and multiscattering energy path. Do not multiply a second Fresnel lobe into
+  `colorNode`.
+- Metalness is identity, not highlight strength. Homogeneous dielectrics use
+  `0`; exposed homogeneous metal uses `1`. Oxide, dirt, coating, and substrate
+  are separate masks/response bundles. Fractional metalness is only a declared
+  subpixel-mixture approximation; broad fractional values make metals waxy.
+- Blend normalized identity weights. If one GGX lobe approximates a subpixel
+  roughness mixture, blend `alpha = roughness^2` then take `sqrt`; a weighted
+  mixture of distinct lobes is not exactly another GGX lobe, so keep visible
+  material regions discrete or use explicit layers.
+- Filter height/normal content before specular AA. Store/sample normal mean plus
+  variance (or a cone/Toksvig statistic) across mips; normalizing the averaged
+  normal and discarding its length falsely sharpens the BRDF. For unit normals
+  whose mip stores the unnormalized vector mean `m`, **Derived** unresolved
+  vector variance is `max(1 - dot(m,m), 0)`; combine it with within-pixel
+  derivative variance.
+- Three.js r185 already adds geometric-normal variation in `getRoughness()`
+  from `normalViewGeometry`. Custom specular AA must add only unresolved
+  material-detail variance, or it double counts geometric roughness.
+- For small-angle material-detail variation, a one-pixel box model gives
+  **Derived** `v_box ~= (|dNdx|^2 + |dNdy|^2)/12`. Map that statistic into GGX
+  `alpha = roughness^2` with an **Authored** calibration, then replace it with
+  a **Measured** fit to a supersampled reference; there is no universal
+  multiplier. Clamp and expose pre/post roughness and variance views.
+- For inline procedural height whose normal already uses screen derivatives,
+  do not blindly differentiate that normal again. Band-limit each component
+  and transfer removed slope energy instead. For a random-phase sinusoid,
+  **Derived** `v_j=(2*pi*A_j*f_j)^2/2 * (1-w_j^2)`; sum independent bands.
+  Noise support and variance coefficients start **Authored** and become
+  **Measured** only after spectrum/reference fitting. Do not add both this term
+  and a mip/box statistic for the same unresolved energy.
+- Installed r185 clearcoat fixes its lobe at **Gated** `F0 = 0.04`; it is not an
+  exact water-film lobe (`F0 ~= 0.0204`). If wetness uses clearcoat, label that
+  an **Authored** approximation and validate the mismatch under grazing light.
 
 ## Color And Output
 
@@ -146,10 +253,13 @@ Per-material budgets:
 - coordinate mode: UV, object, world, planet radial, or generated texture space;
 - real-world or perceptual texture scale, in meters or documented art units;
 - material identity weights and authored response bundles;
-- roughness range, micro-normal strength, and specular AA strength;
+- roughness range, micro-normal strength, specular-variance mapping calibration,
+  and clamp;
 - causal fields for wetness, burn, erosion, lava exposure, climate, or dissolve;
 - texture-array/atlas tile index, mip gutter status, anisotropy tier, and
   triplanar or hex-tiling cost mode;
+- static-map device transcode format, mip bytes, and per-channel compression
+  error; dynamic storage remains uncompressed;
 - derivative filtering thresholds and height-to-normal scale;
 - emissive intensity in HDR scene-linear units, plus bloom contribution debug;
 - instance variant, wetness, dissolve threshold, and lifetime when instanced;
@@ -160,15 +270,20 @@ Per-material budgets:
 
 - PBR channels sample unrelated noise or unrelated coordinate spaces;
 - roughness is a scalar afterthought instead of identity-driven;
-- high-frequency normals survive below one pixel;
+- height/normal bands survive after violating the projected-footprint gate, or
+  their removed variance is discarded;
 - triplanar or hex tiling hides seams by spending samples everywhere;
 - atlas padding is ignored under mipmapping;
+- static compression is selected without max/RMS error gates for normal,
+  roughness, height, or threshold channels;
 - material displacement and shadow/collision position diverge;
 - emissive color owns both lighting and bloom without a raw-emission debug;
 - projected environmental occlusion darkens emission or all ambient response;
 - output conversion is duplicated in material and post;
 - per-instance material state creates cloned materials instead of node
   attributes or storage-backed attributes.
+- broad fractional metalness is used for tarnish, dirt, or coating instead of
+  separate conductor/dielectric identities;
 
 ## Routing Boundary
 

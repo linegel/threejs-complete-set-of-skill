@@ -1,6 +1,6 @@
 # Creature Body Systems — build contract
 
-Exact contract for spec-driven SDF blend-shell creatures on WebGPU/TSL:
+Exact contract for spec-driven field-derived creatures on WebGPU/TSL:
 schema, field math, rig compilation, locomotion, scale architecture, quality
 ladder, lab contract, boot contract, and numeric gates. Treat every formula below as a
 verifiable contract: it earns trust only through CPU/TSL parity tests,
@@ -8,24 +8,67 @@ deterministic lab captures, and numeric gates in this document.
 
 Contents:
 
+0. [Representation selection](#0-representation-selection)
 1. [Spaces and conventions](#1-spaces-and-conventions)
 2. [CharacterSpec schema](#2-characterspec-schema)
 3. [Field contract (the parity law)](#3-field-contract-the-parity-law)
 4. [Rig compiler](#4-rig-compiler)
-5. [Canonical shell](#5-canonical-shell)
+5. [Reference surface and diagnostic shell](#5-reference-surface-and-diagnostic-shell)
 6. [Locomotion library](#6-locomotion-library)
 7. [Scale architecture](#7-scale-architecture)
-8. [Quality ladder toward skinned-look](#8-quality-ladder-toward-skinned-look)
+8. [Surface-quality ladder](#8-surface-quality-ladder)
 9. [Creature lab contract](#9-creature-lab-contract)
 10. [Numeric gates](#10-numeric-gates)
 11. [Boot, compile, and spawn contract](#11-boot-compile-and-spawn-contract)
+
+## 0. Representation selection
+
+The posed-primitive field is a generative source, not automatically the
+shipping representation.
+
+| Update/reuse regime | Shipping surface | Complexity and error contract |
+| --- | --- | --- |
+| pose changes; surface connectivity is fixed | one extracted reference mesh per compatible `{compilerSignature, topologySignature, geometryDigest}` + skinning | meshing is boot-only; gate topology, bidirectional error, weights, and deformation |
+| field parameters change inside a proven fixed-connectivity envelope | the same reference mesh + skinning + bounded local field correction | `O(VK(S+1))` only on corrected vertices; gate Jacobians, residual, and candidate error over the envelope |
+| components can merge/split or holes can open/close | budgeted dynamic extraction, otherwise unsupported | gate event topology, extraction cadence, temporal transition, and complete mesh validity |
+| fixed morphology with visible joint blends | skinned mesh + one local field correction | bound only the correction neighbourhood and prove shadow/depth parity |
+| high instance reuse | shared topology/material + pose storage | batch by compatible compiler/topology/geometry identity; measure dirty bytes and visible submission |
+| small projected extent | simplified mesh or view-constrained impostor | gate silhouette error in pixels over the accepted view cone and transition dwell |
+
+The concatenated per-slot capsule shell is a preview/diagnostic surface. After
+snapping, adjacent slots can cover the same field patch with coincident or
+intersecting sheets; per-vertex residual does not make that mesh manifold. The
+default stable-connectivity surface is one extracted reference mesh per
+compatible compiler, topology, and rest-geometry identity, skinned and
+optionally corrected locally.
+
+Use marching cubes for a simple smooth iso-surface baseline, surface nets for
+lower vertex count, or dual contouring when preserving field features is part
+of the error contract. None guarantees a useful animation mesh by itself:
+repair or reject non-manifold components, orient the surface, create weights,
+and compare both extracted-to-field and field-to-extracted distances. The
+stable-connectivity path never remeshes at spawn or steady state. A declared
+topology-changing path owns a separate dynamic-extraction cadence and budget;
+without that path, the operation is unsupported.
+
+Algorithm selection is explicit. For marching cubes, resolve ambiguous faces
+and cells consistently (for example with an asymptotic-decider/MC33-class
+policy) or topology can change with sampling orientation. Surface nets trade
+vertex count for cell-scale feature rounding and still need triangle-quality
+control. Dual contouring needs Hermite samples plus a rank-aware, regularized,
+cell-constrained QEF; an unconstrained minimizer can leave its cell or amplify
+ill-conditioned normals. The extraction grid/octree resolution, ambiguity
+policy, weld policy, and any remesher are part of `compilerSignature`.
+Use the shared
+[projected-error contract](../../threejs-choose-skills/references/projected-error-contract.md)
+for mesh density, correction acceptance, impostor transitions, and hysteresis.
 
 ## 1. Spaces and conventions
 
 | Quantity | Space | Convention |
 | --- | --- | --- |
 | `PartSpec.a/b/offset/hip` | parent-local | Y-up, +Z forward, accumulated over parent anchors |
-| compiled primitive endpoints | creature-local | identity rest frame, root at ground origin |
+| compiled primitive endpoints | creature-local | identity rest frame, root at the declared rest-support origin |
 | posed primitive endpoints | creature-local | root motion lives in the instance transform; world-space posed primitives forfeit instanced batching and per-instance culling |
 | `RigPose.position/yaw/roll` | world | yaw 0 faces +Z; pose order: squash → roll → yaw → translate |
 | field distance `d` | creature-local units | `d = 0` is the skin; `iso > 0` inflates (outline shells) |
@@ -43,8 +86,8 @@ interface CharacterSpec {
   name: string;
   seed?: number;          // seeded LCG for per-creature variation
   scale?: number;         // uniform world scale, default 1
-  locomotion: {
-    type: 'biped' | 'quadruped' | 'hexapod' | 'hopper' | 'flyer' | 'swimmer';
+  locomotion?: {
+    type: 'none' | 'biped' | 'quadruped' | 'hexapod' | 'hopper' | 'flyer' | 'swimmer';
     speed?: number;       // cruise, world units/s
     stepLength?: number;  // legged: stride trigger distance
     stepHeight?: number;  // legged: swing arc apex
@@ -53,7 +96,26 @@ interface CharacterSpec {
     buoyancy?: number;    undulation?: number;     // swimmer
   };
   parts: PartSpec[];
+  blend: BlendSpec;
 }
+
+type BlendRef = { part: string } | { node: string };
+type BlendSpec =
+  | {
+      mode: 'tree';
+      roots: BlendRef[];
+      nodes: { id: string; left: BlendRef; right: BlendRef; k: number }[];
+    }
+  | {
+      mode: 'symmetric-nary';
+      roots: BlendRef[];
+      groups: {
+        id: string;
+        members: BlendRef[];
+        kernel: string;
+        k: number;
+      }[];
+    };
 
 interface PartSpec {
   id: string;             // unique, non-empty
@@ -62,8 +124,8 @@ interface PartSpec {
   a?: [number, number, number]; b?: [number, number, number]; // capsule/cone
   offset?: [number, number, number];  // sphere center / rope root
   r?: number; r2?: number;            // radius, cone end radius
-  k?: number;             // smooth-min blend radius (default r * 0.6)
-  kCap?: number;          // cap for thin parts so antennae don't dissolve
+  k?: number;             // authoring hint for incident blend-node k
+  kCap?: number;          // compiler cap for generated incident-node k
   color?: string;         // #rrggbb sRGB
   segments?: number; length?: number; taper?: number;  // rope
   hip?: [number, number, number]; upper?: number; lower?: number; phase?: number; // leg
@@ -73,11 +135,19 @@ interface PartSpec {
 
 Validation is one gate and every error names `part.field`. Enforce: unique
 ids, known shapes and locomotion types, `#rrggbb` colors, positive numerics,
-valid parent references, and locomotion leg count (biped=2, quadruped=4,
-hexapod=6, others 0; flyers may carry tucked legs). Slot budget: reject specs
-whose compiled slot count exceeds the configured material budget `maxParts`
+valid parent references, and requested locomotion leg count (biped=2,
+quadruped=4, hexapod=6; flyers may carry tucked legs). Omitted/`none`
+locomotion is valid for static figures, scientific illustrations, product
+visuals, and externally posed bodies. Slot budget: reject specs
+whose compiled slot count exceeds the configured topology/page-layout budget `maxParts`
 (implementer-chosen schema cap, not a canonical constant) — `writePose` must
 throw, not clamp.
+Validate that every blend-tree reference resolves, the graph is acyclic, every
+rendered part reaches exactly one declared root unless a union of roots is
+explicit, and each tree node or n-ary group owns a finite positive `k`. For an n-ary
+kernel, require permutation/rename invariance plus declared multiplicity bias,
+support, and candidate-truncation bound. An id identifies a node; its lexical
+order never defines field composition.
 
 ## 3. Field contract (the parity law)
 
@@ -88,39 +158,54 @@ against the CPU twin; the shader inherits correctness through the contract.
 Tapered capsule distance (spheres are zero-length capsules):
 
 ```
-t = baLen2 < 1e-12 ? 0 : clamp(dot(p - a, b - a) / baLen2, 0, 1)
+t = baLen2 < epsilonLength2 ? 0 : clamp(dot(p - a, b - a) / baLen2, 0, 1)
 d = |p - a - (b - a) * t| - lerp(ra, rb, t)
 ```
 
 Exactness bound: this lerp-radius form is the true distance only for
 `ra = rb`. The exact round-cone surface is the tangent cone of the two end
 spheres, not the lerp cone; with taper slope `s = (rb - ra)/|b - a|` the
-interior distances are compressed by `sqrt(1 + s²)` (4.4% at `|s| = 0.3`).
-Acceptable within the gradient gates below; for stronger tapers use the exact
-round-cone distance with its tangency case split.
+implicit value has gradient magnitude `sqrt(1 + s²)` and therefore expands
+first-order Euclidean distance magnitude by that factor (4.4% at
+`|s| = 0.3`). Locally, signed distance is approximately
+`d_lerp / sqrt(1 + s²)`. Accept only under the explicit field-error gate; for
+stronger tapers use the exact round-cone distance with its tangency case split.
 
-Pairwise sequential polynomial smooth-min (Quilez), blend radius of the
-incoming primitive, `k = max(k_i, 1e-5)`:
+Pairwise polynomial smooth-min (Quilez) at an explicit blend-tree node, with
+the node's symmetric `k = max(k_node, kFloor)`:
 
 ```
-h = clamp(0.5 + 0.5 * (d - d_i) / k, 0, 1)
-d = lerp(d, d_i, h) - k * h * (1 - h)
+h = clamp(0.5 + 0.5 * (d_left - d_right) / k, 0, 1)
+d = lerp(d_left, d_right, h) - k * h * (1 - h)
 ```
 
-Sequential smin is NOT commutative: canonicalize part order at compile time
-(sort by stable part id) so authored/generated array order can never change
-the surface. For authored control over "limb blends into body but not into
-antenna", make blend topology explicit (per-part `kCap`, or symmetric
-`k_ij = min(k_i, k_j)` edges over the compile-time adjacency) rather than
-relying on order side effects.
+For a fixed `k`, the pair operator is commutative, but a fold over three or
+more primitives is not associative. Therefore the explicit tree is part of the
+authored field and compiler/topology signature; swapping either child is
+invariant, but regrouping nodes is a different field. Sorting part ids merely
+makes one accidental fold deterministic: renaming a part then changes the
+geometry, so sorting is rejected. For an order-independent alternative, use a
+validated symmetric n-ary kernel and record its surface bias with member count
+and its candidate-tail bound. Do not call an unbounded log-sum-exp truncation
+local without proving the omitted-tail error.
+
+A concrete symmetric option for one group is stabilized log-sum-exp,
+`d = m - k log Σ_i exp(-(d_i-m)/k)` with `m = min_i d_i`. Its gradient is
+the normalized exponential-weighted sum of primitive gradients. Coincident N
+members shift the field by `-k log N`; that multiplicity bias must be intended
+or compensated in the authored iso value. If included and omitted exponential
+sums are `A` and `B`, candidate truncation changes distance by exactly
+`k log(1+B/A)`, which supplies a usable tail gate. The explicit polynomial tree
+has compact pair support and authored grouping; log-sum-exp has permutation
+invariance but global tails. Select between those properties, not by taste.
 
 Analytic gradient, fused into the same loop — never ship 6-tap finite
 differences in the shader:
 
 ```
 q        = p - a - (b - a) * t
-radial   = q / max(|q|, 1e-6)
-s        = (rb - ra) / max(|b - a|, 1e-6)     // taper slope; 0 for uniform capsules/spheres
+radial   = q / max(|q|, epsilonLength)
+s        = (rb - ra) / max(|b - a|, epsilonLength) // taper slope; 0 for uniform capsules/spheres
 gradPrim = radial - s * normalize(b - a)      // axial term only while 0 < t < 1; caps are radial-only
 grad     = mix(grad, gradPrim_i, h)           // through each smin
 ```
@@ -128,8 +213,13 @@ grad     = mix(grad, gradPrim_i, h)           // through each smin
 The axial `-s·â` term is the gradient of the `-lerp(ra, rb, t)` taper and is
 NOT optional for cones: dropping it tilts normals by `atan(s)` on every
 tapered part and fails the CPU gradient gate for any `|s| > ~0.05`. In the
-interior region `q ⊥ (b - a)`, so `|gradPrim| = sqrt(1 + s²)`; either
-normalize `gradPrim` or account for the magnitude in the gates below.
+interior region `q ⊥ (b - a)`, so `|gradPrim| = sqrt(1 + s²)`. Preserve this
+raw derivative through every blend node and Newton correction; normalizing each
+primitive first destroys the stated smooth-min gradient and the Newton
+`grad/|grad|²` step. Normalize only the final shading normal. If the approximate
+distance rescale `d_lerp/sqrt(1+s²)` is adopted, rescale its gradient
+consistently and revalidate cap transitions and blend-radius semantics; never
+rescale the value or gradient alone.
 
 For the polynomial smooth-min, `mix(gradA, gradB, h)` is the EXACT gradient
 in the unclamped interior, not an approximation: with
@@ -137,33 +227,67 @@ in the unclamped interior, not an approximation: with
 `(d_B - d_A)∇h - k(1 - 2h)∇h` cancel identically, and at saturation the mix
 degenerates to the surviving branch. The only approximation in the normal
 path is treating per-primitive cap/interior transitions as C¹, which the
-clamp on `t` makes piecewise-exact. Keep the central-difference gradient
-(`GRAD_EPS = 1e-3`, 6 taps) as a CPU verification tap: assert
-`|analytic - centralDiff| < 5e-2` over seeded samples near the surface.
+clamp on `t` makes piecewise-exact. Keep the 6-tap central difference only as a
+CPU verification tap. Do not freeze `GRAD_EPS` in world units: for numeric
+precision `epsilon_machine` and local scale
+`ell = max(L, localRadius, |p|)` start near
+`h = cbrt(epsilon_machine) * ell`, then sweep powers of two above and below it.
+Reject taps that do not move the represented coordinate or cross a known field
+nondifferentiability; require an angular/magnitude-error plateau across the
+sweep. Run the sweep separately for the CPU precision and shader-equivalent
+f32 arithmetic.
 
 Proximity color kernel (softmax over the candidate set):
 
 ```
-w_i   = exp(-max(d_i - d_min, 0) / max(k_i, 1e-5))
-color = Σ w_i * c_i / max(Σ w_i, 1e-12)
+w_i   = exp(-max(d_i - d_min, 0) / max(k_i, kFloor))
+color = Σ w_i * c_i / max(Σ w_i, weightFloor)
 ```
 
-Newton snap onto `d = iso`, bounded and residual-aware:
+Geometry saturation does not bound this color kernel. For included weight sum
+`A` and a conservative omitted sum bound `B`, each linear-RGB component changes
+by at most `B/(A+B)` because colors lie in `[0,1]`; the Euclidean RGB bound is
+`sqrt(3)B/(A+B)`. This bound is valid only when omitted-distance intervals prove
+they cannot replace the included `d_min`; otherwise include that primitive.
+Candidate compilation records this weight bound and also gates full-graph
+perceptual color error (for example OKLab Delta E) over the envelope.
+
+Newton correction onto `d = iso`, trust-region bounded and residual-aware.
+Cache accepted samples; every trial, including a rejected backtrack, consumes
+one field query and decrements the common trial budget:
 
 ```
-for step in 0..maxSteps:                 // 2 is enough with early-out
-  d, grad = field(p)                     // fused evaluation
-  if abs(d - iso) < epsilon: break       // residual early-out
-  move = clamp((d - iso) / max(dot(grad, grad), 1e-6), -maxStep, maxStep)
-  p -= grad * move
-// maxStep = 2 * maxPrimitiveRadius
+sample = field(p)
+trials = 0
+while trials < maxTrials:
+  F, grad = sample.d - iso, sample.grad
+  if abs(F) <= residualTolerance: break
+  if dot(grad, grad) <= gradientFloor: reject
+  delta = clampLength(-F * grad / dot(grad, grad), trustRadius)
+  alpha = 1
+  accepted = false
+  while alpha >= alphaMin and trials < maxTrials:
+    trial = p + alpha * delta
+    trialSample = field(trial)
+    trials += 1
+    if abs(trialSample.d - iso) < abs(F):
+      p, sample, accepted = trial, trialSample, true
+      break
+    alpha *= 0.5
+  if not accepted: reject
 ```
 
 This is the true first-order step `Δp = -(d - iso)·∇d/|∇d|²`. The common
 `/|∇d|` variant implicitly assumes `|∇d| = 1`; in blend regions `|∇s| < 1`,
 so it undershoots and spends the second iteration finishing the first one's
 work. Dividing by `|∇d|²` restores the full Newton step there; the clamp
-bounds the move where `|∇d| → 0` near the medial axis.
+bounds the move where `|∇d| → 0` near the medial axis. Set `trustRadius` from
+local reference edge length, primitive radius, and a curvature bound; it is not
+a global multiple copied across meshes. Backtracking provides descent, not
+topology safety: the accepted correction envelope must separately pass signed
+area/Jacobian, inversion, self-intersection, duplicate-coverage, and minimum-
+angle gates. On failure, keep the last proven reference/skinned position or
+reject the morphology/tier.
 
 ## 4. Rig compiler
 
@@ -172,52 +296,103 @@ bounds the move where `|∇d| → 0` near the medial axis.
   k, r, g, b` (12 floats).
 - Anchors accumulate over parent chains in parent-local space; `scale`
   multiplies every length and radius; defaults: color `[0.85, 0.72, 0.5]`,
-  `k = r * 0.6`, k floor `1e-4`.
+  authored part hint `k = r * 0.6`; compile hints into explicit blend-node
+  values before field evaluation. The floor follows the scale/precision
+  contract in §5.
 - `bodyLift = max over legs((upper + lower) * 0.92 - hip.y)` keeps knees bent.
-- Pose transform, in order: volume-preserving squash about the ground plane
+- Pose transform, in order: volume-preserving squash about the declared rest-support plane
   (`y *= squash`, `xz *= 1/sqrt(max(squash, 0.05))`), roll, yaw, translate
   (+ `bodyLift * min(squash, 1)` vertical).
-- Compile-time candidate sets: expand each primitive's rest AABB by `r + k`;
-  two parts are blend-adjacent if the expanded boxes intersect. Each emitted
-  vertex stores its owner slot + up to K adjacent slots. Poses deform, so pad
-  adjacency by the locomotion's maximum excursion (leg reach, rope length,
-  flap amplitude) — validate at lab time by asserting the snapped
-  candidate-set surface matches the full-field surface within the residual
-  gate across a locomotion sweep.
-- K-candidate evaluation is an approximation of the canonical sequential,
-  order-dependent global smooth-min fold, not a bounded local rewrite of the
-  field. Rest-AABB adjacency is a heuristic candidate selector, not an error
-  bound: unsaturated `h` tails can reach in from every primitive, and pose
-  deformation invalidates rest-space adjacency. The only accepted bound is the
-  `candidate-set vs full-field surface` locomotion sweep gate in §10; if that
-  gate fails its threshold, reject the spec/tier or raise K, rebuild the
-  candidate sets, and rerun the sweep until it passes.
-- Cache compiled geometry by `schemaVersion | compilerVersion | tier | slot
-  count and classes | strong digest of geometry-affecting fields`. A bare
-  32-bit hash of the spec JSON is collision-prone at library scale and cannot
-  invalidate on compiler changes.
+- Compile the declared blend graph to an evaluation DAG. A per-vertex
+  candidate program includes selected leaves, every internal ancestor needed
+  to reach the declared root with the same per-node `k`, and a certificate for
+  every omitted sibling. A polynomial-tree sibling may be omitted only when a
+  conservative distance interval proves the parent stays on the same saturated
+  branch over the vertex's complete motion/morphology envelope. A symmetric
+  n-ary group instead carries the `k log(1+B/A)` tail bound from §3. Never take
+  K nearby leaves and fold them in a new order. Expanded rest AABBs may propose
+  leaves. Independently bound omitted proximity-color weight as specified in
+  §3; field saturation is not a color certificate. Envelope proofs and the
+  full-graph sweep in §10 supply acceptance. If
+  the bound fails, enlarge the candidate program, rebuild, or reject the tier.
+- Separate cache identities. `compilerSignature` includes schema/compiler,
+  field kernel, extraction algorithm/settings, numeric mode, and material
+  layout. `topologySignature` includes extracted connectivity, blend graph,
+  slot classes, skin-influence layout, tier, and transported-frame layout.
+  `geometryDigest` covers rest-pose geometry-affecting values. Names and colors
+  do not affect topology; radii/endpoints usually affect the geometry digest.
+  A bare 32-bit spec hash is never an identity. Only the immutable unit
+  primitive preview template is global; extracted connectivity, preview-shell
+  mapping, candidates, weights, and radial frames are signature-specific.
 
-## 5. Canonical shell
+## 5. Reference surface and diagnostic shell
 
-Per-slot canonical capsule, reconstructed and posed entirely in the vertex
-stage from the primitive buffer (`aPart` selects the slot, `aAxial` marks cap
-progression; the mesh itself is never re-posed on the CPU):
+The shipping default is one field-extracted reference mesh per compatible
+`{compilerSignature, topologySignature, geometryDigest}`. Extraction returns oriented connected components
+under an explicit component policy; repair only defects covered by a
+deterministic rule, otherwise reject. The following per-slot capsule is a
+diagnostic preview reconstructed in the vertex stage (`aPart` selects the slot,
+`aAxial` marks cap progression). It is useful for field and candidate
+visualization, but concatenating slots cannot establish a manifold union:
 
 | Tier | radialSegments | capRings | verts/slot `(2+2c)r+2` | tris/slot `r(4+4c)` |
 | --- | ---: | ---: | ---: | ---: |
 | hero | 12 | 3 | 98 | 192 |
-| crowd | 10 | 2 | 62 | 120 |
-| background | 8 | 2 | 50 | 96 |
+| repeated | 10 | 2 | 62 | 120 |
+| distant | 8 | 2 | 50 | 96 |
 
-Add a radial-angle attribute (`aTheta`) alongside `aPart`/`aAxial`: together
-with axial `t` they are stable creature-surface coordinates for the detail
-ladder (§8) — snap displacement must not be the only surface
-parameterization.
+For both reference and preview meshes, store the rest radial direction or
+`aTheta` in a stable local basis. Build a Bishop/rotation-minimizing frame along
+each semantic chain, initialize it from a declared rest vector, and transport
+it with the rig transform before re-orthonormalizing. Never reselect a helper
+axis from the current posed direction: its branch discontinuity rotates radial
+coordinates and procedural detail.
 
-Orient winding outward on the CPU against a reconstructed unit capsule and
-flip violating triangles; gate with `dot(faceNormal, outward) > 0` for every
-pre-snap face. Vertex-basis reconstruction: axis from `b - a` with a
-`|axis.y| < 0.99` helper pick — cross-product basis, no quaternions needed.
+Orient preview winding outward on the CPU against the unit template. For the
+reference mesh and every sampled pose/morphology, gate:
+
+- signed triangle area and deformation Jacobian relative to rest; zero
+  inverted or collapsed faces;
+- zero non-adjacent self-intersections and zero duplicate/coincident surface
+  coverage beyond the declared weld tolerance;
+- minimum angle/edge-quality distributions, including the tail rather than
+  only a mean;
+- bidirectional Hausdorff distance (mesh→field and field→mesh), normal-angle
+  error, and projected silhouette error.
+
+A small field residual alone cannot pass this section.
+
+Compute orientation/Jacobian in each rest triangle's tangent basis, not from an
+unsigned area magnitude. Detect self-intersections with a BVH broad phase and a
+scale-aware robust triangle predicate, excluding only true topological
+neighbours. Detect duplicate coverage separately with a weld/spatial index;
+intersection tests alone miss coincident sheets. For Hausdorff evidence, use
+adaptive surface sampling or conservative cell/triangle bounds in both
+directions and publish the sampling tolerance. Vertex-only mesh→field samples
+and extraction-grid points alone are lower bounds on the maximum error.
+
+### Skin-weight and deformation contract
+
+Seed handles from the semantic rig, then compute weights on the reference
+surface. Use geodesic distances or bounded harmonic/biharmonic weights with
+Dirichlet handles and explicit barriers across contacts where Euclidean
+proximity would leak weight between limbs. Enforce finite, nonnegative weights,
+partition of unity, a measured maximum influence count, and renormalization
+after pruning. Choose the influence cap from deformation error and storage
+cost; it is not a universal constant.
+
+Use linear-blend skinning only when its bend/twist sweep passes signed-volume,
+cross-section radius, joint-collapse, and normal-continuity gates. Use
+dual-quaternion skinning for large rigid rotations when its bulge and
+antipodality handling pass, or center-of-rotation skinning when joint-local
+rotation centres justify its precomputation/storage. Record the selected method
+in the compiler signature; changing it invalidates cached deformation evidence.
+
+`epsilonLength`, `kFloor`, `weightFloor`, `gradientFloor`, and the Newton
+residual are derived from characteristic scale, numeric precision, and the
+projected-error gate. Record them with the compiler signature and sweep them in
+the lab; fixed world-unit magic constants are not portable across microscopic,
+architectural, and planetary scenes.
 
 ## 6. Locomotion library
 
@@ -226,43 +401,69 @@ accumulator (clamp input dt, e.g. accumulate ≤ 0.25 s; step at 1/60; keep
 previous+current pose; render interpolated). Variable render dt straight into
 gait/hop is a known visual bug: one hitch completes half a swing in one frame.
 
-**Reactive planted gait** (2/4/6 legs, one system): feet are world-planted;
-a foot lifts when it lags its home (hip projected to ground in the body
-frame) by more than `stepLength` AND its diagonal phase group is active;
-swings over `swingTime ≈ 0.18 s` with arc `sin(π t) * stepHeight`, landing
-overshot `0.5 * stepLength` along velocity. The defaults assume
-decimetre-to-metre legs; rescale by dynamic similarity — swing time
-`∝ sqrt(L/g)` (pendulum period), and keep the Froude number `v²/(gL) ≲ 1`:
-above it real animals stop walking, and a planted gait reads wrong. Gates:
-stance feet move `< 1e-9` while planted (stationary and moving); a biped
-never lifts both feet.
+Legged locomotion consumes
+`querySupport(worldProbe, tick) -> {point, normal, frameId, supportCoord,
+worldFromSupport, velocityAtPoint, angularVelocity}`. The query may represent terrain, a sloped
+architectural surface, a translating/rotating platform, or another declared
+support. Its normal is normalized; `velocityAtPoint` already includes the
+rigid-frame `omega × r` contribution when applicable. A stance stores
+`(frameId, supportCoord)`; each tick reconstructs the world plant through the
+provider's current support map (a rigid provider may use `worldFromSupport`),
+so zero drift is measured relative to the moving support rather than absolute
+world coordinates. Loss of
+support, discontinuous normals, and frame changes use explicit replant rules.
 
-Foot solve and storage chain: world-planted foot target --apply inverse root
-instance transform--> body-frame IK target --solve IK in body frame-->
-creature-local upper/lower leg slots --contiguous storage upload-->
+**Reactive planted gait** (2/4/6 legs, one system): feet are support-planted;
+a foot lifts when it lags its queried home by more than `stepLength` and its
+phase group is active. Project the hip probe along the declared gravity
+direction onto the support, construct forward/side axes in the local tangent
+plane, and form swing height along the support normal. Landing prediction uses
+body velocity relative to `velocityAtPoint`; do not add `omega × r` again.
+Authored starting values may use a swing arc
+`sin(π t) * stepHeight` and forward overshoot, but they are not flat-ground
+assumptions. Rescale authored timing and speed by dynamic similarity — swing time
+`∝ sqrt(L/g)` (pendulum period), and keep the Froude number `v²/(gL) ≲ 1`:
+above it real animals stop walking, and a planted gait reads wrong. Gate
+platform-relative stance drift over the complete stance interval, normalized
+by leg length and above the declared numeric precision floor; also assert that
+a biped never lifts both feet unless the authored gait explicitly includes a
+flight phase.
+
+Foot solve and storage chain: support-coordinate plant → support query/map →
+world contact target → inverse root instance transform → body-frame IK
+target → body-frame IK solve → creature-local upper/lower leg slots →
+contiguous storage upload →
 posed-AABB culling-bounds update. The root transform is applied exactly once,
 by the object/instance matrix after creature-local SoA upload; `rootTransformSingleApplication`
 checks that no slot endpoint already contains root translation or root yaw.
 
-**2-bone IK**: clamp reach to `[|l1-l2|+1e-4, l1+l2-1e-4]`;
+**2-bone IK**: clamp reach to
+`[|l1-l2|+epsL, l1+l2-epsL]`, where `epsL` is derived from characteristic
+limb length and numeric precision rather than a fixed world-unit epsilon;
 `a = (l1² - l2² + d²) / 2d`, `h = sqrt(max(l1² - a², 0))`; bend hint points
 sideways-out + 0.4 forward in the body frame, made perpendicular to hip→foot
 by full 3D Gram-Schmidt. Derived: with a fully orthogonalized unit hint, the
 joint at `hip + dir·a + perp·h` reconstructs both limb lengths EXACTLY
 (`a² + h² = l1²`; `(d−a)² + h² = l2²` algebraically), so residual error is
 f32/f64 rounding only. A partial Gram-Schmidt that drops the Y term leaves a
-non-perpendicular component and DOES corrupt lengths — observed ~2e-4 in the
-lab's seeded poses (pose-dependent, grows with the hint's Y content; not a
-bound). Gate: reconstructed limb lengths match spec to 4 decimals — a loose
-ceiling relative to the exact solve, sized to catch exactly that
-orthogonalization-bug class (2e-4 fails a 4-decimal match).
+non-perpendicular component and corrupts lengths in proportion to the omitted
+component. Gate relative length residual across scale and precision sweeps;
+decimal-string equality and one fixture's absolute threshold are not valid
+contracts.
+
+`gWorld` has units of world-length/s². If one world unit is one metre, physical
+Earth gravity is `9.81` regardless of the creature's model scale. For a
+geometrically similar body scaled by `lambda` under the same gravity, dynamic
+similarity gives `time' = sqrt(lambda) time` and
+`speed' = sqrt(lambda) speed`; multiplying gravity by `lambda` while keeping
+time fixed is an authored time remapping, not physical scaling.
 
 **Hopper**: state machine `idle → crouch → air → land`. Physics: air height
 is the normalized ballistic parabola `4 t (1 - t) * hopHeight` (`t ∈ [0,1]`;
 it also matches launch/landing velocity ratios, which `sin(π t)` does not),
-and `airDuration = max(0.28, 0.9 * sqrt(hopHeight))` because flight time over
-apex `H` is `2·sqrt(2H/g) = 0.903·sqrt(H)` at `g = 9.81` — the `0.28 s` floor
-keeps micro-hops legible (styling). Styling constants: `crouchTime 0.16`,
+and physical `airDuration = 2 sqrt(2 hopHeight / gWorld)`. A minimum duration
+or altered parabola is styling and must be labeled as such. Example styling
+constants: `crouchTime 0.16`,
 `landTime 0.14`, idle `0.6–2.2 s`; squash: idle `1 + 0.015 sin(6t)`, crouch
 `lerp(1, 0.72, t)`, air `1 + 0.28 cos²(π t) * (t < 0.5 ? 1 : 0.6)`, land
 `lerp(0.78, 1, t)`. Squash is volume-preserving via the rig transform.
@@ -273,10 +474,11 @@ keeps micro-hops legible (styling). Styling constants: `crouchTime 0.16`,
 `phase * 3 + simTime * (4.5 + 2|angularSpeed|) * π`. Sampled, not integrated:
 seekable to any time for deterministic capture.
 
-**Verlet ropes** (tails, ears): fixed step 1/60, gravity 3.5 (styling: ≈ g/3
-reads calm at creature scale; use `9.81 * scale` for physical), damping keep
+**Verlet ropes** (tails, ears): fixed step 1/60, authored gravity 3.5 and damping keep
 `1 - 0.12`, 3 relaxation passes, ≤ 8 substeps per update, dt accumulation
-capped at 0.25 s. Anchor follows the posed body; taper radius toward the tip.
+capped at 0.25 s. `3.5` is a slow-motion styling value; a physical model uses
+the same `gWorld` convention above, not `9.81 * creatureScale`. Anchor follows
+the posed body; taper radius toward the tip.
 Per fixed step, write order is: base body pose writes rest slots after
 volume-preserving squash staging; root yaw/translation remain in the instance
 transform and are not baked into SoA endpoints; body-frame IK writes leg slots
@@ -285,83 +487,112 @@ segment slots from the final particle chain. If stages target the same slot,
 the later stage wins; rope-verlet slot cost is
 `ropeSubsteps * ropeRelaxationPasses * ropeSegments`, not O(slots).
 
-**Swimmer**: buoyancy spring toward injected `getWaterHeight(x, z, t)`
-(stiffness clamped 1..80, response `clamp(stiffness * dt, 0, 1)`), body
-undulation and roll from the swim phase. The injected provider is a water-skill
-contract, not a creature-side sampler. Open seas use
+**Swimmer**: buoyancy response targets an injected
+`getWaterSurface(x, z, t) -> {height, normal, velocity?}`. Do not call a
+first-order lerp a spring. For a critically damped vertical response with
+piecewise-constant target per fixed step, `e = y-h`, `c = v+omega*e`, then
+`eNew = (e+c*dt)*exp(-omega*dt)` and
+`vNew = (v-omega*c*dt)*exp(-omega*dt)`; choose `omega` from a declared settling
+time. A force-based buoyancy model instead integrates dimensioned acceleration
+at fixed step and must pass a step-halving convergence test. Body undulation
+and roll derive from the same simulation phase. The injected provider is a
+water-skill contract, not a creature-side sampler. Open seas use
 `threejs-spectral-ocean/examples/webgpu-fft-ocean/createCpuWaterHeightSampler()`,
 which evaluates a dominant-bin truncation of the same authored FFT spectrum and
 publishes `estimateTruncationError()`. Bounded pools use
 `threejs-water-optics/examples/webgpu-bounded-water/createBoundedWaterHeightQuery()`,
 which evaluates the exact authored analytic wave list and declares the live
 StorageTexture heightfield residual as a separate budget. The provider owns the
-parity-error obligation; creature locomotion treats the query as authoritative,
-does not blend in GPU readback, and must keep buoyancy response error against
-that injected surface `< 0.09` world units across a seeded run (executed by the
-§10 lab gate table — pending until the Wave B lab lands).
+parity-error obligation; creature locomotion treats the query as authoritative
+and does not blend in asynchronous GPU readback. Gate normalized surface
+tracking error, phase lag, and stability across the declared wave-frequency
+band and fixed-step convergence sweep.
 
 ## 7. Scale architecture
 
-- **One geometry + one material per species/tier.** Pose in a storage buffer:
+- **Share by mesh identity, not label.** One geometry may serve bodies only
+  under compatible `{compilerSignature, topologySignature, geometryDigest,
+  tier}`. A material may span geometry digests only when primitive layout,
+  candidate indexing, skin representation, and graph/storage layout match.
+  Pose lives in a storage buffer:
   `struct Prim { vec4 a; vec4 b; vec4 meta; }` indexed
   `instanceIndex * maxParts + slot`, via `instancedArray()`/`storage()` nodes
   (verify exact r185 API in installed source — `apiProof` per router). The
-  rig writes into one mapped `Float32Array`; one contiguous upload per frame.
+  rig writes into a CPU `Float32Array` backing/staging store; this is not a
+  persistently mapped WebGPU buffer. Upload coalesced dirty ranges through the
+  Three.js storage-attribute update mechanism and report bytes/frame. Partition
+  instances into fixed-capacity topology/tier pages, each bound to one
+  compatible geometry identity.
+  Overflow allocates or recycles another page at a controlled boundary, or is
+  deferred/rejected by policy; never resize one global population buffer and
+  rebuild every binding mid-frame. For very large fully recurrent populations, compare a
+  GPU-resident pose solver only when the state remains on GPU and avoids more
+  upload/synchronization than it adds.
 - **Bounded evaluation.** Loop over the candidate set (or at minimum a
   dynamic loop bounded by the actual part count `P`), never a masked
-  compile-time unroll over the full budget. A K-candidate loop approximates
-  the sequential, order-dependent global fold defined in §3; it is accepted
-  only by the full-field locomotion sweep gate, so failed sweeps reject the
-  spec/tier or raise K before rebuild. **Vertex field cost model** (count
-  fused `d, grad` capsule evaluations per shell vertex):
+  compile-time unroll over the full budget. A K-leaf candidate program preserves
+  the explicit blend-tree ancestry and omitted-sibling certificates from §3; it is accepted only
+  by the complete-graph envelope gate, so failed sweeps reject the spec/tier or
+  enlarge/rebuild that program. **Vertex field cost model** (count
+  fused `d, grad` capsule evaluations per corrected vertex):
 
   | Symbol | Meaning |
   | --- | --- |
   | `P` | compiled primitive count for the spec (`≤ maxParts`) |
   | `K` | \|candidate set\| for the vertex (`≤` tier cap in §5) |
-  | `S` | accepted Newton snap steps (`≤` tier snap cap) |
-  | `Q` | field queries per fused eval (`1` analytic; `7` if central-diff FD) |
-  | `C` | extra fused passes over the same candidate indices (color softmax `= 1`; self-AO §8 adds `R` offset samples along `n`) |
+  | `S` | correction trial field evaluations after the initial query, including rejected backtracking trials |
+  | `R` | self-occlusion offset samples along the final normal |
 
   Masked full-budget path (forbidden):
 
   ```
-  E_mask = (S + 1) · Q · P
+  E_mask(FD) = (S + 1) · 7P
   ```
 
   Candidate-set path (mandated):
 
   ```
-  E_cand   = (S + 1) · Q · K
-  E_shade  = E_cand + C · (S + 1) · K   // when color/AO reuse the same set
+  E_snap  = (S + 1)K
+  E_color ∈ {0, K}     // reuse final primitive distances, or evaluate once
+  E_AO    = RK           // R independent offset queries
+  E_total = E_snap + E_color + E_AO
   ```
 
   ALU ratio at equal `S` (analytic good path vs FD masked path):
 
   ```
-  E_mask(FD) / E_cand(analytic) = 7 · P / K
+  E_mask(FD) / E_snap(analytic) = 7P/K
   ```
 
   Plug in `P`, `K`, `S` from the spec and tier table — not from any external
-  project's constants. Frame ms and population caps are lab measurements (§9),
+  project's constants. Frame ms and page capacities are lab measurements (§9),
   never asserted here.
-- **Culling.** Root motion in `Object3D`/instance matrix; per-instance
-  bounding sphere from final creature-local SoA primitive AABBs each fixed
-  step, then transformed to world by the same instance matrix that renders the
-  creature. This is the last stage in the foot pipeline from §6 and is where
-  root placement affects visibility; frustum-cull instances into a compacted
-  visible list (CPU per species cell, or a compute pass at large counts).
-- **Material variants.** Cache by `{tier, outline, debugMode, K}`. Toon
-  bands, outline width, sun direction, tint, warmth are uniforms — changing
+- **Culling.** Root motion lives in the instance matrix. Static and analytic
+  motions use a conservative precomputed envelope when tighter per-step bounds
+  cannot change visibility; independently deforming/dirty instances refit a
+  local bound from final SoA primitive AABBs, then transform it with the same
+  instance matrix that renders the body. Spatial pages reject groups first;
+  compact visible instances only when that compaction reduces submitted work.
+  Compare CPU page/instance culling with GPU compaction on the target adapter;
+  a vertex-shader visibility mask does not reduce submission or vertex work.
+- **Material variants.** Cache by
+  `{compilerSignature, topologySignature, shadingModel, tier, outline,
+  debugMode, K}`. Ramp bands, outline width, sun direction, tint, and scalar
+  visualization ranges are uniforms — changing
   them must not rebuild node graphs or instances.
-- **Outline.** Crowds: creature-ID + normal/depth edge detection as one post
+- **Outline.** Repeated populations: creature-ID + normal/depth edge detection as one post
   pass over the population. Hero: iso-offset back-face hull
   (`iso = outlineWidth`) as a second material — accept that it re-runs the
   snap, and strip color/AO work from its graph.
-- **Shadow parity.** The depth/shadow path must consume the same snapped
-  position function as the display material. Do not assume the renderer
-  transfers `positionNode` to the shadow pass — assert it: render a posed
-  creature, compare visible silhouette vs shadow-map footprint in a lab test.
+- **Shadow parity and spaces.** The depth/shadow path must consume the same
+  snapped position function as the display material. In r185 `positionNode`
+  and `castShadowPositionNode` are local-space positions;
+  `receivedShadowPositionNode` is world-space. Reuse the local snapped node for
+  display/casting, but normally leave the received-shadow override unset so
+  `positionWorld` derives from the displaced vertex. Never assign the local
+  node to the world-space receiver hook. Render a posed body and compare the
+  visible silhouette, shadow-map footprint, and received-shadow lookup in the
+  lab.
 - **Debug modes** are build-time material variants (`off | unsnapped |
   distance | weights | normals`): unsnapped shows the pre-snap shell;
   distance heat-maps `|d|` at the surface; weights shows blended albedo;
@@ -370,56 +601,66 @@ that injected surface `< 0.09` world units across a seeded run (executed by the
   near-zero (dark) everywhere after snap; normals must be smooth across
   blends.
 
-## 8. Quality ladder toward skinned-look
+## 8. Surface-quality ladder
 
 Ordered; each rung is optional per tier, and low tiers stop early:
 
 1. **Analytic gradient normals** across blends (baseline — FD normals across
    12-segment tessellation shade as flat patches).
-2. **SDF self-AO**:
+2. **SDF self-occlusion approximation**:
    `ao = clamp(1 - k_ao · Σ_i 2^{-i} · max(r_i - d(p + n·r_i), 0) / r_i, 0, 1)`
    over 3–5 exponentially spaced radii along the normal, `k_ao ≈ 1`. The
    `/r_i` makes each occlusion term dimensionless, so `k_ao` survives
-   creature rescale; grounds limb joins and belly/ground contact. Ground blob shadows for crowds that skip real shadow receive.
-3. **Scene-light integration**: keep the authored toon ramp but multiply by
-   received shadow/contact terms; creatures that neither receive shadows nor
-   see local lights read pasted-on.
-4. **Stable surface coordinates** (`aPart` owner, axial `t`, radial `theta`) →
-   procedural detail fields in creature space: fur/scale banding, wear,
+   body rescale. This samples only the creature field: it can darken limb
+   joins, but it cannot produce ground contact. Use the shared scene AO/shadow
+   contract for external contact; do not substitute an uncalibrated blob.
+3. **Scene-light integration**: the selected BRDF, illustrative ramp, or
+   scientific palette owns a declared lighting policy. When lighting is used,
+   integrate received shadow/contact terms; a body that ignores the scene's
+   light transport reads composited rather than present.
+4. **Stable surface coordinates** (semantic owner, axial `t`, transported
+   radial `theta`) → procedural detail fields in creature space: fur/scale banding, wear,
    counter-shading gradients, per-part roughness/ramp identity. Author via
    `$threejs-procedural-fields` patterns.
 5. **Eyes and face as authored meshes** parented to head slots: separate
-   small geometry with blink/look-at controls and its own material. SDF
-   blend-shells do not do eyes well; do not try.
+   small geometry with blink/look-at controls and its own material. Smooth
+   field-derived body skins do not do eyes well; do not force them to.
 6. **Secondary motion**: verlet ropes for tails/ears (§6), squash
    states, flap phases; add per-part jiggle springs driven by pose
    acceleration for fleshy creatures.
-7. **Hybrid bodies**: for hero anatomy beyond blended capsules, generate a
-   rest mesh from the field once (marching cubes/dual contouring offline or
-   at load), skin it to the capsule rig by proximity weights, and keep one
-   SDF correction step at render. The control rig, locomotion, and spec
-   pipeline are unchanged — only the skin swaps.
+7. **Reference mesh plus correction**: the stable-topology default is the
+   field-extracted rest mesh from §5, semantic/geodesic or bounded-harmonic
+   weights, and only the local correction count justified by projected error.
+   The control rig, locomotion, and spec pipeline are unchanged.
 
 Ceiling honesty: photoreal humans, cloth, and production animation libraries
 still belong to imported skinned assets. This ladder targets stylized
-creatures, fauna, mascots, and NPCs — there it can match or beat low-poly
-skinned pipelines because morphology is generatable and joints never crease.
+creatures, fauna, generated figures, and illustrative subjects. It can match
+or beat a low-poly skinned representation only when the measured morphology,
+joint-continuity, and workload contract says so.
 
 ## 9. Creature lab contract
 
 A standalone lab app (strict dev port, package-source aliases, zero app
 imports) is the proving ground; the shipping scene stays a thin adapter.
 
-- **Deterministic driver**: fixed step 1/60; `seek(t)`, `step(n, dtMs)`,
-  `advance(dt)`; gate `seek(1)` ≡ `step(60, 1000/60)` exactly.
+- **Deterministic driver**: integer simulation ticks are authoritative;
+  `seekTick(n)` and `stepTicks(n)` must produce the same state hash. Seconds are
+  converted once using an explicit rounding policy. Do not require exact
+  equality between independently accumulated floating-point seconds.
 - **Programmatic API** (`window.__lab`): telemetry snapshot (rig slots,
   bodyLift, geometry stats, per-creature driver state, camera, renderer,
   last-frame ms), focus/tier/debug/toon controls, spec JSON editor with
   `part.field` errors, seeded generation grid, `renderOnce`, `dispose`.
-- **Evidence metrics**: foot-drift markers (planted-foot world delta per
-  frame over a stride; gate `< 1e-4`), snap residual sweep across a locomotion
+- **Evidence metrics**: foot-drift markers (local-solver, world-space, and
+  platform-relative displacement over a stance, each normalized by leg
+  length), snap residual and pixel-error sweeps across a locomotion
   cycle, seed sweeps for generated specs, tier switcher screenshots, hop apex
   sampling (step the clock to the exact apex — temporal gaps are where QA lies).
+- **Epsilon sweep**: run analytic-vs-central-gradient and Newton residual tests
+  over scale/precision-relative powers-of-two perturbations. Record the stable
+  error plateau, representability failures, and nondifferentiable samples; a
+  single hard-coded `GRAD_EPS` result is not evidence.
 - Lab evidence proves the package, never the shipping scene: keep the claim
   boundary explicit in the lab README.
 
@@ -434,35 +675,41 @@ is recorded in `HANDOFF.md` §6, none of these rows may be cited as passed
 evidence. CPU-derivable rows (smin, gradient, taper) are additionally checked
 by the settled-math derivations in §2–§4.
 
-| Gate | Threshold |
+Every threshold below is either an analytic invariant or a product/fixture
+gate. Store `{value, unit, status: Derived|Gated|Measured|Authored, source,
+context}` with the result; an authored threshold is not passed evidence.
+Let `L` be the declared characteristic body length and `e_px` the projected
+screen-space error computed from camera projection and nearest support depth by
+the shared projected-error contract linked in §0.
+
+| Gate | Contract |
 | --- | --- |
-| smooth-min ≤ hard-min + 1e-9 | 200 seeded samples |
-| thin-part blend containment (`kCap`) | ≤ 0.006 excess |
-| gradient magnitude near surface | 0.95–1.05 with per-primitive normalization (raw un-normalized magnitude is `sqrt(1 + s²)`; the raw gate only holds for taper slope `|s| ≤ 0.32`) |
-| analytic vs central-diff gradient (CPU) | < 5e-2 near surface |
-| snap residual after Newton steps | < 0.02 of body scale |
-| pre-snap vertex move clamp | < 2 × max radius |
-| canonical winding | outward `dot > 0`, every face |
-| candidate-set vs full-field surface | within snap residual gate across locomotion sweep |
-| stance foot drift (stationary + moving) | < 1e-9 per frame |
-| IK limb length reconstruction | 4 decimals |
-| swim surface coupling | < 0.09 |
-| platform-mounted foot slide | < 1e-4 |
-| shadow/silhouette parity | visual assert in lab |
-| geometry counts per tier | exact table in §5 |
-| determinism | same seed + sim clock ⇒ bit-identical pose |
-| pipeline compiles after reveal | 0 (count via `renderer.info` / GPU capture) |
-| buffer reallocations after init | 0 — storage sized at population cap |
-| per-creature spawn main-thread cost | ≤ 0.25 ms; O(slots) write, zero alloc |
-| first revealed frame | ≤ 1.5× steady-state frame time |
+| polynomial smooth-min | Derived: `min(a,b)-k/4 <= smin(a,b,k) <= min(a,b)`, fixed-node-`k` pair symmetry, and finite-difference C1 checks away from clamp transitions |
+| blend-graph invariance | Identical field samples and compiled graph under part-array permutation and consistent id renaming; explicit regrouping must change the topology signature; n-ary kernels also gate multiplicity bias and candidate-tail error |
+| thin-part blend containment (`kCap`) | Gated normalized surface deviation `|delta d|/L` over the declared pose envelope |
+| primitive gradient | Derived raw magnitude `sqrt(1+s²)` in the taper interior; normalized shading normal has unit magnitude within numerical tolerance |
+| analytic vs central-difference gradient | Gated angular error and relative magnitude error over stratified cap/interior/blend samples and a precision/scale-relative epsilon sweep with an error plateau |
+| snap residual | Gated `|d-iso|/L` and `e_px`; the tier must satisfy both world-relative and projected limits |
+| Newton safeguard | Trust radius from local edge/radius/curvature scale; record clamp and backtrack counts, gradient-floor rejects, failed descent, and final residual |
+| reference-mesh validity | Zero inversions/collapses, zero non-adjacent self-intersections, zero duplicate/coincident coverage outside weld policy; signed area/Jacobian and minimum-angle tails reported over the pose/morphology envelope |
+| reference mesh vs field | Bidirectional Hausdorff, normal-angle, and projected silhouette error over the complete envelope; one-sided vertex residual is insufficient |
+| candidate program vs full graph | Gated bidirectional surface error, normal-angle error, omitted color-weight bound, and perceptual color Delta E; candidate program preserves declared blend ancestry |
+| skin weights/deformation | Finite nonnegative partition of unity after capped-influence pruning; barrier leakage, bend/twist volume/radius, joint collapse, normal continuity, and DQ bulge/antipodality or CoR error as applicable |
+| planted-foot drift | Gated platform-relative displacement normalized by leg length per stance interval; tolerance must exceed the implementation's declared f32/f64 roundoff floor |
+| support-surface locomotion | Sloped, translating, and rotating supports; contact-normal continuity, support-relative plant drift, landing position/velocity residual, and explicit frame-change/loss behavior |
+| IK reconstruction | Relative upper/lower length residual plus reach-clamp classification, not decimal-string equality |
+| water coupling | Gated height/normal/phase residual against the injected provider, normalized by body or wave scale |
+| shadow/depth parity | Gated silhouette distance in pixels for display, cast shadow, received-shadow lookup, and depth output |
+| geometry counts | Derived exactly from the selected compiler/topology/geometry signature; preview-shell counts are not shipping-mesh counts |
+| determinism | `seekTick(n) == stepTicks(n)` state hash for equal seed, tick, inputs, and declared numeric implementation; array permutation/consistent id rename are additional field invariants; cross-device tolerance is separate |
+| pipeline compilation after reveal | Measured count `0` for predeclared shipping variants; late user-authored variants are classified separately |
+| buffer reallocation after init | Measured count `0` within each fixed page; controlled page allocation/recycling is recorded separately |
+| spawn cost and first visible frame | Product-gated p50/p95 with workload, adapter, warm-up, allocations, and compile events recorded |
 
-Stance-drift thresholds are not contradictory; they measure different frames:
-
-| Threshold | Gate row / evidence | Space and reference frame |
-| --- | --- | --- |
-| `< 1e-9` | stance foot drift | sim-step-local: per fixed step in creature space after inverse root conversion |
-| `< 1e-4` | foot-drift evidence markers | world-space marker displacement accumulated over a stride |
-| `< 1e-4` | platform-mounted foot slide | platform-relative displacement under a moving platform transform |
+Do not publish multiple unlabeled drift thresholds in different frames. Report
+the local solver residual, world-space accumulated drift, and
+platform-relative drift separately, each normalized by leg length and paired
+with its sampling interval and numeric precision.
 
 ## 11. Boot, compile, and spawn contract
 
@@ -472,34 +719,39 @@ the frame the first creature appears. Separate costs by lifetime:
 
 | Lifetime | Work | Where |
 | --- | --- | --- |
-| once per tier | canonical shell geometry (§5) + winding verification — slot-class geometry is species-independent | init; cacheable by versioned digest (§4) |
-| once per species | spec validation, rig compile, blend adjacency + candidate sets, material-variant graphs, storage allocation at population cap | init; time-sliced ≤ 4 ms/frame or in a worker (inputs are plain data) |
-| once per creature | spec/genome instantiation + first O(slots) pose write | any time; ≤ 0.25 ms, zero allocation |
-| per frame | locomotion fixed steps + one contiguous storage upload per species | steady state |
+| once globally | immutable unit primitive used only by the diagnostic shell | init; no topology/spec mapping attached |
+| once per compiler/topology/geometry signature | spec and blend-graph validation, reference extraction, mesh-validity sweep, transported frames, skin weights, closed candidate programs, material variants | load/init; cacheable by the separated signatures in §4 |
+| once per topology/tier/geometry page | fixed-capacity pose/instance storage, bounds, free list, visible list | controlled allocation boundary; never resize in place |
+| once per body | spec/genome instantiation + first O(slots) pose write | any time; product-gated p50/p95, zero geometry/material construction |
+| per frame | recurrent motion steps for active bodies + coalesced dirty-range uploads | steady state; static/analytic unchanged state performs no integration/upload |
 
-- **Pipeline warm-up.** WebGPU compiles one pipeline per material variant per
-  pass on first use; unwarmed, that stall lands on the first visible frame.
-  `await renderer.compileAsync(...)` every shippable variant — display,
-  depth/shadow, and the outline pass — behind the load screen. Debug variants
-  (§7) are lab-only: never warm or ship them.
+- **Pipeline warm-up.** WebGPU compiles per material/pass state; unwarmed, that
+  stall lands on the first visible frame. Compile representative display,
+  depth/shadow, outline, and configured MRT variants behind the load screen.
+  Use `renderer.compileAsync(scene,camera)` for the scene and
+  `scenePass.compileAsync(renderer)` for each configured `PassNode`; exercise
+  representative shadow casters. Debug variants (§7) are lab-only: never warm
+  or ship them.
 - **Spawn is a write, not a build.** Population growth touches only the pose
-  storage region and the visible-instance list. Buffers are sized at cap at
-  init: a WebGPU storage-buffer grow is a new buffer plus bind-group rebuild —
-  never mid-scene.
-- **No synchronous meshing.** The hybrid rung (§8.7) runs marching cubes /
-  dual contouring offline or during the load phase, never at spawn.
-- **Determinism makes init cacheable.** Shell geometry, adjacency, and
-  candidate sets are pure functions of `(spec, tier, compiler version)` —
-  cache by the §4 digest and skip the work on revisit.
+  page region, free list, bounds, and visible-instance list. Page buffers never
+  grow in place: a measured overflow policy allocates another fixed page at a
+  controlled boundary, recycles an empty page, defers spawn, or rejects it.
+- **No synchronous meshing.** Reference extraction runs offline or during the
+  load phase, never at spawn. Connectivity-changing morphology requires its
+  separately budgeted dynamic extractor; otherwise it is unsupported.
+- **Determinism makes signature artifacts cacheable.** Reference geometry,
+  blend DAG, closed candidates, weights, and transported frames are pure
+  functions of their §4 identities. Cache each under the identity that actually
+  affects it; do not call the unit preview shell a reusable species mesh.
 
-Boot gates (also in §10): zero pipeline compilations after reveal (count via
-`renderer.info` or a GPU-devtools capture), zero buffer reallocations after
-init, per-spawn main-thread cost ≤ 0.25 ms, first revealed frame ≤ 1.5× the
-steady-state frame time.
+Boot gates (also in §10): zero pipeline compilations after reveal for the
+predeclared variant set (count via `renderer.info` or a GPU capture), zero
+in-page buffer reallocations, separately classified page additions, and product-gated
+cold/spawn/first-visible p50/p95 with allocations and compile events recorded.
 
 ## Architecture upgrade ledger
 
-Do not cite external game implementations as authority. External code may
+Do not cite external implementations as authority. External code may
 supply **test fixtures** only; trust comes from the formulas above and the §10
 numeric gates executed in the lab.
 
@@ -507,11 +759,16 @@ numeric gates executed in the lab.
 | --- | --- |
 | Masked compile-time unroll over all `P` primitives per vertex | Candidate set of size `K`; loop bounded by `K` or actual `P` |
 | `Q = 7` FD gradient taps per shader field query | Fused analytic gradient (`Q = 1`); FD only on CPU for parity |
-| Per-instance pose in material uniforms (one draw per creature) | Per-species storage-buffer SoA + instancing |
+| Per-instance pose in material uniforms (one draw per creature) | Per-topology/tier fixed-capacity storage pages + instancing |
 | `frustumCulled = false` | Local pose + root transform + per-instance posed bounds |
-| Crowd outline = second full snap draw per creature | Post ID/normal edge pass; iso-offset hull hero-only |
+| Repeated-population outline = second full correction draw per body | Post ID/normal edge pass; iso-offset hull hero-only |
 | Variable render `dt` into gait/hop | Fixed-step accumulator + interpolated presentation pose |
-| Order-dependent sequential smin without canonical sort | Sort by stable part id + explicit blend topology (`kCap`, adjacency) |
-| Shadow pass assumes display `positionNode` | Same snapped position on cast/receive nodes; lab silhouette gate |
-| 32-bit spec hash as sole cache key | Versioned digest: schema + compiler + tier + topology |
-| Debug/tier rebuild per creature | Material-variant cache `{tier, outline, debugMode, K}` + uniform scalars |
+| Sorting ids to hide a non-associative smin fold | Explicit blend tree/groups with per-node symmetric `k`, or a validated permutation-invariant n-ary kernel |
+| K nearby leaves folded in a fresh order | Closed candidate subgraph that preserves declared blend ancestry and passes full-graph error sweeps |
+| Per-slot snapped capsule union shipped as a body mesh | One validated extracted reference mesh per compatible compiler/topology/geometry identity + skinning/local correction; dynamic extraction or explicit rejection for topology change |
+| Euclidean proximity skin weights | Semantic/geodesic or bounded-harmonic weights with contact barriers, normalized capped influences, and twist/bend gates |
+| Posed helper-axis radial basis | Stored rest basis transported continuously with the rig |
+| One resizable global population buffer | Fixed-capacity `{topologySignature, tier}` pages with explicit overflow policy |
+| Shadow pass assumes every position hook has the same space | Local snapped `positionNode`/`castShadowPositionNode`; derived world `positionWorld` for receive; lab silhouette/lookup gates |
+| 32-bit spec hash as sole cache key | Separated strong compiler/topology/geometry identities from §4 |
+| Debug/tier rebuild per creature | Signature-aware material-variant cache + uniform scalars |

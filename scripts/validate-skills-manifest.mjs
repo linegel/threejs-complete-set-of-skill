@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { readFileSync, readdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,10 +36,39 @@ if (skillDirs.length === 0) fail('no top-level threejs-* skill directories found
 const frontmatterByDir = new Map();
 for (const dir of skillDirs) {
   const skillPath = join(root, dir, 'SKILL.md');
-  const fm = parseFrontmatter(readFileSync(skillPath, 'utf8'), `${dir}/SKILL.md`);
+  const skillText = readFileSync(skillPath, 'utf8');
+  const fm = parseFrontmatter(skillText, `${dir}/SKILL.md`);
   if (fm.name !== dir) fail(`${dir}/SKILL.md name is "${fm.name}", expected "${dir}"`);
   if (!fm.description || fm.description.length < 40) fail(`${dir}/SKILL.md has a missing or too-short description`);
+  if (/\b(?:latest|high-quality|high-performance|maximum-performance|production-ready)\b/i.test(fm.description)) {
+    fail(`${dir}/SKILL.md description uses marketing or time-unstable language`);
+  }
   frontmatterByDir.set(dir, fm);
+
+  const referencesDir = join(root, dir, 'references');
+  const markdownPaths = [skillPath];
+  if (existsSync(referencesDir)) {
+    for (const name of readdirSync(referencesDir).filter((entry) => entry.endsWith('.md'))) {
+      markdownPaths.push(join(referencesDir, name));
+    }
+  }
+
+  for (const markdownPath of markdownPaths) {
+    const text = readFileSync(markdownPath, 'utf8');
+    const relativePath = markdownPath.slice(root.length + 1);
+    const fenceCount = (text.match(/^```/gm) ?? []).length;
+    if (fenceCount % 2 !== 0) fail(`${relativePath} has unbalanced fenced code blocks`);
+
+    for (const match of text.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
+      let target = match[1].trim();
+      if (!target || target.startsWith('#') || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
+      if (target.startsWith('<') && target.endsWith('>')) target = target.slice(1, -1);
+      target = target.split('#')[0].split('?')[0];
+      if (!target) continue;
+      const absoluteTarget = resolve(dirname(markdownPath), decodeURIComponent(target));
+      if (!existsSync(absoluteTarget)) fail(`${relativePath} links to missing local target ${target}`);
+    }
+  }
 }
 
 const rootManifestText = readFileSync(join(root, 'skills.json'), 'utf8');

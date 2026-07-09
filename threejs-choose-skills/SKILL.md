@@ -1,55 +1,194 @@
 ---
 name: threejs-choose-skills
-description: Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work and diagnose version-specific Three.js/WebGPU API or renderer failures. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, known-issue debugging, upgrade triage, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.
+description: Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, procedural worlds, and version-specific renderer debugging. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.
 ---
 
 # Three.js WebGPU/TSL Choose Skills
 
-This pack teaches one implementation path: latest Three.js r185-era `WebGPURenderer` from `three/webgpu`, TSL from `three/tsl`, `NodeMaterial` families, node post pipelines, and compute/storage where the algorithm benefits. Route only after the renderer, backend, ownership, and performance architecture are known.
+This router targets the repository's `[Gated] r185` architecture: `WebGPURenderer`
+from `three/webgpu`, TSL from `three/tsl`, `NodeMaterial` families, node
+`RenderPipeline`, and compute/storage only when the workload justifies them.
+The installed package plus runtime `THREE.REVISION` are the revision gate;
+verify lockfile coherence separately. Never infer API availability from the
+router's version label.
 
-Fallback for unavailable WebGPU is not part of this router's destination-skill
-guidance. If, and only if, the user explicitly asks how to apply fallback when
-WebGPU is unavailable, route that teaching to
-`$threejs-compatibility-fallbacks` after the canonical owner skill is known. Do
-not route unrelated target-support or tuning work there.
+Fallback for unavailable WebGPU is quarantined. If, and only if, the user asks
+how to apply fallback when WebGPU is unavailable, route that teaching to
+`$threejs-compatibility-fallbacks` after finding the canonical owner. Otherwise
+retain the flagship route and report the unavailable WebGPU requirement as a
+blocker. Never dilute destination skills with alternate-renderer branches.
 
-## Mandatory WebGPU Preflight
+## Quantitative Evidence Labels
 
-Do this before loading any destination skill:
+Every quantitative claim, budget value, threshold, count, resolution, memory
+figure, timing, and example must carry one of these labels inline:
 
-1. Record the installed Three.js revision and check the matching migration guide for the release band.
-2. Initialize `WebGPURenderer` and record the backend, target browser/device/GPU class, canvas size, pixel ratio, and whether the authored feature uses TSL nodes, compute, storage textures/buffers, MRT, node post, or built-in nodes.
-   - If the backend cannot support the canonical feature and the user explicitly asked how to apply fallback when WebGPU is unavailable, load `$threejs-compatibility-fallbacks`.
-   - If the user did not explicitly ask how to apply fallback when WebGPU is unavailable, keep the flagship route and report the missing requirement as a blocker.
-3. Choose the highest-throughput architecture first: compute/storage for simulation or dense instance state, MRT to share depth/normal/velocity/albedo data, temporal/reduced-resolution passes for expensive screen effects, `BatchedMesh`/`InstancedMesh`/LOD/chunk culling for scale, adaptive DPR for pressure, and shader warmup with `renderer.compileAsync()`.
-4. Assign early ownership for shared resources: one depth source, one normal/velocity source, one history source, one tone-map owner, one output color conversion owner, and one place that adapts resolution.
-5. Define the performance budget before implementation: target frame time, pass count, draw calls, triangle/instance counts, dispatch counts, storage sizes, render-target memory, texture memory, and permitted quality tiers.
+| Label | Meaning | Permitted use |
+| --- | --- | --- |
+| `[Derived]` | Algebra from named inputs with units and the formula recorded. | Frame interval, attachment bytes, dispatch extent, or another reproducible calculation. |
+| `[Gated]` | A capability, correctness invariant, product constraint, or acceptance bound. It is not a performance estimate. | Supported API/format, accuracy tolerance, memory ceiling, ownership invariant. |
+| `[Measured]` | Captured on a named browser/device/GPU at named resolution, DPR, scene state, quality state, and sampling protocol. | Full-frame CPU/GPU distributions, pass timings, memory, thermal behavior. |
+| `[Authored]` | An explicitly authored starting point or policy fixed before a run; it cannot prove acceptance. | Initial quality level, controller persistence, interaction reserve. |
 
-### Pre-Route Cause Ledger
+Serialize reported values as `{ value, unit, label, source }`. An unlabelled
+numeric budget is unknown. Do not route or accept from it. A
+published skill table is not `[Measured]` for the composed scene unless its
+device, resolution, included work, and harness match.
 
-Write this ledger before selecting image or post-processing skills:
+## Mandatory Preflight
+
+Complete this before loading a destination skill:
+
+1. Record the installed Three.js package/revision, inspect the matching migration
+   guide, initialize `WebGPURenderer`, and record the actual backend. Record the
+   required release/backend/features `[Gated]` and the installed/runtime facts
+   `[Measured]`; verify their coherence.
+2. Classify the workload and state its truth contract, interaction, temporal
+   behavior, scale, topology, view pattern, deployment matrix, and permissible
+   error. Missing product inputs are blockers, not invitations to guess.
+3. Run the visual-causality and algorithm-selection gate. Choose from explicit
+   candidates; do not assume compute, MRT, ray marching, temporal accumulation,
+   or maximal geometry is faster or more faithful.
+4. Build a resource/pass ownership graph before selecting effects: scene color,
+   depth, normal, velocity, identifiers, history, tone map, output transform,
+   and adaptive quality each need an owner or an explicit `not used` value.
+5. Define `[Gated]` frame, memory, visual-error, and update-latency bounds from
+   the product target. Define the measurement matrix before implementation.
+6. Route the smallest skill intersection that owns the missing causal systems.
+   Defer consumers until their input signal exists.
+
+### Workload Classification
+
+Use this compact record. Domain is context; the other axes select algorithms.
 
 ```yaml
-physicalCause: ""                 # authored mechanism that creates the visible result
-missingSignal: ""                 # geometry/material/light/field/simulation signal not yet present
-noPostBaseline: ""                # what must remain readable with bloom/AO/grading disabled
-postProcessingRejectedBecause: "" # why a post effect would hide, not solve, the gap
-primaryVisualContract: ""         # one sentence that acceptance evidence must prove
+workloadProfile:
+  domain: scientific-visualization | product-configurator | architecture-aec | cinematic-art | digital-twin | data-scene | other
+  intent: explain | inspect | configure | coordinate | present | monitor
+  truthContract: metric | identity | physically-plausible | perceptual-style
+  representation: imported-hierarchy | procedural-mesh | points-glyphs | lines-graph | surface-field | volume-field | hybrid
+  interaction: fixed-view | orbit | free-navigation | direct-manipulation | multi-view
+  temporal: static | deterministic-animation | simulation | sparse-events | streamed-deltas | live-irregular-updates
+  scale: object | room | building | city-terrain | planetary | multiscale
+  topology: imported-unique | procedural-unique | repeated | streamed-changing
+  viewPattern: bounded | unconstrained | sectioned | overview-to-detail
+  residency: host-authoritative | gpu-resident | hybrid
+  uploadAndReadbackNeeds: []
+  deployment: []
+  authoredResolutionAndDpr: [] # numeric-evidence records
+  errorBounds: []
+  updateLatencyBound: { value: "", unit: ms, label: Gated, source: "product contract" }
 ```
 
-Route image effects only after the source signal exists. If `physicalCause` or
-`missingSignal` is unknown, select the subject-generation owner first and defer
-post-processing.
+| Domain | First protected property | Common routing error |
+| --- | --- | --- |
+| Scientific visualization | Coordinate, topology, units, transfer function, uncertainty, and declared numerical error. | Trading metric truth for smooth temporal imagery or decorative post. |
+| Product/configurator | Silhouette, variant identity, material response, color management, and predictable interaction. | Treating asset preparation as procedural geometry or hiding material errors with bloom/AO. |
+| Architecture/AEC | Dimensions, section/occlusion semantics, spatial legibility, large-model culling, and stable navigation. | Loading procedural-building grammar for imported BIM/CAD or using a monolithic draw path. |
+| Cinematic/art | Shot composition, motion language, authored lighting, temporal coherence, and final-image intent. | Starting with grading before silhouette, light transport, and emission exist. |
+| Digital twin | Stable entity identity, update age, interpolation policy, spatial scale, and sustained operation. | Binding rendering directly to bursty data arrival or rebuilding immutable geometry per update. |
+| Dense data scene | Mapping fidelity, glyph/point density, selection identity, occlusion policy, and overview-to-detail behavior. | Choosing a representation without accounting for projected density and interaction. |
+
+### Visual-Causality Ledger
+
+```yaml
+causeLedger:
+  sourceOfTruth: ""
+  userQuestion: ""
+  primaryObservable: ""
+  truthOrStyleInvariant: ""
+  unitsAndCoordinateFrame: ""
+  missingDataAndUncertainty: ""
+  physicalOrDataCause: ""
+  earliestMissingLayer: topology | geometry | field | material | illumination | transport-volume | motion | camera-projection | image-transform
+  missingSignal: ""
+  candidateAlgorithms: []
+  selectedAlgorithm: ""
+  rejectedAlgorithms: []
+  rejectionEvidence: []
+  noPostBaseline: ""
+  postProcessingRejectedBecause: ""
+  primaryVisualContract: ""
+  errorMetric: ""
+  truthDebugView: ""
+```
+
+Select the earliest missing causal layer. A screen effect cannot repair wrong
+topology, an incorrect transfer function, missing shadows, a bad BRDF, or an
+unstable camera. Post-processing is eligible only when its source signal and
+no-post baseline are already proven.
+
+### Algorithm-Selection Gate
+
+| Decision | Select from evidence | Reject when |
+| --- | --- | --- |
+| Imported, procedural, or hybrid subject | Preserve authoritative CAD/BIM/scientific/glTF data; generate only missing semantics or scalable detail. | A procedural replacement would violate identity, dimensions, topology, or measured data. |
+| Geometry, displacement, material normal/parallax, or screen-space cue | Use geometry for silhouette, intersections, section cuts, cast shadows, and close parallax; use cheaper representations only when the view/error contract permits. | The representation cannot reproduce the observable it is supposed to cause. |
+| Analytic, sampled-data, numerical simulation, or stochastic model | Match the required conservation law, controllability, uncertainty, and update cadence. | A more complex solver adds no observable contract or a shortcut violates the error bound. |
+| CPU update, vertex/fragment evaluation, or compute/storage | Compare state volume, reuse across passes, synchronization, upload/readback, and target-device timings. | Compute merely moves small or rarely reused work behind dispatch and storage overhead. |
+| `BatchedMesh`, `InstancedMesh`, merged geometry, or chunked/streamed LOD | Match geometry reuse, material compatibility, per-entity identity, transform/update frequency, culling granularity, and measured backend draw entries. | Batching destroys required culling/selection identity, dynamic updates rewrite excessive data, or the route makes the forbidden `[Gated]` assumption of one GPU draw per BatchedMesh family. |
+| Minimal forward attachments or shared MRT | Enumerate downstream consumers and compare composed variants on the target GPU. | An attachment has no proven consumer or its store/read bandwidth exceeds saved geometry/pass work. |
+| Spatial estimator, temporal estimator, or deterministic accumulation | Use temporal history only with valid motion/rejection data and a latency/ghosting contract. | Live data, disocclusion, transparency, or quantitative display makes history bias unacceptable. |
+| Raster surface, impostor, point/glyph, or bounded ray march | Choose from projected size, topology, interior/volume requirement, depth ordering, and error tolerance. | The algorithm spends samples where the result is sub-pixel or loses required topology/opacity semantics. |
+
+The route must name the losing alternatives and the evidence that rejected them.
+When target evidence does not distinguish candidates, retain an A/B prototype in
+the plan instead of asserting a winner.
+
+Any screen-error argument for LOD, tessellation, impostors, field bands, or
+simulation extent follows the shared
+[physical-pixel projected-error contract](references/projected-error-contract.md):
+unjittered projection, complete deformed support, nearest positive depth,
+per-view evaluation, hysteresis/dwell, and simultaneous transition memory.
 
 ### Route Manifest
 
-Every route decision must produce a structured manifest:
+Every route decision produces this shape:
 
 ```yaml
+backendManifest:
+  requiredReleaseBand: { value: "", unit: revision, label: Gated, source: "repository contract" }
+  installedPackageVersion: { value: "", unit: semver, label: Measured, source: "installed package" }
+  runtimeRevision: { value: "", unit: revision, label: Measured, source: "THREE.REVISION after import" }
+  requiredBackend: { value: WebGPU, unit: backend, label: Gated, source: "flagship route contract" }
+  actualBackend: { value: "", unit: backend, label: Measured, source: "initialized renderer" }
+  deviceBrowserGpu: { value: "", unit: identity, label: Measured, source: "target run" }
+  cssViewport: { value: "", unit: css-pixels, label: Measured, source: "target run" }
+  rendererDpr: { value: "", unit: ratio, label: Measured, source: "initialized renderer" }
+  physicalRenderExtent: { value: "", unit: physical-pixels, label: Derived, source: "CSS viewport and renderer DPR" }
+  compatibilityMode: { value: "", unit: boolean, label: Measured, source: "initialized backend" }
+  requestedSamples: { value: "", unit: samples-per-pixel, label: Authored, source: "render contract" }
+  actualRendererSamples: { value: "", unit: samples-per-pixel, label: Measured, source: "initialized renderer" }
+  maxColorAttachments: { value: "", unit: attachments, label: Measured, source: "initialized WebGPU device limits" }
+  maxColorAttachmentBytesPerSample: { value: "", unit: bytes-per-sample, label: Measured, source: "initialized WebGPU device limits" }
+  featureGates: []
+  apiProof: []
+workloadProfile: {}
+causeLedger: {}
 selectedSkills: []
 omittedSkills: []
 primaryOwner: ""
 deferredSkills: []
+owners:
+  sourceOfTruth: ""
+  representation: ""
+  spatialFrame: ""
+  timebase: ""
+  semanticIds: ""
+  selectionPicking: ""
+  clipSection: ""
+  presentation: ""
+  validation: ""
+requiredSignals:
+  sceneColorRegistry: {}
+  depthRegistry: {}
+  normalRegistry: {}
+  velocityRegistry: {}
+  objectIdRegistry: {}
+  historyRegistry: {}
+domainSignals: {}
+outputOwnersByPresentationTarget: {}
+# Compatibility projection for existing route tooling; "not used" never allocates.
 sharedResourceOwners:
   gbuffer: ""
   depth: ""
@@ -60,6 +199,40 @@ sharedResourceOwners:
   toneMap: ""
   outputTransform: ""
   adaptiveResolution: ""
+performanceContract:
+  requestedRefresh: { value: "", unit: Hz, label: Authored, source: "product brief" }
+  actualDisplayRefresh: { value: "", unit: Hz, label: Measured, source: "target run" }
+  frozenTargetRefresh: { value: "", unit: Hz, label: Gated, source: "accepted target envelope" }
+  frameInterval: { value: "", unit: ms, label: Derived, source: "1000 ms / frozenTargetRefresh" }
+  cpuP95Budget: { value: "", unit: ms, label: Gated, source: "derived CPU envelope" }
+  gpuP95Budget: { value: "", unit: ms, label: Gated, source: "derived GPU envelope" }
+  presentedP95Budget: { value: "", unit: ms, label: Gated, source: "presentation contract" }
+  peakLiveMemoryBudget: { value: "", unit: bytes, label: Gated, source: "target memory contract" }
+  cpuEnvelopeInputs: [] # numeric-evidence records
+  gpuEnvelopeInputs: [] # numeric-evidence records
+  interactionReserve: { value: "", unit: ms, label: Authored, source: "planning only; never acceptance" }
+  errorBounds: []
+  aggregationPolicy:
+    basis: composed-full-frame-plus-paired-sample-marginals
+    acceptance: measured-composed-frame
+    forbidden: [standalone-total-addition, subsystem-percentile-addition, fixed-time-overhead]
+  drawAccounting:
+    source: renderer-info-plus-backend-trace
+    batchedMeshModel: backend-multidraw-entries-measured
+    forbiddenAssumption: single-gpu-draw-per-batchedmesh-material-family
+  mrtDecision:
+    status: not-used | candidate | accepted
+    attachments: []
+    consumerProof: []
+    targetABEvidence: []
+    tileGpuEvidence: []
+  costRecords: []
+  passKeys: []
+  passLedger: []
+  qualityLadder: []
+  qualityController: {}
+  routeStatus: provisional | measured-valid | invalid | unmeasurable
+coverageStatus: complete | partial | blocked
 acceptanceEvidence:
   requiredDebugViews: []
   requiredMetrics: []
@@ -67,165 +240,417 @@ acceptanceEvidence:
   requiredArtifacts: []
 ```
 
-`selectedSkills` must be the smallest expert set that can author the requested
-mechanism. `omittedSkills` records tempting but unnecessary skills and why they
-were not loaded. `primaryOwner` is the skill that owns the first non-post visual
-mechanism. `deferredSkills` are loaded only after their input signal exists.
-Every recipe and route manifest must carry the same `sharedResourceOwners` keys
-shown above, using an explicit empty or not-used value when the route does not
-consume that shared resource.
+`selectedSkills` is the smallest set that authors the requested causes.
+`primaryOwner` owns the earliest non-post missing layer. `omittedSkills` records
+tempting but unnecessary routes and their rejection reason. `deferredSkills`
+cannot be loaded until their source signal is proven. `owners` separates
+authoritative source/data, render representation, spatial/time/identity policy,
+presentation, and validation. `requiredSignals` describes actual allocation:
+an owner does not imply a depth, normal, velocity, ID, history, or MRT output.
+Every signal in a recipe has a producer and consumers or `not used`.
+`sharedResourceOwners` is retained as a compatibility projection for existing
+route tooling. It mirrors actual `requiredSignals`, `domainSignals`, and
+`outputOwnersByPresentationTarget`; assigning a name there never authorizes allocation. `history`
+names the coordinator, while keyed histories remain separate by semantic signal,
+view, encoding, resolution, jitter, cadence, and reset policy.
+Signal and output registries are keyed by view/presentation target. Depth,
+velocity, histories, and output conversion from different cameras, layers,
+jitter, time samples, or canvases are not shareable merely because their field
+names match.
 
-### Preflight Checkpoint Outputs
-
-Treat preflight as data, not prose:
+### Preflight Checkpoints
 
 | Checkpoint | Required output |
 | --- | --- |
-| backendManifest | Three.js revision, initialized backend, browser/device/GPU class, `getOutputBufferType()`, feature flags, and blocker if unavailable |
-| routeManifest | `selectedSkills`, `omittedSkills`, `primaryOwner`, `deferredSkills`, `sharedResourceOwners`, `acceptanceEvidence` |
-| ownershipMap | depth, normal, velocity, history, weather, tone-map, output-transform, and adaptive-resolution owners |
-| budgetTable | frame ms, pass count, draw calls, triangles/instances, dispatches, storage bytes, render-target bytes |
-| debugViewList | no-post baseline plus every field/pass needed to prove the mechanism |
-| capabilityBlocker | missing backend/API/format/performance condition that blocks the canonical path |
-| rejectionReason | why an attractive but wrong route was rejected |
-| assert | executable grep, script, screenshot, or evidence-bundle check that proves the route contract |
+| backend manifest | Installed revision, initialized backend, browser/device/GPU, output buffer type, feature gates, and blocker. |
+| workload profile | Classification axes, truth contract, target views, data/update behavior, and error bounds. |
+| cause ledger | Earliest missing layer, candidate algorithms, selected algorithm, rejected alternatives, and no-post contract. |
+| route manifest | Selected/omitted/deferred skills, causal/data/render owners, allocated signals, API proof, and acceptance evidence. |
+| performance contract | Evidence-labelled budgets, cost scopes, unique-pass ledger, quality ladder, and controller. |
+| diagnostics | No-post baseline and every field, buffer, pass, and identity view needed to prove the mechanism. |
+| assertion | Executable test, source grep, capture, or evidence-bundle check for each gate. |
 
 ```js
 import * as THREE from 'three/webgpu';
 
 const renderer = new THREE.WebGPURenderer( {
-  antialias: false,
-  outputBufferType: THREE.HalfFloatType
+  antialias: false
 } );
 
 await renderer.init();
 
 const capabilities = {
   revision: THREE.REVISION,
-  webgpu: renderer.backend.isWebGPUBackend,
+  webgpu: renderer.backend.isWebGPUBackend === true,
   outputBufferType: renderer.getOutputBufferType(),
+  actualSamples: renderer.samples,
+  compatibilityMode: renderer.backend.compatibilityMode,
+  deviceLimits: renderer.backend.device?.limits ?? null,
   rendererInfo: renderer.info
 };
 
-if ( renderer.backend.isWebGPUBackend ) {
-  // Canonical path: TSL + NodeMaterial + RenderPipeline + compute/storage as needed.
-} else {
+if ( capabilities.webgpu !== true ) {
   throw new Error(
-    'Canonical flagship route requires WebGPU; if fallback teaching was explicitly requested, route to $threejs-compatibility-fallbacks.'
+    'Canonical flagship route requires WebGPU; route fallback teaching only when explicitly requested.'
   );
 }
 ```
 
-Legacy WebGL implementation (deprecated, do not extend): none in this router folder.
+Legacy WebGL implementation: none in this router folder.
 
-## Architecture Gates
+## Installed-Revision Architecture Gates
 
-- Renderer and materials: use `WebGPURenderer`, TSL, and `MeshStandardNodeMaterial`, `MeshPhysicalNodeMaterial`, `MeshBasicNodeMaterial`, `SpriteNodeMaterial`, or sibling node materials.
-- Post stack: use `RenderPipeline`, `pass()`, `mrt()`, `renderOutput()`, and `PassNode.setResolutionScale()`; plan shared MRT outputs before individual effects.
-- Compute/storage: use `renderer.compute()` or `renderer.computeAsync()` with `Fn().compute(count)`, `StorageTexture`, `StorageBufferAttribute`, `StorageInstancedBufferAttribute`, `storage()` nodes, `textureStore()`, and barriers/atomics when the algorithm requires synchronization.
-- Built-in nodes first: route to the owner skill with `GTAONode`, `BloomNode`, `TRAANode`, `DepthOfFieldNode`, `CSMShadowNode`, `TileShadowNode`, and sky/fog nodes as the first baseline when they cover the need.
-- Scale primitives: choose `BatchedMesh` for many unique static meshes sharing compatible material state, `InstancedMesh` or storage-instanced attributes for repeated dynamic populations, chunked LOD/culling for fields, and adaptive DPR for sustained pressure.
+`[Gated]` in this section means verify against the installed revision and target
+backend before coding.
 
-### r185 API Proof Table
+- Renderer/materials: `WebGPURenderer`, TSL, and the appropriate node-material
+  family. Do not mix a legacy post or material path into the flagship graph.
+- Frame graph: use `RenderPipeline`, `pass()`, `mrt()`, `renderOutput()`, and
+  `PassNode.setResolutionScale()` where proven. Plan producers, consumers,
+  formats, resolutions, lifetimes, and history invalidation before effects.
+  Configure MRT and request every consumed MRT/pass output before
+  `await scenePass.compileAsync( renderer )`. `renderPipeline.render()` owns
+  animation-loop presentation; deprecated `renderAsync()` is not a route.
+  After changing `outputNode` or `outputColorTransform`, set
+  `renderPipeline.needsUpdate = true`.
+- Compute/storage: use `renderer.compute()` or `renderer.computeAsync()` with
+  installed TSL storage APIs only when the algorithm-selection gate justifies
+  dense GPU-resident generation/reduction, persistent state, or cross-pass
+  reuse. Record dispatch extent `[Derived]`;
+  validate synchronization and bounds `[Gated]`. After initialization,
+  `computeAsync()` is not a GPU-completion fence. Workgroup/storage barriers do
+  not provide global cross-workgroup ordering; use dispatch/pass boundaries and
+  ping-pong state for global dependencies.
+- Built-ins: start from `GTAONode`, `BloomNode`, `TRAANode`, `TAAUNode`,
+  `DepthOfFieldNode`, and sky/fog nodes when they implement the required
+  mechanism. Start shadows from ordinary light shadows; use `CSMShadowNode` or
+  `TileShadowNode` only when their coverage/error contract and measured cost
+  justify them. `TileShadowNode` tiles shadow coverage; it is not a tile-GPU
+  performance primitive. Replace built-ins only with evidence.
+  In the `[Gated]` installed revision, gate TAAU on disabled MSAA and the
+  required lower-resolution beauty/depth/velocity inputs; gate
+  `TileShadowNode` away from VSM.
+- Scale: select batching/instancing/merging/chunking from topology, material,
+  identity, update, and culling requirements. Avoid universal draw-count limits;
+  CPU submit, GPU work, and memory behavior are `[Measured]` per target.
+  `[Gated]` in installed r185, `BatchedMesh` does not prove a single GPU draw per
+  material family: the WebGPU backend submits and updates renderer info per
+  `_multiDrawCount` entry. Use it for compatible state/scene management,
+  per-object culling, and replacement; measure backend draw entries instead of
+  budgeting a family as one draw.
+- Precision: choose coordinate origin, buffer precision, depth convention, and
+  data encoding from the workload's scale/error contract. Scientific/AEC truth
+  wins over an attractive but numerically unstable shortcut.
+- Adaptive quality: `[Gated]` a single controller owns DPR and subsystem tiers.
+  Each subsystem exposes monotonic quality states and its visual/error
+  consequences.
+  Record renderer DPR and every pass resolution scale separately because their
+  physical extents compose. A scale/attachment transition updates texel
+  uniforms, jitter, velocity, and history allocation/reset atomically.
 
-Every named r18x API in a route needs `apiProof` from installed source or
-official docs before coding; do not guess current APIs.
+### Installed-Source API Proof
 
-| API | Import path / proof target |
+| API | `[Gated]` proof target |
 | --- | --- |
-| `WebGPURenderer`, `RenderPipeline` | `three/webgpu`; verify in installed source before use |
-| `pass`, `mrt`, `renderOutput` | `three/tsl`; verify in installed source before use |
-| `ao` / `GTAONode` | `three/addons/tsl/display/GTAONode.js` |
-| `bloom` / `BloomNode` | `three/addons/tsl/display/BloomNode.js` |
-| `traa` / `TRAANode` | `three/addons/tsl/display/TRAANode.js` |
-| `dof` / `DepthOfFieldNode` | `three/addons/tsl/display/DepthOfFieldNode.js` |
-| `CSMShadowNode` | `three/addons/csm/CSMShadowNode.js` |
-| `TileShadowNode` | `three/addons/tsl/shadows/TileShadowNode.js` |
-| `PassNode.setResolutionScale()` | installed `PassNode` source or official docs |
+| `WebGPURenderer`, `RenderPipeline` | `three/webgpu`; installed source/export map |
+| `pass`, `mrt`, `renderOutput` | `three/tsl`; installed source/export map |
+| Default `GTAONode`; named `ao` factory | `three/addons/tsl/display/GTAONode.js` |
+| Default `BloomNode`; named `bloom` factory | `three/addons/tsl/display/BloomNode.js` |
+| Default `TRAANode`; named `traa` factory | `three/addons/tsl/display/TRAANode.js` |
+| Default `TAAUNode`; named `taau` factory | `three/addons/tsl/display/TAAUNode.js`; verify scene-pass/sample constraints |
+| Default `DepthOfFieldNode`; named `dof` factory | `three/addons/tsl/display/DepthOfFieldNode.js` |
+| Named `CSMShadowNode` class export | `three/addons/csm/CSMShadowNode.js` |
+| Named `TileShadowNode` class export | `three/addons/tsl/shadows/TileShadowNode.js` |
+| `PassNode.setResolutionScale()` | Installed `PassNode` source |
 
-Record `apiProof` in the route manifest when an implementation depends on one
-of these APIs.
+Record exact file/export proof in the manifest. A nearby release example is not
+proof for the installed package.
 
-### Known-Issue Debugging
+### Known-Issue Investigation
 
-Use this only when the task is debugging, auditing a suspicious behavior, or
-deciding whether a Three.js upgrade is the right fix. Do not load known-issue
-lore into ordinary visual design requests such as building a sun, moon, land,
-water, creature, or atmosphere system.
+Use this only for a concrete bug, audit, or upgrade decision:
 
-1. Capture the local facts first: installed `THREE.REVISION`, package version,
-   import path, renderer class, initialized backend, browser/GPU, failing API
-   name, console error, and the smallest local repro or fixture.
-2. Inspect installed source and official docs for that revision before
-   searching upstream. Many "bugs" are stale API names, wrong import paths,
-   missing `await renderer.init()`, duplicated output conversion, or a mismatch
-   between WebGPU and legacy WebGL examples.
-3. Search upstream only with the concrete symptom and API names, not a generic
-   list of traps. Use GitHub issues, PRs, release notes, and migration guides to
-   classify candidates as `active`, `fixed-after-installed-revision`,
+1. Capture installed revision, imports, initialized backend, browser/GPU, error,
+   failing API, and minimal local repro.
+2. Inspect installed source and the matching official migration material before
+   searching upstream. Test stale imports, missing initialization, duplicated
+   output conversion, and backend mismatch as hypotheses, not folklore.
+3. Search upstream with the concrete symptom/API. Record issue state, affected
+   revision range, merge/fix release, and repro equivalence.
+4. Classify each candidate as `active`, `fixed-after-installed-revision`,
    `not-reproduced`, `intentional-api-change`, or `unrelated`.
-4. For each credible hit, verify the issue/PR state, merge commit or release,
-   affected revision range, first fixed release, and whether the local repro
-   matches the upstream repro. A closed issue is not proof the installed build
-   contains the fix.
-5. Decide from evidence: recommend upgrade when the project is behind a fixed
-   release; recommend a local workaround only when upgrade risk or project
-   constraints are stronger; report a blocker when neither path is proven.
-6. Output a compact investigation note, not a cheat sheet:
+5. Recommend upgrade, local workaround, or blocker only from this evidence.
 
-```yaml
-knownIssueInvestigation:
-  installedRevision:
-  latestRevisionChecked:
-  symptom:
-  localRepro:
-  localSourceFinding:
-  upstreamCandidates:
-    - url:
-      status:
-      affectedRange:
-      firstFixedRelease:
-      matchesLocalRepro:
-  decision:
+Never call an issue current merely because it is closed or memorable.
+
+## Quality Tiers
+
+Every implementation defines canonical WebGPU tiers; no alternate renderer is a
+tier.
+
+| Tier | Contract |
+| --- | --- |
+| Full | Highest authored fidelity that passes `[Gated]` truth/error and `[Measured]` sustained budgets. |
+| Budgeted | Same architecture with reduced resolution, samples, march extent, simulation density, LOD, update cadence, or optional passes selected from the measured bottleneck. |
+| Minimum viable | Cheapest WebGPU path that preserves the declared primary observable and hard correctness/error bounds. |
+
+For scientific visualization, AEC, digital twins, and data scenes, quality
+adaptation must not silently alter values, transfer-function semantics, stable
+IDs, topology, dimensions, or uncertainty. If a lower tier changes such a
+quantity, expose the tier and its `[Gated]` error bound to the user.
+
+## Performance Contract And Aggregation
+
+### Budget Inputs
+
+Do not use universal desktop/mobile pass, draw, triangle, or memory budgets.
+Build a target matrix from the product brief and representative hardware:
+
+```text
+[Derived] frameIntervalMs = 1000 ms / targetRefreshHz
+[Derived] cpuSceneEnvelopeMs = frameIntervalMs - measuredMainThreadReserveMs - authoredCpuSafetyReserveMs
+[Derived] gpuSceneEnvelopeMs = frameIntervalMs - measuredCompositorGpuReserveMs - authoredGpuSafetyReserveMs
 ```
 
-Never call a GitHub issue a current Three.js trap unless this investigation
-proves it against the installed revision. Never carry issue IDs forward as
-ambient context for unrelated feature work.
+`targetRefreshHz` is `[Gated]`; reserves are `[Measured]` under the target host
+shell or explicitly provisional `[Authored]` starting points. Freeze separate
+`[Gated]` CPU/GPU tail-latency limits from the derived envelopes. CPU and GPU
+stages can overlap, so never add their durations unless a measured dependency
+serializes them. Memory, upload, update latency, presentation cadence, and
+deadline misses remain separate gates. End-to-end acceptance uses the composed
+frame, not independent skill tables.
 
-## WebGPU Quality Tiers
+### Cost Scope
 
-Every routed implementation defines explicit tiers inside the canonical WebGPU/TSL architecture:
+Every cost record declares exactly one scope:
 
-| Tier | Use when | Required degradation |
+| Scope | Meaning | Can be added? |
 | --- | --- | --- |
-| Full | `renderer.backend.isWebGPUBackend` is true and budgets hold | All authored compute/storage, MRT, temporal history, and node post paths enabled. |
-| Budgeted | Frame time or memory exceeds budget | Lower DPR, lower pass resolution with `setResolutionScale()`, fewer raymarch steps/samples, smaller simulation grids, sparser LOD, and update amortization. |
-| Minimum viable | WebGPU exists but the target GPU is below budget | Keep the same architecture while reducing density, resolution, history length, update cadence, and optional passes. |
+| `full-frame` | Entire composed frame under the stated harness. | No; it is the acceptance result. |
+| `marginal-feature` | Paired feature-on minus feature-off cost in the same composed harness. | Only provisionally with compatible measurements and unique pass/resource work. |
+| `unique-pass` | Timestamped pass/dispatch that appears once in the pass ledger. | Only once; overlapping queues and bandwidth interactions still require full-frame validation. |
+| `memory` | Resident or transient bytes with lifetime and format. | Add unique allocations whose lifetimes overlap; do not convert bytes to time. |
+| `standalone-total` | Total from a skill demo or isolated fixture. | Never add to another total; use only to select what to measure. |
+| `unknown` | Missing includes/excludes, harness, or numeric-evidence label/source. | No. |
 
-Do not define alternate-renderer tiers here. Use
-`$threejs-compatibility-fallbacks` only for an explicit request to teach how to
-apply fallback when WebGPU is unavailable.
+```yaml
+costRecord:
+  id: ""
+  scope: full-frame | marginal-feature | unique-pass | memory | standalone-total | unknown
+  deviceBrowserGpu: { value: "", unit: identity, label: Measured, source: "benchmark profile" }
+  cssViewport: { value: "", unit: css-pixels, label: Measured, source: "benchmark profile" }
+  rendererDpr: { value: "", unit: ratio, label: Measured, source: "benchmark profile" }
+  renderExtent: { value: "", unit: physical-pixels, label: Derived, source: "CSS viewport and renderer DPR" }
+  qualityState: ""
+  sceneStateAndSeed: ""
+  includes: []
+  excludes: []
+  passKeys: []
+  cpuP50: { value: "", unit: ms, label: Measured, source: "benchmark trace" }
+  cpuP95: { value: "", unit: ms, label: Measured, source: "benchmark trace" }
+  gpuP50: { value: "", unit: ms, label: Measured, source: "GPU timestamp trace" }
+  gpuP95: { value: "", unit: ms, label: Measured, source: "GPU timestamp trace" }
+  presentedP50: { value: "", unit: ms, label: Measured, source: "presentation trace" }
+  presentedP95: { value: "", unit: ms, label: Measured, source: "presentation trace" }
+  bytes: { value: "", unit: bytes, label: Derived, source: "logical allocation ledger" }
+  method: ""
+```
 
-## Performance Budgets
+Every populated percentile field is `[Measured]`. A range maximum from a
+standalone destination skill remains `standalone-total`; relabeling it
+`marginal-feature` is forbidden.
 
-Use these starting budgets unless the product target is stricter:
+### Correct Composed-Scene Estimate
 
-| Target | Frame | GPU budget | Typical constraints |
-| --- | --- | --- | --- |
-| Desktop discrete | 60 Hz | 10-12 ms GPU, 2-4 ms CPU submit | 3-6 full-res passes, 2-6 reduced passes, <= 300 visible draws before batching, <= 256 MB transient render targets. |
-| Desktop integrated | 60 Hz | 6-8 ms GPU, 2 ms CPU submit | 2-4 full-res passes, quarter/half-res expensive effects, <= 120 visible draws, <= 128 MB transient render targets. |
-| Mobile or thermally constrained | 30-60 Hz | 4-7 ms GPU, 1.5 ms CPU submit | 1-2 full-res passes, aggressive DPR, sparse updates, <= 80 visible draws, <= 64 MB transient render targets. |
+Delete the old additive-maxima rule and fixed composition overhead. It
+double-counted scene passes/post work and mixed standalone totals with subsystem
+marginals. Base scene traversal, present, upsample, tone map, and shared buffers
+are measured or derived from the unique pass ledger; none receives an invented
+fixed time.
 
-Record measured `renderer.info`, draw calls, triangles, texture/render-target counts, dispatch sizes, storage sizes, and frame-time evidence before acceptance.
+For planning only:
 
-## Composed-scene budget aggregation
+```text
+[Derived] T_plan,k = T_base,k + sum(deltaT_unique,compatible,k) + R_interaction,k
+[Derived] Q_plan,p = quantile over k of T_plan,k
+```
 
-### Routing preflight
+- `T_base,k` is a `[Measured]` composed-baseline frame sample with the shared scene/present
+  architecture enabled.
+- Each `deltaT...k` is `[Measured]` paired marginal work from the same target,
+  resolution, seed/path, and quality context, and its pass keys are unique.
+- `R_interaction,k` is an `[Authored]` starting-point allowance for unmeasured
+  cache, queue, bandwidth, scheduling, and coupling effects. It is replaced by
+  composed measurement, not tuned to make the route pass.
 
-Before composing a route, enumerate the actually available `threejs-*` skills in
-the live inventory. Compare that inventory against this roster from the current
-workspace:
+If compatible samplewise traces are unavailable, do not manufacture a numeric
+aggregate from skill rows; keep the route qualitative and provisional.
+
+This estimate is not an acceptance proof: percentile sums are not the
+percentile of a sum, GPU work can overlap, and added attachments can change the
+cost of existing passes. A route is performance-valid only when the final
+composition satisfies `[Measured]` CPU and GPU p50/p95, memory, latency, and
+sustained-state gates on the target matrix.
+
+For a feature (s) added to composed graph (G), pair contemporaneous frame
+samples:
+
+```text
+[Derived] deltaT_s|G,k = T_k(G with s) - T_k(G without s)
+```
+
+Report `[Measured]` p50/p95 of the paired differences. Never subtract two
+independently sampled percentiles: quantiles are not additive and their tails
+may occur on different frames. If GPU timestamps are unsupported, mark GPU
+timing `unmeasurable`; CPU or presentation timing cannot be relabelled as GPU
+evidence.
+
+### Shared-Pass Deduplication
+
+Build the union of pass keys, never concatenate skill-local pass lists:
+
+```yaml
+passRecord:
+  key: "stable semantic producer key"
+  runtimeRole: exclusive | shared | validation-only | compile-time-only
+  accountingOwner: ""
+  viewScope:
+    scene: ""
+    camera: ""
+    view: ""
+    layers: ""
+    jitter: ""
+    timeSample: { value: "", unit: seconds, label: Authored, source: "reproducible input path" }
+  producer: ""
+  consumers: []
+  kind: cpu-update | upload | render | compute | copy | resolve | present
+  inputs: []
+  outputs: []
+  resolution: { value: "", unit: physical-pixels, label: Derived, source: "canvas, DPR, pass scale" }
+  formats: []
+  sampleCount: { value: "", unit: samples-per-pixel, label: Measured, source: "configured pass after backend normalization" }
+  loadStoreResolve: []
+  lifetime: ""
+  timing:
+    p50: { value: "", unit: ms, label: Measured, source: "GPU timestamp trace" }
+    p95: { value: "", unit: ms, label: Measured, source: "GPU timestamp trace" }
+```
+
+Skills are ownership/algorithm documents, not timing buckets. Mark validation
+and compilation work explicitly; it contributes to validation/startup evidence,
+not steady-frame cost. Shared work has one accounting owner and any number of
+consumers.
+
+If AO, temporal reconstruction, outlines, and grading consume the same scene
+depth/normal/velocity, their owners reference the same producer. Tone mapping,
+output conversion, history update, and upsample are likewise unique semantic
+producers. A consumer that needs another encoding or resolution must declare a
+conversion pass and its bytes; name reuse is not deduplication.
+
+### MRT And Tile-GPU Bandwidth Gate
+
+MRT saves work only when its consumers justify the attachments. For each
+attachment `j`, compute logical uncompressed payloads from labelled inputs:
+
+```text
+[Derived] logicalSamplePayload_j = width_j * height_j * backendSampleCount_j * bytesPerTexel_j * liveSlots_j
+[Derived] logicalResolvedPayload_j = width_j * height_j * bytesPerTexel_j * resolvedStoresPerFrame_j
+```
+
+Every operand is a `{ value, unit, label, source }` record; the products are
+`[Derived]` records citing those operands.
+
+These are representation estimates, not physical allocation or external-memory
+traffic floors. Record requested samples, actual renderer/pass samples,
+backend-normalized samples, MSAA storage, resolve targets, depth/stencil,
+history copies, texture reads, load/store actions, and concurrent lifetimes
+separately. Row alignment applies to explicit copies/readback, not generic render
+target traffic. Compression, tile residency/spills, implementation allocation,
+and external traffic are `[Gated]` or `[Measured]` properties.
+
+On a tile-based GPU, an attachment consumed after its render pass may require
+off-chip store/resolve traffic; a wide G-buffer can therefore lose against a
+minimal forward path even when it removes a geometry pass. Keep attachment
+count/formats minimal, avoid unconsumed outputs, and A/B the minimal-forward and
+shared-MRT compositions on representative mobile hardware. Select from
+`[Measured]` full-frame p50/p95, attachment traffic/counters when available,
+transient memory, and thermal behavior—not desktop intuition.
+
+Do not infer auxiliary MRT formats from `getOutputBufferType()`: prove each
+attachment's type, format, packing, and consumer encoding before compile. Query
+the initialized device's color-attachment count and per-sample byte limits. For
+mobile AO, A/B depth reconstruction against a stored normal attachment. Bloom
+does not justify emissive MRT unless selective emission is required.
+
+### Measurement Protocol
+
+- Fix browser/device/GPU, power/thermal state, canvas CSS size, physical render
+  size, DPR, camera path, seed/data stream, quality state, visibility, and
+  compilation state.
+- Warm and stabilize shaders/resources before sampling. For mobile and
+  integrated devices, continue through a sustained run until thermal and clock
+  behavior are represented; a cold burst is not acceptance evidence.
+- Capture `[Measured]` full-frame CPU p50/p95, presentation p50/p95, and GPU
+  p50/p95 whenever GPU performance is a gate. If required GPU timing is
+  unavailable, performance status is `unmeasurable`, not passing. Also capture
+  dropped/deferred-frame behavior and pass/dispatch timings,
+  uploads, explicit allocation ledgers, render-target logical payloads, and live
+  storage. Treat `renderer.info` as engine counters/logical estimates with known
+  exclusions, not measured VRAM or external traffic. Record hardware counters,
+  residency, power, clocks, and thermal state only when exposed; otherwise mark
+  them unavailable and rely on sustained timing/cadence/quality drift.
+- Measure feature marginals with paired on/off runs over the same deterministic
+  path. Report the sampling method and run-to-run dispersion; do not subtract
+  unrelated percentile tables.
+- Separate CPU-bound, vertex/primitive-bound, fragment/fill-bound,
+  compute-bound, memory/bandwidth-bound, upload-bound, and synchronization-bound
+  cases before changing quality.
+
+### Hysteretic Quality Adaptation
+
+Every adaptive route records the controller, never just `adaptive DPR`:
+
+```yaml
+qualityController:
+  observedSignals: [cpuP50, cpuP95, gpuP50, gpuP95, presentedP50, presentedP95, droppedFrames, memoryPressure, thermalState]
+  samplingWindow: { value: "", unit: frames-or-time, label: Authored, source: "controller policy" }
+  downgradePredicate: { value: "p95 exceeds its Gated budget for persistent windows", unit: predicate, label: Gated, source: "performance contract" }
+  upgradePredicate: { value: "p50 and p95 remain below lower recovery gates for longer persistence", unit: predicate, label: Gated, source: "performance contract" }
+  headroom: { value: "", unit: budget-fraction-or-ms, label: Authored, source: "controller policy" }
+  downgradePersistence: { value: "", unit: windows, label: Authored, source: "controller policy" }
+  upgradePersistence: { value: "", unit: windows, label: Authored, source: "controller policy" }
+  cooldown: { value: "", unit: windows, label: Authored, source: "controller policy" }
+  bottleneckClassifier: ""
+  qualityLadder: []
+  protectedInvariants: []
+```
+
+`[Gated]` controller invariants: upgrade persistence is stricter than downgrade
+persistence; upgrade has positive headroom; a cooldown follows a transition;
+the controller applies one independently valid transition transaction, observes
+the settled result, then reclassifies pressure. A transaction may atomically
+change coupled state such as scene scale, TAAU, velocity, and history, or remove
+an attachment while enabling its reconstruction path. Quantize scale/tier
+transitions; frequent DPR or pass-scale changes can trigger target reallocation.
+Each transition declares history reset/resample, settling, lifecycle, and
+dispose ownership. These inequalities create hysteresis without inventing
+device-independent thresholds.
+
+Choose the downgrade axis from the measured bottleneck:
+
+| Pressure | First candidate controls |
+| --- | --- |
+| Fragment/fill or render-target bandwidth | DPR, pass scale, attachment count/format, overdraw, shadow/volume resolution. |
+| Compute | Solver grid, march/sample count, dispatch cadence, spatial extent. |
+| CPU submit/traversal | Culling granularity, batching/instancing, visible population, update scheduling. |
+| Upload/live updates | Dirty-range compaction, persistent GPU state, interpolation, update cadence. |
+| Memory | History length, simultaneous targets, attachment formats, transient lifetimes, LOD residency. |
+| Temporal instability | History weight/rejection, jitter policy, or replacement with a spatial estimator; do not lower spatial truth first. |
+
+## Skill Inventory Gate
+
+Enumerate the live `threejs-*` skills before composing a route and intersect it
+with this repository roster:
 
 - `threejs-ambient-contact-shading`
 - `threejs-black-holes-and-space-effects`
@@ -253,236 +678,152 @@ workspace:
 - `threejs-volumetric-clouds`
 - `threejs-water-optics`
 
-If the live inventory and roster differ, route only to the intersection and
-surface the divergence in `routeManifest.rejectionReason`. Do not guess renamed,
-deprecated, or missing siblings. If a required owner is absent from the
-intersection, mark the route blocked or reduce the scope to retained owners.
+Route only to the intersection. Record divergence in the manifest. If a causal
+owner is absent, block that part or reduce scope; never invent a renamed owner.
 
-### Aggregation rule
-
-A composed scene must declare one `frameBudgetMs` before skill selection. Use
-`16.6 ms` for `60 Hz`, `8.3 ms` for `120 Hz`, or `33.3 ms` for `30 Hz` unless
-the brief gives a stricter budget; these are `floor((1000 ms / Hz) * 10) / 10`.
-
-For every selected skill, the route manifest must cite the selected tier row and
-sum that row's published cost-range maximum. If one selected row publishes
-multiple required ranges, add the maxima. Add one fixed overhead line for shared
-composition work:
-
-```yaml
-budgetAggregation:
-  frameBudgetMs:
-  selectedSkillMaxima: []
-fixedOverhead:
-  scenePassMs: 0.5
-  sharedUpsamplesMs: 0.5
-  totalMs: 1.0 # 0.5 + 0.5
-aggregateMs:
-routeValid:
-```
-
-The composed route is invalid when:
-
-```text
-sum(selectedSkillPublishedMaxMs) + fixedOverhead.totalMs > frameBudgetMs
-```
-
-When invalid, downgrade deterministically and recompute after each step:
-
-1. post-effects internals: AO denoise/history, bloom scale, TAA/DoF, optional
-   grading/LUT cadence, and optional history branches;
-2. volumetrics: cloud march scale, step counts, shadow maps, update cadence;
-3. water: FFT grid, cascade count, spray, refraction, and shading tier;
-4. crowds: creature count, shell tier, outline, and update cadence.
-
-If a selected skill has no published cost row for the proposed downgrade, do
-not assign a cheaper number. Keep the previous maximum, record the missing table
-entry, and continue to the next downgrade owner.
-
-### Worked aggregation example
-
-Input route: top-tier horizon ocean, Ultra clouds, desktop creature crowd, and
-full post at `60 Hz`. The declared budget is `16.6 ms` because
-`floor((1000 / 60) * 10) / 10 = 16.6`.
-
-Published rows used:
-
-- `$threejs-spectral-ocean`, `Budgets`, row `High desktop discrete`: target
-  `2.5-4.0 ms simulation` and `1.5-3.0 ms ocean shading/post at 1440p`;
-  aggregate maximum `4.0 + 3.0 = 7.0 ms`.
-- `$threejs-volumetric-clouds`, `Quality Tiers And Budgets`, row
-  `Ultra desktop-discrete`: target cost `2.5-4.0 ms`; maximum `4.0 ms`.
-- `$threejs-procedural-creatures`, `Performance Budgets`, row
-  `Desktop discrete`: frame budget `0.5-1.5 ms`; maximum `1.5 ms`.
-- `$threejs-image-pipeline`, `Budgets`, row `Desktop discrete`: full post
-  frame cost `2.0-4.0 ms at 1440p`; maximum `4.0 ms`.
-- Router fixed overhead: `0.5 ms scene pass + 0.5 ms shared upsamples = 1.0 ms`.
-  Both `0.5 ms` inputs are authored planning placeholders, not measured or
-  validator-gated costs: replace them with the composed scene's own measured
-  scene-pass and upsample timings (from `$threejs-visual-validation` GPU timing
-  evidence) before trusting any aggregate within `1 ms` of the budget line.
-
-Initial aggregate:
-
-```text
-7.0 ocean + 4.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 17.5 ms
-17.5 ms > 16.6 ms, so the route is invalid.
-```
-
-Downgrade order check:
-
-1. Post-effects internals: `$threejs-image-pipeline` publishes no cheaper
-   named full-post tier in its `Budgets` table, so keep `4.0 ms` and record the
-   missing lower row.
-2. Volumetrics: downgrade `$threejs-volumetric-clouds` from
-   `Ultra desktop-discrete` to `High desktop-discrete`; the `Quality Tiers And
-   Budgets` row publishes `1.8-3.0 ms`, maximum `3.0 ms`.
-
-Valid aggregate after the first published downgrade:
-
-```text
-7.0 ocean + 3.0 clouds + 1.5 creatures + 4.0 full post + 1.0 overhead = 16.5 ms
-16.5 ms <= 16.6 ms, so the route is valid.
-```
-
-### Tier-exclusion matrix at 16.6 ms
-
-These combinations are invalid at `60 Hz` with the fixed `1.0 ms` composition
-overhead because the sum of published maxima exceeds `16.6 ms`.
-
-| Combination | Published max sum | Status |
-| --- | ---: | --- |
-| `$threejs-spectral-ocean` High desktop discrete (`4.0 + 3.0 = 7.0`) + `$threejs-volumetric-clouds` Ultra desktop-discrete (`4.0`) + `$threejs-image-pipeline` Desktop discrete full post (`4.0`) + `$threejs-procedural-creatures` Desktop discrete crowd (`1.5`) + overhead (`1.0`) | `17.5 ms` | invalid |
-| `$threejs-spectral-ocean` High desktop discrete (`7.0`) + `$threejs-volumetric-clouds` Ultra desktop-discrete (`4.0`) + `$threejs-image-pipeline` Desktop discrete full post (`4.0`) + `$threejs-ambient-contact-shading` Desktop discrete denoise/temporal AO (`2.0`) + overhead (`1.0`) | `18.0 ms` | invalid |
-| `$threejs-spectral-ocean` High desktop discrete (`7.0`) + `$threejs-volumetric-clouds` Ultra desktop-discrete (`4.0`) + `$threejs-image-pipeline` Desktop discrete full post (`4.0`) + `$threejs-ambient-contact-shading` Desktop discrete scalar GTAO (`1.2`) + `$threejs-procedural-creatures` Desktop discrete crowd (`1.5`) + overhead (`1.0`) | `18.7 ms` | invalid |
-
-Source rows: `$threejs-spectral-ocean` `Budgets`, row
-`High desktop discrete`; `$threejs-volumetric-clouds`
-`Quality Tiers And Budgets`, rows `Ultra desktop-discrete` and
-`High desktop-discrete`; `$threejs-image-pipeline` `Budgets`, row
-`Desktop discrete`; `$threejs-procedural-creatures` `Performance Budgets`, row
-`Desktop discrete`; `$threejs-ambient-contact-shading` `Performance Budgets`,
-row `Desktop discrete`.
-
-### Fauna and ocean handoff
-
-For creature swimmers in a spectral ocean route:
-
-- `$threejs-spectral-ocean` owns water height, displacement derivative, foam,
-  and current queries. `$threejs-procedural-creatures` consumes a sampled
-  swimmer contact interface; it does not recompute FFT spectra or own wave
-  phase.
-- `$threejs-procedural-creatures` owns body shell, gait/swim locomotion, pose
-  storage, crowd tier, and species variant cache.
-- `$threejs-scalable-real-time-shadows` owns the shared shadow clipmap when
-  routed. Creatures cast into that clipmap; do not allocate per-creature shadow
-  maps.
-- `$threejs-image-pipeline` owns MRT, outline inputs, velocity, normal, history,
-  tone map, and output transform. Creature outlines use the shared post edge or
-  MRT signal owner, not a second outline graph.
-
-## Color And Output Rules
-
-- Mark color textures as `SRGBColorSpace`; data maps such as normal, roughness, masks, noise, LUTs, weather, and simulation textures stay `NoColorSpace` or linear.
-- Keep HDR working buffers as `HalfFloatType` until the single tone-map step.
-- The node pipeline owns final conversion through `renderOutput()` and `outputColorTransform`; individual materials and effects must not double-convert.
-- Decide mipmap generation per data texture. Do not auto-generate mipmaps for storage outputs unless the sampling path actually needs them.
-
-## Route By Authored System
+## Route By Causal System
 
 | Required result | Load | Tie-breaker |
 | --- | --- | --- |
-| shot composition, chase/side/orbit rigs, camera handoffs, projection ownership, pointer look, floating origins | `$threejs-camera-controls-and-rigs` | Load before subject skills when framing changes silhouette, scale, or temporal validity. |
-| launch and docking timelines, procedural transform phases, springs, staging, rotating-frame alignment, debris motion | `$threejs-procedural-motion-systems` | Use for transform authorship; use effects only when the visible result is event energy, trails, or particles. |
-| reusable scalar/vector fields, domain warping, causal masks, procedural normals | `$threejs-procedural-fields` | Use when several outputs share one cause; use materials when the field only shades a surface. |
-| atlas-filtered blocks, planetary surfaces, terrain wetness, lava/emissive procedural surfaces, authored frame PBR, specular AA | `$threejs-procedural-materials` | Use for BRDF/material identity; pair with fields for shared masks and geometry for actual silhouette changes. |
-| sculpted rails/frames, branch rings, semantic mesh writers, material groups | `$threejs-procedural-geometry` | Use when vertices, normals, UV density, or material slots must be authored. |
-| trees, stylized grass, GPU-computed grass, branching organisms, roots, foliage, rooted wind deformation | `$threejs-procedural-vegetation` | Use for biological distribution/growth/wind; pair with fields only for terrain or biome control. |
-| procedural creatures, fauna, NPCs, spec-driven bodies, SDF blend-shell skins, capsule rigs, gait/hop/flight/swim locomotion, creature crowds, creature labs | `$threejs-procedural-creatures` | Use for living-actor bodies and locomotion; use motion systems for generic transform timelines, vegetation for plants; imported skinned-clip pipelines stay a declared gap. |
-| buildings, facade grammars, profiles, ornaments, modular mesh writers | `$threejs-procedural-buildings-and-cities` | Use for authored building grammar; use geometry for general mesh construction without architectural semantics. |
-| planets, terrain, craters, biome fields, coastlines, spherical detail | `$threejs-procedural-planets` | Use for planetary terrain/body ownership; pair with atmosphere only after body scale and horizon are fixed. |
-| sky scattering, planetary shells, depth-based aerial perspective | `$threejs-sky-atmosphere-and-haze` | Use for air/sky/light transport; use image pipeline only for final exposure and color ownership. |
-| weather-driven raymarched clouds and cloud shadows | `$threejs-volumetric-clouds` | Use for volumetric density and temporal march; use precipitation for particles or surface wetness. |
-| FFT oceans, hybrid FFT/Gerstner clear water, stylized above/below ocean optics, spectral cascades, choppy derivatives, Jacobian whitecaps | `$threejs-spectral-ocean` | Use for large-water wave spectra and horizon-scale water; use water optics for bounded pools or local interactions. |
-| authored analytic waves, bounded heightfield pools, object ripples, differential-area caustics, ray-traced pool volume optics, shared normals, heuristic refraction, absorption, crest foam | `$threejs-water-optics` | Use for local/bounded water and optical coupling; use temporal surfaces for screen-history masks without physical water. |
-| falling snow, snow accumulation, model snow caps, wet asphalt puddles, procedural ripple normals, splash flipbooks, rain streaks, shared weather envelopes, surface wetness | `$threejs-rain-snow-and-wet-surfaces` | Use for weather particles plus affected surfaces; route puddle optics to water when refraction/caustics dominate. |
-| curved-ray black holes, accretion disks, wormholes | `$threejs-black-holes-and-space-effects` | Use for bounded curved-ray integration; route exposure/bloom separately after HDR signal is correct. |
-| particles, trails, plasma, shockwaves, layered event effects | `$threejs-particles-trails-and-effects` | Use for time-local energy and particles; route motion mechanics to animation when object transforms drive the result. |
-| accumulated screen frost, touch clearing, reduced blur, and refraction masks | `$threejs-dynamic-surface-effects` | Use for screen-space history surfaces; use materials or precipitation when the effect is object/world anchored. |
-| real-time shadows for dynamic or large scenes, cascades, tiles, cached updates | `$threejs-scalable-real-time-shadows` | Use built-in `CSMShadowNode`/`TileShadowNode` first; custom cached clipmaps only for streaming worlds with invalidation budgets. |
-| GTAO, bent normals, bilateral reconstruction | `$threejs-ambient-contact-shading` | Use `GTAONode` baseline; route to image pipeline when depth/normal/MRT ownership is not yet planned. |
-| HDR bloom and selective emission contribution | `$threejs-bloom` | Use `BloomNode` baseline; route to exposure/color grading when bloom strength depends on tone-map/exposure policy. |
-| eye adaptation, tone mapping, LUT grading, output color | `$threejs-exposure-color-grading` | Use when the question changes luminance measurement, tone-map ownership, LUTs, or output conversion. |
-| shared depth/normal/velocity ownership, MRT, history, node pass ordering, final pipeline assembly | `$threejs-image-pipeline` | Plan early for shared buffers; load late again for final image treatment after the no-post baseline reads. |
-| fixed-view diagnostics, seed sweeps, temporal stability, GPU budgets, regression evidence | `$threejs-visual-validation` | Use for any ambitious scene before acceptance, especially compute, temporal, or adaptive-resolution work. |
+| Camera composition, orbit/free navigation, multi-scale framing, projection/depth ownership, handoffs, floating origins | `$threejs-camera-controls-and-rigs` | Load when camera policy changes scale, silhouette, precision, temporal validity, or interaction. |
+| Authored transform phases, kinematics, rotating frames, springs, staging, analytic motion | `$threejs-procedural-motion-systems` | Use for transform authorship; keep live-data interpolation in the application data layer unless procedural motion is the missing cause. |
+| Reusable scalar/vector fields, causal masks, domain warping, derived normals | `$threejs-procedural-fields` | Use when outputs share a field cause; external scientific/data ingestion remains outside the pack. |
+| BRDF/material identity, filtered atlases, frame fields, surface masks, emissive/thermal appearance, specular AA | `$threejs-procedural-materials` | Pair with fields for shared causes and geometry for silhouette/section changes. |
+| Semantic mesh writers, profiles, rails/frames, generated glyphs, material groups | `$threejs-procedural-geometry` | Use when vertices, indices, normals, UVs, groups, or generated topology are owned here; not for generic CAD/glTF optimization. |
+| Trees, grass, roots, canopies, rooted wind, biological distribution | `$threejs-procedural-vegetation` | Use for plant growth/distribution/deformation, including architectural and scientific contexts. |
+| Procedural fauna/organisms, generated bodies, rigs, locomotion, variation, crowds | `$threejs-procedural-creatures` | Imported skinned-asset pipelines remain a declared gap. |
+| Procedural buildings, facade/roof grammars, profiles, ornaments, city kits | `$threejs-procedural-buildings-and-cities` | Imported BIM/AEC review is not procedural-building ownership. |
+| Planetary bodies, terrain, craters, biomes, coastlines, spherical LOD | `$threejs-procedural-planets` | Pair with atmosphere only after body scale/horizon and precision policy are fixed. |
+| Sky scattering, atmospheric shells, aerial perspective, haze | `$threejs-sky-atmosphere-and-haze` | Use image pipeline only for final exposure/color ownership. |
+| Weather-driven volumetric clouds and cloud shadows | `$threejs-volumetric-clouds` | Use only for volumetric density/transport; generic scientific volume rendering remains a gap. |
+| Horizon-scale spectral waves, ocean derivatives, whitecaps, above/below-water optics | `$threejs-spectral-ocean` | Use bounded water for local domains/interactions. |
+| Bounded/analytic water, local heightfields, object ripples, caustics, refraction/absorption | `$threejs-water-optics` | Use screen-history surfaces only for screen-anchored effects. |
+| Rain/snow particles, accumulation, surface wetness, puddles/splashes, shared weather envelope | `$threejs-rain-snow-and-wet-surfaces` | Route optical water coupling only when refraction/caustics are causal. |
+| Curved-ray black holes, accretion disks, wormholes | `$threejs-black-holes-and-space-effects` | Exposure/bloom are consumers after the HDR transport signal is correct. |
+| Particles, trails, plasma, shockwaves, transient event layers | `$threejs-particles-trails-and-effects` | Route object transforms to motion systems; preserve stable data identity in data/digital-twin scenes. |
+| Accumulated screen frost, touch clearing, reduced blur, history/refraction masks | `$threejs-dynamic-surface-effects` | Use only for screen-space history surfaces, not world/object-anchored weather. |
+| Dynamic/large-scene shadows, cascades, tiled coverage, cached updates | `$threejs-scalable-real-time-shadows` | Start from ordinary light shadows; choose CSM/tiled coverage/custom caching only from coverage error, invalidation, and measured cost. |
+| GTAO, bent normals, bilateral reconstruction | `$threejs-ambient-contact-shading` | Route through the shared depth/normal owner; reject AO when it obscures quantitative color or identity. |
+| HDR bloom/selective emission | `$threejs-bloom` | Prove HDR emission and exposure policy first. |
+| Exposure adaptation, tone map, LUT grading, output color | `$threejs-exposure-color-grading` | Scientific/data displays may require a fixed transfer function instead of eye adaptation. |
+| Shared depth/normal/velocity/ID, MRT, history, pass ordering, final presentation | `$threejs-image-pipeline` | Plan early only when sharing exists; load for final assembly after the no-post baseline. |
+| Fixed-view/trajectory evidence, seed/data sweeps, temporal stability, budgets, regression artifacts | `$threejs-visual-validation` | Required for ambitious compute, temporal, adaptive, quantitative, or sustained-performance work. |
+
+See `references/router-recipes.md` for general-purpose domain routes.
+
+## Color, Data, And Output Rules
+
+- Mark color imagery with its actual color space; keep normals, roughness,
+  identifiers, masks, simulation state, uncertainty, and scientific scalar data
+  in linear/data encodings.
+- Keep HDR working buffers in the justified format until the unique tone-map
+  step. Format precision and bytes are `[Gated]`/`[Derived]`, not aesthetic
+  defaults.
+- Final conversion is a `[Gated]` exclusive choice: either provide a scene-linear
+  `outputNode` with `renderPipeline.outputColorTransform = true`, or use an
+  explicit `renderOutput()` node with `outputColorTransform = false`. After
+  changing the node or flag, set `renderPipeline.needsUpdate = true`.
+  Materials/effects must not double-convert.
+- Quantitative transfer functions declare input domain, normalization/clamping,
+  missing/out-of-range values, interpolation, and display conversion. Do not
+  expose scientific values to eye adaptation unless the contract explicitly
+  permits it.
+- Generate mipmaps for data/storage outputs only when the sampling semantics and
+  update cost require them.
 
 ## Execution Order
 
-For a new procedural scene:
-
-1. Run the mandatory WebGPU preflight, capability gate, quality-tier choice, performance budget, and color/output ownership.
-2. Define a visual contract: subject, scale, camera distance, motion, target devices, target frame time, and no-post readability.
-3. Load `$threejs-camera-controls-and-rigs` when framing, lens, camera frame, or mode transitions affect the target.
-4. Load the subject-generation skill and any required field/material/geometry owner.
-5. Add `$threejs-procedural-motion-systems` when object motion requires authored phases, moving frames, or spring convergence.
-6. Plan `$threejs-image-pipeline` early if depth, normal, velocity, MRT, history, tone mapping, or adaptive resolution will be shared.
-7. Add lighting, shadows, atmosphere, and weather only after silhouette and material masks read without effects.
-8. Add atomic image effects only when the authored scene emits the signal they need.
-9. Use `$threejs-image-pipeline` for final node pass ordering and `$threejs-visual-validation` for deterministic evidence.
-
-## Routing Constraints
-
-- Do not load a skill for generic API setup. The router itself owns the r185-era WebGPU/TSL baseline check, then destination skills own domain algorithms.
-- Do not route "make it beautiful" directly to post processing. Find the missing authored system or missing physical signal.
-- Prefer one strong, inspectable visual rule over several independent noise layers.
-- When adapting a supplied reference, preserve the mechanism that creates its character. Do not reduce it to a generic effect category.
-- Keep source-space, world-space, and screen-space systems separate unless the composition explicitly requires coupling.
-- If no retained skill matches, state that the pack lacks expert coverage for that system and use official Three.js docs without inventing a pseudo-owner.
-- Unsupported/common gaps unless a new skill is added: asset optimization pipelines, WebXR interaction design, deployment, UI overlays, editor tooling, physics engines, and generic app architecture.
-- Teaching how to apply fallback when WebGPU is unavailable is not a general gap; it is owned by `$threejs-compatibility-fallbacks` and stays out of flagship destination skills unless the user explicitly asks for it.
+1. Run backend/API gates and classify the workload.
+2. Fix truth/style contract, views, deployment matrix, frame/memory/error bounds,
+   and reproducible input path.
+3. Run the cause/algorithm gate and assign the primary causal owner.
+4. Establish coordinate/precision/camera policy when scale, projection, or
+   navigation affects representation.
+5. Implement subject/data representation, fields, material identity, and motion;
+   prove no-post diagnostics.
+6. Build the unique pass/resource graph and A/B minimal-forward versus shared-MRT
+   or spatial versus temporal alternatives where relevant.
+7. Add lighting, shadows, atmosphere, and volumes only when their source geometry
+   and data are correct.
+8. Add image effects only when their source signals and rejection conditions are
+   proven.
+9. Measure the composed scene, implement hysteretic quality adaptation, run
+   sustained target-device validation, and capture deterministic evidence.
 
 ## Space And Owner Handoff
 
-Every destination handoff must label:
+Every handoff labels:
 
-| Interface | Required label |
+| Interface | Required contract |
 | --- | --- |
-| source-space | object/local/growth/field/simulation coordinates that authored the signal |
-| world-space | Three.js Y-up world units and any floating-origin offset |
-| view-space | camera-space convention, including camera `-Z` and normal encoding |
-| clip-space | projection owner, jitter owner, and depth range |
-| NDC | normalized device coordinates and screen origin assumption |
-| UV | UV origin, wrap mode, and whether deltas are UV or pixels |
-| texel | texel-center rule, physical pixel size, and DPR scaling |
-| depth convention | standard, reversed, logarithmic, orthographic, or resolved MSAA depth |
-| color domain | `SRGBColorSpace`, scene-linear HDR, tone-mapped linear, display-referred sRGB, or data/no-color |
-| owner boundary | which skill writes the signal and which skill may consume it |
+| source space | Object/local/growth/field/simulation/data coordinates and units. |
+| world space | Three.js Y-up world units, georeference, handedness, and floating-origin offset. |
+| view space | Camera convention and normal/vector encoding. |
+| clip/NDC | Projection, jitter, depth range, viewport, and screen-origin owners. |
+| UV/texel | Origin, wrap, texel-center convention, physical pixel size, DPR, and pass scale. |
+| time | Clock, sample timestamp, interpolation/extrapolation, update age, and reset policy. |
+| identity | Stable object/data ID, visibility/picking semantics, and remap owner. |
+| depth | Standard/reversed/logarithmic/orthographic/MSAA-resolve convention. |
+| color/data | Source encoding, scene-linear HDR, transfer function, tone-mapped/display domain, or no-color data. |
+| owner boundary | Producer, permitted consumers, update cadence, lifetime, and invalidation rule. |
 
 ## Route-Away Ledger
 
-Use route-away entries when the request is outside this pack's expert scope:
-
-| Request area | Route-away decision |
+| Request area | Decision |
 | --- | --- |
-| asset pipeline | Use official Three.js/glTF/KTX2/Meshopt/DRACO docs or a future asset skill; do not stretch a visual skill into packaging ownership. |
-| WebXR | Use official WebXR and Three.js docs unless a dedicated skill exists. |
-| UI overlays | Keep DOM/app UI outside flagship graphics skills; only route UI-safe compositing to image-pipeline when it affects color/output ownership. |
-| deployment | Use deployment/platform docs; do not load graphics skills for hosting or bundling. |
-| editor tooling | Use editor/tooling docs or project conventions. |
-| physics engines | Use a physics engine or project-local integration; route visual effects only after physical state is available. |
-| generic app architecture | Keep framework/state/router decisions outside this visual skill pack. |
-| Teaching how to apply fallback when WebGPU is unavailable | Use `$threejs-compatibility-fallbacks` only when the user explicitly asks how to apply fallback when WebGPU is unavailable. |
+| glTF/CAD/BIM/scientific asset ingestion and optimization | Use official Three.js/domain tooling for KTX2, Meshopt, DRACO, LOD, compression, and source-data validation; do not assign procedural ownership. |
+| General lighting design, studio IBL/PMREM, reflection probes, cube capture | Declare missing expert coverage and use official Three.js lighting/environment guidance; materials, shadows, and image pipeline are consumers, not illumination owners. |
+| Generic volume rendering, point-cloud/octree streaming, graph layout, or tensor visualization | Declare missing expert coverage; use official/domain sources and route only shared Three.js rendering concerns here. |
+| Live-data transport, databases, telemetry schemas, interpolation service | Keep in the application/data layer; route the resulting render state, fields, and validation only. |
+| Picking, selection, annotation, DOM UI, accessibility | Keep application/UI ownership outside the flagship pack; image pipeline owns only graphics-safe compositing/output. |
+| WebXR | Use official WebXR/Three.js guidance unless a dedicated skill exists. |
+| Deployment/editor/tooling | Use platform and project conventions. |
+| Physics engines | Use the selected physics/domain solver; route visual state only after physical data exists. |
+| Generic app architecture | Keep framework/state/router decisions outside visual skills. |
+| Teaching fallback when WebGPU is unavailable | Use `$threejs-compatibility-fallbacks` only for an explicit fallback-teaching request. |
+
+## Routing Constraints
+
+- The router owns generic installed-revision preflight; destination skills own
+  domain algorithms.
+- Do not route “make it beautiful” directly to post. Find the missing cause.
+- Prefer a causal, inspectable visual rule over unrelated noise/effect layers.
+- Preserve supplied-reference mechanisms and authoritative data, not merely a
+  broad visual category.
+- Keep source/world/view/screen spaces separate unless the composition defines a
+  conversion and owner.
+- Do not call a workload “game-like” to justify weaker accuracy or stronger
+  hardware assumptions. Route from its actual truth, interaction, view, and
+  deployment contracts.
+- When no skill owns a cause, state the gap and use official/domain sources; do
+  not invent a pseudo-owner.
 
 ## Acceptance Gate
 
-A routed task is incomplete until the implementation exposes:
+A routed implementation is incomplete without:
 
-- installed Three.js revision, initialized backend, target browser/device/GPU class, and migration-guide check;
-- deterministic seed or reproducible inputs;
-- explicit Full/Budgeted/Minimum viable quality tiers and the condition that selects each tier;
-- visual debug modes for controlling fields, intermediate buffers, and shared MRT/history outputs;
-- parameters grouped by perceptual role;
-- no-post baseline that still reads;
-- color texture/data texture `colorSpace`, HDR buffer type, tone-map owner, output conversion owner, and proof of no double conversion;
-- `renderer.info`, draw calls, triangles, texture/render-target counts, dispatch counts, storage sizes, and measured frame-time evidence;
-- validation screenshots or fixed-view captures for the target tiers.
+- required revision/backend/API constraints `[Gated]`, installed/runtime facts
+  `[Measured]`, coherence proof, and target-device matrix;
+- workload profile, truth/error contract, cause ledger, rejected algorithms, and
+  primary owner;
+- deterministic seed, fixed camera path, or reproducible live-data trace;
+- explicit Full/Budgeted/Minimum viable tiers with protected invariants and
+  visible consequences;
+- unique resource/pass ledger with formats, resolution, lifetimes, consumers,
+  and shared-pass deduplication;
+- no-post baseline plus field, geometry, material, identity, depth, velocity,
+  history, and output diagnostics actually used by the route;
+- color/data encoding, HDR format, tone-map owner, output-transform owner, and
+  proof of no double conversion;
+- `[Derived]` render-target/storage byte accounting and target-specific MRT
+  A/B evidence when multiple attachments are proposed;
+- `[Measured]` composed CPU p50/p95 and presentation p50/p95; GPU p50/p95 for
+  every GPU-performance verdict or `unmeasurable` status; uploads and
+  pass/dispatch evidence; `[Derived]` logical memory ledgers; `renderer.info`
+  limitations; sustained timing/quality drift; and exposed thermal/hardware
+  signals or an explicit unavailable reason;
+- hysteretic controller trace showing pressure classification, downgrade,
+  cooldown, recovery headroom, and absence of oscillation;
+- fixed-view/trajectory captures and regression artifacts for every accepted
+  target tier;
+- `{ value, unit, label, source }` evidence on every quantitative claim.
