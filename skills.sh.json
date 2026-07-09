@@ -1,0 +1,61 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Planning and Validation",
+      "description": "Route broad Three.js WebGPU requests and prove rendered results with reproducible evidence.",
+      "skills": [
+        "threejs-choose-skills",
+        "threejs-visual-validation",
+        "threejs-compatibility-fallbacks"
+      ]
+    },
+    {
+      "title": "Cameras and Final Image",
+      "description": "Control camera rigs, shadows, ambient contact shading, bloom, exposure, grading, and render-pipeline ownership.",
+      "skills": [
+        "threejs-camera-controls-and-rigs",
+        "threejs-scalable-real-time-shadows",
+        "threejs-ambient-contact-shading",
+        "threejs-bloom",
+        "threejs-exposure-color-grading",
+        "threejs-image-pipeline"
+      ]
+    },
+    {
+      "title": "Worlds and Environments",
+      "description": "Build skies, atmosphere, clouds, oceans, bounded water, rain, snow, and wet-surface systems.",
+      "skills": [
+        "threejs-sky-atmosphere-and-haze",
+        "threejs-volumetric-clouds",
+        "threejs-spectral-ocean",
+        "threejs-water-optics",
+        "threejs-rain-snow-and-wet-surfaces"
+      ]
+    },
+    {
+      "title": "Procedural Content",
+      "description": "Author procedural fields, materials, geometry, cities, planets, vegetation, and creatures.",
+      "skills": [
+        "threejs-procedural-fields",
+        "threejs-procedural-materials",
+        "threejs-procedural-geometry",
+        "threejs-procedural-buildings-and-cities",
+        "threejs-procedural-planets",
+        "threejs-procedural-vegetation",
+        "threejs-procedural-creatures"
+      ]
+    },
+    {
+      "title": "Motion and Effects",
+      "description": "Implement procedural motion, particles, trails, surface history, and curved-ray space effects.",
+      "skills": [
+        "threejs-procedural-motion-systems",
+        "threejs-particles-trails-and-effects",
+        "threejs-dynamic-surface-effects",
+        "threejs-black-holes-and-space-effects"
+      ]
+    }
+  ]
+}
