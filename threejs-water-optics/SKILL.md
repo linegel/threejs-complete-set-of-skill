@@ -40,25 +40,35 @@ channel-requested. It carries context/provider/signal/schema IDs, the requested
 masks, filter/frequency response, per-channel tolerances, maximum staleness,
 acceptable residency/latency, and batch extent. Descriptor discovery supplies
 a stable descriptor-table reference; the request does not deep-copy a complete
-descriptor. The returned sample always exposes `freeSurfacePoint` and
-`freeSurfaceNormal`; only when represented it exposes
+descriptor. The returned sample always exposes `freeSurfacePoint`,
+`freeSurfaceNormal`, the gauge-invariant scalar
+`geometricNormalVelocityMps`, and the exact
+`WaterSurfaceParameterization`; only when represented it exposes
 `surfacePointVelocityMps`, `materialCurrentVelocityMps`,
 `waterColumnDepthMeters`, `densityKgPerM3`,
 `materialAccelerationMps2`, `pressurePa`, `bathymetryPoint`, and `wetDryState`.
-Each is a complete `SampledChannel` with actual time/support/filter, validity,
-error, and `stateVersion`. The result returns the complete canonical
+Each channel is a complete `SampledChannel` with actual time/support/filter,
+validity, error, and `stateVersion`. The result returns the complete canonical
 `PhysicsSignalDescriptor`, bundle `sampleInstant`, and each channel's
 `actualPhysicsTime` resolving to a `PhysicsInstant`; requested and actual
 instants may differ only within the
 declared latency/staleness gates. Consumers preserve that result envelope rather
 than copying a water-local subset. Packed GPU batches use stable descriptor-table
 handles plus SoA channels, not per-sample descriptor copies. Missing channels
-follow `missingChannelPolicy` and are never zero-filled. Surface-point velocity
-is geometric motion of the sampled surface, not fluid current. Both velocity
-channels are physical polar vectors in `physicsFrameId`: cross-frame transport
-rotates their basis only. A moving-frame coordinate derivative is a distinct
-coordinate-rate schema and must not receive or lose frame-transport terms by
-masquerading as physical velocity.
+follow `missingChannelPolicy` and are never zero-filled. For a parameterized
+surface `r(u,v,t)`, the exact projection identity is
+`geometricNormalVelocityMps = dot(surfacePointVelocityMps,
+freeSurfaceNormal)` whenever the optional full fixed-coordinate velocity is
+present at the same actual time, support/filter, and state version; its channel
+propagates the correlated velocity/normal error. An implicit/level-set or
+reduced owner publishes the scalar normal speed directly when that vector is
+absent. The scalar normal speed is parameterization invariant. The tangential
+part of `surfacePointVelocityMps` depends on the serialized surface gauge, while
+`materialCurrentVelocityMps` is the material fluid velocity and is not surface
+motion. Both vector channels are physical polar vectors in `physicsFrameId`:
+cross-frame transport rotates their basis only. A moving-frame coordinate
+derivative is a distinct coordinate-rate schema and must not receive or lose
+frame-transport terms by masquerading as physical velocity.
 
 Analytic waves, bounded heightfields, coastal solvers, spectral donors, and
 external free-surface solvers implement adapters to this one ABI. Raw helper
@@ -218,6 +228,19 @@ sum to one and derivatives include their spatial gradients; square-root power
 weights apply only to proven independent/orthogonal fields, not two
 representations of one wave.
 
+Whichever handoff is selected, every instantaneous surface/query publication
+uses the same canonical `WaterSurfaceProvider` ABI: mandatory
+`freeSurfacePoint`, `freeSurfaceNormal`, `geometricNormalVelocityMps`, and
+`WaterSurfaceParameterization`, plus only the represented optional
+fixed-parameterization `surfacePointVelocityMps`, material
+`materialCurrentVelocityMps`, depth, density, acceleration, pressure,
+bathymetry, and wet/dry channels. The handoff preserves the complete descriptor,
+requested/actual `PhysicsInstant`, footprint/filter, frame/origin/transform,
+state/resource version, validity, error, latency, and residency envelope. A
+phase-averaged owner without a separately versioned display-phase synthesis
+cannot publish an instantaneous surface bundle and reports that provider query
+invalid instead of inventing phase.
+
 ### Nonlinear shallow water
 
 For wet/dry flow, conservative state is `q=(h,m_x,m_z)^T`, `m=h u`:
@@ -262,9 +285,19 @@ and bounds. Noise may alter microstructure; it cannot create source coverage.
 Partition breaking dissipation once at a model handoff and drive one foam
 history; foam coverage is not conserved wave energy.
 
-Exactly one receiver stores exposed-bed wetness separately. Water supplies
-inundation/wash `SurfaceExchange`; it runs the receiver update itself only when
-the route explicitly assigns it that ownership. For a phase-only/no-solver branch,
+Exactly one receiver stores exposed-bed wetness separately. Water publishes
+exactly one typed inundation/wash `SurfaceExchange` to that route-selected
+receiver, with the canonical context, interval, source/receiver identities,
+frame/origin/transform, support/measure, payload semantics, state versions,
+error, and exact-once batch ledger. If water is explicitly selected as the sole
+receiver, it consumes that routed exchange in its graph stage rather than
+bypassing the ABI; no weather or material owner integrates another copy. A
+receiver-to-water runoff exchange committed over interval `n` is immutable
+input to water interval `n+1`. Water gathers it once into the provisional
+source assembly, and its exact-once application ledger advances only with the
+accepted atomic `n+1` commit; retry or rollback cannot apply it again, and
+newly written receiver state from `n+1` is never read in that same interval.
+For a phase-only/no-solver branch,
 `m_wash` is an explicit prescribed beach-inundation mask; static water depth
 cannot wet exposed bed:
 
@@ -332,6 +365,13 @@ body and water prediction
   -> body and water correction, conservation/stability check, atomic commit
   -> water PresentedStatePair for coordinator PhysicsPresentationCandidate. [D]
 ```
+
+Every CPU, GPU, or external dispatch that advances coupled water state is an
+execution of a declared `PhysicsGraphStage` with an exact
+`executionInterval`, versioned reads/writes, residency dependency, and commit
+group. A render callback may consume the sealed presentation publication and
+request work, but it never advances the water solver, applies runoff, injects a
+disturbance, or performs a private catch-up step.
 
 Declare the coupling class as explicit, semi-implicit, scheduler-bounded
 iterated, or monolithic; do not let a body or water subsystem perform an
@@ -458,8 +498,10 @@ For tile/mobile GPUs:
 - publish presentation resource handles with `resourceGeneration` and a
   frame-in-flight lease/reuse rule instead of deep-copying water fields or
   allowing compute to overwrite a rendered generation;
-- apply physical quality changes only as coordinator-admitted tick-boundary
-  `QualityTransition` transactions with state projection, conservation/error ledger, queue-drain
+- apply every physics-facing change to solver resolution, represented band,
+  active domain, cadence, provider filter/error, or offshore/coastal ownership
+  only as a coordinator-admitted tick-boundary `QualityTransition` transaction
+  with state projection, conservation/error ledger, queue-drain
   boundary, atomic provider-version publication, rollback, and peak old/new
   residency; exactly one representation emits reactions during any visual
   crossfade;
@@ -505,7 +547,12 @@ applicable subset below and every algorithm-specific gate from those references:
   residual, and invalid-sample fraction;
 - foam source/transport/reaction coverage plus bed wetness/inundation history;
 - canonical `WaterSurfaceProvider` conformance, absent-channel rejection, footprint
-  filtering, state-version/error propagation, and CPU/GPU adapter parity;
+  filtering, state-version/error propagation, mandatory normal-velocity
+  projection identity, valid absence of the optional full surface velocity,
+  and CPU/GPU adapter parity;
+- `PhysicsGraph` execution evidence proving every coupled water dispatch,
+  immutable runoff from interval `n` into `n+1`, exactly-once application at
+  accepted commit, and one typed inundation/wash exchange to the sole receiver;
 - one-way authoritative-source, omitted-feedback bound/claim, and invariance;
   or two-way scheduler-order, source/reaction
   `InteractionRecord`, conservation-group, and zero-frame-readback evidence;

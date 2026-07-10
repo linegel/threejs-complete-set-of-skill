@@ -250,6 +250,11 @@ for every cross-domain input or output. `EnvironmentForcingSnapshot` and
 `LightingTransportSnapshot` are immutable versioned boundaries; a cloud-local
 uniform block may cache their projection but may not redefine units, time,
 frames, or ownership.
+The project/environment coordinator exclusively owns and publishes
+`EnvironmentForcingSnapshot`, including its clock, frame, support/filter,
+validity, and revision. The cloud is a consumer of that snapshot and a producer
+of a separate `PrecipitationEmissionSnapshot`; it cannot become a second
+forcing owner.
 Their providers and GPU resources retain the canonical
 `PhysicsSignalDescriptor` envelope: identity/schema/context, owner/consumers,
 channels, physics frame/origin/transform revision, optional chart,
@@ -346,6 +351,14 @@ corresponding measure/Jacobian and kernel units.
 Only the resulting oriented mass-area flux enters the canonical
 `PrecipitationEmissionSnapshot`; the internal volume source remains provenance
 for that derived projection and its error, not a second snapshot ABI.
+The descriptor's area samples, and every downstream
+`InteractionFootprint.distributionKind: intensive-field`, use physical-area
+quadrature: each weight includes the support Jacobian, has units of square
+metres, and the weights sum to `representedMeasure` within the gate. Do not
+multiply an intensive `massFlux` by a normalized `W`. An inverse-square-metre
+kernel normalized to unity is legal only for
+`InteractionFootprint.distributionKind: extensive-distributed`, where it
+distributes one extensive rate or interval transfer.
 
 Physical truncation or escape from the modeled support is recorded as a typed
 `ConservationGroup.boundaryFluxes` entry. Terrain occlusion or a rejected
@@ -353,7 +366,7 @@ destination does not destroy mass: the mass remains in source/pending inventory
 unless a separate typed transfer or boundary flux removes it. Delivery-capacity
 overflow is not a `PrecipitationEmissionSnapshot` or per-record field. When the
 transport edge batches `InteractionRecord`s, its owning
-`SurfaceExchange.batchLedger` records the canonical immutable
+downstream rain `SurfaceExchange.batchLedger` records the canonical immutable
 `InteractionBatchLedger`: overflow policy and sequence ranges, per-consumer
 cursors, typed lost/deferred commodity maps, and application-ledger version.
 The `SurfaceExchange.applicationInterval` and every contained
@@ -381,8 +394,19 @@ model without a validated microphysical closure may still publish an authored
 dimensioned emission policy, but it must be labelled authored/empirical rather
 than physically predicted.
 
-The cloud consumes `EnvironmentForcingSnapshot[n]` and publishes a distinct
-immutable `PrecipitationEmissionSnapshot[n]`. It never writes into its consumed
+The emission is incomplete until both closure gates accept it. Its
+`PrecipitationEmissionSnapshot.conservationGroupId` resolves a
+`ConservationGroup` that closes condensed liquid/ice, airborne and pending
+inventory, phase conversion, vapor transfer, emission, boundary flow, and
+numerical residual over `emissionInterval`. Its `ErrorPropagationLedger`
+names the emitted signal and state version, propagates forcing, density,
+support/Jacobian, quadrature, phase, transport, approximation, and numerical
+errors with their correlations, and applies every consumer tolerance. The
+cloud owns neither downstream delivery cursors nor an `InteractionBatchLedger`.
+
+The cloud consumes `EnvironmentForcingSnapshot[n]`, evolves provisional density,
+derives and validates `PrecipitationEmissionSnapshot[n]`, then atomically
+commits the density and emission generations. It never writes into its consumed
 snapshot. The scheduler either exposes a direct completed
 `emission[n] -> precipitation transport[n+1]` edge or lets the environment
 coordinator incorporate emission into `EnvironmentForcingSnapshot[n+1]` with
@@ -458,10 +482,11 @@ Use this dependency order:
 latch PhysicsContext
   + EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant
   + LightingTransportSnapshot.sampleInstant: PhysicsInstant
-  -> advect/evolve cloud density and conservative majorants
-  -> publish optional PrecipitationEmissionSnapshot.emissionInterval:
-     PhysicsTimeInterval for its declared rain/transport edge
-  -> commit view-independent cloud state/resource generations
+  -> advect/evolve provisional cloud density and conservative majorants
+  -> derive/stage optional PrecipitationEmissionSnapshot.emissionInterval:
+     PhysicsTimeInterval from that provisional state
+  -> evaluate the cloud ConservationGroup and ErrorPropagationLedger
+  -> atomically commit view-independent density and emission generations
   -> publish view-independent PhysicsPresentationCandidate with
      requestedPresentationInstant: PhysicsInstant + presentedStatePairs
      + resourceLeases + eventSequenceRanges only
@@ -479,7 +504,7 @@ latch PhysicsContext
   -> seal PhysicsPresentationSnapshot with snapshotId + candidateId
      + cameraPublicationId + viewPreparationId + presentationTargetId + viewId
      + presentedStatePairRefs + resourceLeaseRefs + eventSequenceRanges
-     + sealVersion only
+     + closureManifest + sealVersion only
   -> render submits cloud beauty/reconstruction/composite from the sealed refs
   -> append FrameExecutionRecord without mutating prior publications
 ```
@@ -487,6 +512,13 @@ latch PhysicsContext
 The completed precipitation-emission edge is independent of presentation
 sealing; rain never waits for a render view. Lighting consumers sample only a
 completed cloud-shadow publication with the declared density revision.
+
+The candidate carries distinct `PresentedStatePair` bindings for the committed
+cloud-density generation and, in causal mode, the committed emission
+generation whenever either participates in presentation. The sealed snapshot's
+`closureManifest` resolves the exact union of their state-handle leases, view
+preparation/shadow/cache/reactive/reset dependencies, and addressed event
+ranges. Missing and extra lease/event IDs are both invalid.
 
 The `PhysicsPresentationCandidate` contains no camera, render origin,
 `globalToRender`, matrices, shadow/cache epochs, or view-specific temporal
@@ -521,6 +553,16 @@ Preserve the same interfaces on constrained targets: use analytic/coarse wind,
 low-rate conservative emission columns, compact single-channel cloud optical
 depth, sparse dirty shadow tiles, and explicit age/error. Do not add a dense
 microphysics grid to make the interface look physical.
+
+Any change to cloud equations, physical state discretization or active support,
+native cadence, provider filter/band, emission representation, conservation
+owner, or stable IDs is admitted only by the coordinator's shared
+`QualityTransition`. It declares the conservative map, introduced filter,
+state/version publication, cursor/ID mapping, residual/error gate, simultaneous
+residency, reset plan, and retirement join. Render-only march resolution,
+sample count, shadow resolution, and temporal reconstruction may change locally
+only while every physical descriptor, state, emission integral, cadence,
+filter, and identity remains invariant.
 
 ## 5. Layered Density Topology
 
@@ -1281,7 +1323,9 @@ inventory/conservation ledgers, cloud-shadow representation/mips, and every
 in-flight resource generation. The candidate carries view-independent pairs,
 leases, and event ranges; camera and view-preparation publications add per-view
 transforms and shadow/cache/reset lease refs. The sealed snapshot contains only
-IDs and refs, never copied pairs or transforms. Rain or CPU logic may not
+IDs, refs, and its exact `closureManifest`, never copied pairs or transforms.
+Account separately for the cloud-density and causal-emission
+`PresentedStatePair` handles. Rain or CPU logic may not
 synchronously read a GPU emission texture in the steady frame loop; use
 same-queue GPU consumption, an explicitly delayed host mirror, or a compact
 analytic emission projection with declared latency/error.
@@ -1338,7 +1382,9 @@ candidate ID plus previous/current PresentationSampleProvenance and pair/lease/e
 CameraViewPublication ID, sample instants, globalToRender revisions, and matrices
 ViewPreparationPublication ID plus full leases for newly created view resources
 and visibility/shadow/cache/reactive/reset lease refs
-snapshotId/candidateId/cameraPublicationId/viewPreparationId/target/view plus pair/lease/event refs; no copied pairs/transforms
+snapshotId/candidateId/cameraPublicationId/viewPreparationId/target/view plus density/emission pair refs, lease/event refs, and exact closureManifest; no copied pairs/transforms
+cloud ConservationGroup and ErrorPropagationLedger status by committed emission version
+QualityTransition ID/state epochs or proof that a change was render-only
 storage texture format, resolution, live bytes, and estimated traffic
 ```
 
@@ -1417,6 +1463,8 @@ Required numerical/image gates:
    per-record overflow field is permitted, and any nonzero lost commodity forces
    failed-conservation status. Liquid/ice internal transfers close separately
    without changing total mass.
+   The emission `ErrorPropagationLedger` resolves the committed output version,
+   every input/local error and correlation rule, and all consumer gates.
    Appearance-only mode exposes no physical emission channel.
 10. Lighting fixtures reject a duplicate atmosphere factor, distinguish
     diffuse sky with/without the direct disc, and prove cloud shadow products
@@ -1425,9 +1473,15 @@ Required numerical/image gates:
     pair has independent previous/current `PresentationSampleProvenance`;
     `CameraViewPublication` owns sample instants, render transforms, and
     matrices; `ViewPreparationPublication` owns visibility/shadow/cache/reactive/
-    reset publications and lease refs; and the snapshot contains only IDs,
-    `presentedStatePairRefs`, `resourceLeaseRefs`, and event ranges. Reject
-    copied pairs/transforms and any aggregate provenance shorthand.
+    reset publications and lease refs; density and causal-emission bindings are
+    distinct pairs; and the snapshot contains only IDs,
+    `presentedStatePairRefs`, `resourceLeaseRefs`, event ranges, and an exact
+    `closureManifest`. Reject copied pairs/transforms, incomplete or surplus
+    closure IDs, and any aggregate provenance shorthand.
+12. Every physics-authoritative cadence, state/support, filter/band, emission,
+    or stable-ID tier change supplies an accepted `QualityTransition` with a
+    conservative map and retirement evidence. Render-only march/shadow/
+    reconstruction changes prove those physical descriptors invariant.
 
 ## 13. Replaced Techniques
 

@@ -104,6 +104,12 @@ per-channel error, residency/cadence/latency, state version, resource
 generation, and missing-channel policy). Domain fields below only narrow its
 channels; they do not rename that envelope.
 
+The project/environment coordinator is the sole owner and publisher of
+`EnvironmentForcingSnapshot`, including its frame, clock, support/filter,
+validity, and revision. Rain consumes that boundary. A rain transport or
+receiver owner may publish downstream state and exchanges, but it cannot
+publish a competing forcing snapshot.
+
 ### Immutable forcing input
 
 Latch one `EnvironmentForcingSnapshot` at its exact
@@ -151,10 +157,12 @@ Cloud coupling has exactly two modes:
   snapshot already latched for the coordination interval. Rain consumes it on
   a declared direct acyclic scheduler edge whose producer precedes rain, or
   from the next environment-forcing revision, maps it to receiver support, and
-  reports initial/final
-  airborne inventory, delivered, typed transfer to the atmosphere-vapor owner,
-  rejected, and overflow mass. The inventory balance closes within the
-  declared numerical error.
+  reports initial/final airborne inventory, delivered mass, typed transfer to
+  the atmosphere-vapor owner, and rejected/deferred/lost mass. The downstream
+  rain `SurfaceExchange.batchLedger` owns the `InteractionBatchLedger` for
+  delivery capacity, sequence ranges, cursors, and lost/deferred commodities;
+  neither the cloud nor `PrecipitationEmissionSnapshot` owns that ledger. The
+  inventory balance closes within the declared numerical error.
 
 ### Surface exchange and impact records
 
@@ -165,8 +173,8 @@ at the forcing/emission versions, and carry precipitation in canonical
 `SurfaceExchange`.
 
 - A rate representation uses `massFlux` in `kg m^-2 s^-1` plus
-  `momentumFlux`/`surfaceTraction` in `Pa`, with the same oriented normalized
-  area footprint and `applicationInterval: PhysicsTimeInterval`.
+  `momentumFlux`/`surfaceTraction` in `Pa`, with the same oriented physical-area
+  quadrature and `applicationInterval: PhysicsTimeInterval`.
 - An interval-integral representation uses canonical `massTransfer` in `kg`
   plus distributed `momentumTransfer` in `N s` (and `N m s` about its named
   point), over the same interval and conservation group. A discrete local
@@ -189,10 +197,23 @@ When a receiver subcycles, its quadrature weights over the record interval sum
 to one application of the parent integral. An `interval-integral` is never
 applied once per subcycle; a `flux` is integrated over each disjoint subinterval.
 
-A distributed footprint kernel `W` is nonnegative and normalized against its
-declared receiver-area measure: `integral_A W dA = 1`. If clipping at a domain
-boundary changes that integral, record rejected transfer or explicitly
-renormalize under the receiver policy; never change support measure silently.
+`InteractionFootprint.distributionKind` selects one of two dimensionally
+distinct paths:
+
+- `intensive-field`: each flux/traction value is a physical density at a
+  quadrature point; each quadrature weight includes its chart/support Jacobian,
+  has units of square metres, and the weights sum to `representedMeasure`.
+  Integrate as `sum_i q_i A_i`; set no normalized spatial kernel. Normalizing
+  `A_i` to unity and then applying the same intensive values destroys area and
+  is invalid.
+- `extensive-distributed`: the payload is one extensive rate or interval
+  transfer. Its nonnegative kernel `W` has inverse-square-metre units and
+  satisfies `integral_A W dA = 1`; the local density is the extensive quantity
+  times `W`. If clipping changes that integral, record rejected transfer or
+  renormalize only under an explicit receiver policy.
+
+Never use the extensive-distributed kernel path to disguise an intensive
+`massFlux`, `momentumFlux`, `surfaceTraction`, or `heatFlux` sample.
 
 Publish energy/enthalpy flux only when a thermal owner consumes it and its
 reference state is declared. For a water receiver with density `rho_w`, the
@@ -207,28 +228,39 @@ contact-like impulses. It records integrated impulse in `N s`, canonical SI
 physics-frame contact/footprint data, exact
 `applicationInterval: PhysicsTimeInterval`, stable IDs, deterministic order,
 reaction owner, conservation-group ID, collision-free `exactOnceKey`, and
-`applicationLedgerKey`. Sequence ranges and partitions live in the batch
-ledger, not ad hoc record fields. Capacity outcomes live
-on the canonical immutable `InteractionBatchLedger`. Its lost/deferred
+`applicationLedgerKey`. Sequence ranges, delivery cursors, and capacity live in
+the batch ledger; causal partition identity lives only in canonical
+`partitionMembership`, never in ad hoc fields. Capacity outcomes live
+on the owning downstream `SurfaceExchange.batchLedger` as the canonical
+immutable `InteractionBatchLedger`. Its lost/deferred
 commodity map contains only represented channels (for example mass, impulse,
 torque, or energy) with exact SI units and per-channel error; unrepresented
 loss quantities block the conservation claim or require a versioned ledger
 schema that represents them. `absentChannels` belongs to provider sample
 records, never to `InteractionBatchLedger`, and no missing commodity is filled
 with zero.
-Physical impact records partition the distributed parent exchange, reference
-its ID, and carry `massTransfer`/`momentumTransfer` or `pointImpulse` weights
-that close to the parent over the same support/interval. A purely visual splash
-belongs to the presentation-event stream, references the parent exchange, and
-is not a second physical `InteractionRecord`. Multiple physical batches use
-disjoint partition IDs and never each claim the complete parent integral.
+Every causal physical impact that partitions a distributed parent carries
+`InteractionRecord.partitionMembership: InteractionPartitionMembership`.
+Its `parentExchangeId`, `parentInteractionIds`, `partitionGroupId`,
+`partitionId`, `partitionMeasure`, and `closureGroupId` bind the impact to the
+parent `SurfaceExchange` and intensive/integrated interaction records. The
+disjoint partitions close parent mass, momentum, angular momentum, and energy
+within their shared `ConservationGroup`; `applicationLedgerKey` and the batch
+sequence/cursors enforce exact-once application. A purely visual splash belongs
+to the presentation-event stream, references the parent exchange, and is not a
+second physical `InteractionRecord`. Multiple physical batches use disjoint
+partition IDs and never each claim the complete parent integral.
 
-Rendered particles are estimators. For accepted samples `i` with weights
-`w_i`, enforce
+Rendered particles are estimators. First integrate intensive fields with
+physical-area quadrature `A_i`; then, if sparse physical impacts partition that
+integral, assign extensive partition masses `m_i` and impulses `J_i`:
 
 ```text
-sum_i w_i = integral_A integral_dt massFlux dA dt
-sum_i w_i v_arrival_i = integral_A integral_dt momentumFlux dA dt
+sum_i A_i = representedMeasure
+M_parent = sum_i massFlux_i * A_i * dt
+J_parent = sum_i momentumFlux_i * A_i * dt
+sum_i m_i = M_parent
+sum_i J_i = J_parent
 ```
 
 Changing streak/flake count, camera cell population, update cadence, or LOD
@@ -294,7 +326,7 @@ latch EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant for
      and resourceLeaseRefs
   -> seal PhysicsPresentationSnapshot from presentedStatePairRefs and
      resourceLeaseRefs plus the exact candidateId, cameraPublicationId, and
-     viewPreparationId
+     viewPreparationId, with closureManifest
   -> materials and render consume only the sealed snapshot
 ```
 
@@ -304,13 +336,27 @@ including requested and mapped `PhysicsInstant` values, clock-map
 revision/error, and lower/upper brackets. Each arm also carries its own
 `presentedInstant: PhysicsInstant`. The candidate contains no camera, render
 origin, global-to-render transform, visibility, shadow, cache, or reset state.
+It exposes distinct `PresentedStatePair` bindings for airborne precipitation,
+receiver state, and any committed cloud-emission generation used by the view.
 The sealed snapshot references candidate pairs and leases only through
 `presentedStatePairRefs` and `resourceLeaseRefs`; it never copies
-`PresentedStatePair` records, provenance, or transforms.
+`PresentedStatePair` records, provenance, or transforms. Its
+`closureManifest` contains exactly the required pair-state, preparation,
+shadow/cache/visibility, reactive/reset lease IDs and addressed event-range
+IDs; missing or surplus closure entries are invalid.
 
 Subcycling may change internal solver cadence but not this dependency order.
 Store unresolved exchange until the consumer cadence or integrate it exactly;
 do not sample-and-drop between rates.
+
+Any change to precipitation equations, recurrent/receiver state, native
+cadence, represented support, provider filter/band, exchange representation,
+partition/application-ledger identity, or stable IDs requires an admitted
+shared `QualityTransition`. Its conservative map preserves inventories,
+positivity, event cursors, exact-once ledgers, filters, IDs, and error bounds;
+retirement waits for all consumers. Render-only particle density, sprite shape,
+beauty scale, and ripple-normal representation may remain local only when those
+physical quantities and descriptors are unchanged.
 
 ## r185 Import Table
 
@@ -518,12 +564,15 @@ water-equivalent-depth rate in `m s^-1`, before snapshot publication through the
 declared reference liquid-water density and provenance:
 `massFlux = rho_reference * depthRate`. Water-equivalent rate is not a third
 accepted forcing channel, and volume source is not relabelled area flux without
-the projection. Rendered particle density is a sampling choice. For `N` deterministic accepted impact
-samples representing receiver area `A` over interval `dt`, sample weights sum
-to `F*A*dt`; changing visual particle count, simulation cadence, or LOD cannot
-change total deposition. Use stratified world-cell samples, deterministic
-overflow/drop accounting, and integrate the complete elapsed forcing,
-drainage, evaporation, and melt interval when receiver cadence changes.
+the projection. Rendered particle density is a sampling choice. For physical
+area quadrature, `sum_i A_i = A` and deposition is
+`sum_i F_i A_i dt`; `A_i` is never normalized to unity. If `N` sparse impacts
+partition that integrated parent, their extensive masses sum to the same
+integral and their `InteractionPartitionMembership` records close it. Changing
+visual particle count, simulation cadence, or LOD cannot change total
+deposition. Use stratified world-cell samples, deterministic overflow/drop
+accounting, and integrate the complete elapsed forcing, drainage, evaporation,
+and melt interval when receiver cadence changes.
 
 ## Snow Accumulation And Object Capping
 
@@ -679,8 +728,9 @@ Detailed constraints:
   bounded event pools, dirty receiver tiles, and lower receiver cadence with
   exact interval accumulation; record clipped support and overflow error.
 - account for exchange batches, interaction stream/ledger capacity, receiver
-  state, `PresentedStatePair` slots, identity/partition maps, and in-flight
-  resource generations. Keep authoritative transfer GPU-resident or compactly
+  state, `PresentedStatePair` slots, exact snapshot `closureManifest`,
+  identity/partition maps, `QualityTransition` overlap, and in-flight resource
+  generations. Keep authoritative transfer GPU-resident or compactly
   host-authored; steady-frame rendering performs no synchronous readback.
 
 Record `{visibleInstances, coveredPixels, layersPerPixel, solverKind,
@@ -701,9 +751,14 @@ Expose at least:
 - `events`: splash or impact buffer occupancy;
 - `progress`: shared weather envelope.
 - `exchange`: rate/integral discriminant, support measure, parent/partition IDs,
-  integrated mass/momentum, residual, reaction owner, and overflow;
+  physical-area weights, integrated mass/momentum, closure group, reaction
+  owner, and `InteractionBatchLedger` overflow/cursors;
 - `receiver`: selected state owner plus deposition/run-up/melt/drainage/
-  infiltration/evaporation terms and published state revision.
+  infiltration/evaporation terms and published state revision;
+- `presentation`: airborne/receiver/emission pair refs and exact
+  `closureManifest` lease/event sets;
+- `quality`: admitted `QualityTransition` ID/state epochs, or proof that the
+  active tier change is render-only.
 
 Diagnostics should report backend tier, instance count, dispatch count, storage
 size, generated variant selection, coverage percentage, and whether particles
@@ -753,9 +808,16 @@ Known failure modes:
 - generated ripple-normal assets are used without preserving their normal-map
   interpretation.
 - sparse impact records and their parent `SurfaceExchange` both deposit the
-  same mass/momentum, or multiple partitions each claim the whole exchange;
+  same mass/momentum, omit `InteractionPartitionMembership`, or multiple
+  partitions each claim the whole exchange;
+- intensive flux is multiplied by a normalized kernel or uses unit-sum area
+  weights instead of physical-square-metre quadrature;
 - particle count, receiver tessellation, or update cadence changes integrated
   deposition under a fixed forcing trace;
+- a physical cadence/state/support/filter/ID change bypasses
+  `QualityTransition`, or a render-only change mutates a provider descriptor;
+- a sealed snapshot omits/supersets its `closureManifest` or collapses
+  airborne, receiver, and causal-emission state into an ambiguous binding;
 - water, weather, and a material each integrate private wetness/snow state, or
   a material consumes a different receiver revision than the visible residue;
 - a Celsius projection is sampled as kelvin or an air-velocity field is used as

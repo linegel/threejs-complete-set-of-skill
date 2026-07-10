@@ -28,6 +28,11 @@ Consume its versioned `PhysicsContext`, `EnvironmentForcingSnapshot`, and
 `LightingTransportSnapshot`; do not invent a cloud-only world scale, wind
 clock, solar basis, or attenuation convention.
 
+The project/environment coordinator is the sole owner and publisher of
+`EnvironmentForcingSnapshot`. Clouds consume that immutable boundary and may
+publish a distinct `PrecipitationEmissionSnapshot`; they never republish
+forcing under a cloud-owned revision or clock.
+
 - Sample environmental air velocity in meters per second from
   `EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant`, with its declared
   frame, altitude/support domain, cadence, interpolation policy,
@@ -46,10 +51,12 @@ clock, solar basis, or attenuation convention.
   interval. A volume-source cloud model projects through its support/Jacobian
   before publication. Include
   fall-delay or transport model, cadence, uncertainty/error, typed
-  `ConservationGroup.boundaryFluxes`, and separate
-  `InteractionBatchLedger` capacity-overflow/lost/deferred accounting for
-  `$threejs-rain-snow-and-wet-surfaces`. Any derived `SurfaceExchange` and
-  `InteractionRecord` use contained `applicationInterval: PhysicsTimeInterval`.
+  `ConservationGroup.boundaryFluxes`, a closing `ConservationGroup`, and an
+  `ErrorPropagationLedger` for the emitted state version. Delivery accounting
+  is not cloud state: the downstream rain-owned `SurfaceExchange.batchLedger`
+  owns its immutable `InteractionBatchLedger`. Any derived `SurfaceExchange`
+  and `InteractionRecord` use contained
+  `applicationInterval: PhysicsTimeInterval`.
 - Consume sun direction and per-channel solar/sky radiance or irradiance
   quantity, unit, spectral/working basis, filter, error, and atmospheric
   transmittance from `LightingTransportSnapshot.sampleInstant: PhysicsInstant`;
@@ -60,10 +67,11 @@ clock, solar basis, or attenuation convention.
   Cloud self-shadowing contributes a separate cloud optical-depth/transmittance
   factor; it never bakes atmospheric attenuation into that factor.
 - Version cloud density, precipitation emission, lighting input, and shadow
-  output independently. The scheduler latches forcing and lighting snapshots
-  before advection/marching. It publishes emission separately; it never mutates
-  the already consumed forcing snapshot. Downstream rain and surface lighting
-  consume only completed scheduled publications.
+  output independently. The scheduler latches forcing and lighting, evolves a
+  provisional cloud state, derives and validates emission from that state, then
+  commits density and emission generations atomically. It never mutates the
+  consumed forcing snapshot. Downstream rain and surface lighting consume only
+  completed committed publications.
 - Publish committed render-consumed, view-independent cloud state generations
   through `PhysicsPresentationCandidate.presentedStatePairs`, with the
   candidate's `requestedPresentationInstant: PhysicsInstant`,
@@ -90,9 +98,20 @@ clock, solar basis, or attenuation convention.
   contains only `snapshotId`, `candidateId`, `cameraPublicationId`,
   `viewPreparationId`, `presentationTargetId`, `viewId`,
   `presentedStatePairRefs`, `resourceLeaseRefs`, `eventSequenceRanges`, and
-  `sealVersion`; it copies no pairs or transforms. Hold, analytic, or
-  no-interpolation policy is explicit in each previous/current provenance
-  record.
+  `closureManifest`, and `sealVersion`; it copies no pairs or transforms. The
+  candidate exposes separate `PresentedStatePair` bindings for committed cloud
+  density and, in causal mode, the committed precipitation-emission generation
+  whenever either is presented. `closureManifest.exactRequiredLeaseIds` and
+  `exactEventRangeIds` close those bindings and dependencies exactly. Hold,
+  analytic, or no-interpolation policy is explicit in each previous/current
+  provenance record.
+
+Route every physics-authoritative change of cloud equations, state
+discretization/support, cadence, provider filter, emission representation, or
+stable identity through the shared `QualityTransition`. A beauty-march scale,
+shadow resolution, or reconstruction-only change may remain local only when it
+does not change any physical state, provider descriptor, emission integral,
+filter, ID, or cadence.
 
 Keep mobile tiers analytic and sparse: a low-rate authored weather map may
 sample a coarse wind provider and causal precipitation may use a conservative

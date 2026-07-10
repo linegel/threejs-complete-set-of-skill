@@ -113,13 +113,20 @@ domainSignals: {}
 # snapshot explicitly unused.
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocate
 

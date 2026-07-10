@@ -73,6 +73,11 @@ Bind this skill to its versioned `PhysicsContext`,
 `ViewPreparationPublication`, and `PhysicsPresentationSnapshot`; do not create
 a second weather clock, wind uniform, contact record, or unit convention.
 
+The project/environment coordinator exclusively owns and publishes
+`EnvironmentForcingSnapshot`. This skill consumes that immutable snapshot and
+may own downstream precipitation transport, exchanges, and receiver state; it
+never republishes forcing under a rain-owned revision.
+
 - Consume atmospheric wind from `EnvironmentForcingSnapshot` in meters per
   second at its exact `sampleInstant: PhysicsInstant`, with its declared frame,
   altitude/support domain, cadence,
@@ -95,13 +100,24 @@ a second weather clock, wind uniform, contact record, or unit convention.
   transports it on the declared later scheduler edge to physics-frame-stable receivers.
 - Emit distributed rain/snow transfer as `SurfaceExchange` with mass and
   momentum fluxes over its exact `applicationInterval: PhysicsTimeInterval`.
+  Intensive flux uses `InteractionFootprint.distributionKind: intensive-field`:
+  physical-area quadrature weights include Jacobians and sum to
+  `representedMeasure`; no normalized `W` multiplies the flux. A normalized
+  inverse-square-metre kernel is permitted only for
+  `distributionKind: extensive-distributed`, where it distributes one
+  extensive rate or interval transfer.
   Emit sparse impacts as `InteractionRecord` with impulse, footprint in the
   declared SI physics frame, source/receiver IDs, exact
   `applicationInterval: PhysicsTimeInterval`, frame/transform revision,
   ordering key, reaction owner, and batch/partition identity. Put capacity
-  outcomes in the canonical immutable `InteractionBatchLedger`, not on individual records. Rendered
-  streak/flake count never changes either integral. Sparse physical impacts
-  partition their parent exchange. Non-authoritative visual splashes use a
+  outcomes in this downstream `SurfaceExchange.batchLedger` as the canonical
+  immutable `InteractionBatchLedger`, never on the cloud emission or individual
+  records. Rendered streak/flake count never changes either integral. Every
+  causal physical impact carries
+  `InteractionRecord.partitionMembership: InteractionPartitionMembership`
+  with its `parentExchangeId`, `parentInteractionIds`, `partitionGroupId`,
+  `partitionId`, `partitionMeasure`, and `closureGroupId`; disjoint partitions
+  close their parent exchange exactly. Non-authoritative visual splashes use a
   presentation-event stream that references the exchange; neither path deposits
   a second copy.
 - Assign exactly one wetness/coverage owner per receiver. That owner integrates
@@ -143,8 +159,18 @@ reactive, and reset owners publish the corresponding
 generations, and `resourceLeaseRefs`. Finally,
 seal a `PhysicsPresentationSnapshot` whose state/resource payload is only
 `presentedStatePairRefs` and `resourceLeaseRefs` plus the exact `candidateId`,
-`cameraPublicationId`, and `viewPreparationId`. The snapshot never copies
-`PresentedStatePair` records, provenance, or global-to-render transforms.
+`cameraPublicationId`, and `viewPreparationId`, with an exact
+`closureManifest`. Present airborne precipitation, receiver state, and any
+causal cloud-emission generation used by the view as distinct
+`PresentedStatePair` bindings. The snapshot never copies `PresentedStatePair`
+records, provenance, or global-to-render transforms.
+
+Use the shared `QualityTransition` for every physics-authoritative change to
+precipitation equations, recurrent state, cadence, receiver support/filter,
+exchange representation, partition/ledger identity, or stable IDs. A
+render-only change to streak count, beauty resolution, sprite geometry, or
+ripple-normal presentation may remain local only when physical state,
+integrals, descriptors, filters, cadence, and identities are unchanged.
 
 ## Capability Gate
 
@@ -180,9 +206,12 @@ Native WebGPU quality tiers preserve the shared weather cause:
    and wind, temperature, precipitation flux, and debug state preserve their
    source versions. Rendered particle count is a
    sampling/appearance choice: accepted impacts use deterministic quadrature
-   weights over the declared exposed-surface measure, and their weights sum to
-   flux integrated over support and elapsed time. Equal division by particle
-   count is valid only for a proven uniform measure/integrand. Wetness and snow coverage are integrated
+   over the declared exposed-surface measure. Physical-area weights include
+   Jacobians and sum to represented area; deposition is
+   `sum_i flux_i * areaWeight_i * dt`. Do not normalize these area weights.
+   Extensive impact sample weights instead close the already integrated parent
+   transfer. Equal division by particle count is valid only for a proven
+   uniform measure/integrand. Wetness and snow coverage are integrated
    state with deposition, drainage/evaporation, or melt terms; they consume the
    same forcing but are not aliases of instantaneous precipitation progress.
 2. Allocate static per-instance seeds once. Evaluate ballistic/domain motion

@@ -135,6 +135,17 @@ absolute frequency by `k dot U` **[D]**; if `U`
 varies materially within a periodic patch, route that region out of the FFT
 instead of freezing an inconsistent dispersion.
 
+The offshore/coastal handoff also carries the canonical
+`WaterSurfaceProvider` envelope for every instantaneous query: mandatory
+`freeSurfacePoint`, `freeSurfaceNormal`, `geometricNormalVelocityMps`, and the
+exact `WaterSurfaceParameterization`, with optional fixed-parameterization
+`surfacePointVelocityMps`, material `materialCurrentVelocityMps`, and only the
+other channels actually represented. Descriptor, requested/actual
+`PhysicsInstant`, footprint/filter, frame/origin/transform, state/resource
+version, validity/error, latency, and residency cross unchanged. A
+phase-averaged handoff needs a separately owned display-phase synthesis before
+it can satisfy this instantaneous provider ABI.
+
 Partition ownership in every transition band. Only disjoint Fourier bins or
 fields proven to have zero cross-covariance may use power windows that sum to
 one **[D,G]** and square-root amplitude weights. Coherent offshore/coastal
@@ -190,6 +201,13 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
 renderer.compute( orderedOceanNodes );
 pipeline.render();
 ```
+
+In a coupled route, every coefficient, transform, assembly, coastal-boundary,
+and source dispatch that advances physical water state executes inside a
+declared `PhysicsGraphStage` with exact interval and versioned dependencies.
+The render loop consumes the sealed presentation state; it does not advance the
+FFT/coastal solver, resample mutable forcing, apply runoff, or inject a private
+disturbance step.
 
 ## Non-Negotiable Numerical Contract
 
@@ -302,8 +320,9 @@ sample in physics-frame metres: `freeSurfacePoint`, `freeSurfaceNormal`,
 `geometricNormalVelocityMps`, its exact `WaterSurfaceParameterization`,
 optional fixed-coordinate `surfacePointVelocityMps`, optional
 `materialCurrentVelocityMps`, optional
-`waterColumnDepthMeters` and `densityKgPerM3`. Each is a complete shared
-`SampledChannel`; the result returns the complete shared
+`waterColumnDepthMeters` and `densityKgPerM3`. Each named channel is a complete
+shared `SampledChannel`; the parameterization remains its own exact canonical record.
+The result returns the complete shared
 `PhysicsSignalDescriptor`, bundle `sampleInstant`, and each channel's
 `actualPhysicsTime` resolving to a `PhysicsInstant`. The requested
 `PhysicsInstant` remains distinct from those returned actual instants and may
@@ -318,9 +337,15 @@ bathymetry point, and wet/dry state—are likewise absent unless a named model
 supplies each with actual support and error.
 
 `surfacePointVelocityMps` is a physical polar vector bound to the serialized
-surface gauge; only its normal projection is geometric. The material-current
-vector is independent of that parameterization. Both are in `physicsFrameId`,
-not moving-frame coordinate rates. Cross-frame
+surface gauge; only its normal projection is geometric. Whenever that optional
+vector is present, the exact identity is
+`geometricNormalVelocityMps = dot(surfacePointVelocityMps,
+freeSurfaceNormal)` at the same actual time, support/filter, and state version;
+its channel propagates correlated vector/normal error. The scalar normal speed
+is gauge invariant and remains a mandatory publication even when a
+reduced/implicit owner cannot publish the full fixed-coordinate vector. The
+material-current vector is independent of that parameterization. Both vector
+channels are in `physicsFrameId`, not moving-frame coordinate rates. Cross-frame
 transport rotates their basis; it does not add origin or `omega x r` transport
 terms to an already physical vector.
 
@@ -365,10 +390,13 @@ Batch `WaterSurfaceProvider` requests as compact channel-masked SoA. A
 presentation candidate references immutable resource generations under a
 frame-in-flight lease/reuse rule; it does not deep-copy FFT maps, and the next
 compute update cannot overwrite a generation still consumed by rendering.
-Any physical band/representation `QualityTransition` commits at a scheduler tick with
+Any physics-facing change to represented spectrum, solver representation,
+coastal ownership, cadence, provider filter/error, or active domain uses a
+coordinator-admitted `QualityTransition` and commits at a scheduler tick with
 state/energy projection, atomic provider/resource generation, queue boundary,
 history action, rollback, and peak simultaneous residency. A visual crossfade
-never gives two representations interaction or reaction ownership.
+never gives two representations interaction or reaction ownership. Render-only
+mesh/post sampling changes do not mutate the physical provider.
 
 For bandwidth-constrained tile GPUs, prefer a workgroup-resident one-dimensional FFT plus
 transpose when device workgroup storage and invocation limits admit the chosen
@@ -395,8 +423,9 @@ different and stricter error case than storing only resolved maps in half-float.
 - foam source, transported state, decay, and display coverage over time;
 - CPU omitted bound, inversion residual, and GPU probe error;
 - canonical `WaterSurfaceProvider` conformance, footprint/filter response,
-  absent-channel handling, state-version/error propagation, and zero
-  frame-critical readback;
+  absent-channel handling, state-version/error propagation, mandatory
+  `geometricNormalVelocityMps` projection identity, valid absence of optional
+  full `surfacePointVelocityMps`, and zero frame-critical readback;
 - immutable physics presentation-snapshot coherence for displacement,
   derivatives, velocity, shadows, foam, and temporal-history rejection;
 - typed lighting-transport channel/factor ledger proving disc, sky,

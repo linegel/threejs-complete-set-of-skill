@@ -105,6 +105,18 @@ coastalHandoff:
   currentField: "metres per second, sampling space, cadence, owner"
   incomingOwner: spectral-ocean
   outgoingOwner: coastal-solver | absorbing-layer
+  waterSurfaceProviderAbi:
+    requiredChannels: [freeSurfacePoint, freeSurfaceNormal, geometricNormalVelocityMps]
+    parameterization: WaterSurfaceParameterization
+    optionalChannels:
+      - surfacePointVelocityMps
+      - materialCurrentVelocityMps
+      - waterColumnDepthMeters
+      - densityKgPerM3
+      - materialAccelerationMps2
+      - pressurePa
+      - bathymetryPoint
+      - wetDryState
   renderSurfaceOwner: "one mesh/material in every overlap sample"
   foamHistoryOwner: "one state, coordinate space, transport, and remap rule"
   donorStateVersion: "version and validity/error propagation policy"
@@ -116,6 +128,15 @@ distance/frame, wet mask, obstacle/porosity fields, bottom roughness, currents,
 and invalid/unknown regions. The linked coastal contract defines their
 generation and filtering. Spectral code consumes these only to locate and
 validate the handoff; it must not silently reinterpret them.
+
+Runoff and exposed-surface wetness never become offshore spectral state. The
+coastal owner consumes the receiver-to-water runoff exchange committed for
+interval `n` as immutable input to interval `n+1`, gathers it exactly once into
+the provisional conservative source assembly, and advances its application
+ledger only with the accepted atomic `n+1` commit. It publishes one typed
+inundation/wash `SurfaceExchange` to the route-selected sole receiver; neither
+the spectral donor nor a material/weather display path integrates another
+copy.
 
 ### Phase-resolved boundary forcing
 
@@ -311,7 +332,8 @@ frame and one canonical `PhysicsInstant`. The adapter returns:
 domain channel records:
   freeSurfacePoint
   freeSurfaceNormal
-  surfacePointVelocityMps
+  geometricNormalVelocityMps   # mandatory gauge-invariant scalar interface speed
+  surfacePointVelocityMps?     # optional fixed-coordinate velocity under the serialized parameterization
   materialCurrentVelocityMps?  # represented declared mean/current only
   waterColumnDepthMeters?      # valid depth/datum only
   densityKgPerM3?              # optional SI density channel
@@ -319,6 +341,7 @@ domain channel records:
 sample bundle/envelope:
   descriptor: PhysicsSignalDescriptor
   sampleInstant: PhysicsInstant
+  surfaceParameterization: WaterSurfaceParameterization
   representedFootprint, filter, validity, error, absentChannels
 ```
 
@@ -334,15 +357,22 @@ the footprint/filter actually represented, validity, per-channel error,
 residency/latency/cadence, state/resource generation, frame/transform/source
 epochs, and missing-channel policy.
 
-The surface-point velocity is differentiated from the same seeded spectral
-field and horizontal map used for geometry; it is not phase speed or group
-speed. Material current is the separately declared current `U`, not surface
-motion. Missing current, depth, or density is absent with structured validity;
-zero remains a represented physical value. Footprint filtering removes modes
-that the response footprint cannot resolve and reports the omitted
+The surface-point velocity is differentiated at fixed coordinates of the exact
+serialized parameterization from the same seeded spectral field and horizontal
+map used for geometry; it is not phase speed or group speed. When that optional
+vector is present, the exact identity is
+`geometricNormalVelocityMps = dot(surfacePointVelocityMps,
+freeSurfaceNormal)` at the same actual time, support/filter, and state version;
+its channel propagates correlated vector/normal error. The scalar is
+parameterization/gauge invariant and is mandatory even when an implicit or
+reduced owner publishes it directly and marks the full fixed-coordinate vector
+absent. Material current is the separately declared fluid current `U`, not surface motion. Missing current,
+depth, or density is absent with structured validity; zero remains a
+represented physical value. Footprint filtering removes modes that the
+response footprint cannot resolve and reports the omitted
 height/slope/velocity contribution.
 
-Both returned velocity channels are physical polar vectors in
+Both returned vector velocity channels are physical polar vectors in
 `physicsFrameId`. A frame change rotates their basis only. A translating or
 rotating frame's coordinate derivative is a distinct coordinate-rate schema;
 do not add origin or `omega x r` transport terms to an already physical vector.
@@ -415,6 +445,15 @@ support, not viewport resolution. Reduce storage traffic and active domain
 before arithmetic. A lower action/foam update cadence requires transport and
 reprojection error evidence **[G,M]**. No tier receives a generic device-class
 grid, cascade, cadence, or timing budget.
+
+Any tier change that alters a physics-facing spectrum band, coastal solver or
+owner, active domain, cadence, provider filter/error, conserved inventory, or
+interaction cursor is admitted only through the route coordinator's
+`QualityTransition`. It prepares and conservatively maps or explicitly resets
+state, commits provider/resource generations and exactly-once ledgers at one
+scheduler boundary, and retires the old representation after all consumers
+complete. Render-only mesh, normal, or post sampling changes do not mutate the
+physical provider.
 
 ## Pinned Three.js r185 WebGPU/TSL contract
 
@@ -874,6 +913,13 @@ renderer.compute( [
   foamNode,
 ] );
 ```
+
+In a coupled route, those dispatches are implementation work recorded as
+executions of declared `PhysicsGraphStage`s with exact execution intervals,
+versioned reads/writes, residency dependencies, and commit groups. Their array
+order does not authorize an ad-hoc render-loop timestep: rendering consumes a
+sealed presentation publication and never advances coefficients, coastal
+state, runoff, or disturbances privately.
 
 The array order is an r185 API property verified in this repository **[G]**.
 Do not `await computeAsync()` every frame expecting a GPU fence. Use timestamp
@@ -1341,7 +1387,10 @@ Optimize in this order:
   footprint/filter behavior, absent-channel rejection, residency, and complete
   state-version/error propagation;
 - raw-sampler-to-provider parity for surface point/normal/velocity, current,
-  depth when represented, and zero frame-critical readbacks;
+  depth when represented, including the mandatory
+  `geometricNormalVelocityMps` projection identity and the valid case where the
+  optional full `surfacePointVelocityMps` is absent, and zero frame-critical
+  readbacks;
 - `PhysicsPresentationSnapshot` coherence across displacement, derivatives,
   velocity, shadows, foam, temporal history, origin epochs, and quality/state
   migrations;
@@ -1355,6 +1404,9 @@ Optimize in this order:
 
 - serialized coupling manifest plus bathymetry, coast frame, wet/obstacle mask,
   current, solver ownership, and overlap-band diagnostic views;
+- `PhysicsGraph` execution trace proving prior committed runoff is immutable
+  input to the next coastal interval, applied exactly once at accepted commit,
+  and paired with one inundation/wash exchange to the sole receiver;
 - phase-resolved constant-depth single-mode tests at normal and oblique
   incidence: `eta`, wave discharge, phase, group delay, reflection, and
   transmitted power, plus the spectral continuity residual for bidirectional
