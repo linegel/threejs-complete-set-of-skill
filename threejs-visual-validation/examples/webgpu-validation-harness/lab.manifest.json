@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-validation-harness",
+  "title": "Native WebGPU validation harness",
+  "skill": "threejs-visual-validation",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-visual-validation/examples/webgpu-validation-harness"
+  ],
+  "browserEntry": "threejs-visual-validation/examples/webgpu-validation-harness/index.html",
+  "publishPath": "/demos/webgpu-validation-harness/",
+  "scenarios": [
+    { "id": "browser-capture", "route": "/demos/webgpu-validation-harness/?scenario=browser-capture", "acceptanceStatus": "incomplete" },
+    { "id": "pipeline-graph-inspector", "route": "/demos/webgpu-validation-harness/?scenario=pipeline-graph-inspector", "acceptanceStatus": "incomplete" },
+    { "id": "resource-ledger", "route": "/demos/webgpu-validation-harness/?scenario=resource-ledger", "acceptanceStatus": "incomplete" },
+    { "id": "timing-and-governor", "route": "/demos/webgpu-validation-harness/?scenario=timing-and-governor", "acceptanceStatus": "incomplete" },
+    { "id": "lifecycle-and-leaks", "route": "/demos/webgpu-validation-harness/?scenario=lifecycle-and-leaks", "acceptanceStatus": "incomplete" },
+    { "id": "visual-error-metrics", "route": "/demos/webgpu-validation-harness/?scenario=visual-error-metrics", "acceptanceStatus": "incomplete" },
+    { "id": "mutation-gallery", "route": "/demos/webgpu-validation-harness/?scenario=mutation-gallery", "acceptanceStatus": "incomplete" },
+    { "id": "artifact-inspector", "route": "/demos/webgpu-validation-harness/?scenario=artifact-inspector", "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "aligned-readback", "route": "/demos/webgpu-validation-harness/mechanism/aligned-readback/", "startup": { "scenario": "browser-capture", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "claim-verdicts", "route": "/demos/webgpu-validation-harness/mechanism/claim-verdicts/", "startup": { "scenario": "artifact-inspector", "mode": "emissive" }, "acceptanceStatus": "incomplete" },
+    { "id": "gpu-timestamps", "route": "/demos/webgpu-validation-harness/mechanism/gpu-timestamps/", "startup": { "scenario": "timing-and-governor", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "resource-inventory", "route": "/demos/webgpu-validation-harness/mechanism/resource-inventory/", "startup": { "scenario": "resource-ledger", "mode": "normal" }, "acceptanceStatus": "incomplete" },
+    { "id": "visual-errors", "route": "/demos/webgpu-validation-harness/mechanism/visual-errors/", "startup": { "scenario": "visual-error-metrics", "mode": "normal" }, "acceptanceStatus": "incomplete" },
+    { "id": "lifecycle-trend", "route": "/demos/webgpu-validation-harness/mechanism/lifecycle-trend/", "startup": { "scenario": "lifecycle-and-leaks", "mode": "final" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "schema-fixture",
+      "targetClass": "schema-transport-only",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "scenePassScale": 1, "dprCap": 1 },
+      "mechanismLimits": { "runtimeClaims": 0 },
+      "resourceLimits": { "publishable": false },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [ "schema v2", "claim separation", "fixture quarantine" ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "webgpu-correctness",
+      "targetClass": "current-adapter-correctness",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "scenePassScale": 1, "dprCap": 2 },
+      "mechanismLimits": { "mrtAttachments": 3 },
+      "resourceLimits": { "lifecycleCyclesMinimum": 50, "lifecycleCyclesMaximum": 100 },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [ "native WebGPU", "real MRT", "aligned readback", "one output owner" ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "target-performance",
+      "targetClass": "current-adapter-performance",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "scenePassScale": 1, "dprCap": 1 },
+      "mechanismLimits": { "gpuTimestampsRequired": true },
+      "resourceLimits": { "sustainedTraceRequired": true },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [ "native WebGPU", "timestamp-backed GPU attribution" ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "governor-stress",
+      "targetClass": "current-adapter-governor-stress",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "scenePassScale": 0.5, "dprCap": 1 },
+      "mechanismLimits": { "governorTraceRequired": true },
+      "resourceLimits": { "oscillationAllowed": false },
+      "degradationFromPrevious": [ "scene pass resolution scale reduced to 0.5" ],
+      "preservedInvariants": [ "native WebGPU", "MRT semantics", "output ownership" ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "release",
+      "targetClass": "current-adapter-release",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "scenePassScale": 1, "dprCap": 1 },
+      "mechanismLimits": { "allClaimClassesResolved": true },
+      "resourceLimits": { "lifecycleCyclesMinimum": 50, "lifecycleCyclesMaximum": 100 },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [ "native WebGPU", "schema v2", "real images", "lifecycle stability" ],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": [ "final", "no-post", "normal", "emissive" ],
+  "cameras": [ "near", "design", "far" ],
+  "seeds": [ 1, 2654435769 ],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend after await renderer.init()", "status": "incomplete" },
+    { "id": "render-target-readback", "required": true, "evidence": "RGBA8 capture target copied through an aligned WebGPU row layout", "status": "incomplete" },
+    { "id": "timestamp-query", "required": false, "evidence": "Required only by target-performance and release GPU-attribution claims", "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "renderer-init", "required": true, "evidence": "Native browser subject initialization and backend gate", "status": "incomplete" },
+    { "id": "mrt-readback", "required": true, "evidence": "Actual output, normal, and emissive render-target readback", "status": "incomplete" },
+    { "id": "schema-v2", "required": true, "evidence": "Fourteen semantic JSON artifacts plus required real images", "status": "incomplete" },
+    { "id": "lifecycle", "required": true, "evidence": "50-100 create/render/resize/mode/tier/dispose cycles", "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full",
+  "commands": {
+    "check": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run check",
+    "test": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:unit",
+    "mutations": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run test:mutations",
+    "capture": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture",
+    "validateArtifacts": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
+    "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
+  ]
+}

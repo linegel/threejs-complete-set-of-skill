@@ -4,9 +4,19 @@
   "type": "module",
   "scripts": {
     "validate": "node src/validate.js",
-    "check": "node --check src/*.js src/schema/*.js && node --input-type=module -e \"await import('./src/browser-webgpu-surface.js')\""
+    "validate:v1": "node src/validate.js",
+    "validate:v2": "node src/validate-v2.js",
+    "validate:unit": "node src/validate-v2.js",
+    "test:mutations": "node src/v2-self-test.js",
+    "test:routes": "node --test src/route-locks.test.js",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-validation-harness --target final",
+    "capture:evidence": "node src/capture-browser.js",
+    "validate:artifacts": "node src/validate-browser-artifacts.js",
+    "validate:quick": "npm run check && npm run test:routes && npm run test:mutations",
+    "validate:full": "npm run check && npm run test:routes && npm run validate:v1 && npm run validate:v2 && npm run validate:artifacts",
+    "check": "node --check src/*.js src/schema/*.js && node src/check-imports.mjs"
   },
   "dependencies": {
-    "three": "^0.185.1"
+    "three": "0.185.1"
   }
 }
