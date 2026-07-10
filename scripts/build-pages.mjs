@@ -754,7 +754,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}.hero-action:active{scale:.96}
 .hero-ledger{padding:clamp(24px,3.2vw,36px);border-radius:22px;background:rgba(9,12,17,.86);box-shadow:0 0 0 1px rgba(255,255,255,.1),0 28px 72px rgba(0,0,0,.28)}
 .hero-ledger-kicker{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase}.hero-ledger h2{max-width:16ch;margin-top:10px;font-size:clamp(24px,3vw,38px);line-height:1.08}
-.hero-ledger dl{margin-top:24px;border-top:1px solid var(--line)}.hero-ledger-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}.hero-ledger dt{color:var(--dim);font-size:14px}.hero-ledger dd{font-family:var(--mono);font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}.hero-ledger dd[data-state="accepted"]{color:var(--cyan)}.hero-ledger dd[data-state="pending"]{color:var(--amber)}
+.hero-ledger dl{margin-top:24px;border-top:1px solid var(--line)}.hero-ledger-row{display:grid;grid-template-columns:minmax(110px,.42fr) minmax(0,1fr);gap:20px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}.hero-ledger dt{color:var(--dim);font-size:14px}.hero-ledger dd{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--ink)}.hero-ledger dd[data-state="accepted"]{color:var(--cyan)}.hero-ledger dd[data-state="pending"]{color:var(--amber)}
 .hero-ledger-note{margin-top:20px;color:var(--dim);font-size:13px}.hero-ledger-link{display:inline-flex;min-height:44px;align-items:center;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--amber)}.hero-ledger-link:hover{text-decoration:underline}
 .stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.64)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:0}
@@ -783,7 +783,7 @@ h1 em{font-style:normal;color:var(--amber)}
 @media (hover:hover) and (pointer:fine){.flagship-card:hover,.lab-card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}.category:has(.card:hover) .category-head h3{color:var(--cyan)}}
 @media (max-width:980px){.hero-layout{grid-template-columns:1fr}.hero-ledger{max-width:620px;width:100%;justify-self:center}.matrix-shell{grid-template-columns:1fr}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-install{max-width:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview,.flagship-preview-missing{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
-@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:18px}.rail-head{flex-direction:column;gap:2px}}
+@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.hero-ledger-row{grid-template-columns:1fr;gap:4px}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:18px}.rail-head{flex-direction:column;gap:2px}}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}.card:hover,.flagship-card:hover,.lab-card:hover{translate:0 0}}
 </style>
 </head>
@@ -797,7 +797,7 @@ ${navHtml('')}
         <p class="kicker">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · Native WebGPU/TSL · Evidence-gated</p>
         <h1>${total} expert skills. One coherent <em>WebGPU research stack.</em></h1>
         <p class="lede">A source-complete matrix for advanced Three.js graphics: ${canonicalDemos.length} canonical labs, ${flagshipDemos.length} cross-skill flagships, and ${supportPrimaryDemos.length} focused integration and mechanism surfaces. Every primary entry has a fixed browser route and source hash. Runtime acceptance stays deliberately harder.</p>
-        <p class="hero-proof">${loadablePrimaryDemos.length}/${primaryDemos.length} primary implementations are browser-wired</p>
+        <p class="hero-proof">Acceptance state is explicit on every primary route</p>
         <div class="hero-install" aria-label="Install the complete skill pack">
           <code id="hero-install-command">${esc(SKILLS_INSTALL_PACK)}</code>
           <button type="button" data-copy-install aria-label="Copy the full skill pack installation command">Copy</button>
@@ -812,10 +812,10 @@ ${navHtml('')}
         <p class="hero-ledger-kicker">Current acceptance ledger</p>
         <h2 id="hero-ledger-title">What the repository proves today</h2>
         <dl>
-          <div class="hero-ledger-row"><dt>Primary routes browser-wired</dt><dd>${loadablePrimaryDemos.length} / ${primaryDemos.length}</dd></div>
-          <div class="hero-ledger-row"><dt>Primary evidence accepted</dt><dd data-state="accepted">${acceptedPrimaryDemos.length} / ${primaryDemos.length}</dd></div>
-          <div class="hero-ledger-row"><dt>Runtime evidence pending</dt><dd data-state="pending">${primaryDemos.length - acceptedPrimaryDemos.length}</dd></div>
-          <div class="hero-ledger-row"><dt>Secondary demos counted as proof</dt><dd>0</dd></div>
+          <div class="hero-ledger-row"><dt>Browser-wired</dt><dd>Route loads; runtime proof may still be pending</dd></div>
+          <div class="hero-ledger-row"><dt>Accepted evidence</dt><dd data-state="accepted">Readback, timing, lifecycle, and visuals passed</dd></div>
+          <div class="hero-ledger-row"><dt>Evidence pending</dt><dd data-state="pending">No accepted runtime claim</dd></div>
+          <div class="hero-ledger-row"><dt>Secondary demo</dt><dd>Never counted as primary proof</dd></div>
         </dl>
         <p class="hero-ledger-note">Browser-wired means loadable. Accepted requires the declared runtime, readback, timing, lifecycle, and visual evidence.</p>
         <a class="hero-ledger-link" href="#labs">Inspect every lab and evidence state&nbsp;→</a>
