@@ -214,6 +214,7 @@ physicsErrorPropagationLedgers: {}
 physicsInteractions: []
 physicsInteractionApplicationLedgers: {}
 physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
 physicsQualityTransitions: []
 physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
@@ -297,6 +298,17 @@ one `InteractionApplicationLedger` in
 stage execution, commit, candidate, `PresentationRenderPlan`, or frame execution
 resolves to the exact record and version in the route inventories; unresolved
 or stale references block publication.
+`physicsExternalSolverAdaptersById` is the route-owned authoritative adapter
+inventory. Key each active value by its exact `ExternalSolverAdapter.adapterId`
+and emit the complete canonical record at that key; use `{}` when the route has
+no external solver. A singular `externalSolverAdapter` block in a recipe is a
+nonserialized explanatory sketch only and never substitutes for this mapping.
+An admitted physical quality change that replaces an adapter boundary,
+transport, residency, capability, clock map, or owned equation keeps the old
+adapter resources and authority live through the transition's simulation,
+coupling, external, and presentation completion join. Remove the old inventory
+entry only after `QualityTransition.retireAfterCompletion.retirementEvidence`
+closes that join; rejection or rollback leaves the prior keyed record active.
 Every Candidate, frame-cohort admission, and render plan resolves its
 `timeCohortId` to one immutable `PresentationTimeCohort` in
 `physicsPresentationTimeCohortsById`; a target/view with different requested

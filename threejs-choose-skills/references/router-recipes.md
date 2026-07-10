@@ -50,6 +50,13 @@ Every active physical route also emits `PhysicsCostLedger`; compact recipe
 summaries may name required evidence, but cannot omit coordination-interval,
 per-second, catch-up, critical-path, hot-byte/traffic, multiview, migration-
 overlap, and sustained-target accounting from the final manifest.
+Every route also owns a top-level `physicsExternalSolverAdaptersById` mapping.
+It is `{}` when no external solver participates. For each active adapter, the
+key equals `ExternalSolverAdapter.adapterId` and the value is the complete
+canonical `ExternalSolverAdapter` record; an unresolved pointer, singular
+alias, or partial overlay is not an inventory entry. Any singular
+`externalSolverAdapter` block retained below is explicitly a nonserialized
+readability sketch and is omitted from emitted manifests.
 Every provider response resolves its `errorPropagationLedgerRef` through the
 route's `physicsErrorPropagationLedgers`; every accepted interaction resolves
 one exact `InteractionApplicationLedger`. Neither error nor exact-once
@@ -128,6 +135,12 @@ The image quality governor emits only `QualityChangeRequest`. The physics
 coordinator may admit it as `QualityTransition` at the route's declared commit
 barrier after migration and rollback resources exist; render code never changes
 solver resolution, extent, representation, or cadence during a physics stage.
+If a transition replaces an external adapter record or any of its boundary,
+transport, residency, clock, capability, or ownership state, the route keeps
+the old keyed adapter and resources authoritative until the transition's
+simulation, coupling, external, and presentation completion join closes.
+Only the resulting `retireAfterCompletion.retirementEvidence` may retire the
+old adapter entry; rejection or rollback preserves it unchanged.
 Each recipe maps every selected skill's local quality names into route
 `Full`/`Budgeted`/`Minimum viable` tiers in
 `performanceContract.skillTierCrosswalk`; identical labels do not imply
@@ -273,6 +286,7 @@ physicsContext:
   producer: route physics coordinator
   consumers: [$threejs-procedural-fields, $threejs-procedural-geometry, $threejs-water-optics, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in a stable right-handed physics frame; typed gravity; coast transform; floating-origin epoch; generation-bearing entity/material IDs; analytic time origin
+physicsExternalSolverAdaptersById: {}
 physicsGraph:
   type: PhysicsGraph
   producer: route physics coordinator
@@ -471,6 +485,7 @@ physicsContext:
   consumers: [$threejs-water-optics, $threejs-procedural-motion-systems, $threejs-procedural-geometry, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in a stable right-handed physics frame; typed gravity; floating-origin epoch; generation-bearing entity/material IDs; time origin for every stage
   physicsMaterialRegistry: { registryId: authored-vessel-materials, owner: route material-registry owner, registryVersion: exact version, materials: [water, hull, static support], materialStateDescriptors: [water/hull state descriptors when dynamic], pairLawResolver: deterministic ordered water-hull slip/drag law with missing-pair rejection, renderBindings: explicit optional map; no PBR inference }
+physicsExternalSolverAdaptersById: {}
 physicsMaterialsAndProxies:
   vesselBoundaryProxy: { type: ColliderProxy, colliderId: authored-hull collider generation, entityId: authored-vessel generation, shapeId: hull-shape generation, contextId: physicsContext.contextId, shapeFrameId: registered vessel frame, physicsFrameId: physicsContext.physicsRootFrameId, physicsOriginEpoch: current epoch, transformRevision: registered revision, shapeRepresentation: closed mesh or convex compound, shapeDefinitionRef: content-addressed proxy, topologyRevision: hull topology version, poseSignalRef: vesselSourceState descriptor, poseStateVersion: exact provisional source version, validityInterval: wake interval, updateCadence: authored-vessel clock, sweptBounds: conservative interval bound, oneSidedness: two-sided, closedness: watertight-with-gate, collisionMode: continuous-with-named-sweep, featureIdPolicy: stable versioned map, conservativeInflationMeters: Gated quantity, physicsMaterialId: hull material ID, collisionGroups: explicit water-boundary filter, approximationError: support-distance/volume error, residency: CPU authoritative }
 physicsGraph:
@@ -731,6 +746,7 @@ physicsContext:
   consumers: [$threejs-spectral-ocean, $threejs-water-optics, $threejs-procedural-motion-systems, $threejs-procedural-geometry, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in a stable right-handed physics frame; typed gravity; datum; floating-origin epoch; generation-bearing entity/material registry; time origin across offshore, coast, body, and render domains
   physicsMaterialRegistry: { registryId: spectral-authored-vessel-materials, owner: route material-registry owner, registryVersion: exact version, materials: [water, hull, static support], materialStateDescriptors: [water/hull state descriptors when dynamic], pairLawResolver: deterministic ordered water-hull slip/drag law with missing-pair rejection, renderBindings: explicit optional map; no PBR inference }
+physicsExternalSolverAdaptersById: {}
 physicsMaterialsAndProxies:
   vesselBoundaryProxy: { type: ColliderProxy, colliderId: authored-hull collider generation, entityId: authored-vessel generation, shapeId: hull-shape generation, contextId: physicsContext.contextId, shapeFrameId: registered vessel frame, physicsFrameId: physicsContext.physicsRootFrameId, physicsOriginEpoch: current epoch, transformRevision: registered revision, shapeRepresentation: closed mesh or convex compound, shapeDefinitionRef: content-addressed proxy, topologyRevision: hull topology version, poseSignalRef: vesselSourceState descriptor, poseStateVersion: exact provisional source version, validityInterval: wake interval, updateCadence: authored-vessel clock, sweptBounds: conservative interval bound, oneSidedness: two-sided, closedness: watertight-with-gate, collisionMode: continuous-with-named-sweep, featureIdPolicy: stable versioned map, conservativeInflationMeters: Gated quantity, physicsMaterialId: hull material ID, collisionGroups: explicit water-boundary filter, approximationError: support-distance/volume error, residency: CPU authoritative }
 physicsGraph:
@@ -939,6 +955,11 @@ physicsMaterialsAndProxies:
   hydrostaticHull: { type: HydrostaticHullProperties, entityId: vessel ID, hullFrameId: registered body frame, geometry: clipped-panels, geometryRevision: hull-v3, displacedVolumeQuery: versioned watertight query, waterlineClipping: conservative oriented-panel clipper, buoyancyModel: hydrostatic plus declared wave extension, dragModel: versioned relative-current law, addedMassModel: versioned law with loop stability gate, waveExcitationModel: no duplicate offshore/coastal term, samplingFootprint: hull quadrature support, approximationError: per-output bounds, validity: declared Froude/depth/wave regime }
   hullCollider: { type: ColliderProxy, colliderId: hull collider generation, entityId: vessel generation, shapeId: hull shape generation, contextId: physicsContext.contextId, shapeFrameId: registered body frame, physicsFrameId: physics root, physicsOriginEpoch: current epoch, transformRevision: registered revision, shapeRepresentation: convex compound, shapeDefinitionRef: content-addressed hull proxy, topologyRevision: hull-v3, poseSignalRef: bodyState descriptor ref, poseStateVersion: committed body version, validityInterval: exact body interval, updateCadence: external-body clock, sweptBounds: conservative interval bound, oneSidedness: two-sided, closedness: watertight-with-gate, collisionMode: continuous-with-named-sweep, featureIdPolicy: stable versioned map, conservativeInflationMeters: Gated quantity, physicsMaterialId: hull material ID, collisionGroups: explicit filters, approximationError: support-distance/inertia bounds, residency: CPU external adapter }
   contactManifoldRecords: { type: ContactManifoldRecord, owner: external rigid-body adapter, canonicalFields: generation-bearing manifold ID, solver/law revision, begin/persist/end interval, sample instant, frame/origin/transform, both body/collider/shape/feature/state and material/version records, persistent patch points/tangent/area, separation/TOI/relative velocity, pair law, friction/adhesion/warm-start state, emitted interaction IDs, validity/error/reset-migration policy }
+# Authoritative emitted inventory. Expand the complete sketch below into this
+# exact key; the emitted value's adapterId must equal the key byte-for-byte.
+physicsExternalSolverAdaptersById:
+  external-rigid-body-adapter: canonicalExpansion(exact complete ExternalSolverAdapter record from the nonserialized sketch below; no reference, alias, or partial overlay survives emission)
+# NONSERIALIZED READABILITY SKETCH ONLY. Omit this singular key from emission.
 externalSolverAdapter:
   type: ExternalSolverAdapter
   adapterId: external-rigid-body-adapter
@@ -1386,6 +1407,7 @@ physicsContext:
   producer: route physics coordinator
   consumers: [$threejs-procedural-planets, $threejs-spectral-ocean, $threejs-sky-atmosphere-and-haze, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in stable right-handed planet-fixed/inertial frames; typed gravity; nonlinear charts kept out of the rigid-frame graph; floating-origin epoch; radiometric units/basis; generation-bearing entity IDs; time origin
+physicsExternalSolverAdaptersById: {}
 physicsGraph:
   type: PhysicsGraph
   producer: route physics coordinator
@@ -1613,6 +1635,7 @@ physicsContext:
   producer: route physics coordinator
   consumers: [project environment forcing coordinator, $threejs-procedural-buildings-and-cities, $threejs-rain-snow-and-wet-surfaces, $threejs-water-optics, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in a stable right-handed physics frame; typed gravity; floating-origin epoch; generation-bearing material/entity IDs; time origin for precipitation, receivers, puddles, and rendering
+physicsExternalSolverAdaptersById: {}
 physicsGraph:
   type: PhysicsGraph
   producer: route physics coordinator
@@ -1965,6 +1988,7 @@ physicsContext:
   producer: route physics coordinator
   consumers: [project environment forcing coordinator, project contact adapter, $threejs-procedural-fields, $threejs-procedural-vegetation, $threejs-camera-controls-and-rigs, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in a stable right-handed physics frame; typed gravity; floating-origin epoch; generation-bearing entity/material IDs; time origin across terrain, contacts, vegetation, and rendering
+physicsExternalSolverAdaptersById: {}
 physicsGraph:
   type: PhysicsGraph
   producer: route physics coordinator
@@ -2217,6 +2241,11 @@ physicsContext:
   consumers: [external rigid-body adapter, project coupling adapter, $threejs-water-optics, $threejs-camera-controls-and-rigs, $threejs-image-pipeline, $threejs-visual-validation]
   invariant: one finite positive metersPerWorldUnit is the sole world-to-physics scale boundary; provider state remains SI in stable right-handed physics/solver frames; typed gravity; floating-origin epoch; generation-bearing body/collider/material IDs; time origin
   physicsMaterialRegistry: { registryId: external-coupling-materials, owner: project material-registry adapter, registryVersion: exact version, materials: [body/hull, water, static support], pairLawResolver: deterministic ordered pair laws with explicit missing-pair rejection, renderBindings: optional explicit render-binding-to-PhysicsMaterialId map; no PBR inference }
+# Authoritative emitted inventory. Expand the complete sketch below into this
+# exact key; the emitted value's adapterId must equal the key byte-for-byte.
+physicsExternalSolverAdaptersById:
+  external-rigid-body-adapter: canonicalExpansion(exact complete ExternalSolverAdapter record from the nonserialized sketch below; no reference, alias, or partial overlay survives emission)
+# NONSERIALIZED READABILITY SKETCH ONLY. Omit this singular key from emission.
 externalSolverAdapter:
   type: ExternalSolverAdapter
   adapterId: external-rigid-body-adapter
