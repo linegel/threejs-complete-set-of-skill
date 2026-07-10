@@ -243,8 +243,9 @@ spatial binding. A projection selected or built for one view belongs instead to
 `ViewPreparationPublication`. Materials resolve the sealed snapshot's candidate
 binding/lease refs plus its `CameraViewPublication` render mapping; snapshots do
 not copy pairs or transforms. A new generation never overwrites a leased
-previous/current resource in place, and multi-target completion/retirement is
-recorded by lease ID in `FrameExecutionRecord`.
+previous/current resource in place. Multi-target submission, completion, and
+retirement append one `FrameExecutionRecord`, with each lease disposition keyed
+by lease ID and closed against consuming snapshots and completion joins.
 
 ## Performance Budgets
 
