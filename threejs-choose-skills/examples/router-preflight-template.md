@@ -108,6 +108,21 @@ requiredSignals:
 
 domainSignals: {}
 
+# A nonphysical route keeps these exact empty values. Replace the active records
+# with the versioned shared ABI for a coupled route; keep the deprecated singular
+# snapshot explicitly unused.
+physicsContext: not used
+physicsGraph: not used
+physicsCostLedger: not used
+physicsSignals: {}
+physicsInteractions: []
+physicsPresentationCandidate: not used
+physicsCameraViewPublicationsByTarget: {}
+physicsViewPreparationPublicationsByTarget: {}
+physicsPresentationSnapshotsByTarget: {}
+frameExecutionRecord: not used
+physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocate
+
 outputOwnersByPresentationTarget:
   primary-presentation:
     toneMap: "<fill>"
@@ -175,6 +190,8 @@ performanceContract:
     targetABEvidence: []
     tileGpuEvidence: []
 
+  passKeys: [primary-view.scene, primary-presentation.present]
+
   costRecords:
     - id: composed-full-frame
       scope: full-frame
@@ -210,6 +227,10 @@ performanceContract:
       producer: "<fill>"
       consumers: [primary-presentation.present]
       kind: render
+      clockId: not used
+      cadence: not used
+      substepMultiplicity: not used
+      executionsPerPresentedFrame: { value: 1, unit: execution-per-frame, label: Authored, source: route-structure }
       inputs: []
       outputs: [primary-view.scene-color]
       resolution: { value: "<fill>", unit: physical-pixels, label: Derived, source: canvas-dpr-pass-scale }
@@ -217,6 +238,8 @@ performanceContract:
       sampleCount: { value: "<fill>", unit: samples-per-pixel, label: Measured, source: configured-pass }
       loadStoreResolve: []
       lifetime: "<fill>"
+      hotBytesPerExecution: { value: "<fill>", unit: bytes-per-execution, label: Derived, source: pass-resource-ledger }
+      sourceReactionOrConservationGroups: []
       timing:
         p50: { value: "<fill>", unit: ms, label: Measured, source: gpu-timestamp-trace }
         p95: { value: "<fill>", unit: ms, label: Measured, source: gpu-timestamp-trace }
@@ -233,6 +256,10 @@ performanceContract:
       producer: "<fill>"
       consumers: [display]
       kind: present
+      clockId: not used
+      cadence: per-presented-frame
+      substepMultiplicity: not used
+      executionsPerPresentedFrame: { value: 1, unit: execution-per-frame, label: Authored, source: route-structure }
       inputs: [primary-view.scene-color]
       outputs: [display]
       resolution: { value: "<fill>", unit: physical-pixels, label: Derived, source: canvas-dpr-pass-scale }
@@ -240,11 +267,14 @@ performanceContract:
       sampleCount: { value: "<fill>", unit: samples-per-pixel, label: Measured, source: configured-pass }
       loadStoreResolve: []
       lifetime: "<fill>"
+      hotBytesPerExecution: { value: "<fill>", unit: bytes-per-execution, label: Derived, source: pass-resource-ledger }
+      sourceReactionOrConservationGroups: []
       timing:
         p50: { value: "<fill>", unit: ms, label: Measured, source: gpu-timestamp-trace }
         p95: { value: "<fill>", unit: ms, label: Measured, source: gpu-timestamp-trace }
 
   qualityLadder: []
+  skillTierCrosswalk: {}
   qualityController:
     observedSignals: [cpuP50, cpuP95, gpuP50, gpuP95, presentedP50, presentedP95, droppedFrames, memoryPressure, thermalState]
     samplingWindow: { value: "<fill>", unit: frames-or-time, label: Authored, source: controller-policy }
@@ -255,7 +285,7 @@ performanceContract:
     upgradePersistence: { value: "<fill>", unit: windows, label: Authored, source: controller-policy }
     cooldown: { value: "<fill>", unit: windows, label: Authored, source: controller-policy }
     bottleneckClassifier: "<fill>"
-    transitions: []
+    qualityLadder: []
     protectedInvariants: []
 
   routeStatus: provisional | measured-valid | invalid | unmeasurable

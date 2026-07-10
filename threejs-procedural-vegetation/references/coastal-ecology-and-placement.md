@@ -14,6 +14,7 @@ values are explicit ecological or style parameters.
 ## Contents
 
 - Ownership and environmental input
+- Shared dynamic forcing, structural response, and interactions
 - Species suitability and community structure
 - Directional exposure, shelter, and salt
 - Deterministic order-independent placement
@@ -30,8 +31,21 @@ The vegetation compiler consumes a versioned environmental snapshot:
 environmentSnapshot:
   revision: ""
   seed: ""
-  coordinateFrame: ""
-  sceneUnitsPerMeter: ""
+  physicsContextRef:
+    contextId: PhysicsContextId
+    schemaId: PhysicsContextSchemaId
+    contextVersion: opaque-version
+    physicsRootFrameId: PhysicsFrameId
+    physicsOriginEpoch: PhysicsOriginEpoch
+    worldTransformRevision: opaque-version
+  environmentForcingRef:
+    descriptorRef: PhysicsSignalDescriptorRef
+    sampleInstant: PhysicsInstant
+    stateVersion: opaque-version
+  climatologyReductionRef:
+    descriptorRef: PhysicsSignalDescriptorRef
+    sampleInstant: PhysicsInstant
+    stateVersion: opaque-version
   spatialExtent: ""
   terrain:
     elevation: { units: meters, filter: "", invalidValue: "" }
@@ -41,14 +55,26 @@ environmentSnapshot:
   coast:
     signedDistance: { units: meters, sign: land-positive-water-negative }
     tangentNormal: { convention: "" }
-    runupEnvelope: { units: meters-or-mask, timeMeaning: "" }
+    runupEnvelopeRef:
+      descriptorRef: PhysicsSignalDescriptorRef
+      sampleInstant: PhysicsInstant
+      stateVersion: opaque-version
+      kind: elevation-envelope | coverage-mask
+      elevationChannelId: channel-id | absent
+      coverageChannelId: channel-id | absent
   ecology:
     drainage: { units: "", support: "" }
     soilMoisture: { units: "", support: "" }
     disturbance: { units: "", support: "" }
     canopyOrLight: { units: "", support: "" }
     saltExposure: { units: "", support: "" }
-    windExposure: { units: "", prevailingDirection: "" }
+    windExposureClimatologyRef:
+      descriptorRef: PhysicsSignalDescriptorRef
+      sampleInstant: PhysicsInstant
+      stateVersion: opaque-version
+      exposureChannelId: channel-id
+      prevailingDirectionChannelId: channel-id
+      averagingWindow: PhysicsDuration
   authoredMasks:
     exclusion: ""
     restorationOrPlanting: ""
@@ -58,6 +84,10 @@ environmentSnapshot:
   invalidationKey: ""
   missingDataPolicy: ""
 ```
+
+Units, datum/chart, support/filter, validity, and error for the referenced
+run-up and wind-climatology channels come from the descriptor's per-channel
+metadata; these records do not redeclare them locally.
 
 Do not sample a rendered terrain depth buffer to place persistent vegetation.
 Placement uses authoritative terrain coordinates and geometry/field queries;
@@ -80,6 +110,189 @@ conservatively bounded, or categorical. Never linearly filter categorical
 substrate/semantic IDs. If coarse levels can merge disconnected coasts or
 habitats, retain conservative bounds or select a level whose support preserves
 the classification needed by the candidate.
+
+The placement snapshot is a compile/update-time ecological reduction. It
+references the router's canonical
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+instead of duplicating world scale, frame, or weather semantics. In particular,
+`windExposureClimatologyRef` is a climatological/statistical reduction with a declared
+averaging window and revision. It is not the instantaneous air velocity used
+for branch or leaf deformation.
+All dynamic forcing, receiver-state, interaction-derived, and deformation
+resources retain the canonical `PhysicsSignalDescriptor` envelope: signal/
+provider/schema/context identity, owner/consumers, channels, physics frame/
+origin/transform revision, optional chart, exact `PhysicsInstant` samples or
+`PhysicsTimeInterval` graph/exchange/application intervals, sample phase,
+represented footprint/filter, validity and per-channel error,
+residency/cadence/latency, state version, resource generation, and
+missing-channel policy. The vegetation records below specialize channels only.
+
+## Shared Dynamic Forcing, Structural Response, And Interactions
+
+### EnvironmentForcingSnapshot consumption
+
+Latch one immutable `EnvironmentForcingSnapshot` per scheduled vegetation
+update. Require air velocity `u_air(x,t)` in `m s^-1`, its Cartesian SI physics
+frame,
+altitude/support domain, exact `sampleInstant: PhysicsInstant`, validity
+whose temporal domain is a `PhysicsTimeInterval`, cadence, interpolation policy,
+requested oriented crown/patch
+footprint and spatial/temporal filter or band, returned actual footprint/filter
+and per-channel error. Temperature K and
+canonical specific humidity in `kg kg^-1` may parameterize
+vegetation structural/material response to an already published receiver state,
+or be consumed by the separate receiver-state owner; vegetation does not
+integrate snow/melt from them unless the route explicitly assigns it that
+receiver ownership. Missing forcing follows
+the route's hold/degrade/block policy and remains visible in diagnostics.
+
+Air velocity is the environmental cause. Vegetation owns the structural
+transfer and state, never a competing wind provider. Distinguish:
+
+```text
+u_air                  atmospheric air velocity, m s^-1
+v_structure            velocity of the branch/leaf point, m s^-1
+u_relative             u_air - v_structure
+water material current fluid transport velocity, separate water provider
+surface-point velocity kinematic motion of a wave surface, separate provider
+```
+
+When mean, gust, and turbulence channels coexist, require an inclusion/band
+ledger: each band is disjoint or explicitly already included in
+`airVelocityMps`. Structural response never adds overlapping wind energy twice.
+
+Choose structural complexity from the visible contract:
+
+| Observable | Lowest valid structural response |
+| --- | --- |
+| far/static vegetation | deterministic phase/bend evaluated from the latched air field; no persistent state |
+| grass and leaf gust response | analytic/rooted bend plus bounded dynamic touch field |
+| visible trunk/branch lag and recovery | reduced damped modal state per plant/cluster |
+| validated load/stress or breakage | external/explicit structural solver with material/load/error evidence |
+
+For a physical drag claim, require air density `rho_air` in `kg m^-3` from the
+forcing/provider or a separately versioned thermodynamic adapter, then derive
+force from declared air density, projected
+area, drag coefficient, and relative velocity, e.g.
+`F_d = 0.5 rho_air C_D A |u_relative| u_relative`; do not call an arbitrary
+noise amplitude Newtons. If air density is unavailable, use an explicitly
+authored non-authoritative bend response and do not report forces/stress. A reduced mode `q_j` may use
+
+```text
+q_j'' + 2 zeta_j omega_j q_j' + omega_j^2 q_j = b_j dot F_external
+```
+
+with units, integration scheme, stability/substep limit, and modal truncation
+error declared. LOD may collapse high modes or switch to analytic response only
+when displacement/velocity, silhouette, shadow, and bound errors pass. All
+visible and shadow paths sample the same published deformation snapshot.
+
+### Receiver state
+
+Consume wetness, run-up/inundation, snow mass/load, melt state, and age from the
+single route-selected receiver-state owner through its
+`PhysicsSignalDescriptorRef` at an exact `sampleInstant: PhysicsInstant`.
+Vegetation may map those quantities to weight, damping, stiffness, albedo,
+roughness, or breakage through declared response functions; it does not
+re-integrate rain, run-up, drainage, evaporation, or melt. The material samples
+the same receiver-state revision and instant as the structural update, or the
+`PhysicsGraphEdge` declares `maximumStaleness` as a canonical `PhysicsDuration`
+on a named `PhysicsClockId`, plus a `PhysicsLatencyDescriptor`, including
+tick-to-seconds mapping revision and error.
+
+### InteractionRecord ingestion
+
+Trampling, stance, sweep, impact, support-load, and breakage inputs use the
+canonical `InteractionRecord`. A vegetation consumer requires:
+
+```text
+payload tag and provenance/model revision
+applicationInterval: PhysicsTimeInterval, physicsFrameId, physicsOriginEpoch,
+  and transformRevision
+sourceOwner/sourceEntityId and targetOwner/targetEntityId/targetStateEquation
+InteractionFootprint and reference point in physics-frame metres
+canonical pointImpulse, wrenchRate, or constraintTarget payload
+InteractionRecord role, reactionGroupId, and reactionToInteractionIds;
+  coupling mode remains on SurfaceExchange
+per-payload-and-footprint error, exactOnceKey, and applicationLedgerKey
+sequence, partition, cursor, and overflow remain in InteractionBatchLedger
+```
+
+Do not overload a dimensionless `weight` as impulse, force, pressure, depth,
+and decay. Convert a completed record once into the vegetation touch/load state
+using the declared footprint kernel. If a dense touch texture is selected, bin
+records into dirty tiles and integrate only touched support plus decay regions;
+static candidate/placement buffers remain immutable.
+Decay time/constants belong to vegetation response state and are never
+retroactively written into the immutable contact record.
+
+One-way visual trampling declares `SurfaceExchange.mode: one-way` with an
+`applicationInterval: PhysicsTimeInterval` and emits no reaction record; it does
+not add a `reactionOwner` field to `InteractionRecord`. It may deform vegetation
+but cannot move the source body.
+Two-way coupling is resolved by the authoritative contact/physics solver, which
+owns equal-and-opposite impulses; vegetation only consumes the resulting
+record/state. A render or compute pass must never feed an unregistered force
+back to that solver.
+
+Use this scheduler order:
+
+```text
+physics/contact solver commits its completed
+     PhysicsGraphStage.executionInterval: PhysicsTimeInterval and state version
+  -> publish sorted InteractionRecord batch and receiver-state snapshot
+  -> vegetation latches EnvironmentForcingSnapshot and completed records
+  -> bin/update touch and load fields at the declared subrate
+  -> integrate/evaluate structural wind response
+  -> commit deformation state and publish view-independent
+     PhysicsPresentationCandidate with
+     requestedPresentationInstant: PhysicsInstant, presentedStatePairs,
+     resourceLeases, and eventSequenceRanges
+  -> camera owner publishes CameraViewPublication per target/view with
+     previousRenderSampleInstant: PhysicsInstant and
+     currentRenderSampleInstant: PhysicsInstant plus
+     globalToRenderPrevious/globalToRenderCurrent, view/projection matrices,
+     jitter, viewport, and depth state
+  -> visibility/acceleration/shadow/cache/reactive/reset owners publish
+     ViewPreparationPublication with visibilityPublicationRefs,
+     accelerationPublicationRefs, shadowViewPublicationRefs,
+     cachePublicationRefs, reactiveEpochs, reactivePublications,
+     resetDependencies, full resourceLeases for newly created view resources,
+     and resourceLeaseRefs
+  -> seal PhysicsPresentationSnapshot from presentedStatePairRefs and
+     resourceLeaseRefs plus candidateId, cameraPublicationId, and
+     viewPreparationId
+  -> visible geometry and shadow casters consume the same sealed
+     PhysicsPresentationSnapshot
+```
+
+Each candidate pair uses independent `previousPresented.provenance` and
+`currentPresented.provenance` records of type `PresentationSampleProvenance`.
+Its `previousPresented.presentedInstant: PhysicsInstant` and
+`currentPresented.presentedInstant: PhysicsInstant`, state handles, and global
+spatial bindings remain distinct; no shared pair-level provenance shorthand is
+allowed. The candidate contains leases and event ranges plus
+`requestedPresentationInstant: PhysicsInstant`, but no camera or render
+transform. A snapshot names its candidate, camera/preparation
+publications, target/view, and seal version; it references state and resources
+only through `presentedStatePairRefs` and `resourceLeaseRefs`, and never copies
+pairs or transforms. Per-view render instants/transforms belong only to
+`CameraViewPublication`, while visibility, shadow/cache publications, reactive
+records, and `resetDependencies` belong only to `ViewPreparationPublication`.
+
+Events between vegetation updates are accumulated, not overwritten. A bounded
+pool uses deterministic priority/overflow policy. Its canonical immutable
+`InteractionBatchLedger` publishes the sequence range, accepted/rejected/late/
+duplicate counts, per-consumer cursors, overflow policy/ranges, lost/deferred
+commodity maps, and exact-once application-ledger version. Coalescing is a
+producer transformation with its own provenance, not an extra ledger field;
+affected support, `absentChannels`, validity, and error remain on the canonical
+descriptors/records. Commodity maps contain only represented quantities such as
+impulse, torque, load-work, or mass with exact SI units; they never invent zero
+placeholders. On mobile, prefer
+analytic vertex wind, cluster-level modes, compact record batches, sparse dirty
+tiles, and lower-rate touch/receiver updates; preserve ordering, units, and
+integrated load when reducing cadence.
 
 ## Species Suitability And Community Structure
 
@@ -389,7 +602,8 @@ placement compile/update:
 
 resident state:
   instance stride after alignment, species/variant tables, duplicate LOD data,
-  dynamic wind/contact fields, impostor/color/depth/normal assets
+  dynamic wind/contact fields, interaction queues/InteractionBatchLedgers,
+  PresentedStatePair slots, impostor/color/depth/normal assets
 
 render:
   visible/submitted pages and instances, rejected-but-processed vertices,
@@ -410,6 +624,14 @@ Quality reduction order follows measured pressure:
 - memory: evict distant species/LOD pages and duplicate representations with
   transition-lifetime accounting.
 
+Candidate pair handles and interaction metadata reference compact SoA pages by
+lease/resource generation; they do not deep-copy plant state or allocate one JS
+object per event. Per-view snapshots retain only candidate binding and lease
+refs. Keep touch/load ingestion GPU-resident or use compact dirty host ranges.
+Steady-frame deformation/shadow submission performs no synchronous GPU readback;
+a CPU culler consumes a conservative host/analytic bound mirror with declared
+age/error or the route remains GPU-driven.
+
 Use world-up-constrained multi-azimuth or octahedral impostors for structured
 trees. Add depth/normal layers only when relighting/parallax error justifies
 their bytes and samples. Grass/flower clusters may use cards when alpha
@@ -426,6 +648,12 @@ terrain height/normal/slope and substrate IDs
 signed coast distance, coast frame, run-up and hard exclusions
 moisture, drainage, disturbance, light/canopy
 wind direction, shelter/terrain horizon, salt source and final salt exposure
+EnvironmentForcingSnapshot revision/age/support and structural-response mode
+InteractionRecord IDs/order/application intervals/footprints/units, dirty tiles,
+  batch overflow, SurfaceExchange mode, and reaction groups
+receiver-state owner/revision for wetness, run-up, snow load and melt
+candidate binding/lease/event ranges, CameraViewPublication,
+  ViewPreparationPublication visibility/shadow/cache/reset refs, and snapshot IDs
 per-species response factors, hard eligibility, final suitability
 candidate cells/IDs/priorities, rejected cause, conflict radius and winners
 chunk interior/halo and seam ownership
@@ -451,6 +679,16 @@ Acceptance includes:
   silhouette, alpha, canopy, and density errors remain inside **Gated** bounds;
 - composed target runs pass **Measured** CPU/GPU/presentation, live-byte,
   upload, and sustained thermal gates.
+- replaying the same air-velocity snapshot and ordered interaction records at
+  several presentation rates preserves structural state within the declared
+  integrator/interpolation error;
+- permuting record delivery before canonical ordering yields identical touch
+  state, duplicate IDs are consumed once, and deterministic overflow reports
+  the same retained set and represented impulse/load;
+- one-way trampling produces no actor reaction, while a two-way fixture closes
+  equal-and-opposite impulse in the authoritative contact solver;
+- changing render LOD or material wetness cannot change the receiver-state
+  owner, accumulation totals, or immutable placement records.
 
 Reject a result that merely resembles a green island. The evidence must show
 why each community exists, which fields exclude it from cliffs/water/site

@@ -119,6 +119,100 @@ type CameraFrameState = {
 Epochs are integer state versions (**Derived** from discontinuities), not frame
 numbers. Increment only when the represented mapping changes incompatibly.
 
+### Immutable physics presentation input
+
+The canonical cross-skill schemas are the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+For every rendered target/view, bind exactly one central immutable publication
+chain; do not define a reduced camera-local binding. Validate the candidate's
+per-binding/provider `PresentedStatePair`s, the complete previous/current
+render transforms in `CameraViewPublication`, the reset/reactive plan in
+`ViewPreparationPublication`, the sealed Snapshot references, and every
+`PhysicsSignalDescriptor` used by the rig.
+
+The camera owner writes the exact target/view `CameraViewPublication`: IDs and
+view scope; camera/projection versions; previous/current render-sample instants;
+complete previous/current `RenderSimilarityTransform`s; *unjittered* view and
+projection matrices; `jitterSampleAndConvention`; viewport; DPR/extent; depth
+convention; and projection validity/error. Velocity consumes the unjittered
+pair; the temporal owner applies jitter once.
+
+Camera pose/constraint first consumes the view-independent immutable
+`PhysicsPresentationCandidate`. The camera owner publishes
+`CameraViewPublication`; culling/shadow/cache owners publish
+`ViewPreparationPublication`; the assembler seals a Snapshot that references
+those exact IDs and candidate binding IDs. Matrices/transforms resolve through
+`cameraPublicationId`; reactive/reset records resolve through
+`viewPreparationId`. A mixed-chain read fails. Map the camera's local
+`projectionEpoch` explicitly to `cameraProjectionRevision`. No phase patches an
+earlier record.
+Feedback that misses the seal is explicitly one-presentation deferred, and render
+continues to use the prior committed version named by the current snapshot.
+
+For a followed entity `e`, let `P^-_e` and `P^+_e` be its transforms in the
+domain's previous/current presented pair. These are adjacent presented-frame
+transforms after that signal's policy. Its provider bracket is provenance for
+`P^+_e`, not the previous-render transform. Camera follow, obstruction, and
+motion-vector consumers therefore use `P^+_e`, while temporal reprojection uses
+the pair `(P^-_e, P^+_e)`. No consumer reruns interpolation with its own clock.
+
+External rigid-body, robotics, scientific, or offline-simulation pose streams
+must pass through one timestamped adapter:
+
+```text
+source frame/units/time/IDs
+  -> PhysicsContext conversion
+  -> ordered sample buffer and discontinuity detection
+  -> independent previous/current presentation-instant mappings
+  -> PresentedStatePair provenance, poses, validity, and error bounds
+  -> immutable candidate -> camera -> preparation -> snapshot chain
+```
+
+Extrapolation is legal only with a declared horizon and error gate. Missing,
+late, reordered, or frame-incompatible samples set `validity`/`error` or hold a
+declared last-valid pose; they never trigger an unversioned transform write.
+Spawn/despawn, teleport, reparent, incompatible LOD, and stable-ID change are
+discontinuities with explicit history/follow validity; never smooth through
+them as if they were consecutive samples. Append executed reset actions to
+`FrameExecutionRecord`; `ViewPreparationPublication.resetDependencies` remains
+immutable.
+
+If required camera/projection preparation or sealing fails, append a
+`FrameExecutionRecord` with `overallStatus: aborted` (or `partial-failure` when
+another target survives), exclude the failed target from `snapshotIds`, store
+typed absence in its target execution's `snapshotId`, cancel or defer actions,
+retire only failed-target-exclusive preparation leases, and retain Candidate
+leases until every surviving snapshot consumer joins through
+`leaseDispositionById`. Device loss
+appends `overallStatus: device-lost` and affected target statuses `device-lost`, advances
+`deviceLossGeneration`, cancels dependent actions, and invalidates resources
+and leases from the lost generation without mutating Candidate/Snapshot records
+or inventing a completion token. Rebuild under the new generation.
+
+### Rebase-invariant presentation
+
+Let `G_k` be the complete global-to-render transform stored for
+`originEpoch = k`.
+Velocity and camera-relative transforms use
+
+```text
+X_render_previous = G_previous * X_presented_previous
+X_render_current  = G_current  * X_presented_current
+```
+
+with the two epoch transforms retained together. For a stationary global body,
+a pure rebase must produce zero physical displacement after compensation. Test
+camera follow, obstruction, culling, picking, shadow lookup, and temporal
+velocity across the same crossing. When compensation data is absent, reject
+history through `ViewPreparationPublication.resetDependencies`; never treat
+`G_current - G_previous` as body or camera velocity.
+
+This compensation does not make stock r185 TRAA history rebase-safe. Its
+previous-depth reconstruction lacks the previous-render-to-current-render
+mapping, so any render-origin translation or tangent-basis change rebuilds/
+reseeds stock TRAA. A custom/patched node may preserve only when it consumes
+both complete transforms and passes the rebase residual gate.
+
 ## Space Contract
 
 | Space | Representation | Owner |

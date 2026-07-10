@@ -11,6 +11,21 @@ post-stack architecture. This skill owns object-space plasma, generated wakes,
 analytic sparks, pooled debris, lifetime compaction, and scene-relative HDR
 emission for effects.
 
+When particles collide with world geometry or exchange physical sources, read
+the shared
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Consume a registered `ColliderProxy` with its canonical frame/origin,
+topology/pose versions, swept bounds, physics material, residency, and error;
+query `SupportSurfaceSample` separately with its descriptor,
+`sampleInstant: PhysicsInstant`, footprint, validity, and per-channel error.
+Weather-coupled dynamics consume the route's immutable
+`EnvironmentForcingSnapshot`; aerodynamic force uses same-frame relative air
+velocity plus density, while direction-only visuals make no force claim.
+Emit typed `InteractionRecord`
+values only to the owning domain. A depth hit, visual spark, or wake ribbon is
+not an impulse, mass source, or equal-and-opposite reaction unless that record
+and schedule exist.
+
 ## Choose Simulation And Compaction Classes First
 
 | State or coupling | Fastest correct representation | Reject |

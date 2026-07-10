@@ -21,6 +21,29 @@ graphics systems. Use `$threejs-procedural-materials` when the task is channel
 assembly and material response, and `$threejs-procedural-planets` when the
 deliverable is a complete planetary body.
 
+When a field participates in dynamics, collision, support, forcing, or another physics query, bind it to the route's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+The public boundary is a typed `PhysicsSignalDescriptor`, not a TSL function,
+texture handle, or undocumented callback. It references the active
+`PhysicsContext` through canonical `contextId`, `physicsFrameId`,
+`physicsOriginEpoch`, `transformRevision`, `clockId`, channel/unit,
+represented-footprint/filter, validity, `perChannelError`, cadence/latency,
+`stateVersion`, residency, and `resourceGeneration` fields. Requests name the
+exact `PhysicsInstant` or `PhysicsTimeInterval` they accept; returned
+`SampledChannel.actualPhysicsTime` uses that direct instant-or-interval wire
+shape, not the generic `PhysicsTime` wrapper. Do not add time
+to the descriptor or create a field-local timestamp dialect. Convert from
+Three.js world coordinates exactly once through
+`PhysicsContext.worldToPhysicsTransform` and its sole positive
+`metersPerWorldUnit`; no field serializes the reciprocal or another scale.
+Field math and storage stay domain-owned; cross-system consumers may read only
+descriptors whose context, frame, version, and error gates pass. Publish
+physics values in SI in a stable physical frame. A render rebase makes the
+camera owner publish a new `CameraViewPublication` with a changed render
+mapping and `renderOriginEpoch`; the view-independent candidate and physical
+field state do not change
+`physicsFrameId`, `physicsOriginEpoch`, values, IDs, or versions.
+
 ## Numerical Provenance
 
 Every numerical claim emitted from this skill carries one label:
@@ -102,6 +125,12 @@ Quality tiers:
 | `budgeted` | **Measured** full tier misses time or bandwidth | Same WebGPU graph with fewer active spectral bands, smaller/dirty-tiled bakes, lower update cadence, and packed access-local channels. |
 | `minimum-native` | **Gated** WebGPU exists but the budgeted tier still misses | Same WebGPU consumer contract with precomputed generated data, coarser native-WebGPU textures, and only silhouette/identity-critical fields. |
 
+These are presentation/storage tiers for purely visual fields. Changing the
+representation, filter, active band, cadence, or error of a physics-facing
+field requires a coordinator-admitted `QualityTransition` at a graph step
+boundary, with an explicit conservative map or reset/handoff and one
+authoritative producer throughout the transition.
+
 ## Field Contract
 
 Before code, write a field bundle:
@@ -137,6 +166,31 @@ The contract must record:
   threshold guard bands;
 - debug output for every named field.
 
+For every physics-facing output, emit its `PhysicsSignalDescriptor` and batched
+adapter. Static fields publish an immutable `stateVersion` with
+`analytic-on-demand` or `event-driven` cadence as appropriate; every request
+and returned channel, including a static/analytic result, carries a canonical
+requested/actual `PhysicsInstant` or `PhysicsTimeInterval` directly. Edited or simulated fields additionally publish
+their cadence, latency, and invalidation state. Missing, stale, ambiguous, or
+out-of-domain samples remain explicit validity states. Optional channels that
+do not exist remain absent. Never substitute zero, reuse an old origin epoch,
+or silently sample a lower render LOD.
+
+Register every edited/simulated field owner, read/write version, cadence,
+sample phase, and CPU/GPU dependency on the route's `PhysicsGraph`; a texture
+dispatch is not an implicit scheduler edge. When a physics-owned field is also
+rendered, publish a view-independent `PhysicsPresentationCandidate` containing
+one leased `PresentedStatePair` per stable binding/provider. Its previous and
+current states each carry their own `PresentationSampleProvenance`,
+`PhysicsInstant`, state handle, and field `PresentationSpatialBinding`.
+`CameraViewPublication` owns the per-view render mapping;
+`ViewPreparationPublication` owns visibility, shadows, caches, resets, and
+view-specific lease refs. The sealed snapshot references candidate binding IDs
+and leases instead of copying pairs or transforms, and the multi-target
+`FrameExecutionRecord` owns completion and lease disposition. Static analytic
+fields may use explicit hold/not-interpolated provenance with identical bracket
+versions rather than omitting lifetime ownership.
+
 ### Local terrain and coast field contract
 
 For a local island, archipelago, reservoir edge, river reach, or coastal
@@ -152,6 +206,14 @@ stable world/tile-local XZ
   -> cross-shore land height + bathymetry
   -> terrace, cliff, beach, wet-line, drainage, exposure, and placement fields
 ```
+
+Here `wet-line` is static substrate/capacity or a statistical envelope derived
+from declared land causes. It is not dynamic free-surface position, foam,
+run-up, or conserved wetness. Water owns free-surface/foam/wash signals; the
+route-selected receiver-state owner alone integrates precipitation,
+inundation, infiltration, drainage, evaporation, and snow storage. This field
+skill may publish static support/eligibility and consume the resulting
+immutable receiver snapshot, but it never advances a competing wetness store.
 
 Use the sign convention `dCoast > 0` on land, `dCoast = 0` at the waterline,
 and `dCoast < 0` in water. If primitive union, coordinate warp, or raster
@@ -445,8 +507,10 @@ Every field stack needs a debug route for:
 - humidity, temperature, slope, cavity, and identity masks;
 - near/mid/far or footprint weights;
 - baked channel pack visualization;
-- water normal and crest from the same evaluation;
-- wetness by world height;
+- water-provider normal/crest reference versus the land field, without
+  regenerating either water channel;
+- receiver-owned wetness versus land support/height, with both source
+  revisions shown;
 - seed and stratification cells;
 - CPU versus TSL parity error.
 
@@ -462,6 +526,9 @@ restore full resolution only where inspection needs it.
 
 - field contract with coordinate owner, physical/perceptual units, seed owner,
   filtering rule, and bake-vs-evaluate decision;
+- one `PhysicsSignalDescriptor` and provider adapter per physics field, using the canonical context/frame/time/channel/footprint/filter,
+  validity/error, version/resource, residency/latency, and missing-channel
+  envelope unchanged;
 - TSL `Fn` field bundle and CPU parity port;
 - packed channel schema for direct material use or `StorageTexture` bakes;
 - debug views for every named field;

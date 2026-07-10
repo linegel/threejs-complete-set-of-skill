@@ -506,6 +506,99 @@ State meanings:
 Before first render, `valid = false`; no sentinel coordinate alone is a
 sufficient validity contract.
 
+### Acyclic presentation binding
+
+The route-level schema is the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+When the route declares a physics-to-render boundary, for each shadow
+preparation batch latch the immutable `PhysicsPresentationCandidate` produced
+after simulation and the target/view `CameraViewPublication`. Validate both
+exact central schemas and derive caster poses/swept bounds from the domain's
+`PresentedStatePair` plus referenced `PhysicsSignalDescriptor`; derive render
+mapping and projection only from the camera publication. The
+provider solver bracket explains how the current presented state was built but
+is not a substitute for adjacent rendered poses.
+
+For a physically sourced directional light, bind
+`LightingTransportSnapshot.sourceDirection` through its provider-wide
+`PresentedStatePair`. Validate context/provider/signal IDs, directional basis
+and support, requested `PhysicsInstant`, channel `actualPhysicsTime`, declared
+clock mapping, maximum staleness, state/resource generations, lease, validity,
+and angular error.
+Reject a single directional projection when a broad source
+distribution exceeds its declared approximation gate. A nonphysical route
+leaves this binding `not used` and declares an authored light basis.
+
+Cache ownership does not move to the route. This shadow system remains the sole
+writer of every level's desired/dirty/invalid/rendered/committed state and keeps
+`shadowContentEpoch`, `shadowCommittedEpoch`, and desired-coverage debt as
+owner-internal state. Do not define a shadow-local ABI. On an accepted commit,
+map them into the exact central records: return a `shadowViewPublicationRefs`
+entry containing `shadowOwner`, `shadowViewId`, `cameraProjectionRevision`,
+`shadowContentEpoch`, `resourceLeaseRefs`, and `boundedDelay`, plus one
+`ReactivePublication` with `kind: shadow-content`, `sourceVersion` equal to the
+committed epoch, canonical `affectedRegion`, `resourceLeaseId`, validity/error,
+and `plannedConsumerActions`. Also return a versioned shadow-visibility factor ID;
+downstream lighting/render-radiance provenance includes it exactly once in
+`attenuationFactorIds` rather than mutating the already published lighting
+snapshot.
+
+The preparation owner emits a new immutable `ViewPreparationPublication` with
+the shadow refs, `reactivePublications`, `resetDependencies`, and
+full `resourceLeases` for newly created camera-dependent shadow/cache
+generations plus `resourceLeaseRefs`; the assembler then seals
+`PhysicsPresentationSnapshot`.
+Visible receivers, scene radiance, temporal rejection, and diagnostics resolve
+that state through `viewPreparationId`. Candidate, camera publication,
+preparation publication, and Snapshot remain immutable. A cache update encoded after
+sealing is both visible and publishable only for the next frame; the current
+frame continues sampling the prior committed resource named by its snapshot.
+
+That deferred schedule requires double buffering: render the update into an
+inactive resource generation while the prior generation remains pinned, then
+atomically publish/swap it in the next sealed snapshot. Without an inactive
+generation, suppress the late update. Rendering in place through a normal
+render hook would make current receivers sample content newer than their sealed
+snapshot and is forbidden. Same-presentation shadow work must run and commit
+before sealing.
+
+Publications are keyed by presentation target, view/camera, light, and
+projection epoch. They cannot be reused across a different camera merely
+because the light and texture match. The resource generation/layout/layer and
+lease remain pinned until every consumer has submitted and the central
+`PresentationResourceLease.reuseProhibitedUntil` condition is satisfied;
+retirement is recorded in `FrameExecutionRecord.leaseDispositionById` with its
+completion join/evidence. Logical
+content version, resource generation, submission epoch, GPU queue availability,
+and host visibility are distinct records; `computeAsync()` or command encoding
+is not a completion fence. Device loss invalidates resources and leases from
+the lost generation, not the immutable publication records that reference them.
+
+`shadowContentEpoch` advances when light, caster, alpha/deformation, resource,
+or content-affecting quality dependencies change. Desired camera/snapped-center
+coverage has a separate desired-coverage epoch/update debt. It does not advance
+content or trigger a radiance reset while the prior committed containment
+remains valid. `shadowCommittedEpoch` advances only
+after a valid matching render commit. When content is invalid but not repaired,
+the level remains unsampled/invalid; advancing only the content epoch cannot
+authorize stale depth. On a new commit, publish conservative changed *receiver*
+coverage in stable physics-frame metres or the central mask descriptor. Derive
+it by extruding old and new occluder silhouettes along the light over the
+committed receiver domain, then dilate for filter/normal-bias footprint,
+projection/reprojection uncertainty, and the temporal neighborhood. A moved
+caster's swept AABB alone is not a receiver-radiance bound. If this proof or a
+leased aligned mask is absent, publish `affectedRegion: full-frame` and reset
+the affected radiance history.
+
+A render-origin change alone does not change semantic shadow content. Apply the
+previous/current `RenderSimilarityTransform`s from `CameraViewPublication` and
+verify identical light-space coordinates within the declared error. A
+physics-origin change is different: preserve cached depth only when the
+accepted `PhysicsOriginRebaseTransaction` includes caster, receiver, contact,
+and cache state and passes light-space/round-trip error gates. Otherwise
+invalidate the affected levels and temporal receivers. A missing/incompatible
+transform or a real caster/light change also invalidates maps.
+
 ## Update Scheduling
 
 Dirty causes are not equal:
@@ -586,8 +679,28 @@ Commit sequence:
    rendered epoch;
 6. set `valid = true`, clear satisfied reasons, and reset debt/age.
 
+7. return the canonical `shadowViewPublicationRefs` entry,
+   `ReactivePublication`, resource lease refs, and factor ID for a new
+   `ViewPreparationPublication`; never mutate an earlier publication or sealed
+   Snapshot.
+
+Append the actual render/submit/commit/failure and reset execution to
+`FrameExecutionRecord`. `ViewPreparationPublication.resetDependencies` remains
+the immutable plan and is not edited to report completion.
+
 If render submission fails, retain the previous valid commit only when it still
-represents correct content; otherwise keep the level invalid.
+represents correct content and the route's declared degradation permits it;
+otherwise keep the level invalid. If a required valid shadow cannot be supplied
+before sealing, append a `FrameExecutionRecord` with `overallStatus: aborted`
+(or `partial-failure` when another target survives), exclude the failed target
+from `snapshotIds`, store typed absence in its target execution's `snapshotId`,
+cancel or defer actions, retire only failed-target-exclusive preparation
+leases, and retain Candidate leases until every surviving snapshot consumer
+joins through `leaseDispositionById`. Device loss appends `overallStatus: device-lost` and
+affected target statuses `device-lost`,
+advances `deviceLossGeneration`, cancels actions, and invalidates resources and
+leases from the lost generation without mutating Candidate/Snapshot records or
+inventing a normal completion token. Rebuild under the new generation.
 
 ## Cross-Level Containment And Sampling
 

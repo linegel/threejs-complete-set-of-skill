@@ -327,6 +327,160 @@ format is not normal packing.
 
 ## Temporal Ordering And Reprojection
 
+### Immutable presentation snapshot
+
+The canonical schema and scheduling rules live in the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+When the route declares a physics-to-render boundary, the pre-render coordinator
+first latches the view-independent immutable `PhysicsPresentationCandidate`;
+the camera owner emits `CameraViewPublication`; visibility/shadow/cache owners
+emit `ViewPreparationPublication`; and the assembler seals one target/view
+`PhysicsPresentationSnapshot`. The image pipeline latches that exact chain
+before constructing frame uniforms. Validate the candidate pairs/descriptors,
+camera transforms/matrices, preparation reactive/reset plan and committed
+resources, and the Snapshot reference closure. Scene, shadow receivers,
+culling, MRT, history, post, picking, and diagnostics consume the same
+candidate/camera/preparation/snapshot IDs. No stage mutates an earlier record. A
+declared one-frame-deferred alternative may publish late cache feedback on the
+next frame only; this frame keeps sampling the prior committed resource/version
+named by its snapshot.
+
+Every `PhysicsSignalDescriptor` supplies the central per-channel/frame/time/
+version/residency/error metadata, and each stable binding/provider supplies its
+central `PresentedStatePair` in the Candidate. The Snapshot references these by
+`presentedStatePairRefs`; it does not copy them. A single route-wide alpha cannot describe providers with
+different cadences. Every GPU-backed binding pins resource generation, layout,
+entity map, slot/range, access, and the central `PresentationResourceLease`
+until all consumers submit and its `reuseProhibitedUntil` condition is
+satisfied. Retirement is recorded in
+`FrameExecutionRecord.leaseDispositionById` with its completion join/evidence.
+
+For vertex `x`, generate temporal positions from adjacent *presented* states:
+
+```text
+clipPrevious = projectionPreviousUnjittered * viewPrevious
+               * globalToRenderPrevious * bind(presentedPair.previousPresented.globalBinding) * xPrevious
+clipCurrent  = projectionCurrentUnjittered * viewCurrent
+               * globalToRenderCurrent * bind(presentedPair.currentPresented.globalBinding) * xCurrent
+velocityNDC  = ndc(clipCurrent) - ndc(clipPrevious)
+```
+
+`xPrevious`/`xCurrent` include the previous/current presented rigid, instanced,
+skinned, particle, and procedural deformation. They are not the provider's two
+fixed-step endpoints. Projecting endpoints while rendering an interpolated pose
+creates cadence-dependent velocity, ghosting, and false disocclusion. A custom
+high/low or rebased position path must apply the corresponding previous/current
+global-to-render transform; a coordinate-only rebase then produces no physical
+motion. Spawn, despawn, teleport, reparent, incompatible LOD, and slot reuse
+carry explicit invalidity and cannot borrow history. Particle compaction moves
+identity, current state, and previous-presented state atomically.
+
+Temporal jitter is a separate mapping owned after this unjittered velocity
+calculation. Do not include jitter in one endpoint only or apply it twice.
+
+Stock r185 `VelocityNode` stores previous object state globally rather than by
+presentation target/view and advances it after a velocity render. Gate it to
+one presentation history and one velocity-bearing render per object per
+presented frame, and only where its built-in rigid/skinned/instanced/
+deformation previous-state path matches the central binding. Multiple views,
+targets, or velocity passes and arbitrary prior procedural/particle state use a
+custom snapshot-bound velocity path. Validate the actual GPU/CPU binding and
+slot generation; schema presence alone is insufficient.
+
+An external solver pose stream is legal only after its route adapter has
+published ordered timestamps, state versions, converted frames/units, stable
+IDs, discontinuities, and a bounded interpolation/extrapolation error into the
+candidate's independently provenanced previous/current presented states. Render
+code never polls that external engine independently.
+
+### Lighting transport and reset DAG
+
+Latch the central `LightingTransportSnapshot` through a provider-wide
+`PresentedStatePair` (`entityId: typed-absence`) in the Candidate and require
+its binding ID in the sealed Snapshot's `presentedStatePairRefs`. Match
+context/provider/signal IDs, descriptor and state/resource generations,
+`PresentationStateHandle`, each state's requested presentation instant, mapped
+source instant and clock-map revision/error, plus the bundle `sampleInstant`;
+validate channel `actualPhysicsTime`, filter/age, maximum staleness, validity,
+and error. Do not
+redeclare a parallel lighting record. Each canonical channel
+declares its own basis/primaries or spectral basis, radiometric quantity, SI
+unit, frame/time, revision, validity, and error.
+Materials, atmosphere, meter, bloom, and diagnostics must use a compatible
+channel or an explicit dimensionally valid conversion. If rendering uses a
+normalized scene-linear RGB basis, expose it as a separately named render-local
+signal derived by a versioned SI-to-render conversion with reference scale,
+provenance, and error. It is not a normalized canonical physics channel. A
+nonphysical route leaves the router physics fields `not used` and declares only
+its render-local color contract.
+
+Build executable reset edges from
+`ViewPreparationPublication.reactivePublications` and
+`ViewPreparationPublication.resetDependencies`:
+
+Every reactive publication is the exact central target/view record with
+source/version/epoch, typed cause, affected region (`full-frame` or a leased
+mask handle), validity/error, and planned history action. Its mask descriptor
+must pin extent, camera/projection/jitter mapping, encoding/format, resource
+generation/layout/slot, conservative coverage/error, and retirement lease.
+
+| Cause committed for this frame | Required consumers before use |
+| --- | --- |
+| uncompensated origin/projection discontinuity or camera cut | velocity/depth mapping, TRAA and every screen-reprojected history; shadow fitting/cache coordinates as declared |
+| solver reset, topology change, or quality-state migration | histories and shadows whose producers depend on changed state; preserve unrelated histories only with a version proof |
+| shadow content invalidation/commit | render only committed valid maps; a custom/patched temporal node may reject changed radiance pixels through a shadow mask, otherwise reset/reseed the full affected radiance history |
+| foam, emissive, wetness, refraction, absorption, or other optical discontinuity | reject the affected temporal-radiance/surface history; preserve geometry history only when depth/velocity remain valid |
+| radiance-basis/calibration, primaries, quantity convention, or exposure-key revision | invalidate or exactly convert scene-radiance histories, meter accumulators, adapted exposure, and bloom threshold conversion |
+| size/DPR/format/MRT-layout change | recreate/reseed every dimension- or format-dependent history before graph publication |
+
+Required order is:
+
+```text
+validate presentation candidate and lighting input
+  -> CameraViewPublication with render transforms/matrices/jitter/depth
+  -> ViewPreparationPublication with committed visibility/shadows/reactive/reset records
+  -> seal PhysicsPresentationSnapshot references
+  -> validate and latch the exact publication chain
+  -> render depth, velocity, and scene-linear radiance
+  -> materialize local reactive masks
+  -> reject/reseed AO, volumetric, surface, and color histories
+  -> resolve the photographed meter source
+  -> update exposure
+  -> bloom/tone-map/grade/output
+```
+
+Each immutable plan edge uses the exact canonical `ScopedResetAction.policy`:
+`preserve-with-proof`, `reset`, `reject-region`, `reproject-with-proof`,
+`reseed`, `rebuild`, `bypass`, `hold-prior`, or `convert-with-proof`. Actual
+completion/failure and queue submission are appended to `FrameExecutionRecord`,
+not written back into the preparation record or Snapshot. The graph must be acyclic for a frame; a
+producer completed after its consumer is deferred to the next snapshot,
+never retroactively published. Stock r185 `TRAANode` cannot consume a reactive
+mask and exposes no public general reset; use a validated custom/patched node,
+or an evidenced rebuild, bypass/reseed wrapper, or full reset.
+
+For resource validity, distinguish logical state version, resource generation,
+submission epoch, GPU queue availability, and host visibility. `computeAsync()`
+does not establish completion. A pre-seal camera/shadow/cache or sealing failure
+appends a `FrameExecutionRecord` with `overallStatus: aborted` (or
+`partial-failure` when another target survives), excludes the failed target from
+`snapshotIds`, stores typed absence in its target execution's `snapshotId`,
+cancels or defers actions, retires only failed-target-exclusive preparation
+leases, and retains Candidate leases until every surviving snapshot consumer
+joins through `leaseDispositionById`. Device loss appends `overallStatus: device-lost` and
+affected target statuses `device-lost`, advances the
+device-loss generation, cancels actions, and invalidates lost-generation
+resources/leases without fabricating normal completion. Candidate/Snapshot
+records remain immutable evidence; only their lost-generation bindings become
+unusable until the route rebuilds and reseeds under a new generation.
+
+Stock r185 `TRAANode` also cannot preserve history across a render-origin
+translation or tangent-basis rebase: its previous-depth world reconstruction
+has no mapping from the previous render frame to the current one. Rebuild/
+reseed stock TRAA on every render-origin epoch change even when custom velocity
+correctly cancels the coordinate jump. Only a custom/patched temporal node that
+uses both complete global-to-render transforms may preserve after proof.
+
 ### Velocity Convention
 
 r185 `VelocityNode` computes:

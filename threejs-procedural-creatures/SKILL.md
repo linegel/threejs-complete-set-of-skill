@@ -15,6 +15,15 @@ is diagnostic only. Distant bodies may use view-constrained impostors. No path
 raymarches the body. Pose is a compact primitive buffer sampled from an
 analytic clock or advanced by a fixed-step solver when state is recurrent.
 
+Read the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+before habitat, support, water, contact, or cross-domain coupling. It defines the
+SI physics frame, gravity, clocks/ticks, scheduler, typed providers including
+the immutable `EnvironmentForcingSnapshot`,
+`InteractionRecord`, conservation groups, residency/state versions, and
+the immutable presentation publication chain. This skill consumes those boundaries;
+it does not fork them inside creature locomotion.
+
 For plants and foliage use `$threejs-procedural-vegetation`. For generic
 transform timelines, springs, and staging use
 `$threejs-procedural-motion-systems`. Imported glTF skinned-clip pipelines
@@ -146,16 +155,38 @@ this order; every step ends in something renderable or assertable.
     units, validity, and error; they never infer coast, substrate, slope, or
     water depth from rendered color or read a GPU render target back to the
     CPU. Reactive planted gait consumes an injected
-    support-surface query returning contact point, normal, frame identity, and
-    linear/angular surface velocity. Plant feet in that moving support frame;
-    derive homes and swing arcs in its tangent plane, including slopes. Then
+    canonical `SupportSurfaceProvider` returning stable support/feature IDs,
+    closest point, outward normal, and represented point velocity/acceleration;
+    moving-frame angular kinematics come from its `PhysicsFrameDescriptor`.
+    Plant feet in that moving support frame;
+    this is kinematic support sampling, not a collision/contact impulse ABI;
+    physical contacts use the shared contact record and `InteractionRecord`.
+    Derive homes and swing arcs in its tangent plane, including slopes. Then
     use analytic 2-bone IK with a Gram-Schmidt bend hint;
     hopper state machine with volume-preserving squash
     (`sxz = 1/sqrt(squash)`); closed-form flight sampled from sim time;
-    fixed-step verlet ropes; buoyancy response against an injected water-state
-    provider. Its surface-point velocity and material current are distinct
-    channels; a provider that exposes only height/normal declares the omitted
-    dynamics and the creature tier cannot silently invent them. An injected
+    weather-responsive flight/appendages consume same-frame relative air
+    velocity and density from a versioned `EnvironmentForcingSnapshot` graph
+    edge, preserving channel time/support/filter/error and never owning private
+    wind state;
+    fixed-step verlet ropes; buoyancy response against the shared batched,
+    channel-requested `WaterSurfaceProvider`. The canonical request uses
+    physics-frame metres and carries context/provider/signal/schema IDs,
+    requested `PhysicsInstant`, channel masks, footprint/filter, tolerances,
+    staleness, acceptable residency/latency, and batch extent; descriptor
+    discovery supplies a stable descriptor-table reference rather than a deep
+    copy. Samples use
+    `freeSurfacePoint`, `freeSurfaceNormal`, `surfacePointVelocityMps`,
+    `materialCurrentVelocityMps`, `waterColumnDepthMeters`, optional
+    `densityKgPerM3`, and return the complete `PhysicsSignalDescriptor`, bundle
+    `sampleInstant`, and per-channel `actualPhysicsTime` resolving to a
+    `PhysicsInstant`. Requested and actual instants may differ only within
+    declared latency/staleness gates. Each channel
+    is the complete shared `SampledChannel`.
+    Surface-point velocity and material current are distinct;
+    unrepresented channels are absent, not zero, and a dependent tier is
+    blocked rather than inventing them. Consumers do not subset, rename, or
+    independently clock the shared envelope. An injected
     open-sea adapter may wrap
     `threejs-spectral-ocean/examples/webgpu-fft-ocean/createCpuWaterHeightSampler()`;
     a bounded-water adapter may wrap
@@ -164,14 +195,43 @@ this order; every step ends in something renderable or assertable.
     and per-sample inversion residuals; the provider adapter adds any measured
     floating-point/GPU-probe discrepancy or marks it unavailable. The bounded
     adapter reports analytic inversion/residual error plus either a proven
-    live-grid residual bound, a converged surrogate error, or `null`. Missing
+    live-grid residual bound, a converged surrogate error, or canonical typed
+    absence classified `unavailable`. Missing
     error fields block locomotion tiers that require them. Creature locomotion
     never hides those errors behind frame-critical GPU readback. Rope-verlet
     writes its segment slots after base squash staging,
     after root-yaw target conversion, and after IK writes; the last stage
     touching a slot wins. Everything deterministic: seeded LCG + sim clock
     only — `Math.random`/`Date.now`/`performance.now` are banned in render
-    code.
+    code. A one-way creature/water route identifies the authoritative source and
+    records a `[G]` upper bound on omitted creature-to-water feedback or
+    explicitly narrows the claim/regime. If a creature participates in two-way
+    water or contact physics, it
+    emits source `InteractionRecord` entries and consumes reduced reaction
+    records in the shared both-owner-predict/sample/load-scatter/water-advance/
+    reaction-reduce/correct/check/atomic-commit graph; local
+    decals or ripple calls are not feedback. Coupling declares explicit,
+    semi-implicit, scheduler-bounded iterated, or monolithic ownership; its
+    gather/scatter pair preserves zeroth/first moments and gates force, torque,
+    interface work, and added-mass stability. Source/reaction records form an
+    all-or-none `InteractionReactionGroup`; many-to-many reduction is legal and
+    balance is tested in its declared frame/reference point. The accepted pose is contributed
+    as a per-binding/provider `PresentedStatePair` to the view-independent
+    `PhysicsPresentationCandidate`, which contains no camera or render
+    transform. `previousPresented` and `currentPresented` each carry independent
+    `PresentationSampleProvenance`, `presentedInstant`, state handle, and global
+    spatial binding. The camera owner publishes `CameraViewPublication`,
+    preparation owners publish `ViewPreparationPublication`, and the sealed
+    `PhysicsPresentationSnapshot` references candidate binding IDs and lease
+    refs. `FrameExecutionRecord` records multi-target execution and lease
+    disposition keyed by lease ID. The presented states are not assumed solver
+    `n/n+1`. Visible deformation, bounds, shadows, motion vectors, and temporal
+    history resolve through this chain with separately tracked instants/frame/
+    transform/source epochs. Pose/topology/LOD/disocclusion history decisions
+    are scoped `ReactivePublication` and `ScopedResetAction` records in
+    `ViewPreparationPublication`, not extra pair or snapshot flags.
+    Pose/topology/LOD/disocclusion changes contribute scoped reactive epochs and
+    affected entities/regions for those per-view records.
 11. **Boot.** All heavy work is init-phase and budgeted. Only an immutable unit
     primitive template may be global; extracted connectivity, shell/reference
     mapping, transported radial frames, blend ancestry, candidate sets, and
@@ -258,6 +318,19 @@ step, while rope-verlet CPU cost is
 closed-form poses must not be rewritten or integrated merely to exercise a
 compute path.
 
+Batch habitat/support/water requests and interaction records as compact
+channel-masked SoA with generation-bearing identities distinct from population
+slots, bounded deterministic queues, and canonical batch-level
+`InteractionBatchLedger` records. Avoid
+per-creature query objects. Presented pose/resource generations use a
+frame-in-flight lease/reuse rule so compute or slot recycling cannot overwrite
+state still referenced by a sealed snapshot.
+Physical locomotion/interaction `QualityTransition` commits only at a scheduler
+tick with state projection, queue boundary, conserved-value/error ledger,
+atomic provider/identity generation, history action, rollback, and measured
+old/new peak residency. Visual mesh/LOD crossfades never duplicate an
+authoritative body or its reactions.
+
 Boot side: all shippable material variants `compileAsync`-warmed before
 reveal; build work is time-sliced to a declared main-thread gate or off-thread;
 capacity is a measured set of fixed topology/tier pages. Spawn is an O(slots)
@@ -321,10 +394,19 @@ snapped shell remains diagnostic even after that closure.
 - a swimmer treats wave phase/surface-height velocity as material current, or
   consumes an unlabelled `velocity` channel whose frame and meaning are
   undefined;
-- creature scale is multiplied into physical gravity while world units and
-  seconds remain fixed;
+- a missing `WaterSurfaceSample` channel follows the descriptor's explicit
+  `missingChannelPolicy` (`absent`, `reject`, or a schema-named reconstruction
+  policy); it is never silently zero-filled, and provider error/version
+  is discarded, or a two-way creature bypasses `InteractionRecord` and its
+  conservation group;
+- creature scale is multiplied into the shared gravity-provider acceleration
+  while the SI metre/second contract remains fixed;
 - shadows silently use a different position path than the visible deformed
   surface;
+- visible pose, bounds, shadows, motion vectors, or temporal history consume
+  different physics presentation snapshots, state versions, or origin epochs;
+- spawn/death, teleport, reparent, page-slot reuse, topology or LOD transition
+  emits an extreme motion vector instead of an explicit history-invalid reason;
 - the outline doubles the full field-correction cost per body in a
   repeated-population scene;
 - debug/tier/band changes rebuild materials and meshes per creature instead of
@@ -346,7 +428,8 @@ Use `$threejs-procedural-motion-systems` for generic transform timelines,
 springs, staging, and rotating frames; this skill owns creature bodies, rigs,
 and creature locomotion. Terrain, planetary, and water skills own environment
 fields and their query error; this skill only consumes their support, habitat,
-and water-state interfaces. Use `$threejs-procedural-geometry` for general
+and shared provider interfaces under the physics-domain and interaction
+contract. Use `$threejs-procedural-geometry` for general
 semantic mesh writers; this skill owns field-derived reference skins and its
 diagnostic shell. Use
 `$threejs-procedural-vegetation` for plants. Use `$threejs-visual-validation`

@@ -89,6 +89,78 @@ for suitability equations, windward/leeward and salt fields, order-independent
 placement, chunk seams, succession/asset manifests, LOD population invariants,
 and coastal diagnostics.
 
+## Shared Environmental And Interaction Boundary
+
+When vegetation participates in coupled weather, contacts, loading, or water,
+first read the router's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Consume its `PhysicsContext`, `EnvironmentForcingSnapshot`, receiver-state
+signal sample, and `InteractionRecord`; do not author private clocks,
+wind/current fields, or contact schemas.
+
+Environmental wind is an air-velocity provider in meters per second with a
+declared frame, altitude/support domain, exact `sampleInstant: PhysicsInstant`,
+cadence, interpolation policy, requested/actual oriented crown/patch footprint
+and spatial/temporal filter or band, and per-channel error. Vegetation owns only
+the structural response: modal trunk and
+branch state, leaf flutter, damping, root constraints, bounds, and LOD
+projection. Water current and water-surface velocity are different providers.
+Static prevailing-wind exposure used by ecology is a climatological reduction
+sampled at an exact `PhysicsInstant` with its own revision; it is not the
+instantaneous deformation sample.
+
+Consume trampling, sweep, support-load, and impact events as typed
+`InteractionRecord`s. Use stable source/receiver IDs, an
+`applicationInterval: PhysicsTimeInterval`, SI-physics-frame footprint/impulse
+or load units, deterministic ordering keys, canonical source/target ownership,
+`SurfaceExchange.mode`, reaction-group identity, and batch/partition identity.
+Keep sequence ranges, consumer cursors, overflow, and lost/deferred commodities
+in the canonical immutable `InteractionBatchLedger`; coalescing is a producer
+transformation with provenance. Bin sparse records into affected
+patches, update the contact/touch state after physics contact resolution, then
+evaluate structural wind/contact deformation and commit domain state over the
+declared `PhysicsGraphStage.executionInterval: PhysicsTimeInterval`.
+
+Contribute each stable deformation binding as a `PresentedStatePair` to one
+view-independent `PhysicsPresentationCandidate` at
+`requestedPresentationInstant: PhysicsInstant`; the candidate owns the
+`PresentationResourceLease` records and consumer-scoped event sequence ranges.
+Each pair's `previousPresented.provenance` and
+`currentPresented.provenance` are independent
+`PresentationSampleProvenance` records;
+`previousPresented.presentedInstant: PhysicsInstant` and
+`currentPresented.presentedInstant: PhysicsInstant` remain distinct, as do
+their state handles and global spatial bindings. A shared pair-level provenance
+shorthand is forbidden.
+The candidate contains no camera or render transform. The camera owner publishes
+one `CameraViewPublication` per target/view with
+`previousRenderSampleInstant: PhysicsInstant` and
+`currentRenderSampleInstant: PhysicsInstant` plus
+`globalToRenderPrevious`/`globalToRenderCurrent`, view/projection matrices,
+jitter, viewport, and depth state; visibility, acceleration, shadow, cache,
+reactive, and reset owners then publish
+`ViewPreparationPublication` with `visibilityPublicationRefs`,
+`accelerationPublicationRefs`, `shadowViewPublicationRefs`,
+`cachePublicationRefs`, `reactiveEpochs`, `reactivePublications`,
+`resetDependencies`, full `resourceLeases` for newly created camera-dependent
+generations, and `resourceLeaseRefs`. The sealed
+`PhysicsPresentationSnapshot` names the candidate, camera/preparation
+publications through `candidateId`, `cameraPublicationId`, and
+`viewPreparationId`, plus `presentationTargetId`, `viewId`, and `sealVersion`;
+its state/resource payload is only `presentedStatePairRefs` and
+`resourceLeaseRefs`, accompanied by scoped `eventSequenceRanges`, never copied
+pairs or transforms. Never mutate immutable placement or publication records. One-way
+visual deformation uses a one-way exchange and emits no reaction record;
+two-way coupling leaves the matched reaction to the authoritative physics
+solver.
+
+Wetness, run-up, snow load, and melt are consumed from the route-selected
+receiver-state owner at an exact `PhysicsInstant` after it integrates all
+exchanges. Vegetation and its materials do not create independent accumulation
+fields. On budgeted/mobile tiers retain analytic vertex wind, compact sparse
+interaction records, bounded dirty patches, lower-rate receiver fields, and
+explicit stream-loss/per-channel-error accounting.
+
 ## Capability Gate And Tiers
 
 Initialize the renderer before allocating storage resources:
@@ -162,7 +234,15 @@ overdraw/over-submission and culling granularity.
 
 ## Creature Composition
 
-Vegetation owns the wind field as an authored procedural field in the sense of `$threejs-procedural-fields`; creatures sample that same field for fur, feather, cloth, or antenna response, so there is no second wind system with an independent phase. For trampling, creature stance events must write world-space contact positions, radii, weights, and decay into the same touch/interaction channel consumed by grass displacement. The current WebGPU dense-grass example exposes wind uniforms and static density storage but no local trampling displacement channel, so this is a future contract: add a dynamic touch texture or compact storage buffer, sample it in the blade position node, and leave static blade storage immutable.
+Vegetation and creatures consume the same `EnvironmentForcingSnapshot` air
+velocity but own different structural response models. Creature stance/contact
+resolution publishes typed `InteractionRecord`s; vegetation bins completed
+records into its dynamic touch texture or compact patch storage before blade
+deformation. The current WebGPU dense-grass example exposes only wind uniforms
+and static density storage, so it is not evidence that contact ingestion is
+implemented. A production route must instantiate the shared record adapter,
+dynamic touch resource, scheduler edge, overflow diagnostic, and immutable
+static-placement invariant.
 
 ## r185 Add-On Import Paths
 
@@ -275,4 +355,7 @@ Visual failures:
 
 Use `$threejs-procedural-geometry` for generic branch-ring emission without a growth model. Use `$threejs-procedural-fields` for shared terrain, coast, exposure, density, weather, and biome fields. Use `$threejs-procedural-materials` for authored bark/leaf/grass PBR identities. Use `$threejs-water-optics` for run-up/inundation/shore signals when water is their causal owner; vegetation consumes those signals but does not solve water. Use `$threejs-scalable-real-time-shadows` for custom shadow clipmaps beyond `CSMShadowNode` or `TileShadowNode`. Use `$threejs-image-pipeline` when the vegetation scene owns the final HDR, AO, bloom, temporal AA, and output-transform stack.
 
-This skill owns species tables, topology, child placement, foliage, grass fields, roots, chunked dense vegetation, static/dynamic storage separation, and hierarchical/rooted wind.
+This skill owns species tables, topology, child placement, foliage, grass fields,
+roots, chunked dense vegetation, static/dynamic storage separation, and
+hierarchical/rooted structural response. The routed environment owner supplies
+air velocity; the authoritative contact solver supplies interaction records.

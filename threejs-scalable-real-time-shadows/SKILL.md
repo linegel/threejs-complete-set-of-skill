@@ -174,6 +174,108 @@ filter footprints with excessive bias.
 
 ## Cache Invalidation
 
+### Physics presentation and reactive publication
+
+Keep the existing shadow node/cache as sole owner of desired, invalid,
+rendered, and committed map state. When the route declares a physics-to-render
+boundary, bind shadow preparation to the immutable pair of
+`PhysicsPresentationCandidate` and target/view `CameraViewPublication` from the
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md),
+and validate its exact central per-binding/provider presented pairs, signal descriptors,
+camera render transforms/projection, validity, and errors. After cache
+publications return, the preparation owner emits `ViewPreparationPublication`
+and the central writer seals `PhysicsPresentationSnapshot`; visible receivers
+and temporal consumers resolve committed shadow refs, `reactivePublications`,
+`resetDependencies`, and resource lease refs transitively through
+`viewPreparationId`.
+
+Caster invalidation uses the domain's current `PresentedStatePair`; swept
+bounds use both presented states. Do not use fixed-step endpoints or poll an external physics
+engine from the shadow pass. A pure render-origin rebase leaves semantic
+light/caster geometry invariant when both camera transforms are applied; it
+does not dirty depth content merely because float render coordinates changed.
+A physics-origin rebase may preserve cached depth only after the accepted
+`PhysicsOriginRebaseTransaction` transforms every caster/receiver/cache binding
+and a light-space round-trip invariant passes; otherwise invalidate the cache
+and its dependent temporal region.
+
+For a physically sourced directional light, bind the canonical
+`LightingTransportSnapshot.sourceDirection` through its provider-wide
+`PresentedStatePair` and validate context/provider/signal IDs, basis, support,
+requested `PhysicsInstant`, channel `actualPhysicsTime`, declared clock mapping,
+maximum staleness,
+state/resource generations, lease, validity, and angular error.
+A broad directional distribution that exceeds the single-direction projection
+gate cannot be silently collapsed into one shadow camera. A nonphysical route
+keeps this lighting binding `not used` and declares an authored light basis.
+
+The cache owns, but does not publish as a parallel ABI, two internal states:
+
+- `shadowContentEpoch`: newest caster/light/alpha/deformation/resource content version that
+  correct shadow content must represent;
+- `shadowCommittedEpoch`: exact valid content version and map identity actually
+  sampled by receivers, plus changed receiver bounds or a conservative screen
+  mask.
+
+On an accepted commit, map those states into the exact central records: return a
+`shadowViewPublicationRefs` entry containing `shadowOwner`, `shadowViewId`,
+`cameraProjectionRevision`, `shadowContentEpoch`, `resourceLeaseRefs`, and
+`boundedDelay`, plus one `ReactivePublication` with `kind: shadow-content`,
+`sourceVersion` equal to the committed epoch, canonical `affectedRegion`,
+`resourceLeaseId`, validity/error, and `plannedConsumerActions`. Return a
+versioned shadow-visibility factor ID as
+radiometric provenance; downstream lighting/render-radiance provenance includes
+that ID exactly once in `attenuationFactorIds`. Never mutate the already
+published lighting snapshot to retrofit it.
+
+Keep `desiredCoverageEpoch` and update debt separate. Camera/snapped-center
+motion may leave the prior committed map correct within its committed domain;
+it is not a content/radiance change until containment fails or a new map
+actually commits.
+
+Key both records by presentation target, view/camera-projection identity, and
+light; one camera's committed coverage cannot authorize another
+view. Publications also pin resource generation/layout/layer and a queue-safe
+lease until every receiver has submitted and its central
+`reuseProhibitedUntil` condition is satisfied; append release to
+`FrameExecutionRecord.leaseDispositionById` with its completion join/evidence.
+
+The preparation owner writes those refs, publications, actions, and leases into
+a new immutable `ViewPreparationPublication` before sealing the Snapshot.
+Candidate, camera publication, preparation publication, and Snapshot are
+immutable; a shadow node never patches an earlier record. If a render-hook update finishes after sealing, both publication
+and receiver use are deferred to the next snapshot/presentation epoch; the
+current scene continues sampling the prior committed resource named by its
+snapshot. This requires an inactive resource generation while the prior leased
+generation remains untouched, followed by an atomic next-snapshot swap.
+Otherwise suppress the late update; an in-place render-hook write violates
+snapshot/content agreement. Same-presentation commits run before the seal.
+Never label desired or merely scheduled content as committed. A changed commit
+is a radiance discontinuity: reject the affected temporal-radiance pixels, or
+reset the full radiance history when no conservative mask exists. Shadow cache
+age and update scheduling remain owned here; the central contract standardizes
+only the published boundary and ordering.
+
+`ViewPreparationPublication.resetDependencies` is only the immutable action
+plan. Append actual shadow
+renders, queue submissions, cache commits, reseeds, failures, and deferred
+feedback to `FrameExecutionRecord`. Do not treat logical content epoch,
+submission epoch, GPU queue availability, or host readback as equivalent.
+`computeAsync()` is not a completion fence. If required shadow preparation
+cannot return a valid committed or declared prior/degraded version before seal,
+append a `FrameExecutionRecord` with `overallStatus: aborted` (or
+`partial-failure` when another target survives), exclude the failed target from
+`snapshotIds`, store typed absence in its target execution's `snapshotId`,
+cancel or defer actions, retire only failed-target-exclusive preparation
+leases, and retain Candidate/shared leases until all surviving snapshot
+consumers join through `leaseDispositionById`. Device loss appends
+`overallStatus: device-lost` and
+affected target statuses `device-lost`, advances
+`deviceLossGeneration`, cancels actions, and invalidates lost-generation shadow
+resources/leases without mutating Candidate/Snapshot records or inventing a
+normal completion token. Rebuild the cache under the new generation before
+publication.
+
 Track at least these dirty causes:
 
 - snapped coverage center or fitted depth range changed;

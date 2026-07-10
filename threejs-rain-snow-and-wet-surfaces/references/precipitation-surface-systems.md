@@ -10,6 +10,7 @@ instance data.
 
 - Architecture
 - Capability gate and tiers
+- Shared environment, exchange, and receiver contract
 - Shared weather envelope
 - Compute precipitation volume
 - Snow accumulation and object capping
@@ -63,8 +64,10 @@ particle uses a terminal-speed claim, state diameter/mass, fluid density, drag
 coefficient, projected area, and model; for quadratic drag,
 `v_t = sqrt(2 m g / (rho_air C_D A))`. Real drops and snow aggregates need
 shape/Reynolds-dependent drag, so authored fall speeds are not universal
-physics constants. Wind is horizontal world length units per second under the
-declared scene scale. Capillary ripple rings are a bounded surface-response
+physics constants. Canonical wind is `airVelocityMps`, a three-component
+velocity in `m s^-1` in the declared stable right-handed `PhysicsFrameId`;
+only the non-authoritative render projection converts it to world/render units.
+Capillary ripple rings are a bounded surface-response
 approximation, not a water simulation. Snow deposition needs exposure,
 occlusion, slope/adhesion, transport/melt, and capacity policy; an upward-normal
 gate alone is only a stylized mask. Wetness first changes roughness,
@@ -72,8 +75,9 @@ absorption/base-color response, and layered dielectric Fresnel; do not
 arbitrarily animate metalness or a bare-material F0 scalar.
 
 A suspend policy is explicit: freeze the weather clock, analytically catch up
-rate equations, or bounded-substep recurrent state. Clamping `deltaTime` while
-advancing wall time silently loses deposition and is not deterministic.
+rate equations, or bounded-substep recurrent state. Clamping the duration
+derived from `PhysicsGraphStage.executionInterval: PhysicsTimeInterval` while
+advancing its clock mapping silently loses deposition and is not deterministic.
 
 Visible signature: rain streak length tracks fall speed, wind drift aligns with
 wetness/ripple motion, ripples form expanding rings rather than unrelated
@@ -81,6 +85,232 @@ noise, snow does not stick to vertical faces, and wet asphalt roughness changes
 before heavy-rain ripple normals. Wrong output: slow beads for heavy rain,
 particle/wetness drift, vertical-face snow, roughness tied only to ripple masks,
 or splash residue on hidden/downward faces.
+
+## Shared Environment, Exchange, And Receiver Contract
+
+Use the router's canonical
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+whenever precipitation crosses a subsystem boundary. Its
+`EnvironmentForcingSnapshot`, `SurfaceExchange`, `InteractionRecord`, and
+`PhysicsPresentationCandidate` -> `CameraViewPublication` ->
+`ViewPreparationPublication` -> `PhysicsPresentationSnapshot` chain are
+authoritative. The records below are required projections of those types, not
+weather-local replacements.
+Every provider/resource projection retains the canonical
+`PhysicsSignalDescriptor` envelope (`signalId`, `providerId`, `schemaId`,
+context/owner/consumers, channels, physics frame/origin/transform revision,
+optional chart, clock ID/sample phase, represented footprint/filter, validity,
+per-channel error, residency/cadence/latency, state version, resource
+generation, and missing-channel policy). Domain fields below only narrow its
+channels; they do not rename that envelope.
+
+### Immutable forcing input
+
+Latch one `EnvironmentForcingSnapshot` at its exact
+`sampleInstant: PhysicsInstant` for one graph
+`coordinationInterval: PhysicsTimeInterval`. Require:
+
+```text
+context and forcing revision; origin epoch and coordinate frame
+`sampleInstant: PhysicsInstant`, descriptor `validity` whose temporal domain is
+  a `PhysicsTimeInterval`, producer cadence, and interpolation policy
+air-velocity provider u_air(x,t) in m s^-1, including altitude/support domain,
+  requested/actual oriented physical footprint, spatial/temporal filter or
+  band, and per-channel error
+temperature in K and canonical specific humidity in kg kg^-1; convert external
+  relative humidity or mixing ratio in a named thermodynamic adapter
+optional pressure and air density in Pa and kg m^-3, or a named equation-of-state
+  adapter with propagated per-channel error, when drag/phase models require them
+precipitation liquid/ice phase fractions and canonical oriented mass-area flux
+  with physical support/Jacobian
+source/arrival support, fall-delay/transport model, uncertainty and per-channel error
+missing/stale-data and quality-tier policy
+```
+
+Do not reinterpret the air velocity as water material current, water-surface
+point velocity, vegetation displacement, or cloud-relative topology motion.
+If mean, gust, and turbulence channels coexist, the provider declares whether
+each band is disjoint or already included in `airVelocityMps`; never add
+overlapping bands twice.
+Convert scene/world units only at the `PhysicsContext` boundary. Interpolate a
+provider only within its validity/error contract; otherwise hold, extrapolate,
+degrade, or block according to the declared policy and expose that decision.
+
+Cloud coupling has exactly two modes:
+
+- `appearance-only`: the physical emission channel is absent; precipitation
+  bias may coordinate the shot but cannot imply a mass, momentum, wetness, or
+  snow transfer;
+- `causal-precipitation`: the cloud producer supplies liquid/ice
+  phase-fraction-resolved `PrecipitationEmissionSnapshot` over its exact
+  `emissionInterval: PhysicsTimeInterval` as canonical oriented mass-area flux
+  in `kg m^-2 s^-1`, with support/Jacobian plus a fall-delay/transport kernel or
+  explicit airborne state. A cloud volume source is projected to that area
+  measure before publication and retains its provenance/error. The snapshot is
+  a completed immutable producer output, never a mutation of the forcing
+  snapshot already latched for the coordination interval. Rain consumes it on
+  a declared direct acyclic scheduler edge whose producer precedes rain, or
+  from the next environment-forcing revision, maps it to receiver support, and
+  reports initial/final
+  airborne inventory, delivered, typed transfer to the atmosphere-vapor owner,
+  rejected, and overflow mass. The inventory balance closes within the
+  declared numerical error.
+
+### Surface exchange and impact records
+
+Use the canonical `SurfaceExchange` only as the coupling envelope. Give it an
+exact `applicationInterval: PhysicsTimeInterval`, point its `sourceDescriptors`
+at the forcing/emission versions, and carry precipitation in canonical
+`InteractionRecord.payload` tags; do not add weather-local fields to
+`SurfaceExchange`.
+
+- A rate representation uses `massFlux` in `kg m^-2 s^-1` plus
+  `momentumFlux`/`surfaceTraction` in `Pa`, with the same oriented normalized
+  area footprint and `applicationInterval: PhysicsTimeInterval`.
+- An interval-integral representation uses canonical `massTransfer` in `kg`
+  plus distributed `momentumTransfer` in `N s` (and `N m s` about its named
+  point), over the same interval and conservation group. A discrete local
+  impact uses `pointImpulse` instead of pretending to be an area average.
+- Liquid/ice mass fractions are nonnegative and sum to one within their
+  residual. Support measure/Jacobian, source/target IDs, physics frame/origin/
+  transform revisions, target state-equation terms, exact-once keys, and
+  reaction ownership come from the canonical records.
+
+Mass is nonnegative and moves from `sourceEntityId` into `targetOwner` under
+`positive-source-to-receiver`. Momentum/impulse vectors are the physical
+momentum delivered to the receiver in `physicsFrameId`; components may have
+either sign. A reverse transfer swaps participants and publishes the actual
+delivered vector. An equal-and-opposite reaction is a separate record in the
+same conservation group with opposite impulse; never encode reverse mass with
+a negative scalar. Select rate or interval-integral as the authoritative
+representation. If both are carried for audit, mark one derived and prove its
+support/time integral equals the authoritative record within the residual.
+When a receiver subcycles, its quadrature weights over the record interval sum
+to one application of the parent integral. An `interval-integral` is never
+applied once per subcycle; a `flux` is integrated over each disjoint subinterval.
+
+A distributed footprint kernel `W` is nonnegative and normalized against its
+declared receiver-area measure: `integral_A W dA = 1`. If clipping at a domain
+boundary changes that integral, record rejected transfer or explicitly
+renormalize under the receiver policy; never change support measure silently.
+
+Publish energy/enthalpy flux only when a thermal owner consumes it and its
+reference state is declared. For a water receiver with density `rho_w`, the
+depth source is **Derived** as `S_h = massFlux / rho_w` in `m s^-1`; the
+horizontal depth-integrated momentum source is **Derived** as
+`S_hu = momentumFluxHorizontal / rho_w` in `m^2 s^-2`. Vertical impact
+momentum is not silently inserted into horizontal shallow-water momentum: the
+water owner maps it to splash, turbulence, pressure, or a rejected quantity.
+
+Use `InteractionRecord` for sparse physical impacts/splashes, branch/leaf hits, or
+contact-like impulses. It records integrated impulse in `N s`, canonical SI
+physics-frame contact/footprint data, exact
+`applicationInterval: PhysicsTimeInterval`, stable IDs, deterministic order,
+reaction owner, conservation-group ID, collision-free `exactOnceKey`, and
+`applicationLedgerKey`. Sequence ranges and partitions live in the batch
+ledger, not ad hoc record fields. Capacity outcomes live
+on the canonical immutable `InteractionBatchLedger`. Its lost/deferred
+commodity map contains only represented channels (for example mass, impulse,
+torque, or energy) with exact SI units and per-channel error; unrepresented
+loss quantities block the conservation claim or require a versioned ledger
+schema that represents them. `absentChannels` belongs to provider sample
+records, never to `InteractionBatchLedger`, and no missing commodity is filled
+with zero.
+Physical impact records partition the distributed parent exchange, reference
+its ID, and carry `massTransfer`/`momentumTransfer` or `pointImpulse` weights
+that close to the parent over the same support/interval. A purely visual splash
+belongs to the presentation-event stream, references the parent exchange, and
+is not a second physical `InteractionRecord`. Multiple physical batches use
+disjoint partition IDs and never each claim the complete parent integral.
+
+Rendered particles are estimators. For accepted samples `i` with weights
+`w_i`, enforce
+
+```text
+sum_i w_i = integral_A integral_dt massFlux dA dt
+sum_i w_i v_arrival_i = integral_A integral_dt momentumFlux dA dt
+```
+
+Changing streak/flake count, camera cell population, update cadence, or LOD
+must leave these integrals unchanged. Count deterministic overflow separately;
+never renormalize dropped events invisibly when that would concentrate local
+flux.
+
+### Single receiver-state owner
+
+Assign one owner for each receiver's liquid storage, snow storage,
+temperature-dependent phase, age, and derived display coverage. A non-water
+surface normally conserves liquid/snow mass per area in `kg m^-2`; a water
+solver may instead conserve depth/volume plus declared density. Choose one
+authoritative representation and derive the other, never integrate both.
+Derive
+snow water-equivalent depth from mass per area and reference liquid-water
+density; derive geometric height from snow bulk density/compaction; derive
+display coverage from the chosen support model. Water equivalent, height, and
+coverage are not additional conserved truths. The owner consumes all
+relevant exchanges:
+
+```text
+# non-water receiver: m_liquid and m_snow are kg m^-2
+d m_liquid / dt = rain + runupOrInundation + melt
+                  - drainage - infiltration - evaporation - exportedRunoff
+d m_snow / dt   = snowfall + refreeze
+                  - melt - sublimation - transport - inundationWash
+```
+
+Every term has one producer, units, support, cadence, and sign. The state owner
+may be this weather system, a water/terrain domain, or an application solver,
+but never more than one for the same quantity and receiver. Materials consume
+an immutable receiver-state snapshot to derive albedo, roughness, normals,
+residue, and displacement. They do not integrate state in a fragment shader.
+
+The scheduler edge is fixed:
+
+```text
+latch EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant for
+     PhysicsGraph.coordinationInterval: PhysicsTimeInterval
+  -> execute each
+     PhysicsGraphStage.executionInterval: PhysicsTimeInterval
+  -> advance analytic/recurrent airborne precipitation
+  -> resolve/bin impacts
+  -> publish SurfaceExchange.applicationInterval: PhysicsTimeInterval and
+     contained InteractionRecord.applicationInterval: PhysicsTimeInterval
+  -> water/contact owners consume forces and sources
+  -> receiver owner integrates wetness/snow/coverage
+  -> commit domain state
+  -> publish view-independent PhysicsPresentationCandidate with
+     requestedPresentationInstant: PhysicsInstant, presentedStatePairs,
+     resourceLeases, and eventSequenceRanges only
+  -> camera owner publishes per-target/view CameraViewPublication with
+     previousRenderSampleInstant: PhysicsInstant and
+     currentRenderSampleInstant: PhysicsInstant plus
+     globalToRenderPrevious/globalToRenderCurrent, view/projection matrices,
+     jitter, viewport, and depth state
+  -> visibility/acceleration/shadow/cache/reactive/reset owners publish
+     ViewPreparationPublication with visibilityPublicationRefs,
+     accelerationPublicationRefs, shadowViewPublicationRefs,
+     cachePublicationRefs, reactiveEpochs, reactivePublications,
+     resetDependencies, full resourceLeases for newly created view resources,
+     and resourceLeaseRefs
+  -> seal PhysicsPresentationSnapshot from presentedStatePairRefs and
+     resourceLeaseRefs plus the exact candidateId, cameraPublicationId, and
+     viewPreparationId
+  -> materials and render consume only the sealed snapshot
+```
+
+Each `PresentedStatePair.previousPresented.provenance` and
+`currentPresented.provenance` is its own `PresentationSampleProvenance`,
+including requested and mapped `PhysicsInstant` values, clock-map
+revision/error, and lower/upper brackets. Each arm also carries its own
+`presentedInstant: PhysicsInstant`. The candidate contains no camera, render
+origin, global-to-render transform, visibility, shadow, cache, or reset state.
+The sealed snapshot references candidate pairs and leases only through
+`presentedStatePairRefs` and `resourceLeaseRefs`; it never copies
+`PresentedStatePair` records, provenance, or transforms.
+
+Subcycling may change internal solver cadence but not this dependency order.
+Store unresolved exchange until the consumer cadence or integrate it exactly;
+do not sample-and-drop between rates.
 
 ## r185 Import Table
 
@@ -111,9 +341,10 @@ or splash residue on hidden/downward faces.
 
 ## Checkpointed Build Order
 
-Checkpoint 1: weather debug. You must see shared time, `deltaTime`, wind,
-forcing, response-state ages, and quality tier; if you see drift, the likely
-mistake is separate clocks.
+Checkpoint 1: weather debug. You must see the forcing `sampleInstant`, derived
+stage-interval duration, wind, forcing, response-state ages, and quality tier;
+if you see drift, the likely mistake is separate clocks or an unregistered
+clock mapping.
 
 Checkpoint 2: storage buffer debug. You must see packed position/life,
 velocity/life, and seed/flags records; if you see CPU matrix uploads, the
@@ -176,40 +407,56 @@ Use the generated normal maps as the cheap rain tier and as diagnostics:
 - `assets/generated-variants/ripple-normal-b.png`
 - `assets/generated-variants/ripple-normal-c.png`
 
-## Shared Weather Envelope
+## Projected Weather Uniforms
 
-One weather state feeds particles and surfaces. It exposes shared time, wind,
-temperature, precipitation forcing, and quality nodes. Wetness, puddle fill,
-and snow coverage are response states: integrate deposition against
-drainage/evaporation/melt rather than assigning every surface to one progress
-scalar.
+One immutable projection of the latched environment snapshot feeds visual
+particles and surfaces. It exposes canonical-derived time plus projected wind,
+temperature, visual event forcing, and quality nodes. Wetness, puddle fill, and
+snow coverage remain receiver-owned response states; integrate deposition
+against drainage/evaporation/melt rather than assigning every surface to one
+progress scalar.
 
 ```js
 const weather = {
-  time: uniform(0),
-  deltaTime: uniform(0),
+  sampleInstantSeconds: uniform(0),
+  executionIntervalSeconds: uniform(0),
   wind: uniform(new THREE.Vector3(1.2, 0, 0.5)),
-  temperatureC: uniform(5),
+  temperatureK: uniform(278.15), // [D] 5 degC + 273.15
   forcing: uniform(0),
-  precipitationRate: uniform(1),
+  visualParticleDensityScale: uniform(1),
   debugMode: uniform(0),
 };
 
-function updateWeather(delta, targetForcing) {
-  weather.time.value += delta;
-  weather.deltaTime.value = delta;
+function projectWeather(
+  sampleInstantSecondsDerived,
+  executionIntervalSecondsDerived,
+  targetVisualForcing,
+) {
+  weather.sampleInstantSeconds.value = sampleInstantSecondsDerived;
+  weather.executionIntervalSeconds.value = executionIntervalSecondsDerived;
   weather.forcing.value = THREE.MathUtils.damp(
     weather.forcing.value,
-    targetForcing,
+    targetVisualForcing,
     0.9,
-    delta,
+    executionIntervalSecondsDerived,
   );
 }
 ```
 
-The wind vector is horizontal in world units per second. `forcing` coordinates
-the event, while response fields integrate their own physically named rates.
-They share causes and time ownership without becoming identical curves.
+This object is a material/node projection of the latched
+`EnvironmentForcingSnapshot`, not a second owner. Convert its wind from the
+canonical air-velocity provider into render units once; preserve the source
+revision and sample instant. `sampleInstantSecondsDerived` comes from the
+latched `EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant`;
+`executionIntervalSecondsDerived` is derived from the owning
+`PhysicsGraphStage.executionInterval: PhysicsTimeInterval`. Authoritative
+deposition consumes `precipitationMassFluxKgPerM2S`, and
+`visualParticleDensityScale` cannot author an exchange. Keep temperature in
+kelvin; a Celsius UI projection
+uses the explicit **Derived** conversion `temperatureC = temperatureK - 273.15`
+and never changes the stored forcing quantity. `forcing` coordinates the event, while response
+fields integrate their own physically named rates. They share causes and time
+ownership without becoming identical curves.
 
 ## Recurrent Compute Precipitation
 
@@ -220,7 +467,7 @@ that writes storage data, then renders from that data via attribute nodes.
 ```js
 const positionBuffer = instancedArray(maxInstances, "vec4");
 const velocityLifeBuffer = instancedArray(maxInstances, "vec4");
-const deltaTime = uniform(0);
+const executionIntervalSeconds = uniform(0);
 
 const updatePrecipitation = Fn(() => {
   const i = instanceIndex;
@@ -228,8 +475,8 @@ const updatePrecipitation = Fn(() => {
   const velocityLife = velocityLifeBuffer.element(i);
   positionLife.assign(
     vec4(
-      positionLife.xyz.add(velocityLife.xyz.mul(deltaTime)),
-      positionLife.w.add(deltaTime)
+      positionLife.xyz.add(velocityLife.xyz.mul(executionIntervalSeconds)),
+      positionLife.w.add(executionIntervalSeconds)
     )
   );
 })().compute(maxInstances, [64]);
@@ -237,8 +484,10 @@ const updatePrecipitation = Fn(() => {
 renderer.compute(updatePrecipitation);
 ```
 
-This is only the r185 writable-node shape; constant velocity should normally be
-evaluated analytically. A real recurrent solver adds its named force/integrator,
+This is only the r185 writable-node shape; set
+`executionIntervalSeconds` from the derived duration of the owning
+`PhysicsGraphStage.executionInterval: PhysicsTimeInterval`. Constant velocity
+should normally be evaluated analytically. A real recurrent solver adds its named force/integrator,
 extent guards, lifecycle transition, and convergence gates. Use `storage()` over `StorageBufferAttribute` or
 `StorageInstancedBufferAttribute` when you need explicit buffer ownership.
 In r185 `computeAsync()` only awaits renderer initialization before enqueueing
@@ -262,9 +511,14 @@ Keep static random values immutable. Only dynamic fields update in compute.
 
 ## Flux And Tier Conservation
 
-Declare precipitation forcing as a world-space exposed-area flux `F` with
-units such as water-equivalent length/time or mass/(area*time). Rendered
-particle density is a sampling choice. For `N` deterministic accepted impact
+Publish precipitation forcing as canonical `mass-area-flux` in
+`kg m^-2 s^-1`. An ingestion adapter first projects an external volume source
+through its physical support/chart Jacobian, or converts an external
+water-equivalent-depth rate in `m s^-1`, before snapshot publication through the
+declared reference liquid-water density and provenance:
+`massFlux = rho_reference * depthRate`. Water-equivalent rate is not a third
+accepted forcing channel, and volume source is not relabelled area flux without
+the projection. Rendered particle density is a sampling choice. For `N` deterministic accepted impact
 samples representing receiver area `A` over interval `dt`, sample weights sum
 to `F*A*dt`; changing visual particle count, simulation cadence, or LOD cannot
 change total deposition. Use stratified world-cell samples, deterministic
@@ -305,12 +559,15 @@ thickness to local units when needed.
 
 ## Wet Puddles And Ripple Normals
 
-Wet asphalt is a material transition driven by rain progress. Split it into
-separate bands:
+Wet asphalt is a material projection of the route-selected receiver owner's
+immutable liquid-storage/coverage state. Rain progress may coordinate only
+non-authoritative art direction. Split the material projection into separate
+bands:
 
 - Early wetness: darken albedo slightly and move roughness toward a wet range.
-- Puddle mask: form low areas from a world- or decal-space TSL field, not an
-  undocumented hardcoded world-origin clip.
+- Puddle eligibility/capacity: form low areas from a world- or decal-space TSL
+  field, not an undocumented hardcoded world-origin clip; actual fill comes
+  from receiver-owned liquid storage.
 - Heavy rain: add ripple normals only after wetness is established.
 
 Use `MeshPhysicalNodeMaterial` when clearcoat, IOR, or extra specular controls
@@ -417,6 +674,14 @@ Detailed constraints:
   budget;
 - field octave count is selected by projected-frequency/error analysis; do not
   evaluate bands above pixel Nyquist or below visible contrast.
+- on constrained/mobile targets, keep the same exchange integrals while using
+  analytic visual particles, conservative column/fall-delay transport,
+  bounded event pools, dirty receiver tiles, and lower receiver cadence with
+  exact interval accumulation; record clipped support and overflow error.
+- account for exchange batches, interaction stream/ledger capacity, receiver
+  state, `PresentedStatePair` slots, identity/partition maps, and in-flight
+  resource generations. Keep authoritative transfer GPU-resident or compactly
+  host-authored; steady-frame rendering performs no synchronous readback.
 
 Record `{visibleInstances, coveredPixels, layersPerPixel, solverKind,
 storageBytes, eventCount, dirtyTiles, fieldExtent, renderExtent, sampleCount}`.
@@ -435,10 +700,14 @@ Expose at least:
 - `particles`: precipitation density, wrapping, and active instance count;
 - `events`: splash or impact buffer occupancy;
 - `progress`: shared weather envelope.
+- `exchange`: rate/integral discriminant, support measure, parent/partition IDs,
+  integrated mass/momentum, residual, reaction owner, and overflow;
+- `receiver`: selected state owner plus deposition/run-up/melt/drainage/
+  infiltration/evaporation terms and published state revision.
 
 Diagnostics should report backend tier, instance count, dispatch count, storage
 size, generated variant selection, coverage percentage, and whether particles
-and surfaces read the same weather envelope.
+and surfaces read the same `EnvironmentForcingSnapshot` revision.
 
 ## Replaced Techniques
 
@@ -483,3 +752,11 @@ Known failure modes:
 - the post stage double-applies output conversion;
 - generated ripple-normal assets are used without preserving their normal-map
   interpretation.
+- sparse impact records and their parent `SurfaceExchange` both deposit the
+  same mass/momentum, or multiple partitions each claim the whole exchange;
+- particle count, receiver tessellation, or update cadence changes integrated
+  deposition under a fixed forcing trace;
+- water, weather, and a material each integrate private wetness/snow state, or
+  a material consumes a different receiver revision than the visible residue;
+- a Celsius projection is sampled as kelvin or an air-velocity field is used as
+  water current/vegetation displacement.

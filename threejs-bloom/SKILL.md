@@ -37,6 +37,63 @@ and transmitted radiance unless those signals are authored into the
 contribution target. Full-scene bloom is usually both more physical and cheaper
 on bandwidth-limited devices.
 
+## Radiometric And Reactive Contract
+
+When the route declares a physics-to-render boundary, consume its immutable
+`PhysicsPresentationCandidate` -> `CameraViewPublication` ->
+`ViewPreparationPublication` ->
+`PhysicsPresentationSnapshot` chain and bind `LightingTransportSnapshot`
+through a provider-wide `PresentedStatePair` (`entityId: typed-absence`) in the
+Candidate whose binding ID is referenced by the Snapshot, from the
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Validate the exact central presentation and lighting channel descriptors; do
+not redeclare a bloom-local lighting record. Bloom input is scene-linear
+radiance in its declared render-local basis. Match the pair's context/provider/
+signal IDs, descriptor/state/resource generations, `PresentationStateHandle`,
+each state's requested presentation instant, mapped source instant, clock-map
+revision/error, and the lighting bundle `sampleInstant`; validate channel
+`actualPhysicsTime`, filter/age, maximum staleness, validity, and error.
+Irradiance transport values
+must pass through the lighting/BRDF contract before bloom. Selective emission
+cannot use an unrelated arbitrary intensity scale.
+
+Basis, quantity, SI unit, bundle `sampleInstant`, channel `actualPhysicsTime`,
+state/resource version, validity, and error are checked per canonical channel.
+Canonical lighting-provider channels
+remain SI-valued. A normalized RGB bloom input is a separately named
+render-local signal produced by a versioned SI-to-render conversion with
+reference scale, provenance, and error; it is not a normalized canonical
+lighting channel. One route-wide label
+cannot make `incidentRadiance`, `surfaceIrradiance`,
+`directSolarIrradiance`, `skyIrradiance`, `transmittance`, or material emission
+dimensionally compatible; applied attenuation uses `attenuationFactorIds`.
+A nonphysical route leaves the router physics fields `not used` and declares
+only its render-local color contract.
+
+Declare threshold domain explicitly:
+
+- scene-referred threshold: fixed in the bloom input's radiance units;
+- exposed-linear threshold: convert each frame by the adapted exposure;
+- display-referred threshold: invert the declared output/tone-map path or reject
+  the policy when no stable inverse exists.
+
+Do not tune one numeric threshold across incompatible lighting bases. A change
+to basis/calibration, working primaries, quantity convention, or exposure-key
+policy emits the relevant `ViewPreparationPublication.reactivePublications`
+entry and recomputes/reseeds
+threshold state before bloom. Shadow commits and discontinuous foam,
+emissive, or optical changes produce a versioned radiance-reactive mask for any
+upstream temporal history. `BloomNode` itself has no history to reset, but it
+must consume the source after required rejection/reseed and publish the same
+epoch in diagnostics.
+`ViewPreparationPublication.resetDependencies` is an immutable plan; append the performed threshold
+conversion, upstream history action, graph rebuild, and submission to
+`FrameExecutionRecord`. Device loss appends a `FrameExecutionRecord` with
+`overallStatus: device-lost`, affected target execution statuses
+`device-lost`, cancelled dependent actions, and lost-generation entries in
+`leaseDispositionById`; it invalidates bloom resources and timing evidence without
+mutating the sealed snapshot. Rebuild under the new backend/resource generation.
+
 ## r185 source facts
 
 Verified against installed `three@0.185.1` **[Measured]**:

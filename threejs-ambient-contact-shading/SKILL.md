@@ -111,6 +111,60 @@ Read [references/gtao-bent-normal-pipeline.md](references/gtao-bent-normal-pipel
 for the exact graph, tap model, memory equations, temporal contract, and bent-
 normal validation.
 
+## Physics Scale And Presentation Contract
+
+When the route declares physical metre-scale contact, resolve AO distances
+through `PhysicsContext` and the current presentation transform in the
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Let `sRender` be `CameraViewPublication.globalToRenderCurrent.renderUnitsPerMeter`:
+
+```text
+radiusRender    = radiusMeters    * sRender                  [Derived]
+thicknessRender = thicknessMeters * sRender                  [Derived]
+biasRender      = biasMeters      * sRender                  [Derived]
+```
+
+For the ordinary authored-world mapping, gate
+`sRender = 1 / PhysicsContext.metersPerWorldUnit`; a deliberate visualization
+rescale declares a new `RenderSimilarityTransform.transformRevision` and uses
+its exact dimensioned transform. `biasRender` applies only to a custom AO bias that is dimensionally a world
+distance; normalized-depth or angular biases retain their own declared units.
+If the route intentionally uses perceptual scene units, label radius,
+thickness, and bias as scene-unit-only and do not compare them across scaled
+assets, physics contexts, or rebases as metres. A static/stylistic route may use
+this mode without instantiating the physics ABI.
+
+Latch the immutable central `PhysicsPresentationSnapshot` and resolve its exact
+Candidate, `CameraViewPublication`, and `ViewPreparationPublication`; do not
+define an AO-local subset. AO, depth, velocity, camera, and downstream history
+consume candidate pair refs/signal descriptors, camera transforms/matrices, and
+the preparation reactive/reset plan from the same chain. Temporal velocity uses adjacent
+presented poses, never fixed-step endpoints. A compensated origin rebase keeps
+AO radius, depth, and motion invariant only when previous/current uniform scales
+are equal. A scale change converts AO parameters and resets/reseeds history; it
+is not an origin rebase.
+
+The Candidate supplies pose/deformation pairs, the camera publication supplies
+complete render transforms/matrices, and the Snapshot references both plus the
+preparation publication. Depth, normal, and velocity are target/view render-pass
+resources produced after sealing and carry their image-pipeline resource
+versions; never misclassify those attachments as physics provider signals.
+
+Reset/reject AO history for changed geometry/deformation/coverage, camera or
+projection discontinuity, uncompensated rebase, AO scale/parameter change, or
+quality/resolution migration. A shadow or emissive-only radiance change does
+not change scalar ambient visibility; preserve AO history, but propagate its
+radiance-reactive mask to a downstream color history only when that temporal
+implementation supports it. Stock r185 `TRAANode` does not; use evidenced
+rebuild/bypass/reseed or a conservative full reset. When no local mask can
+bound a geometry discontinuity, reset the affected history conservatively.
+`ViewPreparationPublication.resetDependencies` is immutable; append executed actions to
+`FrameExecutionRecord`. Device loss appends a `FrameExecutionRecord` with
+`overallStatus: device-lost`, affected target execution statuses
+`device-lost`, cancelled dependent actions, and lost-generation entries in
+`leaseDispositionById`; it invalidates AO/history resources and timing proof without
+mutating the sealed snapshot. Rebuild under the new backend/resource generation.
+
 ## Quality gates
 
 | Tier | Authored start | Mandatory gate |

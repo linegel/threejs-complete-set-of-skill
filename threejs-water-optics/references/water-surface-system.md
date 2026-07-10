@@ -400,7 +400,10 @@ An analytic-only CPU query has one of three valid residual contracts:
   omitted-grid height interval is `+/- H_grid` **[D,G]**;
 - a reduced CPU grid mirrors the same sources and integrator; its discrepancy
   is established by resolution/time-step convergence and fixed probes **[M]**;
-- no bound is claimed, and consumers receive `gridResidualBound: null`.
+- no bound is claimed; `gridResidualBound` is canonical typed absence with an
+  `unavailable` error classification, and every consumer whose tolerance
+  requires that bound is blocked. Never encode this case as `null`, zero, or a
+  sentinel magnitude.
 
 An asynchronous GPU reduction can measure an earlier frame's maximum, but that
 is a lagged measurement **[M]**, not a bound on future state.

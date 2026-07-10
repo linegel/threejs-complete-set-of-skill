@@ -16,6 +16,14 @@ source and context. An authored count/rate is a trial point, a derived value
 cites its equation, a gate belongs to the product contract, and a measurement
 names runtime, target, workload, and quantile. None is universal by default.
 
+Read the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+before coupling motion to terrain, water, weather, contacts, or another solver.
+It defines the SI physics frame, gravity and unit conversion, clocks/ticks,
+multi-rate scheduler, `WaterSurfaceProvider`, `InteractionRecord`, residency,
+state/error versions, and `PhysicsPresentationSnapshot`. This skill owns motion
+algorithms behind that boundary; it does not create local substitutes.
+
 ## Build order
 
 Choose the time model before the throughput model:
@@ -75,15 +83,64 @@ Throughput decision table:
    keep `outputColorTransform` as the single output owner.
 
 Environment-coupled motion is an explicit algorithm boundary. Boats, buoys,
-floating debris, and swimmers consume a versioned water-state provider whose
-surface-point velocity and material current are distinct. Declare one-way
-coupling (water drives the actor but receives no load) or two-way coupling
-(equal-and-opposite actor loads enter the water solver in an ordered fixed-step
-graph). A visual wake does not make a one-way model two-way. Never obtain the
+floating debris, and swimmers consume the canonical batched,
+channel-requested `WaterSurfaceProvider`. Requests use physics-frame metres and
+declare footprint/filter, frame, and one canonical `PhysicsInstant`. Samples use the exact
+shared names `freeSurfacePoint`, `freeSurfaceNormal`,
+`surfacePointVelocityMps`, `materialCurrentVelocityMps`,
+`waterColumnDepthMeters`, optional `densityKgPerM3`,
+and the returned shared `PhysicsSignalDescriptor` and bundle `sampleInstant`.
+Each channel is the complete shared `SampledChannel` and retains
+`actualPhysicsTime` resolving to a `PhysicsInstant`; the requested and actual
+instants may differ only within the
+declared latency/staleness gates. Missing channels
+follow `missingChannelPolicy` and are never synthesized as zero; geometric
+surface velocity and material current remain distinct. Consumers do not
+redeclare or subset the descriptor/time envelope.
+
+Declare one-way coupling (water drives the actor but receives no load) or
+two-way coupling. One-way mode identifies the authoritative source and records
+a `[G]` upper bound on omitted actor-to-water feedback or explicitly narrows the
+claim/regime. The latter uses the shared scheduler order: both owners
+predict, sample one coupling-time water bracket, emit source
+`InteractionRecord` entries, conservatively scatter loads by conservation
+group, advance water/subcycles, reduce reaction records, correct both owners,
+check conservation/stability, and atomically commit. Declare explicit,
+semi-implicit, scheduler-bounded iterated, or
+monolithic coupling. Gather/scatter are discrete adjoints preserving zeroth/
+first moments and gating force, torque, interface work, and added-mass
+stability. Conservation covers represented mass, linear/angular momentum,
+energy/work, and species; volume is only a fixed-density incompressible
+constraint. A visual wake does not make a one-way model two-way. Never obtain
 state through frame-critical GPU readback; use a shared analytic/CPU query,
 GPU-resident coupled state, or an explicitly latency-bounded service. Route
 metric six-degree-of-freedom hydrodynamics to a domain solver and consume its
-pose here.
+pose through the canonical `ExternalSolverAdapter`.
+
+Two-way source/reaction records form an all-or-none
+`InteractionReactionGroup`; many-to-many reduction is legal, and balance is
+tested after transport to its declared frame/reference point.
+
+Presentation is not another physics query. Motion contributes a per-binding/provider
+`PresentedStatePair` to the view-independent `PhysicsPresentationCandidate`,
+which contains no camera or render transform. `previousPresented` and
+`currentPresented` each carry independent `PresentationSampleProvenance`,
+`presentedInstant`, state handle, and global spatial binding; `motionBinding`
+references both handles and records identity mapping and validity. The camera
+owner publishes `CameraViewPublication`, preparation owners publish
+`ViewPreparationPublication`, and the sealed `PhysicsPresentationSnapshot`
+references candidate binding IDs and lease refs. `FrameExecutionRecord` records
+multi-target execution and lease disposition keyed by lease ID. Those poses
+need not be solver states `n` and `n+1`. Visible transforms, motion vectors,
+shadows, bounds, and temporal history resolve through that immutable chain.
+Physical instants, physics-frame transforms, floating-origin, and source epochs
+remain separate. An incompatible state, transform/source
+epoch, residency, or quality migration invalidates or explicitly migrates
+history through scoped `ReactivePublication` and `ScopedResetAction` records in
+`ViewPreparationPublication`, not extra pair or snapshot flags.
+Teleports, topology/deformation changes, emissive events, and disocclusion
+contribute scoped reactive epochs/regions for the coordinator's per-view
+publication and reset plan.
 
 Read [references/procedural-motion-and-docking-systems.md](references/procedural-motion-and-docking-systems.md)
 for the WebGPU/TSL launch, staging, docking, debris, spring, quaternion,
@@ -128,6 +185,18 @@ Quality tiers:
   workgroup size on the target. Add culling/compaction only when it removes more
   submission/vertex/fragment work than its dispatch and traffic cost; no
   steady-frame readback.
+- Provider requests and interaction streams use compact channel-masked SoA,
+  bounded queues, generation-bearing identities distinct from storage slots,
+  deterministic reductions, and canonical batch-level
+  `InteractionBatchLedger` records; avoid per-sample
+  JavaScript objects.
+- Presentation bindings reference immutable resource generations under a
+  frame-in-flight lease/reuse rule; no solver overwrites a pose generation
+  still used by a sealed snapshot.
+- Physical representation/quality `QualityTransition` is coordinator-admitted at a tick
+  boundary with state projection, conserved-value/error ledger, interaction-
+  queue boundary, atomic provider generation, history action, rollback, and
+  peak old/new residency. Visual crossfades never duplicate forces/reactions.
 - Memory: derive hot state as `activeCapacity * alignedDynamicStrideBytes` plus
   history/scan slots. Split immutable parameters from dynamic state and upload
   dirty ranges only.
@@ -170,9 +239,18 @@ Quality tiers:
 - Do not call wave phase velocity, group velocity, or the vertical rate of a
   height field a material current. Every water velocity channel names its
   frame and meaning.
-- One-way and two-way water coupling are different contracts. Two-way requires
-  an ordered load-scatter/water-step/body-correction schedule and a
-  conservation/error gate; a foam trail is not feedback.
+- One-way and two-way water coupling are different contracts. One-way requires
+  authoritative-source identity plus a gated omitted-feedback bound or narrowed
+  claim. Two-way requires
+  predict/sample/source-record/load-scatter/water-advance/reaction-reduce/
+  correct/check/atomic-commit order, conservation-group and error gates, and matching state
+  versions; a foam trail is not feedback.
+- Render transforms, velocities, bounds, shadows, and temporal consumers read
+  one sealed per-target/view `PhysicsPresentationSnapshot`, never a mixture of
+  the candidate with live pre-step or post-step resources.
+- Spawn, despawn, teleport, reparent, slot reuse, topology/LOD, and discontinuous
+  quality changes publish a motion/history validity reason; they never become
+  an extreme derived velocity.
 
 ## Replaced techniques
 
@@ -199,5 +277,7 @@ or effect pooling rather than object transform motion.
 Use `$threejs-water-optics` for bounded/coastal free-surface state and
 `$threejs-spectral-ocean` for open-ocean wave state. Those skills own the water
 query, solver, and coupling error; this skill owns actor pose integration from
-that contract. Full rigid-body hydrodynamics, collision, and control remain
-domain-physics ownership.
+the shared `WaterSurfaceProvider` contract. Full rigid-body hydrodynamics,
+collision, and control remain domain-physics ownership, while cross-domain
+ordering and exchange remain governed by the shared physics-domain and
+interaction contract.

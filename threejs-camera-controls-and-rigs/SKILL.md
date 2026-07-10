@@ -61,6 +61,95 @@ Orthographic framing changes frustum or `zoom`; dolly does not change occupancy.
 
 Input systems produce intents while inactive. They do not write the camera.
 
+## Physics Presentation Boundary
+
+When the view follows or frames simulated content, use the acyclic lifecycle
+defined by the
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Camera follow/framing consumes the immutable `PhysicsPresentationCandidate`
+created after simulation and any physics-origin transaction. That candidate is
+view-independent and contains no camera, render origin, view matrix, shadow
+epoch, or global-to-render mapping. The camera owner emits one immutable
+`CameraViewPublication` per target/view; visibility/shadow/cache owners consume
+both records and emit `ViewPreparationPublication`; only then does the assembler
+seal `PhysicsPresentationSnapshot`. Do not read a solver buffer,
+external-engine transform, or fixed-step endpoint directly from the camera
+loop.
+
+Validate the exact central Candidate, `CameraViewPublication`,
+`ViewPreparationPublication`, Snapshot, and every referenced
+`PhysicsSignalDescriptor`; do not redeclare a reduced camera-local schema. Each
+phase has one writer and emits a new immutable version. Camera, culling,
+shadows, velocity, post, picking, and diagnostics consume only their declared
+prior publication and never independently resample physics.
+
+The camera owner writes the exact `CameraViewPublication`: publication,
+candidate, target/view/camera and owner IDs; view scope; camera/projection
+versions; previous/current render-sample instants; complete previous/current
+`RenderSimilarityTransform`s; unjittered view/projection matrices; jitter;
+viewport; DPR/extent; depth convention; and projection validity/error. Origin
+epoch numbers alone cannot reconstruct a cross-rebase trajectory.
+
+The sealed Snapshot is deliberately small: it references candidate binding IDs,
+`cameraPublicationId`, `viewPreparationId`, lease refs, and event ranges. Render
+consumers resolve the matrices/transforms through `cameraPublicationId` and the
+reactive/reset plan through `viewPreparationId`; they do not copy mutable local
+subsets. A separate temporal owner supplies `jitterSampleAndConvention`. Motion
+vectors never use jittered projections.
+
+Each per-binding/provider `PresentedStatePair` contains independent
+`previousPresented` and `currentPresented` provenance, presented instants, state
+handles, and global bindings after that signal's declared clock mapping and
+interpolation/extrapolation policy. Solver brackets are provenance, not the two
+rendered poses. Downstream motion vectors project the presented pair. Using
+solver endpoints produces false velocity whenever render and simulation cadence
+differ.
+
+An external physics stream enters through one adapter that converts its units,
+axes, origin, IDs, timestamps, and discontinuity flags into the common context,
+buffers enough timestamped samples for the declared presentation policy, and
+publishes bounded error or invalidity when either requested presentation
+instant cannot be
+represented. It never writes the Three.js camera or object transforms beside
+the snapshot writer.
+
+Spawn, despawn, teleport, reparent, incompatible LOD, stream discontinuity, or
+identity change invalidates follow smoothing and temporal motion according to
+the `ViewPreparationPublication.resetDependencies`; it is not interpolated as
+ordinary locomotion. The reset record is a plan. Actual completion/failure belongs in the append-only
+`FrameExecutionRecord`, not a mutation of the sealed snapshot.
+
+The camera owner returns `CameraViewPublication`; preparation owners return
+`ViewPreparationPublication`; neither mutates an earlier record. Same-frame
+results are included only before sealing. An explicitly declared alternate
+schedule may defer feedback by one frame, in which case the sealed snapshot and
+render continue to name the prior committed resource/version.
+
+If required camera/projection preparation or sealing fails, append a
+`FrameExecutionRecord` with `overallStatus: aborted` (or `partial-failure` when
+another target survives), exclude the failed target from `snapshotIds`, store
+typed absence in its target execution's `snapshotId`, cancel or defer actions,
+and retire only failed-target-exclusive `ViewPreparationPublication.resourceLeases` through
+`leaseDispositionById`. Candidate/shared leases remain retained until every
+surviving snapshot consumer joins. Device loss
+appends `overallStatus: device-lost` and affected target statuses `device-lost`, advances
+`deviceLossGeneration`, cancels dependent actions, and invalidates resources
+and leases from the lost generation without mutating Candidate/Snapshot records
+or inventing a completion token. Rebuild under the new backend/resource
+generation.
+
+For a rebase, transform both presented states through their respective origin
+epochs. A pure coordinate change representing the same global trajectory must
+leave camera-relative pose, obstruction result, and projected motion invariant.
+If either epoch transform is missing or the bound is exceeded, increment the
+appropriate reactive epoch and execute the declared reset dependencies before
+rendering; do not encode the origin jump as physical motion.
+
+Stock r185 `TRAANode` cannot preserve its previous-depth history across any
+render-origin translation or tangent-basis rebase, even when custom velocity is
+rebase-correct. Rebuild/reseed it. Only a custom/patched temporal node using
+both complete global-to-render transforms may preserve history after proof.
+
 ## r185 WebGPU/TSL Contract
 
 ```js

@@ -27,6 +27,28 @@ not performance or physics claims.
 Use `$threejs-choose-skills` preflight for scenes that also need atmosphere,
 clouds, oceans, shadows, post, or validation ownership.
 
+When a rendered surface also participates in contact, flow, heat, wetting, or
+another physical interaction, use the route's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Bind its semantic surface explicitly to a `PhysicsMaterialId` in the shared
+`PhysicsMaterialRegistry`. Never infer friction, restitution, density,
+compliance, permeability, adhesion, or thermal/hydraulic response from base
+color, roughness, metalness, clearcoat, opacity, a texture name, or visual
+wetness.
+
+Every dynamic physics/receiver/lighting cause is sampled through its unchanged
+`PhysicsSignalDescriptor` at an exact `PhysicsInstant` or
+`PhysicsTimeInterval`, including context, frame/origin/transform revision,
+requested/actual footprint and filter, validity/error, state/resource
+generation, residency, and cadence/latency. A rendered dynamic cause resolves
+through a view-independent candidate pair: its previous/current arms own
+independent provenance and state handles, `CameraViewPublication` owns render
+mapping, `ViewPreparationPublication` owns per-view caches/shadows/resets, and
+the sealed snapshot references candidate binding IDs and leases. Convert world
+coordinates only through the active `PhysicsContext` boundary and the camera
+publication's derived render transform; material uniforms do not define another
+scale, clock, provider, transform, or state owner.
+
 ## Select Architecture From Invocation Topology
 
 Algorithm class dominates material throughput. Start from one shared TSL cause
@@ -77,7 +99,8 @@ Canonical walnut, antique-gold, ebony, and lava TSL example:
 [examples/tsl-procedural-pbr/](examples/tsl-procedural-pbr/).
 
 The example now enforces dielectric/conductor metalness endpoints, meter-valued
-height through `sceneUnitsPerMeter`, footprint-filtered structural bands, and
+height through the route's `metersPerWorldUnit`, footprint-filtered structural
+bands, and
 removed material slope-energy transfer so r185 geometry roughness is not
 counted twice. Its spectral-support/variance multipliers and identity ranges
 remain **Authored** trial values. The Node construction validator is structural
@@ -114,8 +137,11 @@ reef/rock/sand/organic-cover eligibility and authored exclusion masks
 
 `water-column depth` is **Derived** from compatible elevations; it is not a
 second painted shallow-water mask. Water owns dynamic free-surface, foam, and
-optical transport. This skill owns the dry/wet terrain and submerged substrate
-responses that those optics reveal. A white shoreline stripe painted into
+optical transport. The route-selected receiver owner alone integrates liquid/
+snow storage, precipitation, inundation/wash, infiltration, drainage,
+evaporation, and melt. This skill owns only the visual dry/wet terrain and
+submerged-substrate response projected from those immutable signals. A white
+shoreline stripe painted into
 terrain albedo is not foam, and cyan seabed emission is not shallow-water
 transport.
 
@@ -151,6 +177,32 @@ caustics, and foam.
 The detailed response, filtering, and asset-channel contract is in
 [references/procedural-pbr-system.md](references/procedural-pbr-system.md).
 
+## Physics Material Boundary
+
+Keep `MaterialResponseBundleId` and `PhysicsMaterialId` distinct. Bind both to
+the semantic surface/asset slot that needs them; neither ID is derived from the
+other, and the mapping need not be one-to-one. A physics record declares its
+constitutive model, SI units, validity range/state, uncertainty, provenance,
+version, and solver combine rule. Depending on the selected solver it may
+contain density; static/dynamic and anisotropic friction; restitution with an
+impact-speed range; normal/tangential compliance and damping; permeability,
+porosity, absorption, capillary/contact-angle or hydraulic data; adhesion as a
+named surface-energy or traction model; and thermal conductivity, specific
+heat, emissivity spectrum, or phase-change data. Omit unsupported
+properties explicitly; do not fabricate plausible constants.
+
+Collider and support proxies carry `PhysicsMaterialId` independently of render
+material and LOD. Wet, icy, damaged, compacted, or thermally changed states
+switch to a versioned physics material/state only through the owning physical
+model; a darker or shinier shader state alone does not change contact response.
+Material-pair lookup uses a deterministic canonical ID/registry/law-state key
+unless
+the constitutive law is explicitly directed. Latch both material IDs and state
+versions atomically for a solve; select exactly one admissible pair law, reject
+incompatible restitution-plus-damping energy models, and report dissipated work.
+Read the detailed registry and validation contract in
+[references/procedural-pbr-system.md](references/procedural-pbr-system.md#physics-material-registry).
+
 ## Capability Gate And Tiers
 
 Initialize the renderer before selecting quality. This skill has one production
@@ -176,6 +228,23 @@ Quality tiers:
 | Full | TSL fields, cost-gated `StorageTexture` cause maps, storage-backed instance state, filtered normals/specular AA, projection only where UVs cannot preserve scale | **Measured** close-inspection target inside budget |
 | Budgeted | same graph with packed sampled data, single-/two-axis projection where valid, fewer filtered bands, lower update cadence | **Measured** full tier misses the named target's traffic, thermal, or frame gate |
 | Minimum native | precomputed generated variants, lower field resolution, filtered UV/array sampling, static instance attributes | **Gated** WebGPU exists; Budgeted still misses target |
+
+These rows change presentation work only. A physics-facing cause/provider may
+change representation, filter, cadence, state, or error only through a
+coordinator-admitted `QualityTransition`; material quality selection has no
+authority to mutate physics or receiver state.
+
+Dynamic cause-map producers are explicit `PhysicsGraph` stages when they
+advance physical/receiver state, with declared versions and GPU dependencies.
+A view-independent render projection publishes each stable binding as a leased
+`PresentedStatePair` in `PhysicsPresentationCandidate`; each pair arm carries
+its own `PresentationSampleProvenance`, `presentedInstant`, state handle, and
+spatial binding. A projection selected or built for one view belongs instead to
+`ViewPreparationPublication`. Materials resolve the sealed snapshot's candidate
+binding/lease refs plus its `CameraViewPublication` render mapping; snapshots do
+not copy pairs or transforms. A new generation never overwrites a leased
+previous/current resource in place, and multi-target completion/retirement is
+recorded by lease ID in `FrameExecutionRecord`.
 
 ## Performance Budgets
 
@@ -336,7 +405,10 @@ and update cadence agree.
 - atlas padding is ignored under mipmapping;
 - static compression is selected without max/RMS error gates for normal,
   roughness, height, or threshold channels;
-- material displacement and shadow/collision position diverge;
+- material displacement and caster position diverge beyond their visual gate,
+  or a collision proxy exceeds its declared surface/normal error bound; exact
+  parity with fragment microdisplacement is not required when the bounded proxy
+  preserves the contact contract;
 - emissive color owns both lighting and bloom without a raw-emission debug;
 - projected environmental occlusion darkens emission or all ambient response;
 - output conversion is duplicated in material and post;
@@ -349,6 +421,10 @@ and update cadence agree.
 - terrain identity transitions disagree across color, roughness, normals,
   semantic IDs, and wetness, or authored cliff facets are erased by material
   normal blending;
+- a physics solver derives a property or `PhysicsMaterialId` from PBR channels,
+  filenames, shader state, or the current render LOD;
+- pair lookup depends on contact ordering, mixes material-state revisions, or
+  stacks restitution and damping laws whose combined energy is not admissible;
 
 ## Routing Boundary
 

@@ -28,6 +28,7 @@ algebra are derived.
 4. Surface mapping and LOD choice
 5. Quadtree/CDLOD submission and crack contract
 6. Shared planet field bundle and cache
+6a. Physics signal publication
 7. CPU query and TSL compute parity
 8. Crater stamps and geological structures
 9. Altitude-filtered detail
@@ -461,6 +462,104 @@ geology. Use an LRU/fence-safe allocator; never overwrite a tile still consumed
 by an in-flight render. A parent and child can share coarse causes, but a child
 must own the residual/error needed by its LOD gate.
 
+## 6a. Physics Signal Publication
+
+Use the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+for every planet field consumed outside rendering. Publish a typed
+`PhysicsSignalDescriptor` and batched provider rather than exposing a patch
+texture, TSL node, quadtree address, or render-LOD sampler. The descriptor must
+use the common envelope verbatim:
+
+```text
+signalId, providerId, schemaId, contextId, owner, consumers, channels
+physicsFrameId, physicsOriginEpoch, transformRevision, optional chartId
+clockId, samplePhase, representedFootprint, filter, validity, perChannelError
+residency, cadence, latency, stateVersion, resourceGeneration
+missingChannelPolicy
+```
+
+Channel metadata supplies SI unit and scalar/vector/tensor basis. Each error
+supplies unit, basis, norm, and hard-bound/measured/statistical/unknown class.
+Requests/results use the exact canonical `PhysicsInstant` or
+`PhysicsTimeInterval` required by the query; the generic `PhysicsTime` alias is
+only the discriminated union for boundaries that truly allow either. Body ID,
+analysis revision, source resolution, reconstruction, and domain/singularity
+masks are channel/provider provenance, not renamed common-envelope fields.
+
+Optional channels absent from a descriptor remain absent; never zero-fill an
+unavailable gradient, velocity, temperature, humidity, gravity, or category.
+`stateVersion` does not imply GPU completion. The descriptor publishes
+`resourceGeneration` and `PhysicsResidencyDescriptor`; canonical
+`GpuStatePublication` carries queue ordering and completion. CPU consumers
+require an analytic/host mirror or explicit asynchronous completion with
+declared latency/error, never steady-frame readback. When physics-owned planet
+state is rendered, publish a `PresentedStatePair` with
+`motionBinding.kind: field` for each stable binding/provider into the view-independent
+`PhysicsPresentationCandidate`. Its previous/current arms have independent
+`PresentationSampleProvenance`, `presentedInstant`, state handles, and field
+spatial bindings. The candidate owns every `PresentationResourceLease` and no
+camera or render transform. `CameraViewPublication` owns the render mapping;
+`ViewPreparationPublication` owns per-view LOD, visibility, shadows, caches,
+resets, and preparation lease refs. Sealed snapshots reference candidate
+binding IDs and leases without copying pairs or transforms. The multi-target
+`FrameExecutionRecord` owns completion and lease disposition. Never render a
+mutable cache/write tile.
+
+The body-frame provider performs the declared body-to-world transform once per
+request epoch. Consumers must not independently apply `metersPerWorldUnit`,
+planet-center subtraction, geodetic conversion, or floating-origin offsets.
+Store physical values in SI at the provider boundary; render conversion belongs
+only to the per-view `RenderSimilarityTransform` fields in
+`CameraViewPublication`.
+
+Cube-face UV, longitude/latitude, geodetic coordinates, and local tangent
+parameterizations are nonlinear charts, not `physicsFrameId` values. A
+chart-bearing descriptor declares `chartId` plus chart version, domain and
+seam/singularity validity,
+forward/inverse mapping, Jacobian, metric tensor or equivalent orthonormal
+basis, and associated error. Transport gradients, velocities, forces, and
+covariances through that Jacobian/basis, then expose components in a named
+Cartesian body/world frame. Treating degrees, normalized face UV, or tangent
+components as Cartesian meters silently corrupts norms, fluxes, inertia, and
+integration.
+
+Use separate descriptors for reference surface position/normal, solid-surface
+height, seabed height, gravity/equipotential data if supplied, metric coast
+distance/frame, bathymetry gradient, hydrology regions, and material/semantic
+IDs. Their units, filtering, validity, and error structure differ. A visual
+biome weight or atmosphere mask is not a physical temperature, humidity,
+gravity, or permeability signal unless a source-backed descriptor says so.
+Gravity is a vector in `m s^-2` sampled at a canonical `PhysicsInstant` and SI
+position. Declare whether it is central, multipole, rotating-frame effective,
+dataset-derived, or external; include frame, validity and error. Only derive
+`up=-g/|g|` above a declared minimum-magnitude gate. Reference-surface normal,
+radial direction, and gravity direction are distinct on a general ellipsoid or
+rotating body.
+
+If contact or transport consumes surface identity, publish a separate exact
+categorical `PhysicsMaterialId` channel/reference resolved through
+`PhysicsMaterialRegistry`. Visual biome, semantic region, substrate color, and
+PBR identity cannot determine it.
+
+Stable physics identity follows the body and analysis graph, not the visible
+patch. Quadtree split/merge, morphing, cache eviction, or graphics quality
+changes may select another implementation tile but must preserve provider and
+signal IDs, frame, source revision, and accepted error. A body-field,
+georeference, sea-level, mapping, or analysis revision increments the source
+version and invalidates overlapping samples. Reject mixed epochs or versions
+before solver dispatch.
+A render floating-origin rebase changes only presentation global-to-render
+transforms and the render-origin epoch; it does not change
+`physicsOriginEpoch`, body-field source/state revision, or SI sample identity.
+
+Validate descriptors and samples at cube-face edges/corners, coast singular
+sets, craters and steep gradients, invalid dataset cells, large origin rebases,
+direct-versus-cache paths, and every accepted footprint. Gate dimensional and
+frame metadata, timestamp/cadence semantics, LOD invariance, and propagated
+position/normal/value errors independently; CPU/TSL parity alone does not prove
+the physics-facing adapter.
+
 ## 7. CPU Query And TSL Compute Parity
 
 Picking, geospatial analysis, measurement, camera constraints, and atmosphere
@@ -716,6 +815,11 @@ planetCoastSample(direction, analysisVersion) -> {
   maxCoastDistanceErrorMeters, validityMask, version
 }
 ```
+
+Expose this record through the corresponding physics signal descriptors. The
+function notation documents the domain sample; it is not permission for each
+consumer to invent a private frame, units conversion, cache lookup, or missing-
+data fallback.
 
 `signedWaterColumn = meanSeaSurfaceHeight - terrainHeight` is vertical/reference-
 normal clearance; it is not coast distance. `coastGeodesicDistance` is

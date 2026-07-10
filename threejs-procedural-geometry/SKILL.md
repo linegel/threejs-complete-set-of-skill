@@ -17,6 +17,25 @@ post processing all matter. This skill owns reusable mesh emission. Use
 `$threejs-procedural-vegetation` for growth hierarchies, and then apply these
 mesh-writer mechanisms inside those subject skills.
 
+When geometry supplies collision or support, apply the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Publish stable `ColliderProxy` records and a static `SupportSurfaceSample`
+adapter from authoritative geometry/field topology. Its canonical
+`PhysicsSignalDescriptor` and each batched `PhysicsSampleRequest`/
+`SupportSurfaceSample` preserve `contextId`, requested/actual footprint and
+filter, frame/origin/transform revision, state/resource version, validity,
+per-channel error, residency, cadence/latency, and explicit absence. A request
+uses its exact `PhysicsInstant` or `PhysicsTimeInterval`; the returned support
+record uses `sampleInstant: PhysicsInstant`.
+Convert world geometry once through `PhysicsContext.worldToPhysicsTransform`
+and its sole `metersPerWorldUnit`; the proxy/provider serializes no reciprocal
+or second scale. IDs, material bindings, frames, source versions, validity, and
+error bounds are independent of render LOD, batching, and runtime triangle/
+instance indices. Moving or
+deforming support remains owned by motion/site/domain solvers through a
+`DeformingSupportProxy`; this mesh compiler must not infer its velocity from
+render-frame differences.
+
 ## API Baseline
 
 - Renderer: `WebGPURenderer` from `three/webgpu`; call `await renderer.init()`.
@@ -116,8 +135,54 @@ slope, terrace ID, clearance, and seed. Buildings, docks, paths, vegetation,
 and rocks consume those records and an explicit exclusion field; they must not
 re-sample an approximate display mesh and invent new identities.
 
+`wet-beach` is a static substrate/capacity identity and `visible-seabed` is a
+geometry/visibility identity. Neither stores dynamic liquid, inundation, foam,
+or precipitation state. Their materials consume the route-selected receiver
+owner's immutable wetness/inundation snapshot and the water owner's completed
+signals.
+
 Read the full compiler, LOD, seam, and adversarial-validation contract in
 [profile-sweeps-and-mesh-writers.md](references/profile-sweeps-and-mesh-writers.md#local-terrain-and-coast-mesh-compiler).
+
+### Static physics support output
+
+When requested by the route, compile a physics proxy package beside render
+geometry. It references the active `PhysicsContext`, canonical
+`physicsFrameId`/`physicsOriginEpoch`/`transformRevision`, source
+field/topology revision, stable proxy and semantic IDs,
+`PhysicsMaterialId`, support domain, sidedness, sample footprint policy, and
+maximum position/support-height/normal error. A `SupportSurfaceSample` adapter
+queries this package or its authoritative field, never the current display LOD
+or camera depth.
+
+`SupportSurfaceSample` is kinematic only. Its optional nearest-surface signed
+separation is not a contact penetration/manifold. It does not own contact
+lifecycle, impulses, or reactions. The collision solver owns
+the canonical `ContactManifoldRecord` plus dimensional `InteractionRecord` ABI
+and resolves impulses;
+geometry supplies stable generation-bearing shape/support/feature identity and
+bounded surface data only.
+
+A view-independent geometry/deformation state publishes one leased
+`PresentedStatePair` per stable binding/provider in
+`PhysicsPresentationCandidate`; each previous/current arm carries independent
+provenance, `PhysicsInstant`, state handle, and spatial binding. Per-view render
+LOD, visibility, picking acceleration, shadow representation, cache state, and
+reset actions belong to `ViewPreparationPublication`, after
+`CameraViewPublication` owns the render mapping. The sealed snapshot references
+candidate binding IDs and lease refs rather than copying pairs or transforms;
+the multi-target `FrameExecutionRecord` owns completion and lease disposition.
+A representation/topology change emits the scoped motion/history invalidation
+reason. Static geometry is an explicit hold pair, not an unleased mutable
+buffer, and a view-specific LOD is never baked into the shared candidate.
+
+Graphics LOD may change vertices, groups, and draw representation while the
+physics proxy identity remains fixed. A distinct physics proxy quality change
+requires an explicit `QualityTransition` and new declared errors; it cannot be
+triggered as a side effect of render LOD. This skill emits only static support.
+Moving platforms, flexible structures, animated hulls, and edited deforming
+surfaces require a versioned `DeformingSupportProxy` and transform/deformation
+provider owned by the motion, site, or external solver adapter.
 
 ## Build Order
 
@@ -215,3 +280,5 @@ separates mobile from desktop.
 - attribute `usage` is changed after upload instead of rebuilding the attribute;
 - dynamic geometry uploads whole buffers when only subranges changed;
 - triangle count is the only reported complexity metric.
+- collision/support is sampled from the active render LOD, camera depth, or
+  runtime triangle index, or a graphics LOD change mutates proxy identity;

@@ -201,6 +201,46 @@ then reject any value that creates occlusion across a known open gap
 `distanceFallOff` in `[0, 1]` by r185 **[Derived API domain]**; choose them only
 after radius and thickness are fixed.
 
+### PhysicsContext scale binding
+
+The canonical scale and presentation schema is the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+When the AO contract is physical, require finite positive
+`PhysicsContext.metersPerWorldUnit`. Let `sRender` be the dimensioned uniform
+`CameraViewPublication.globalToRenderCurrent.renderUnitsPerMeter`:
+
+```text
+gRender          = gMeters          * sRender              [Derived]
+radiusRender     = radiusMeters     * sRender              [Derived]
+thicknessRender  = thicknessMeters  * sRender              [Derived]
+customBiasRender = customBiasMeters * sRender              [Derived]
+```
+
+For the ordinary authored-world mapping require
+`sRender = 1 / metersPerWorldUnit` **[Gated]**. A deliberate visualization scale
+uses its exact declared `RenderSimilarityTransform` and creates a new
+`transformRevision`; it is not a rebase.
+
+Do not apply that conversion to normalized depth, angular, or unitless GTAO
+controls. If no physical scale is intended, declare `scene-unit-perceptual` and
+store the authored scene-unit radius/thickness/bias with the context revision.
+That mode makes no metre-scale contact claim and must be re-authored or
+validated after asset/world scaling.
+
+For each frame, validate and latch the exact central Candidate,
+`CameraViewPublication`, `ViewPreparationPublication`, and target/view Snapshot;
+do not define an AO-local schema. Resolve per-binding/provider
+`PresentedStatePair`s and descriptors from the Candidate, transforms/matrices
+from the camera publication, and reactive/reset records from the preparation
+publication. Motion vectors project adjacent presented states; each presented
+state has independent provenance. A shared epoch number or
+route-wide interpolation alpha is not proof.
+
+A pure floating-origin rebase changes no metric separation. Apply both epoch
+transforms and require identical AO/depth within the declared numerical error;
+require equal previous/current uniform scale. Otherwise convert AO parameters
+and reject/reseed history instead of widening AO to hide the discontinuity.
+
 ## Reconstruction choice
 
 Half-scale GTAO reduces AO pixels to `0.25 * width * height` **[Derived]**.
@@ -281,6 +321,35 @@ targets.
 Two full-resolution RGBA16F TRAA color targets account for
 `16 * width * height` bytes, excluding depth/history implementation details
 **[Derived lower bound]**. This is not a cheap AO-only history path.
+
+### Reactive dependency policy
+
+Execute the route's `ViewPreparationPublication.resetDependencies` before
+sampling history:
+
+| Epoch change | AO visibility history | Downstream radiance history |
+| --- | --- | --- |
+| geometry, deformation, alpha coverage, solver topology/reset | `reject-region` for changed pixels or `reset` | same changed-pixel rejection |
+| camera/projection cut or uncompensated origin change | reset | reset |
+| AO radius/thickness/bias, scale convention, resolution, or quality migration | reseed/reset | reject where AO contribution changed |
+| shadow-content, emission, foam, or optical change with unchanged geometry | preserve AO visibility | use the published radiance-reactive mask or reset color history |
+| compensated coordinate rebase | current-frame AO remains invariant | stock TRAA rebuilds/reseeds; only a custom frame-bridged history may preserve after proof |
+
+If the implementation has only full-image TRAA rather than a separate AO
+history, these distinctions still control the required rejection policy, but
+stock r185 `TRAANode` has no reactive-mask input or public general reset. A mask
+requires a custom/patched temporal node with evidence; the stock path uses an
+evidenced rebuild, bypass/reseed wrapper, or conservative full reset. Absence
+of a conservative mask converts `reject-region` to `reset`. Publish the AO
+parameter/quality revision in diagnostics so stale color history cannot survive
+a changed visibility field unnoticed. Keep
+`ViewPreparationPublication.resetDependencies` immutable and
+append actual execution/failure to `FrameExecutionRecord`. Device loss appends
+a `FrameExecutionRecord` with `overallStatus: device-lost`, affected target
+execution statuses `device-lost`, cancelled dependent actions, and
+lost-generation entries in `leaseDispositionById`; it invalidates AO/history
+resources without mutating the sealed snapshot. Rebuild under the new
+backend/resource generation.
 
 ## Lighting application
 

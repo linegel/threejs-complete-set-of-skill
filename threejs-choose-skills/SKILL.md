@@ -1,6 +1,6 @@
 ---
 name: threejs-choose-skills
-description: "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance."
+description: "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, cross-skill physics coupling, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance."
 ---
 
 # Three.js WebGPU/TSL Choose Skills
@@ -49,12 +49,19 @@ Complete this before loading a destination skill:
 3. Run the visual-causality and algorithm-selection gate. Choose from explicit
    candidates; do not assume compute, MRT, ray marching, temporal accumulation,
    or maximal geometry is faster or more faithful.
-4. Build a resource/pass ownership graph before selecting effects: scene color,
+4. When physical domains interact, instantiate the shared
+   [physics domain and interaction contract](references/physics-domain-and-interaction-contract.md):
+   one `PhysicsContext`, typed providers, an ordered multi-rate `PhysicsGraph`,
+   explicit one-way/two-way interaction edges, one immutable presentation
+   candidate, per-view camera/preparation publications, one sealed snapshot per
+   selected presentation target/view, and an active `PhysicsCostLedger`.
+   A producer/consumer label alone is not an integration contract.
+5. Build a resource/pass ownership graph before selecting effects: scene color,
    depth, normal, velocity, identifiers, history, tone map, output transform,
    and adaptive quality each need an owner or an explicit `not used` value.
-5. Define `[Gated]` frame, memory, visual-error, and update-latency bounds from
+6. Define `[Gated]` frame, memory, visual-error, and update-latency bounds from
    the product target. Define the measurement matrix before implementation.
-6. Route the smallest skill intersection that owns the missing causal systems.
+7. Route the smallest skill intersection that owns the missing causal systems.
    Defer consumers until their input signal exists.
 
 ### Workload Classification
@@ -126,6 +133,7 @@ no-post baseline are already proven.
 | Local terrain/coast or planetary body | Use fields + semantic geometry for a local height/bathymetry domain; use the planet skill only when curvature, horizon, spherical continuity, or planet-scale precision is observable. | A cube-sphere/quadtree adds no visible contract, or a planar domain cannot satisfy the required horizon/precision error. |
 | Geometry, displacement, material normal/parallax, or screen-space cue | Use geometry for silhouette, intersections, section cuts, cast shadows, and close parallax; use cheaper representations only when the view/error contract permits. | The representation cannot reproduce the observable it is supposed to cause. |
 | Analytic, sampled-data, numerical simulation, or stochastic model | Match the required conservation law, controllability, uncertainty, and update cadence. | A more complex solver adds no observable contract or a shortcut violates the error bound. |
+| Independent or coupled physical domains | Keep each domain's least-cost valid solver; exchange only typed, versioned signals and source/reaction records through an ordered graph. | Units, frame, clock, footprint, validity, error, latency, reaction ownership, or synchronization is implicit; a universal state buffer/timestep would waste sparse or analytic work. |
 | CPU update, vertex/fragment evaluation, or compute/storage | Compare state volume, reuse across passes, synchronization, upload/readback, and target-device timings. | Compute merely moves small or rarely reused work behind dispatch and storage overhead. |
 | `BatchedMesh`, `InstancedMesh`, merged geometry, or chunked/streamed LOD | Match geometry reuse, material compatibility, per-entity identity, transform/update frequency, culling granularity, and measured backend draw entries. | Batching destroys required culling/selection identity, dynamic updates rewrite excessive data, or the route makes the forbidden `[Gated]` assumption of one GPU draw per BatchedMesh family. |
 | Minimal forward attachments or shared MRT | Enumerate downstream consumers and compare composed variants on the target GPU. | An attachment has no proven consumer or its store/read bandwidth exceeds saved geometry/pass work. |
@@ -188,6 +196,18 @@ requiredSignals:
   objectIdRegistry: {}
   historyRegistry: {}
 domainSignals: {}
+physicsContext: not used
+physicsGraph: not used
+physicsCostLedger: not used
+physicsSignals: {}
+physicsInteractions: []
+physicsPresentationCandidate: not used
+physicsCameraViewPublicationsByTarget: {}
+physicsViewPreparationPublicationsByTarget: {}
+physicsPresentationSnapshotsByTarget: {}
+frameExecutionRecord: not used
+# Deprecated compatibility projection. It never carries allocated state.
+physicsPresentationSnapshot: not used
 outputOwnersByPresentationTarget: {}
 # Compatibility projection for existing route tooling; "not used" never allocates.
 sharedResourceOwners:
@@ -231,6 +251,7 @@ performanceContract:
   passKeys: []
   passLedger: []
   qualityLadder: []
+  skillTierCrosswalk: {} # selected skill local tier -> Full/Budgeted/Minimum viable
   qualityController: {}
   routeStatus: provisional | measured-valid | invalid | unmeasurable
 coverageStatus: complete | partial | blocked
@@ -249,6 +270,14 @@ authoritative source/data, render representation, spatial/time/identity policy,
 presentation, and validation. `requiredSignals` describes actual allocation:
 an owner does not imply a depth, normal, velocity, ID, history, or MRT output.
 Every signal in a recipe has a producer and consumers or `not used`.
+When any selected domain consumes another domain's physical state, every
+declared `physics...` field plus `frameExecutionRecord` is mandatory and follows the
+[shared ABI](references/physics-domain-and-interaction-contract.md).
+`domainSignals` remains a routing index; every physical entry points to a
+`PhysicsSignalDescriptor` rather than redefining units, clocks, validity, or
+errors locally. Missing channels are absent and can block a consumer; they are
+never implicit zero. External solvers use the same boundary contract without
+ceding their internal representation or timestep.
 `sharedResourceOwners` is retained as a compatibility projection for existing
 route tooling. It mirrors actual `requiredSignals`, `domainSignals`, and
 `outputOwnersByPresentationTarget`; assigning a name there never authorizes allocation. `history`
@@ -266,6 +295,7 @@ names match.
 | backend manifest | Installed revision, initialized backend, browser/device/GPU, output buffer type, feature gates, and blocker. |
 | workload profile | Classification axes, truth contract, target views, data/update behavior, and error bounds. |
 | cause ledger | Earliest missing layer, candidate algorithms, selected algorithm, rejected alternatives, and no-post contract. |
+| physics contract | For interacting physical domains: context, typed signals, clocks/stages, interactions/reactions, material/proxy IDs, presentation snapshot, quality migration, and blockers. |
 | route manifest | Selected/omitted/deferred skills, causal/data/render owners, allocated signals, API proof, and acceptance evidence. |
 | performance contract | Evidence-labelled budgets, cost scopes, unique-pass ledger, quality ladder, and controller. |
 | diagnostics | No-post baseline and every field, buffer, pass, and identity view needed to prove the mechanism. |
@@ -382,6 +412,12 @@ For scientific visualization, AEC, digital twins, and data scenes, quality
 adaptation must not silently alter values, transfer-function semantics, stable
 IDs, topology, dimensions, or uncertainty. If a lower tier changes such a
 quantity, expose the tier and its `[Gated]` error bound to the user.
+
+The route manifest maps every selected skill's local tier vocabulary into
+`Full`, `Budgeted`, or `Minimum viable` in
+`performanceContract.skillTierCrosswalk`. A route transition names both the
+route tier and every affected local tier; matching names are not assumed to
+mean matching equations, costs, or errors.
 
 ## Performance Contract And Aggregation
 
@@ -508,6 +544,10 @@ passRecord:
   producer: ""
   consumers: []
   kind: cpu-update | upload | render | compute | copy | resolve | present
+  clockId: not used
+  cadence: not used
+  substepMultiplicity: not used
+  executionsPerPresentedFrame: not used
   inputs: []
   outputs: []
   resolution: { value: "", unit: physical-pixels, label: Derived, source: "canvas, DPR, pass scale" }
@@ -515,6 +555,8 @@ passRecord:
   sampleCount: { value: "", unit: samples-per-pixel, label: Measured, source: "configured pass after backend normalization" }
   loadStoreResolve: []
   lifetime: ""
+  hotBytesPerExecution: not used
+  sourceReactionOrConservationGroups: []
   timing:
     p50: { value: "", unit: ms, label: Measured, source: "GPU timestamp trace" }
     p95: { value: "", unit: ms, label: Measured, source: "GPU timestamp trace" }
@@ -530,6 +572,9 @@ depth/normal/velocity, their owners reference the same producer. Tone mapping,
 output conversion, history update, and upsample are likewise unique semantic
 producers. A consumer that needs another encoding or resolution must declare a
 conversion pass and its bytes; name reuse is not deduplication.
+Physics stages additionally declare state epochs, barriers, subcycling, hot
+traffic, and conservation side effects. Do not infer solver order from the
+render-pass list.
 
 ### MRT And Tile-GPU Bandwidth Gate
 
@@ -619,6 +664,10 @@ transitions; frequent DPR or pass-scale changes can trigger target reallocation.
 Each transition declares history reset/resample, settling, lifecycle, and
 dispose ownership. These inequalities create hysteresis without inventing
 device-independent thresholds.
+For physical state, a transition is valid only when its `QualityTransition`
+declares state projection/reset, provider-version publication, conservation
+correction or residual, simultaneous residency, and consumer invalidation.
+Changing solver class to meet a budget is a new truth contract, not a tier.
 
 Choose the downgrade axis from the measured bottleneck:
 
@@ -673,6 +722,7 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | Unexpected Three.js runtime/API behavior, documentation/source disagreement, suspected regression, known-issue research, or upgrade triage | `$threejs-debugging` | Load for local diagnosis and upstream/version proof. Add domain skills only when mechanism expertise is required; do not load debugging for ordinary scene design. |
 | Camera composition, orbit/free navigation, multi-scale framing, projection/depth ownership, handoffs, floating origins | `$threejs-camera-controls-and-rigs` | Load when camera policy changes scale, silhouette, precision, temporal validity, or interaction. |
 | Authored transform phases, kinematics, rotating frames, springs, staging, analytic motion | `$threejs-procedural-motion-systems` | Use for transform authorship; keep live-data interpolation in the application data layer unless procedural motion is the missing cause. |
+| Interacting water, bodies, weather, vegetation, particles, terrain, or external physics | `$threejs-choose-skills` plus the smallest domain owners | Instantiate the shared physics ABI and ordered graph first; do not invent pairwise adapters inside render callbacks. |
 | Reusable scalar/vector fields, causal masks, domain warping, derived normals | `$threejs-procedural-fields` | Use when outputs share a field cause; external scientific/data ingestion remains outside the pack. |
 | Local terrain, islands, beaches, cliffs, seabed, and coastline semantics | `$threejs-procedural-fields` + `$threejs-procedural-geometry` + `$threejs-procedural-materials` | Fields own the common land/bathymetry cause, geometry owns silhouette/topology/material groups, and materials consume the same semantic bundle. Add water only when a water surface or transport is visible. |
 | BRDF/material identity, filtered atlases, frame fields, surface masks, emissive/thermal appearance, specular AA | `$threejs-procedural-materials` | Pair with fields for shared causes and geometry for silhouette/section changes. |
@@ -735,15 +785,17 @@ recipe.
 3. Run the cause/algorithm gate and assign the primary causal owner.
 4. Establish coordinate/precision/camera policy when scale, projection, or
    navigation affects representation.
-5. Implement subject/data representation, fields, material identity, and motion;
+5. For interacting physical domains, freeze `PhysicsContext`, signal schemas,
+   clocks/stages, source/reaction ownership, and presentation interpolation.
+6. Implement subject/data representation, fields, material identity, and motion;
    prove no-post diagnostics.
-6. Build the unique pass/resource graph and A/B minimal-forward versus shared-MRT
+7. Build the unique pass/resource graph and A/B minimal-forward versus shared-MRT
    or spatial versus temporal alternatives where relevant.
-7. Add lighting, shadows, atmosphere, and volumes only when their source geometry
+8. Add lighting, shadows, atmosphere, and volumes only when their source geometry
    and data are correct.
-8. Add image effects only when their source signals and rejection conditions are
+9. Add image effects only when their source signals and rejection conditions are
    proven.
-9. Measure the composed scene, implement hysteretic quality adaptation, run
+10. Measure the composed scene, implement hysteretic quality adaptation, run
    sustained target-device validation, and capture deterministic evidence.
 
 ## Space And Owner Handoff
@@ -763,6 +815,13 @@ Every handoff labels:
 | color/data | Source encoding, scene-linear HDR, transfer function, tone-mapped/display domain, or no-color data. |
 | owner boundary | Producer, permitted consumers, update cadence, lifetime, and invalidation rule. |
 
+For physical handoffs these labels are serialized, not prose. Use
+`PhysicsSignalDescriptor`, `InteractionRecord`, `PhysicsPresentationCandidate`,
+and per-target/view `PhysicsPresentationSnapshot`
+from the [physics contract](references/physics-domain-and-interaction-contract.md),
+including footprint/filtering, validity, typed error, latency, origin epoch,
+state version, and residency.
+
 ## Route-Away Ledger
 
 | Request area | Decision |
@@ -774,7 +833,7 @@ Every handoff labels:
 | Picking, selection, annotation, DOM UI, accessibility | Keep application/UI ownership outside the flagship pack; image pipeline owns only graphics-safe compositing/output. |
 | WebXR | Use official WebXR/Three.js guidance unless a dedicated skill exists. |
 | Deployment/editor/tooling | Use platform and project conventions. |
-| Physics engines | Use the selected physics/domain solver; route visual state only after physical data exists. |
+| Physics engines | Keep the selected engine/domain solver authoritative internally, but require its adapter to publish the shared `PhysicsContext`, typed provider/state epochs, interactions, and `PhysicsPresentationSnapshot`; unsupported channels remain explicit blockers. |
 | General authored prop libraries, mesh repair, UV unwrapping, texture baking, compression, and source-asset LOD production | Treat these as an explicit asset-pipeline input. Procedural skills may define anchors, variants, and runtime compilation, but they do not make an unvalidated source asset production-ready. |
 | Generic app architecture | Keep framework/state/router decisions outside visual skills. |
 | Teaching fallback when WebGPU is unavailable | Use `$threejs-compatibility-fallbacks` only for an explicit fallback-teaching request. |
@@ -809,6 +868,14 @@ A routed implementation is incomplete without:
   visible consequences;
 - unique resource/pass ledger with formats, resolution, lifetimes, consumers,
   and shared-pass deduplication;
+- for every interacting physical route, a serialized `PhysicsContext`, typed
+  signal/provider inventory, ordered multi-rate `PhysicsGraph`, interaction and
+  conservation ledger, external-solver adapter evidence where applicable,
+  physics-material/proxy identities, the immutable presentation publication chain,
+  conservative quality-transition records, and an active `PhysicsCostLedger`
+  covering coordination intervals, native owner steps, worst permitted catch-up,
+  stage executions/hot bytes, critical queue path, traffic/readbacks, multiview/
+  frames-in-flight multiplication, migration overlap, and sustained thermal state;
 - no-post baseline plus field, geometry, material, identity, depth, velocity,
   history, and output diagnostics actually used by the route;
 - color/data encoding, HDR format, tone-map owner, output-transform owner, and
@@ -824,4 +891,7 @@ A routed implementation is incomplete without:
   cooldown, recovery headroom, and absence of oscillation;
 - fixed-view/trajectory captures and regression artifacts for every accepted
   target tier;
+- coupled replay, subcycle/step convergence, reaction/conservation, provider
+  error propagation, origin-rebase, presentation-motion, and quality-migration
+  evidence for every active physics edge;
 - `{ value, unit, label, source }` evidence on every quantitative claim.

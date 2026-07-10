@@ -10,6 +10,14 @@ reference is only the offshore producer. Read the
 for bathymetry, coastal-solver selection, terrain/water data, and wet/dry
 ownership.
 
+Read the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+for the SI physics frame, clock/instant/interval ordering, canonical
+`WaterSurfaceProvider`,
+interaction exchange, state/error versions, residency, and immutable
+presentation snapshot. Solver-local FFT records do not replace those external
+interfaces.
+
 ## Quantitative provenance
 
 Use **[D] Derived**, **[G] Gated**, **[M] Measured**, and **[A] Authored** for
@@ -85,18 +93,22 @@ solver:
 ```yaml
 coastalHandoff:
   mode: phase-resolved | phase-averaged
-  worldFrame: "Y-up frame, handedness, metres-per-unit, floating-origin owner"
+  physicsContext: "shared context id/version; SI metre frame and gravity"
+  physicsSignalDescriptor: "complete shared descriptor; no local subset"
+  sampleInstant: "PhysicsInstant with clock mapping/discontinuity revisions"
+  transferInterval: "PhysicsTimeInterval when flux/action is integrated"
   waterDatum: "mean free-surface elevation in metres"
   bathymetrySign: "bed elevation or positive-down depth; never implicit"
-  couplingGeometry: "oriented world-space curve or tile boundary Gamma"
+  couplingGeometry: "oriented physics-frame-metre curve/tile boundary Gamma"
   coastNormal: "orientation and tangent convention"
-  timebase: "clock, timestamp, fixed-step owner, reset rule"
   spectralBands: "frequency/direction support and stable IDs"
   currentField: "metres per second, sampling space, cadence, owner"
   incomingOwner: spectral-ocean
   outgoingOwner: coastal-solver | absorbing-layer
   renderSurfaceOwner: "one mesh/material in every overlap sample"
   foamHistoryOwner: "one state, coordinate space, transport, and remap rule"
+  donorStateVersion: "version and validity/error propagation policy"
+  residency: "provider state location and legal synchronization boundary"
 ```
 
 The full coastal data set includes bed elevation, positive water depth, coast
@@ -177,11 +189,14 @@ do not allocate a full velocity atlas merely because phase-resolved coupling
 was requested.
 
 Transfer `eta_b`, normal and tangential components of `q'_b`, surface slope,
-timestamp, and stable mode/band identity. The coastal boundary converts them to
-the incoming characteristic or a verified internal wavemaker. It leaves the
-outgoing characteristic to the coastal solution or an absorbing layer. Strongly
-prescribing both elevation and discharge while deleting outgoing information
-overconstrains the boundary and manufactures reflection.
+canonical `PhysicsInstant`, donor `stateVersion`/`resourceGeneration`, and stable
+mode/band identity under the handoff's complete `PhysicsSignalDescriptor`.
+Requested versus actual sample time remains explicit. The coastal boundary
+converts these channels to the incoming characteristic or a verified internal
+wavemaker. It leaves the outgoing characteristic to the coastal solution or an
+absorbing layer. Strongly prescribing both elevation and discharge while
+deleting outgoing information overconstrains the boundary and manufactures
+reflection.
 
 A one-way spectral donor has no mechanism to display an outgoing reflected
 field beyond `Gamma`. If that field is observable, either extend the phase-
@@ -284,18 +299,90 @@ or a phase-resolving spatial solver. Never advect the final displacement
 texture over a varying current and claim refraction. The handoff records mean
 current, wave-induced discharge, and render displacement as separate signals.
 
-### Foam transfer
+### Canonical water-provider adapter
 
-There is one foam-history owner at each world point. Transfer:
+The FFT and its reduced CPU sampler are internal representations. External
+motion, creature, force, and contact consumers query the shared
+batched, channel-requested `WaterSurfaceProvider`, in physics-frame metres,
+with a declared footprint/filter,
+frame and one canonical `PhysicsInstant`. The adapter returns:
 
 ```text
-coverage [1], sourceRate [s^-1], carrierVelocity [m s^-1],
-diffusion [m^2 s^-1], decayRate [s^-1], coordinateSpace,
-timestamp [s], validity.                                       [D]
+domain channel records:
+  freeSurfacePoint
+  freeSurfaceNormal
+  surfacePointVelocityMps
+  materialCurrentVelocityMps?  # represented declared mean/current only
+  waterColumnDepthMeters?      # valid depth/datum only
+  densityKgPerM3?              # optional SI density channel
+  materialAccelerationMps2?, pressurePa?, bathymetryPoint?, wetDryState?
+sample bundle/envelope:
+  descriptor: PhysicsSignalDescriptor
+  sampleInstant: PhysicsInstant
+  representedFootprint, filter, validity, error, absentChannels
 ```
 
+Every channel is the complete shared `SampledChannel`, including actual time,
+support/filter, validity, error, and `stateVersion`. The complete
+shared `PhysicsSignalDescriptor` and bundle `sampleInstant` are returned without
+a spectral-local subset; each channel's `actualPhysicsTime` resolves to a
+`PhysicsInstant`. The requested and returned actual instants may differ only
+within declared latency/staleness gates. Descriptor discovery supplies a stable table ID/version, and
+packed hot batches use that reference plus SoA channels rather than deep-copying
+the descriptor. The descriptor owns
+the footprint/filter actually represented, validity, per-channel error,
+residency/latency/cadence, state/resource generation, frame/transform/source
+epochs, and missing-channel policy.
+
+The surface-point velocity is differentiated from the same seeded spectral
+field and horizontal map used for geometry; it is not phase speed or group
+speed. Material current is the separately declared current `U`, not surface
+motion. Missing current, depth, or density is absent with structured validity;
+zero remains a represented physical value. Footprint filtering removes modes
+that the response footprint cannot resolve and reports the omitted
+height/slope/velocity contribution.
+
+Both returned velocity channels are physical polar vectors in
+`physicsFrameId`. A frame change rotates their basis only. A translating or
+rotating frame's coordinate derivative is a distinct coordinate-rate schema;
+do not add origin or `omega x r` transport terms to an already physical vector.
+
+The homogeneous FFT normally reports acceleration, pressure, bathymetry, and
+wet/dry channels absent as well; an adapter may expose one only under a named
+model with the channel's actual support, validity, and error.
+
+The adapter composes reduced-coefficient bounds, Eulerian-inversion residual,
+CPU numeric error, GPU-probe discrepancy when measured, filter truncation,
+clock skew/latency, and source `stateVersion`. A lagged GPU reduction is a
+lagged measurement, not a bound for the requested tick. The frame path performs
+no synchronous readback.
+
+A homogeneous periodic FFT may service one-way samples only when the
+authoritative source is identified and omitted feedback has a `[G]` upper bound
+or the claim/regime is explicitly narrowed. It rejects two-way
+body/source `InteractionRecord` loads because it has no localized
+mass/momentum boundary response. Such interactions route to the coastal/
+bounded solver or an external hydrodynamic solver, whose conservation group
+owns both source and reaction.
+
+### Foam transfer
+
+There is one foam-history owner at each physics-frame point. Transfer it as one
+versioned provider signal, not a bare local tuple. The complete
+`PhysicsSignalDescriptor` carries context, physics frame, physics-origin epoch,
+transform revision, chart when applicable, footprint/filter, cadence/latency/
+residency, state/resource generation, validity, missing-channel policy, and
+per-channel error. Its canonical `SampledChannel`s carry coverage `[1]`, source
+rate `[s^-1]`, carrier velocity `[m s^-1]`, diffusion `[m^2 s^-1]`, and decay
+rate `[s^-1]`, with bundle `sampleInstant: PhysicsInstant` and channel
+`actualPhysicsTime`; source-rate channels declare their actual sample interval.
+No
+independent seconds timestamp is legal. An atlas/coordinate ownership change
+uses a declared conservative state map and records remap, clamp, and lost-
+coverage residuals.
+
 Attribute offshore whitecap and depth-breaking dissipation to exactly one owner
-per band and world region. Combine those disjoint dissipation terms, then apply
+per band and physics region. Combine those disjoint dissipation terms, then apply
 one calibrated conversion into one bounded foam source/reaction update.
 Saturating-addition or partitioning of two evolved histories double counts
 persistence. When spectral history in parameter space is handed to an Eulerian
@@ -388,6 +475,64 @@ shape **[M]**.
 Use `RenderPipeline`, `pass()`, optional `mrt()`, and one output transform. When
 using `renderOutput()` explicitly, set `pipeline.outputColorTransform=false`.
 Set `pipeline.needsUpdate=true` after replacing the output graph.
+
+## Environment-forcing adapter for wind sea
+
+The spectral model consumes the shared `EnvironmentForcingSnapshot`; it never
+reads a vegetation gust uniform, rain-particle drift, camera-relative wind, or
+raw instantaneous air velocity and treats that value as a sea state. A
+spectral-forcing adapter records:
+
+```text
+complete PhysicsSignalDescriptor and sampleInstant: PhysicsInstant
+airVelocityMps plus its measurement/reference height and actual filter
+vertical-profile/drag model, roughness and atmospheric stability treatment
+fetch geometry and forcing duration/wave age
+directional-spreading family and its calibrated parameters
+represented wind input, whitecapping, nonlinear-transfer, and bottom terms
+spectral forcing adapter calibration/version.                            [D]
+```
+
+The `PhysicsGraph` latches this descriptor/version at `sample-forcing` for its
+declared interval. Coefficient evolution consumes that immutable version and
+that `PhysicsInstant`; it never resamples render time or mutable weather state.
+
+When a logarithmic boundary-layer profile is justified, a neutral/stability-
+corrected adapter may use
+
+```text
+Phi_m(z) = ln((z-d)/z_0)
+           - psi_m((z-d)/L_MO) + psi_m(z_0/L_MO),
+U(z) = (u_star/kappa) Phi_m(z),
+U_10 = U(z_r) Phi_m(10 m) / Phi_m(z_r).                        [D]
+```
+
+with displacement height `d`, aerodynamic roughness `z_0`, von Karman constant
+`kappa`, Monin-Obukhov length `L_MO`, and stability function `psi_m`. The
+adapter derives the wind vector at 10 m from the ratio above, requiring
+`z_r>d+z_0`, `10 m>d+z_0`, finite nonzero profile factors, and a calibration
+range that covers both heights. `u_star`, `z_0`, `d`, stability, and
+calibration range carry provenance. If those inputs are unavailable, use a
+named calibrated transfer or require supplied `U10`; do not silently assume a
+neutral profile. Preserve direction during the conversion and report calm,
+invalid-height, and out-of-calibration cases.
+
+Fetch is the upwind water-path geometry seen by the forcing footprint, not an
+arbitrary scalar copied across islands; duration/wave age controls whether the
+target sea can have reached a stationary fetch-limited spectrum. The adapter
+therefore produces calibrated reference-height wind, fetch/duration/stability,
+directional spreading, and represented source-term parameters with propagated
+error/version. A stationary FFT initializes or slowly retargets its statistical
+state from a documented snapshot. A genuinely evolving sea advances a
+validated spectral action/energy source balance while preserving coefficient
+phase continuity; it does not regenerate independent Gaussian coefficients on
+each gust.
+
+Water mean current remains a separate `WaterSurfaceSample` channel and Doppler
+term. It is not atmospheric wind. Conversely, wind forcing never becomes
+`materialCurrentVelocityMps`. Short gusts may drive spray and small-scale
+appearance without claiming that the equilibrium wave spectrum responded
+instantaneously.
 
 ## Wavevector grid and transform convention
 
@@ -894,8 +1039,10 @@ Declare the transport space:
 moves with the spectral horizontal map. This is the cheapest coherent option,
 but it does not add wind drift or exchange after folds.
 
-**Eulerian/world history.** Backtrace with surface transport velocity and
-sample a world or camera-relative atlas. Semi-Lagrangian transport is stable
+**Eulerian/physics-frame history.** Backtrace with surface transport velocity
+and sample a stable physics-frame atlas. Camera-relative storage is only an
+implementation window with an explicit origin epoch and conservative remap; it
+never changes the coordinates of the conserved state. Semi-Lagrangian transport is stable
 for large steps but diffusive; gate backtrace distance in texels and mass loss
 **[G,M]**. A bounded MacCormack/BFECC correction costs more and must clamp to
 the source neighborhood to avoid negative/overshoot coverage.
@@ -924,7 +1071,15 @@ The ocean material consumes the exact displacement, tangents, normal,
 Jacobian, and foam state. It must not reconstruct a different wave cause from
 unrelated normal textures.
 
-Use one sky-radiance function for the visible sky and reflected ray. Evaluate
+Consume the shared typed `LightingTransportSnapshot`. Use its
+`incidentRadiance` channel for the visible sky/reflected ray where requested,
+and its separately identified `directSolarIrradiance`, `skyIrradiance`,
+`surfaceIrradiance`, `transmittance`, and `sourceDirection` channels. Each keeps
+its radiometric quantity/unit, spectral/working basis, angular/spatial filter,
+factor identity/revision, validity, and error; the snapshot states whether sky
+irradiance already includes the disc. Atmosphere, cloud, opaque-visibility, and
+water-extinction factors apply exactly once. Radiometry is not an
+`InteractionRecord`. Evaluate
 side-aware dielectric Fresnel and Beer-Lambert attenuation as specified in
 `../../threejs-water-optics/references/water-surface-system.md`. For water-side
 views use exact Fresnel near total internal reflection. A specular node material
@@ -955,6 +1110,25 @@ linear HDR; tone mapping and output conversion occur once. Add bloom, ambient
 occlusion, or temporal reconstruction only when their input signals and cost
 pass explicit gates **[G,M]**.
 
+The spectral owner contributes a `PresentedStatePair` to the view-independent
+`PhysicsPresentationCandidate`, which contains no camera or render transform.
+`previousPresented` and `currentPresented` each carry independent
+`PresentationSampleProvenance`, `presentedInstant`, state handle, and global
+spatial binding. A per-view `CameraViewPublication` owns render mappings and
+camera matrices; `ViewPreparationPublication` owns visibility, shadows, caches,
+reactive publications, and resets. The sealed `PhysicsPresentationSnapshot`
+references candidate binding IDs and lease refs rather than copying pairs or
+transforms, and `FrameExecutionRecord` records multi-target completion plus
+lease disposition keyed by lease ID. Those presented states need not be solver
+states `n` and `n+1`. Their independent provenance, errors, and motion validity jointly
+own displacement, exact derivatives, surface
+velocity, foam, shadows, motion vectors, and temporal reconstruction.
+Physics-time, physics-frame transform, floating-origin, and source-data epochs
+remain separate. State/residency/coefficient/quality or transform/source-epoch
+changes that break continuity produce scoped `ReactivePublication` and
+`ScopedResetAction` records in `ViewPreparationPublication` or explicitly
+migrate history; reset flags are not extra pair or snapshot fields.
+
 ## CPU coupling and rigorous truncation error
 
 ### Parameter-coordinate query
@@ -964,7 +1138,11 @@ set `K_o`, define
 
 ```text
 B_0 = sum_(k in K_o) (|a_k|+|a_-k|)
-B_1 = sum_(k in K_o) |k| (|a_k|+|a_-k|).                       [D]
+B_1 = sum_(k in K_o) |k| (|a_k|+|a_-k|)
+B_t = sum_(k in K_o) |omega_param(k)| (|a_k|+|a_-k|),          [D]
+
+omega_param = omega_abs for a physics-frame-stationary q,
+omega_param = omega_int for a parameter chart advected exactly by U.         [D]
 ```
 
 At any time and fixed parameter coordinate:
@@ -972,16 +1150,27 @@ At any time and fixed parameter coordinate:
 ```text
 |h_full-h_reduced| <= B_0
 ||grad h_full-grad h_reduced|| <= B_1
-||chi D_full-chi D_reduced|| <= chi B_0.                        [D]
+||chi D_full-chi D_reduced|| <= chi B_0
+|partial_t h_full-partial_t h_reduced| <= B_t
+||chi partial_t D_full-chi partial_t D_reduced|| <= chi B_t.   [D]
 ```
+
+The last two bounds apply to `surfacePointVelocityMps`, which is the derivative
+of `P(q,t)` at fixed surface parameter as required by the shared ABI. After a
+physics-horizontal inversion, add the recovered-parameter error propagated
+through the spatial Jacobian of that velocity; do not relabel the vertical
+Eulerian height rate or phase/group speed as the full surface-point velocity.
+Serialize whether `q` is physics-frame stationary or advected by the uniform
+current; that choice selects `omega_param` and cannot change between geometry
+and provider evaluation.
 
 Sort retained modes for the queried quantity: amplitude controls height,
 whereas `|k|`-weighted amplitude controls slopes/normals. A single
 "dominant-bin" list is not optimal for both.
 
-### World-horizontal query
+### Physics-horizontal query
 
-For world horizontal coordinate `x`, solve
+For physics-frame horizontal coordinate `x`, solve
 
 ```text
 X(q) = q + chi D(q) = x.                                       [D]
@@ -1010,7 +1199,7 @@ and the Eulerian height error obeys
 ```
 
 This bound is conservative. When `L>=1` or folds are allowed, do not claim a
-global world-coordinate bound; return parametric results or measured local
+global physics-coordinate bound; return parametric results or measured local
 probe error **[M]**. Add CPU solver tolerance **[G]**, floating-point/FFT probe
 discrepancy **[M]**, and omitted-coefficient bound **[D]** as separate fields.
 
@@ -1110,6 +1299,12 @@ Optimize in this order:
 
 ### Spectrum
 
+- `EnvironmentForcingSnapshot` identity/version/error, averaging footprint/
+  interval, measured/reference height, vertical-profile/stability calibration,
+  derived `U10`, fetch geometry, duration/wave age, directional spreading, and
+  represented source terms; calm/invalid/out-of-range classifications;
+- stationary forcing replay and evolving-source continuity showing that gusts
+  neither reseed coefficients nor masquerade as material water current;
 - all input units and authored sea-state parameters;
 - `S_omega`, directional normalization, `P(k_x,k_z)`, and `d omega/dk`;
 - Gaussian mean/variance and coordinate stability;
@@ -1142,6 +1337,14 @@ Optimize in this order:
 ### Runtime
 
 - renderer/backend identity, relevant device limits, texture formats;
+- canonical `WaterSurfaceProvider` conformance, requested-channel and
+  footprint/filter behavior, absent-channel rejection, residency, and complete
+  state-version/error propagation;
+- raw-sampler-to-provider parity for surface point/normal/velocity, current,
+  depth when represented, and zero frame-critical readbacks;
+- `PhysicsPresentationSnapshot` coherence across displacement, derivatives,
+  velocity, shadows, foam, temporal history, origin epochs, and quality/state
+  migrations;
 - allocation and peak-live ledger;
 - dispatch and draw inventory;
 - GPU time by evolution, transforms, assembly, foam, surface, and post **[M]**;

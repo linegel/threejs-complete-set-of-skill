@@ -11,6 +11,7 @@ geometry-level diagnostics in pinned Three.js r185 WebGPU/TSL.
 - Capability gate and quality tiers
 - Semantic writer contract
 - Local terrain and coast mesh compiler
+- Static support and collider adapters
 - Sculpted frame profile
 - Rail mesh emission
 - Oriented branch rings
@@ -401,6 +402,97 @@ Rasterize accepted footprints back into the shared exclusion field or maintain
 a spatial index whose version is recorded. Order-dependent "place then reject"
 loops are not deterministic when generation order or threading changes; use
 stable candidate priorities and a declared conflict rule.
+
+### Static support and collider adapters
+
+Apply the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+when compiled topology is consumed by physics. Produce a physics proxy package
+in the capacity/semantic pass, before render-vertex duplication and LOD packing:
+
+```text
+ColliderProxy:
+  colliderId, entityId, shapeId
+  physicsFrameId, physicsOriginEpoch
+  shapeRepresentation, topologyRevision, poseStateVersion, sweptBounds
+  physicsMaterialId, collisionGroups, approximationError, residency
+SupportSurfaceSample provider:
+  canonical PhysicsSignalDescriptor plus stable supportId/featureId
+```
+
+Use the common records unchanged. The geometry package additionally keys build
+provenance, source field/topology revision, sidedness/closedness, margin/CCD,
+scale/domain validity, semantic-feature remap, and component error evidence to
+their canonical IDs; it does not add another proxy or sample envelope. A
+compound with multiple physical materials uses child `ColliderProxy` records.
+
+Choose the canonical `analytic`/`convex`/`mesh`/`sdf`/`compound`/`external`
+proxy class by the selected solver's capability, contact observables, topology,
+update rate, and
+measured cost. The render mesh is eligible only when it independently passes
+that proxy contract; visual fidelity is not collision fidelity. Validate
+watertightness/closure where volume or inside/outside is consumed, feature and
+material-region preservation, conservative bounds, thin-feature loss,
+triangle degeneracy, and distance/normal error against the authoritative
+surface.
+Require finite proper rigid physics transforms. Reject reflection/negative
+scale or compile a separately versioned proxy with recomputed winding,
+materials, volume/error, and body properties; render transforms cannot smuggle
+scale into the physics frame.
+
+The static adapter returns canonical `SupportSurfaceSample` values: descriptor,
+`sampleInstant: PhysicsInstant`, generation-bearing `supportId`/`featureId`, closest point,
+outward normal, optional signed separation/point velocity/point acceleration,
+optional `PhysicsMaterialId`, one-sidedness, represented footprint, validity,
+per-channel error, and explicit absent channels. Keep optional channels absent;
+never zero-fill canonical optional velocity, acceleration, separation, or
+material channels. Temperature, moisture, wetness, and thermal state are not
+`SupportSurfaceSample` fields; publish them through separate typed
+`PhysicsSignalDescriptor` providers. Static support velocity is a declared
+physical zero only when the
+canonical frame is inertial for that interval, not because a mesh buffer did
+not change.
+
+`SupportSurfaceSample` is strictly kinematic. It may return the canonical
+nearest-surface `signedSeparationMeters`, but that query result is not contact
+penetration, a manifold, or lifecycle state. The collision solver emits the
+separate canonical `ContactManifoldRecord` and owns impulses/reactions.
+That record owns collider/shape/feature pairs, manifold generation and points,
+separation/contact lifecycle, friction/adhesion state, warm starts, material-
+law versions, `PhysicsTimeInterval` validity, and migration/reset policy. Dimensioned
+impulse, wrench, traction, or constraint exchange uses canonical
+`InteractionRecord`. The collision adapter additionally gates time of impact,
+A-to-B normal, and relative point velocity including each moving frame's
+`omega cross r`. The solver, not this geometry provider, chooses the
+constitutive pair law. Reversing A/B applies the declared normal/velocity
+transform without changing stable identity.
+
+Proxy and feature identity is LOD-invariant. Whole-island simplification,
+chunking, `BatchedMesh`, instancing, impostors, and graphics quality changes may
+alter render topology but must not renumber the `ColliderProxy`, support
+provider, semantic feature, or physics-material IDs. A physics proxy may have
+separate variants only through a canonical `QualityTransition` with explicit
+error/conservation effects, simultaneous-state policy, and solver acceptance.
+Render LOD selection alone has no authority over it.
+When a transition changes a contact proxy, the collision owner migrates or
+resets manifolds and warm starts explicitly. During graphics crossfade, one and
+only one proxy representation may emit contacts/forces.
+
+This compiler owns static support only. Moving rigid supports, animated boats,
+flexible docks, morphing terrain, fracture, and other deforming surfaces bind a
+`DeformingSupportProxy` whose transform/deformation and surface-point velocity
+are owned by the motion/site/external solver adapter. Do not estimate velocity
+by differencing whichever render vertices were visible, and do not rebuild a
+physics proxy inside a render callback.
+
+Fixtures must sweep render LODs, chunk/page order, rebases, proxy variants, and
+semantic boundaries while asserting identical proxy/provider/material IDs;
+accepted position/normal/support errors; correct absent-channel behavior; and
+no runtime readback. Moving-support fixtures belong to the owning adapter, not
+to this static mesh writer.
+Contact fixtures additionally verify A/B reversal, generation reuse, epochs,
+manifold continuity, TOI, moving-frame relative velocity, lifecycle, material-
+law version latching, and that no geometry callback applies an impulse.
 
 ### Bounded complexity and low-end/mobile policy
 

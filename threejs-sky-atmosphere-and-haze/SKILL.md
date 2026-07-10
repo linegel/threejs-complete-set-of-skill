@@ -17,6 +17,76 @@ before implementation. It defines the LUT contracts, capability gate, authored
 workload trials, measurement obligations, color/output ownership, depth contract, diagnostics, and the
 techniques replaced by the WebGPU/TSL architecture.
 
+## Shared Lighting Transport Boundary
+
+For any material, cloud, water, vegetation, or weather consumer, first read the
+router's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Publish one versioned `LightingTransportSnapshot` from this atmosphere model.
+The snapshot declares:
+
+- physics-context/origin epoch, `sampleInstant: PhysicsInstant`, descriptor
+  `validity` whose temporal domain is a `PhysicsTimeInterval`, producer and
+  parameter revisions, spatial support, update cadence, and interpolation/error
+  policy;
+- sample-to-sun unit direction in `physicsFrameId` and disc angular radius;
+- whether the calibrated solar source is normal irradiance or finite-disc
+  radiance, including its per-channel SI unit and solid-angle conversion; an
+  authored dimensionless relative scale is an internal nonphysical model input
+  only and leaves snapshot radiance/irradiance channels absent;
+- each returned `SampledChannel`'s quantity kind, SI unit, filter/error, and,
+  where applicable, spectral/angular basis and conversion revision; a
+  provider-level transform registry never overrides channel metadata;
+- atmospheric direct-sun transmittance/irradiance, sky radiance/irradiance, and
+  segment transmittance/inscattering providers with their domain and error;
+- typed provider request signatures with position, direction/normal or segment
+  endpoints, footprint/solid-angle support, frame, and `PhysicsInstant`;
+- applied versioned `attenuationFactorIds` for every output and explicit
+  `skyIncludesDirectSolarDisc` state for sky irradiance. A boolean
+  "attenuated" flag is insufficient.
+
+Consumers must choose either a pre-attenuated direct-light value or an
+unattenuated source plus the atmosphere transmittance provider. They may not
+use both. Cloud optical-depth shadows, opaque-geometry visibility, and water
+extinction are separate factors and each is applied exactly once. Do not bake
+cloud attenuation into this atmosphere snapshot or let a material reapply
+aerial perspective already owned by the image path.
+
+`EnvironmentForcingSnapshot` is a separate thermodynamic/mechanical interface
+sampled at `sampleInstant: PhysicsInstant`; use `PhysicsTimeInterval` only for
+an actual validity or graph-stage interval. If temperature, humidity, pressure,
+aerosol loading, or wind drive atmosphere parameters, record that forcing
+revision and the transfer model; do not treat RGB extinction coefficients as a
+wind or humidity provider.
+
+After every physical owner commits, publish one view-independent
+`PhysicsPresentationCandidate` with
+`requestedPresentationInstant: PhysicsInstant`, containing the atmosphere's
+base-provider `presentedStatePairs`, `resourceLeases`, and
+`eventSequenceRanges`. Each
+pair gives `previousPresented.provenance` and `currentPresented.provenance`
+their own full `PresentationSampleProvenance`; never share one bracket, clock
+map, or interpolation alpha across the two states. Each arm also carries its
+own `presentedInstant: PhysicsInstant`. Static or low-rate products still
+declare explicit `hold` or `not-interpolated` provenance.
+
+For each target/view, the camera owner publishes `CameraViewPublication` with
+`previousRenderSampleInstant: PhysicsInstant`,
+`currentRenderSampleInstant: PhysicsInstant`, and
+`globalToRenderPrevious`/`globalToRenderCurrent` plus view/projection matrices,
+jitter, viewport, and depth state. Sky, aerial, shadow, cache, visibility, and
+reset preparation then publishes a `ViewPreparationPublication`
+against that camera record and the immutable candidate, owning
+`visibilityPublicationRefs`, `accelerationPublicationRefs`,
+`shadowViewPublicationRefs`, `cachePublicationRefs`, `reactiveEpochs`,
+`reactivePublications`, `resetDependencies`, full `resourceLeases` for newly
+created camera-dependent generations, and `resourceLeaseRefs`. Beyond
+identity, target/view scope, seal metadata, and scoped `eventSequenceRanges`, the sealed
+`PhysicsPresentationSnapshot` carries `candidateId`, `cameraPublicationId`,
+`viewPreparationId`, `presentedStatePairRefs`, and `resourceLeaseRefs`; it never
+copies `PresentedStatePair` records or `globalToRender` transforms. Leases
+remain live through every consumer.
+
 Canonical implementation contract: `examples/webgpu-lut-atmosphere/`.
 Run `node examples/webgpu-lut-atmosphere/validation.js` after edits.
 
@@ -216,3 +286,5 @@ Use `$threejs-image-pipeline` for whole-frame HDR/depth/MRT ownership,
 `$threejs-volumetric-clouds` for weather-shaped cloud density and cloud
 shadows, `$threejs-procedural-planets` for planet terrain/material fields, and
 `$threejs-visual-validation` for fixed-view diagnostics and GPU timing evidence.
+This skill is the unique producer of the atmosphere-derived
+`LightingTransportSnapshot` for a routed scene.

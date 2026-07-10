@@ -20,6 +20,85 @@ State this boundary in every implementation.
 Read [references/weather-volume-and-reconstruction.md](references/weather-volume-and-reconstruction.md)
 before implementing or auditing the cloud system.
 
+## Shared Environmental And Lighting Boundary
+
+For coupled weather or lighting, first read the router's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Consume its versioned `PhysicsContext`, `EnvironmentForcingSnapshot`, and
+`LightingTransportSnapshot`; do not invent a cloud-only world scale, wind
+clock, solar basis, or attenuation convention.
+
+- Sample environmental air velocity in meters per second from
+  `EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant`, with its declared
+  frame, altitude/support domain, cadence, interpolation policy,
+  requested/actual oriented spatial footprint, spatial/temporal filter or band,
+  and per-channel error. Every forcing channel has
+  `SampledChannel.actualPhysicsTime: PhysicsInstant`. Cloud-relative evolution
+  is a separately named velocity relative to the air. It is not water current
+  or vegetation deformation.
+- Select `appearance-only` or `causal-precipitation` explicitly. An
+  appearance-only density field may expose an artistic precipitation bias but
+  exposes no physical emission channel. A causal producer publishes dimensioned
+  phase-fraction-resolved liquid/ice `PrecipitationEmissionSnapshot` with
+  `emissionInterval: PhysicsTimeInterval` and canonical oriented mass-area flux;
+  every emission channel has
+  `SampledChannel.actualPhysicsTime: PhysicsTimeInterval` equal to that
+  interval. A volume-source cloud model projects through its support/Jacobian
+  before publication. Include
+  fall-delay or transport model, cadence, uncertainty/error, typed
+  `ConservationGroup.boundaryFluxes`, and separate
+  `InteractionBatchLedger` capacity-overflow/lost/deferred accounting for
+  `$threejs-rain-snow-and-wet-surfaces`. Any derived `SurfaceExchange` and
+  `InteractionRecord` use contained `applicationInterval: PhysicsTimeInterval`.
+- Consume sun direction and per-channel solar/sky radiance or irradiance
+  quantity, unit, spectral/working basis, filter, error, and atmospheric
+  transmittance from `LightingTransportSnapshot.sampleInstant: PhysicsInstant`;
+  every lighting channel has
+  `SampledChannel.actualPhysicsTime: PhysicsInstant`. Apply
+  atmospheric attenuation exactly once using its versioned
+  `attenuationFactorIds`, not a boolean.
+  Cloud self-shadowing contributes a separate cloud optical-depth/transmittance
+  factor; it never bakes atmospheric attenuation into that factor.
+- Version cloud density, precipitation emission, lighting input, and shadow
+  output independently. The scheduler latches forcing and lighting snapshots
+  before advection/marching. It publishes emission separately; it never mutates
+  the already consumed forcing snapshot. Downstream rain and surface lighting
+  consume only completed scheduled publications.
+- Publish committed render-consumed, view-independent cloud state generations
+  through `PhysicsPresentationCandidate.presentedStatePairs`, with the
+  candidate's `requestedPresentationInstant: PhysicsInstant`,
+  `resourceLeases`, and `eventSequenceRanges`. The candidate contains no camera,
+  render origin, `globalToRender`, view/projection matrix, shadow/cache epoch,
+  or view-specific current/history/reconstruction state. Every pair carries
+  independent `previousPresented.provenance` and
+  `currentPresented.provenance` records of type
+  `PresentationSampleProvenance`; never collapse them into one shared
+  provenance record. Each arm has its own `presentedInstant: PhysicsInstant`.
+  The camera owner publishes a per-target/view `CameraViewPublication` with
+  `previousRenderSampleInstant: PhysicsInstant`,
+  `currentRenderSampleInstant: PhysicsInstant`, source-qualified
+  `globalToRenderPrevious`, `globalToRenderCurrent`, and view/projection
+  matrices. Visibility, acceleration, cloud-shadow view products, temporal
+  caches, reactive/reset
+  plans, and their lease refs belong to the subsequent per-view
+  `ViewPreparationPublication` fields `visibilityPublicationRefs`,
+  `accelerationPublicationRefs`, `shadowViewPublicationRefs`,
+  `cachePublicationRefs`, `reactiveEpochs`, `reactivePublications`,
+  `resetDependencies`, full `resourceLeases` for newly created
+  camera-dependent generations, and `resourceLeaseRefs`. The sealed
+  `PhysicsPresentationSnapshot`
+  contains only `snapshotId`, `candidateId`, `cameraPublicationId`,
+  `viewPreparationId`, `presentationTargetId`, `viewId`,
+  `presentedStatePairRefs`, `resourceLeaseRefs`, `eventSequenceRanges`, and
+  `sealVersion`; it copies no pairs or transforms. Hold, analytic, or
+  no-interpolation policy is explicit in each previous/current provenance
+  record.
+
+Keep mobile tiers analytic and sparse: a low-rate authored weather map may
+sample a coarse wind provider and causal precipitation may use a conservative
+column flux/fall delay. Do not allocate cloud microphysics or dense transport
+state unless its observable and error contract requires it.
+
 Phase 1 WebGPU/TSL validation scaffold:
 `examples/webgpu-weather-volume-clouds/`. It includes `validateCloudConfig()`,
 asset-manifest checks, and shadow/temporal/composite ownership descriptors. Its
@@ -240,4 +319,6 @@ scattering without weather density, `$threejs-image-pipeline` for whole-frame
 HDR/post ownership, `$threejs-exposure-color-grading` for tone mapping and LUT
 policy, and `$threejs-scalable-real-time-shadows` when terrain/scene shadows need CSM or
 tiled shadow integration. This skill owns weather-shaped cloud volumes,
-temporal reconstruction, cloud lighting, and cloud optical-depth shadows.
+temporal reconstruction, optional typed precipitation emission, cloud lighting,
+and cloud-only optical-depth shadows. Atmosphere owns the shared lighting
+transport snapshot; rain owns precipitation transport to receivers.

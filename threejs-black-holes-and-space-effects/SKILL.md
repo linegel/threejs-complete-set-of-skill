@@ -13,6 +13,83 @@ whether a shot uses a geodesic model, a radiative-transfer approximation, or an
 art-directed deformation; numerical integration does not by itself make a
 model physical.
 
+## Shared Physics Boundary
+
+When lens, metric, observer, or emitter state changes with the routed scene,
+read the shared
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Register those producers and the presentation consumer in `PhysicsGraph`.
+Consume one `PhysicsContext` for `schemaId`, `contextVersion`, the canonical SI
+`worldFrameId`/`physicsRootFrameId`, `worldToPhysicsTransform` and
+`worldTransformRevision`, `physicsFrameRegistry`, `metersPerWorldUnit`,
+`physicsOriginEpoch`, and the named source clock. Camera-relative rendering is
+a presentation adapter; it never owns metric or emitter state.
+
+Publish each metric/lens/emitter source through `PhysicsSignalDescriptor` with
+stable provider/signal identity, model kind and revision, physics-frame pose,
+valid `PhysicsTimeInterval`, sample `PhysicsInstant`, bounded domain or query
+footprint, units/nondimensionalization, state version, residency, validity, and
+typed per-channel error. A physical scale is explicit: for example Schwarzschild
+state records `r_s = 2 G M / c^2` in metres (or mass in kilograms with the
+conversion provenance), Kerr spin records either `J [kg m^2 s^-1]` or declared
+`a* = c J / (G M^2)`, and Ellis state records throat radius in metres. Do not
+hide any of these in Three.js scene scale.
+
+Keep metric coordinate time, proper time where a massive emitter uses it, null
+affine parameter, any solver-only reparameterization such as Mino time, source
+simulation time, requested render time, and each binding's actual presented
+time distinct. The ODE parameter advances a ray. Map the observer event from
+the canonical source `PhysicsInstant` into the metric chart; for a
+nonstationary metric, integrate or recover `t_coord(lambda)` and
+sample/interpolate the metric and emitter fields at each mapped coordinate
+event with their versions and error.
+Using one immutable metric state for the complete ray is a frozen/quasi-static
+approximation with a declared evolution-error gate, not a general
+time-dependent geodesic solution.
+
+`PhysicsPresentationCandidate.requestedPresentationInstant` is `t_request`.
+For each stable binding `b`, resolve the candidate's `PresentedStatePair` and
+use `currentPresented.presentedInstant` as `t_presented[b]`; its previous and
+current states each carry independent `PresentationSampleProvenance`, clock
+mapping, brackets, interpolation/extrapolation policy, and error. Never assume
+those instants equal the request or share one interpolation alpha across lens,
+observer, disk, and emitter providers. For a view, use
+`CameraViewPublication.previousRenderSampleInstant` and
+`currentRenderSampleInstant`. When current is later and their clock mapping and
+discontinuity epoch agree, form the exact half-open `PhysicsTimeInterval` for
+temporal reconstruction. Equal instants mean no elapsed interval, not a
+zero-length interval record; reversal or discontinuity forces the scoped reset
+policy. Render delta is neither an affine step nor a physics step.
+
+Consume the sealed `PhysicsPresentationSnapshot` only as a reference closure:
+resolve its exact view-independent candidate, per-view `CameraViewPublication`,
+and preceding `ViewPreparationPublication`. The candidate owns the
+previous/current lens, observer, and emitter/disk pairs and read leases; the
+camera publication owns previous/current global-to-render transforms, render
+sample instants, and projection; the view-preparation publication owns
+visibility/shadow/cache publications, reactive state, and scoped reset actions.
+The snapshot contains binding and lease references, not copied pairs or those
+view fields. Validate model/signal version, provenance, validity, and error
+through the resolved `PhysicsSignalDescriptor` and pair.
+Lens history derives from these presented states and resets on model/revision,
+exterior/termination class, origin/projection, or validity discontinuity.
+Consume environment and emitter radiometry through the matching
+`LightingTransportSnapshot`; retain each sampled channel's radiometric
+quantity, working/spectral/angular basis, factor identity, validity, and error
+so attenuation is not applied twice. Do not invent a bundle-wide basis that
+overrides channel metadata.
+
+Ray escape, horizon/core hit, disk crossing, and step-cap termination are
+numerical integration events, not `InteractionRecord` values. A spacetime,
+metric parameter, or emissive medium is not a `PhysicsMaterialId` registered
+in `PhysicsMaterialRegistry`. This renderer does not publish force or impulse
+merely because it bends light; body dynamics must consume the same metric/mass
+signal through a separate dynamics owner.
+A `QualityTransition` may change tolerances, cache/map resolution, cadence, or
+reconstruction only while preserving the selected model class and physical or
+artistic claim. A metric/model-class change is a new truth contract and forces
+explicit history invalidation or migration.
+
 ## Model Claim Gate
 
 | Model | Defensible claim | Required evidence |
@@ -179,9 +256,14 @@ infer mobile feasibility from resolution scale alone.
   discontinuities, disk animation, or large bent-direction residuals. Generic
   mesh velocity/depth alone is insufficient for a lens.
 
-For emitting media, let `sigma_t` be extinction in inverse scene-length units,
-`j` emission/source density in radiance per scene-length, and
-`tau = sigma_t * ds` dimensionless. A constant segment contributes
+For a physical emitting medium after the declared SI adapter, let `sigma_t` be
+extinction in `m^-1`, `j` be an emission coefficient in
+`W m^-3 sr^-1` (or the declared wavelength-resolved equivalent), radiance be
+in `W m^-2 sr^-1`, and `tau = sigma_t * ds` be dimensionless. Declare the
+local comoving tetrad/spectral basis; curved-spacetime frequency transfer still
+obeys the invariant transfer rules above. An explicitly artistic medium may
+instead declare a coherent scene-length basis, but then it
+makes no SI radiometric claim. A constant segment contributes
 `T * (j / sigma_t) * (1 - exp(-tau))`; use the `j * ds` limit as `sigma_t`
 approaches zero. If code instead multiplies `segmentEmission` by alpha, document
 that value as the source function `j / sigma_t`, not an emission coefficient.
@@ -202,6 +284,10 @@ that value as the source function `j / sigma_t`, not an emission coefficient.
   `renderPipeline.needsUpdate = true` after changing diagnostic `outputNode`.
 
 ## References
+
+The shared physics ABI is defined only by
+[the physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md);
+this skill supplies the curved-ray adapter, not a parallel physics schema.
 
 Read [references/curved-ray-integrators.md](references/curved-ray-integrators.md)
 for the WebGPU/TSL architecture, RK4 wormhole state reduction, artistic

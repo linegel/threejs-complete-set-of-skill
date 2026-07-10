@@ -38,6 +38,9 @@ before implementing the generator.
 For generated terrain, islands, coasts, ruins, docks, boats, rocks, pebbles,
 flowers, or small scene assemblies, also read
 [references/semantic-site-asset-kits.md](references/semantic-site-asset-kits.md).
+When any asset supplies collision, support, rigid-body, hydrostatic, structural,
+or interaction semantics, also apply the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
 
 Legacy implementation (deprecated, do not extend):
 `examples/authored-financial-tower/`.
@@ -81,6 +84,21 @@ manifests; it emits placements with stable IDs, explicit anchors, support and
 exclusion volumes, material slots, LOD representations, and diagnostics. It
 does not infer meaning from arbitrary mesh bounds after placement.
 
+Physics-facing manifests additionally publish stable `ColliderProxy` and, when
+needed, `DeformingSupportProxy` IDs; `PhysicsMaterialId` bindings; provider IDs;
+and versioned `RigidBodyProperties` or `HydrostaticHullProperties`. These proxy
+identities and body properties are independent of render LOD, batching, and
+runtime instance index. A display hull, building mesh, or bounding box is not a
+collision, structural, buoyancy, or drag model.
+
+Dynamic transforms publish `RigidBodyState` and view-independent
+`PresentedStatePair` bindings with independent previous/current provenance and
+leases. Cameras own render mapping through `CameraViewPublication`; per-view
+LOD, visibility, shadows, caches, and resets belong to
+`ViewPreparationPublication`. A sealed snapshot references candidate binding
+IDs and leases, and multi-target `FrameExecutionRecord` entries retire those
+leases only after every consumer completes.
+
 Required reference families must resolve to a licensed compact asset kit or a
 tested procedural module/generator. A missing ruin, dock, boat, rock/reef,
 vegetation, cloud-silhouette, or other identity-bearing family is a blocker,
@@ -112,7 +130,7 @@ them.
 | --- | --- | --- |
 | ruin/wall/foundation | module graph, corners/openings, support footprint, collapse state, material slots, vegetation sockets | low-level profiles/mesh writers route to geometry; materials route to procedural materials |
 | dock/pier/bridge | land root, coast tangent/outward normal, deck datum, pile/bed contacts, berth/mooring frames, clearance prism | water surface/depth from water; optional motion from motion systems |
-| boat/floating prop | hull/waterline frame, conservative swept bound, berth/free-water mode, material slots, wake/interaction emitter metadata | buoyancy/wave/current state from water or domain solver; transform motion from motion systems |
+| boat/floating prop | hull/waterline frame, conservative swept bound, berth/free-water mode, material slots, `RigidBodyProperties`, `HydrostaticHullProperties`, stable collider/support proxy and wake/interaction emitter metadata | buoyancy/wave/current state from water or domain solver; transform motion from motion systems |
 | rock/boulder/pebble/debris | ground/embed anchor, support normal policy, footprint, cluster group, substrate/coast eligibility | topology from procedural geometry; PBR identity from procedural materials |
 | flower/grass/shrub/tree | root anchor, ecology/species response, crown/wind bounds, clearance, growth/LOD package | placement/growth/wind from procedural vegetation |
 
@@ -321,6 +339,13 @@ water and transform state consumed by docks/boats. This compiler owns semantic
 assembly, anchors, attachments, exclusions, stable asset selection, and the
 site-plan package; it does not own water simulation, buoyancy physics, plant
 growth, or generic rock mesh generation.
+
+Structural deformation, fracture progression, collision resolution, rigid-body
+dynamics, buoyancy, and fluid/structure coupling remain owned by the selected
+external/domain solver. The site compiler serializes the canonical proxy,
+property, provider, and adapter IDs; the solver participates in the shared
+`PhysicsGraph` and exchanges canonical samples/interactions. Do not add a
+site-local timestep, force accumulator, or mesh-bound collision callback.
 
 Use `$threejs-scalable-real-time-shadows` for CSM/tiled shadow budgets and diagnostics.
 

@@ -27,6 +27,88 @@ uses a bright-pass and a small multi-resolution blur pyramid. Consequently:
 - bloom cannot replace geometry, volumetric scattering, occlusion, fog shafts,
   or readable base lighting.
 
+### Lighting-transport binding
+
+The canonical cross-skill schemas are in the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+When the route declares a physics-to-render boundary, latch one immutable
+`PhysicsPresentationCandidate` -> `CameraViewPublication` ->
+`ViewPreparationPublication` ->
+`PhysicsPresentationSnapshot` chain and bind the matching
+`LightingTransportSnapshot` through a provider-wide `PresentedStatePair`
+(`entityId: typed-absence`) in the Candidate whose binding ID is referenced by
+the Snapshot. Match context/provider/signal IDs, descriptor and
+state/resource generations, `PresentationStateHandle`, each state's requested
+presentation instant, mapped source instant, clock-map revision/error, and the
+bundle `sampleInstant`; validate channel `actualPhysicsTime`, filter/age,
+maximum staleness, validity, and error. Validate the exact central
+target/view and per-channel schemas; do not define a reduced bloom-local field
+list.
+
+For each lighting channel, record basis/primaries or spectral basis,
+radiance/irradiance quantity, SI unit, bundle `sampleInstant`, channel
+`actualPhysicsTime`, revision, validity, and error.
+Canonical provider channels remain SI-valued. The route-level fields are an index,
+not permission to combine incompatible channel quantities.
+
+The bloom source is sensor-reaching scene-linear radiance after lighting and
+material transport. A calibrated render basis may retain physical units. A
+normalized RGB basis is a separately named render-local signal derived through
+a versioned SI-to-render conversion whose reference scale, provenance, and error
+cover direct light, sky/environment, atmosphere, reflection, transmission,
+emission, foam, and optical effects. It is not a normalized canonical channel.
+A nonphysical route leaves the router physics fields `not used`. Do not add
+`directSolarIrradiance` or `skyIrradiance` directly to a radiance
+buffer when the snapshot declares irradiance; the BRDF/geometry stage owns that
+conversion. Do not let exposure or bloom strength hide incompatible units.
+
+### Threshold-domain contract
+
+Store one of these policies with the graph:
+
+```text
+scene-referred:
+  thresholdScene has the same radiance basis and units as BloomNode input
+
+exposed-linear:
+  exposure = exp2(currentEV)
+  thresholdScene = thresholdExposedLinear / exposure       [Derived]
+
+display-referred:
+  thresholdScene = inverseOutputAndToneMap(thresholdDisplay) / exposure
+```
+
+The display-referred form is legal only when the declared tone map/output path
+has a stable, channel/basis-aware inverse over the accepted range. Otherwise
+use scene-referred or exposed-linear policy. Threshold and soft-knee widths
+convert together; strength is not a unit conversion.
+
+When any consumed lighting-channel descriptor/revision, radiance calibration/
+basis, primaries, quantity convention, or the exposure-key policy changes,
+execute the corresponding `ViewPreparationPublication.resetDependencies` before
+bloom and recompute its
+threshold conversion. A known linear radiance rescale may convert the threshold
+by the same scale; a spectral/primary/nonlinear change requires re-authoring or
+a validated transform.
+
+Shadow-map commits and discontinuous foam, emissive, wet-surface, absorption,
+or refraction changes emit versioned radiance-reactive publications. If a temporal color or
+selective-emissive history precedes bloom, reject its affected pixels with the
+published mask, or reset it entirely when no conservative mask exists.
+`BloomNode` owns no temporal history and therefore is not itself rebuilt for a
+local radiance edit; diagnostics still record the source reactive epoch so a
+stale upstream history cannot masquerade as stable bloom.
+
+`ViewPreparationPublication.resetDependencies` remains an immutable action
+plan. Record the executed
+threshold conversion, upstream temporal reset/reseed, graph rebuild, queue
+submission, or failure in `FrameExecutionRecord`. Logical revision and GPU
+availability are distinct. Device loss appends a `FrameExecutionRecord` with
+`overallStatus: device-lost`, affected target execution statuses
+`device-lost`, cancelled dependent actions, and lost-generation entries in
+`leaseDispositionById`; it invalidates node resources and timing evidence without
+mutating the sealed snapshot. Rebuild under a new backend/resource generation.
+
 ## Signal-source decision
 
 Stabilize exposure and capture scene-linear luminance before choosing a source.

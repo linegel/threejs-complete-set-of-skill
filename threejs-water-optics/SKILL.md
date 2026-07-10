@@ -16,6 +16,55 @@ module owns water state, displacement, derivatives, optical evaluation, and
 diagnostics. The host owns the renderer, scene partition, camera, lighting,
 transparent ordering, and final image pipeline.
 
+“Host owns lighting” means the water shader consumes the shared typed
+`LightingTransportSnapshot`: incident radiance, receiver-normal surface/sky
+irradiance, direct-solar irradiance, source direction, and transmittance each keep
+their quantity, SI radiometric unit, spectral/working basis, footprint, factor
+identity/version, validity, and error. Lighting transport is a provider, never
+an `InteractionRecord`; atmosphere, cloud, opaque-visibility, and water
+extinction factors are identified and applied exactly once.
+
+Before implementation, read the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+All physical water state lives in its SI physics frame. World/scene conversion,
+clock/instant/interval identity, graph ordering, interaction exchange, residency, version
+propagation, and presentation interpolation use that contract rather than a
+water-local dialect.
+
+### Canonical water-provider boundary
+
+This skill publishes the canonical `WaterSurfaceProvider` interface and
+`WaterSurfaceSample`. A canonical `PhysicsSampleRequest` is batched and
+channel-requested. It carries context/provider/signal/schema IDs, the requested
+`PhysicsInstant`, physics-frame-metre points or oriented footprints, channel
+masks, filter/frequency response, per-channel tolerances, maximum staleness,
+acceptable residency/latency, and batch extent. Descriptor discovery supplies
+a stable descriptor-table reference; the request does not deep-copy a complete
+descriptor. The returned sample always exposes `freeSurfacePoint` and
+`freeSurfaceNormal`; only when represented it exposes
+`surfacePointVelocityMps`, `materialCurrentVelocityMps`,
+`waterColumnDepthMeters`, `densityKgPerM3`,
+`materialAccelerationMps2`, `pressurePa`, `bathymetryPoint`, and `wetDryState`.
+Each is a complete `SampledChannel` with actual time/support/filter, validity,
+error, and `stateVersion`. The result returns the complete canonical
+`PhysicsSignalDescriptor`, bundle `sampleInstant`, and each channel's
+`actualPhysicsTime` resolving to a `PhysicsInstant`; requested and actual
+instants may differ only within the
+declared latency/staleness gates. Consumers preserve that result envelope rather
+than copying a water-local subset. Packed GPU batches use stable descriptor-table
+handles plus SoA channels, not per-sample descriptor copies. Missing channels
+follow `missingChannelPolicy` and are never zero-filled. Surface-point velocity
+is geometric motion of the sampled surface, not fluid current. Both velocity
+channels are physical polar vectors in `physicsFrameId`: cross-frame transport
+rotates their basis only. A moving-frame coordinate derivative is a distinct
+coordinate-rate schema and must not receive or lose frame-transport terms by
+masquerading as physical velocity.
+
+Analytic waves, bounded heightfields, coastal solvers, spectral donors, and
+external free-surface solvers implement adapters to this one ABI. Raw helper
+functions such as `getWaterHeight()` are implementation details and cannot be
+passed directly to motion, creature, collision, or force consumers.
+
 ## Numeric Provenance
 
 Every quantitative choice must carry one of these tags in implementation notes,
@@ -159,7 +208,7 @@ linear phenomena are required over fixed bathymetry.
 
 At an offshore/nearshore handoff, choose one contract. A phase-resolved handoff
 transfers frequency, direction, complex surface-elevation amplitude, wavenumber,
-intrinsic frequency, energy, and time origin. A phase-averaged handoff transfers
+intrinsic frequency, energy, and phase-reference `PhysicsInstant`. A phase-averaged handoff transfers
 action/energy quadrature and direction with no crest-phase claim; local phase is
 a separate owner. Match model validity before blending. Do not alpha-crossfade
 independently phased geometric surfaces; one owner supplies height and
@@ -213,7 +262,9 @@ and bounds. Noise may alter microstructure; it cannot create source coverage.
 Partition breaking dissipation once at a model handoff and drive one foam
 history; foam coverage is not conserved wave energy.
 
-Store exposed-bed wetness separately. For a phase-only/no-solver branch,
+Exactly one receiver stores exposed-bed wetness separately. Water supplies
+inundation/wash `SurfaceExchange`; it runs the receiver update itself only when
+the route explicitly assigns it that ownership. For a phase-only/no-solver branch,
 `m_wash` is an explicit prescribed beach-inundation mask; static water depth
 cannot wet exposed bed:
 
@@ -264,6 +315,85 @@ Choose one honest contract:
   disturbances.
 
 Never hide readback latency in a per-frame query.
+
+### Coupled interaction order
+
+Water/body feedback uses the shared scheduler and `InteractionRecord` schema;
+it is not an actor-side wake callback. For every coupled coordination interval, preserve
+the dependency chain
+
+```text
+body and water prediction
+  -> footprint-filtered sampling from both predictors at one declared bracket
+  -> source InteractionRecord generation
+  -> conservative load scatter by conservation group
+  -> water advance (including declared subcycles)
+  -> reaction InteractionRecord reduction
+  -> body and water correction, conservation/stability check, atomic commit
+  -> water PresentedStatePair for coordinator PhysicsPresentationCandidate. [D]
+```
+
+Declare the coupling class as explicit, semi-implicit, scheduler-bounded
+iterated, or monolithic; do not let a body or water subsystem perform an
+unbounded private iteration.
+For a bounded iteration, repeat prediction, same-bracket sampling, source/
+reaction construction, solve, reduction, and correction using the exact prior
+iteration versions named by `iterationCarriedEdges`; a frozen pre-step sample
+is only an explicitly selected one-way/explicit scheme, not an iterated solve.
+
+Every two-way source/reaction relation is an all-or-none
+`InteractionReactionGroup`; one source may split across reactions and several
+sources may reduce into one reaction. All members are transported to the
+group's balance frame/reference point before impulse/torque residuals are
+tested. Mass,
+linear/angular momentum, energy/work (including declared dissipation/heat), and
+species transfers reconcile across their complete conservation group. Volume
+is only a separately gated constraint for a fixed-density incompressible model.
+Gather and scatter are a discrete-adjoint pair that preserves zeroth and first
+kernel moments and gates force, torque, interface-work, and added-mass
+stability. Records carry SI units, frame, canonical
+`applicationInterval: PhysicsTimeInterval`,
+footprint, producer/consumer identities, ordering key, validity/error,
+`stateVersion`, and conservation-group identity through the complete shared
+`InteractionRecord`; water must not redeclare a subset. Stable interaction and
+causal IDs plus application state enforce exactly-once consumption. Reproducible
+paths use stable bin/sort and a fixed reduction tree or bounded fixed-point
+accumulation, not schedule-dependent floating atomics. The exact
+`InteractionBatchLedger` records published sequence range, per-consumer cursor,
+accepted/rejected/late/duplicate counts, overflow policy and sequence ranges,
+typed lost/deferred conserved commodities, and exact-once ledger version.
+Authoritative overflow backpressures, substeps, or conservatively aggregates.
+One-way coupling identifies the authoritative source and records a `[G]` upper
+bound on omitted feedback or explicitly narrows the claim; it emits no reaction
+and must not claim feedback. Keep
+coupled hot state on one execution side or in a validated shared mirror;
+synchronous frame-critical GPU readback is forbidden.
+
+Water contributes a per-binding/provider `PresentedStatePair` to the
+view-independent `PhysicsPresentationCandidate`, which contains committed
+state brackets, leases, and events but no camera, render origin, view matrix,
+shadow/cache state, or global-to-render transform. `previousPresented` and
+`currentPresented` each independently contain a
+`PresentationSampleProvenance`, `presentedInstant`, `PresentationStateHandle`,
+and `PresentationSpatialBinding`; `motionBinding` references the two state
+handles and records identity mapping and motion validity. The camera owner then
+publishes a per-view `CameraViewPublication`; visibility/shadow/cache owners
+publish `ViewPreparationPublication`; the sealed
+`PhysicsPresentationSnapshot` references candidate binding IDs and lease refs
+rather than copying pairs or transforms. `FrameExecutionRecord` records all
+target/view executions and lease disposition keyed by lease ID. These presented
+states need not equal solver states `n` and `n+1`. Surface position,
+normals, velocity/MRT output, shadows, foam/wetness display, and temporal
+rejection resolve through that immutable publication chain and separately
+versioned physical instants, physics-frame transforms, and source-data epochs.
+A state, residency,
+transform/source epoch, or quality migration that invalidates history is
+propagated and reset explicitly rather than hidden by interpolation.
+Foam, optical, deformation, wet/dry-topology, and disocclusion changes
+contribute scoped reactive epochs/affected regions; the coordinator turns them
+into per-view `ReactivePublication` and capability-gated `ScopedResetAction`
+plans in `ViewPreparationPublication`. Reset/history flags are not undocumented
+`PresentedStatePair` or snapshot fields.
 
 ### Caustics
 
@@ -322,6 +452,17 @@ peak live bytes, allocation churn, and thermal drift on the named target
 
 For tile/mobile GPUs:
 
+- batch provider requests and `InteractionRecord` streams as compact SoA with
+  channel masks, bounded queues, stable IDs distinct from slots, and fixed
+  deterministic reductions; never allocate one JavaScript object per sample;
+- publish presentation resource handles with `resourceGeneration` and a
+  frame-in-flight lease/reuse rule instead of deep-copying water fields or
+  allowing compute to overwrite a rendered generation;
+- apply physical quality changes only as coordinator-admitted tick-boundary
+  `QualityTransition` transactions with state projection, conservation/error ledger, queue-drain
+  boundary, atomic provider-version publication, rollback, and peak old/new
+  residency; exactly one representation emits reactions during any visual
+  crossfade;
 - keep simulation resolution independent of viewport resolution;
 - restrict nearshore simulation to persistent causal-influence tiles, not
   merely currently visible tiles;
@@ -363,6 +504,16 @@ applicable subset below and every algorithm-specific gate from those references:
 - exact Fresnel versus approximation error, TIR classification, refraction-ray
   residual, and invalid-sample fraction;
 - foam source/transport/reaction coverage plus bed wetness/inundation history;
+- canonical `WaterSurfaceProvider` conformance, absent-channel rejection, footprint
+  filtering, state-version/error propagation, and CPU/GPU adapter parity;
+- one-way authoritative-source, omitted-feedback bound/claim, and invariance;
+  or two-way scheduler-order, source/reaction
+  `InteractionRecord`, conservation-group, and zero-frame-readback evidence;
+- physics presentation-snapshot coherence across interpolation, origin/version
+  changes, velocity output, shadows, and temporal-history rejection;
+- `LightingTransportSnapshot` channel units/bases/filters and factor ledger
+  proving solar disc, sky, atmosphere, cloud, visibility, and water extinction
+  are neither omitted nor double-applied;
 - close beach/cliff, whole-island, multi-island, and rock/pier fixed views at
   multiple times, with bathymetry/depth/phase/flow/foam/optics diagnostics;
 - final/no-optics/no-caustics/no-foam fixed views;
@@ -377,12 +528,19 @@ semantics, or any unlabeled quantitative claim.
 ## Routing Boundary
 
 This skill consumes the versioned coast SDF, bathymetry, obstacle, and substrate
-contract from the terrain/data owner. It owns shoreline phase, bathymetry-aware
+contract from the terrain/data owner and the shared physics ABI from
+`../threejs-choose-skills/references/physics-domain-and-interaction-contract.md`.
+It owns shoreline phase, bathymetry-aware
 nearshore transformation, water boundary/state, bounded wave grids,
 depth-averaged shallow-water wet/dry state, sparse coastal tiles, exact
-small-wave parametric surfaces, transported foam/wetness,
-depth-aware refraction, water-volume attenuation, and bounded caustics. Use
+small-wave parametric surfaces, transported foam, and inundation/wash exchange.
+It owns integrated receiver wetness only when explicitly selected as the single
+receiver owner; otherwise the route-selected receiver-state owner integrates it.
+It also owns depth-aware refraction, water-volume attenuation, and bounded
+caustics. Use
 `$threejs-spectral-ocean` for offshore directional spectra and FFT cascades,
-then hand off explicitly; use the weather-water skill for precipitation-driven
-surface accumulation. Route overturning/three-dimensional free-surface physics
-to an external solver and consume its visual state here.
+then hand off explicitly. Precipitation and surface accumulation consume the
+`SurfaceExchange`/`InteractionRecord` boundary published by
+`$threejs-rain-snow-and-wet-surfaces`; no additional adapter skill owns this
+handoff. Route overturning/three-dimensional free-surface physics to an external
+solver and consume its versioned provider and presentation state here.

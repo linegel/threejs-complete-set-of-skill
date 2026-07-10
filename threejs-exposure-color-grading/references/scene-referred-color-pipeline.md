@@ -145,6 +145,105 @@ This order is `[Derived: producer-before-consumer dependency]`. The delay and
 meter cadence are `[Authored]`. Running the reduction before the first scene
 pass without a cleared/initialized source is invalid.
 
+## Route-Level Radiometric Boundary
+
+Use the canonical schemas in the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+When the route declares a physics-to-render boundary, the exposure owner latches
+the exact `PhysicsPresentationCandidate` -> `CameraViewPublication` ->
+`ViewPreparationPublication` -> `PhysicsPresentationSnapshot` chain and binds one
+`LightingTransportSnapshot` through a provider-wide `PresentedStatePair`
+(`entityId: typed-absence`) in the Candidate whose binding ID is referenced by
+the Snapshot. Match context/provider/signal IDs, descriptor and state/resource
+generations, and `PresentationStateHandle`. Clocks need not share a `clockId`;
+require each `PresentationSampleProvenance` mapping from requested presentation
+instant to mapped source instant and validate every channel's
+`actualPhysicsTime`,
+age, filter, maximum staleness, validity, and error. Record intentional lag.
+Reject a
+snapshot with unsupported central descriptor schema/context IDs or context
+version, invalid bundle/channel validity, or a blocking error.
+
+Validate the exact central `LightingTransportSnapshot` and its channel
+descriptors rather than mirroring a reduced exposure-local field list.
+
+`directSolarIrradiance`/`skyIrradiance` are transport inputs in irradiance units. The
+material/lighting stage must apply its BRDF and geometry terms to produce the
+scene-linear radiance sampled by the meter. It is dimensionally invalid to add
+irradiance directly to radiance or to compare their numeric values as if they
+shared a threshold.
+
+The basis and quantity declaration is per canonical channel. Record for
+`incidentRadiance`, `surfaceIrradiance`, `directSolarIrradiance`,
+`skyIrradiance`, `transmittance`, and `sourceDirection`: spectral basis,
+radiometric quantity, SI unit, filter/support, bundle `sampleInstant`, channel
+`actualPhysicsTime`, state/resource version, validity, and error. The bundle
+instant is a `PhysicsInstant`; a channel time is the exact instant-or-interval
+union allowed by `SampledChannel`. Record all applied atmosphere/cloud/visibility
+factors through `attenuationFactorIds`. A global quantity summary cannot
+override an incompatible channel descriptor.
+
+Canonical `LightingTransportSnapshot` channels remain SI-valued. Choose exactly
+one render-radiance convention:
+
+- calibrated radiance that retains recorded physical units and exposure
+  calibration;
+- a separately named render-local normalized scene-linear signal produced by a
+  versioned SI-to-render conversion with a named reference, provenance, error,
+  and one common scale for lights, environment, atmosphere, emissive materials,
+  foam, and optical effects.
+
+The second is a perceptual rendering contract, not a canonical physical channel
+or physical calibration. A purely perceptual route leaves the router physics
+fields `not used` rather than fabricating a normalized physics snapshot.
+Auto exposure cannot validate or repair arbitrary gains applied by individual
+skills. Store the convention, each consumed channel descriptor/revision, the
+meter's working basis, and authored exposure-key revision with every exposure
+state.
+
+### Reactive and basis-epoch behavior
+
+Resolve `reactivePublications`/`resetDependencies` from the Snapshot's
+`viewPreparationId`:
+
+- local shadow-content commits and local foam/emissive/optical changes alter
+  the next valid meter source; adaptation continues unless the shot policy
+  explicitly cuts it;
+- a camera cut may hold, cut, or reseed exposure only by the authored shot
+  policy; it always records the decision;
+- a radiance scale/basis, working-primary, quantity-convention, or exposure-key
+  change invalidates accumulated meter statistics and the adapted-state
+  interpretation unless an exact conversion is supplied;
+- invalid or temporally mismatched transport executes a bounded canonical
+  `hold-prior` action for the last valid GPU target and raises a diagnostic
+  flag; CPU telemetry never substitutes a value.
+
+For a known positive scale change `L_new = k L_old`, preserve the displayed
+product with:
+
+```text
+currentEV_new = currentEV_old - log2(k)                  [Derived]
+targetEV_new  = targetEV_old  - log2(k)                  [Derived]
+```
+
+This conversion is legal only when the basis/primaries and exposure key are
+otherwise identical. Spectral-basis, primary, quantity, or nonlinear
+normalization changes require a new reduction/reseed. Execute that dependency
+before tone mapping the new epoch; never let one frame use old exposure state
+with an incompatible radiance basis without declaring the transient.
+
+`ViewPreparationPublication.resetDependencies` is immutable. Append the actual conversion,
+meter reset/reseed/hold, compute submission, and failure to
+`FrameExecutionRecord`. Distinguish logical exposure-state version, resource
+generation, submission epoch, GPU queue availability, and diagnostic host
+visibility. `computeAsync()` is not a fence. Device loss invalidates exposure
+state/resources, appends a `FrameExecutionRecord` with
+`overallStatus: device-lost`, affected target execution statuses
+`device-lost`, cancelled dependent actions, and lost-generation entries in
+`leaseDispositionById`, and requires an authored reseed under a new backend/resource
+generation before presentation resumes. The immutable snapshot remains audit
+evidence; its lost-generation bindings are unusable.
+
 ## Meter Selection: Re-Derivation
 
 Let the source contain `N = width * height` pixels `[Derived]`, use `W` compute
@@ -307,6 +406,11 @@ Measured]`. Report underflow and overflow counts so the EV window cannot
 silently clip the scene.
 
 ## GPU Exposure State And Adaptation
+
+Allocate one state record per exposure-control group keyed by target/view,
+`cameraPublicationId`, projection revision, and radiance binding. Share a record only when the
+meter mask, exposure-key policy, sample-time policy, and reset history are
+identical; otherwise one view can adapt another view's exposure.
 
 Keep float and integer state in typed storage records:
 

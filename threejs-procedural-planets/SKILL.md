@@ -13,6 +13,32 @@ views; a hybrid hands it to the global quadtree. The same planet-space causes
 must drive geometry, normals, material identity, scientific/query outputs,
 diagnostics, and atmosphere handoff.
 
+Any planet output consumed by dynamics, contact, navigation, water, weather,
+or another physics domain must use the route's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Publish typed `PhysicsSignalDescriptor` records bound to the active
+`PhysicsContext` through the canonical IDs, physics frame/origin epoch,
+transform/chart, `clockId`/`samplePhase`, channels, represented-footprint/
+filter, validity/`perChannelError`, residency/cadence/latency, state/resource
+version, and missing-channel envelope. Every `PhysicsSampleRequest` and
+returned `SampledChannel.actualPhysicsTime`, including static/analytic results,
+carries a direct canonical `PhysicsInstant | PhysicsTimeInterval`, never the
+generic `PhysicsTime` wrapper; time is not an extra descriptor field. A
+quadtree tile, render LOD, TSL function, or cache texture is never the public
+physics ABI.
+When that state is rendered, the candidate stays view-independent and each
+field binding publishes independent previous/current provenance and leased
+state handles. `CameraViewPublication` owns render mapping,
+`ViewPreparationPublication` owns per-view LOD/caches/shadows/resets, and the
+sealed snapshot references candidate binding IDs and leases rather than copying
+state or transforms.
+Treat cube-face UV, longitude/latitude, geodetic coordinates, and tangent
+parameterizations as nonlinear charts, not Cartesian frames. Publish their
+metric/Jacobian, domain/seam validity, and chart version; express physical
+vectors in a declared orthonormal body/world frame.
+When dynamics need gravity, publish a point/time vector signal in `m s^-2`;
+never substitute world `-Y`, radial up, or a normalized surface normal.
+
 Do not load this skill merely because a scene contains islands. A bounded
 archipelago, coastal site, bathymetric model, or isometric land tile whose
 planetary curvature, horizon, global geodesy, and orbit-to-ground transition are
@@ -66,6 +92,9 @@ Legacy WebGL implementation (deprecated, do not extend): `examples/procedural-pl
    mean-surface, bathymetry, metric coast-distance/frame, material, version,
    and uncertainty contract from the fixed body analysis field; do not make
    the water renderer rediscover coast topology from a transient render LOD.
+   Register every physics-facing body/coast/hydrology field as a typed
+   `PhysicsSignalDescriptor`; the descriptor's analysis revision and error
+   bounds, not the visible patch level, determine whether a consumer may use it.
 7. Filter detail by represented vertex spacing and pixel footprint. Camera
    altitude may choose policy but is not a frequency filter. Fade contribution
    strength before aliasing; do not change procedural frequency abruptly.
@@ -179,6 +208,12 @@ validation.
 - Macro silhouette must survive altitude changes; micro detail may fade out.
 - Expose field views, patch error, parity error, detail weights, and
   displacement exaggeration.
+- Reject physics queries whose `PhysicsContext`, body/world frame, origin
+  epoch, analysis revision, validity, footprint, or error bound does not match;
+  never convert a missing or ambiguous planet sample to a plausible zero.
+- A render floating-origin rebase changes only presentation transforms and its
+  render-origin epoch; it never changes `physicsOriginEpoch`, body-field
+  source/state revision, stable identity, or SI values.
 
 ## Completion Test
 

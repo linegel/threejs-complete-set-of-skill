@@ -117,6 +117,100 @@ a non-WebGPU fallback.
 - lifecycle evidence: resize, DPR and tier changes, history reset, teardown,
   device errors, and dispose/recreate loops with before/after resource counts.
 
+## Pack-Wide Physics Integration Gate
+
+Use the canonical
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+whenever two or more physical domains or a physics-to-render boundary is
+claimed. Validate the `PhysicsContext`, provider schemas, scheduler DAG,
+`InteractionBatchLedger`, `InteractionReactionGroup`, `ConservationGroup`,
+`PhysicsPresentationCandidate`, sealed
+`CameraViewPublication`, `ViewPreparationPublication`,
+`PhysicsPresentationSnapshot`, `LightingTransportSnapshot`, and append-only
+`FrameExecutionRecord`; a polished coupled animation is not interface proof.
+
+The sealed Snapshot is per presentation target/view and deliberately contains
+references. Validate adjacent previous/current presented states and independent
+provenance in Candidate pairs, complete render instants/transforms/matrices in
+`CameraViewPublication`, reactive/reset/resource publications in
+`ViewPreparationPublication`, and the Snapshot's exact transitive ID/lease/event
+closure. Do not define or accept a reduced validation-local schema. Motion
+bindings cover rigid,
+skinned, instanced, and procedural deformation plus spawn, despawn, teleport,
+reparent, and LOD validity. Motion vectors from solver `n/n+1` endpoints fail.
+
+Validate the acyclic lifecycle:
+
+```text
+simulation/provider commits + origin rebase
+  -> immutable PhysicsPresentationCandidate
+  -> per-view CameraViewPublication
+  -> per-view ViewPreparationPublication
+  -> sealed PhysicsPresentationSnapshot
+  -> depth/velocity/radiance/history/output consumers
+  -> append-only FrameExecutionRecord of completed reset/submit actions
+```
+
+No stage mutates an earlier immutable record. A one-frame-deferred alternative is
+legal only when declared and when the current frame continues using the exact
+prior committed resource/version named by its snapshot. GPU descriptors pin
+generation, layout, entity-map, slot, and a queue-safe lease through every
+consumer submission and until its central `reuseProhibitedUntil` condition is
+satisfied;
+retirement must appear in `FrameExecutionRecord.leaseDispositionById` with its
+completion join/evidence. Do not equate
+logical state version, submission epoch,
+GPU queue availability, or host visibility; `computeAsync()` is not a fence.
+A pre-seal failure must append a `FrameExecutionRecord` with aborted overall
+status (or `partial-failure` when another target survives), exclude the failed
+target from `snapshotIds`, store typed absence in its target execution's
+`snapshotId`, cancel/defer actions, retire only failed-target-exclusive
+preparation leases, and retain Candidate leases until every surviving consumer
+joins through `leaseDispositionById`. Device loss must append `overallStatus: device-lost`
+and affected target statuses `device-lost`, advance `deviceLossGeneration`, cancel actions, and
+invalidate lost-generation resources/leases without mutating immutable
+Candidate/Snapshot records or fabricating a completion token. Rebuild histories
+and timing proof under the new generation.
+
+Acceptance requires schema/version/unit/axis checks; DAG edge and barrier
+ordering; step/subcycle convergence for numerical solvers; provider validity,
+uncertainty, and error propagation; source/flux/conservation and equal-and-
+opposite reaction residuals for claimed conserved quantities; rebase
+invariance; deterministic reset; and conservative quality-state migration.
+Validate the exact central `QualityTransition` record for every migration.
+Every unsupported channel must remain explicitly unavailable rather than
+becoming zero or an invented adapter default.
+
+Run one deterministic end-to-end interaction fixture:
+
+```text
+cloud/atmosphere precipitation flux
+  -> rain ground/water flux
+  -> water mass and momentum source
+  -> boat buoyancy/drag/reaction
+  -> wake source
+  -> wave/breaking dissipation
+  -> one foam source/history
+  -> shoreline wetness
+  -> vegetation wetness/load and boat/terrain/vegetation contact
+```
+
+Capture each provider input/output, event/source record, reaction owner,
+residual, reactive epoch/mask, reset action, and final visual contribution.
+Disable each link in turn; downstream state must change only through declared
+dependencies. This fixture must also cross an origin rebase, simulation-rate
+change, quality migration, resize/DPR transition, and an external pose-stream
+gap or error.
+
+For every domain and target, record coordination intervals, per-owner native
+ticks/subcycles, compute dispatches, render passes, queue submissions,
+executions per presented frame, barriers,
+readbacks (steady-state physics/render readback is normally zero), hot working-
+set bytes, resident and peak/migration-overlap bytes, compulsory reads/writes
+per execution, traffic per presented frame, upload volume, timing-query resolve
+latency, CPU/GPU/presentation distributions, and settled quality. A mobile
+claim requires this evidence on the named physical low-power device.
+
 ## Refresh-Derived Performance Envelope
 
 Do not use a universal device-class millisecond table. For each target

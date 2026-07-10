@@ -670,6 +670,340 @@ the real pipeline and report the resulting graph and resource state.
 
 ## Mechanism-Specific Evidence
 
+### Pack-wide physics, interaction, and presentation linkage
+
+Apply this section whenever a route combines physical domains, consumes an
+external solver, or presents solver-owned state. The authoritative interface is
+the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+
+#### Required physics artifacts
+
+Add these stable artifacts to the evidence bundle:
+
+```text
+physics-context.json
+physics-schema-validation.json
+physics-scheduler-dag.json
+physics-signal-inventory.json
+physics-provider-contracts.json
+physics-interactions.json
+physics-overflow-and-conservation.json
+physics-materials-and-proxies.json
+physics-presentation-candidates.jsonl
+physics-camera-view-publications.jsonl
+physics-view-preparation-publications.jsonl
+physics-presentation-snapshots.jsonl
+physics-frame-execution.jsonl
+physics-quality-migration.json
+physics-performance-and-traffic.json
+images/physics.provider-validity.png
+images/physics.interactions-and-reactions.png
+images/physics.rebase-residual.png
+images/physics.migration-residual.png
+images/physics.reactive-and-reset-dag.png
+images/physics.coupled-rain-water-boat.png
+```
+
+`physics-context.json` records only canonical `PhysicsContext` ownership:
+schema/context revision, meters-per-world-unit, world-to-physics transform,
+axes/handedness, gravity provider, clocks/charts/frames, physics-origin epoch,
+stable entity/material IDs, and capability limits. Candidate/Snapshot artifacts
+do not own render transforms: `CameraViewPublication` owns render transforms and
+render-origin epochs. `physics-signal-inventory.json`
+names every field/provider channel, units, basis, frame, support, sampler/filter,
+cadence, current state/resource version, error bound, missing-channel policy,
+writer, consumers, and residency. Its joined presentation columns must be
+explicitly sourced from each
+`PresentedStatePair.previousPresented.provenance` and
+`currentPresented.provenance`, which independently own requested/mapped
+instants, clock-map revision/error, brackets, interpolation/extrapolation, and
+state-handle generations.
+
+`physics-interactions.json` records each canonical `InteractionRecord`: source/
+reaction role, exact-once key, `applicationInterval`, frame/origin epoch and
+transform revision, target state
+equation/version, footprint, tagged payload, units, producer/receiver, reaction
+link, validity/error, and provenance. Sequence ranges, ordering outcome,
+overflow policy, per-consumer cursor, and lost/deferred commodity amounts belong
+only to the corresponding `InteractionBatchLedger` in
+`physics-overflow-and-conservation.json`. Repeated presentation frames must not
+replay births/impulses; skipped frames must not drop sequence ranges. Overflow
+is visible evidence, never silent replacement or truncation.
+
+`physics-materials-and-proxies.json` verifies each explicit render-binding to
+`PhysicsMaterialId`, then resolves friction, restitution, compliance, adhesion,
+permeability, drag, thermal response, and collision proxies from the versioned
+`PhysicsMaterialRegistry`. It never infers a physical property from PBR color,
+roughness, or metalness. Proxy parity is an error bound over
+support, silhouette/contact distance, mass properties, and interaction
+envelope; literal parity with fragment microdisplacement is neither required
+nor generally possible.
+
+#### Snapshot schema and lifecycle validation
+
+Run executable schema validators on `PhysicsContext`, `PhysicsGraph`, every
+`PhysicsSignalDescriptor`, interaction/material/proxy/migration records,
+`PhysicsPresentationCandidate`, `CameraViewPublication`,
+`ViewPreparationPublication`, sealed `PhysicsPresentationSnapshot`,
+`LightingTransportSnapshot`, `PresentationResourceLease`, GPU resource
+descriptors, and `FrameExecutionRecord`. The sealed Snapshot is target/view
+specific and references, rather than copies, candidate bindings, camera and
+preparation publications, leases, and event ranges. Validate the exact central
+schemas and transitive closure; do not mirror a reduced field list in the
+harness.
+
+`physics-schema-validation.json` records central schema and validator hashes,
+validated artifact hashes, validator revision, positive results, every negative
+fixture and expected error code, observed error paths/codes, and the final
+decision. Negative fixtures include missing required IDs/units, reciprocal
+scale fields, wrong frame/clock, absent channel encoded as zero, stale resource
+generation, reused entity slot, mutated snapshot, and reset completion written
+into the immutable plan. A command exit code without these results is not
+reviewable schema evidence.
+
+Also require:
+
+- independent previous/current presented instants, provenance, state handles,
+  and global bindings in each Candidate pair;
+- complete previous/current `RenderSimilarityTransform`s, unjittered matrices,
+  jitter, viewport/DPR/extent, depth convention, and projection validity in
+  `CameraViewPublication`, not only origin epoch numbers;
+- per-provider/signal mapped instants and brackets with versions, frames/origin
+  epochs/transform revisions, clock-map revision/error,
+  interpolation/extrapolation policy, alpha, validity, and uncertainty;
+- motion bindings for rigid, skinned, instanced, particle, and procedural
+  deformation with stable entity/slot maps and explicit spawn, despawn,
+  teleport, reparent, and LOD validity reasons;
+- GPU resource generation, layout, entity map, slot/range, access mode, and a
+  central `PresentationResourceLease` pinned until every consumer submits and
+  its `reuseProhibitedUntil` completion join is satisfied, with retirement in
+  `FrameExecutionRecord.leaseDispositionById` plus completion join/evidence;
+- lighting metadata for canonical `incidentRadiance`, `surfaceIrradiance`,
+  `directSolarIrradiance`, `skyIrradiance`, `transmittance`, and
+  `sourceDirection`: spectral basis, quantity, SI unit, filter/support,
+  bundle `sampleInstant`, channel `actualPhysicsTime`, state/resource version,
+  validity, and error; plus every applied
+  atmosphere/cloud/visibility factor in `attenuationFactorIds`.
+
+The lighting snapshot must be bound by a provider-wide `PresentedStatePair`
+with `entityId: typed-absence` in the Candidate and referenced by the sealed
+Snapshot. Validate context/provider/signal IDs, descriptor and state/resource
+generations, `PresentationStateHandle`, requested/mapped presentation instants,
+actual channel times/filters/ages, clock-map revisions/errors, maximum
+staleness, validity, and error.
+
+One global lighting label cannot legalize incompatible channel units. Verify
+every radiance/irradiance conversion through the declared transport/BRDF stage.
+
+Validate this acyclic publication order:
+
+```text
+provider/solver commits and origin rebase
+  -> immutable PhysicsPresentationCandidate
+  -> per-view CameraViewPublication
+  -> per-view ViewPreparationPublication with full leases for newly created
+     view resources plus visibility/shadow/cache/reactive/reset refs
+  -> seal PhysicsPresentationSnapshot
+  -> bind leased resources
+  -> depth/velocity/radiance/history/output submissions
+  -> append completed actions to FrameExecutionRecord
+```
+
+Mutation of Candidate, camera publication, preparation publication, or Snapshot
+fails. `ViewPreparationPublication.resetDependencies` is an immutable plan;
+completion, failure, queue submission, and fallback action belong only in the
+append-only `FrameExecutionRecord`. A declared one-frame-deferred cache schedule
+passes only when the current snapshot/render retain the exact prior committed
+resource/version and the next snapshot receives the late publication.
+
+Exercise both exceptional paths. Pre-seal failure must produce
+`overallStatus: aborted` (or `partial-failure` when another target survives), an
+empty/omitted snapshot for the failed target, cancelled/deferred actions, and one
+keyed abort disposition for failed-target-exclusive preparation leases while
+Candidate leases remain joined to surviving snapshots. Device loss must produce
+`overallStatus: device-lost` and affected target statuses `device-lost`, advance
+`deviceLossGeneration`, cancel actions, invalidate every lost-generation
+resource/lease, and contain no fabricated normal completion token.
+
+Distinguish and record:
+
+```text
+logicalStateVersion
+resourceGeneration
+submissionEpoch
+GPU queue availability
+host visibility/readback completion
+```
+
+Equality or monotonicity among those values is not a completion fence.
+`renderer.computeAsync()` does not prove GPU completion. Device loss does not
+mutate immutable Candidate/Snapshot evidence; it makes their lost-generation
+resource references unusable. Validate rebuild/reseed under the new generation
+before accepting another frame.
+
+Motion-vector truth is:
+
+```text
+previous clip <- PresentedStatePair.previousPresented at its presented time
+current clip  <- PresentedStatePair.currentPresented at currentRenderSampleInstant
+```
+
+using each state's `globalBinding` and the complete respective
+`CameraViewPublication` render, view, and projection transforms. Solver `n/n+1`
+endpoints are only provenance brackets. Particle
+compaction moves stable identity, current state, and previous-presented state
+atomically. Birth, death, slot reuse, teleport, reparent, or incompatible LOD
+marks motion/history invalid instead of borrowing another entity's vector.
+
+#### Scheduler, convergence, errors, and conservation
+
+Serialize the multi-rate scheduler as a DAG containing the coordination
+interval, each stage's `clockId`, execution interval, native step rule and
+subcycles, reads, writes, interaction collection, source
+application, equal-and-opposite reactions, barriers, GPU submissions, snapshot
+publication, and presentation interpolation. Validate one writer per signal,
+producer-before-consumer ordering, no undeclared cycle, no double advance, no
+stale read, no hidden CPU/GPU synchronization, and deterministic tie-breaking.
+
+For each numerical domain, freeze labelled refinement sequences and minimum
+sample counts as `Gated` inputs before inspection. Isolate temporal convergence
+by refining domain step/subcycles at fixed spatial representation; isolate
+spatial convergence at fixed sufficiently resolved time policy; and separately
+sweep cross-domain subcycle ratios/coupling iterations over the same physical
+interval to measure integrated exchange error. Report native state/residual
+norms and observed order or bounded non-asymptotic error. Coupled `dt`+`dx`
+refinement alone is insufficient. Discontinuous contact, breaking, and wet/dry
+fronts use integral/weak, impulse, arrival-time, or region metrics rather than
+invalid pointwise order claims. Analytic/perceptual branches instead prove their
+stated phase, response, and frame-rate invariants; do not impose a conservation
+claim they never make.
+
+Inject provider failures independently: stale version, missing channel,
+out-of-support query, excessive interpolation/extrapolation error, non-finite
+value, clock mismatch, unit/frame mismatch, queue/resource unavailability, and
+device loss. Every consumer must propagate `validity`/`error`, select its
+declared hold/disable/degrade path, and expose the result. Fabricated zero wind,
+flat water, identity transform, or silent last-value reuse fails.
+
+For every consumer, serialize an error propagation rule and downstream gate.
+For differentiable transforms a valid first-order bound is
+
+```text
+Eout >= Emodel (+) combine_i( norm(J_i) * Ein_i )          [Derived]
+```
+
+where `(+)` and `combine` are the correlation/norm rules declared by the
+central `PhysicsErrorDescriptor`; correlated inputs cannot be root-sum-squared
+by convenience. Nonlinear or discontinuous consumers use interval/Lipschitz,
+ensemble/confidence, or explicit worst-case propagation appropriate to their
+error class. `unknown` remains `unknown`. Acceptance requires
+`Eout <= consumerTolerance` with compatible units/basis; relabelling a provider
+error as visual noise or dropping it at an adapter fails.
+
+For a conserved scalar/vector `Q`, report:
+
+```text
+residualQ = (Q_next - Q_previous)
+            - integratedExternalSourcesIntoDomain
+            - integratedBoundaryFluxIntoDomain
+            - integratedExchangeReactionsIntoDomain
+            + integratedPositiveDissipationSink                  [Derived]
+```
+
+Every term is integrated over the same interval; sources/fluxes/reactions are
+positive into the control domain and dissipation is a nonnegative sink. A
+different convention is legal only when the displayed residual is re-derived
+and serialized. Apply this gate only to quantities the route declares
+conserved or balanced. For exchanged impulse,
+momentum, force, heat, mass, or moisture, report both sides and the reaction
+residual; one-way coupling is legal only when explicitly declared and excluded
+from a two-way conservation claim. Compare tolerances with discretization,
+solver, provider, and proxy error bounds instead of hiding leakage in a visual
+threshold.
+
+#### Rebase and quality-migration gates
+
+Cross an origin cell while every physical input is otherwise frozen. Compare
+global trajectories, pair distances, contacts, provider samples, forces,
+shadow light-space coordinates, current/previous presented poses, motion
+vectors, and final radiance before/after applying the two complete
+global-to-render transforms. A pure rebase has zero physical impulse and no
+false temporal velocity. Missing compensation triggers the declared reset; it
+does not pass through a wider temporal filter.
+
+A physical quality migration requires a queue-drain/version boundary, a
+declared conservative restriction/prolongation or state rebuild, contact-
+manifold and warm-start migration/reset, event-cursor preservation, history
+policy, and a bounded overlap lifetime. During a visual crossfade, exactly one
+representation emits forces/sources/reactions. Compare conserved quantities,
+support/contact state, phase, presented pose, and visual contribution before,
+during, and after migration. Test round trips and repeated transitions; no
+duplicate force, event replay, missing event, identity swap, or unbounded
+resource overlap is permitted.
+
+#### End-to-end coupled fixture
+
+Run a deterministic fixture containing this complete chain:
+
+```text
+cloud/atmosphere precipitation production
+  -> dimensioned rain ground/water flux
+  -> water mass/momentum source
+  -> boat buoyancy, drag, collision, and equal/opposite reaction
+  -> boat displacement/wake source
+  -> wave propagation/breaking dissipation
+  -> exactly one foam source and one foam history owner
+  -> shoreline wetness/infiltration/evaporation state
+  -> vegetation moisture/load response
+  -> boat/terrain/vegetation contact event and reaction
+```
+
+Capture every typed provider sample, source/event range, reaction, state
+version, residual, presentation bracket, shadow/radiance reactive publication,
+history reset/rejection, and isolated visual contribution. Disable each edge
+one at a time and prove that no undeclared path carries the response. Sweep rain
+rate, water/boat step ratio, presentation rate, external-pose latency/error,
+origin rebase, resize/DPR, solver reset, and quality migration. Include a zero-
+forcing equilibrium and a stress/overflow case selected before inspection.
+
+Stock r185 `TRAANode` has neither a reactive-mask input nor a public general
+reset. A local reactive-mask claim therefore requires a custom/patched temporal
+node with direct evidence. The stock path uses an evidenced rebuild, bypass,
+reseed wrapper, or conservative full reset; a diagnostic mask alone does not
+change its history.
+
+#### Per-execution, memory, traffic, and mobile evidence
+
+For each domain, provider adapter, interaction queue, presentation stage,
+shadow preparation, and post/history consumer, record:
+
+```text
+coordination intervals and per-owner native ticks/subcycles
+executions and compute dispatches per coordination interval and presented frame
+render passes, queue submissions, barriers, and timing-query resolves
+readbacks/maps and their latency (steady-state physics/render path normally zero)
+active elements, allocated capacity, and occupancy
+bytes per element and simultaneously hot slots
+compulsory reads/writes/atomics per execution
+uploads, downloads, attachment stores/resolves, and queue copies
+resident bytes, hot working-set bytes, peak transients, frames-in-flight bytes
+quality-migration overlap bytes and lifetime
+```
+
+The byte inventory includes solver ping-pong, current and previous presentation
+slots, provider brackets, event queues, per-consumer cursors, identity/entity-
+slot maps, resource-descriptor/lease rings, reactive masks, histories, staging,
+readback, and in-flight frame rings. Derive lower/upper traffic per execution,
+multiply by measured executions per presented frame, then by measured
+presentation rate. Report queue/timestamp resolution latency separately; do not
+attribute a blocking query resolve to solver cost.
+
+Mobile acceptance requires sustained CPU, GPU, presentation, memory, traffic,
+allocation, migration-spike, deadline, and settled-quality evidence on the
+named physical low-power device. Device labels, desktop emulation, a short warm
+trace, or resident bytes without the hot/migration/in-flight set do not pass.
+
 ### Generated geometry, vegetation, and structures
 
 Report semantic element counts, topology groups, material slots, exposed-edge

@@ -97,10 +97,14 @@ contract promote them; never infer a device tier from those counts.
 
 ## Space Contract
 
+For a coupled effect, `world` names the stable SI `physicsFrameId` chosen by
+`PhysicsContext`, never camera-relative or scaled Three.js render coordinates.
+The presentation adapter performs the one `metersPerWorldUnit` conversion.
+
 | Space | Owner | Convention |
 | --- | --- | --- |
 | local hull | source mesh | hull samples, normals, and UV shell coordinates before world transform |
-| world flow | event packet | normalized downstream fluid-relative-to-body direction `flowDirectionWorld = normalize(vFluidWorld - vBodyWorld)`; a body moving through still fluid therefore supplies one negation; convert physical acceleration with `sceneUnitsPerMeter`, or declare authored world-length-units/s² |
+| world flow | event packet | normalized downstream fluid-relative-to-body direction `flowDirectionWorld = normalize(vFluidWorld - vBodyWorld)`; a body moving through still fluid therefore supplies one negation; coupled physical acceleration remains SI in `PhysicsContext` and is converted once by its registered render adapter |
 | event frame | effect pool | wake forward from world flow, projected up, right-handed basis |
 | camera-facing sprite frame | renderer | camera -Z forward, sprite axes derived after world position |
 | UV shell | shell material | `u` around hull or capsule, `v` normalized head-to-tail age |
@@ -175,6 +179,15 @@ non-indexed indirect command to `IndirectStorageBufferAttribute`, attached with
 `geometry.setIndirect()`. Never update only a draw count while leaving custom
 state or identity maps behind.
 
+Compaction moves stable generation-bearing identity, current recurrent state,
+previous presented state, and every per-particle render lane atomically, then
+rebuilds the versioned `motionBinding.identitySlotMap`. A
+`PresentedStatePair` is published once per stable binding/provider after
+commit; it is not a per-particle lane and is never scattered through the pool.
+Birth, death, generation change, and slot reuse invalidate motion-vector,
+trail, interpolation, and temporal-history keys before the slot is presented;
+a new entity must not inherit the removed entity's previous pose.
+
 Initialize every invariant indirect word before GPU publication. Non-indexed
 layout is `[vertexCount:u32, instanceCount:u32, firstVertex:u32,
 firstInstance:u32]`; indexed layout is `[indexCount:u32, instanceCount:u32,
@@ -191,10 +204,173 @@ Use workgroup/storage barriers only for dependencies in their valid scope and
 dispatch boundaries for global phases. Avoid readback in the frame loop; an
 actual async readback/map operation is required for CPU-visible completion.
 
+### Presentation snapshot and temporal participation
+
+Bind physics-driven pools to immutable, generation-bearing resources through
+the candidate-first lifecycle. The view-independent
+`PhysicsPresentationCandidate` owns each exact `PresentationResourceLease` and
+one pair per stable binding/provider. Each pair's previous/current arm carries
+independent `PresentationSampleProvenance`, `presentedInstant`, state handle,
+and particle spatial binding. `CameraViewPublication` owns per-view render
+sample instants, camera/projection state, and previous/current render mappings.
+`ViewPreparationPublication` owns visibility, culling, acceleration, shadows,
+caches, reset actions, and preparation lease refs. A sealed per-target/view
+`PhysicsPresentationSnapshot` references candidate binding IDs and lease refs
+plus those camera/preparation publication IDs; it copies no pair or transform.
+Record resource/device generation, layout and entity-map revision, slot/range,
+residency, access, queue availability, and the retirement condition. Metadata
+immutability alone does not stop a GPU buffer from being overwritten.
+
+Retain each lease until the multi-target `FrameExecutionRecord` records every
+consuming snapshot under its target/view key and satisfies the lease-keyed
+`ConsumerCompletionJoin`. On pre-seal failure, keep that target's `snapshotId`
+absent and record `retired-after-abort` for each affected lease. On device loss,
+record `device-lost`, invalidate the lost resource generation, and use the
+lease's `invalidated-by-device-loss` disposition rather than wait for a
+completion token that cannot arrive. A frame-in-flight ring is valid only when
+it implements these candidate, snapshot-reference, multi-consumer completion,
+abort, and loss rules.
+
+Analytic particles evaluate pose at both previous and current presentation
+times from immutable spawn data. Recurrent pools retain or generate adjacent
+presented states separately from solver endpoints. Motion vectors use adjacent
+presented poses, never physical velocity or a slot-index lookup. Publish
+validity/rejection for birth, death, teleport, reparent, dissolve discontinuity,
+generation/slot reuse, topology/representation change, and unavailable prior
+state.
+
+Each transparent class explicitly selects one route: pre-temporal with valid
+depth/velocity and rejection, post-temporal, or temporal exclusion. Record the
+choice and ghost/disocclusion tests; transparency does not inherit opaque-scene
+history semantics automatically.
+
 ## Physics Contract
 
+Coupled effects use the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+They join the route's `PhysicsContext` and `PhysicsGraph`; they do not define a
+private gravity, scene scale, origin epoch, collision material, support query,
+or timestep. The canonical schedule is:
+
+```text
+ingest -> sample-forcing -> predict -> emit-interactions -> solve-subcycles
+       -> reduce-reactions -> correct -> commit -> publish-presentation
+```
+
+`publish-presentation` emits each stable binding/provider's
+`PresentedStatePair` into a view-independent
+`PhysicsPresentationCandidate`. The camera owner publishes
+`CameraViewPublication`; visibility/shadow/cache owners publish
+`ViewPreparationPublication`; only then does the per-target/view snapshot seal
+candidate binding and lease refs. An effect pool does not mutate or pre-empt
+any phase.
+
+Weather-coupled particles, spray, smoke, debris, and wakes consume the route's
+immutable `EnvironmentForcingSnapshot` through a declared `PhysicsGraph` edge.
+They compute `vRel = airVelocityMps - particleVelocityMps` only after both
+vectors are transformed into the same registered physics frame at the sample
+instant. Drag or lift additionally requires `airDensityKgPerM3`, or a named
+equation-of-state adapter; a direction-only visual may consume wind without
+claiming aerodynamic force. Every consumed `SampledChannel` retains its actual
+time, support, filter, state version, validity, and error, and missing required
+channels follow the edge's explicit absence policy. Recurrent physical pools
+apply forcing in their owned solver stage and publish reciprocal exchange, when
+modeled, through canonical `InteractionRecord`/reaction groups. Analytic visual
+pools may sample forcing only into immutable event parameters or presentation
+state. Neither path owns a second wind field or mutates the forcing snapshot.
+
+Choose the coupling class before allocating recurrent state:
+
+| Effect | Physics boundary |
+| --- | --- |
+| purely visual analytic spark/trail | consume either a route-local presentation-only event or a non-authoritative view of the canonical `InteractionRecord` stream with its consumer cursor; emit no physical reaction |
+| support-colliding particle/debris | consume registered `ColliderProxy` plus canonical `SupportSurfaceSample` at `sampleInstant: PhysicsInstant` |
+| wake, impact, deposition, heat, erosion, or momentum source | emit a canonical `InteractionRecord` over `applicationInterval: PhysicsTimeInterval`; join a declared reaction group only when the coupling mode requires reactions |
+| two-way debris/fluid/body coupling | solver adapter consumes interactions and returns reactions during `reduce-reactions`; the visual pool does not apply both sides |
+
+An effect pool is presentation-only by default. It becomes an authoritative
+physics participant only through a registered solver adapter with SI state and
+stable generation-bearing body, collider/shape, proxy/support, and
+`PhysicsMaterialId` identities. A colored sprite, visual debris instance, or
+analytic trail never acquires mass, momentum, heat, or contact authority from
+appearance. Authoritative bodies remain in the solver even when their visual
+instances are culled, compacted, thinned, or unavailable.
+
+`ColliderProxy` identity, topology version, frame/transform provider,
+`PhysicsMaterialId`, and error bounds come from the site/geometry/domain owner.
+The contact solver resolves that ID through the shared
+`PhysicsMaterialRegistry`; an effect shader never derives coefficients from PBR
+roughness, particle color, or debris appearance.
+Support point, frame, physics material, point velocity, and point acceleration
+come from the exact canonical `SupportSurfaceSample`. Thermal state, wetness,
+receiver inventory, and other non-support quantities come from separate
+`PhysicsSignalDescriptor` providers owned by their state equations; they are
+not extra support-sample fields. Optional channels that are unavailable remain
+absent. Do not zero-fill them, raycast the active render LOD, sample camera
+depth as world collision, or create an effect-local height/collision field.
+Screen depth remains a visual occlusion/soft-fade input only.
+
+`SupportSurfaceSample` is kinematic. The registered collision solver owns the
+separate contact ABI: `ContactManifoldRecord` carries generation-bearing
+collider/shape/feature pairs, manifold generation and points, separation and
+lifecycle, friction/adhesion state, warm starts, material-law versions,
+validity, and migration/reset policy; canonical `InteractionRecord` values
+carry dimensioned impulses, constraint targets, and reactions. Moving-frame
+relative point velocity includes `omega cross r` under the central frame/time
+contract. A presentation-only effect consumes these records; it does not
+rediscover or resolve contact.
+
+Every physically meaningful spawn, impact, scrape, deposition, wake, or heat
+exchange crossing an owner boundary is one canonical `InteractionRecord`
+serialized exactly as defined by the shared contract; this skill defines no
+abbreviated record, alias, or parallel event envelope. Preserve the canonical
+source and target state versions, target state equation, time/frame/origin,
+footprint, tagged dimensional payload and sign, exact-once/application keys,
+reaction/conservation links, validity, error, and provenance. Effect-specific
+code selects a legal payload tag but cannot rename or omit common fields.
+Generate child visual seeds from `interactionId`. Do not reconstruct an impulse
+from flash brightness, convert particle count to mass, or emit separate
+wake/impact formats per effect class. A presentation-only event is explicitly
+non-authoritative and cannot enter an `InteractionBatchLedger` or
+`InteractionReactionGroup`.
+
+Batch support/proxy sampling and interaction emission on the owning compute or
+solver path. Declare queue capacity, exactly-once producer sequence and consumer
+cursor, total ordering, compaction, coalescing, and CPU/GPU barriers. Serialize
+the exact canonical `InteractionBatchLedger`; do not define an effect-local
+subset. In particular retain `batchId`, `exchangeId`, `producerId`, published
+sequence range, every per-consumer cursor, typed accepted/rejected/late/
+duplicate counts, overflow policy and sequence ranges, lost/deferred commodity
+maps, and `exactOnceApplicationLedgerVersion`. The published range and typed
+outcomes account produced, coalesced, or dropped work without adding per-record
+overflow. A record that never entered the queue cannot report its own loss. A
+full authoritative
+queue backpressures, substeps, or conservatively aggregates under the route's
+policy; silent loss can violate conservation or regression identity. A
+reproducible GPU path uses stable bin/sort and a fixed reduction tree or proven
+bounded fixed-point accumulation, not scheduling-dependent floating atomics.
+Avoid in-frame readback. When a visual pool consumes a physics event without
+feedback, mark it non-authoritative so it cannot accidentally enter an
+`InteractionReactionGroup` or `ConservationGroup`.
+
+Pool capacity and graphics quality are not conservation controls. Overflow,
+LOD thinning, lifetime expiry, scan/compaction, or render-page eviction may
+drop or coalesce presentation records under the declared visual policy, but
+must never delete an authoritative body, contact lifecycle, or undelivered
+physical `InteractionRecord`. Size authoritative queues from the physics
+contract or apply its explicit backpressure/failure rule; maintain a separate
+best-effort visual queue when graceful degradation is required.
+
+An authoritative physics `QualityTransition` also migrates or explicitly
+resets contact manifolds, warm-start impulses, and dependent history under the
+shared error/conservation gate. During any render crossfade, exactly one
+physical representation owns force/contact emission; overlapping visual
+representations may both draw but may not both emit interactions or reactions.
+
 Use an analytic trajectory when acceleration and drag permit exact seeking;
-otherwise use a named integrator in declared scene length units and seconds.
+otherwise use a named integrator. Coupled state uses `PhysicsContext` SI meters
+and seconds, then converts to rendering once; an authored visual-only path may
+use art units only while it emits no physical `InteractionRecord` or reaction.
 For `dv/dt = a - gamma*v` with constant `a` over a step, use the exponential
 update rather than attenuating a newly added acceleration impulse:
 
@@ -212,11 +388,12 @@ normalizedAge = (time - spawnTime) / lifetime
 ```
 
 For position/velocity-dependent forces, collision, or constraints, choose and
-name an integrator, fixed step, event solve, and convergence gate. Gravity is
-world-space length units per second squared under the project's declared unit
-convention. Lateral spawn velocity is in the event frame and then converted to
-world flow. Lifetime and drag ranges are authored per effect; gate them by
-trajectory/energy/error envelopes rather than copying fixture constants.
+name an integrator, fixed step, event solve, and convergence gate inside the
+registered `PhysicsGraph`. Gravity comes from `PhysicsContext` in SI and is
+converted at the declared boundary once. Lateral spawn velocity is in the
+event frame and then converted to the canonical physics frame. Lifetime and
+drag ranges are authored per effect; gate them by trajectory/energy/error
+envelopes rather than copying fixture constants.
 
 Visible wrongness signatures:
 
@@ -380,11 +557,19 @@ collision readability. Reference artistic parameters:
 ```text
 radius = 0.45
 lifetime = random 2 -> 4 seconds
-mass = 0.1
-friction = 0.4
-restitution = 0.8
-gravity scale = 1.2
 ```
+
+Those are visual fixture values in authored object/time units, not physics.
+Presentation debris has no mass, friction, restitution, or gravity scale. An
+authoritative fragment instead binds versioned SI `RigidBodyProperties`, a
+generation-bearing `ColliderProxy`, `PhysicsMaterialId` plus state version, and
+the `PhysicsContext` gravity provider. Its solver state remains outside the
+effect pool. After commit, the authoritative binding publishes its
+`PresentedStatePair` into `PhysicsPresentationCandidate`; each visual pool
+resolves that candidate binding through the per-view
+`CameraViewPublication`, `ViewPreparationPublication`, and sealed snapshot
+refs. The snapshot copies no pair or render mapping, and the pool creates no
+private snapshot mirror or second presentation-state owner.
 
 Per-instance data:
 
@@ -463,6 +648,7 @@ Account unique work rather than assigning a universal tier table:
 | stable-slot draw | capacity versus live count and hole ratio; accept only if wasted vertex/fragment work fits |
 | scan compaction | mark/scan/scatter reads+writes and moved records; compare against stable slots under identical occupancy |
 | effect draw | submitted/visible instances, triangles, covered pixels, mean/p95 transparent layers |
+| physics linkage | proxy/support samples, interaction records, queue/overflow counts, subcycles, barriers, and reaction reductions; deduplicate shared provider work |
 | post | exact formats/extents/history slots and attachment read/write lower bound |
 
 Allocate a ceiling from the complete frame, then measure contemporaneous
@@ -485,6 +671,10 @@ pool occupancy and overflow drops
 instance index/entity mapping
 age, velocity, acceleration, and radius
 fall/flow direction and support point
+PhysicsContext/frame/origin epoch and PhysicsGraph stage
+ColliderProxy/SupportSurfaceSample provider IDs, versions, validity, and errors
+InteractionRecord payload/source/target/interval/order/dedup/reaction group
+canonical InteractionBatchLedger occupancy, sequence/outcome/overflow/loss fields
 shell facing/core/envelope/shock masks
 coarse and fine wake fields
 wake profile distance and tail fade

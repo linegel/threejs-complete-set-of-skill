@@ -95,6 +95,51 @@ color, temporal, space, and lifecycle invariant to one status:
 If a degraded image would misrepresent the mechanism, remove the feature. Do
 not use presentation treatment to hide lost geometry, energy, state, or parity.
 
+## Physics ABI Is Inherited, Not Downgraded
+
+This skill remains exempt from physics routing until the activation gate has
+passed. After activation, if the canonical owner participates in cross-domain
+physics, read the
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+and inherit it unchanged. Fallback authorization does not authorize a second
+unit system, frame graph, clock, scheduler, identifier namespace, provider
+envelope, interaction/reaction convention, material/collider registry, or
+presentation schema.
+
+Classify each physics-facing channel explicitly:
+
+| Status | Required compatibility behavior |
+| --- | --- |
+| `preserved` | Keep the owner's exact `PhysicsContext`, `PhysicsGraph` dependency, `PhysicsSignalDescriptor`, stable generation-bearing IDs, `PhysicsMaterialRegistry`/`PhysicsMaterialId`/`ColliderProxy` identity, applicable `SurfaceExchange`/`InteractionRecord`/`InteractionBatchLedger`/`ContactManifoldRecord` semantics, and the complete view-independent `PhysicsPresentationCandidate` -> per-view `CameraViewPublication` -> `ViewPreparationPublication` -> sealed `PhysicsPresentationSnapshot` -> append-only `FrameExecutionRecord` lifecycle. Preserve the candidate's per-binding `PresentedStatePair` provenance and `requestedPresentationInstant`, camera `previousRenderSampleInstant`/`currentRenderSampleInstant` and transforms, preparation/reset publications, read-only `PresentationResourceLease`, `ConsumerCompletionJoin`, and abort/device-loss disposition. |
+| `weakened` | Keep the same schema and physical quantity; publish the increased error, latency, staleness, footprint, cadence, or reduced valid `PhysicsTimeInterval`. A renamed or differently dimensioned approximation is not the same channel. |
+| `removed` | Mark the channel absent/unsupported with a typed error and remove the associated physical, interaction, and conservation claims. Never zero-fill missing force, mass, velocity, temperature, wetness, or contact. |
+
+A cached or precomputed branch claiming preservation retains provider/signal
+and resource generations, units, valid `PhysicsTimeInterval`,
+residency/latency, typed error, each state pair's independent
+`PresentationSampleProvenance`, candidate
+`requestedPresentationInstant`, per-view camera render instants, preparation
+publications, snapshot references, lease retirement, and candidate abort/
+device-loss cleanup. It does not move view transforms or reset state into the
+candidate/snapshot or collapse source and presentation clocks. `NodeMaterial`
+or PBR appearance cannot substitute for a
+`PhysicsMaterialId` registered in `PhysicsMaterialRegistry`; stable material/
+collider IDs either remain valid or the capability is explicitly unsupported.
+CPU/offline substitution must not add a frame-critical readback or silently
+change the source `PhysicsInstant` or its clock mapping.
+
+Inside inherited physics records, retain the canonical quantitative form
+`{ value, unit, label: Derived|Gated|Measured|Authored, source }`.
+`[D/G/M/A]` are compact prose aliases only; the fallback must not rewrite the
+canonical provider or interaction schema.
+
+Preserved dynamics still require replay, convergence, conservation/reaction,
+origin-rebase, stable-ID, and sustained-resource evidence. A
+`QualityTransition` must prove state migration/reset and history invalidation;
+it cannot silently change solver/model class or let old and new representations
+emit the same reaction. If those proofs cannot survive, mark the mechanism
+weakened or removed rather than presenting visual similarity as physics parity.
+
 ## Workflow After Activation
 
 - Name the canonical owner and exact downgraded feature.
@@ -167,6 +212,10 @@ behavior, and physical bandwidth are not measured unless counters expose them.
 
 ## References
 
+- [Physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md):
+  conditional canonical ABI inherited only after explicit fallback activation;
+  it is not an activation route into this skill.
+
 - [references/canonical-loss-ledger.md](references/canonical-loss-ledger.md):
   owner invariants, permitted losses, forbidden misrepresentation, and proof
   deltas.
@@ -193,6 +242,10 @@ Also include:
   quality policy, and visual-error gates;
 - exact color/data texture domains and output owner;
 - lifecycle, disposal, and rebuild deltas;
+- the exact preserved/weakened/removed physics channels, typed unsupported
+  errors, stable-ID/material/collider continuity, presentation semantics, and
+  replay/convergence/conservation/rebase proof delta, including candidate,
+  camera, view-preparation, snapshot-reference, lease, and execution records;
 - separate canonical and compatibility test commands and artifact paths;
 - every unsupported claim, including `INSUFFICIENT_EVIDENCE_GPU_TIMING` when
   required.

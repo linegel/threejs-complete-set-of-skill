@@ -5,6 +5,14 @@ launch, staging, docking, spring, rotating-frame, detachment, and debris motion.
 The best path is analytic semantic state first, then instanced node attributes
 or compute/storage state for scale.
 
+Read the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+first. It defines the SI `PhysicsContext`, frame transforms, clock/instant/
+interval graph,
+multi-rate ordering, typed providers, `InteractionRecord`, conservation groups,
+residency/state versions, and immutable `PhysicsPresentationSnapshot`. The
+motion equations below are domain implementations, not competing interfaces.
+
 Number labels: Gated values are validation limits, quality tiers, or explicit
 budget gates. Derived values come from the authored scene scale, preset
 equations, actor count, or measured hardware. Treat unfit hardware or scale as
@@ -165,6 +173,33 @@ instead of dropped time, recurrent systems must be resynchronized by an exact
 state transition or bounded backlog before analytic motion samples wall time;
 never let analytic and recurrent paths silently diverge after a clamp.
 
+That local drop policy is valid only for a standalone fixture. Once motion is a
+`PhysicsGraph` owner, the graph supplies the coordination interval and one
+catch-up/drop/discontinuity decision for every domain. Motion may choose native
+substeps but cannot discard a physical interval that water, contacts, or
+another owner advances; rate/integral interactions cover the graph interval
+exactly once.
+
+`fixedState.render` above is an implementation staging value, not a public
+cross-domain snapshot. At the scheduler's presentation-publication stage,
+contribute a per-binding/provider `PresentedStatePair` to the view-independent
+`PhysicsPresentationCandidate`, which contains committed state brackets,
+leases, and events but no camera or render transform. `previousPresented` and
+`currentPresented` each carry independent `PresentationSampleProvenance`,
+`presentedInstant`, state handle, and global spatial binding. Bounds/error remain
+in their typed provider state. A per-view `CameraViewPublication` owns render
+mappings and camera matrices; `ViewPreparationPublication` owns visibility,
+shadows, caches, reactive publications, and reset actions. The sealed
+`PhysicsPresentationSnapshot` references candidate binding IDs and lease refs,
+and `FrameExecutionRecord` records multi-target completion and lease disposition
+keyed by lease ID. The presented poses need not be solver states `n` and `n+1`.
+Render transforms, storage uploads, motion vectors, bounds, shadow/depth passes,
+and temporal effects resolve through that chain without resampling providers at
+render time. Physical instants, physics-frame transform, floating-origin, and source-data epochs
+remain separate. A state/residency/quality or transform/source-epoch migration
+either supplies a declared migration/error record or invalidates the affected
+history.
+
 ## Capability gate and quality tiers
 
 Use `WebGPURenderer` everywhere and gate only the quality tier. Explicit
@@ -201,12 +236,29 @@ compatibility-fallbacks skill.
 
 ## Validity ranges and visible wrongness
 
-Use one scene scale:
+Physical state uses the shared SI physics frame. Serialize only the finite
+positive `PhysicsContext.metersPerWorldUnit`; its reciprocal is a read-only
+derived presentation value, never a second scale knob:
 
 ```text
-sceneUnits = meters * sceneUnitsPerMeter
-# equivalently: sceneUnits = meters / metersPerSceneUnit
+renderUnitsPerMeter = presentationScale / metersPerWorldUnit,
+x_render = renderUnitsPerMeter R_physicsToRender x_physicsMeters
+           + translationRenderUnits.                         [D]
 ```
+
+This is the `CameraViewPublication`'s `RenderSimilarityTransform`, not candidate
+state. A physical polar velocity changes basis as
+`V_renderBasis = renderUnitsPerMeter R_physicsToRender V_physics`; it receives
+no origin or angular transport terms. The coordinate rate of `x_render` under a
+moving render frame is a different schema kind and requires derivatives of the
+mapping. `RenderSimilarityTransform` does not serialize those derivatives, so
+motion vectors compare previous/current presented positions through the two
+published render transforms instead of treating physical velocity as a moving-
+frame coordinate rate or differentiating a camera rebase.
+
+Mass, force, impulse, density, and material properties remain SI; angular rates
+remain radians per second. The render conversion occurs only in the
+presentation binding.
 
 Recommended validity ranges:
 
@@ -214,11 +266,11 @@ Recommended validity ranges:
 fixed step: 1/240 -> 1/60 s
 clamped frame delta: <= 1/20 s
 max substeps: 4 -> 12
-launch speed: <= 95 sceneUnits / s unless the preset declares another cap
+launch speed: <= 95 m/s unless the preset declares another SI cap
 stage spin: 0.06-0.15 rad/s for readable hero debris
 docking spin: 0-3.15 rad/s for the reference preset
 debris lifetime: 0.5-12 s
-terminal snap epsilon: position <= 1e-4 sceneUnits, quaternion angle <= 1e-4 rad
+terminal snap epsilon: position <= 1e-4 m, quaternion angle <= 1e-4 rad
 ```
 
 Visible signature and wrongness checks:
@@ -470,17 +522,16 @@ arcAngle = groundArcDistance / planetRadius
 Example **Authored** preset constants:
 
 ```text
-target altitude = 420 km converted through sceneUnitsPerMeter
-max ground arc = 2200 km converted through sceneUnitsPerMeter
-max crossrange = 26 km converted through sceneUnitsPerMeter
+target altitude = 420 km converted to metres in physics state
+max ground arc = 2200 km converted to metres in physics state
+max crossrange = 26 km converted to metres in physics state
 ```
 
 Declare one unit contract:
 
 ```text
-sceneUnits = meters * sceneUnitsPerMeter
-# or sceneUnits = meters / metersPerSceneUnit
-all authored km/m constants convert before entering simulation/storage
+all authored km/m constants convert to metres before simulation/storage
+render units are derived later from PhysicsContext.metersPerWorldUnit
 ```
 
 Construct:
@@ -567,7 +618,8 @@ side speed = 5.8 m/s
 earthward speed = 4.2 m/s
 ```
 
-Convert these through the scene unit contract before simulation. For one hero
+They already enter the stable physics state in metres and metres per second;
+render conversion occurs only through `PhysicsContext`. For one hero
 stage, integrate the semantic actor in the fixed step. For many released parts,
 write the initial separation vector, seed, and release time into storage and
 evaluate the analytic offset or fixed-step velocity in compute.
@@ -588,8 +640,8 @@ approach starts = 4.0 s
 approach duration = 14.5 s
 dock settle = 3.0 s
 post-dock spin-down = 3.0 s
-dock axial clearance = 4.1 scene units
-dock radial offset = 0.35 scene units
+dock axial clearance = 4.1 m
+dock radial offset = 0.35 m
 ```
 
 Every phase uses named event times and a `smoothstepRange(start, end, time)`.
@@ -686,99 +738,168 @@ A spring alone can retain imperceptible but destabilizing residual motion.
 
 ## Water-surface, current, and floating-body coupling
 
-Water is an injected causal system, not a transform curve. The water owner
-publishes a sample with named spaces, units, time, validity, version, and error:
+Water is an injected causal system, not a transform curve. Motion consumes the
+shared batched, channel-requested `WaterSurfaceProvider`; it does not define a
+local scalar query record. The request position is in physics-frame
+metres. The exact `PhysicsSampleRequest` carries context/provider/signal/schema
+IDs, requested `PhysicsInstant`, channel masks, oriented footprint/filter,
+tolerances, staleness, acceptable residency/latency, and batch extent; descriptor
+discovery supplies a stable descriptor-table reference rather than a deep copy.
+These motion tiers request the following subset of the canonical
+`WaterSurfaceSample` domain payload:
 
 ```text
-sampleWaterState(worldPoint, timeSeconds, footprint) -> {
-  freeSurfacePoint,
-  freeSurfaceNormal,
-  surfacePointVelocity,
-  materialCurrentVelocity,
-  waterColumnDepth,
-  densityOrNotUsed,
-  frameId,
-  validity,
-  spatialTemporalError,
-  representedFootprint,
-  fieldVersion
-}
+freeSurfacePoint, freeSurfaceNormal, geometricNormalVelocityMps,
+surfacePointVelocityMps?, materialCurrentVelocityMps?,
+waterColumnDepthMeters?, densityKgPerM3?.
 ```
 
-`surfacePointVelocity` is the time derivative of the geometric surface sample.
-`materialCurrentVelocity` is fluid transport. Phase velocity, group velocity,
-Stokes drift, Eulerian current, and `partial(eta)/partial(t)` are different
-quantities; the provider states which it supplies. Immersion/heave may consume
-the geometric surface rate, while drag consumes material-relative velocity.
-An unlabelled `velocity` is rejected.
+Question marks indicate optional requested channels. Absence means unavailable;
+zero means a represented physical zero. `geometricNormalVelocityMps` is the
+gauge-invariant normal interface speed. `surfacePointVelocityMps` is the time
+derivative at fixed coordinates of the serialized surface parameterization;
+its tangential component is gauge-dependent. `materialCurrentVelocityMps` is
+fluid transport. Phase velocity, group velocity, Stokes drift, Eulerian
+current, and `partial(eta)/partial(t)` are different quantities; the provider
+states which it supplies. Immersion/heave consumes the geometric normal speed
+or an explicitly parameterization-bound coordinate velocity,
+while drag consumes material-relative velocity. An unlabelled `velocity` is
+rejected.
+
+Both channels are physical polar vectors in `physicsFrameId`; a frame change
+rotates their basis only. A moving frame's coordinate derivative is a distinct
+coordinate-rate type and carries origin/`omega x r` transport terms. Never add
+those terms to an already physical velocity vector.
+
+Every named channel is the complete shared `SampledChannel`. The
+result returns the complete `PhysicsSignalDescriptor`, bundle `sampleInstant`,
+and per-channel `actualPhysicsTime` resolving to a `PhysicsInstant`; requested
+and actual instants may differ only
+within declared latency/staleness gates. Motion cannot rename, subset, or
+re-clock that result. In particular the shared descriptor
+owns represented footprint/filter, validity/per-channel error, frame/transform/
+source epochs, state/resource generation, cadence/latency/residency, and
+missing-channel policy.
+The `WaterSurfaceSample` bundle's actual represented footprint/filter, atomic
+validity/error, and `absentChannels` also remain intact.
 
 The footprint is the actor/hull response scale, not a shading-texel footprint.
 A point-sampled micro-normal can roll a large boat on capillary detail that
 should average out. The provider returns a footprint-filtered state or the
 motion system integrates a declared distributed sample set; neither consumes a
-material normal or foam texture as geometry.
+material normal or foam texture as geometry. Motion propagates each requested
+channel's provider error and `stateVersion` through load, integration, and
+presentation evidence; it cannot relabel a filtered or stale sample as exact.
 
 Choose the cheapest coupling class that satisfies the observable:
 
 | Required behavior | Motion route | Water feedback |
 | --- | --- | --- |
 | kinematic boat/buoy presentation | sample height/normal, evaluate authored heave/roll response around a scripted horizontal path | none; one-way and explicitly nonphysical |
-| passive floating actor with visible inertia/current drift | fixed-step rigid pose with distributed buoyancy/drag samples; refine sample layout until pose/force error passes | none; the prescribed water is unchanged |
-| visible displacement, object-generated waves, or load-dependent wake | coupled water/body solver with ordered load scatter, water advance, and body correction | two-way; equal-and-opposite source terms and conservation/error ledger required |
-| metric hull loads, slamming, planing, added mass, radiation/diffraction, or control design | dedicated hydrodynamics/FSI solver | outside this motion skill; consume timestamped pose/load data |
+| passive floating actor with visible inertia/current drift | fixed-step rigid pose with distributed buoyancy/drag samples; refine sample layout until pose/force error passes | one-way only under a `[G]` bound on omitted actor-to-water feedback or an explicitly narrowed negligible-feedback regime; prescribed water is unchanged |
+| visible displacement, object-generated waves, or load-dependent wake | coupled water/body solver with ordered load scatter, water advance, and body correction | two-way; all-or-none `InteractionReactionGroup` plus balance-frame residual and conservation/error ledgers required |
+| metric hull loads, slamming, planing, added mass, radiation/diffraction, or control design | dedicated hydrodynamics/FSI solver | outside this motion skill; consume its typed signals at `PhysicsInstant` and interactions over `PhysicsTimeInterval` through `ExternalSolverAdapter` with exact frame/unit/clock mapping |
 
 For the one-way dynamic middle tier, a distributed hydrostatic approximation
-can partition the hull into quadrature cells. For cell `i`, compute signed
+binds the shared versioned `HydrostaticHullProperties`; its geometry/waterline clipping,
+displaced-volume query, sampling footprint, buoyancy/drag model, validity, and
+per-output error are authoritative and LOD-invariant. One implementation can
+partition the proxy into quadrature cells. For cell `i`, compute signed
 immersion along the effective-gravity up direction, evaluate a prevalidated
 submerged-volume function `V_i(d_i)`, and place that volume at a corresponding
-submerged centroid `x_b,i(d_i)`. Then, under the declared gravity frame,
+submerged centroid `x_b,i(d_i)`. Query the shared gravity provider at the hull
+physics point and `PhysicsInstant`; reject the hydrostatic approximation when its
+magnitude is below the route's up-direction gate. Then, in the stable physics
+frame,
 
 ```text
-g_up = -g / |g|
+g_up = -gMps2 / |gMps2|
 d_i = dot(freeSurfacePoint_i - x_i, g_up)
-F_b,i = rho * |g| * V_i(d_i) * g_up
+F_b,i = densityKgPerM3_i * |gMps2| * V_i(d_i) * g_up
 v_body,i = v_com + omega_body cross (x_i - x_com)
-v_rel,i = v_body,i - materialCurrentVelocity_i
-F_d,i = -0.5 * rho * C_d,i * A_i * |v_rel,i| * v_rel,i
+v_rel,i = v_body,i - materialCurrentVelocityMps_i
+F_d,i = -0.5 * densityKgPerM3_i * C_d,i * A_i * |v_rel,i| * v_rel,i
 tau_i = (x_b,i - x_com) cross F_b,i
       + (x_i - x_com) cross F_d,i
 ```
 
 This is an authored quadrature/drag model, not a general wave-body solution.
+`densityKgPerM3_i` and `materialCurrentVelocityMps_i` are required requested
+provider channels for this force tier. Missing current blocks the drag term or
+forces a separately named no-drag model transition; it never becomes zero.
 `V_i`, `A_i`, and `C_d,i` carry units and are calibrated or derived from the
 hull partition; `area * penetration` is accepted only when its volume error is
 gated. Integrate translation and rotation at a fixed step, normalize
 quaternions, and run step-halving plus quadrature-refinement sweeps. Do not use
-surface-point velocity as current in the drag term. A simpler critically damped
+`surfacePointVelocityMps` as current in the drag term. A simpler critically damped
 heave/normal-follow response is presentation-authored and must not be reported
 as buoyancy physics. Wave radiation/diffraction, slamming, and dynamic pressure
 are absent from this hydrostatic model and route to the final row of the table.
 
 Two-way coupling is a single ordered simulation graph. A valid partitioned
-schedule names, for each fixed step, whether it performs body prediction,
-water sampling, load/volume/impulse scatter, water advance, and body correction,
-and whether those stages are explicit, semi-implicit, or iterated. The water
-receives the negative of the actor impulse/source under the same units and
-frame; momentum/volume residual and coupling-iteration error are reported.
+schedule performs, for each coupling interval, both-owner prediction, footprint-filtered
+`WaterSurfaceProvider` sampling from both predictors at the declared common
+coupling bracket,
+source `InteractionRecord` generation, deterministic conservative
+load/source scatter by `conservationGroupId`, water advance including
+its subcycles, reaction-record reduction, correction of both owners,
+conservation/stability check, and atomic commit. It declares whether the block is explicit,
+semi-implicit, scheduler-bounded iterated, or monolithic. In a bounded loop the
+loads are rebuilt from the exact previous-iteration body/water versions at the
+same bracket on every iteration. Gather and scatter are a discrete-adjoint pair
+under a named quadrature-weighted inner product; transpose weights include the
+metric/Jacobian and need not be textually the same kernel. They preserve zeroth
+and first moments and gate force, torque, virtual/interface work, and added-mass
+stability. The water receives the negative of the accepted
+actor impulse/source under the same SI units and physics frame; mass, momentum,
+angular momentum, work/energy, represented species, reaction closure,
+state-version, and coupling-iteration residuals are reported. Volume is only a
+separate constraint for a declared fixed-density incompressible model.
+Source/reaction records form an all-or-none `InteractionReactionGroup`;
+many-to-many reduction is legal, and residuals are tested after transport to
+its declared balance frame/reference point.
 Workgroup barriers do not order global water and body stages. Use dispatch/pass
 boundaries and ping-pong state. If one system is CPU-owned and the other
 GPU-owned, do not insert synchronous frame-loop readback; move the coupled hot
 state to one side, use a shared analytic mirror where valid, or declare a
 latency model whose phase/error gate passes.
 
+Motion never converts a generic ripple `height` or `velocity` directly into a
+solver texel. Its `InteractionRecord` uses a legal closed-union payload such as
+`pointImpulse`, `wrenchImpulse`, `wrenchRate`, `surfaceTraction`, `massRate`/`massFlux`/
+`massTransfer`, `volumeRate`/`volumeFlux`/`volumeTransfer`,
+`momentumFlux`/`momentumTransfer`, or `movingBoundary`, with footprint and
+`applicationInterval: PhysicsTimeInterval` carrying the rate-versus-integral semantics. The water
+adapter applies cell measure, local depth/density, wet/boundary masks, and the
+normalized kernel. A direct height/velocity
+increment is presentation-authored and carries no conservation claim.
+Motion emits the complete shared record and stable interaction/causal identity;
+it does not invent a smaller hull-source schema. Exactly-once application,
+deterministic total order/reduction, authoritative-overflow accounting, and
+source/reaction roles remain scheduler-owned.
+
 Wake ownership follows physics ownership. A foam ribbon or particle trail may
 visualize a one-way kinematic wake, but it cannot be cited as displaced water or
-two-way momentum exchange. When the water solver accepts wake/vorticity/height
-sources, the water skill owns their discretization, stability, wet/dry masking,
-and history; motion supplies timestamped hull/source records only.
+two-way momentum exchange. When the water solver accepts canonical force,
+traction, momentum, mass/volume-transfer, or moving-boundary interactions, the
+water skill owns the derived wake/vorticity/height response, discretization,
+stability, wet/dry masking, and history. Motion supplies complete source/reaction
+`InteractionRecord` entries with canonical `applicationInterval`; wake, vorticity, and
+height are not new payload tags.
 
 Validation includes flat-water equilibrium, phase-locked monochromatic waves,
 constant-current drift, asymmetric hull torque, surface-normal discontinuities,
 water-field version changes, fixed-step convergence, and provider-error
-propagation. One-way tests assert that actor motion leaves water state bitwise or
-tolerance-equivalent. Two-way tests gate equal-and-opposite impulse, volume/mass
-balance appropriate to the selected solver, wake causality, coupling stability,
-and deterministic replay. Record zero frame-critical GPU readbacks.
+propagation. One-way tests verify authoritative-source identity, the omitted-
+feedback bound or narrowed claim, and that actor motion leaves water state
+bitwise or tolerance-equivalent. Two-way tests gate all-or-none reaction-group
+acceptance and balance-frame force/impulse/torque residuals,
+mass, linear/angular momentum, energy/work and represented-species balance,
+discrete-adjoint moments, force/torque/interface-work residual, added-mass
+stability, conservation-group closure, wake causality, state-version ordering,
+coupling stability, and deterministic replay. A volume residual is required
+only for a fixed-density incompressible constraint.
+Record zero frame-critical GPU readbacks.
 
 ## Peeling and released debris
 
@@ -809,7 +930,7 @@ velocity =
 ```
 
 Released debris then integrates linear velocity and quaternion rotation from
-its angular-velocity vector. Speed is capped at `95` scene units per second
+its angular-velocity vector. Speed is capped at `95 m/s`
 unless the preset declares another scale.
 
 This rotating-frame inheritance is the defining mechanism. Random outward
@@ -963,7 +1084,8 @@ Observed boundaries:
 - Storage layouts must be versioned when validation snapshots depend on byte
   offsets.
 - Water coupling must declare one-way or two-way. A visual wake, height-follow
-  spring, or actor-side ripple does not prove fluid feedback.
+  spring, or actor-side ripple does not prove fluid feedback. One-way mode also
+  records its authoritative source and omitted-feedback bound/narrowed claim.
 - Surface-point velocity and material current must remain separate; conflating
   them injects wave phase motion into drag and produces nonphysical drift.
 
@@ -983,9 +1105,20 @@ dock port, axis, parallel error, radial error, and snap epsilon
 spring target, velocity, stiffness, damping, and terminal lock state
 spin rates and accumulated angles
 debris inherited tangential/outward/axial velocity
-water provider version/error, free-surface point/normal/rate, material current
-water coupling class, sample/quadrature residual, actor loads and reaction sources
-two-way stage order, impulse/volume residual, coupling iterations, and readback count
+water provider `stateVersion`/error/residency, `freeSurfacePoint`,
+`freeSurfaceNormal`, `surfacePointVelocityMps`,
+`materialCurrentVelocityMps`, `waterColumnDepthMeters`, footprint/filter
+water coupling class, requested/absent channels, sample/quadrature residual,
+actor source/reaction `InteractionRecord` entries and conservation group
+two-way stage/class, adjoint-moment and force/torque/interface-work residuals,
+added-mass stability, conserved mass/momentum/angular-momentum/energy/species,
+conditional incompressible-volume residual, accepted versions, coupling
+iterations, and readback count
+physics presentation: independent previous/current
+`PresentationSampleProvenance`, presented instants, state handles and global
+bindings; `motionBinding.motionVectorValidity`; candidate/camera/preparation/
+snapshot IDs and lease refs; multi-target execution plus lease disposition;
+separate instant/frame/transform/source epochs and scoped reactive/reset decisions
 active instance count, dispatch count, workgroup size, storage bytes
 node post passes and output transform owner
 ```
@@ -1004,8 +1137,16 @@ zero NaNs in radial fallback and quaternion helpers
 quaternion norm drift below threshold
 storage buffer snapshot for selected frames outside the frame loop
 GPU timing for compute dispatches and render pass count
-one-way water invariance or two-way impulse/volume/coupling-convergence evidence
-water-query phase/current separation and zero frame-critical readback
+one-way authoritative-source, omitted-feedback bound/claim, and water
+invariance; or two-way adjoint-moment, force/torque/interface-work,
+added-mass, conservation-group, and coupling-convergence evidence
+canonical `WaterSurfaceProvider` conformance, requested-channel absence,
+no raw-helper bypass, phase/current separation, footprint/filter behavior, and zero frame-critical
+readback
+physics presentation snapshot coherence across transforms, velocities, bounds,
+shadows, motion vectors, state/origin changes, resource-generation leases, and
+temporal history; spawn/despawn/teleport/reparent/slot/LOD discontinuities carry
+explicit rejection reasons
 ```
 
 Use `$threejs-camera-controls-and-rigs` for camera validation, `$threejs-particles-trails-and-effects`

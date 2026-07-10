@@ -6,6 +6,14 @@ ladder, lab contract, boot contract, and numeric gates. Treat every formula belo
 verifiable contract: it earns trust only through CPU/TSL parity tests,
 deterministic lab captures, and numeric gates in this document.
 
+Read the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+before connecting a creature to habitat, support, water, contacts, weather, or
+rendering. It defines the SI `PhysicsContext`, frames, clocks/ticks, multi-rate
+scheduler, typed providers, `InteractionRecord`, conservation groups,
+residency/state versions, and immutable `PhysicsPresentationSnapshot`. This
+reference specializes creature algorithms behind those boundaries.
+
 Contents:
 
 0. [Representation selection](#0-representation-selection)
@@ -70,7 +78,7 @@ for mesh density, correction acceptance, impostor transitions, and hysteresis.
 | `PartSpec.a/b/offset/hip` | parent-local | Y-up, +Z forward, accumulated over parent anchors |
 | compiled primitive endpoints | creature-local | identity rest frame, root at the declared rest-support origin |
 | posed primitive endpoints | creature-local | root motion lives in the instance transform; world-space posed primitives forfeit instanced batching and per-instance culling |
-| `RigPose.position/yaw/roll` | world | yaw 0 faces +Z; pose order: squash → roll → yaw → translate |
+| `RigPose.position/yaw/roll` | stable SI physics frame | position is metres; yaw 0 faces declared frame +Z; pose order: squash → roll → yaw → translate |
 | field distance `d` | creature-local units | `d = 0` is the skin; `iso > 0` inflates (outline shells) |
 | part colors | authored sRGB hex → linear floats before upload | data buffers are `NoColorSpace` |
 
@@ -85,10 +93,10 @@ and shadows.
 interface CharacterSpec {
   name: string;
   seed?: number;          // seeded LCG for per-creature variation
-  scale?: number;         // uniform world scale, default 1
+  scale?: number;         // dimensionless uniform morphology scale, default 1
   locomotion?: {
     type: 'none' | 'biped' | 'quadruped' | 'hexapod' | 'hopper' | 'flyer' | 'swimmer';
-    speed?: number;       // cruise, world units/s
+    speed?: number;       // cruise m/s in the physics frame after input adaptation
     stepLength?: number;  // legged: stride trigger distance
     stepHeight?: number;  // legged: swing arc apex
     hopLength?: number;   hopHeight?: number;      // hopper
@@ -396,10 +404,14 @@ architectural, and planetary scenes.
 
 ## 6. Locomotion library
 
-All deterministic: seeded LCG + injected sim clock. Run on a fixed-step
+All deterministic: seeded LCG + injected sim clock. A standalone lab may run on a fixed-step
 accumulator (clamp input dt, e.g. accumulate ≤ 0.25 s; step at 1/60; keep
 previous+current pose; render interpolated). Variable render dt straight into
 gait/hop is a known visual bug: one hitch completes half a swing in one frame.
+Inside an integrated `PhysicsGraph`, the graph owns the coordination interval
+and common catch-up/drop/discontinuity decision. Creature locomotion keeps its
+native substeps but never skips an interval independently of water/support/
+contact owners, and rate/integral interactions cover the graph interval once.
 
 ### Environment-query boundary
 
@@ -408,39 +420,77 @@ bathymetry, vegetation, or fluid state. They consume explicit providers from
 the world-generation/data layer. Keep three semantics separate:
 
 ```text
-queryHabitat(worldPoint, tick) -> {
-  validity, fieldVersion, sourceResolution, errorBound,
-  signedCoastDistance, waterColumnDepth, slope,
-  substrateIdOrWeights, moisture, exposure, domainChannels...
-}
-
-querySupport(worldProbe, tick) -> {
-  point, normal, frameId, supportCoord, worldFromSupport,
-  velocityAtPoint, angularVelocity, validity, errorBound
-}
-
-queryWaterState(worldPoint, timeSeconds, footprint) -> {
-  surfacePoint, surfaceNormal, surfacePointVelocity,
-  materialCurrentVelocity, waterDepth,
-  representedFootprint, frameId, validity, errorBound, fieldVersion
-}
+queryHabitat(...) -> HabitatSample
+querySupport(...) -> SupportSurfaceSample
 ```
+
+Both calls are semantic abbreviations, not local provider ABIs. Habitat uses the
+canonical `PhysicsSampleRequest`: context/provider/signal/schema IDs, requested
+`PhysicsInstant`, a physics-frame-metre probe/footprint, channel masks, filter,
+tolerances, staleness, acceptable residency/latency, and batch extent.
+Descriptor discovery supplies a stable descriptor-table reference; the result
+returns the complete `PhysicsSignalDescriptor` and per-channel actual time/error.
+Requested domain channels may include typed coast distance, water-column depth,
+slope, substrate weights, moisture, and exposure. Errors remain per channel
+rather than one scalar `errorBound`.
+
+The support provider uses the same request protocol. Its returned
+`SupportSurfaceSample` carries the complete descriptor and bundle
+`sampleInstant`, while every channel's `actualPhysicsTime` resolves to a
+`PhysicsInstant`; it also returns stable
+generation-bearing support/feature identity distinct from frame identity,
+moving-frame kinematics, and per-channel error. Any legacy scalar/tuple helper
+is an internal adapter input and cannot bypass that envelope.
+
+Water is not a third creature-local schema. Swimmers and buoyant bodies consume
+the shared batched, channel-requested `WaterSurfaceProvider`. A request uses a
+physics-frame-metre position and declares channels, response footprint/filter,
+context/provider/signal/schema IDs, requested `PhysicsInstant`, tolerances,
+staleness, acceptable residency/latency, and batch extent; it references
+descriptor discovery rather than deep-copying a complete descriptor. Creature
+locomotion requests the following subset of the canonical `WaterSurfaceSample`
+domain payload:
+
+```text
+freeSurfacePoint, freeSurfaceNormal, surfacePointVelocityMps,
+materialCurrentVelocityMps?, waterColumnDepthMeters?, densityKgPerM3?.
+```
+
+Optional requested channels that are unrepresented are absent, not zero. Zero
+is a valid represented physical value.
+
+Every named channel is the complete shared `SampledChannel`. The
+result returns the complete shared descriptor and bundle `sampleInstant`, while
+each channel's `actualPhysicsTime` resolves to a `PhysicsInstant`; requested and
+actual instants may differ
+only within declared latency/staleness gates. Creature code may not subset,
+rename, or re-clock the returned envelope. It owns actual footprint/filter, validity/
+per-channel error, state/resource generation, cadence/latency/residency,
+frame/transform/source epochs, and missing-channel policy.
+The `WaterSurfaceSample` bundle's actual represented footprint/filter, atomic
+validity/error, and `absentChannels` also remain intact.
 
 The consumer declares which habitat channels and units it requires; unspecified
 domain channels are absent, not zero. `queryHabitat` is for deterministic
 placement, route selection, and behavior policy. `querySupport` owns contact
-geometry and moving-frame kinematics. `queryWaterState` owns the instantaneous
-free-surface sample. A field revision invalidates cached placements/routes
+geometry and moving-frame kinematics. `WaterSurfaceProvider` owns the
+instantaneous free-surface sample. A field revision invalidates cached placements/routes
 through an explicit policy; render-patch LOD and material-detail changes must
 not move a physical habitat boundary.
 
-`surfacePointVelocity` is the time derivative of the sampled geometric surface
-point under the provider's parameterization. `materialCurrentVelocity` is
-Eulerian/Lagrangian fluid transport as declared by the water model. Wave phase
+`surfacePointVelocityMps` is the time derivative of the sampled geometric
+surface point at fixed surface parameters under the provider's filter.
+`materialCurrentVelocityMps` is Eulerian/Lagrangian fluid transport as declared
+by the water model. Wave phase
 velocity, group velocity, vertical `partial(eta)/partial(t)`, and material
 current are not interchangeable. A simple visual-float tier may omit current,
 but must mark it `not used`; a behavior or force model requiring current is
 blocked when that channel is unavailable.
+
+Both channels are physical polar vectors in `physicsFrameId`; cross-frame
+transport rotates their basis only. A translating/rotating frame's coordinate
+derivative is a separate coordinate-rate type. Do not add origin or `omega x r`
+transport terms to an already physical velocity vector.
 
 The water footprint is set by the body/contact response scale. Its normal is a
 filtered physical free-surface normal, never a material/shading normal; otherwise
@@ -449,27 +499,55 @@ micro-normal detail can inject macroscopic roll and steering.
 Providers may use an analytic CPU mirror, a deterministic shared field, or a
 batched asynchronous query service with a declared latency contract. They may
 not perform frame-critical GPU readback. Placement and locomotion acceptance
-include provider spatial/temporal error; a precise IK solve against an
+include the descriptor's per-channel error/state/residency plus the requested
+and actual `PhysicsInstant`;
+a precise IK solve against an
 under-resolved coast or water sample is not precise world coupling.
 
-Legged locomotion consumes
-`querySupport(worldProbe, tick) -> {point, normal, frameId, supportCoord,
-worldFromSupport, velocityAtPoint, angularVelocity}`. The query may represent terrain, a sloped
+Every recurrent creature step records which provider versions/errors it
+consumed. After the shared scheduler accepts the tick, it contributes a
+per-binding/provider `PresentedStatePair` to the view-independent
+`PhysicsPresentationCandidate`, which has no camera or render transform.
+`previousPresented` and `currentPresented` each carry independent
+`PresentationSampleProvenance`, `presentedInstant`, state handle, and global
+spatial binding. Bounds/error remain typed provider state. A per-view
+`CameraViewPublication` owns render mappings and matrices;
+`ViewPreparationPublication` owns visibility, shadows, caches, reactive
+publications, and reset actions. The sealed `PhysicsPresentationSnapshot`
+references candidate binding IDs and lease refs, while `FrameExecutionRecord`
+records multi-target execution and lease disposition keyed by lease ID.
+Presented states need not be solver states `n` and `n+1`. Visible deformation,
+storage uploads, bounds, shadows, motion vectors, and temporal effects use that
+pair only through the sealed per-target/view snapshot; they do not issue
+presentation-time environment queries. Physical instants,
+physics-frame transform, floating-origin, and source-data epochs remain
+separate.
+
+Legged locomotion consumes the canonical `SupportSurfaceProvider`/
+`SupportSurfaceSample` shared contract and requires contact point, normal,
+stable support/feature identity, and represented point velocity/acceleration.
+The provider's `PhysicsFrameDescriptor` supplies moving-frame translation and
+angular kinematics. The query may represent terrain, a sloped
 architectural surface, a translating/rotating platform, or another declared
-support. Its normal is normalized; `velocityAtPoint` already includes the
+support. Its normal is normalized; the returned point velocity already includes the
 rigid-frame `omega × r` contribution when applicable. A stance stores
-`(frameId, supportCoord)`; each tick reconstructs the world plant through the
-provider's current support map (a rigid provider may use `worldFromSupport`),
-so zero drift is measured relative to the moving support rather than absolute
-world coordinates. Loss of
+`(supportId, featureId, identityGeneration, plantedLocalPoint)` separately from
+its physics frame; each tick reconstructs the physics-frame plant through the
+provider's current support/frame map. A deforming support needs a named,
+versioned material-coordinate extension; without it that planting tier is
+blocked. Measure zero drift relative to the moving support rather than absolute
+physics-frame coordinates. Loss of
 support, discontinuous normals, and frame changes use explicit replant rules.
+This provider is kinematic. Collision manifolds, material-pair state, contact
+lifecycle, impulses, and reactions belong to the shared contact/
+`InteractionRecord` ABI and never hide inside a support sample.
 
 **Reactive planted gait** (2/4/6 legs, one system): feet are support-planted;
 a foot lifts when it lags its queried home by more than `stepLength` and its
 phase group is active. Project the hip probe along the declared gravity
 direction onto the support, construct forward/side axes in the local tangent
 plane, and form swing height along the support normal. Landing prediction uses
-body velocity relative to `velocityAtPoint`; do not add `omega × r` again.
+body velocity relative to `pointVelocityMps`; do not add `omega × r` again.
 Authored starting values may use a swing arc
 `sin(π t) * stepHeight` and forward overshoot, but they are not flat-ground
 assumptions. Rescale authored timing and speed by dynamic similarity — swing time
@@ -502,8 +580,12 @@ component. Gate relative length residual across scale and precision sweeps;
 decimal-string equality and one fixture's absolute threshold are not valid
 contracts.
 
-`gWorld` has units of world-length/s². If one world unit is one metre, physical
-Earth gravity is `9.81` regardless of the creature's model scale. For a
+Query the shared gravity provider at the creature physics point and
+`PhysicsInstant`; let the returned `gMps2` have units m/s² and
+`gMagMps2=|gMps2|`. Transform it as a vector and never rescale it inside
+locomotion. A legacy scene-
+unit preset is converted once through the exact context adapter before entering
+physical state. For a
 geometrically similar body scaled by `lambda` under the same gravity, dynamic
 similarity gives `time' = sqrt(lambda) time` and
 `speed' = sqrt(lambda) speed`; multiplying gravity by `lambda` while keeping
@@ -512,7 +594,7 @@ time fixed is an authored time remapping, not physical scaling.
 **Hopper**: state machine `idle → crouch → air → land`. Physics: air height
 is the normalized ballistic parabola `4 t (1 - t) * hopHeight` (`t ∈ [0,1]`;
 it also matches launch/landing velocity ratios, which `sin(π t)` does not),
-and physical `airDuration = 2 sqrt(2 hopHeight / gWorld)`. A minimum duration
+and physical `airDuration = 2 sqrt(2 hopHeight / gMagMps2)`. A minimum duration
 or altered parabola is styling and must be labeled as such. Example styling
 constants: `crouchTime 0.16`,
 `landTime 0.14`, idle `0.6–2.2 s`; squash: idle `1 + 0.015 sin(6t)`, crouch
@@ -525,10 +607,25 @@ constants: `crouchTime 0.16`,
 `phase * 3 + simTime * (4.5 + 2|angularSpeed|) * π`. Sampled, not integrated:
 seekable to any time for deterministic capture.
 
+A flyer, feather/fur appendage, or airborne population that responds to weather
+samples the route's immutable `EnvironmentForcingSnapshot` through a declared
+`PhysicsGraph` edge. Aerodynamic relative velocity is
+`vRel = airVelocityMps - bodyPointVelocityMps`; force models also require
+`airDensityKgPerM3` or a named equation-of-state adapter. Transform both
+velocities into one registered physics frame at the sample instant before
+subtracting them. Preserve each `SampledChannel`'s actual time, support,
+filter, state version, validity, and error; reject or follow the edge's explicit
+absence policy when a required channel is absent. Analytic patrol remains
+kinematic and may use the snapshot only for non-authoritative presentation
+deformation. A dynamically affected flyer consumes forcing in its owned
+equation stage and emits any reciprocal momentum exchange through canonical
+`InteractionRecord`/reaction groups; it never creates a creature-local wind
+field or writes back into the forcing snapshot.
+
 **Verlet ropes** (tails, ears): fixed step 1/60, authored gravity 3.5 and damping keep
 `1 - 0.12`, 3 relaxation passes, ≤ 8 substeps per update, dt accumulation
 capped at 0.25 s. `3.5` is a slow-motion styling value; a physical model uses
-the same `gWorld` convention above, not `9.81 * creatureScale`. Anchor follows
+the same `gMps2` convention above, not `9.81 * creatureScale`. Anchor follows
 the posed body; taper radius toward the tip.
 Per fixed step, write order is: base body pose writes rest slots after
 volume-preserving squash staging; root yaw/translation remain in the instance
@@ -538,10 +635,11 @@ segment slots from the final particle chain. If stages target the same slot,
 the later stage wins; rope-verlet slot cost is
 `ropeSubsteps * ropeRelaxationPasses * ropeSegments`, not O(slots).
 
-**Swimmer**: buoyancy response targets the injected water-state contract above;
-legacy scalar providers may expose
-`getWaterSurface(x, z, t) -> {height, normal, surfacePointVelocity?}` only for
-tiers that explicitly omit material current and depth. Do not call a
+**Swimmer**: buoyancy response targets `WaterSurfaceProvider` above. A legacy
+`getWaterSurface(x,z,t)` scalar helper is noncanonical internal input only; an
+adapter must convert it to `WaterSurfaceSample`, mark unsupported requested
+channels absent, and propagate its error/version/residency before locomotion
+may consume it. Do not call a
 first-order lerp a spring. For a critically damped vertical response with
 piecewise-constant target per fixed step, `e = y-h`, `c = v+omega*e`, then
 `eNew = (e+c*dt)*exp(-omega*dt)` and
@@ -555,12 +653,43 @@ which evaluates a dominant-bin truncation of the same authored FFT spectrum and
 publishes `estimateTruncationError()`. Bounded pools use
 `threejs-water-optics/examples/webgpu-bounded-water/createBoundedWaterHeightQuery()`,
 which evaluates the exact authored analytic wave list and declares the live
-StorageTexture heightfield residual as a separate budget. The provider owns the
+StorageTexture heightfield residual as a separate budget. Their raw return
+shapes are not public physics ABIs; the provider adapters emit the exact shared
+sample names and metadata. The provider owns the
 parity-error obligation; creature locomotion treats the query as authoritative
 and does not blend in asynchronous GPU readback. Gate normalized surface
 tracking error, phase lag, normal error, and, when consumed, material-current
 error across the declared wave-frequency/current band and fixed-step
 convergence sweep.
+
+One-way swimming produces no water reaction, identifies the authoritative
+source, and records a `[G]` upper bound on omitted creature-to-water feedback or
+explicitly narrows the claim/regime. A two-way creature emits typed
+source `InteractionRecord` entries and consumes reduced reaction records in the
+shared conservation group. It participates in the ordered both-owner-predict/
+provider-sample/load-scatter/water-advance/reaction-reduce/correct/check/atomic-
+commit schedule. It may not write a water texture or spawn
+a visual ripple and call that feedback. Coupling declares explicit,
+semi-implicit, scheduler-bounded iterated, or monolithic ownership.
+Gather/scatter use the same normalized footprint kernel as discrete adjoints;
+gate zeroth/first moments, force, torque, interface work, and added-mass
+stability. Ledgers cover represented mass, linear/angular momentum,
+energy/work, and species; volume is only a fixed-density incompressible
+constraint. Source/reaction records form an all-or-none
+`InteractionReactionGroup`; many-to-many reduction is legal, and balance is
+tested after transport to its declared frame/reference point. The accepted pose uses the exact view-independent
+`PresentedStatePair` chain described above; accumulated provider errors and
+transform/source epochs remain
+in their typed records rather than becoming extra pair fields. Visible
+deformation, storage upload, culling
+bounds, shadows, motion vectors, and temporal effects consume the sealed
+per-target/view `PhysicsPresentationSnapshot`, not live providers sampled at
+presentation time.
+
+Creature code emits the complete shared `InteractionRecord`, including stable
+interaction/causal identity and conservation group; it does not define a
+smaller swim/contact event. Exactly-once application, deterministic ordering/
+reduction, and authoritative batch-overflow accounting remain scheduler-owned.
 
 ## 7. Scale architecture
 
@@ -706,7 +835,7 @@ imports) is the proving ground; the shipping scene stays a thin adapter.
   bodyLift, geometry stats, per-creature driver state, camera, renderer,
   last-frame ms), focus/tier/debug/toon controls, spec JSON editor with
   `part.field` errors, seeded generation grid, `renderOnce`, `dispose`.
-- **Evidence metrics**: foot-drift markers (local-solver, world-space, and
+- **Evidence metrics**: foot-drift markers (local-solver, stable physics-frame, and
   platform-relative displacement over a stance, each normalized by leg
   length), snap residual and pixel-error sweeps across a locomotion
   cycle, seed sweeps for generated specs, tier switcher screenshots, hop apex
@@ -750,10 +879,12 @@ the shared projected-error contract linked in §0.
 | candidate program vs full graph | Gated bidirectional surface error, normal-angle error, omitted color-weight bound, and perceptual color Delta E; candidate program preserves declared blend ancestry |
 | skin weights/deformation | Finite nonnegative partition of unity after capped-influence pruning; barrier leakage, bend/twist volume/radius, joint collapse, normal continuity, and DQ bulge/antipodality or CoR error as applicable |
 | planted-foot drift | Gated platform-relative displacement normalized by leg length per stance interval; tolerance must exceed the implementation's declared f32/f64 roundoff floor |
-| support-surface locomotion | Sloped, translating, and rotating supports; contact-normal continuity, support-relative plant drift, landing position/velocity residual, and explicit frame-change/loss behavior |
+| support-surface locomotion | Canonical provider/envelope conformance with no legacy-helper bypass; sloped, translating, rotating, and deforming-support-extension cases; normal continuity, support-relative plant drift, landing position/velocity residual, and explicit identity/frame/loss behavior |
 | habitat query | Required-channel/unit/schema validation, field-version invalidation, deterministic placement under equal inputs, and placement/classification error including provider source resolution |
 | IK reconstruction | Relative upper/lower length residual plus reach-clamp classification, not decimal-string equality |
-| water coupling | Gated height/normal/phase residual and, when consumed, surface-point/material-current velocity residual against the injected provider, normalized by body or wave/current scale |
+| water-provider coupling | Canonical request/sample/envelope conformance with no raw-helper bypass; footprint/filter evidence; absent-channel rejection; gated `freeSurfacePoint`, `freeSurfaceNormal`, `surfacePointVelocityMps`, and when consumed `materialCurrentVelocityMps`, depth, and density residual; complete provider error/version/residency propagation; one-way authoritative-source and omitted-feedback bound/narrowed-claim evidence when applicable; zero frame-critical readback |
+| two-way creature interaction | Ordered both-owner-predict/sample/source-record/load-scatter/water-advance/reaction-reduce/correct/check/atomic-commit stages; declared explicit/semi-implicit/bounded-iterated/monolithic coupling; discrete-adjoint zeroth/first moments; force/torque/interface-work and added-mass stability; conservation-group mass, linear/angular momentum, energy/work and species closure; volume only for fixed-density incompressibility; deterministic replay; visual ripples do not count |
+| physics presentation | One per-binding/provider `PresentedStatePair` in the immutable candidate, then one sealed per-target/view snapshot for visible pose, deformation storage, bounds, shadows, motion vectors, and temporal history; presented states are not assumed solver `n/n+1`; resource-generation leases; separate time/frame/transform/source epochs; explicit history-invalid reasons for spawn/death/teleport/reparent/slot/topology/LOD/provider/quality discontinuities |
 | shadow/depth parity | Gated silhouette distance in pixels for display, cast shadow, received-shadow lookup, and depth output |
 | geometry counts | Derived exactly from the selected compiler/topology/geometry signature; preview-shell counts are not shipping-mesh counts |
 | determinism | `seekTick(n) == stepTicks(n)` state hash for equal seed, tick, inputs, and declared numeric implementation; array permutation/consistent id rename are additional field invariants; cross-device tolerance is separate |
@@ -762,7 +893,7 @@ the shared projected-error contract linked in §0.
 | spawn cost and first visible frame | Product-gated p50/p95 with workload, adapter, warm-up, allocations, and compile events recorded |
 
 Do not publish multiple unlabeled drift thresholds in different frames. Report
-the local solver residual, world-space accumulated drift, and
+the local solver residual, stable-physics-frame accumulated drift, and
 platform-relative drift separately, each normalized by leg length and paired
 with its sampling interval and numeric precision.
 

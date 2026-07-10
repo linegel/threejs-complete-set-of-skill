@@ -16,6 +16,7 @@ march without history when the complete A/B wins.
 2. Capability gate and tiers
 3. Texture, storage, and color contract
 4. Physical/approximation boundary and units
+4a. Shared environment, precipitation, and lighting boundary
 5. Layered density topology
 6. Packed intervals and conservative empty-space skipping
 7. Weather, shape, turbulence, and detail fields
@@ -241,6 +242,286 @@ source term must use that same convention.
 | Procedural weather/shape/detail density | Authored appearance topology, not cloud microphysics |
 | Low-rate optical-depth shadow map | Numerical approximation with measurable transmittance error |
 
+## 4a. Shared Environment, Precipitation, And Lighting Boundary
+
+Use the router's
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+for every cross-domain input or output. `EnvironmentForcingSnapshot` and
+`LightingTransportSnapshot` are immutable versioned boundaries; a cloud-local
+uniform block may cache their projection but may not redefine units, time,
+frames, or ownership.
+Their providers and GPU resources retain the canonical
+`PhysicsSignalDescriptor` envelope: identity/schema/context, owner/consumers,
+channels, physics frame/origin/transform revision, optional chart,
+registered clock/sample phase, represented footprint/filter, validity and
+per-channel error, residency/cadence/latency, state version, resource
+generation, and missing-channel policy. `EnvironmentForcingSnapshot` and
+`LightingTransportSnapshot` use `sampleInstant: PhysicsInstant`;
+`PrecipitationEmissionSnapshot` uses
+`emissionInterval: PhysicsTimeInterval`. Their `SampledChannel.actualPhysicsTime`
+fields use the corresponding exact `PhysicsInstant` or `PhysicsTimeInterval`
+type. The cloud fields below specialize channels only.
+
+### Air motion and thermodynamic forcing
+
+Sample environmental air velocity `u_air(x,t)` in `m s^-1` at
+`EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant`, from its declared
+Cartesian SI physics frame, altitude/support domain, actual temporal validity
+in descriptor `validity` as a `PhysicsTimeInterval`, cadence,
+interpolator, requested oriented physical footprint and spatial/temporal filter
+or band, returned actual footprint/filter, and per-channel error. The returned
+air-velocity channel has `actualPhysicsTime: PhysicsInstant`. Advect a material
+cloud feature with
+
+```text
+dx_feature/dt = u_air(x_feature,t) + u_relative(x_feature,t)
+```
+
+where `u_relative` is a named cloud-topology evolution velocity relative to the
+air. It is not a second wind. Water material current, water-surface point
+velocity, vegetation modal displacement, and camera-relative texture phase are
+different quantities and cannot satisfy this input.
+If the forcing exposes mean/gust/turbulence bands, its descriptor declares
+which are disjoint and which are already included in `airVelocityMps`; the cloud
+never sums overlapping bands or republishes a filtered sample as a new wind.
+
+For a coarse/mobile tier, sample a low-order altitude profile or a bounded
+piecewise-constant wind cell and integrate its displacement over the complete
+interval. The provider's spatial/temporal interpolation residual becomes part
+of the density-advection and shadow-age error. `currentWind * elapsedTime`
+remains invalid under a changing forcing snapshot.
+
+Temperature, pressure, and humidity are consumed only when the density,
+phase/coefficients, evaporation, or precipitation model declares the transfer
+function and thermodynamic convention. Relative humidity, specific humidity,
+and mixing ratio are not interchangeable; normalize to canonical specific
+humidity before snapshot publication. An authored coverage map is not
+meteorological state merely because it samples those controls.
+
+### Appearance-only versus causal precipitation
+
+Declare one mode in the route manifest:
+
+| Mode | Cloud output | Downstream meaning |
+| --- | --- | --- |
+| `appearance-only` | precipitation-emission channel absent | `precipitationBias` shapes density/appearance only; downstream physics treats the channel as unavailable, not as a measured zero |
+| `causal-precipitation` | liquid/ice phase-fraction-resolved `PrecipitationEmissionSnapshot` with oriented mass-area flux | rain/snow transports a dimensioned source to receiver surfaces on a declared scheduler edge |
+
+A causal cloud model first discriminates its internal measure:
+
+- `area-flux`: `q_p` in `kg m^-2 s^-1` on a declared oriented column/surface
+  support with its physical area measure and world/support Jacobian;
+- `volume-source`: `s_p` in `kg m^-3 s^-1` over a declared cloud volume with
+  its physical volume measure and world/support Jacobian.
+
+It also publishes nonnegative liquid/ice phase fractions that sum to one,
+emission altitude/depth distribution,
+`emissionInterval: PhysicsTimeInterval`, cadence, and uncertainty/error. Every
+emission channel has `actualPhysicsTime: PhysicsTimeInterval` equal to that
+interval. A layer parameter alone is neither an area nor a volume; the
+measure/Jacobian is
+mandatory before integration. The emitter publishes one transport choice:
+
+- explicit airborne particles/parcels owned by the precipitation system;
+- a fall-time and horizontal-drift map with a declared approximation error; or
+- a nonnegative transfer kernel `K(deltaX, tau)` whose integral over horizontal
+  displacement and delay is one within the conservation tolerance.
+
+For the kernel form, receiver arrival flux is **Derived** as
+
+```text
+q_column(x_h,t) = q_area(x_h,t), or
+q_column(x_h,t) = integral s_volume(x_h,z,t) J_volume/J_area dz
+
+q_arrive(x,t) = integral integral q_emit(x-deltaX,t-tau)
+                                K(deltaX,tau) d(deltaX) d(tau)
+```
+
+The volume-to-area pushforward uses the support chart/Jacobian and produces
+`kg m^-2 s^-1` before horizontal/time transport. For two horizontal metre
+coordinates and delay in seconds, `K` has units `m^-2 s^-1` and
+`integral K d(deltaX) d(tau) = 1`. A different coordinate chart publishes the
+corresponding measure/Jacobian and kernel units.
+
+Only the resulting oriented mass-area flux enters the canonical
+`PrecipitationEmissionSnapshot`; the internal volume source remains provenance
+for that derived projection and its error, not a second snapshot ABI.
+
+Physical truncation or escape from the modeled support is recorded as a typed
+`ConservationGroup.boundaryFluxes` entry. Terrain occlusion or a rejected
+destination does not destroy mass: the mass remains in source/pending inventory
+unless a separate typed transfer or boundary flux removes it. Delivery-capacity
+overflow is not a `PrecipitationEmissionSnapshot` or per-record field. When the
+transport edge batches `InteractionRecord`s, its owning
+`SurfaceExchange.batchLedger` records the canonical immutable
+`InteractionBatchLedger`: overflow policy and sequence ranges, per-consumer
+cursors, typed lost/deferred commodity maps, and application-ledger version.
+The `SurfaceExchange.applicationInterval` and every contained
+`InteractionRecord.applicationInterval` are `PhysicsTimeInterval` records
+contained in or explicitly mapped to the emission interval.
+Deferred commodities remain in pending/final inventory; lost commodities enter
+the conservation audit explicitly and force the ledger's failed-conservation
+status; they are never normalized away. Evaporation/sublimation is a typed mass
+transfer to the atmospheric-vapor owner, not numerical loss.
+Liquid-to-ice or ice-to-liquid conversion is an internal phase transfer: it
+changes phase inventories but not total precipitation mass. Over an audit
+interval,
+
+```text
+M_airborne(t0) + M_pending(t0) + M_emittedAccepted[t0,t1]
+  = M_airborne(t1) + M_pending(t1) + M_delivered[t0,t1]
+    + M_transferredToVapor[t0,t1]
+    + M_boundaryOutflow[t0,t1]
+    + M_batchLedgerLost[t0,t1] + residual
+```
+
+within the declared error. Visual cloud opacity, raymarch samples, weather-map
+texels, and rendered rain count cannot scale this mass. A cloud appearance
+model without a validated microphysical closure may still publish an authored
+dimensioned emission policy, but it must be labelled authored/empirical rather
+than physically predicted.
+
+The cloud consumes `EnvironmentForcingSnapshot[n]` and publishes a distinct
+immutable `PrecipitationEmissionSnapshot[n]`. It never writes into its consumed
+snapshot. The scheduler either exposes a direct completed
+`emission[n] -> precipitation transport[n+1]` edge or lets the environment
+coordinator incorporate emission into `EnvironmentForcingSnapshot[n+1]` with
+the declared delay and identical conservation-group identity.
+
+### LightingTransportSnapshot consumption
+
+Consume the atmosphere-owned `LightingTransportSnapshot` through its canonical
+descriptor. Each selected `incidentRadiance`, `directSolarIrradiance`,
+`skyIrradiance`, `transmittance`, and `sourceDirection` `SampledChannel`
+preserves its own quantity kind, SI unit, applicable spectral/angular basis,
+`actualPhysicsTime: PhysicsInstant`, actual support/filter, validity, error, and
+state version. Snapshot-level `sampleInstant: PhysicsInstant`, atomic validity,
+and error correlation do not override channel metadata. Choose one direct-light
+path per channel:
+
+```text
+Path A: unattenuated solar source * T_atmosphere(sample->sun)
+Path B: directSolarIrradiance, or incidentRadiance with declared solar-disc
+        angular support, at the sample;
+        attenuationFactorIds contains the atmosphere path factor ID/revision
+```
+
+Never multiply Path B by atmospheric transmittance again. Convert each consumed
+spectral channel into the scene-linear working basis exactly once at a named
+adapter or consumer boundary, carrying conversion provenance and error. No
+snapshot-wide basis or conversion flag may override channel metadata. Likewise,
+do not interpret hemispherical sky irradiance as directional radiance without
+the declared angular model. Query the typed provider with SI sample position,
+physics frame/transform revision,
+sample-to-sun direction plus solar-disc angular footprint, or incoming
+sky-propagation direction/receiver normal, requested spatial/solid-angle
+footprint and filter, canonical `PhysicsInstant`, and maximum staleness. Do not
+reuse a point result outside its returned support/error.
+
+Cloud lighting then applies only cloud-local transport:
+
+```text
+j_direct = sigma_s * phase * E_direct_after_atmosphere * T_cloudLocal
+T_direct_at_receiver = T_atmosphere * T_cloud * V_opaque
+```
+
+with the finite-disc/radiance alternative using its solid-angle integral.
+`T_cloud` is the cloud-only transmittance `exp(-tau_cloud)`. The cloud shadow
+product discriminates `representation: point-optical-depth |
+point-transmittance | footprint-average-transmittance`; publishes the matching
+units/encoding, spatial/angular footprint, filter domain,
+`sampleInstant: PhysicsInstant`, cadence, per-channel error,
+and cloud factor ID/model revision/path key; and must not
+bake `T_atmosphere`, terrain/opaque
+visibility, exposure, or tone mapping into that product. Water and materials
+therefore combine atmosphere, cloud, and geometry terms once each rather than
+receiving an ambiguously pre-darkened light color.
+
+Filtering is representation-aware: in general
+`E[exp(-tau)] != exp(-E[tau])`. A footprint-average irradiance shadow therefore
+filters/integrates transmittance, or stores sufficient optical-depth statistics
+to reconstruct it within an error gate. Bilinear/minified optical depth instead
+defines an interpolated point-extinction model and cannot be relabelled an area
+average.
+
+Sky radiance/irradiance from the snapshot supplies the external sky source and
+declares whether it includes the direct solar disc. Do not add a separate disc
+source when that factor is already included.
+The cloud march may attenuate and scatter that source through cloud density,
+but it must not rerun or add the atmosphere's multiple-scattering solution.
+
+### Scheduler and mobile invariant
+
+Use this dependency order:
+
+```text
+latch PhysicsContext
+  + EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant
+  + LightingTransportSnapshot.sampleInstant: PhysicsInstant
+  -> advect/evolve cloud density and conservative majorants
+  -> publish optional PrecipitationEmissionSnapshot.emissionInterval:
+     PhysicsTimeInterval for its declared rain/transport edge
+  -> commit view-independent cloud state/resource generations
+  -> publish view-independent PhysicsPresentationCandidate with
+     requestedPresentationInstant: PhysicsInstant + presentedStatePairs
+     + resourceLeases + eventSequenceRanges only
+  -> publish per-view CameraViewPublication with
+     previousRenderSampleInstant: PhysicsInstant
+     + currentRenderSampleInstant: PhysicsInstant
+     + globalToRenderPrevious + globalToRenderCurrent
+     + view/projection matrices
+  -> prepare visibility/acceleration/cloud shadows/caches/reactive-reset plans
+     and publish per-view ViewPreparationPublication with
+     visibilityPublicationRefs + accelerationPublicationRefs
+     + shadowViewPublicationRefs + cachePublicationRefs
+     + reactiveEpochs + reactivePublications + resetDependencies
+     + resourceLeaseRefs
+  -> seal PhysicsPresentationSnapshot with snapshotId + candidateId
+     + cameraPublicationId + viewPreparationId + presentationTargetId + viewId
+     + presentedStatePairRefs + resourceLeaseRefs + eventSequenceRanges
+     + sealVersion only
+  -> render submits cloud beauty/reconstruction/composite from the sealed refs
+  -> append FrameExecutionRecord without mutating prior publications
+```
+
+The completed precipitation-emission edge is independent of presentation
+sealing; rain never waits for a render view. Lighting consumers sample only a
+completed cloud-shadow publication with the declared density revision.
+
+The `PhysicsPresentationCandidate` contains no camera, render origin,
+`globalToRender`, matrices, shadow/cache epochs, or view-specific temporal
+state. Each cloud `PresentedStatePair` has independent
+`previousPresented.provenance` and `currentPresented.provenance` records of type
+`PresentationSampleProvenance`; one shared provenance record is forbidden, and
+each arm carries its own `presentedInstant: PhysicsInstant`.
+`CameraViewPublication` exclusively owns
+`previousRenderSampleInstant: PhysicsInstant`,
+`currentRenderSampleInstant: PhysicsInstant`, render
+transforms, and matrices. `ViewPreparationPublication` exclusively owns the
+`visibilityPublicationRefs`, `accelerationPublicationRefs`,
+`shadowViewPublicationRefs`, `cachePublicationRefs`, `reactiveEpochs`,
+`reactivePublications`, `resetDependencies`, full `resourceLeases` for newly
+created camera-dependent generations, and `resourceLeaseRefs` fields.
+`PhysicsPresentationSnapshot` references candidate pairs and transitive
+leases by ID; it copies no pairs or transforms.
+
+Every `PhysicsGraphStage` records `executionInterval: PhysicsTimeInterval`; its
+edges name producer/consumer stage IDs, registered `clockId` mappings, required
+state version/sample phase, latency, barrier, and maximum staleness. A typed
+exchange/interaction edge carries `SurfaceExchange.applicationInterval` and
+`InteractionRecord.applicationInterval` as `PhysicsTimeInterval`. A
+same-coordination-interval edge is legal only when its producer precedes its
+consumer in the outer `PhysicsGraph` DAG; feedback is a scheduler-owned bounded
+`BoundedCouplingLoop`. Otherwise publish into an explicitly declared later
+interval. Do not use unqualified same-tick/next-tick labels. Do not let rain
+read a partially written emission texture or lighting sample a shadow cascade
+whose density revision does not match its metadata.
+
+Preserve the same interfaces on constrained targets: use analytic/coarse wind,
+low-rate conservative emission columns, compact single-channel cloud optical
+depth, sparse dirty shadow tiles, and explicit age/error. Do not add a dense
+microphysics grid to make the interface look physical.
+
 ## 5. Layered Density Topology
 
 Evaluate active layers independently until altitude, profile, weather, shape,
@@ -398,19 +679,27 @@ Include divergence and hierarchy bandwidth in `C_traverse`.
 
 ## 7. Weather, Shape, Turbulence, And Detail Fields
 
-Generate or load fields once, then advect offsets each frame:
+Generate or load fields once. At each cloud-owner `PhysicsGraphStage` execution
+interval, not each render frame, integrate the latched air and named relative
+velocities over that stage's canonical `executionInterval: PhysicsTimeInterval`
+in the declared Cartesian physics frame:
 
 ```text
-weatherOffset += weatherVelocity * dt
-shapeOffset += shapeVelocity * dt
-detailOffset += detailVelocity * dt
-turbulenceOffset += turbulenceVelocity * dt
+macroOffset += integral_executionInterval u_air(x,t) dt
+weatherOffset = macroOffset + integratedRelativeWeatherOffset
+shapeOffset = macroOffset + integratedRelativeShapeOffset
+detailOffset = macroOffset + integratedRelativeDetailOffset
+turbulenceOffset = macroOffset + integratedRelativeTurbulenceOffset
 ```
 
 Use one macro advection shared by causally related fields plus bounded relative
 motions for shape/detail evolution. Unrestricted independent winds destroy
 cross-scale coherence and produce boiling. Periodically wrap/rebase texture
 phase in a way that leaves sampled coordinates continuous.
+`u_air` comes from the latched `EnvironmentForcingSnapshot`; each relative
+velocity is explicitly relative to that air motion. Preserve integrated offsets
+across forcing revisions instead of recomputing phase from current velocity and
+elapsed time.
 
 Local weather channels:
 
@@ -502,15 +791,19 @@ derivatives remain finite.
 Shape application in a declared local parameterization:
 
 ```text
-weatherPosition = worldToWeather(position - weatherVelocity * time)
+xPhysicsMeters = samplePositionPhysicsMeters
+weatherPosition =
+  physicsMetersToWeatherParameter(xPhysicsMeters - weatherOffset)
 
-turbulence =
+turbulenceMeters =
   displacementMeters
   * (curlTexture * 2 - 1)
   * turbulenceHeightEnvelope
 
 shapePosition =
-  worldToShape(position - shapeVelocity * time + turbulence)
+  physicsMetersToShapeParameter(
+    xPhysicsMeters - shapeOffset + turbulenceMeters
+  )
 
 density =
   remapClamped(
@@ -519,6 +812,10 @@ density =
     1
   )
 ```
+
+Both mappings are versioned frame/chart adapters with unit-bearing Jacobians.
+Raw time, render-frame count, or current velocity multiplied by elapsed time may
+not replace the integrated offsets.
 
 Do not replace vector advection with `length(offset)` along a radial normal; it
 loses wind direction and assumes a planet-centered domain. Texture-coordinate
@@ -653,6 +950,11 @@ early-exit and skipped-distance histograms
 | Step-halving changes topology | Reduce step/filter octaves before increasing temporal history |
 
 ## 9. Lighting And Cloud Shadows
+
+Latch the atmosphere-owned `LightingTransportSnapshot` before this stage.
+Every direct or sky source below declares whether atmospheric attenuation and
+spectral-to-working-basis conversion are already included. Cloud self-shadow
+terms contain cloud optical depth only.
 
 Per occupied sample, evaluate:
 
@@ -974,6 +1276,16 @@ depth-aware upsample/composite: 1 node pass
 optional bloom/aerial perspective: host image pipeline
 ```
 
+Also count forcing/emission descriptors, precipitation support/Jacobian data,
+inventory/conservation ledgers, cloud-shadow representation/mips, and every
+in-flight resource generation. The candidate carries view-independent pairs,
+leases, and event ranges; camera and view-preparation publications add per-view
+transforms and shadow/cache/reset lease refs. The sealed snapshot contains only
+IDs and refs, never copied pairs or transforms. Rain or CPU logic may not
+synchronously read a GPU emission texture in the steady frame loop; use
+same-queue GPU consumption, an explicitly delayed host mirror, or a compact
+analytic emission projection with declared latency/error.
+
 Use `BloomNode`, `GTAONode`, and related built-in display nodes in the host
 image pipeline before writing custom post nodes. Custom cloud nodes are
 justified because the density, optical-depth shadow, and temporal data contract
@@ -995,6 +1307,9 @@ Expose debug views:
 
 ```text
 weather RGBA
+EnvironmentForcingSnapshot revision/age and sampled air-velocity support/error
+appearance-only versus causal-precipitation mode
+emission measure/Jacobian, liquid/ice fractions, airborne inventory and mass residual
 per-layer height fractions
 packed empty intervals
 coverage-remapped density
@@ -1017,6 +1332,13 @@ history rejection reason, age, and confidence
 upsample depth weights
 shadow cascade index
 phase normalization/direction diagnostic
+LightingTransportSnapshot revision, typed request support and factor ledger
+direct-solar-disc inclusion and cloud-only shadow factor ID/revision
+candidate ID plus previous/current PresentationSampleProvenance and pair/lease/event inventory
+CameraViewPublication ID, sample instants, globalToRender revisions, and matrices
+ViewPreparationPublication ID plus full leases for newly created view resources
+and visibility/shadow/cache/reactive/reset lease refs
+snapshotId/candidateId/cameraPublicationId/viewPreparationId/target/view plus pair/lease/event refs; no copied pairs/transforms
 storage texture format, resolution, live bytes, and estimated traffic
 ```
 
@@ -1083,6 +1405,29 @@ Required numerical/image gates:
 7. Resource create/resize/tier-switch/dispose loops plus p50/p95 GPU timestamps,
    live bytes, estimated traffic, and thermal behavior on named desktop and
    mobile targets.
+8. Identical air-velocity traces at several cloud update cadences preserve
+   integrated advection within the provider/interpolation error; replacing the
+   trace with water current or vegetation response must fail schema validation.
+9. Causal precipitation closes initial plus accepted emitted mass against final
+   airborne and pending/deferred inventory, delivered mass, typed transfer to
+   vapor, `ConservationGroup.boundaryFluxes`, typed
+   `InteractionBatchLedger.lostCommodities`, and numerical residual for both
+   area-flux and volume-source fixtures. Reconcile
+   `InteractionBatchLedger.deferredCommodities` with pending inventory; no
+   per-record overflow field is permitted, and any nonzero lost commodity forces
+   failed-conservation status. Liquid/ice internal transfers close separately
+   without changing total mass.
+   Appearance-only mode exposes no physical emission channel.
+10. Lighting fixtures reject a duplicate atmosphere factor, distinguish
+    diffuse sky with/without the direct disc, and prove cloud shadow products
+    contain cloud attenuation only. Validate before tone mapping.
+11. Presentation fixtures prove that the candidate is view-independent; each
+    pair has independent previous/current `PresentationSampleProvenance`;
+    `CameraViewPublication` owns sample instants, render transforms, and
+    matrices; `ViewPreparationPublication` owns visibility/shadow/cache/reactive/
+    reset publications and lease refs; and the snapshot contains only IDs,
+    `presentedStatePairRefs`, `resourceLeaseRefs`, and event ranges. Reject
+    copied pairs/transforms and any aggregate provenance shorthand.
 
 ## 13. Replaced Techniques
 

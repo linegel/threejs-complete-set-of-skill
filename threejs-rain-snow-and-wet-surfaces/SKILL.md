@@ -63,6 +63,89 @@ Read
 for the full contracts, quality tiers, budgets, diagnostics, and replacement
 notes.
 
+## Shared Physics Boundary
+
+When weather interacts with any other simulated domain, first read the router's
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Bind this skill to its versioned `PhysicsContext`,
+`EnvironmentForcingSnapshot`, `SurfaceExchange`, `InteractionRecord`, and
+`PhysicsPresentationCandidate`, `CameraViewPublication`,
+`ViewPreparationPublication`, and `PhysicsPresentationSnapshot`; do not create
+a second weather clock, wind uniform, contact record, or unit convention.
+
+- Consume atmospheric wind from `EnvironmentForcingSnapshot` in meters per
+  second at its exact `sampleInstant: PhysicsInstant`, with its declared frame,
+  altitude/support domain, cadence,
+  requested/actual oriented spatial footprint and spatial/temporal filter or
+  band, interpolation policy, and
+  per-channel error. Wind is air velocity. It is not plant
+  structural response, water material current, or water-surface point velocity.
+- Consume temperature and humidity only with their declared thermodynamic
+  convention. Consume canonical precipitation as oriented mass-area flux.
+  Convert any external volume source through its physical support/Jacobian, or
+  any water-equivalent-depth rate through explicit reference density/provenance,
+  before publishing the forcing snapshot. Preserve liquid/ice fractions,
+  physical support/Jacobian, and arrival-time information. A scalar `forcing` may
+  coordinate art direction but cannot author deposition or conservation.
+- Treat clouds in one declared mode. Appearance-only clouds publish no physical
+  precipitation channel. A causal cloud producer may publish a separate
+  immutable `PrecipitationEmissionSnapshot` with
+  `emissionInterval: PhysicsTimeInterval`, cloud support,
+  fall-delay/transport policy, cadence, and per-channel error; this skill
+  transports it on the declared later scheduler edge to physics-frame-stable receivers.
+- Emit distributed rain/snow transfer as `SurfaceExchange` with mass and
+  momentum fluxes over its exact `applicationInterval: PhysicsTimeInterval`.
+  Emit sparse impacts as `InteractionRecord` with impulse, footprint in the
+  declared SI physics frame, source/receiver IDs, exact
+  `applicationInterval: PhysicsTimeInterval`, frame/transform revision,
+  ordering key, reaction owner, and batch/partition identity. Put capacity
+  outcomes in the canonical immutable `InteractionBatchLedger`, not on individual records. Rendered
+  streak/flake count never changes either integral. Sparse physical impacts
+  partition their parent exchange. Non-authoritative visual splashes use a
+  presentation-event stream that references the exchange; neither path deposits
+  a second copy.
+- Assign exactly one wetness/coverage owner per receiver. That owner integrates
+  rain deposition, water run-up/inundation, melt, drainage, infiltration, and
+  evaporation into one state. Water, this skill, and materials may not each
+  integrate private copies. A material consumes the published receiver state;
+  it never integrates precipitation in a fragment node.
+
+Order coupled updates as follows: latch one immutable forcing snapshot at its
+`sampleInstant: PhysicsInstant` for the graph's
+`coordinationInterval: PhysicsTimeInterval`; give every participating
+`PhysicsGraphStage` an exact `executionInterval: PhysicsTimeInterval`; advance
+analytic or recurrent precipitation; resolve/bin impacts; publish exchanges and
+interaction records with exact `applicationInterval: PhysicsTimeInterval`; let
+the selected receiver owner integrate wetness/snow/coverage; and commit domain
+state. Do not read a newly written receiver field inside the update that
+produced it unless the graph declares the exact dispatch dependency, pass
+boundary, same-queue order, or host-visible completion. A workgroup barrier
+never orders a whole grid.
+
+After commit, publish one view-independent `PhysicsPresentationCandidate` at
+`requestedPresentationInstant: PhysicsInstant`, containing
+`presentedStatePairs`, `resourceLeases`, and `eventSequenceRanges`, but no
+camera, render-origin transform, visibility, shadow, cache, or reset state.
+Each pair's `previousPresented.provenance` and
+`currentPresented.provenance` are independent
+`PresentationSampleProvenance` records, and each arm carries its own
+`presentedInstant: PhysicsInstant`. The camera owner then publishes one
+`CameraViewPublication` per target/view with
+`previousRenderSampleInstant: PhysicsInstant` and
+`currentRenderSampleInstant: PhysicsInstant` plus
+`globalToRenderPrevious`/`globalToRenderCurrent`, view/projection matrices,
+jitter, viewport, and depth state; visibility, acceleration, shadow, cache,
+reactive, and reset owners publish the corresponding
+`ViewPreparationPublication` with `visibilityPublicationRefs`,
+`accelerationPublicationRefs`, `shadowViewPublicationRefs`,
+`cachePublicationRefs`, `reactiveEpochs`, `reactivePublications`,
+`resetDependencies`, full `resourceLeases` for newly created camera-dependent
+generations, and `resourceLeaseRefs`. Finally,
+seal a `PhysicsPresentationSnapshot` whose state/resource payload is only
+`presentedStatePairRefs` and `resourceLeaseRefs` plus the exact `candidateId`,
+`cameraPublicationId`, and `viewPreparationId`. The snapshot never copies
+`PresentedStatePair` records, provenance, or global-to-render transforms.
+
 ## Capability Gate
 
 Initialize the renderer before allocating compute or storage resources. The
@@ -91,10 +174,15 @@ Native WebGPU quality tiers preserve the shared weather cause:
 
 ## Build Order
 
-1. Define one shared weather state with time, delta time, wind, temperature,
-   world-space precipitation flux, and debug mode. Rendered particle count is a
-   sampling/appearance choice: each accepted impact carries exposed-area flux
-   times elapsed time divided by the deterministic sample count. Wetness and snow coverage are integrated
+1. Define one immutable weather projection from the latched forcing snapshot:
+   sample time comes from `sampleInstant: PhysicsInstant`, step duration is
+   derived from the owning stage's `executionInterval: PhysicsTimeInterval`,
+   and wind, temperature, precipitation flux, and debug state preserve their
+   source versions. Rendered particle count is a
+   sampling/appearance choice: accepted impacts use deterministic quadrature
+   weights over the declared exposed-surface measure, and their weights sum to
+   flux integrated over support and elapsed time. Equal division by particle
+   count is valid only for a proven uniform measure/integrand. Wetness and snow coverage are integrated
    state with deposition, drainage/evaporation, or melt terms; they consume the
    same forcing but are not aliases of instantaneous precipitation progress.
 2. Allocate static per-instance seeds once. Evaluate ballistic/domain motion
@@ -222,4 +310,5 @@ general sparks, plasma, trails, and non-weather particles. Use
 Use `$threejs-image-pipeline` for full-frame post ownership when precipitation
 is part of a larger HDR pipeline. Use `$threejs-scalable-real-time-shadows` when weather
 visibility depends on large-scene shadow budgets. This skill owns
-precipitation events and the surfaces they visibly alter.
+precipitation transport and its typed exchanges. The route-selected receiver
+owner owns integrated wetness/coverage; surface materials only consume it.

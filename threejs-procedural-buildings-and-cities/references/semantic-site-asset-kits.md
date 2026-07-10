@@ -17,6 +17,7 @@ design/ecology parameters.
 - Compiler and ownership architecture
 - Environment and site-plan intermediate representation
 - Asset manifest and registry
+- Physics proxies, body properties, and solver adapters
 - Constraint solving and deterministic placement
 - Ruins and constructed fragments
 - Docks, piers, boats, and water interfaces
@@ -80,19 +81,20 @@ invent a substitute solver inside a placement callback.
 environmentSnapshot:
   revision: ""
   seed: ""
-  coordinateFrame: ""
-  sceneUnitsPerMeter: ""
+  coordinateFrame: "" # site-plan coordinates only; never a physics provider frame
+  physicsContextRef: { contextId: "", schemaId: "", contextVersion: "" }
+  physicsSignalDescriptorRefs: []
   extent: ""
   terrain:
     elevationAndNormal: ""
     slopeCurvatureCavity: ""
     substrateAndSemanticRegions: ""
   coast:
-    signedDistance: { units: meters, sign: land-positive-water-negative }
+    signedDistance: { channelRef: "", sign: land-positive-water-negative }
     tangentOutwardNormal: { convention: "" }
-    restWaterElevation: { units: meters, datum: "" }
-    staticWaterDepth: { units: meters, derivation: "" }
-    runupOrInundationEnvelope: { timeMeaning: "" }
+    restWaterElevation: { channelRef: "" }
+    staticWaterDepth: { channelRef: "", derivation: "" }
+    runupOrInundationEnvelope: { channelRef: "" }
   ecologyAndExposure:
     moistureSaltWindShelter: ""
   authoredConstraints:
@@ -111,6 +113,11 @@ view-independent and versioned. A shoreline tangent/normal must specify which
 normal points from land to water; docks and sea-facing modules otherwise flip
 unpredictably. Static water depth is **Derived** from terrain and rest-water
 elevations only when units and datum agree.
+For physics-facing inputs, `physicsSignalDescriptorRefs` references canonical
+providers; the snapshot does not restate their units, scale, frame, time,
+filter, validity, or errors. `coordinateFrame` describes only site-plan layout.
+Obtain `metersPerWorldUnit` and all world/physics transforms only from the
+referenced `PhysicsContext`; derive its reciprocal once.
 
 ### Serializable site plan
 
@@ -141,6 +148,18 @@ type SitePlacement = {
   representationPolicyId: string;
   semanticIds: Record<string, string | number>;
   dynamicProviderIds: string[];
+  colliderIds: string[];
+  deformingSupportIds: string[];
+  rigidBodyPropertiesRef?: {
+    entityId: string;
+    sourceRecordId: string;
+    sourceRecordVersion: string;
+  };
+  hydrostaticHullPropertiesRef?: {
+    entityId: string;
+    sourceRecordId: string;
+    sourceRecordVersion: string;
+  };
 };
 ```
 
@@ -215,6 +234,7 @@ siteAsset:
     variantWeights: []
   dynamicInterfaces:
     providerSchemaIds: []
+    providerIds: []
     stateBounds: ""
     interactionTags:
       waterSurface: []
@@ -229,6 +249,13 @@ siteAsset:
     shadowProxies: []
     pickingProxies: []
     collisionOrPhysicalProxies: []
+  physics:
+    derivedPhysicsMaterialIds: [] # validation projection from collider/body refs; not an owner
+    colliderIds: []
+    deformingSupportIds: []
+    rigidBodyPropertiesRef: { entityId: "", sourceRecordId: "", sourceRecordVersion: "" }
+    hydrostaticHullPropertiesRef: { entityId: "", sourceRecordId: "", sourceRecordVersion: "" }
+    externalSolverAdapterIds: []
   diagnosticsAndTests: ""
 ```
 
@@ -240,6 +267,8 @@ The registry validates before site generation:
 - topology identity keys for instancing and uniqueness for merge/batch paths;
 - LOD/proxy coverage and transition policy;
 - required dynamic provider schemas and missing-provider behavior;
+- canonical physics provider/adapter IDs, proxy schemas, property records,
+  `PhysicsContext` compatibility, and explicit absent-channel behavior;
 - support, clearance, attachment, and semantic IDs;
 - water/foam/wetness/caustic/wind interaction tags plus collision/physical,
   picking, and shadow proxies where the product contract consumes them;
@@ -260,6 +289,179 @@ generic boxes, cylinders, billboard blobs, or unrelated noise and call the
 reference matched. Route cloud generation/transport to the cloud/atmosphere
 owner; this registry records only its composition requirement, ID, bounds, and
 handoff.
+
+## Physics Proxies, Body Properties, And Solver Adapters
+
+Apply the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+The site plan declares physical semantics; it does not become a physics engine.
+Every consumed record is registered by stable ID and version under one
+`PhysicsContext` and one route `PhysicsGraph`/coordinator. Individual graph
+stages and records retain their canonical distinct owners.
+
+### Collider and support proxies
+
+A `ColliderProxy` uses the common schema unchanged:
+
+```text
+colliderId, entityId, shapeId                       generation-bearing IDs
+physicsFrameId, physicsOriginEpoch
+shapeRepresentation, topologyRevision, poseStateVersion
+sweptBounds, physicsMaterialId, collisionGroups
+approximationError, residency
+```
+
+The site asset manifest keys source asset/version, semantic owner,
+transform-provider ID, sidedness/closedness, margin/CCD policy, scale/state
+validity, provenance/build revision, and fixtures to that canonical record; it
+does not add a competing collider envelope. A compound object uses child
+`ColliderProxy` records when regions need different `PhysicsMaterialId` values.
+
+Select the canonical `analytic`, `convex`, `mesh`, `sdf`, `compound`, or
+`external` representation from contact/error and update requirements; a
+primitive or heightfield maps through the named analytic/external adapter.
+Do not use a render bounding box as an accepted proxy merely because it is
+cheap. Concave triangle meshes and moving/deforming shapes require explicit
+solver capability, cost, tunnelling/CCD, and update evidence.
+
+Static support exposes the canonical `SupportSurfaceSample` through the terrain
+or geometry adapter. A moving or deforming support uses a
+`DeformingSupportProxy` with stable support/feature IDs, topology/version,
+frame/transform provider, valid `PhysicsTimeInterval`, deformation/swept
+bounds, footprint, and error contract. The site compiler may bind that proxy
+but may not synthesize motion from the visible mesh. Missing optional sample
+channels are absent, never zero-filled.
+
+`SupportSurfaceSample` stays kinematic. Contact lifecycle, A-to-B normals,
+manifolds, contact penetration, TOI, moving-frame relative point velocity,
+material-state latching, impulses, and reactions belong to the collision
+solver, not the site or support provider. `ContactManifoldRecord` owns persistent
+manifold/lifecycle/internal state; canonical `InteractionRecord` owns typed
+impulses, constraints, and reactions. Optional support signed separation
+remains only a kinematic query.
+
+Proxy identity is LOD-invariant. Hero, mid, far, impostor, shadow, picking, and
+batched representations all reference the same physical proxy IDs. A proxy may
+have its own quality/cost variants only through an explicit physics
+`QualityTransition` that preserves semantic body/material IDs, declares changed
+error and conservation effects, and is accepted by the physics owner. Graphics
+LOD selection cannot silently switch collision topology.
+
+If a physics transition changes proxy representation, migrate or explicitly
+reset contact manifolds and warm starts. A render crossfade may show both LODs,
+but exactly one physical representation emits contacts/forces.
+
+### Rigid body and hydrostatic records
+
+`RigidBodyProperties` is source data, not an inference from render triangles:
+
+```text
+entityId, owner, bodyFrameId
+massKg, centerOfMassBodyMeters, inertiaTensorBodyKgM2
+colliderIds, physicsMaterialIds
+stateEquation, forceTorqueApplicationOwner, error (per-property map)
+```
+
+Use those canonical fields unchanged. Store source/provenance, valid
+configuration/scale, and derivation evidence in the asset/property source
+record referenced by the manifest, not as a second body-property ABI.
+
+Gate positive mass and a finite symmetric positive-definite inertia tensor;
+verify parallel-axis and frame conversions. Scaling an asset requires a newly
+derived/versioned mass-property record under a declared density/scale law, not
+reuse of the original tensor.
+Physics body/proxy frames permit only finite proper rigid transforms; reject
+reflection/negative scale at the adapter boundary or bake a separately
+validated asset/proxy/properties version. A quaternion cannot encode a
+reflection, and an unrecorded scale invalidates mass, inertia, volume, and drag.
+
+`HydrostaticHullProperties` records the closed wetted/hull representation used
+by the selected water/body adapter, not the visible hull skin:
+
+```text
+entityId, hullFrameId, geometry, geometryRevision
+displacedVolumeQuery, waterlineClipping, buoyancyModel
+dragModel, addedMassModel, waveExcitationModel
+samplingFootprint, approximationError, validity
+```
+
+The versioned queries/laws carry closed volume or displaced-volume-versus-
+immersion data, center-of-buoyancy/waterplane results, reference waterline and
+valid heel/trim/immersion domain, drag/lift areas and coefficients, and their SI
+units, regime, provenance, closure/sampling/interpolation errors. Do not promote
+those implementation details to alternate top-level field names.
+
+Displacement mass is `rho_fluid * displacedVolume` only for the declared fluid
+density and state; store volume and mass semantics separately. A single drag
+coefficient without reference area, velocity convention, fluid properties,
+valid regime, and provenance is unusable. Visual sample points may drive a
+perceptual bobbing adapter, but they do not prove hydrostatic conservation.
+The body adapter uses the same filtered `WaterSurfaceSample` bracket as the
+coupling schedule: buoyancy uses the declared surface/pressure model, while
+drag uses material-current velocity relative to the body, not surface-point
+velocity. Added-mass/wave-excitation laws must not duplicate water-solver force.
+
+### External solver adapter
+
+Structural response, fracture, rigid-body contact, mooring constraints,
+buoyancy, navigation, and two-way fluid/structure coupling belong to a named
+external/domain solver adapter. Use `ExternalSolverAdapter` unchanged:
+`adapterId`, `externalSolverIdVersion`, `contextId`, `ownedStateEquations`,
+`supportedFramesCharts`, `unitConversion`, `clockMapping`, `stepSemantics`,
+`signalDescriptors`, `acceptedInteractions`, `emittedReactions`,
+`residencySynchronization`, `precisionDeterminism`, `errorModel`,
+`checkpointRollback`, and `failurePolicy`. Site metadata references that
+adapter; it does not define another solver envelope. The adapter joins the
+canonical scheduler:
+
+```text
+ingest -> sample-forcing -> predict -> emit-interactions -> solve-subcycles
+       -> reduce-reactions -> correct -> commit -> publish-presentation
+```
+
+`publish-presentation` produces a view-independent
+`PhysicsPresentationCandidate` with one `PresentedStatePair` per stable
+binding/provider. Dynamic transforms use canonical `RigidBodyState`; each
+pair's previous/current arm has independent `PresentationSampleProvenance`,
+`presentedInstant`, state handle, and spatial binding. The camera owner then
+publishes `CameraViewPublication` with render mapping; visibility, LOD,
+acceleration, shadows, caches, resets, and preparation lease refs belong to
+`ViewPreparationPublication`. The sealed per-target/view snapshot references
+candidate binding IDs and leases rather than copying pairs or transforms. The
+multi-target `FrameExecutionRecord` owns target status and lease-keyed
+completion, abort, device-loss, and retirement disposition. A site/solver
+adapter does not publish a singular final snapshot before those consumers run.
+
+Adapters consume canonical `SupportSurfaceSample`, `WaterSurfaceSample`,
+`EnvironmentForcingSnapshot`, `ColliderProxy`, and material/body records as
+required, and exchange canonical `InteractionRecord`/reaction data. They do
+not call site placement or render-mesh raycasts inside the solver step.
+Provider latency, stale/missing behavior, CPU/GPU barriers, and interpolation
+are declared in the route's `PhysicsGraph`; no in-frame readback is hidden by a
+site callback.
+The collision adapter alone resolves contact impulses. It computes relative
+point velocity with translational and `omega cross r` terms, uses the declared
+A-to-B normal convention and begin/persist/end lifecycle, and atomically
+latches both `PhysicsMaterialId`/`materialStateVersion` values plus registry and
+selected constitutive-pair-law versions before
+selecting one admissible pair law.
+
+Validate registry closure, frame/unit/context agreement, LOD-invariant proxy
+identity, material bindings, mass/inertia/hull positivity, hydrostatic curves,
+proxy-versus-source surface error, swept bounds, missing-provider failure, and
+adapter round trips. For supported two-way coupling, close reaction impulse and
+mass, linear/angular momentum, energy/work, and species ledgers within product
+**Gated** bounds. Check hydrostatic displaced-volume consistency separately;
+volume is conserved only under an explicitly fixed-density incompressible model.
+
+Package immutable proxy topology and hull tables once per asset/version and
+bind instances through compact SoA IDs/transforms/state versions; do not clone
+collider meshes or create per-object query callbacks. Account proxy/property/
+identity-map bytes, broad/narrow-phase work, provider batches, interaction and
+contact queues, warm starts/manifolds, frame-in-flight resources, and old/new
+`QualityTransition` overlap separately from render geometry. View culling may
+hide presentation only; physics sleeping/domain activation remains solver-owned
+and cannot discard an authoritative body merely because it is off camera.
 
 ## Constraint Solving And Deterministic Placement
 
@@ -425,28 +627,47 @@ A boat or floating object supplies:
 
 ```yaml
 floatingInterface:
-  hullFrame: ""
+  hullFrameId: ""
   authoredWaterlinePlane: ""
   hullBoundsAndDraftEnvelope: ""
+  rigidBodyPropertiesRef: { entityId: "", sourceRecordId: "", sourceRecordVersion: "" }
+  hydrostaticHullPropertiesRef: { entityId: "", sourceRecordId: "", sourceRecordVersion: "" }
+  colliderIds: []             # ColliderProxy.colliderId
   visualSamplePoints: []
   berthAndMooringAnchors: []
   freeWaterClearanceHull: ""
-  dynamicProviderSchema: ""
+  providerSchemaId: ""
+  transformProviderId: ""
+  waterProviderId: ""
   wakeOrInteractionEmitters: []
   staticAndSweptRenderBounds: ""
 ```
 
 The authored waterline is asset semantics, not inferred from whichever
-triangles happen to intersect the current water surface. A selected water or
-buoyancy provider returns transform state in declared units/time/space. A
-simple visual heave/pitch/roll sampler is acceptable only when the truth/style
-contract permits it; conserved buoyancy or navigation physics belongs to a
-domain solver. The site plan stores provider and anchor IDs, not the solver.
+triangles happen to intersect the current water surface. The water provider
+returns canonical `WaterSurfaceSample` values at `sampleInstant`; the selected
+body/motion solver owns versioned `RigidBodyState` at its `PhysicsInstant` and
+`PhysicsTimeInterval` validity. A simple visual
+heave/pitch/roll adapter is acceptable only when the truth/style contract
+permits it; conserved buoyancy or navigation physics belongs to a domain
+solver. The site plan stores provider and anchor IDs, not the solver.
+The domain solver consumes the registered mass, inertia, hull, collider,
+physics-material, and water-provider records; it must not derive them from the
+active hull LOD or its render bounds.
 
-Wake/interaction emitters are metadata: position/frame, footprint, intensity
-parameterization, activation state, and owner ID. Water decides whether they
-produce analytic ripples, a local heightfield source, foam, or no effect. A
-boat material or transform script must not paint its own independent wake.
+Wake/interaction emitters are metadata: position/frame, footprint, dimensioned
+parameterization, activation state, and owner ID. At runtime the owning adapter
+serializes them through the canonical `InteractionRecord` schema unchanged,
+including `applicationInterval: PhysicsTimeInterval`, tagged dimensional
+payload, target state equation, exact-once/application keys,
+`reactionGroupId`/`reactionToInteractionIds`, and conservation groups. Overflow belongs to the
+`InteractionBatchLedger`, which
+uses the canonical published range, per-consumer cursors, typed outcomes,
+overflow ranges/policy, lost/deferred commodity maps, and application-ledger
+version. A dropped record cannot carry its own status. Water
+decides whether accepted records produce analytic ripples, a local heightfield
+source, foam, or no effect. A boat material or transform script must not paint
+its own independent wake.
 
 Berth fixtures verify boat swept bounds against dock, shore, neighboring
 vessels, and approach volumes over the supplied motion envelope. Free-water
@@ -560,14 +781,15 @@ supplementalInventory:
   representationAssets:
     - geometry LODs, cluster proxies, impostor color/depth/normal as justified
     - shadow proxies and conservative bounds
-    - collision/physical and picking proxies when consumed by the product
+    - ColliderProxy/DeformingSupportProxy records and picking proxies when consumed
+    - RigidBodyProperties and HydrostaticHullProperties for dynamic/floating assets
   compositionFamilies:
     - required ruin, dock, boat, rock/reef, debris, and vegetation kits
     - required foreground/background cloud-silhouette package or tested cloud generator
   semanticData:
     - all asset manifests, anchors, sockets, support/clearance shapes
     - material-slot registry, stable IDs, provenance, generation revisions
-    - dynamic provider schemas for water/motion/interactions
+    - PhysicsMaterialId bindings and provider/adapter schemas for water/motion/interactions
   validation:
     - fixed seeds, environment snapshots, reference cameras/trajectories
     - field/identity/anchor/LOD diagnostics and target-device evidence profiles
@@ -600,6 +822,9 @@ candidate IDs/priorities/families/variants and rejection causes
 placement anchors/frames, support probes, embed, footprint, and normal spread
 hard/soft clearance volumes, conflicts, winners, authored precedence
 attachment graph, sockets, required/missing providers
+PhysicsContext/frame/epoch, physics-material and LOD-invariant proxy IDs
+RigidBodyProperties mass/COM/inertia and HydrostaticHullProperties diagnostics
+external solver adapter stage, interaction/reaction ownership, and conservation residuals
 ruin module/damage/closure/rubble/colonization ownership
 dock root/deck/piles/bed contacts/berths/approach and under-deck clearance
 boat hull/waterline/swept bounds/moorings/provider/wake emitter metadata
@@ -624,6 +849,10 @@ Validation fixtures include:
   convention errors;
 - missing asset/material/anchor/socket/provider tests that fail plan validation
   before partial geometry appears;
+- proxy identity across every render LOD, context/frame/epoch mismatch,
+  unknown `PhysicsMaterialId`, invalid mass/inertia/hull properties, absent
+  optional channels, missing external solver adapter, and interaction-stream
+  overflow/conservation fixtures that fail before simulation;
 - overlap, unsupported footprint, hollow underside, water/depth, run-up,
   access, berth, and swept-bound failures with explicit diagnostics;
 - close/mid/far and trajectory captures showing representation, shadow,
@@ -634,6 +863,7 @@ Validation fixtures include:
 
 Reject the system when visual plausibility depends on generation order,
 untracked mesh extrema, per-object material clones, uncullable world batches,
-private terrain/water noise, or silent asset substitution. A valid site can be
+private terrain/water noise, render-derived physical properties or proxies, or
+silent asset substitution. A valid site can be
 explained from environment revision and seed through candidates, constraints,
 anchors, manifests, compilation, and final representation.

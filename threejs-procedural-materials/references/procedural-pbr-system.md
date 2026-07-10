@@ -21,6 +21,7 @@ widths, channel counts, and API-version digits are structural.
 - Atlas, texture array, triplanar, and hex tiling
 - Derivative normals and specular AA
 - Authored PBR response bundles
+- Physics material registry
 - Coupled terrain, coast, and seabed materials
 - Planet, terrain wetness, lava, and emissive surfaces
 - Per-instance dissolve and variants
@@ -403,6 +404,97 @@ Visible correctness signatures:
 | Wet rock | Visible signature: wetness lowers roughness, darkens color, and changes normal response together | classic wrong: wetness as a washed overlay or roughness-only scalar |
 | Wetness fields | Visible signature: waterline/cavity/slope causes align across color, roughness, normal, and clearcoat | classic wrong: washed fields, sRGB-as-data masks, material-owned display encoding |
 
+## Physics Material Registry
+
+Apply the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+when a semantic surface participates in physical interaction. Rendering and
+physics use separate identities:
+
+```yaml
+PhysicsMaterialRegistry.renderBindings:
+  semanticSurfaceId: ""
+  materialResponseBundleId: ""  # optical/PBR identity
+  physicsMaterialId: ""         # PhysicsMaterialId; constitutive identity
+  bindingVersion: ""
+  provenance: ""
+```
+
+This is the route-owned entry in canonical
+`PhysicsMaterialRegistry.renderBindings`, not a second surface/material map.
+The mapping is explicit and may be many-to-one or state-dependent. A visual
+material can cover several physical substrates, and several weathered looks
+can share one physical material. Conversely, a wet/icy/charred state can change
+physics without requiring a new visual graph. Never hash or classify PBR
+channels to obtain `PhysicsMaterialId`.
+
+Register each consumed ID in the route's `PhysicsMaterialRegistry`. The record
+contains only properties supported by a named constitutive/solver adapter.
+Canonical scalar fields remain SI `Quantity` values; registry `uncertainty`
+and `provenance` carry their property-level error/source. Temperature,
+moisture, strain, rate, impact-speed validity, model revision, state variables,
+and extrapolation policy belong inside the relevant versioned law payload or
+its referenced source record, not as new material-entry envelope fields.
+
+Use the common keys unchanged: `densityKgPerM3`, `contactLaw`, `frictionLaw`,
+`restitutionLaw`, `complianceDampingLaw`, `adhesionCohesionLaw`,
+`permeabilityPorosityLaw`, `wettingContactAngleLaw`, `dragRoughnessLaw`,
+`thermalConductivityWPerMK`, `specificHeatJPerKgK`, `emissivitySpectrum`,
+`phaseChangeLaw`, per-property `uncertainty`, and `provenance`. The table below
+specifies requirements inside those versioned laws; it is not another schema.
+
+| Property | Required semantics and unit |
+| --- | --- |
+| mass density | `kg m^-3`; distinguish bulk, solid, and apparent density |
+| friction | static/dynamic coefficients, dimensionless; optional anisotropic tangent basis and velocity/state range |
+| restitution | dimensionless with impact-speed/material-pair validity; not a universal surface constant |
+| compliance/damping | named normal/tangential contact law; compliance in `m N^-1`, damping in the solver law's declared SI form |
+| permeability/porosity | intrinsic permeability in `m^2`; porosity dimensionless; do not confuse either with fluid-dependent hydraulic conductivity |
+| hydraulic/wetting | optional conductivity `m s^-1`, absorption/storage law, capillary pressure `Pa`, contact angle `rad`, and fluid/temperature provenance |
+| adhesion/cohesion | named model; surface energy `J m^-2` or cohesive traction `Pa`, never an unlabelled strength scalar |
+| thermal | optional conductivity `W m^-1 K^-1`, specific heat `J kg^-1 K^-1`, emissivity spectrum, and versioned phase-change law with temperature in `K` |
+
+Pair response is owned by the selected solver adapter. Unless a law is
+explicitly directed, form its deterministic key by canonically ordering the
+two `(PhysicsMaterialId, materialStateVersion)` tuples, while latching the
+shared `registryVersion` and the selected `constitutivePairLaw` version; A/B
+contact ordering must not select another law. Latch all of them atomically for
+each solver transaction. A state change during persistent contact follows the
+adapter's declared reinitialization/migration rule rather than mixing old and
+new coefficients in one solve.
+
+Select exactly one admissible constitutive law per active contact mode. Declare
+coefficient combination, anisotropy-frame transport, state lookup,
+missing-property behavior, and energy accounting. Do not apply a coefficient
+of restitution on top of a compliant damping law that already determines
+rebound unless their combined formulation is derived and passivity-gated;
+reject incompatible combinations. Record normal/tangential/adhesive work and
+the nonnegative dissipated-work ledger within numerical tolerance. Averaging
+two arbitrary coefficients is not a default law. If a solver needs
+rolling/torsional resistance, plasticity, fracture, viscosity, or another
+property, revise the central `PhysicsMaterialRegistry` schema when it must be a
+new cross-solver top-level property. Solver-specific additions remain inside an
+existing versioned law payload with units and provenance; never invent a
+material-local top-level field or overload roughness/friction.
+An active/actuated interface instead declares its external energy source and
+signed work ledger; it must not hide injected work as negative dissipation.
+
+Bind `PhysicsMaterialId` to the LOD-invariant collider/support proxy, not to a
+triangle group in whichever render LOD is visible. Appearance LOD, texture
+streaming, palette quantization, and shader-quality changes must leave contact
+identity unchanged. A physical state transition is emitted by the owning
+weather/thermal/damage solver and selects a versioned material/state record;
+visual wetness or color change alone has no physical authority.
+
+Validation must reject unknown IDs, duplicate registry ownership, missing
+units/provenance, invalid ranges, non-positive density, inadmissible tensors or
+coefficients, noncanonical unordered pair keys, mixed state versions,
+incompatible restitution/damping, undefined pair-combine rules, negative
+dissipated work outside tolerance, and render-LOD-dependent bindings.
+Run fixtures that vary visual response while holding physics identity fixed and
+vice versa. Report material/state/version IDs with contact diagnostics so a
+correct-looking surface cannot hide an invented physical response.
+
 ## Coupled Terrain, Coast, And Seabed Materials
 
 ### Provider interface
@@ -412,29 +504,30 @@ record. The field owner may generate it analytically, rasterize it into a
 texture hierarchy, or stream it by chunk; the material interface is unchanged:
 
 ```yaml
-surfaceFieldContract:
-  revision: ""
-  coordinateFrame: ""
-  sceneUnitsPerMeter: ""
-  sampleToWorld: ""
-  coastDistance:
-    units: meters
-    sign: land-positive-water-negative
-    filter: signed-distance-preserving
-  terrainElevation: { units: meters, datum: "" }
-  waterRestElevation: { units: meters, datum: "" }
-  waterColumnDepth: { units: meters, derivation: "max(waterRest-terrain,0)" }
-  coastFrame: { channels: [nearestCoastNormal, nearestCoastTangent] }
-  geomorphology: { channels: [slope, curvature, cavity, drainage, exposure] }
-  surfaceState: { channels: [moisture, saltExposure, runupEnvelope, wetness] }
-  identity: { channels: [substrateId, semanticRegionId, authoredExclusion] }
-  encoding: ""
-  extentAndTexelSize: ""
-  mipOrLodPolicy: ""
-  updateCadence: ""
-  invalidationKey: ""
-  missingDataPolicy: ""
+surfaceFieldProjection:
+  contextRef: { contextId: "", contextVersion: "" }
+  sourceSignals:
+    landSupport: { descriptorRef: "", channelRefs: [coastDistance, terrainElevation, waterRestElevation, coastFrame, geomorphology, identity] }
+    receiverState: { descriptorRef: "", channelRefs: [moisture, liquidStorage, runupEnvelope, wetnessCoverage] }
+  channelSemantics:
+    coastDistance: { sign: land-positive-water-negative, requiredFilter: signed-distance-preserving }
+    waterColumnDepth: { derivedFrom: [waterRestElevation, terrainElevation], formula: "max(waterRest-terrain,0)" }
+  presentedBindingId: "" # stable PresentedStatePair binding when a GPU resource is rendered
+  missingDataPolicy: ""  # must agree with each descriptor
 ```
+
+The descriptor/channel records own SI units, frame, the exact
+`PhysicsInstant`/`PhysicsTimeInterval`, support, filter, validity/error,
+cadence/latency, state/resource generation, and the sole world-to-physics
+conversion. This projection serializes neither `metersPerWorldUnit` nor
+`sampleToWorld`. A physics-owned rendered field obtains immutable previous and
+current state handles, independent sample provenance, and physical spatial
+bindings from its candidate-owned `PresentedStatePair`.
+`CameraViewPublication` alone owns previous/current render mappings;
+`ViewPreparationPublication` owns view-specific caches, shadows, visibility,
+resets, and preparation lease refs. The per-target/view snapshot references the
+candidate binding ID and leases rather than copying the pair or transforms, and
+`FrameExecutionRecord` joins multi-target completion before lease retirement.
 
 All numerical values in a produced manifest use the repository evidence labels.
 The **Derived** still-water depth is

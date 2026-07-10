@@ -5,6 +5,47 @@ apply fallback when WebGPU is unavailable. It must never be copied into a
 canonical WebGPU/TSL skill. The canonical owner defines truth; this file only records what
 an authorized compatibility branch may preserve, weaken, or remove.
 
+## Conditional Physics ABI Ledger
+
+Only after activation, a branch whose canonical owner uses cross-domain
+physics inherits the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+This ledger records loss; it never defines a fallback physics ABI.
+
+| Channel disposition | Required record |
+| --- | --- |
+| Preserved | Exact canonical `PhysicsContext`, `PhysicsGraph` edge/stage semantics, `PhysicsSignalDescriptor`, SI units/frame/clock, stable generation-bearing provider/entity/material/collider IDs, `PhysicsMaterialRegistry`/`PhysicsMaterialId`, applicable `SurfaceExchange`/`InteractionRecord`/`InteractionBatchLedger`/`ContactManifoldRecord` semantics, typed errors, and the complete view-independent `PhysicsPresentationCandidate` -> per-view `CameraViewPublication` -> `ViewPreparationPublication` -> sealed `PhysicsPresentationSnapshot` -> append-only `FrameExecutionRecord` lifecycle remain unchanged. Preserve candidate `PresentedStatePair` provenance and `requestedPresentationInstant`, camera `previousRenderSampleInstant`/`currentRenderSampleInstant` and transforms, preparation/reset publications, read-only `PresentationResourceLease`, `ConsumerCompletionJoin`, and abort/device-loss disposition. |
+| Weakened | The canonical quantity and envelope remain; record changed footprint/filter, cadence, valid `PhysicsTimeInterval`, latency/staleness, residency, approximation/model revision, and increased typed error. Revalidate every surviving physical claim. |
+| Removed | Publish absence/unsupported capability with a typed error, remove dependent graph edges and interactions, and delete physical/conservation claims. Never encode removal as a zero-valued channel or a plausible visual substitute. |
+
+A cached/precomputed result claiming preservation retains signal/state/resource
+generations, valid `PhysicsTimeInterval`, source `PhysicsInstant`, errors, each
+pair's independent `PresentationSampleProvenance`, candidate requested instant,
+per-view camera render instants, preparation publications, sealed snapshot
+references, lease retirement, and candidate abort/device-loss cleanup. It does
+not move view transforms/reset state into the candidate or snapshot or collapse
+source and presentation clocks. A
+CPU/offline branch declares latency/residency and may not introduce a
+steady-frame synchronous GPU readback. PBR material similarity does not
+preserve a `PhysicsMaterialId` registered in `PhysicsMaterialRegistry`; visual
+proxy similarity does not preserve a
+`ColliderProxy`. Those stable identities and their mappings survive or the
+channel is unsupported.
+
+Inherited physics records keep canonical
+`{ value, unit, label: Derived|Gated|Measured|Authored, source }` quantities.
+`[D/G/M/A]` are compact prose aliases only, not an ABI substitution.
+
+For preserved dynamics, the proof delta includes deterministic replay across
+render rates, numerical convergence, source/reaction and conservation closure,
+stationary-state behavior across origin rebases, stale-generation rejection,
+and sustained timing/traffic without frame-loop readback. A
+`QualityTransition` records migration/reset, queue boundary, conserved-state
+residuals, simultaneous old/new residency, and presentation-history action. A
+solver/model-class change is a different truth contract, not a quality tier;
+only one representation may emit authoritative reactions during a visual
+crossfade.
+
 Every numeric value uses `{ value, unit, label, source }`, where `label` is
 `Authored`, `Derived`, `Measured`, or `Gated`. No row supplies universal
 device-class constants. Each branch derives its performance envelope from the
@@ -52,6 +93,11 @@ Every authorized branch also records:
 - resident and peak transient memory, attachment footprint, load/store/resolve
   traffic, upload/readback volume, and bounded traffic model;
 - per-invariant visual-error maps, measured distributions, and frozen gates;
+- exact physics-channel disposition, typed unsupported errors, stable-ID and
+  material/collider continuity, replay/convergence/conservation/rebase
+  evidence, exact candidate/camera/view-preparation/snapshot-reference/lease/
+  execution records, and `QualityTransition` migration/reset residuals where
+  the canonical owner exposes them;
 - color/data domains, sole tone-map/output owner, disposal, and rebuild rules;
 - `INSUFFICIENT_EVIDENCE_GPU_TIMING` whenever GPU attribution is required but
   timestamp evidence is unavailable.

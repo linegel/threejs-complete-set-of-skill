@@ -18,6 +18,17 @@ Read
 before implementation or review. For any island, coast, shoal, reef, harbor, or
 moving waterline, also read the
 [coastal archipelago contract](../threejs-water-optics/references/coastal-archipelago-system.md).
+All physics-frame, clock, provider, interaction, residency, state-version, and
+presentation boundaries come from the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+The FFT remains a domain solver behind those interfaces; it does not define a
+parallel water-query schema.
+
+Ocean optics consumes the same typed `LightingTransportSnapshot` as the sky
+and coastal owner. Solar-disc, sky-radiance/irradiance, segment-transmittance,
+cloud, visibility, and water-extinction factors retain distinct quantity/unit/
+basis and factor identities so no attenuation or direct disc is applied twice.
+Radiometry is a provider boundary, not an `InteractionRecord`.
 
 ## Numeric Provenance
 
@@ -50,6 +61,32 @@ sustained storage bandwidth.
 | Shoreline motion is sub-pixel and only wave statistics matter | Phase-averaged wave-action transport plus analytic display bands | No instantaneous phase contract; validate action/energy and image error. |
 
 Do not disguise scrolling normals or a wave pile as a low FFT tier.
+
+### Environmental forcing adapter
+
+A wind-sea preset consumes the shared `EnvironmentForcingSnapshot` through an
+explicit spectral-forcing adapter. It does not feed instantaneous air velocity
+directly into a spectrum. The adapter records the sampled wind vector and
+reference height, surface roughness/drag or another calibrated vertical-profile
+model, atmospheric stability treatment, averaging window, spatial footprint,
+fetch geometry, forcing duration/age, directional spreading model, and the
+source-term family represented. It derives a calibrated `U10` (or declares a
+different named reference-height input), peak/fetch parameters, and spectral
+direction in one physics frame with propagated version/error.
+
+The input channel is the snapshot's footprint/filter-bearing `airVelocityMps`;
+air density/pressure/temperature/stability channels remain absent unless the
+selected adapter actually requires and receives them.
+`PhysicsGraph` latches the forcing version at `sample-forcing` for a declared
+interval. Spectrum/coefficient evolution never samples render time or a mutable
+weather uniform independently.
+
+Gust-scale forcing may modulate spray or shading, but it cannot reseed a mature
+wave spectrum every frame. A stationary FFT sea freezes a documented forcing
+snapshot/statistical state; an evolving sea advances a validated action/energy
+source balance and preserves phase/coefficient continuity. Mean water current
+remains a separate water channel and Doppler term—it is never substituted for
+wind, and wind is never exposed as `materialCurrentVelocityMps`.
 
 ### Offshore/coastal handoff
 
@@ -90,10 +127,13 @@ phase-resolving domain or implement an explicit two-way modal projection with
 phase, energy, localization, and periodic-copy residuals **[G,M]**. An
 absorbing layer is valid only when the rejected reflection is below its gate.
 
-Both modes use one world frame, water datum, bathymetry convention, seed or
-band identity, and monotonic timebase. A current `U` changes absolute frequency
-by `k dot U` **[D]**; if `U` varies materially within a periodic patch, route
-that region out of the FFT instead of freezing an inconsistent dispersion.
+Both modes use one `PhysicsContext`, stable SI physics frame, water datum,
+bathymetry convention, seed or band identity, canonical `PhysicsInstant`
+samples, and `PhysicsTimeInterval` transfers from registered clock mappings.
+They do not introduce an independent monotonic timebase. A current `U` changes
+absolute frequency by `k dot U` **[D]**; if `U`
+varies materially within a periodic patch, route that region out of the FFT
+instead of freezing an inconsistent dispersion.
 
 Partition ownership in every transition band. Only disjoint Fourier bins or
 fields proven to have zero cross-covariance may use power windows that sum to
@@ -105,13 +145,18 @@ displacement, tangents, normals, and velocity come from the same phase-matched
 composite field, including blend-weight gradients. Independently lerping final
 normals or adding both foam histories violates parity.
 
-Foam crosses the handoff as one declared coverage/source transport contract:
-coverage, carrier velocity, source rate, decay state, coordinate space, and
-timestamp. Attribute whitecap and depth-breaking dissipation to exactly one
-owner, combine the disjoint dissipation terms, then map them once into one foam
-source/history. Never partition or saturated-add evolved coverage histories.
-Conservative remap or measured coverage loss is required when atlas or solver
-coordinates change.
+Foam crosses the handoff as one versioned provider signal. Its complete
+`PhysicsSignalDescriptor` identifies context, frame, physics-origin epoch,
+transform revision, footprint/filter, cadence/latency/residency, state/resource
+generation, validity, and per-channel error; canonical channels carry coverage,
+carrier velocity, source rate, diffusion, and decay state at
+`sampleInstant: PhysicsInstant`, with each source-rate channel declaring its actual sampling
+interval.
+Attribute whitecap and depth-breaking dissipation to exactly one owner, combine
+the disjoint dissipation terms, then map them once into one foam source/history.
+Never partition or saturated-add evolved coverage histories. A coordinate/atlas
+ownership change uses a declared conservative state map with remap/clamp/lost-
+coverage evidence, not a second independent-seconds foam tuple.
 
 ## Pinned Three.js r185 Architecture
 
@@ -225,19 +270,19 @@ a fold, not a normal-map detail.
 Compression may source foam, but a thresholded Jacobian is not persistent foam.
 Use a bounded, timestep-correct source/decay update and declare whether the
 history lives in Lagrangian parameter coordinates or is advected in an
-Eulerian/world atlas. Include transport, dissipation, and source terms in
+Eulerian/stable-physics-frame atlas. Include transport, dissipation, and source terms in
 diagnostics. Display thresholding is separate from state evolution.
 
-## CPU Coupling Contract
+## CPU Coupling And Canonical Water Provider
 
-Expose parametric sampling separately from world-horizontal sampling. A
+Expose parametric sampling separately from physics-horizontal sampling. A
 dominant-bin CPU sum approximates the same seeded coefficients and dispersion;
 its omitted-coefficient triangle bound applies at fixed parameter coordinate.
-When choppy horizontal displacement is nonzero, a world `(x,z)` query must also
+When choppy horizontal displacement is nonzero, a physics-frame `(x,z)` query must also
 invert the horizontal map. The reference derives the additional inversion
 error and the condition under which it is bounded.
 
-Return:
+The raw numerical sampler may return its solver-specific diagnostics:
 
 ```ts
 {
@@ -251,8 +296,57 @@ Return:
 ```
 
 The omitted bound **[D]**, solver tolerance **[G]**, and GPU-versus-CPU probe
-error **[M]** are distinct fields. Do not read the full FFT maps back in the
-frame path.
+error **[M]** are distinct fields. A public physics consumer never receives
+that raw shape. The spectral adapter publishes the canonical `WaterSurfaceProvider`
+sample in physics-frame metres: `freeSurfacePoint`, `freeSurfaceNormal`,
+`geometricNormalVelocityMps`, its exact `WaterSurfaceParameterization`,
+optional fixed-coordinate `surfacePointVelocityMps`, optional
+`materialCurrentVelocityMps`, optional
+`waterColumnDepthMeters` and `densityKgPerM3`. Each is a complete shared
+`SampledChannel`; the result returns the complete shared
+`PhysicsSignalDescriptor`, bundle `sampleInstant`, and each channel's
+`actualPhysicsTime` resolving to a `PhysicsInstant`. The requested
+`PhysicsInstant` remains distinct from those returned actual instants and may
+differ only within declared latency/staleness gates. Unrepresented current,
+depth, or density channels are absent under
+`missingChannelPolicy`, not zero. The adapter composes coefficient omission, horizontal inversion,
+floating-point, transform/probe, filtering, and latency error without
+collapsing them into a false scalar certainty. Do not read the full FFT maps
+back in the frame path.
+The remaining canonical optional channels—material acceleration, pressure,
+bathymetry point, and wet/dry state—are likewise absent unless a named model
+supplies each with actual support and error.
+
+`surfacePointVelocityMps` is a physical polar vector bound to the serialized
+surface gauge; only its normal projection is geometric. The material-current
+vector is independent of that parameterization. Both are in `physicsFrameId`,
+not moving-frame coordinate rates. Cross-frame
+transport rotates their basis; it does not add origin or `omega x r` transport
+terms to an already physical vector.
+
+The homogeneous spectral patch may drive one-way bodies through this provider
+only when the authoritative source is named and omitted body-to-water feedback
+has a `[G]` upper bound or the claim/regime is explicitly narrowed.
+It does not accept two-way body/source `InteractionRecord` feedback unless an
+explicit spatial interaction solver owns that region; route such loads through
+`$threejs-water-optics` or a canonical `ExternalSolverAdapter`. Rendering uses the shared
+presentation lifecycle: the spectral owner contributes its `PresentedStatePair`
+to the view-independent `PhysicsPresentationCandidate`, which contains no
+camera or render transform. `previousPresented` and `currentPresented` each
+carry independent `PresentationSampleProvenance`, `presentedInstant`, state
+handle, and global spatial binding. The camera owner publishes
+`CameraViewPublication`; preparation owners publish
+`ViewPreparationPublication`; the sealed `PhysicsPresentationSnapshot`
+references candidate binding IDs and lease refs. `FrameExecutionRecord` records
+multi-target execution and lease disposition keyed by lease ID. The presented
+spectral states are not assumed solver `n/n+1`, so
+displacement, exact tangents, velocity, shadows, foam, and temporal history
+resolve one pair with independently provenanced presented states and separately
+tracked instant/frame/transform/source epochs.
+Spectral deformation, foam, coefficient, and optical discontinuities contribute
+scoped reactive epochs/regions for the per-view `ReactivePublication` and
+`ScopedResetAction` plan in `ViewPreparationPublication`; reset flags are not
+extra pair or snapshot fields.
 
 ## Sustained Performance Contract
 
@@ -267,6 +361,15 @@ bandwidth, peak live bytes, allocation churn, and thermal drift **[M]**. One
 consumes `16 N^2` bytes **[D]**. Derive quality tiers only from named-target
 measurements.
 
+Batch `WaterSurfaceProvider` requests as compact channel-masked SoA. A
+presentation candidate references immutable resource generations under a
+frame-in-flight lease/reuse rule; it does not deep-copy FFT maps, and the next
+compute update cannot overwrite a generation still consumed by rendering.
+Any physical band/representation `QualityTransition` commits at a scheduler tick with
+state/energy projection, atomic provider/resource generation, queue boundary,
+history action, rollback, and peak simultaneous residency. A visual crossfade
+never gives two representations interaction or reaction ownership.
+
 For bandwidth-constrained tile GPUs, prefer a workgroup-resident one-dimensional FFT plus
 transpose when device workgroup storage and invocation limits admit the chosen
 row representation. Otherwise use the global Stockham reference path. The
@@ -280,6 +383,9 @@ different and stricter error case than storing only resolved maps in half-float.
 ## Required Evidence
 
 - dimensional spectrum integral and target-versus-realized variance **[M]**;
+- environmental-forcing adapter provenance: reference-height wind conversion,
+  averaging/footprint, fetch/duration/stability/spreading/source terms,
+  version/error propagation, and stationary-versus-evolving response;
 - cascade power-sum, holes/overlap, and repeat-distance diagnostics;
 - DC, axis-frequency, oblique-frequency, partner-pair, and Nyquist FFT tests;
 - maximum transform error, imaginary leakage, and Parseval error **[M]**;
@@ -288,6 +394,13 @@ different and stricter error case than storing only resolved maps in half-float.
 - per-cascade and combined displacement/slope/Jacobian views;
 - foam source, transported state, decay, and display coverage over time;
 - CPU omitted bound, inversion residual, and GPU probe error;
+- canonical `WaterSurfaceProvider` conformance, footprint/filter response,
+  absent-channel handling, state-version/error propagation, and zero
+  frame-critical readback;
+- immutable physics presentation-snapshot coherence for displacement,
+  derivatives, velocity, shadows, foam, and temporal-history rejection;
+- typed lighting-transport channel/factor ledger proving disc, sky,
+  atmosphere/cloud, visibility, and water extinction are applied once;
 - allocation ledger, dispatch inventory, warm sustained timings, and mobile
   thermal behavior;
 - fixed-camera multi-time captures, no-foam/no-detail/no-post baselines, and
@@ -325,4 +438,6 @@ derivatives, displaced-surface geometry, and deep-water whitecap state. The
 coastal owner supplies bathymetry-aware propagation, boundaries, interaction,
 breaking, wet/dry state, and shore foam. The spectral implementation remains a
 forcing producer and render contributor outside that domain; it does not gain
-coastal ownership by sampling a depth texture in its material.
+coastal ownership by sampling a depth texture in its material. It implements
+the shared `WaterSurfaceProvider` and presentation contracts but rejects unsupported
+two-way `InteractionRecord` loads rather than fabricating an offshore response.

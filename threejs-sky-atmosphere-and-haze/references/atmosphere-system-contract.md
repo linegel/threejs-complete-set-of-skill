@@ -5,6 +5,18 @@ that keeps sky, aerial perspective, material irradiance, coordinate transforms,
 depth, and output ownership coherent for general visualization, geospatial,
 scientific, cinematic, and interactive 3D work.
 
+## Contents
+
+- Numeric provenance and architecture
+- Current Three.js API, capability gate, and tiers
+- Shared parameter and radiometric model
+- `LightingTransportSnapshot` and presentation publication
+- LUT products, parameterization, errors, and generation order
+- Ellipsoid, frames, and depth ownership
+- Sky, surface, lighting, and shell/post composition
+- Color/output and performance evidence
+- Diagnostics, validation, replaced techniques, and failure conditions
+
 ## Numeric Provenance
 
 Every tunable number in an implementation or evidence bundle carries one tag:
@@ -304,12 +316,16 @@ ground returns `albedo/pi` times incident irradiance. The multiscatter solve
 must conserve absorbed versus escaped energy; adding `1-T` as radiance is not
 an energy model.
 
-Declare whether the solar vector is normal irradiance or disc radiance. For a
-uniform disc with angular radius `alpha`, the **[Derived]** conversion is
-`L_sun = E_normal / (pi * sin(alpha)^2)`. If the vector is merely an authored
-relative spectral scale, label it as such and do not attach SI radiance units.
-The manifest records `solarQuantity`, `radianceUnit`, phase normalization, and
-whether solar magnitude is factored out of reusable LUTs.
+Declare whether a calibrated solar provider carries normal irradiance or
+finite-disc radiance. For a uniform disc with angular radius `alpha`, the
+**[Derived]** conversion is
+`L_sun = E_normal / (pi * sin(alpha)^2)`. If solar magnitude is only an
+authored dimensionless relative scale, keep it as an internal nonphysical model
+input; never publish it through `LightingTransportSnapshot`, and mark the
+calibrated solar radiance/irradiance channels absent. The manifest records the
+solar calibration status, per-channel quantity/unit/basis and conversion
+revision, phase normalization, and whether solar magnitude is factored out of
+reusable LUTs.
 
 The three coefficient channels are a declared spectral/basis approximation,
 not automatically display sRGB. Record representative wavelengths or basis
@@ -321,6 +337,240 @@ transfer function to LUT channels is invalid.
 Preserve one explicit meter-to-render-unit conversion boundary. Provide tested
 examples for `1 world unit = 1 meter` and `1 world unit = 1 kilometer`. Do not
 let individual materials, nodes, or passes apply their own scale corrections.
+
+## LightingTransportSnapshot
+
+Publish cross-domain lighting through the router's canonical
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+`LightingTransportSnapshot` is the immutable radiometric boundary between this
+atmosphere and clouds, water, materials, vegetation, particles, and weather.
+Do not pass an untyped `sunColor`, `skyColor`, or already-darkened light
+uniform across that boundary.
+Each sampled provider/resource keeps the router's canonical
+`PhysicsSignalDescriptor` envelope—identity/schema/context, owner/consumers,
+channels, physics frame/origin/transform revision, optional chart,
+clock/sample phase, represented footprint/filter, descriptor `validity` whose
+temporal domain is a `PhysicsTimeInterval`, per-channel
+error, residency/cadence/latency, state version, resource generation, and
+missing-channel policy. The enclosing `LightingTransportSnapshot` supplies
+`sampleInstant: PhysicsInstant`. This reference defines radiometric channel
+semantics, not a competing envelope. An instantaneous sample is never encoded
+as a zero-length interval.
+
+### Required metadata and provider projections
+
+The snapshot declares:
+
+```text
+PhysicsContext revision, Cartesian physicsFrameId, physics-origin epoch and transform revision
+snapshot/atmosphere parameter revisions and sampleInstant: PhysicsInstant
+descriptor validity with an actual temporal PhysicsTimeInterval
+spatial support, update cadence, interpolation/hold policy and per-channel errors
+sample-to-sun unit direction in physicsFrameId; sun angular radius
+solar quantity kind: normal irradiance | finite-disc radiance
+per-channel quantity kind, SI unit, angular support, and, where applicable,
+  spectral/angular basis and conversion revision
+finite-disc solid-angle convention
+optional named transform registry to scene-linear working RGB; it never
+  overrides PhysicsChannelDescriptor or SampledChannel metadata
+transmittance-to-sun provider and its atmosphere/body-occlusion domain
+direct-sun provider with versioned attenuationFactorIds
+sky-radiance and normal-dependent sky-irradiance providers, each declaring
+  whether the direct solar disc is included
+camera-segment transmittance and inscattering providers
+provider-specific dependency revision, encoding, cadence and per-channel reference errors
+```
+
+Every request carries the snapshot/context revision, `physicsFrameId`, transform
+revision, physics-origin epoch, `PhysicsInstant`, requested filter/footprint,
+maximum staleness, and consistency policy. Positions/endpoints are SI metres in
+that physics frame. Responses return the actual represented footprint/filter,
+sample instant, latency, and per-channel error through the canonical
+`PhysicsSignalDescriptor` envelope. The minimum semantic signatures are:
+
+```text
+sampleSunTransmittance(positionPhysicsMeters, toSunPhysics,
+                       spatialFootprintMeters,
+                       solarAngularFootprintSteradians, physicsInstant)
+sampleDirectSun(positionPhysicsMeters, toSunPhysics,
+                spatialFootprintMeters,
+                solarAngularFootprintSteradians, physicsInstant)
+sampleSkyRadiance(positionPhysicsMeters, incomingPropagationPhysics,
+                  angularFootprintSteradians, physicsInstant)
+sampleSkyIrradiance(positionPhysicsMeters, receiverNormalPhysics,
+                    spatialFootprintMeters, physicsInstant)
+sampleCameraSegment(startPhysicsMeters, endPhysicsMeters,
+                    spatialFootprintMeters, physicsInstant)
+```
+
+The actual ABI may batch queries or expose textures/LUTs, but its adapter must
+preserve these arguments and report unsupported footprint/time variation
+rather than silently point-sampling. `sampleCameraSegment` returns both RGB
+transmittance and RGB inscattering for the same oriented endpoints. A reversed
+segment is a different request. `toSunPhysics` points from sample to sun.
+`incomingPropagationPhysics` points in the direction photons travel at the
+sample; for an outward ray `directionToSky`, request
+`incomingPropagationPhysics = -directionToSky`. All direction/normal vectors
+are unit polar vectors in `physicsFrameId`.
+
+Every returned `SampledChannel` includes
+
+```text
+channelId; quantity kind; SI unit
+spectral/angular basis and conversion revision where applicable
+actualPhysicsTime: PhysicsInstant; actual support/filter; validity and error
+stateVersion
+```
+
+The enclosing `LightingTransportSnapshot` carries atomic bundle validity, the
+per-channel error map and correlation, explicit `absentChannels`, and
+`attenuationFactorIds: [versioned-factor-id]`.
+
+Each factor ID identifies one applied physical attenuation/visibility operation
+and its model revision/path. Consumers reject applying an already listed
+factor. An empty list means no attenuation factor was applied; it does not mean
+the channel itself is present. A boolean attenuation flag is not composition
+evidence.
+
+Use `toSunPhysics` for the unit polar direction from the sample toward the sun
+in `physicsFrameId`; if a consumer stores photon propagation, name it
+`incomingPropagationPhysics = -toSunPhysics`. The solar record carries either
+`E_normal` in `W m^-2` (or a declared spectral SI equivalent) or finite-disc
+radiance in `W m^-2 sr^-1` (or a declared spectral SI equivalent). An authored
+dimensionless relative scale remains an internal nonphysical model input and is
+never a `LightingTransportSnapshot` radiance/irradiance channel; without SI
+calibration those physical channels are absent. The relation
+`L_sun = E_normal / (pi sin^2(alpha))` is applied exactly once for the uniform
+disc convention.
+
+Provider output factor ledgers carry attenuation status. A consumer selects
+one of:
+
+```text
+A. sourceAtTopOrVacuum * T_atmosphere(sample -> sun)
+B. directAtSample, attenuationFactorIds contains the atmosphere path factor
+```
+
+Using `B * T_atmosphere` is a hard double-attenuation failure. A pre-evaluated
+direct value also states whether body/terrain visibility is included; the
+default atmosphere snapshot includes atmospheric transport and body occlusion
+from its shell model, not cloud or arbitrary scene-mesh shadows.
+
+Cloud and geometry factors remain orthogonal:
+
+```text
+E_surface_direct = E_after_atmosphere
+                   * T_cloudOnly
+                   * V_opaqueGeometry
+```
+
+Water-volume extinction acts on the camera/light path inside water and is not
+part of the atmosphere transmittance. Aerial perspective owns the
+camera-to-surface segment composition
+`C_scene*T_segment + S_segment`; a material cannot reapply the same segment
+transport. Record the component ledger in diagnostics so a dark result cannot
+hide duplicated factors.
+
+Sky radiance `L_sky(x,omega)` and sky irradiance `E_sky(x,n)` are distinct
+providers. `E_sky` includes the declared hemisphere/cosine integration over
+atmospheric sky radiance; consumers may use it for diffuse lighting. By
+default, both diffuse-sky providers set `includesDirectSolarDisc: false` and
+the direct provider owns the disc. If a product includes the disc, it sets the
+flag and factor ID explicitly and consumers must not add direct solar energy a
+second time. A cloud may sample directional `L_sky` in its scattering
+quadrature. Neither consumer may reinterpret irradiance as radiance without an
+angular closure.
+
+### Spectral and working-basis ownership
+
+Transport LUT channels remain in their declared spectral/basis space until the
+snapshot's one named conversion. Every returned `SampledChannel` declares
+`spectral-basis` or `scene-linear-working-basis` and the applicable conversion
+matrix/integration revision; provider-level metadata may not replace the
+channel declaration. Clouds, water, and materials must not repeat that
+conversion or apply an sRGB transfer function to transport data. If a consumer
+requires a different spectral resolution, it requests another provider or
+declares a bounded approximation; it does not guess channel wavelengths.
+
+### Environment forcing is separate
+
+`EnvironmentForcingSnapshot` carries thermodynamic/mechanical state such as air
+velocity, temperature K, pressure, and canonical specific humidity in
+`kg kg^-1`. Its `sampleInstant: PhysicsInstant`, and every atmosphere request
+against it carries a `PhysicsInstant`; `PhysicsTimeInterval` is used only for an
+actual validity interval or
+`PhysicsGraphStage.executionInterval: PhysicsTimeInterval`. This skill does not
+become the wind or weather owner merely because it models an atmosphere. When forcing changes
+optical parameters, record the forcing revision and the transfer model into the
+affected LUT dependency hashes. Relative humidity, aerosol concentration,
+extinction, and RGB haze color are not interchangeable state variables.
+
+### Publication and invalidation order
+
+Publish a lighting snapshot only after every provider it exposes is internally
+revision-consistent, then follow the canonical acyclic presentation chain:
+
+```text
+latch PhysicsContext and optional
+     EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant
+  -> update dirty base LUTs and view-independent solar products
+  -> publish one LightingTransportSnapshot.sampleInstant: PhysicsInstant
+     atomically
+  -> after every physical owner commits, publish one view-independent
+     PhysicsPresentationCandidate with
+     requestedPresentationInstant: PhysicsInstant, presentedStatePairs,
+     resourceLeases, and eventSequenceRanges
+  -> per target/view publish CameraViewPublication with
+     previousRenderSampleInstant: PhysicsInstant and
+     currentRenderSampleInstant: PhysicsInstant
+  -> per target/view publish ViewPreparationPublication for camera-dependent
+     sky/aerial products, visibility, shadows, caches, reactive state, and resets
+  -> seal PhysicsPresentationSnapshot with candidateId, presentedStatePairRefs,
+     resourceLeaseRefs, scoped eventSequenceRanges, cameraPublicationId,
+     and viewPreparationId
+  -> render consumes only the sealed snapshot and its transitive publications
+```
+
+The candidate contains no camera, render origin, view matrix, shadow/cache
+epoch, or `globalToRender` mapping. Each `PresentedStatePair` carries separate
+`previousPresented.provenance` and `currentPresented.provenance` records, each a
+complete `PresentationSampleProvenance` with its own requested and mapped
+`PhysicsInstant`, clock-map revision/error, lower/upper brackets,
+interpolation/extrapolation policy, frame/origin/transform revisions, and
+resource generation. Each arm also carries its own
+`presentedInstant: PhysicsInstant`. Static or low-rate state still uses an
+explicit `hold` or `not-interpolated` policy; there is no shared bracket or
+graph-wide alpha.
+
+`CameraViewPublication` alone owns
+`previousRenderSampleInstant: PhysicsInstant`,
+`currentRenderSampleInstant: PhysicsInstant`, camera and
+projection revisions, view/projection matrices, viewport/depth convention, and
+`globalToRenderPrevious`/`globalToRenderCurrent`. `ViewPreparationPublication`
+consumes the immutable candidate and camera publication and owns per-view
+sky/aerial products through `visibilityPublicationRefs`,
+`accelerationPublicationRefs`, `shadowViewPublicationRefs`,
+`cachePublicationRefs`, `reactiveEpochs`, `reactivePublications`,
+`resetDependencies`, full `resourceLeases` for newly created view-dependent
+generations, and Candidate/same-preparation `resourceLeaseRefs`. Beyond identity,
+target/view scope, seal metadata, and scoped `eventSequenceRanges`, the sealed snapshot stores
+`candidateId`, `presentedStatePairRefs`, `resourceLeaseRefs`,
+`cameraPublicationId`, and `viewPreparationId`; it does not copy pairs,
+provenance, camera matrices, or `globalToRender` transforms.
+
+Clouds, materials, and water latch completed provider versions for their next
+scheduled update. View preparation may consume the current immutable candidate
+but may not mutate it or create a same-phase shadow/cache cycle.
+
+A stale but valid snapshot carries age and error; a half-updated combination of
+new transmittance with old irradiance is never published. Floating-origin
+translation updates the context epoch/transform but does not regenerate
+body-frame LUTs whose physical dependencies are unchanged.
+
+On mobile, publish the same interface from cached base LUTs, compact sky-view
+and aerial products, amortized slices, or a reference-gated analytic minimum.
+Lower resolution/cadence changes provider error and age, not units, attenuation
+ownership, or the consumer API.
 
 ## LUT Products
 
@@ -344,9 +594,10 @@ dimensions
 storage format and channel layout
 byte order for binary assets
 source atmosphere parameters
-radiance units
+per-channel quantity kind, SI unit, and applicable spectral/angular basis/conversion revision
 integration length/coefficient units
-solar quantity: normal irradiance, disc radiance, or authored relative scale
+solar calibration: SI normal irradiance, SI disc radiance, or an internal
+  authored relative scale with `LightingTransportSnapshot` solar channels absent
 phase normalization and spectral band wavelengths/basis
 source algorithm/revision
 hashes
@@ -706,6 +957,13 @@ Update cadence and history copies change both bytes and work; record them in
 the ledger. No device-class timing or memory ceiling in this reference is a
 product gate.
 
+`LightingTransportSnapshot` carries descriptor/handle generations, not copies
+of every LUT or froxel. Count in-flight resource slots, factor ledgers, provider
+tables, candidate `PresentedStatePair` handles and leases, per-view camera and
+preparation publications, sealed snapshots, and quality-transition overlap.
+Consumers use declared same-queue ordering or a versioned host/analytic mirror;
+never add a steady-frame LUT readback to answer a CPU lighting query.
+
 Warm profile changes may spend more time for base-LUT regeneration, but
 camera-only movement updates only view-dependent products. On mobile, use a
 single full-screen composition, render-scale-aware froxel dimensions, cached
@@ -742,6 +1000,10 @@ shell/post blend
 LUT coordinates and texture slices
 froxel depth distribution
 per-product dependency hash, age, and invalidation reason
+LightingTransportSnapshot sampleInstant/revision, provider request arguments and factor ledgers
+candidateId/presentedStatePairRefs/resourceLeaseRefs, cameraPublicationId,
+  viewPreparationId, eventSequenceRanges, and sealVersion
+direct-solar-disc inclusion; per-channel quantity/SI unit/filter/error and applicable spectral-angular basis/conversion revision
 reference tau/radiance error and energy residual
 RGB optical depth versus any scalar-transmittance approximation
 manifest hash and byte-count checks for imported LUT assets
@@ -767,6 +1029,18 @@ Required tests:
   floating-origin translation do not refresh unchanged body-frame LUTs;
 - payload tests proving chromatic segment transmittance for the accepted aerial
   representation.
+- typed-provider fixtures over position, direction/normal, segment endpoints,
+  spatial/solid-angle footprint, frame/origin epoch, and `PhysicsInstant`,
+  including stale, interval-as-instant, and unsupported-footprint rejection;
+- factor-ledger tests proving atmosphere, cloud, geometry, water, and aerial
+  segment factors are each applied once and duplicate factor IDs are rejected;
+- sky-radiance/irradiance fixtures with the direct solar disc both excluded and
+  explicitly included, proving total direct-plus-diffuse energy is not counted
+  twice;
+- presentation fixtures proving the candidate is view-independent, previous and
+  current provenance are independent, per-view camera/preparation publications
+  precede sealing, and the snapshot contains references rather than copied pairs
+  or `globalToRender` transforms;
 
 Phase 1 structural/equation gate:
 

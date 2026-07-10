@@ -24,6 +24,156 @@ caches.
 - Diagnostics and validation
 - Replaced techniques
 
+## Routed Physics Adapter
+
+The exact cross-domain ABI is owned by the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Use it when a lens, metric, observer, or emitter is time-varying or shared with
+another domain. This reference specifies only the curved-ray projection of that
+ABI.
+
+One `PhysicsContext` owns the stable SI physics frame,
+`worldToPhysicsTransform`/`worldTransformRevision`, `physicsOriginEpoch`, scale,
+and clock identities. `PhysicsPresentationCandidate` owns view-independent
+state pairs and leases; each `CameraViewPublication` owns its separate
+global-to-render mappings. `PhysicsSignalDescriptor` records own
+metric/lens/emitter model identity, physical scale, valid `PhysicsTimeInterval`,
+domain support, nondimensionalization, residency, validity, and typed error.
+Register the source stages and presentation consumer in `PhysicsGraph`; the
+per-pixel geodesic or artistic march remains a render stage and is not inserted
+as the rigid-body or environmental dynamics timestep.
+
+Use these source roles without inventing local envelope types:
+
+| Source role | Required physical meaning |
+| --- | --- |
+| Metric/lens state | Named model and revision; lens frame/worldline; chart and tetrad identities; bounded validity interval; physical length scale and conversion provenance. |
+| Schwarzschild/Kerr parameters | `M [kg]` or `G M / c^2 [m]`; `J [kg m^2 s^-1]` or declared `a* = c J / (G M^2)`; never an unqualified scene-unit radius/spin. |
+| Ellis parameters | Throat radius `a [m]`, exterior convention, chart/tetrad mapping, and nondimensional `L=l/a`, `B=b/a` conversion. |
+| Observer/emitter state | Physics-frame pose plus four-velocity/tetrad when the transfer model needs it; a Three.js transform alone cannot establish redshift. |
+| Emissive medium | Physical extinction/emission fields, or an explicitly artistic field whose non-SI claim is recorded. |
+
+### Time and unit bases
+
+Never alias the following independent variables:
+
+```text
+t_coord       metric chart coordinate time
+t_proper      proper time on a massive observer/emitter worldline
+lambda_affine null-geodesic affine parameter
+sigma_solver  optional dimensionless/Mino-like reparameterization
+t_source      canonical PhysicsInstant before mapping to a metric/emitter event
+t_request     PhysicsPresentationCandidate.requestedPresentationInstant
+t_render_prev[v] CameraViewPublication[v].previousRenderSampleInstant
+t_render_current[v] CameraViewPublication[v].currentRenderSampleInstant
+t_presented[b] PresentedStatePair[b].currentPresented.presentedInstant
+t_previous_presented[b] the same binding's previousPresented.presentedInstant
+```
+
+The ray integrator advances `lambda_affine` or `sigma_solver`. Map the observer
+event from `t_source` into the metric chart, including clock/chart conversion
+and error. For a nonstationary spacetime, coordinate time is a curve component:
+integrate or recover `t_coord(lambda)` and sample/interpolate metric and emitter
+providers at every mapped coordinate event with their state/resource versions,
+validity, and interpolation error. A single immutable metric snapshot is only a
+frozen/quasi-static approximation; declare a bound on metric evolution over the
+ray and forbid a general time-dependent-geodesic claim when that bound fails.
+
+Reconstruction is requested at `t_request`, but every stable binding supplies
+its own `t_presented[b]`, previous presented time, source bracket, clock,
+interpolation/extrapolation policy, and error. Do not assume equality with the
+request or reuse one alpha for lens, observer, disk, and emitter providers. A
+view forms a half-open `PhysicsTimeInterval` only when its validated
+`t_render_current[v]` is later than `t_render_prev[v]` under the same clock
+mapping and discontinuity epoch. Equal instants mean no elapsed interval and
+must not be encoded as a zero-length interval; reversal or discontinuity follows
+the scoped reset policy. The interval never comes from the candidate request or
+a source binding's clock. Neither display delta nor temporal-history weight
+changes the geodesic step.
+
+Keep conversions explicit at one adapter boundary:
+
+```text
+x_physics = R_worldToPhysics * (metersPerWorldUnit * x_world) + t_physics
+x_render  = CameraViewPublication.globalToRenderCurrent(x_physics)
+r_s      = 2 G M / c^2                         [m]
+x_geom   = x_SI / L0
+t_geom   = c * t_SI / L0
+x_hat    = x_geom / L_solver
+```
+
+`L0` and `L_solver` are recorded conversion scales. A declaration `G=c=1`
+does not erase dimensions; it selects a geometrized basis from which SI and
+render values remain recoverable. Chart coordinates are not automatically a
+Cartesian physics frame, so vectors/tetrads use the declared chart Jacobian
+and frame mapping rather than a raw `Object3D.matrixWorld`.
+
+### Presentation and radiometry
+
+After physics commit, the route publishes one view-independent
+`PhysicsPresentationCandidate`. Each camera owner consumes that candidate and
+publishes a per-view `CameraViewPublication`; visibility, shadows, and caches
+then publish a `ViewPreparationPublication`; only then may the route seal the
+per-view `PhysicsPresentationSnapshot`. The snapshot references candidate
+binding IDs and leases and the exact camera/view-preparation publications; it
+does not copy pairs, transforms, or reset actions.
+
+Resolve each relevant candidate `PresentedStatePair`: previous/current lens,
+observer, and emitter/disk samples each retain their own
+`PresentationSampleProvenance`, source-clock mapping, brackets, and
+interpolation/extrapolation policy. Resolve previous/current global-to-render
+transforms and render instants from `CameraViewPublication`, and reactive/reset
+actions from `ViewPreparationPublication`. Validate source/model version,
+validity, and typed error through the associated `PhysicsSignalDescriptor`. A
+referenced state handle must retain its exact candidate lease generation until
+the `ConsumerCompletionJoin` permits retirement; object immutability does not
+make overwritten ping-pong storage immutable. Completion belongs to the
+append-only multi-target `FrameExecutionRecord`, not a candidate or snapshot
+mutation.
+
+Lens-specific temporal history rejects samples across metric class or revision,
+termination/exterior/event class, critical/Jacobian discontinuity,
+origin/projection discontinuity, or invalid source state. Motion/reprojection
+comes from adjacent *presented* states, not raw solver endpoints.
+
+Consume environment and emitter input from the matching
+`LightingTransportSnapshot`. Preserve every sampled channel's radiometric
+quantity and spectral/angular basis; no bundle-wide basis overrides channel
+metadata. Apply each atmosphere/cloud/visibility/medium factor once. For a
+physical medium after SI conversion:
+
+```text
+sigma_t  extinction                         [m^-1]
+j        emission coefficient               [W m^-3 sr^-1]
+L        radiance                           [W m^-2 sr^-1]
+tau      sigma_t * ds                       [1]
+Delta L  T * (j / sigma_t) * (1-exp(-tau))
+```
+
+The coefficients are defined in a declared local comoving tetrad and
+spectral/bolometric basis; use invariant frequency transfer for a relativistic
+medium rather than treating RGB as that basis. The zero-extinction limit is
+`T*j*ds`. Wavelength-resolved transport carries the corresponding
+per-wavelength units and basis. An artistic scene-unit
+medium may use the same algebra only after declaring its non-SI basis and
+dropping the physical radiometric claim.
+
+### Semantic exclusions and quality changes
+
+- Ray escape, horizon/core absorption, disk/shell crossing, critical capture,
+  and max-step failure are integration termination/event diagnostics. They are
+  not `InteractionRecord` values and have no equal-and-opposite reaction.
+- A metric, throat, accretion density, extinction field, or color ramp is not a
+  `PhysicsMaterialId` in `PhysicsMaterialRegistry`. Surface contact law
+  selection does not follow shader parameters.
+- A visual ray renderer produces no body force. If scene bodies respond to the
+  lens mass/metric, a separate dynamics owner consumes the same descriptor and
+  publishes its own state/interactions.
+- `QualityTransition` may change tolerance, cache/map resolution, update
+  cadence, ray footprint sampling, or reconstruction only while preserving
+  model class and claim. Metric/model/solver-class changes require a new truth
+  contract; migrate or invalidate history explicitly.
+
 ## Production Architecture
 
 Build the effect as a bounded local-space numerical renderer:
@@ -509,10 +659,12 @@ emission scale 1.95
 additional emission color (1.0, 0.72, 0.26)
 ```
 
-Declare one length unit before transfer integration. Let `rho` be a
-dimensionless density shape, `beta_t` an extinction scale in inverse length,
-`sigma_t = rho * beta_t`, and `j` a source/emission coefficient in radiance per
-length. For a constant segment:
+Declare one length and radiometric basis before transfer integration. For a
+physical claim, convert distance to metres, let `rho` be a dimensionless
+density shape, `beta_t` be in `m^-1`, `sigma_t = rho * beta_t`, and `j` be in
+`W m^-3 sr^-1` (or the declared spectral equivalent). An artistic medium may
+use a named scene-length/radiance basis only after dropping the SI claim. For a
+constant segment:
 
 ```text
 tau = sigma_t * stepLength
@@ -707,6 +859,25 @@ Validation requirements:
   transmittance;
 - proxy-transform tests for moved, uniformly scaled, nonuniformly scaled, and
   far-from-origin volumes;
+- `PhysicsContext` SI/geometrized/nondimensional/render round trips, including
+  a stationary lens across render-origin rebases;
+- independent sweeps of source simulation time, metric coordinate time,
+  affine/reparameterized step, and presentation time to prove that none is
+  accidentally driven by render delta;
+- `PhysicsSignalDescriptor` validity/version/error rejection; candidate pair
+  provenance, per-view `CameraViewPublication` render instants/transforms, and
+  `ViewPreparationPublication` reset actions across model, signal, origin,
+  projection, termination, and exterior discontinuities; sealed snapshots must
+  resolve those exact publications rather than copy or mutate them;
+- `LightingTransportSnapshot` basis/factor-ledger tests proving that external
+  attenuation is neither omitted nor applied twice;
+- `QualityTransition` mutation tests accepting only same-model tolerance,
+  cache/map, cadence, footprint, or reconstruction changes; model-class swaps
+  fail, numerical gates remain active, scoped history actions execute, and
+  simultaneous old/new residency is recorded;
+- an assertion that ray termination writes diagnostics only: no
+  `InteractionRecord`, `PhysicsMaterialId`, force, impulse, or frame-critical
+  physics readback is synthesized by the visual ray path;
 - temporal rejection tests for camera cuts, disocclusion, and fast orbiting
   cameras, plus termination/exterior/critical-mask changes;
 - full-resolution scene-depth occlusion, camera-inside proxy, and front/back

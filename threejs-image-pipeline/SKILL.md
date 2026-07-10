@@ -207,6 +207,129 @@ match the drawing buffer; a scaled scene pass is not a silent TAAU path.
 general `reset()` method; resize is handled internally, while cuts and other
 discontinuities need a validated wrapper policy or node rebuild/disposal.
 
+### Physics presentation and reactive radiance
+
+When the route manifest declares a physics-to-render boundary, it first
+publishes a view-independent immutable `PhysicsPresentationCandidate`, then one
+`CameraViewPublication` per target/view, then `ViewPreparationPublication` for
+visibility/shadow/cache/reset results, and finally seals
+`PhysicsPresentationSnapshot`. Bind the scene pass to that exact publication
+chain and bind the matching
+`LightingTransportSnapshot` through a provider-wide `PresentedStatePair`
+(`entityId: typed-absence`) referenced from the candidate by the Snapshot, from the
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Validate the exact central Candidate, camera publication, preparation
+publication, Snapshot, `PhysicsSignalDescriptor`, and lighting-channel schemas
+rather than defining a post-local subset. The target/view Snapshot contains
+references, not copied pairs, transforms, or reset records. Resolve stable
+binding pairs through `presentedStatePairRefs`, previous/current render instants
+and complete transforms/matrices through `cameraPublicationId`, and reactive/
+reset records through `viewPreparationId`. A post node may not sample a different provider bracket
+or silently mix radiance and irradiance. Match the lighting pair's context,
+provider/signal IDs, descriptor/state/resource generations,
+`PresentationStateHandle`, each state's requested presentation instant, mapped
+source instant and clock-map revision/error, plus the bundle `sampleInstant`;
+validate channel `actualPhysicsTime`, filter/age, maximum staleness, validity,
+and error.
+
+Canonical lighting-provider channels remain SI-valued. A normalized RGB working
+buffer is a separately named render-local signal derived through a versioned
+SI-to-render conversion with reference scale, provenance, and error; it is not a
+normalized `LightingTransportSnapshot` channel. A nonphysical image route keeps
+the router physics fields `not used` and declares its render-local color basis
+without instantiating this ABI.
+
+Velocity is projected from the pair's independent `previousPresented` and
+`currentPresented` state handles/global bindings, using the corresponding
+previous/current `RenderSimilarityTransform` and unjittered matrices from
+`CameraViewPublication`. Each provider's fixed-step states only bracket each
+presented sample through `PresentationSampleProvenance`; they are not the
+previous/current rendered poses. Bindings cover rigid,
+skinned, instanced, and procedural deformation and explicitly invalidate
+spawn/despawn/teleport/reparent/LOD changes. A rebase must disappear after
+origin compensation, not become a full-screen motion vector.
+
+Velocity projects unjittered previous/current view and projection matrices;
+the temporal owner applies jitter separately. Stock r185 `VelocityNode` is
+gated to one presentation history and one velocity-bearing render per object
+per presented frame, with built-in previous-state coverage sufficient for the
+rendered rigid/skinned/instanced/deformation path. It is not target/view keyed.
+Multiple views/targets, multiple velocity passes, or arbitrary snapshot-bound
+previous deformation require a custom velocity path consuming the central
+presented pairs and leased resources.
+
+The camera owner returns `CameraViewPublication`; view-preparation owners return
+`ViewPreparationPublication`; no phase mutates an earlier record. Feedback that cannot precede the seal is
+explicitly one-frame deferred; the current render continues to sample the
+prior committed version named by its snapshot.
+
+The route serializes typed view-scoped `reactivePublications` and
+`resetDependencies` in `ViewPreparationPublication`. At minimum,
+dependency edges cover solver reset/quality migration, uncompensated origin or
+projection change, shadow-content commit, and discontinuous foam, emissive, or
+optical state. Use a conservative full reset when no reliable affected-pixel
+mask exists; otherwise a custom/patched temporal node may consume a versioned
+reactive mask. Stock r185 `TRAANode` has no reactive-mask input or public
+general reset, so its executable choices are evidenced rebuild, bypass/reseed
+wrapper, or conservative full reset—not a diagnostic mask alone.
+
+Each publication uses the exact central view-scoped record: source/version/
+epoch, kind (`shadow-content`, `foam`, `emissive`, `optical`, `topology`,
+`deformation`, `disocclusion`, or `event`), full-frame or leased mask
+affected-region form, validity/error, and planned history action. A mask ID
+without descriptor, alignment, error, resource generation, and retirement
+lease is invalid.
+Do not reset exposure for every local radiance edit. Reset or analytically
+convert exposure state only when the radiance basis/calibration, working
+primaries, quantity convention, or authored exposure key changes.
+
+Execute the dependency DAG before the first consumer of the new epoch:
+
+```text
+presentation candidate
+  -> CameraViewPublication with transforms/matrices/jitter/depth
+  -> ViewPreparationPublication with visibility/shadows/reactive/reset records
+  -> seal snapshot references
+  -> depth + velocity + scene-linear radiance
+  -> AO/surface/volumetric/color history rejection or reseed
+  -> resolved meter source
+  -> exposure adaptation
+  -> bloom, tone map, grade, output
+```
+
+Every planned edge names its writer, consumers, and action. The immutable
+snapshot does not claim completion; append actual rebuild/reseed/submission
+results to a separate `FrameExecutionRecord`. GPU descriptors pin resource
+generation, layout, entity map, slot/range, and a central
+`PresentationResourceLease` until all consumers submit and its
+`reuseProhibitedUntil` completion join is satisfied; retirement is recorded in
+`FrameExecutionRecord.leaseDispositionById`.
+Logical state version, submission epoch, GPU queue
+availability, and host visibility are distinct; `computeAsync()` is not a
+fence.
+
+A required camera/shadow/cache or sealing failure appends a
+`FrameExecutionRecord` with `overallStatus: aborted` (or `partial-failure` when
+other targets survive), omits that target's snapshot from `snapshotIds`, stores
+typed absence in its `targetExecutions.snapshotId`, cancels or defers actions,
+retires only failed-target-exclusive preparation leases, and retains
+Candidate/shared leases until all surviving snapshot consumers join through
+`leaseDispositionById`. Device loss
+appends `overallStatus: device-lost` and affected target statuses
+`device-lost`, advances
+`deviceLossGeneration`, cancels dependent actions, and invalidates resources
+and leases from the lost generation without inventing a completion token. The
+immutable Candidate/Snapshot remain audit records; their lost-generation
+resource references are no longer bindable. Rebuild histories and timing proof
+under the new backend/resource generation.
+
+Even with compensated custom velocity, stock r185 `TRAANode` cannot preserve
+history across a render-origin translation or tangent-basis rebase because its
+previous-depth reconstruction has no previous-render-to-current-render bridge.
+Rebuild/reseed it on every such rebase. Only a custom/patched temporal node
+that consumes both complete global-to-render transforms may preserve history
+after an invariance proof.
+
 ## Output Ownership
 
 - source color textures tagged with an sRGB transfer use `SRGBColorSpace`;

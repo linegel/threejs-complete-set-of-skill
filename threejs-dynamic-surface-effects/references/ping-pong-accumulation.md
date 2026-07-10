@@ -4,6 +4,90 @@ Use this reference for screen-space frost whose visible mask and refractive
 response depend on persistent touch history, reduced-resolution scene blur,
 static crystalline fields, and two-scale TSL normal refraction.
 
+## Presentation-Only Physics Boundary
+
+The cross-domain ABI is owned by the
+[physics domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+This effect may consume that ABI but does not publish a physics domain. Its
+screen-space ping-pong state is a renderer-owned appearance cache.
+
+It is specifically **not** any of the following authoritative quantities:
+
+```text
+temperature [K]
+phase/coverage fraction [1]
+frost or ice areal loading [kg m^-2]
+water/wetness inventory, traction, or friction
+heat or mass flux
+contact/manifold state
+precipitation or weather state
+```
+
+For physically driven appearance, consume read-only signal channels described
+by `PhysicsSignalDescriptor` through one sealed
+`PhysicsPresentationSnapshot` and its exact candidate/camera/view-preparation
+references. Permitted appearance inputs include coverage or
+phase fraction in `[0,1]`, temperature in kelvin, and optional frost/ice areal
+loading in `kg m^-2`. Resolve the view-independent candidate's
+`PresentedStatePair`; each previous/current state supplies independent
+`PresentationSampleProvenance`, brackets, mapped `PhysicsInstant`, and error.
+Its associated descriptor supplies frame, clock, valid `PhysicsTimeInterval`,
+footprint/filter, version, validity, and typed per-channel error. The route, not
+this effect, owns them. Reject incompatible or stale brackets; never replace an
+absent channel with zero.
+
+The direction of coupling is fixed:
+
+```text
+physical input/hit in the canonical physics frame
+  -> owning thermal/contact/surface solver receives InteractionRecord
+  -> owner advances authoritative state
+  -> owner publishes a versioned signal under PhysicsSignalDescriptor
+  -> PhysicsPresentationCandidate owns immutable state pairs and leases
+  -> CameraViewPublication owns per-view render instants and transforms
+  -> ViewPreparationPublication owns reactive/reset preparation
+  -> PhysicsPresentationSnapshot seals references to those publications
+  -> this effect composites a read-only appearance projection + UI history
+```
+
+This effect emits no `InteractionRecord` or `SurfaceExchange`. A screen-space
+pointer stamp cannot establish contact point, area, impulse, heat, mass, or an
+equal-and-opposite reaction. Never read history textures back to infer those
+quantities. If a physical scrape/touch is required, route the physical event to
+the owner independently and consume only its returned state.
+
+Keep the owner sample and renderer history in separate channels. Do not use a
+local pointer-clear mask to lower physically claimed coverage, phase fraction,
+or areal loading until the owning solver publishes that change. A composite
+that alters them independently is a declared decorative interaction overlay,
+not simulated thaw or scraping.
+
+`NodeMaterial` tint, refraction IOR, normal amplitude, roughness, and mask
+parameters are visual material state; they do not create or mutate a
+`PhysicsMaterialId` or `PhysicsMaterialRegistry` entry. Screen UV has no metric
+physics-frame meaning, so world- or object-space ownership must be resolved
+before this effect receives a presentation projection.
+
+Visual history integrates only from the resolved
+`CameraViewPublication.previousRenderSampleInstant` to
+`currentRenderSampleInstant`. If current is later, validate their shared clock,
+mapping revision, discontinuity epoch, and order, then form the exact half-open
+`PhysicsTimeInterval`; derive seconds only through that mapping. Equal instants
+mean no elapsed interval and must not be encoded as a zero-length interval.
+Never infer `dt` from one instant, subtract unrelated clock seconds, or silently
+clamp a seek/hitch. A missing instant, reversal, invalid mapping, or
+discontinuity executes the declared scoped reset, freeze, or bounded catch-up
+policy. Follow the resolved
+`ViewPreparationPublication.resetDependencies` when
+`PhysicsContext.contextVersion`/`worldTransformRevision`, descriptor
+`transformRevision`/`physicsOriginEpoch`, camera
+render-origin/transform/projection state, candidate-pair provenance or lease
+`resourceGeneration`, a discontinuous
+`ReactivePublication.sourceVersion`, render mapping/projection, invalidity, or
+a `QualityTransition` makes history incompatible. An ordinary `stateVersion`
+advance is sampled rather than treated as a reset. A render-tier change never
+resamples or rewrites authoritative solver state.
+
 ## State-Update Decision
 
 Use full-field ping-pong only when decay, diffusion, or another evolution term
@@ -111,7 +195,8 @@ The update is compute-side and read-back-free:
 
 ```text
 previous = historyRead(pixel)
-dt = authoritative interval under the declared suspend policy
+interval = validated half-open PhysicsTimeInterval from CameraViewPublication
+dt = interval duration derived through its clock mapping, or zero when instants equal
 
 segment = timestamped pointer p0,t0 -> p1,t1 with pressure endpoints
 distance = aspect-corrected distance to the swept segment/capsule
@@ -378,6 +463,14 @@ Add pause and single-step controls. Run these validations:
 - Boundary sampling confirms repeat or mirrored-repeat normal wrapping.
 - Output screenshots are checked for double conversion and missing output
   conversion.
+- Optional physics-driven appearance rejects invalid, stale, unsupported, or
+  footprint-incompatible candidate-pair provenance and proves the declared
+  context, transform/origin, lease generation, per-view camera render interval,
+  `ViewPreparationPublication` reactive/reset source, render
+  mapping/projection, and quality policy; the sealed snapshot resolves rather
+  than copies those exact publications.
+- The steady frame loop performs zero history readbacks and publishes zero
+  physics interactions, exchanges, contacts, material properties, or state.
 
 ## Routing Boundary
 
@@ -385,3 +478,5 @@ This reference is for viewport-locked state. Do not use it for world footprints,
 object-UV paint, simulation-plane wetness, puddles, rain, or snow accumulation.
 Route those to `$threejs-particles-trails-and-effects`, `$threejs-rain-snow-and-wet-surfaces`, or
 `$threejs-water-optics` as appropriate.
+Route physical touch/scraping to its selected solver owner; this reference may
+only show the returned presentation sample.

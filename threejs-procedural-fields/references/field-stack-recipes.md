@@ -43,6 +43,7 @@ desktop API assumptions.
 - Parity harness
 - Performance budgets and lifecycle
 - Cross-system implementation contract
+- Physics signal publication
 - Diagnostics
 
 ## Architecture First
@@ -979,6 +980,94 @@ quality tier behavior
 performance budget
 resource owner and disposal point
 ```
+
+### Physics signal publication
+
+Apply the shared
+[physics-domain and interaction contract](../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+when a field drives support, contact, forcing, transport, a body solver, or
+another physical interaction. A GPU resource is an implementation detail; the
+portable boundary is a typed descriptor and provider:
+
+```text
+physics-facing field provider
+  -> PhysicsSignalDescriptor
+  -> batched PhysicsSampleRequest with PhysicsInstant | PhysicsTimeInterval
+  -> samples carrying context/frame/footprint, state/resource versions,
+     actual PhysicsInstant | PhysicsTimeInterval, validity/error
+```
+
+Use the common envelope verbatim: `signalId`, `providerId`, `schemaId`,
+`contextId`, owner/consumers/channels, `physicsFrameId`,
+`physicsOriginEpoch`, `transformRevision`, optional `chartId`, `clockId`,
+`samplePhase`, `representedFootprint`, filter, validity, `perChannelError`,
+residency, cadence, latency, `stateVersion`, `resourceGeneration`, and
+`missingChannelPolicy`. Channel records carry SI unit and scalar/vector/tensor
+basis; errors carry unit, basis, norm, and hard-bound/measured/statistical/
+unknown classification. Requests use the exact `PhysicsInstant` or
+`PhysicsTimeInterval` their query requires. `SampledChannel.actualPhysicsTime`
+stores that direct `PhysicsInstant | PhysicsTimeInterval` arm; it never wraps it
+in the generic `PhysicsTime` alias or flattens the two shapes. A packed
+texture channel, TSL `Fn`, CPU mirror, or render-LOD mesh may implement the
+provider, but none is the ABI. The adapter performs conversion once and returns
+the direct actual instant/interval, `stateVersion`, and `resourceGeneration` with every batch.
+`stateVersion` is logical state, not GPU completion. The descriptor carries
+`resourceGeneration` and `PhysicsResidencyDescriptor`; actual queue ordering
+and completion use canonical `GpuStatePublication`. A host consumer needs an
+explicit mirror or asynchronous completion with declared latency/error, never a
+steady-frame synchronous readback. When physics-owned field state is rendered,
+publish one `PresentedStatePair` with `motionBinding.kind: field` per stable
+binding/provider into the view-independent `PhysicsPresentationCandidate`.
+The previous and current pair arms each carry independent
+`PresentationSampleProvenance`, `presentedInstant`, state handle, and field
+spatial binding. The candidate owns its `PresentationResourceLease` records and no
+camera or render mapping. `CameraViewPublication` owns previous/current render
+sample instants and `RenderSimilarityTransform`s; `ViewPreparationPublication`
+owns per-view visibility, shadows, caches, resets, and preparation lease refs.
+The sealed snapshot references candidate binding IDs and lease refs rather than
+copying pairs or transforms. Multi-target execution and every lease retirement,
+abort, or device-loss disposition live in `FrameExecutionRecord`. Never render
+from the mutable write buffer.
+
+Optional channels not declared by the descriptor are absent; providers never
+zero-fill a missing gradient, velocity, temperature, moisture, or category.
+
+Publish separate descriptors for quantities whose dimensions or
+interpolation differ. For a local coast these commonly include:
+
+```text
+terrain elevation                 m
+bathymetric/bed elevation         m, same declared datum
+metric coast distance             m, land-positive/water-negative
+surface or bed gradient           dimensionless in the declared frame
+coast-frame basis                 dimensionless, with invalid singular set
+moisture/exposure                 declared physical unit or dimensionless model
+categorical substrate/region ID   exact integer, nearest/no interpolation
+physics material ID               exact PhysicsMaterialId, nearest/no interpolation
+```
+
+When contact or transport consumes a surface category, publish a distinct
+categorical `PhysicsMaterialId` channel/reference resolved through the active
+`PhysicsMaterialRegistry`. Never derive it from biome weight, visual substrate,
+semantic color, filename, or PBR response.
+
+Do not fold exact IDs, signed distance, and smoothed appearance weights into
+one filtered sample. Do not publish a normal without its orientation,
+conditioning mask, angular error, and footprint. A field/domain edit, storage
+encoding change that changes accepted values, coast analysis revision, or datum
+change increments the source revision and invalidates dependent samples. A
+render floating-origin rebase emits a new `CameraViewPublication` whose
+`RenderSimilarityTransform` and render-origin epoch change; it must not change `physicsFrameId`,
+`physicsOriginEpoch`, stable SI identity, or source/state revision. A render-
+cache LOD change likewise must not change physical signal identity.
+
+Provider acceptance requires deterministic probes across tile seams, invalid
+and medial-axis regions, threshold uncertainty, large rebased coordinates,
+direct-versus-stored paths, and every supported footprint. Gate dimensional
+metadata, context/frame/origin equality, version propagation, `PhysicsTime`,
+per-channel value/gradient/position errors, and missing-data behavior before a
+consuming solver runs. Consumer-specific smoothing belongs in an explicit adapter with
+its own error record, never in a silently altered source descriptor.
 
 Reject a field stack when:
 

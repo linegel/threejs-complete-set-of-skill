@@ -14,6 +14,62 @@ Run `$threejs-choose-skills` before implementation when the request could also
 involve world-space residue, weather accumulation, object paint, water, or a
 larger post stack.
 
+## Presentation-Only Physics Boundary
+
+Read the shared
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
+before showing state owned by a thermal, weather, contact, or surface solver.
+This skill remains a presentation consumer: its screen-UV R/A history is not
+authoritative temperature `[K]`, phase or coverage fraction, frost/ice loading
+`[kg m^-2]`, wetness, traction, heat flux, precipitation, contact, or weather
+state. Screen UV has no physics-frame measure.
+
+Physics-driven frost may consume read-only signal channels described by
+`PhysicsSignalDescriptor`: dimensionless coverage/phase fraction, temperature
+in kelvin, and optional areal frost/ice loading, all reached through one sealed
+`PhysicsPresentationSnapshot` and its exact candidate/camera/view-preparation
+references. Resolve the candidate's `PresentedStatePair`; its previous and
+current states have independent `PresentationSampleProvenance`. Use that
+provenance and the associated
+`PhysicsSignalDescriptor` footprint/filter, source clock and mapped
+`PhysicsInstant`, state version, validity, and typed per-channel error. Missing
+or invalid channels are
+absent—not zero—and the effect either follows its declared decorative policy
+or does not render the physical claim.
+
+Keep physical appearance and UI history as separate inputs. A local pointer
+mask must not subtract physical frost/ice coverage or loading unless the owner
+has published the corresponding updated state. If it does, label the result a
+decorative interaction overlay rather than simulated thaw.
+
+Pointer history is UI input. If scraping, touch, deposition, or heat transfer
+must change physical state, input/interaction routing sends a typed
+`InteractionRecord` to the owning solver; this skill later consumes the
+solver-published snapshot. It emits neither `InteractionRecord` nor
+`SurfaceExchange`, and it never reads screen history back to fabricate physical
+state. `NodeMaterial` frost tint, IOR, normals, and roughness are visual state,
+not a `PhysicsMaterialId` or properties in `PhysicsMaterialRegistry`.
+
+Advance visual history from the per-view
+`CameraViewPublication.previousRenderSampleInstant` and
+`currentRenderSampleInstant`. When current is later than previous, validate and
+form their half-open `PhysicsTimeInterval` before deriving seconds through the
+versioned clock mapping. Equal instants mean no elapsed interval; never invent a
+zero-length `PhysicsTimeInterval`. Never derive `dt` from one timestamp or
+subtract unrelated clock seconds. On seek, reversal, clock discontinuity,
+invalid mapping, or missing previous instant, execute the declared scoped
+reset/freeze/catch-up policy. This presentation interval is not a solver fixed
+step. Reset, remap, or reproject only through the resolved
+`ViewPreparationPublication.resetDependencies` when
+`PhysicsContext.contextVersion`/`worldTransformRevision`, descriptor
+`transformRevision`/`physicsOriginEpoch`, the camera publication's
+render-origin/transform/projection state, candidate-pair provenance or lease
+`resourceGeneration`, a discontinuous
+`ReactivePublication.sourceVersion`, render mapping/projection, validity, or a
+declared `QualityTransition` makes the history incompatible. An ordinary
+`stateVersion` advance is sampled; it is not itself a reset.
+A render-quality change cannot alter or rewrite the source physics signal.
+
 ## Choose The State Update First
 
 The history representation follows the state transition, not the visual theme:
@@ -38,14 +94,19 @@ Build the high-throughput frame graph first. Do not start from a simple
 per-frame visual mask and later "upgrade" to history.
 
 ```text
-input events for this frame
-  -> compute pointer deposit into next history StorageTexture
-  -> swap history read/write
-  -> scene pass via pass(scene, camera)
+sealed PhysicsPresentationSnapshot
+  -> resolve PhysicsPresentationCandidate bindings/leases
+  -> resolve CameraViewPublication render interval/transforms
+  -> resolve ViewPreparationPublication reactive/reset actions
+  -> validate/project physical appearance channels ---------------------+
+UI input events for this frame                                           |
+  -> compute pointer deposit into next visual-history StorageTexture    |
+  -> swap visual-history read/write ------------------------------------+
+scene pass via pass(scene, camera)                                      |
   -> reduced-resolution vertical blur pass at a scale selected by edge/error gates
   -> reduced-resolution horizontal blur pass at the same measured scale
   -> static crystalline fields, generated once or loaded from assets
-  -> full-resolution frost/thaw composite node
+  -> full-resolution frost/thaw composite node <------------------------+
   -> two-scale TSL normal refraction node
   -> RenderPipeline output node with one output transform owner
 ```
@@ -106,6 +167,9 @@ a non-WebGPU path here.
 
 ## Implementation Rules
 
+- Treat both ping-pong slots as renderer-owned presentation resources. They are
+  never registered as authoritative physics signals and have no physics
+  readback path.
 - Keep persistent history, scene color, and static structure textures separate.
 - Record `eventCount`, dirty-tile count, texels dispatched, and the asymptotic
   update cost. A storage dispatch over the complete drawing buffer is not
@@ -209,6 +273,14 @@ Add pause and single-step controls. Validate:
 - `RenderPipeline.render()` owns presentation when the node pipeline is active.
 - Output screenshots are neither double-converted nor left in linear display
   space.
+- Optional physical inputs reject stale, unsupported, invalid, or incompatible
+  candidate-pair provenance; context, transform/origin, lease generation,
+  per-view camera interval, view-preparation reactive source,
+  render-mapping/projection, and quality discontinuities take the declared
+  scoped reset/remap/reprojection path, and the snapshot resolves rather than
+  copies those exact publications.
+- The steady frame loop performs zero readbacks from presentation history and
+  emits zero physical interaction, exchange, material, force, or contact state.
 
 Interface anchors:
 
@@ -243,5 +315,7 @@ when the work is mostly full-frame post ownership, tone mapping, bloom, GTAO, or
 anti-aliasing.
 
 This skill owns screen-space persistent surface history and its composite.
+It does not own thermal phase, frost mass, wetness, friction, or physical
+contact even when those signals drive the composite.
 
 Legacy WebGL implementation (deprecated, do not extend): `examples/touch-history-frost/frost-surface-effect.js`.
