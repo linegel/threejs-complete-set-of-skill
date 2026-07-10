@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "threejs-physics-domain-and-interaction-abi/v1",
+  "title": "Three.js physics domain and interaction ABI vocabulary",
+  "description": "Machine-readable keys, enums, and cross-record invariants for router validation. The adjacent Markdown contract remains the semantic authority.",
+  "absencePolicy": {
+    "typedAbsenceOnly": true,
+    "forbiddenAbsenceEncodings": [null, ""],
+    "zeroMayBeAValidPhysicalValue": true,
+    "zeroCannotEncodeAbsence": true,
+    "missingPhysicalChannel": ["report-absent", "reject-request", "named-reconstruction-with-error"]
+  },
+  "enums": {
+    "typedAbsenceReasons": ["unsupported", "unavailable", "not-requested", "not-applicable", "gated-off"],
+    "validityStatuses": ["valid", "stale-within-gate", "out-of-domain", "unavailable", "failed"],
+    "supportKinds": ["point", "line", "area", "volume", "solid-angle", "path", "global"],
+    "basisBehaviors": ["scalar", "polar-vector", "axial-vector", "covector", "tensor", "structured"],
+    "quantityClasses": ["intensive", "extensive", "geometric", "categorical"],
+    "samplingMeasures": ["point", "line", "area", "volume", "solid-angle", "path", "none"],
+    "errorClassifications": ["hard-bound", "measured-residual", "statistical-uncertainty", "unavailable"],
+    "errorCorrelationModels": ["independent", "fully-correlated", "covariance-ref", "bounded-adversarial", "named-model"],
+    "errorCombinationRules": ["triangle", "root-sum-square", "covariance-propagation", "operator-bound", "interval-arithmetic", "named-rule"],
+    "residencyKinds": ["cpu", "gpu", "external", "mirrored"],
+    "cadenceKinds": ["analytic-on-demand", "fixed", "adaptive", "event-driven", "streamed"],
+    "physicsTimeKinds": ["instant", "interval"],
+    "clockMappingKinds": ["fixed-rational", "timestamp-table", "piecewise-versioned", "external"],
+    "clockMappingStorageKinds": ["inline", "immutable-resource"],
+    "clockOutOfRangePolicies": ["reject"],
+    "stageKinds": ["ingest", "sample-forcing", "predict", "emit-interactions", "solve-subcycles", "reduce-reactions", "correct", "commit", "publish-presentation"],
+    "samplePhases": ["interval-start", "substep-stage", "interval-end", "analytic-at-request"],
+    "writeDispositions": ["provisional", "committed-publication"],
+    "nativeStepRules": ["analytic", "fixed", "adaptive", "event", "streamed", "external"],
+    "barrierKinds": ["cpu-data", "gpu-pass-dispatch", "same-queue-transition", "cross-queue", "copy-map", "external-fence", "none"],
+    "interactionPayloadTags": ["pointImpulse", "wrenchImpulse", "wrenchRate", "surfaceTraction", "massRate", "massFlux", "massTransfer", "volumeRate", "volumeFlux", "volumeTransfer", "momentumFlux", "momentumTransfer", "heatRate", "heatFlux", "heatTransfer", "energyTransfer", "movingBoundary", "constraintTarget"],
+    "interactionFootprintKinds": ["point", "line", "area", "volume"],
+    "interactionDistributionKinds": ["point", "intensive-field", "extensive-distributed"],
+    "interactionTimeSemantics": ["rate", "interval-integrated", "state-over-interval", "algebraic-over-interval"],
+    "interactionRoles": ["source", "reaction"],
+    "surfaceExchangeModes": ["one-way", "two-way-explicit", "two-way-iterated"],
+    "reactiveKinds": ["shadow-content", "foam", "emissive", "optical", "topology", "deformation", "disocclusion", "event"],
+    "affectedRegionKinds": ["full-frame", "entity-set", "physics-bounds", "screen-mask"],
+    "resetPolicies": ["preserve-with-proof", "reset", "reject-region", "reproject-with-proof", "reseed", "rebuild", "bypass", "hold-prior", "convert-with-proof"],
+    "motionKinds": ["rigid", "skinned", "procedural-deformation", "particles", "field"],
+    "motionValidity": ["valid", "spawn", "despawn", "teleport", "reparent", "lod-change", "slot-reuse", "discontinuity", "unavailable"],
+    "executionStatuses": ["submitted", "completed", "partial-failure", "aborted", "device-lost"],
+    "targetExecutionStatuses": ["submitted", "completed", "failed", "aborted", "device-lost"],
+    "leaseDispositions": ["retained-until-join", "retired-after-abort", "invalidated-by-device-loss"],
+    "externalTransportKinds": ["shared-resource", "device-copy", "host-staging", "network-message"],
+    "checkpointSupportKinds": ["none", "checkpoint", "checkpoint-and-replay"],
+    "gpuRecoveryModes": ["restore-and-replay", "discontinuous-restart"],
+    "consumerKinds": ["simulation", "coupling", "external", "presentation"]
+  },
+  "records": {
+    "TypedAbsence": {
+      "required": ["kind", "reason", "authority", "schemaId", "effectiveTime", "provenance"]
+    },
+    "PhysicsContext": {
+      "required": ["contextId", "schemaId", "contextVersion", "metersPerWorldUnit", "quantitySystem", "worldFrameId", "physicsRootFrameId", "worldToPhysicsTransform", "worldTransformRevision", "physicsFrameRegistry", "chartRegistry", "physicsClockRegistry", "gravityProvider", "physicsOriginEpoch", "idNamespaces", "physicsMaterialRegistry"]
+    },
+    "PhysicsQuantitySystem": {
+      "required": ["systemId", "registryRevision", "length", "mass", "time", "thermodynamicTemperature", "angle", "amountOfSubstance", "electricCurrent", "luminousIntensity", "derivedQuantityRegistry"]
+    },
+    "WorldPhysicsTransform": {
+      "required": ["transformRevision", "referenceInstant", "physicsOriginEpoch", "scaleSource", "properBasisRotation", "translationMeters", "originCoordinateRateMps", "angularRateOfWorldRelativeToPhysicsRadPerS", "originCoordinateAccelerationMps2", "angularAccelerationRadPerS2", "validityInterval", "error"]
+    },
+    "PhysicsFrameDescriptor": {
+      "required": ["frameId", "parentFrameId", "owner", "transformRevision", "referenceInstant", "parentFromFrameRotation", "parentFromFrameTranslationMeters", "originCoordinateRateInParentMps", "angularRateOfFrameRelativeToParentInParentRadPerS", "originCoordinateAccelerationInParentMps2", "angularAccelerationInParentRadPerS2", "validityInterval", "uncertainty"]
+    },
+    "PhysicsChartDescriptor": {
+      "required": ["chartId", "owner", "anchorPhysicsFrameId", "physicsOriginEpoch", "transformRevision", "chartRevision", "coordinateUnitsAndRanges", "forwardMap", "inverseMap", "jacobian", "metricTensor", "orientation", "validityDomain", "singularitiesAndSeams", "curvatureAndLinearizationError"]
+    },
+    "PhysicsInstant": {
+      "required": ["clockId", "tick", "rationalSubstep", "clockMappingRevision", "discontinuityEpoch", "timeSecondsDerived"]
+    },
+    "PhysicsTimeInterval": {
+      "required": ["clockId", "start", "endExclusive", "intervalMappingRevision"]
+    },
+    "PhysicsTime": {
+      "required": ["kind", "instant", "interval"]
+    },
+    "PhysicsDuration": {
+      "required": ["kind", "seconds", "clockSpan", "secondsDerived", "mappingError"]
+    },
+    "PhysicsClockSpan": {
+      "required": ["clockId", "start", "endExclusive", "mappingRevision"]
+    },
+    "PhysicsDeadline": {
+      "required": ["kind", "absoluteTime", "requestInstant", "duration"]
+    },
+    "PhysicsClockDescriptor": {
+      "required": ["clockId", "owner", "mappingRevision", "discontinuityEpoch", "mappingKind", "mapping", "pauseSeekPolicy", "timeScalePolicy", "coordinationClockMap"]
+    },
+    "ClockFixedRationalMapping": {
+      "required": ["epochTick", "epochRationalSubstep", "epochSeconds", "secondsPerTick"]
+    },
+    "ClockTimestampTableMapping": {
+      "required": ["tableVersion", "coveredInstantRange", "knotTable", "interpolationRule", "outOfRangePolicy", "error"]
+    },
+    "ClockPiecewiseMapping": {
+      "required": ["segmentTableVersion", "coveredInstantRange", "segmentTable", "outOfRangePolicy", "error"]
+    },
+    "ClockExternalMapping": {
+      "required": ["adapterId", "adapterVersion", "mappingHandle", "coveredInstantRange", "frozenEvaluationTable", "onlineQueryProtocol", "unloggedQueryPolicy", "error"]
+    },
+    "ClockMappingTableStorage": {
+      "required": ["storage", "inlineEntries", "resourceRef"]
+    },
+    "PhysicsSignalDescriptor": {
+      "required": ["signalId", "providerId", "schemaId", "contextId", "owner", "consumers", "channels", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "chartId", "clockId", "samplePhase", "representedFootprint", "filter", "validity", "perChannelError", "residency", "cadence", "latency", "stateVersion", "resourceGeneration", "missingChannelPolicy"]
+    },
+    "OptionalResourceGeneration": {
+      "required": ["kind", "generation"]
+    },
+    "PhysicsChannelDescriptor": {
+      "required": ["channelId", "valueType", "tensorRankAndShape", "unit", "basisBehavior", "quantityClass", "samplingMeasure", "declaredSupport", "declaredFilter", "timeSemantics", "validity", "errorRef"]
+    },
+    "PhysicsValidityDescriptor": {
+      "required": ["status", "domain", "validTime", "staleAfter", "reason", "acceptanceGate"]
+    },
+    "PhysicsSupportDescriptor": {
+      "required": ["supportId", "kind", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "chartId", "geometry", "orientation", "measureUnit", "representedMeasure", "error"]
+    },
+    "PhysicsFilterDescriptor": {
+      "required": ["filterId", "supportMeasure", "kernelOrTransferFunction", "spatialBandwidth", "temporalBandwidth", "phaseSemantics", "normalization", "causality", "error"]
+    },
+    "PhysicsErrorDescriptor": {
+      "required": ["errorId", "quantityOrChannelId", "classification", "norm", "basisFrameId", "support", "boundOrStatistic", "confidenceOrCoverage", "correlationModel", "combinationRule", "source", "validity"]
+    },
+    "ErrorPropagationLedger": {
+      "required": ["ledgerId", "contextId", "outputSignalOrInteractionId", "outputStateVersion", "evaluationInterval", "inputErrors", "transformsFiltersInterpolations", "correlationAssumptions", "operatorOrGainBounds", "modeledApproximationTerms", "numericalTerms", "combinationRule", "outputError", "acceptanceGate", "provenance"]
+    },
+    "PhysicsMirrorDescriptor": {
+      "required": ["kind", "sourceStateVersion", "mirrorStateVersion", "availableAt", "age", "error", "synchronization"]
+    },
+    "PhysicsResidencyDescriptor": {
+      "required": ["kind", "deviceId", "queueId", "bindingIdentity", "sameQueueAvailability", "hostVisibility", "mirror", "readbackPolicy"]
+    },
+    "PhysicsCadenceDescriptor": {
+      "required": ["kind", "clockId", "intervalOrTrigger", "samplePhase", "jitterBound", "maximumBurst", "evidence"]
+    },
+    "PhysicsLatencyDescriptor": {
+      "required": ["productionDelay", "consumerAvailability", "maximumStaleness", "hostVisibleDelay", "clockMappingRevision", "error"]
+    },
+    "PhysicsChannelTolerance": {
+      "required": ["channelId", "norm", "maximumError", "maximumAge", "requiredValidity"]
+    },
+    "PhysicsSampleRequest": {
+      "required": ["requestId", "contextId", "providerId", "signalId", "schemaId", "requestedPhysicsTime", "requiredChannels", "optionalChannels", "queryFrameId", "physicsOriginEpoch", "transformRevision", "chartId", "querySupport", "requestedFilter", "tolerancesByChannel", "maximumStaleness", "acceptableResidency", "acceptableLatency", "batchExtent", "responseMode", "exactOnceKey"]
+    },
+    "PhysicsSampleResponseEnvelope": {
+      "required": ["requestId", "descriptorRef", "requestedPhysicsTime", "actualBundleTime", "resultStateVersion", "resourceGeneration", "channels", "absentChannels", "representedSupport", "actualFilter", "latency", "residency", "validity", "error", "errorPropagationLedgerRef", "provenance"]
+    },
+    "SampledChannel": {
+      "required": ["channelId", "value", "unit", "actualPhysicsTime", "actualSupport", "actualFilter", "validity", "error", "stateVersion"]
+    },
+    "EnvironmentForcingSnapshot": {
+      "required": ["descriptor", "sampleInstant", "airVelocityMps", "airDensityKgPerM3", "airPressurePa", "temperatureK", "specificHumidityKgPerKg", "turbulenceStatistics", "precipitationMassFluxKgPerM2S", "precipitationPhase", "precipitationVelocityMps", "mediumMaterialVelocityMps", "validity", "error", "absentChannels"]
+    },
+    "PrecipitationEmissionSnapshot": {
+      "required": ["descriptor", "emissionInterval", "emittedMassFluxKgPerM2S", "phase", "emissionVelocityMps", "airborneInventory", "transportDelay", "destinationFootprint", "conservationGroupId"]
+    },
+    "WaterSurfaceSample": {
+      "required": ["descriptor", "sampleInstant", "surfaceParameterization", "freeSurfacePoint", "freeSurfaceNormal", "geometricNormalVelocityMps", "surfacePointVelocityMps", "materialCurrentVelocityMps", "waterColumnDepthMeters", "densityKgPerM3", "materialAccelerationMps2", "pressurePa", "bathymetryPoint", "wetDryState", "representedFootprint", "filter", "validity", "error", "absentChannels"]
+    },
+    "WaterSurfaceParameterization": {
+      "required": ["parameterizationId", "chartId", "parameterizationRevision", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "coordinateMap", "gaugeConvention", "validityDomainAndSeams", "error"]
+    },
+    "SupportSurfaceSample": {
+      "required": ["descriptor", "sampleInstant", "supportId", "featureId", "closestPointMeters", "outwardNormal", "signedSeparationMeters", "pointVelocityMps", "pointAccelerationMps2", "physicsMaterialId", "oneSidedness", "representedFootprint", "validity", "error", "absentChannels"]
+    },
+    "LightingTransportSnapshot": {
+      "required": ["descriptor", "sampleInstant", "incidentRadiance", "surfaceIrradiance", "directSolarIrradiance", "skyIrradiance", "transmittance", "sourceDirection", "attenuationFactorIds", "skyIncludesDirectSolarDisc", "validity", "error", "absentChannels"]
+    },
+    "PhysicsGraph": {
+      "required": ["graphId", "contextId", "coordinationInterval", "stages", "edges", "loopMacros", "commitGroups", "originRebaseTransactions", "catchUpPolicy", "discontinuityPolicy", "executionLedger"]
+    },
+    "PhysicsGraphStage": {
+      "required": ["stageId", "stageKind", "owner", "clockId", "executionInterval", "samplePhase", "reads", "writes", "immutableSubstepParameters", "nativeStepRule", "executionResidency", "failurePolicy"]
+    },
+    "PhysicsGraphEdge": {
+      "required": ["edgeId", "producerStageId", "consumerStageId", "payload", "requiredVersionAndPhase", "interpolationExtrapolation", "maximumStaleness", "latency", "barrier", "absencePolicy"]
+    },
+    "BoundedCouplingLoop": {
+      "required": ["loopId", "orderedStageIds", "iterationBound", "residuals", "convergenceBounds", "conservationGroupIds", "provisionalVersionNamespace", "seedCommittedVersions", "externalReads", "iterationCarriedEdges", "iterationVersionRule", "acceptedWrites", "perIterationLedger", "acceptedIteratePublication", "divergenceFallback"]
+    },
+    "CouplingIterationEdge": {
+      "required": ["edgeId", "producerStageId", "consumerStageId", "signalOrExchangeId", "producedIterationOffset", "consumedIterationOffset", "requiredBracket", "requiredProvisionalVersionPattern", "barrier"]
+    },
+    "CouplingIterationLedger": {
+      "required": ["loopId", "iterationIndex", "bracket", "inputVersions", "outputVersions", "interactionSequenceRanges", "residualValues", "conservationResults", "accepted", "dependencyCompletionRefs"]
+    },
+    "PhysicsCommitGroup": {
+      "required": ["commitGroupId", "owner", "interval", "provisionalVersions", "committedPublications", "publicationLineage", "stateEquationOwners", "conservationAndErrorGates", "atomicity", "failureDisposition"]
+    },
+    "CommitPublicationLineage": {
+      "required": ["provisionalVersion", "committedVersion", "contentDigest", "semanticEquivalenceProof", "ownerApproval", "publicationInstant"]
+    },
+    "PhysicsExecutionLedger": {
+      "required": ["ledgerId", "graphId", "graphRevision", "coordinationInterval", "stageExecutions", "loopResults", "commitResults", "catchUpDebtBeforeAfter", "discontinuityEpoch", "physicsCostLedgerId"]
+    },
+    "SurfaceExchange": {
+      "required": ["exchangeId", "contextId", "applicationInterval", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "mode", "participants", "sourceDescriptors", "interactions", "reactions", "reactionGroups", "conservationGroups", "couplingLoopId", "stabilityGate", "convergence", "batchLedger"]
+    },
+    "InteractionRecord": {
+      "required": ["interactionId", "exactOnceKey", "role", "sourceOwner", "sourceEntityId", "sourceStateVersions", "targetOwner", "targetEntityId", "targetStateVersionExpected", "targetStateEquation", "applicationInterval", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "footprint", "payload", "signConvention", "applicationLedgerKey", "reactionGroupId", "reactionToInteractionIds", "conservationGroupIds", "validity", "error", "provenance"]
+    },
+    "InteractionFootprint": {
+      "required": ["footprintId", "kind", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "chartId", "supportGeometry", "orientation", "measureUnit", "representedMeasure", "distributionKind", "kernel", "kernelUnit", "normalizationTarget", "normalizationIntegral", "quadrature", "referencePointMeters", "approximationError"]
+    },
+    "PointImpulsePayload": {
+      "required": ["tag", "timeSemantics", "linearImpulseNs", "applicationPointMeters"]
+    },
+    "WrenchImpulsePayload": {
+      "required": ["tag", "timeSemantics", "linearImpulseNs", "angularImpulseNms", "referencePointMeters"]
+    },
+    "WrenchRatePayload": {
+      "required": ["tag", "timeSemantics", "forceN", "torqueNm", "referencePointMeters"]
+    },
+    "SurfaceTractionPayload": {
+      "required": ["tag", "timeSemantics", "tractionPaByQuadraturePoint"]
+    },
+    "MassRatePayload": {
+      "required": ["tag", "timeSemantics", "speciesPhaseMassRateKgPerS"]
+    },
+    "MassFluxPayload": {
+      "required": ["tag", "timeSemantics", "speciesPhaseMassFluxKgPerM2SByQuadraturePoint"]
+    },
+    "MassTransferPayload": {
+      "required": ["tag", "timeSemantics", "speciesPhaseMassKg"]
+    },
+    "VolumeRatePayload": {
+      "required": ["tag", "timeSemantics", "volumeRateM3PerS", "materialPhaseId"]
+    },
+    "VolumeFluxPayload": {
+      "required": ["tag", "timeSemantics", "normalVolumeFluxMpsByQuadraturePoint", "materialPhaseId"]
+    },
+    "VolumeTransferPayload": {
+      "required": ["tag", "timeSemantics", "volumeM3", "materialPhaseId", "constraintLawRef"]
+    },
+    "MomentumFluxPayload": {
+      "required": ["tag", "timeSemantics", "momentumFluxTensorPaByQuadraturePoint"]
+    },
+    "MomentumTransferPayload": {
+      "required": ["tag", "timeSemantics", "linearMomentumNs", "angularMomentumNms", "referencePointMeters"]
+    },
+    "HeatRatePayload": {
+      "required": ["tag", "timeSemantics", "powerW"]
+    },
+    "HeatFluxPayload": {
+      "required": ["tag", "timeSemantics", "heatFluxWPerM2ByQuadraturePoint"]
+    },
+    "HeatTransferPayload": {
+      "required": ["tag", "timeSemantics", "heatJ"]
+    },
+    "EnergyTransferPayload": {
+      "required": ["tag", "timeSemantics", "energyJ", "energyClassification"]
+    },
+    "MovingBoundaryPayload": {
+      "required": ["tag", "timeSemantics", "boundaryPositionMetersByQuadraturePoint", "boundaryVelocityMpsByQuadraturePoint", "noPenetrationAndSlipLawRef"]
+    },
+    "ConstraintTargetPayload": {
+      "required": ["tag", "timeSemantics", "constrainedDofs", "targetValues", "complianceLawRef", "workAccountingRef"]
+    },
+    "InteractionReactionGroup": {
+      "required": ["reactionGroupId", "contextId", "exchangeId", "applicationInterval", "sourceInteractionIds", "reactionInteractionIds", "acceptance", "orderedReduction", "balanceFrameId", "physicsOriginEpoch", "balanceTransformRevision", "balanceReferencePoint", "conservationGroupIds", "residualsAndBounds"]
+    },
+    "InteractionBatchLedger": {
+      "required": ["batchId", "exchangeId", "producerId", "publishedSequenceRange", "perConsumerCursor", "acceptedRejectedLateDuplicate", "overflowPolicy", "overflowSequenceRanges", "lostCommodities", "deferredCommodities", "exactOnceApplicationLedgerVersion"]
+    },
+    "ContactManifoldRecord": {
+      "required": ["descriptor", "manifoldId", "contextId", "owner", "solverIdAndRevision", "lifecycle", "validityInterval", "sampleInstant", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "bodyA", "bodyB", "materialA", "materialB", "normalConvention", "manifoldPatch", "signedSeparationMeters", "separationConvention", "timeOfImpact", "relativePointVelocityMps", "constitutivePairLaw", "frictionAdhesionState", "warmStartImpulses", "emittedInteractionIds", "validity", "error", "resetMigrationPolicy"]
+    },
+    "ConservationGroup": {
+      "required": ["conservationGroupId", "contextId", "interval", "participants", "referencePhysicsFrameId", "physicsOriginEpoch", "transformRevision", "angularMomentumReference", "commodities", "explicitConstraints", "initialInventory", "finalInventory", "externalSources", "boundaryFluxes", "modeledInternalTransfers", "modeledConversions", "modeledDissipation", "numericalResidual", "residualNorms", "acceptanceBounds"]
+    },
+    "PhysicsMaterialRegistry": {
+      "required": ["registryId", "owner", "registryVersion", "materials", "materialStateDescriptors", "pairLawResolver", "renderBindings"]
+    },
+    "PhysicsMaterialState": {
+      "required": ["descriptor", "materialStateId", "physicsMaterialId", "owner", "stateVersion", "sampleInstant", "validityInterval", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "temperatureK", "liquidSaturation", "iceMassFraction", "phaseMassFractions", "damageOrCompactionState", "constitutiveInputs", "validity", "error"]
+    },
+    "ColliderProxy": {
+      "required": ["colliderId", "entityId", "shapeId", "contextId", "shapeFrameId", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "shapeRepresentation", "shapeDefinitionRef", "topologyRevision", "poseSignalRef", "poseStateVersion", "validityInterval", "updateCadence", "sweptBounds", "oneSidedness", "closedness", "collisionMode", "featureIdPolicy", "conservativeInflationMeters", "physicsMaterialId", "collisionGroups", "approximationError", "residency"]
+    },
+    "RigidBodyProperties": {
+      "required": ["entityId", "owner", "massKg", "centerOfMassBodyMeters", "inertiaTensorBodyKgM2", "bodyFrameId", "colliderIds", "physicsMaterialIds", "stateEquation", "forceTorqueApplicationOwner", "error"]
+    },
+    "SpatialReferencePoint": {
+      "required": ["kind", "pointMeters", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "sampleInstant"]
+    },
+    "RigidBodyState": {
+      "required": ["descriptor", "entityId", "owner", "stateVersion", "sampleInstant", "validityInterval", "physicsFrameId", "physicsOriginEpoch", "transformRevision", "bodyFrameId", "centerOfMassPositionMeters", "bodyToPhysicsRotation", "twist", "acceleration", "motionMode", "committedDisposition", "error"]
+    },
+    "HydrostaticHullProperties": {
+      "required": ["entityId", "hullFrameId", "geometry", "geometryRevision", "displacedVolumeQuery", "waterlineClipping", "buoyancyModel", "dragModel", "addedMassModel", "waveExcitationModel", "samplingFootprint", "approximationError", "validity"]
+    },
+    "GpuStatePublication": {
+      "required": ["logicalStateVersion", "resourceGeneration", "producingStageId", "queueSubmissionEpoch", "sameQueueAvailableAfter", "deviceCompletionToken", "hostVisibleCompletionEpoch", "leasedResources"]
+    },
+    "AuthoritativeGpuStateRecovery": {
+      "required": ["recoveryId", "contextId", "owner", "authoritativeSignalIds", "recoveryMode", "authoritativeResidency", "checkpointPolicy", "latestCheckpoint", "replayLogCoverage", "restoreTransaction", "restartTransaction", "unrecoverablePolicy"]
+    },
+    "GpuCheckpointState": {
+      "required": ["checkpointId", "contentDigest", "contextVersion", "graphAndMaterialRegistryVersions", "frameClockAndMappingRevisions", "committedVersions", "checkpointInstant", "physicsOriginEpoch", "resourceGenerations", "conservedInventories", "stableIdRngEventAndLedgerCursors"]
+    },
+    "GpuDeviceLossRestoreTransaction": {
+      "required": ["freezeCommitGroupIds", "invalidateDeviceAndResourceGenerations", "retireLostPresentationLeasesBy", "restoreCheckpointId", "restoreTargetResidency", "replayInterval", "replayInteractionEventRanges", "restoreLedgerCursorsBeforeReplay", "validationGates", "atomicPublicationCommitGroupId", "publishedDeviceLossGeneration"]
+    },
+    "GpuDiscontinuousRestartTransaction": {
+      "required": ["freezeCommitGroupIds", "invalidateDeviceAndResourceGenerations", "affectedStateEquationsAndSignals", "lostInventoriesInteractionsAndEvents", "restartInitialStateAndProvenance", "newDiscontinuityEpoch", "resetActions", "validationGates", "atomicPublicationCommitGroupId", "publishedDeviceLossGeneration"]
+    },
+    "ExternalSolverAdapter": {
+      "required": ["adapterId", "externalSolverIdVersion", "contextId", "boundaryRevision", "ownedStateEquations", "ownership", "supportedFramesCharts", "unitConversion", "clockMapping", "stepSemantics", "signalDescriptors", "acceptedInteractions", "emittedReactions", "residencySynchronization", "precisionDeterminism", "errorModel", "checkpointRollback", "failurePolicy"]
+    },
+    "PhysicsPresentationCandidate": {
+      "required": ["candidateId", "contextId", "presentationEpoch", "requestedPresentationInstant", "physicsOriginEpoch", "candidateScope", "presentedStatePairs", "resourceLeases", "eventSequenceRanges"]
+    },
+    "PresentationEventRange": {
+      "required": ["rangeId", "producerId", "consumerId", "streamId", "firstSequence", "lastSequenceInclusive", "sourceStateVersion", "interval", "cursorBefore", "cursorAfter", "payloadDigest"]
+    },
+    "PresentationSampleProvenance": {
+      "required": ["sourceClockId", "requestedPresentationInstant", "mappedSourceInstant", "clockMapRevision", "clockMapError", "lowerBracket", "upperBracket", "interpolation", "extrapolation"]
+    },
+    "PresentationStateHandle": {
+      "required": ["leaseId", "resourceGeneration", "deviceLossGeneration", "layoutRevision", "subresourceOrCpuSlice"]
+    },
+    "PresentationSpatialBinding": {
+      "required": ["kind", "sourcePhysicsFrameId", "physicsOriginEpoch", "transformRevision", "bindingPayload"]
+    },
+    "PresentedStatePair": {
+      "required": ["bindingId", "entityId", "providerId", "signalId", "previousPresented", "currentPresented", "motionBinding"]
+    },
+    "PresentedStateArm": {
+      "required": ["provenance", "presentedInstant", "stateHandle", "globalBinding", "originEpochBridge"]
+    },
+    "PhysicsOriginEpochBridge": {
+      "required": ["transactionId", "fromPhysicsOriginEpoch", "toPhysicsOriginEpoch", "fromToTransformRevision", "transformedStateVersion", "roundTripAndErrorGates"]
+    },
+    "MotionBinding": {
+      "required": ["kind", "storageRepresentation", "previousStateHandle", "currentStateHandle", "identitySlotMap", "motionVectorValidity"]
+    },
+    "RenderSimilarityTransform": {
+      "required": ["sourcePhysicsFrameId", "sourceTransformRevision", "sourcePhysicsOriginEpoch", "destinationRenderFrameId", "renderOriginEpoch", "referenceInstant", "properBasisRotation", "presentationScale", "renderUnitsPerMeter", "translationRenderUnits", "transformRevision", "error"]
+    },
+    "CameraViewPublication": {
+      "required": ["cameraPublicationId", "candidateId", "owner", "presentationTargetId", "viewId", "cameraId", "viewScope", "cameraStateVersion", "cameraProjectionRevision", "previousRenderSampleInstant", "currentRenderSampleInstant", "globalToRenderPrevious", "globalToRenderCurrent", "previousUnjitteredViewMatrix", "currentUnjitteredViewMatrix", "previousUnjitteredProjectionMatrix", "currentUnjitteredProjectionMatrix", "jitterSampleAndConvention", "viewport", "rendererDpr", "renderExtent", "depthConvention", "projectionValidityAndError"]
+    },
+    "ViewPreparationPublication": {
+      "required": ["viewPreparationId", "candidateId", "cameraPublicationId", "presentationTargetId", "viewId", "visibilityPublicationRefs", "accelerationPublicationRefs", "shadowViewPublicationRefs", "cachePublicationRefs", "reactiveEpochs", "reactivePublications", "resetDependencies", "resourceLeases", "resourceLeaseRefs"]
+    },
+    "ShadowViewPublicationRef": {
+      "required": ["shadowOwner", "shadowViewId", "presentationTargetId", "receiverViewId", "cameraPublicationId", "cameraProjectionRevision", "shadowContentEpoch", "resourceLeaseRefs", "boundedDelay"]
+    },
+    "PhysicsPresentationSnapshot": {
+      "required": ["snapshotId", "candidateId", "cameraPublicationId", "viewPreparationId", "presentationTargetId", "viewId", "presentedStatePairRefs", "resourceLeaseRefs", "eventSequenceRanges", "closureManifest", "sealVersion"]
+    },
+    "PresentationClosureManifest": {
+      "required": ["snapshotId", "pairStateHandleLeaseIds", "preparationDependencyLeaseIds", "reactiveAndResetLeaseIds", "shadowCacheVisibilityLeaseIds", "exactRequiredLeaseIds", "exactEventRangeIds", "dependencyDagDigest", "closureDigest"]
+    },
+    "ReactivePublication": {
+      "required": ["sourceId", "sourceVersion", "reactiveEpoch", "kind", "presentationTargetId", "viewId", "affectedRegion", "resourceLeaseId", "validity", "error", "plannedConsumerActions"]
+    },
+    "AffectedRegionDescriptor": {
+      "required": ["kind", "fullFrame", "entitySet", "physicsBounds", "screenMask"]
+    },
+    "ScopedResetAction": {
+      "required": ["actionId", "owner", "historyKey", "presentationTargetId", "viewId", "causeEpochs", "affectedRegion", "policy", "capabilityGate", "dependencies", "executionStrategy", "resourceLeaseId"]
+    },
+    "ReactiveMaskDescriptor": {
+      "required": ["presentationTargetId", "viewId", "cameraId", "cameraProjectionRevision", "jitterKey", "physicalExtent", "resolutionScale", "encodingFormat", "conservativeCoverage", "dilationAndError", "resourceLeaseId"]
+    },
+    "PresentationResourceLease": {
+      "required": ["leaseId", "resourceId", "deviceId", "deviceLossGeneration", "resourceGeneration", "layoutRevision", "entitySlotMapVersion", "residency", "slotRangeStrideCount", "owner", "leaseScope", "access", "submissionAvailability", "leaseBegin", "reuseProhibitedUntil"]
+    },
+    "PresentationResourceLeaseRef": {
+      "required": ["leaseId", "deviceId", "deviceLossGeneration", "resourceGeneration", "layoutRevision", "subresourceOrCpuSlice"]
+    },
+    "ConsumerCompletionJoin": {
+      "required": ["joinId", "leaseId", "requiredConsumerKeys", "simulationConsumers", "couplingConsumers", "externalConsumers", "presentationConsumers", "joinPredicate", "joinDigest", "deviceLossRetirementPath"]
+    },
+    "CompletionTokenRef": {
+      "required": ["tokenId", "consumerKey", "consumerKind", "executionId", "presentationTargetId", "viewId", "snapshotId", "queueSubmissionEpoch", "backendGeneration", "deviceLossGeneration", "completionSemantics"]
+    },
+    "FrameExecutionRecord": {
+      "required": ["executionId", "candidateId", "requiredTargetViewKeys", "snapshotIds", "overallStatus", "backendGeneration", "deviceLossGeneration", "targetExecutions", "leaseDispositionById"]
+    },
+    "TargetExecution": {
+      "required": ["snapshotId", "presentationTargetId", "viewId", "status", "submittedPasses", "queueSubmissionEpochs", "actionResults", "completionTokens", "presentedTimestamp", "failure"]
+    },
+    "LeaseDisposition": {
+      "required": ["disposition", "consumingSnapshotIds", "completionJoin", "retirementEvidence"]
+    },
+    "PhysicsOriginRebaseTransaction": {
+      "required": ["transactionId", "contextId", "commitInstant", "fromContextVersion", "toContextVersion", "fromPhysicsOriginEpoch", "toPhysicsOriginEpoch", "fromWorldTransformRevision", "toWorldTransformRevision", "fromFrameRegistryRevision", "toFrameRegistryRevision", "fromChartRegistryRevision", "toChartRegistryRevision", "fromToTransform", "affectedOwnersAndCommittedVersions", "transformedStateKinds", "interactionAndEventQueueAction", "provisionalStateRequirement", "conservationRoundTripAndErrorGates", "presentationResetPlan", "atomicPublication", "rollback"]
+    },
+    "QualityChangeRequest": {
+      "required": ["requestId", "requesterId", "requestSequence", "observedInterval", "affectedTargetsViews", "pressureClass", "requestedDirection", "rankedCandidateControls", "evidenceRecords", "protectedInvariants", "latencyOrDeadlineGate"]
+    },
+    "QualityTransition": {
+      "required": ["transitionId", "contextId", "fromState", "toState", "fromQualityEpoch", "toQualityEpoch", "triggerEvidence", "protectedInvariants", "prepare", "commitAtStepBoundary", "retireAfterCompletion", "resetPlan", "rollback"]
+    },
+    "PhysicsQualityStateDescriptor": {
+      "required": ["qualityStateId", "contextId", "owner", "qualityEpoch", "equationsAndConstitutiveLawVersions", "discretizationAndActiveDomain", "representedBandsFootprintsAndFilters", "boundaryTreatment", "nativeStepAndCouplingControls", "stateVariablesAndInventories", "stochasticStreamsAndCursors", "stableIdPolicy", "contactAndWarmStartState", "presentationRepresentation", "physicalAndVisualErrorBounds", "hotTransientTrafficAndSynchronizationCosts", "validity"]
+    },
+    "ConservativeStateMap": {
+      "required": ["mapId", "contextId", "sourceQualityStateId", "destinationQualityStateId", "sourceStateVersions", "destinationProvisionalVersions", "restrictionOrProlongationOperator", "sourceMeasure", "destinationMeasure", "conservedCommodities", "positivityAndConstraintPreservation", "boundaryAndActiveDomainTreatment", "introducedFilter", "stableIdRngEventAndLedgerMap", "contactWarmStartMap", "residuals", "errorPropagationLedgerRef", "acceptanceGate"]
+    },
+    "PhysicsCostLedger": {
+      "required": ["ledgerId", "contextId", "graphId", "graphRevision", "measurementInterval", "measurementClockId", "qualityEpoch", "presentationTargetsAndViews", "measurementProtocolRefs", "status", "targetAndHarness", "qualityState", "graphStageCosts", "coordinationIntervalsPerSecond", "stageExecutionsPerCoordinationInterval", "stageExecutionsPerSecond", "coordinationIntervalsPerPresentedFrame", "subcyclesAndCouplingIterationsPerPresentedFrame", "executionsPerPresentedFrame", "worstPermittedCatchUpBurst", "hotBytesReadWrittenPerExecution", "solverDispatches", "queueSubmissionsAndPassBreaks", "dependencyCriticalPaths", "tileGpuTraffic", "bindingAndDeviceLimits", "cpuWork", "allocationGcAndCompilation", "uploadsCopiesMaps", "hostCompletionsReadbacksPerPresentedFrame", "synchronization", "multiviewAndFramesInFlightMultipliers", "hotState", "peakTransient", "migrationOverlap", "thermalPowerState"]
+    }
+  },
+  "relationships": [
+    "PhysicsContext.worldTransformRevision equals WorldPhysicsTransform.transformRevision",
+    "PhysicsInstant rationalSubstep is reduced and satisfies 0 <= numerator < denominator",
+    "PhysicsTime has exactly one active arm",
+    "PhysicsClockDescriptor.mapping has exactly the arm named by mappingKind; all other arms are typed-absence",
+    "Clock mapping tables use exactly one inline or content-addressed immutable-resource arm and reject out-of-range evaluation",
+    "PhysicsInstant.timeSecondsDerived equals the normative evaluation under clockMappingRevision",
+    "PhysicsSignalDescriptor channels and perChannelError have identical key sets",
+    "Every graph read is justified by one edge and every edge terminates at one matching read",
+    "Only committed-publication versions escape a loop or transaction",
+    "Interaction payload tag is compatible with its footprint measure",
+    "Reaction groups are accepted all-or-none and close in one balance frame/reference point",
+    "Every committed stage write belongs to exactly one matching successful PhysicsCommitGroup result",
+    "External and GPU-authoritative recovery restores state, inventories, stable IDs, RNG/event/application cursors, then replays exactly once before atomic publication",
+    "Candidate contains no camera or render transform",
+    "CameraViewPublication references one candidate",
+    "ViewPreparationPublication references the same candidate and camera publication",
+    "Each camera target/view has exactly one preparation and either one sealed snapshot or one typed failed target execution",
+    "ViewPreparationPublication owns full leases only for resources first created by that target/view and may reference Candidate plus same-preparation leases",
+    "Snapshot references candidate binding IDs and lease refs instead of copying pairs or transforms",
+    "LeaseDisposition.consumingSnapshotIds equals every sealed snapshot that references that lease",
+    "FrameExecutionRecord lease dispositions are keyed by leaseId",
+    "Physical routes require PhysicsCostLedger and zero steady frame-critical readback"
+  ]
+}
