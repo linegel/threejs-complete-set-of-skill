@@ -8,7 +8,7 @@
     "validate:v2": "node src/validate-v2.js",
     "validate:unit": "node src/validate-v2.js",
     "test:mutations": "node src/v2-self-test.js",
-    "test:routes": "node --test src/route-locks.test.js",
+    "test:routes": "node --test src/route-locks.test.js src/renderer-info-snapshot.test.js",
     "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-validation-harness --target final",
     "capture:evidence": "node src/capture-browser.js",
     "validate:artifacts": "node src/validate-browser-artifacts.js",
