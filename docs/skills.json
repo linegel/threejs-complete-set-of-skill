@@ -1,6 +1,6 @@
 {
   "name": "threejs-webgpu-skill-pack",
-  "description": "25 agent skills for Three.js WebGPU/TSL procedural graphics and visual validation",
+  "description": "26 agent skills for Three.js WebGPU/TSL procedural graphics and visual validation",
   "repository": "https://github.com/linegel/threejs-complete-set-of-skill",
   "source": "linegel/threejs-complete-set-of-skill",
   "homepage": "https://linegel.github.io/threejs-complete-set-of-skill/",
@@ -25,6 +25,7 @@
       "name": "Planning and Validation",
       "skills": [
         "threejs-choose-skills",
+        "threejs-debugging",
         "threejs-visual-validation",
         "threejs-compatibility-fallbacks"
       ]
@@ -145,13 +146,13 @@
     {
       "name": "threejs-choose-skills",
       "title": "Three.js WebGPU/TSL Choose Skills",
-      "description": "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, procedural worlds, and version-specific renderer debugging. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.",
+      "description": "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.",
       "examples": [],
       "latestUpdate": {
-        "date": "2026-07-09",
-        "datetime": "2026-07-09T01:18:48+03:00",
-        "commit": "a8bd0fefba4a5821eacefdd55a41732cc4020309",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/a8bd0fefba4a5821eacefdd55a41732cc4020309"
+        "date": "2026-07-10",
+        "datetime": "2026-07-10T17:49:59+03:00",
+        "commit": "87a988589e0d8d027873b86c7c03f1bb6f931c07",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/87a988589e0d8d027873b86c7c03f1bb6f931c07"
       },
       "page": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
@@ -173,6 +174,21 @@
       "page": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-compatibility-fallbacks/SKILL.md",
       "raw": "https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-compatibility-fallbacks/SKILL.md"
+    },
+    {
+      "name": "threejs-debugging",
+      "title": "Three.js Debugging",
+      "description": "Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request.",
+      "examples": [],
+      "latestUpdate": {
+        "date": "2026-07-10",
+        "datetime": "2026-07-10T17:49:59+03:00",
+        "commit": "87a988589e0d8d027873b86c7c03f1bb6f931c07",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/87a988589e0d8d027873b86c7c03f1bb6f931c07"
+      },
+      "page": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-debugging.html",
+      "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-debugging/SKILL.md",
+      "raw": "https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-debugging/SKILL.md"
     },
     {
       "name": "threejs-dynamic-surface-effects",

@@ -1,7 +1,7 @@
 {
   "name": "Three.js WebGPU Skill Pack",
   "short_name": "Three.js Skills",
-  "description": "25 expert agent skills for Three.js WebGPU/TSL procedural graphics and visual validation.",
+  "description": "26 expert agent skills for Three.js WebGPU/TSL debugging, procedural graphics, and visual validation.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

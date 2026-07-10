@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three.js Debugging — Three.js WebGPU Skill Pack</title>
+<meta name="description" content="Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request." />
+<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-debugging.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta name="theme-color" content="#0a0c10" />
+<link rel="icon" href="../favicon.ico" sizes="any" />
+<link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+<link rel="manifest" href="../site.webmanifest" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Three.js Debugging — Three.js WebGPU agent skill" />
+<meta property="og:description" content="Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request." />
+<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-debugging.html" />
+<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="760" />
+<meta property="og:image:alt" content="Three.js Debugging visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Three.js Debugging visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Three.js Debugging — Three.js WebGPU agent skill" />
+<meta name="twitter:description" content="Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request." />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "headline": "Three.js Debugging — Three.js WebGPU agent skill",
+   "description": "Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request.",
+   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-debugging.html",
+   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-10T17:49:59+03:00",
+   "isPartOf": {
+    "@type": "SoftwareSourceCode",
+    "name": "Three.js WebGPU Skill Pack",
+    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
+    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+   },
+   "about": [
+    "Three.js",
+    "WebGPU",
+    "TSL",
+    "Three.js Debugging"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Planning and Validation",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Three.js Debugging",
+     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-debugging.html"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+
+:root{
+  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
+  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
+  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
+nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
+nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+nav .links a:hover{color:var(--amber)}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.card:active{transform:translateY(-1px) scale(.98)}
+.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+figure{background:var(--bg2);border:1px solid var(--line)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
+figcaption span{color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+
+header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+.skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
+.skill-hero .wrap{position:relative;z-index:2}
+.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.46;filter:saturate(1.08) contrast(1.04)}
+.skill-hero:before{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
+  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs a:hover{color:var(--amber)}
+h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
+.lede{margin-top:24px;max-width:70ch;color:var(--dim)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
+  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
+a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
+a.chip:active{transform:scale(.96)}
+.chip.a{color:var(--amber)}
+.science{max-width:74ch}
+.science p{color:var(--dim);margin:18px 0}
+.science .katex-display{margin:26px 0;padding:18px 20px;background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--cyan);overflow-x:auto}
+.science .katex{font-size:1.05em;color:var(--ink)}
+.skilltext{max-width:78ch}
+.skilltext>h2:first-child{display:none}
+.skilltext h2{font-size:26px;margin:44px 0 14px}
+.skilltext h3{font-size:20px;margin:32px 0 10px}
+.skilltext p,.skilltext li{color:var(--dim);font-size:16px}
+.skilltext ul,.skilltext ol{padding-left:24px;margin:14px 0}
+.skilltext li{margin:6px 0}
+.skilltext pre{margin:18px 0}
+.skilltext code:not(pre code){background:#07090c;border:1px solid var(--line);padding:1px 6px;font-size:13px;color:var(--cyan)}
+.skilltext table{border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+.skilltext th,.skilltext td{border:1px solid var(--line);padding:8px 12px;text-align:left;color:var(--dim)}
+.skilltext th{color:var(--ink);font-family:var(--disp);font-weight:600}
+.skilltext a{color:var(--cyan)}
+.skilltext a:hover{text-decoration:underline}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
+.pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
+.pn a:hover{color:var(--amber);border-color:var(--amber)}
+.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
+  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.live-visual:before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
+  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
+.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
+.live-visual>*{position:relative}
+.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
+.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
+.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
+.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
+.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
+.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
+.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
+.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
+.live-visual--validation{--accent:#b8a4ff}
+@media (max-width:720px){
+  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero-bg{opacity:.3}
+  .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
+}
+</style>
+</head>
+<body>
+<div class="wrap"><nav>
+  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div>
+
+<header class="">
+
+  <div class="wrap">
+    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Planning and Validation</a> / Three.js Debugging</p>
+    <h1>Three.js Debugging</h1>
+    <p class="lede">Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request.</p>
+    <div class="meta-row">
+      <span class="chip a">$threejs-debugging</span>
+
+
+      <span class="chip">Latest skill update <time datetime="2026-07-10T17:49:59+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/87a988589e0d8d027873b86c7c03f1bb6f931c07">commit 87a9885 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-debugging/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-debugging/SKILL.md">raw (for agents) ↗</a>
+    </div>
+  </div>
+</header>
+
+
+
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Three.js Debugging</h2>
+<p>Establish the failure locally, then treat official upstream history as executable
+diagnostic evidence. Do not preload remembered issue lists. Issue status, affected
+versions, fix availability, and backend behavior are revision-dependent facts.</p>
+<p>This skill owns root-cause and version/fix triage. A domain skill owns the
+intended graphics or physics mechanism. <code>$threejs-visual-validation</code> owns formal
+image, timing, resource, and regression evidence when those proofs are required;
+it does not own issue archaeology.</p>
+<h2>Investigation Contract</h2>
+<p>Keep one compact working record. This is diagnostic output, not an extension of
+the visual-validation manifest:</p>
+<pre><code class="language-yaml">debugCase:
+  symptom: &quot;&quot;
+  expectedBehavior: &quot;&quot;
+  firstObserved: &quot;&quot;
+  minimalRepro: &quot;&quot;
+  installed:
+    packageVersion: &quot;&quot;
+    runtimeRevision: &quot;&quot;
+    lockfileResolution: &quot;&quot;
+    importEntrypoints: []
+    rendererClass: &quot;&quot;
+    initializedBackend: &quot;&quot;
+    browserGpuOs: &quot;&quot;
+  suspectApis: []
+  localEvidence: []
+  upstreamCandidates: []
+  versionMatrix: []
+  conclusion: &quot;&quot;
+  nextAction: &quot;&quot;
+</code></pre>
+<p>Record exact commands, commits, package versions, URLs, and repro results. Keep
+unknown values unknown; do not infer the runtime revision from a lockfile range.</p>
+<h2>Diagnostic Workflow</h2>
+<ol>
+<li><strong>Freeze the failing configuration.</strong> Record the resolved package version,
+runtime <code>THREE.REVISION</code>, import map or bundler resolution, renderer class,
+initialized backend, browser/OS/GPU, relevant capabilities, scene seed, asset
+revisions, and the smallest deterministic reproduction.</li>
+<li><strong>State the violated contract.</strong> Separate expected API semantics, numerical
+invariants, render-state invariants, and visual expectations. Record the first
+failing assertion, frame, pass, draw, dispatch, or resource transition.</li>
+<li><strong>Reduce without replacing the suspected mechanism.</strong> Remove unrelated scene
+systems and post effects, but preserve the API, material, geometry path,
+backend, projection, precision, and lifecycle behavior under investigation.
+A different material or renderer may localize the fault; it cannot prove the
+original path correct.</li>
+<li><strong>Partition local hypotheses.</strong> Test application misuse, stale imports or
+examples, migration changes, duplicated output conversion, missing renderer
+initialization, unsupported backend/capability, invalid data, lifecycle or
+synchronization errors, and third-party integration before declaring an
+engine defect.</li>
+<li><strong>Inspect the installed implementation.</strong> Read the resolved export map,
+source, types, tests, examples, and migration material for the installed
+revision. Prefer an executable assertion or source path over prose memory.</li>
+<li><strong>Research upstream when local evidence does not settle the cause, installed
+code and current documentation disagree, the installed release is behind, or
+the user asks about known issues or upgrade value.</strong> A recognizable regression
+signature is not a prerequisite. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-debugging/references/upstream-research.md">upstream research</a> before searching.</li>
+<li><strong>Build a version matrix.</strong> Reproduce on the installed version and, as
+evidence permits, a last-known-good version, first-bad version, fixing commit,
+first published fixed release, and current checked release. Hold the repro,
+backend, browser/GPU, assets, and assertion constant.</li>
+<li><strong>Verify the proposed fix.</strong> A merged PR proves only that code entered its
+target branch. Recommend a released upgrade only after proving which published
+package contains the fix and that the minimal repro passes there. Preserve the
+repro as a project regression test when the failure can recur.</li>
+<li><strong>Choose the narrowest proven action.</strong> Use an application correction for
+misuse or invalid state; upgrade for a verified released fix; use a bounded
+workaround or pinned patch when upgrade constraints dominate; file or extend
+an upstream report when the current checked release still reproduces without
+a matching report; return a blocker when required evidence cannot be obtained.</li>
+</ol>
+<p>Do not stop after finding a plausible issue title. Continue until its reproduction,
+affected range, fix state, and release availability agree with the local case.</p>
+<h2>Candidate Classification</h2>
+<p>Classify each upstream candidate independently:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Required proof</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>usage-or-integration-error</code></td>
+<td>Installed source/API contract explains the local failure and a local correction passes.</td>
+</tr>
+<tr>
+<td><code>intentional-api-change</code></td>
+<td>Official migration/source history proves the behavior changed by design.</td>
+</tr>
+<tr>
+<td><code>upstream-active</code></td>
+<td>Current checked code reproduces and an open or acknowledged upstream record matches.</td>
+</tr>
+<tr>
+<td><code>fixed-unreleased</code></td>
+<td>The matching fix is merged, but no verified published package contains it.</td>
+</tr>
+<tr>
+<td><code>fixed-released</code></td>
+<td>A published release contains the fixing commit and the local repro passes on it.</td>
+</tr>
+<tr>
+<td><code>not-reproduced</code></td>
+<td>The candidate&#39;s stated configuration cannot reproduce the local failure.</td>
+</tr>
+<tr>
+<td><code>unrelated</code></td>
+<td>API path, backend, symptom, affected range, or reproduction differs materially.</td>
+</tr>
+<tr>
+<td><code>insufficient-evidence</code></td>
+<td>Fix containment, release mapping, or reproduction proof is missing.</td>
+</tr>
+</tbody></table>
+<p>Closed is not a classification. A closed issue may be fixed, duplicated,
+invalid, intentional, or abandoned. Likewise, a merged PR is not automatically
+available to an npm-installed project.</p>
+<h2>Decision Evidence</h2>
+<p>Before recommending an upgrade, record:</p>
+<ul>
+<li>the installed package and runtime revision;</li>
+<li>the fixing PR or commit and its target branch;</li>
+<li>the first verified published release containing that commit;</li>
+<li>installed-versus-fixed repro results under the same configuration;</li>
+<li>migration and dependency risks relevant to the project;</li>
+<li>the regression test or assertion that will prevent recurrence.</li>
+</ul>
+<p>Before recommending a workaround, record the violated invariant, why the
+workaround avoids it, its version/backend scope, removal condition, and whether
+it changes correctness, image quality, performance, or resource ownership.</p>
+<h2>Report</h2>
+<p>Return only the evidence needed to act:</p>
+<pre><code class="language-yaml">threejsDebugging:
+  rootCause: &quot;&quot;
+  installedResult: &quot;&quot;
+  upstream:
+    issueOrPr: &quot;&quot;
+    fixingCommit: &quot;&quot;
+    affectedRange: &quot;&quot;
+    firstPublishedFixedRelease: &quot;&quot;
+    classification: &quot;&quot;
+  verification:
+    fixedVersionResult: &quot;&quot;
+    regressionTest: &quot;&quot;
+  decision: application-fix | upgrade | workaround | upstream-report | blocker
+  limitations: []
+</code></pre>
+<p>Do not turn investigated issue IDs into a general cheat sheet. Carry them only
+inside the case that proved their relevance.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-compatibility-fallbacks.html">← Three.js Compatibility Fallbacks</a>
+    <a href="threejs-dynamic-surface-effects.html">Dynamic Surface Effects →</a>
+  </div>
+</div></div>
+
+
+
+<div class="wrap"><footer>
+  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+</footer></div>
+</body>
+</html>
