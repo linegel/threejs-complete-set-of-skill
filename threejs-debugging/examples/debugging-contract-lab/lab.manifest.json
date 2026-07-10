@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "id": "debugging-contract-lab",
+  "title": "Three.js Debugging Decision Lab",
+  "skill": "threejs-debugging",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "accepted",
+  "canonicalSource": [
+    "threejs-debugging/SKILL.md",
+    "threejs-debugging/references/upstream-research.md",
+    "threejs-debugging/examples/triage-cases.json",
+    "threejs-debugging/examples/debugging-contract.test.mjs",
+    "threejs-debugging/examples/debugging-contract-lab/app.mjs",
+    "threejs-debugging/examples/debugging-contract-lab/contract-lab.test.mjs"
+  ],
+  "browserEntry": "threejs-debugging/examples/debugging-contract-lab/index.html",
+  "publishPath": "/demos/debugging-contract-lab/",
+  "scenarios": [
+    { "id": "ordinary-scene-design", "route": "/demos/debugging-contract-lab/scenario/ordinary-scene-design/", "startup": { "scenario": "ordinary-scene-design" }, "acceptanceStatus": "accepted" },
+    { "id": "older-release-suspicious-output", "route": "/demos/debugging-contract-lab/scenario/older-release-suspicious-output/", "startup": { "scenario": "older-release-suspicious-output" }, "acceptanceStatus": "accepted" },
+    { "id": "merged-but-unreleased", "route": "/demos/debugging-contract-lab/scenario/merged-but-unreleased/", "startup": { "scenario": "merged-but-unreleased" }, "acceptanceStatus": "accepted" },
+    { "id": "closed-but-unrelated", "route": "/demos/debugging-contract-lab/scenario/closed-but-unrelated/", "startup": { "scenario": "closed-but-unrelated" }, "acceptanceStatus": "accepted" },
+    { "id": "installed-source-docs-disagree", "route": "/demos/debugging-contract-lab/scenario/installed-source-docs-disagree/", "startup": { "scenario": "installed-source-docs-disagree" }, "acceptanceStatus": "accepted" },
+    { "id": "current-release-reproduces-without-match", "route": "/demos/debugging-contract-lab/scenario/current-release-reproduces-without-match/", "startup": { "scenario": "current-release-reproduces-without-match" }, "acceptanceStatus": "accepted" },
+    { "id": "local-usage-error", "route": "/demos/debugging-contract-lab/scenario/local-usage-error/", "startup": { "scenario": "local-usage-error" }, "acceptanceStatus": "accepted" }
+  ],
+  "mechanisms": [
+    { "id": "activation-gate", "route": "/demos/debugging-contract-lab/mechanism/activation-gate/", "startup": { "scenario": "ordinary-scene-design" }, "acceptanceStatus": "accepted" },
+    { "id": "version-matrix", "route": "/demos/debugging-contract-lab/mechanism/version-matrix/", "startup": { "scenario": "older-release-suspicious-output" }, "acceptanceStatus": "accepted" },
+    { "id": "release-containment", "route": "/demos/debugging-contract-lab/mechanism/release-containment/", "startup": { "scenario": "merged-but-unreleased" }, "acceptanceStatus": "accepted" },
+    { "id": "candidate-classification", "route": "/demos/debugging-contract-lab/mechanism/candidate-classification/", "startup": { "scenario": "closed-but-unrelated" }, "acceptanceStatus": "accepted" },
+    { "id": "decision-boundary", "route": "/demos/debugging-contract-lab/mechanism/decision-boundary/", "startup": { "scenario": "local-usage-error" }, "acceptanceStatus": "accepted" }
+  ],
+  "tiers": [],
+  "modes": ["triage"],
+  "cameras": ["case"],
+  "seeds": [0],
+  "capabilityRequirements": [
+    { "id": "rendering-not-required", "required": false, "evidence": "This diagnostic contract suite performs no rendering and makes no GPU claim.", "status": "not-applicable" }
+  ],
+  "runtimeProof": [
+    { "id": "fixture-driven-ui", "required": true, "evidence": "The browser and tests consume the same seven triage cases.", "status": "accepted" },
+    { "id": "stable-decision-outcomes", "required": true, "evidence": "Every case freezes activation and the required evidence-backed decision class.", "status": "accepted" },
+    { "id": "no-static-issue-cache", "required": true, "evidence": "The contract rejects static upstream issue folklore in skill guidance.", "status": "accepted" }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "node threejs-debugging/examples/debugging-contract-lab/contract-lab.test.mjs",
+  "commands": {
+    "check": "npm --prefix threejs-debugging/examples/debugging-contract-lab run check",
+    "test": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:unit",
+    "mutations": "npm --prefix threejs-debugging/examples/debugging-contract-lab run test:mutations",
+    "capture": "npm --prefix threejs-debugging/examples/debugging-contract-lab run capture",
+    "validateArtifacts": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:quick",
+    "validateFull": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "nonRenderingScenarioSuite": true
+}

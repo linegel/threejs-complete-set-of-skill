@@ -1,0 +1,15 @@
+{
+  "name": "@threejs-skills/debugging-contract-lab",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check app.mjs && node --check contract-lab.test.mjs",
+    "validate:unit": "node ../debugging-contract.test.mjs && node contract-lab.test.mjs",
+    "test:mutations": "node contract-lab.test.mjs",
+    "capture": "node contract-lab.test.mjs",
+    "validate:artifacts": "node contract-lab.test.mjs",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run check && npm run validate:unit && npm run test:mutations"
+  }
+}
