@@ -19,6 +19,7 @@
     "pages:capture-previews": "node scripts/capture-site-previews.mjs",
     "pages:refresh-previews": "node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/capture-site-previews.mjs && node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
     "pages:smoke": "node scripts/pages-smoke.mjs",
+    "pages:audit-live": "node scripts/audit-live-site-seo.mjs",
     "pages:validate-presentation": "node scripts/validate-site-presentation.mjs",
     "pages:validate-seo": "node scripts/validate-site-seo.mjs",
     "pages:validate-source-hashes": "node scripts/validate-pages-source-hashes.mjs",
