@@ -4,6 +4,7 @@ const SITE = new URL(process.env.SITE_URL ?? 'https://threejs-skills.com/');
 const RETIRED_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const CONCURRENCY = 8;
 const errors = [];
+const pageRecords = [];
 
 function assert(condition, message) {
   if (!condition) errors.push(message);
@@ -70,6 +71,29 @@ function schemaNodes(values) {
 function hasType(node, type) {
   const types = Array.isArray(node?.['@type']) ? node['@type'] : [node?.['@type']];
   return types.includes(type);
+}
+
+function duplicateValues(records, key) {
+  const owners = new Map();
+  for (const record of records) {
+    const value = record[key];
+    if (!value) continue;
+    const normalized = value.replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!owners.has(normalized)) owners.set(normalized, []);
+    owners.get(normalized).push(record.url);
+  }
+  return [...owners.values()].filter((ownersForValue) => ownersForValue.length > 1);
+}
+
+function internalLinks(html, baseUrl) {
+  return [...html.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>/gi)]
+    .map((match) => match[1])
+    .filter((href) => !/^(?:mailto:|tel:|javascript:)/i.test(href))
+    .map((href) => {
+      const url = new URL(href, baseUrl);
+      url.hash = '';
+      return url.href;
+    });
 }
 
 async function mapConcurrent(values, worker) {
@@ -171,7 +195,26 @@ await mapConcurrent(urls, async (url) => {
     assert(metaValues(html, 'property', 'article:published_time')[0] === article?.datePublished, `${url}: publication timestamps disagree`);
     assert(metaValues(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${url}: modification timestamps disagree`);
   }
+  pageRecords.push({ url, title, description: description[0], links: internalLinks(html, url) });
 });
+
+for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
+  for (const owners of duplicateValues(pageRecords, key)) {
+    errors.push(`duplicate ${label}: ${owners.join(', ')}`);
+  }
+}
+
+const sitemapSet = new Set(urls);
+const inboundLinks = new Map(urls.map((url) => [url, 0]));
+for (const record of pageRecords) {
+  for (const target of new Set(record.links)) {
+    if (!sitemapSet.has(target) || target === record.url) continue;
+    inboundLinks.set(target, inboundLinks.get(target) + 1);
+  }
+}
+for (const [url, count] of inboundLinks) {
+  if (url !== SITE.href) assert(count > 0, `${url}: orphaned sitemap URL`);
+}
 
 const indexDuplicate = await request(new URL('index.html', SITE), { redirect: 'manual' });
 assert(indexDuplicate.status === 200, `index.html: expected 200, received ${indexDuplicate.status}`);

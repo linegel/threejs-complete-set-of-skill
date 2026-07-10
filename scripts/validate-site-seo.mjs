@@ -149,12 +149,31 @@ function validateIndexablePage(path, expectedUrl, {
       assert(/^\d+$/.test(attribute(tag, 'height') ?? ''), `${label}: image lacks intrinsic height (${attribute(tag, 'src')})`);
     }
   }
+  return {
+    title: titles[0],
+    description: descriptions[0],
+    html,
+  };
+}
+
+function duplicateValues(records, key) {
+  const owners = new Map();
+  for (const record of records) {
+    const value = record[key];
+    if (!value) continue;
+    const normalized = value.replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!owners.has(normalized)) owners.set(normalized, []);
+    owners.get(normalized).push(record.url);
+  }
+  return [...owners.values()].filter((urls) => urls.length > 1);
 }
 
 const sitemapPath = join(DOCS, 'sitemap.xml');
 const sitemap = readFileSync(sitemapPath, 'utf8');
 const sitemapUrls = matches(sitemap, /<loc>([^<]+)<\/loc>/g).map((match) => match[1]);
 const pageUrls = sitemapUrls.filter((url) => !/\.(?:png|jpg|jpeg|webp|avif|gif)$/i.test(new URL(url).pathname));
+const sitemapSet = new Set(pageUrls);
+const pageRecords = [];
 assert(sitemap.includes('xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'), 'sitemap.xml: image namespace is missing');
 assert(!sitemap.includes('<changefreq>') && !sitemap.includes('<priority>'), 'sitemap.xml: contains ignored changefreq or priority hints');
 assert(new Set(pageUrls).size === pageUrls.length, 'sitemap.xml: contains duplicate page URLs');
@@ -170,16 +189,37 @@ for (const url of pageUrls) {
   if (!path || !existsSync(path)) continue;
   const isHome = url === SITE;
   const isSkill = new URL(url).pathname.startsWith('/skills/');
-  validateIndexablePage(path, url, {
+  const record = validateIndexablePage(path, url, {
     requireH1: isHome || isSkill,
     validateImages: isHome || isSkill,
     requireDiscovery: isHome || isSkill,
     requireArticle: isSkill,
     requireCatalog: isHome,
   });
+  pageRecords.push({ url, ...record });
 }
 
-const sitemapSet = new Set(pageUrls);
+for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
+  for (const urls of duplicateValues(pageRecords, key)) {
+    errors.push(`duplicate ${label}: ${urls.join(', ')}`);
+  }
+}
+
+const inboundLinks = new Map(pageUrls.map((url) => [url, 0]));
+for (const record of pageRecords) {
+  for (const [tag] of matches(record.html, /<a\b[^>]*href=["'][^"']+["'][^>]*>/gi)) {
+    const href = attribute(tag, 'href');
+    if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
+    const target = new URL(href, record.url);
+    target.hash = '';
+    if (target.origin !== new URL(SITE).origin || !sitemapSet.has(target.href) || target.href === record.url) continue;
+    inboundLinks.set(target.href, inboundLinks.get(target.href) + 1);
+  }
+}
+for (const [url, count] of inboundLinks) {
+  if (url !== SITE) assert(count > 0, `sitemap.xml: orphaned indexable URL ${url}`);
+}
+
 for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
   const relativePath = relative(DOCS, path).split('\\').join('/');
   const html = readFileSync(path, 'utf8');
