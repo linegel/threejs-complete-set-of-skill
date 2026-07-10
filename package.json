@@ -31,9 +31,11 @@
   },
   "license": "ISC",
   "dependencies": {
-    "three": "^0.185.1"
+    "three": "0.185.1"
   },
   "devDependencies": {
-    "marked": "^18.0.5"
+    "marked": "18.0.5",
+    "playwright": "1.61.1",
+    "vite": "8.1.3"
   }
 }
