@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linegel.github.io/threejs-complete-set-of-skill/schemas/runtime-graph-v2.json",
+  "title": "Runtime ownership and reachability graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "owners",
+    "signals",
+    "sceneSubmissions",
+    "computeDispatches",
+    "resources",
+    "finalToneMapOwner",
+    "finalOutputTransformOwner"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "owners": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "signals": { "type": "array", "items": { "$ref": "#/$defs/signal" } },
+    "sceneSubmissions": { "type": "array", "items": { "$ref": "#/$defs/pass" } },
+    "computeDispatches": { "type": "array", "items": { "$ref": "#/$defs/dispatch" } },
+    "resources": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
+    "finalToneMapOwner": { "type": "string", "minLength": 1 },
+    "finalOutputTransformOwner": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "producer", "consumers", "reachable"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "producer": { "type": "string", "minLength": 1 },
+        "consumers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "reachable": { "type": "boolean" },
+        "encoding": { "type": "string" }
+      }
+    },
+    "pass": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "owner", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "enum": ["prepass", "lit-scene", "shadow", "post", "diagnostic", "present"] }
+      }
+    },
+    "dispatch": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "owner", "workgroups"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "workgroups": {
+          "type": "object",
+          "required": ["values", "unit", "label", "source"],
+          "properties": {
+            "values": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "integer", "minimum": 0 } },
+            "unit": { "const": "workgroups" },
+            "label": { "const": "Derived" },
+            "source": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "owner", "kind", "residentBytes"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 },
+        "residentBytes": {
+          "type": "object",
+          "required": ["value", "unit", "label", "source"],
+          "properties": {
+            "value": { "type": "number", "minimum": 0 },
+            "unit": { "const": "bytes" },
+            "label": { "enum": ["Derived", "Measured"] },
+            "source": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}
