@@ -393,6 +393,10 @@ header.hero{min-height:min(620px,calc(100svh - 172px));padding:clamp(34px,5vw,58
 h1{font-weight:700;font-size:clamp(42px,6.3vw,84px);line-height:1.04;letter-spacing:0;max-width:15ch;animation:rise .7s .08s ease both}
 h1 em{font-style:normal;color:var(--amber)}
 .lede{margin-top:28px;max-width:62ch;color:var(--dim);animation:rise .7s .16s ease both}
+.hero-install{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;max-width:720px;margin-top:20px;border-radius:8px;background:rgba(8,11,16,.88);box-shadow:0 0 0 1px rgba(255,180,84,.34),0 14px 42px rgba(0,0,0,.28);overflow:hidden}
+.hero-install code{min-width:0;display:flex;align-items:center;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.45;color:var(--ink);white-space:nowrap;scrollbar-width:thin}
+.hero-install button{min-width:72px;min-height:44px;padding:10px 14px;border:0;border-left:1px solid rgba(255,255,255,.14);background:rgba(255,180,84,.12);font-family:var(--mono);font-size:12px;color:var(--amber);cursor:pointer;transition-property:background,color,scale;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.hero-install button:hover{background:rgba(255,180,84,.22);color:var(--ink)}.hero-install button:active{scale:.96}.hero-install button:focus-visible{outline:2px solid var(--cyan);outline-offset:-3px}
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;animation:rise .7s .22s ease both}
 .hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:42px;display:inline-flex;align-items:center;padding:10px 16px;background:rgba(15,18,24,.72);
   box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition:transform .2s,color .2s,box-shadow .2s}
@@ -441,6 +445,10 @@ ${navHtml('')}
         <p class="kicker">TSL-first · WebGPURenderer · Screenshot-backed validation</p>
         <h1>${total} expert skills for <em>ambitious</em> Three.js WebGPU scenes.</h1>
         <p class="lede">Not a tutorial. A skill pack for agents — Claude Code, Codex, and any shell that loads local skill folders — that need to design, implement, debug, and <strong>prove</strong> advanced real-time graphics: oceans, atmospheres, planets, volumetric clouds, water optics, particles, shadows, and full node post pipelines.</p>
+        <div class="hero-install" aria-label="Install the complete skill pack">
+          <code id="hero-install-command">${esc(SKILLS_INSTALL_PACK)}</code>
+          <button type="button" data-copy-install aria-label="Copy the full skill pack installation command">Copy</button>
+        </div>
         <div class="hero-actions">
           <a class="hero-action" href="#skills">Browse skills</a>
           <a class="hero-action" href="#gallery">View evidence</a>
@@ -508,6 +516,28 @@ ${catalog}
   </div>
 </div></div>
 
+<script>
+const copyInstallButton = document.querySelector('[data-copy-install]');
+const installCommand = document.getElementById('hero-install-command')?.textContent;
+copyInstallButton?.addEventListener('click', async () => {
+  if (!installCommand) return;
+  try {
+    await navigator.clipboard.writeText(installCommand);
+  } catch {
+    const textArea = document.createElement('textarea');
+    textArea.value = installCommand;
+    textArea.setAttribute('readonly', '');
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.append(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    textArea.remove();
+  }
+  copyInstallButton.textContent = 'Copied';
+  window.setTimeout(() => { copyInstallButton.textContent = 'Copy'; }, 1800);
+});
+</script>
 ${footerHtml}
 </body>
 </html>
