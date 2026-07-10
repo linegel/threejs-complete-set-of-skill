@@ -1,0 +1,1165 @@
+{
+  "generatedBy": "scripts/generate-responsive-images.mjs",
+  "sources": {
+    "generated-asset-contact-sheet.png": {
+      "url": "https://threejs-skills.com/generated-asset-contact-sheet.png",
+      "width": 480,
+      "height": 2020,
+      "bytes": 1498383,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/generated-asset-contact-sheet.avif",
+          "width": 480,
+          "height": 2020,
+          "bytes": 96211
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/generated-asset-contact-sheet.webp",
+          "width": 480,
+          "height": 2020,
+          "bytes": 119590
+        }
+      }
+    },
+    "previews/primary/debugging-contract-lab.png": {
+      "url": "https://threejs-skills.com/previews/primary/debugging-contract-lab.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 486079,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/primary/debugging-contract-lab.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 28478
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/primary/debugging-contract-lab.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 47870
+        }
+      }
+    },
+    "previews/primary/router-manifest-lab.png": {
+      "url": "https://threejs-skills.com/previews/primary/router-manifest-lab.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 266278,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/primary/router-manifest-lab.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 33881
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/primary/router-manifest-lab.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 62294
+        }
+      }
+    },
+    "previews/provider/ambient-contact-shading-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/ambient-contact-shading-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 418791,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/ambient-contact-shading-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 28294
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/ambient-contact-shading-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 36354
+        }
+      }
+    },
+    "previews/provider/camera-rig-handoff-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 414687,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 31776
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 39418
+        }
+      }
+    },
+    "previews/provider/compatibility-fallback-planner-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 313482,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 29880
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 39728
+        }
+      }
+    },
+    "previews/provider/exposure-color-grading-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/exposure-color-grading-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 324117,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/exposure-color-grading-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 25557
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/exposure-color-grading-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 34612
+        }
+      }
+    },
+    "previews/provider/image-pipeline-framegraph-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/image-pipeline-framegraph-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 377288,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/image-pipeline-framegraph-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 30363
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/image-pipeline-framegraph-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 37434
+        }
+      }
+    },
+    "previews/provider/pooled-particles-effects-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/pooled-particles-effects-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 319763,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/pooled-particles-effects-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 29018
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/pooled-particles-effects-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 36704
+        }
+      }
+    },
+    "previews/provider/procedural-building-compiler-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/procedural-building-compiler-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 578797,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-building-compiler-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 44698
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-building-compiler-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 53028
+        }
+      }
+    },
+    "previews/provider/procedural-creature-lab-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/procedural-creature-lab-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 455053,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-creature-lab-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 35376
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-creature-lab-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 43720
+        }
+      }
+    },
+    "previews/provider/procedural-geometry-writer-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/procedural-geometry-writer-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 313848,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-geometry-writer-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 28758
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-geometry-writer-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 35128
+        }
+      }
+    },
+    "previews/provider/procedural-motion-timeline-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/procedural-motion-timeline-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 249007,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-motion-timeline-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 24110
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/procedural-motion-timeline-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 31320
+        }
+      }
+    },
+    "previews/provider/selective-bloom-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/selective-bloom-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 384931,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/selective-bloom-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 27442
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/selective-bloom-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 33726
+        }
+      }
+    },
+    "previews/provider/shadow-cascade-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/shadow-cascade-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 486599,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/shadow-cascade-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 31973
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/shadow-cascade-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 39962
+        }
+      }
+    },
+    "previews/provider/skill-router-manifest-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/skill-router-manifest-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 361243,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/skill-router-manifest-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 35075
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/skill-router-manifest-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 42982
+        }
+      }
+    },
+    "previews/provider/sky-atmosphere-haze-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/sky-atmosphere-haze-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 731193,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/sky-atmosphere-haze-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 40946
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/sky-atmosphere-haze-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 49128
+        }
+      }
+    },
+    "previews/provider/visual-validation-harness-demo.png": {
+      "url": "https://threejs-skills.com/previews/provider/visual-validation-harness-demo.png",
+      "width": 1440,
+      "height": 757,
+      "bytes": 341066,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/previews/provider/visual-validation-harness-demo.avif",
+          "width": 1440,
+          "height": 757,
+          "bytes": 34936
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/previews/provider/visual-validation-harness-demo.webp",
+          "width": 1440,
+          "height": 757,
+          "bytes": 43596
+        }
+      }
+    },
+    "visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1284882,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 46616
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 63824
+        }
+      }
+    },
+    "visual-validation/cloud-generated-weather-maps/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 219555,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 14624
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23720
+        }
+      }
+    },
+    "visual-validation/cloud-generated-weather-maps/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 469165,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 16661
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23960
+        }
+      }
+    },
+    "visual-validation/cloud-generated-weather-maps/temporal.t001.png": {
+      "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/temporal.t001.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 189058,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/temporal.t001.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 7932
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/temporal.t001.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 12110
+        }
+      }
+    },
+    "visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1714161,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 158770
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 153140
+        }
+      }
+    },
+    "visual-validation/fields-generated-biome-maps/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1217765,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 101320
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 120004
+        }
+      }
+    },
+    "visual-validation/fields-generated-biome-maps/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1090016,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 72137
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 82182
+        }
+      }
+    },
+    "visual-validation/fields-generated-biome-maps/seed-stress.final.png": {
+      "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/seed-stress.final.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1714161,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/seed-stress.final.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 158770
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/seed-stress.final.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 153140
+        }
+      }
+    },
+    "visual-validation/frost-generated-crystals/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 788788,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 68557
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 72288
+        }
+      }
+    },
+    "visual-validation/frost-generated-crystals/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 617709,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 36370
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 36548
+        }
+      }
+    },
+    "visual-validation/frost-generated-crystals/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 418090,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 20375
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 22512
+        }
+      }
+    },
+    "visual-validation/frost-generated-crystals/temporal.t001.png": {
+      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/temporal.t001.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 358900,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/temporal.t001.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 14749
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/temporal.t001.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 15872
+        }
+      }
+    },
+    "visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1378891,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 68433
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 101692
+        }
+      }
+    },
+    "visual-validation/materials-generated-lava-causes/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 798390,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 39907
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 55954
+        }
+      }
+    },
+    "visual-validation/materials-generated-lava-causes/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 858880,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 33599
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 42798
+        }
+      }
+    },
+    "visual-validation/materials-generated-lava-causes/temporal.t001.png": {
+      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/temporal.t001.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 689845,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/temporal.t001.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 25548
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/temporal.t001.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 31988
+        }
+      }
+    },
+    "visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1297776,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 101824
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 173918
+        }
+      }
+    },
+    "visual-validation/ocean-generated-wave-seeds/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 985120,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 45560
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 76962
+        }
+      }
+    },
+    "visual-validation/ocean-generated-wave-seeds/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 484435,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 35378
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 48074
+        }
+      }
+    },
+    "visual-validation/ocean-generated-wave-seeds/seed-stress.final.png": {
+      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/seed-stress.final.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1297776,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/seed-stress.final.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 101824
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/seed-stress.final.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 173918
+        }
+      }
+    },
+    "visual-validation/planet-generated-craters/camera.near.png": {
+      "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/camera.near.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 247094,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/camera.near.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 8418
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/camera.near.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 9820
+        }
+      }
+    },
+    "visual-validation/planet-generated-craters/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 592864,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 34041
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 44344
+        }
+      }
+    },
+    "visual-validation/planet-generated-craters/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 391420,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 21136
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 29194
+        }
+      }
+    },
+    "visual-validation/planet-generated-craters/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 274218,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 15479
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23404
+        }
+      }
+    },
+    "visual-validation/rain-generated-ripples/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 1077046,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 138541
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 160448
+        }
+      }
+    },
+    "visual-validation/rain-generated-ripples/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 741379,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 77105
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 104662
+        }
+      }
+    },
+    "visual-validation/rain-generated-ripples/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 414103,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 41123
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 56788
+        }
+      }
+    },
+    "visual-validation/space-generated-starfields/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 194857,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23182
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 47852
+        }
+      }
+    },
+    "visual-validation/space-generated-starfields/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 423479,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 32270
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 41620
+        }
+      }
+    },
+    "visual-validation/space-generated-starfields/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 390930,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 21689
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 35422
+        }
+      }
+    },
+    "visual-validation/space-generated-starfields/seed-stress.final.png": {
+      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/seed-stress.final.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 194857,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/seed-stress.final.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23182
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/seed-stress.final.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 47852
+        }
+      }
+    },
+    "visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 95882,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 36556
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 59068
+        }
+      }
+    },
+    "visual-validation/vegetation-generated-meadow-density/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 72754,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 16612
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 27530
+        }
+      }
+    },
+    "visual-validation/vegetation-generated-meadow-density/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 92223,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 16509
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23294
+        }
+      }
+    },
+    "visual-validation/vegetation-generated-meadow-density/seed-stress.final.png": {
+      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/seed-stress.final.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 95882,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/seed-stress.final.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 36556
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/seed-stress.final.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 59068
+        }
+      }
+    },
+    "visual-validation/water-generated-caustics/camera.near.png": {
+      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/camera.near.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 408274,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/camera.near.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 23155
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/camera.near.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 31444
+        }
+      }
+    },
+    "visual-validation/water-generated-caustics/diagnostics.mosaic.png": {
+      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 854444,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 112225
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 171250
+        }
+      }
+    },
+    "visual-validation/water-generated-caustics/final.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 374165,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 44858
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 79836
+        }
+      }
+    },
+    "visual-validation/water-generated-caustics/no-post.design.png": {
+      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/no-post.design.png",
+      "width": 1200,
+      "height": 760,
+      "bytes": 352486,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/no-post.design.avif",
+          "width": 1200,
+          "height": 760,
+          "bytes": 19248
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/no-post.design.webp",
+          "width": 1200,
+          "height": 760,
+          "bytes": 27246
+        }
+      }
+    },
+    "visual-validation/water-integration-surface/integration-surface-readback.png": {
+      "url": "https://threejs-skills.com/visual-validation/water-integration-surface/integration-surface-readback.png",
+      "width": 640,
+      "height": 400,
+      "bytes": 106576,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/water-integration-surface/integration-surface-readback.avif",
+          "width": 640,
+          "height": 400,
+          "bytes": 5415
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/water-integration-surface/integration-surface-readback.webp",
+          "width": 640,
+          "height": 400,
+          "bytes": 6028
+        }
+      }
+    }
+  }
+}

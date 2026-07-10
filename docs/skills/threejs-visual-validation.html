@@ -17,7 +17,7 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" fetchpriority="high" />
+<link rel="preload" as="image" href="../visual-validation/planet-generated-craters/diagnostics.mosaic.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -142,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -274,7 +275,11 @@ a.chip:active{scale:.96}
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.webp" />
+          <img data-responsive-preview class="skill-hero-bg" src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+        </picture>
   <span class="hero-preview-badge">Generated crater-asset diagnostics</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Planning and Validation</a></li><li aria-current="page">Visual Validation</li></ol></nav>
@@ -300,7 +305,11 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-validation-harness/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-validation-harness" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Related skill preview · Generated crater-asset diagnostics for Native WebGPU validation harness" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated crater-asset diagnostics</span></span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-validation-harness" data-preview-classification="related-generated-asset-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.webp" />
+          <img data-responsive-preview class="card-preview" src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Related skill preview · Generated crater-asset diagnostics for Native WebGPU validation harness" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Generated crater-asset diagnostics</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Native WebGPU validation harness</h3>
         <p>8 fixed scenarios, 6 mechanism routes, and 5 locked tiers.</p>
@@ -314,7 +323,11 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
-        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Final Image Flight" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-classification="related-concept-proxy-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/image-pipeline-framegraph-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/image-pipeline-framegraph-demo.webp" />
+          <img data-responsive-preview class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Final Image Flight" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -345,43 +358,83 @@ capability manifest, renderer.info counters, per-pass timings — so regressions
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>10 published images</code></div>
     <div class="gallery">
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Visual Validation — Generated crater-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Visual Validation — Generated crater-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated crater-asset diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Visual Validation — Generated caustic-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/water-generated-caustics/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/water-generated-caustics/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Visual Validation — Generated caustic-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated caustic-asset diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Visual Validation — Generated wave-seed diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Visual Validation — Generated wave-seed diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated wave-seed diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Visual Validation — Generated ripple-normal diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Visual Validation — Generated ripple-normal diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated ripple-normal diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated weather-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated weather-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated weather-map diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/frost-generated-crystals/diagnostics.mosaic.png" alt="Visual Validation — Generated frost-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/frost-generated-crystals/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/frost-generated-crystals/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/frost-generated-crystals/diagnostics.mosaic.png" alt="Visual Validation — Generated frost-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated frost-map diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png" alt="Visual Validation — Generated lava-cause diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png" alt="Visual Validation — Generated lava-cause diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated lava-cause diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png" alt="Visual Validation — Generated meadow-mask diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png" alt="Visual Validation — Generated meadow-mask diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated meadow-mask diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/space-generated-starfields/diagnostics.mosaic.png" alt="Visual Validation — Generated starfield-tile diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/space-generated-starfields/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/space-generated-starfields/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/space-generated-starfields/diagnostics.mosaic.png" alt="Visual Validation — Generated starfield-tile diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated starfield-tile diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated biome-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated biome-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated biome-map diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
@@ -823,7 +876,11 @@ is unavailable.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/visual-validation-harness-demo/"><figure>
-        <span class="preview-media"><img src="../previews/provider/visual-validation-harness-demo.png" alt="Live concept proxy screenshot for Validation Evidence Harness; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/visual-validation-harness-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/visual-validation-harness-demo.webp" />
+          <img data-responsive-preview src="../previews/provider/visual-validation-harness-demo.png" alt="Live concept proxy screenshot for Validation Evidence Harness; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Validation Evidence Harness</strong><span>Concept proxy · The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.</span></figcaption>
       </figure></a>
     </div>

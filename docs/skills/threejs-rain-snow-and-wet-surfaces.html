@@ -17,7 +17,7 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/rain-generated-ripples/final.design.png" fetchpriority="high" />
+<link rel="preload" as="image" href="../visual-validation/rain-generated-ripples/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -142,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -274,7 +275,11 @@ a.chip:active{scale:.96}
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/rain-generated-ripples/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/final.design.webp" />
+          <img data-responsive-preview class="skill-hero-bg" src="../visual-validation/rain-generated-ripples/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+        </picture>
   <span class="hero-preview-badge">Generated ripple-normal asset preview</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Rain, Snow, and Wet Surfaces</li></ol></nav>
@@ -300,14 +305,22 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/integration-precipitation-image-pipeline/">
-        <span class="card-preview-wrap" data-preview-for="integration-precipitation-image-pipeline" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/rain-generated-ripples/final.design.png" alt="Related skill preview · Generated ripple-normal asset preview for Integration Precipitation Image Pipeline" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated ripple-normal asset preview</span></span>
+        <span class="card-preview-wrap" data-preview-for="integration-precipitation-image-pipeline" data-preview-classification="related-generated-asset-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/final.design.webp" />
+          <img data-responsive-preview class="card-preview" src="../visual-validation/rain-generated-ripples/final.design.png" alt="Related skill preview · Generated ripple-normal asset preview for Integration Precipitation Image Pipeline" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Generated ripple-normal asset preview</span></span>
         <span class="card-head"><span class="card-index">Integration</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Integration Precipitation Image Pipeline</h3>
         <p>2 fixed scenarios, 4 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-rain-snow-and-wet-surfaces/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-rain-snow-and-wet-surfaces" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/rain-generated-ripples/final.design.png" alt="Related skill preview · Generated ripple-normal asset preview for WebGPU Rain Snow And Wet Surfaces" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated ripple-normal asset preview</span></span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-rain-snow-and-wet-surfaces" data-preview-classification="related-generated-asset-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/final.design.webp" />
+          <img data-responsive-preview class="card-preview" src="../visual-validation/rain-generated-ripples/final.design.png" alt="Related skill preview · Generated ripple-normal asset preview for WebGPU Rain Snow And Wet Surfaces" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Generated ripple-normal asset preview</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Rain Snow And Wet Surfaces</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -321,19 +334,31 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/weathered-world/">
-        <span class="card-preview-wrap" data-preview-for="weathered-world" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="weathered-world" data-preview-classification="related-concept-proxy-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/image-pipeline-framegraph-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/image-pipeline-framegraph-demo.webp" />
+          <img data-responsive-preview class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Weathered World</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/procedural-district/">
-        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Procedural District" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-classification="related-concept-proxy-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/image-pipeline-framegraph-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/image-pipeline-framegraph-demo.webp" />
+          <img data-responsive-preview class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Procedural District" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/creature-habitat/">
-        <span class="card-preview-wrap" data-preview-for="creature-habitat" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Creature Habitat" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="creature-habitat" data-preview-classification="related-concept-proxy-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/image-pipeline-framegraph-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/image-pipeline-framegraph-demo.webp" />
+          <img data-responsive-preview class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Creature Habitat" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Creature Habitat</h3>
         <span class="card-meta">5 mechanisms · 3 locked tiers</span>
@@ -363,15 +388,27 @@ ring: $h(r,t) = A\,e^{-\gamma t}\cos(kr - \omega t)$, baked or generated as norm
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>3 published images</code></div>
     <div class="gallery">
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Rain, Snow, and Wet Surfaces — Generated ripple-normal asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/rain-generated-ripples/final.design.png" alt="Rain, Snow, and Wet Surfaces — Generated ripple-normal asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated ripple-normal asset preview</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/rain-generated-ripples/no-post.design.png" alt="Rain, Snow, and Wet Surfaces — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/rain-generated-ripples/no-post.design.png" alt="Rain, Snow, and Wet Surfaces — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Asset-preview baseline</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Rain, Snow, and Wet Surfaces — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Rain, Snow, and Wet Surfaces — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated-asset channel diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
@@ -724,7 +761,11 @@ owner owns integrated wetness/coverage; surface materials only consume it.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/rain-generated-ripples/"><figure>
-        <span class="preview-media"><img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Live generated asset preview screenshot for Wet Surface Ripple Normals; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/rain-generated-ripples/final.design.png" alt="Live generated asset preview screenshot for Wet Surface Ripple Normals; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Wet Surface Ripple Normals</strong><span>Generated asset preview · The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.</span></figcaption>
       </figure></a>
     </div>

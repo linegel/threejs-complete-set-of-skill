@@ -17,7 +17,7 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/materials-generated-lava-causes/final.design.png" fetchpriority="high" />
+<link rel="preload" as="image" href="../visual-validation/materials-generated-lava-causes/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -142,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -274,7 +275,11 @@ a.chip:active{scale:.96}
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/final.design.webp" />
+          <img data-responsive-preview class="skill-hero-bg" src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+        </picture>
   <span class="hero-preview-badge">Generated lava-cause asset preview</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Materials</li></ol></nav>
@@ -300,7 +305,11 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/tsl-procedural-pbr/">
-        <span class="card-preview-wrap" data-preview-for="tsl-procedural-pbr" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="Related skill preview · Generated lava-cause asset preview for TSL Procedural PBR" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated lava-cause asset preview</span></span>
+        <span class="card-preview-wrap" data-preview-for="tsl-procedural-pbr" data-preview-classification="related-generated-asset-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/final.design.webp" />
+          <img data-responsive-preview class="card-preview" src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="Related skill preview · Generated lava-cause asset preview for TSL Procedural PBR" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Generated lava-cause asset preview</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>TSL Procedural PBR</h3>
         <p>6 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -314,7 +323,11 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/procedural-district/">
-        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Procedural District" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-classification="related-concept-proxy-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/image-pipeline-framegraph-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/image-pipeline-framegraph-demo.webp" />
+          <img data-responsive-preview class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Procedural District" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -344,19 +357,35 @@ blackbody-inspired ramp so brightness lives in scene-relative HDR units, not dis
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>4 published images</code></div>
     <div class="gallery">
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="Procedural Materials — Generated lava-cause asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="Procedural Materials — Generated lava-cause asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated lava-cause asset preview</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/no-post.design.png" alt="Procedural Materials — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/no-post.design.png" alt="Procedural Materials — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Asset-preview baseline</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png" alt="Procedural Materials — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png" alt="Procedural Materials — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated-asset channel diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/temporal.t001.png" alt="Procedural Materials — Asset-preview parameter variation" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/temporal.t001.png" alt="Procedural Materials — Asset-preview parameter variation" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Asset-preview parameter variation</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
@@ -778,7 +807,11 @@ tone mapping, or final image ownership. Use <code>$threejs-scalable-real-time-sh
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/materials-generated-lava-causes/"><figure>
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="Live generated asset preview screenshot for Lava Cause Material; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/final.design.png" alt="Live generated asset preview screenshot for Lava Cause Material; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Lava Cause Material</strong><span>Generated asset preview · Generated lava maps are reduced-tier diagnostic inputs. The production material path remains NodeMaterial PBR slots with HDR emissive and BloomNode ownership.</span></figcaption>
       </figure></a>
     </div>

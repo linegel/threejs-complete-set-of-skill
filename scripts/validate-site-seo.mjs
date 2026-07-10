@@ -14,6 +14,13 @@ const ARTICLE_IMAGE_SPECS = [
   { id: '16x9', width: 1200, height: 675 },
 ];
 const errors = [];
+const responsiveSourcesSeen = new Set();
+let responsiveManifest = { sources: {} };
+try {
+  responsiveManifest = JSON.parse(readFileSync(join(DOCS, 'seo', 'responsive-images.json'), 'utf8'));
+} catch (error) {
+  errors.push(`responsive image manifest is missing or invalid (${error.message})`);
+}
 
 function assert(condition, message) {
   if (!condition) errors.push(message);
@@ -116,6 +123,7 @@ function validateIndexablePage(path, expectedUrl, {
   requireCatalog = false,
   requireDemoShell = false,
   requireAbout = false,
+  requireResponsivePreviews = false,
 } = {}) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
@@ -209,10 +217,56 @@ function validateIndexablePage(path, expectedUrl, {
     assert(/<nav\b[^>]*aria-label=["']Demo documentation and provenance["']/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks provenance navigation`);
   }
   if (validateImages) {
-    for (const [tag] of matches(html, /<img\b[^>]*>/gi)) {
+    const imageTags = matches(html, /<img\b[^>]*>/gi).map(([tag]) => tag);
+    for (const tag of imageTags) {
       assert(attribute(tag, 'alt') !== null, `${label}: image lacks alt text (${tag.slice(0, 100)})`);
       assert(/^\d+$/.test(attribute(tag, 'width') ?? ''), `${label}: image lacks intrinsic width (${attribute(tag, 'src')})`);
       assert(/^\d+$/.test(attribute(tag, 'height') ?? ''), `${label}: image lacks intrinsic height (${attribute(tag, 'src')})`);
+    }
+    if (requireResponsivePreviews) {
+      const pictures = matches(html, /<picture\b[^>]*class=["'][^"']*\bresponsive-preview\b[^"']*["'][^>]*>([\s\S]*?)<\/picture>/gi);
+      assert(pictures.length === imageTags.length, `${label}: expected ${imageTags.length} responsive picture wrappers, found ${pictures.length}`);
+      for (const [, body] of pictures) {
+        const sources = matches(body, /<source\b[^>]*>/gi).map(([tag]) => tag);
+        const image = body.match(/<img\b[^>]*>/i)?.[0];
+        assert(sources.length === 2, `${label}: responsive picture must contain exactly AVIF and WebP sources`);
+        assert(attribute(sources[0] ?? '', 'type') === 'image/avif', `${label}: AVIF must be the first responsive source`);
+        assert(attribute(sources[1] ?? '', 'type') === 'image/webp', `${label}: WebP must be the second responsive source`);
+        assert(Boolean(image && /\bdata-responsive-preview(?:\s|=)/i.test(image)), `${label}: responsive PNG fallback lacks data-responsive-preview`);
+        const fallback = attribute(image ?? '', 'src');
+        const avif = attribute(sources[0] ?? '', 'srcset');
+        const webp = attribute(sources[1] ?? '', 'srcset');
+        assert(Boolean(fallback && /\.png$/i.test(fallback)), `${label}: responsive fallback is not PNG`);
+        assert(avif === fallback?.replace(/\.png$/i, '.avif'), `${label}: AVIF source does not match PNG fallback ${fallback}`);
+        assert(webp === fallback?.replace(/\.png$/i, '.webp'), `${label}: WebP source does not match PNG fallback ${fallback}`);
+        if (!fallback) continue;
+        const fallbackPath = localPathForUrl(new URL(fallback, expectedUrl).href);
+        const key = fallbackPath ? relative(DOCS, fallbackPath).split('\\').join('/') : null;
+        const record = key ? responsiveManifest.sources?.[key] : null;
+        responsiveSourcesSeen.add(key);
+        assert(Boolean(record), `${label}: ${fallback} is missing from the responsive image manifest`);
+        if (!record || !fallbackPath) continue;
+        const fallbackDimensions = pngDimensions(fallbackPath);
+        assert(record.width === fallbackDimensions?.width && record.height === fallbackDimensions?.height, `${label}: manifest dimensions drift for ${fallback}`);
+        assert(record.bytes === statSync(fallbackPath).size, `${label}: manifest PNG byte size drift for ${fallback}`);
+        for (const [format, relativeUrl] of [['avif', avif], ['webp', webp]]) {
+          const formatUrl = relativeUrl ? new URL(relativeUrl, expectedUrl).href : null;
+          const formatPath = formatUrl ? localPathForUrl(formatUrl) : null;
+          const formatRecord = record.formats?.[format];
+          assert(Boolean(formatPath && existsSync(formatPath)), `${label}: ${format.toUpperCase()} file is missing for ${fallback}`);
+          assert(formatRecord?.url === formatUrl, `${label}: manifest ${format.toUpperCase()} URL drift for ${fallback}`);
+          assert(formatRecord?.width === record.width && formatRecord?.height === record.height, `${label}: ${format.toUpperCase()} dimensions drift for ${fallback}`);
+          if (formatPath && existsSync(formatPath)) {
+            assert(formatRecord?.bytes === statSync(formatPath).size, `${label}: manifest ${format.toUpperCase()} byte size drift for ${fallback}`);
+            assert(statSync(formatPath).size < statSync(fallbackPath).size, `${label}: ${format.toUpperCase()} is not smaller than PNG for ${fallback}`);
+          }
+        }
+      }
+      if (/class=["'][^"']*\bskill-hero-bg\b/i.test(html)) {
+        const preload = matches(html, /<link\b[^>]*>/gi).map(([tag]) => tag)
+          .find((tag) => attribute(tag, 'rel') === 'preload' && attribute(tag, 'as') === 'image');
+        assert(attribute(preload ?? '', 'type') === 'image/avif' && /\.avif$/i.test(attribute(preload ?? '', 'href') ?? ''), `${label}: skill hero preload is not AVIF`);
+      }
     }
   }
   return {
@@ -267,6 +321,7 @@ for (const url of pageUrls) {
     requireCatalog: isHome,
     requireDemoShell: isDemo,
     requireAbout: isAbout,
+    requireResponsivePreviews: isHome || isSkill,
   });
   pageRecords.push({ url, ...record });
 }
@@ -275,6 +330,11 @@ for (const url of pageUrls.filter((value) => new URL(value).pathname.startsWith(
   const slug = new URL(url).pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
   assert(sitemap.includes(`<image:loc>${SITE}seo/article/${slug}-16x9.png</image:loc>`), `sitemap.xml: ${slug} is missing its 16:9 Article image`);
 }
+const responsiveManifestSources = Object.keys(responsiveManifest.sources ?? {});
+assert(responsiveManifest.generatedBy === 'scripts/generate-responsive-images.mjs', 'responsive image manifest: unexpected generator identity');
+assert(responsiveManifestSources.length > 0, 'responsive image manifest: no source images');
+assert(responsiveManifestSources.length === responsiveSourcesSeen.size, `responsive image manifest: ${responsiveManifestSources.length} entries but ${responsiveSourcesSeen.size} are referenced`);
+for (const source of responsiveManifestSources) assert(responsiveSourcesSeen.has(source), `responsive image manifest: stale source ${source}`);
 
 for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
   for (const urls of duplicateValues(pageRecords, key)) {

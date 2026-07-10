@@ -8,6 +8,7 @@ const ARTICLE_IMAGE_RATIOS = ['1x1', '4x3', '16x9'];
 const errors = [];
 const pageRecords = [];
 const structuredImageUrls = new Set([PUBLISHER_LOGO]);
+const responsiveImageTypes = new Map();
 
 function assert(condition, message) {
   if (!condition) errors.push(message);
@@ -28,6 +29,10 @@ function metaValues(html, attribute, value) {
   return tags
     .filter((tag) => get(tag, attribute)?.toLowerCase() === value.toLowerCase())
     .map((tag) => get(tag, 'content'));
+}
+
+function tagAttribute(tag, name) {
+  return tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'))?.[1] ?? null;
 }
 
 function canonicals(html) {
@@ -186,6 +191,7 @@ await mapConcurrent(urls, async (url) => {
   assert(robotsMeta.length === 1 && /\bindex\b/i.test(robotsMeta[0]) && !/\bnoindex\b/i.test(robotsMeta[0]), `${url}: not explicitly indexable`);
   assert(canonical.length === 1 && canonical[0] === url, `${url}: canonical mismatch (${canonical.join(', ') || 'missing'})`);
   assert(metaValues(html, 'property', 'og:url')[0] === url, `${url}: og:url mismatch`);
+  assert(/\.png$/i.test(metaValues(html, 'property', 'og:image')[0] ?? ''), `${url}: social image is not preserved as PNG`);
   assert(metaValues(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${url}: missing large Twitter card`);
   assert(!html.includes(RETIRED_SITE), `${url}: contains the retired origin`);
 
@@ -203,6 +209,24 @@ await mapConcurrent(urls, async (url) => {
     assert(/\bdata-owning-skill=["'][^"']+["']/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks owning-skill identity`);
     assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks mechanism inventory`);
     assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${url}: demo shell lacks evidence status`);
+  }
+  if (pathname === '/' || pathname.startsWith('/skills/')) {
+    const imageTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
+    const pictures = [...html.matchAll(/<picture\b[^>]*class=["'][^"']*\bresponsive-preview\b[^"']*["'][^>]*>([\s\S]*?)<\/picture>/gi)];
+    assert(pictures.length === imageTags.length, `${url}: expected ${imageTags.length} responsive picture wrappers, found ${pictures.length}`);
+    for (const [, body] of pictures) {
+      const sources = [...body.matchAll(/<source\b[^>]*>/gi)].map((match) => match[0]);
+      const fallback = body.match(/<img\b[^>]*>/i)?.[0];
+      assert(sources.length === 2, `${url}: responsive picture does not contain two sources`);
+      assert(tagAttribute(sources[0] ?? '', 'type') === 'image/avif', `${url}: AVIF is not the first responsive source`);
+      assert(tagAttribute(sources[1] ?? '', 'type') === 'image/webp', `${url}: WebP is not the second responsive source`);
+      assert(/\.png$/i.test(tagAttribute(fallback ?? '', 'src') ?? ''), `${url}: responsive fallback is not PNG`);
+      for (const source of sources) {
+        const srcset = tagAttribute(source, 'srcset');
+        const type = tagAttribute(source, 'type');
+        if (srcset && type) responsiveImageTypes.set(new URL(srcset, url).href, type);
+      }
+    }
   }
   const expectedType = pathname === '/'
     ? 'WebSite'
@@ -246,6 +270,11 @@ await mapConcurrent([...structuredImageUrls], async (url) => {
   assert(response.status === 200, `${url}: structured image returned ${response.status}`);
   assert(response.headers.get('content-type')?.startsWith('image/png'), `${url}: structured image is not served as PNG`);
 });
+await mapConcurrent([...responsiveImageTypes], async ([url, expectedType]) => {
+  const response = await request(url, { method: 'HEAD', redirect: 'manual' });
+  assert(response.status === 200, `${url}: responsive image returned ${response.status}`);
+  assert(response.headers.get('content-type')?.startsWith(expectedType), `${url}: responsive image is not served as ${expectedType}`);
+});
 
 for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
   for (const owners of duplicateValues(pageRecords, key)) {
@@ -281,5 +310,5 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Live SEO audit passed: ${urls.length} sitemap pages, ${structuredImageUrls.size} structured images, 3 permanent redirects, 2 LLM endpoints, and 1 crawl-safe 404.`);
+  console.log(`Live SEO audit passed: ${urls.length} sitemap pages, ${structuredImageUrls.size} structured images, ${responsiveImageTypes.size} modern preview variants, 3 permanent redirects, 2 LLM endpoints, and 1 crawl-safe 404.`);
 }
