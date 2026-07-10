@@ -120,6 +120,9 @@ physicsErrorPropagationLedgers: {}
 physicsInteractions: []
 physicsInteractionApplicationLedgers: {}
 physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
 physicsQualityTransitions: []
 physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used

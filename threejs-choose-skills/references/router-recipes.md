@@ -2592,13 +2592,23 @@ domainSignals:
   rayDiagnostics: { producer: $threejs-black-holes-and-space-effects, consumers: [validation] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
@@ -2691,13 +2701,23 @@ domainSignals:
   variantState: { producer: project configurator, consumers: [material/visibility binding, validation] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
@@ -2796,13 +2816,23 @@ domainSignals:
   valueMapping: { producer: application mapping policy, consumers: [material encoding, legend, validation] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
@@ -2897,13 +2927,23 @@ domainSignals:
   vectorField: { producer: scientific data layer, consumers: [glyphs, probes] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
@@ -2994,13 +3034,23 @@ domainSignals:
   semanticHierarchy: { producer: project BIM layer, consumers: [visibility, picking, section, validation] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
@@ -3094,13 +3144,23 @@ domainSignals:
   timeAndStaleness: { producer: application twin layer, consumers: [interpolation, display, validation] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
@@ -3193,13 +3253,23 @@ domainSignals:
   deformationState: { producer: $threejs-procedural-motion-systems, consumers: [geometry/material, validation] }
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
+physicsQualityRequests: {}
+physicsQualityStates: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 physicsPresentationSnapshot: not used # deprecated compatibility projection; never allocated
 outputOwnersByPresentationTarget:
