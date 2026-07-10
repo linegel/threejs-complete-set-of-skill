@@ -214,6 +214,25 @@ These are final downstream commits after all source commits they describe.
 
 F05 and F06 must not be generated from a dirty or changing source tree.
 
+### Interim presentation correction — does not close F06
+
+The ornamental/related-preview regression was corrected before the canonical
+source freeze because it materially misrepresented unfinished labs on the
+public presentation surface. These commits are deliberately recorded outside
+F06; the accepted catalog must still be regenerated after F01–F05 pass without
+drift.
+
+| Commit | Boundary | Verification |
+| --- | --- | --- |
+| `6c34265` | evidence-first generator and methodology route | desktop and 390×844 visual inspection; exact primary-preview source policy |
+| `1779978` | unrelated-preview regression gate | presentation validator rejects related-skill primary media |
+| `4bd64cd` | optional hero markup cleanup | generated-output whitespace check |
+| `010b0b3` | provisional generated catalog | Pages build, 93-page SEO, 39-primary presentation, and 98-route smoke pass |
+
+`010b0b3` is not an acceptance or deployment claim. The pack-wide source-hash
+gate still reports the previously recorded registry and router-proxy drift, so
+F06 remains open.
+
 ## Final clean-checkout gate
 
 After the ledger is complete, run exactly:
