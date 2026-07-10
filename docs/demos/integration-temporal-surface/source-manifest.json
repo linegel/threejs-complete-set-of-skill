@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "labId": "integration-temporal-surface",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/temporal-surface-integration.js",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/browser-host.js",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/route-state.mjs",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/main.js",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/index.html",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/validate-integration.mjs",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface/test-mutations.mjs",
+    "README.md"
+  ],
+  "sourceHashInputs": [
+    "README.md",
+    "threejs-dynamic-surface-effects/examples/integration-temporal-surface",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js"
+  ],
+  "browserEntry": "threejs-dynamic-surface-effects/examples/integration-temporal-surface/index.html",
+  "sourceHash": "sha256:0964e514ce075881516482b6c4141498bcba40ff1a4823b9ceb473cfc1daba8e",
+  "publishedHashInputs": [
+    "docs/demos/integration-temporal-surface",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:f8c0fed88a5d58f9607f795f27d0841fcd0b42d29857ca32a1c1bedd2fcbd6ab",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

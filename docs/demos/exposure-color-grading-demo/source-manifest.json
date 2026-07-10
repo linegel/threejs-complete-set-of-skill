@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "exposure-color-grading-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:aae11b11004a57015726c6caba0c65b4aaabfdd23493b8980f4ddf8ca83c0e23",
+  "publishedHashInputs": [
+    "docs/demos/exposure-color-grading-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:652e00fbd2c81cb978f34c73c42858d79a7e632a854cc1c73c7c0adfc89ec565",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

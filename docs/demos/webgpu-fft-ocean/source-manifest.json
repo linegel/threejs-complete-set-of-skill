@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-fft-ocean",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-spectral-ocean/examples/webgpu-fft-ocean"
+  ],
+  "sourceHashInputs": [
+    "threejs-spectral-ocean/examples/webgpu-fft-ocean"
+  ],
+  "browserEntry": "threejs-spectral-ocean/examples/webgpu-fft-ocean/index.html",
+  "sourceHash": "sha256:747f813c18711c5f4a56a092af254831aef8ec4fed2a036bcee63e9a19029d2f",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-fft-ocean",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:9cb5dd02024df1b272f3fedf0a074e9b932a1745d168c747c616d54147d7808f",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

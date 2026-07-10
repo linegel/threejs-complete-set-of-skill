@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-shadow-pipeline-integration",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/main.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/index.html",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical-lab.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical-lab.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/routes.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration"
+  ],
+  "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/index.html",
+  "sourceHash": "sha256:27394576b055625138a3c3ca1d2b9a5e5e34dbe53b36d8ddb2bcdb0bd066dab8",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-shadow-pipeline-integration",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:099b559197b37663c7128b09eb97891e2f28e5681e5f27401e8524a18e4d9578",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

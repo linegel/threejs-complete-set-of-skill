@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebGPU Touch History Frost | Three.js WebGPU Demo</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #07101d; color: #e3f2ff; font: 13px/1.4 ui-monospace, monospace; overflow: hidden; }
+    canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+    aside { position: fixed; inset: 12px auto auto 12px; width: min(410px, calc(100vw - 48px)); padding: 12px; border: 1px solid #91c8ff35; border-radius: 8px; background: #081522df; backdrop-filter: blur(12px); }
+    header { font-weight: 700; margin-bottom: 8px; }
+    label { display: grid; grid-template-columns: 9.5rem 1fr; align-items: center; gap: 8px; margin: 6px 0; }
+    select, button { width: 100%; color: inherit; background: #102237; border: 1px solid #7a9fc044; border-radius: 4px; padding: 5px; }
+    pre { max-height: 26vh; overflow: auto; margin: 10px 0 0; color: #a9d8ff; font-size: 10px; }
+    small { color: #a5b7c9; display: block; }
+  </style>
+
+  <meta name="lab-id" content="webgpu-touch-history-frost">
+  <meta name="acceptance-status" content="incomplete">
+  <style>.lab-status-banner{position:fixed;z-index:2147483647;top:10px;left:50%;transform:translateX(-50%);max-width:min(800px,calc(100vw - 20px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.95);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.lab-status-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Touch History Frost, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/webgpu-touch-history-frost/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="WebGPU Touch History Frost | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Touch History Frost, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta property="og:url" content="https://threejs-skills.com/demos/webgpu-touch-history-frost/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WebGPU Touch History Frost | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Touch History Frost, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/webgpu-touch-history-frost/#demo","name":"WebGPU Touch History Frost","description":"Interactive Three.js WebGPU/TSL demo for WebGPU Touch History Frost, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.","url":"https://threejs-skills.com/demos/webgpu-touch-history-frost/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Dynamic Surface Effects"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Dynamic Surface Effects","item":"https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html"},{"@type":"ListItem","position":3,"name":"WebGPU Touch History Frost","item":"https://threejs-skills.com/demos/webgpu-touch-history-frost/"}]}]}</script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/node_modules/three/build/three.webgpu.js",
+      "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+      "three/tsl": "/node_modules/three/build/three.tsl.js",
+      "three/addons/": "/node_modules/three/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" crossorigin src="../assets/index-cTvVoTiJ.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BLzGo2sq.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl-Bsul1SiG.js">
+  <link rel="modulepreload" crossorigin href="../assets/frost-surface-effect-DPa4780b.js">
+</head>
+<body><aside class="lab-status-banner"><strong>Canonical lab incomplete.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../registry.json">Registry</a>.</aside>
+  <canvas aria-label="Native WebGPU touch-history frost lab"></canvas>
+  <aside>
+    <header>Touch-history frost — native WebGPU</header>
+    <small>Drag across the viewport. Pointer capsules update RGBA16F ping-pong history before the same frame’s frost/refraction composite.</small>
+    <label>mechanism <select data-mechanism></select></label>
+    <label>tier <select data-tier></select></label>
+    <label>diagnostic <select data-mode></select></label>
+    <label>history <button data-clear type="button">clear both ping-pong textures</button></label>
+    <pre data-status>initializing WebGPU…</pre>
+  </aside>
+</body>
+</html>

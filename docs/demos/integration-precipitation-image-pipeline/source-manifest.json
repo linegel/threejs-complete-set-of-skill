@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "labId": "integration-precipitation-image-pipeline",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/precipitation-image-pipeline-integration.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/browser-host.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/route-state.mjs",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/main.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/index.html",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/validate-integration.mjs",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/test-mutations.mjs",
+    "README.md"
+  ],
+  "sourceHashInputs": [
+    "README.md",
+    "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js"
+  ],
+  "browserEntry": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/index.html",
+  "sourceHash": "sha256:fd1c8e3d52557e281c4b2fb7c4ab4c4ecbc4729936a7021bdb3265a0065a3a1a",
+  "publishedHashInputs": [
+    "docs/demos/integration-precipitation-image-pipeline",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:d6239d1d18ea58a48efe578658c7cd187f4e4609a85b0610f530e97a773d05b8",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

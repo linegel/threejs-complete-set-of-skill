@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "procedural-motion-timeline-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:577c7252836a83e69bef32c47b612a4baca536bb035cd3aa1d63d472acc447ef",
+  "publishedHashInputs": [
+    "docs/demos/procedural-motion-timeline-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:57c10d8176882c285d319e6dff2f7b50747b47888df9ca1b473c33bc67fda029",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ambient Contact Shading — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html" />
+<title>Ambient Contact Shading | Three.js WebGPU Skill</title>
+<meta name="description" content="Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Ambient Contact Shading — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:title" content="Ambient Contact Shading | Three.js WebGPU Skill" />
+<meta property="og:description" content="Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Ambient Contact Shading visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Ambient Contact Shading visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Ambient Contact Shading evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Ambient Contact Shading evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Ambient Contact Shading — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions." />
+<meta name="twitter:title" content="Ambient Contact Shading | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Ambient Contact Shading — Three.js WebGPU agent skill",
-   "description": "Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
-   "dateModified": "2026-07-05T01:26:21+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html#article",
+   "headline": "Ambient Contact Shading | Three.js WebGPU Skill",
+   "description": "Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.",
+   "url": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Cameras, Lighting, and Final Image",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Ambient Contact Shading",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html"
+     "item": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="">
   
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Ambient Contact Shading</p>
-    <h1>Ambient Contact Shading</h1>
-    <p class="lede">Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Ambient Contact Shading</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-ambient-contact-shading">Ambient Contact Shading</h1>
+    <p class="lede">Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-ambient-contact-shading</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">1 runnable example</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T01:26:21+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/31e7f1869609ecadb9461d76265e07613db36764">commit 31e7f18 ↗</a>
+      <span class="chip">2 primary implementations</span>
+<span class="chip">2 flagships</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-ambient-contact-shading/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,178 +275,41 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/ambient-contact-shading-demo/"><figure>
-        <div class="live-visual live-visual--ao" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
-        <strong>AO.r + direct light separation</strong>
-        <span class="lv-m">final / no-ao / ao-debug</span>
-      </div>
-        <figcaption><strong>Ambient Contact Shading Lab</strong><span>Ambient contact visibility grounds nearby surfaces while direct light and emissive terms stay readable.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-ambient-contact-shading/examples/webgpu-node-gtao">
-        <h4>webgpu-node-gtao</h4>
-        <span class="card-meta">threejs-ambient-contact-shading/examples/webgpu-node-gtao</span>
+      <a class="card" href="../demos/integration-image-pipeline-ao/">
+        <span class="card-head"><span class="card-index">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Image Pipeline and Material-context AO Integration</h3>
+        <p>2 fixed scenarios, 3 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
+      </a>
+      <a class="card" href="../demos/webgpu-node-gtao/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>WebGPU Node GTAO</h3>
+        <p>7 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Ambient Contact Shading</h2>
-<p>AO is ambient visibility. It reduces indirect diffuse and environment response;
-it must not darken direct light, emission, or the final tone-mapped image.</p>
-<p>Use <code>$threejs-choose-skills</code> for preflight when AO interacts with a broader
-graphics stack. Use <code>$threejs-image-pipeline</code> when depth, normal, velocity,
-MRT ownership, tone mapping, or output color conversion must be coordinated
-with bloom, grading, shadows, SSGI, or other image-space systems.</p>
-<h2>Architecture First</h2>
-<p>Start with the highest-throughput path:</p>
-<ol>
-<li>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>,
-<code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, and the <code>NodeMaterial</code> family such as
-<code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code>.</li>
-<li>Render one scene pass with MRT output for color and view normals; consume
-the pass depth texture directly.</li>
-<li>Build AO with the official <code>ao()</code> / <code>GTAONode</code> baseline. It is the fastest
-correct default because Three.js owns the r185-era node integration,
-internal targets, depth/normal reconstruction behavior, and frame updates.</li>
-<li>Set AO to half linear resolution with <code>resolutionScale = 0.5</code> or
-<code>setResolutionScale(0.5)</code> where the pass owns scaling, then reconstruct at
-full resolution with depth- and normal-aware filtering.</li>
-<li>Enable <code>GTAONode.useTemporalFiltering</code> only when the app already uses
-<code>TRAANode</code> with valid depth and velocity. Otherwise prefer optional
-<code>DenoiseNode</code> or a cheaper spatial preset over unmanaged history.</li>
-<li>Apply scalar AO through material or node-pipeline ambient visibility before
-tone mapping. Keep HDR buffers as <code>HalfFloatType</code> until the single output
-transform.</li>
-<li>Add a custom TSL bent-normal/horizon extension only when directional
-ambient tint, diagnostics, or a proven scene-specific quality/performance
-win beats the built-in scalar <code>GTAONode</code>.</li>
-</ol>
-<p>Read <a href="references/gtao-bent-normal-pipeline.md">references/gtao-bent-normal-pipeline.md</a>.</p>
-<h2>Capability Gate</h2>
-<p>Every implementation initializes the renderer and gates features by backend
-capability.</p>
-<pre><code class="language-js">await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend ) {
-  // Full tier: GTAONode, MRT normals, TRAANode/DenoiseNode, optional storage extension.
-} else {
-  throw new Error( &#39;threejs-ambient-contact-shading requires WebGPU; route explicit fallback requests to threejs-compatibility-fallbacks.&#39; );
-}
-</code></pre>
-<p>Legacy WebGL implementation (deprecated, do not extend): none in this folder;
-explicit requests for how to apply fallback when WebGPU is unavailable route to
-<code>../threejs-compatibility-fallbacks/</code>.</p>
-<h2>WebGPU Quality Tiers</h2>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th>Use</th>
-<th>Settings</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Ultra</td>
-<td>Desktop discrete GPU, cinematic close inspection</td>
-<td><code>GTAONode</code>, MRT normals, temporal filtering through <code>TRAANode</code>, half-res AO, optional <code>DenoiseNode</code>, custom bent-normal extension only after validation</td>
-</tr>
-<tr>
-<td>High</td>
-<td>Desktop integrated GPU and normal production default</td>
-<td><code>GTAONode</code>, MRT normals, <code>resolutionScale = 0.5</code>, normal-aware bilateral reconstruction, no directional tint unless required</td>
-</tr>
-<tr>
-<td>Medium</td>
-<td>WebGPU mobile or thermally constrained devices</td>
-<td><code>GTAONode</code>, depth-reconstructed normals if MRT pressure is too high, fewer samples, half/quarter-res AO, no temporal history unless ghosting tests pass</td>
-</tr>
-</tbody></table>
-<h2>Performance Budgets</h2>
-<p>Target AO as a small part of the post stack:</p>
-<table>
-<thead>
-<tr>
-<th>Target</th>
-<th align="right">Full-resolution output</th>
-<th align="right">AO resolution</th>
-<th align="right">Budget</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Desktop discrete</td>
-<td align="right">2560x1440 DPR 1</td>
-<td align="right">1280x720</td>
-<td align="right">0.6-1.2 ms scalar GTAO, 1.2-2.0 ms with denoise/temporal</td>
-</tr>
-<tr>
-<td>Desktop integrated</td>
-<td align="right">1920x1080 DPR 1</td>
-<td align="right">960x540</td>
-<td align="right">0.8-1.8 ms scalar GTAO, &lt;= 2.5 ms with denoise</td>
-</tr>
-<tr>
-<td>Mobile/high-DPR tablet</td>
-<td align="right">1920x1080 effective</td>
-<td align="right">960x540 or 480x270</td>
-<td align="right">1.0-2.5 ms, dynamic scale down before sample count rises</td>
-</tr>
-</tbody></table>
-<p>Budgets include AO gather, denoise or reconstruction, and composite. Track pass
-count, draw calls, target size, texture formats, and disabled-AO bypass cost.
-Do not increase samples before proving half-resolution scaling, temporal
-filtering, and bilateral reconstruction are already exhausted.</p>
-<h2>Color And Output</h2>
-<ul>
-<li>Color textures use <code>SRGBColorSpace</code>; depth, normal, AO, bent-normal, velocity,
-mask, noise, and LUT data stay linear with <code>NoColorSpace</code> unless a specific
-node API owns conversion.</li>
-<li>Keep AO and intermediate post buffers in HDR-compatible linear targets;
-prefer <code>HalfFloatType</code> where range matters.</li>
-<li>The app has one tone-map owner and one output conversion owner. In the node
-post pipeline, <code>RenderPipeline.outputColorTransform</code> or <code>renderOutput()</code> owns
-final conversion; AO nodes never double-convert.</li>
-</ul>
-<h2>Failure Conditions</h2>
-<ul>
-<li>AO multiplies final scene color instead of indirect/environment visibility.</li>
-<li>Direct light, emissive materials, UI, or bloom-fed highlights become gray.</li>
-<li>Radius is specified only in pixels rather than projected from world units.</li>
-<li>Foreground silhouettes cast thick screen-space halos.</li>
-<li>Depth discontinuities are blurred together because normal-aware bilateral
-weights were omitted.</li>
-<li>AO remains strong at distances where its world radius is subpixel.</li>
-<li>Temporal filtering is enabled without valid velocity, depth rejection,
-history invalidation, and camera-cut reset.</li>
-<li>Bent normals are used for lighting before the one-wall validation proves the
-decoded direction turns away from the blocked hemisphere.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>This skill owns GTAO configuration, AO quality tiers, scalar ambient-visibility
-application, optional custom bent-normal gathering, denoising, and halo
-diagnosis. <code>$threejs-image-pipeline</code> owns shared depth/normal/velocity buffers,
-global pass order, tone mapping, output conversion, and multi-effect MRT reuse.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-water-optics.html">← Water Optics</a>
-    <a href="threejs-black-holes-and-space-effects.html">Black Holes and Space Effects →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/final-image-flight/">
+        <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Final Image Flight</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/procedural-district/">
+        <span class="card-head"><span class="card-index">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Procedural District</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -408,10 +326,357 @@ $w = w_{spatial}\cdot\exp\!\big(-|z - z_c|/\sigma_z\big)$, and the result modula
 indirect diffuse term of the lighting equation — the composition point is the contract.</p></div>
   </div></div>
 
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Ambient Contact Shading</h2>
+<p>AO is visibility of indirect illumination. It may attenuate indirect diffuse and
+environment/specular response; it must not multiply direct light, emission, UI,
+or a tone-mapped frame.</p>
+<p>Use <code>$threejs-choose-skills</code> for renderer and budget preflight. Use
+<code>$threejs-image-pipeline</code> when depth, normal, velocity, history, tone mapping,
+or adaptive resolution are shared.</p>
+<h2>Numeric provenance</h2>
+<p>Every quantitative claim is tagged:</p>
+<ul>
+<li><strong>[Derived]</strong> follows from r185 source or an explicit formula.</li>
+<li><strong>[Gated]</strong> is a branch condition that must pass on the target scene/device.</li>
+<li><strong>[Measured]</strong> is recorded target-device evidence, never a portable promise.</li>
+<li><strong>[Authored]</strong> is a starting value or planning ceiling, not a fact of hardware.</li>
+</ul>
+<p>Release numbers and list ordering are identifiers, not tuning claims.</p>
+<h2>Decide whether screen AO is the right algorithm</h2>
+<p>Use the first row whose gate passes:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Algorithm</th>
+<th>Gate and consequence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Static or slowly changing local occlusion can be authored in assets</td>
+<td>material <code>aoMap</code> / <code>aoNode</code></td>
+<td>Prefer it: one forward scene render and correct lighting placement. Dynamic inter-object contact is absent.</td>
+</tr>
+<tr>
+<td>The renderer already exposes an indirect-light term or uses deferred lighting</td>
+<td>apply GTAO visibility to that term</td>
+<td>One geometry pass can remain possible; the lighting decomposition owns correctness.</td>
+</tr>
+<tr>
+<td>Stock r185 forward <code>NodeMaterial</code> lighting and dynamic screen contact are required</td>
+<td>depth/normal pass -&gt; GTAO -&gt; optional reconstruction -&gt; second lit pass with <code>builtinAOContext()</code></td>
+<td>Correct placement costs a second scene traversal and shaded scene render. Accept only when <code>measuredMarginalAO &lt;= declaredMarginalAOBudget</code> <strong>[Gated]</strong>.</td>
+</tr>
+<tr>
+<td>The previous rows fail their quality or budget gate</td>
+<td>omit screen AO</td>
+<td>Keep direct shadows, materials, and silhouette readable. Do not replace ambient visibility with a final-color multiply.</td>
+</tr>
+</tbody></table>
+<p>The second lit pass is not an implementation detail. r185 <code>GTAONode</code> needs
+current depth/normal before AO exists, while <code>builtinAOContext()</code> must be present
+when materials are lit. A single stock forward pass cannot satisfy both
+dependencies. If the first pass exists only for AO, count its color attachment,
+material evaluation, deformation, alpha testing, draw submission, and depth/
+normal writes; calling it a cheap prepass is incorrect.</p>
+<h2>r185 API proof and non-negotiable constraints</h2>
+<p>Verified against installed <code>three@0.185.1</code> <strong>[Measured]</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Local proof</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ao(depthNode, normalNode, camera)</code> exists; <code>normalNode</code> may be <code>null</code></td>
+<td><code>examples/jsm/tsl/display/GTAONode.js</code></td>
+<td>Use the built-in node as the scalar baseline.</td>
+</tr>
+<tr>
+<td><code>GTAONode.resolutionScale</code> is a property; it has no <code>setResolutionScale()</code></td>
+<td>same source</td>
+<td>Assign the property directly.</td>
+</tr>
+<tr>
+<td>Scalar AO target is <code>RedFormat</code>; its default scale is <code>1</code> <strong>[Derived]</strong></td>
+<td>same source</td>
+<td>Scalar visibility does not need an HDR RGBA target. Start below full resolution only with a reconstruction/temporal plan.</td>
+</tr>
+<tr>
+<td><code>DenoiseNode</code> is an inline node with center plus <code>16</code> neighbor samples <strong>[Derived]</strong></td>
+<td><code>DenoiseNode.js</code></td>
+<td>If inserted directly into a material context, its taps execute per shaded fragment. Materialize once with <code>rtt()</code> when a full-screen reconstruction pass is intended.</td>
+</tr>
+<tr>
+<td>Depth-normal reconstruction performs <code>9</code> depth loads per normal evaluation <strong>[Derived]</strong></td>
+<td><code>src/nodes/utils/PostProcessingUtils.js</code></td>
+<td>Reconstructing normals is not free; avoid it inside a <code>17</code>-sample denoise.</td>
+</tr>
+<tr>
+<td><code>useTemporalFiltering</code> only rotates the GTAO pattern; <code>TRAANode</code> supplies history/reprojection</td>
+<td><code>GTAONode.js</code>, <code>TRAANode.js</code></td>
+<td>Never enable it without a live TRAA resolve.</td>
+</tr>
+<tr>
+<td>r185 <code>GTAONode</code> has no reversed-depth branch and rejects sky with <code>depth &gt;= 1</code> <strong>[Derived]</strong></td>
+<td><code>GTAONode.js</code></td>
+<td>Stock GTAO is gated to non-reversed depth. Do not claim reversed-depth support without a tested custom adapter/node.</td>
+</tr>
+<tr>
+<td><code>TRAANode</code> restarts history on resize but exposes no public camera-cut reset <strong>[Derived]</strong></td>
+<td><code>TRAANode.js</code></td>
+<td>On a camera/projection discontinuity, replace and dispose the TRAA node, replace the output graph, and set <code>RenderPipeline.needsUpdate = true</code>.</td>
+</tr>
+<tr>
+<td><code>builtinAOContext()</code> skips transparent materials <strong>[Derived]</strong></td>
+<td><code>src/nodes/core/ContextNode.js</code></td>
+<td>Transparent indirect occlusion needs an authored material policy; do not assume the context affects it.</td>
+</tr>
+<tr>
+<td>A texture node without an explicit coordinate falls back to mesh <code>uv()</code> in a material graph <strong>[Derived]</strong></td>
+<td><code>src/nodes/accessors/TextureNode.js</code>, <code>UV.js</code></td>
+<td>Feed the context <code>visibilityTexture.sample(screenUV).r</code>; using <code>.r</code> directly maps AO through each mesh&#39;s UVs.</td>
+</tr>
+</tbody></table>
+<p>Initialize and hard-gate WebGPU before graph construction:</p>
+<pre><code class="language-js">await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;threejs-ambient-contact-shading requires WebGPU.&#39; );
+}
+
+if ( renderer.reversedDepthBuffer === true ) {
+  throw new Error( &#39;r185 GTAONode baseline is not validated for reversed depth.&#39; );
+}
+</code></pre>
+<p>There is no non-WebGPU implementation in this skill.</p>
+<h2>Production graph</h2>
+<pre><code class="language-text">shared-or-AO-owned scene pass: depth + optional normal/velocity
+  -&gt; GTAONode scalar visibility
+  -&gt; optional materialized depth+normal-aware reconstruction
+  -&gt; second forward scene pass with builtinAOContext(visibility)
+  -&gt; optional TRAANode over final HDR beauty
+  -&gt; single tone-map/output-transform owner
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li>Share an existing depth/normal/velocity pass when it is already required. Do
+not create duplicate G-buffers.</li>
+<li>A half-scale raw AO texture receives only ordinary texture filtering when
+sampled at full resolution; that is not bilateral reconstruction.</li>
+<li>Use <code>rtt(denoise(...))</code> to materialize reconstruction once before the second
+scene pass. Directly embedding <code>denoise(...)</code> in <code>builtinAOContext()</code> repeats
+its taps over scene overdraw.</li>
+<li>Sample the materialized texture with <code>screenUV</code> before passing it to
+<code>builtinAOContext()</code>. Pass textures default to fullscreen <code>uv()</code> only while
+evaluated by a fullscreen quad; material evaluation otherwise resolves
+ordinary mesh UV attributes.</li>
+<li>Use the full-resolution normal MRT when reconstruction is enabled or when
+another effect already owns normals. For raw reduced-resolution GTAO alone,
+benchmark a normal attachment against depth reconstruction.</li>
+<li>Keep scalar visibility in a single channel. Use <code>RGBA16F</code> only when a custom
+bent direction and scalar visibility must coexist.</li>
+<li>Bypass inactive AO nodes. Zeroing strength while keeping dependencies in the
+output graph still executes work.</li>
+</ul>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md">references/gtao-bent-normal-pipeline.md</a>
+for the exact graph, tap model, memory equations, temporal contract, and bent-
+normal validation.</p>
+<h2>Physics Scale And Presentation Contract</h2>
+<p>When the route declares physical metre-scale contact, resolve AO distances
+through <code>PhysicsContext</code> and the current presentation transform in the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
+Let <code>sRender</code> be <code>CameraViewPublication.globalToRenderCurrent.renderUnitsPerMeter</code>:</p>
+<pre><code class="language-text">radiusRender    = radiusMeters    * sRender                  [Derived]
+thicknessRender = thicknessMeters * sRender                  [Derived]
+biasRender      = biasMeters      * sRender                  [Derived]
+</code></pre>
+<p>For the ordinary authored-world mapping, gate
+<code>sRender = 1 / PhysicsContext.metersPerWorldUnit</code>; a deliberate visualization
+rescale declares a new <code>RenderSimilarityTransform.transformRevision</code> and uses
+its exact dimensioned transform. <code>biasRender</code> applies only to a custom AO bias that is dimensionally a world
+distance; normalized-depth or angular biases retain their own declared units.
+If the route intentionally uses perceptual scene units, label radius,
+thickness, and bias as scene-unit-only and do not compare them across scaled
+assets, physics contexts, or rebases as metres. A static/stylistic route may use
+this mode without instantiating the physics ABI.</p>
+<p>Latch the immutable central <code>PhysicsPresentationSnapshot</code> and resolve its exact
+Candidate, <code>CameraViewPublication</code>, and <code>ViewPreparationPublication</code>; do not
+define an AO-local subset. AO, depth, velocity, camera, and downstream history
+consume candidate pair refs/signal descriptors, camera transforms/matrices, and
+the preparation reactive/reset plan from the same chain. Temporal velocity uses adjacent
+presented poses, never fixed-step endpoints. A compensated origin rebase keeps
+AO radius, depth, and motion invariant only when previous/current uniform scales
+are equal. A scale change converts AO parameters and resets/reseeds history; it
+is not an origin rebase.</p>
+<p>The Candidate supplies pose/deformation pairs, the camera publication supplies
+complete render transforms/matrices, and the Snapshot references both plus the
+preparation publication. Depth, normal, and velocity are target/view render-pass
+resources produced after sealing and carry their image-pipeline resource
+versions; never misclassify those attachments as physics provider signals.</p>
+<p>Reset/reject AO history for changed geometry/deformation/coverage, camera or
+projection discontinuity, uncompensated rebase, AO scale/parameter change, or
+quality/resolution migration. A shadow or emissive-only radiance change does
+not change scalar ambient visibility; preserve AO history, but propagate its
+radiance-reactive mask to a downstream color history only when that temporal
+implementation supports it. Stock r185 <code>TRAANode</code> does not; use evidenced
+rebuild/bypass/reseed or a conservative full reset. When no local mask can
+bound a geometry discontinuity, reset the affected history conservatively.
+<code>ViewPreparationPublication.resetDependencies</code> is immutable; append executed actions to
+<code>FrameExecutionRecord</code>. Device loss appends a <code>FrameExecutionRecord</code> with
+<code>overallStatus: device-lost</code>, affected target execution statuses
+<code>device-lost</code>, cancelled dependent actions, and lost-generation entries in
+<code>leaseDispositionById</code>; it invalidates AO/history resources and timing proof without
+mutating the sealed snapshot. Rebuild under the new backend/resource generation.</p>
+<h2>Quality gates</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Authored start</th>
+<th>Mandatory gate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full</td>
+<td>scale <code>0.5</code>, samples <code>16</code>, MRT normal, materialized denoise, optional TRAA <strong>[Authored]</strong></td>
+<td>Complete marginal cost including the second scene pass fits; thin silhouettes and camera cuts pass.</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>scale <code>0.5</code>, samples <code>8-12</code>, MRT normal if shared, no temporal history <strong>[Authored]</strong></td>
+<td>Raw/denoised edge error passes fixed-view comparison; no cross-edge halo.</td>
+</tr>
+<tr>
+<td>Constrained WebGPU</td>
+<td>scale <code>0.25-0.33</code>, samples <code>8</code>, depth-reconstructed normal only if it beats the MRT attachment <strong>[Authored]</strong></td>
+<td>Target-device GPU time and tile bandwidth pass; otherwise omit screen AO.</td>
+</tr>
+</tbody></table>
+<p><code>samples</code> is not the number of depth taps. In r185:</p>
+<pre><code class="language-text">D = samples &lt; 30 ? 3 : 5                         [Derived]
+S = floor((samples + D - 1) / D)                [Derived]
+horizon depth taps per GTAO pixel = 2 * D * S    [Derived]
+samples = 16 -&gt; 36 depth taps                    [Derived]
+samples = 8  -&gt; 18 depth taps                    [Derived]
+</code></pre>
+<p>Increase samples only after scale, radius, reconstruction, and temporal policy
+have been validated.</p>
+<h2>Composable marginal budget</h2>
+<p>Measure toggles with the same camera path and warmed pipelines:</p>
+<pre><code class="language-text">deltaAO = time(complete AO graph) - time(no-screen-AO graph)       [Measured]
+deltaNormal = time(scene pass with normal) - time(without normal)  [Measured]
+deltaVelocity = analogous velocity attachment delta               [Measured]
+deltaSecondScene = time(second lit pass)                           [Measured]
+route valid iff deltaAO &lt;= declaredMarginalAOBudget                [Gated]
+</code></pre>
+<p>Do not add the shared scene pass twice in a composed budget. Charge only its
+measured attachment delta to AO when another selected system already owns that
+pass; charge the entire first pass when AO created it.</p>
+<p>For the stock half-float <code>PassNode</code> MRT, each extra full-resolution normal or
+velocity attachment is <code>8 * width * height</code> bytes <strong>[Derived]</strong> before MSAA,
+backend padding, and tile scratch. The built-in scalar GTAO target is
+approximately <code>scale^2 * width * height</code> bytes for R8 <strong>[Derived]</strong>. On a tile
+GPU, an extra MRT attachment can reduce tile residency or force stores; this is
+a measured architecture decision, not a desktop assumption.</p>
+<p>Do not seed the search with adapter-class millisecond tables. They hide scene
+complexity, DPR, attachment traffic, browser state, and thermal drift. Start
+from the cheapest representation that can meet the declared contact-radius and
+edge-error gates, then measure <code>deltaAO</code>, <code>deltaNormal</code>,
+<code>deltaVelocity</code>, and any <code>deltaSecondScene</code> separately on each named target.
+The product&#39;s marginal AO budget is <strong>[Gated]</strong>; only matched, warmed A/B traces
+are <strong>[Measured]</strong>.</p>
+<h2>Visual wrongness signatures</h2>
+<table>
+<thead>
+<tr>
+<th>Signature</th>
+<th>Cause / action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Direct highlights or emitters turn gray</td>
+<td>Final-color multiply. Move AO into indirect lighting.</td>
+</tr>
+<tr>
+<td>Dark fringe around a foreground silhouette</td>
+<td>Reduced AO crossed a depth discontinuity; materialize depth+normal-aware reconstruction or reduce thickness/radius.</td>
+</tr>
+<tr>
+<td>Creases look inked at every scale</td>
+<td>Radius/thickness are image-style controls rather than scene-scale contact visibility.</td>
+</tr>
+<tr>
+<td>Contact vanishes at the screen edge or when an occluder leaves view</td>
+<td>Screen-space information loss; accept explicitly or use authored/baked visibility.</td>
+</tr>
+<tr>
+<td>Crawling grain on a static camera</td>
+<td>Too few samples without denoise, or temporal rotation enabled without TRAA.</td>
+</tr>
+<tr>
+<td>Trails behind deforming or alpha-masked geometry</td>
+<td>Invalid velocity/history rejection; disable temporal AO or repair motion vectors.</td>
+</tr>
+<tr>
+<td>Faceted or unstable AO on smooth thin surfaces</td>
+<td>Depth-reconstructed normals failed; use MRT normals or omit AO for that tier.</td>
+</tr>
+<tr>
+<td>AO follows UV seams, stretches per object, or differs across meshes</td>
+<td>The visibility texture used mesh <code>uv()</code>; sample it explicitly with <code>screenUV</code>.</td>
+</tr>
+<tr>
+<td>Camera rotation changes bent tint twice or not at all</td>
+<td>View/world transform or bent-direction sign is wrong. Keep directional tint disabled.</td>
+</tr>
+<tr>
+<td>AO-off timing is unchanged</td>
+<td>The output graph still depends on AO. Replace the graph and mark the pipeline dirty.</td>
+</tr>
+</tbody></table>
+<h2>Ownership boundary</h2>
+<p>This skill owns scalar GTAO, reconstruction choice, ambient-light placement,
+temporal eligibility, optional bent normals, and AO diagnostics. The image-
+pipeline owner controls shared MRTs, global pass order, history, tone mapping,
+output conversion, and adaptive resolution.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-water-optics.html">← Water Optics</a>
+    <a href="threejs-black-holes-and-space-effects.html">Black Holes and Space Effects →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/ambient-contact-shading-demo/"><figure>
+        <div class="live-visual live-visual--ao" aria-hidden="true">
+        <span class="lv-k">Concept proxy</span>
+        <strong>AO.r + direct light separation</strong>
+        <span class="lv-m">final / no-ao / ao-debug</span>
+      </div>
+        <figcaption><strong>Ambient Contact Shading Lab</strong><span>Concept proxy · The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

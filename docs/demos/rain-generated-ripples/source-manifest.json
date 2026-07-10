@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "rain-generated-ripples",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:4bbf15952bced678c76059dc9038a457734aa89e39cf831bb0c96c6f63c49797",
+  "publishedHashInputs": [
+    "docs/demos/rain-generated-ripples",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:255af92da7202f472d9b4f44c9141f40fee9f31930820a9b21a813560b52ac4f",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

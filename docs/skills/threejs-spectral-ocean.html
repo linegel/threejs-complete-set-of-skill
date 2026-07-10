@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Spectral Ocean — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html" />
+<title>Spectral Ocean | Three.js WebGPU Skill</title>
+<meta name="description" content="Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-spectral-ocean.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<link rel="preload" as="image" href="../visual-validation/ocean-generated-wave-seeds/final.design.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Spectral Ocean — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/ocean-generated-wave-seeds/final.design.png" />
+<meta property="og:title" content="Spectral Ocean | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-spectral-ocean.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Spectral Ocean visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/ocean-generated-wave-seeds/final.design.png" />
-<meta name="twitter:image:alt" content="Spectral Ocean visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Spectral Ocean evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.png" />
+<meta name="twitter:image:alt" content="Spectral Ocean evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Spectral Ocean — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation." />
+<meta name="twitter:title" content="Spectral Ocean | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Spectral Ocean — Three.js WebGPU agent skill",
-   "description": "Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/ocean-generated-wave-seeds/final.design.png",
-   "dateModified": "2026-07-05T05:01:16+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-spectral-ocean.html#article",
+   "headline": "Spectral Ocean | Three.js WebGPU Skill",
+   "description": "Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.",
+   "url": "https://threejs-skills.com/skills/threejs-spectral-ocean.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-spectral-ocean.html",
+   "image": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Worlds and Environments",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Spectral Ocean",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html"
+     "item": "https://threejs-skills.com/skills/threejs-spectral-ocean.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Spectral Ocean validation preview" fetchpriority="high" decoding="async" />
+  <img class="skill-hero-bg" src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Worlds and Environments</a> / Spectral Ocean</p>
-    <h1>Spectral Ocean</h1>
-    <p class="lede">Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Spectral Ocean</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-spectral-ocean">Spectral Ocean</h1>
+    <p class="lede">Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-spectral-ocean</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">4 runnable examples</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T05:01:16+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/e8bca402ee705d702103c5bc3c04e40ca80a03e9">commit e8bca40 ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">1 flagship</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-spectral-ocean/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,167 +275,30 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/ocean-generated-wave-seeds/"><figure>
-        <img src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Directional Wave Seed Surface" loading="lazy" />
-        <figcaption><strong>Directional Wave Seed Surface</strong><span>Generated directional wave seeds are used as live scene inputs for reduced-tier displacement and slope diagnostics.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-  <div class="section" id="validation"><div class="wrap">
-    <h2>Validation gallery</h2>
-    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
-    <div class="gallery">
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Spectral Ocean in Three.js WebGPU — Final design frame — spectral cascade ocean" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Final design frame — spectral cascade ocean</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/ocean-generated-wave-seeds/no-post.design.png" alt="Spectral Ocean in Three.js WebGPU — No-post baseline — the wave cause without grading" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>No-post baseline — the wave cause without grading</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Spectral Ocean in Three.js WebGPU — Per-signal diagnostics mosaic" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Per-signal diagnostics mosaic</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/ocean-generated-wave-seeds/seed-stress.final.png" alt="Spectral Ocean in Three.js WebGPU — Seed-stress sweep frame" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Seed-stress sweep frame</span></figcaption>
-      </figure>
-    </div>
-  </div></div>
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/hybrid-clear-water-ocean">
-        <h4>hybrid-clear-water-ocean</h4>
-        <span class="card-meta">threejs-spectral-ocean/examples/hybrid-clear-water-ocean</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/spectral-cascade-ocean">
-        <h4>spectral-cascade-ocean</h4>
-        <span class="card-meta">threejs-spectral-ocean/examples/spectral-cascade-ocean</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/stylized-above-below-ocean">
-        <h4>stylized-above-below-ocean</h4>
-        <span class="card-meta">threejs-spectral-ocean/examples/stylized-above-below-ocean</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-spectral-ocean/examples/webgpu-fft-ocean">
-        <h4>webgpu-fft-ocean</h4>
-        <span class="card-meta">threejs-spectral-ocean/examples/webgpu-fft-ocean</span>
+      <a class="card" href="../demos/webgpu-fft-ocean/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>WebGPU FFT Ocean</h3>
+        <p>1 fixed scenarios, 6 mechanism routes, and 4 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Spectral Ocean</h2>
-<p>Treat an ocean as a sampled stochastic wave field whose highest-throughput implementation is owned in frequency space. Start from compute-shader FFT cascades, not analytic wave piles, scrolling textures, or a simplified renderer path.</p>
-<p>Run <code>$threejs-choose-skills</code> first when the request spans ocean simulation plus atmosphere, shadows, validation, or final-image treatment. Read <a href="references/spectral-cascade-ocean-system.md">references/spectral-cascade-ocean-system.md</a> before implementing or auditing this skill.</p>
-<p>Canonical WebGPU/TSL example: <a href="examples/webgpu-fft-ocean/">examples/webgpu-fft-ocean/</a>.</p>
-<h2>Build Order</h2>
-<ol>
-<li>Create a <code>WebGPURenderer</code> from <code>three/webgpu</code>, initialize it, and install the capability gate before allocating compute resources.</li>
-<li>Choose the quality tier from grid size, cascade count, dispatch budget, texture memory, and target GPU class.</li>
-<li>Build disjoint wavelength cascades from a deterministic directional spectrum.</li>
-<li>Generate coordinate-stable Gaussian seeds and conjugate-packed <code>h0(k)</code> for every cell before masking out-of-band energy.</li>
-<li>Evolve height, horizontal displacement, slopes, horizontal derivatives, and cross derivatives in frequency space with TSL <code>Fn().compute()</code> kernels.</li>
-<li>Pack derivative fields before the inverse transform; never derive slopes or Jacobians with finite differences after the IFFT.</li>
-<li>Run Stockham or Cooley-Tukey inverse FFT stages through <code>StorageTexture</code> ping-pongs, using <code>renderer.compute()</code> or <code>renderer.computeAsync()</code> with ordered stage boundaries.</li>
-<li>Assemble filterable displacement, derivative, Jacobian, and foam-history textures in the same compute dispatch chain.</li>
-<li>Shade the displaced mesh with a <code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code> graph driven by the resolved spectral maps.</li>
-<li>Compose reflections, underwater absorption, crest scatter, optional <code>BloomNode</code>/<code>GTAONode</code>/<code>TRAANode</code>, and output conversion in a <code>RenderPipeline</code>.</li>
-<li>Expose diagnostics for spectra, transformed fields, foam history, node-pass outputs, and GPU timings.</li>
-</ol>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/spectral-cascade-ocean/</code>, <code>examples/hybrid-clear-water-ocean/</code>, <code>examples/stylized-above-below-ocean/</code>.</p>
-<h2>Capability Gate</h2>
-<p>Use one implementation path: WebGPU-backed TSL compute. If that canonical path
-is unavailable, report the missing backend as a blocker unless the user
-explicitly asks how to apply fallback when WebGPU is unavailable.</p>
-<pre><code class="language-js">import { WebGPURenderer } from &#39;three/webgpu&#39;;
-
-const renderer = new WebGPURenderer( { antialias: false } );
-await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend ) {
-  await ocean.allocateStorageTextures();
-  await renderer.computeAsync( ocean.validateFftNodes );
-} else {
-  throw new Error( &#39;WebGPU backend required for the canonical FFT ocean path.&#39; );
-}
-</code></pre>
-<p>Budgeted WebGPU tiers use smaller grids, fewer cascades, or lower-resolution
-debug input fixtures inside the canonical architecture. They must not contain a second
-hand-written renderer backend. If, and only if, the user explicitly asks how to
-apply fallback when WebGPU is unavailable, route that teaching to
-<code>$threejs-compatibility-fallbacks</code>.</p>
-<h2>Non-Negotiable Gates</h2>
-<ul>
-<li>Require power-of-two grids, positive patch lengths, disjoint wavenumber intervals, finite depth/gravity values, and a supported storage texture format before construction.</li>
-<li>Validate DC, X-frequency, Y-frequency, horizontal-displacement direction, derivative sign, and Jacobian determinant before connecting the spectrum to the surface.</li>
-<li>Keep Gaussian samples coordinate-stable: hash by <code>(seed, cascade, x, y)</code> or consume random values for every cell before masking.</li>
-<li>Compute all displacement derivatives in frequency space: slopes, horizontal derivatives, and the cross derivative are transformed fields, not post-IFFT differences.</li>
-<li>Persist foam as simulation state in a ping-ponged storage texture; display thresholds are separate from history recovery.</li>
-<li>Submit FFT stages with ordered whole-grid boundaries verified against the active Three.js backend; batch independent fields at the same stage, then advance.</li>
-<li>Share sun, sky, exposure, and output-conversion ownership across the sky, ocean reflection, underwater path, and post pipeline.</li>
-<li>Keep fixed seeds, fixed camera captures, no-post baselines, and GPU timing history for comparisons.</li>
-</ul>
-<h2>Cross-Skill Water Height Contract</h2>
-<p>When another skill needs water coupling, expose a CPU-evaluable query of the
-same authored cause rather than reading back the GPU simulation. The interface
-shape is:</p>
-<pre><code class="language-js">const sampler = createCpuWaterHeightSampler(oceanConfig);
-const y = sampler.getWaterHeight(x, z, timeSeconds);
-const parity = sampler.estimateTruncationError();
-</code></pre>
-<p>This is a one-way provider contract. The water provider carries the parity
-obligation; consumers treat <code>getWaterHeight(x, z, t)</code> as authoritative and do
-not perform GPU readback. For the canonical FFT ocean, the CPU query is a
-dominant-bin truncation of the same seeded spectrum and dispersion relation as
-the WebGPU kernels. Its error bound is the omitted coefficient budget:</p>
-<pre><code class="language-text">|height_full - height_truncated| &lt;= sum_{omitted bins} (|h0(k)| + |h0(-k)|)
-</code></pre>
-<p>Validators must compare the truncated query against a full pure-JS spectral
-mirror at fixed probe points/times and assert the measured error is within the
-reported bound plus numerical epsilon. Use this pattern for cross-skill
-interfaces: CPU-evaluable query of the same authored cause, stated parity
-error, one-way consumer, no hot-path readback.</p>
-<h2>Budgets</h2>
-<ul>
-<li>High desktop discrete: <code>512^2</code>, 3 cascades, 4 packed complex fields per cascade, about <code>3 * (8 evolve + 4 * 2 * log2(N) FFT + 4 assemble/history)</code> compute dispatch groups, about 102 MiB ocean storage with a 104 MiB tier gate, target 2.5-4.0 ms simulation and 1.5-3.0 ms ocean shading/post at 1440p.</li>
-<li>Standard desktop integrated: <code>256^2</code>, 3 cascades, half-float storage when validated, under 28 MiB ocean storage, target 1.5-3.0 ms simulation and 1.5-2.5 ms shading/post at 1080p.</li>
-<li>Mobile or budgeted WebGPU tier: <code>128^2</code>, 1-2 cascades and lower-resolution debug inputs, under 8 MiB ocean storage, target under 2.0 ms simulation-equivalent work and no spray.</li>
-<li>Draw calls: one ocean surface draw, one sky draw, optional spray/crest instancing only when routed through <code>$threejs-particles-trails-and-effects</code>.</li>
-<li>Post passes: one scene <code>pass()</code>, optional <code>mrt()</code> for normal/emissive outputs, reduced-resolution <code>BloomNode</code> or <code>GTAONode</code> only when visibly useful, one output transform.</li>
-</ul>
-<h2>Color And Output</h2>
-<ul>
-<li>Color textures use <code>SRGBColorSpace</code>; spectra, displacement, derivative, Jacobian, foam, normal, noise, LUT, and weather data use <code>NoColorSpace</code> or linear data semantics.</li>
-<li>Keep ocean simulation textures as data, with mipmaps disabled unless the compute chain writes them deliberately.</li>
-<li>Use HDR <code>HalfFloatType</code> working buffers until tone mapping.</li>
-<li>The <code>RenderPipeline</code> owns tone mapping and color conversion through <code>outputColorTransform</code> or an explicit <code>renderOutput()</code> node. Materials and custom nodes must not double-convert.</li>
-<li><code>PostProcessing</code> is only a renamed predecessor of <code>RenderPipeline</code>; do not use it for new work.</li>
-</ul>
-<h2>Route Elsewhere</h2>
-<ul>
-<li>Use <code>$threejs-water-optics</code> for bounded pools, screen-space refraction, local heightfield ripples, shoreline absorption, caustics, and analytic wave surfaces.</li>
-<li>Add <code>$threejs-particles-trails-and-effects</code> only when crest spray, splashes, foam particles, or interaction effects are required.</li>
-<li>Add <code>$threejs-visual-validation</code> for fixed-view contracts, cross-seed sweeps, temporal stability, pass diagnostics, and GPU evidence.</li>
-<li>Add <code>$threejs-image-pipeline</code> or <code>$threejs-exposure-color-grading</code> when the ocean must share a larger HDR, bloom, exposure, or grading stack.</li>
-</ul>
-</div>
-  <div class="pn">
-    <a href="threejs-sky-atmosphere-and-haze.html">← Sky, Atmosphere, and Haze</a>
-    <a href="threejs-visual-validation.html">Visual Validation →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/weathered-world/">
+        <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Weathered World</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -401,10 +319,492 @@ single cross term is exact. Multiple cascades cover wavelength bands with half-o
 $[k_{lo}, k_{hi})$ to avoid double-counting energy at handoffs.</p></div>
   </div></div>
 
+
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Evidence and asset previews</h2>
+    <p class="sub">Preserved diagnostic or generated-asset frames. Consult the demo registry before treating any frame as canonical runtime evidence.</p>
+    <div class="gallery">
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Spectral Ocean in Three.js WebGPU — Generated wave-seed asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated wave-seed asset preview</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/ocean-generated-wave-seeds/no-post.design.png" alt="Spectral Ocean in Three.js WebGPU — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview baseline</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Spectral Ocean in Three.js WebGPU — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated-asset channel diagnostics</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/ocean-generated-wave-seeds/seed-stress.final.png" alt="Spectral Ocean in Three.js WebGPU — Asset-preview seed stress" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview seed stress</span></figcaption>
+      </figure>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Spectral Ocean</h2>
+<p>Use this skill when a large, unbounded-looking water surface must span several
+wavelength scales with directional wind sea or swell. The canonical state is a
+sampled random field in wavevector space, evolved by dispersion and transformed
+on the GPU. It assumes a horizontally homogeneous, periodic patch with one
+dispersion relation per cascade. It is not a coastline, bathymetry, inundation,
+or obstacle-flow solver. Use <code>$threejs-water-optics</code> for bounded interaction
+grids, coastal coupling, or a small authored wave set.</p>
+<p>Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/references/spectral-cascade-ocean-system.md">references/spectral-cascade-ocean-system.md</a>
+before implementation or review. For any island, coast, shoal, reef, harbor, or
+moving waterline, also read the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/references/coastal-archipelago-system.md">coastal archipelago contract</a>.
+All physics-frame, clock, provider, interaction, residency, state-version, and
+presentation boundaries come from the shared
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
+The FFT remains a domain solver behind those interfaces; it does not define a
+parallel water-query schema.</p>
+<p>Ocean optics consumes the same typed <code>LightingTransportSnapshot</code> as the sky
+and coastal owner. Solar-disc, sky-radiance/irradiance, segment-transmittance,
+cloud, visibility, and water-extinction factors retain distinct quantity/unit/
+basis and factor identities so no attenuation or direct disc is applied twice.
+Radiometry is a provider boundary, not an <code>InteractionRecord</code>.</p>
+<h2>Numeric Provenance</h2>
+<p>Every quantitative statement uses one tag:</p>
+<ul>
+<li><strong>[D] Derived</strong> from equations, dimensions, formats, or reproducible counts;</li>
+<li><strong>[G] Gated</strong> as a predeclared pass/fail limit;</li>
+<li><strong>[M] Measured</strong> on a named device, viewport, and workload;</li>
+<li><strong>[A] Authored</strong> as a visual/application input.</li>
+</ul>
+<p>Unlabelled integers inside exact equations, tensor dimensions, byte identities,
+and API names are [D]. Resolutions, patch lengths, sea-state constants,
+thresholds, format choices, timings, and memory limits must be tagged.</p>
+<h2>Algorithm Gate</h2>
+<p>Choose FFT cascades only when the visible band contains enough independent
+modes that direct summation is more expensive or visibly repetitive. The
+decision variables are visible wavelength interval, directional statistics,
+periodic-repeat distance, tolerated phase/slope error, interaction needs, and
+sustained storage bandwidth.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Algorithm</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Few art-directed modes or exact cheap CPU queries</td>
+<td>Parametric waves in <code>$threejs-water-optics</code></td>
+<td>Cost grows with component count.</td>
+</tr>
+<tr>
+<td>Bounded disturbances</td>
+<td>Compute heightfield in <code>$threejs-water-optics</code></td>
+<td>CFL and domain-boundary error.</td>
+</tr>
+<tr>
+<td>Broad stochastic directional sea</td>
+<td>Multi-cascade FFT</td>
+<td>Periodic patches, spectral quadrature, FFT precision.</td>
+</tr>
+<tr>
+<td>Spatially varying depth; phase-resolved shoaling/refraction matters</td>
+<td>Coastal dispersive or phase-resolving solver selected by <code>$threejs-water-optics</code></td>
+<td>Local depth, boundary, and breaking-model error; FFT is only the offshore forcing.</td>
+</tr>
+<tr>
+<td>Wet/dry fronts, run-up, bores, or hydraulic jumps matter</td>
+<td>Positivity-preserving depth-averaged coastal solver selected by <code>$threejs-water-optics</code></td>
+<td>Conservation, wet/dry, and numerical-dissipation error; a heightfield or FFT is invalid.</td>
+</tr>
+<tr>
+<td>Shoreline motion is sub-pixel and only wave statistics matter</td>
+<td>Phase-averaged wave-action transport plus analytic display bands</td>
+<td>No instantaneous phase contract; validate action/energy and image error.</td>
+</tr>
+</tbody></table>
+<p>Do not disguise scrolling normals or a wave pile as a low FFT tier.</p>
+<h3>Environmental forcing adapter</h3>
+<p>A wind-sea preset consumes the shared <code>EnvironmentForcingSnapshot</code> through an
+explicit spectral-forcing adapter. It does not feed instantaneous air velocity
+directly into a spectrum. The adapter records the sampled wind vector and
+reference height, surface roughness/drag or another calibrated vertical-profile
+model, atmospheric stability treatment, averaging window, spatial footprint,
+fetch geometry, forcing duration/age, directional spreading model, and the
+source-term family represented. It derives a calibrated <code>U10</code> (or declares a
+different named reference-height input), peak/fetch parameters, and spectral
+direction in one physics frame with propagated version/error.</p>
+<p>The input channel is the snapshot&#39;s footprint/filter-bearing <code>airVelocityMps</code>;
+air density/pressure/temperature/stability channels remain absent unless the
+selected adapter actually requires and receives them.
+<code>PhysicsGraph</code> latches the forcing version at <code>sample-forcing</code> for a declared
+interval. Spectrum/coefficient evolution never samples render time or a mutable
+weather uniform independently.</p>
+<p>Gust-scale forcing may modulate spray or shading, but it cannot reseed a mature
+wave spectrum every frame. A stationary FFT sea freezes a documented forcing
+snapshot/statistical state; an evolving sea advances a validated action/energy
+source balance and preserves phase/coefficient continuity. Mean water current
+remains a separate water channel and Doppler term—it is never substituted for
+wind, and wind is never exposed as <code>materialCurrentVelocityMps</code>.</p>
+<h3>Offshore/coastal handoff</h3>
+<p>A spatially varying bottom destroys the global Fourier diagonalization used by
+the FFT. The spectral patch cannot, without a different solver, produce
+bathymetric refraction, shoaling, depth-induced breaking, diffraction around
+islands, reflection from cliffs, porous-reef loss, wave setup, run-up, or
+wetting/drying. Do not fade an unchanged deep-water FFT through the beach and
+label the result coastal simulation.</p>
+<p>Choose exactly one handoff semantics:</p>
+<ul>
+<li><strong>Phase-resolved.</strong> At an offshore coupling curve, evaluate the same seeded
+spectral coefficients into surface elevation <code>eta_b</code> in metres and
+depth-integrated wave-discharge perturbation <code>q&#39;_b</code> in square metres per
+second <strong>[D]</strong>; mean-current discharge remains a separate signal.
+For a matching finite-depth Airy mode,
+<code>q&#39;_hat=(omega_int/|k|^2) k eta_hat</code> <strong>[D]</strong>, from linearized continuity
+<code>-i omega_int eta_hat+i k dot q&#39;_hat=0</code> <strong>[D]</strong>. With uniform current,
+<code>omega_abs=omega_int+k dot U</code> <strong>[D]</strong>: intrinsic frequency owns orbital
+flux; absolute frequency owns the shared phase clock. The coastal boundary
+injects only the incoming characteristic and retains the outgoing one. Record
+phase, elevation, discharge, and reflected-wave residuals <strong>[M]</strong>.</li>
+<li><strong>Phase-averaged.</strong> Convert height-variance density <code>P_eta(k)</code> to physical
+wavevector energy density
+<code>E(k)=[rho g+sigma_surface |k|^2]P_eta(k)</code>, where
+<code>sigma_surface</code> is surface tension, and
+transport wave action <code>N=E/omega_int</code> when currents vary <strong>[D]</strong>. Transfer
+<code>N</code>, intrinsic frequency, group velocity, mean current, and dimensioned band
+quadrature. The near-shore model owns refraction, shoaling, breaking loss,
+and local phase synthesis. It makes no instantaneous phase-parity claim.
+Record incoming, dissipated, reflected, and transmitted band energy/action
+in one unit convention <strong>[M]</strong>.</li>
+</ul>
+<p>A one-way FFT donor cannot display coastal reflection that propagates back
+through the coupling curve. If that outgoing field is observable, extend the
+phase-resolving domain or implement an explicit two-way modal projection with
+phase, energy, localization, and periodic-copy residuals <strong>[G,M]</strong>. An
+absorbing layer is valid only when the rejected reflection is below its gate.</p>
+<p>Both modes use one <code>PhysicsContext</code>, stable SI physics frame, water datum,
+bathymetry convention, seed or band identity, canonical <code>PhysicsInstant</code>
+samples, and <code>PhysicsTimeInterval</code> transfers from registered clock mappings.
+They do not introduce an independent monotonic timebase. A current <code>U</code> changes
+absolute frequency by <code>k dot U</code> <strong>[D]</strong>; if <code>U</code>
+varies materially within a periodic patch, route that region out of the FFT
+instead of freezing an inconsistent dispersion.</p>
+<p>The offshore/coastal handoff also carries the canonical
+<code>WaterSurfaceProvider</code> envelope for every instantaneous query: mandatory
+<code>freeSurfacePoint</code>, <code>freeSurfaceNormal</code>, <code>geometricNormalVelocityMps</code>, and the
+exact <code>WaterSurfaceParameterization</code>, with optional fixed-parameterization
+<code>surfacePointVelocityMps</code>, material <code>materialCurrentVelocityMps</code>, and only the
+other channels actually represented. Descriptor, requested/actual
+<code>PhysicsInstant</code>, footprint/filter, frame/origin/transform, state/resource
+version, validity/error, latency, and residency cross unchanged. A
+phase-averaged handoff needs a separately owned display-phase synthesis before
+it can satisfy this instantaneous provider ABI.</p>
+<p>Partition ownership in every transition band. Only disjoint Fourier bins or
+fields proven to have zero cross-covariance may use power windows that sum to
+one <strong>[D,G]</strong> and square-root amplitude weights. Coherent offshore/coastal
+copies have a covariance cross-term: a phase-resolved wave crosses the coupling
+curve at full amplitude and has one spatial render owner. If a render-only
+spatial blend is unavoidable, its coherent amplitude weights sum to one and
+displacement, tangents, normals, and velocity come from the same phase-matched
+composite field, including blend-weight gradients. Independently lerping final
+normals or adding both foam histories violates parity.</p>
+<p>Foam crosses the handoff as one versioned provider signal. Its complete
+<code>PhysicsSignalDescriptor</code> identifies context, frame, physics-origin epoch,
+transform revision, footprint/filter, cadence/latency/residency, state/resource
+generation, validity, and per-channel error; canonical channels carry coverage,
+carrier velocity, source rate, diffusion, and decay state at
+<code>sampleInstant: PhysicsInstant</code>, with each source-rate channel declaring its actual sampling
+interval.
+Attribute whitecap and depth-breaking dissipation to exactly one owner, combine
+the disjoint dissipation terms, then map them once into one foam source/history.
+Never partition or saturated-add evolved coverage histories. A coordinate/atlas
+ownership change uses a declared conservative state map with remap/clamp/lost-
+coverage evidence, not a second independent-seconds foam tuple.</p>
+<h2>Pinned Three.js r185 Architecture</h2>
+<p>The API contract is verified against installed <code>three@0.185.1</code> <strong>[G]</strong>:</p>
+<ul>
+<li><code>WebGPURenderer</code>, <code>RenderPipeline</code>, <code>StorageTexture</code>, and node materials come
+from <code>three/webgpu</code>; TSL comes from <code>three/tsl</code>.</li>
+<li>Initialize before checking <code>renderer.backend.isWebGPUBackend</code>, device limits,
+or <code>renderer.hasFeature()</code>.</li>
+<li>Build compute with <code>Fn(...).compute(...)</code>. After initialization,
+<code>renderer.compute(nodeOrArray)</code> records ordered dispatches.
+<code>computeAsync()</code> is initialization-safe but is not a GPU-completion fence.</li>
+<li><code>StorageTexture</code> simulation data uses <code>NoColorSpace</code>, no generated mipmaps,
+and explicit <code>HalfFloatType</code> or <code>FloatType</code> selected by validation.</li>
+<li>Gate each kernel against the initialized device&#39;s
+<code>maxStorageTexturesPerShaderStage</code> and compiled binding layout. The reference
+fused physical assembly requires seven storage-texture bindings; use its
+ordered split path with at most three per dispatch on portable four-binding
+targets. Never allocate or compile the fused path before this gate.</li>
+<li>Use <code>pass()</code>, optional <code>mrt()</code>, and one <code>RenderPipeline</code>; use
+<code>PassNode.setResolutionScale()</code>. Use exactly one output transform.</li>
+</ul>
+<pre><code class="language-js">const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;WebGPU is required for the spectral ocean.&#39; );
+}
+
+renderer.compute( orderedOceanNodes );
+pipeline.render();
+</code></pre>
+<p>In a coupled route, every coefficient, transform, assembly, coastal-boundary,
+and source dispatch that advances physical water state executes inside a
+declared <code>PhysicsGraphStage</code> with exact interval and versioned dependencies.
+The render loop consumes the sealed presentation state; it does not advance the
+FFT/coastal solver, resample mutable forcing, apply runoff, or inject a private
+disturbance step.</p>
+<h2>Non-Negotiable Numerical Contract</h2>
+<h3>Spectrum dimensions and cascades</h3>
+<p>Start from a directional angular-frequency variance density
+<code>S_omega(omega,theta)</code> with units <code>m^2 s</code> <strong>[D]</strong>, normalized directional
+distribution, and finite-depth capillary-gravity dispersion. Convert it to the
+two-dimensional wavevector density</p>
+<pre><code class="language-text">P(k_x,k_z) = S_omega(omega(k),theta)
+             |d omega/d k| / k,        [P] = m^4.              [D]
+</code></pre>
+<p>Discrete coefficient variance includes <code>Delta k_x Delta k_z</code> <strong>[D]</strong>. A
+missing Jacobian, cell area, or Gaussian normalization invalidates sea-state
+amplitude.</p>
+<p>Cascade power windows must satisfy <code>sum_i w_i(k)=1</code> over the represented band
+<strong>[D,G]</strong>. Hard half-open bands are valid; smooth overlap uses amplitude
+<code>sqrt(w_i)</code> so expected power is not doubled. Each cascade declares patch
+length, grid spacing in <code>k</code>, isotropic upper cutoff, and repeat distance.</p>
+<h3>Transform convention</h3>
+<p>Write the transform pair in code and tests. This skill uses the unnormalized
+inverse convention</p>
+<pre><code class="language-text">f[j] = sum_n F[n] exp(+i 2 pi n dot j / N).                     [D]
+</code></pre>
+<p>With this convention a unit DC coefficient produces a unit constant field.
+Any normalized IFFT must rescale initial coefficients consistently. Never tune
+spectrum amplitude around an undocumented FFT scale.</p>
+<p>Pack the eight real fields required for height, horizontal displacement,
+slopes, and horizontal derivatives into four complex transforms, preferably as
+two complex lanes in each of two RGBA textures <strong>[D]</strong>. Validate the algebra
+<code>G=A+iB</code>, not component interleaving.</p>
+<h3>Hermitian and Nyquist rules</h3>
+<p>The evolved height spectrum must satisfy
+<code>H(-k)=conjugate(H(k))</code> <strong>[D]</strong>. DC and self-conjugate Nyquist cells are real.
+Derivative multipliers receive parity-specific masks:</p>
+<ul>
+<li>fields odd in <code>k_x</code> are zero on the <code>k_x</code> Nyquist line;</li>
+<li>fields odd in <code>k_z</code> are zero on the <code>k_z</code> Nyquist line;</li>
+<li>the mixed derivative is zero on either Nyquist line;</li>
+<li>even second derivatives need no blanket Nyquist removal, but the final
+spectrum must still pass Hermitian projection and imaginary-leakage gates.</li>
+</ul>
+<p>Zero <code>k=0</code> before every division by <code>|k|</code>. Do not multiply a singular result by
+a zero mask and call it safe.</p>
+<h3>Exact choppy geometry</h3>
+<p>For the declared inverse-transform sign, choose the horizontal displacement
+sign by a one-mode test. This skill defines positive choppiness <code>chi</code> so
+<code>h=a cos(kx)</code> maps to <code>X=x-chi a sin(kx)</code>, compressing the crest <strong>[D]</strong>.</p>
+<p>Sum displacement and derivatives across cascades before forming the horizontal
+Jacobian. For</p>
+<pre><code class="language-text">P(q) = (q_x + chi D_x, h, q_z + chi D_z),
+</code></pre>
+<p>compute <code>P_qx</code>, <code>P_qz</code>, the determinant, and
+<code>normalize(cross(P_qz,P_qx))</code> exactly. Do not divide each height slope by only
+its same-axis stretch; that omits cross coupling. A nonpositive determinant is
+a fold, not a normal-map detail.</p>
+<h3>Foam state</h3>
+<p>Compression may source foam, but a thresholded Jacobian is not persistent foam.
+Use a bounded, timestep-correct source/decay update and declare whether the
+history lives in Lagrangian parameter coordinates or is advected in an
+Eulerian/stable-physics-frame atlas. Include transport, dissipation, and source terms in
+diagnostics. Display thresholding is separate from state evolution.</p>
+<h2>CPU Coupling And Canonical Water Provider</h2>
+<p>Expose parametric sampling separately from physics-horizontal sampling. A
+dominant-bin CPU sum approximates the same seeded coefficients and dispersion;
+its omitted-coefficient triangle bound applies at fixed parameter coordinate.
+When choppy horizontal displacement is nonzero, a physics-frame <code>(x,z)</code> query must also
+invert the horizontal map. The reference derives the additional inversion
+error and the condition under which it is bounded.</p>
+<p>The raw numerical sampler may return its solver-specific diagnostics:</p>
+<pre><code class="language-ts">{
+  height,
+  normal,
+  horizontalResidual,
+  omittedCoefficientBound,
+  numericalErrorMeasured,
+  status,
+}
+</code></pre>
+<p>The omitted bound <strong>[D]</strong>, solver tolerance <strong>[G]</strong>, and GPU-versus-CPU probe
+error <strong>[M]</strong> are distinct fields. A public physics consumer never receives
+that raw shape. The spectral adapter publishes the canonical <code>WaterSurfaceProvider</code>
+sample in physics-frame metres: <code>freeSurfacePoint</code>, <code>freeSurfaceNormal</code>,
+<code>geometricNormalVelocityMps</code>, its exact <code>WaterSurfaceParameterization</code>,
+optional fixed-coordinate <code>surfacePointVelocityMps</code>, optional
+<code>materialCurrentVelocityMps</code>, optional
+<code>waterColumnDepthMeters</code> and <code>densityKgPerM3</code>. Each named channel is a complete
+shared <code>SampledChannel</code>; the parameterization remains its own exact canonical record.
+The result returns the complete shared
+<code>PhysicsSignalDescriptor</code>, bundle <code>sampleInstant</code>, and each channel&#39;s
+<code>actualPhysicsTime</code> resolving to a <code>PhysicsInstant</code>. The requested
+<code>PhysicsInstant</code> remains distinct from those returned actual instants and may
+differ only within declared latency/staleness gates. Unrepresented current,
+depth, or density channels are absent under
+<code>missingChannelPolicy</code>, not zero. The adapter composes coefficient omission, horizontal inversion,
+floating-point, transform/probe, filtering, and latency error without
+collapsing them into a false scalar certainty. Do not read the full FFT maps
+back in the frame path.
+The remaining canonical optional channels—material acceleration, pressure,
+bathymetry point, and wet/dry state—are likewise absent unless a named model
+supplies each with actual support and error.</p>
+<p><code>surfacePointVelocityMps</code> is a physical polar vector bound to the serialized
+surface gauge; only its normal projection is geometric. Whenever that optional
+vector is present, the exact identity is
+<code>geometricNormalVelocityMps = dot(surfacePointVelocityMps, freeSurfaceNormal)</code> at the same actual time, support/filter, and state version;
+its channel propagates correlated vector/normal error. The scalar normal speed
+is gauge invariant and remains a mandatory publication even when a
+reduced/implicit owner cannot publish the full fixed-coordinate vector. The
+material-current vector is independent of that parameterization. Both vector
+channels are in <code>physicsFrameId</code>, not moving-frame coordinate rates. Cross-frame
+transport rotates their basis; it does not add origin or <code>omega x r</code> transport
+terms to an already physical vector.</p>
+<p>The homogeneous spectral patch may drive one-way bodies through this provider
+only when the authoritative source is named and omitted body-to-water feedback
+has a <code>[G]</code> upper bound or the claim/regime is explicitly narrowed.
+It does not accept two-way body/source <code>InteractionRecord</code> feedback unless an
+explicit spatial interaction solver owns that region; route such loads through
+<code>$threejs-water-optics</code> or a canonical <code>ExternalSolverAdapter</code>. Rendering uses the shared
+presentation lifecycle: the spectral owner contributes its <code>PresentedStatePair</code>
+to the view-independent <code>PhysicsPresentationCandidate</code>, which contains no
+camera or render transform. <code>previousPresented</code> and <code>currentPresented</code> each
+carry independent <code>PresentationSampleProvenance</code>, <code>presentedInstant</code>, state
+handle, and global spatial binding. The camera owner publishes
+<code>CameraViewPublication</code>; preparation owners publish
+<code>ViewPreparationPublication</code>; the sealed <code>PhysicsPresentationSnapshot</code>
+references candidate binding IDs and lease refs. <code>FrameExecutionRecord</code> records
+multi-target execution and lease disposition keyed by lease ID. The presented
+spectral states are not assumed solver <code>n/n+1</code>, so
+displacement, exact tangents, velocity, shadows, foam, and temporal history
+resolve one pair with independently provenanced presented states and separately
+tracked instant/frame/transform/source epochs.
+Spectral deformation, foam, coefficient, and optical discontinuities contribute
+scoped reactive epochs/regions for the per-view <code>ReactivePublication</code> and
+<code>ScopedResetAction</code> plan in <code>ViewPreparationPublication</code>; reset flags are not
+extra pair or snapshot fields.</p>
+<h2>Sustained Performance Contract</h2>
+<p>Do not publish generic mobile/integrated/discrete timing tables. For each named
+target, declare the scene, viewport, DPR, resolution, cascade bands, precision
+placement, active foam/optics, warm-up, sample window, power state, and
+pass/fail threshold <strong>[G]</strong> before measuring <strong>[M]</strong>.</p>
+<p>Keep a complete resource ledger and report warm percentile timings, per-stage
+bandwidth, peak live bytes, allocation churn, and thermal drift <strong>[M]</strong>. One
+<code>RGBA16F</code> texture consumes <code>8 N^2</code> bytes <strong>[D]</strong> and one <code>RGBA32F</code> texture
+consumes <code>16 N^2</code> bytes <strong>[D]</strong>. Derive quality tiers only from named-target
+measurements.</p>
+<p>Batch <code>WaterSurfaceProvider</code> requests as compact channel-masked SoA. A
+presentation candidate references immutable resource generations under a
+frame-in-flight lease/reuse rule; it does not deep-copy FFT maps, and the next
+compute update cannot overwrite a generation still consumed by rendering.
+Any physics-facing change to represented spectrum, solver representation,
+coastal ownership, cadence, provider filter/error, or active domain uses a
+coordinator-admitted <code>QualityTransition</code> and commits at a scheduler tick with
+state/energy projection, atomic provider/resource generation, queue boundary,
+history action, rollback, and peak simultaneous residency. A visual crossfade
+never gives two representations interaction or reaction ownership. Render-only
+mesh/post sampling changes do not mutate the physical provider.</p>
+<p>For bandwidth-constrained tile GPUs, prefer a workgroup-resident one-dimensional FFT plus
+transpose when device workgroup storage and invocation limits admit the chosen
+row representation. Otherwise use the global Stockham reference path. The
+accepted kernel is the fastest one that passes the same transform, precision,
+and occupancy gates; algorithm names alone are not evidence.</p>
+<p>Resolved display maps may use half-float only after comparison with the float
+FFT reference <strong>[M]</strong>. Repeated half-float quantization at every FFT stage is a
+different and stricter error case than storing only resolved maps in half-float.</p>
+<h2>Required Evidence</h2>
+<ul>
+<li>dimensional spectrum integral and target-versus-realized variance <strong>[M]</strong>;</li>
+<li>environmental-forcing adapter provenance: reference-height wind conversion,
+averaging/footprint, fetch/duration/stability/spreading/source terms,
+version/error propagation, and stationary-versus-evolving response;</li>
+<li>cascade power-sum, holes/overlap, and repeat-distance diagnostics;</li>
+<li>DC, axis-frequency, oblique-frequency, partner-pair, and Nyquist FFT tests;</li>
+<li>maximum transform error, imaginary leakage, and Parseval error <strong>[M]</strong>;</li>
+<li>one-mode propagation direction, displacement sign, every derivative sign,
+exact normal, and determinant;</li>
+<li>per-cascade and combined displacement/slope/Jacobian views;</li>
+<li>foam source, transported state, decay, and display coverage over time;</li>
+<li>CPU omitted bound, inversion residual, and GPU probe error;</li>
+<li>canonical <code>WaterSurfaceProvider</code> conformance, footprint/filter response,
+absent-channel handling, state-version/error propagation, mandatory
+<code>geometricNormalVelocityMps</code> projection identity, valid absence of optional
+full <code>surfacePointVelocityMps</code>, and zero frame-critical readback;</li>
+<li>immutable physics presentation-snapshot coherence for displacement,
+derivatives, velocity, shadows, foam, and temporal-history rejection;</li>
+<li>typed lighting-transport channel/factor ledger proving disc, sky,
+atmosphere/cloud, visibility, and water extinction are applied once;</li>
+<li>allocation ledger, dispatch inventory, warm sustained timings, and mobile
+thermal behavior;</li>
+<li>fixed-camera multi-time captures, no-foam/no-detail/no-post baselines, and
+one final output transform.</li>
+</ul>
+<p>For every coastal composition also require:</p>
+<ul>
+<li>bathymetry, wet mask, coast distance/frame, obstacle, current, and coupling-
+band diagnostics with units and owners;</li>
+<li>single-mode normal- and oblique-incidence tests measuring elevation,
+discharge, phase, transmitted power, and reflection across the handoff;</li>
+<li>bidirectional spectral continuity residual, omitted elevation/discharge
+bounds, incoming-characteristic proof, and discharge-producer cost;</li>
+<li>outgoing absorption or two-way modal-projection phase/energy/localization
+residuals whenever reflected waves cross the coupling curve;</li>
+<li>no-breaking/no-current conservation, breaking-loss accounting, and foam-
+source closure <strong>[M]</strong>;</li>
+<li>overlap-band variance/power closure and composite tangent-normal parity;</li>
+<li>fixed-flight seam captures over seed, tide/datum, time, and quality-tier
+sweeps; and</li>
+<li>sustained composed-frame, live-memory, and thermal evidence on each named
+low-end/mobile target <strong>[M]</strong>.</li>
+</ul>
+<p>Fail the implementation if any coefficient has ambiguous units, FFT
+normalization is implicit, a Nyquist parity rule is missing, half precision is
+assumed accurate, the normal is not the cross product of displaced tangents,
+foam has no transport semantics, a homogeneous periodic FFT is treated as a
+coastal solver, handoff power is double-counted, coherent copies are square-
+root weighted as if independent, or a performance number lacks provenance.</p>
+<h2>Routing Boundary</h2>
+<p>This skill owns offshore homogeneous spectral synthesis, exact spectral
+derivatives, displaced-surface geometry, and deep-water whitecap state. The
+coastal owner supplies bathymetry-aware propagation, boundaries, interaction,
+breaking, wet/dry state, and shore foam. The spectral implementation remains a
+forcing producer and render contributor outside that domain; it does not gain
+coastal ownership by sampling a depth texture in its material. It implements
+the shared <code>WaterSurfaceProvider</code> and presentation contracts but rejects unsupported
+two-way <code>InteractionRecord</code> loads rather than fabricating an offshore response.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-sky-atmosphere-and-haze.html">← Sky, Atmosphere, and Haze</a>
+    <a href="threejs-visual-validation.html">Visual Validation →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/ocean-generated-wave-seeds/"><figure>
+        <img src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Directional Wave Seed Surface" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Directional Wave Seed Surface</strong><span>Generated asset preview · Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

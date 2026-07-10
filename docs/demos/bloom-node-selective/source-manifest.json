@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "labId": "bloom-node-selective",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-bloom/examples/node-selective-bloom/index.js",
+    "threejs-bloom/examples/node-selective-bloom/browser.js"
+  ],
+  "browserEntry": "threejs-bloom/examples/node-selective-bloom/index.html",
+  "sourceHash": "sha256:3764473396c07caef6fbd4736a6a0cb03e6471a40a716312ccb43196bd4ef18b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "013a8f06a439f75bb9b406bb7403822617bae6b7",
+  "evidenceBundleId": null
+}

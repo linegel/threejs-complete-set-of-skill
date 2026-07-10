@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "labId": "router-manifest-lab",
+  "kind": "canonical-lab",
+  "status": "accepted",
+  "canonicalSource": [
+    "threejs-choose-skills/examples/router-manifest-lab/router-core.mjs",
+    "threejs-choose-skills/examples/router-manifest-lab/router-fixtures.json",
+    "threejs-choose-skills/examples/router-manifest-lab/app.mjs"
+  ],
+  "sourceHashInputs": [
+    "threejs-choose-skills/examples/router-manifest-lab"
+  ],
+  "browserEntry": "threejs-choose-skills/examples/router-manifest-lab/index.html",
+  "sourceHash": "sha256:96be1085980ca50ff873f19032b100df87005f0b6ffc7875c7acecb49b864eb7",
+  "publishedHashInputs": [
+    "docs/demos/router-manifest-lab",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:7ff58b557d06d62248e1f9faddc093542637ab1d219631ef347892838582c9e9",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

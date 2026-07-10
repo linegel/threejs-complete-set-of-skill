@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "procedural-building-compiler-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:7871ff6a259f26e44ee0da80dc54b6aac5e7a4a6479138dedee80eb9ff94f635",
+  "publishedHashInputs": [
+    "docs/demos/procedural-building-compiler-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:69c9a1fbcb7fa91201fd022b17b7bedea3f6bcee00203f6b71e62b7ebe3cc44b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

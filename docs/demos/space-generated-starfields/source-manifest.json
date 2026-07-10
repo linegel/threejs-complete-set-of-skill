@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "space-generated-starfields",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:513fd70c0595a2c92e34333f4f8ce06b527e03da729dfb423e8387cea5ccda9e",
+  "publishedHashInputs": [
+    "docs/demos/space-generated-starfields",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:7bda4a5d17b9ca7db8d0203dc36b0a26da9c3e9e727a31424882fcaba3fe1b4e",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

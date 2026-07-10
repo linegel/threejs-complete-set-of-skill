@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "ocean-generated-wave-seeds",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-spectral-ocean/examples/webgpu-fft-ocean",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-spectral-ocean/examples/webgpu-fft-ocean"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:76a2f44a942d79e4f83dd191037ca02850d101cf0f6afd8fff635c7052e6428e",
+  "publishedHashInputs": [
+    "docs/demos/ocean-generated-wave-seeds",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:d8ea35b922a3b9c4577522a7a4a6efc59f92812bdd292a2297fd2345c62d1cc6",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

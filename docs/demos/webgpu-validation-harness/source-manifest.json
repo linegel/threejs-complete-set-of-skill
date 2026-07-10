@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-validation-harness",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-visual-validation/examples/webgpu-validation-harness"
+  ],
+  "sourceHashInputs": [
+    "threejs-visual-validation/examples/webgpu-validation-harness"
+  ],
+  "browserEntry": "threejs-visual-validation/examples/webgpu-validation-harness/index.html",
+  "sourceHash": "sha256:44bfcf58370e5d312508fc0e0e7e4ad94c596b6f12254783625de76e93e77aa6",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-validation-harness",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:cbfef426c4ac5ae592fe77aeca69528db5172629d5edd9e2ae01342512e26c3e",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

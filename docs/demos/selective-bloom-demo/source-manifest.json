@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "selective-bloom-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-bloom/examples/node-selective-bloom",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-bloom/examples/node-selective-bloom"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:1ef52d6683e6463e6ee0ddd773ee2266af748c23bf98d5a942ad6f87bcc55de8",
+  "publishedHashInputs": [
+    "docs/demos/selective-bloom-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:f9a667205cb2ae473b9994d3f756630cadba2930ea1c5f5f8da495013e7dc94c",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

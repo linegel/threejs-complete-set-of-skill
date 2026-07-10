@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-vegetation-integration",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/browser-lab.js",
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/route-contract.js",
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/vegetation-integration.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js"
+  ],
+  "sourceHashInputs": [
+    "labs/runtime/strict-lab-controller.mjs",
+    "threejs-procedural-vegetation/assets/generated-variants/meadow-density-a.png",
+    "threejs-procedural-vegetation/assets/generated-variants/meadow-density-b.png",
+    "threejs-procedural-vegetation/assets/generated-variants/meadow-density-c.png",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/ash.png",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/bark-color.jpg",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/bark-normal.jpg",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/bark-roughness.jpg",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-preset.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/tree-system.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/dense-grass-system.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
+  ],
+  "browserEntry": "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/index.html",
+  "sourceHash": "sha256:31984441062514cab7c0c7fa5a3156d32290c6f981b3e4ce4aa250de7031da6f",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-vegetation-integration",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:2fcd125b4855bbe4379453736ef8640ac8f2966abb7eefea7d57ce589ddcc73e",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "compatibility-fallback-planner-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-compatibility-fallbacks/examples/tier-planner",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-compatibility-fallbacks/examples/tier-planner"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:0ccd0dfb3838faa4112489cc77e204876db8378dd602fc5c9e3857830aa32363",
+  "publishedHashInputs": [
+    "docs/demos/compatibility-fallback-planner-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:6bfbeb469dbb1f01bc678cdf16f0f5e0920bf53e135acef84576c12800e9f29a",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "ambient-contact-shading-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-ambient-contact-shading/examples/webgpu-node-gtao",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:a89a693c0ac6a1c9cddff3d872475ac2adda17a9ce4cbf39387be6b1fe12bc42",
+  "publishedHashInputs": [
+    "docs/demos/ambient-contact-shading-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:e9b1312515a4a93a3aacede24c062adbf09a053501fafae0ef8301d397e8698a",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "labId": "browser-fallback-harness",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-core.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-fixtures.json",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/app.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/compatibility-renderer.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/capture.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/validate-artifacts.mjs"
+  ],
+  "sourceHashInputs": [
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness"
+  ],
+  "browserEntry": "threejs-compatibility-fallbacks/examples/browser-fallback-harness/index.html",
+  "sourceHash": "sha256:9231fa99929b91403d81f6e359d3355bdc75731afc8491203e1482c54f1024da",
+  "publishedHashInputs": [
+    "docs/demos/browser-fallback-harness",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:47123089704fa3ebbf1671f1a6510bf375484d437088e6c91c614959aa095727",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

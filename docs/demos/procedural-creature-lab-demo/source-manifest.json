@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "procedural-creature-lab-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-procedural-creatures/SKILL.md",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-procedural-creatures/SKILL.md"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:03f6e4de4660774e3c9aa9545218e631ec152a132455c644e832b6576dec1969",
+  "publishedHashInputs": [
+    "docs/demos/procedural-creature-lab-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:d65bccfaea562dd8c7d700adcad93304779bacb68d6b127baef045eca88b146f",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-pooled-effects",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/lab.mjs",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/gpu-compaction-pool.js",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/effect-visuals.js",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/effect-pool.js",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/reentry-shell.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
+  ],
+  "browserEntry": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/index.html",
+  "sourceHash": "sha256:acc472f7c027972d668998d5087a5d42534983271f7c156af24af4ec1a4e0ffb",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-pooled-effects",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:5c2efc719d9f6549565ca33602d35bcd98ab541973dedc27ee1e9ef38428d3fb",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-exposure-color-pipeline",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
+  ],
+  "sourceHashInputs": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
+  ],
+  "browserEntry": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/index.html",
+  "sourceHash": "sha256:4a896359be4a21d22a8009e04ba9253a95b63168be13916b23420740123381c5",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-exposure-color-pipeline",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:64864f909cab96cba1d0da96d4c5edfbfc84bebf50ffe7ba8e23f19383967bba",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

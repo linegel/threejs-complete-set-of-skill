@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-weather-volume-clouds",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-config.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-domains.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-nodes.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-history.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-shadows.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-composite.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/browser-app.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/lab-routes.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/route-shell.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
+  ],
+  "browserEntry": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/index.html",
+  "sourceHash": "sha256:7f234f0be198c3471e8600d5b9457438affaec1ead9a67bf7e7ba7faf0a2b912",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-weather-volume-clouds",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:f748d2eb0e2368719586f57abff5fe9d5870b8495f2e7826ea62d29d8b5d9474",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

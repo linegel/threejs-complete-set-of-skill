@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "labId": "tsl-curved-ray",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-lab.mjs",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-gpu-probes.js",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.js",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
+  ],
+  "browserEntry": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/index.html",
+  "sourceHash": "sha256:88f02b547cf8c5ad93a38e88b1a3bc1fe8de1185524820c282eec39e9bc3bde8",
+  "publishedHashInputs": [
+    "docs/demos/tsl-curved-ray",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:77a8b9fd88a41a9030a8466583f2c6b6d76a777b3dc7366005ff8ebd329df7db",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

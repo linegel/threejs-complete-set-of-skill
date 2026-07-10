@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-touch-history-frost",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-webgpu-lab.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/route-wrapper.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/main.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html"
+  ],
+  "sourceHashInputs": [
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
+  ],
+  "browserEntry": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html",
+  "sourceHash": "sha256:e541d9f92d87a2d58a4658fa3ef2e1dd49fa0ffd64ca1d9bd9f651dee5ada385",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-touch-history-frost",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:ee83f0a95871fd26cf6c1a61c95e75efa9eb061825febb23220420816582baf2",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

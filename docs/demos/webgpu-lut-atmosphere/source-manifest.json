@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-lut-atmosphere",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/webgpu-lut-atmosphere.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-config.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-math.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/depth-contract.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/runtime-state.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/browser-app.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/lab-routes.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/route-shell.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
+  ],
+  "browserEntry": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/index.html",
+  "sourceHash": "sha256:551de40c2730a4ca58fed3ba792ff39c57961b8db97761040519eaca1f2ebc61",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-lut-atmosphere",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:b15b1545171b7b174a7406290fadfd09b39988e81a08ba770e871080474cb33e",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

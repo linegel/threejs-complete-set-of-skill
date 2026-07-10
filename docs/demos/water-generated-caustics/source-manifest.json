@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "water-generated-caustics",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-water-optics/examples/webgpu-bounded-water",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-water-optics/examples/webgpu-bounded-water"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:1935fb54daf784b1640d742223e329da03b9fdfd52dc904df3df7a3afe798192",
+  "publishedHashInputs": [
+    "docs/demos/water-generated-caustics",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:adb1c8b3cc8671e8857aadc72253b45651b86aaa90142f846ff03be059b5d872",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

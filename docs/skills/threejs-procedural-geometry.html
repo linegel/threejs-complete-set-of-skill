@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Procedural Geometry — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-geometry.html" />
+<title>Procedural Geometry | Three.js WebGPU Skill</title>
+<meta name="description" content="Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-geometry.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Procedural Geometry — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-geometry.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:title" content="Procedural Geometry | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-geometry.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Procedural Geometry visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Procedural Geometry visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Procedural Geometry evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Procedural Geometry evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Procedural Geometry — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets." />
+<meta name="twitter:title" content="Procedural Geometry | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Procedural Geometry — Three.js WebGPU agent skill",
-   "description": "Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-geometry.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
-   "dateModified": "2026-07-04T23:30:20+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-procedural-geometry.html#article",
+   "headline": "Procedural Geometry | Three.js WebGPU Skill",
+   "description": "Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.",
+   "url": "https://threejs-skills.com/skills/threejs-procedural-geometry.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-procedural-geometry.html",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Procedural Content",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Procedural Geometry",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-geometry.html"
+     "item": "https://threejs-skills.com/skills/threejs-procedural-geometry.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="">
   
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Geometry</p>
-    <h1>Procedural Geometry</h1>
-    <p class="lede">Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Geometry</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-procedural-geometry">Procedural Geometry</h1>
+    <p class="lede">Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-procedural-geometry</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">2 runnable examples</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-04T23:30:20+03:00">2026-07-04</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/f0cf7d80ddd4ccf09f61c2d0e887be0eb033eb73">commit f0cf7d8 ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">1 flagship</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-geometry/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-geometry/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,36 +275,48 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/procedural-geometry-writer-demo/"><figure>
-        <div class="live-visual live-visual--geometry" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
-        <strong>profile sweep + material groups</strong>
-        <span class="lv-m">final / groups / wire</span>
-      </div>
-        <figcaption><strong>Semantic Mesh Writer Bench</strong><span>Semantic dimensions, material groups, hard-edge duplication, and LOD tiers drive inspectable generated geometry.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-geometry/examples/sculpted-gallery-frame">
-        <h4>sculpted-gallery-frame</h4>
-        <span class="card-meta">threejs-procedural-geometry/examples/sculpted-gallery-frame</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-geometry/examples/semantic-mesh-writer">
-        <h4>semantic-mesh-writer</h4>
-        <span class="card-meta">threejs-procedural-geometry/examples/semantic-mesh-writer</span>
+      <a class="card" href="../demos/semantic-mesh-writer/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Semantic Mesh Writer</h3>
+        <p>6 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
+  </div></section>
+
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/procedural-district/">
+        <span class="card-head"><span class="card-index">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Procedural District</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Meshes are written by semantic writers: rings, profiles, and lofts emitted into indexed
+buffers with explicit attribute ownership. A profile swept along a frame uses parallel
+transport to avoid twist — the frame advances by the minimal rotation between tangents:</p>
+$$\mathbf n_{i+1} = R\big(\mathbf t_i \times \mathbf t_{i+1},\; \angle(\mathbf t_i, \mathbf t_{i+1})\big)\,\mathbf n_i$$
+<p>Smooth normals accumulate face normals weighted by corner angle, then normalize:
+$\mathbf n_v = \operatorname{normalize}\sum_f \theta_{v,f}\,\mathbf n_f$. Index sharing versus
+splitting is decided by crease angle: split when
+$\mathbf n_a \cdot \mathbf n_b < \cos\theta_{crease}$.</p>
+<p>Draw-call strategy is a budget decision: $N$ unique shapes × $M$ instances favors
+BatchedMesh when shapes vary, InstancedMesh when only transforms do — one material slot
+per identity either way.</p></div>
   </div></div>
+
+
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
@@ -265,6 +332,24 @@ post processing all matter. This skill owns reusable mesh emission. Use
 <code>$threejs-procedural-buildings-and-cities</code> for building grammars,
 <code>$threejs-procedural-vegetation</code> for growth hierarchies, and then apply these
 mesh-writer mechanisms inside those subject skills.</p>
+<p>When geometry supplies collision or support, apply the shared
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
+Publish stable <code>ColliderProxy</code> records and a static <code>SupportSurfaceSample</code>
+adapter from authoritative geometry/field topology. Its canonical
+<code>PhysicsSignalDescriptor</code> and each batched <code>PhysicsSampleRequest</code>/
+<code>SupportSurfaceSample</code> preserve <code>contextId</code>, requested/actual footprint and
+filter, frame/origin/transform revision, state/resource version, validity,
+per-channel error, residency, cadence/latency, and explicit absence. A request
+uses its exact <code>PhysicsInstant</code> or <code>PhysicsTimeInterval</code>; the returned support
+record uses <code>sampleInstant: PhysicsInstant</code>.
+Convert world geometry once through <code>PhysicsContext.worldToPhysicsTransform</code>
+and its sole <code>metersPerWorldUnit</code>; the proxy/provider serializes no reciprocal
+or second scale. IDs, material bindings, frames, source versions, validity, and
+error bounds are independent of render LOD, batching, and runtime triangle/
+instance indices. Moving or
+deforming support remains owned by motion/site/domain solvers through a
+<code>DeformingSupportProxy</code>; this mesh compiler must not infer its velocity from
+render-frame differences.</p>
 <h2>API Baseline</h2>
 <ul>
 <li>Renderer: <code>WebGPURenderer</code> from <code>three/webgpu</code>; call <code>await renderer.init()</code>.</li>
@@ -279,23 +364,23 @@ needed by the inspection scene.</li>
 <code>renderer.compute()</code> / <code>renderer.computeAsync()</code>, with <code>StorageBufferAttribute</code>,
 <code>StorageInstancedBufferAttribute</code>, <code>storage()</code> nodes, and indirect draw buffers
 where culling or compaction is compute-owned.</li>
-<li>Color: color textures use <code>SRGBColorSpace</code>; geometry data, normals, masks,
+<li>Color: LDR color assets encoded as sRGB use <code>SRGBColorSpace</code>; HDR/EXR
+radiance remains loader-declared linear. Geometry data, normals, masks,
 LUTs, and procedural lookup textures use <code>NoColorSpace</code>/linear. Keep HDR
 buffers as <code>HalfFloatType</code> until the single tone-map and output conversion
 owner in the node pipeline via <code>outputColorTransform</code> or <code>renderOutput()</code>.</li>
 </ul>
+<p>After initialization, use <code>renderer.compute()</code> for ordinary submission. r185
+<code>computeAsync()</code> only initializes on demand before enqueueing and is not a
+GPU-completion fence.</p>
 <h2>Capability Gate</h2>
-<p>Use one renderer path and degrade quality, not implementation model:</p>
+<p>Use one native renderer path and degrade geometry quality, not backend:</p>
 <pre><code class="language-js">await renderer.init();
 
-const tier = renderer.backend.isWebGPUBackend ? &quot;gpu-storage&quot; : &quot;static-lod&quot;;
-
-if (tier === &quot;gpu-storage&quot;) {
-  // Full tier: compute-generated dynamic attributes, storage buffers,
-  // indirect draw compaction, and full mesh validation overlays.
-} else {
-  // Reduced tier: precomputed meshes, smaller grids, static LODs, and fewer
-  // material diagnostics. No alternate low-level renderer recipe.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    &#39;WebGPU is required for the canonical procedural-geometry path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.&#39;
+  );
 }
 </code></pre>
 <p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/sculpted-gallery-frame/frame-geometry.js</code></p>
@@ -329,7 +414,7 @@ after edits.</p>
 <tr>
 <td>production UV</td>
 <td>material sampler</td>
-<td>real-distance <code>s</code> and profile arc length times texels/world unit</td>
+<td>store physical distance or repeats: <code>u=distance/metersPerRepeat=distance*texelsPerWorld/textureAxisTexels</code>; never pass raw texel coordinates as normalized UV</td>
 </tr>
 <tr>
 <td>debug <code>(s,t)</code></td>
@@ -347,6 +432,105 @@ after edits.</p>
 <td>semantic dimensions, material slot, smoothing group, UV chart, boundary reason</td>
 </tr>
 </tbody></table>
+<h2>Local Terrain And Coast Representation Gate</h2>
+<p>For local islands, archipelagos, reservoirs, river margins, and coastal sites,
+consume one versioned field contract from <code>$threejs-procedural-fields</code>:
+positive-inside shoreline distance, coast frame, raw elevation, bathymetry,
+terrace levels, cliff top/toe, material identities, and placement exclusions.
+Do not independently regenerate a shoreline in the terrain, seabed, material,
+and placement paths.</p>
+<p>Choose the mesh class from the observable:</p>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Representation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>single-valued continuous relief under free close inspection</td>
+<td>indexed adaptive grid, quadtree, or clipmap with explicit error and seam policy</td>
+</tr>
+<tr>
+<td>hard stylized terraces, beaches, and vertical cliffs</td>
+<td>contour-derived 2.5D caps plus explicit wall strips and band meshes</td>
+</tr>
+<tr>
+<td>fixed set of moderate isolated landforms</td>
+<td>compile each island into whole-object LODs before considering chunks</td>
+</tr>
+<tr>
+<td>caves, arches, or overhangs whose topology is visible</td>
+<td>bounded volumetric SDF meshing; marching cubes or dual contouring only after its memory/topology cost passes</td>
+</tr>
+<tr>
+<td>static seed catalogue</td>
+<td>precompute meshes and anchors when runtime regeneration has no product value</td>
+</tr>
+</tbody></table>
+<p>The terraced compiler operates on superlevel regions
+<code>Omega_k={p:zRaw(p)&gt;=L_k}</code>. The horizontal cap at level <code>L_k</code> is the polygonal
+region <code>Omega_k minus Omega_(k+1)</code>; the boundary of <code>Omega_(k+1)</code> owns the wall
+from <code>L_k</code> to <code>L_(k+1)</code>. This handles split/merge topology without attempting
+to pair unrelated contour vertices. Extract contours with marching squares and
+an asymptotic decider for ambiguous cells; key intersections by global grid
+edge plus iso-level so adjacent cells and chunks reuse the same result.</p>
+<p>Use constrained triangulation for polygons with holes and robust predicates.
+Ear clipping is eligible only for validated simple loops. Duplicate render
+vertices across cap/wall, material, UV, and hard-normal boundaries, but retain
+a separate topological edge/vertex identity so manifold validation still knows
+the surfaces meet. A closed land body requires every topological edge to have
+two incident faces; explicitly declared waterline or chunk boundaries are the
+only exceptions.</p>
+<p>Emit semantic slots such as <code>terrain-cap</code>, <code>cliff-wall</code>, <code>dry-beach</code>,
+<code>wet-beach</code>, and <code>visible-seabed</code>. Caps use world-distance XZ UVs; walls use
+coast arc length and physical height. Export stable shoreline/terrace boundary
+IDs plus placement anchors carrying position, surface frame, coast distance,
+slope, terrace ID, clearance, and seed. Buildings, docks, paths, vegetation,
+and rocks consume those records and an explicit exclusion field; they must not
+re-sample an approximate display mesh and invent new identities.</p>
+<p><code>wet-beach</code> is a static substrate/capacity identity and <code>visible-seabed</code> is a
+geometry/visibility identity. Neither stores dynamic liquid, inundation, foam,
+or precipitation state. Their materials consume the route-selected receiver
+owner&#39;s immutable wetness/inundation snapshot and the water owner&#39;s completed
+signals.</p>
+<p>Read the full compiler, LOD, seam, and adversarial-validation contract in
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-geometry/references/profile-sweeps-and-mesh-writers.md#local-terrain-and-coast-mesh-compiler">profile-sweeps-and-mesh-writers.md</a>.</p>
+<h3>Static physics support output</h3>
+<p>When requested by the route, compile a physics proxy package beside render
+geometry. It references the active <code>PhysicsContext</code>, canonical
+<code>physicsFrameId</code>/<code>physicsOriginEpoch</code>/<code>transformRevision</code>, source
+field/topology revision, stable proxy and semantic IDs,
+<code>PhysicsMaterialId</code>, support domain, sidedness, sample footprint policy, and
+maximum position/support-height/normal error. A <code>SupportSurfaceSample</code> adapter
+queries this package or its authoritative field, never the current display LOD
+or camera depth.</p>
+<p><code>SupportSurfaceSample</code> is kinematic only. Its optional nearest-surface signed
+separation is not a contact penetration/manifold. It does not own contact
+lifecycle, impulses, or reactions. The collision solver owns
+the canonical <code>ContactManifoldRecord</code> plus dimensional <code>InteractionRecord</code> ABI
+and resolves impulses;
+geometry supplies stable generation-bearing shape/support/feature identity and
+bounded surface data only.</p>
+<p>A view-independent geometry/deformation state publishes one leased
+<code>PresentedStatePair</code> per stable binding/provider in
+<code>PhysicsPresentationCandidate</code>; each previous/current arm carries independent
+provenance, <code>PhysicsInstant</code>, state handle, and spatial binding. Per-view render
+LOD, visibility, picking acceleration, shadow representation, cache state, and
+reset actions belong to <code>ViewPreparationPublication</code>, after
+<code>CameraViewPublication</code> owns the render mapping. The sealed snapshot references
+candidate binding IDs and lease refs rather than copying pairs or transforms;
+the multi-target <code>FrameExecutionRecord</code> owns completion and lease disposition.
+A representation/topology change emits the scoped motion/history invalidation
+reason. Static geometry is an explicit hold pair, not an unleased mutable
+buffer, and a view-specific LOD is never baked into the shared candidate.</p>
+<p>Graphics LOD may change vertices, groups, and draw representation while the
+physics proxy identity remains fixed. A distinct physics proxy quality change
+requires an explicit <code>QualityTransition</code> and new declared errors; it cannot be
+triggered as a side effect of render LOD. This skill emits only static support.
+Moving platforms, flexible structures, animated hulls, and edited deforming
+surfaces require a versioned <code>DeformingSupportProxy</code> and transform/deformation
+provider owned by the motion, site, or external solver adapter.</p>
 <h2>Build Order</h2>
 <ol>
 <li>Choose the algorithm class and batch model:
@@ -356,7 +540,10 @@ semantic indexed <code>BufferGeometry</code> writer for unique authored surfaces
 attributes, and storage/indirect buffers only when visibility or deformation
 is hot enough to justify GPU-side generation.</li>
 <li>Define semantic dimensions, named regions, material slots, smoothing groups,
-UV charts, and LOD tiers before allocating buffers.</li>
+UV charts, and LOD tiers before allocating buffers. Each LOD declares a
+projected geometric-error threshold using the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/projected-error-contract.md">shared physical-pixel contract</a>;
+triangle-count ratios alone do not bound silhouette or shading error.</li>
 <li>Precompute exact vertex/index capacity per tier; allocate typed arrays once;
 select <code>Uint16Array</code> indices only when every referenced vertex fits, otherwise
 use <code>Uint32Array</code>.</li>
@@ -367,40 +554,62 @@ boundaries, mirrored tangent spaces, and any place that needs independent
 normals or tangents.</li>
 <li>Generate UVs from real distance for production materials. Reserve normalized
 <code>(s,t)</code> coordinates for local debug views or analytic node masks.</li>
+<li>Sweep curves with a rotation-minimizing parallel-transport frame: project an
+authored initial normal off the first tangent, apply the minimal tangent-to-
+tangent rotation with an explicit antiparallel fallback, re-orthonormalize,
+and apply authored twist separately. Closed loops distribute residual
+holonomy by arc length. Frenet frames are invalid at zero curvature and
+inflections.</li>
 <li>Prefer analytic normals and tangents from the generator. Use
 <code>computeVertexNormals()</code> only for intentionally smooth shared-vertex regions;
-use <code>BufferGeometryUtils.computeMikkTSpaceTangents()</code> for normal-mapped
-surfaces and validate mirrored seams.</li>
+for Mikk parity, await <code>MikkTSpace.ready</code> and call
+<code>computeMikkTSpaceTangents(geometry,MikkTSpace,negateSign)</code>. r185 de-indexes
+indexed input, so treat it as a separate representation and recompute
+counts/groups/bounds/bytes; prefer analytic tangents when valid.</li>
 <li>Assign <code>BufferGeometry</code> groups exactly: every index belongs to one group, no
 group overlaps, and material index order is stable across LODs.</li>
 <li>Set attribute usage before first render. Static meshes can release CPU arrays
-with <code>onUpload()</code> when no rebuild is needed; dynamic sections use
-<code>addUpdateRange()</code>, <code>needsUpdate</code>, and targeted bounds recomputation.</li>
+   with <code>onUpload()</code> when no rebuild is needed; dynamic sections use
+   <code>addUpdateRange()</code>, <code>needsUpdate</code>, and targeted bounds recomputation.</li>
 <li>Validate finite attributes, index bounds, degenerate triangles, winding,
 normal length, tangent handedness, UV density, bounding box/sphere, group
 coverage, byte cost, draw calls, and renderer stats.</li>
+<li>For large sets, partition by the smallest useful culling/streaming unit.
+Compare CPU chunk submission, <code>BatchedMesh</code>, and compute-filled indirect
+visibility using submitted-work measurements. A shader mask that still
+executes every hidden vertex is not culling.</li>
 </ol>
-<p>Read <a href="references/profile-sweeps-and-mesh-writers.md">references/profile-sweeps-and-mesh-writers.md</a>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-geometry/references/profile-sweeps-and-mesh-writers.md">references/profile-sweeps-and-mesh-writers.md</a>
 for the profile sweep, rail emission, branch-ring, semantic writer, batching
 decision table, quality tiers, and validation budgets.</p>
-<h2>Performance Budgets</h2>
+<h2>Performance Contract</h2>
 <ul>
-<li>Static hero profile: &lt;= 35k vertices, &lt;= 70k triangles, &lt;= 6 material groups,
-one mesh draw per material group, no per-frame allocation, rebuild only when
-dimensions change.</li>
-<li>Repeated unique modules: <code>BatchedMesh</code> per material, one draw per material
-batch, reserve vertex/index capacity up front, keep per-object culling enabled
-unless a measured scene proves otherwise.</li>
-<li>Repeated identical topology: <code>InstancedMesh</code> with instance attributes; move hot
-transforms/colors into <code>StorageInstancedBufferAttribute</code> when compute updates
-replace CPU uploads.</li>
+<li>Static profile: record <code>V</code>, <code>T</code>, index width, attribute stride, material
+groups, projected geometric error, and compile bytes/time. It performs no
+per-frame allocation or mutation and rebuilds only when geometry inputs
+change.</li>
+<li>Repeated unique modules: <code>BatchedMesh</code> can reduce scene objects/state churn
+while preserving per-object culling/replacement, but r185 WebGPU emits one
+backend draw item per visible multi-draw entry. Measure <code>renderer.info</code> and
+GPU submission; merge static compatible geometry when draw collapse is the
+actual requirement.</li>
+<li>Repeated identical topology with CPU-owned matrices: <code>InstancedMesh</code> and its
+<code>instanceMatrix</code>. When storage owns the complete transform, use a matrix-free
+<code>Mesh</code> with <code>InstancedBufferGeometry</code> plus storage-backed position/quaternion/
+scale (or required affine state); otherwise r185 still allocates/applies the
+redundant <strong>[Derived]</strong> 64-byte <code>mat4&lt;f32&gt;</code> <code>instanceMatrix</code>.</li>
 <li>Dynamic edits: update only changed component ranges; target zero full-buffer
 uploads during interaction and zero geometry object churn per frame.</li>
-<li>Frame targets for geometry work: &lt;= 0.25 ms CPU update on desktop discrete,
-&lt;= 0.75 ms desktop integrated, &lt;= 1.5 ms mobile for routine edits; rebuilds
-may exceed this only on explicit user actions and must report vertex/index
-counts, bytes, group count, draw calls, and update ranges.</li>
+<li>Dynamic updates report changed ranges and bytes, CPU encode/submission
+p50/p95, GPU consumption p50/p95, and allocation count. Rebuilds are a
+separate cold/interaction class and must report vertices, indices, groups,
+peak transient bytes, and time to first correct frame.</li>
 </ul>
+<p>The scene router allocates the actual ceiling. Accept with target-device
+whole-frame and paired-marginal p50/p95, update/submission timing, peak upload
+bytes, and sustained behavior. Static scenes have no per-frame geometry
+mutation. Choose tessellation from projected error; no universal triangle cap
+separates mobile from desktop.</p>
 <h2>Failure Conditions</h2>
 <ul>
 <li>triangle emission starts before the batch model and material slots are known;</li>
@@ -411,10 +620,13 @@ counts, bytes, group count, draw calls, and update ranges.</li>
 material boundaries;</li>
 <li>generated dimensions are hidden in magic multipliers;</li>
 <li><code>InstancedMesh</code> is used despite per-instance topology differences;</li>
-<li><code>BatchedMesh</code> is skipped for many same-material unique geometries;</li>
+<li><code>BatchedMesh</code> is claimed to collapse r185 WebGPU GPU draws without inspecting
+visible multi-draw entries/backend commands;</li>
 <li>attribute <code>usage</code> is changed after upload instead of rebuilding the attribute;</li>
 <li>dynamic geometry uploads whole buffers when only subranges changed;</li>
 <li>triangle count is the only reported complexity metric.</li>
+<li>collision/support is sampled from the active render LOD, camera depth, or
+runtime triangle index, or a graphics LOD change mutates proxy identity;</li>
 </ul>
 </div>
   <div class="pn">
@@ -424,26 +636,28 @@ material boundaries;</li>
 </div></div>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Meshes are written by semantic writers: rings, profiles, and lofts emitted into indexed
-buffers with explicit attribute ownership. A profile swept along a frame uses parallel
-transport to avoid twist — the frame advances by the minimal rotation between tangents:</p>
-$$\mathbf n_{i+1} = R\big(\mathbf t_i \times \mathbf t_{i+1},\; \angle(\mathbf t_i, \mathbf t_{i+1})\big)\,\mathbf n_i$$
-<p>Smooth normals accumulate face normals weighted by corner angle, then normalize:
-$\mathbf n_v = \operatorname{normalize}\sum_f \theta_{v,f}\,\mathbf n_f$. Index sharing versus
-splitting is decided by crease angle: split when
-$\mathbf n_a \cdot \mathbf n_b < \cos\theta_{crease}$.</p>
-<p>Draw-call strategy is a budget decision: $N$ unique shapes × $M$ instances favors
-BatchedMesh when shapes vary, InstancedMesh when only transforms do — one material slot
-per identity either way.</p></div>
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/procedural-geometry-writer-demo/"><figure>
+        <div class="live-visual live-visual--geometry" aria-hidden="true">
+        <span class="lv-k">Concept proxy</span>
+        <strong>profile sweep + material groups</strong>
+        <span class="lv-m">final / groups / wire</span>
+      </div>
+        <figcaption><strong>Semantic Mesh Writer Bench</strong><span>Concept proxy · The docs page implements a compact runtime frame-profile writer for inspection. The production skill remains preallocated typed-array writers, exact group coverage, tangent validation, batching decisions, and targeted update ranges.</span></figcaption>
+      </figure></a>
+    </div>
   </div></div>
+
+</main>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

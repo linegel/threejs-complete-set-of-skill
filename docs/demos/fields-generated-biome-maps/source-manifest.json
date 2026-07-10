@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "fields-generated-biome-maps",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-procedural-fields/examples/webgpu-field-bake",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:673c7ab179bba44bca8b3c5f4b43a983d50d57e3849af2af063235a938b1063a",
+  "publishedHashInputs": [
+    "docs/demos/fields-generated-biome-maps",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:8c7f951c620451b936d4fd0771cd1b540285efe0c5cfa5edd2e8df923d66b39b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

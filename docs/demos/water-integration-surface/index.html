@@ -1,152 +1,47 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Water Integration Surface Experiment</title>
-    <style>
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        overflow: hidden;
-        background: #061014;
-        color: #e9f5f7;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-
-      .hud {
-        position: fixed;
-        inset: 16px auto auto 16px;
-        width: min(420px, calc(100vw - 32px));
-        display: grid;
-        gap: 10px;
-        padding: 12px;
-        border: 1px solid rgba(208, 239, 244, 0.22);
-        border-radius: 6px;
-        background: rgba(4, 14, 18, 0.74);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
-      }
-
-      .row {
-        display: grid;
-        grid-template-columns: 96px 1fr;
-        align-items: center;
-        gap: 8px;
-        min-height: 28px;
-      }
-
-      .label {
-        color: rgba(233, 245, 247, 0.62);
-        font-size: 12px;
-        line-height: 1;
-      }
-
-      select,
-      button {
-        height: 28px;
-        border: 1px solid rgba(202, 235, 241, 0.22);
-        border-radius: 4px;
-        background: rgba(12, 31, 38, 0.92);
-        color: #edf9fb;
-        font: inherit;
-        font-size: 12px;
-      }
-
-      button {
-        cursor: pointer;
-      }
-
-      .button-row {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 6px;
-      }
-
-      .metrics {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 6px;
-      }
-
-      .metric {
-        min-height: 36px;
-        padding: 7px 8px;
-        border: 1px solid rgba(202, 235, 241, 0.12);
-        border-radius: 4px;
-        background: rgba(11, 25, 31, 0.7);
-      }
-
-      .metric b {
-        display: block;
-        color: rgba(233, 245, 247, 0.58);
-        font-size: 10px;
-        font-weight: 500;
-        line-height: 1.1;
-      }
-
-      .metric span {
-        display: block;
-        margin-top: 3px;
-        color: #effcff;
-        font-size: 13px;
-        line-height: 1.1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      body.headless .hud {
-        display: none;
-      }
-    </style>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.webgpu.js",
-          "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.webgpu.js",
-          "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.tsl.js",
-          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
-        }
-      }
-    </script>
-  </head>
-  <body>
-    <div class="hud" aria-label="Water integration controls">
-      <div class="row">
-        <div class="label">Preset</div>
-        <select id="preset-select"></select>
-      </div>
-      <div class="row">
-        <div class="label">Quality</div>
-        <select id="quality-select">
-          <option value="reduced">reduced</option>
-          <option value="high" selected>high</option>
-          <option value="ultra">ultra</option>
-        </select>
-      </div>
-      <div class="button-row">
-        <button id="drop-button" type="button">Drop</button>
-        <button id="sync-button" type="button">Sync Tick</button>
-        <button id="storm-button" type="button">Storm</button>
-      </div>
-      <div class="metrics">
-        <div class="metric"><b>Backend</b><span id="metric-backend">...</span></div>
-        <div class="metric"><b>Tick</b><span id="metric-tick">...</span></div>
-        <div class="metric"><b>Buoyancy</b><span id="metric-buoyancy">...</span></div>
-        <div class="metric"><b>Spray</b><span id="metric-spray">...</span></div>
-        <div class="metric"><b>Masks</b><span id="metric-mask">...</span></div>
-        <div class="metric"><b>Ordering</b><span id="metric-ordering">...</span></div>
-      </div>
-    </div>
-    <script type="module" src="./integration-demo.js"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="demo-kind" content="proxy-demo">
+  <title>Water Integration Surface | Three.js WebGPU Demo</title>
+  <style>.classification-banner{position:fixed;z-index:20;top:12px;left:50%;transform:translateX(-50%);max-width:min(760px,calc(100vw - 24px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.94);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.classification-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU concept demo for Water Optics. The mask registry is intentionally shown as incomplete until a screen-space mask texture and…">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/water-integration-surface/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="Water Integration Surface | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU concept demo for Water Optics. The mask registry is intentionally shown as incomplete until a screen-space mask texture and…">
+  <meta property="og:url" content="https://threejs-skills.com/demos/water-integration-surface/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Water Integration Surface | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU concept demo for Water Optics. The mask registry is intentionally shown as incomplete until a screen-space mask texture and…">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/water-integration-surface/#demo","name":"Water Integration Surface","description":"Interactive Three.js WebGPU concept demo for Water Optics. The mask registry is intentionally shown as incomplete until a screen-space mask texture and…","url":"https://threejs-skills.com/demos/water-integration-surface/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Water Optics"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Water Optics","item":"https://threejs-skills.com/skills/threejs-water-optics.html"},{"@type":"ListItem","position":3,"name":"Water Integration Surface","item":"https://threejs-skills.com/demos/water-integration-surface/"}]}]}</script>
+  <script type="module" crossorigin src="../assets/index-YxT0fJZs.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BLzGo2sq.js">
+  <link rel="modulepreload" crossorigin href="../assets/OrbitControls-B9POmq7-.js">
+  <link rel="stylesheet" crossorigin href="../assets/index-9UBVqAHj.css">
+</head>
+<body data-demo="water-integration-surface" data-demo-kind="proxy-demo">
+  <aside class="classification-banner"><strong>Concept proxy.</strong> The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented. The host project owns post-processing, transparent ordering, and final output conversion. <a href="../webgpu-bounded-water/">Canonical lab or contract</a>.</aside>
+  <main>
+    <canvas id="demo-canvas"></canvas>
+    <section class="hud">
+      <div class="panel"><p class="meta" id="demo-skill"></p><h1 class="title" id="demo-title"></h1><p class="claim" id="demo-claim"></p><div class="controls" id="demo-controls"></div></div>
+      <div class="panel"><p class="status" id="demo-status">Initializing WebGPU...</p><p class="links"><a id="demo-evidence" href="../webgpu-bounded-water/">Canonical lab or contract</a></p></div>
+    </section>
+  </main>
+</body>
 </html>

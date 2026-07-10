@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "structured-ash-growth",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/structured-ash-growth/browser-lab.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/tree-system.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/route-contract.js"
+  ],
+  "sourceHashInputs": [
+    "labs/runtime/strict-lab-controller.mjs",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/ash.png",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/bark-color.jpg",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/bark-normal.jpg",
+    "threejs-procedural-vegetation/assets/structured-ash-growth/bark-roughness.jpg",
+    "threejs-procedural-vegetation/examples/structured-ash-growth"
+  ],
+  "browserEntry": "threejs-procedural-vegetation/examples/structured-ash-growth/index.html",
+  "sourceHash": "sha256:047eef14e678046964839d0403d5d409e7604613b720c07c4d47b89e2b4c2509",
+  "publishedHashInputs": [
+    "docs/demos/structured-ash-growth",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:043a236161022adcae2730f62f8b8d02aa156709422f9f520100f067ae61ee36",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

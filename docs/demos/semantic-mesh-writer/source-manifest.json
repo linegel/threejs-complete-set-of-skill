@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "semantic-mesh-writer",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-geometry/examples/semantic-mesh-writer"
+  ],
+  "sourceHashInputs": [
+    "threejs-procedural-geometry/examples/semantic-mesh-writer"
+  ],
+  "browserEntry": "threejs-procedural-geometry/examples/semantic-mesh-writer/index.html",
+  "sourceHash": "sha256:9218a7322fe2c95e48d0640697f04334c0d71b870de7e27bcf4c4ab287d2d6a8",
+  "publishedHashInputs": [
+    "docs/demos/semantic-mesh-writer",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:b8dea7d9986a2ddc232eeddd2be2e52714fa23fca61169d12699b81c52a478c8",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

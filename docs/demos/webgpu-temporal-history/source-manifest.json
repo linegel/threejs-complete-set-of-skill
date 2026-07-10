@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-temporal-history",
+  "kind": "mechanism-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+    "threejs-image-pipeline/examples/webgpu-temporal-history"
+  ],
+  "sourceHashInputs": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+    "threejs-image-pipeline/examples/webgpu-temporal-history"
+  ],
+  "browserEntry": "threejs-image-pipeline/examples/webgpu-temporal-history/index.html",
+  "sourceHash": "sha256:488b22e084958397dd5c1677b050b3d75723e96a1ff4b01ea3c1bd49dca2401f",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-temporal-history",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:3098dd26caed94ca3201d0d55f86246b54c8480051de8f7385fafe2e8025991a",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-field-bake",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/browser-app.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-procedural-fields/examples/webgpu-field-bake"
+  ],
+  "browserEntry": "threejs-procedural-fields/examples/webgpu-field-bake/index.html",
+  "sourceHash": "sha256:555355c7341ff6cefdaf0eb681bcd2440bdb30b957f79aebff935b6d0d9ce0e7",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-field-bake",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:56d491c57aca63faf5d4dcc41428cd1e73be928f3f9114c98d4a1f70904d698b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

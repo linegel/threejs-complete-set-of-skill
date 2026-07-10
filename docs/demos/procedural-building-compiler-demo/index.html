@@ -1,37 +1,47 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Material-Slot Building Compiler</title>
-    <link rel="stylesheet" href="../shared/provider-demo.css" />
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.webgpu.js",
-          "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.webgpu.js",
-          "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.tsl.js",
-          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
-        }
-      }
-    </script>
-  </head>
-  <body data-demo="procedural-building-compiler-demo">
-    <main>
-      <canvas id="demo-canvas"></canvas>
-      <section class="hud">
-        <div class="panel">
-          <p class="meta" id="demo-skill"></p>
-          <h1 class="title" id="demo-title"></h1>
-          <p class="claim" id="demo-claim"></p>
-          <div class="controls" id="demo-controls"></div>
-        </div>
-        <div class="panel">
-          <p class="status" id="demo-status">Initializing WebGPU...</p>
-          <p class="links"><a id="demo-evidence" href="../../skills/threejs-procedural-buildings-and-cities.html">Skill contract</a></p>
-        </div>
-      </section>
-    </main>
-    <script type="module" src="../shared/provider-demo.mjs"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="demo-kind" content="proxy-demo">
+  <title>Material-Slot Building Compiler | Three.js WebGPU Demo</title>
+  <style>.classification-banner{position:fixed;z-index:20;top:12px;left:50%;transform:translateX(-50%);max-width:min(760px,calc(100vw - 24px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.94);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.classification-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU concept demo for Procedural Buildings and Cities. The docs page uses compact runtime geometry instead of the full fixture compiler…">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/procedural-building-compiler-demo/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="Material-Slot Building Compiler | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU concept demo for Procedural Buildings and Cities. The docs page uses compact runtime geometry instead of the full fixture compiler…">
+  <meta property="og:url" content="https://threejs-skills.com/demos/procedural-building-compiler-demo/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Material-Slot Building Compiler | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU concept demo for Procedural Buildings and Cities. The docs page uses compact runtime geometry instead of the full fixture compiler…">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/procedural-building-compiler-demo/#demo","name":"Material-Slot Building Compiler","description":"Interactive Three.js WebGPU concept demo for Procedural Buildings and Cities. The docs page uses compact runtime geometry instead of the full fixture compiler…","url":"https://threejs-skills.com/demos/procedural-building-compiler-demo/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Procedural Buildings and Cities"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Procedural Buildings and Cities","item":"https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html"},{"@type":"ListItem","position":3,"name":"Material-Slot Building Compiler","item":"https://threejs-skills.com/demos/procedural-building-compiler-demo/"}]}]}</script>
+  <script type="module" crossorigin src="../assets/index-C5ouShGw2.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BLzGo2sq.js">
+  <link rel="modulepreload" crossorigin href="../assets/OrbitControls-B9POmq7-.js">
+  <link rel="stylesheet" crossorigin href="../assets/index-9UBVqAHj.css">
+</head>
+<body data-demo="procedural-building-compiler-demo" data-demo-kind="proxy-demo">
+  <aside class="classification-banner"><strong>Concept proxy.</strong> The docs page uses compact runtime geometry instead of the full fixture compiler and BatchedMesh capacity accounting. The production skill remains plan validation, interval overlap checks, physical UV scale, material-slot mesh compilation, and city-chunk budget evidence. <a href="../webgpu-material-slot-compiler/">Canonical lab or contract</a>.</aside>
+  <main>
+    <canvas id="demo-canvas"></canvas>
+    <section class="hud">
+      <div class="panel"><p class="meta" id="demo-skill"></p><h1 class="title" id="demo-title"></h1><p class="claim" id="demo-claim"></p><div class="controls" id="demo-controls"></div></div>
+      <div class="panel"><p class="status" id="demo-status">Initializing WebGPU...</p><p class="links"><a id="demo-evidence" href="../webgpu-material-slot-compiler/">Canonical lab or contract</a></p></div>
+    </section>
+  </main>
+</body>
 </html>

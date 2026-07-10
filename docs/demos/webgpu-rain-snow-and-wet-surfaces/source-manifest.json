@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-rain-snow-and-wet-surfaces",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/test-runtime-contracts.mjs",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/route-wrapper.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/main.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/index.html"
+  ],
+  "sourceHashInputs": [
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
+  ],
+  "browserEntry": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/index.html",
+  "sourceHash": "sha256:9e552daa3e86398238544b5eaf98af3400ead574a5c65629db4ae6291200b114",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-rain-snow-and-wet-surfaces",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:cce63edc479fb4dfe85ba33942f88b8e57ef3d9c19075520907f1397eb25a3b6",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

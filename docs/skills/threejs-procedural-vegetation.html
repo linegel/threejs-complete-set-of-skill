@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Procedural Vegetation — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-vegetation.html" />
+<title>Procedural Vegetation | Three.js WebGPU Skill</title>
+<meta name="description" content="Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-vegetation.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<link rel="preload" as="image" href="../visual-validation/vegetation-generated-meadow-density/final.design.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Procedural Vegetation — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-vegetation.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/vegetation-generated-meadow-density/final.design.png" />
+<meta property="og:title" content="Procedural Vegetation | Three.js WebGPU Skill" />
+<meta property="og:description" content="Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-vegetation.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Procedural Vegetation visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/vegetation-generated-meadow-density/final.design.png" />
-<meta name="twitter:image:alt" content="Procedural Vegetation visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Procedural Vegetation evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.png" />
+<meta name="twitter:image:alt" content="Procedural Vegetation evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Procedural Vegetation — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics." />
+<meta name="twitter:title" content="Procedural Vegetation | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Procedural Vegetation — Three.js WebGPU agent skill",
-   "description": "Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-vegetation.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/vegetation-generated-meadow-density/final.design.png",
-   "dateModified": "2026-07-05T05:30:33+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html#article",
+   "headline": "Procedural Vegetation | Three.js WebGPU Skill",
+   "description": "Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.",
+   "url": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html",
+   "image": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Procedural Content",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Procedural Vegetation",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-vegetation.html"
+     "item": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Procedural Vegetation validation preview" fetchpriority="high" decoding="async" />
+  <img class="skill-hero-bg" src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Procedural Content</a> / Procedural Vegetation</p>
-    <h1>Procedural Vegetation</h1>
-    <p class="lede">Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Vegetation</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-procedural-vegetation">Procedural Vegetation</h1>
+    <p class="lede">Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-procedural-vegetation</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">5 runnable examples</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T05:30:33+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3dcde64d2d817e9e74080ee4e2e002e7c1206283">commit 3dcde64 ↗</a>
+      <span class="chip">3 primary implementations</span>
+<span class="chip">2 flagships</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-vegetation/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,311 +275,47 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/vegetation-generated-meadow-density/"><figure>
-        <img src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Meadow Density Placement" loading="lazy" />
-        <figcaption><strong>Meadow Density Placement</strong><span>Generated meadow density maps are used as live scene inputs for placement, path clearing, flower tint, and LOD response.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-  <div class="section" id="validation"><div class="wrap">
-    <h2>Validation gallery</h2>
-    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
-    <div class="gallery">
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Procedural Vegetation in Three.js WebGPU — Final design frame — generated meadow density masks" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Final design frame — generated meadow density masks</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/vegetation-generated-meadow-density/no-post.design.png" alt="Procedural Vegetation in Three.js WebGPU — Uniform meadow baseline" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Uniform meadow baseline</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png" alt="Procedural Vegetation in Three.js WebGPU — Density, path, clump, and flower-mask diagnostics" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Density, path, clump, and flower-mask diagnostics</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/vegetation-generated-meadow-density/seed-stress.final.png" alt="Procedural Vegetation in Three.js WebGPU — Seed-stress meadow placement frame" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Seed-stress meadow placement frame</span></figcaption>
-      </figure>
-    </div>
-  </div></div>
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-vegetation/examples/gpu-computed-grass">
-        <h4>gpu-computed-grass</h4>
-        <span class="card-meta">threejs-procedural-vegetation/examples/gpu-computed-grass</span>
+      <a class="card" href="../demos/structured-ash-growth/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Native WebGPU Structured Ash Growth</h3>
+        <p>6 fixed scenarios, 4 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-vegetation/examples/structured-ash-growth">
-        <h4>structured-ash-growth</h4>
-        <span class="card-meta">threejs-procedural-vegetation/examples/structured-ash-growth</span>
+      <a class="card" href="../demos/webgpu-dense-grass/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Native WebGPU Dense Grass</h3>
+        <p>7 fixed scenarios, 3 mechanism routes, and 4 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-vegetation/examples/stylized-meadow-grass">
-        <h4>stylized-meadow-grass</h4>
-        <span class="card-meta">threejs-procedural-vegetation/examples/stylized-meadow-grass</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-vegetation/examples/validation">
-        <h4>validation</h4>
-        <span class="card-meta">threejs-procedural-vegetation/examples/validation</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-vegetation/examples/webgpu-dense-grass">
-        <h4>webgpu-dense-grass</h4>
-        <span class="card-meta">threejs-procedural-vegetation/examples/webgpu-dense-grass</span>
+      <a class="card" href="../demos/webgpu-vegetation-integration/">
+        <span class="card-head"><span class="card-index">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Host-Owned Planet, Terrain, Dense Grass, and Ash Integration</h3>
+        <p>2 fixed scenarios, 3 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Procedural Vegetation</h2>
-<p>Use this skill for vegetation that has botanical structure and scale discipline: dense grass, authored meadows, deciduous trees, recursive branches, roots, canopies, leaf cards, trellises, deterministic species variation, and rooted wind. Start every implementation with <code>$threejs-choose-skills</code> when the scene also needs atmosphere, terrain, water, shadows, post, or camera doctrine.</p>
-<p>The only taught implementation path is latest Three.js <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, <code>NodeMaterial</code> subclasses, node render pipelines, and compute/storage data. Legacy WebGL implementation (deprecated, do not extend): <code>examples/stylized-meadow-grass/grass-system.js</code>, <code>examples/gpu-computed-grass/gpu-grass-system.js</code>.</p>
-<p>Canonical WebGPU dense-grass example: <code>examples/webgpu-dense-grass/</code>.</p>
-<h2>Best Architecture First</h2>
-<p>For dense grass and meadow vegetation, use this architecture before considering any API detail:</p>
-<ol>
-<li>Partition the field into deterministic chunks with fixed tile seeds, conservative per-patch bounds, and a visible debug overlay for bounds, density, and impostor state.</li>
-<li>Generate static blade, clump, species, terrain-conforming origin, facing, bend, color, and material parameters once in TSL compute into <code>StorageInstancedBufferAttribute</code> or <code>instancedArray()</code> storage nodes.</li>
-<li>Consume the storage data directly from a <code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code>; attach storage nodes through position, normal, color, roughness, alpha, and translucency node slots.</li>
-<li>Keep wind, touch response, camera-facing yaw, seasonal wetness, and trampling as dynamic fields. Update only those fields per frame, or evaluate them in the vertex node when it is cheaper than a dispatch.</li>
-<li>Cull and LOD by patch before draw submission: frustum culling from expanded bounds, distance density tiers, near geometric blades, mid reduced instance density, far clump/impostor cards, and optional compute compaction for high-overlap fields.</li>
-<li>Use node post only after the geometry budget is under control: <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code> for shared output/normal/depth/emissive data, <code>GTAONode</code> for contact, <code>BloomNode</code> only for authored emissive vegetation, and <code>TRAANode</code> when alpha shimmer needs temporal stabilization.</li>
-</ol>
-<p>The replaced sub-best path is full-field per-frame parameter regeneration. Static blade and clump data are immutable after spawn; only dynamic fields should be refreshed.</p>
-<h2>Capability Gate And Tiers</h2>
-<p>Initialize the renderer before allocating storage resources:</p>
-<pre><code class="language-js">import { WebGPURenderer } from &quot;three/webgpu&quot;;
-
-const renderer = new WebGPURenderer({ antialias: false });
-await renderer.init();
-
-const nativeStorageTier = renderer.backend.isWebGPUBackend;
-if (nativeStorageTier) {
-  await renderer.computeAsync(initVegetationNode);
-} else {
-  throw new Error(&#39;WebGPU backend unavailable for the canonical vegetation path.&#39;);
-}
-</code></pre>
-<p>Quality tiers are product tiers, not alternate shader stacks:</p>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th>Capability</th>
-<th>Vegetation path</th>
-<th>Target use</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Ultra</td>
-<td>Native storage and compute</td>
-<td>64-128 chunks, compute-filled storage instance data, dynamic wind fields, per-patch cull, density LOD, impostors</td>
-<td>desktop discrete</td>
-</tr>
-<tr>
-<td>High</td>
-<td>Native storage and compute with lower budgets</td>
-<td>32-64 chunks, static compute generation, vertex-node wind, reduced post</td>
-<td>desktop integrated</td>
-</tr>
-<tr>
-<td>Medium</td>
-<td>Native WebGPU with budgeted storage/compute</td>
-<td>16-32 chunks, coarser storage attributes, lower density, fixed wind textures, fewer dynamic fields</td>
-<td>mobile WebGPU</td>
-</tr>
-<tr>
-<td>Low</td>
-<td>Native WebGPU minimal render budget</td>
-<td>authored tree meshes, sparse grass cards, impostor rings, static wind phase</td>
-<td>screenshots, previews, low-power WebGPU devices</td>
-</tr>
-</tbody></table>
-<p>If the user explicitly asks how to apply fallback when WebGPU is unavailable,
-route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead of adding
-a second path here.</p>
-<h2>Dense Grass Build Order</h2>
-<ol>
-<li>Choose patch size from culling, not from texture dimensions. An authored starting point (not a gated value — tune it against your own scene&#39;s culling and density budget) is 16-32 m patches with 8-20 k blades each; keep one <code>InstancedMesh</code> per patch per LOD representation, and budget submitted draw objects as <code>visibleDraws = drawObjectsPerPatch * visiblePatches</code>.</li>
-<li>Allocate static storage attributes: origin/height/width/facing/bend, clump id/density/species, color variation, terrain normal, and packed material flags. Prefer 16-byte alignment and pack half-precision-like ranges into normalized fields when visual error is below one pixel.</li>
-<li>Run one initialization dispatch per chunk with <code>Fn().compute(count)</code> and deterministic hash seeds. Write to <code>StorageInstancedBufferAttribute</code> via <code>storage()</code> nodes or use <code>instancedArray()</code> then <code>toAttribute()</code> for render consumption.</li>
-<li>Use the same terrain field, density mask, path mask, and clump field for placement, material variation, and LOD thresholds. Do not let visual color clumps drift from density clumps.</li>
-<li>Render blades with a shared low-vertex strip or clump mesh. Fold the blade in the vertex node with Bezier or circular-arc math from root to tip; keep the root anchored in both color and shadow passes.</li>
-<li>Update dynamic fields on a fixed budget: wind vector texture or storage buffer, gust-front phase, player/object touch history, wetness, snow weight, and seasonal color scalar.</li>
-<li>Submit only visible chunks. Each chunk owns expanded bounds for maximum blade height, terrain displacement, and wind bend. Never make one monolithic uncullable grass object the production default.</li>
-<li>Transition to impostors by patch, not by individual blade. Cross-fade density or alpha hash over a short distance band and keep shadow density matched to visible density.</li>
-</ol>
-<p>Use <code>renderer.compute()</code> when dispatch order can stay inside the frame graph; use <code>renderer.computeAsync()</code> for explicit initialization, streaming chunk generation, readback-free validation steps, or when the app needs a promise boundary.</p>
-<p>Canonical dense-grass draw counts are per patch because the patch is the culling granularity. In <code>examples/webgpu-dense-grass/dense-grass-system.js</code>, each patch owns one blade <code>InstancedMesh</code> and one impostor-card <code>InstancedMesh</code>; <code>getStats().drawObjectsPerPatch</code> reports <code>2</code>, and <code>validateDenseGrassConfig()</code> uses <code>visibleDrawObjectCeiling = patchCount * 2</code>. Derive patch count as <code>visiblePatchesWorst = (2 * patchGridRadius + 1)^2</code>. The ultra preset comment cites <code>81</code> patches, <code>1.46M</code> visible blades, and <code>2</code> draw objects per visible patch; the high preset comment cites <code>49</code> patches, <code>588k</code> visible blades, and <code>2-12</code> submitted patch draws typical after frustum culling. The worst-case counts are Derived (the <code>(2r+1)^2</code> grid arithmetic above) and the ceiling is Gated by <code>validateDenseGrassConfig()</code>; the <code>2-12</code> typical range is an observed after-culling figure from the example scene, not a gate — only the ceiling is enforced.</p>
-<table>
-<thead>
-<tr>
-<th>Preset</th>
-<th>Source parameters</th>
-<th align="right">Worst visible patches</th>
-<th align="right">Worst submitted draw objects</th>
-<th align="right">Allocated blades</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Ultra</td>
-<td><code>patchGridRadius = 4</code>, <code>drawObjectsPerPatch = 2</code>, <code>bladesPerPatch = 18000</code></td>
-<td align="right"><code>(2 * 4 + 1)^2 = 81</code></td>
-<td align="right"><code>2 * 81 = 162</code></td>
-<td align="right"><code>81 * 18000 = 1458000</code></td>
-</tr>
-<tr>
-<td>High</td>
-<td><code>patchGridRadius = 3</code>, <code>drawObjectsPerPatch = 2</code>, <code>bladesPerPatch = 12000</code></td>
-<td align="right"><code>(2 * 3 + 1)^2 = 49</code></td>
-<td align="right"><code>2 * 49 = 98</code></td>
-<td align="right"><code>49 * 12000 = 588000</code></td>
-</tr>
-<tr>
-<td>Default runtime options</td>
-<td><code>normalizeOptions({})</code> selects <code>high</code></td>
-<td align="right"><code>(2 * 3 + 1)^2 = 49</code></td>
-<td align="right"><code>2 * 49 = 98</code></td>
-<td align="right"><code>49 * 12000 = 588000</code></td>
-</tr>
-</tbody></table>
-<h2>Creature Composition</h2>
-<p>Vegetation owns the wind field as an authored procedural field in the sense of <code>$threejs-procedural-fields</code>; creatures sample that same field for fur, feather, cloth, or antenna response, so there is no second wind system with an independent phase. For trampling, creature stance events must write world-space contact positions, radii, weights, and decay into the same touch/interaction channel consumed by grass displacement. The current WebGPU dense-grass example exposes wind uniforms and static density storage but no local trampling displacement channel, so this is a future contract: add a dynamic touch texture or compact storage buffer, sample it in the blade position node, and leave static blade storage immutable.</p>
-<h2>r185 Add-On Import Paths</h2>
-<p>Use these exact add-on paths when vegetation needs built-in post or shadow helpers:</p>
-<table>
-<thead>
-<tr>
-<th>Helper</th>
-<th>Import path</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>GTAONode</code> / <code>ao</code></td>
-<td><code>three/examples/jsm/tsl/display/GTAONode.js</code></td>
-</tr>
-<tr>
-<td><code>BloomNode</code> / <code>bloom</code></td>
-<td><code>three/examples/jsm/tsl/display/BloomNode.js</code></td>
-</tr>
-<tr>
-<td><code>TRAANode</code> / <code>traa</code></td>
-<td><code>three/examples/jsm/tsl/display/TRAANode.js</code></td>
-</tr>
-<tr>
-<td><code>CSMShadowNode</code></td>
-<td><code>three/examples/jsm/csm/CSMShadowNode.js</code></td>
-</tr>
-<tr>
-<td><code>TileShadowNode</code></td>
-<td><code>three/examples/jsm/tsl/shadows/TileShadowNode.js</code></td>
-</tr>
-</tbody></table>
-<h2>Trees And Plant Growth</h2>
-<p>Represent a plant as a growth hierarchy plus rendering adaptations. Do not model it as randomly scattered cylinders.</p>
-<ol>
-<li>Define a per-level species table: length, radius, taper, child count, emergence range, angle, twist, gnarliness, sections, radial segments.</li>
-<li>Grow branches iteratively from a queue so recursion depth and budgets remain inspectable.</li>
-<li>Emit each branch as oriented rings with an intentional UV seam, or route generic ring writing to <code>$threejs-procedural-geometry</code>.</li>
-<li>Update section orientation from inherited direction, stochastic curvature, tropism or external force, and optional attraction constraints.</li>
-<li>Spawn children with stratified longitudinal slots and independently permuted angular slots.</li>
-<li>Generate leaves only after branch topology is stable.</li>
-<li>Build foliage normals from card orientation plus local crown volume; for high-density leaf fields, store per-leaf root, card basis, bend phase, and alpha cutoff in storage attributes.</li>
-<li>Choose wind scope explicitly. Leaf-root deformation, branch hierarchy deformation, trunk sway, and whole-tree motion are separate systems and must share the same visible and shadow deformation.</li>
-</ol>
-<p>Read <a href="references/structured-ash-growth-system.md">references/structured-ash-growth-system.md</a> before tuning Ash-like deciduous trees. Preserve its preset, continuation, child-placement, leaf, material, wind, composition, diagnostic, and numeric contracts.</p>
-<h2>Materials, Alpha, And Output</h2>
-<ul>
-<li>Use <code>MeshStandardNodeMaterial</code> for grass and bark, <code>MeshPhysicalNodeMaterial</code> when leaf translucency or clearcoat-style wax response matters, and <code>SpriteNodeMaterial</code> only for far impostors.</li>
-<li>Use <code>alphaTest</code> or <code>alphaHash</code> for leaves and grass. Avoid sorted transparency for dense vegetation unless the asset truly needs partial glass-like blending. Use <code>forceSinglePass</code> for double-sided flat vegetation when it removes redundant back-side work without visible loss.</li>
-<li>Deform shadow casters with the same node math as visible geometry. If the wind root is at <code>uv.y = 0</code>, both color and shadow geometry must keep that root fixed.</li>
-<li>Color textures such as bark, leaf, flower, and albedo atlases use <code>SRGBColorSpace</code>. Data maps such as normal, roughness, density, alpha, path, clump, wind, LUT, and weather masks use <code>NoColorSpace</code>/linear data. Disable mip generation only when compute writes all mip levels or the map is sampled without minification.</li>
-<li>Keep HDR buffers as <code>HalfFloatType</code> until tone mapping. The app has one tone-map owner and one output conversion owner through <code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code> node.</li>
-<li>Prefer <code>CSMShadowNode</code> for sunlit vegetation ranges and <code>TileShadowNode</code> for large tiled scenes. Custom cached clipmaps belong in <code>$threejs-scalable-real-time-shadows</code>.</li>
-</ul>
-<h2>Performance Budgets</h2>
-<p>State budgets before implementation:</p>
-<table>
-<thead>
-<tr>
-<th>Device tier</th>
-<th align="right">Visible blades</th>
-<th align="right">Chunks submitted</th>
-<th align="right">Init compute</th>
-<th align="right">Per-frame compute</th>
-<th align="right">Submitted draw objects</th>
-<th align="right">Post budget</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Desktop discrete</td>
-<td align="right">1-4 M</td>
-<td align="right">64-128</td>
-<td align="right">under 8 ms per streamed region</td>
-<td align="right">under 0.8 ms</td>
-<td align="right"><code>2 * visiblePatches</code>; ultra worst <code>2 * 81 = 162</code></td>
-<td align="right">under 2.0 ms</td>
-</tr>
-<tr>
-<td>Desktop integrated</td>
-<td align="right">250 k-1 M</td>
-<td align="right">24-64</td>
-<td align="right">under 12 ms per streamed region</td>
-<td align="right">under 0.5 ms</td>
-<td align="right"><code>2 * visiblePatches</code>; high/default worst <code>2 * 49 = 98</code>; typical <code>2-12</code> after culling</td>
-<td align="right">under 1.2 ms</td>
-</tr>
-<tr>
-<td>Mobile/low power</td>
-<td align="right">50-250 k</td>
-<td align="right">8-32</td>
-<td align="right">amortized over frames</td>
-<td align="right">under 0.25 ms</td>
-<td align="right"><code>2 * visiblePatches</code>; derive worst from preset radius</td>
-<td align="right">under 0.8 ms</td>
-</tr>
-</tbody></table>
-<p>Storage budget targets:</p>
-<ul>
-<li>Static grass attributes: 32-64 bytes per blade after packing.</li>
-<li>Dynamic fields: one 2D wind/touch texture or one compact storage buffer per active region, under 8 MB for desktop and under 2 MB for low-power tiers.</li>
-<li>Tree geometry: compile once into typed buffers; do not allocate vector objects in runtime wind or per-frame LOD loops.</li>
-<li>Node post: one scene pass with <code>mrt()</code> when normals/depth/emissive are reused, reduced-resolution AO/bloom via <code>setResolutionScale()</code>, and no duplicate scene re-render for diagnostics unless explicitly requested.</li>
-</ul>
-<h2>Diagnostics And Failure Conditions</h2>
-<p>Capture diagnostics as first-class views: patch bounds, density LOD, impostor transitions, static versus dynamic storage fields, clump ids, terrain height/normal fit, wind displacement magnitude, alpha coverage, shadow parity, leaf origins, branch-level colors, bark UV checker, and final composition.</p>
-<p>Visual failures:</p>
-<ul>
-<li>branches form visible helices;</li>
-<li>dense grass ignores terrain height, path masks, or clump-level variation;</li>
-<li>static blade parameters regenerate every frame;</li>
-<li>chunks outside the frustum still dominate submitted draw work;</li>
-<li>every child emerges at the same relative height;</li>
-<li>bark texture scale changes unintentionally with branch radius;</li>
-<li>leaves reveal flat card normals under rotation;</li>
-<li>leaf or grass wind moves roots instead of keeping them anchored;</li>
-<li>visible vegetation and shadow vegetation deform differently;</li>
-<li>different seeds change species identity rather than controlled variation;</li>
-<li>geometry cost grows without per-level, per-chunk, and per-device budgets.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-procedural-geometry</code> for generic branch-ring emission without a growth model. Use <code>$threejs-procedural-fields</code> for shared terrain, density, weather, and biome fields. Use <code>$threejs-procedural-materials</code> for authored bark/leaf/grass PBR identities. Use <code>$threejs-scalable-real-time-shadows</code> for custom shadow clipmaps beyond <code>CSMShadowNode</code> or <code>TileShadowNode</code>. Use <code>$threejs-image-pipeline</code> when the vegetation scene owns the final HDR, AO, bloom, temporal AA, and output-transform stack.</p>
-<p>This skill owns species tables, topology, child placement, foliage, grass fields, roots, chunked dense vegetation, static/dynamic storage separation, and hierarchical/rooted wind.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-procedural-planets.html">← Procedural Planets</a>
-    <a href="threejs-rain-snow-and-wet-surfaces.html">Rain, Snow, and Wet Surfaces →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/weathered-world/">
+        <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Weathered World</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/creature-habitat/">
+        <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Creature Habitat</h3>
+        <span class="card-meta">5 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -541,10 +332,447 @@ the density field shared between placement (CPU) and shading (GPU) under the fie
 contract.</p></div>
   </div></div>
 
+
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Evidence and asset previews</h2>
+    <p class="sub">Preserved diagnostic or generated-asset frames. Consult the demo registry before treating any frame as canonical runtime evidence.</p>
+    <div class="gallery">
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Procedural Vegetation in Three.js WebGPU — Generated meadow-mask asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated meadow-mask asset preview</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/vegetation-generated-meadow-density/no-post.design.png" alt="Procedural Vegetation in Three.js WebGPU — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview baseline</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png" alt="Procedural Vegetation in Three.js WebGPU — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated-asset channel diagnostics</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/vegetation-generated-meadow-density/seed-stress.final.png" alt="Procedural Vegetation in Three.js WebGPU — Asset-preview seed stress" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview seed stress</span></figcaption>
+      </figure>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Procedural Vegetation</h2>
+<p>Use this skill for vegetation that has botanical structure and scale discipline: dense grass, authored meadows, deciduous trees, recursive branches, roots, canopies, leaf cards, trellises, deterministic species variation, and rooted wind. Start every implementation with <code>$threejs-choose-skills</code> when the scene also needs atmosphere, terrain, water, shadows, post, or camera doctrine.</p>
+<p>The taught renderer path is pinned Three.js r185 <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, <code>NodeMaterial</code> subclasses, node render pipelines, and compute/storage only when selected by workload. Legacy WebGL implementation (deprecated, do not extend): <code>examples/stylized-meadow-grass/grass-system.js</code>, <code>examples/gpu-computed-grass/gpu-grass-system.js</code>.</p>
+<p>Canonical WebGPU dense-grass example: <code>examples/webgpu-dense-grass/</code>.</p>
+<h2>Select Architecture From Population And Projected Error</h2>
+<p>Choose the representation by visual error and population before choosing
+compute:</p>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th>Default</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>One/few close trees</td>
+<td>CPU growth compile into indexed typed arrays; optional generated LODs</td>
+<td>Topology changes rarely; compute adds runtime state without saving frame work</td>
+</tr>
+<tr>
+<td>Repeated trees/shrubs</td>
+<td>Species mesh/cluster variants instanced in spatial pages, with geometry LOD then impostors</td>
+<td>Reuses topology and preserves chunk culling</td>
+</tr>
+<tr>
+<td>Dense grass/ground cover</td>
+<td>Shared strip/clump geometry plus the cheapest proven placement representation: implicit seed reconstruction, clump records, compact CPU attributes, or storage</td>
+<td>Avoids object traversal without assuming per-blade hot storage is free</td>
+</tr>
+<tr>
+<td>Interactive growth or massive regenerated placement</td>
+<td>Compute only the changing topology/placement/state, then compact visible records</td>
+<td>Compute earns its dispatch through changed data volume</td>
+</tr>
+</tbody></table>
+<p>Do not confuse GPU generation with GPU efficiency. Static vegetation generated
+once on the CPU can be the lowest-runtime-cost result.</p>
+<p>For dense grass and meadow vegetation, use this architecture before considering any API detail:</p>
+<ol>
+<li>Partition the field into deterministic chunks with fixed tile seeds, conservative per-patch bounds, and a visible debug overlay for bounds, density, and impostor state.</li>
+<li>A/B placement storage: reconstruct invariants from
+<code>{chunkSeed,instanceIndex,shared density/terrain field}</code>, store clump-level
+records, upload compact worker-generated attributes, or compute-fill
+per-blade storage. Record the actual r185-aligned stride/resident bytes;
+<code>vec3</code> may pad to <code>vec4</code> and narrow integers may widen.</li>
+<li>Consume only irreducible per-instance data from a
+<code>MeshStandardNodeMaterial</code>/<code>MeshPhysicalNodeMaterial</code>; derive the rest from
+shared fields and stable integer hashes.</li>
+<li>Keep wind, touch response, camera-facing yaw, seasonal wetness, and trampling as dynamic fields. Update only those fields per frame, or evaluate them in the vertex node when it is cheaper than a dispatch.</li>
+<li>Cull and LOD by patch before draw submission: frustum culling from expanded bounds, distance density tiers, near geometric blades, mid reduced instance density, far clump/impostor cards, and optional compute compaction for high-overlap fields.</li>
+<li>Use node post only after the geometry budget is under control: <code>RenderPipeline</code>, <code>pass()</code>, conditional <code>mrt()</code> only for consumed signals, <code>GTAONode</code> for contact, full-scene <code>BloomNode</code> when HDR vegetation emission/lighting requires glare, and <code>TRAANode</code> when alpha shimmer needs temporal stabilization. Selective emissive MRT remains a separately proven exception.</li>
+</ol>
+<p>The replaced sub-best path is full-field per-frame parameter regeneration. Static blade and clump data are immutable after spawn; only dynamic fields should be refreshed.</p>
+<h2>Terrain And Coastal Ecology Contract</h2>
+<p>Vegetation placement consumes the shared terrain/coast field provider; it does
+not synthesize private height, shoreline, slope, moisture, or salt noise. The
+provider declares coordinate frame, units, generation revision, filtering,
+chunk halo, and invalidation for:</p>
+<pre><code class="language-text">terrain height and geometric normal/slope
+signed coast distance and coast tangent/normal
+substrate/semantic region, cliff/beach/water and authored exclusions
+drainage, cavity, soil moisture, disturbance, and canopy/light exposure
+prevailing wind, directional terrain shelter, and salt/spray exposure
+run-up/inundation envelope and persistent wetness when supplied
+</code></pre>
+<p>Keep hard eligibility separate from ecological preference. Water, active
+run-up, unstable cliff, built footprint, path, and authored clearance volumes
+are hard exclusions when the species contract says so. Moisture, slope,
+salinity, wind exposure, sun, substrate, and elevation feed smooth species
+response curves. A stable hashed priority or blue-noise/variable-radius Poisson
+process turns suitability into candidates. Independent color noise and density
+noise are forbidden.</p>
+<p>Windward/leeward distribution is directional. Derive static shelter from the
+terrain/obstacle field along the prevailing-wind direction, then combine it
+with coast exposure and elevation. Distance from water alone cannot distinguish
+an exposed windward headland from a protected leeward hollow. Recompute this
+coarse field only when terrain, obstacles, or climate policy changes; the
+per-frame wind deformation field is a separate dynamic consumer.</p>
+<p>Each plant asset carries a root/ground frame, conservative crown and wind-swept
+bounds, clearance radius or footprint, material slots, shadow proxy,
+species-response table, growth/age variant, LOD/impostor representations, and
+stable semantic ID. Flowers, grass clumps, palms, shrubs, and trees are selected
+by species identity first and varied within that identity second. Placement
+around ruins, paths, rocks, docks, or instruments consumes their exclusion
+volumes and optional colonization sockets; it never infers clearance from the
+render mesh at runtime.</p>
+<p>Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/references/coastal-ecology-and-placement.md">references/coastal-ecology-and-placement.md</a>
+for suitability equations, windward/leeward and salt fields, order-independent
+placement, chunk seams, succession/asset manifests, LOD population invariants,
+and coastal diagnostics.</p>
+<h2>Shared Environmental And Interaction Boundary</h2>
+<p>When vegetation participates in coupled weather, contacts, loading, or water,
+first read the router&#39;s
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
+Consume its <code>PhysicsContext</code>, <code>EnvironmentForcingSnapshot</code>, receiver-state
+signal sample, and <code>InteractionRecord</code>; do not author private clocks,
+wind/current fields, or contact schemas.</p>
+<p>Environmental wind is an air-velocity provider in meters per second with a
+declared frame, altitude/support domain, exact <code>sampleInstant: PhysicsInstant</code>,
+cadence, interpolation policy, requested/actual oriented crown/patch footprint
+and spatial/temporal filter or band, and per-channel error. Vegetation owns only
+the structural response: modal trunk and
+branch state, leaf flutter, damping, root constraints, bounds, and LOD
+projection. Water current and water-surface velocity are different providers.
+Static prevailing-wind exposure used by ecology is a climatological reduction
+sampled at an exact <code>PhysicsInstant</code> with its own revision; it is not the
+instantaneous deformation sample.</p>
+<p>Consume trampling, sweep, support-load, and impact events as typed
+<code>InteractionRecord</code>s. Use stable source/receiver IDs, an
+<code>applicationInterval: PhysicsTimeInterval</code>, SI-physics-frame footprint/impulse
+or load units, deterministic ordering keys, canonical source/target ownership,
+<code>SurfaceExchange.mode</code>, reaction-group identity, and batch/partition identity.
+Keep sequence ranges, consumer cursors, overflow, and lost/deferred commodities
+in the canonical immutable <code>InteractionBatchLedger</code>; coalescing is a producer
+transformation with provenance. Bin sparse records into affected
+patches, update the contact/touch state after physics contact resolution, then
+evaluate structural wind/contact deformation and commit domain state over the
+declared <code>PhysicsGraphStage.executionInterval: PhysicsTimeInterval</code>.</p>
+<p>Contribute each stable deformation binding as a <code>PresentedStatePair</code> to one
+view-independent <code>PhysicsPresentationCandidate</code> at
+<code>requestedPresentationInstant: PhysicsInstant</code>; the candidate owns the
+<code>PresentationResourceLease</code> records and consumer-scoped event sequence ranges.
+Each pair&#39;s <code>previousPresented.provenance</code> and
+<code>currentPresented.provenance</code> are independent
+<code>PresentationSampleProvenance</code> records;
+<code>previousPresented.presentedInstant: PhysicsInstant</code> and
+<code>currentPresented.presentedInstant: PhysicsInstant</code> remain distinct, as do
+their state handles and global spatial bindings. A shared pair-level provenance
+shorthand is forbidden.
+The candidate contains no camera or render transform. The camera owner publishes
+one <code>CameraViewPublication</code> per target/view with
+<code>previousRenderSampleInstant: PhysicsInstant</code> and
+<code>currentRenderSampleInstant: PhysicsInstant</code> plus
+<code>globalToRenderPrevious</code>/<code>globalToRenderCurrent</code>, view/projection matrices,
+jitter, viewport, and depth state; visibility, acceleration, shadow, cache,
+reactive, and reset owners then publish
+<code>ViewPreparationPublication</code> with <code>visibilityPublicationRefs</code>,
+<code>accelerationPublicationRefs</code>, <code>shadowViewPublicationRefs</code>,
+<code>cachePublicationRefs</code>, <code>reactiveEpochs</code>, <code>reactivePublications</code>,
+<code>resetDependencies</code>, full <code>resourceLeases</code> for newly created camera-dependent
+generations, and <code>resourceLeaseRefs</code>. The sealed
+<code>PhysicsPresentationSnapshot</code> names the candidate, camera/preparation
+publications through <code>candidateId</code>, <code>cameraPublicationId</code>, and
+<code>viewPreparationId</code>, plus <code>presentationTargetId</code>, <code>viewId</code>, and <code>sealVersion</code>;
+its state/resource payload is only <code>presentedStatePairRefs</code> and
+<code>resourceLeaseRefs</code>, accompanied by scoped <code>eventSequenceRanges</code>, never copied
+pairs or transforms. Never mutate immutable placement or publication records. One-way
+visual deformation uses a one-way exchange and emits no reaction record;
+two-way coupling leaves the matched reaction to the authoritative physics
+solver.</p>
+<p>Wetness, run-up, snow load, and melt are consumed from the route-selected
+receiver-state owner at an exact <code>PhysicsInstant</code> after it integrates all
+exchanges. Vegetation and its materials do not create independent accumulation
+fields. On budgeted/mobile tiers retain analytic vertex wind, compact sparse
+interaction records, bounded dirty patches, lower-rate receiver fields, and
+explicit stream-loss/per-channel-error accounting.</p>
+<p>A tier change that alters physics-facing state, cadence, represented support or
+band/filter, error bounds, inventories, stable IDs/RNG streams, or event and
+exact-once application-ledger cursors requires the shared <code>QualityTransition</code>:
+request it, conservatively map and atomically commit it at a safe graph-step
+boundary, then retire the old state through its completion join. A change may
+remain vegetation-local only when it is render-only and leaves every provider,
+<code>PhysicsGraph</code> ownership, interaction, committed state, ID, cursor, and physical
+error contract unchanged.</p>
+<h2>Capability Gate And Tiers</h2>
+<p>Initialize the renderer before allocating storage resources:</p>
+<pre><code class="language-js">import { WebGPURenderer } from &quot;three/webgpu&quot;;
+
+const renderer = new WebGPURenderer({ antialias: false });
+await renderer.init();
+
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(&#39;WebGPU backend unavailable for the canonical vegetation path.&#39;);
+}
+</code></pre>
+<p>Quality tiers are product tiers, not alternate shader stacks:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Capability</th>
+<th>Vegetation path</th>
+<th>Acceptance axis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full</td>
+<td>Native WebGPU</td>
+<td>selected CPU/implicit/storage placement, dynamic wind/contact fields, spatial culling, density LOD, impostors</td>
+<td>close silhouette, interaction, and motion-error gates all pass</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>Native WebGPU with lower bandwidth</td>
+<td>implicit/compact static placement, vertex-node wind, reduced post and density</td>
+<td>projected blade/canopy and motion error pass</td>
+</tr>
+<tr>
+<td>Budgeted</td>
+<td>Native WebGPU</td>
+<td>packed/coarser storage, fewer dynamic fields, larger pages and earlier impostors</td>
+<td>whole-frame, memory, alpha-overdraw, and transition gates pass</td>
+</tr>
+<tr>
+<td>Minimum</td>
+<td>Native WebGPU minimal graph</td>
+<td>authored tree meshes, sparse grass cards, impostor rings, static wind phase</td>
+<td>primary silhouette/species identity remains above the declared error floor</td>
+</tr>
+</tbody></table>
+<p>If the user explicitly asks how to apply fallback when WebGPU is unavailable,
+route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead of adding
+a second path here.</p>
+<h2>Dense Grass Build Order</h2>
+<ol>
+<li>Choose patch/page size from the measured culling-versus-submission
+crossover, not texture dimensions or a copied meter/blade count. Budget
+submitted work as <code>visibleDraws = drawObjectsPerPage * visiblePages</code>, then
+include rejected-but-submitted vertices and alpha fragments.</li>
+<li>Select implicit/clump/compact-CPU/per-blade-storage placement by paired A/B.
+If storage wins, derive the real post-init stride, allocator bytes, duplicate
+LOD records, and hot vertex reads. Packing is explicit and capability-tested;
+it is not implied by authoring a narrow JS typed array.</li>
+<li>Deterministic placement uses one specified u32 mixer with wraparound/bit
+semantics and CPU test vectors shared by CPU/TSL. Float <code>sin</code> hashes are only
+same-adapter visual variation. Compute initialization is optional and never a
+GPU-completion claim from <code>computeAsync()</code>.</li>
+<li>Use the same terrain field, density mask, path mask, and clump field for placement, material variation, and LOD thresholds. Do not let visual color clumps drift from density clumps.</li>
+<li>Render blades with a shared low-vertex strip or clump mesh. Fold the blade in the vertex node with Bezier or circular-arc math from root to tip; keep the root anchored in both color and shadow passes.</li>
+<li>Update dynamic fields on a fixed budget: wind vector texture or storage buffer, gust-front phase, contact/interactor history, wetness, snow weight, and seasonal color scalar.</li>
+<li>Submit only visible chunks. Each chunk owns expanded bounds for maximum blade height, terrain displacement, and wind bend. Never make one monolithic uncullable grass object the production default.</li>
+<li>Transition by patch under the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/projected-error-contract.md">shared physical-pixel error contract</a>.
+Trees use world-up-constrained multi-azimuth/octahedral impostors, adding
+depth/normal for relighting/parallax when required; one free-facing sprite
+is insufficient for structured crowns. Use dither/hysteresis/dwell and a
+matched shadow proxy.</li>
+</ol>
+<p>Use queued <code>renderer.compute()</code> only when compute placement/state wins the A/B.
+In r185 <code>computeAsync()</code> merely awaits renderer initialization before enqueue;
+it is not a GPU-completion fence.</p>
+<p>The dense-grass fixture allocates one matrix-free instanced blade mesh and one
+impostor-card mesh per patch, but mutual exclusion submits at most one
+representation per visible patch. Its <strong>Derived</strong> worst vegetation submission
+is therefore <code>visiblePatchesWorst</code>; allocation count is still
+<code>2 * patchCount</code>. Those fixture counts are structural evidence for that
+example, not a recommended page size, blade density, or submission ceiling.</p>
+<p>Per-patch draws are a culling baseline, not an invariant. If worst-case visible
+patch draws exceed the target&#39;s measured CPU submission ceiling, aggregate
+adjacent patches into larger spatial pages or use compute compaction with an
+indirect count. A vertex-stage visibility mask that still processes every
+blade is not culling. Select page size from the measured trade between
+overdraw/over-submission and culling granularity.</p>
+<h2>Creature Composition</h2>
+<p>Vegetation and creatures consume the same <code>EnvironmentForcingSnapshot</code> air
+velocity but own different structural response models. Creature stance/contact
+resolution publishes typed <code>InteractionRecord</code>s; vegetation bins completed
+records into its dynamic touch texture or compact patch storage before blade
+deformation. The current WebGPU dense-grass example exposes only wind uniforms
+and static density storage, so it is not evidence that contact ingestion is
+implemented. A production route must instantiate the shared record adapter,
+dynamic touch resource, scheduler edge, overflow diagnostic, and immutable
+static-placement invariant.</p>
+<h2>r185 Add-On Import Paths</h2>
+<p>Use these exact add-on paths when vegetation needs built-in post or shadow helpers:</p>
+<table>
+<thead>
+<tr>
+<th>Helper</th>
+<th>Import path</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>GTAONode</code> / <code>ao</code></td>
+<td><code>three/addons/tsl/display/GTAONode.js</code></td>
+</tr>
+<tr>
+<td><code>BloomNode</code> / <code>bloom</code></td>
+<td><code>three/addons/tsl/display/BloomNode.js</code></td>
+</tr>
+<tr>
+<td><code>TRAANode</code> / <code>traa</code></td>
+<td><code>three/addons/tsl/display/TRAANode.js</code></td>
+</tr>
+<tr>
+<td><code>CSMShadowNode</code></td>
+<td><code>three/addons/csm/CSMShadowNode.js</code></td>
+</tr>
+<tr>
+<td><code>TileShadowNode</code></td>
+<td><code>three/addons/tsl/shadows/TileShadowNode.js</code></td>
+</tr>
+</tbody></table>
+<h2>Trees And Plant Growth</h2>
+<p>Represent a plant as a growth hierarchy plus rendering adaptations. Do not model it as randomly scattered cylinders.</p>
+<ol>
+<li>Define a per-level species table: length, radius, taper, child count, emergence range, angle, twist, gnarliness, sections, radial segments.</li>
+<li>Grow branches iteratively from a queue so recursion depth and budgets remain inspectable.</li>
+<li>Emit each branch as oriented rings with an intentional UV seam, or route generic ring writing to <code>$threejs-procedural-geometry</code>.</li>
+<li>Update section orientation from inherited direction, stochastic curvature, tropism or external force, and optional attraction constraints.</li>
+<li>Spawn children with stratified longitudinal slots and independently permuted angular slots.</li>
+<li>Generate leaves only after branch topology is stable.</li>
+<li>Build foliage normals from card orientation plus local crown volume; for high-density leaf fields, store per-leaf root, card basis, bend phase, and alpha cutoff in storage attributes.</li>
+<li>Choose wind scope explicitly. Leaf-root deformation, branch hierarchy deformation, trunk sway, and whole-tree motion are separate systems and must share the same visible and shadow deformation.</li>
+<li>Production branches use rotation-minimizing quaternion frames plus explicit
+twist, arc-length/feature-scale curvature limits, and a species-calibrated
+pipe/allometry law <code>r_parent^p &gt;= r_cont^p + sum(r_child^p)</code>. Hero junctions
+cut at the parent surface and stitch a collar/zipper patch or use load-time
+implicit extraction; mid/far overlap removes hidden caps and gates the seam.</li>
+<li>Production wind is a reduced-order hierarchy of damped trunk/branch modes
+   driven by the shared field, with higher-band leaf flutter. Collapse modes by
+   LOD and use identical display/shadow deformation.</li>
+</ol>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/references/structured-ash-growth-system.md">references/structured-ash-growth-system.md</a> before tuning Ash-like deciduous trees. Preserve its preset, continuation, child-placement, leaf, material, wind, composition, diagnostic, and numeric contracts.</p>
+<h2>Materials, Alpha, And Output</h2>
+<ul>
+<li>Use <code>MeshStandardNodeMaterial</code> for grass and bark and
+<code>MeshPhysicalNodeMaterial</code> when leaf translucency/wax response matters.
+<code>SpriteNodeMaterial</code> is acceptable only inside a validated multi-view far
+impostor representation, not as a single rotating tree card.</li>
+<li>Use <code>alphaTest</code> or <code>alphaHash</code> for leaves and grass. Avoid sorted transparency for dense vegetation unless the asset truly needs partial glass-like blending. Use <code>forceSinglePass</code> for double-sided flat vegetation when it removes redundant back-side work without visible loss.</li>
+<li>Deform shadow casters with the same node math as visible geometry. If the wind root is at <code>uv.y = 0</code>, both color and shadow geometry must keep that root fixed.</li>
+<li>LDR bark, leaf, flower, and albedo atlases encoded as sRGB use
+<code>SRGBColorSpace</code>; HDR/EXR radiance remains loader-declared linear. Data maps
+such as normal, roughness, density, alpha, path, clump, wind, LUT, and weather
+masks use <code>NoColorSpace</code>/linear data. Disable mip generation only when compute
+writes all mip levels or the map is sampled without minification.</li>
+<li>Keep HDR buffers as <code>HalfFloatType</code> until tone mapping. The app has one tone-map owner and one output conversion owner through <code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code> node.</li>
+<li>Start from the cheapest ordinary directional shadow that meets coverage and
+texel-error gates. Route CSM, tiled arrays, or custom cached clipmaps through
+<code>$threejs-scalable-real-time-shadows</code>; <code>TileShadowNode</code> is not a generic
+large-scene or tile-GPU optimization.</li>
+</ul>
+<h2>Performance Contract</h2>
+<p>State the workload before implementation: visible spatial pages/patches,
+instances per representation, blade/card pixels, mean and p95 alpha layers,
+shadowed instances, dynamic-field texels, dirty interactions, draw objects,
+storage stride, and post attachments. Instance count without projected alpha
+coverage is not a vegetation cost model.</p>
+<p>For terrain/coastal placement also record accepted/rejected candidates by
+cause, species suitability distributions, overlap/clearance violations, chunk
+halo work, coast/slope/moisture/salt field samples, static shelter-bake cost,
+LOD population change, and resident bytes for species/asset manifests. These
+are compile/update costs unless the placement actually changes every frame.</p>
+<p>Storage budget targets:</p>
+<ul>
+<li>Static grass attributes: derive <code>instanceCount * alignedStrideBytes</code> from the
+actual packed layout and include duplicate LOD/impostor records.</li>
+<li>Dynamic fields: sum exact wind/contact texture or storage extents, formats,
+history slots, dirty update traffic, and cadence per active region.</li>
+<li>Tree geometry: compile once into typed buffers; do not allocate vector objects in runtime wind or per-frame LOD loops.</li>
+<li>Node post: one scene pass with <code>mrt()</code> when normals/depth/emissive are reused, reduced-resolution AO/bloom via <code>setResolutionScale()</code>, and no duplicate scene re-render for diagnostics unless explicitly requested.</li>
+</ul>
+<p>Allocate vegetation cost from the whole frame and accept with contemporaneous
+full-frame and paired-marginal p50/p95 GPU time, CPU submission, visible/culled
+instances, alpha fragments, hot traffic, peak resident/transient bytes, and
+thermal behavior. On low-power/tile targets first reduce invisible submission,
+alpha coverage, shadow representation, and dynamic-field bandwidth while
+preserving the primary silhouette/species contract.</p>
+<h2>Diagnostics And Failure Conditions</h2>
+<p>Capture diagnostics as first-class views: patch bounds, density LOD, impostor transitions, static versus dynamic storage fields, clump ids, terrain height/normal fit, signed coast distance, hard exclusions, species suitability, wind exposure/shelter, salt exposure, moisture, accepted candidate priority, clearance conflicts, wind displacement magnitude, alpha coverage, shadow parity, leaf origins, branch-level colors, bark UV checker, and final composition.</p>
+<p>Visual failures:</p>
+<ul>
+<li>branches form visible helices;</li>
+<li>dense grass ignores terrain height, path masks, or clump-level variation;</li>
+<li>static blade parameters regenerate every frame;</li>
+<li>chunks outside the frustum still dominate submitted draw work;</li>
+<li>every child emerges at the same relative height;</li>
+<li>bark texture scale changes unintentionally with branch radius;</li>
+<li>leaves reveal flat card normals under rotation;</li>
+<li>leaf or grass wind moves roots instead of keeping them anchored;</li>
+<li>visible vegetation and shadow vegetation deform differently;</li>
+<li>different seeds change species identity rather than controlled variation;</li>
+<li>geometry cost grows without per-level, per-chunk, and named-target evidence.</li>
+<li>coast-distance rings replace a real ecology response, windward and leeward
+sides receive identical populations despite a directional exposure contract,
+or vegetation occupies active run-up/unstable cliff/building exclusions;</li>
+<li>chunk generation order changes accepted plants, neighboring chunks disagree
+at seams, or density LOD causes the apparent biome boundary to migrate;</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-procedural-geometry</code> for generic branch-ring emission without a growth model. Use <code>$threejs-procedural-fields</code> for shared terrain, coast, exposure, density, weather, and biome fields. Use <code>$threejs-procedural-materials</code> for authored bark/leaf/grass PBR identities. Use <code>$threejs-water-optics</code> for run-up/inundation/shore signals when water is their causal owner; vegetation consumes those signals but does not solve water. Use <code>$threejs-scalable-real-time-shadows</code> for custom shadow clipmaps beyond <code>CSMShadowNode</code> or <code>TileShadowNode</code>. Use <code>$threejs-image-pipeline</code> when the vegetation scene owns the final HDR, AO, bloom, temporal AA, and output-transform stack.</p>
+<p>This skill owns species tables, topology, child placement, foliage, grass fields,
+roots, chunked dense vegetation, static/dynamic storage separation, and
+hierarchical/rooted structural response. The routed environment owner supplies
+air velocity; the authoritative contact solver supplies interaction records.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-procedural-planets.html">← Procedural Planets</a>
+    <a href="threejs-rain-snow-and-wet-surfaces.html">Rain, Snow, and Wet Surfaces →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/vegetation-generated-meadow-density/"><figure>
+        <img src="../visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Meadow Density Placement" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Meadow Density Placement</strong><span>Generated asset preview · Generated meadow maps are reduced-tier diagnostic inputs. The production vegetation path remains chunked compute/storage instance data, patch culling, and rooted wind.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

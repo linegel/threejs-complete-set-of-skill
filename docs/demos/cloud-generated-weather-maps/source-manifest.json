@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "cloud-generated-weather-maps",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:cabfdd5fa44b66a2c53e2eb30c4d951284c3c8ec0b164f7dec278b7ad5512685",
+  "publishedHashInputs": [
+    "docs/demos/cloud-generated-weather-maps",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:b1d28e93c027cebf272894188b06dbdbc12e510df4b53aff9529dc0330dee1d4",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-procedural-creature-lab",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
+  ],
+  "sourceHashInputs": [
+    "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
+  ],
+  "browserEntry": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
+  "sourceHash": "sha256:49685873c12aeb57f13b1f1d6ce4df2033e65cb9361daa0b4c3be930a99778f0",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-procedural-creature-lab",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:76624b816010eb799f4400d28741b7ad918ef45045173da82a4e6e4d4b8ca96b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

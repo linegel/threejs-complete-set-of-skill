@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "camera-rig-handoff-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:960d7fd221155e33c8e58573a98bcecd6ec0f0207b5a340efcb73aea3d91247d",
+  "publishedHashInputs": [
+    "docs/demos/camera-rig-handoff-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:dd081176e0f1fb5e0d9bb8a8b2529684232cf06e1e000423eb2d8b2527fd58e2",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

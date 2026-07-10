@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bloom — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-bloom.html" />
+<title>Bloom | Three.js WebGPU Skill</title>
+<meta name="description" content="Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-bloom.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Bloom — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-bloom.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:title" content="Bloom | Three.js WebGPU Skill" />
+<meta property="og:description" content="Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-bloom.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Bloom visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Bloom visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Bloom evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Bloom evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Bloom — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics." />
+<meta name="twitter:title" content="Bloom | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Bloom — Three.js WebGPU agent skill",
-   "description": "Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-bloom.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
-   "dateModified": "2026-07-05T01:26:21+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-bloom.html#article",
+   "headline": "Bloom | Three.js WebGPU Skill",
+   "description": "Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid costs, transparent blending rules, PSF limits, and mobile/tile-GPU gates.",
+   "url": "https://threejs-skills.com/skills/threejs-bloom.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-bloom.html",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Cameras, Lighting, and Final Image",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Bloom",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-bloom.html"
+     "item": "https://threejs-skills.com/skills/threejs-bloom.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="">
   
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Bloom</p>
-    <h1>Bloom</h1>
-    <p class="lede">Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Bloom</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-bloom">Bloom</h1>
+    <p class="lede">Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid costs, transparent blending rules, PSF limits, and mobile/tile-GPU gates.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-bloom</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">1 runnable example</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T01:26:21+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/ba1742a532c448d56f32234f970128dbb288c664">commit ba1742a ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">2 flagships</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-bloom/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-bloom/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,111 +275,35 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/selective-bloom-demo/"><figure>
-        <div class="live-visual live-visual--bloom" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
-        <strong>emissive source + bloom contribution</strong>
-        <span class="lv-m">final / base-only / bloom-only</span>
-      </div>
-        <figcaption><strong>Selective HDR Bloom Bench</strong><span>Selective emissive signal is isolated from readable base materials before a bloom response is added back.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-bloom/examples/node-selective-bloom">
-        <h4>node-selective-bloom</h4>
-        <span class="card-meta">threejs-bloom/examples/node-selective-bloom</span>
+      <a class="card" href="../demos/node-selective-bloom/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Node Selective Bloom</h3>
+        <p>6 fixed scenarios, 6 mechanism routes, and 4 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Bloom</h2>
-<p>Bloom is a camera/display response to bright HDR signal. Teach it as one
-node-pipeline effect fed by authored scene luminance, not as the only visible
-form of an object or effects.</p>
-<h2>Architecture First</h2>
-<p>The production path is latest Three.js <code>WebGPURenderer</code> from <code>three/webgpu</code>,
-TSL from <code>three/tsl</code>, <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt({ output, emissive })</code>,
-and <code>BloomNode</code> from <code>bloom()</code>.</p>
-<p>Build selective bloom from the scene pass MRT emissive output:</p>
-<pre><code class="language-text">scene pass with MRT output + emissive
-  -&gt; scene color texture node
-  -&gt; emissive contribution texture node
-  -&gt; bloom(emissive).setResolutionScale(...)
-  -&gt; scene color + bloom
-  -&gt; single renderOutput / outputColorTransform owner
-</code></pre>
-<p>This is the top-tier architecture for this skill: one scene render, direct
-MRT-selective contribution, HDR signal preserved until the final output
-transform, and per-pass resolution scaling for the expensive blur work.</p>
-<p>Read <a href="references/hdr-bloom-system.md">references/hdr-bloom-system.md</a> for the
-r185-era WebGPU/TSL skeleton, capability gate, quality tiers, budgets, color
-rules, diagnostics, and replacement notes.</p>
-<p>Canonical WebGPU/TSL example: <a href="examples/node-selective-bloom/">examples/node-selective-bloom/</a>.</p>
-<h2>Workflow</h2>
-<ol>
-<li>Run <code>$threejs-choose-skills</code> preflight when bloom is part of a larger image
-pipeline.</li>
-<li>Author emissive contribution with <code>NodeMaterial</code> materials and route it to
-MRT <code>emissive</code>.</li>
-<li>Feed <code>BloomNode</code> from the emissive texture node, not from a separate scene
-render.</li>
-<li>Tune <code>strength</code>, <code>radius</code>, <code>threshold</code>, <code>smoothWidth</code>, and
-<code>setResolutionScale()</code> in pre-tone-map HDR.</li>
-<li>Keep exactly one tone-map and output conversion owner.</li>
-<li>Validate base, emissive contribution, bloom-only, and final output views at
-desktop-discrete, desktop-integrated, and mobile budgets.</li>
-</ol>
-<h2>Capability Gate</h2>
-<p>Any implementation using MRT or storage resources must gate after renderer
-initialization:</p>
-<pre><code class="language-js">await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error(
-    &#39;WebGPU backend required for threejs-bloom. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.&#39;
-  );
-}
-
-// WebGPU tiers may reduce bloomScale, pixelRatioCap, contributor count, or
-// disable bloom while preserving a readable base scene.
-</code></pre>
-<p>Legacy WebGL implementation (deprecated, do not extend): none in this skill folder; explicit fallback requests route to <code>$threejs-compatibility-fallbacks</code>.</p>
-<h2>Failure Conditions</h2>
-<ul>
-<li>bloom creates the only visible form of an effect;</li>
-<li>ordinary albedo or lit surfaces leak into the emissive contribution target;</li>
-<li>all bright materials share one arbitrary emission multiplier;</li>
-<li>threshold is tuned after tone mapping or display conversion;</li>
-<li>multiple systems own tone mapping or output color conversion;</li>
-<li>the bloom pass runs full resolution by default on bandwidth-limited devices;</li>
-<li>resize paths omit <code>setSize()</code> or resolution-scale validation;</li>
-<li>highlights become gray because HDR energy is clamped before bloom.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-exposure-color-grading</code> for metering, adaptation, tone mapping,
-and LUTs. Use <code>$threejs-image-pipeline</code> when bloom must share depth, normals,
-AO, TAA, or other image-space resources. Use <code>$threejs-visual-validation</code> for
-fixed-view pass diagnostics and GPU timing evidence.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-black-holes-and-space-effects.html">← Black Holes and Space Effects</a>
-    <a href="threejs-camera-controls-and-rigs.html">Camera Controls and Rigs →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/final-image-flight/">
+        <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Final Image Flight</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/relativistic-space-shot/">
+        <span class="card-head"><span class="card-index">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Relativistic Space Shot</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -342,10 +321,368 @@ $$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relativ
 (sun ≫ plasma ≫ LED); bloom reveals that hierarchy, it must never <em>be</em> the object.</p></div>
   </div></div>
 
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Bloom</h2>
+<p>Bloom approximates the broad tail of an imaging point-spread function (PSF).
+The physically motivated input is scene-linear HDR radiance. A bright-pass and
+selective emissive membership are real-time/art-direction approximations, not
+optical laws. The base scene must remain readable with bloom disabled.</p>
+<p>Use <code>$threejs-choose-skills</code> for renderer/budget preflight,
+<code>$threejs-exposure-color-grading</code> for exposure and output ownership, and
+<code>$threejs-image-pipeline</code> when the scene pass/MRT is shared.</p>
+<h2>Numeric provenance</h2>
+<ul>
+<li><strong>[Derived]</strong> follows from installed r185 source or a displayed equation.</li>
+<li><strong>[Gated]</strong> is a branch threshold validated on the target scene/device.</li>
+<li><strong>[Measured]</strong> is target-device evidence.</li>
+<li><strong>[Authored]</strong> is a starting value or planning ceiling.</li>
+</ul>
+<p>Release numbers and list ordering are identifiers, not tuning claims.</p>
+<h2>Choose the bloom signal before building MRT</h2>
+<table>
+<thead>
+<tr>
+<th>Visual contract</th>
+<th>Input</th>
+<th>Decision threshold</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Optical glare: bright direct lighting, reflections, transmission, sky/sun, and emission should respond to one exposure-relative luminance rule</td>
+<td><code>bloom(sceneColor)</code></td>
+<td>Default. It needs no bloom-membership MRT and includes final transparent/reflected radiance.</td>
+</tr>
+<tr>
+<td>Art-directed selective glow: named surfaces must bloom differently from equally bright radiance</td>
+<td><code>bloom(emissiveContribution)</code> from the existing scene-pass MRT</td>
+<td>Use only when no single bright-pass threshold can meet the contributor false-positive/false-negative contract <strong>[Gated]</strong> and the measured MRT delta fits.</td>
+</tr>
+<tr>
+<td>Selective boost plus optical highlights</td>
+<td><code>bloom(sceneColor + authoredBoost)</code></td>
+<td>Use only when both mechanisms are required and the extra attachment is charged once <strong>[Gated]</strong>.</td>
+</tr>
+<tr>
+<td>Base form disappears without bloom</td>
+<td>neither</td>
+<td>Repair geometry/material/lighting first. Bloom is deferred.</td>
+</tr>
+</tbody></table>
+<p>Selective MRT is not automatically higher quality. It omits bright reflected
+and transmitted radiance unless those signals are authored into the
+contribution target. Full-scene bloom is usually both more physical and cheaper
+on bandwidth-limited devices.</p>
+<h2>Radiometric And Reactive Contract</h2>
+<p>When the route declares a physics-to-render boundary, consume its immutable
+<code>PhysicsPresentationCandidate</code> -&gt; <code>CameraViewPublication</code> -&gt;
+<code>ViewPreparationPublication</code> -&gt;
+<code>PhysicsPresentationSnapshot</code> chain and bind <code>LightingTransportSnapshot</code>
+through a provider-wide <code>PresentedStatePair</code> (<code>entityId: typed-absence</code>) in the
+Candidate whose binding ID is referenced by the Snapshot, from the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
+Validate the exact central presentation and lighting channel descriptors; do
+not redeclare a bloom-local lighting record. Bloom input is scene-linear
+radiance in its declared render-local basis. Match the pair&#39;s context/provider/
+signal IDs, descriptor/state/resource generations, <code>PresentationStateHandle</code>,
+each state&#39;s requested presentation instant, mapped source instant, clock-map
+revision/error, and the lighting bundle <code>sampleInstant</code>; validate channel
+<code>actualPhysicsTime</code>, filter/age, maximum staleness, validity, and error.
+Irradiance transport values
+must pass through the lighting/BRDF contract before bloom. Selective emission
+cannot use an unrelated arbitrary intensity scale.</p>
+<p>Basis, quantity, SI unit, bundle <code>sampleInstant</code>, channel <code>actualPhysicsTime</code>,
+state/resource version, validity, and error are checked per canonical channel.
+Canonical lighting-provider channels
+remain SI-valued. A normalized RGB bloom input is a separately named
+render-local signal produced by a versioned SI-to-render conversion with
+reference scale, provenance, and error; it is not a normalized canonical
+lighting channel. One route-wide label
+cannot make <code>incidentRadiance</code>, <code>surfaceIrradiance</code>,
+<code>directSolarIrradiance</code>, <code>skyIrradiance</code>, <code>transmittance</code>, or material emission
+dimensionally compatible; applied attenuation uses <code>attenuationFactorIds</code>.
+A nonphysical route leaves the router physics fields <code>not used</code> and declares
+only its render-local color contract.</p>
+<p>Declare threshold domain explicitly:</p>
+<ul>
+<li>scene-referred threshold: fixed in the bloom input&#39;s radiance units;</li>
+<li>exposed-linear threshold: convert each frame by the adapted exposure;</li>
+<li>display-referred threshold: invert the declared output/tone-map path or reject
+the policy when no stable inverse exists.</li>
+</ul>
+<p>Do not tune one numeric threshold across incompatible lighting bases. A change
+to basis/calibration, working primaries, quantity convention, or exposure-key
+policy emits the relevant <code>ViewPreparationPublication.reactivePublications</code>
+entry and recomputes/reseeds
+threshold state before bloom. Shadow commits and discontinuous foam,
+emissive, or optical changes produce a versioned radiance-reactive mask for any
+upstream temporal history. <code>BloomNode</code> itself has no history to reset, but it
+must consume the source after required rejection/reseed and publish the same
+epoch in diagnostics.
+<code>ViewPreparationPublication.resetDependencies</code> is an immutable plan; append the performed threshold
+conversion, upstream history action, graph rebuild, and submission to
+<code>FrameExecutionRecord</code>. Device loss appends a <code>FrameExecutionRecord</code> with
+<code>overallStatus: device-lost</code>, affected target execution statuses
+<code>device-lost</code>, cancelled dependent actions, and lost-generation entries in
+<code>leaseDispositionById</code>; it invalidates bloom resources and timing evidence without
+mutating the sealed snapshot. Rebuild under the new backend/resource generation.</p>
+<h2>r185 source facts</h2>
+<p>Verified against installed <code>three@0.185.1</code> <strong>[Measured]</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Consequence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>bloom(node, strength, radius, threshold)</code> and <code>BloomNode.setResolutionScale()</code> exist.</td>
+<td>Use the built-in baseline; do not invent stale pass wrappers.</td>
+</tr>
+<tr>
+<td>The default internal linear scale is <code>0.5</code> <strong>[Derived]</strong>.</td>
+<td>It is a source default, not a device-quality decision.</td>
+</tr>
+<tr>
+<td>High-pass weight is <code>smoothstep(threshold, threshold + smoothWidth, luminance(input.rgb))</code> <strong>[Derived]</strong>.</td>
+<td>Thresholding occurs in the input&#39;s scene-linear domain. <code>smoothWidth</code> is a soft knee, not blur radius.</td>
+</tr>
+<tr>
+<td>The node uses <code>5</code> mip levels with separable kernel radii <code>[6, 10, 14, 18, 22]</code> <strong>[Derived]</strong>.</td>
+<td>It is a multi-Gaussian approximation, not an arbitrary physical PSF.</td>
+</tr>
+<tr>
+<td><code>radius</code> mixes fixed cross-mip weights; it does not change kernel support <strong>[Derived]</strong>.</td>
+<td>Call it a mip-spread control, not a physical radius or sigma.</td>
+</tr>
+<tr>
+<td>Internal bright/blur targets are RGBA16F <strong>[Derived]</strong>.</td>
+<td>BloomNode itself cannot become an R11/RG compact path through a quality flag.</td>
+</tr>
+<tr>
+<td>Blur stages write alpha <code>1</code> and the composite carries nonzero alpha <strong>[Derived]</strong>.</td>
+<td>Add bloom RGB while preserving scene alpha when canvas/compositor alpha matters.</td>
+</tr>
+<tr>
+<td>Only MRT output named <code>output</code> uses material blending by default; other outputs default to no blending <strong>[Derived]</strong>.</td>
+<td>Transparent emissive contributions overwrite unless the MRT output receives an explicit blend mode.</td>
+</tr>
+<tr>
+<td>r185 <code>MRTNode.merge()</code> assigns merged modes to <code>blendings</code>, not the operative <code>blendModes</code> map <strong>[Derived]</strong>.</td>
+<td>A material-level <code>mrtNode</code> can drop the scene emissive blend mode; do not use that combination in the canonical transparent path.</td>
+</tr>
+<tr>
+<td><code>PassNode.compileAsync()</code> compiles the scene pass, not BloomNode&#39;s fullscreen materials <strong>[Derived]</strong>.</td>
+<td>Warm and time the complete RenderPipeline; scene compilation alone is insufficient.</td>
+</tr>
+</tbody></table>
+<p>Initialize and hard-gate WebGPU:</p>
+<pre><code class="language-js">await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;threejs-bloom requires WebGPU.&#39; );
+}
+</code></pre>
+<p>There is no non-WebGPU implementation in this skill.</p>
+<h2>Canonical graphs</h2>
+<p>Optical/full-scene path:</p>
+<pre><code class="language-text">one HDR scene pass -&gt; BloomNode(scene color) -&gt; HDR add -&gt; one output transform
+</code></pre>
+<p>Selective path:</p>
+<pre><code class="language-text">one HDR scene pass with output + emissive MRT
+  -&gt; BloomNode(emissive contribution)
+  -&gt; add to scene color
+  -&gt; one output transform
+</code></pre>
+<p>Both paths use one scene traversal. The selective path adds an HDR attachment;
+it does not add a selection scene render.</p>
+<p>Treat the HDR add as <code>vec4(scene.rgb + bloom.rgb, scene.a)</code>, not an unchecked
+vec4 sum. An opaque swapchain can hide alpha corruption that later appears in
+DOM/video compositing.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-bloom/references/hdr-bloom-system.md">references/hdr-bloom-system.md</a> for
+verified code, transparent MRT blending, exact pass/fetch/memory equations,
+adaptation rules, and validation.</p>
+<h2>Transparent contribution contract</h2>
+<p>For selective bloom, inspect the emissive texture before tuning bloom. r185
+MRT outputs other than <code>output</code> do not inherit material blending by default.
+Configure the emissive MRT output with <code>BlendMode(MaterialBlending)</code>. Author
+transparent contribution through the regular <code>emissiveNode</code>, already weighted
+for the material&#39;s premultiplied/straight-alpha policy. Avoid material-level
+<code>mrtNode</code> overrides in r185 because the stock MRT merge loses the configured
+non-output blend map.</p>
+<p>Use additive contribution for additive optical energy; use alpha compositing
+only when the visible surface uses the same ordered model. Charge transparent
+cost by measured covered fragments/overdraw, not object count. A screen-filling
+layer can cost more than thousands of tiny contributors.</p>
+<p>If visible emission and bloom contribution must diverge per transparent
+material, use a separately measured contribution pass or a source-verified
+custom MRT fix. This forfeits the stock one-scene-pass guarantee and must be
+budgeted explicitly.</p>
+<h2>Quality gates</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Authored start</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full</td>
+<td>scale <code>0.5</code>, strength <code>0.35-0.75</code>, mip-spread <code>0.25-0.45</code>, soft knee <code>0.05-0.12</code> <strong>[Authored]</strong></td>
+<td>HDR signal, PSF footprint, and full marginal time pass at maximum target DPR.</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>scale <code>0.33-0.5</code>, narrower contribution/threshold range <strong>[Authored]</strong></td>
+<td>Fixed-view halo error is acceptable and measured bloom delta fits.</td>
+</tr>
+<tr>
+<td>Constrained WebGPU</td>
+<td>scale <code>0.25-0.33</code>, reduced transparent screen coverage, optional bloom disable <strong>[Authored]</strong></td>
+<td>Tile bandwidth, thermal run, and minimum-mip dimension pass; otherwise disable bloom.</td>
+</tr>
+</tbody></table>
+<p>Threshold has no portable numeric default. Derive it from the stabilized
+exposure and a false-color pre-tone luminance view. For selective input,
+threshold still controls energy within membership; it is not the membership
+mechanism.</p>
+<p>The deepest r185 level is valid only when
+<code>floor(scale * min(width, height)) &gt;= 16</code> <strong>[Derived/Gated]</strong>. Below that, the
+fixed <code>5</code>-level chain reaches a zero-sized target. Reduce mip count in a custom
+node or disable bloom for that surface size; do not rely on undefined tiny-
+target behavior.</p>
+<h2>Composable marginal budget</h2>
+<pre><code class="language-text">deltaBloomFull = time(scene + full-scene bloom) - time(scene)       [Measured]
+deltaMRT = time(scene with contribution MRT) - time(scene)          [Measured]
+deltaBloomSelective = time(scene + contribution MRT + bloom) - time(scene)
+                                                                    [Measured]
+route valid iff charged delta &lt;= declaredMarginalBloomBudget        [Gated]
+</code></pre>
+<p>If another effect already owns the same emissive attachment, charge its
+measured attachment delta once in the unique-work ledger. Use the complete
+paired <code>deltaBloomSelective</code> for acceptance; do not add independently sampled
+MRT and BloomNode percentiles or assume their interaction is zero.</p>
+<p>Let <code>A = scale^2 * width * height</code> bloom pixels <strong>[Derived]</strong>. The fixed r185
+node performs <code>12</code> fullscreen draws <strong>[Derived]</strong>: one high-pass, two blur
+directions across <code>5</code> levels, and one composite. Its allocated internal target
+storage approaches <code>29.3125 * A</code> bytes before integer-size floors <strong>[Derived]</strong>
+and its shader work is about
+<code>42.3047 * A</code> texture samples plus <code>4.6641 * A</code> pixel writes <strong>[Derived]</strong>.</p>
+<p>At <code>1920x1080</code>, scale <code>0.5</code>, internal targets occupy <code>14.49 MiB</code>; a selective
+RGBA16F emissive attachment adds <code>15.82 MiB</code>, for <code>30.31 MiB</code> incremental live
+image storage before depth, output, MSAA, alignment, and tile scratch
+<strong>[Derived]</strong>.</p>
+<p>Do not seed the search with adapter-class millisecond tables. They obscure DPR,
+HDR sparsity, MRT stores, browser state, and thermal behavior. Declare one
+product marginal budget <strong>[Gated]</strong>, measure the complete charged delta with
+matched warmed A/B traces <strong>[Measured]</strong>, and reject every tier that misses it.</p>
+<p>For a pixel-bound miss, estimate
+<code>nextScale = currentScale * sqrt(budgetMs / measuredMs)</code> <strong>[Derived]</strong>, clamp
+to the tier and minimum-mip gates, then remeasure. The square-root estimate is
+invalid when MRT stores, fixed pass overhead, or transparent overdraw dominate.</p>
+<h2>Tile/mobile rules</h2>
+<ul>
+<li>Prefer full-scene input when it meets the visual contract; it removes the
+full-resolution contribution attachment.</li>
+<li>Measure MRT with the target MSAA count. An RGBA16F contribution attachment is
+<code>8 * width * height</code> resolved bytes <strong>[Derived]</strong> and may add multisample tile
+storage before resolve.</li>
+<li>Reduce bloom scale before changing the scene resolution. Bloom cost is
+approximately quadratic in linear scale while the pixel-bound assumption
+holds <strong>[Derived]</strong>.</li>
+<li>Use screen-coverage/overdraw heatmaps for transparent contributors. Sorting,
+destination reads, and two attachment writes can dominate a tile renderer.</li>
+<li>Run a sustained thermal trace; a short desktop capture does not validate
+mobile equilibrium.</li>
+</ul>
+<h2>Visual wrongness signatures</h2>
+<table>
+<thead>
+<tr>
+<th>Signature</th>
+<th>Cause / decision</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gray, clipped highlight cores</td>
+<td>HDR was clamped or output-converted before high-pass.</td>
+</tr>
+<tr>
+<td>Uniform milky veil</td>
+<td>Threshold/knee admits broad midtones, or strength compensates for a bad source signal.</td>
+</tr>
+<tr>
+<td>Bright reflections stay razor-sharp while emitters glow</td>
+<td>Selective MRT omitted optical radiance; use scene-color or hybrid input.</td>
+</tr>
+<tr>
+<td>Transparent contributors disappear or pop by draw order</td>
+<td>Emissive MRT blending/alpha is wrong.</td>
+</tr>
+<tr>
+<td>Halo changes with DPR or resize</td>
+<td>Fixed mip/kernel footprint changed in output-pixel terms; validate endpoints or use a custom PSF.</td>
+</tr>
+<tr>
+<td>Blocky staircase around small highlights</td>
+<td>Bloom scale is too low for the feature; raise scale or reject bloom for that tier.</td>
+</tr>
+<tr>
+<td>Tiny hot pixels create enormous halos</td>
+<td>Unbounded HDR fireflies; repair sampling/exposure or robustly cap the source before bloom.</td>
+</tr>
+<tr>
+<td>Scene form vanishes when bloom is disabled</td>
+<td>Bloom is carrying silhouette/lighting; repair the base scene.</td>
+</tr>
+<tr>
+<td>Bloom-off timing is unchanged</td>
+<td>Bloom remains reachable in the active graph; replace output node and set <code>needsUpdate</code>.</td>
+</tr>
+<tr>
+<td>Transparent canvas gains an opaque rectangle or wrong edge alpha</td>
+<td>Bloom alpha was added to scene alpha; preserve base alpha explicitly.</td>
+</tr>
+</tbody></table>
+<h2>Ownership boundary</h2>
+<p>This skill owns source-signal selection, BloomNode controls, selective MRT
+contribution, transparent blending, PSF diagnostics, and bloom marginal cost.
+Exposure/color grading owns metering, adaptation, tone mapping, and display
+conversion. Image-pipeline owns shared scene passes and global ordering.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-black-holes-and-space-effects.html">← Black Holes and Space Effects</a>
+    <a href="threejs-camera-controls-and-rigs.html">Camera Controls And Rigs →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/selective-bloom-demo/"><figure>
+        <div class="live-visual live-visual--bloom" aria-hidden="true">
+        <span class="lv-k">Concept proxy</span>
+        <strong>emissive source + bloom contribution</strong>
+        <span class="lv-m">final / base-only / bloom-only</span>
+      </div>
+        <figcaption><strong>Selective HDR Bloom Bench</strong><span>Concept proxy · The live page uses additive response geometry for interaction and mode switching. The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

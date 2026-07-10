@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rain, Snow, and Wet Surfaces — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-rain-snow-and-wet-surfaces.html" />
+<title>Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill</title>
+<meta name="description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<link rel="preload" as="image" href="../visual-validation/rain-generated-ripples/final.design.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Rain, Snow, and Wet Surfaces — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-rain-snow-and-wet-surfaces.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/rain-generated-ripples/final.design.png" />
+<meta property="og:title" content="Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Rain, Snow, and Wet Surfaces visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/rain-generated-ripples/final.design.png" />
-<meta name="twitter:image:alt" content="Rain, Snow, and Wet Surfaces visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Rain, Snow, and Wet Surfaces evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.png" />
+<meta name="twitter:image:alt" content="Rain, Snow, and Wet Surfaces evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Rain, Snow, and Wet Surfaces — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions." />
+<meta name="twitter:title" content="Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Rain, Snow, and Wet Surfaces — Three.js WebGPU agent skill",
+   "@id": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html#article",
+   "headline": "Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill",
    "description": "Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-rain-snow-and-wet-surfaces.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/rain-generated-ripples/final.design.png",
-   "dateModified": "2026-07-05T05:36:19+03:00",
+   "url": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html",
+   "image": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Worlds and Environments",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Rain, Snow, and Wet Surfaces",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-rain-snow-and-wet-surfaces.html"
+     "item": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/rain-generated-ripples/final.design.png" alt="Rain, Snow, and Wet Surfaces validation preview" fetchpriority="high" decoding="async" />
+  <img class="skill-hero-bg" src="../visual-validation/rain-generated-ripples/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Worlds and Environments</a> / Rain, Snow, and Wet Surfaces</p>
-    <h1>Rain, Snow, and Wet Surfaces</h1>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Rain, Snow, and Wet Surfaces</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-rain-snow-and-wet-surfaces">Rain, Snow, and Wet Surfaces</h1>
     <p class="lede">Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-rain-snow-and-wet-surfaces</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">3 runnable examples</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T05:36:19+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/73ac89625ab16bfbabae4739890a89eb3485e70b">commit 73ac896 ↗</a>
+      <span class="chip">2 primary implementations</span>
+<span class="chip">3 flagships</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-rain-snow-and-wet-surfaces/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,52 +275,79 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/rain-generated-ripples/"><figure>
-        <img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Wet Surface Ripple Normals" loading="lazy" />
-        <figcaption><strong>Wet Surface Ripple Normals</strong><span>Generated ripple normal variants are used as live scene inputs for wet asphalt lighting response.</span></figcaption>
-      </figure></a>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <div class="grid">
+      <a class="card" href="../demos/integration-precipitation-image-pipeline/">
+        <span class="card-head"><span class="card-index">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Integration Precipitation Image Pipeline</h3>
+        <p>2 fixed scenarios, 4 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
+      </a>
+      <a class="card" href="../demos/webgpu-rain-snow-and-wet-surfaces/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>WebGPU Rain Snow And Wet Surfaces</h3>
+        <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
+      </a>
     </div>
+  </div></section>
+
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/weathered-world/">
+        <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Weathered World</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/procedural-district/">
+        <span class="card-head"><span class="card-index">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Procedural District</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/creature-habitat/">
+        <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Creature Habitat</h3>
+        <span class="card-meta">5 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
+
+  <div class="section" id="approach"><div class="wrap">
+    <h2>The approach, mathematically</h2>
+    <div class="science">
+<p>Weather is one envelope driving many systems: precipitation intensity $\rho_w \in [0,1]$
+feeds particles, accumulation, and surface response so they can never disagree. Falling
+particles integrate gravity with terminal velocity and wind:</p>
+$$\mathbf v_{t+dt} = \mathbf v_t + \big(\mathbf g - k\,\mathbf v_t + \mathbf w(t)\big)\,dt$$
+<p>Wetness darkens albedo and sharpens specular response — a wet material interpolates:</p>
+$$\alpha' = \operatorname{lerp}(\alpha, \alpha_{wet}, w), \qquad
+c' = c\,(1 - 0.3\,w), \qquad F_0' = \operatorname{lerp}(F_0, 0.02\text{–}0.04, w_{film})$$
+<p>Snow accumulates by up-facing exposure $s = \operatorname{smoothstep}(c_0, c_1, \mathbf n\cdot\hat{\mathbf u})\cdot\rho_s$,
+and puddles fill height-field basins from the bottom up. Ripple normals advance phase per
+ring: $h(r,t) = A\,e^{-\gamma t}\cos(kr - \omega t)$, baked or generated as normal variants.</p></div>
   </div></div>
+
 
   <div class="section" id="validation"><div class="wrap">
-    <h2>Validation gallery</h2>
-    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
+    <h2>Evidence and asset previews</h2>
+    <p class="sub">Preserved diagnostic or generated-asset frames. Consult the demo registry before treating any frame as canonical runtime evidence.</p>
     <div class="gallery">
       <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Final design frame — wet surface with generated ripples" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Final design frame — wet surface with generated ripples</span></figcaption>
+        <img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Generated ripple-normal asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated ripple-normal asset preview</span></figcaption>
       </figure>
       <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/rain-generated-ripples/no-post.design.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — No-post baseline" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>No-post baseline</span></figcaption>
+        <img src="../visual-validation/rain-generated-ripples/no-post.design.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview baseline</span></figcaption>
       </figure>
       <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Diagnostics mosaic" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Diagnostics mosaic</span></figcaption>
+        <img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Rain, Snow, and Wet Surfaces in Three.js WebGPU — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated-asset channel diagnostics</span></figcaption>
       </figure>
-    </div>
-  </div></div>
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
-    <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-rain-snow-and-wet-surfaces/examples/snow-accumulation">
-        <h4>snow-accumulation</h4>
-        <span class="card-meta">threejs-rain-snow-and-wet-surfaces/examples/snow-accumulation</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces">
-        <h4>webgpu-rain-snow-and-wet-surfaces</h4>
-        <span class="card-meta">threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-rain-snow-and-wet-surfaces/examples/wet-puddle-rain">
-        <h4>wet-puddle-rain</h4>
-        <span class="card-meta">threejs-rain-snow-and-wet-surfaces/examples/wet-puddle-rain</span>
-      </a>
     </div>
   </div></div>
 
@@ -275,70 +357,221 @@ a.chip:active{transform:scale(.96)}
   <div class="skilltext"><h2>Rain, Snow, and Wet Surfaces</h2>
 <p>Treat weather as one coupled GPU system: a shared weather envelope drives
 precipitation particles, surface masks, normals, roughness, residue, lighting,
-and diagnostics. The first design decision is algorithm class, because a
-compute/storage architecture can be orders of magnitude faster than per-object
-or per-frame CPU mutation at the same visual quality.</p>
+and diagnostics. The first design decision is algorithm class: immutable
+analytic motion, sparse CPU-updated events, and dense GPU-resident recurrence
+have different asymptotic and bandwidth costs.</p>
 <p>Run <code>threejs-choose-skills</code> preflight for backend, budget, and resource owner
-decisions when precipitation joins a larger scene.</p>
+decisions when precipitation joins a larger scene. Dense recurrent state can
+benefit from GPU residency; analytic or sparse branch-heavy work can be faster
+without a compute dispatch. The target measurement decides.</p>
 <h2>Required Architecture</h2>
-<p>Build new work on latest Three.js with <code>WebGPURenderer</code> from <code>three/webgpu</code>,
+<p>Build new work on pinned Three.js r185 with <code>WebGPURenderer</code> from <code>three/webgpu</code>,
 TSL from <code>three/tsl</code>, <code>NodeMaterial</code> classes such as
 <code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>, and
 <code>SpriteNodeMaterial</code>, and the node post stack with <code>RenderPipeline</code>, <code>pass()</code>,
 <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>, <code>outputColorTransform</code>, and
 <code>renderOutput()</code>.</p>
-<p>The highest-throughput architecture for this domain is:</p>
+<p>The canonical frame graph exposes the selected state path:</p>
 <pre><code class="language-text">shared weather envelope
-  -&gt; compute-updated StorageInstancedBufferAttribute precipitation volume
-  -&gt; camera-wrapped instance positions and per-instance random/static fields
+  -&gt; immutable analytic seeds OR compute-updated recurrent precipitation
+  -&gt; domain-selected world cells: unbounded streamed, or localized bounded
   -&gt; TSL surface masks for snow, wetness, puddles, roughness, and normals
   -&gt; GPU impact/splash event buffers or generated ripple-normal quality tier
   -&gt; node presentation with one tone-map and one output transform owner
 </code></pre>
+<p>Choose the precipitation update before allocating dynamic storage:</p>
+<table>
+<thead>
+<tr>
+<th>Required behavior</th>
+<th>Default algorithm</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Constant ballistic fall/wind, no collisions</td>
+<td>Immutable seeds; derive world-cell position analytically from time in vertex TSL; stream/wrap only for unbounded visual weather</td>
+</tr>
+<tr>
+<td>Authored time-varying wind with analytic integral</td>
+<td>Immutable seeds plus accumulated/integrated wind displacement <code>integral v_wind(t) dt</code>; never multiply the current wind by total elapsed time</td>
+</tr>
+<tr>
+<td>Turbulence, collisions, or recurrent particle state</td>
+<td>Compute-updated storage instances</td>
+</tr>
+<tr>
+<td>World impacts/accumulation</td>
+<td>World-stable precipitation cells plus a compact impact/coverage field; camera-wrapped visual particles may not author physical contacts</td>
+</tr>
+<tr>
+<td>Sparse close splashes</td>
+<td>Event pool over impacted tiles/receivers, not a global particle scan</td>
+</tr>
+</tbody></table>
+<p>Analytic precipitation removes hot-buffer writes and a dispatch. Camera wrapping
+is a presentation optimization; hash cells in world space so camera motion does
+not make rain/snow phase or impact locations jump.</p>
 <p>Legacy WebGL implementations (deprecated, do not extend): <code>examples/snow-accumulation/snow-system.js</code>, <code>examples/wet-puddle-rain/rain-puddle-system.js</code>.</p>
-<p>Canonical Phase 1 WebGPU/TSL contract:
-<code>examples/webgpu-rain-snow-and-wet-surfaces/</code>. Run
+<p>Diagnostic/source scaffold:
+<code>examples/webgpu-rain-snow-and-wet-surfaces/</code>. Its descriptor and token checks
+do not prove renderer initialization, shader compilation, GPU execution,
+readback, images, or timing. Run
 <code>node examples/webgpu-rain-snow-and-wet-surfaces/validate.js</code> after edits.</p>
 <p>Read
-<a href="references/precipitation-surface-systems.md">references/precipitation-surface-systems.md</a>
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/references/precipitation-surface-systems.md">references/precipitation-surface-systems.md</a>
 for the full contracts, quality tiers, budgets, diagnostics, and replacement
 notes.</p>
+<h2>Shared Physics Boundary</h2>
+<p>When weather interacts with any other simulated domain, first read the router&#39;s
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
+Bind this skill to its versioned <code>PhysicsContext</code>,
+<code>EnvironmentForcingSnapshot</code>, <code>SurfaceExchange</code>, <code>InteractionRecord</code>, and
+<code>PhysicsPresentationCandidate</code>, <code>CameraViewPublication</code>,
+<code>ViewPreparationPublication</code>, and <code>PhysicsPresentationSnapshot</code>; do not create
+a second weather clock, wind uniform, contact record, or unit convention.</p>
+<p>The project/environment coordinator exclusively owns and publishes
+<code>EnvironmentForcingSnapshot</code>. This skill consumes that immutable snapshot and
+may own downstream precipitation transport, exchanges, and receiver state; it
+never republishes forcing under a rain-owned revision.</p>
+<ul>
+<li>Consume atmospheric wind from <code>EnvironmentForcingSnapshot</code> in meters per
+second at its exact <code>sampleInstant: PhysicsInstant</code>, with its declared frame,
+altitude/support domain, cadence,
+requested/actual oriented spatial footprint and spatial/temporal filter or
+band, interpolation policy, and
+per-channel error. Wind is air velocity. It is not plant
+structural response, water material current, or water-surface point velocity.</li>
+<li>Consume temperature and humidity only with their declared thermodynamic
+convention. Consume canonical precipitation as oriented mass-area flux.
+Convert any external volume source through its physical support/Jacobian, or
+any water-equivalent-depth rate through explicit reference density/provenance,
+before publishing the forcing snapshot. Preserve liquid/ice fractions,
+physical support/Jacobian, and arrival-time information. A scalar <code>forcing</code> may
+coordinate art direction but cannot author deposition or conservation.</li>
+<li>Treat clouds in one declared mode. Appearance-only clouds publish no physical
+precipitation channel. A causal cloud producer may publish a separate
+immutable <code>PrecipitationEmissionSnapshot</code> with
+<code>emissionInterval: PhysicsTimeInterval</code>, cloud support,
+fall-delay/transport policy, cadence, and per-channel error; this skill
+transports it on the declared later scheduler edge to physics-frame-stable receivers.</li>
+<li>Emit distributed rain/snow transfer as <code>SurfaceExchange</code> with mass and
+momentum fluxes over its exact <code>applicationInterval: PhysicsTimeInterval</code>.
+Intensive flux uses <code>InteractionFootprint.distributionKind: intensive-field</code>:
+physical-area quadrature weights include Jacobians and sum to
+<code>representedMeasure</code>; no normalized <code>W</code> multiplies the flux. A normalized
+inverse-square-metre kernel is permitted only for
+<code>distributionKind: extensive-distributed</code>, where it distributes one
+extensive rate or interval transfer.
+Emit sparse impacts as <code>InteractionRecord</code> with impulse, footprint in the
+declared SI physics frame, source/receiver IDs, exact
+<code>applicationInterval: PhysicsTimeInterval</code>, frame/transform revision,
+ordering key, reaction owner, and batch/partition identity. Put capacity
+outcomes in this downstream <code>SurfaceExchange.batchLedger</code> as the canonical
+immutable <code>InteractionBatchLedger</code>, never on the cloud emission or individual
+records. Rendered streak/flake count never changes either integral. Every
+causal physical impact carries
+<code>InteractionRecord.partitionMembership: InteractionPartitionMembership</code>
+with its <code>parentExchangeId</code>, <code>parentInteractionIds</code>, <code>partitionGroupId</code>,
+<code>partitionId</code>, <code>partitionMeasure</code>, and <code>closureGroupId</code>; disjoint partitions
+close their parent exchange exactly. Non-authoritative visual splashes use a
+presentation-event stream that references the exchange; neither path deposits
+a second copy.</li>
+<li>Assign exactly one wetness/coverage owner per receiver. That owner integrates
+rain deposition, water run-up/inundation, melt, drainage, infiltration, and
+evaporation into one state. Water, this skill, and materials may not each
+integrate private copies. A material consumes the published receiver state;
+it never integrates precipitation in a fragment node.</li>
+</ul>
+<p>Order coupled updates as follows: latch one immutable forcing snapshot at its
+<code>sampleInstant: PhysicsInstant</code> for the graph&#39;s
+<code>coordinationInterval: PhysicsTimeInterval</code>; give every participating
+<code>PhysicsGraphStage</code> an exact <code>executionInterval: PhysicsTimeInterval</code>; advance
+analytic or recurrent precipitation; resolve/bin impacts; publish exchanges and
+interaction records with exact <code>applicationInterval: PhysicsTimeInterval</code>; let
+the selected receiver owner integrate wetness/snow/coverage; and commit domain
+state. Do not read a newly written receiver field inside the update that
+produced it unless the graph declares the exact dispatch dependency, pass
+boundary, same-queue order, or host-visible completion. A workgroup barrier
+never orders a whole grid.</p>
+<p>After commit, publish one view-independent <code>PhysicsPresentationCandidate</code> at
+<code>requestedPresentationInstant: PhysicsInstant</code>, containing
+<code>presentedStatePairs</code>, <code>resourceLeases</code>, and <code>eventSequenceRanges</code>, but no
+camera, render-origin transform, visibility, shadow, cache, or reset state.
+Each pair&#39;s <code>previousPresented.provenance</code> and
+<code>currentPresented.provenance</code> are independent
+<code>PresentationSampleProvenance</code> records, and each arm carries its own
+<code>presentedInstant: PhysicsInstant</code>. The camera owner then publishes one
+<code>CameraViewPublication</code> per target/view with
+<code>previousRenderSampleInstant: PhysicsInstant</code> and
+<code>currentRenderSampleInstant: PhysicsInstant</code> plus
+<code>globalToRenderPrevious</code>/<code>globalToRenderCurrent</code>, view/projection matrices,
+jitter, viewport, and depth state; visibility, acceleration, shadow, cache,
+reactive, and reset owners publish the corresponding
+<code>ViewPreparationPublication</code> with <code>visibilityPublicationRefs</code>,
+<code>accelerationPublicationRefs</code>, <code>shadowViewPublicationRefs</code>,
+<code>cachePublicationRefs</code>, <code>reactiveEpochs</code>, <code>reactivePublications</code>,
+<code>resetDependencies</code>, full <code>resourceLeases</code> for newly created camera-dependent
+generations, and <code>resourceLeaseRefs</code>. Finally,
+seal a <code>PhysicsPresentationSnapshot</code> whose state/resource payload is only
+<code>presentedStatePairRefs</code> and <code>resourceLeaseRefs</code> plus the exact <code>candidateId</code>,
+<code>cameraPublicationId</code>, and <code>viewPreparationId</code>, with an exact
+<code>closureManifest</code>. Present airborne precipitation, receiver state, and any
+causal cloud-emission generation used by the view as distinct
+<code>PresentedStatePair</code> bindings. The snapshot never copies <code>PresentedStatePair</code>
+records, provenance, or global-to-render transforms.</p>
+<p>Use the shared <code>QualityTransition</code> for every physics-authoritative change to
+precipitation equations, recurrent state, cadence, receiver support/filter,
+exchange representation, partition/ledger identity, or stable IDs. A
+render-only change to streak count, beauty resolution, sprite geometry, or
+ripple-normal presentation may remain local only when physical state,
+integrals, descriptors, filters, cadence, and identities are unchanged.</p>
 <h2>Capability Gate</h2>
 <p>Initialize the renderer before allocating compute or storage resources. The
 high tier requires the WebGPU backend; the reduced tiers keep the same weather
 envelope and switch quality, not implementation doctrine.</p>
 <pre><code class="language-js">await renderer.init();
 
-if (renderer.backend.isWebGPUBackend) {
-  // High tier: compute/storage precipitation and dynamic surface fields.
-} else {
-  // Reduced tier: fewer instances, static masks, and generated ripple normals.
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(
+    &#39;WebGPU is required for the canonical weather path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.&#39;
+  );
 }
 </code></pre>
-<p>Quality tiers:</p>
+<p>Native WebGPU quality tiers preserve the shared weather cause:</p>
 <ul>
-<li><code>high</code>: compute-updated rain or snow positions in storage instanced buffers;
-dynamic TSL wetness, snow, puddle, and ripple fields; GPU event buffers for
-impact residue when needed.</li>
-<li><code>medium</code>: same storage-instanced precipitation with lower counts and cheaper
-material field octaves; ripple normals come from preloaded variants in
-<code>assets/generated-variants/</code>.</li>
-<li><code>reduced</code>: no custom backend rewrite; keep shared weather uniforms, use lower
-instance counts or static precipitation, static coverage masks, and generated
-ripple-normal variants.</li>
+<li><code>full</code>: analytic or recurrent motion as required, world-stable sparse
+impacts, integrated receiver fields, and measured reconstruction/post.</li>
+<li><code>balanced</code>: lower projected density/history extent and fewer field bands,
+with response conservation and image-error gates intact.</li>
+<li><code>budgeted</code>: analytic precipitation where possible, bounded event pools,
+lower-rate/reduced receiver state, and optional explicitly stylized generated
+ripple normals.</li>
 </ul>
 <h2>Build Order</h2>
 <ol>
-<li>Define one shared weather envelope with time, delta time, wind, coverage,
-wetness, precipitation rate, and debug mode. Particles and surfaces must
-read the same nodes or uniform references.</li>
-<li>Allocate static per-instance seeds once. Update only dynamic particle state
-with <code>renderer.compute()</code> or <code>renderer.computeAsync()</code> into
-<code>StorageInstancedBufferAttribute</code> or storage nodes created with
-<code>instancedArray()</code>.</li>
-<li>Keep precipitation in a camera-wrapped volume. Wrap positions in compute or
-TSL from camera position, volume size, wind, fall speed, and seed; never let
-an emitter edge enter the shot.</li>
+<li>Define one immutable weather projection from the latched forcing snapshot:
+sample time comes from <code>sampleInstant: PhysicsInstant</code>, step duration is
+derived from the owning stage&#39;s <code>executionInterval: PhysicsTimeInterval</code>,
+and wind, temperature, precipitation flux, and debug state preserve their
+source versions. Rendered particle count is a
+sampling/appearance choice: accepted impacts use deterministic quadrature
+over the declared exposed-surface measure. Physical-area weights include
+Jacobians and sum to represented area; deposition is
+<code>sum_i flux_i * areaWeight_i * dt</code>. Do not normalize these area weights.
+Extensive impact sample weights instead close the already integrated parent
+transfer. Equal division by particle count is valid only for a proven
+uniform measure/integrand. Wetness and snow coverage are integrated
+state with deposition, drainage/evaporation, or melt terms; they consume the
+same forcing but are not aliases of instantaneous precipitation progress.</li>
+<li>Allocate static per-instance seeds once. Evaluate ballistic/domain motion
+analytically when possible. Update only recurrent particle state with
+queued <code>renderer.compute()</code> into storage; r185 <code>computeAsync()</code> is not a
+GPU-completion fence.</li>
+<li>Choose the visual domain. Unbounded precipitation uses camera-centred
+world-cell streaming with stable world hashes. Localized weather uses a
+world-anchored bounded volume whose boundary is physically hidden or softly
+modelled. Impacts/accumulation always use an independent world-stable
+receiver field.</li>
 <li>Author surfaces as <code>MeshStandardNodeMaterial</code> or
 <code>MeshPhysicalNodeMaterial</code>. Drive color, roughness, metalness, normal,
 opacity, and displacement through node slots, not string patching.</li>
@@ -347,8 +580,8 @@ displacement and normals; one wetness/puddle mask gates roughness, ripple
 normals, splash intensity, and debug output.</li>
 <li>For rain surfaces, split early wetness from heavy-rain ripple response.
 Roughness should change before ripple normals appear.</li>
-<li>For splashes, generate or compact impact candidates on the GPU when counts
-are high. Weight by world-space upward normals, reject hidden/downward
+<li>For splashes, generate or compact impact candidates on the GPU only past the
+measured CPU/dirty-upload crossover. Weight by world-space upward normals, reject hidden/downward
 surfaces, and animate flipbook progress without per-splash CPU rewrites.</li>
 <li>Present with <code>RenderPipeline</code>. Use built-in nodes first: <code>GTAONode</code> or
 <code>ao()</code> for contact grounding, <code>BloomNode</code> or <code>bloom()</code> only for bright
@@ -359,40 +592,47 @@ and <code>CSMShadowNode</code> or <code>TileShadowNode</code> for large precipit
 <ul>
 <li>precipitation density, rate, speed, and quality tier;</li>
 <li>wind direction, strength, and gust phase;</li>
-<li>shared weather coverage or wetness progress;</li>
-<li>wrapped volume size and camera-follow offset;</li>
+<li>shared weather forcing plus independently integrated wetness/snow state;</li>
+<li>visual domain bounds, cell-streaming/wrapping policy, and receiver-field extent;</li>
 <li>wetness, snow, or puddle mask threshold and softness;</li>
 <li>ripple source: dynamic field, generated variant A/B/C, or disabled;</li>
 <li>ripple or drift normal strength;</li>
 <li>surface roughness and color response;</li>
 <li>particle, residue, and splash opacity;</li>
-<li>debug modes for masks, normals, particles, event buffers, and weather
-progress.</li>
+<li>debug modes for masks, normals, particles, event buffers, forcing, and
+integrated surface state.</li>
 </ul>
-<h2>Performance Budgets</h2>
-<p>Target these as starting budgets, then tighten for the product scene:</p>
+<h2>Performance Contract</h2>
+<p>Derive particle count from projected coverage and overdraw, not a device-class
+lookup table. An analytic camera-relative precipitation field can render with
+immutable seeds and no simulation dispatch. A recurrent particle solver pays
+storage plus compute only when interaction, collision, or persistent state is
+visible. Sparse world impacts use a bounded event pool; do not update a dense
+world grid merely because precipitation is dense on screen.</p>
 <ul>
-<li>Desktop discrete GPU: 100k to 300k precipitation instances, one compute
-dispatch per precipitation family, one optional event dispatch, 1 to 2 weather
-surface fields, 1.5 ms precipitation, 1.0 ms material overhead, 0.8 ms post.</li>
-<li>Desktop integrated GPU: 40k to 100k instances, one dispatch per family,
-generated ripple-normal variants for medium rain, 2.5 ms precipitation,
-1.5 ms material overhead, 1.0 ms post.</li>
-<li>Mobile or reduced tier: 8k to 40k instances, static or lower-rate compute,
-generated ripple-normal variants, &lt;= 2 dynamic field octaves, 3.0 ms total
-weather budget.</li>
-<li>Storage: keep dynamic instance buffers packed to position, velocity/life, and
-seed/flags. A 100k instance system with three <code>vec4</code> storage records is about
-4.8 MB before alignment and render-target overhead.</li>
+<li>Storage: keep recurrent instance buffers packed to the fields actually read.
+For an <strong>Authored</strong> example capacity of 100,000 instances with three
+<code>vec4&lt;f32&gt;</code> records, the <strong>Derived</strong> payload is
+<code>100000 * 3 * 16 = 4,800,000 B = 4.58 MiB</code>, excluding allocator padding,
+render targets, and duplicate/history slots.</li>
 <li>Passes: one beauty pass, optional MRT only when later nodes reuse depth,
 normals, wetness, or velocity; reduced-resolution post effects must use
 <code>PassNode.setResolutionScale()</code>.</li>
-<li>Draw calls: one draw per precipitation family, one draw per splash pool, and
-no per-drop or per-splash object allocation.</li>
+<li>Draw calls: one draw per visible spatial page and compatible precipitation
+or splash material class; never trade submission savings for one uncullable
+world-wide batch. Use no per-drop or per-splash object allocation.</li>
 </ul>
+<p>Record <code>{visibleInstances, pixelsCovered, mean/max layersPerPixel, streakQuadPx, solverKind, storageBytes, dirtyImpactTiles, renderExtent, sampleCount}</code>. The
+router assigns a whole-frame allocation; report contemporaneous full-frame
+p50/p95 and a paired marginal A/B result for precipitation. Gate sustained GPU
+and CPU p50/p95, hot bytes/frame, transparent overdraw, impact-field work, peak
+live memory, and thermal behavior on the named target. On tile GPUs compare
+analytic/no-history, reduced field, and recurrent tiers under the same visual
+error contract; instance count alone says nothing about mobile suitability.</p>
 <h2>Color And Output</h2>
 <ul>
-<li>Color textures use <code>SRGBColorSpace</code>.</li>
+<li>LDR albedo/emissive textures encoded as sRGB use <code>SRGBColorSpace</code>; HDR/EXR
+radiance remains loader-declared linear.</li>
 <li>Data textures, normal maps, roughness maps, masks, noise, LUTs, and weather
 fields use <code>NoColorSpace</code> or linear treatment.</li>
 <li>Decide mipmaps per use: pregenerated ripple-normal variants should have
@@ -404,9 +644,10 @@ ownership.</li>
 </ul>
 <h2>Replacement Doctrine</h2>
 <ul>
-<li>Replace per-frame CPU attribute and instance-matrix rewrites with
-compute-updated storage instance data. This removes upload bandwidth and
-scales to high particle counts.</li>
+<li>For dense recurrent state, replace per-frame CPU instance rewrites with
+GPU-resident compute/storage only after the state remains resident and the
+measured dispatch is cheaper. Analytic seeds need neither path; sparse,
+branch-heavy authoritative events may remain CPU-updated dirty ranges.</li>
 <li>Replace disconnected particle clocks and surface clocks with one weather
 envelope. This prevents rain, splashes, puddles, and snow coverage from
 drifting apart.</li>
@@ -423,8 +664,8 @@ optional depth or occlusion rejection.</li>
 <ul>
 <li>falling precipitation ignores the wind, time, or progress used by surfaces;</li>
 <li>instance positions or splash progress are rewritten on the CPU every frame;</li>
-<li>the precipitation volume exposes emitter edges instead of wrapping around the
-camera;</li>
+<li>an unbounded streamed volume exposes emitter edges, or a localized volume
+hides an unexplained hard boundary;</li>
 <li>snow height and snow normals come from different fields;</li>
 <li>model snow slides in world space or sticks to vertical faces;</li>
 <li>puddles only lower roughness without a mask, normal response, or ripple tier;</li>
@@ -443,7 +684,8 @@ general sparks, plasma, trails, and non-weather particles. Use
 Use <code>$threejs-image-pipeline</code> for full-frame post ownership when precipitation
 is part of a larger HDR pipeline. Use <code>$threejs-scalable-real-time-shadows</code> when weather
 visibility depends on large-scene shadow budgets. This skill owns
-precipitation events and the surfaces they visibly alter.</p>
+precipitation transport and its typed exchanges. The route-selected receiver
+owner owns integrated wetness/coverage; surface materials only consume it.</p>
 </div>
   <div class="pn">
     <a href="threejs-procedural-vegetation.html">← Procedural Vegetation</a>
@@ -452,25 +694,24 @@ precipitation events and the surfaces they visibly alter.</p>
 </div></div>
 
 
-  <div class="section" id="approach"><div class="wrap">
-    <h2>The approach, mathematically</h2>
-    <div class="science">
-<p>Weather is one envelope driving many systems: precipitation intensity $\rho_w \in [0,1]$
-feeds particles, accumulation, and surface response so they can never disagree. Falling
-particles integrate gravity with terminal velocity and wind:</p>
-$$\mathbf v_{t+dt} = \mathbf v_t + \big(\mathbf g - k\,\mathbf v_t + \mathbf w(t)\big)\,dt$$
-<p>Wetness darkens albedo and sharpens specular response — a wet material interpolates:</p>
-$$\alpha' = \operatorname{lerp}(\alpha, \alpha_{wet}, w), \qquad
-c' = c\,(1 - 0.3\,w), \qquad F_0' = \operatorname{lerp}(F_0, 0.02\text{–}0.04, w_{film})$$
-<p>Snow accumulates by up-facing exposure $s = \operatorname{smoothstep}(c_0, c_1, \mathbf n\cdot\hat{\mathbf u})\cdot\rho_s$,
-and puddles fill height-field basins from the bottom up. Ripple normals advance phase per
-ring: $h(r,t) = A\,e^{-\gamma t}\cos(kr - \omega t)$, baked or generated as normal variants.</p></div>
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/rain-generated-ripples/"><figure>
+        <img src="../visual-validation/rain-generated-ripples/final.design.png" alt="Wet Surface Ripple Normals" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Wet Surface Ripple Normals</strong><span>Generated asset preview · The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.</span></figcaption>
+      </figure></a>
+    </div>
   </div></div>
+
+</main>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

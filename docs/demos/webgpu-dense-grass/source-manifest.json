@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-dense-grass",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/browser-lab.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/dense-grass-system.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/route-contract.js"
+  ],
+  "sourceHashInputs": [
+    "labs/runtime/strict-lab-controller.mjs",
+    "threejs-procedural-vegetation/assets/generated-variants/meadow-density-a.png",
+    "threejs-procedural-vegetation/assets/generated-variants/meadow-density-b.png",
+    "threejs-procedural-vegetation/assets/generated-variants/meadow-density-c.png",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass"
+  ],
+  "browserEntry": "threejs-procedural-vegetation/examples/webgpu-dense-grass/index.html",
+  "sourceHash": "sha256:6203a4de2601015034bba82f5910ca7997bbfe786526d925290f577ac4839111",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-dense-grass",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:49d74da0161bfeef366ce02a5c82965078a8e31cf0d171aa7d419055e895edf7",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

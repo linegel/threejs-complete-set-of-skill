@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Volumetric Clouds — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-volumetric-clouds.html" />
+<title>Volumetric Clouds | Three.js WebGPU Skill</title>
+<meta name="description" content="Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-volumetric-clouds.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<link rel="preload" as="image" href="../visual-validation/cloud-generated-weather-maps/final.design.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Volumetric Clouds — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-volumetric-clouds.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/cloud-generated-weather-maps/final.design.png" />
+<meta property="og:title" content="Volumetric Clouds | Three.js WebGPU Skill" />
+<meta property="og:description" content="Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-volumetric-clouds.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Volumetric Clouds visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/cloud-generated-weather-maps/final.design.png" />
-<meta name="twitter:image:alt" content="Volumetric Clouds visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Volumetric Clouds evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.png" />
+<meta name="twitter:image:alt" content="Volumetric Clouds evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Volumetric Clouds — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers." />
+<meta name="twitter:title" content="Volumetric Clouds | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Volumetric Clouds — Three.js WebGPU agent skill",
-   "description": "Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-volumetric-clouds.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/cloud-generated-weather-maps/final.design.png",
-   "dateModified": "2026-07-05T05:30:33+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html#article",
+   "headline": "Volumetric Clouds | Three.js WebGPU Skill",
+   "description": "Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and error-bounded quality tiers.",
+   "url": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html",
+   "image": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Worlds and Environments",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Volumetric Clouds",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-volumetric-clouds.html"
+     "item": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/cloud-generated-weather-maps/final.design.png" alt="Volumetric Clouds validation preview" fetchpriority="high" decoding="async" />
+  <img class="skill-hero-bg" src="../visual-validation/cloud-generated-weather-maps/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Worlds and Environments</a> / Volumetric Clouds</p>
-    <h1>Volumetric Clouds</h1>
-    <p class="lede">Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Volumetric Clouds</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-volumetric-clouds">Volumetric Clouds</h1>
+    <p class="lede">Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and error-bounded quality tiers.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-volumetric-clouds</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">2 runnable examples</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T05:30:33+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3dcde64d2d817e9e74080ee4e2e002e7c1206283">commit 3dcde64 ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">1 flagship</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-volumetric-clouds/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-volumetric-clouds/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,232 +275,30 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/cloud-generated-weather-maps/"><figure>
-        <img src="../visual-validation/cloud-generated-weather-maps/final.design.png" alt="Weather Map Cloud Layers" loading="lazy" />
-        <figcaption><strong>Weather Map Cloud Layers</strong><span>Generated weather maps are used as live scene inputs for layered cloud density and erosion response.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-  <div class="section" id="validation"><div class="wrap">
-    <h2>Validation gallery</h2>
-    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
-    <div class="gallery">
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/cloud-generated-weather-maps/final.design.png" alt="Volumetric Clouds in Three.js WebGPU — Final design frame — generated weather-map cloud density" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Final design frame — generated weather-map cloud density</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/cloud-generated-weather-maps/no-post.design.png" alt="Volumetric Clouds in Three.js WebGPU — No-weather baseline" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>No-weather baseline</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Volumetric Clouds in Three.js WebGPU — RGB weather fields and semantic alpha erosion" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>RGB weather fields and semantic alpha erosion</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/cloud-generated-weather-maps/temporal.t001.png" alt="Volumetric Clouds in Three.js WebGPU — Temporal weather-field response" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Temporal weather-field response</span></figcaption>
-      </figure>
-    </div>
-  </div></div>
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-volumetric-clouds/examples/deprecated-weather-volume-clouds">
-        <h4>deprecated-weather-volume-clouds</h4>
-        <span class="card-meta">threejs-volumetric-clouds/examples/deprecated-weather-volume-clouds</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds">
-        <h4>webgpu-weather-volume-clouds</h4>
-        <span class="card-meta">threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds</span>
+      <a class="card" href="../demos/webgpu-weather-volume-clouds/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Native WebGPU Weather Volume Clouds</h3>
+        <p>4 fixed scenarios, 7 mechanism routes, and 4 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Volumetric Clouds</h2>
-<p>Cloud throughput is won by architecture before code details: march fewer pixels,
-march only occupied volume, amortize with temporal reprojection, and carry enough
-depth/velocity data to reject bad history. The taught path is latest Three.js
-with <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, node materials,
-compute/storage resources, and a node <code>RenderPipeline</code>.</p>
-<p>Read <a href="references/weather-volume-and-reconstruction.md">references/weather-volume-and-reconstruction.md</a>
-before implementing or auditing the cloud system.</p>
-<p>Active canonical implementation contract:
-<code>examples/webgpu-weather-volume-clouds/</code>. It is the WebGPU/TSL-only active path
-for new work, includes <code>validateCloudConfig()</code>, asset-manifest checks, cloud
-shadow/temporal/composite ownership modules, and must pass
-<code>node examples/webgpu-weather-volume-clouds/validation.js</code> after edits.</p>
-<p>Legacy WebGL implementation (quarantined, do not extend or use as a pattern):
-<code>examples/deprecated-weather-volume-clouds/</code>.</p>
-<h2>Build Order</h2>
-<ol>
-<li>Start with the performance architecture: half-resolution high tier or
-quarter-resolution default tier bounded raymarch, blue-noise first-sample
-offset, transmittance early exit, adaptive step length, cloud shadow map in
-the same update chain, temporal reprojection with velocity and depth
-rejection, then depth-aware upsample to full resolution in the node pipeline.</li>
-<li>Initialize one <code>WebGPURenderer</code>, call <code>await renderer.init()</code>, and route
-compute/storage tiers through a capability gate:</li>
-</ol>
-<pre><code class="language-js">await renderer.init();
-
-if (renderer.backend.isWebGPUBackend) {
-  // compute/storage volumetric path
-} else {
-  // reduced-quality tier: precomputed assets, lower resolution, static shadows
-}
-</code></pre>
-<ol start="3">
-<li>Use <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
-<code>renderOutput()</code>, and <code>outputColorTransform</code> ownership for the host image
-chain. Keep one tone-map owner and one output transform owner.</li>
-<li>Produce cloud work in TSL <code>Fn().compute(count)</code> dispatches through
-<code>renderer.compute()</code> or <code>renderer.computeAsync()</code>. Write current cloud
-radiance/transmittance, representative depth, velocity, history, and compact
-shadow data into <code>StorageTexture</code>/<code>Storage3DTexture</code> resources with
-<code>textureStore()</code>/<code>storageTexture()</code>.</li>
-<li>Feed the full-resolution composite as linear HDR cloud radiance plus
-transmittance into the host <code>RenderPipeline</code>; combine with scene color before
-the single output transform.</li>
-</ol>
-<h2>Required Architecture</h2>
-<ul>
-<li>Weather-shaped density uses packed 2D weather fields plus 3D base/detail
-fields. Keep the four-layer vector model until after per-layer altitude,
-profile, shape, and detail controls.</li>
-<li>Ray intervals come from cloud shell bounds and opaque scene depth. Never scale
-primary cost with camera far distance when the view only crosses a thin cloud
-layer.</li>
-<li>Primary march runs at reduced resolution, uses spatiotemporal blue-noise
-offset, skips packed empty altitude gaps, increases step length through empty
-or low-density space, and terminates on transmittance.</li>
-<li>Temporal reconstruction is velocity/depth aware. Same-UV history blending is
-not accepted because it loses the 4-16x amortization that makes the reduced
-march viable under camera motion.</li>
-<li>Cloud shadows are a separate compact optical-depth product, not a reuse of the
-beauty march. Update shadows on their own cadence and feed lighting lookups
-from that representation.</li>
-<li>Upsampling is depth-aware and edge-aware in the node pipeline, not a blind
-stretch. Prefer <code>TRAANode</code> when the host scene also needs temporal AA; custom
-cloud reprojection must still provide representative depth and velocity.</li>
-</ul>
-<h2>Quality Tiers And Budgets</h2>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th align="right">March scale</th>
-<th align="right">Primary steps</th>
-<th align="right">Light steps</th>
-<th>Shadow maps</th>
-<th>Target cost</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Ultra desktop-discrete</td>
-<td align="right">1/2 linear</td>
-<td align="right">96-160</td>
-<td align="right">6-8</td>
-<td>3x 768-1024</td>
-<td>2.5-4.0 ms</td>
-</tr>
-<tr>
-<td>High desktop-discrete</td>
-<td align="right">1/2 linear</td>
-<td align="right">72-120</td>
-<td align="right">4-6</td>
-<td>3x 512</td>
-<td>1.8-3.0 ms</td>
-</tr>
-<tr>
-<td>Default integrated/mobile</td>
-<td align="right">1/4 linear</td>
-<td align="right">48-80</td>
-<td align="right">3-4</td>
-<td>2x 256-384</td>
-<td>1.0-2.0 ms</td>
-</tr>
-<tr>
-<td>Reduced backend tier</td>
-<td align="right">1/4-1/8 linear</td>
-<td align="right">24-48 or precomputed</td>
-<td align="right">1-2</td>
-<td>static/precomputed</td>
-<td>0.5-1.2 ms</td>
-</tr>
-</tbody></table>
-<p>Budgets assume one cloud layer stack, one depth-aware upsample, one temporal
-resolve, and one shadow update amortized over 2-8 frames. Keep storage memory
-explicit and derived: quarter-linear 1920x1080 RGBA16F is
-480 x 270 x 8 B = 1,036,800 B, about 1.0 MB per buffer; half-linear is
-960 x 540 x 8 B = 4,147,200 B, about 4.15 MB per buffer. Representative
-depth/velocity and rejection masks should stay below the cloud color history
-footprint. Shadow cascades are the largest fixed cost: a 512x512 RGBA16F
-cascade is about 2 MB.</p>
-<h2>Required Controls</h2>
-<ul>
-<li>coverage, cloud type, precipitation, and anvil bias;</li>
-<li>base/top altitude and vertical density profile per active layer;</li>
-<li>shape/detail scales, erosion, and height-dependent detail policy;</li>
-<li>independent wind for weather, shape, detail, and turbulence fields;</li>
-<li>primary step count, adaptive step limits, light step count, and empty-space
-policy;</li>
-<li>temporal alpha, velocity limit, depth rejection, variance-clipping width, and
-history reset causes;</li>
-<li>cloud-shadow extent, cascade count, resolution, update cadence, and compact
-channel layout;</li>
-<li>debug mode for each density, march, temporal, and shadow stage.</li>
-</ul>
-<h2>Color And Output</h2>
-<ul>
-<li>Color textures use <code>SRGBColorSpace</code>. Weather, noise, masks, depth, velocity,
-LUTs, and shadow optical-depth data use <code>NoColorSpace</code>/linear sampling.</li>
-<li>HDR cloud current/history/composite buffers use <code>HalfFloatType</code> until the
-pipeline tone maps.</li>
-<li>The cloud material/effect must not apply its own output conversion. The host
-<code>RenderPipeline</code> owns output conversion with <code>outputColorTransform</code> or an
-explicit <code>renderOutput()</code> node.</li>
-<li>Generated volume textures use deterministic seeds, documented dimensions,
-channel semantics, wrap/filter policy, and mip policy. Regenerate them only
-when their recipe changes.</li>
-</ul>
-<h2>Failure Conditions</h2>
-<ul>
-<li>density is only procedural noise evaluated at position;</li>
-<li>the raymarch traverses the full camera range instead of bounded shell/depth
-intervals;</li>
-<li>detail noise adds density instead of eroding shaped masses by height;</li>
-<li>temporal history is accepted without velocity and depth rejection;</li>
-<li>history is reset on ordinary camera motion instead of reprojected;</li>
-<li>shadows use the full beauty march or update every pixel every frame;</li>
-<li>every layer shares the same wind, altitude profile, and density controls;</li>
-<li>output is tone mapped or color-converted more than once.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-choose-skills</code> for preflight when the task spans several rendering
-systems. Use <code>$threejs-sky-atmosphere-and-haze</code> for molecular/aerosol
-scattering without weather density, <code>$threejs-image-pipeline</code> for whole-frame
-HDR/post ownership, <code>$threejs-exposure-color-grading</code> for tone mapping and LUT
-policy, and <code>$threejs-scalable-real-time-shadows</code> when terrain/scene shadows need CSM or
-tiled shadow integration. This skill owns weather-shaped cloud volumes,
-temporal reconstruction, cloud lighting, and cloud optical-depth shadows.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-visual-validation.html">← Visual Validation</a>
-    <a href="threejs-water-optics.html">Water Optics →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/weathered-world/">
+        <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Weathered World</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -462,10 +315,451 @@ history reprojection $H_t = \alpha\,C_t + (1-\alpha)\,H_{t-1}(\mathbf{uv} - \Del
 — the history fetch must be motion-warped, or the amortization degenerates to screen-space smearing.</p></div>
   </div></div>
 
+
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Evidence and asset previews</h2>
+    <p class="sub">Preserved diagnostic or generated-asset frames. Consult the demo registry before treating any frame as canonical runtime evidence.</p>
+    <div class="gallery">
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/cloud-generated-weather-maps/final.design.png" alt="Volumetric Clouds in Three.js WebGPU — Generated weather-map asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated weather-map asset preview</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/cloud-generated-weather-maps/no-post.design.png" alt="Volumetric Clouds in Three.js WebGPU — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview baseline</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Volumetric Clouds in Three.js WebGPU — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated-asset channel diagnostics</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/cloud-generated-weather-maps/temporal.t001.png" alt="Volumetric Clouds in Three.js WebGPU — Asset-preview parameter variation" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview parameter variation</span></figcaption>
+      </figure>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Volumetric Clouds</h2>
+<p>Cloud throughput is won by architecture before code details: march fewer pixels,
+march only occupied volume, amortize with temporal reprojection, and carry enough
+depth/velocity data to reject bad history. The taught path is pinned Three.js r185
+with <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from <code>three/tsl</code>, node materials,
+compute/storage resources, and a node <code>RenderPipeline</code>.</p>
+<p>The density field is an authored meteorological appearance model unless it is
+coupled to validated atmospheric data. Beer-Lambert attenuation is physical for
+the declared coefficients; dual-lobe phase fits, octave multiple scattering,
+powder terms, procedural coverage, and compact shadow tails are approximations.
+State this boundary in every implementation.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-volumetric-clouds/references/weather-volume-and-reconstruction.md">references/weather-volume-and-reconstruction.md</a>
+before implementing or auditing the cloud system.</p>
+<h2>Shared Environmental And Lighting Boundary</h2>
+<p>For coupled weather or lighting, first read the router&#39;s
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
+Consume its versioned <code>PhysicsContext</code>, <code>EnvironmentForcingSnapshot</code>, and
+<code>LightingTransportSnapshot</code>; do not invent a cloud-only world scale, wind
+clock, solar basis, or attenuation convention.</p>
+<p>The project/environment coordinator is the sole owner and publisher of
+<code>EnvironmentForcingSnapshot</code>. Clouds consume that immutable boundary and may
+publish a distinct <code>PrecipitationEmissionSnapshot</code>; they never republish
+forcing under a cloud-owned revision or clock.</p>
+<ul>
+<li>Sample environmental air velocity in meters per second from
+<code>EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant</code>, with its declared
+frame, altitude/support domain, cadence, interpolation policy,
+requested/actual oriented spatial footprint, spatial/temporal filter or band,
+and per-channel error. Every forcing channel has
+<code>SampledChannel.actualPhysicsTime: PhysicsInstant</code>. Cloud-relative evolution
+is a separately named velocity relative to the air. It is not water current
+or vegetation deformation.</li>
+<li>Select <code>appearance-only</code> or <code>causal-precipitation</code> explicitly. An
+appearance-only density field may expose an artistic precipitation bias but
+exposes no physical emission channel. A causal producer publishes dimensioned
+phase-fraction-resolved liquid/ice <code>PrecipitationEmissionSnapshot</code> with
+<code>emissionInterval: PhysicsTimeInterval</code> and canonical oriented mass-area flux;
+every emission channel has
+<code>SampledChannel.actualPhysicsTime: PhysicsTimeInterval</code> equal to that
+interval. A volume-source cloud model projects through its support/Jacobian
+before publication. Include
+fall-delay or transport model, cadence, uncertainty/error, typed
+<code>ConservationGroup.boundaryFluxes</code>, a closing <code>ConservationGroup</code>, and an
+<code>ErrorPropagationLedger</code> for the emitted state version. Delivery accounting
+is not cloud state: the downstream rain-owned <code>SurfaceExchange.batchLedger</code>
+owns its immutable <code>InteractionBatchLedger</code>. Any derived <code>SurfaceExchange</code>
+and <code>InteractionRecord</code> use contained
+<code>applicationInterval: PhysicsTimeInterval</code>.</li>
+<li>Consume sun direction and per-channel solar/sky radiance or irradiance
+quantity, unit, spectral/working basis, filter, error, and atmospheric
+transmittance from <code>LightingTransportSnapshot.sampleInstant: PhysicsInstant</code>;
+every lighting channel has
+<code>SampledChannel.actualPhysicsTime: PhysicsInstant</code>. Apply
+atmospheric attenuation exactly once using its versioned
+<code>attenuationFactorIds</code>, not a boolean.
+Cloud self-shadowing contributes a separate cloud optical-depth/transmittance
+factor; it never bakes atmospheric attenuation into that factor.</li>
+<li>Version cloud density, precipitation emission, lighting input, and shadow
+output independently. The scheduler latches forcing and lighting, evolves a
+provisional cloud state, derives and validates emission from that state, then
+commits density and emission generations atomically. It never mutates the
+consumed forcing snapshot. Downstream rain and surface lighting consume only
+completed committed publications.</li>
+<li>Publish committed render-consumed, view-independent cloud state generations
+through <code>PhysicsPresentationCandidate.presentedStatePairs</code>, with the
+candidate&#39;s <code>requestedPresentationInstant: PhysicsInstant</code>,
+<code>resourceLeases</code>, and <code>eventSequenceRanges</code>. The candidate contains no camera,
+render origin, <code>globalToRender</code>, view/projection matrix, shadow/cache epoch,
+or view-specific current/history/reconstruction state. Every pair carries
+independent <code>previousPresented.provenance</code> and
+<code>currentPresented.provenance</code> records of type
+<code>PresentationSampleProvenance</code>; never collapse them into one shared
+provenance record. Each arm has its own <code>presentedInstant: PhysicsInstant</code>.
+The camera owner publishes a per-target/view <code>CameraViewPublication</code> with
+<code>previousRenderSampleInstant: PhysicsInstant</code>,
+<code>currentRenderSampleInstant: PhysicsInstant</code>, source-qualified
+<code>globalToRenderPrevious</code>, <code>globalToRenderCurrent</code>, and view/projection
+matrices. Visibility, acceleration, cloud-shadow view products, temporal
+caches, reactive/reset
+plans, and their lease refs belong to the subsequent per-view
+<code>ViewPreparationPublication</code> fields <code>visibilityPublicationRefs</code>,
+<code>accelerationPublicationRefs</code>, <code>shadowViewPublicationRefs</code>,
+<code>cachePublicationRefs</code>, <code>reactiveEpochs</code>, <code>reactivePublications</code>,
+<code>resetDependencies</code>, full <code>resourceLeases</code> for newly created
+camera-dependent generations, and <code>resourceLeaseRefs</code>. The sealed
+<code>PhysicsPresentationSnapshot</code>
+contains only <code>snapshotId</code>, <code>candidateId</code>, <code>cameraPublicationId</code>,
+<code>viewPreparationId</code>, <code>presentationTargetId</code>, <code>viewId</code>,
+<code>presentedStatePairRefs</code>, <code>resourceLeaseRefs</code>, <code>eventSequenceRanges</code>, and
+<code>closureManifest</code>, and <code>sealVersion</code>; it copies no pairs or transforms. The
+candidate exposes separate <code>PresentedStatePair</code> bindings for committed cloud
+density and, in causal mode, the committed precipitation-emission generation
+whenever either is presented. <code>closureManifest.exactRequiredLeaseIds</code> and
+<code>exactEventRangeIds</code> close those bindings and dependencies exactly. Hold,
+analytic, or no-interpolation policy is explicit in each previous/current
+provenance record.</li>
+</ul>
+<p>Route every physics-authoritative change of cloud equations, state
+discretization/support, cadence, provider filter, emission representation, or
+stable identity through the shared <code>QualityTransition</code>. A beauty-march scale,
+shadow resolution, or reconstruction-only change may remain local only when it
+does not change any physical state, provider descriptor, emission integral,
+filter, ID, or cadence.</p>
+<p>Keep mobile tiers analytic and sparse: a low-rate authored weather map may
+sample a coarse wind provider and causal precipitation may use a conservative
+column flux/fall delay. Do not allocate cloud microphysics or dense transport
+state unless its observable and error contract requires it.</p>
+<p>Phase 1 WebGPU/TSL validation scaffold:
+<code>examples/webgpu-weather-volume-clouds/</code>. It includes <code>validateCloudConfig()</code>,
+asset-manifest checks, and shadow/temporal/composite ownership descriptors. Its
+validator checks contract wiring, not radiometric, spatial, temporal, or visual
+correctness; use this skill/reference as the implementation specification and
+the numerical/image gates below before promoting a renderer. Still run
+<code>node examples/webgpu-weather-volume-clouds/validation.js</code> after scaffold edits.</p>
+<p>Legacy WebGL implementation (quarantined, do not extend or use as a pattern):
+<code>examples/deprecated-weather-volume-clouds/</code>.</p>
+<h2>Build Order</h2>
+<ol>
+<li>Start with the cheapest error-valid spatial route: a full-resolution
+scissored/bounded march for a small projected cloud volume, otherwise a
+measured reduced-resolution bounded raymarch, blue-noise first-sample
+offset, transmittance early exit, adaptive step length, cloud shadow map in
+the same update chain, temporal reprojection with velocity and depth
+rejection, then depth-aware upsample to full resolution in the node pipeline.</li>
+<li>Initialize one <code>WebGPURenderer</code>, call <code>await renderer.init()</code>, and route
+compute/storage tiers through a capability gate:</li>
+</ol>
+<pre><code class="language-js">await renderer.init();
+
+if (renderer.backend.isWebGPUBackend) {
+  // Canonical compute/storage volumetric path.
+} else {
+  throw new Error(&quot;WebGPU backend unavailable for the canonical path.&quot;);
+}
+</code></pre>
+<ol start="3">
+<li>Use <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
+<code>renderOutput()</code>, and <code>outputColorTransform</code> ownership for the host image
+chain. Keep one tone-map owner and one output transform owner.</li>
+<li>Produce cloud work in TSL <code>Fn().compute(count)</code> dispatches through
+<code>renderer.compute()</code> or <code>renderer.computeAsync()</code>. Write current cloud
+radiance/transmittance, representative depth, velocity, history, and compact
+shadow data into <code>StorageTexture</code>/<code>Storage3DTexture</code> resources with
+<code>textureStore()</code>/<code>storageTexture()</code>.
+After initialization use <code>renderer.compute()</code> for submission; r185
+<code>computeAsync()</code> is not a GPU-completion fence.</li>
+<li>Feed the full-resolution composite as linear HDR cloud radiance plus
+transmittance into the host <code>RenderPipeline</code>; combine with scene color before
+the single output transform.</li>
+</ol>
+<p>Do not add a second renderer branch to this flagship specification. A missing
+WebGPU backend is a reported capability failure.</p>
+<h3>r185 API Verification</h3>
+<p>Verified against local Three.js <code>REVISION === &quot;185&quot;</code>:
+<code>WebGPURenderer</code>, <code>RenderPipeline</code>, <code>StorageTexture</code>, and <code>Storage3DTexture</code> are
+exports of <code>three/webgpu</code>; <code>Fn</code>, <code>pass</code>, <code>mrt</code>, <code>renderOutput</code>,
+<code>storageTexture</code>, <code>storageTexture3D</code>, and <code>textureStore</code> are exports of
+<code>three/tsl</code>. <code>TRAANode</code> is the default export and <code>traa</code> the named factory from
+<code>three/addons/tsl/display/TRAANode.js</code>. These symbols are revision-sensitive;
+smoke-test imports after upgrades. Explicitly configure every storage texture&#39;s
+format/type/filter/mipmap policy; r185 <code>StorageTexture</code> constructor defaults do
+not imply an HDR cloud target.</p>
+<h2>Required Architecture</h2>
+<ul>
+<li>Weather-shaped density uses packed 2D weather fields plus 3D base/detail
+fields. The example&#39;s RGBA layout supports up to four layers; it is a storage
+optimization, not a physical requirement. Keep active layers separate until
+after per-layer altitude, profile, shape, and detail controls.</li>
+<li>Ray intervals come from cloud shell bounds and opaque scene depth. Never scale
+primary cost with camera far distance when the view only crosses a thin cloud
+layer.</li>
+<li>Keep the opaque host scene/depth at its required resolution and allocate a
+separate cloud target when reduction is selected. <code>PassNode.setResolutionScale()</code>
+scales its entire pass; it does not selectively downsample one material.</li>
+<li>A small projected cloud bound may use a full-resolution scissor/dispatch and
+no history when that wins the complete A/B. Larger coverage usually uses a
+reduced primary march with spatiotemporal blue-noise
+offset, skips packed empty altitude gaps and conservatively empty 3D
+macrocells, increases step length only under an error/occupancy gate, and
+terminates on a bounded remaining contribution.</li>
+<li>Temporal reconstruction is velocity/depth aware. Same-UV history blending is
+not accepted under camera or cloud motion. A single representative depth is
+allowed only for a unimodal contribution distribution; otherwise store depth
+spread or split layers.</li>
+<li>Cloud shadows are a separate compact optical-depth product, not a reuse of the
+beauty march. Update shadows on their own cadence and feed lighting lookups
+from that representation.</li>
+<li>Upsampling is depth-aware and edge-aware in the node pipeline, not a blind
+stretch. <code>TRAANode</code> supplies host temporal AA, not cloud-specific upscaling;
+cloud reprojection still owns cloud depth, motion, confidence, and topology
+rejection.</li>
+</ul>
+<h2>Physical And Numerical Contract</h2>
+<p>Use scene length in meters or declare an exact conversion. With dimensionless
+density shape <code>rho</code>, base coefficients <code>beta_s</code> and <code>beta_a</code> in <code>m^-1</code>:</p>
+<pre><code class="language-text">sigma_s = rho * beta_s
+sigma_a = rho * beta_a
+sigma_t = sigma_s + sigma_a
+tau = integral(sigma_t ds)                 // dimensionless
+dL/ds = -sigma_t L + j                     // j: radiance per meter
+L_acc += T_acc * (j / sigma_t) * (1 - exp(-sigma_t ds))
+T_acc *= exp(-sigma_t ds)
+</code></pre>
+<p>Use the <code>j * ds</code> limit as <code>sigma_t -&gt; 0</code>. A direct-light single-scattering
+source is either <code>sigma_s * T_sun * integral_sunDisk(p * L_sun dOmega)</code> for
+finite-disk radiance or <code>sigma_s * p * E_sun * T_sun</code> under a declared
+collimated-irradiance convention. Never substitute radiance for irradiance
+without the solid-angle integral. Omitting <code>sigma_s</code> or dividing an already-
+normalized source twice breaks units. Normalize
+phase functions so <code>2*pi*integral_-1^1 p(mu)dmu = 1</code>; dual-lobe weights must be
+nonnegative and sum to one.</p>
+<h2>Architecture Selection</h2>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Select</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Small projected bounded volume, low temporal reuse</td>
+<td>Full-resolution scissored/bounded march, no history</td>
+<td>Full-res covered pixels cost less than reduced reconstruction/history and pass error gates</td>
+</tr>
+<tr>
+<td>High occupied-sample fraction</td>
+<td>Bounded adaptive march; no 3D hierarchy</td>
+<td>Hierarchy lookup/divergence costs more than skipped field reads</td>
+</tr>
+<tr>
+<td>Sparse, slowly evolving density</td>
+<td>Conservative max-density macrocell hierarchy plus DDA</td>
+<td>Skipped optical-depth/source upper bound is below the radiance error budget</td>
+</tr>
+<tr>
+<td>Empty bands only vary by altitude</td>
+<td>CPU-merged occupied intervals/complementary gaps</td>
+<td>Debug view proves no occupied band is skipped</td>
+</tr>
+<tr>
+<td>High temporal coherence, unimodal depth</td>
+<td>Full low-resolution grid each frame, jitter, one representative depth/motion</td>
+<td>Depth spread and rejection rate stay below gates</td>
+</tr>
+<tr>
+<td>High coherence, strict dispatch budget</td>
+<td>Explicit sparse/checkerboard update</td>
+<td>Missing-sample reconstruction is defined separately from low-resolution jitter</td>
+</tr>
+<tr>
+<td>Multi-layer or broad depth contribution</td>
+<td>Depth moments, front depth, or separate layer histories</td>
+<td>Single-depth reprojection exceeds disocclusion error gate</td>
+</tr>
+<tr>
+<td>Low coherence, topology change, or camera cut</td>
+<td>Current sample dominates; invalidate history</td>
+<td>Stale-history confidence is zero</td>
+</tr>
+<tr>
+<td>Mobile bandwidth limit</td>
+<td>Quarter-linear targets, compact formats, fewer live histories, dynamic scale</td>
+<td>Measured bytes/frame and GPU timestamps fit device/thermal budget</td>
+</tr>
+</tbody></table>
+<h2>Workload Tuples And Budgets</h2>
+<table>
+<thead>
+<tr>
+<th>Authored key</th>
+<th align="right">Linear scale</th>
+<th align="right">Primary cap</th>
+<th align="right">Light cap</th>
+<th>Shadow product</th>
+<th align="right">Temporal phase</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ultra</code></td>
+<td align="right">1/2</td>
+<td align="right">160</td>
+<td align="right">8</td>
+<td>3x 768-1024</td>
+<td align="right">4 frames</td>
+</tr>
+<tr>
+<td><code>high</code></td>
+<td align="right">1/2</td>
+<td align="right">96</td>
+<td align="right">6</td>
+<td>3x 512</td>
+<td align="right">4 frames</td>
+</tr>
+<tr>
+<td><code>default</code></td>
+<td align="right">1/4</td>
+<td align="right">64</td>
+<td align="right">4</td>
+<td>2x 384</td>
+<td align="right">16 frames</td>
+</tr>
+<tr>
+<td><code>reduced</code></td>
+<td align="right">1/4</td>
+<td align="right">32</td>
+<td align="right">2</td>
+<td>1-2x 128-256, amortized</td>
+<td align="right">16 frames</td>
+</tr>
+</tbody></table>
+<p>These are workload trial points, not hardware routes or time promises. A number is
+<strong>Derived</strong> when it follows from format/resolution, <strong>Gated</strong> when computed from
+an error limit, <strong>Measured</strong> only with hardware/revision/viewport/percentile and
+thermal state, and otherwise <strong>Authored</strong>. Keep storage memory explicit:
+quarter-linear 1920x1080 RGBA16F is
+<code>480 * 270 * 8 = 1,036,800 B = 0.989 MiB</code>; half-linear is
+<code>960 * 540 * 8 = 4,147,200 B = 3.955 MiB</code> (<strong>Derived</strong>). A 512x512 RGBA16F
+cascade is <code>2 MiB</code> (<strong>Derived</strong>), but a direct-sun optical-depth cascade should
+normally be one explicitly formatted channel rather than RGBA16F.</p>
+<p>Meter depth cannot be stored directly in binary16 beyond 65,504 m. For a
+200 km interval, store interval-normalized/log depth in R16F and decode with the
+same ray interval, or use R32F; this range constraint is <strong>Derived</strong>. Record
+bytes read/written per dispatch, not only allocation size, because mobile cloud
+passes are commonly bandwidth-limited.</p>
+<p>Report whole-frame p50/p95 and paired marginal p50/p95 from the same fixture
+with the cloud system alternated on/off. Do not subtract unrelated percentile
+runs, sum pass percentiles, or select a tuple from a device label. Select from
+measured occupancy, quality gates, bytes/frame, paired marginal cost, and
+thermal steady state.</p>
+<h2>Required Controls</h2>
+<ul>
+<li>coverage, cloud type, precipitation, and anvil bias;</li>
+<li>base/top altitude and vertical density profile per active layer;</li>
+<li>shape/detail scales, erosion, and height-dependent detail policy;</li>
+<li>common macro advection plus bounded relative motion for weather, shape,
+detail, and turbulence fields;</li>
+<li>density convention, length-unit conversion, <code>beta_s</code>, <code>beta_a</code>, and phase
+convention;</li>
+<li>primary step count, adaptive step limits, light step count, and empty-space
+policy;</li>
+<li>frame-rate-independent current response time/weight, velocity limit, depth
+rejection, variance-clipping width, and history reset causes;</li>
+<li>cloud-shadow extent, cascade count, resolution, update cadence, and compact
+channel layout;</li>
+<li>debug mode for each density, march, temporal, and shadow stage.</li>
+</ul>
+<h2>Color And Output</h2>
+<ul>
+<li>LDR PNG/JPEG color authored in sRGB uses <code>SRGBColorSpace</code>; HDR/generated
+radiance remains in its declared linear working space. Weather, noise, masks,
+depth, velocity, LUTs, and shadow optical-depth data use
+<code>NoColorSpace</code>/linear sampling.</li>
+<li>HDR cloud current/history/composite buffers use <code>HalfFloatType</code> until the
+pipeline tone maps.</li>
+<li>The cloud material/effect must not apply its own output conversion. The host
+<code>RenderPipeline</code> owns output conversion with <code>outputColorTransform</code> or an
+explicit <code>renderOutput()</code> node. When <code>renderOutput()</code> is explicit, set
+<code>renderPipeline.outputColorTransform = false</code>; after switching diagnostic
+<code>outputNode</code>, set <code>renderPipeline.needsUpdate = true</code>.</li>
+<li>Generated volume textures use deterministic seeds, documented dimensions,
+channel semantics, wrap/filter policy, and mip policy. Regenerate them only
+when their recipe changes.</li>
+</ul>
+<h2>Failure Conditions</h2>
+<ul>
+<li>density is only procedural noise evaluated at position;</li>
+<li>the raymarch traverses the full camera range instead of bounded shell/depth
+intervals;</li>
+<li>detail noise adds density instead of eroding shaped masses by height;</li>
+<li>temporal history is accepted without velocity and depth rejection;</li>
+<li>history is reset on ordinary camera motion instead of reprojected;</li>
+<li>host surface velocity is used as cloud velocity without reconstructing the
+advected representative cloud position;</li>
+<li>shadows use the full beauty march or update every pixel every frame;</li>
+<li>every layer shares the same wind, altitude profile, and density controls;</li>
+<li>output is tone mapped or color-converted more than once.</li>
+<li>meter depth is written to R16F beyond its finite range;</li>
+<li>averaged mipmaps or nonconservative occupancy masks are used to skip density;</li>
+<li>low-resolution jitter and sparse/checkerboard missing-sample reconstruction
+are conflated without a defined target lattice.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-choose-skills</code> for preflight when the task spans several rendering
+systems. Use <code>$threejs-sky-atmosphere-and-haze</code> for molecular/aerosol
+scattering without weather density, <code>$threejs-image-pipeline</code> for whole-frame
+HDR/post ownership, <code>$threejs-exposure-color-grading</code> for tone mapping and LUT
+policy, and <code>$threejs-scalable-real-time-shadows</code> when terrain/scene shadows need CSM or
+tiled shadow integration. This skill owns weather-shaped cloud volumes,
+temporal reconstruction, optional typed precipitation emission, cloud lighting,
+and cloud-only optical-depth shadows. Atmosphere owns the shared lighting
+transport snapshot; rain owns precipitation transport to receivers.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-visual-validation.html">← Visual Validation</a>
+    <a href="threejs-water-optics.html">Water Optics →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/cloud-generated-weather-maps/"><figure>
+        <img src="../visual-validation/cloud-generated-weather-maps/final.design.png" alt="Weather Map Cloud Layers" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Weather Map Cloud Layers</strong><span>Generated asset preview · Generated weather maps are reduced-tier diagnostic inputs. The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

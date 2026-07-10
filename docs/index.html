@@ -3,53 +3,94 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Three.js WebGPU Skill Pack — TSL, Procedural Graphics, Visual Validation</title>
-<meta name="description" content="26 specialized agent skills for ambitious Three.js WebGPU/TSL scenes: debugging, oceans, clouds, planets, water optics, image pipelines, and screenshot-backed visual validation. Works with Claude Code, Codex, Cursor, Gemini CLI, and any agent that loads local skill folders." />
-<meta name="keywords" content="three.js, threejs, webgpu, TSL, three shading language, NodeMaterial, agent skills, claude code skills, codex skills, procedural graphics, spectral ocean, volumetric clouds, procedural planets, visual validation, RenderPipeline" />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/" />
+<title>Three.js WebGPU & TSL Skills for AI Coding Agents</title>
+<meta name="description" content="Install 26 expert Three.js WebGPU and TSL skills with 39 source-ready implementations, procedural graphics systems, and evidence-gated validation." />
+<link rel="canonical" href="https://threejs-skills.com/" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="favicon.ico" sizes="any" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
 <meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Three.js WebGPU Skill Pack — 26 expert agent skills for TSL scenes" />
-<meta property="og:description" content="Agent skills for ambitious Three.js WebGPU/TSL graphics: oceans, atmospheres, planets, clouds, water optics, image pipelines, and screenshot-backed validation." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:title" content="Three.js WebGPU & TSL Skills for AI Coding Agents" />
+<meta property="og:description" content="Install 26 expert Three.js WebGPU and TSL skills with 39 source-ready implementations, procedural graphics systems, and evidence-gated validation." />
+<meta property="og:url" content="https://threejs-skills.com/" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Procedural planet crater field rendered with the skill pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Procedural planet crater field rendered with the skill pack" />
+<meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack; not canonical planet-renderer evidence" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack; not canonical planet-renderer evidence" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Three.js WebGPU Skill Pack — 26 expert agent skills" />
-<meta name="twitter:description" content="TSL-first Three.js WebGPU skills for Claude Code, Codex, Cursor, Gemini CLI, and any skill-aware agent." />
+<meta name="twitter:title" content="Three.js WebGPU & TSL Skills for AI Coding Agents" />
+<meta name="twitter:description" content="Install 26 expert Three.js WebGPU and TSL skills with 39 source-ready implementations, procedural graphics systems, and evidence-gated validation." />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
-   "@type": "SoftwareSourceCode",
+   "@type": "WebSite",
+   "@id": "https://threejs-skills.com/#website",
+   "url": "https://threejs-skills.com/",
    "name": "Three.js WebGPU Skill Pack",
-   "description": "26 specialized agent skills for Three.js WebGPU/TSL: debugging, procedural graphics, image pipelines, and visual validation.",
+   "alternateName": "Three.js Skills",
+   "inLanguage": "en",
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   }
+  },
+  {
+   "@type": "CollectionPage",
+   "@id": "https://threejs-skills.com/#webpage",
+   "url": "https://threejs-skills.com/",
+   "name": "Three.js WebGPU & TSL Skills for AI Coding Agents",
+   "description": "Install 26 expert Three.js WebGPU and TSL skills with 39 source-ready implementations, procedural graphics systems, and evidence-gated validation.",
+   "isPartOf": {
+    "@id": "https://threejs-skills.com/#website"
+   },
+   "mainEntity": {
+    "@id": "https://threejs-skills.com/#skill-catalog"
+   },
+   "about": {
+    "@id": "https://threejs-skills.com/#software"
+   },
+   "inLanguage": "en"
+  },
+  {
+   "@type": "SoftwareSourceCode",
+   "@id": "https://threejs-skills.com/#software",
+   "name": "Three.js WebGPU Skill Pack",
+   "description": "26 specialized agent skills with 39 source-ready Three.js WebGPU/TSL primary implementations, 27 canonical labs, 5 cross-skill flagships, and evidence-gated validation.",
    "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/",
+   "url": "https://threejs-skills.com/",
+   "mainEntityOfPage": {
+    "@id": "https://threejs-skills.com/#webpage"
+   },
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
    "programmingLanguage": [
     "JavaScript",
     "TSL"
    ],
    "runtimePlatform": "Three.js WebGPURenderer",
    "keywords": "three.js, webgpu, TSL, agent skills, procedural graphics, visual validation",
-   "license": "https://opensource.org/licenses/MIT",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png"
+   "license": "https://spdx.org/licenses/ISC.html",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png"
   },
   {
    "@type": "ItemList",
+   "@id": "https://threejs-skills.com/#skill-catalog",
    "name": "Skill catalog",
    "numberOfItems": 26,
    "itemListElement": [
@@ -57,209 +98,209 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Ambient Contact Shading",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-ambient-contact-shading.html",
-     "description": "Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.",
-     "dateModified": "2026-07-05T01:26:21+03:00"
+     "url": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html",
+     "description": "Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Black Holes and Space Effects",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-black-holes-and-space-effects.html",
+     "url": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html",
      "description": "Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.",
-     "dateModified": "2026-07-05T05:30:33+03:00"
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Bloom",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-bloom.html",
-     "description": "Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics.",
-     "dateModified": "2026-07-05T01:26:21+03:00"
+     "url": "https://threejs-skills.com/skills/threejs-bloom.html",
+     "description": "Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid costs, transparent blending rules, PSF limits, and mobile/tile-GPU gates.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 4,
-     "name": "Camera Controls and Rigs",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-camera-controls-and-rigs.html",
-     "description": "Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration.",
-     "dateModified": "2026-07-04T23:30:19+03:00"
+     "name": "Camera Controls And Rigs",
+     "url": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
+     "description": "Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 5,
      "name": "Three.js WebGPU/TSL Choose Skills",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-choose-skills.html",
-     "description": "Choose the smallest expert skill set for ambitious Three.js WebGPU/TSL visual work and diagnose version-specific Three.js/WebGPU API or renderer failures. Use for WebGPURenderer scenes, TSL/NodeMaterial graphics rewrites, node post pipelines, compute/storage systems, reference matching, known-issue debugging, upgrade triage, or requests spanning geometry, materials, atmosphere, shadows, temporal effects, and final image treatment.",
-     "dateModified": "2026-07-09T01:18:48+03:00"
+     "url": "https://threejs-skills.com/skills/threejs-choose-skills.html",
+     "description": "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, cross-skill physics coupling, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.",
+     "dateModified": "2026-07-10T19:26:02+03:00"
     },
     {
      "@type": "ListItem",
      "position": 6,
      "name": "Three.js Compatibility Fallbacks",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-compatibility-fallbacks.html",
-     "description": "Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.",
-     "dateModified": "2026-07-08T21:57:49+03:00"
+     "url": "https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html",
+     "description": "Use only for teaching how to apply fallback when WebGPU is unavailable after the user explicitly requests it. Never activate for canonical WebGPU/TSL work, low-end tuning, mobile optimization, capability preflight, or general target support.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 7,
-     "name": "Dynamic Surface Effects",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-dynamic-surface-effects.html",
-     "description": "Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
-     "dateModified": "2026-07-05T05:30:33+03:00"
+     "name": "Three.js Debugging",
+     "url": "https://threejs-skills.com/skills/threejs-debugging.html",
+     "description": "Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request.",
+     "dateModified": "2026-07-10T19:00:16+03:00"
     },
     {
      "@type": "ListItem",
      "position": 8,
-     "name": "Exposure and Color Grading",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-exposure-color-grading.html",
-     "description": "Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading.",
-     "dateModified": "2026-07-05T01:26:45+03:00"
+     "name": "Dynamic Surface Effects",
+     "url": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
+     "description": "Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 9,
-     "name": "Image Pipeline",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-image-pipeline.html",
-     "description": "Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.",
-     "dateModified": "2026-07-05T04:55:12+03:00"
+     "name": "Exposure And Color Grading",
+     "url": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html",
+     "description": "Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 10,
-     "name": "Particles, Trails, and Effects",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-particles-trails-and-effects.html",
-     "description": "Author production WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for ship-conforming reentry plasma, generated capsule wakes, compute-updated instanced sparks, timed dissolving debris, dense-swap effect pools, and MRT-driven scene-relative HDR emission hierarchy.",
-     "dateModified": "2026-07-04T23:30:20+03:00"
+     "name": "Image Pipeline",
+     "url": "https://threejs-skills.com/skills/threejs-image-pipeline.html",
+     "description": "Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 11,
-     "name": "Procedural Buildings and Cities",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-buildings-and-cities.html",
-     "description": "Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.",
-     "dateModified": "2026-07-04T23:30:20+03:00"
+     "name": "Particles, Trails, and Effects",
+     "url": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html",
+     "description": "Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced sparks, timed dissolves, GPU particle pools, deterministic compaction, and conditional scene-relative HDR emission signals.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 12,
-     "name": "Procedural Creatures",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-creatures.html",
-     "description": "Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.",
-     "dateModified": "2026-07-08T21:57:49+03:00"
+     "name": "Procedural Buildings and Cities",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html",
+     "description": "Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 13,
-     "name": "Procedural Fields",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-fields.html",
-     "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
-     "dateModified": "2026-07-05T05:30:33+03:00"
+     "name": "Procedural Creatures",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-creatures.html",
+     "description": "Build workload-selected procedural and generated creatures in Three.js r185 WebGPU/TSL. Use for spec-driven bodies, semantic rigs, field-extracted skinned reference meshes, diagnostic SDF shells, procedural gait/hop/flight/swim locomotion, support-relative foot planting, 2-bone IK, verlet appendages, repeated populations, deterministic creature labs, and genetic variation. Not for imported glTF skinned-clip pipelines.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 14,
-     "name": "Procedural Geometry",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-geometry.html",
-     "description": "Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.",
-     "dateModified": "2026-07-04T23:30:20+03:00"
+     "name": "Procedural Fields",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-fields.html",
+     "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 15,
-     "name": "Procedural Materials",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-materials.html",
-     "description": "Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.",
-     "dateModified": "2026-07-05T05:30:33+03:00"
+     "name": "Procedural Geometry",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-geometry.html",
+     "description": "Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 16,
-     "name": "Procedural Motion Systems",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-motion-systems.html",
-     "description": "Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
-     "dateModified": "2026-07-05T05:01:16+03:00"
+     "name": "Procedural Materials",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-materials.html",
+     "description": "Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for coupled terrain/coast/seabed response bundles, grass, rock, dry/wet sand and reef identities, NodeMaterial PBR fields, atlas and triplanar filtering, footprint filtering, specular AA, terrain wetness, stylized palette/facet policies, emissive or raymarched fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 17,
-     "name": "Procedural Planets",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-planets.html",
-     "description": "Author high-performance procedural planetary bodies in latest Three.js with WebGPURenderer, TSL, NodeMaterial, cube-sphere quadtree LOD, GPU displacement, coupled crater/biome/climate fields, analytic normals, altitude LOD, and atmosphere handoff from orbit through close approach.",
-     "dateModified": "2026-07-05T05:36:19+03:00"
+     "name": "Procedural Motion Systems",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html",
+     "description": "Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 18,
-     "name": "Procedural Vegetation",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-procedural-vegetation.html",
-     "description": "Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.",
-     "dateModified": "2026-07-05T05:30:33+03:00"
+     "name": "Procedural Planets",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-planets.html",
+     "description": "Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 19,
-     "name": "Rain, Snow, and Wet Surfaces",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-rain-snow-and-wet-surfaces.html",
-     "description": "Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.",
-     "dateModified": "2026-07-05T05:36:19+03:00"
+     "name": "Procedural Vegetation",
+     "url": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html",
+     "description": "Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 20,
-     "name": "Scalable Real-Time Shadows",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-scalable-real-time-shadows.html",
-     "description": "Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity.",
-     "dateModified": "2026-07-05T05:31:27+03:00"
+     "name": "Rain, Snow, and Wet Surfaces",
+     "url": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html",
+     "description": "Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 21,
-     "name": "Sky, Atmosphere, and Haze",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-sky-atmosphere-and-haze.html",
-     "description": "Implement maximum-performance sky, atmosphere, and haze systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, RenderPipeline, compute-generated scattering LUTs, depth-aware aerial perspective, sun/moon discs, and atmosphere-aware lighting.",
-     "dateModified": "2026-07-05T04:09:20+03:00"
+     "name": "Scalable Real-Time Shadows",
+     "url": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html",
+     "description": "Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached clipmaps, stable texel snapping, filter/bias footprints, cache invalidation, caster parity, binding pressure, and sustained mobile budgets.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 22,
-     "name": "Spectral Ocean",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-spectral-ocean.html",
-     "description": "Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.",
-     "dateModified": "2026-07-05T05:01:16+03:00"
+     "name": "Sky, Atmosphere, and Haze",
+     "url": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html",
+     "description": "Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 23,
-     "name": "Visual Validation",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-visual-validation.html",
-     "description": "Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.",
-     "dateModified": "2026-07-08T21:57:49+03:00"
+     "name": "Spectral Ocean",
+     "url": "https://threejs-skills.com/skills/threejs-spectral-ocean.html",
+     "description": "Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 24,
-     "name": "Volumetric Clouds",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-volumetric-clouds.html",
-     "description": "Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers.",
-     "dateModified": "2026-07-05T05:30:33+03:00"
+     "name": "Visual Validation",
+     "url": "https://threejs-skills.com/skills/threejs-visual-validation.html",
+     "description": "Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.",
+     "dateModified": "2026-07-10T19:10:06+03:00"
     },
     {
      "@type": "ListItem",
      "position": 25,
-     "name": "Water Optics",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html",
-     "description": "Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.",
-     "dateModified": "2026-07-05T12:41:19+03:00"
+     "name": "Volumetric Clouds",
+     "url": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html",
+     "description": "Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and error-bounded quality tiers.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     },
     {
      "@type": "ListItem",
      "position": 26,
-     "name": "Three.js Debugging",
-     "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-debugging.html",
-     "description": "Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request.",
-     "dateModified": "2026-07-10T17:49:59+03:00"
+     "name": "Water Optics",
+     "url": "https://threejs-skills.com/skills/threejs-water-optics.html",
+     "description": "Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.",
+     "dateModified": "2026-07-10T18:34:25+03:00"
     }
    ]
   }
@@ -268,46 +309,63 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -315,165 +373,491 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
-.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
-  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.live-visual:before{content:"";position:absolute;inset:0;background:
-  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
-  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
+.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.live-visual:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
 .live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
-.live-visual>*{position:relative}
-.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
-.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
-.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
-.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
-.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
-.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
-.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
-.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
-.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
-.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
-.live-visual--validation{--accent:#b8a4ff}
-header.hero{min-height:min(620px,calc(100svh - 172px));padding:clamp(34px,5vw,58px) 0 clamp(28px,4vw,44px);position:relative;overflow:hidden;display:grid;align-items:end}
-.hero-bg-grid{position:absolute;z-index:0;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:1px;opacity:.78;filter:saturate(1.08) contrast(1.08)}
-.hero-bg-grid img{width:100%;height:100%;object-fit:cover;min-height:0;outline:1px solid rgba(255,255,255,.08);outline-offset:-1px}
-.hero:before{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,rgba(10,12,16,.98) 0%,rgba(10,12,16,.94) 42%,rgba(10,12,16,.5) 74%,rgba(10,12,16,.86) 100%),
-  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.38) 42%,rgba(10,12,16,.78) 100%);z-index:1}
+.live-visual>*{position:relative}.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}.live-visual--validation{--accent:#b8a4ff}
+header.hero{position:relative;overflow:hidden;min-height:calc(100svh - 76px);display:grid;align-items:center;padding:clamp(64px,8vw,112px) 0}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 44%,rgba(127,212,193,.09),transparent 28%),radial-gradient(circle at 16% 22%,rgba(255,180,84,.1),transparent 28%),linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);background-size:auto,auto,52px 52px,52px 52px;mask-image:linear-gradient(to bottom,black 0%,rgba(0,0,0,.82) 72%,transparent 100%)}
 .hero .wrap{position:relative;z-index:2;width:100%}
-.hero-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(34px,6vw,72px)}
-.hero .kicker{animation:rise .7s ease both}
-h1{font-weight:700;font-size:clamp(42px,6.3vw,84px);line-height:1.04;letter-spacing:0;max-width:15ch;animation:rise .7s .08s ease both}
+.hero-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);align-items:center;gap:clamp(38px,7vw,96px)}
+.hero .kicker{font-size:clamp(10px,1.25vw,13px);letter-spacing:clamp(.1em,1vw,.22em);margin-bottom:24px}
+h1{font-weight:700;font-size:clamp(46px,6.2vw,82px);line-height:1.01;letter-spacing:-.025em;max-width:13ch}
 h1 em{font-style:normal;color:var(--amber)}
-.lede{margin-top:28px;max-width:62ch;color:var(--dim);animation:rise .7s .16s ease both}
-.hero-install{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;max-width:720px;margin-top:20px;border-radius:8px;background:rgba(8,11,16,.88);box-shadow:0 0 0 1px rgba(255,180,84,.34),0 14px 42px rgba(0,0,0,.28);overflow:hidden}
+.lede{margin-top:28px;max-width:62ch;color:var(--dim);font-size:clamp(16px,1.45vw,19px)}
+.hero-proof{display:inline-flex;align-items:center;gap:9px;margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.06em;text-transform:uppercase}
+.hero-proof:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+.hero-install{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;max-width:720px;margin-top:20px;border-radius:12px;background:rgba(8,11,16,.88);box-shadow:0 0 0 1px rgba(255,180,84,.34),0 14px 42px rgba(0,0,0,.28);overflow:hidden}
 .hero-install code{min-width:0;display:flex;align-items:center;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.45;color:var(--ink);white-space:nowrap;scrollbar-width:thin}
 .hero-install button{min-width:72px;min-height:44px;padding:10px 14px;border:0;border-left:1px solid rgba(255,255,255,.14);background:rgba(255,180,84,.12);font-family:var(--mono);font-size:12px;color:var(--amber);cursor:pointer;transition-property:background,color,scale;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .hero-install button:hover{background:rgba(255,180,84,.22);color:var(--ink)}.hero-install button:active{scale:.96}.hero-install button:focus-visible{outline:2px solid var(--cyan);outline-offset:-3px}
-.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;animation:rise .7s .22s ease both}
-.hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:42px;display:inline-flex;align-items:center;padding:10px 16px;background:rgba(15,18,24,.72);
-  box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition:transform .2s,color .2s,box-shadow .2s}
-.hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}
-.hero-action:active{transform:scale(.96)}
-.stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.58)}
-.stats{display:flex;flex-wrap:wrap;gap:clamp(24px,4vw,54px);padding:18px 0}
-.stat b{display:block;font-family:var(--disp);font-weight:600;font-size:36px;color:var(--ink);font-variant-numeric:tabular-nums}
-.stat span{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
-.step{background:var(--bg2);border:1px solid var(--line);padding:26px 26px 22px;position:relative}
-.step .n{font-family:var(--mono);position:absolute;top:-14px;left:22px;background:var(--bg);border:1px solid var(--line);color:var(--amber);
-  font-size:12px;padding:2px 10px;letter-spacing:.15em}
-.step h3{font-size:19px;margin-bottom:10px}
-.step p{color:var(--dim);font-size:15.5px;margin-bottom:14px}
-.category{margin-bottom:64px}
-.category-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 26px;margin-bottom:24px}
-.category-head h3{font-size:23px;color:var(--amber);font-weight:600}
-.category-head p{color:var(--dim);font-size:15px;max-width:60ch}
-@media (max-width:720px){
-  header.hero{min-height:min(610px,calc(100svh - 238px));padding:32px 0 30px}
-  .hero-bg-grid{grid-template-columns:repeat(2,minmax(0,1fr));opacity:.55}
-  .hero:before{background:linear-gradient(90deg,rgba(10,12,16,.99),rgba(10,12,16,.88)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.52) 54%,rgba(10,12,16,.9))}
-  .lede{margin-top:22px}
-  .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;padding:16px 0}
-  .stat b{font-size:31px}
-}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:44px;display:inline-flex;align-items:center;padding:10px 16px;background:rgba(15,18,24,.78);border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition-property:scale,color,box-shadow;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}.hero-action:active{scale:.96}
+.pipeline-visual{position:relative;isolation:isolate;aspect-ratio:1;border-radius:28px;background:radial-gradient(circle at center,rgba(127,212,193,.09),transparent 22%),linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),rgba(9,12,17,.82);background-size:auto,32px 32px,32px 32px;box-shadow:0 0 0 1px rgba(255,255,255,.09),inset 0 0 80px rgba(0,0,0,.54),0 40px 100px rgba(0,0,0,.34);overflow:hidden}
+.pipeline-visual:before{content:"";position:absolute;z-index:-1;inset:9%;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 18%,rgba(127,212,193,.72) 24%,transparent 31% 61%,rgba(255,180,84,.65) 67%,transparent 74%);mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 0);will-change:transform}
+.pipeline-visual:after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,transparent 0 46%,rgba(127,212,193,.11) 49%,rgba(127,212,193,.28) 50%,rgba(127,212,193,.11) 51%,transparent 54%);translate:0 -100%}
+.pipeline-ring{position:absolute;border:1px solid rgba(255,255,255,.09);border-radius:50%;inset:20%}.pipeline-ring--outer{inset:9%;border-style:dashed}.pipeline-ring--inner{inset:31%;border-color:rgba(255,180,84,.16)}
+.pipeline-core,.pipeline-node{position:absolute;display:grid;place-items:center;text-align:center;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;background:rgba(10,13,18,.9);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.35)}
+.pipeline-core{width:112px;aspect-ratio:1;border-radius:50%;left:50%;top:50%;translate:-50% -50%;color:var(--ink);font-size:12px}.pipeline-core b{display:block;color:var(--cyan);font-size:20px;font-variant-numeric:tabular-nums}
+.pipeline-node{min-width:82px;min-height:40px;border-radius:11px;padding:8px;color:var(--dim);font-size:9px}
+.pipeline-node--1{left:50%;top:7%;translate:-50% 0}.pipeline-node--2{right:5%;top:34%}.pipeline-node--3{right:12%;bottom:9%}.pipeline-node--4{left:12%;bottom:9%}.pipeline-node--5{left:5%;top:34%}
+.pipeline-caption{position:absolute;left:18px;right:18px;bottom:16px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.64)}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:0}
+.stat{padding:20px clamp(10px,2vw,24px);border-left:1px solid var(--line)}.stat:first-child{border-left:0}
+.stat dd{font-family:var(--disp);font-weight:600;font-size:clamp(28px,3.2vw,40px);line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}.stat dt{margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.matrix-shell{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);gap:clamp(32px,6vw,80px);align-items:start}
+.matrix-label{display:inline-flex;margin-bottom:18px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
+.matrix-copy p{color:var(--dim);max-width:56ch}.matrix-copy strong{color:var(--ink)}
+.matrix-rails{display:grid;gap:20px;padding:24px;border-radius:20px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));box-shadow:var(--shadow-card)}
+.coverage-rail{display:grid;gap:9px}.rail-head{display:flex;justify-content:space-between;gap:20px;font-family:var(--mono);font-size:11px}.rail-head b{color:var(--ink);font-weight:500}.rail-head span{color:var(--dim);font-variant-numeric:tabular-nums}.rail-track{height:9px;overflow:hidden;border-radius:6px;background:#06080b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.rail-fill{height:100%;width:var(--value);border-radius:inherit;background:linear-gradient(90deg,var(--cyan),#b9f5e7);box-shadow:0 0 20px rgba(127,212,193,.34)}.coverage-rail--acceptance .rail-fill{background:linear-gradient(90deg,var(--amber),#ffd392);box-shadow:0 0 20px rgba(255,180,84,.3)}.rail-note{color:var(--dim);font-size:13px}
+.achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
+.flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{--tone:var(--amber);position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--tone) 8%,var(--bg3)),rgba(11,14,19,.97) 60%);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--cyan{--tone:var(--cyan)}.flagship-card--lime{--tone:var(--lime)}.flagship-card--violet{--tone:var(--violet)}.flagship-card--rose{--tone:var(--rose)}
+.flagship-visual{position:relative;align-self:stretch;min-height:230px;border-radius:14px;background:radial-gradient(circle at center,color-mix(in srgb,var(--tone) 12%,transparent),transparent 38%),linear-gradient(rgba(255,255,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.032) 1px,transparent 1px);background-size:auto,22px 22px,22px 22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-orbit{position:absolute;inset:16%;border:1px dashed color-mix(in srgb,var(--tone) 52%,transparent);border-radius:50%}.flagship-core{position:absolute;left:50%;top:50%;translate:-50% -50%;width:70px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;font-family:var(--mono);font-size:9px;line-height:1.3;color:var(--tone);background:#0b0f14;box-shadow:0 0 0 1px color-mix(in srgb,var(--tone) 55%,transparent),0 0 28px color-mix(in srgb,var(--tone) 16%,transparent)}.flagship-node{position:absolute;font-family:var(--mono);font-size:8px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}.flagship-node--1{left:50%;top:8%;translate:-50% 0}.flagship-node--2{right:4%;top:34%}.flagship-node--3{right:12%;bottom:8%}.flagship-node--4{left:12%;bottom:8%}.flagship-node--5{left:4%;top:34%}
+.flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--tone)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
+.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:190px;padding:18px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.88),rgba(12,15,21,.94));box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:22px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px dashed var(--line)}
+.protocol-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.protocol-card{min-height:190px;padding:20px;border-radius:16px;background:var(--bg2);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.protocol-card code{font-size:10px;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.protocol-card h3{margin-top:14px;font-size:19px}.protocol-card p{margin-top:8px;color:var(--dim);font-size:14px}.protocol-flow{grid-column:span 2;background:linear-gradient(135deg,rgba(127,212,193,.08),rgba(15,18,24,.94))}.protocol-flow ol{list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:20px}.protocol-flow li{font-family:var(--mono);font-size:10px;color:var(--dim)}.protocol-flow li:not(:last-child):after{content:"→";margin-left:8px;color:var(--amber)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}.step{background:var(--bg2);border-radius:18px;padding:26px 26px 22px;position:relative;box-shadow:var(--shadow-card)}.step .n{font-family:var(--mono);position:absolute;top:-12px;left:22px;background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.1);border-radius:7px;color:var(--amber);font-size:12px;padding:2px 10px;letter-spacing:.15em}.step h3{font-size:19px;margin-bottom:10px}.step p{color:var(--dim);font-size:15.5px;margin-bottom:14px}
+.install-console{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:24px;border-radius:20px;background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(15,18,24,.94));box-shadow:var(--shadow-card)}.install-console p{color:var(--dim);font-size:14px}.install-console pre{margin-top:14px}.install-console .hero-action{white-space:nowrap}
+.install-details,.archive{margin-top:28px}.install-details summary,.archive summary{position:relative;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;list-style:none;padding:12px 56px 12px 16px;border-radius:14px;background:var(--bg2);box-shadow:0 0 0 1px rgba(255,255,255,.08);font-family:var(--mono);font-size:12px;color:var(--dim)}.install-details summary::-webkit-details-marker,.archive summary::-webkit-details-marker{display:none}
+.install-details summary:before,.install-details summary:after,.archive summary:before,.archive summary:after{position:absolute;right:16px;top:50%;translate:0 -50%;display:grid;place-items:center;width:28px;height:28px;color:var(--amber);font-size:20px;transition-property:scale,opacity,filter;transition-duration:300ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.install-details summary:before,.archive summary:before{content:"+";opacity:1;scale:1;filter:blur(0)}.install-details summary:after,.archive summary:after{content:"−";opacity:0;scale:.25;filter:blur(4px)}.install-details[open] summary:before,.archive[open] summary:before{opacity:0;scale:.25;filter:blur(4px)}.install-details[open] summary:after,.archive[open] summary:after{opacity:1;scale:1;filter:blur(0)}.install-details .steps,.archive .gallery{margin-top:22px}
+.category{margin-bottom:64px;content-visibility:auto;contain-intrinsic-size:920px}.category-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 26px;margin-bottom:24px}.category-head h3{font-size:23px;color:var(--amber);font-weight:600}.category-head p{color:var(--dim);font-size:15px;max-width:60ch}
+.archive-note{display:block;margin-top:4px;font-size:10px;color:var(--dim)}
+@keyframes rise{from{opacity:0;translate:0 12px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}@keyframes graph-turn{to{rotate:1turn}}@keyframes graph-scan{0%{translate:0 -100%}40%,100%{translate:0 100%}}
+@media (prefers-reduced-motion:no-preference){.hero .kicker{animation:rise .55s ease-out both}h1{animation:rise .55s .07s ease-out both}.lede,.hero-proof{animation:rise .55s .14s ease-out both}.hero-actions{animation:rise .55s .2s ease-out both}.pipeline-visual:before{animation:graph-turn 18s linear infinite}.pipeline-visual:after{animation:graph-scan 8s ease-in-out infinite}@supports(animation-timeline:view()){.flagship-card{animation:rise linear both;animation-timeline:view();animation-range:entry 8% cover 28%}}}
+@media (hover:hover) and (pointer:fine){.flagship-card:hover,.lab-card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}.category:has(.card:hover) .category-head h3{color:var(--cyan)}}
+@media (max-width:980px){.hero-layout{grid-template-columns:1fr}.pipeline-visual{max-width:520px;width:100%;justify-self:center}.matrix-shell{grid-template-columns:1fr}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-install{max-width:none}.pipeline-visual{border-radius:20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-visual{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
+@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.pipeline-node{min-width:68px;font-size:8px}.pipeline-core{width:92px}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:18px}.rail-head{flex-direction:column;gap:2px}}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}.pipeline-visual:before,.pipeline-visual:after{animation:none}.card:hover,.flagship-card:hover,.lab-card:hover{translate:0 0}}
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="index.html#quickstart">Usage</a><a href="index.html#install">Install</a><a href="index.html#skills">Skills</a><a href="index.html#gallery">Gallery</a><a href="index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="#matrix">Matrix</a><a href="#flagships">Flagships</a><a href="#skills">Skills</a><a href="#labs">Labs</a><a href="#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
 <header class="hero">
-  <div class="hero-bg-grid">
-    <img src="demos/shared/generated-variants/caustic-field-a.png" alt="Generated caustic field asset used by the Three.js WebGPU skill pack" fetchpriority="high" decoding="async" />
-    <img src="demos/shared/generated-variants/directional-wave-seed-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
-    <img src="demos/shared/generated-variants/weather-map-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
-    <img src="demos/shared/generated-variants/frost-crystal-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
-    <img src="demos/shared/generated-variants/starfield-tile-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
-    <img src="demos/shared/generated-variants/biome-field-a.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
-  </div>
   <div class="wrap">
     <div class="hero-layout">
       <div class="hero-copy">
-        <p class="kicker">TSL-first · WebGPURenderer · Screenshot-backed validation</p>
-        <h1>26 expert skills for <em>ambitious</em> Three.js WebGPU scenes.</h1>
-        <p class="lede">Not a tutorial. A skill pack for agents — Claude Code, Codex, and any shell that loads local skill folders — that need to design, implement, debug, and <strong>prove</strong> advanced real-time graphics: oceans, atmospheres, planets, volumetric clouds, water optics, particles, shadows, and full node post pipelines.</p>
+        <p class="kicker">Three r185.1 · Native WebGPU/TSL · Evidence-gated</p>
+        <h1>26 expert skills. One coherent <em>WebGPU research stack.</em></h1>
+        <p class="lede">A source-complete matrix for advanced Three.js graphics: 27 canonical labs, 5 cross-skill flagships, and 7 focused integration and mechanism surfaces. Every primary entry has a fixed browser route and source hash. Runtime acceptance stays deliberately harder.</p>
+        <p class="hero-proof">39/39 primary implementations are browser-wired</p>
         <div class="hero-install" aria-label="Install the complete skill pack">
           <code id="hero-install-command">npx skills@latest add linegel/threejs-complete-set-of-skill --skill &#39;*&#39;</code>
           <button type="button" data-copy-install aria-label="Copy the full skill pack installation command">Copy</button>
         </div>
         <div class="hero-actions">
-          <a class="hero-action" href="#skills">Browse skills</a>
-          <a class="hero-action" href="#gallery">View evidence</a>
-          <a class="hero-action" href="#demos">Launch demos</a>
+          <a class="hero-action" href="#matrix">Explore the matrix</a>
+          <a class="hero-action" href="#flagships">Inspect flagships</a>
         </div>
+      </div>
+      <div class="pipeline-visual" aria-hidden="true">
+        <span class="pipeline-ring pipeline-ring--outer"></span><span class="pipeline-ring"></span><span class="pipeline-ring pipeline-ring--inner"></span>
+        <span class="pipeline-node pipeline-node--1">Compute</span><span class="pipeline-node pipeline-node--2">History</span><span class="pipeline-node pipeline-node--3">Evidence</span><span class="pipeline-node pipeline-node--4">Output</span><span class="pipeline-node pipeline-node--5">MRT</span>
+        <span class="pipeline-core"><span><b>1×</b>pipeline</span></span>
+        <span class="pipeline-caption">one renderer · one tone map · one output transform</span>
       </div>
     </div>
   </div>
 </header>
 
 <div class="stats-band"><div class="wrap">
-  <div class="stats">
-    <div class="stat"><b>26</b><span>skills</span></div>
-    <div class="stat"><b>45</b><span>runnable examples</span></div>
-    <div class="stat"><b>TSL</b><span>node-first architecture</span></div>
-    <div class="stat"><b>PNG+JSON</b><span>regression evidence</span></div>
-  </div>
+  <dl class="stats">
+    <div class="stat"><dd>26</dd><dt>expert skills</dt></div>
+    <div class="stat"><dd>39</dd><dt>primary implementations</dt></div>
+    <div class="stat"><dd>27</dd><dt>canonical labs</dt></div>
+    <div class="stat"><dd>5</dd><dt>cross-skill flagships</dt></div>
+    <div class="stat"><dd>533</dd><dt>unique primary URLs</dt></div>
+  </dl>
 </div></div>
 
-<div class="section" id="quickstart"><div class="wrap">
-  <h2>Usage</h2>
-  <p class="sub">Install the complete pack with <code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code>, or clone the repo where your agent can see it and invoke skills by name. Broad scene requests should use the in-pack router after the pack is installed; each skill carries its own references, agents, and runnable examples.</p>
-  <div class="steps">
-    <div class="step"><span class="n">01</span><h3>Install</h3>
-      <p>List available skills first, then install the whole pack as one coherent graphics toolkit.</p>
-      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code></pre></div>
-    <div class="step"><span class="n">02</span><h3>Route</h3>
-      <p>Start broad requests with the router so only the relevant experts are loaded into context.</p>
-      <pre><code>Use $threejs-choose-skills to plan a WebGPU/TSL
-scene with an ocean at sunset, volumetric clouds,
-camera flythrough, bloom, and validation.</code></pre></div>
-    <div class="step"><span class="n">03</span><h3>Build &amp; validate</h3>
-      <p>Load the selected skills, build the visual cause first, then prove the frame with reproducible evidence.</p>
-      <pre><code>Use $threejs-spectral-ocean and
-$threejs-sky-atmosphere-and-haze, then
-$threejs-visual-validation to verify the frame.</code></pre></div>
+<main id="main-content" tabindex="-1">
+<section class="section" id="matrix" aria-labelledby="matrix-title"><div class="wrap">
+  <div class="matrix-shell">
+    <div class="matrix-copy">
+      <span class="matrix-label">Implementation ≠ acceptance</span>
+      <h2 id="matrix-title">The matrix is built. Evidence still has veto power.</h2>
+      <p><strong>All 39 primary targets are loadable from canonical source.</strong> Acceptance is a separate runtime claim: only the non-rendering router suite is accepted today; 37 native-WebGPU surfaces remain explicitly pending current-adapter capture, timing, lifecycle, and visual review.</p>
+      <div class="achievement-grid">
+        <div class="achievement"><code>canonical</code><b>27</b><span>skill-owned labs built from native source</span></div>
+        <div class="achievement"><code>support</code><b>7</b><span>focused integrations and mechanism benches</span></div>
+        <div class="achievement"><code>startup contracts</code><b>494</b><span>167 scenarios · 217 mechanisms · 110 tiers</span></div>
+        <div class="achievement"><code>preserved</code><b>47</b><span>secondary records, none counted as primary proof</span></div>
+        <div class="achievement"><code>renderer</code><b>r185.1</b><span>exact Three.js revision across the matrix</span></div>
+        <div class="achievement"><code>toolchain</code><b>8.1.3</b><span>Vite · Playwright 1.61.1</span></div>
+      </div>
+    </div>
+    <div class="matrix-rails" aria-label="Implementation and evidence coverage">
+      <div class="coverage-rail">
+        <div class="rail-head"><b>Source implementation</b><span>39 / 39</span></div>
+        <div class="rail-track"><div class="rail-fill" style="--value:100%"></div></div>
+        <p class="rail-note">Browser entry, fixed route, local build, capture wiring, canonical source hash.</p>
+      </div>
+      <div class="coverage-rail coverage-rail--acceptance">
+        <div class="rail-head"><b>Accepted runtime evidence</b><span>2 / 39</span></div>
+        <div class="rail-track"><div class="rail-fill" style="--value:5.128205128205128%"></div></div>
+        <p class="rail-note">No GPU timing, lifecycle, or visual claim is promoted without current-adapter evidence.</p>
+      </div>
+      <span class="status status--accepted">2 accepted non-rendering suite</span>
+      <span class="status status--pending">37 native evidence runs pending</span>
+      <a class="hero-action" href="demos/registry.json">Inspect the versioned registry</a>
+    </div>
   </div>
-</div></div>
+</div></section>
 
-<div class="section" id="install"><div class="wrap">
-  <h2>Install for your harness</h2>
-  <p class="sub">Every skill is a plain folder — SKILL.md with YAML frontmatter, references/, agents/, and runnable examples/ — so skills CLI, skills.sh, and any agent that reads local files can use the pack. Machine-readable index: <a href="skills.json" style="color:var(--cyan)">skills.json</a> · plain-text overview for LLMs: <a href="llms.txt" style="color:var(--cyan)">llms.txt</a>.</p>
-  <div class="steps">
-    <div class="step"><span class="n">01</span><h3>skills CLI</h3>
-      <p>Use the open skills installer to list the pack, then install every top-level threejs-* skill folder as one coherent graphics skill pack for your selected agent.</p>
-      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
-npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code></pre></div>
-    <div class="step"><span class="n">02</span><h3>Claude Code</h3>
-      <p>Install through skills CLI, or symlink/copy the skill folders into a personal or project skills directory.</p>
-      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -a claude-code -g -y
-# manual fallback:
-git clone https://github.com/linegel/threejs-complete-set-of-skill.git
-ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/</code></pre></div>
-    <div class="step"><span class="n">03</span><h3>Codex CLI</h3>
-      <p>Install the whole pack through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local threejs-*/SKILL.md files as the authoritative source.</p>
-      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -a codex -g -y
-# local checkout fallback: read ./threejs-*/SKILL.md when a task matches</code></pre></div>
-    <div class="step"><span class="n">04</span><h3>Cursor / Gemini / generic agents</h3>
-      <p>Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, agents/, and examples/. The machine-readable index lives at skills.json; a plain-text overview at llms.txt.</p>
-      <pre><code>git submodule add https://github.com/linegel/threejs-complete-set-of-skill.git skills/threejs
-curl -s https://linegel.github.io/threejs-complete-set-of-skill/skills.json | jq '.install.source, .skills[].name'
-curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code></pre></div>
-  </div>
-</div></div>
+<section class="section" id="flagships" aria-labelledby="flagships-title"><div class="wrap">
+  <h2 id="flagships-title">Five systems. Five ownership stress tests.</h2>
+  <p class="sub">The flagships are where individually correct algorithms must share world units, temporal state, signals, render submissions, and final-image ownership without quietly duplicating expensive work.</p>
+  <div class="flagship-grid">
+      <a class="flagship-card flagship-card--amber" href="demos/final-image-flight/">
+        <div class="flagship-visual" aria-hidden="true">
+          <span class="flagship-orbit"></span>
+          <span class="flagship-core">ONE<br/>OWNER</span>
+          <span class="flagship-node flagship-node--1">camera</span><span class="flagship-node flagship-node--2">motion</span><span class="flagship-node flagship-node--3">AO</span><span class="flagship-node flagship-node--4">bloom</span><span class="flagship-node flagship-node--5">exposure</span>
+        </div>
+        <div class="flagship-copy">
+          <span class="flagship-kicker">Final image systems</span>
+          <h3>Final Image Flight</h3>
+          <p>Camera and motion state feed one shared signal graph for shadows, honest material-context AO, emissive bloom, exposure, grading, and final output.</p>
+          <div class="flagship-meta"><span>6 mechanisms</span><span>3 locked tiers</span><span class="status status--pending">Evidence pending</span></div>
+        </div>
+      </a>
+      <a class="flagship-card flagship-card--cyan" href="demos/weathered-world/">
+        <div class="flagship-visual" aria-hidden="true">
+          <span class="flagship-orbit"></span>
+          <span class="flagship-core">ONE<br/>OWNER</span>
+          <span class="flagship-node flagship-node--1">planet</span><span class="flagship-node flagship-node--2">sky</span><span class="flagship-node flagship-node--3">clouds</span><span class="flagship-node flagship-node--4">water</span><span class="flagship-node flagship-node--5">weather</span>
+        </div>
+        <div class="flagship-copy">
+          <span class="flagship-kicker">Planetary environment</span>
+          <h3>Weathered World</h3>
+          <p>Planet, atmosphere, clouds, oceans, bounded water, precipitation, vegetation, and shadows share units, weather, and one HDR composition.</p>
+          <div class="flagship-meta"><span>6 mechanisms</span><span>3 locked tiers</span><span class="status status--pending">Evidence pending</span></div>
+        </div>
+      </a>
+      <a class="flagship-card flagship-card--lime" href="demos/procedural-district/">
+        <div class="flagship-visual" aria-hidden="true">
+          <span class="flagship-orbit"></span>
+          <span class="flagship-core">ONE<br/>OWNER</span>
+          <span class="flagship-node flagship-node--1">fields</span><span class="flagship-node flagship-node--2">geometry</span><span class="flagship-node flagship-node--3">city</span><span class="flagship-node flagship-node--4">materials</span><span class="flagship-node flagship-node--5">shadows</span>
+        </div>
+        <div class="flagship-copy">
+          <span class="flagship-kicker">Authored procedural world</span>
+          <h3>Procedural District</h3>
+          <p>One causal field drives terrain, zoning, wear, wetness, and placement while geometry, buildings, materials, AO, and shadows keep strict ownership.</p>
+          <div class="flagship-meta"><span>6 mechanisms</span><span>3 locked tiers</span><span class="status status--pending">Evidence pending</span></div>
+        </div>
+      </a>
+      <a class="flagship-card flagship-card--violet" href="demos/creature-habitat/">
+        <div class="flagship-visual" aria-hidden="true">
+          <span class="flagship-orbit"></span>
+          <span class="flagship-core">ONE<br/>OWNER</span>
+          <span class="flagship-node flagship-node--1">creatures</span><span class="flagship-node flagship-node--2">plants</span><span class="flagship-node flagship-node--3">water</span><span class="flagship-node flagship-node--4">weather</span><span class="flagship-node flagship-node--5">outline</span>
+        </div>
+        <div class="flagship-copy">
+          <span class="flagship-kicker">Actors and environment</span>
+          <h3>Creature Habitat</h3>
+          <p>Creatures, vegetation, local water, weather, camera, shadows, and outline effects exchange contact signals without rewriting static spawn state.</p>
+          <div class="flagship-meta"><span>5 mechanisms</span><span>3 locked tiers</span><span class="status status--pending">Evidence pending</span></div>
+        </div>
+      </a>
+      <a class="flagship-card flagship-card--rose" href="demos/relativistic-space-shot/">
+        <div class="flagship-visual" aria-hidden="true">
+          <span class="flagship-orbit"></span>
+          <span class="flagship-core">ONE<br/>OWNER</span>
+          <span class="flagship-node flagship-node--1">rays</span><span class="flagship-node flagship-node--2">motion</span><span class="flagship-node flagship-node--3">effects</span><span class="flagship-node flagship-node--4">bloom</span><span class="flagship-node flagship-node--5">history</span>
+        </div>
+        <div class="flagship-copy">
+          <span class="flagship-kicker">Relativistic cinematic</span>
+          <h3>Relativistic Space Shot</h3>
+          <p>Curved-ray HDR, analytic motion, pooled effects, shared emissive bloom, exposure, camera jitter, and temporal history converge under one owner graph.</p>
+          <div class="flagship-meta"><span>6 mechanisms</span><span>3 locked tiers</span><span class="status status--pending">Evidence pending</span></div>
+        </div>
+      </a></div>
+</div></section>
 
-<div class="section" id="skills"><div class="wrap">
-  <h2>Skill catalog</h2>
-  <p class="sub">One owner for depth, tone mapping, and output color. Build the visual cause first; use post to preserve it. Validate with evidence, not one attractive screenshot. Every card opens a dedicated page with the approach, math, gallery, and full skill text.</p>
+<section class="section" id="labs" aria-labelledby="labs-title"><div class="wrap">
+  <h2 id="labs-title">The complete primary lab matrix</h2>
+  <p class="sub">Every card is a distinct published base route generated from the canonical source revision. “Evidence pending” means the implementation exists and loads, but its v2 runtime bundle has not yet earned acceptance.</p>
+
+    <section class="lab-group" aria-labelledby="canonicalskilllabs-title">
+      <div class="lab-group-head"><div><h3 id="canonicalskilllabs-title">Canonical skill labs</h3><p>One native implementation surface per rendering skill, plus the non-rendering router and explicit fallback harness.</p></div><span>27 routes</span></div>
+      <div class="lab-grid">
+        <a class="lab-card" href="demos/browser-fallback-harness/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Explicit WebGPU Fallback Teaching Harness</h4>
+          <p>Three.js Compatibility Fallbacks</p>
+          <span class="lab-route-counts">7 scenarios · 6 mechanisms · 0 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/debugging-contract-lab/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--accepted">Accepted</span></span>
+          <h4>Three.js Debugging Decision Lab</h4>
+          <p>Three.js Debugging</p>
+          <span class="lab-route-counts">7 scenarios · 5 mechanisms · 0 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/node-selective-bloom/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Node Selective Bloom</h4>
+          <p>Bloom</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 4 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/router-manifest-lab/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--accepted">Accepted</span></span>
+          <h4>Skill Router Manifest Lab</h4>
+          <p>Three.js WebGPU/TSL Choose Skills</p>
+          <span class="lab-route-counts">16 scenarios · 8 mechanisms · 0 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/semantic-mesh-writer/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Semantic Mesh Writer</h4>
+          <p>Procedural Geometry</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/structured-ash-growth/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU Structured Ash Growth</h4>
+          <p>Procedural Vegetation</p>
+          <span class="lab-route-counts">6 scenarios · 4 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/tsl-curved-ray/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>TSL Curved Ray</h4>
+          <p>Black Holes and Space Effects</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 4 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/tsl-procedural-pbr/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>TSL Procedural PBR</h4>
+          <p>Procedural Materials</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-bounded-water/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Bounded Water</h4>
+          <p>Water Optics</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 4 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-cached-clipmap-shadow/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU Cached Clipmap Shadow Lab</h4>
+          <p>Scalable Real-Time Shadows</p>
+          <span class="lab-route-counts">9 scenarios · 9 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-camera-rig/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Camera Rig</h4>
+          <p>Camera Controls And Rigs</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-dense-grass/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU Dense Grass</h4>
+          <p>Procedural Vegetation</p>
+          <span class="lab-route-counts">7 scenarios · 3 mechanisms · 4 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-exposure-color-pipeline/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Exposure Color Pipeline</h4>
+          <p>Exposure And Color Grading</p>
+          <span class="lab-route-counts">5 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-fft-ocean/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU FFT Ocean</h4>
+          <p>Spectral Ocean</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 4 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-field-bake/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Field Bake</h4>
+          <p>Procedural Fields</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-image-pipeline/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Image Pipeline</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-lut-atmosphere/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU LUT Atmosphere</h4>
+          <p>Sky, Atmosphere, and Haze</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-material-slot-compiler/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Material Slot Compiler</h4>
+          <p>Procedural Buildings and Cities</p>
+          <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-node-gtao/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Node GTAO</h4>
+          <p>Ambient Contact Shading</p>
+          <span class="lab-route-counts">7 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-pooled-effects/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Pooled Effects</h4>
+          <p>Particles, Trails, and Effects</p>
+          <span class="lab-route-counts">7 scenarios · 7 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-procedural-creature-lab/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Procedural Creature Lab</h4>
+          <p>Procedural Creatures</p>
+          <span class="lab-route-counts">7 scenarios · 7 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-procedural-timelines/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Procedural Timelines</h4>
+          <p>Procedural Motion Systems</p>
+          <span class="lab-route-counts">3 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-quadtree-planet/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU Quadtree Planet</h4>
+          <p>Procedural Planets</p>
+          <span class="lab-route-counts">7 scenarios · 7 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-rain-snow-and-wet-surfaces/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Rain Snow And Wet Surfaces</h4>
+          <p>Rain, Snow, and Wet Surfaces</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-touch-history-frost/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Touch History Frost</h4>
+          <p>Dynamic Surface Effects</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-validation-harness/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU validation harness</h4>
+          <p>Visual Validation</p>
+          <span class="lab-route-counts">8 scenarios · 6 mechanisms · 5 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-weather-volume-clouds/">
+          <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Native WebGPU Weather Volume Clouds</h4>
+          <p>Volumetric Clouds</p>
+          <span class="lab-route-counts">4 scenarios · 7 mechanisms · 4 tiers</span>
+        </a>
+      </div>
+    </section>
+    <section class="lab-group" aria-labelledby="cross-skillflagships-title">
+      <div class="lab-group-head"><div><h3 id="cross-skillflagships-title">Cross-skill flagships</h3><p>The five ownership-critical scenes where independent systems must compose without duplicate render, signal, tone-map, or output owners.</p></div><span>5 routes</span></div>
+      <div class="lab-grid">
+        <a class="lab-card" href="demos/final-image-flight/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Final Image Flight</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/weathered-world/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Weathered World</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/procedural-district/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Procedural District</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/creature-habitat/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Creature Habitat</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 5 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/relativistic-space-shot/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Relativistic Space Shot</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
+        </a>
+      </div>
+    </section>
+    <section class="lab-group" aria-labelledby="focusedintegrationsandbenches-title">
+      <div class="lab-group-head"><div><h3 id="focusedintegrationsandbenches-title">Focused integrations and benches</h3><p>Five focused integration hosts and two mechanism benches that prove temporal, AO, vegetation, precipitation, and shadow composition.</p></div><span>7 routes</span></div>
+      <div class="lab-grid">
+        <a class="lab-card" href="demos/integration-image-pipeline-ao/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Image Pipeline and Material-context AO Integration</h4>
+          <p>Ambient Contact Shading</p>
+          <span class="lab-route-counts">2 scenarios · 3 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/integration-precipitation-image-pipeline/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Integration Precipitation Image Pipeline</h4>
+          <p>Rain, Snow, and Wet Surfaces</p>
+          <span class="lab-route-counts">2 scenarios · 4 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/integration-temporal-surface/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Integration Temporal Surface</h4>
+          <p>Dynamic Surface Effects</p>
+          <span class="lab-route-counts">2 scenarios · 5 mechanisms · 3 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-shadow-architecture-bench/">
+          <span class="lab-card-top"><span>Mechanism bench</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Directional Shadow Architecture Bench</h4>
+          <p>Scalable Real-Time Shadows</p>
+          <span class="lab-route-counts">4 scenarios · 4 mechanisms · 1 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-shadow-pipeline-integration/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Cached Shadow Pipeline Integration</h4>
+          <p>Scalable Real-Time Shadows</p>
+          <span class="lab-route-counts">1 scenarios · 3 mechanisms · 1 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-temporal-history/">
+          <span class="lab-card-top"><span>Mechanism bench</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>WebGPU Temporal History</h4>
+          <p>Image Pipeline</p>
+          <span class="lab-route-counts">1 scenarios · 1 mechanisms · 1 tiers</span>
+        </a>
+        <a class="lab-card" href="demos/webgpu-vegetation-integration/">
+          <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
+          <h4>Host-Owned Planet, Terrain, Dense Grass, and Ash Integration</h4>
+          <p>Procedural Vegetation</p>
+          <span class="lab-route-counts">2 scenarios · 3 mechanisms · 3 tiers</span>
+        </a>
+      </div>
+    </section>
+</div></section>
+
+<section class="section" id="skills" aria-labelledby="skills-title"><div class="wrap">
+  <h2 id="skills-title">The 25-skill expert system</h2>
+  <p class="sub">Each skill owns a bounded technical domain. Cards report implementation surface and evidence separately, so substantial source work is visible without laundering it into a runtime claim.</p>
 
     <section class="category">
       <div class="category-head">
@@ -482,28 +866,28 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       </div>
       <div class="grid">
       <a class="card" href="skills/threejs-choose-skills.html">
-        <span class="card-index">01</span>
-        <h4>Three.js WebGPU/TSL Choose Skills</h4>
-        <p>Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.</p>
-        <span class="card-meta">$threejs-choose-skills</span>
+        <span class="card-head"><span class="card-index">01</span><span class="status status--accepted">Accepted evidence</span></span>
+        <h4 style="view-transition-name:skill-threejs-choose-skills">Three.js WebGPU/TSL Choose Skills</h4>
+        <p>Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, cross-skill physics coupling, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance.</p>
+        <span class="card-meta">1 primary · 8 mechanisms · 0 tiers</span>
       </a>
       <a class="card" href="skills/threejs-debugging.html">
-        <span class="card-index">02</span>
-        <h4>Three.js Debugging</h4>
-        <p>Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use for suspicious output, documentation or installed-source disagreement, known-issue research, fix-version proof, and evidence-backed upgrade or workaround decisions.</p>
-        <span class="card-meta">$threejs-debugging</span>
+        <span class="card-head"><span class="card-index">02</span><span class="status status--accepted">Accepted evidence</span></span>
+        <h4 style="view-transition-name:skill-threejs-debugging">Three.js Debugging</h4>
+        <p>Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior, installed source, types, documentation, or examples; when a regression or known upstream issue may exist; when a project is behind and a later fix may justify upgrading; or when choosing among an application fix, dependency upgrade, bounded workaround, upstream report, and blocker. Do not use for ordinary scene design without a concrete failure, suspicious behavior, or audit request.</p>
+        <span class="card-meta">1 primary · 5 mechanisms · 0 tiers</span>
       </a>
       <a class="card" href="skills/threejs-visual-validation.html">
-        <span class="card-index">03</span>
-        <h4>Visual Validation</h4>
-        <p>Validate advanced Three.js WebGPU/TSL graphics as authored systems using fixed-view visual contracts, node-pipeline diagnostics, no-post baselines, seed and temporal sweeps, renderer.info and GPU timing evidence, capability manifests, leak loops, and stable JSON+PNG regression bundles.</p>
-        <span class="card-meta">$threejs-visual-validation · 1 example</span>
+        <span class="card-head"><span class="card-index">03</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-visual-validation">Visual Validation</h4>
+        <p>Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 5 tiers</span>
       </a>
       <a class="card" href="skills/threejs-compatibility-fallbacks.html">
-        <span class="card-index">04</span>
-        <h4>Three.js Compatibility Fallbacks</h4>
-        <p>Teach how to apply fallback for Three.js WebGPU work only when the user explicitly asks how to apply fallback when WebGPU is unavailable. Do not use for flagship WebGPU/TSL implementations, automatic routing, or unrelated target-support/tuning work.</p>
-        <span class="card-meta">$threejs-compatibility-fallbacks · 1 example</span>
+        <span class="card-head"><span class="card-index">04</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-compatibility-fallbacks">Three.js Compatibility Fallbacks</h4>
+        <p>Use only for teaching how to apply fallback when WebGPU is unavailable after the user explicitly requests it. Never activate for canonical WebGPU/TSL work, low-end tuning, mobile optimization, capability preflight, or general target support.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 0 tiers</span>
       </a>
       </div>
     </section>
@@ -515,40 +899,40 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       </div>
       <div class="grid">
       <a class="card" href="skills/threejs-camera-controls-and-rigs.html">
-        <span class="card-index">05</span>
-        <h4>Camera Controls and Rigs</h4>
-        <p>Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration.</p>
-        <span class="card-meta">$threejs-camera-controls-and-rigs · 1 example</span>
+        <span class="card-head"><span class="card-index">05</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-camera-controls-and-rigs">Camera Controls And Rigs</h4>
+        <p>Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-scalable-real-time-shadows.html">
-        <span class="card-index">06</span>
-        <h4>Scalable Real-Time Shadows</h4>
-        <p>Implement scalable real-time WebGPU/TSL shadow systems for Three.js. Use for dynamic scenes, bounded lights, cascades, tiled projections, streaming open worlds, cached clipmaps, ShadowNode hooks, texel stabilization, update budgets, targeted invalidation, and node-material caster parity.</p>
-        <span class="card-meta">$threejs-scalable-real-time-shadows · 1 example</span>
+        <span class="card-head"><span class="card-index">06</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-scalable-real-time-shadows">Scalable Real-Time Shadows</h4>
+        <p>Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached clipmaps, stable texel snapping, filter/bias footprints, cache invalidation, caster parity, binding pressure, and sustained mobile budgets.</p>
+        <span class="card-meta">3 primary · 16 mechanisms · 5 tiers</span>
       </a>
       <a class="card" href="skills/threejs-ambient-contact-shading.html">
-        <span class="card-index">07</span>
-        <h4>Ambient Contact Shading</h4>
-        <p>Implement production ambient contact shading and ambient occlusion in latest Three.js with WebGPURenderer, TSL, RenderPipeline, GTAONode, TRAANode integration, half-resolution node passes, bilateral reconstruction, and optional custom bent-normal extensions.</p>
-        <span class="card-meta">$threejs-ambient-contact-shading · 1 example</span>
+        <span class="card-head"><span class="card-index">07</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-ambient-contact-shading">Ambient Contact Shading</h4>
+        <p>Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.</p>
+        <span class="card-meta">2 primary · 9 mechanisms · 6 tiers</span>
       </a>
       <a class="card" href="skills/threejs-bloom.html">
-        <span class="card-index">08</span>
-        <h4>Bloom</h4>
-        <p>Implement production bloom in advanced Three.js WebGPU/TSL scenes. Use for RenderPipeline HDR signal ordering, MRT emissive-output selective bloom, BloomNode controls, scene-relative emissive hierarchy, resolution-scale budgets, and effect-isolation diagnostics.</p>
-        <span class="card-meta">$threejs-bloom · 1 example</span>
+        <span class="card-head"><span class="card-index">08</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-bloom">Bloom</h4>
+        <p>Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid costs, transparent blending rules, PSF limits, and mobile/tile-GPU gates.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 4 tiers</span>
       </a>
       <a class="card" href="skills/threejs-exposure-color-grading.html">
-        <span class="card-index">09</span>
-        <h4>Exposure and Color Grading</h4>
-        <p>Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading.</p>
-        <span class="card-meta">$threejs-exposure-color-grading · 1 example</span>
+        <span class="card-head"><span class="card-index">09</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-exposure-color-grading">Exposure And Color Grading</h4>
+        <p>Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-image-pipeline.html">
-        <span class="card-index">10</span>
-        <h4>Image Pipeline</h4>
-        <p>Build a maximum-performance WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, and pass diagnostics.</p>
-        <span class="card-meta">$threejs-image-pipeline · 2 examples</span>
+        <span class="card-head"><span class="card-index">10</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-image-pipeline">Image Pipeline</h4>
+        <p>Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.</p>
+        <span class="card-meta">7 primary · 36 mechanisms · 19 tiers</span>
       </a>
       </div>
     </section>
@@ -560,34 +944,34 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       </div>
       <div class="grid">
       <a class="card" href="skills/threejs-sky-atmosphere-and-haze.html">
-        <span class="card-index">11</span>
-        <h4>Sky, Atmosphere, and Haze</h4>
-        <p>Implement maximum-performance sky, atmosphere, and haze systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, RenderPipeline, compute-generated scattering LUTs, depth-aware aerial perspective, sun/moon discs, and atmosphere-aware lighting.</p>
-        <span class="card-meta">$threejs-sky-atmosphere-and-haze · 2 examples</span>
+        <span class="card-head"><span class="card-index">11</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-sky-atmosphere-and-haze">Sky, Atmosphere, and Haze</h4>
+        <p>Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-volumetric-clouds.html">
-        <span class="card-index">12</span>
-        <h4>Volumetric Clouds</h4>
-        <p>Implement maximum-performance volumetric cloud systems in latest Three.js with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and scalable quality tiers.</p>
-        <span class="card-meta">$threejs-volumetric-clouds · 2 examples</span>
+        <span class="card-head"><span class="card-index">12</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-volumetric-clouds">Volumetric Clouds</h4>
+        <p>Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and error-bounded quality tiers.</p>
+        <span class="card-meta">1 primary · 7 mechanisms · 4 tiers</span>
       </a>
       <a class="card" href="skills/threejs-spectral-ocean.html">
-        <span class="card-index">13</span>
-        <h4>Spectral Ocean</h4>
-        <p>Build large procedural oceans in latest Three.js with WebGPURenderer, TSL compute FFT cascades, StorageTexture ping-pongs, NodeMaterial shading, node post pipelines, multi-cascade wavelength bands, clear-water optics, above/below surface rendering, spectral derivatives, Jacobian whitecaps, temporal foam, analytic sky reflection, underwater absorption, crest scatter, and GPU validation.</p>
-        <span class="card-meta">$threejs-spectral-ocean · 4 examples</span>
+        <span class="card-head"><span class="card-index">13</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-spectral-ocean">Spectral Ocean</h4>
+        <p>Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 4 tiers</span>
       </a>
       <a class="card" href="skills/threejs-water-optics.html">
-        <span class="card-index">14</span>
-        <h4>Water Optics</h4>
-        <p>Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.</p>
-        <span class="card-meta">$threejs-water-optics · 3 examples</span>
+        <span class="card-head"><span class="card-index">14</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-water-optics">Water Optics</h4>
+        <p>Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 4 tiers</span>
       </a>
       <a class="card" href="skills/threejs-rain-snow-and-wet-surfaces.html">
-        <span class="card-index">15</span>
-        <h4>Rain, Snow, and Wet Surfaces</h4>
+        <span class="card-head"><span class="card-index">15</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-rain-snow-and-wet-surfaces">Rain, Snow, and Wet Surfaces</h4>
         <p>Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.</p>
-        <span class="card-meta">$threejs-rain-snow-and-wet-surfaces · 3 examples</span>
+        <span class="card-meta">2 primary · 10 mechanisms · 6 tiers</span>
       </a>
       </div>
     </section>
@@ -599,46 +983,46 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       </div>
       <div class="grid">
       <a class="card" href="skills/threejs-procedural-fields.html">
-        <span class="card-index">16</span>
-        <h4>Procedural Fields</h4>
-        <p>Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js NodeMaterials, compute bakes, storage textures, terrain, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.</p>
-        <span class="card-meta">$threejs-procedural-fields · 1 example</span>
+        <span class="card-head"><span class="card-index">16</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-fields">Procedural Fields</h4>
+        <p>Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-procedural-materials.html">
-        <span class="card-index">17</span>
-        <h4>Procedural Materials</h4>
-        <p>Author production WebGPU/TSL procedural materials in Three.js. Use for NodeMaterial PBR identity fields, atlas and triplanar filtering, specular AA, planet-space material fields, terrain wetness, lava and hot emissive procedural surfaces, raymarched material fields, per-instance dissolve, derivative normals, and authored physical response bundles.</p>
-        <span class="card-meta">$threejs-procedural-materials · 2 examples</span>
+        <span class="card-head"><span class="card-index">17</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-materials">Procedural Materials</h4>
+        <p>Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for coupled terrain/coast/seabed response bundles, grass, rock, dry/wet sand and reef identities, NodeMaterial PBR fields, atlas and triplanar filtering, footprint filtering, specular AA, terrain wetness, stylized palette/facet policies, emissive or raymarched fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-procedural-geometry.html">
-        <span class="card-index">18</span>
-        <h4>Procedural Geometry</h4>
-        <p>Build production procedural mesh systems in latest Three.js WebGPU/TSL. Use for sculpted rail and frame profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and close-inspection geometry budgets.</p>
-        <span class="card-meta">$threejs-procedural-geometry · 2 examples</span>
+        <span class="card-head"><span class="card-index">18</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-geometry">Procedural Geometry</h4>
+        <p>Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-procedural-buildings-and-cities.html">
-        <span class="card-index">19</span>
-        <h4>Procedural Buildings and Cities</h4>
-        <p>Build authored procedural buildings, facades, and city kits in latest Three.js WebGPU/TSL. Use for massing grammars, exposed-edge analysis, facade bays, profiles, arches, cornices, roofs, ornaments, material-slot BatchedMesh or merged BufferGeometry compilation, deterministic variants, NodeMaterial identities, and procedural city assets.</p>
-        <span class="card-meta">$threejs-procedural-buildings-and-cities · 2 examples</span>
+        <span class="card-head"><span class="card-index">19</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-buildings-and-cities">Procedural Buildings and Cities</h4>
+        <p>Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-procedural-planets.html">
-        <span class="card-index">20</span>
-        <h4>Procedural Planets</h4>
-        <p>Author high-performance procedural planetary bodies in latest Three.js with WebGPURenderer, TSL, NodeMaterial, cube-sphere quadtree LOD, GPU displacement, coupled crater/biome/climate fields, analytic normals, altitude LOD, and atmosphere handoff from orbit through close approach.</p>
-        <span class="card-meta">$threejs-procedural-planets · 2 examples</span>
+        <span class="card-head"><span class="card-index">20</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-planets">Procedural Planets</h4>
+        <p>Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.</p>
+        <span class="card-meta">1 primary · 7 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-procedural-vegetation.html">
-        <span class="card-index">21</span>
-        <h4>Procedural Vegetation</h4>
-        <p>Generate authored procedural trees, grass, and vegetation in latest Three.js with WebGPURenderer, TSL, NodeMaterial, compute storage buffers, rooted wind, chunked LOD, species presets, trunks, branches, roots, canopies, leaf cards, trellises, and deterministic vegetation diagnostics.</p>
-        <span class="card-meta">$threejs-procedural-vegetation · 5 examples</span>
+        <span class="card-head"><span class="card-index">21</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-vegetation">Procedural Vegetation</h4>
+        <p>Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.</p>
+        <span class="card-meta">3 primary · 10 mechanisms · 10 tiers</span>
       </a>
       <a class="card" href="skills/threejs-procedural-creatures.html">
-        <span class="card-index">22</span>
-        <h4>Procedural Creatures</h4>
-        <p>Build high-quality procedural and generated creatures in Three.js WebGPU/TSL. Use for spec-driven creature bodies, skeleton/control rigs, SDF blend-shell or generated/hybrid skins, procedural gait/hop/flight/swim locomotion, foot planting and 2-bone IK, verlet tails and ears, squash-and-stretch, toon fauna and NPCs, creature crowds, deterministic creature labs, and genetic creature variation. Not for imported glTF skinned-clip pipelines.</p>
-        <span class="card-meta">$threejs-procedural-creatures · 1 example</span>
+        <span class="card-head"><span class="card-index">22</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-creatures">Procedural Creatures</h4>
+        <p>Build workload-selected procedural and generated creatures in Three.js r185 WebGPU/TSL. Use for spec-driven bodies, semantic rigs, field-extracted skinned reference meshes, diagnostic SDF shells, procedural gait/hop/flight/swim locomotion, support-relative foot planting, 2-bone IK, verlet appendages, repeated populations, deterministic creature labs, and genetic variation. Not for imported glTF skinned-clip pipelines.</p>
+        <span class="card-meta">1 primary · 7 mechanisms · 3 tiers</span>
       </a>
       </div>
     </section>
@@ -650,266 +1034,310 @@ curl -s https://linegel.github.io/threejs-complete-set-of-skill/llms.txt</code><
       </div>
       <div class="grid">
       <a class="card" href="skills/threejs-procedural-motion-systems.html">
-        <span class="card-index">23</span>
-        <h4>Procedural Motion Systems</h4>
-        <p>Build high-performance procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, peeling debris, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.</p>
-        <span class="card-meta">$threejs-procedural-motion-systems · 1 example</span>
+        <span class="card-head"><span class="card-index">23</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-procedural-motion-systems">Procedural Motion Systems</h4>
+        <p>Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.</p>
+        <span class="card-meta">1 primary · 6 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-particles-trails-and-effects.html">
-        <span class="card-index">24</span>
-        <h4>Particles, Trails, and Effects</h4>
-        <p>Author production WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for ship-conforming reentry plasma, generated capsule wakes, compute-updated instanced sparks, timed dissolving debris, dense-swap effect pools, and MRT-driven scene-relative HDR emission hierarchy.</p>
-        <span class="card-meta">$threejs-particles-trails-and-effects · 2 examples</span>
+        <span class="card-head"><span class="card-index">24</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-particles-trails-and-effects">Particles, Trails, and Effects</h4>
+        <p>Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced sparks, timed dissolves, GPU particle pools, deterministic compaction, and conditional scene-relative HDR emission signals.</p>
+        <span class="card-meta">1 primary · 7 mechanisms · 3 tiers</span>
       </a>
       <a class="card" href="skills/threejs-dynamic-surface-effects.html">
-        <span class="card-index">25</span>
-        <h4>Dynamic Surface Effects</h4>
-        <p>Build dynamic screen-space surface effects in latest Three.js WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.</p>
-        <span class="card-meta">$threejs-dynamic-surface-effects · 2 examples</span>
+        <span class="card-head"><span class="card-index">25</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-dynamic-surface-effects">Dynamic Surface Effects</h4>
+        <p>Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.</p>
+        <span class="card-meta">2 primary · 11 mechanisms · 6 tiers</span>
       </a>
       <a class="card" href="skills/threejs-black-holes-and-space-effects.html">
-        <span class="card-index">26</span>
-        <h4>Black Holes and Space Effects</h4>
+        <span class="card-head"><span class="card-index">26</span><span class="status status--pending">Native evidence pending</span></span>
+        <h4 style="view-transition-name:skill-threejs-black-holes-and-space-effects">Black Holes and Space Effects</h4>
         <p>Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.</p>
-        <span class="card-meta">$threejs-black-holes-and-space-effects · 2 examples</span>
+        <span class="card-meta">1 primary · 6 mechanisms · 4 tiers</span>
       </a>
       </div>
     </section>
-</div></div>
+</div></section>
 
-<div class="section" id="gallery"><div class="wrap">
-  <h2>Validation gallery</h2>
-  <p class="sub">Frames produced and verified by the skills themselves — fixed-view design contracts, per-signal diagnostics mosaics, and deterministic generated texture assets. Click through to the owning skill.</p>
-  <div class="gallery">
+<section class="section" id="protocol" aria-labelledby="protocol-title"><div class="wrap">
+  <h2 id="protocol-title">A validation protocol designed to reject pretty lies.</h2>
+  <p class="sub">The schema-v2 contract separates what was authored, derived, measured, and gated; its verdicts cannot collapse missing GPU timing or mechanism proof into an aggregate pass.</p>
+  <div class="protocol-grid">
+    <div class="protocol-card"><code>numeric provenance</code><h3>Four labels</h3><p>Authored · Derived · Measured · Gated. Every normative number names where it came from.</p></div>
+    <div class="protocol-card"><code>claim verdicts</code><h3>Four outcomes</h3><p>PASS · FAIL · INSUFFICIENT_EVIDENCE · NOT_CLAIMED. Silence cannot masquerade as success.</p></div>
+    <div class="protocol-card"><code>bundle</code><h3>14 ledgers</h3><p>Pipeline, timing, resources, bandwidth, errors, lifecycle, mechanisms, and the exact visual contract travel together.</p></div>
+    <div class="protocol-card"><code>readback</code><h3>256-byte alignment</h3><p>Odd-size and padded-row tests prevent valid WebGPU frames from becoming striped or falsely nonblank PNGs.</p></div>
+    <div class="protocol-card protocol-flow"><code>single-owner graph</code><h3>One final image path</h3><ol><li>scene HDR</li><li>shared MRT</li><li>physical stages</li><li>exposure</li><li>tone map</li><li>output</li></ol></div>
+    <div class="protocol-card"><code>lifecycle</code><h3>50–100 cycles</h3><p>Create, render, resize, switch mode and tier, then dispose—measured repeatedly rather than inferred from one clean frame.</p></div>
+    <div class="protocol-card"><code>mutations</code><h3>Failure must fail</h3><p>Bad stride, duplicate owners, false diagnostics, self-comparison, leaked storage, and missing timestamps are blocking cases.</p></div>
+  </div>
+</div></section>
+
+<section class="section" id="install" aria-labelledby="install-title"><div class="wrap">
+  <h2 id="install-title">Install the whole research stack.</h2>
+  <p class="sub">The router selects the smallest relevant expert set after installation. Directory presence is never interpreted as runtime proof; the registry remains the public source of coverage truth.</p>
+  <div class="install-console" id="quickstart">
+    <div><p>List the pack, then install all top-level skills for your agent.</p><pre tabindex="0"><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'</code></pre></div>
+    <a class="hero-action" href="https://github.com/linegel/threejs-complete-set-of-skill">Open repository ↗</a>
+  </div>
+  <details class="install-details"><summary>Harness-specific installation recipes <span>4 targets</span></summary><div class="steps">
+    <div class="step"><span class="n">01</span><h3>skills CLI</h3>
+      <p>Use the open skills installer to list the pack, then install every top-level threejs-* skill folder as one coherent graphics skill pack for your selected agent.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --list
+npx skills@latest add linegel/threejs-complete-set-of-skill --skill &#39;*&#39;</code></pre></div>
+    <div class="step"><span class="n">02</span><h3>Claude Code</h3>
+      <p>Install through skills CLI, or symlink/copy the skill folders into a personal or project skills directory.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill &#39;*&#39; -a claude-code -g -y
+# manual fallback:
+git clone https://github.com/linegel/threejs-complete-set-of-skill.git
+ln -s &quot;$PWD/threejs-complete-set-of-skill&quot;/threejs-* ~/.claude/skills/</code></pre></div>
+    <div class="step"><span class="n">03</span><h3>Codex CLI</h3>
+      <p>Install the whole pack through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local threejs-*/SKILL.md files as the authoritative source.</p>
+      <pre><code>npx skills@latest add linegel/threejs-complete-set-of-skill --skill &#39;*&#39; -a codex -g -y
+# local checkout fallback: read ./threejs-*/SKILL.md when a task matches</code></pre></div>
+    <div class="step"><span class="n">04</span><h3>Cursor / Gemini / generic agents</h3>
+      <p>Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, agents/, and examples/. The machine-readable index lives at skills.json; a plain-text overview at llms.txt.</p>
+      <pre><code>git submodule add https://github.com/linegel/threejs-complete-set-of-skill.git skills/threejs
+curl -s https://threejs-skills.com/skills.json | jq &#39;.install.source, .skills[].name&#39;
+curl -s https://threejs-skills.com/llms.txt</code></pre></div></div></details>
+</div></section>
+
+<section class="section" id="gallery" aria-labelledby="gallery-title"><div class="wrap">
+  <h2 id="gallery-title">Historical evidence and generated inputs</h2>
+  <p class="sub">These frames are preserved diagnostic or asset previews. They are useful inputs and historical context, but none become canonical renderer evidence merely by looking convincing.</p>
+  <details class="archive"><summary>Open the preview archive <span>14 frames</span></summary><div class="gallery">
       <a href="skills/threejs-spectral-ocean.html"><figure>
-        <img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Spectral ocean — generated wave seeds" loading="lazy" />
-        <figcaption><strong>Spectral ocean — generated wave seeds</strong><span>threejs-spectral-ocean · FFT cascade ocean from the fixed-view visual contract</span></figcaption>
+        <img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Ocean input — generated wave seeds" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Ocean input — generated wave seeds</strong><span>threejs-spectral-ocean · generated-asset preview; not FFT renderer evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-procedural-planets.html"><figure>
-        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Procedural planet — crater field" loading="lazy" />
-        <figcaption><strong>Procedural planet — crater field</strong><span>threejs-procedural-planets · final design frame from the fixed-view visual contract</span></figcaption>
+        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Planet input — generated crater field" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Planet input — generated crater field</strong><span>threejs-procedural-planets · generated-asset preview; not quadtree renderer evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-water-optics.html"><figure>
-        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded water — generated caustics" loading="lazy" />
-        <figcaption><strong>Bounded water — generated caustics</strong><span>threejs-water-optics · differential-area caustics with depth-aware refraction</span></figcaption>
+        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Water input — generated caustics" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Water input — generated caustics</strong><span>threejs-water-optics · generated-asset preview; not caustic transport evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-rain-snow-and-wet-surfaces.html"><figure>
-        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Rain — generated ripple normals" loading="lazy" />
-        <figcaption><strong>Rain — generated ripple normals</strong><span>threejs-rain-snow-and-wet-surfaces · wet-surface ripples from generated normal variants</span></figcaption>
+        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Rain input — generated ripple normals" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Rain input — generated ripple normals</strong><span>threejs-rain-snow-and-wet-surfaces · generated-asset preview; not dynamic weather evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-volumetric-clouds.html"><figure>
-        <img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Volumetric clouds — weather maps" loading="lazy" />
-        <figcaption><strong>Volumetric clouds — weather maps</strong><span>threejs-volumetric-clouds · coverage, type, detail, vertical bias, and erosion channels</span></figcaption>
+        <img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Cloud input — weather maps" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Cloud input — weather maps</strong><span>threejs-volumetric-clouds · generated-asset channel preview; not volume-renderer evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-dynamic-surface-effects.html"><figure>
-        <img src="visual-validation/frost-generated-crystals/final.design.png" alt="Dynamic surfaces — frost crystals" loading="lazy" />
-        <figcaption><strong>Dynamic surfaces — frost crystals</strong><span>threejs-dynamic-surface-effects · crystal masks, derived normals, and touch-history clearing</span></figcaption>
+        <img src="visual-validation/frost-generated-crystals/final.design.png" alt="Surface input — frost crystals" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Surface input — frost crystals</strong><span>threejs-dynamic-surface-effects · generated-asset preview; not StorageTexture history evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-procedural-materials.html"><figure>
-        <img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Procedural materials — lava causes" loading="lazy" />
-        <figcaption><strong>Procedural materials — lava causes</strong><span>threejs-procedural-materials · PBR crust, fracture, heat, roughness, and emissive response</span></figcaption>
+        <img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Material input — lava causes" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Material input — lava causes</strong><span>threejs-procedural-materials · generated-asset preview; not PBR energy or timing evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-procedural-vegetation.html"><figure>
-        <img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Procedural vegetation — meadow density" loading="lazy" />
-        <figcaption><strong>Procedural vegetation — meadow density</strong><span>threejs-procedural-vegetation · placement, clearing paths, clumps, and flower masks</span></figcaption>
+        <img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Vegetation input — meadow density" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Vegetation input — meadow density</strong><span>threejs-procedural-vegetation · generated-asset preview; not placement GPU evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-black-holes-and-space-effects.html"><figure>
-        <img src="visual-validation/space-generated-starfields/final.design.png" alt="Curved rays — starfield tiles" loading="lazy" />
-        <figcaption><strong>Curved rays — starfield tiles</strong><span>threejs-black-holes-and-space-effects · SRGB background lookup through lensed directions</span></figcaption>
+        <img src="visual-validation/space-generated-starfields/final.design.png" alt="Space input — starfield tiles" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Space input — starfield tiles</strong><span>threejs-black-holes-and-space-effects · artistic generated-asset preview; not geodesic evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-procedural-fields.html"><figure>
-        <img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Procedural fields — biome maps" loading="lazy" />
-        <figcaption><strong>Procedural fields — biome maps</strong><span>threejs-procedural-fields · macro height, ridges, cavities, and alpha moisture</span></figcaption>
+        <img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Field input — biome maps" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Field input — biome maps</strong><span>threejs-procedural-fields · generated-asset preview; not compute-bake parity evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-visual-validation.html"><figure>
-        <img src="visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Diagnostics mosaic — planet" loading="lazy" />
-        <figcaption><strong>Diagnostics mosaic — planet</strong><span>threejs-visual-validation · per-signal diagnostic passes, not a single pretty screenshot</span></figcaption>
+        <img src="visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Diagnostics mosaic — generated crater field" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Diagnostics mosaic — generated crater field</strong><span>threejs-visual-validation · generated asset-channel mosaic; not runtime g-buffer evidence</span></figcaption>
       </figure></a>
       <a href="skills/threejs-visual-validation.html"><figure>
-        <img src="visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Diagnostics mosaic — generated weather" loading="lazy" />
-        <figcaption><strong>Diagnostics mosaic — generated weather</strong><span>threejs-visual-validation · generated-asset channel proof for cloud coverage and erosion</span></figcaption>
+        <img src="visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Diagnostics mosaic — generated weather" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Diagnostics mosaic — generated weather</strong><span>threejs-visual-validation · generated-asset channel preview for cloud inputs</span></figcaption>
       </figure></a>
       <a href="skills/threejs-visual-validation.html"><figure>
-        <img src="visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png" alt="Diagnostics mosaic — generated fields" loading="lazy" />
-        <figcaption><strong>Diagnostics mosaic — generated fields</strong><span>threejs-visual-validation · generated-asset channel proof for biome field semantics</span></figcaption>
+        <img src="visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png" alt="Diagnostics mosaic — generated fields" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Diagnostics mosaic — generated fields</strong><span>threejs-visual-validation · generated-asset channel preview for biome inputs</span></figcaption>
       </figure></a>
       <a href="skills/threejs-procedural-materials.html"><figure>
-        <img src="generated-asset-contact-sheet.png" alt="Generated texture asset contact sheet" loading="lazy" />
+        <img src="generated-asset-contact-sheet.png" alt="Generated texture asset contact sheet" width="480" height="2020" loading="lazy" decoding="async" />
         <figcaption><strong>Generated texture asset contact sheet</strong><span>deterministic PNG variants shipped under assets/generated-variants/</span></figcaption>
-      </figure></a>
-  </div>
-</div></div>
+      </figure></a></div></details>
+</div></section>
 
-<div class="section" id="demos"><div class="wrap">
-  <h2>Live WebGPU demos</h2>
-  <p class="sub">GitHub Pages demos that initialize WebGPU in the browser. They are integration probes and reduced-tier provider surfaces, not substitute production engines.</p>
-  <div class="gallery">
+<section class="section" id="demos" aria-labelledby="demos-title"><div class="wrap">
+  <h2 id="demos-title">Preserved secondary surfaces</h2>
+  <p class="sub">Concept proxies, generated-asset previews, fixtures, and the legacy reference retain their public URLs and explicit limitations. They contribute exactly zero primary acceptance.</p>
+  <details class="archive"><summary>Open the secondary archive <span>26 published previews</span></summary><div class="gallery">
       <a href="demos/water-integration-surface/"><figure>
-        <img src="visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" loading="lazy" />
-        <figcaption><strong>Water Integration Surface</strong><span>threejs-water-optics · The bounded-water core integrates into a host scene with presets, quality selection, buoyancy, spray probes, deterministic ticks, transparent ordering, and mask-gap evidence.</span></figcaption>
+        <img src="visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" width="640" height="400" loading="lazy" decoding="async" />
+        <figcaption><strong>Water Integration Surface</strong><span>Concept proxy · threejs-water-optics · The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented. The host project owns post-processing, transparent ordering, and final output conversion.</span></figcaption>
       </figure></a>
       <a href="demos/ambient-contact-shading-demo/"><figure>
         <div class="live-visual live-visual--ao" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>AO.r + direct light separation</strong>
         <span class="lv-m">final / no-ao / ao-debug</span>
       </div>
-        <figcaption><strong>Ambient Contact Shading Lab</strong><span>threejs-ambient-contact-shading · Ambient contact visibility grounds nearby surfaces while direct light and emissive terms stay readable.</span></figcaption>
+        <figcaption><strong>Ambient Contact Shading Lab</strong><span>Concept proxy · threejs-ambient-contact-shading · The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.</span></figcaption>
       </figure></a>
       <a href="demos/selective-bloom-demo/"><figure>
         <div class="live-visual live-visual--bloom" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>emissive source + bloom contribution</strong>
         <span class="lv-m">final / base-only / bloom-only</span>
       </div>
-        <figcaption><strong>Selective HDR Bloom Bench</strong><span>threejs-bloom · Selective emissive signal is isolated from readable base materials before a bloom response is added back.</span></figcaption>
+        <figcaption><strong>Selective HDR Bloom Bench</strong><span>Concept proxy · threejs-bloom · The live page uses additive response geometry for interaction and mode switching. The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.</span></figcaption>
       </figure></a>
       <a href="demos/exposure-color-grading-demo/"><figure>
         <div class="live-visual live-visual--exposure" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>HDR meter + adapted exposure state</strong>
         <span class="lv-m">final / identity-lut / meter-debug</span>
       </div>
-        <figcaption><strong>Scene-Referred Exposure Rig</strong><span>threejs-exposure-color-grading · A scene-referred meter drives asymmetric exposure adaptation before tone-map-domain grading.</span></figcaption>
+        <figcaption><strong>Scene-Referred Exposure Rig</strong><span>Concept proxy · threejs-exposure-color-grading · The docs page simulates the meter state in live scene controls for readability. The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.</span></figcaption>
       </figure></a>
       <a href="demos/image-pipeline-framegraph-demo/"><figure>
         <div class="live-visual live-visual--pipeline" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>one pass feeding shared diagnostics</strong>
         <span class="lv-m">final / signals / bypass-post</span>
       </div>
-        <figcaption><strong>Shared Signal Framegraph</strong><span>threejs-image-pipeline · One scene frame feeds owned color, depth, normal, emissive, and velocity-style signal views.</span></figcaption>
+        <figcaption><strong>Shared Signal Framegraph</strong><span>Concept proxy · threejs-image-pipeline · The docs page visualizes the signal contract with live panels rather than allocating production MRT targets. The production skill remains one RenderPipeline, one pass/MRT producer, and one tone-map/output conversion owner.</span></figcaption>
       </figure></a>
       <a href="demos/shadow-cascade-demo/"><figure>
         <div class="live-visual live-visual--shadow" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>coverage levels + bounded shadow map</strong>
         <span class="lv-m">final / cascade-debug / single-map</span>
       </div>
-        <figcaption><strong>Scalable Shadow Coverage</strong><span>threejs-scalable-real-time-shadows · Bounded, cascade-style, and cached-budget views expose coverage, update scope, and bias pressure.</span></figcaption>
+        <figcaption><strong>Scalable Shadow Coverage</strong><span>Concept proxy · threejs-scalable-real-time-shadows · The live page uses a single real shadow map plus debug coverage overlays. The production skill chooses one shadow, CSMShadowNode, TileShadowNode, or a measured custom cached clipmap from the target scene.</span></figcaption>
       </figure></a>
       <a href="demos/sky-atmosphere-haze-demo/"><figure>
         <div class="live-visual live-visual--sky" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>shared sky, sun, haze, and LUT views</strong>
         <span class="lv-m">final / no-haze / lut-debug</span>
       </div>
-        <figcaption><strong>Atmosphere And Haze Stack</strong><span>threejs-sky-atmosphere-and-haze · Shared sky, sun, depth haze, and LUT diagnostic views preserve one atmosphere parameter model.</span></figcaption>
+        <figcaption><strong>Atmosphere And Haze Stack</strong><span>Concept proxy · threejs-sky-atmosphere-and-haze · The docs page uses procedural sky bands and haze layers for direct interaction. The production skill remains compute-generated transmittance, multiscatter, sky-view, and aerial-perspective LUT/froxel products.</span></figcaption>
       </figure></a>
       <a href="demos/camera-rig-handoff-demo/"><figure>
         <div class="live-visual live-visual--camera" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>scale-aware chase + handoff pose</strong>
         <span class="lv-m">final / side / handoff</span>
       </div>
-        <figcaption><strong>Scale-Aware Camera Rig</strong><span>threejs-camera-controls-and-rigs · One camera owner derives chase, side, and handoff poses from subject scale and projection envelopes.</span></figcaption>
+        <figcaption><strong>Scale-Aware Camera Rig</strong><span>Concept proxy · threejs-camera-controls-and-rigs · The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path. The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-motion-timeline-demo/"><figure>
         <div class="live-visual live-visual--motion" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>phase timeline + seeded debris</strong>
         <span class="lv-m">final / phase-debug / replay-slice</span>
       </div>
-        <figcaption><strong>Procedural Motion Timeline</strong><span>threejs-procedural-motion-systems · Named phases drive analytic launch, staging, docking, and debris motion without frame-count state.</span></figcaption>
+        <figcaption><strong>Procedural Motion Timeline</strong><span>Concept proxy · threejs-procedural-motion-systems · The docs page uses a small CPU-side hero actor set for readability. The production skill remains fixed-step replay, previous/current storage slots, compute dispatch ownership, and quaternion frame contracts.</span></figcaption>
       </figure></a>
       <a href="demos/pooled-particles-effects-demo/"><figure>
         <div class="live-visual live-visual--effects" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>event pool + shell/wake/sparks</strong>
         <span class="lv-m">final / pool-debug / bloom-off</span>
       </div>
-        <figcaption><strong>Pooled Particles And Trails</strong><span>threejs-particles-trails-and-effects · Seeded event packets feed a dense visual pool with shell, wake, spark, and bloom-isolated views.</span></figcaption>
+        <figcaption><strong>Pooled Particles And Trails</strong><span>Concept proxy · threejs-particles-trails-and-effects · The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-geometry-writer-demo/"><figure>
         <div class="live-visual live-visual--geometry" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>profile sweep + material groups</strong>
         <span class="lv-m">final / groups / wire</span>
       </div>
-        <figcaption><strong>Semantic Mesh Writer Bench</strong><span>threejs-procedural-geometry · Semantic dimensions, material groups, hard-edge duplication, and LOD tiers drive inspectable generated geometry.</span></figcaption>
+        <figcaption><strong>Semantic Mesh Writer Bench</strong><span>Concept proxy · threejs-procedural-geometry · The docs page implements a compact runtime frame-profile writer for inspection. The production skill remains preallocated typed-array writers, exact group coverage, tangent validation, batching decisions, and targeted update ranges.</span></figcaption>
       </figure></a>
       <a href="demos/skill-router-manifest-demo/"><figure>
         <div class="live-visual live-visual--route" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>route manifest + shared owners</strong>
         <span class="lv-m">final / budget / ownership</span>
       </div>
-        <figcaption><strong>Skill Router Manifest Bench</strong><span>threejs-choose-skills · A WebGPU preflight routes one brief into selected, omitted, deferred, and shared-owner skill contracts.</span></figcaption>
+        <figcaption><strong>Skill Router Manifest Bench</strong><span>Concept proxy · threejs-choose-skills · The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.</span></figcaption>
       </figure></a>
       <a href="demos/compatibility-fallback-planner-demo/"><figure>
         <div class="live-visual live-visual--fallback" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>explicit fallback + loss ledger</strong>
         <span class="lv-m">final / loss-ledger / blocked</span>
       </div>
-        <figcaption><strong>Fallback Loss Ledger</strong><span>threejs-compatibility-fallbacks · Explicit fallback requests produce a capability ledger with preserved, weakened, removed, and blocked invariants.</span></figcaption>
+        <figcaption><strong>Fallback Loss Ledger</strong><span>Concept proxy · threejs-compatibility-fallbacks · The docs page is a teaching visualization and intentionally shows a blocked mode when no explicit fallback request exists. The canonical skill must not weaken flagship WebGPU guidance or silently route to WebGL-compatible behavior.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-building-compiler-demo/"><figure>
         <div class="live-visual live-visual--building" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>massing + exposed edges + slots</strong>
         <span class="lv-m">final / exposed-edges / material-slots</span>
       </div>
-        <figcaption><strong>Material-Slot Building Compiler</strong><span>threejs-procedural-buildings-and-cities · Deterministic massing, exposed edges, placement ownership, and material-slot batches compile into inspectable city geometry.</span></figcaption>
+        <figcaption><strong>Material-Slot Building Compiler</strong><span>Concept proxy · threejs-procedural-buildings-and-cities · The docs page uses compact runtime geometry instead of the full fixture compiler and BatchedMesh capacity accounting. The production skill remains plan validation, interval overlap checks, physical UV scale, material-slot mesh compilation, and city-chunk budget evidence.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-creature-lab-demo/"><figure>
         <div class="live-visual live-visual--creature" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>rig + gait + candidate fields</strong>
         <span class="lv-m">final / rig-debug / field-debug</span>
       </div>
-        <figcaption><strong>Reduced Creature Lab</strong><span>threejs-procedural-creatures · A spec-driven procedural creature exposes rig, gait, candidate field shells, and planted-foot diagnostics.</span></figcaption>
+        <figcaption><strong>Reduced Creature Lab</strong><span>Concept proxy · threejs-procedural-creatures · The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract. The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.</span></figcaption>
       </figure></a>
       <a href="demos/visual-validation-harness-demo/"><figure>
         <div class="live-visual live-visual--validation" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
+        <span class="lv-k">Concept proxy</span>
         <strong>contract images + manifest evidence</strong>
         <span class="lv-m">final / diagnostics / bundle</span>
       </div>
-        <figcaption><strong>Validation Evidence Harness</strong><span>threejs-visual-validation · Fixed-camera contracts expose final, no-post, diagnostic, seed, resource, and sign-off evidence as a first-class artifact.</span></figcaption>
+        <figcaption><strong>Validation Evidence Harness</strong><span>Concept proxy · threejs-visual-validation · The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.</span></figcaption>
       </figure></a>
       <a href="demos/water-generated-caustics/"><figure>
-        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" loading="lazy" />
-        <figcaption><strong>Bounded Water Caustic Projection</strong><span>threejs-water-optics · Generated caustic fields are used as live scene inputs for a bounded-water floor projection.</span></figcaption>
+        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Bounded Water Caustic Projection</strong><span>Generated asset preview · threejs-water-optics · Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.</span></figcaption>
       </figure></a>
       <a href="demos/cloud-generated-weather-maps/"><figure>
-        <img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Weather Map Cloud Layers" loading="lazy" />
-        <figcaption><strong>Weather Map Cloud Layers</strong><span>threejs-volumetric-clouds · Generated weather maps are used as live scene inputs for layered cloud density and erosion response.</span></figcaption>
+        <img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Weather Map Cloud Layers" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Weather Map Cloud Layers</strong><span>Generated asset preview · threejs-volumetric-clouds · Generated weather maps are reduced-tier diagnostic inputs. The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.</span></figcaption>
       </figure></a>
       <a href="demos/fields-generated-biome-maps/"><figure>
-        <img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Biome Field Terrain" loading="lazy" />
-        <figcaption><strong>Biome Field Terrain</strong><span>threejs-procedural-fields · Generated biome maps are used as live scene inputs for terrain height, placement markers, and material response.</span></figcaption>
+        <img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Biome Field Terrain" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Biome Field Terrain</strong><span>Generated asset preview · threejs-procedural-fields · Generated biome maps are reduced-tier diagnostics. The production field path remains shared CPU/TSL parity plus compute/storage bakes when reuse justifies it.</span></figcaption>
       </figure></a>
       <a href="demos/frost-generated-crystals/"><figure>
-        <img src="visual-validation/frost-generated-crystals/final.design.png" alt="Frost Crystal Surface" loading="lazy" />
-        <figcaption><strong>Frost Crystal Surface</strong><span>threejs-dynamic-surface-effects · Generated frost crystal fields are used as live scene inputs for surface structure, tint, and thaw diagnostics.</span></figcaption>
+        <img src="visual-validation/frost-generated-crystals/final.design.png" alt="Frost Crystal Surface" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Frost Crystal Surface</strong><span>Generated asset preview · threejs-dynamic-surface-effects · Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.</span></figcaption>
       </figure></a>
       <a href="demos/materials-generated-lava-causes/"><figure>
-        <img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Lava Cause Material" loading="lazy" />
-        <figcaption><strong>Lava Cause Material</strong><span>threejs-procedural-materials · Generated lava cause maps are used as live scene inputs for PBR crust, normal relief, and raw emissive response.</span></figcaption>
+        <img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Lava Cause Material" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Lava Cause Material</strong><span>Generated asset preview · threejs-procedural-materials · Generated lava maps are reduced-tier diagnostic inputs. The production material path remains NodeMaterial PBR slots with HDR emissive and BloomNode ownership.</span></figcaption>
       </figure></a>
       <a href="demos/ocean-generated-wave-seeds/"><figure>
-        <img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Directional Wave Seed Surface" loading="lazy" />
-        <figcaption><strong>Directional Wave Seed Surface</strong><span>threejs-spectral-ocean · Generated directional wave seeds are used as live scene inputs for reduced-tier displacement and slope diagnostics.</span></figcaption>
+        <img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Directional Wave Seed Surface" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Directional Wave Seed Surface</strong><span>Generated asset preview · threejs-spectral-ocean · Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.</span></figcaption>
       </figure></a>
       <a href="demos/space-generated-starfields/"><figure>
-        <img src="visual-validation/space-generated-starfields/final.design.png" alt="Curved-Ray Starfield Preview" loading="lazy" />
-        <figcaption><strong>Curved-Ray Starfield Preview</strong><span>threejs-black-holes-and-space-effects · Generated star tiles are used as live scene inputs for a repeatable background around a bounded lensing proxy.</span></figcaption>
+        <img src="visual-validation/space-generated-starfields/final.design.png" alt="Curved-Ray Starfield Preview" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Curved-Ray Starfield Preview</strong><span>Generated asset preview · threejs-black-holes-and-space-effects · Generated star tiles are distant/background-tier inputs. The production space path remains bounded adaptive ray integration and final-direction environment lookup.</span></figcaption>
       </figure></a>
       <a href="demos/vegetation-generated-meadow-density/"><figure>
-        <img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Meadow Density Placement" loading="lazy" />
-        <figcaption><strong>Meadow Density Placement</strong><span>threejs-procedural-vegetation · Generated meadow density maps are used as live scene inputs for placement, path clearing, flower tint, and LOD response.</span></figcaption>
+        <img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Meadow Density Placement" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Meadow Density Placement</strong><span>Generated asset preview · threejs-procedural-vegetation · Generated meadow maps are reduced-tier diagnostic inputs. The production vegetation path remains chunked compute/storage instance data, patch culling, and rooted wind.</span></figcaption>
       </figure></a>
       <a href="demos/rain-generated-ripples/"><figure>
-        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Wet Surface Ripple Normals" loading="lazy" />
-        <figcaption><strong>Wet Surface Ripple Normals</strong><span>threejs-rain-snow-and-wet-surfaces · Generated ripple normal variants are used as live scene inputs for wet asphalt lighting response.</span></figcaption>
+        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Wet Surface Ripple Normals" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Wet Surface Ripple Normals</strong><span>Generated asset preview · threejs-rain-snow-and-wet-surfaces · The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.</span></figcaption>
       </figure></a>
       <a href="demos/planet-generated-craters/"><figure>
-        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Reduced-Tier Crater Mask Planet" loading="lazy" />
-        <figcaption><strong>Reduced-Tier Crater Mask Planet</strong><span>threejs-procedural-planets · Generated crater mask channels are used as live scene inputs for relief and material response on a WebGPU sphere.</span></figcaption>
-      </figure></a>
-  </div>
-</div></div>
+        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Reduced-Tier Crater Mask Planet" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Reduced-Tier Crater Mask Planet</strong><span>Generated asset preview · threejs-procedural-planets · Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.</span></figcaption>
+      </figure></a></div></details>
+</div></section>
+
+</main>
 
 <script>
 const copyInstallButton = document.querySelector('[data-copy-install]');
@@ -935,8 +1363,9 @@ copyInstallButton?.addEventListener('click', async () => {
 </script>
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

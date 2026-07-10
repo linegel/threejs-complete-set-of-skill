@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "labId": "debugging-contract-lab",
+  "kind": "canonical-lab",
+  "status": "accepted",
+  "canonicalSource": [
+    "threejs-debugging/SKILL.md",
+    "threejs-debugging/references/upstream-research.md",
+    "threejs-debugging/examples/triage-cases.json",
+    "threejs-debugging/examples/debugging-contract.test.mjs",
+    "threejs-debugging/examples/debugging-contract-lab/app.mjs",
+    "threejs-debugging/examples/debugging-contract-lab/contract-lab.test.mjs"
+  ],
+  "sourceHashInputs": [
+    "threejs-debugging/examples/debugging-contract-lab",
+    "threejs-debugging/examples/debugging-contract.test.mjs",
+    "threejs-debugging/examples/triage-cases.json",
+    "threejs-debugging/references/upstream-research.md",
+    "threejs-debugging/SKILL.md"
+  ],
+  "browserEntry": "threejs-debugging/examples/debugging-contract-lab/index.html",
+  "sourceHash": "sha256:f2bdc1ae6bdef99e8072c87235bb5fbbd0d89c1aaff0eb4a095824635fa9e989",
+  "publishedHashInputs": [
+    "docs/demos/debugging-contract-lab",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:04844db076eb0e4759b5cdb341cfd4f844f662fb5a270bda2a734428d26a87ef",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

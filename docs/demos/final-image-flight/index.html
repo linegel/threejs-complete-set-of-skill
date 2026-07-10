@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="demo-kind" content="integration-demo">
+  <meta name="acceptance-status" content="incomplete">
+  <meta name="integration-contract" content="./contract.json">
+  <title>Final Image Flight | Three.js WebGPU Demo</title>
+
+  <meta name="lab-id" content="final-image-flight">
+  <meta name="acceptance-status" content="incomplete">
+  <style>.lab-status-banner{position:fixed;z-index:2147483647;top:10px;left:50%;transform:translateX(-50%);max-width:min(800px,calc(100vw - 20px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.95);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.lab-status-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU/TSL demo for Final Image Flight, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/final-image-flight/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="Final Image Flight | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU/TSL demo for Final Image Flight, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta property="og:url" content="https://threejs-skills.com/demos/final-image-flight/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Final Image Flight | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU/TSL demo for Final Image Flight, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/final-image-flight/#demo","name":"Final Image Flight","description":"Interactive Three.js WebGPU/TSL demo for Final Image Flight, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.","url":"https://threejs-skills.com/demos/final-image-flight/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Image Pipeline"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Image Pipeline","item":"https://threejs-skills.com/skills/threejs-image-pipeline.html"},{"@type":"ListItem","position":3,"name":"Final Image Flight","item":"https://threejs-skills.com/demos/final-image-flight/"}]}]}</script>
+  <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.webgpu.js","three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+  <script type="module" crossorigin src="../assets/index-CdoOh6WS.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BLzGo2sq.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl-Bsul1SiG.js">
+  <link rel="modulepreload" crossorigin href="../assets/BloomNode-Dex_Xd1i.js">
+  <link rel="modulepreload" crossorigin href="../assets/CameraDirectionController-CbgWpZkH.js">
+  <link rel="modulepreload" crossorigin href="../assets/main-DxXTu6jM.js">
+  <link rel="modulepreload" crossorigin href="../assets/main-BvnIUL3a.js">
+  <link rel="modulepreload" crossorigin href="../assets/GTAONode-Dz5bb6F0.js">
+  <link rel="modulepreload" crossorigin href="../assets/TRAANode-D9aLA1tV.js">
+  <link rel="modulepreload" crossorigin href="../assets/main-DK_l1vVQ.js">
+  <link rel="modulepreload" crossorigin href="../assets/host-adapter-kjrA2RCI.js">
+  <link rel="modulepreload" crossorigin href="../assets/node-selective-bloom-Cv8JY377.js">
+  <link rel="modulepreload" crossorigin href="../assets/stage-D6asUQDH.js">
+  <link rel="modulepreload" crossorigin href="../assets/shadow-architectures-4IjQZLCs.js">
+  <link rel="modulepreload" crossorigin href="../assets/readback-DKeMx131.js">
+  <link rel="stylesheet" crossorigin href="../assets/index-R7IV7aRd.css">
+</head>
+<body><aside class="lab-status-banner"><strong>Canonical lab incomplete.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../registry.json">Registry</a>.</aside>
+  <main class="shell">
+    <section class="viewport" aria-label="Final Image Flight WebGPU viewport"><canvas data-flight-canvas width="1200" height="800"></canvas></section>
+    <aside class="panel">
+      <p class="eyebrow">Native WebGPU · integration evidence pending</p>
+      <h1>Final Image Flight</h1>
+      <p data-flight-status class="status">Initializing the sole WebGPU renderer and RenderPipeline…</p>
+      <div class="controls">
+        <label>Output mode<select data-flight-mode></select></label>
+        <label>Camera<select data-flight-camera></select></label>
+        <label>Seed<select data-flight-seed></select></label>
+      </div>
+      <pre data-flight-debug aria-live="polite">Awaiting first render…</pre>
+    </aside>
+  </main>
+</body>
+</html>

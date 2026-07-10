@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-procedural-timelines",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/gpu-instance-motion.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/browser.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/launch-and-staging/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/spin-docking/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/debris-release/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/quaternion-and-reparent/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/compute-storage/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/interpolation-and-velocity/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/full/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/balanced/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/test-minimum/index.html"
+  ],
+  "sourceHashInputs": [
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
+  ],
+  "browserEntry": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
+  "sourceHash": "sha256:19124fd4449829f795f22a3b12d3309b52b2058db6968dd0c65f844ac73b5ecc",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-procedural-timelines",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:20f333523604e37f50fec42c6f844175b95b0e88ad4bc71c3eca96cba83ab981",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

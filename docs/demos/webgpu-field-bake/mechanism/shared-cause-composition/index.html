@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="lab-mechanism" content="shared-cause-composition">
+  <meta name="description" content="Fixed mechanism state for WebGPU Field Bake; the canonical interactive demo contains the indexable content.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://threejs-skills.com/demos/webgpu-field-bake/">
+  <title>webgpu-field-bake — mechanism shared-cause-composition</title>
+  <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#080b10;color:#ece8de}body{overflow:hidden}.route-blocker{box-sizing:border-box;max-width:760px;height:auto;margin:10vh auto;padding:28px;border:1px solid #ff6b6b;background:#111722;font:15px/1.55 system-ui,sans-serif}.route-blocker code{color:#ffb454}</style>
+</head>
+<body>
+  <iframe id="canonical-lab" title="webgpu-field-bake — mechanism shared-cause-composition" src="../../?mechanism=shared-cause-composition" allow="fullscreen"></iframe>
+  <script type="module">
+    const frame = document.querySelector('#canonical-lab');
+    const startup = {"scenario":"shared-cause-composition"};
+    const setterCalls = [{"setter":"setScenario","value":"shared-cause-composition"}];
+    const routeKind = "mechanism";
+    const routeId = "shared-cause-composition";
+    const acknowledgementKeys = ["mechanism","mechanismId","activeMechanism","scenario","scenarioId","mode"];
+    const startupAcknowledgementKeys = {"scenario":["scenario","scenarioId","activeScenario"],"mode":["mode","modeId","activeMode"],"tier":["tier","tierId","activeTier","quality","qualityTier"],"seed":["seed","currentSeed"],"camera":["camera","cameraId","activeCamera"],"time":["time","timeSeconds","currentTime"]};
+    frame.addEventListener('load', async () => {
+      try {
+        const controller = await Promise.resolve(
+          frame.contentWindow.labController
+          ?? frame.contentWindow.__LAB_CONTROLLER__
+          ?? frame.contentWindow.__labController
+          ?? null
+        );
+        if (!controller) throw new Error('Canonical lab did not expose labController or __LAB_CONTROLLER__.');
+        if (typeof controller.ready !== 'function') throw new Error('Canonical lab controller has no ready() method.');
+        await controller.ready();
+        for (const call of setterCalls) {
+          if (typeof controller[call.setter] !== 'function') throw new Error('Canonical lab controller has no ' + call.setter + '() method.');
+          await controller[call.setter](call.value);
+        }
+        if (typeof controller.renderOnce === 'function') await controller.renderOnce();
+        if (typeof controller.getMetrics !== 'function') throw new Error('Canonical lab controller has no getMetrics() route acknowledgement.');
+        const metrics = await controller.getMetrics();
+        const nested = metrics?.routeSelection;
+        const normalizeRouteValue = (value) => value && typeof value === 'object' ? (value.id ?? value.name ?? null) : value;
+        const candidates = (keys, kind) => [
+          ...keys.map((key) => metrics?.[key]),
+          nested?.[kind],
+          nested?.kind === kind ? nested.id : null
+        ].map(normalizeRouteValue);
+        const directAcknowledgement = candidates(acknowledgementKeys, routeKind).includes(routeId);
+        const startupEntries = Object.entries(startup);
+        const startupAcknowledged = startupEntries.every(([key, expected]) => (
+          candidates(startupAcknowledgementKeys[key] ?? [], key).includes(expected)
+        ));
+        if (!startupAcknowledged) {
+          throw new Error('Canonical lab setters did not apply every explicit locked startup value.');
+        }
+        if (!directAcknowledgement && startupEntries.length === 0) {
+          throw new Error('Canonical lab did not acknowledge locked ' + routeKind + ' route "' + routeId + '" in getMetrics().');
+        }
+        window.labController = controller;
+        window.dispatchEvent(new CustomEvent('lab-route-ready', { detail: { kind: "mechanism", id: "shared-cause-composition", startup } }));
+      } catch (error) {
+        window.__LAB_ROUTE_ERROR__ = String(error?.stack ?? error);
+        const message = String(error?.stack ?? error).replace(/[&<>]/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[character]));
+        document.body.innerHTML = '<main class="route-blocker"><h1>Locked route failed</h1><p>This route cannot silently fall back to a default state.</p><pre><code>' + message + '</code></pre></main>';
+      }
+    });
+  </script>
+</body>
+</html>

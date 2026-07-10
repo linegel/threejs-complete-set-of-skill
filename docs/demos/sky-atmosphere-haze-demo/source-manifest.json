@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "sky-atmosphere-haze-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:61cce1f93d01278d105b77547a037caf639b32fc5fa76d6a5f5e13e56bc4a290",
+  "publishedHashInputs": [
+    "docs/demos/sky-atmosphere-haze-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:1ae2697a1d2ee3e019a58d1c6544ac14b13583f186926bc99cacf26391bf425b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

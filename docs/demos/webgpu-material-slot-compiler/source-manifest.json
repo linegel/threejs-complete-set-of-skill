@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-material-slot-compiler",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
+  ],
+  "sourceHashInputs": [
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
+  ],
+  "browserEntry": "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/index.html",
+  "sourceHash": "sha256:7ad7958a7bf3a2a3bdda298b38666f2e4f4983b7b0780aef6b74d4795e99da3b",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-material-slot-compiler",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:7c3353e8dc8b47fa8970c84c8cfc9b8eb00490cd22e956db7c94488e91432f65",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

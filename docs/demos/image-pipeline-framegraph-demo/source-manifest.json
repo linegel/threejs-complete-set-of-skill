@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "image-pipeline-framegraph-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-image-pipeline/examples/webgpu-image-pipeline",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:48fd78a732d2f8b0ba32cc219fd9bb69ecc2885c9ea6c2cf8ab378d422b849f2",
+  "publishedHashInputs": [
+    "docs/demos/image-pipeline-framegraph-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:1d3d1d8eae893752e4256f8320471a868fbf87953d5ebcb6fcb4b4c0c0ea4afa",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

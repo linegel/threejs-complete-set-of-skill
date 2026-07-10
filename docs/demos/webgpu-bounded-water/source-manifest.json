@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-bounded-water",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-water-optics/examples/webgpu-bounded-water",
+    "scripts/capture-lab-browser.mjs",
+    "scripts/lib/evidence-v2.mjs"
+  ],
+  "sourceHashInputs": [
+    "labs/runtime/aligned-readback.mjs",
+    "scripts/capture-lab-browser.mjs",
+    "scripts/lib/evidence-v2.mjs",
+    "scripts/lib/lab-registry.mjs",
+    "scripts/lib/png-rgba.mjs",
+    "scripts/lib/vite-lab-config.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-water-optics/examples/webgpu-bounded-water"
+  ],
+  "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
+  "sourceHash": "sha256:9995f2b2ec9854d4653c2d23486bcaf2e441bb742f5121f7f5989b473ebb0265",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-bounded-water",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:675bbe4eb793f01373d151f9748d6ca949478468d66c8eec7dda8edddee29318",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

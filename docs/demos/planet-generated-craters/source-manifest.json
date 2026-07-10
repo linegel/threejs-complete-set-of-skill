@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "planet-generated-craters",
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:06bf9efd5d64e399aeee6cef790af08b3ef43074302d4dd6d20242ec8fd15979",
+  "publishedHashInputs": [
+    "docs/demos/planet-generated-craters",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:afdcdaf781b1bc6245bd8c2ea77516c1df2a62f5c2f9e64360ffa24e3b5091db",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

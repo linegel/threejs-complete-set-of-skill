@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-shadow-architecture-bench",
+  "kind": "mechanism-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/main.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical-lab.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical-lab.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/routes.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench"
+  ],
+  "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
+  "sourceHash": "sha256:40940db67adf92fe7da2e55717e3ef0b5a58e672e51dddf4a986618f97628367",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-shadow-architecture-bench",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:09dfb2c133e6521b66d41da64e5e75332eb20201039e69ecb410c1e985a532af",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

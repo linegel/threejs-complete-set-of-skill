@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "shadow-cascade-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:55c4cd97c49ab7157f8eec431487e238b76b239ebd8f2ee634147fd5494124db",
+  "publishedHashInputs": [
+    "docs/demos/shadow-cascade-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:360a8ad15b9550712438d271b030f6138db00d4063dcef201d8aef0a346cb33e",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

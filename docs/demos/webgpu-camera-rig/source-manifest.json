@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-camera-rig",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraRelativeOrigin.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/routeState.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/main.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/browser.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/scale-aware-framing/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/handoff-and-replay/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/pointer-orbit-and-collision/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/floating-origin/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/projection-and-depth/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/shared-jitter-and-velocity/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/full/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/budgeted/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/minimum/index.html"
+  ],
+  "sourceHashInputs": [
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
+  ],
+  "browserEntry": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
+  "sourceHash": "sha256:65da557ed0239e743e9d91115cf57a8dd06a29116d833538042104aa486c60e2",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-camera-rig",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:353673bdd8af1e4b128f0ff2001211bcab27bab46ea6ecb29a44546f5d50a794",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

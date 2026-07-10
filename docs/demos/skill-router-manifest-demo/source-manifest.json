@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "skill-router-manifest-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-choose-skills/examples/router-contract.test.mjs",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-choose-skills/examples/router-contract.test.mjs"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:87900d2ec1b540e0c9b3345caa24c832ab0323fa2aad55031ecd7cf5d3e8ca95",
+  "publishedHashInputs": [
+    "docs/demos/skill-router-manifest-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:42e42bf6afb14eb821ce85fea83687d3c9d1195d6c8aaa0f3fd74870300dd98c",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

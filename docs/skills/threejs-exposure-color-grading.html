@@ -3,53 +3,73 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Exposure and Color Grading — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-exposure-color-grading.html" />
+<title>Exposure And Color Grading | Three.js WebGPU Skill</title>
+<meta name="description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Exposure and Color Grading — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-exposure-color-grading.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Exposure and Color Grading visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Exposure and Color Grading visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Exposure And Color Grading evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Exposure And Color Grading evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Exposure and Color Grading — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading." />
+<meta name="twitter:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Exposure and Color Grading — Three.js WebGPU agent skill",
-   "description": "Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-exposure-color-grading.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
-   "dateModified": "2026-07-05T01:26:45+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html#article",
+   "headline": "Exposure And Color Grading | Three.js WebGPU Skill",
+   "description": "Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.",
+   "url": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
     "WebGPU",
     "TSL",
-    "Exposure and Color Grading"
+    "Exposure And Color Grading"
    ]
   },
   {
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Cameras, Lighting, and Final Image",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
-     "name": "Exposure and Color Grading",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-exposure-color-grading.html"
+     "name": "Exposure And Color Grading",
+     "item": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="">
   
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Exposure and Color Grading</p>
-    <h1>Exposure and Color Grading</h1>
-    <p class="lede">Build a maximum-performance WebGPU/TSL exposure and grading path in Three.js. Use for compute-reduced luminance metering, storage-buffer exposure state, shader-side asymmetric adaptation, single tone-map/output ownership, and post-tone-map lut3D color grading.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Exposure And Color Grading</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-exposure-color-grading">Exposure And Color Grading</h1>
+    <p class="lede">Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-exposure-color-grading</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">1 runnable example</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T01:26:45+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/a20dfa242eed243b10804d395d2a25e452375a5d">commit a20dfa2 ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">2 flagships</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-exposure-color-grading/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,101 +275,35 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/exposure-color-grading-demo/"><figure>
-        <div class="live-visual live-visual--exposure" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
-        <strong>HDR meter + adapted exposure state</strong>
-        <span class="lv-m">final / identity-lut / meter-debug</span>
-      </div>
-        <figcaption><strong>Scene-Referred Exposure Rig</strong><span>A scene-referred meter drives asymmetric exposure adaptation before tone-map-domain grading.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline">
-        <h4>webgpu-exposure-color-pipeline</h4>
-        <span class="card-meta">threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline</span>
+      <a class="card" href="../demos/webgpu-exposure-color-pipeline/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>WebGPU Exposure Color Pipeline</h3>
+        <p>5 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Exposure and Color Grading</h2>
-<p>Lead with the fastest architecture: one <code>WebGPURenderer</code>, one node
-<code>RenderPipeline</code>, HDR scene color in <code>HalfFloatType</code>, GPU compute reduction for
-metering, storage-buffer exposure state, one tone-map owner, <code>lut3D()</code> in a
-documented post-tone-map domain, and one final output conversion. <code>lut3D</code> is an
-addon, not a <code>three/tsl</code> core export:
-<code>import { lut3D } from &#39;three/addons/tsl/display/Lut3DNode.js&#39;</code>.</p>
-<p>Do not tune color by stacking compensating operations. Exposure, tone mapping,
-creative grading, gamut handling, antialiasing, and output conversion each own
-one named stage.</p>
-<h2>Order</h2>
-<pre><code class="language-text">HDR scene pass / MRT
-  -&gt; HDR effects such as bloom
-  -&gt; compute luminance reduction into storage buffers
-  -&gt; compute adapted exposure state
-  -&gt; apply adapted exposure in TSL
-  -&gt; tone map into bounded post-tone-map linear display domain
-  -&gt; lut3D color grade in that documented domain
-  -&gt; optional gamut compression / dithering / FXAA in named domain
-  -&gt; renderOutput(..., NoToneMapping, renderer.outputColorSpace)
-</code></pre>
-<p>Read <a href="references/scene-referred-color-pipeline.md">references/scene-referred-color-pipeline.md</a>
-for the compute meter, quality tiers, budgets, color-space ownership rules, LUT
-setup, and replacements for the old meter/readback path.</p>
-<h2>Capability Gate</h2>
-<pre><code class="language-js">await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend ) {
-  await renderer.computeAsync( exposureWarmupNodes );
-  quality.exposure = &#39;compute-histogram&#39;;
-} else {
-  throw new Error( &#39;WebGPU backend unavailable for the canonical exposure path.&#39; );
-}
-</code></pre>
-<p>Budgeted WebGPU tiers may use lower metering cadence, authored shot tables, or
-smaller LUTs inside the canonical WebGPU/TSL architecture. Do not build a
-parallel shader pipeline inside this skill.
-If, and only if, the user explicitly asks how to apply fallback when WebGPU is unavailable,
-route that teaching to <code>../threejs-compatibility-fallbacks/</code>.</p>
-<h2>Failure conditions</h2>
-<ul>
-<li>the meter renders a tiny target and reduces it on the CPU;</li>
-<li>per-frame readback blocks exposure or drives the in-frame result;</li>
-<li>tone mapping occurs in both materials and post;</li>
-<li><code>renderer.toneMappingExposure</code> and adapted exposure both animate;</li>
-<li><code>renderOutput()</code> is placed before a LUT that expects linear display-domain input;</li>
-<li>exposure is used to repair physically inconsistent light ratios;</li>
-<li>meter weighting, masks, and percentile clipping are not inspected;</li>
-<li>adaptation speed is symmetric toward light and dark;</li>
-<li>LUT input/output domains are undocumented;</li>
-<li>output conversion happens twice;</li>
-<li>a post-tone-map LUT is moved before tone mapping without being rebuilt.</li>
-</ul>
-<h2>Routing boundary</h2>
-<p>Run <code>$threejs-choose-skills</code> preflight for broad final-image ownership. Use
-<code>$threejs-bloom</code> for HDR glow contribution, <code>$threejs-image-pipeline</code> when this
-path shares ownership with AO, atmosphere, velocity/history, or effect-local
-targets, and <code>$threejs-visual-validation</code> for exposure/LUT regression scenes.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-dynamic-surface-effects.html">← Dynamic Surface Effects</a>
-    <a href="threejs-image-pipeline.html">Image Pipeline →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/final-image-flight/">
+        <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Final Image Flight</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/relativistic-space-shot/">
+        <span class="card-head"><span class="card-index">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Relativistic Space Shot</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -332,10 +321,200 @@ $c' = \operatorname{LUT}_{3D}(\operatorname{tonemap}(E\cdot L))$. Two owners of 
 transform is the classic double-transform bug.</p></div>
   </div></div>
 
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Exposure And Color Grading</h2>
+<p>Use one <code>WebGPURenderer</code>, one <code>RenderPipeline</code>, one scene-linear HDR source, one
+GPU-resident exposure state per declared exposure-control group, one tone-map
+owner, and one output conversion owner. A group may span target/views only when
+their radiance binding, meter mask, exposure-key policy, sample-time policy, and
+reset history are identical. Choose the meter by measured marginal cost. For an exact global mean, a
+direct full-pixel reduction has fewer intermediate writes than an exposure-only
+pyramid; a sampled estimator reads fewer source pixels but is not exact.</p>
+<p>Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md">references/scene-referred-color-pipeline.md</a>
+before implementation. It defines the metering decision, temporal taps, EV
+adaptation, LUT domains, r185 API proof, and measured budget contract.</p>
+<h2>Numeric Evidence Rule</h2>
+<p>Every numeric value in an implementation or recommendation must carry one tag:</p>
+<ul>
+<li><code>[Derived]</code>: follows from a formula, format, dimensions, or verified API;</li>
+<li><code>[Gated]</code>: legal only after a named capability/correctness gate;</li>
+<li><code>[Measured]</code>: captured on the named browser, device, resolution, and graph;</li>
+<li><code>[Authored]</code>: an intentional look/control starting value, never a performance
+fact.</li>
+</ul>
+<p>Do not publish an untagged workgroup size, sample grid, percentile, EV clamp,
+time constant, LUT dimension, cadence, memory figure, or timing target.</p>
+<h2>Canonical Ordering</h2>
+<pre><code class="language-text">scene-linear lighting / AO / atmosphere
+  -&gt; temporal reconstruction of stable scene radiance, when enabled
+  -&gt; meter tap from resolved pre-bloom HDR by default
+  -&gt; bloom and other authored scene-linear optical contributions
+  -&gt; apply adapted exposure
+  -&gt; tone map
+  -&gt; tone-mapped-linear LUT, when that is the LUT contract
+  -&gt; output conversion
+  -&gt; display-encoded effects / dither / UI, when their domains require it
+</code></pre>
+<p>The pre-bloom tap avoids an exposure/bloom feedback loop. Metering bloom is an
+<code>[Authored]</code> shot policy and must be regression-tested. Keep temporal history
+unexposed; otherwise rescale history by the exposure ratio or reject it.</p>
+<h2>Lighting-Transport And Physics Snapshot Contract</h2>
+<p>When the route declares a physics-to-render boundary, consume the immutable
+<code>PhysicsPresentationCandidate</code> -&gt; <code>CameraViewPublication</code> -&gt;
+<code>ViewPreparationPublication</code> -&gt;
+<code>PhysicsPresentationSnapshot</code> chain and bind its matching
+<code>LightingTransportSnapshot</code> through a provider-wide <code>PresentedStatePair</code>
+(<code>entityId: typed-absence</code>) in the Candidate and referenced by the Snapshot, as defined by the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
+Validate the exact central lighting and presentation schemas; do not redeclare
+an exposure-local record. Each consumed <code>incidentRadiance</code>,
+<code>surfaceIrradiance</code>, <code>directSolarIrradiance</code>, <code>skyIrradiance</code>, <code>transmittance</code>,
+and <code>sourceDirection</code> channel has its own basis, quantity, SI unit,
+<code>sampleInstant</code>/<code>actualPhysicsTime</code>, validity, and error. Normalization belongs only to the derived
+render-local signal described below. Applied atmosphere/cloud/
+visibility factors are versioned through <code>attenuationFactorIds</code>. Match the
+pair&#39;s context/provider/signal IDs, descriptor/state/resource generations,
+<code>PresentationStateHandle</code>, requested presentation instant and mapped source
+instant. Channel clocks may differ from the presentation clock only through the
+declared <code>PresentationSampleProvenance</code> clock mapping; validate channel
+<code>actualPhysicsTime</code>, age, filter, maximum staleness, validity, and error against
+the target/view <code>currentRenderSampleInstant</code>.</p>
+<p>Canonical lighting-provider channels remain SI-valued. The meter input is
+scene-linear radiance in the declared working basis. A physically calibrated
+render basis may retain those units. A normalized RGB render basis is a
+separately named render-local signal produced by a versioned SI-to-render
+conversion with reference scale, provenance, and error; it is not a normalized
+canonical lighting channel. Do not let auto exposure conceal incompatible
+radiance/irradiance units or per-skill compensating gains.
+If transport values are irradiance, the lighting model converts them through
+the declared BRDF/emission contract before the radiance meter tap.
+A nonphysical route leaves the router physics fields <code>not used</code> and declares
+only its render-local color contract.</p>
+<p><code>ViewPreparationPublication.reactivePublications</code> and
+<code>ViewPreparationPublication.resetDependencies</code>
+distinguish local radiance changes
+from basis changes. Shadow commits and discontinuous foam/emissive/optical
+updates flow through the meter normally and do not reset adaptation by default.
+A change to radiance scale/basis, working primaries, quantity convention, or
+the authored exposure key must either provide an exact EV conversion or reseed
+meter accumulation and adapted state before use. Invalid lighting executes a
+bounded canonical <code>hold-prior</code> action or selects an explicitly authored fixed
+EV; it never mixes the bad sample into GPU state.</p>
+<p><code>ViewPreparationPublication.resetDependencies</code> is the immutable plan; record actual exposure conversion,
+reduction reset, reseed, hold, and GPU submission in <code>FrameExecutionRecord</code>.
+Do not use <code>computeAsync()</code> as a completion fence. Device loss invalidates the
+exposure buffers, meter history, and timing evidence, then appends a
+<code>FrameExecutionRecord</code> with <code>overallStatus: device-lost</code>, affected target
+execution statuses <code>device-lost</code>, cancelled dependent actions, and
+lost-generation entries in <code>leaseDispositionById</code>. The immutable snapshot remains audit
+evidence but its lost-generation resource references are not bindable; rebuild
+and reseed under the new backend/resource generation.</p>
+<h2>Meter Decision</h2>
+<p>Choose in dependency order:</p>
+<ul>
+<li>Prefer authored/fixed exposure for a controlled shot or product view.</li>
+<li>Otherwise use a stratified screen grid or tile sampler for the default global
+meter.</li>
+<li>Escalate to direct full-pixel hierarchical reduction when exact masks or
+subpixel emitters are acceptance requirements.</li>
+<li>Build an explicit log-luminance/weight pyramid only when another feature
+consumes its levels or spatial statistics.</li>
+<li>Add a log-luminance histogram only when percentile clipping solves a proven
+outlier or bimodal-lighting failure.</li>
+</ul>
+<p>Do not infer that an internal <code>BloomNode</code> pyramid is reusable: r185 exposes the
+bloom result, not its private mip chain.</p>
+<h2>Capability Gate</h2>
+<pre><code class="language-js">// r185 API literals and backend test: [Gated: installed source]
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;Native WebGPU is required for this exposure path.&#39; );
+}
+
+const canTimeGpu = renderer.hasFeature( &#39;timestamp-query&#39; );
+renderer.compute( exposureComputeNodes );
+</code></pre>
+<p><code>renderer.computeAsync()</code> is valid and initializes on demand, but in r185 it
+does not constitute a GPU-completion fence. Use <code>getArrayBufferAsync()</code> only for
+scheduled diagnostics; exposure must never wait for CPU readback.</p>
+<p>If, and only if, the user explicitly asks for teaching how to apply fallback
+when WebGPU is unavailable, route that request to
+<code>../threejs-compatibility-fallbacks/</code>.</p>
+<h2>Ownership Invariants</h2>
+<ul>
+<li>meter scene-linear working color, never transfer-encoded or graded color;</li>
+<li>adapt exposure in EV/log space in GPU state;</li>
+<li>keep <code>renderer.toneMappingExposure</code> fixed when adapted exposure is applied
+explicitly;</li>
+<li>use <code>toneMapping()</code> before a tone-mapped-linear LUT, then
+<code>renderOutput(..., NoToneMapping, renderer.outputColorSpace)</code>;</li>
+<li>use <code>renderOutput()</code> before a LUT only when that LUT is explicitly authored
+for the exact display primaries and transfer function;</li>
+<li>set <code>RenderPipeline.outputColorTransform = false</code> whenever the graph contains
+an explicit <code>renderOutput()</code>;</li>
+<li>set <code>renderPipeline.needsUpdate = true</code> after changing <code>outputNode</code> or output
+ownership.</li>
+</ul>
+<h2>Failure Conditions</h2>
+<ul>
+<li>a sampled grid is described as a full-pixel reduction, or vice versa;</li>
+<li>a one-sample-per-cell grid is trusted for tiny emitters without a jitter or
+box-filter validation;</li>
+<li>a histogram uses global per-pixel atomics instead of local aggregation without
+<code>[Measured]</code> proof;</li>
+<li>a luminance pyramid exists only for exposure and costs more traffic than the
+statistic it replaces;</li>
+<li>CPU readback drives current-frame exposure;</li>
+<li>readback staleness changes GPU exposure state;</li>
+<li>exposure is applied before temporal history without ratio compensation;</li>
+<li>bloom output meters itself through exposure feedback;</li>
+<li>tone mapping, transfer conversion, or dynamic exposure has two owners;</li>
+<li>LUT primaries, transfer, shaper, legal range, interpolation, and tone-map
+dependency are undocumented;</li>
+<li>an sRGB-encoded LUT is sampled as though it were tone-mapped linear data;</li>
+<li>authored numbers are presented as device budgets.</li>
+</ul>
+<h2>Routing Boundary</h2>
+<p>Run <code>$threejs-choose-skills</code> for broad ownership. Use
+<code>$threejs-image-pipeline</code> for shared MRT, temporal history, adaptive DPR, or
+transient-lifetime decisions; <code>$threejs-bloom</code> for the HDR glare source; and
+<code>$threejs-visual-validation</code> for fixed-view exposure and LUT evidence.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-dynamic-surface-effects.html">← Dynamic Surface Effects</a>
+    <a href="threejs-image-pipeline.html">Image Pipeline →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/exposure-color-grading-demo/"><figure>
+        <div class="live-visual live-visual--exposure" aria-hidden="true">
+        <span class="lv-k">Concept proxy</span>
+        <strong>HDR meter + adapted exposure state</strong>
+        <span class="lv-m">final / identity-lut / meter-debug</span>
+      </div>
+        <figcaption><strong>Scene-Referred Exposure Rig</strong><span>Concept proxy · The docs page simulates the meter state in live scene controls for readability. The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

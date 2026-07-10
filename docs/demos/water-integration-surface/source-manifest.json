@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "water-integration-surface",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-water-optics/EXPERIMENTAL/water-integration-surface",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-water-optics/EXPERIMENTAL/water-integration-surface"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:4b2959fc6e37bf7f39eadb3d08ddac108bb6d9418bc4e47ba4a6c0f2d0d1f8f8",
+  "publishedHashInputs": [
+    "docs/demos/water-integration-surface",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:b29b6a70891d643ad44dc15fac215022c39f1e8b2e4484efe9fab78de5353295",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

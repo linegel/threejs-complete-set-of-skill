@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "pooled-particles-effects-demo",
+  "kind": "proxy-demo",
+  "status": "secondary",
+  "canonicalSource": [
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects",
+    "scripts/provider-demos.mjs",
+    "labs/provider-proxies/provider-demo.mjs",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/generated-variants"
+  ],
+  "sourceHashInputs": [
+    "labs/provider-proxies/generated-variants",
+    "labs/provider-proxies/provider-demo.css",
+    "labs/provider-proxies/provider-demo.mjs",
+    "scripts/provider-demos.mjs",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
+  ],
+  "browserEntry": null,
+  "sourceHash": "sha256:fa7d7b297a96955a48f967e6730518b219a55a703a62cde8e8f39ea8aa89b0b5",
+  "publishedHashInputs": [
+    "docs/demos/pooled-particles-effects-demo",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:f36ba0ea2a51e99e3fcf2b9a70eb1cc1ebf52b3401709f8a2bbad922b9dfc1a6",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

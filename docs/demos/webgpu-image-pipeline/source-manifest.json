@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-image-pipeline",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-image-pipeline/examples/webgpu-image-pipeline"
+  ],
+  "sourceHashInputs": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline"
+  ],
+  "browserEntry": "threejs-image-pipeline/examples/webgpu-image-pipeline/index.html",
+  "sourceHash": "sha256:d50e5b0ce11ff03b4f8d95eaf17a18b99d275759de12bb63e39b818d263b50d4",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-image-pipeline",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:365a778c6d9696fecaab42f56c213eb1005ef30efa89c92b887074e2c9d1a933",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

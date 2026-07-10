@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-quadtree-planet",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/browser-lab.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-fields.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-field-atlas.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/patch-compute.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/integration-adapter.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/route-contract.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-tiers.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-mesh.js",
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-quadtree.js"
+  ],
+  "sourceHashInputs": [
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet"
+  ],
+  "browserEntry": "threejs-procedural-planets/examples/webgpu-quadtree-planet/index.html",
+  "sourceHash": "sha256:6c5063ccb8e9b53f5e7e7b9202e8f4073745a7c3f27705001c4190bc9b4d762f",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-quadtree-planet",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:8e4200945f46a4079c770f5d88db57534984975aefa1979a28304e9bb13c9a66",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}

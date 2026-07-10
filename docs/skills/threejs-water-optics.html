@@ -3,47 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Water Optics — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html" />
+<title>Water Optics | Three.js WebGPU Skill</title>
+<meta name="description" content="Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-water-optics.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<link rel="preload" as="image" href="../visual-validation/water-generated-caustics/final.design.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Water Optics — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/water-generated-caustics/final.design.png" />
+<meta property="og:title" content="Water Optics | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-water-optics.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Water Optics visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/water-generated-caustics/final.design.png" />
-<meta name="twitter:image:alt" content="Water Optics visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Water Optics evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png" />
+<meta name="twitter:image:alt" content="Water Optics evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Water Optics — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam." />
+<meta name="twitter:title" content="Water Optics | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Water Optics — Three.js WebGPU agent skill",
-   "description": "Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/water-generated-caustics/final.design.png",
-   "dateModified": "2026-07-05T12:41:19+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-water-optics.html#article",
+   "headline": "Water Optics | Three.js WebGPU Skill",
+   "description": "Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.",
+   "url": "https://threejs-skills.com/skills/threejs-water-optics.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-water-optics.html",
+   "image": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Worlds and Environments",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
      "name": "Water Optics",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-water-optics.html"
+     "item": "https://threejs-skills.com/skills/threejs-water-optics.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/water-generated-caustics/final.design.png" alt="Water Optics validation preview" fetchpriority="high" decoding="async" />
+  <img class="skill-hero-bg" src="../visual-validation/water-generated-caustics/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Worlds and Environments</a> / Water Optics</p>
-    <h1>Water Optics</h1>
-    <p class="lede">Build production WebGPU/TSL analytic and bounded water in Three.js. Use for compute StorageTexture heightfield simulation, TSL shared multi-wave displacement and normals, local drops, object ripples, differential-area caustics, depth-aware node refraction, NodeMaterial water optics, Beer-Lambert absorption, side-aware Fresnel, derivative-filtered normal bands, analytic sky reflection, and crest foam.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Water Optics</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-water-optics">Water Optics</h1>
+    <p class="lede">Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-water-optics</span>
-      <span class="chip">2 browser demos</span>
-      <span class="chip">3 runnable examples</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-05T12:41:19+03:00">2026-07-05</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/d15ebd2e85898dc3ef0a825ffcbafc20266446e9">commit d15ebd2 ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">2 flagships</span>
+<span class="chip">2 secondary surfaces</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-water-optics/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,343 +275,35 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/water-integration-surface/"><figure>
-        <img src="../visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" loading="lazy" />
-        <figcaption><strong>Water Integration Surface</strong><span>The bounded-water core integrates into a host scene with presets, quality selection, buoyancy, spray probes, deterministic ticks, transparent ordering, and mask-gap evidence.</span></figcaption>
-      </figure></a>
-      <a href="../demos/water-generated-caustics/"><figure>
-        <img src="../visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" loading="lazy" />
-        <figcaption><strong>Bounded Water Caustic Projection</strong><span>Generated caustic fields are used as live scene inputs for a bounded-water floor projection.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-  <div class="section" id="validation"><div class="wrap">
-    <h2>Validation gallery</h2>
-    <p class="sub">Evidence frames produced by this skill's validation contract.</p>
-    <div class="gallery">
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/water-generated-caustics/final.design.png" alt="Water Optics in Three.js WebGPU — Final design frame — generated caustics" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Final design frame — generated caustics</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/water-generated-caustics/no-post.design.png" alt="Water Optics in Three.js WebGPU — No-post baseline" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>No-post baseline</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Water Optics in Three.js WebGPU — Effect-isolation diagnostics mosaic" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Effect-isolation diagnostics mosaic</span></figcaption>
-      </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/water-generated-caustics/camera.near.png" alt="Water Optics in Three.js WebGPU — Near camera probe" itemprop="contentUrl" loading="lazy" />
-        <figcaption itemprop="caption"><span>Near camera probe</span></figcaption>
-      </figure>
-    </div>
-  </div></div>
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-water-optics/examples/analytic-wave-optics">
-        <h4>analytic-wave-optics</h4>
-        <span class="card-meta">threejs-water-optics/examples/analytic-wave-optics</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-water-optics/examples/interactive-pool-volume">
-        <h4>interactive-pool-volume</h4>
-        <span class="card-meta">threejs-water-optics/examples/interactive-pool-volume</span>
-      </a>
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-water-optics/examples/webgpu-bounded-water">
-        <h4>webgpu-bounded-water</h4>
-        <span class="card-meta">threejs-water-optics/examples/webgpu-bounded-water</span>
+      <a class="card" href="../demos/webgpu-bounded-water/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>WebGPU Bounded Water</h3>
+        <p>1 fixed scenarios, 6 mechanism routes, and 4 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Water Optics</h2>
-<p>Start with <code>$threejs-choose-skills</code> preflight when water interacts with a larger
-scene stack. Treat water as simulated state, geometry motion, surface
-orientation, and optical transport. A blue transparent material is not a water
-system.</p>
-<p>Use this skill to integrate a WebGPU water module into an existing Three.js
-project. Do not replace the host app. The host owns scenes, camera, controls,
-assets, transparent ordering, post-processing, physics, networking, and masks.
-The water module owns GPU-resident simulation, surface shading, depth-aware
-refraction inputs, impulses, surface queries, and diagnostics.</p>
-<p>For large stochastic seas driven by directional spectra and GPU FFTs, use
-<code>$threejs-spectral-ocean</code> instead.</p>
-<h2>Host Integration Contract</h2>
-<p>Minimum shape:</p>
-<pre><code class="language-js">const water = await createWebGPUBoundedWaterSystem(renderer, {
-  sceneColorScene: opaqueSceneWithoutWater,
-  camera,
-  tier: &quot;high&quot;,
-  parameters: preset.simulation,
-  timeNode: fixedTickTimeNode,
-});
-
-scene.add(water.mesh);
-
-function frame(deltaSeconds) {
-  fixedClock.step(deltaSeconds, (fixedDt, tick) =&gt; {
-    water.update(fixedDt);
-    buoyancy.update(waterQuery, fixedDt, tick);
-    spray.update(waterQuery, fixedDt, tick);
-  });
-
-  water.pipeline?.render();
-  renderer.render(scene, camera);
-}
-</code></pre>
-<p>The water mesh must not be in the opaque prepass scene it samples for
-refraction. Transparent host objects are normally excluded from that prepass and
-rendered after water unless the project implements a separate
-order-independent-transparency path.</p>
-<h2>Mandatory Architecture</h2>
-<p>The production path is latest Three.js <code>WebGPURenderer</code> from <code>three/webgpu</code>,
-TSL from <code>three/tsl</code>, <code>MeshPhysicalNodeMaterial</code> or
-<code>MeshStandardNodeMaterial</code>, <code>StorageTexture</code> compute ping-pong, and the node
-render pipeline. Build the highest-throughput algorithm first:</p>
-<ol>
-<li>Simulate bounded water in ping-ponged <code>StorageTexture</code> state with
-<code>Fn().compute(count)</code> and <code>renderer.compute()</code> or
-<code>renderer.computeAsync()</code>. Use a fixed timestep, no CPU readback, no
-render-pass simulation.</li>
-<li>Store height, previous height or velocity, packed normal/slope, validity,
-and caustic intensity in storage textures. Run drops, object impulses,
-propagation, normal reconstruction, and differential-area caustics in the
-same compute chain.</li>
-<li>Compute caustics from the local Jacobian/differential area with
-<code>max(area, epsilon)</code>, finite intensity clamps, and invalid-value
-diagnostics.</li>
-<li>Evaluate authored multi-wave displacement and analytic normals once as TSL
-functions shared by vertex displacement, lighting normals, crest metrics,
-foam, CPU-side camera clearance approximations, and debug views.
-Export the CPU coupling shape for the analytic component:
-<code>getWaterHeight(x, z, timeSeconds)</code>. This CPU evaluator imports the same
-<code>AUTHORED_WAVES</code> list used by the TSL displacement path and has zero
-analytic parity error. The compute <code>StorageTexture</code> heightfield residual is
-not read back; its coupling gap is bounded by the declared impulse budget
-<code>dropStrength + objectDisplacementScale</code> in
-<code>examples/webgpu-bounded-water/constants.js</code> and the
-<code>estimateWaterVerticalAmplitude()</code> mesh-bounds calculation in
-<code>examples/webgpu-bounded-water/webgpu-bounded-water.js</code>.</li>
-<li>Composite the water through a <code>RenderPipeline</code>: use <code>pass()</code>, <code>mrt()</code> where
-the scene needs shared color/depth/normal data, <code>PassNode.setResolutionScale()</code>
-for reduced-resolution effects, and one final <code>outputColorTransform</code> or
-<code>renderOutput()</code> owner.</li>
-<li>Refract against scene color plus depth in TSL. Reject foreground samples,
-clamp screen UVs, fade invalid refraction to analytic sky/body color, and
-report the invalid fraction in diagnostics.</li>
-<li>Blend reflection, refraction, absorption, glints, caustics, and foam through
-side-aware Fresnel and an explicit energy budget.</li>
-<li>Expose integration contracts for presets, quality tiers, buoyancy queries,
-deterministic ticks, spray probes, transparent ordering, screen-space masks,
-and host-owned post-processing. These are host/module contracts, not a
-monolithic library API.</li>
-</ol>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/analytic-wave-optics/water-system.js</code>, <code>examples/interactive-pool-volume/water-volume-system.js</code>.</p>
-<h2>Capability Gate</h2>
-<p>Use one renderer path and degrade by quality tier, not by alternate shader
-stacks:</p>
-<pre><code class="language-js">const renderer = new WebGPURenderer({ antialias: false });
-await renderer.init();
-
-if (renderer.backend.isWebGPUBackend) {
-  await renderer.computeAsync([dropNode, propagateNode, normalCausticNode]);
-} else {
-  throw new Error(&#39;WebGPU backend unavailable for the canonical water optics path.&#39;);
-}
-</code></pre>
-<p>Quality tiers are resource and feature budgets inside the same WebGPU path:</p>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th>Backend condition</th>
-<th align="right">Heightfield</th>
-<th align="right">Analytic bands</th>
-<th>Refraction</th>
-<th>Caustics</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Ultra</td>
-<td>WebGPU discrete</td>
-<td align="right">512-1024 square</td>
-<td align="right">5 displaced + 4 micro</td>
-<td>full-res depth-aware</td>
-<td>compute differential area</td>
-</tr>
-<tr>
-<td>High</td>
-<td>WebGPU integrated/discrete</td>
-<td align="right">256-512 square</td>
-<td align="right">4 displaced + 3 micro</td>
-<td>depth-aware or half-res depth-aware</td>
-<td>compute differential area</td>
-</tr>
-<tr>
-<td>Medium</td>
-<td>WebGPU integrated</td>
-<td align="right">192-256 square</td>
-<td align="right">3-4 displaced + 1 micro</td>
-<td>half-res depth-aware</td>
-<td>compute differential area</td>
-</tr>
-<tr>
-<td>Low/Budgeted</td>
-<td>WebGPU mobile or low-power</td>
-<td align="right">128-256 square</td>
-<td align="right">2-3 bands</td>
-<td>clamped depth-aware or body color</td>
-<td>lower-resolution computed caustics</td>
-</tr>
-</tbody></table>
-<p>If the user explicitly asks how to apply fallback when WebGPU is unavailable,
-route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead of adding
-it to this flagship path.</p>
-<p>Runtime quality changes are resource rebuilds. Preserve host-level state across
-the rebuild: authoritative tick, active preset, registered buoyancy objects,
-spray emitters, masks, transparent ordering, and post-processing output owner.</p>
-<h2>Integration Features</h2>
-<p>Presets are data bundles. They configure water simulation, optics, foam, spray
-defaults, and optional quality preference. Sky, lighting, fog, and grading stay
-host-owned; a preset may provide host hints, but it must not take scene
-ownership.</p>
-<p>Buoyancy is host/physics code using a stable surface query:</p>
-<pre><code class="language-js">const y = waterQuery.getWaterHeight(x, z, tick * stepSize);
-</code></pre>
-<p>Keep active buoyancy samples under 128 unless the project states another
-budget. Multi-point hulls use stable local-space samples; single-point floats
-scale by object count. Do not read GPU heightfield textures back each frame.
-Submit object motion back to the GPU with an impulse contract such as
-<code>setObjectImpulse({ oldCenter, newCenter, radius, strength })</code>.</p>
-<p>Deterministic multiplayer uses integer ticks:</p>
-<pre><code class="language-js">waterClock.syncToTick(authoritativeTick);
-water.update(fixedStepSeconds);
-</code></pre>
-<p>Shader time is <code>tick * fixedStepSeconds</code>. Cap catch-up steps, hash seeded drops
-and spray jitter from integers, and document tick wrap.</p>
-<p>Spray is an emitter/probe system coupled to the surface query. Probes live in
-object-local space and fire on signed-distance crossings whose impact speed
-exceeds <code>velocityThreshold</code>. System defaults are overridden by emitter values,
-then probe values. Probe indices stay stable when probes are disabled.</p>
-<p>Screen-space masking requires a host-owned mask registry and a water material
-mask sample. Mask meshes are invisible in the main scene, rendered into a
-<code>NoColorSpace</code> screen-space texture before water, and sampled by the water
-material to discard or fade masked fragments. A registry without a mask texture
-and material hook is not complete masking.</p>
-<p>Host-owned post-processing order is: opaque color/depth prepass, water
-refraction/absorption/reflection/foam, depth-dependent underwater haze or fog,
-anti-aliasing, bloom/glints, grading, final output transform.</p>
-<h2>Performance Budgets</h2>
-<p>Budget the water before styling it:</p>
-<table>
-<thead>
-<tr>
-<th>Target</th>
-<th>Simulation</th>
-<th>Storage</th>
-<th>Passes</th>
-<th align="right">Draws</th>
-<th align="right">Frame budget</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Desktop discrete</td>
-<td>512 square, 2-4 compute dispatches, 8x8 or 16x16 workgroups</td>
-<td>3-5 RGBA half-float storage textures, about 6-10 MiB at 512</td>
-<td>scene MRT + water + caustic/lighting + output</td>
-<td align="right">1-3</td>
-<td align="right">0.6-1.5 ms</td>
-</tr>
-<tr>
-<td>Desktop integrated</td>
-<td>256-384 square, 2-3 dispatches</td>
-<td>3-4 RGBA half-float storage textures, about 1.5-4.5 MiB</td>
-<td>half-res refraction/caustics where possible</td>
-<td align="right">1-3</td>
-<td align="right">1.0-2.5 ms</td>
-</tr>
-<tr>
-<td>Mobile WebGPU</td>
-<td>128-256 square</td>
-<td>2-3 compact textures</td>
-<td>reduced refraction, lower-resolution caustics</td>
-<td align="right">1-2</td>
-<td align="right">1.5-3.5 ms</td>
-</tr>
-</tbody></table>
-<p>Keep simulation resolution independent of canvas resolution. Update static
-parameters once, then update only drops, object impulses, propagation, normals,
-and caustics per fixed step. Prefer fewer, fused compute dispatches over many
-single-purpose passes when storage hazards allow it.</p>
-<h2>Color And Output</h2>
-<ul>
-<li>Color textures and environment maps use <code>SRGBColorSpace</code>.</li>
-<li>Height, velocity, normals, slope, caustic fields, masks, LUTs, and noise use
-<code>NoColorSpace</code>/linear data.</li>
-<li>Keep HDR working buffers as <code>HalfFloatType</code> until tone mapping.</li>
-<li>The node pipeline owns the only tone mapping and output conversion through
-<code>outputColorTransform</code> or a final <code>renderOutput()</code> node.</li>
-<li>Water materials and caustic nodes must not apply their own output conversion.</li>
-<li>Generate mipmaps only for sampled color/environment or prefiltered caustic
-variants; storage state used by compute normally keeps mipmaps disabled or
-explicitly generated by compute.</li>
-</ul>
-<h2>Reference</h2>
-<p>Read <a href="references/water-surface-system.md">references/water-surface-system.md</a>
-for the exact WebGPU/TSL build contract: storage heightfields, analytic
-multi-wave functions, normal filtering, differential-area caustics,
-depth-aware refraction, quality tiers, diagnostics, and replacement notes.</p>
-<p>Canonical WebGPU/TSL example: <a href="examples/webgpu-bounded-water">examples/webgpu-bounded-water</a>.</p>
-<h2>Failure Conditions</h2>
-<ul>
-<li>simulation state is read back to the CPU each frame;</li>
-<li>normal texture motion does not agree with displaced crests;</li>
-<li>bounded caustics are decorative projections detached from simulated height
-normals and differential area;</li>
-<li>caustic area division lacks epsilon clamps and finite-value diagnostics;</li>
-<li>refraction samples foreground objects without rejection and a documented
-invalid-sample policy;</li>
-<li>approximate path length is presented as reconstructed scene thickness;</li>
-<li>micro-waves alias into sparkling noise because derivative filtering is absent;</li>
-<li>foam is a scrolling texture unrelated to the shared crest metric;</li>
-<li>buoyancy uses per-frame GPU readback instead of an analytic or budgeted
-surface query;</li>
-<li>deterministic mode uses wall-clock time or uncapped catch-up instead of
-authoritative integer ticks;</li>
-<li>spray emitters are visual-only particles detached from surface crossings;</li>
-<li>transparent objects are included in the opaque refraction prepass by default;</li>
-<li>screen-space masks are claimed without a mask texture and water material hook;</li>
-<li>post-processing lets water own the final output transform inside a host stack;</li>
-<li>Fresnel is replaced by constant opacity;</li>
-<li>reflection, refraction, glints, crest tint, transparency, and foam are added
-without an energy budget;</li>
-<li>tone mapping or color conversion is applied more than once.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-spectral-ocean</code> for stochastic directional spectra, FFT cascades,
-Jacobian breaking, and persistent ocean foam. Use
-<code>$threejs-rain-snow-and-wet-surfaces</code> for rain-driven puddle wetness, ripple masks,
-and weather-coupled splashes on ground surfaces. This skill owns authored
-analytic waves, bounded compute heightfield simulation, differential-area
-caustics, pool-volume optical cues, and bounded-water optics.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-volumetric-clouds.html">← Volumetric Clouds</a>
-    <a href="threejs-ambient-contact-shading.html">Ambient Contact Shading →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/weathered-world/">
+        <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Weathered World</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/creature-habitat/">
+        <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Creature Habitat</h3>
+        <span class="card-meta">5 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -574,10 +321,618 @@ $$I_c \propto \left|\det \frac{\partial \mathbf x_{floor}}{\partial \mathbf x_{s
 \qquad F(\theta) = F_0 + (1-F_0)(1-\cos\theta)^5$$</div>
   </div></div>
 
+
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Evidence and asset previews</h2>
+    <p class="sub">Preserved diagnostic or generated-asset frames. Consult the demo registry before treating any frame as canonical runtime evidence.</p>
+    <div class="gallery">
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/final.design.png" alt="Water Optics in Three.js WebGPU — Generated caustic-texture preview fixture" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated caustic-texture preview fixture</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/no-post.design.png" alt="Water Optics in Three.js WebGPU — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview baseline</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Water Optics in Three.js WebGPU — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Generated-asset channel diagnostics</span></figcaption>
+      </figure>
+      <figure itemscope itemtype="https://schema.org/ImageObject">
+        <img src="../visual-validation/water-generated-caustics/camera.near.png" alt="Water Optics in Three.js WebGPU — Asset-preview near framing" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption itemprop="caption"><span>Asset-preview near framing</span></figcaption>
+      </figure>
+    </div>
+  </div></div>
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Water Optics</h2>
+<p>Use this skill for generated coastlines and archipelagos, bounded interactive
+water, authored analytic surfaces, shallow transparent volumes, wet/dry flow,
+and local optical effects. Use <code>$threejs-spectral-ocean</code> when the offshore
+spatial range is a stochastic directional sea synthesized by FFT cascades; its
+periodic field does not own transformation around islands or the shoreline.</p>
+<p>This is a simulation-and-transport contract, not a blue-material recipe. The
+module owns water state, displacement, derivatives, optical evaluation, and
+diagnostics. The host owns the renderer, scene partition, camera, lighting,
+transparent ordering, and final image pipeline.</p>
+<p>“Host owns lighting” means the water shader consumes the shared typed
+<code>LightingTransportSnapshot</code>: incident radiance, receiver-normal surface/sky
+irradiance, direct-solar irradiance, source direction, and transmittance each keep
+their quantity, SI radiometric unit, spectral/working basis, footprint, factor
+identity/version, validity, and error. Lighting transport is a provider, never
+an <code>InteractionRecord</code>; atmosphere, cloud, opaque-visibility, and water
+extinction factors are identified and applied exactly once.</p>
+<p>Before implementation, read the shared
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
+All physical water state lives in its SI physics frame. World/scene conversion,
+clock/instant/interval identity, graph ordering, interaction exchange, residency, version
+propagation, and presentation interpolation use that contract rather than a
+water-local dialect.</p>
+<h3>Canonical water-provider boundary</h3>
+<p>This skill publishes the canonical <code>WaterSurfaceProvider</code> interface and
+<code>WaterSurfaceSample</code>. A canonical <code>PhysicsSampleRequest</code> is batched and
+channel-requested. It carries context/provider/signal/schema IDs, the requested
+<code>PhysicsInstant</code>, physics-frame-metre points or oriented footprints, channel
+masks, filter/frequency response, per-channel tolerances, maximum staleness,
+acceptable residency/latency, and batch extent. Descriptor discovery supplies
+a stable descriptor-table reference; the request does not deep-copy a complete
+descriptor. The returned sample always exposes <code>freeSurfacePoint</code>,
+<code>freeSurfaceNormal</code>, the gauge-invariant scalar
+<code>geometricNormalVelocityMps</code>, and the exact
+<code>WaterSurfaceParameterization</code>; only when represented it exposes
+<code>surfacePointVelocityMps</code>, <code>materialCurrentVelocityMps</code>,
+<code>waterColumnDepthMeters</code>, <code>densityKgPerM3</code>,
+<code>materialAccelerationMps2</code>, <code>pressurePa</code>, <code>bathymetryPoint</code>, and <code>wetDryState</code>.
+Each channel is a complete <code>SampledChannel</code> with actual time/support/filter,
+validity, error, and <code>stateVersion</code>. The result returns the complete canonical
+<code>PhysicsSignalDescriptor</code>, bundle <code>sampleInstant</code>, and each channel&#39;s
+<code>actualPhysicsTime</code> resolving to a <code>PhysicsInstant</code>; requested and actual
+instants may differ only within the
+declared latency/staleness gates. Consumers preserve that result envelope rather
+than copying a water-local subset. Packed GPU batches use stable descriptor-table
+handles plus SoA channels, not per-sample descriptor copies. Missing channels
+follow <code>missingChannelPolicy</code> and are never zero-filled. For a parameterized
+surface <code>r(u,v,t)</code>, the exact projection identity is
+<code>geometricNormalVelocityMps = dot(surfacePointVelocityMps, freeSurfaceNormal)</code> whenever the optional full fixed-coordinate velocity is
+present at the same actual time, support/filter, and state version; its channel
+propagates the correlated velocity/normal error. An implicit/level-set or
+reduced owner publishes the scalar normal speed directly when that vector is
+absent. The scalar normal speed is parameterization invariant. The tangential
+part of <code>surfacePointVelocityMps</code> depends on the serialized surface gauge, while
+<code>materialCurrentVelocityMps</code> is the material fluid velocity and is not surface
+motion. Both vector channels are physical polar vectors in <code>physicsFrameId</code>:
+cross-frame transport rotates their basis only. A moving-frame coordinate
+derivative is a distinct coordinate-rate schema and must not receive or lose
+frame-transport terms by masquerading as physical velocity.</p>
+<p>Analytic waves, bounded heightfields, coastal solvers, spectral donors, and
+external free-surface solvers implement adapters to this one ABI. Raw helper
+functions such as <code>getWaterHeight()</code> are implementation details and cannot be
+passed directly to motion, creature, collision, or force consumers.</p>
+<h2>Numeric Provenance</h2>
+<p>Every quantitative choice must carry one of these tags in implementation notes,
+presets, and validation artifacts:</p>
+<ul>
+<li><strong>[D] Derived</strong>: follows from stated equations, dimensions, resource formats,
+or a reproducible calculation.</li>
+<li><strong>[G] Gated</strong>: a pass/fail limit selected before measurement.</li>
+<li><strong>[M] Measured</strong>: captured on a named device, viewport, and workload.</li>
+<li><strong>[A] Authored</strong>: a visual or application input with no universality claim.</li>
+</ul>
+<p>Unlabelled integers inside exact equations, vector dimensions, byte identities,
+and API names are [D]. Do not publish an unlabelled resolution, timestep,
+coefficient, iteration count, memory limit, or millisecond target.</p>
+<h2>Choose The Algorithm First</h2>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Surface algorithm</th>
+<th>Error and cost boundary</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fixed/perceptual island shot; prescribed waterline; no interactive flow</td>
+<td>Coast SDF plus phase-locked analytic shoreline bands</td>
+<td>No mass, momentum, diffraction, run-up, or wake claim; nearest-coast ambiguity and crest aliasing are gated.</td>
+</tr>
+<tr>
+<td>Small authored wave set; no local disturbance</td>
+<td>Parametric Gerstner-style map with exact tangents</td>
+<td>Cost is linear in component count; CPU parity requires inversion of horizontal displacement.</td>
+</tr>
+<tr>
+<td>Bounded local interaction; mild non-breaking waves</td>
+<td>GPU linear wave equation in ping-ponged storage textures</td>
+<td>CFL-limited; cannot represent overturning, hydraulic jumps, or shoreline topology changes.</td>
+</tr>
+<tr>
+<td>Fixed bathymetry needs shoaling/refraction but not nonlinear flow</td>
+<td>Frequency/direction wave-action or ray transport</td>
+<td>Geometric rays do not model diffraction/interference and require phase/energy regularization.</td>
+</tr>
+<tr>
+<td>Fixed islands need linear diffraction/interference</td>
+<td>Frequency-domain mild-slope solution, normally precomputed</td>
+<td>Invalid for strong nonlinearity, breaking/run-up, moving bathymetry, or broad live spectra.</td>
+</tr>
+<tr>
+<td>Long waves over permanently wet variable bathymetry</td>
+<td>Conservative linearized shallow-water elevation/discharge system</td>
+<td>Cannot own moving wet/dry fronts, breaking, or finite-amplitude bores.</td>
+</tr>
+<tr>
+<td>Run-up, bores, bulk current, obstacle wakes, or changing wet/dry topology</td>
+<td>Well-balanced positivity-preserving finite-volume shallow water</td>
+<td>Hydrostatic and nondispersive; requires conservative fluxes, wet/dry gates, and fixed-step evidence.</td>
+</tr>
+<tr>
+<td>Visible finite-depth dispersion beyond shallow water</td>
+<td>Validated Boussinesq-family nearshore solver</td>
+<td>Higher derivatives/state and fragile boundaries are unjustified unless phase/run-up error is observable.</td>
+</tr>
+<tr>
+<td>Flat or distant surface where silhouette motion is sub-pixel</td>
+<td>Derivative-filtered normal bands only</td>
+<td>Lowest geometry cost; explicitly no geometry/normal parity.</td>
+</tr>
+<tr>
+<td>Large stochastic sea over decades of wavelength</td>
+<td><code>$threejs-spectral-ocean</code></td>
+<td>FFT cascades and spectral derivatives.</td>
+</tr>
+<tr>
+<td>Overturning breakers, entrained air, jets, or three-dimensional vortices</td>
+<td>External free-surface/particle/VOF solver</td>
+<td>This skill consumes its visual state; a single-valued or depth-averaged model cannot own the phenomenon.</td>
+</tr>
+</tbody></table>
+<p>Choose from spatial scale, smallest resolved wavelength, interaction radius,
+allowed phase/error, wet/dry topology, conservation needs, bathymetric variation,
+and sustained GPU budget. Do not select by visual style. Do not stack every row
+as quality; use the least complex valid model and explicit handoffs only.</p>
+<h3>Coastal archipelago preflight</h3>
+<p>Before selecting a water algorithm, define:</p>
+<pre><code class="language-text">z_b(x,z) = upward-positive bed elevation in metres,
+eta(x,z,t) = free-surface elevation in metres,
+h = max(eta-z_b,0),
+phi &gt; 0 on land, phi = 0 at the authored still-water coast,
+phi &lt; 0 in water.                                             [D]
+</code></pre>
+<p>Record one owner for bathymetry, water datum, coast SDF/nearest-coast ID,
+substrate IDs, obstacle boundaries, offshore wave record, water state, foam,
+wetness, optical depth, and final geometry. Horizontal SDF distance is not
+vertical water depth. The SDF zero contour and <code>z_b=eta_0</code> contour must agree
+within a declared gate <strong>[G,M]</strong>.</p>
+<p>For reference-like generated islands, prove the causes separately: continuous
+deep-to-shallow bathymetry; sand/reef/rock receivers; incident phase transformed
+by coast/depth; causal breaking or prescribed crest arrival; transported foam;
+wet-sand history; water-column absorption/scatter; and one surface/normal cause.
+A cyan halo, radial island gradient, or unrelated scrolling foam texture does
+not satisfy the contract.</p>
+<h2>Pinned Three.js r185 WebGPU Architecture</h2>
+<p>The API contract below is verified against the repository&#39;s installed
+<code>three@0.185.1</code> <strong>[G]</strong>:</p>
+<ul>
+<li><code>WebGPURenderer</code>, <code>RenderPipeline</code>, <code>StorageTexture</code>, and node materials come
+from <code>three/webgpu</code>.</li>
+<li>TSL nodes come from <code>three/tsl</code>.</li>
+<li>Call <code>await renderer.init()</code> before inspecting
+<code>renderer.backend.isWebGPUBackend</code> or <code>renderer.hasFeature()</code>.</li>
+<li>Build kernels with <code>Fn(...).compute(...)</code>; after initialization submit an
+ordered node or node array with <code>renderer.compute(...)</code>. <code>computeAsync()</code> is
+the initialization-safe wrapper, not a GPU-completion fence.</li>
+<li>Set <code>StorageTexture.colorSpace = NoColorSpace</code>,
+<code>generateMipmaps = false</code>, and <code>mipmapsAutoUpdate = false</code> for simulation
+state unless a compute kernel deliberately writes every sampled mip.</li>
+<li>Use <code>pass(scene, camera)</code>, optional <code>mrt(...)</code>, and one <code>RenderPipeline</code>.
+<code>PassNode.setResolutionScale()</code> is current. If <code>renderOutput()</code> is explicit,
+set <code>pipeline.outputColorTransform = false</code>; otherwise leave the pipeline as
+the sole output-transform owner.</li>
+</ul>
+<pre><code class="language-js">const renderer = new WebGPURenderer( { antialias: false } );
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;WebGPU is required for this water system.&#39; );
+}
+
+renderer.compute( [ impulseNode, propagateNode, derivativeNode ] );
+pipeline.render();
+</code></pre>
+<p>The opaque color/depth pass sampled by water must exclude the water surface.
+Transparent objects need an explicit ordering policy; do not silently include
+them in opaque refraction inputs.</p>
+<h2>Scientific Gates</h2>
+<h3>Bounded heightfield</h3>
+<p>For cell sizes <code>dx</code>, <code>dz</code>, wave speed <code>c</code>, and fixed step <code>dt</code>, the explicit
+second-order wave stencil must satisfy the derived stability condition</p>
+<pre><code class="language-text">C_x^2 + C_z^2 &lt;= 1,   C_x = c dt / dx,   C_z = c dt / dz.       [D]
+</code></pre>
+<p>For square cells this becomes <code>c dt / dx &lt;= 1/sqrt(2)</code> <strong>[D]</strong>. Damping does
+not legalize a CFL violation. Record the selected CFL margin <strong>[G]</strong>, phase and
+amplitude error against an analytic mode <strong>[M]</strong>, and the boundary reflection
+coefficient <strong>[M]</strong>.</p>
+<p>Boundary mode is part of the model:</p>
+<ul>
+<li>periodic: wrap neighbors and conserve the periodic mean;</li>
+<li>reflecting: mirrored ghost samples implement zero normal derivative;</li>
+<li>absorbing: use a spatial damping sponge and measure reflection over the
+active frequency band;</li>
+<li>fixed-height: a deliberate phase-inverting wall, never a generic clamp.</li>
+</ul>
+<h3>Coastal wave transformation</h3>
+<p>For local depth <code>h</code>, wavenumber <code>k</code>, current <code>U</code>, and intrinsic frequency
+<code>sigma_i</code>, use the declared finite-depth dispersion model:</p>
+<pre><code class="language-text">sigma_i^2 = (g k + tau k^3) tanh(k h),
+omega_abs = sigma_i + k dot U,
+grad(theta) = k,
+partial_t(theta) = -omega_abs.                                [D]
+</code></pre>
+<p>Wave-action transport uses <code>N=E/sigma_i</code> and ray velocity
+<code>dx/dt=U+partial sigma_i/partial k</code> <strong>[D]</strong>. Record incident, outgoing,
+dissipated, clipped, and regularized energy by frequency/direction band
+<strong>[M]</strong>. A ray field must report phase-loop/curl residual and cannot claim
+diffraction or interference. Use a converged mild-slope solution when those
+linear phenomena are required over fixed bathymetry.</p>
+<p>At an offshore/nearshore handoff, choose one contract. A phase-resolved handoff
+transfers frequency, direction, complex surface-elevation amplitude, wavenumber,
+intrinsic frequency, energy, and phase-reference <code>PhysicsInstant</code>. A phase-averaged handoff transfers
+action/energy quadrature and direction with no crest-phase claim; local phase is
+a separate owner. Match model validity before blending. Do not alpha-crossfade
+independently phased geometric surfaces; one owner supplies height and
+derivatives at each location. Measure reflection by frequency and incidence
+angle <strong>[M]</strong>. If a coherent display overlap is unavoidable, amplitude weights
+sum to one and derivatives include their spatial gradients; square-root power
+weights apply only to proven independent/orthogonal fields, not two
+representations of one wave.</p>
+<p>Whichever handoff is selected, every instantaneous surface/query publication
+uses the same canonical <code>WaterSurfaceProvider</code> ABI: mandatory
+<code>freeSurfacePoint</code>, <code>freeSurfaceNormal</code>, <code>geometricNormalVelocityMps</code>, and
+<code>WaterSurfaceParameterization</code>, plus only the represented optional
+fixed-parameterization <code>surfacePointVelocityMps</code>, material
+<code>materialCurrentVelocityMps</code>, depth, density, acceleration, pressure,
+bathymetry, and wet/dry channels. The handoff preserves the complete descriptor,
+requested/actual <code>PhysicsInstant</code>, footprint/filter, frame/origin/transform,
+state/resource version, validity, error, latency, and residency envelope. A
+phase-averaged owner without a separately versioned display-phase synthesis
+cannot publish an instantaneous surface bundle and reports that provider query
+invalid instead of inventing phase.</p>
+<h3>Nonlinear shallow water</h3>
+<p>For wet/dry flow, conservative state is <code>q=(h,m_x,m_z)^T</code>, <code>m=h u</code>:</p>
+<pre><code class="language-text">partial_t q + partial_x F(q) + partial_z G(q) = S,
+F = (m_x, m_x^2/h + g h^2/2, m_x m_z/h)^T,
+G = (m_z, m_x m_z/h, m_z^2/h + g h^2/2)^T,
+S_momentum = -g h grad(z_b) + S_friction + S_external.        [D]
+</code></pre>
+<p>Use one canonical numerical flux per face, well-balanced bathymetry treatment,
+a positivity-preserving update, and an explicit dry-state policy before any
+division by <code>h</code>. The invariant <code>u=0</code>, <code>h+z_b=constant</code> must remain a lake at
+rest <strong>[G,M]</strong>. A post-update depth clamp that loses unreported mass is a
+failure.</p>
+<p>For an explicit unsplit rectangular-grid update, derive and enforce</p>
+<pre><code class="language-text">dt &lt;= C_CFL min_cells 1 /
+      [ (|u_x|+sqrt(g h))/dx + (|u_z|+sqrt(g h))/dz ].         [D,G]
+</code></pre>
+<p>Select Rusanov, HLL, HLLC, reconstruction order, and friction integration from
+positivity, diffusion, conservation, convergence, and target-GPU evidence—not
+algorithm prestige. Compare shallow-water dispersion
+<code>omega=sqrt(g h_0) k</code> against <code>omega^2=g k tanh(k h_0)</code> over the injected band
+<strong>[G,M]</strong>. Load a dispersive model only when this error is observable and its
+extra boundary/stability/state cost passes.</p>
+<h3>Foam, wetness, and shoreline state</h3>
+<p>Use modeled breaking dissipation, calibrated shock/entropy loss, surface
+compression, exact Jacobian/curvature, or prescribed crest arrival—in that
+priority order—as the foam source. Raw numerical entropy loss changes with
+flux/grid and is not physical dissipation without convergence calibration.
+Declare whether state is dimensionless coverage transported by a material
+derivative or conserved areal density transported by a divergence flux; do not
+mix their equations. Apply timestep-correct source/decay, optional diffusion,
+and bounds. Noise may alter microstructure; it cannot create source coverage.
+Partition breaking dissipation once at a model handoff and drive one foam
+history; foam coverage is not conserved wave energy.</p>
+<p>Exactly one receiver stores exposed-bed wetness separately. Water publishes
+exactly one typed inundation/wash <code>SurfaceExchange</code> to that route-selected
+receiver, with the canonical context, interval, source/receiver identities,
+frame/origin/transform, support/measure, payload semantics, state versions,
+error, and exact-once batch ledger. If water is explicitly selected as the sole
+receiver, it consumes that routed exchange in its graph stage rather than
+bypassing the ABI; no weather or material owner integrates another copy. A
+receiver-to-water runoff exchange committed over interval <code>n</code> is immutable
+input to water interval <code>n+1</code>. Water gathers it once into the provisional
+source assembly, and its exact-once application ledger advances only with the
+accepted atomic <code>n+1</code> commit; retry or rollback cannot apply it again, and
+newly written receiver state from <code>n+1</code> is never read in that same interval.
+For a phase-only/no-solver branch,
+<code>m_wash</code> is an explicit prescribed beach-inundation mask; static water depth
+cannot wet exposed bed:</p>
+<pre><code class="language-text">I_wet = (h &gt;= h_wet) or (m_wash &gt;= m_wet),
+w_next = 1                         when I_wet,
+w_next = w exp(-dt/tau_dry)        otherwise.                 [D]
+</code></pre>
+<p><code>h_wet</code>, <code>m_wet</code>, and <code>tau_dry</code> are authored inputs <strong>[A]</strong>. Wetness changes
+the bed material response, not water mass or geometric shoreline.</p>
+<h3>Parametric waves</h3>
+<p>For each normalized direction <code>d_i</code>, amplitude <code>a_i</code>, horizontal ratio <code>Q_i</code>,
+<code>k_i = 2 pi / wavelength_i</code>, and phase <code>theta_i</code>, use</p>
+<pre><code class="language-text">P(q,t) = (q_x, 0, q_z)
+       + sum_i (Q_i a_i d_ix cos(theta_i),
+                a_i sin(theta_i),
+                Q_i a_i d_iz cos(theta_i)).                    [D]
+</code></pre>
+<p>Compute both parametric tangents by differentiation and the upward normal as
+<code>normalize(cross(P_qz, P_qx))</code>. The shortcut
+<code>normalize((-height_x, 1, -height_z))</code> is exact only when horizontal
+displacement is absent. Require positive horizontal Jacobian for a
+single-valued surface. The conservative no-fold gate
+<code>sum_i abs(Q_i a_i k_i) &lt; 1</code> is <strong>[D]</strong>; the actual minimum determinant over the
+authored domain is <strong>[M]</strong>.</p>
+<h3>CPU surface queries</h3>
+<p><code>getWaterHeight(x,z,t)</code> cannot obtain Eulerian parity by evaluating analytic
+phases directly at <code>(x,z)</code> when horizontal displacement is nonzero. It must
+invert the horizontal map with a bounded fixed-point or Newton solve, then
+evaluate height at the recovered parameter coordinate. Report iteration limit
+<strong>[G]</strong>, residual tolerance <strong>[G]</strong>, and observed residual <strong>[M]</strong>.</p>
+<p>The GPU heightfield residual is not bounded by the sum of impulse controls.
+Choose one honest contract:</p>
+<ul>
+<li>enforce a hard height envelope <code>H_grid</code> <strong>[G]</strong>, giving a derived analytic-
+only query interval of <code>+/- H_grid</code> <strong>[D]</strong>;</li>
+<li>maintain a CPU surrogate and report convergence/probe error <strong>[M]</strong>; or</li>
+<li>declare the query analytic-only and unbounded with respect to live GPU
+disturbances.</li>
+</ul>
+<p>Never hide readback latency in a per-frame query.</p>
+<h3>Coupled interaction order</h3>
+<p>Water/body feedback uses the shared scheduler and <code>InteractionRecord</code> schema;
+it is not an actor-side wake callback. For every coupled coordination interval, preserve
+the dependency chain</p>
+<pre><code class="language-text">body and water prediction
+  -&gt; footprint-filtered sampling from both predictors at one declared bracket
+  -&gt; source InteractionRecord generation
+  -&gt; conservative load scatter by conservation group
+  -&gt; water advance (including declared subcycles)
+  -&gt; reaction InteractionRecord reduction
+  -&gt; body and water correction, conservation/stability check, atomic commit
+  -&gt; water PresentedStatePair for coordinator PhysicsPresentationCandidate. [D]
+</code></pre>
+<p>Every CPU, GPU, or external dispatch that advances coupled water state is an
+execution of a declared <code>PhysicsGraphStage</code> with an exact
+<code>executionInterval</code>, versioned reads/writes, residency dependency, and commit
+group. A render callback may consume the sealed presentation publication and
+request work, but it never advances the water solver, applies runoff, injects a
+disturbance, or performs a private catch-up step.</p>
+<p>Declare the coupling class as explicit, semi-implicit, scheduler-bounded
+iterated, or monolithic; do not let a body or water subsystem perform an
+unbounded private iteration.
+For a bounded iteration, repeat prediction, same-bracket sampling, source/
+reaction construction, solve, reduction, and correction using the exact prior
+iteration versions named by <code>iterationCarriedEdges</code>; a frozen pre-step sample
+is only an explicitly selected one-way/explicit scheme, not an iterated solve.</p>
+<p>Every two-way source/reaction relation is an all-or-none
+<code>InteractionReactionGroup</code>; one source may split across reactions and several
+sources may reduce into one reaction. All members are transported to the
+group&#39;s balance frame/reference point before impulse/torque residuals are
+tested. Mass,
+linear/angular momentum, energy/work (including declared dissipation/heat), and
+species transfers reconcile across their complete conservation group. Volume
+is only a separately gated constraint for a fixed-density incompressible model.
+Gather and scatter are a discrete-adjoint pair that preserves zeroth and first
+kernel moments and gates force, torque, interface-work, and added-mass
+stability. Records carry SI units, frame, canonical
+<code>applicationInterval: PhysicsTimeInterval</code>,
+footprint, producer/consumer identities, ordering key, validity/error,
+<code>stateVersion</code>, and conservation-group identity through the complete shared
+<code>InteractionRecord</code>; water must not redeclare a subset. Stable interaction and
+causal IDs plus application state enforce exactly-once consumption. Reproducible
+paths use stable bin/sort and a fixed reduction tree or bounded fixed-point
+accumulation, not schedule-dependent floating atomics. The exact
+<code>InteractionBatchLedger</code> records published sequence range, per-consumer cursor,
+accepted/rejected/late/duplicate counts, overflow policy and sequence ranges,
+typed lost/deferred conserved commodities, and exact-once ledger version.
+Authoritative overflow backpressures, substeps, or conservatively aggregates.
+One-way coupling identifies the authoritative source and records a <code>[G]</code> upper
+bound on omitted feedback or explicitly narrows the claim; it emits no reaction
+and must not claim feedback. Keep
+coupled hot state on one execution side or in a validated shared mirror;
+synchronous frame-critical GPU readback is forbidden.</p>
+<p>Water contributes a per-binding/provider <code>PresentedStatePair</code> to the
+view-independent <code>PhysicsPresentationCandidate</code>, which contains committed
+state brackets, leases, and events but no camera, render origin, view matrix,
+shadow/cache state, or global-to-render transform. <code>previousPresented</code> and
+<code>currentPresented</code> each independently contain a
+<code>PresentationSampleProvenance</code>, <code>presentedInstant</code>, <code>PresentationStateHandle</code>,
+and <code>PresentationSpatialBinding</code>; <code>motionBinding</code> references the two state
+handles and records identity mapping and motion validity. The camera owner then
+publishes a per-view <code>CameraViewPublication</code>; visibility/shadow/cache owners
+publish <code>ViewPreparationPublication</code>; the sealed
+<code>PhysicsPresentationSnapshot</code> references candidate binding IDs and lease refs
+rather than copying pairs or transforms. <code>FrameExecutionRecord</code> records all
+target/view executions and lease disposition keyed by lease ID. These presented
+states need not equal solver states <code>n</code> and <code>n+1</code>. Surface position,
+normals, velocity/MRT output, shadows, foam/wetness display, and temporal
+rejection resolve through that immutable publication chain and separately
+versioned physical instants, physics-frame transforms, and source-data epochs.
+A state, residency,
+transform/source epoch, or quality migration that invalidates history is
+propagated and reset explicitly rather than hidden by interpolation.
+Foam, optical, deformation, wet/dry-topology, and disocclusion changes
+contribute scoped reactive epochs/affected regions; the coordinator turns them
+into per-view <code>ReactivePublication</code> and capability-gated <code>ScopedResetAction</code>
+plans in <code>ViewPreparationPublication</code>. Reset/history flags are not undocumented
+<code>PresentedStatePair</code> or snapshot fields.</p>
+<h3>Caustics</h3>
+<p>Map each surface differential through Snell refraction to a stated receiver.
+For receiver-plane coordinates <code>F(q)</code>, use</p>
+<pre><code class="language-text">A_receiver = abs(det(dF/dq)) dq_x dq_z                       [D]
+P_cell = E_incident max(0, -l dot n) A_surface
+         (1 - F_dielectric) T_light                         [D]
+E_receiver = P_cell / max(A_receiver, A_epsilon).            [D]
+</code></pre>
+<p><code>length(dFdx) * length(dFdy)</code> is not an area; it omits the sine of the angle
+between derivatives. Use a determinant in a receiver basis or a cross-product
+magnitude. Deposit energy conservatively into receiver texels or solve an
+inverse map; merely displaying the ratio at source texels misplaces light.
+Clamp only after recording pre-clamp energy and invalid/TIR counts.</p>
+<h3>Optical transport</h3>
+<p>Classify the incident medium before evaluating Snell and Fresnel. Use exact
+unpolarized dielectric Fresnel near total internal reflection; Schlick is
+allowed only behind a recorded error gate <strong>[G]</strong> and comparison <strong>[M]</strong>.</p>
+<pre><code class="language-text">sigma_t = sigma_a + sigma_s                                   [D]
+T_rgb = exp(-sigma_t_rgb * pathLengthMeters)                  [D]
+omega_0 = sigma_s / max(sigma_t, epsilon_sigma)               [D]
+L = F L_reflected
+  + (1-F) [T L_refracted + (1-T) omega_0 L_source]            [D]
+</code></pre>
+<p><code>sigma_a</code>, <code>sigma_s</code>, and <code>sigma_t</code> have units <code>m^-1</code> <strong>[D]</strong>; <code>L_source</code>
+contains the declared phase/source-light approximation. Absorbed energy does
+not become in-scattering. Reconstruct positions from scene depth,
+reject foreground/off-viewport samples, and validate that the reconstructed
+point lies on the forward refracted ray before calling its distance a path
+length. A specular BRDF already contains the sun glint; do not add a second
+unbudgeted glint lobe. Foam replaces an energy-conserving fraction of the water
+response instead of adding white radiance.</p>
+<h2>Sustained Performance Contract</h2>
+<p>Quality is a target-specific measured envelope, not a device-class label. Do
+not publish generic mobile/integrated/discrete timing tables. For each named
+target, declare the scene, viewport, DPR, grid, fixed cadence, precision,
+active effects, warm-up, sample window, power state, and pass/fail threshold
+<strong>[G]</strong> before measuring <strong>[M]</strong>.</p>
+<p>An <code>RGBA16F</code> texture consumes <code>8 N^2</code> bytes <strong>[D]</strong>; enumerate every
+persistent, ping-pong, transient, scene-color, depth, geometry, and pipeline
+allocation. Measure warm percentile frame time, each bandwidth-sensitive pass,
+peak live bytes, allocation churn, and thermal drift on the named target
+<strong>[M]</strong>. Derive tiers only from those measurements.</p>
+<p>For tile/mobile GPUs:</p>
+<ul>
+<li>batch provider requests and <code>InteractionRecord</code> streams as compact SoA with
+channel masks, bounded queues, stable IDs distinct from slots, and fixed
+deterministic reductions; never allocate one JavaScript object per sample;</li>
+<li>publish presentation resource handles with <code>resourceGeneration</code> and a
+frame-in-flight lease/reuse rule instead of deep-copying water fields or
+allowing compute to overwrite a rendered generation;</li>
+<li>apply every physics-facing change to solver resolution, represented band,
+active domain, cadence, provider filter/error, or offshore/coastal ownership
+only as a coordinator-admitted tick-boundary <code>QualityTransition</code> transaction
+with state projection, conservation/error ledger, queue-drain
+boundary, atomic provider-version publication, rollback, and peak old/new
+residency; exactly one representation emits reactions during any visual
+crossfade;</li>
+<li>keep simulation resolution independent of viewport resolution;</li>
+<li>restrict nearshore simulation to persistent causal-influence tiles, not
+merely currently visible tiles;</li>
+<li>use a separate halo/boundary pass before any whole-tile stencil and a later
+dispatch for each global producer/consumer dependency;</li>
+<li>retain one canonical face flux when claiming shallow-water conservation;</li>
+<li>account for tile halos, inactive retained state, activation transitions,
+face-flux storage, and simultaneous quality states;</li>
+<li>fuse kernels only when read/write hazards remain explicit;</li>
+<li>prefer <code>textureLoad</code> for stencil state and filtered sampling only for resolved
+display fields;</li>
+<li>reduce storage traffic before reducing arithmetic;</li>
+<li>update caustics less often only if reprojection error remains below a stated
+screen-space gate <strong>[G]</strong>;</li>
+<li>exclude diagnostic textures and timestamp queries from production budgets,
+but include their separate measured overhead <strong>[M]</strong>.</li>
+</ul>
+<h2>Required Evidence</h2>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/references/water-surface-system.md">references/water-surface-system.md</a>
+and
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/references/coastal-archipelago-system.md">references/coastal-archipelago-system.md</a>
+before coastal or archipelago implementation. Validation must include the
+applicable subset below and every algorithm-specific gate from those references:</p>
+<ul>
+<li>bathymetry/datum/shoreline agreement, SDF eikonal and nearest-coast ambiguity;</li>
+<li>crest phase/direction/filtering and coastwise continuity for prescribed bands;</li>
+<li>wave-action energy/direction, separately owned crest phase, shoaling/
+refraction, and handoff reflection when depth transformation is used;</li>
+<li>lake-at-rest, positivity, mass/flux residual, wet/dry run-up, convergence,
+and boundary reflection when shallow water is used;</li>
+<li>analytic single-mode phase/amplitude error and the CFL margin;</li>
+<li>boundary reflection and mean/volume drift;</li>
+<li>finite-value scan of all state and derivative outputs;</li>
+<li>exact tangent-normal versus finite-difference normal error;</li>
+<li>minimum horizontal Jacobian and fold count;</li>
+<li>CPU query residual plus its declared live-grid error contract;</li>
+<li>receiver-space caustic energy before/after deposition and clamp;</li>
+<li>exact Fresnel versus approximation error, TIR classification, refraction-ray
+residual, and invalid-sample fraction;</li>
+<li>foam source/transport/reaction coverage plus bed wetness/inundation history;</li>
+<li>canonical <code>WaterSurfaceProvider</code> conformance, absent-channel rejection, footprint
+filtering, state-version/error propagation, mandatory normal-velocity
+projection identity, valid absence of the optional full surface velocity,
+and CPU/GPU adapter parity;</li>
+<li><code>PhysicsGraph</code> execution evidence proving every coupled water dispatch,
+immutable runoff from interval <code>n</code> into <code>n+1</code>, exactly-once application at
+accepted commit, and one typed inundation/wash exchange to the sole receiver;</li>
+<li>one-way authoritative-source, omitted-feedback bound/claim, and invariance;
+or two-way scheduler-order, source/reaction
+<code>InteractionRecord</code>, conservation-group, and zero-frame-readback evidence;</li>
+<li>physics presentation-snapshot coherence across interpolation, origin/version
+changes, velocity output, shadows, and temporal-history rejection;</li>
+<li><code>LightingTransportSnapshot</code> channel units/bases/filters and factor ledger
+proving solar disc, sky, atmosphere, cloud, visibility, and water extinction
+are neither omitted nor double-applied;</li>
+<li>close beach/cliff, whole-island, multi-island, and rock/pier fixed views at
+multiple times, with bathymetry/depth/phase/flow/foam/optics diagnostics;</li>
+<li>final/no-optics/no-caustics/no-foam fixed views;</li>
+<li>renderer info, allocation ledger, dispatch count, and sustained GPU timings.</li>
+</ul>
+<p>Fail the build on an unstable stencil, stale derivative state, invalid values,
+double output conversion, source-space caustics presented as receiver-space
+light, two geometric surface owners at a handoff, negative/unbalanced shallow
+water, unexplained mass/energy loss, a cache without units/datum/channel
+semantics, or any unlabeled quantitative claim.</p>
+<h2>Routing Boundary</h2>
+<p>This skill consumes the versioned coast SDF, bathymetry, obstacle, and substrate
+contract from the terrain/data owner and the shared physics ABI from
+<code>../threejs-choose-skills/references/physics-domain-and-interaction-contract.md</code>.
+It owns shoreline phase, bathymetry-aware
+nearshore transformation, water boundary/state, bounded wave grids,
+depth-averaged shallow-water wet/dry state, sparse coastal tiles, exact
+small-wave parametric surfaces, transported foam, and inundation/wash exchange.
+It owns integrated receiver wetness only when explicitly selected as the single
+receiver owner; otherwise the route-selected receiver-state owner integrates it.
+It also owns depth-aware refraction, water-volume attenuation, and bounded
+caustics. Use
+<code>$threejs-spectral-ocean</code> for offshore directional spectra and FFT cascades,
+then hand off explicitly. Precipitation and surface accumulation consume the
+<code>SurfaceExchange</code>/<code>InteractionRecord</code> boundary published by
+<code>$threejs-rain-snow-and-wet-surfaces</code>; no additional adapter skill owns this
+handoff. Route overturning/three-dimensional free-surface physics to an external
+solver and consume its versioned provider and presentation state here.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-volumetric-clouds.html">← Volumetric Clouds</a>
+    <a href="threejs-ambient-contact-shading.html">Ambient Contact Shading →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/water-integration-surface/"><figure>
+        <img src="../visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" width="640" height="400" loading="lazy" decoding="async" />
+        <figcaption><strong>Water Integration Surface</strong><span>Concept proxy · The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented. The host project owns post-processing, transparent ordering, and final output conversion.</span></figcaption>
+      </figure></a>
+      <a href="../demos/water-generated-caustics/"><figure>
+        <img src="../visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" width="1200" height="760" loading="lazy" decoding="async" />
+        <figcaption><strong>Bounded Water Caustic Projection</strong><span>Generated asset preview · Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

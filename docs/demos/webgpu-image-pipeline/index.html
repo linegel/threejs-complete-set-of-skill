@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>WebGPU Image Pipeline | Three.js WebGPU Demo</title>
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				overflow: hidden;
+				background: #080b10;
+			}
+
+			canvas {
+				display: block;
+				width: 100vw;
+				height: 100vh;
+			}
+
+			#status {
+				position: fixed;
+				left: 12px;
+				bottom: 12px;
+				max-width: min(680px, calc(100vw - 24px));
+				padding: 8px 10px;
+				border: 1px solid rgba(255, 255, 255, 0.18);
+				background: rgba(0, 0, 0, 0.72);
+				color: #f7f9fc;
+				font: 12px/1.35 system-ui, sans-serif;
+				white-space: pre-wrap;
+			}
+		</style>
+
+	  <meta name="lab-id" content="webgpu-image-pipeline">
+  <meta name="acceptance-status" content="incomplete">
+  <style>.lab-status-banner{position:fixed;z-index:2147483647;top:10px;left:50%;transform:translateX(-50%);max-width:min(800px,calc(100vw - 20px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.95);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.lab-status-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Image Pipeline, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/webgpu-image-pipeline/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="WebGPU Image Pipeline | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Image Pipeline, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta property="og:url" content="https://threejs-skills.com/demos/webgpu-image-pipeline/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WebGPU Image Pipeline | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Image Pipeline, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/webgpu-image-pipeline/#demo","name":"WebGPU Image Pipeline","description":"Interactive Three.js WebGPU/TSL demo for WebGPU Image Pipeline, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.","url":"https://threejs-skills.com/demos/webgpu-image-pipeline/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Image Pipeline"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Image Pipeline","item":"https://threejs-skills.com/skills/threejs-image-pipeline.html"},{"@type":"ListItem","position":3,"name":"WebGPU Image Pipeline","item":"https://threejs-skills.com/demos/webgpu-image-pipeline/"}]}]}</script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../../node_modules/three/build/three.webgpu.js",
+					"three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
+					"three/tsl": "../../../node_modules/three/build/three.tsl.js",
+					"three/addons/": "../../../node_modules/three/examples/jsm/"
+				}
+			}
+		</script>
+  <script type="module" crossorigin src="../assets/modulepreload-polyfill-Dezn_h7o.js"></script>
+  <script type="module" crossorigin src="../assets/three.webgpu-BLzGo2sq.js"></script>
+  <script type="module" crossorigin src="../assets/three.tsl-Bsul1SiG.js"></script>
+  <script type="module" crossorigin src="../assets/BloomNode-Dex_Xd1i.js"></script>
+  <script type="module" crossorigin src="../assets/GTAONode-Dz5bb6F0.js"></script>
+  <script type="module" crossorigin src="../assets/TRAANode-D9aLA1tV.js"></script>
+  <script type="module" crossorigin src="../assets/stage-D6asUQDH.js"></script>
+  <script type="module" crossorigin src="../assets/canonical-browser-app-2HQ-T5xO.js"></script>
+</head>
+	<body><aside class="lab-status-banner"><strong>Canonical lab incomplete.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../registry.json">Registry</a>.</aside>
+		<canvas id="view"></canvas>
+		<div id="status">initializing</div>
+	</body>
+</html>

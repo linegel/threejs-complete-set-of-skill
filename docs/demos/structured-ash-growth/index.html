@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Native WebGPU Structured Ash Growth | Three.js WebGPU Demo</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #98b8cf; }
+    #view { display: block; width: 100%; height: 100%; }
+    #status { position: fixed; left: 12px; bottom: 10px; color: #122719; font: 12px/1.4 ui-monospace, monospace; }
+  </style>
+
+  <meta name="lab-id" content="structured-ash-growth">
+  <meta name="acceptance-status" content="incomplete">
+  <style>.lab-status-banner{position:fixed;z-index:2147483647;top:10px;left:50%;transform:translateX(-50%);max-width:min(800px,calc(100vw - 20px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.95);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.lab-status-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU/TSL demo for Native WebGPU Structured Ash Growth, with 6 scenarios, 4 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/structured-ash-growth/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="Native WebGPU Structured Ash Growth | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU/TSL demo for Native WebGPU Structured Ash Growth, with 6 scenarios, 4 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta property="og:url" content="https://threejs-skills.com/demos/structured-ash-growth/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Native WebGPU Structured Ash Growth | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU/TSL demo for Native WebGPU Structured Ash Growth, with 6 scenarios, 4 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/structured-ash-growth/#demo","name":"Native WebGPU Structured Ash Growth","description":"Interactive Three.js WebGPU/TSL demo for Native WebGPU Structured Ash Growth, with 6 scenarios, 4 mechanisms, and 3 quality tiers and evidence-gated validation.","url":"https://threejs-skills.com/demos/structured-ash-growth/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Procedural Vegetation"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Procedural Vegetation","item":"https://threejs-skills.com/skills/threejs-procedural-vegetation.html"},{"@type":"ListItem","position":3,"name":"Native WebGPU Structured Ash Growth","item":"https://threejs-skills.com/demos/structured-ash-growth/"}]}]}</script>
+  <script type="importmap">
+  { "imports": {
+    "three": "/node_modules/three/build/three.webgpu.js",
+    "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+    "three/tsl": "/node_modules/three/build/three.tsl.js",
+    "three/addons/": "/node_modules/three/examples/jsm/"
+  } }
+  </script>
+  <script type="module" crossorigin src="../assets/index-Co80tWAn.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BLzGo2sq.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl-Bsul1SiG.js">
+  <link rel="modulepreload" crossorigin href="../assets/ash-scene-DHsg9_K-.js">
+  <link rel="modulepreload" crossorigin href="../assets/strict-lab-controller-DqIV3RB2.js">
+</head>
+<body><aside class="lab-status-banner"><strong>Canonical lab incomplete.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../registry.json">Registry</a>.</aside>
+  <canvas id="view" width="1200" height="800"></canvas>
+  <output id="status">initializing native WebGPU…</output>
+</body>
+</html>

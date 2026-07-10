@@ -3,53 +3,73 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Camera Controls and Rigs — Three.js WebGPU Skill Pack</title>
-<meta name="description" content="Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration." />
-<link rel="canonical" href="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-camera-controls-and-rigs.html" />
+<title>Camera Controls And Rigs | Three.js WebGPU Skill</title>
+<meta name="description" content="Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored…" />
+<meta name="author" content="Three.js WebGPU Skill Pack contributors" />
+<link rel="canonical" href="https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
+<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Camera Controls and Rigs — Three.js WebGPU agent skill" />
-<meta property="og:description" content="Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration." />
-<meta property="og:url" content="https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-camera-controls-and-rigs.html" />
-<meta property="og:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:title" content="Camera Controls And Rigs | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored…" />
+<meta property="og:url" content="https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html" />
+<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Camera Controls and Rigs visual validation frame from the Three.js WebGPU Skill Pack" />
-<meta name="twitter:image" content="https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Camera Controls and Rigs visual validation frame from the Three.js WebGPU Skill Pack" />
+<meta property="og:image:alt" content="Camera Controls And Rigs evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image:alt" content="Camera Controls And Rigs evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Camera Controls and Rigs — Three.js WebGPU agent skill" />
-<meta name="twitter:description" content="Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration." />
+<meta name="twitter:title" content="Camera Controls And Rigs | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "TechArticle",
-   "headline": "Camera Controls and Rigs — Three.js WebGPU agent skill",
-   "description": "Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration.",
-   "url": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-camera-controls-and-rigs.html",
-   "image": "https://linegel.github.io/threejs-complete-set-of-skill/visual-validation/planet-generated-craters/final.design.png",
-   "dateModified": "2026-07-04T23:30:19+03:00",
+   "@id": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html#article",
+   "headline": "Camera Controls And Rigs | Three.js WebGPU Skill",
+   "description": "Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.",
+   "url": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
+   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "dateModified": "2026-07-10T18:34:25+03:00",
+   "author": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Three.js WebGPU Skill Pack contributors",
+    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+   },
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
    "isPartOf": {
     "@type": "SoftwareSourceCode",
+    "@id": "https://threejs-skills.com/#software",
     "name": "Three.js WebGPU Skill Pack",
     "codeRepository": "https://github.com/linegel/threejs-complete-set-of-skill",
-    "url": "https://linegel.github.io/threejs-complete-set-of-skill/"
+    "url": "https://threejs-skills.com/"
    },
    "about": [
     "Three.js",
     "WebGPU",
     "TSL",
-    "Camera Controls and Rigs"
+    "Camera Controls And Rigs"
    ]
   },
   {
@@ -59,19 +79,19 @@
      "@type": "ListItem",
      "position": 1,
      "name": "Skill Pack",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/"
+     "item": "https://threejs-skills.com/"
     },
     {
      "@type": "ListItem",
      "position": 2,
      "name": "Cameras, Lighting, and Final Image",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/#skills"
+     "item": "https://threejs-skills.com/#skills"
     },
     {
      "@type": "ListItem",
      "position": 3,
-     "name": "Camera Controls and Rigs",
-     "item": "https://linegel.github.io/threejs-complete-set-of-skill/skills/threejs-camera-controls-and-rigs.html"
+     "name": "Camera Controls And Rigs",
+     "item": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html"
     }
    ]
   }
@@ -80,50 +100,67 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
+@view-transition{navigation:auto}
 :root{
-  --bg:#0a0c10; --bg2:#0f1218; --ink:#ece8de; --dim:#b3af9f;
-  --amber:#ffb454; --cyan:#7fd4c1; --line:#23262e;
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
   --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,180,84,.07),transparent),
-  radial-gradient(ellipse 60% 40% at 90% 110%,rgba(127,212,193,.05),transparent)}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
+  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-nav{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:28px 0;border-bottom:1px solid var(--line)}
-nav .brand{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:0}
-nav .links{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:13px;color:var(--dim)}
-nav .links a{display:inline-block;padding:10px 6px;margin:-10px 0;transition:color .2s}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
 nav .links a:hover{color:var(--amber)}
+nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
 .section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
 .section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
 .kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
-pre{font-family:var(--mono);background:#07090c;border:1px solid var(--line);border-left:2px solid var(--amber);padding:14px 16px;overflow-x:auto;
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
   font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
 code{font-family:var(--mono)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px;
-  transition:border-color .25s,transform .25s,box-shadow .25s}
-.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-.card:active{transform:translateY(-1px) scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.99}
 .card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
-.card h4{font-size:19px;font-weight:600}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
-figure{background:var(--bg2);border:1px solid var(--line)}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
@@ -131,6 +168,21 @@ figcaption span{color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
+  nav .brand{font-size:16px}
+  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
+  nav .links::-webkit-scrollbar{display:none}
+  nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
 
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
@@ -139,15 +191,15 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
   linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
-.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}
+.crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid rgba(255,255,255,.12);background:rgba(15,18,24,.68);padding:6px 12px;
-  transition:color .2s,border-color .2s,transform .2s;backdrop-filter:blur(10px)}
-a.chip:hover{color:var(--amber);border-color:rgba(255,180,84,.5)}
-a.chip:active{transform:scale(.96)}
+.chip{font-family:var(--mono);font-size:12px;color:var(--cyan);box-shadow:0 0 0 1px rgba(255,255,255,.12);border-radius:10px;background:rgba(15,18,24,.68);padding:7px 12px;backdrop-filter:blur(10px)}
+a.chip{min-height:44px;display:inline-flex;align-items:center;transition-property:color,box-shadow,scale;transition-duration:180ms}
+a.chip:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.5)}
+a.chip:active{scale:.96}
 .chip.a{color:var(--amber)}
 .science{max-width:74ch}
 .science p{color:var(--dim);margin:18px 0}
@@ -189,30 +241,33 @@ a.chip:active{transform:scale(.96)}
 .live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
 .live-visual--validation{--accent:#b8a4ff}
 @media (max-width:720px){
-  .skill-hero{min-height:calc(100svh - 154px)}
+  .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
 }
 </style>
 </head>
 <body>
-<div class="wrap"><nav>
-  <a class="brand" href="../index.html">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../index.html#quickstart">Usage</a><a href="../index.html#install">Install</a><a href="../index.html#skills">Skills</a><a href="../index.html#gallery">Gallery</a><a href="../index.html#demos">Demos</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div>
+<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
+  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+</nav></div></div>
 
+<main id="main-content" tabindex="-1">
 <header class="">
   
   <div class="wrap">
-    <p class="crumbs"><a href="../index.html">Skill Pack</a> / <a href="../index.html#skills">Cameras, Lighting, and Final Image</a> / Camera Controls and Rigs</p>
-    <h1>Camera Controls and Rigs</h1>
-    <p class="lede">Build advanced Three.js WebGPU/TSL camera controls and rigs. Use for scale-aware chase rigs, thrust lag, side/orbit cameras, body-relative up vectors, quaternion handoffs, authored cinematic framing, floating origins with storage-buffer world offsets, pointer-look controls, camera collision constraints, projection/depth ownership, node post-pipeline integration, and lifecycle restoration.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Camera Controls And Rigs</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-camera-controls-and-rigs">Camera Controls And Rigs</h1>
+    <p class="lede">Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-camera-controls-and-rigs</span>
-      <span class="chip">1 browser demo</span>
-      <span class="chip">1 runnable example</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-04T23:30:19+03:00">2026-07-04</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3b103c7d9e766b6eb3620bd7d76dd0e5743fc2b7">commit 3b103c7 ↗</a>
+      <span class="chip">1 primary implementation</span>
+<span class="chip">3 flagships</span>
+<span class="chip">1 secondary surface</span>
+      <span class="chip">native evidence pending</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-camera-controls-and-rigs/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-camera-controls-and-rigs/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -220,167 +275,40 @@ a.chip:active{transform:scale(.96)}
 </header>
 
 
-  <div class="section" id="demos"><div class="wrap">
-    <h2>Live WebGPU demos</h2>
-    <p class="sub">Browser-launchable provider demos for this skill. These are reduced-tier live surfaces or integration probes; the skill text below remains the source of truth for production requirements.</p>
-    <div class="gallery">
-      <a href="../demos/camera-rig-handoff-demo/"><figure>
-        <div class="live-visual live-visual--camera" aria-hidden="true">
-        <span class="lv-k">Live WebGPU</span>
-        <strong>scale-aware chase + handoff pose</strong>
-        <span class="lv-m">final / side / handoff</span>
-      </div>
-        <figcaption><strong>Scale-Aware Camera Rig</strong><span>One camera owner derives chase, side, and handoff poses from subject scale and projection envelopes.</span></figcaption>
-      </figure></a>
-    </div>
-  </div></div>
-
-
-  <div class="section" id="examples"><div class="wrap">
-    <h2>Runnable examples</h2>
-    <p class="sub">Shipped inside the skill folder — each is a working WebGPU/TSL scene or harness you can run and screenshot.</p>
+  <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
+    <h2 id="primary-implementations-title">Primary implementation surface</h2>
+    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
-      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-camera-controls-and-rigs/examples/webgpu-camera-rig">
-        <h4>webgpu-camera-rig</h4>
-        <span class="card-meta">threejs-camera-controls-and-rigs/examples/webgpu-camera-rig</span>
+      <a class="card" href="../demos/webgpu-camera-rig/">
+        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>WebGPU Camera Rig</h3>
+        <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
       </a>
     </div>
-  </div></div>
+  </div></section>
 
-<div class="section" id="skill-text"><div class="wrap">
-  <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Camera Controls and Rigs</h2>
-<p>Treat the camera as an authored visual system, not a passive viewport. The
-fast path is renderer-agnostic camera ownership expressed on the current
-Three.js WebGPU stack: <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL
-(<code>three/tsl</code>), <code>NodeMaterial</code> materials, and <code>RenderPipeline</code> node post.</p>
-<h2>Architecture First</h2>
-<p>The best architecture for camera direction is not a shader trick. It is a
-single camera owner that computes a semantic pose, writes projection/depth
-state once, and feeds the node render pipeline with stable camera-relative
-coordinates. Keep this order:</p>
-<ol>
-<li>Define the design frame: subject bounds, desired screen occupancy, lens,
-near/far envelope, target frame time, post stack, and horizon/up convention.</li>
-<li>Build semantic target poses in subject, body, docking-axis, or
-shot-authored frames. Each mode must produce a valid position/quaternion
-without depending on another mode.</li>
-<li>Use a canonical camera basis: visual forward maps to camera local <code>-Z</code>,
-right maps to <code>+X</code>, and up maps to <code>+Y</code>. Validate by projecting the target
-to screen center.</li>
-<li>Derive position and orientation independently, then combine them once.</li>
-<li>Add input orbit/look only inside declared yaw/pitch and spatial
-constraints.</li>
-<li>Apply frame-rate-independent exp-decay smoothing or a bounded spring only
-where inertia is part of the shot. During explicit handoff, use one
-<code>lerp</code>/<code>slerp</code> stage and return.</li>
-<li>Own projection, depth, view offsets, output color, node post, and controls
-lifecycle as one snapshot/restore contract.</li>
-<li>For large worlds, keep the camera near the origin and move renderable
-world offsets through storage buffers or camera-relative group transforms.</li>
-</ol>
-<p>Read <a href="references/camera-rig-and-cinematic-systems.md">references/camera-rig-and-cinematic-systems.md</a>
-for chase/side/orbit rigs, projection and depth policy, pointer/orbit
-interop, floating-origin storage-buffer patterns, collision, budgets, and
-validation.</p>
-<h2>WebGPU/TSL Baseline</h2>
-<ul>
-<li>Renderer: <code>WebGPURenderer</code> from <code>three/webgpu</code>; call <code>await renderer.init()</code>
-before capability decisions.</li>
-<li>Materials: <code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>,
-<code>MeshBasicNodeMaterial</code>, <code>SpriteNodeMaterial</code>, or another <code>NodeMaterial</code>
-family member. Put camera-relative deformation and world-offset math in TSL
-nodes.</li>
-<li>Post: <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
-<code>outputColorTransform</code>, and <code>renderOutput()</code>. <code>PostProcessing</code> was renamed;
-mention it only as historical context and use <code>RenderPipeline</code> in current
-text and code.</li>
-<li>Built-in nodes first: use <code>GTAONode</code>, <code>BloomNode</code>, <code>TRAANode</code>,
-<code>DepthOfFieldNode</code>, <code>CSMShadowNode</code>, and <code>TileShadowNode</code> where camera
-projection/depth participates in the effect.</li>
-<li>GPU state: use <code>StorageBufferAttribute</code>, <code>StorageInstancedBufferAttribute</code>,
-<code>StorageTexture</code>, <code>storage()</code> nodes, and <code>renderer.compute()</code> /
-<code>renderer.computeAsync()</code> for large camera-relative fields or generated
-offsets.</li>
-</ul>
-<h2>Capability Gate And Tiers</h2>
-<p>Any path that uses compute, storage, or MRT must gate once after init:</p>
-<pre><code class="language-js">await renderer.init();
-
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(&quot;WebGPU backend required for the canonical camera rig path. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route to threejs-compatibility-fallbacks.&quot;);
-}
-
-const tier = &quot;full&quot;;
-</code></pre>
-<p>Full tier uses storage-buffer world offsets, MRT depth/normal/velocity output,
-TRAA jitter, and compute-updated camera-relative instance data. Reduced tier
-inside WebGPU may lower post resolution, density, update cadence, or scene
-scale while preserving the same camera owner and projection contract. Do not
-write a second renderer implementation here. If the user explicitly asks how to
-apply fallback when WebGPU is unavailable, route that teaching to
-<code>../threejs-compatibility-fallbacks/</code>.</p>
-<h2>Non-Negotiable Rules</h2>
-<ul>
-<li>Derive offsets from subject <code>Box3</code>/bounding sphere dimensions; do not tune a
-single fixed distance for differently scaled assets.</li>
-<li>Use <code>PerspectiveCamera.getViewSize(distance, scratch.viewSize)</code> or
-<code>getViewBounds(distance, scratch.minView, scratch.maxView)</code> to measure screen
-occupancy before changing FOV or distance.</li>
-<li>Keep <code>near</code> as large and <code>far</code> as small as each mode allows. Prefer
-camera-relative rendering and <code>reversedDepthBuffer</code>; use
-<code>logarithmicDepthBuffer</code> only after measuring depth/post/shadow behavior.</li>
-<li>Rebuild orthonormal frames with degeneracy fallbacks. Never rely on
-<code>lookAt()</code> under non-uniformly scaled parents.</li>
-<li>Call <code>updateWorldMatrix()</code> before reading mounts, use <code>localToWorld()</code>,
-<code>worldToLocal()</code>, <code>getWorldPosition()</code>, and <code>getWorldQuaternion()</code> for
-hierarchy crossings, and avoid non-uniform camera/control parents.</li>
-<li>Interpolate position with <code>lerp</code> and orientation with <code>slerp</code>; normalize
-quaternions after custom math.</li>
-<li>Clamp tab-stall <code>dt</code>, substep springs when required, and allocate scratch
-vectors/quaternions/matrices once in rig state.</li>
-<li>Re-sync yaw/pitch from the camera when pointer lock is acquired. Disable
-orbit/pointer controls during authored transitions, then sync targets and
-call <code>controls.update()</code> before returning control.</li>
-<li>Snapshot and restore projection (<code>fov</code>, <code>near</code>, <code>far</code>, <code>aspect</code>, <code>zoom</code>,
-<code>filmGauge</code>, <code>filmOffset</code>, view offset), <code>camera.up</code>, layers, controls,
-event listeners, pointer-lock state, render pipeline output ownership, and
-depth assumptions.</li>
-<li>Color textures use <code>SRGBColorSpace</code>; data maps, masks, velocity, normals,
-depth helpers, LUTs, and generated offset data use <code>NoColorSpace</code>/linear.
-Keep HDR <code>HalfFloatType</code> buffers until one tone-map owner and one output
-transform owner convert the final image.</li>
-</ul>
-<h2>Performance Budgets</h2>
-<ul>
-<li>Camera rig CPU update: 0 allocations and under 0.10 ms desktop-discrete,
-0.20 ms desktop-integrated, 0.35 ms mobile for one active camera owner.</li>
-<li>Explicit handoff: one pose blend and no extra smoothing pass.</li>
-<li>Storage-buffer camera-relative offset update: one compute dispatch per
-dynamic field, with static offsets computed once; target under 0.15 / 0.35 /
-0.70 ms by tier.</li>
-<li>Node post camera dependencies: one scene <code>pass()</code> with MRT for shared
-color/depth/normal/velocity where possible; keep AO/bloom/DOF at reduced
-resolution via <code>setResolutionScale()</code> unless close-up inspection requires
-full resolution.</li>
-<li>Draw calls: camera system adds zero draw calls except optional debug guides.
-Debug overlays must be toggleable and excluded from production budgets.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-procedural-motion-systems</code> for object motion timelines, springs,
-docking, staging, and debris. Use <code>$threejs-camera-controls-and-rigs</code> for how the
-scene is viewed, how camera modes hand off, and how projection/depth/post
-state follows the shot. For broad graphics architecture preflight, route
-through <code>$threejs-choose-skills</code>; for shadows, post, atmosphere, planets, water,
-or bloom details, keep links to the relevant sibling <code>$threejs-...</code> skills.</p>
-</div>
-  <div class="pn">
-    <a href="threejs-bloom.html">← Bloom</a>
-    <a href="threejs-choose-skills.html">Three.js WebGPU/TSL Choose Skills →</a>
-  </div>
-</div></div>
-
+  <section class="section" id="flagship-participation" aria-labelledby="flagship-participation-title"><div class="wrap">
+    <h2 id="flagship-participation-title">Flagship participation</h2>
+    <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
+    <div class="grid">
+      <a class="card" href="../demos/final-image-flight/">
+        <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Final Image Flight</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/creature-habitat/">
+        <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Creature Habitat</h3>
+        <span class="card-meta">5 mechanisms · 3 locked tiers</span>
+      </a>
+      <a class="card" href="../demos/relativistic-space-shot/">
+        <span class="card-head"><span class="card-index">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Relativistic Space Shot</h3>
+        <span class="card-meta">6 mechanisms · 3 locked tiers</span>
+      </a>
+    </div>
+  </div></section>
 
   <div class="section" id="approach"><div class="wrap">
     <h2>The approach, mathematically</h2>
@@ -398,10 +326,365 @@ buffer so camera-local coordinates stay in float32-safe range
 ($|\mathbf p| < 10^4$ m keeps sub-millimeter precision).</p></div>
   </div></div>
 
+
+
+<div class="section" id="skill-text"><div class="wrap">
+  <h2>The full skill</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <div class="skilltext"><h2>Camera Controls And Rigs</h2>
+<p>A camera system emits exactly one semantic pose, one unjittered projection, and
+one coordinate-origin epoch per frame. Controls, fit solvers, authored shots,
+temporal jitter, and post effects are separate owners with an explicit handoff;
+they must not all mutate the camera opportunistically.</p>
+<h2>Number Labels</h2>
+<p>Label every consequential number in an implementation or review:</p>
+<ul>
+<li><strong>Derived</strong>: computed from bounds, viewport, projection, target refresh rate,
+adapter limits, or a stated equation.</li>
+<li><strong>Gated</strong>: a hard correctness/resource limit that fails validation when
+exceeded.</li>
+<li><strong>Measured</strong>: captured on the named device, resolution, DPR, scene, and
+sustained trace; never copied from this skill.</li>
+<li><strong>Authored</strong>: composition or interaction intent such as occupancy, lens,
+damping, or horizon placement.</li>
+</ul>
+<p>Unlabelled millisecond targets and universal camera distances are invalid.</p>
+<h2>Choose The Framing Problem First</h2>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th>First camera architecture</th>
+<th>Primary correctness test</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Product/asset inspection</td>
+<td>bounds-fit perspective or orthographic camera plus <code>OrbitControls</code></td>
+<td>every required bound remains inside the safe frame through a full rotation</td>
+</tr>
+<tr>
+<td>Architecture/interior</td>
+<td>eye- or section-plane anchors, lens shift, constrained orbit/pan/walkthrough</td>
+<td>vertical/horizon policy, near-plane clearance, and room-scale navigation remain stable</td>
+</tr>
+<tr>
+<td>Scientific/data visualization</td>
+<td>reproducible pose records, declared axes/units, perspective or orthographic projection selected by measurement semantics</td>
+<td>projected scale, clipping, and axis conventions are deterministic</td>
+</tr>
+<tr>
+<td>Geospatial/astronomical scale</td>
+<td>local tangent frame plus rebased or high/low camera-relative coordinates</td>
+<td>no float32 jitter, origin pop, or temporal-history discontinuity at representative coordinates</td>
+</tr>
+<tr>
+<td>Cinematic/editorial</td>
+<td>authored pose/projection tracks with explicit cut and blend epochs</td>
+<td>frame-rate-independent endpoints and intentional temporal-history resets</td>
+</tr>
+</tbody></table>
+<p>Use planar <code>getViewSize()</code> only for centered size occupancy when subject depth
+is small; it discards principal-point translation. Use <code>getViewBounds()</code> for an
+asymmetric frame. For volumes, bisect only the XY occupancy residual under
+fixed orientation/intrinsics and a safe frame containing the principal point,
+then intersect its distance bracket with the independently Derived near/far
+feasible interval. Otherwise solve frustum shift/pose too or report infeasible.
+Orthographic framing changes frustum or <code>zoom</code>; dolly does not change occupancy.</p>
+<h2>Ownership Order</h2>
+<ol>
+<li>Resolve the active semantic owner: user controls, fit solver, authored shot,
+or external/XR camera.</li>
+<li>Compute the owner pose in a declared reference frame; camera local forward
+is <code>-Z</code>, right is <code>+X</code>, and up is <code>+Y</code>.</li>
+<li>Apply constraints/obstruction to the desired position without changing the
+aim contract.</li>
+<li>Blend once, if and only if an explicit handoff is active.</li>
+<li>Write camera pose and unjittered projection once; update world and projection
+matrices.</li>
+<li>Rebase camera-relative coordinates only at a declared origin epoch.</li>
+<li>Let the temporal node own transient projection jitter during rendering.</li>
+<li>Return control only after its target/yaw/pitch state is reconstructed from
+the delivered camera pose.</li>
+</ol>
+<p>Input systems produce intents while inactive. They do not write the camera.</p>
+<h2>Physics Presentation Boundary</h2>
+<p>When the view follows or frames simulated content, use the acyclic lifecycle
+defined by the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
+Camera follow/framing consumes the immutable <code>PhysicsPresentationCandidate</code>
+created after simulation and any physics-origin transaction. That candidate is
+view-independent and contains no camera, render origin, view matrix, shadow
+epoch, or global-to-render mapping. The camera owner emits one immutable
+<code>CameraViewPublication</code> per target/view; visibility/shadow/cache owners consume
+both records and emit <code>ViewPreparationPublication</code>; only then does the assembler
+seal <code>PhysicsPresentationSnapshot</code>. Do not read a solver buffer,
+external-engine transform, or fixed-step endpoint directly from the camera
+loop.</p>
+<p>Validate the exact central Candidate, <code>CameraViewPublication</code>,
+<code>ViewPreparationPublication</code>, Snapshot, and every referenced
+<code>PhysicsSignalDescriptor</code>; do not redeclare a reduced camera-local schema. Each
+phase has one writer and emits a new immutable version. Camera, culling,
+shadows, velocity, post, picking, and diagnostics consume only their declared
+prior publication and never independently resample physics.</p>
+<p>The camera owner writes the exact <code>CameraViewPublication</code>: publication,
+candidate, target/view/camera and owner IDs; view scope; camera/projection
+versions; previous/current render-sample instants; complete previous/current
+<code>RenderSimilarityTransform</code>s; unjittered view/projection matrices; jitter;
+viewport; DPR/extent; depth convention; and projection validity/error. Origin
+epoch numbers alone cannot reconstruct a cross-rebase trajectory.</p>
+<p>The sealed Snapshot is deliberately small: it references candidate binding IDs,
+<code>cameraPublicationId</code>, <code>viewPreparationId</code>, lease refs, and event ranges. Render
+consumers resolve the matrices/transforms through <code>cameraPublicationId</code> and the
+reactive/reset plan through <code>viewPreparationId</code>; they do not copy mutable local
+subsets. A separate temporal owner supplies <code>jitterSampleAndConvention</code>. Motion
+vectors never use jittered projections.</p>
+<p>Each per-binding/provider <code>PresentedStatePair</code> contains independent
+<code>previousPresented</code> and <code>currentPresented</code> provenance, presented instants, state
+handles, and global bindings after that signal&#39;s declared clock mapping and
+interpolation/extrapolation policy. Solver brackets are provenance, not the two
+rendered poses. Downstream motion vectors project the presented pair. Using
+solver endpoints produces false velocity whenever render and simulation cadence
+differ.</p>
+<p>An external physics stream enters through one adapter that converts its units,
+axes, origin, IDs, timestamps, and discontinuity flags into the common context,
+buffers enough timestamped samples for the declared presentation policy, and
+publishes bounded error or invalidity when either requested presentation
+instant cannot be
+represented. It never writes the Three.js camera or object transforms beside
+the snapshot writer.</p>
+<p>Spawn, despawn, teleport, reparent, incompatible LOD, stream discontinuity, or
+identity change invalidates follow smoothing and temporal motion according to
+the <code>ViewPreparationPublication.resetDependencies</code>; it is not interpolated as
+ordinary locomotion. The reset record is a plan. Actual completion/failure belongs in the append-only
+<code>FrameExecutionRecord</code>, not a mutation of the sealed snapshot.</p>
+<p>The camera owner returns <code>CameraViewPublication</code>; preparation owners return
+<code>ViewPreparationPublication</code>; neither mutates an earlier record. Same-frame
+results are included only before sealing. An explicitly declared alternate
+schedule may defer feedback by one frame, in which case the sealed snapshot and
+render continue to name the prior committed resource/version.</p>
+<p>If required camera/projection preparation or sealing fails, append a
+<code>FrameExecutionRecord</code> with <code>overallStatus: aborted</code> (or <code>partial-failure</code> when
+another target survives), exclude the failed target from <code>snapshotIds</code>, store
+typed absence in its target execution&#39;s <code>snapshotId</code>, cancel or defer actions,
+and retire only failed-target-exclusive <code>ViewPreparationPublication.resourceLeases</code> through
+<code>leaseDispositionById</code>. Candidate/shared leases remain retained until every
+surviving snapshot consumer joins. Device loss
+appends <code>overallStatus: device-lost</code> and affected target statuses <code>device-lost</code>, advances
+<code>deviceLossGeneration</code>, cancels dependent actions, and invalidates resources
+and leases from the lost generation without mutating Candidate/Snapshot records
+or inventing a completion token. Rebuild under the new backend/resource
+generation.</p>
+<p>For a rebase, transform both presented states through their respective origin
+epochs. A pure coordinate change representing the same global trajectory must
+leave camera-relative pose, obstruction result, and projected motion invariant.
+If either epoch transform is missing or the bound is exceeded, increment the
+appropriate reactive epoch and execute the declared reset dependencies before
+rendering; do not encode the origin jump as physical motion.</p>
+<p>Stock r185 <code>TRAANode</code> cannot preserve its previous-depth history across any
+render-origin translation or tangent-basis rebase, even when custom velocity is
+rebase-correct. Rebuild/reseed it. Only a custom/patched temporal node using
+both complete global-to-render transforms may preserve history after proof.</p>
+<h2>r185 WebGPU/TSL Contract</h2>
+<pre><code class="language-js">import { WebGPURenderer, RenderPipeline } from &quot;three/webgpu&quot;;
+import { pass, mrt, output, velocity, renderOutput } from &quot;three/tsl&quot;;
+import { traa } from &quot;three/addons/tsl/display/TRAANode.js&quot;;
+
+const renderer = new WebGPURenderer({ reversedDepthBuffer: true });
+await renderer.init();
+
+if (renderer.backend.isWebGPUBackend !== true) {
+  throw new Error(&quot;This camera architecture requires the WebGPU backend.&quot;);
+}
+</code></pre>
+<p>r185 source establishes these constraints:</p>
+<ul>
+<li><code>PerspectiveCamera.getViewSize(distance, target)</code> and
+<code>getViewBounds(distance, minTarget, maxTarget)</code> use the current projection
+matrix, including zoom, film offset, and active view offset.</li>
+<li><code>PerspectiveCamera.setViewOffset()</code> stores <code>offsetX</code>/<code>offsetY</code>, changes
+<code>aspect</code>, and updates projection; orthographic view offset does not own
+aspect. Snapshot the complete <code>camera.view</code> object.</li>
+<li><code>reversedDepthBuffer</code> and <code>logarithmicDepthBuffer</code> are read-only renderer
+construction options, not per-shot state. Choose once and validate the whole
+depth/post/shadow pipeline.</li>
+<li><code>renderer.highPrecision = true</code> computes model-view and normal-view matrices
+in JavaScript number precision before upload, but r185 explicitly excludes
+<code>InstancedMesh</code> and <code>SkinnedMesh</code> from that path. Choose it before compile/
+warmup; late changes require graph invalidation/recompile.</li>
+<li>r185 <code>TRAANode</code> installs <code>RenderPipeline</code> before/after hooks, calls its own
+<code>camera.setViewOffset()</code>, then calls <code>camera.clearViewOffset()</code>. It does not
+compose or restore an authored nonzero view offset and exposes no public
+history-reset method. On <code>PerspectiveCamera</code> it also overwrites aspect; it
+assumes drawing-buffer-sized inputs for depth history and is not an
+XR/ArrayCamera contract.</li>
+<li>r185 <code>OrbitControls.update(deltaTime)</code> reconstructs camera orientation from
+<code>position</code>, <code>target</code>, and an up-basis cached at construction. <code>deltaTime</code>
+affects auto-rotate but not damping. A handoff must reconstruct <code>target</code>,
+recreate/flush latent control state, and recreate controls if <code>camera.up</code>
+changed; copying a quaternion then calling <code>update()</code> is not a contract.</li>
+</ul>
+<p>Therefore one projection owner supplies the unjittered matrix before
+<code>RenderPipeline.render()</code>. Do not manually jitter the same camera. Do not use
+the stock r185 <code>TRAANode</code> on a camera that simultaneously needs authored,
+tiled, or multi-viewport <code>view</code> offsets; use a separately owned camera/pass or
+an explicitly composed WebGPU temporal node. Recreate and dispose the temporal
+node at hard cuts or incompatible origin/projection epochs when history cannot
+remain valid. Do not resolution-scale stock TRAA inputs. Stock r185 <code>TAAUNode</code>
+is not a canonical alternative: it lacks reversed/logarithmic/orthographic
+depth paths, can copy incompatible depth formats, does not scale jitter to
+output pixels as documented, and mutates the singleton velocity node rather
+than an arbitrary supplied producer. Gate it to a standard non-log
+perspective/canonical-velocity experiment, or patch and validate depth format,
+jitter, velocity, and history.</p>
+<h2>Non-Negotiable Geometry And Projection Rules</h2>
+<ul>
+<li>Derive framing from <code>Box3</code>, <code>Sphere</code>, oriented bounds, or declared data
+extents. Never reuse one fixed distance across differently scaled content.
+Six axis extrema are not a conservative perspective projection of a sphere;
+use its tangent cone or a conservative enclosing box/hull.</li>
+<li>Rebuild an orthonormal basis with a deterministic near-parallel up fallback.
+Do not use <code>lookAt()</code> through non-uniformly scaled parents.</li>
+<li>Call <code>updateWorldMatrix()</code> before hierarchy reads and use
+<code>localToWorld()</code>, <code>worldToLocal()</code>, <code>getWorldPosition()</code>, and
+<code>getWorldQuaternion()</code> at space boundaries.</li>
+<li>Gate the active camera to an identity parent/ancestry scale of one, or convert
+the delivered world pose through the updated inverse parent world transform
+and rotation before assigning local <code>position</code>/<code>quaternion</code>.</li>
+<li>Perspective <code>near</code> must be positive and as large as visibility permits.
+r185 <code>OrthographicCamera</code> permits <code>near = 0</code>; fit its near/far interval to the
+required view volume. Reversed depth improves float-depth distribution; it
+does not excuse an unbounded projection or imprecise world coordinates.</li>
+<li>Call <code>updateProjectionMatrix()</code> after changing <code>fov</code>, <code>near</code>, <code>far</code>,
+<code>aspect</code>, <code>zoom</code>, <code>filmGauge</code>, <code>filmOffset</code>, or view offset.</li>
+<li>Use <code>lerp</code> for translation and shortest-path <code>slerp</code> for orientation. Clamp
+stalled <code>dt</code>; use <code>1 - exp(-lambda * dt)</code> or a substepped bounded spring only
+when inertia is Authored.</li>
+<li>A cut, projection discontinuity, camera-origin epoch, or render-size change
+is also a temporal-history event. Propagate it to TRAA, motion vectors, DOF,
+shadow fitting, and any reprojection cache.</li>
+<li>After an obstruction solve changes camera pose, rerun safe-frame and depth
+feasibility. Clearance and composition are coupled constraints.</li>
+</ul>
+<h2>Camera-Relative Precision</h2>
+<p>Never subtract two large float32 world positions in a vertex node. Keep global
+coordinates as JavaScript doubles on the CPU, then use one of these paths:</p>
+<ul>
+<li>Few ordinary meshes with small local vertices: enable r185
+<code>renderer.highPrecision</code> before compile/warmup and verify object types. It
+stabilizes current CPU-composed model-view only; built-in velocity and TRAA
+previous/world matrices remain float32.</li>
+<li>Chunked scenes: store vertices in chunk-local float coordinates; subtract the
+double-precision origin from each chunk origin on the CPU only when the
+origin epoch changes, then upload the small relative translation.</li>
+<li>Many instances or shared multi-pass data: store high/low split origins or
+already-relative chunk origins in <code>StorageBufferAttribute</code> /
+<code>StorageInstancedBufferAttribute</code> and consume them in one shared
+<code>positionNode</code>/caster path.</li>
+</ul>
+<p>Rebase at cell/threshold crossings, not automatically every frame. Carry both
+current and previous global-to-local transforms, including tangent-frame basis
+rotation, into velocity reconstruction or invalidate temporal history at the
+epoch. Stock velocity/TRAA require small current and previous camera-relative
+matrices; a custom high/low position path also needs matching previous-position
+velocity logic.</p>
+<h2>Optional Full-Resolution TRAA Contract</h2>
+<pre><code class="language-js">const renderPipeline = new RenderPipeline(renderer);
+const scenePass = pass(scene, camera);
+
+scenePass.setMRT(mrt({
+  output,
+  velocity,
+}));
+
+const colorTexture = scenePass.getTextureNode(&quot;output&quot;);
+const depthTexture = scenePass.getTextureNode(&quot;depth&quot;);
+const velocityTexture = scenePass.getTextureNode(&quot;velocity&quot;);
+const temporalColor = traa(colorTexture, depthTexture, velocityTexture, camera);
+
+renderPipeline.outputNode = renderOutput(temporalColor);
+renderPipeline.outputColorTransform = false;
+</code></pre>
+<p>This minimal TRAA graph deliberately omits normal and emissive attachments.
+Add MRT channels only when another declared consumer needs them. Do not combine
+TRAA with MSAA or scale its input pass below drawing-buffer resolution in r185.
+Treat it as one AA candidate—not the mobile default—against a patched/gated
+TAAU, MSAA, spatial AA, or none using Measured quality, bandwidth, persistent
+memory, copies, and resolve cost. Keep one tone-map owner and one output-
+transform owner.</p>
+<h2>Workload Breakpoints And Sustained Budgets</h2>
+<ul>
+<li><strong>Gated</strong> pose/control steady state: one active pose owner, one projection
+writer, zero transient allocations, zero pose/control-added draws. Temporal
+post draws/copies are budgeted separately.</li>
+<li><strong>Derived</strong> fit work: proportional to the number of required bound points,
+not scene triangle count; cache static bounds and update only changed sets.</li>
+<li><strong>Derived</strong> rebase upload: <code>changedChunks * bytesPerRelativeOrigin</code>; choose
+CPU group transforms, storage updates, or high/low evaluation from this
+workload and Measured transfer/vertex cost.</li>
+<li><strong>Derived/Measured</strong> high-precision CPU work: one model-view/normal-view
+callback per rendered object/pass pair; multi-pass visibility can dominate.</li>
+<li><strong>Gated</strong> temporal work: one jitter owner and one history epoch. A cut or
+origin discontinuity cannot reuse incompatible history.</li>
+<li><strong>Gated before capture</strong>: independent CPU, GPU, presented-frame, peak-memory,
+and spike/headroom budgets derived from the product target; CPU and GPU time
+overlap and are not added.</li>
+<li><strong>Measured</strong> sustained mobile evidence: target resolution/DPR, refresh goal,
+longest navigation/shot trace, thermal steady state, CPU and GPU frame
+percentiles, allocation/GC trace, origin-rebase spike, and post/shadow
+invalidation spike. Derive the frame allowance as <code>1000 / targetHz</code> and test
+the predeclared gates; the trace cannot define its own threshold. GPU claims
+require timestamp-query support and resolved timestamps, otherwise mark them
+unavailable. r185 render timestamps cover timestamped render passes, not
+compute, copies, queue gaps, or presentation; use a target profiler for
+end-to-end claims.</li>
+</ul>
+<p>Select degradation from evidence: cache/accelerate when CPU-bound; remove MRT
+and AA/post bandwidth when GPU-memory-bound; reduce overdraw/LOD when raster-
+bound; change DPR/refresh policy when thermally or presentation-bound. Preserve
+declared measurement, framing, and authorship invariants instead of applying a
+universal reduction order.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-camera-controls-and-rigs/references/camera-rig-and-cinematic-systems.md">references/camera-rig-and-cinematic-systems.md</a>
+for the detailed frame contracts, occupancy solvers, projection precision,
+controls handoff, temporal jitter, large-coordinate representations, budgets,
+and validation matrix.</p>
+<h2>Routing Boundary</h2>
+<p>Use <code>$threejs-procedural-motion-systems</code> for motion of scene objects. Use this
+skill for view pose, framing, projection, control ownership, temporal camera
+state, and camera-relative coordinates. Route shadow fitting to
+<code>$threejs-scalable-real-time-shadows</code>, post ownership to
+<code>$threejs-image-pipeline</code>, and fixed-view/replay evidence to
+<code>$threejs-visual-validation</code>.</p>
+</div>
+  <div class="pn">
+    <a href="threejs-bloom.html">← Bloom</a>
+    <a href="threejs-choose-skills.html">Three.js WebGPU/TSL Choose Skills →</a>
+  </div>
+</div></div>
+
+
+  <div class="section" id="demos"><div class="wrap">
+    <h2>Secondary provider surfaces</h2>
+    <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
+    <div class="gallery">
+      <a href="../demos/camera-rig-handoff-demo/"><figure>
+        <div class="live-visual live-visual--camera" aria-hidden="true">
+        <span class="lv-k">Concept proxy</span>
+        <strong>scale-aware chase + handoff pose</strong>
+        <span class="lv-m">final / side / handoff</span>
+      </div>
+        <figcaption><strong>Scale-Aware Camera Rig</strong><span>Concept proxy · The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path. The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.</span></figcaption>
+      </figure></a>
+    </div>
+  </div></div>
+
+</main>
+
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/llms.txt">llms.txt</a> · <a href="https://linegel.github.io/threejs-complete-set-of-skill/skills.json">skills.json</a></span>
+  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://linegel.github.io/threejs-complete-set-of-skill/sitemap.xml
+Sitemap: https://threejs-skills.com/sitemap.xml

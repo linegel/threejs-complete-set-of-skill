@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "labId": "procedural-district",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "integration-labs/procedural-district"
+  ],
+  "sourceHashInputs": [
+    "integration-labs/procedural-district",
+    "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/building-plan.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/compiler.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/diagnostics.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/exposed-edges.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/modules.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/placements.js",
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/uv-debug.js",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
+    "threejs-procedural-geometry/examples/semantic-mesh-writer/mesh-writer.js",
+    "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png",
+    "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png",
+    "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png",
+    "threejs-procedural-materials/examples/tsl-procedural-pbr/procedural-pbr-materials.js",
+    "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
+  ],
+  "browserEntry": "integration-labs/procedural-district/index.html",
+  "sourceHash": "sha256:0610238964bdd587347cd5ba8298565de173bdf582676ca262d4c80cb81b9fd1",
+  "publishedHashInputs": [
+    "docs/demos/procedural-district",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:fd34c1e85198b90f2dc6afa994c08d2dfacd17487748126a93c2cd4af91661bf",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "evidenceBundleId": null
+}
