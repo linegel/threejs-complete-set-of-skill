@@ -373,12 +373,15 @@ for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
     assert(!sitemapSet.has(wrapperUrl), `${relativePath}: state wrapper must not be in sitemap`);
     continue;
   }
-  if (/^demos\/[^/]+\/index\.html$/.test(relativePath) && /\bnoindex\b/i.test(headValue(html, 'name', 'robots')[0] ?? '')) {
+  if (/^demos\/[^/]+\/index\.html$/.test(relativePath)) {
+    const pageUrl = `${SITE}${relativePath.replace(/index\.html$/, '')}`;
+    if (sitemapSet.has(pageUrl)) continue;
+    const robots = headValue(html, 'name', 'robots');
     const owningSkill = headValue(html, 'name', 'owning-skill')[0];
     const canonical = canonicalValues(html);
+    assert(robots.length === 1 && /\bnoindex\b/i.test(robots[0]) && /\bfollow\b/i.test(robots[0]), `${relativePath}: demo excluded from sitemap must be noindex, follow`);
     assert(Boolean(owningSkill), `${relativePath}: noindex demo lacks owning-skill metadata`);
     assert(canonical.length === 1 && canonical[0] === `${SITE}skills/${owningSkill}.html`, `${relativePath}: noindex demo must canonicalize to its owning skill`);
-    const pageUrl = `${SITE}${relativePath.replace(/index\.html$/, '')}`;
     assert(!sitemapSet.has(pageUrl), `${relativePath}: noindex demo must not appear in sitemap`);
   }
 }
