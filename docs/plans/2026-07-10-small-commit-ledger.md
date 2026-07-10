@@ -1,5 +1,44 @@
 # Small Thematic Commit Ledger — 2026-07-10
 
+## Execution status — 2026-07-11
+
+The ledger remains the source-to-publication order, but Phase A has advanced.
+Do not recreate already landed commits or fold their remaining working-tree
+supersets into later lab commits.
+
+| Boundary | Status | Evidence |
+| --- | --- | --- |
+| A01 | complete | `1f56368` |
+| A02–A18 | role closure landed, historical grouping differs from the proposed one-file split | `916e377`, `3be3966`, earlier lifecycle commits; live `npm run test:skills` passes |
+| A19 | complete | `070bfcc`; live `npm run test:skills` passes |
+| A20 | complete as six fixture commits | `9cbb5e4`, `359be02`, `a7519d2`, `5b0330f`, `c5e549f`, `04f4897`; full router suite passes |
+| A21 | pending | implementation-matrix and source auditors remain untracked |
+| A22 | complete locally | `1abe419`; rerun after source freeze |
+| A23 | complete | `438be92` |
+| B–F | pending | no proxy, lab, evidence, or generated publication row is accepted by this reconciliation |
+
+### A20 executed split
+
+The original A20 row understated the fixture count. It was correctly landed as
+these smaller units:
+
+1. `test(physics): close provider and water causality` — provider, water,
+   environment, and error-ledger closure.
+2. `test(physics): close contact and material identity` — sampled material,
+   support, contact, and exact-once identity closure.
+3. `test(physics): close external and GPU ownership` — directional adapter,
+   recovery, receipt, and GPU-generation closure.
+4. `test(physics): close physical impact partitions` — chart partition,
+   non-overlap, measure, and commodity closure.
+5. `test(physics): reconcile quality migration resources` — old/new/scratch
+   allocations, traffic, completion, conservation, and retirement.
+6. `test(physics): execute routed semantic invariants` — canonical route
+   integration and the schema-keyed semantic runner.
+
+The authoritative verification at `04f4897` passed 12 recipes, 33 semantic
+invariants, 123 semantic cases, 5,230 subject-record validations, and 215
+negative cases in 265 seconds.
+
 ## Commit rules
 
 Every row below is an independent commit boundary. Do not bulk-stage an entire

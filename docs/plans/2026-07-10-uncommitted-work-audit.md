@@ -1,5 +1,50 @@
 # Uncommitted Worktree Audit — 2026-07-10
 
+## Live reconciliation — 2026-07-11
+
+The frozen snapshot below remains the preservation baseline, but it is no
+longer the current staging inventory. At `04f4897` the live checkout contains
+1,059 changed paths:
+
+- 68 paths have both staged and unstaged differences;
+- 303 tracked paths have unstaged differences;
+- one tracked path is deleted;
+- 687 paths are untracked.
+
+Relative to the 18:14Z snapshot, 886 shared paths are byte-identical, 168
+shared paths changed content, five new dirty paths appeared, and eight paths
+left the dirty inventory because they were committed. The five additions are
+`LICENSE`, `docs/about/index.html`, `docs/llm.txt`, `docs/llms.txt`, and
+`scripts/build-pages.mjs`. The committed removals include the router test,
+provider/water, external/GPU, and quality fixture modules plus the Pages hash
+and smoke validators and the deduplicated root ignore policy.
+
+The current top-level distribution still matches the original architecture:
+176 generated `docs/` paths, 152 integration-lab paths, 33 provider/registry
+paths, nine scripts, one generated root catalog, and the remaining skill-owned
+lab implementations. Therefore the original Core / Contracts / Evidence split
+is still valid; generated publication remains downstream-only.
+
+### Verified progress since the frozen snapshot
+
+| Unit | Commit(s) | Current verification |
+| --- | --- | --- |
+| audit and preservation | `1f56368` | committed without generated output |
+| physics role prose | `916e377`, `3be3966`, `0033683`, `845264a` | `npm run test:skills` passes in the live checkout |
+| Pages local/hash gates | `1abe419` | committed; publication still waits for source freeze |
+| creature ignore policy | `438be92` | committed without creature source changes |
+| provider/water causality | `9cbb5e4` | syntax and integrated router suite pass |
+| contact/material identity | `359be02` | syntax and integrated router suite pass |
+| external/GPU ownership | `a7519d2` | syntax and integrated router suite pass |
+| physical impact partitions | `5b0330f` | syntax and integrated router suite pass |
+| quality migration resources | `c5e549f` | syntax and integrated router suite pass |
+| semantic invariant execution | `04f4897` | 33 invariants, 123 cases, 5,230 record validations, 215 negative cases; PASS in 265 s |
+| skill ABI closure gate | `070bfcc` | `npm run test:skills` passes and invokes the executable router suite |
+
+This reconciliation does not promote any rendering lab to accepted. The 37
+native-WebGPU primary surfaces still require their declared browser, readback,
+timing, lifecycle, and visual evidence.
+
 ## Scope and preservation
 
 This audit freezes the repository before any new staging or bulk commit. The
