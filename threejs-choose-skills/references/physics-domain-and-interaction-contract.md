@@ -147,8 +147,8 @@ WorldPhysicsTransform:
   translationMeters: Vec3
   originCoordinateRateMps: Vec3
   angularRateOfWorldRelativeToPhysicsRadPerS: Vec3
-  originCoordinateAccelerationMps2: Vec3 | typed-absence
-  angularAccelerationRadPerS2: Vec3 | typed-absence
+  originCoordinateAccelerationMps2: Vec3 | TypedAbsence
+  angularAccelerationRadPerS2: Vec3 | TypedAbsence
   validityInterval: PhysicsTimeInterval
   error: PhysicsErrorDescriptor
 ```
@@ -195,8 +195,8 @@ PhysicsFrameDescriptor:
   parentFromFrameTranslationMeters: Vec3
   originCoordinateRateInParentMps: Vec3
   angularRateOfFrameRelativeToParentInParentRadPerS: Vec3
-  originCoordinateAccelerationInParentMps2: Vec3 | typed-absence
-  angularAccelerationInParentRadPerS2: Vec3 | typed-absence
+  originCoordinateAccelerationInParentMps2: Vec3 | TypedAbsence
+  angularAccelerationInParentRadPerS2: Vec3 | TypedAbsence
   validityInterval: PhysicsTimeInterval
   uncertainty: PhysicsErrorDescriptor
 ```
@@ -259,6 +259,63 @@ PhysicsChartDescriptor:
   curvatureAndLinearizationError: PhysicsErrorDescriptor
 ```
 
+Registries are versioned records, not untyped maps:
+
+```yaml
+PhysicsFrameRegistry:
+  registryId: PhysicsFrameRegistryId
+  owner: owner-id
+  registryRevision: opaque-version
+  rootFrameId: PhysicsFrameId
+  framesById: { PhysicsFrameId: PhysicsFrameDescriptor }
+  parentDagDigest: collision-resistant-digest
+
+PhysicsChartRegistry:
+  registryId: PhysicsChartRegistryId
+  owner: owner-id
+  registryRevision: opaque-version
+  chartsById: { PhysicsChartId: PhysicsChartDescriptor }
+  anchorFrameRegistryRevision: opaque-version
+
+PhysicsClockRegistry:
+  registryId: PhysicsClockRegistryId
+  owner: owner-id
+  registryRevision: opaque-version
+  clocksById: { PhysicsClockId: PhysicsClockDescriptor }
+  coordinationClockId: PhysicsClockId
+  mappingDagDigest: collision-resistant-digest
+
+PhysicsIdentityRegistry:
+  registryId: PhysicsIdentityRegistryId
+  owner: owner-id
+  registryRevision: opaque-version
+  namespacesByKind:
+    entity: IdentityNamespaceDescriptor
+    provider: IdentityNamespaceDescriptor
+    signal: IdentityNamespaceDescriptor
+    collider: IdentityNamespaceDescriptor
+    shape: IdentityNamespaceDescriptor
+    support: IdentityNamespaceDescriptor
+    feature: IdentityNamespaceDescriptor
+    contactManifold: IdentityNamespaceDescriptor
+    physicsMaterial: IdentityNamespaceDescriptor
+    interaction: IdentityNamespaceDescriptor
+    conservationGroup: IdentityNamespaceDescriptor
+
+IdentityNamespaceDescriptor:
+  namespaceId: opaque-id
+  owner: owner-id
+  schemaId: opaque-schema-id
+  generationPolicy: monotonically-increment-on-reuse
+  allocationCursor: monotonic-integer-sequence
+  retiredGenerationDigest: collision-resistant-digest
+```
+
+The frame parent graph is acyclic, has exactly one registered root, and every
+parent reference resolves inside the same registry revision. Every chart anchor
+resolves against `anchorFrameRegistryRevision`. Every clock-map edge resolves in
+the same clock-registry revision and the mapping graph has no competing path
+with a different result/error. Registry revision changes are atomic publications.
 `PhysicsIdentityRegistry` assigns distinct generation-bearing IDs for entity,
 provider, signal, collider, shape, support, feature, contact manifold,
 `PhysicsMaterialId`, interaction, and conservation group. IDs are never GPU
@@ -290,8 +347,8 @@ PhysicsTimeInterval:
 
 PhysicsTime:
   kind: instant | interval
-  instant: PhysicsInstant | typed-absence
-  interval: PhysicsTimeInterval | typed-absence
+  instant: PhysicsInstant | TypedAbsence
+  interval: PhysicsTimeInterval | TypedAbsence
 ```
 
 Canonicalize the rational with `0 <= numerator < denominator` and
@@ -309,10 +366,10 @@ seconds or ticks:
 ```yaml
 PhysicsDuration:
   kind: seconds | clock-span
-  seconds: Quantity<second> | typed-absence
-  clockSpan: PhysicsClockSpan | typed-absence
-  secondsDerived: Quantity<second> | typed-absence # [D] for a clock-span
-  mappingError: PhysicsErrorDescriptor | typed-absence
+  seconds: Quantity<second> | TypedAbsence
+  clockSpan: PhysicsClockSpan | TypedAbsence
+  secondsDerived: Quantity<second> | TypedAbsence # [D] for a clock-span
+  mappingError: PhysicsErrorDescriptor | TypedAbsence
 
 PhysicsClockSpan:
   clockId: PhysicsClockId
@@ -322,9 +379,9 @@ PhysicsClockSpan:
 
 PhysicsDeadline:
   kind: absolute-time | duration-from-request
-  absoluteTime: PhysicsInstant | typed-absence
-  requestInstant: PhysicsInstant | typed-absence
-  duration: PhysicsDuration | typed-absence
+  absoluteTime: PhysicsInstant | TypedAbsence
+  requestInstant: PhysicsInstant | TypedAbsence
+  duration: PhysicsDuration | TypedAbsence
 ```
 
 Exactly one duration/deadline arm is present. A seconds duration has no clock
@@ -346,25 +403,25 @@ PhysicsClockDescriptor:
   mappingKind: fixed-rational | timestamp-table | piecewise-versioned | external
   mapping:
     fixedRational:
-      { epochTick, epochRationalSubstep, epochSeconds, secondsPerTick } | typed-absence
+      { epochTick, epochRationalSubstep, epochSeconds, secondsPerTick } | TypedAbsence
     timestampTable:
       { tableVersion, coveredInstantRange, knotTable, interpolationRule,
-        outOfRangePolicy, error } | typed-absence
+        outOfRangePolicy, error } | TypedAbsence
     piecewiseVersioned:
       { segmentTableVersion, coveredInstantRange, segmentTable,
-        outOfRangePolicy, error } | typed-absence
+        outOfRangePolicy, error } | TypedAbsence
     external:
       { adapterId, adapterVersion, mappingHandle, coveredInstantRange,
         frozenEvaluationTable, onlineQueryProtocol, unloggedQueryPolicy,
-        error } | typed-absence
+        error } | TypedAbsence
   pauseSeekPolicy: typed-policy
   timeScalePolicy: typed-policy
   coordinationClockMap: versioned-map-and-error
 ```
 
 `knotTable` and `segmentTable` are each a discriminated storage record: either
-`{ storage: inline, inlineEntries, resourceRef: typed-absence }` or
-`{ storage: immutable-resource, inlineEntries: typed-absence,
+`{ storage: inline, inlineEntries, resourceRef: TypedAbsence }` or
+`{ storage: immutable-resource, inlineEntries: TypedAbsence,
 resourceRef: { contentDigest, byteLayout, elementCount } }`. Resolving the
 resource by digest must reproduce the exact canonical entry bytes. A timestamp
 knot is `{ instantKey: { tick, rationalSubstep }, timeSeconds }`. An affine
@@ -412,12 +469,16 @@ PhysicsGraph:
   graphId: PhysicsGraphId
   contextId: PhysicsContextId
   coordinationInterval: PhysicsTimeInterval
+  coordinationAdvance: PhysicsCoordinationAdvanceRecord
+  catchUpBatch: PhysicsCatchUpBatch | TypedAbsence
   stages: [PhysicsGraphStage]
   edges: [PhysicsGraphEdge]
+  dependencies: [PhysicsDependency]
   loopMacros: [BoundedCouplingLoop]
   commitGroups: [PhysicsCommitGroup]
+  commitTransactions: [PhysicsCommitTransaction]
   originRebaseTransactions: [PhysicsOriginRebaseTransaction]
-  catchUpPolicy: graph-wide-policy
+  catchUpPolicy: PhysicsCatchUpPolicy
   discontinuityPolicy: graph-wide-policy
   executionLedger: PhysicsExecutionLedger
 ```
@@ -442,14 +503,75 @@ PhysicsGraphStage:
   clockId: PhysicsClockId
   executionInterval: PhysicsTimeInterval
   samplePhase: interval-start | substep-stage | interval-end | analytic-at-request
-  reads:
-    - { signalId, requiredStateVersion, requiredDisposition, samplePhase }
-  writes:
-    - { signalId, producedStateVersion, disposition, commitGroupId }
+  reads: [PhysicsStageRead]
+  writes: [PhysicsStageWrite]
   immutableSubstepParameters: { parameterRecordId, version }
   nativeStepRule: analytic | fixed | adaptive | event | streamed | external
+  executionRule: PhysicsStageExecutionRule
   executionResidency: PhysicsResidencyDescriptor
   failurePolicy: typed-atomic-policy
+
+PhysicsStageRead:
+  readId: PhysicsStageReadId
+  signalId: PhysicsSignalId
+  requiredStateVersionRule: committed-predecessor | loop-seed-or-prior-iteration | exact-named-version
+  requiredDisposition: committed | loop-provisional | transaction-prepared
+  requestedTime: PhysicsTime
+  samplePhase: interval-start | substep-stage | interval-end | analytic-at-request
+  maximumStaleness: PhysicsDuration | not-applicable
+  dependencyId: PhysicsDependencyId | TypedAbsence
+  consumerTolerance: typed-gate
+
+PhysicsStageWrite:
+  writeId: PhysicsStageWriteId
+  signalId: PhysicsSignalId
+  producedStateVersionRule: execution-derived-unique-version
+  disposition: loop-provisional | transaction-prepared
+  producedTime: PhysicsTime
+  commitGroupId: PhysicsCommitGroupId | TypedAbsence
+  stateAdvanceClaimId: StateAdvanceClaimId | TypedAbsence
+  publicationEligibility: loop-accepted-only | transaction-commit-only | never-publish
+
+PhysicsStageExecutionRule:
+  activation: per-advance | per-loop-iteration | per-event | per-analytic-request
+  partition: single | exact-subcycle-tile | sparse-events | analytic-samples
+  maximumActivationsPerAdvance: Quantity<activations>
+  maximumExecutionsPerActivation: Quantity<executions>
+  nativeSubcycleSelection: fixed-count | stability-bound | error-controller | event-times | not-applicable
+  ordering: monotonic-interval-then-native-sequence
+
+PhysicsStageExecution:
+  executionId: PhysicsStageExecutionId
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  stageId: PhysicsGraphStageId
+  executionSequence: integer
+  executionInterval: PhysicsTimeInterval
+  coordinationCoverageInterval: PhysicsTimeInterval
+  coordinationClockMappingProof: clock-map-revision-error-and-rational-endpoints
+  subcycleIndex: integer | TypedAbsence
+  couplingLoopId: BoundedCouplingLoopId | TypedAbsence
+  iterationIndex: integer | TypedAbsence
+  readResolutions: [read-id-state-version-time-and-dependency]
+  writeResolutions: [write-id-prepared-version-and-content-digest]
+  dependencyCompletions: [PhysicsDependencyCompletionRef]
+  stateAdvanceClaimIds: [StateAdvanceClaimId]
+  interactionApplicationLedgerIds: [InteractionApplicationLedgerId]
+  status: prepared | completed | rejected | failed
+  completionReceiptDigest: collision-resistant-digest
+
+StateAdvanceClaim:
+  claimId: StateAdvanceClaimId
+  contextId: PhysicsContextId
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  owner: state-equation-owner-id
+  stateEquationId: named-state-equation
+  kind: analytic-evaluation | state-hold | state-advance | event-application
+  inputCommittedVersions: [typed-version-ref]
+  outputPreparedVersion: typed-version-ref | TypedAbsence
+  applicationInterval: PhysicsTimeInterval | TypedAbsence
+  nativeExecutionIds: [PhysicsStageExecutionId]
+  interactionApplicationLedgerIds: [InteractionApplicationLedgerId]
+  exactOnceAdvanceKey: collision-free-key
 
 PhysicsGraphEdge:
   edgeId: PhysicsGraphEdgeId
@@ -460,11 +582,123 @@ PhysicsGraphEdge:
   interpolationExtrapolation: named-policy-and-error | not-used
   maximumStaleness: PhysicsDuration | not-applicable
   latency: PhysicsLatencyDescriptor
-  barrier: cpu-data | gpu-pass-dispatch | same-queue-transition | cross-queue | copy-map | external-fence | none
+  barrier: PhysicsDependencyRef
   absencePolicy: block | declared-approximation | not-used
+
+PhysicsDependencyRef:
+  dependencyId: PhysicsDependencyId
+  requiredCompletionVersion: opaque-version
+
+PhysicsDependency:
+  dependencyId: PhysicsDependencyId
+  kind: cpu-data | gpu-pass-dispatch | same-queue-transition | cross-queue | copy-map | external-fence | none
+  producerStageId: PhysicsGraphStageId
+  consumerStageId: PhysicsGraphStageId
+  payloadSchemaAndVersionRule: typed-signal-exchange-state-or-resource-rule
+  producerResidencyRule: typed-residency-rule
+  consumerResidencyRule: typed-residency-rule
+  resourceSubresourceRule: typed-resource-range-rule | TypedAbsence
+  accessTransitionRule: producer-access-to-consumer-access-rule
+  generationCompatibilityRule: typed-generation-rule | TypedAbsence
+  releaseAcquireProtocol: typed-protocol | TypedAbsence
+  externalFenceOrHostVisibilityRule: typed-proof-rule | TypedAbsence
+  completionSemantics: exact-template-condition
+
+PhysicsDependencyCompletionRef:
+  completionId: PhysicsDependencyCompletionId
+  dependencyId: PhysicsDependencyId
+  receiptDigest: collision-resistant-digest
+
+PhysicsDependencyCompletion:
+  completionId: PhysicsDependencyCompletionId
+  dependencyId: PhysicsDependencyId
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  producerExecutionId: PhysicsStageExecutionId
+  consumerExecutionId: PhysicsStageExecutionId
+  payloadAndVersion: typed-signal-exchange-state-or-resource-ref
+  producerResidency: PhysicsResidencyDescriptor
+  consumerResidency: PhysicsResidencyDescriptor
+  resourceIdentityAndSubresource: typed-resource-ref | TypedAbsence
+  accessTransition: producer-access-to-consumer-access
+  deviceBackendResourceGenerations: typed-generation-tuple | TypedAbsence
+  producerRelease: submission-epoch-and-completion-token | TypedAbsence
+  consumerAcquire: wait-token-and-first-use | TypedAbsence
+  externalFenceOrHostVisibility: typed-proof | TypedAbsence
+  status: completed | failed
+  receiptDigest: collision-resistant-digest
+
+PhysicsCatchUpPolicy:
+  owner: graph-coordinator-id
+  debtClockId: PhysicsClockId
+  maximumDebt: PhysicsDuration
+  maximumCoordinationAdvancesPerPresentationOpportunity: Quantity<advances>
+  maximumNativeExecutionsPerOpportunity: Quantity<executions>
+  debtDisposition: retain | drop-with-loss-ledger | block-presentation
+  discontinuityOnDrop: required | forbidden
+  externalDeadlinePolicy: wait | reject-advance | bounded-defer
+  errorAndResourceGates: [typed-gate]
+
+PhysicsCatchUpDebtIdentity:
+  debtIdentityId: PhysicsCatchUpDebtIdentityId
+  graphId: PhysicsGraphId
+  debtClockId: PhysicsClockId
+  sourceCursorBeforeAfter: typed-monotonic-cursor-pair
+  presentationOpportunitySequence: integer
+  observedAt: PhysicsInstant
+  policyRevision: opaque-version
+
+PhysicsCatchUpLossLedger:
+  lossLedgerId: PhysicsCatchUpLossLedgerId
+  debtIdentityId: PhysicsCatchUpDebtIdentityId
+  droppedIntervals: [PhysicsTimeInterval]
+  droppedStateEquationAdvances: [state-equation-id-and-interval]
+  droppedInteractionAndEventRanges: [typed-closed-range]
+  lostCommodities: typed-commodity-map
+  approximationErrors: [PhysicsErrorDescriptor]
+  discontinuityEpochBeforeAfter: typed-version-pair
+  resetActions: [ScopedResetAction]
+  contentDigest: collision-resistant-digest
+
+PhysicsCatchUpBatch:
+  catchUpBatchId: PhysicsCatchUpBatchId
+  graphId: PhysicsGraphId
+  contextId: PhysicsContextId
+  owner: graph-coordinator-id
+  debtIdentity: PhysicsCatchUpDebtIdentity
+  debtBefore: PhysicsDuration
+  elapsedDuringBatch: PhysicsDuration
+  admittedAdvanceIntervals: [PhysicsTimeInterval]
+  coordinationAdvanceIds: [PhysicsCoordinationAdvanceId]
+  committedAdvanceDuration: PhysicsDuration
+  explicitlyDroppedDuration: PhysicsDuration
+  debtAfter: PhysicsDuration
+  lossLedger: PhysicsCatchUpLossLedger | TypedAbsence
+  policyRevision: opaque-version
+  errorResourceAndExecutionGateResults: [typed-gate-and-result]
+  status: completed | rejected | blocked
+  receiptDigest: collision-resistant-digest
+
+PhysicsCoordinationAdvanceRecord:
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  graphId: PhysicsGraphId
+  contextId: PhysicsContextId
+  coordinationSequence: integer
+  catchUpBatchId: PhysicsCatchUpBatchId | TypedAbsence
+  predecessorAdvanceId: PhysicsCoordinationAdvanceId | TypedAbsence
+  predecessorReceiptDigest: collision-resistant-digest | TypedAbsence
+  interval: PhysicsTimeInterval
+  debtBefore: PhysicsDuration
+  debtAfter: PhysicsDuration
+  stageExecutionIds: [PhysicsStageExecutionId]
+  stateAdvanceClaimIds: [StateAdvanceClaimId]
+  commitTransactionIds: [PhysicsCommitTransactionId]
+  status: prepared | committed | rejected | failed
+  receiptDigest: collision-resistant-digest
 
 BoundedCouplingLoop:
   loopId: BoundedCouplingLoopId
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  couplingInterval: PhysicsTimeInterval
   orderedStageIds: [PhysicsGraphStageId]
   iterationBound: Quantity<iterations> # [G]
   residuals: [typed-residual-norm]
@@ -477,6 +711,9 @@ BoundedCouplingLoop:
   iterationVersionRule: exact-iteration-index-and-bracket-rule
   acceptedWrites: [provisional-version-ref]
   perIterationLedger: [CouplingIterationLedger]
+  acceptedIterationIndex: integer | TypedAbsence
+  acceptedWriteLineage: [CouplingAcceptedWriteLineage]
+  outerEdgePolicy: ingress-committed-and-accepted-egress-only
   acceptedIteratePublication: atomic
   divergenceFallback: reject | rollback | declared-one-way-degrade
 
@@ -501,19 +738,73 @@ CouplingIterationLedger:
   residualValues: [labelled-quantity]
   conservationResults: [ConservationGroupId-and-status]
   accepted: boolean
+  stageExecutionIds: [PhysicsStageExecutionId]
+  interactionApplicationLedgerIds: [InteractionApplicationLedgerId]
+  outputContentDigest: collision-resistant-digest
   dependencyCompletionRefs: [typed-completion-ref]
+
+CouplingAcceptedWriteLineage:
+  loopId: BoundedCouplingLoopId
+  acceptedIterationIndex: integer
+  provisionalVersion: typed-version-ref
+  iterationOutputDigest: collision-resistant-digest
+  preparedPublicationId: PhysicsPreparedPublicationId
+  preparedVersion: typed-version-ref
+  semanticEquivalenceProof: exact-copy | immutable-handle-promotion | named-conversion-with-error
 
 PhysicsCommitGroup:
   commitGroupId: PhysicsCommitGroupId
   owner: transaction-owner-id
   interval: PhysicsTimeInterval
   provisionalVersions: [typed-version-ref]
+  preparedPublications: [PhysicsPreparedPublication]
   committedPublications: [typed-version-ref]
   publicationLineage: [CommitPublicationLineage]
   stateEquationOwners: { named-state-equation: owner-id }
   conservationAndErrorGates: [typed-gate]
   atomicity: all-or-none
   failureDisposition: rollback | preserve-prior-commit | typed-degraded-commit
+  commitTransactionId: PhysicsCommitTransactionId
+
+PhysicsPreparedPublication:
+  preparedPublicationId: PhysicsPreparedPublicationId
+  commitGroupId: PhysicsCommitGroupId
+  stateEquationOwner: owner-id
+  signalOrStateEquationId: id
+  provisionalVersion: typed-version-ref
+  preparedVersion: typed-version-ref
+  contentDigest: collision-resistant-digest
+  ownerApproval: owner-id-and-revision
+  prepareDependencyRefs: [PhysicsDependencyRef]
+  visibility: transaction-private
+
+PhysicsCommitTransaction:
+  commitTransactionId: PhysicsCommitTransactionId
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  contextId: PhysicsContextId
+  interval: PhysicsTimeInterval
+  commitGroupIds: [PhysicsCommitGroupId]
+  preparedPublicationIds: [PhysicsPreparedPublicationId]
+  conservationErrorAndResourceGates: [typed-gate-and-result]
+  priorCommittedVersions: [typed-version-ref]
+  publicationSetDigest: collision-resistant-digest
+  atomicPublicationProtocol: prepare-validate-single-registry-swap
+  status: preparing | prepared | committed | rejected | rolled-back
+  receipt: PhysicsCommitReceipt | TypedAbsence
+
+PhysicsCommitReceipt:
+  receiptId: PhysicsCommitReceiptId
+  commitTransactionId: PhysicsCommitTransactionId
+  publicationInstant: PhysicsInstant
+  preparedToCommittedPublicationMap: [prepared-publication-id-version-digest-to-committed-version-digest]
+  committedPublications: [typed-version-ref]
+  priorToCommittedVersionMap: [typed-version-transition]
+  publicationSetDigest: collision-resistant-digest
+  registryRevisionBeforeAfter: typed-version-pair
+  dependencyCompletionRefs: [PhysicsDependencyCompletionRef]
+  conservationAndErrorGateResults: [typed-gate-and-result]
+  status: committed
+  receiptDigest: collision-resistant-digest
 
 CommitPublicationLineage:
   provisionalVersion: typed-version-ref
@@ -528,41 +819,63 @@ PhysicsExecutionLedger:
   graphId: PhysicsGraphId
   graphRevision: opaque-version
   coordinationInterval: PhysicsTimeInterval
-  stageExecutions:
-    - { stageId, executionInterval, executionSequence, inputVersions,
-        provisionalOutputVersions, committedOutputVersions, status,
-        dependencyCompletionRefs }
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  stageExecutions: [PhysicsStageExecution]
+  dependencyCompletions: [PhysicsDependencyCompletion]
+  stateAdvanceClaims: [StateAdvanceClaim]
+  interactionApplicationLedgers: [InteractionApplicationLedger]
   loopResults: [loop-id-iterations-residuals-and-accepted-iterate]
-  commitResults: [commit-group-id-status-and-published-versions]
+  commitReceipts: [PhysicsCommitReceipt]
   catchUpDebtBeforeAfter: typed-duration-pair
   discontinuityEpoch: opaque-version
   physicsCostLedgerId: PhysicsCostLedgerId
 ```
 
-One ledger covers one graph coordination interval. Stage rows are ordered by
+One ledger covers one `PhysicsCoordinationAdvanceRecord` and one graph
+coordination interval. Stage rows are ordered by
 the graph partial order and execution sequence; a committed output must appear
-in exactly one successful `commitResults` row. The cost-ledger reference binds
+in exactly one successful `commitReceipt`. The cost-ledger reference binds
 the same target/workload quality state used to measure this execution policy;
 it is not a timing value copied into every row.
 
 A `PhysicsGraphStage` declares `stageId`, `stageKind`, owner, `clockId`, exact
-input interval and sample phase, read versions, write versions, immutable
+input interval and sample phase, static read/write port version rules, immutable
 substep-parameter record, native stepping rule, execution residency, and failure
-policy. A write is either loop/transaction-local `provisional` state or a
-`committed-publication`; it never becomes externally sampleable merely because a
+policy. A stage write is either loop-local `provisional` state or a
+transaction-private `prepared` state; it never becomes externally sampleable merely because a
 dispatch completed. Every externally visible committed version appears in
 exactly one `PhysicsCommitGroup`, and only the authoritative state-equation owner
 may contribute its publication. A coordinator may commit an owner's already
 prepared version atomically but does not become a second state-equation owner.
 
+For a stage with `exact-subcycle-tile`, its successful
+`PhysicsStageExecution` intervals
+are ordered, nonoverlapping, gap-free, and their union equals the enclosing
+coordination coverage interval. Native-clock endpoints map to exact structural
+rational endpoints on the coordination clock under the cited mapping proof;
+derived floating seconds are not tiling evidence. Static stage ports declare
+version-selection rules, while each execution resolves exact input/output
+versions and digests. Sparse event executions instead enumerate the closed event set;
+analytic samples evaluate state without advancing it. `state-hold` records an
+explicitly admitted interval with no state advance. For each state equation
+and physical interval, at most one successful `StateAdvanceClaim` has kind
+`state-advance`; subcycles are members of that claim, not independent graph
+advances. An execution without its claim, or two claims that overlap the same
+state equation and interval, is a hard double-step failure.
+
 A `PhysicsGraphEdge` declares producer/consumer, exact signal/interaction and
 version, sample phase, interpolation/extrapolation policy, maximum staleness,
-latency, barrier kind, and absence policy. Each stage clock is registered. Each
+latency, dependency, and absence policy. Each stage clock is registered. Each
 execution interval is nonempty and either contained in or explicitly mapped to
 the coordination interval. Every read is justified by exactly one matching edge
 from a committed prior version or a permitted loop-local provisional writer;
-every edge terminates at a matching read. Barrier semantics must satisfy the
-producer/consumer residency pair.
+every edge terminates at a matching read. A `PhysicsDependency` is an immutable
+stage-level protocol template; each producer/consumer execution pair emits a
+distinct `PhysicsDependencyCompletion` that binds payload, version, resource
+identity/subresource, access, device/backend/resource generations, release,
+acquire, and completion semantics. Submission order or a handle string alone is
+not a completion proof. Every completion must satisfy
+the producer/consumer residency pair before first consumer access.
 
 The outer graph is a DAG `[G]`. A physical feedback cycle is one
 `BoundedCouplingLoop` supernode with iteration ordering, maximum-iteration gate,
@@ -577,11 +890,33 @@ the accepted iterate enters its commit group; rejected/divergent iterates cannot
 leak through descriptors, events, caches, or presentation. Do not hide a cycle
 with a stale sample or a one-frame lag.
 
+Every iteration uses the identical `couplingInterval` and bracket. Iteration
+zero inputs equal the declared seeds and committed ingress; iteration `k > 0`
+inputs equal the exact versions and content digests selected by each carried
+edge from iteration `k - 1`. The loop's accepted writes equal, with no extras or
+omissions, the accepted row's outputs and
+`CouplingAcceptedWriteLineage`; only those versions may cross an outer egress
+edge. Correction and conservation gates that influence acceptance execute
+inside the loop. Rejected iterations may not publish interactions, application
+ledgers, resource leases, cache entries, events, or presentation state.
+
 Every successful commit has a one-to-one `publicationLineage` row from each
 provisional version to each committed publication, with a digest and either an
 exact immutable promotion proof or a named conversion/error proof. A matching
 name is not lineage; no unlisted byte range or state equation may enter the
 commit.
+
+Commit is prepare then atomic publication. Every group first produces
+transaction-private `PhysicsPreparedPublication` records. A
+`PhysicsCommitTransaction` validates the complete closed publication set and
+per-owner approvals, then performs one logical registry-table swap; its receipt
+is the sole transition to externally visible committed state. Failure before
+that swap preserves the full prior committed set. A consumer can observe either
+all receipt publications or none, including across CPU, GPU, and external
+owners; per-resource completion without the transaction receipt is not commit.
+The receipt's prepared-to-committed map is a bijection over the transaction's
+prepared and committed sets, preserving each content digest unless a named
+conversion with bounded error was admitted before the swap.
 
 Each graph execution advances one explicit coordination interval. Each owner chooses its
 native substeps subject to its stability/error gate. Rate interactions are
@@ -589,6 +924,19 @@ integrated over each overlapping subinterval; integrated impulses are applied
 exactly once over their declared interval. The graph owns a common catch-up,
 drop, and discontinuity decision so domains cannot independently skip different
 physical intervals.
+
+Committed coordination advances form a digest-linked monotonic sequence. Their
+intervals are adjacent unless the catch-up policy emits a loss ledger and new
+discontinuity epoch. Catch-up admission is graph-wide: it bounds both
+coordination advances and all native executions for one presentation
+opportunity, and it cannot be applied independently by a domain or render loop.
+One `PhysicsCatchUpBatch` owns the exact debt cursor/opportunity identity,
+ordered admitted intervals, and debt delta. Dropped debt requires its complete
+loss ledger and discontinuity/reset transition; retained debt has typed absence
+for that ledger. Its exact identity is `debtAfter = debtBefore +
+elapsedDuringBatch - committedAdvanceDuration - explicitlyDroppedDuration`;
+every term shares the registered debt clock and mapping revision. Per-domain
+debt accounting is forbidden.
 
 Use a collision-free total delivery key over physical time, stage order,
 producer ID, producer-local monotonic sequence, and interaction ID. Declare
@@ -610,7 +958,7 @@ PhysicsSignalDescriptor:
   physicsFrameId: PhysicsFrameId
   physicsOriginEpoch: PhysicsOriginEpoch
   transformRevision: opaque-version
-  chartId: PhysicsChartId | absent
+  chartId: PhysicsChartId | TypedAbsence
   clockId: PhysicsClockId
   samplePhase: graph-stage-and-boundary
   representedFootprint: spatial-support
@@ -805,7 +1153,7 @@ measure, actual sample interval, age, validity, and `errorRef`. The descriptor's
 set as `channels`; each `errorRef` resolves to its corresponding entry. Do not
 duplicate independently mutable error values in both places.
 `PhysicsErrorDescriptor` declares norm/basis, bound or statistic, classification
-(`hard-bound`, `measured-residual`, `statistical-uncertainty`, or `unknown`),
+(`hard-bound`, `measured-residual`, `statistical-uncertainty`, or `unavailable`),
 correlation/combination rule, and source. One aggregate error scalar cannot
 replace per-channel errors.
 
@@ -819,12 +1167,13 @@ availability, maximum staleness, and host-visible delay. The packed GPU form
 uses stable descriptor-table handles plus SoA channel arrays; it does not
 deep-copy descriptors into each hot sample or interaction.
 
-A `PhysicsSampleRequest` carries context/provider/signal/schema IDs, a
-`PhysicsInstant` or `PhysicsTimeInterval`, required and optional channel masks,
+A `PhysicsSampleRequest` carries context/provider/signal/schema IDs, one
+discriminated `PhysicsTime` arm, required and optional channel masks,
 query points or oriented
 footprints in physics-frame metres, requested filter/frequency response,
 per-channel tolerances, maximum staleness, acceptable residency/latency, and
-batch extent. A result returns the actual support, filter/band, interval, age,
+batch extent. A result returns a discriminated `actualBundleTime`, actual
+per-channel `PhysicsTime`, support, filter/band, age,
 versions, resource generation, and explicit `absentChannels`. Adapters may add
 a channel only under a named approximation with error and provenance; they may
 not synthesize an exact-looking zero.
@@ -849,7 +1198,7 @@ SampledChannel<T>:
   channelId: channel-id
   value: T
   unit: SI-unit
-  actualPhysicsTime: PhysicsInstant | PhysicsTimeInterval
+  actualPhysicsTime: PhysicsTime
   actualSupport: spatial-or-directional-support
   actualFilter: PhysicsFilterDescriptor
   validity: valid | stale-within-gate | out-of-domain | unavailable | failed
@@ -872,16 +1221,16 @@ consumers. It is not mutable shared weather state and not a wave spectrum.
 EnvironmentForcingSnapshot:
   descriptor: PhysicsSignalDescriptor
   sampleInstant: PhysicsInstant
-  airVelocityMps: SampledChannel<Vec3> | absent
-  airDensityKgPerM3: SampledChannel<scalar> | absent
-  airPressurePa: SampledChannel<scalar> | absent
-  temperatureK: SampledChannel<scalar> | absent
-  specificHumidityKgPerKg: SampledChannel<scalar> | absent
-  turbulenceStatistics: SampledChannel<typed-statistics> | absent
-  precipitationMassFluxKgPerM2S: SampledChannel<scalar> | absent
-  precipitationPhase: SampledChannel<phase-or-mass-fractions> | absent
-  precipitationVelocityMps: SampledChannel<Vec3> | absent
-  mediumMaterialVelocityMps: SampledChannel<Vec3> | absent
+  airVelocityMps: SampledChannel<Vec3> | TypedAbsence
+  airDensityKgPerM3: SampledChannel<scalar> | TypedAbsence
+  airPressurePa: SampledChannel<scalar> | TypedAbsence
+  temperatureK: SampledChannel<scalar> | TypedAbsence
+  specificHumidityKgPerKg: SampledChannel<scalar> | TypedAbsence
+  turbulenceStatistics: SampledChannel<typed-statistics> | TypedAbsence
+  precipitationMassFluxKgPerM2S: SampledChannel<scalar> | TypedAbsence
+  precipitationPhase: SampledChannel<phase-or-mass-fractions> | TypedAbsence
+  precipitationVelocityMps: SampledChannel<Vec3> | TypedAbsence
+  mediumMaterialVelocityMps: SampledChannel<Vec3> | TypedAbsence
   validity: atomic-bundle-validity
   error: per-channel-error-map-and-correlation
   absentChannels: [channel-id]
@@ -943,14 +1292,14 @@ WaterSurfaceSample:
   freeSurfacePoint: SampledChannel<Vec3>
   freeSurfaceNormal: SampledChannel<Vec3>
   geometricNormalVelocityMps: SampledChannel<scalar>
-  surfacePointVelocityMps: SampledChannel<Vec3> | absent
-  materialCurrentVelocityMps: SampledChannel<Vec3> | absent
-  waterColumnDepthMeters: SampledChannel<scalar> | absent
-  densityKgPerM3: SampledChannel<scalar> | absent
-  materialAccelerationMps2: SampledChannel<Vec3> | absent
-  pressurePa: SampledChannel<scalar> | absent
-  bathymetryPoint: SampledChannel<Vec3> | absent
-  wetDryState: SampledChannel<state> | absent
+  surfacePointVelocityMps: SampledChannel<Vec3> | TypedAbsence
+  materialCurrentVelocityMps: SampledChannel<Vec3> | TypedAbsence
+  waterColumnDepthMeters: SampledChannel<scalar> | TypedAbsence
+  densityKgPerM3: SampledChannel<scalar> | TypedAbsence
+  materialAccelerationMps2: SampledChannel<Vec3> | TypedAbsence
+  pressurePa: SampledChannel<scalar> | TypedAbsence
+  bathymetryPoint: SampledChannel<Vec3> | TypedAbsence
+  wetDryState: SampledChannel<state> | TypedAbsence
   representedFootprint: spatial-support
   filter: PhysicsFilterDescriptor
   validity: atomic-bundle-validity
@@ -1009,10 +1358,10 @@ SupportSurfaceSample:
   featureId: FeatureId
   closestPointMeters: SampledChannel<Vec3>
   outwardNormal: SampledChannel<Vec3>
-  signedSeparationMeters: SampledChannel<scalar> | absent
-  pointVelocityMps: SampledChannel<Vec3> | absent
-  pointAccelerationMps2: SampledChannel<Vec3> | absent
-  physicsMaterialId: PhysicsMaterialId | absent
+  signedSeparationMeters: SampledChannel<scalar> | TypedAbsence
+  pointVelocityMps: SampledChannel<Vec3> | TypedAbsence
+  pointAccelerationMps2: SampledChannel<Vec3> | TypedAbsence
+  physicsMaterialId: PhysicsMaterialId | TypedAbsence
   oneSidedness: front | back | two-sided
   representedFootprint: spatial-support
   validity: atomic-bundle-validity
@@ -1041,14 +1390,14 @@ It is a `PhysicsSignalDescriptor` provider output, never an
 LightingTransportSnapshot:
   descriptor: PhysicsSignalDescriptor
   sampleInstant: PhysicsInstant
-  incidentRadiance: SampledChannel<spectral-radiance> | absent
-  surfaceIrradiance: SampledChannel<spectral-irradiance> | absent
-  directSolarIrradiance: SampledChannel<spectral-irradiance> | absent
-  skyIrradiance: SampledChannel<spectral-irradiance> | absent
-  transmittance: SampledChannel<dimensionless-spectrum> | absent
-  sourceDirection: SampledChannel<Vec3-or-distribution> | absent
+  incidentRadiance: SampledChannel<spectral-radiance> | TypedAbsence
+  surfaceIrradiance: SampledChannel<spectral-irradiance> | TypedAbsence
+  directSolarIrradiance: SampledChannel<spectral-irradiance> | TypedAbsence
+  skyIrradiance: SampledChannel<spectral-irradiance> | TypedAbsence
+  transmittance: SampledChannel<dimensionless-spectrum> | TypedAbsence
+  sourceDirection: SampledChannel<Vec3-or-distribution> | TypedAbsence
   attenuationFactorIds: [versioned-factor-id]
-  skyIncludesDirectSolarDisc: true | false | absent
+  skyIncludesDirectSolarDisc: true | false | TypedAbsence
   validity: atomic-bundle-validity
   error: per-channel-error-map-and-correlation
   absentChannels: [channel-id]
@@ -1096,9 +1445,11 @@ SurfaceExchange:
   sourceDescriptors: [PhysicsSignalDescriptorRef]
   interactions: [InteractionRecord]
   reactions: [InteractionRecord]
+  physicalImpactParents: [PhysicalImpactParentRecord]
+  physicalImpactPartitions: [PhysicalImpactPartitionRecord]
   reactionGroups: [InteractionReactionGroup]
   conservationGroups: [ConservationGroup]
-  couplingLoopId: BoundedCouplingLoopId | absent
+  couplingLoopId: BoundedCouplingLoopId | TypedAbsence
   stabilityGate: stability-model-and-bound
   convergence: residuals-and-status | not-applicable
   batchLedger: InteractionBatchLedger
@@ -1125,10 +1476,10 @@ InteractionRecord:
   exactOnceKey: collision-free-delivery-key
   role: source | reaction
   sourceOwner: owner-id
-  sourceEntityId: EntityId-with-generation | absent
+  sourceEntityId: EntityId-with-generation | TypedAbsence
   sourceStateVersions: [signal-or-material-state-version]
   targetOwner: state-equation-owner
-  targetEntityId: EntityId-with-generation | absent
+  targetEntityId: EntityId-with-generation | TypedAbsence
   targetStateVersionExpected: opaque-version
   targetStateEquation: named-equation-and-term
   applicationInterval: PhysicsTimeInterval
@@ -1139,13 +1490,58 @@ InteractionRecord:
   payload: InteractionPayload # tagged union below
   signConvention: positive-source-to-receiver
   applicationLedgerKey: exact-once-ledger-key
-  reactionGroupId: InteractionReactionGroupId | typed-absence
+  partitionMembership: InteractionPartitionMembership | TypedAbsence
+  reactionGroupId: InteractionReactionGroupId | TypedAbsence
   reactionToInteractionIds: [InteractionId]
   conservationGroupIds: [ConservationGroupId]
   validity: typed-validity
   error: per-payload-and-footprint-error
   provenance: source-model-adapter-and-revision
 ```
+
+Physical impacts that are spatially partitioned use these machine records:
+
+```yaml
+InteractionPartitionMembership:
+  parentExchangeId: SurfaceExchangeId
+  parentInteractionIds: [InteractionId]
+  partitionGroupId: InteractionPartitionGroupId
+  partitionId: InteractionPartitionId
+  partitionMeasure: Quantity
+  closureGroupId: ConservationGroupId
+
+PhysicalImpactParentRecord:
+  physicalImpactParentId: PhysicalImpactParentId
+  contextId: PhysicsContextId
+  parentExchangeId: SurfaceExchangeId
+  parentInteractionIds: [InteractionId]
+  applicationInterval: PhysicsTimeInterval
+  physicsFrameId: PhysicsFrameId
+  physicsOriginEpoch: PhysicsOriginEpoch
+  transformRevision: opaque-version
+  partitionGroupId: InteractionPartitionGroupId
+  partitionIds: [InteractionPartitionId]
+  totalFootprintMeasure: Quantity
+  conservedPayloadInventory: typed-commodity-map
+  closureGroupId: ConservationGroupId
+  sourceContentDigest: collision-resistant-digest
+
+PhysicalImpactPartitionRecord:
+  physicalImpactPartitionId: PhysicalImpactPartitionRecordId
+  physicalImpactParentId: PhysicalImpactParentId
+  membership: InteractionPartitionMembership
+  childInteractionIds: [InteractionId]
+  partitionFootprint: InteractionFootprint
+  partitionPayloadInventory: typed-commodity-map
+  visualChildIds: [non-authoritative-visual-id]
+  partitionContentDigest: collision-resistant-digest
+```
+
+The partition IDs are unique inside one `partitionGroupId`; their footprint
+interiors do not overlap, their measures sum to the parent's measure within the
+declared quadrature bound, and their payload inventories sum to the parent
+inventory under `closureGroupId`. Visual children never own, duplicate, or
+apply the physical payload.
 
 `InteractionPayload` is a closed tagged dimensional union. Never put force,
 impulse, traction, mass flux, volume flux, momentum flux, or heat flux into a
@@ -1418,7 +1814,47 @@ InteractionBatchLedger:
   lostCommodities: typed-commodity-map
   deferredCommodities: typed-commodity-map
   exactOnceApplicationLedgerVersion: opaque-version
+  applicationLedgerIds: [InteractionApplicationLedgerId]
+
+InteractionApplicationLedger:
+  applicationLedgerId: InteractionApplicationLedgerId
+  contextId: PhysicsContextId
+  exchangeId: SurfaceExchangeId
+  interactionId: InteractionId
+  exactOnceKey: collision-free-delivery-key
+  targetOwner: state-equation-owner-id
+  targetEntityId: EntityId-with-generation | TypedAbsence
+  targetStateEquation: named-equation-and-term
+  targetStateVersionExpected: opaque-version
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  stageExecutionId: PhysicsStageExecutionId
+  nativeSubcycleIndex: integer | TypedAbsence
+  payloadTimeSemantics: rate | interval-integrated | state-over-interval | algebraic-over-interval
+  declaredApplicationInterval: PhysicsTimeInterval
+  executionOverlapInterval: PhysicsTimeInterval | TypedAbsence
+  overlapMeasureSeconds: Quantity<second>
+  appliedPayloadAmount: typed-dimensioned-payload-integral | TypedAbsence
+  applicationFraction: Quantity<dimensionless>
+  cursorBefore: integer
+  cursorAfter: integer
+  targetPreparedVersion: typed-version-ref | TypedAbsence
+  commitTransactionId: PhysicsCommitTransactionId | TypedAbsence
+  disposition: prepared | committed | duplicate-no-op | deferred | rejected
+  replayEpoch: opaque-version
+  replaySourceLedgerId: InteractionApplicationLedgerId | TypedAbsence
+  applicationContentDigest: collision-resistant-digest
+  receiptDigest: collision-resistant-digest | TypedAbsence
 ```
+
+A rate payload is integrated exactly over the intersection of its declared
+interval and the execution interval; disjoint executions record zero overlap
+and no application. An interval-integrated payload has exactly one committed
+ledger row with `applicationFraction = 1`; all repeats are `duplicate-no-op`.
+Partition children are exact-once under their own IDs while the closure ledger
+prevents a parent payload from also being applied. Replay restores the cursor
+and application-ledger version before a closed replay range, applies only keys
+without committed receipts, and atomically publishes the new cursor with the
+resulting state.
 
 ### Contact manifolds and discrete exchange
 
@@ -1441,6 +1877,7 @@ ContactManifoldRecord:
   bodyB: { entityId, colliderId, shapeId, featureIds, stateVersion }
   materialA: { physicsMaterialId, materialStateId, materialStateVersion, sampleInstant }
   materialB: { physicsMaterialId, materialStateId, materialStateVersion, sampleInstant }
+  materialPairSelection: PhysicsMaterialPairSelection
   normalConvention: A-to-B
   manifoldPatch:
     referencePointMeters: Vec3
@@ -1450,7 +1887,7 @@ ContactManifoldRecord:
       - { persistentPointId, pointMeters, featurePair, areaWeightM2 }
   signedSeparationMeters: per-point-values-and-error
   separationConvention: positive-separated-zero-touching-negative-penetrating
-  timeOfImpact: PhysicsInstant | typed-absence
+  timeOfImpact: PhysicsInstant | TypedAbsence
   relativePointVelocityMps: per-point-A-relative-to-B
   constitutivePairLaw: deterministic-versioned-law
   frictionAdhesionState: solver-owned-state | TypedAbsence
@@ -1492,8 +1929,8 @@ ConservationGroup:
   angularMomentumReference:
     kind: fixed-inertial-point | moving-point-with-transport
     pointAtStartMeters: Vec3
-    trajectoryAndVelocity: typed-trajectory | typed-absence
-    transportTerms: typed-angular-momentum-transport | typed-absence
+    trajectoryAndVelocity: typed-trajectory | TypedAbsence
+    transportTerms: typed-angular-momentum-transport | TypedAbsence
   commodities: [mass, linear-momentum, angular-momentum, energy, species]
   explicitConstraints: [incompressible-volume] | []
   initialInventory: typed-commodity-map
@@ -1540,31 +1977,63 @@ PhysicsMaterialRegistry:
   registryId: PhysicsMaterialRegistryId
   owner: material-registry-owner-id
   registryVersion: opaque-version
-  materials:
-    PhysicsMaterialId:
-      densityKgPerM3: Quantity | absent
-      contactLaw: versioned-law-and-parameters | absent
-      frictionLaw: versioned-law-and-parameters | absent
-      restitutionLaw: versioned-law-and-parameters | absent
-      complianceDampingLaw: versioned-law-and-parameters | absent
-      adhesionCohesionLaw: versioned-law-and-parameters | absent
-      permeabilityPorosityLaw: versioned-law-and-parameters | absent
-      wettingContactAngleLaw: versioned-law-and-parameters | absent
-      dragRoughnessLaw: versioned-law-and-parameters | absent
-      thermalConductivityWPerMK: Quantity | absent
-      specificHeatJPerKgK: Quantity | absent
-      emissivitySpectrum: typed-spectrum | absent
-      phaseChangeLaw: versioned-law-and-parameters | absent
-      uncertainty: per-property-error-map
-      provenance: source-record
+  materials: { PhysicsMaterialId: PhysicsMaterialRecord }
   materialStateDescriptors: [PhysicsSignalDescriptorRef<PhysicsMaterialState>]
-  pairLawResolver:
-    resolverIdAndVersion: deterministic-resolver-revision
-    participantOrdering: ordered-A-B-with-contact-frame
-    explicitPairOverrides: versioned-pair-map
-    perLawCompositionRules: versioned-named-rules
-    missingPairPolicy: block | named-approximation-with-error
-  renderBindings: optional-explicit-map
+  pairLawResolver: PhysicsMaterialPairResolver
+  renderBindings: [PhysicsMaterialBinding] | TypedAbsence
+
+PhysicsMaterialRecord:
+  physicsMaterialId: PhysicsMaterialId
+  recordVersion: opaque-version
+  densityKgPerM3: Quantity | TypedAbsence
+  contactLaw: versioned-law-and-parameters | TypedAbsence
+  frictionLaw: versioned-law-and-parameters | TypedAbsence
+  restitutionLaw: versioned-law-and-parameters | TypedAbsence
+  complianceDampingLaw: versioned-law-and-parameters | TypedAbsence
+  adhesionCohesionLaw: versioned-law-and-parameters | TypedAbsence
+  permeabilityPorosityLaw: versioned-law-and-parameters | TypedAbsence
+  wettingContactAngleLaw: versioned-law-and-parameters | TypedAbsence
+  dragRoughnessLaw: versioned-law-and-parameters | TypedAbsence
+  thermalConductivityWPerMK: Quantity | TypedAbsence
+  specificHeatJPerKgK: Quantity | TypedAbsence
+  emissivitySpectrum: typed-spectrum | TypedAbsence
+  phaseChangeLaw: versioned-law-and-parameters | TypedAbsence
+  uncertainty: per-property-error-map
+  provenance: source-record
+
+PhysicsMaterialBinding:
+  bindingId: PhysicsMaterialBindingId
+  renderMaterialOrPrimitiveSelector: stable-render-identity-and-slot
+  physicsMaterialId: PhysicsMaterialId
+  bindingVersion: opaque-version
+  scope: exact-primitive | material-slot | semantic-asset-part
+  overridePolicy: forbidden | named-explicit-override
+  provenance: author-compiler-and-manifest-revision
+
+PhysicsMaterialPairResolver:
+  resolverId: PhysicsMaterialPairResolverId
+  resolverVersion: opaque-version
+  participantOrdering: ordered-A-B-with-contact-frame
+  explicitPairOverrides: versioned-pair-map
+  perLawCompositionRules: versioned-named-rules
+  missingPairPolicy: block | named-approximation-with-error
+  deterministicSelectionDigestRule: canonical-input-and-law-digest
+
+PhysicsMaterialPairSelection:
+  selectionId: PhysicsMaterialPairSelectionId
+  interactionId: InteractionId
+  applicationInterval: PhysicsTimeInterval
+  orderedPhysicsMaterialIds: [PhysicsMaterialId, PhysicsMaterialId]
+  orderedMaterialRecordVersions: [opaque-version, opaque-version]
+  orderedMaterialStateIdsAndVersions: [typed-material-state-ref]
+  materialStateSampleInstants: [PhysicsInstant]
+  contactFrameId: PhysicsFrameId
+  resolverId: PhysicsMaterialPairResolverId
+  resolverVersion: opaque-version
+  selectedLawRefsAndParameters: [versioned-law-and-parameters]
+  approximationErrors: [PhysicsErrorDescriptor]
+  selectionDigest: collision-resistant-digest
+  latching: immutable-for-application-interval
 
 PhysicsMaterialState:
   descriptor: PhysicsSignalDescriptor
@@ -1623,7 +2092,78 @@ ColliderProxy:
   featureIdPolicy: stable-versioned-remap-policy
   conservativeInflationMeters: Quantity<meter>
   physicsMaterialId: PhysicsMaterialId
-  collisionGroups: explicit-filter
+  collisionGroups: CollisionFilterDescriptor
+  approximationError: PhysicsErrorDescriptor
+  residency: PhysicsResidencyDescriptor
+```
+
+```yaml
+CollisionFilterDescriptor:
+  filterId: CollisionFilterId
+  filterVersion: opaque-version
+  layerId: stable-layer-id
+  belongsToMask: fixed-width-bitset
+  collidesWithMask: fixed-width-bitset
+  explicitPairExclusions: [ordered-collider-id-pair]
+  explicitPairInclusions: [ordered-collider-id-pair]
+  role: solid | sensor | query-only | boundary
+  selfCollisionPolicy: disabled | enabled-by-shape-pair
+  resolverOrdering: exclusions-then-inclusions-then-masks
+
+DeformingSupportProxy:
+  supportProxyId: DeformingSupportProxyId-with-generation
+  contextId: PhysicsContextId
+  owner: deformation-state-owner-id
+  deformationSignalRef: PhysicsSignalDescriptorRef
+  deformationStateVersion: opaque-version
+  physicsFrameId: PhysicsFrameId
+  physicsOriginEpoch: PhysicsOriginEpoch
+  transformRevision: opaque-version
+  validityInterval: PhysicsTimeInterval
+  topologyRevision: opaque-version
+  positionSampler: versioned-position-sampler
+  velocitySampler: versioned-material-point-velocity-sampler
+  normalAndJacobianSampler: versioned-differential-sampler
+  conservativeSweptBounds: typed-bounds-and-interval
+  topologyChangePolicy: forbidden-in-interval | versioned-remap-at-boundary
+  supportFeatureRemap: stable-old-to-new-feature-map | TypedAbsence
+  collisionFilter: CollisionFilterDescriptor
+  physicsMaterialId: PhysicsMaterialId
+  approximationError: PhysicsErrorDescriptor
+  residency: PhysicsResidencyDescriptor
+
+BoundaryConditionDescriptor:
+  descriptorId: BoundaryConditionDescriptorId
+  descriptorVersion: opaque-version
+  normalCondition: no-penetration | prescribed-normal-velocity | prescribed-volume-flux | pressure | open-radiation
+  tangentialCondition: free-slip | no-slip | navier-slip | prescribed-tangential-velocity
+  thermalCondition: adiabatic | prescribed-temperature | prescribed-heat-flux | TypedAbsence
+  speciesConditions: [species-id-and-value-flux-or-robin-law]
+  roughnessAndPermeabilityLawRef: versioned-law-ref | TypedAbsence
+  wetDryActivationRule: versioned-threshold-hysteresis-law | TypedAbsence
+  twoWayReactionPolicy: required | forbidden | declared-one-way-with-error
+  compatibilityAndStabilityGate: typed-gate
+
+FluidBoundaryProxy:
+  fluidBoundaryProxyId: FluidBoundaryProxyId-with-generation
+  contextId: PhysicsContextId
+  owner: boundary-state-owner-id
+  physicsFrameId: PhysicsFrameId
+  physicsOriginEpoch: PhysicsOriginEpoch
+  transformRevision: opaque-version
+  validityInterval: PhysicsTimeInterval
+  supportGeometryRef: versioned-geometry-or-analytic-support
+  geometryStateVersion: opaque-version
+  positionSampler: versioned-position-sampler
+  materialVelocitySampler: versioned-boundary-velocity-sampler
+  normalAndMeasureSampler: versioned-differential-sampler
+  conservativeSweptBounds: typed-bounds-and-interval
+  boundaryCondition: BoundaryConditionDescriptor
+  collisionFilter: CollisionFilterDescriptor
+  physicsMaterialSelection: PhysicsMaterialId | PhysicsMaterialPairSelection
+  reactionExchangeId: SurfaceExchangeId | TypedAbsence
+  updateCadence: PhysicsCadenceDescriptor
+  topologyRevisionAndRemap: typed-version-and-feature-remap
   approximationError: PhysicsErrorDescriptor
   residency: PhysicsResidencyDescriptor
 ```
@@ -1635,8 +2175,12 @@ shape-to-physics pose resolves through `shapeFrameId`, `poseSignalRef`, exact
 pose version, transform revision, and origin epoch; an ID plus an opaque pose
 version is not enough to place a collider. A
 `DeformingSupportProxy` additionally declares deformation source/version,
-position and velocity sampler, conservative swept bounds, topology-change
-policy, and support-feature remapping.
+position and material-point velocity samplers, differential sampler,
+conservative swept bounds, topology-change policy, and support-feature
+remapping. `FluidBoundaryProxy` is the only boundary arm consumed by a fluid
+solver; rendering geometry is not a boundary condition. Pair filtering is
+deterministic and versioned. A `PhysicsMaterialPairSelection` is latched before
+the first interaction application and cannot change inside its interval.
 
 ### `RigidBodyProperties`
 
@@ -1692,7 +2236,7 @@ RigidBodyState:
     angularVelocityRadPerS: SampledChannel<Vec3>
     linearVelocityMps: SampledChannel<Vec3>
     referencePoint: SpatialReferencePoint
-  acceleration: typed-spatial-acceleration | typed-absence
+  acceleration: typed-spatial-acceleration | TypedAbsence
   motionMode: dynamic | kinematic | static | sleeping
   committedDisposition: committed-publication
   error: per-state-channel-error-map
@@ -1722,9 +2266,9 @@ HydrostaticHullProperties:
   displacedVolumeQuery: versioned-query
   waterlineClipping: named-algorithm
   buoyancyModel: hydrostatic | Froude-Krylov | named-extension
-  dragModel: versioned-law | absent
-  addedMassModel: versioned-law | absent
-  waveExcitationModel: versioned-law | absent
+  dragModel: versioned-law | TypedAbsence
+  addedMassModel: versioned-law | TypedAbsence
+  waveExcitationModel: versioned-law | TypedAbsence
   samplingFootprint: spatial-support
   approximationError: per-output-error-map
   validity: regime-and-domain
@@ -1826,7 +2370,7 @@ AuthoritativeGpuStateRecovery:
     maximumRollback: PhysicsDuration
     maximumRecoveryError: PhysicsErrorDescriptor
   latestCheckpoint: GpuCheckpointState | TypedAbsence
-  replayLogCoverage: PhysicsTimeInterval | typed-absence
+  replayLogCoverage: PhysicsTimeInterval | TypedAbsence
   restoreTransaction: GpuDeviceLossRestoreTransaction | TypedAbsence
   restartTransaction: GpuDiscontinuousRestartTransaction | TypedAbsence
   unrecoverablePolicy: block-route | execute-declared-restart
@@ -1923,8 +2467,8 @@ ExternalSolverAdapter:
     maximumAgeAndMappingError: typed-gates
   stepSemantics: analytic | fixed | adaptive | event | remote-stream
   signalDescriptors: [PhysicsSignalDescriptor]
-  acceptedInteractions: [InteractionPayload-tag]
-  emittedReactions: [InteractionPayload-tag]
+  interactionCapabilities: [ExternalInteractionCapability]
+  stepReceipts: [ExternalSolverStepReceipt]
   residencySynchronization:
     authorityBySignalOrStateEquation: explicit-owner-map
     transport: shared-resource | device-copy | host-staging | network-message
@@ -1932,7 +2476,7 @@ ExternalSolverAdapter:
       handleAndLayoutKinds: versioned-ABI
       producerAccessAndConsumerAccess: typed-access-map
       generationAndSubresourceFields: explicit-field-map
-      acquireDependency: PhysicsGraphEdge-barrier
+      acquireDependency: PhysicsDependencyRef
       releaseOrCompletionToken: typed-token
       lifecycleAndRetirementOwner: owner-id
     transferProtocol:
@@ -1944,22 +2488,54 @@ ExternalSolverAdapter:
   precisionDeterminism:
     scalarFormatsAndAccumulationMode: explicit-map
     reductionOrdering: deterministic-tree | declared-nondeterministic-with-error
-    solverSeedAndStreamIdentity: typed-cursor-map | typed-absence
+    solverSeedAndStreamIdentity: typed-cursor-map | TypedAbsence
     replayEquivalenceGate: bitwise | bounded-observable-error | unsupported
   errorModel: per-channel-and-coupling-errors
   checkpointRollback:
     support: none | checkpoint | checkpoint-and-replay
-    checkpointFormatAndDigest: versioned-format | typed-absence
-    cadenceAndMaximumRollback: typed-policy | typed-absence
-    includedStateVersionsInventoriesAndCursors: explicit-set | typed-absence
-    restoreOrderingAndValidationGates: typed-stage-plan | typed-absence
+    checkpointFormatAndDigest: versioned-format | TypedAbsence
+    cadenceAndMaximumRollback: typed-policy | TypedAbsence
+    includedStateVersionsInventoriesAndCursors: explicit-set | TypedAbsence
+    restoreOrderingAndValidationGates: typed-stage-plan | TypedAbsence
   failurePolicy:
     detectionAndTimeout: typed-gates
     freezeCommitGroups: [PhysicsCommitGroupId]
     priorCommittedStateDisposition: preserve | invalidate-with-discontinuity
     queuedInteractionEventDisposition: drain | retain-for-replay | reject-and-ledger
-    recoveryOwnerAndPlan: owner-and-transaction-ref | typed-absence
+    recoveryOwnerAndPlan: owner-and-transaction-ref | TypedAbsence
     degradedPublication: forbidden | explicit-signals-errors-and-quality-epoch
+
+ExternalInteractionCapability:
+  capabilityId: ExternalInteractionCapabilityId
+  direction: ingress | egress
+  role: source | reaction
+  payloadTag: InteractionPayload-tag
+  targetEquationId: named-state-equation | TypedAbsence
+  frameId: PhysicsFrameId
+  unitSignature: exact-SI-dimensional-signature
+  footprintKinds: [point | line | area | volume]
+  cadence: PhysicsCadenceDescriptor
+  batchBounds: typed-count-layout-and-byte-bound
+  exactOnceSupport: required-ledger | unsupported
+  reactionAtomicity: same-commit-transaction | independent-with-conservation-bound | not-applicable
+  residency: PhysicsResidencyDescriptor
+  dependencyRef: PhysicsDependencyRef
+  errorDescriptorRef: PhysicsErrorId
+
+ExternalSolverStepReceipt:
+  receiptId: ExternalSolverStepReceiptId
+  adapterId: PhysicsProviderId
+  coordinationAdvanceId: PhysicsCoordinationAdvanceId
+  externalStepSequence: integer
+  requestedInterval: PhysicsTimeInterval
+  actualNativeExecutionIntervals: [PhysicsTimeInterval]
+  inputStateVersions: [typed-version-ref]
+  inputApplicationLedgerIds: [InteractionApplicationLedgerId]
+  outputPreparedVersions: [typed-version-ref]
+  emittedInteractionSequenceRanges: [closed-sequence-range]
+  dependencyCompletionRefs: [PhysicsDependencyCompletionRef]
+  status: prepared | completed | rejected | failed
+  contentDigest: collision-resistant-digest
 ```
 
 Convert units, frames, handedness, and time at exactly one named adapter
@@ -1969,6 +2545,14 @@ defines the typed handoff between them. No implicit engine default may own
 stepping, constraints, collisions, manifold lifecycle, accumulation, or commit.
 Expose interpolation, extrapolation, and delayed-state error instead of hiding
 network/process latency.
+
+Every external interaction matches exactly one directional
+`ExternalInteractionCapability`. Ingress requires a target equation and
+exact-once application support; egress records whether its reaction must share
+the ingress commit transaction. Capability frame, units, footprint, cadence,
+batch, residency, dependency, and error gates are checked before dispatch, not
+inferred from the returned bytes. Unsupported required capability blocks the
+route.
 
 A shared-resource transport must match device, backend generation, resource
 generation, layout, access, subresource, and acquire/release dependency; a
@@ -1990,10 +2574,12 @@ Presentation is an explicit acyclic publication chain:
 
 ```text
 committed physics/origin transaction
+  -> PresentationTimeCohort
   -> view-independent PhysicsPresentationCandidate
   -> per-view CameraViewPublication
   -> per-view ViewPreparationPublication (visibility, shadows, caches, resets)
   -> sealed PhysicsPresentationSnapshot
+  -> per-target PresentationRenderPlan
   -> FrameExecutionRecord
 ```
 
@@ -2011,12 +2597,39 @@ PhysicsPresentationCandidate:
   candidateId: PhysicsPresentationCandidateId
   contextId: PhysicsContextId
   presentationEpoch: PhysicsPresentationEpoch
+  timeCohortId: PresentationTimeCohortId
   requestedPresentationInstant: PhysicsInstant
   physicsOriginEpoch: PhysicsOriginEpoch
+  commitProvenance: CandidateCommitProvenance
   candidateScope: committed-state-brackets-leases-and-events
   presentedStatePairs: [PresentedStatePair]
   resourceLeases: [PresentationResourceLease]
   eventSequenceRanges: [PresentationEventRange]
+
+PresentationTimeCohort:
+  timeCohortId: PresentationTimeCohortId
+  presentationClockId: PhysicsClockId
+  presentationOpportunitySequence: integer
+  previousRequestedPresentationInstant: PhysicsInstant
+  currentRequestedPresentationInstant: PhysicsInstant
+  requestedPresentationInstant: PhysicsInstant
+  requiredContextIds: [PhysicsContextId]
+  requiredDiscontinuityEpochs: { PhysicsContextId: opaque-version }
+  maximumInterContextSkew: PhysicsDuration
+  maximumCandidateAge: PhysicsDuration
+  admissionPolicy: exact-instant | bounded-mapped-skew
+  cohortSpecificationDigest: collision-resistant-digest
+
+CandidateCommitProvenance:
+  provenanceId: CandidateCommitProvenanceId
+  contextId: PhysicsContextId
+  coordinationAdvanceIds: [PhysicsCoordinationAdvanceId]
+  commitTransactionIds: [PhysicsCommitTransactionId]
+  commitReceiptIdsAndDigests: [receipt-id-and-content-digest]
+  committedStateVersions: [typed-version-ref]
+  physicsOriginTransactionId: PhysicsOriginRebaseTransactionId | TypedAbsence
+  qualityTransitionId: QualityTransitionId | TypedAbsence
+  closedPublicationSetDigest: collision-resistant-digest
 
 PresentationEventRange:
   rangeId: PresentationEventRangeId
@@ -2036,6 +2649,17 @@ The candidate contains no camera, render origin, view matrix, shadow/cache
 epoch, or global-to-render mapping. Candidates may be shared by views whose
 requested physical state pairs and event ranges are identical even when their
 cameras, projections, render origins, resolutions, or shadow policies differ.
+Every presented version resolves through `CandidateCommitProvenance` to one
+committed receipt in the closed publication set; prepared or loop-provisional
+versions are inadmissible. The candidate instant and context/discontinuity
+epochs satisfy its immutable `PresentationTimeCohort` specification. A cohort
+does not force equal solver clocks; it admits their mapped committed states
+under the serialized skew and age gates.
+
+`requestedPresentationInstant` equals the cohort's
+`currentRequestedPresentationInstant`. Every selected pair arm and camera
+publication maps the same previous/current cohort instants; views with a
+different pair of requested instants require another cohort and Candidate.
 
 Each previous/current presented state has independent provenance:
 
@@ -2053,7 +2677,7 @@ PresentationSampleProvenance:
     { stateVersion, sampleInstant, physicsFrameId, physicsOriginEpoch,
       transformRevision, resourceGeneration }
   interpolation: named-policy-alpha-and-error
-  extrapolation: named-policy-age-and-error | typed-absence
+  extrapolation: named-policy-age-and-error | TypedAbsence
 
 PresentationStateHandle:
   leaseId: lease-id
@@ -2071,7 +2695,7 @@ PresentationSpatialBinding:
 
 PresentedStatePair:
   bindingId: stable-binding-id
-  entityId: EntityId-with-generation | typed-absence
+  entityId: EntityId-with-generation | TypedAbsence
   providerId: PhysicsProviderId
   signalId: PhysicsSignalId
   previousPresented:
@@ -2079,13 +2703,13 @@ PresentedStatePair:
     presentedInstant: PhysicsInstant
     stateHandle: PresentationStateHandle
     globalBinding: PresentationSpatialBinding
-    originEpochBridge: PhysicsOriginEpochBridge | typed-absence
+    originEpochBridge: PhysicsOriginEpochBridge | TypedAbsence
   currentPresented:
     provenance: PresentationSampleProvenance
     presentedInstant: PhysicsInstant
     stateHandle: PresentationStateHandle
     globalBinding: PresentationSpatialBinding
-    originEpochBridge: PhysicsOriginEpochBridge | typed-absence
+    originEpochBridge: PhysicsOriginEpochBridge | TypedAbsence
   motionBinding:
     kind: rigid | skinned | procedural-deformation | particles | field
     storageRepresentation: cpu-struct | gpu-structured-buffer | texture-field | external-handle | named-packed-layout
@@ -2165,7 +2789,9 @@ CameraViewPublication:
   currentUnjitteredViewMatrix: typed-matrix
   previousUnjitteredProjectionMatrix: typed-matrix
   currentUnjitteredProjectionMatrix: typed-matrix
-  jitterSampleAndConvention: typed-jitter-record
+  previousJitterSampleAndConvention: typed-jitter-record
+  currentJitterSampleAndConvention: typed-jitter-record
+  jitterSequenceRevision: opaque-version
   viewport: typed-physical-and-css-viewport
   rendererDpr: Quantity<ratio>
   renderExtent: Quantity<physical-pixels>
@@ -2188,6 +2814,9 @@ source frame/revision, origin epoch, and transform revision. A pure
 camera-relative rebase changes translation and `renderOriginEpoch`, not physical
 state. Rotation/scale changes require a new semantic transform revision. Every
 mapping names its source physics frame, transform revision, and origin epoch.
+Previous/current jitter samples bind to the corresponding unjittered matrices
+and one immutable `jitterSequenceRevision`; a singular current-only jitter key
+cannot establish temporal motion or history compatibility.
 
 ### Shadow/cache preparation and sealed snapshot
 
@@ -2208,8 +2837,42 @@ ViewPreparationPublication:
   reactiveEpochs: [scoped-epoch]
   reactivePublications: [ReactivePublication]
   resetDependencies: [ScopedResetAction]
+  resetActionResults: [ScopedResetActionResult]
+  requiredPreparationEdges: [PresentationPreparationEdge]
   resourceLeases: [PresentationResourceLease] # full records created by this view preparation
   resourceLeaseRefs: [PresentationResourceLeaseRef]
+  renderResourceLeases: [RenderResourceLease]
+
+PresentationPreparationEdge:
+  edgeId: PresentationPreparationEdgeId
+  producerPublicationId: immutable-publication-id
+  consumerPublicationId: immutable-publication-id
+  requiredContentIdAndVersion: typed-content-ref
+  resourceLeaseRef: PresentationResourceLeaseRef | TypedAbsence
+  dependencyRef: PhysicsDependencyRef
+  accessTransition: producer-access-to-consumer-access
+  completionRequiredBefore: first-consumer-pass-or-seal
+  status: satisfied | failed
+
+ScopedResetActionResult:
+  resultId: ScopedResetActionResultId
+  actionId: scoped-action-id
+  presentationTargetId: presentation-target-id
+  viewId: view-id
+  historyKey: view-signal-encoding-resolution-jitter-key
+  causeEpochs: [scoped-epoch]
+  appliedRegion: AffectedRegionDescriptor
+  policyApplied: preserve-with-proof | reset | reject-region | reproject-with-proof | reseed | rebuild | bypass | hold-prior | convert-with-proof
+  inputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
+  outputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
+  inputHistoryGeneration: opaque-version | TypedAbsence
+  outputHistoryGeneration: opaque-version | TypedAbsence
+  dependencyCompletionRefs: [PhysicsDependencyCompletionRef]
+  queueSubmissionEpoch: opaque-sequence | TypedAbsence
+  status: completed | failed | bypassed-with-proof
+  residualAndError: typed-residual-and-error
+  failure: typed-failure-record | TypedAbsence
+  resultDigest: collision-resistant-digest
 ```
 
 Shadow views are explicit publications, not inferred global epochs. A shadow,
@@ -2226,8 +2889,24 @@ ShadowViewPublicationRef:
   cameraPublicationId: CameraViewPublicationId
   cameraProjectionRevision: opaque-version
   shadowContentEpoch: scoped-epoch
+  shadowFactorProvenance: ShadowFactorProvenance
   resourceLeaseRefs: [PresentationResourceLeaseRef]
-  boundedDelay: PhysicsDuration | typed-absence
+  boundedDelay: PhysicsDuration | TypedAbsence
+
+ShadowFactorProvenance:
+  shadowFactorId: ShadowFactorId
+  shadowViewId: shadow-view-id
+  lightIdAndStateVersion: stable-light-id-and-version
+  receiverViewId: view-id
+  receiverStateVersions: [typed-version-ref]
+  occluderPublicationRefs: [versioned-view-publication-ref]
+  candidateId: PhysicsPresentationCandidateId
+  cameraPublicationId: CameraViewPublicationId
+  encodingAndFilterRevision: typed-shadow-encoding-filter-ref
+  factorSemantics: direct-light-visibility
+  applicationOwner: lighting-owner-id
+  applicationMultiplicity: exactly-once
+  contentDigest: collision-resistant-digest
 ```
 
 Every shadow ref is target/view keyed, names the camera publication that
@@ -2293,11 +2972,11 @@ ReactivePublication:
   sourceId: owner-or-signal-id
   sourceVersion: opaque-version
   reactiveEpoch: scoped-epoch
-  kind: shadow-content | foam | emissive | optical | topology | deformation | disocclusion | event
+  kind: shadow-content | foam | emissive | optical | topology | deformation | disocclusion | event | camera-cut | projection | render-origin | physics-origin | quality | material-law | radiance-basis
   presentationTargetId: presentation-target-id
   viewId: view-id
   affectedRegion: AffectedRegionDescriptor
-  resourceLeaseId: lease-id | typed-absence
+  resourceLeaseId: lease-id | TypedAbsence
   validity: typed-validity
   error: PhysicsErrorDescriptor
   plannedConsumerActions: [ScopedResetAction-reference]
@@ -2314,7 +2993,11 @@ ScopedResetAction:
   capabilityGate: named-consumer-capability
   dependencies: [scoped-action-id]
   executionStrategy: named-pass-dispatch-or-state-operation
-  resourceLeaseId: lease-id | typed-absence
+  resourceLeaseId: lease-id | TypedAbsence
+  inputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
+  expectedInputHistoryGeneration: opaque-version | TypedAbsence
+  expectedOutputHistoryGeneration: opaque-version | TypedAbsence
+  expectedPolicyResult: typed-policy-result
 ```
 
 `AffectedRegionDescriptor` is the exact tagged union below. Exactly one arm
@@ -2323,12 +3006,12 @@ matching `kind` is present and all other arms are typed absence:
 ```yaml
 AffectedRegionDescriptor:
   kind: full-frame | entity-set | physics-bounds | screen-mask
-  fullFrame: { reason: scoped-reason } | typed-absence
-  entitySet: { entityIds: [EntityId-with-generation] } | typed-absence
+  fullFrame: { reason: scoped-reason } | TypedAbsence
+  entitySet: { entityIds: [EntityId-with-generation] } | TypedAbsence
   physicsBounds:
     { physicsFrameId, physicsOriginEpoch, transformRevision,
-      boundType, boundsMeters, error } | typed-absence
-  screenMask: ReactiveMaskDescriptor | typed-absence
+      boundType, boundsMeters, error } | TypedAbsence
+  screenMask: ReactiveMaskDescriptor | TypedAbsence
 ```
 
 `physics-bounds` uses physics-frame metres and carries origin/revision/error;
@@ -2361,7 +3044,7 @@ PresentationResourceLease:
   deviceLossGeneration: opaque-version
   resourceGeneration: opaque-version
   layoutRevision: opaque-version
-  entitySlotMapVersion: opaque-version | typed-absence
+  entitySlotMapVersion: opaque-version | TypedAbsence
   residency: cpu | gpu | external | mirrored
   slotRangeStrideCount: typed-Quantity-records
   owner: owner-id
@@ -2369,6 +3052,24 @@ PresentationResourceLease:
   access: read
   submissionAvailability: typed-gpu-dependency
   leaseBegin: opaque-sequence
+  reuseProhibitedUntil: ConsumerCompletionJoin
+
+RenderResourceLease:
+  renderResourceLeaseId: RenderResourceLeaseId
+  baseLeaseRef: PresentationResourceLeaseRef
+  presentationTargetId: presentation-target-id
+  viewId: view-id
+  semantic: color | depth | velocity | shadow-factor | history | reactive-mask | visibility | cache | named
+  encodingFormat: semantic-encoding-and-physical-format
+  physicalExtent: Quantity<physical-pixels>
+  resolutionScale: Quantity<ratio>
+  sampleCount: Quantity<samples>
+  subresourceRange: typed-range
+  producerPreparationEdgeId: PresentationPreparationEdgeId | TypedAbsence
+  firstConsumerPhase: render-phase-id
+  lastConsumerPhase: render-phase-id
+  requiredConsumerKeys: [typed-consumer-key]
+  aliasGroupAndCompatibility: typed-alias-proof | TypedAbsence
   reuseProhibitedUntil: ConsumerCompletionJoin
 
 PresentationResourceLeaseRef:
@@ -2419,9 +3120,101 @@ join ID/digest. An unrelated completion token cannot satisfy the join.
 Execution/completion is a separate multi-target record:
 
 ```yaml
+PresentationRenderPlan:
+  renderPlanId: PresentationRenderPlanId
+  timeCohortId: PresentationTimeCohortId
+  candidateId: PhysicsPresentationCandidateId
+  snapshotId: PhysicsPresentationSnapshotId
+  presentationTargetId: presentation-target-id
+  viewId: view-id
+  phaseIds: [RenderPlanPhaseId]
+  phaseRecords: [RenderPlanPhase]
+  edges: [RenderPlanEdge]
+  requiredPreparationEdgeIds: [PresentationPreparationEdgeId]
+  renderResourceLeaseIds: [RenderResourceLeaseId]
+  plannedResetActionIds: [scoped-action-id]
+  expectedResetHistoryGenerations:
+    scoped-action-id: { inputHistoryGeneration, outputHistoryGeneration }
+  shadowFactorIds: [ShadowFactorId]
+  closureDigest: collision-resistant-digest
+  immutablePlanDigest: collision-resistant-digest
+
+RenderPlanPhase:
+  phaseId: RenderPlanPhaseId
+  renderPlanId: PresentationRenderPlanId
+  presentationTargetId: presentation-target-id
+  viewId: view-id
+  owner: owner-id
+  queueId: queue-id
+  backendGeneration: opaque-version
+  passOrDispatchKey: pass-or-dispatch-key
+  inputResourceGenerationIds: [typed-resource-generation-id]
+  outputResourceGenerationIds: [typed-resource-generation-id]
+  outputOwnerByGeneration: { typed-resource-generation-id: owner-id }
+  outputEncodingByGeneration: { typed-resource-generation-id: semantic-encoding-and-physical-format }
+  outputPhysicalExtentByGeneration: { typed-resource-generation-id: Quantity<physical-pixels> }
+  historyReadGenerationIds: [typed-history-generation-id]
+  historyWriteGenerationIds: [typed-history-generation-id]
+
+RenderPlanEdge:
+  edgeId: RenderPlanEdgeId
+  renderPlanId: PresentationRenderPlanId
+  producerPhaseId: RenderPlanPhaseId
+  consumerPhaseId: RenderPlanPhaseId
+  dependencyRef: PhysicsDependencyRef
+  resourceGenerationId: typed-resource-generation-id
+  subresourceRange: typed-range
+  producerAccess: typed-resource-access
+  consumerAccess: typed-resource-access
+  completionRef: PhysicsDependencyCompletionRef
+  externalFence: typed-fence-and-generation-proof | TypedAbsence
+
+FrameCohortAdmission:
+  cohortAdmissionId: FrameCohortAdmissionId
+  timeCohortId: PresentationTimeCohortId
+  targetFrameSequence: monotonic-integer-sequence
+  requiredTargetViewKeys: [target-view-key]
+  candidateIds: [PhysicsPresentationCandidateId]
+  snapshotIds: [PhysicsPresentationSnapshotId]
+  renderPlanIds: [PresentationRenderPlanId]
+  mappedPresentationInstants: { context-id: PhysicsInstant }
+  observedMaximumSkew: PhysicsDuration
+  configuredMaximumFramesInFlightByTarget: { target-view-key: positive-integer }
+  observedFramesInFlightByTarget: { target-view-key: nonnegative-integer }
+  saturationPolicyByTarget: { target-view-key: stall | drop-unsubmitted | reject-admission }
+  ageSkewDiscontinuityAndClosureGateResults: [typed-gate-and-result]
+  status: admitted | rejected
+  admissionDigest: collision-resistant-digest
+
+FrameSlotAdmission:
+  slotAdmissionId: FrameSlotAdmissionId
+  cohortAdmissionId: FrameCohortAdmissionId
+  targetFrameSequence: monotonic-integer-sequence
+  presentationTargetId: presentation-target-id
+  viewId: view-id
+  configuredMaximumFramesInFlight: positive-integer
+  observedFramesInFlightAtAdmission: nonnegative-integer
+  saturationPolicy: stall | drop-unsubmitted | reject-admission
+  frameSlotIndex: integer
+  frameSlotGeneration: opaque-version
+  backendGeneration: opaque-version
+  deviceLossGeneration: opaque-version
+  priorOccupantExecutionId: FrameExecutionRecordId | TypedAbsence
+  priorSlotCompletionJoin: ConsumerCompletionJoin | TypedAbsence
+  acquisitionToken: typed-target-acquisition-token
+  presentCompletionReservation: typed-target-present-reservation
+  requiredRenderResourceLeaseIds: [RenderResourceLeaseId]
+  capacityAndAliasingGateResults: [typed-gate-and-result]
+  status: admitted | rejected
+  admissionDigest: collision-resistant-digest
+
 FrameExecutionRecord:
   executionId: FrameExecutionRecordId
-  candidateId: PhysicsPresentationCandidateId
+  timeCohortId: PresentationTimeCohortId
+  candidateIds: [PhysicsPresentationCandidateId]
+  cohortAdmission: FrameCohortAdmission
+  renderPlans: [PresentationRenderPlan]
+  slotAdmissions: [FrameSlotAdmission]
   requiredTargetViewKeys: [target-view-key]
   snapshotIds: [PhysicsPresentationSnapshotId]
   overallStatus: submitted | completed | partial-failure | aborted | device-lost
@@ -2429,13 +3222,16 @@ FrameExecutionRecord:
   deviceLossGeneration: opaque-version
   targetExecutions:
     target-view-key:
-      snapshotId: PhysicsPresentationSnapshotId | typed-absence
+      snapshotId: PhysicsPresentationSnapshotId | TypedAbsence
+      renderPlanId: PresentationRenderPlanId | TypedAbsence
+      slotAdmissionId: FrameSlotAdmissionId | TypedAbsence
       presentationTargetId: presentation-target-id
       viewId: view-id
       status: submitted | completed | failed | aborted | device-lost
       submittedPasses: [pass-or-dispatch-key]
       queueSubmissionEpochs: [opaque-sequence]
       actionResults: [typed-action-result]
+      resetActionResults: [ScopedResetActionResult]
       completionTokens: [CompletionTokenRef]
       presentedTimestamp: PhysicsInstant | TypedAbsence
       failure: typed-failure-record-or-TypedAbsence
@@ -2446,6 +3242,28 @@ FrameExecutionRecord:
       completionJoin: ConsumerCompletionJoin
       retirementEvidence: typed-completion-or-loss-record
 ```
+
+No target submits until its `FrameCohortAdmission`, `PresentationRenderPlan`,
+and `FrameSlotAdmission` are all admitted and digest-consistent. Cohort
+candidate/snapshot/plan sets equal the required target/view set exactly. A slot
+is admitted only after its prior completion join or loss invalidation and after
+every required render lease passes capacity, generation, and aliasing gates.
+Observed in-flight occupancy cannot exceed the configured target maximum. At
+saturation, only the serialized policy may stall, drop an unsubmitted cohort,
+or reject admission; it never overwrites a live slot. Acquisition and present
+reservations resolve to the exact target, frame sequence, slot generation, and
+eventual completion token or typed failure.
+The plan's `phaseIds` equal its phase-record IDs; phase edges form a DAG and
+bind every inter-phase resource/subresource generation to a concrete completion
+or fence. Each phase output-generation set equals the key set of its owner,
+encoding, and extent maps. The render plan contains every required preparation
+edge, planned reset action/expected generation, shadow factor, and render-
+resource lifetime; later phases cannot add a mutable hidden dependency. Each
+actual `ScopedResetActionResult` matches one planned action and its expected
+input/output generations, queue epoch, residual/error, and typed failure arm.
+Each `ShadowFactorId` is applied exactly once by its lighting owner
+to the named direct-light term and never again by a material or final-image
+phase.
 
 Never mutate a candidate or snapshot to record completion. A pre-seal failure
 uses an empty snapshot list for that target, cancels dependent actions, and
@@ -2555,7 +3373,59 @@ QualityChangeRequest:
   rankedCandidateControls: [quality-control-id]
   evidenceRecords: [canonical-labelled-quantity]
   protectedInvariants: [named-invariant]
-  latencyOrDeadlineGate: PhysicsDuration | PhysicsDeadline | absent
+  latencyOrDeadlineGate: PhysicsDuration | PhysicsDeadline | TypedAbsence
+  requestedAllocation: QualityAllocationRequest
+  admissionRequirements: [QualityAdmissionRequirement]
+
+QualityAllocationRequest:
+  allocationRequestId: QualityAllocationRequestId
+  affectedTargetsViews: [target-view-id]
+  requestedHotBytesByResidency: labelled-byte-map
+  requestedTransientPeakBytesByResidency: labelled-byte-map
+  migrationOverlapBytesByResidency: labelled-byte-map
+  requestedBindingsTexturesBuffersAndAttachments: labelled-limit-demand-map
+  requestedTrafficBytesPerCoordinationIntervalAndSecond: labelled-rate-map
+  requestedCpuGpuAndExternalWork: labelled-cadence-work-map
+  maximumFramesInFlightAndMultiviewMultiplier: labelled-counts
+  thermalPowerEnvelope: labelled-gate
+  lifetimeAndRetirementPlanDigest: collision-resistant-digest
+
+QualityAdmissionRequirement:
+  requirementId: QualityAdmissionRequirementId
+  kind: physical-error | visual-error | conservation | stability | latency | memory | traffic | binding-limit | thermal | safe-boundary
+  bound: canonical-labelled-quantity-or-typed-predicate
+  evidenceRef: content-addressed-measurement-or-proof
+  failureDisposition: reject | hold-current | narrower-candidate
+
+QualityRequestAdmission:
+  admissionId: QualityRequestAdmissionId
+  requestId: QualityChangeRequestId
+  coordinatorId: route-physics-coordinator
+  currentQualityStateId: PhysicsQualityStateId
+  currentQualityEpoch: PhysicsQualityEpoch
+  selectedCandidateQualityStateId: PhysicsQualityStateId | TypedAbsence
+  hysteresisAndMinimumResidenceResults: [typed-gate-and-result]
+  admissionRequirementResults: [requirement-id-and-result]
+  safeCommitBoundary: PhysicsTime | TypedAbsence
+  allocationRequestDigest: collision-resistant-digest
+  status: admitted | rejected | deferred
+  reason: typed-reason
+
+QualityAllocationAdmission:
+  allocationAdmissionId: QualityAllocationAdmissionId
+  allocationRequestId: QualityAllocationRequestId
+  transitionId: QualityTransitionId
+  allocatorOwner: owner-id
+  targetDeviceBackendGenerations: [typed-generation-tuple]
+  grantedBytesByResidencyAndLifetime: labelled-byte-map
+  grantedBindingsTexturesBuffersAndAttachments: labelled-limit-map
+  grantedTrafficAndWorkEnvelope: labelled-cadence-work-map
+  allocationLeaseIds: [lease-id]
+  simultaneousOldNewPeakProof: PhysicsMemoryLedger
+  limitHeadroomAndThermalGateResults: [typed-gate-and-result]
+  retirementJoinRefs: [ConsumerCompletionJoin]
+  status: admitted | rejected
+  receiptDigest: collision-resistant-digest
 ```
 
 The physics coordinator consumes this through a `PhysicsSignalDescriptor`,
@@ -2625,13 +3495,20 @@ equations, closure, handoff error, and conservation semantics.
 QualityTransition:
   transitionId: QualityTransitionId
   contextId: PhysicsContextId
+  requestId: QualityChangeRequestId
+  requestSequence: monotonic-integer-sequence
+  affectedTargetsViews: [target-view-id]
+  affectedControls: [quality-control-id]
+  sourceEvidenceDigest: collision-resistant-digest
   fromState: PhysicsQualityStateId
   toState: PhysicsQualityStateId
   fromQualityEpoch: PhysicsQualityEpoch
   toQualityEpoch: PhysicsQualityEpoch
   triggerEvidence: labelled-pressure-and-error-records
+  requestAdmission: QualityRequestAdmission
   protectedInvariants: [named-invariant]
   prepare:
+    allocationAdmission: QualityAllocationAdmission
     allocateCompilePopulate: [operation]
     sourceStateVersion: opaque-version
     eventQueuePartition: declared-policy
@@ -2660,6 +3537,14 @@ maps one coherent committed state, accepts conservation/error residuals, and
 atomically increments the quality epoch. `retireAfterCompletion` keeps old
 resources alive until simulation, coupling, presentation, and render consumers
 release them.
+
+No transition allocates or compiles before an admitted
+`QualityRequestAdmission`, and no population or commit uses capacity absent
+from the admitted `QualityAllocationAdmission`. Granted lifetimes and bytes
+cover simultaneous old/new state plus frames in flight; rejection leaves the
+current quality state and its authority unchanged. Transition `requestId`,
+sequence, target/view scope, controls, and evidence digest equal the admitted
+request exactly; they cannot be widened, reordered, or silently replaced.
 
 Each `ConservativeStateMap` declares restriction/prolongation operator,
 source/destination measures, conserved commodities, positivity/constraint
@@ -2693,6 +3578,7 @@ PhysicsCostLedger:
   qualityEpoch: opaque-version
   presentationTargetsAndViews: [target-view-key]
   measurementProtocolRefs: [content-addressed-protocol-and-trace]
+  cadenceTraceTotals: CadenceTraceTotals
   status: active | provisional
   targetAndHarness: named-device-browser-view-workload
   qualityState: PhysicsQualityStateId
@@ -2722,10 +3608,105 @@ PhysicsCostLedger:
   hostCompletionsReadbacksPerPresentedFrame: labelled-counts # steady runtime expects zero
   synchronization: [wait-or-stall-record]
   multiviewAndFramesInFlightMultipliers: labelled-resource-and-work-records
+  workAttribution: [PhysicsCostAttribution]
+  sharedWorkKeys: [PhysicsWorkKey]
+  perViewWorkKeys: { target-view-key: [PhysicsWorkKey] }
   hotState: PhysicsMemoryLedger
   peakTransient: PhysicsMemoryLedger
   migrationOverlap: PhysicsMemoryLedger
   thermalPowerState: measured-or-unavailable
+
+CadenceTraceTotals:
+  traceTotalsId: CadenceTraceTotalsId
+  traceRef: content-addressed-protocol-and-trace
+  measurementInterval: PhysicsTimeInterval
+  exactDuration: PhysicsDuration
+  coordinationAdvanceCount: Quantity<count>
+  catchUpBatchCount: Quantity<count>
+  stageExecutionCounts: { PhysicsGraphStageId: Quantity<count> }
+  nativeSubcycleCounts: { owner-id: Quantity<count> }
+  couplingIterationCounts: { BoundedCouplingLoopId: Quantity<count> }
+  interactionApplicationCounts: { payload-tag: Quantity<count> }
+  presentedFrameCounts: { target-view-key: Quantity<count> }
+  workOccurrenceCounts: { PhysicsWorkKey: Quantity<count> }
+  trafficOccurrenceAndLogicalByteTotals: { TrafficRecordId: typed-count-byte-pair }
+  droppedCoordinationIntervals: [PhysicsTimeInterval]
+  exactTotalsDigest: collision-resistant-digest
+
+PhysicsMemoryLedger:
+  memoryLedgerId: PhysicsMemoryLedgerId
+  contextId: PhysicsContextId
+  measurementInterval: PhysicsTimeInterval
+  qualityEpoch: PhysicsQualityEpoch
+  category: hot-state | peak-transient | migration-overlap | frame-cohort
+  allocations: [PhysicsMemoryAllocationRecord]
+  logicalBytesByResidency: labelled-byte-map
+  physicalAllocatedBytesByResidency: labelled-byte-map-or-unavailable
+  maximumSimultaneouslyLiveBytes: labelled-byte-map
+  sharedBytesByWorkKey: { PhysicsWorkKey: Quantity<byte> }
+  perViewBytesByTargetView: { target-view-key: Quantity<byte> }
+  lifetimeDagDigest: collision-resistant-digest
+  allocationTraceRef: content-addressed-trace
+  status: measured | derived-with-measured-allocation | unavailable
+
+PhysicsMemoryAllocationRecord:
+  allocationId: PhysicsMemoryAllocationId
+  resourceId: resource-id
+  owner: owner-id
+  semantic: solver-state | interaction-queue | descriptor-table | checkpoint | presentation | render | validation | named
+  residency: PhysicsResidencyDescriptor
+  deviceBackendResourceGenerations: typed-generation-tuple | TypedAbsence
+  encodingFormatAndExtent: typed-layout-extent-record
+  elementCountStrideAndLogicalBytes: typed-count-stride-byte-record
+  physicalAllocatedBytes: Quantity<byte> | TypedAbsence
+  liveInterval: typed-allocation-sequence-interval
+  framesInFlightMultiplier: Quantity<count>
+  sharingScope: route-shared | context-shared | target-shared | per-view
+  targetViewKeys: [target-view-key]
+  workKey: PhysicsWorkKey
+  aliasGroupAndNonoverlapProof: typed-alias-proof | TypedAbsence
+  leaseIdsAndCompletionJoins: [lease-id-and-join-ref]
+  evidenceRef: content-addressed-measurement-or-derivation
+
+TrafficRecord:
+  trafficRecordId: TrafficRecordId
+  contextId: PhysicsContextId
+  producer: owner-stage-pass-or-external-id
+  consumers: [owner-stage-pass-or-external-id]
+  direction: cpu-to-gpu | gpu-to-cpu | gpu-to-gpu | external-ingress | external-egress | same-residency
+  resourceIdAndVersion: typed-resource-version-ref
+  sourceAndDestinationResidency: typed-residency-pair
+  deviceBackendResourceGenerations: typed-generation-tuple | TypedAbsence
+  logicalBytesPerOccurrence: Quantity<byte>
+  physicalBytesPerOccurrence: Quantity<byte> | TypedAbsence
+  occurrenceCount: Quantity<count>
+  cadenceBasis: per-stage-execution | per-coordination-advance | per-presented-frame | per-second | event-driven
+  dirtyFraction: Quantity<dimensionless>
+  measurementInterval: PhysicsTimeInterval
+  accessAndResourceTransition: typed-before-after-access-record
+  passDispatchOrExternalBoundary: typed-boundary-ref
+  dependencyRefs: [PhysicsDependencyRef]
+  readbackMapBehavior: none | asynchronous-diagnostic | host-critical-failure
+  workKey: PhysicsWorkKey
+  sharingScope: shared | per-view
+  targetViewKeys: [target-view-key]
+  measuredCountersRef: content-addressed-counters | TypedAbsence
+
+PhysicsCostAttribution:
+  workKey: PhysicsWorkKey
+  owner: owner-id
+  scope: shared | per-view
+  targetViewKeys: [target-view-key]
+  coordinationAdvanceIds: [PhysicsCoordinationAdvanceId]
+  stageExecutionPassOrDispatchIds: [typed-execution-id]
+  occurrenceCount: Quantity<count>
+  cpuTime: labelled-duration-distribution | TypedAbsence
+  gpuTime: labelled-duration-distribution | TypedAbsence
+  externalLatency: labelled-duration-distribution | TypedAbsence
+  trafficRecordIds: [TrafficRecordId]
+  memoryAllocationIds: [PhysicsMemoryAllocationId]
+  attributionRule: count-shared-once | count-once-per-listed-view
+  attributionDigest: collision-resistant-digest
 ```
 
 `PhysicsMemoryLedger` includes every live solver ping-pong/version slot,
@@ -2734,6 +3715,14 @@ table, stable-ID map, CPU mirror, previous/current presentation state,
 frames-in-flight resources, validation/readback allocation, and simultaneous
 old/new transition state. Derive logical bytes from extents/formats/lifetimes
 `[D]`; treat physical allocation/residency as `[M]` when observable.
+
+Every live allocation appears exactly once in a memory-ledger lifetime DAG,
+and every transfer/copy/map appears in one `TrafficRecord`; logical and physical
+bytes are never conflated. A shared `PhysicsWorkKey` appears once in
+`sharedWorkKeys` and names all consumers. A per-view key appears only under the
+target/view that actually executes it. Aggregate cost is the sum over unique
+keys: shared work is not multiplied by view count, and per-view work is not
+misreported as free sharing.
 
 Every `TrafficRecord` declares producer, consumers, direction, logical bytes,
 frequency, dirty fraction, resource transition, pass/dispatch boundary,
@@ -2755,8 +3744,10 @@ All cadence distributions are observations over the same serialized
 `measurementInterval`, clock mapping, quality epoch, target/view set, and
 protocol trace. A percentile of `A`, a percentile of `B`, and a percentile of
 their ratio are three separate statistics; multiplying percentile summaries is
-not an exact cadence identity. Cross-check exact integer totals per trace, then
-report paired distributions from those same samples.
+not an exact cadence identity. `CadenceTraceTotals` is the exact count/duration/
+byte authority for the cited trace. Every reported distribution derives from
+paired samples whose integer totals and interval equal that record; no
+percentile multiplication may reconstruct cadence.
 
 Keep frequently sampled state in its consuming residency. Batch queries and
 interactions, compact active regions, update dirty ranges, and use analytic or
@@ -2782,19 +3773,26 @@ correctly.
 | spatial vectors | SE(3) twist adjoint and wrench/impulse coadjoint preserve power/virtual work and apply the correct reference-point torque shift |
 | charts | Geodetic/coast chart forward/inverse/Jacobian/metric residuals over valid domain; singularity and curvature-error gates trigger |
 | origin epochs | Camera render rebase preserves physical state; a `PhysicsOriginRebaseTransaction` transforms all owners/proxies/contacts/queues/checkpoints atomically or rolls back; stale epoch samples reject |
+| registry authority | Frame/chart/clock/identity lookups resolve one atomic registry revision; parent and clock-mapping DAGs are acyclic; retired generations never alias live identities |
 | clocks and graph | Canonical rationals and versioned fixed, timestamp-table, piecewise, external, adaptive, analytic, event, GPU, and presentation mappings cover identical coordination intervals without double step, hidden lag, or domain-specific drop |
+| coordination and catch-up | Digest-linked `PhysicsCoordinationAdvanceRecord` intervals tile exactly; activation and partition multiplicities respect both maxima; one state equation has at most one advance claim per interval; `state-hold` and analytic evaluations do not advance; `PhysicsCatchUpBatch` debt arithmetic, drops, loss, and discontinuity close exactly |
+| dependency completion | Recurrent producer/consumer executions emit distinct `PhysicsDependencyCompletion` receipts; deliberately wrong payload/version/subresource/access/generation/release/acquire/fence proofs reject before first consumer access |
 | graph publication | Provisional versions cannot escape; every edge matches a read/write/version/residency dependency; an all-or-none commit group publishes only accepted owner versions |
+| commit transaction | Prepare all owner-approved publications, fail one gate, and prove the prior registry remains wholly visible; then pass all gates and prove one `PhysicsCommitReceipt` atomically exposes the exact closed publication set |
 | bounded feedback | Coupling loop converges under its residual gate and atomically rejects a divergent provisional iterate; graph remains acyclic outside the loop macro |
+| loop lineage | Every iteration input digest equals its seeds or exact prior-iteration output; only the accepted row equals `CouplingAcceptedWriteLineage`; rejected interaction/application/cache/lease/event versions cannot cross an outer edge |
 | provider envelope | Required-channel masks, per-channel unit/filter/time/error, actual band/support, age/staleness, state/resource versions, and explicit absence survive CPU/GPU/external adapters |
 | absent channel mutation | Replace a required channel with absent, stale, wrong-unit, wrong-frame, wrong-epoch, or implicit-zero data; the consumer blocks or selects a declared approximation |
-| water semantics | Surface-point velocity and material-current velocity differ in a known analytic wave/current case; each consumer selects the equation-correct channel and filter |
+| water semantics | `geometricNormalVelocityMps` satisfies the analytic interface projection identity; full parameterization velocity may be typed absence; surface-point and material-current velocity differ in a known wave/current case; each consumer selects the equation-correct channel and filter |
 | rigid-body boundary | `RigidBodyState` pose/twist/reference point/frame/epoch/version matches analytic motion and remains immutable through native, GPU, and external adapters |
 | support/contact | Moving and deforming support point velocity and separation sign match analytic motion; support queries do not create duplicate impulses; the named contact owner/solver revision preserves point IDs and lifecycle or explicitly resets |
 | material/proxy identity | Deterministic pair-law resolution latches both material versions; collider shape/pose bindings and support/feature IDs survive batching, compaction, rebase, and visual LOD within proxy-error gates; render PBR state cannot alter them |
+| deforming/fluid proxy | Analytic moving/deforming support and fluid boundaries match position, material velocity, normals/Jacobians, swept bounds, feature remap, collision filter, wet/dry activation, and declared boundary-condition reactions over their validity intervals |
 | precipitation | Airborne inventory, emitted/deposited/advected/phase-changed mass, destination footprint, and residual close across graph intervals; same-tick mutation is impossible |
 | wind coupling | Air-density-dependent force, filtered reference-height wind, stability/fetch/duration, and ocean source-term calibration are explicit; raw wind-to-spectrum mutation fails |
 | lighting transport | Position/direction-or-normal/footprint/solid-angle/time queries preserve per-channel radiometric units/bases; duplicated attenuation-factor ID and ambiguous solar-disc inclusion fail |
 | dimensional interactions | Every payload tag passes unit/measure/rate-integral/footprint checks; point versus wrench impulse is unambiguous; integrated transfers apply exactly once across different receiver subcycle counts |
+| impact partition and application | Partition measures and commodity inventories close to each `PhysicalImpactParentRecord`; visual children have no authority; overlap-integrated rates and once-only integrals produce exact `InteractionApplicationLedger` rows; replay from restored cursors commits only previously unapplied keys |
 | reaction grouping | One-to-many and many-to-one reaction groups transform into one balance frame/reference point, accept atomically, and close impulse/torque/commodity residuals |
 | delivery/overflow | Duplicate, late, reordered, skipped-frame, overflow, retry, and cancellation cases preserve per-consumer cursors and report lost conserved quantities |
 | discrete exchange | Gather/scatter moment, force, torque, work, and energy residuals meet gates under translation/rotation and resolution change |
@@ -2804,12 +3802,18 @@ correctly.
 | authoritative GPU recovery | Device loss freezes commits, invalidates the lost generation, restores one coherent checkpoint, replays exact-once ranges, revalidates conservation/error, and atomically publishes—or records an explicit discontinuous restart |
 | no-readback critical path | Runtime trace contains no frame-critical GPU-to-CPU map/readback; diagnostic readback is delayed and excluded from steady-state claims |
 | presentation pair | Independent previous/current per-binding brackets reconstruct their requested instants with clock-map error; motion uses their immutable state handles and the per-view source-frame-qualified render transforms |
+| presentation admission | Candidate versions resolve to committed receipts and one `PresentationTimeCohort`; cohort candidate/snapshot/plan keys close exactly; rejected cohort or occupied `FrameSlotAdmission` submits nothing; accepted slots retain every `RenderResourceLease` through the exact completion join |
 | motion identity | Spawn, death, teleport, reparent, LOD change, compaction, and slot reuse preserve stable IDs and invalidate motion with the exact reason |
 | shadow/reactive lifecycle | The candidate -> camera view -> explicit shadow/visibility/cache publication -> seal DAG is acyclic; reactive publications and scoped reset plans have no same-phase mutation/cycle |
+| render-plan closure | Every `PresentationRenderPlan` phase/edge DAG declares exact input/output/history generations, owners, encodings, extents, dependencies, fences, planned reset generations, leases, and shadow factors; each actual `ScopedResetActionResult` matches the plan; missing or extra closure members reject; each `ShadowFactorId` applies once to direct light under its exact provenance |
 | candidate abort/device loss | Multi-target pre-seal failure and device loss append keyed target/lease dispositions, cancel dependent actions, retire or invalidate every lease, and never fabricate a snapshot/completion token |
 | event presentation | Repeated rendering does not respawn an event; skipped rendering consumes the complete monotonic sequence range exactly once |
 | quality transition | Prepare/commit/retire order, conservative map, positivity/constraints, ID/RNG/cursor preservation, queue/manifold policy, peak overlap, rollback, per-equation authoritative emitters, and multi-consumer completion join all pass |
+| quality admission | Rejected request admission performs no allocation; rejected allocation admission performs no population/commit; admitted capacity covers hot, transient, old/new migration overlap, frames in flight, binding limits, traffic, and thermal gates |
 | external adapter | Native-versus-adapted frame/time/unit/channel/state results meet errors; stepping/constraints/collision/contact/accumulation/commit ownership is complete; process/device failure cannot half-commit an exchange |
+| external directional capability | Every ingress/egress payload matches exactly one `ExternalInteractionCapability` frame/unit/footprint/cadence/batch/residency/dependency/error record; ingress exact-once and reaction atomicity survive retry and process failure |
+| memory/traffic attribution | Allocation lifetime totals match `PhysicsMemoryLedger`; every copy/map/transition matches one `TrafficRecord`; unique work keys count shared work once and per-view work only for actual views; logical/physical bytes remain distinct |
+| cadence trace totals | Exact duration/count/byte totals in `CadenceTraceTotals` reconcile all per-advance, per-second, per-frame, catch-up, work, and traffic distributions without percentile multiplication |
 | mobile sustained run | Per-interval/per-second/presented-frame costs, worst catch-up burst, dependency tails, tile traffic/spills, device limits, allocations, multiview/in-flight multiplication, memory, thermal/clock drift, quality trace, errors, and teardown stay within named target gates |
 
 ### Hard failure gates
@@ -2822,24 +3826,42 @@ Reject the affected route or narrow its claim when any of the following occurs:
   or appearance state is treated as conserved receiver inventory;
 - a quantity lacks SI unit/frame/time/support, uses the reciprocal scale
   convention, or crosses an unversioned transform/chart;
+- a frame/chart/clock/identity lookup mixes registry revisions, resolves two
+  authority paths, aliases a retired generation, or uses a cyclic parent/map DAG;
 - a required channel is absent, zero-filled, stale beyond its gate, synthesized
   without error, or filtered incompatibly with its consumer;
 - an instant rational is noncanonical, a clock mapping/revision cannot derive its
-  seconds, graph intervals have gaps/overlaps, provisional state escapes, a
-  commit group is partial, an iterative cycle is unbounded, or catch-up differs
-  by domain;
-- a rate is applied as an integral, an integral is applied per substep, a
-  footprint kernel is not normalized, or a payload uses the wrong state term;
+  seconds, execution/coordination intervals have gaps/overlaps, activation or
+  partition maxima are exceeded, a state equation double-steps, a state-hold or
+  analytic evaluation advances state, or catch-up debt/drop/loss differs by
+  domain or lacks one graph-wide batch;
+- a dependency template is treated as a reusable completion, or a concrete
+  completion omits/mismatches execution, payload, version, subresource, access,
+  generation, release/acquire, fence, or host-visibility proof;
+- provisional/prepared state escapes, a commit skips prepare, a commit receipt
+  is partial, an iterative cycle is unbounded, an iteration reads the wrong
+  lineage/bracket, or any rejected/nonaccepted loop output crosses an outer edge;
+- a rate is applied as an integral, an integral is applied per substep,
+  intensive-flux quadrature does not sum to represented physical area, an
+  extensive-distributed inverse-area kernel does not integrate to one, or a
+  payload uses the wrong state term;
 - a payload/footprint pair is invalid, point impulse contains an undeclared free
   couple, source/reaction-group acceptance is non-atomic, an exact-once key
   repeats, overflow hides lost commodities, or nondeterministic reduction is
   claimed deterministic;
+- impact partitions overlap or fail measure/commodity closure, a visual child
+  applies parent authority, a rate is integrated outside interval overlap, or
+  replay applies a key with an existing committed application receipt;
 - conservation residual, coupling stability, positivity, constraint, chart,
   transform, or approximation error exceeds its `[G]` bound;
 - contact ownership/solver revision, collider pose, separation sign, material
   pair law, or rigid-body twist reference is ambiguous; a physical property is
   inferred from visual PBR state; or an unavailable property silently becomes
   zero;
+- a deforming/fluid proxy lacks material-point velocity, differential/swept-
+  bound validity, filter, boundary condition, feature remap, or latched material
+  selection; or an external interaction lacks exactly one directional
+  capability and dependency/error/exact-once/reaction-atomicity policy;
 - GPU submission is called completion, authoritative GPU state lacks a bounded
   recovery/restart transaction, a resource is reused before its keyed
   multi-consumer lease join retires, a workgroup barrier is used as a global
@@ -2848,10 +3870,23 @@ Reject the affected route or narrow its claim when any of the following occurs:
   across bindings/views, derives motion from adjacent solver states, omits
   previous/current provenance, creates a candidate-camera-cache cycle, or
   mutates a candidate/publication/snapshot in a later phase;
+- a candidate lacks commit provenance/time-cohort admission, a target submits
+  without an admitted render plan and frame slot, preparation/reset/lease
+  closure is incomplete, a reset lacks a matching `ScopedResetActionResult`, a render
+  resource is reused before its join, or one shadow factor is applied zero or
+  multiple times;
+- previous/current cohort or jitter provenance disagree, in-flight occupancy
+  exceeds the admitted target maximum, a live frame slot is overwritten, or an
+  acquisition/present reservation resolves to another target, sequence, slot,
+  or generation;
 - a quality switch changes equations without explicit handoff/error, loses
   inventories/IDs/events silently, has two emitters for one state-equation/source
   channel during crossfade, retires before all consumer classes complete, or
   exceeds peak memory;
+- quality work starts before request/allocation admission, an allocation is
+  absent from the memory lifetime ledger, a transfer is absent from traffic,
+  shared/per-view work is double-counted, logical/physical bytes are conflated,
+  or cadence distributions do not reconcile to exact trace totals;
 - target acceptance uses isolated demo timings, desktop extrapolation, a cold
   burst, unlabelled budgets, or a final image without native-domain diagnostics.
 
