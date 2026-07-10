@@ -392,8 +392,11 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
+.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -419,14 +422,14 @@ footer code{color:var(--cyan);font-size:11px}
 
 const navHtml = (depth) => `<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="${depth}">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
 </nav></div></div>`;
 
 const footerHtml = `<div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
   <span style="font-size:13px">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary implementations · registry <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="${REPO}">Repository</a> · <a href="${SITE}demos/registry.json">demo registry</a> · <a href="${SITE}llms.txt">llms.txt</a> · <a href="${SITE}skills.json">skills.json</a></span>
+  <span><a href="${SITE}about/">About &amp; methodology</a> · <a href="${REPO}">Repository</a> · <a href="${SITE}demos/registry.json">demo registry</a> · <a href="${SITE}llms.txt">llms.txt</a> · <a href="${SITE}skills.json">skills.json</a></span>
 </footer></div>`;
 
 const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" />
@@ -504,18 +507,6 @@ const providerPosterPath = (demo) => {
   const preview = providerPreviewPath(demo);
   return previewImageExists(preview) ? preview : null;
 };
-const providerPreviewForSkill = (slug) => {
-  const demo = PROVIDER_DEMOS.find((entry) => entry.skill === slug && providerPosterPath(entry));
-  if (!demo) return null;
-  return {
-    path: providerPosterPath(demo),
-    classification: demo.poster ? 'published-preview' : 'concept-proxy-preview',
-    label: demo.poster
-      ? 'Published preview screenshot · not canonical evidence'
-      : 'Live concept-proxy screenshot · not canonical evidence',
-    sourceId: demo.id,
-  };
-};
 const directPrimaryPreview = (demo) => {
   const screenshot = primaryPreviewPath(demo);
   if (previewImageExists(screenshot)) {
@@ -539,38 +530,26 @@ const directPrimaryPreview = (demo) => {
   }
   return null;
 };
-const skillPreview = (slug) => {
+const canonicalSkillPreview = (slug) => {
   const owned = primaryDemos.filter((demo) => demo.skill === slug);
-  const accepted = owned.find((demo) => (
-    demo.status === 'accepted'
-    && demo.nonRenderingScenarioSuite
-    && directPrimaryPreview(demo)
-  ));
+  const accepted = owned.find((demo) => demo.status === 'accepted' && directPrimaryPreview(demo));
   if (accepted) return directPrimaryPreview(accepted);
-  const validation = VALIDATION[slug]?.find(([path]) => docsImageExists(path));
-  if (validation) {
-    return {
-      path: validation[0],
-      classification: 'generated-asset-preview',
-      label: validation[1],
-      sourceId: slug,
-    };
-  }
-  const provider = providerPreviewForSkill(slug);
-  if (provider) return provider;
   const canonical = owned.find((demo) => demo.kind === 'canonical-lab' && directPrimaryPreview(demo));
-  return canonical ? directPrimaryPreview(canonical) : null;
+  if (canonical) return directPrimaryPreview(canonical);
+  const direct = owned.find((demo) => directPrimaryPreview(demo));
+  return direct ? directPrimaryPreview(direct) : null;
 };
-const previewForPrimary = (demo) => {
-  const direct = directPrimaryPreview(demo);
-  if (direct && (demo.status === 'accepted' || demo.nonRenderingScenarioSuite)) return direct;
-  const related = skillPreview(demo.skill);
-  if (!related) return direct;
-  return {
-    ...related,
-    classification: `related-${related.classification}`,
-    label: `Related skill preview · ${related.label}`,
-  };
+const previewForPrimary = (demo) => directPrimaryPreview(demo);
+const primaryEvidencePanel = (demo, className = '') => {
+  const sourceHash = demo.sourceHash?.replace(/^sha256:/, '').slice(0, 12) ?? 'unavailable';
+  const fixedStates = demo.scenarios.length + demo.mechanisms.length + demo.tiers.length;
+  const requiredProofs = demo.runtimeProof?.length ?? 0;
+  return `<span class="primary-evidence-panel ${esc(className)}" data-evidence-state="${esc(demo.status)}" data-preview-for="${esc(demo.id)}">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>${demo.status === 'accepted' ? 'Accepted evidence published' : 'Runtime evidence pending'}</strong>
+    <span><code>${esc(sourceHash)}</code> source hash</span>
+    <span>${fixedStates} fixed states · ${requiredProofs} runtime proof requirements</span>
+  </span>`;
 };
 const classificationLabel = (demo) => {
   const kind = registryDemoById.get(demo.id)?.kind;
@@ -583,7 +562,7 @@ const secondaryLimitation = (demo) => registryDemoById.get(demo.id)?.proxyStatus
 const liveDemoVisual = (demo, prefix = '') => {
   const poster = providerPosterPath(demo);
   return poster
-    ? `<span class="preview-media"><img src="${prefix}${poster}" alt="Live ${esc(classificationLabel(demo).toLowerCase())} screenshot for ${esc(demo.title)}; not canonical runtime evidence" ${imageSizeAttrs(poster)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(classificationLabel(demo))} preview</span></span>`
+    ? `<span class="preview-media" data-preview-classification="${safeClass(classificationLabel(demo))}"><img src="${prefix}${poster}" alt="Live ${esc(classificationLabel(demo).toLowerCase())} screenshot for ${esc(demo.title)}; not canonical runtime evidence" ${imageSizeAttrs(poster)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(classificationLabel(demo))} preview</span></span>`
     : `<div class="preview-missing" role="img" aria-label="Preview capture pending for ${esc(demo.title)}">
         <span>Preview capture pending</span><code>${esc(demo.id)}</code>
       </div>`;
@@ -599,7 +578,7 @@ const flagshipHtml = flagshipDemos.map(({ demo, tone, domain, copy }) => {
   const preview = previewForPrimary(demo);
   return `
       <a class="flagship-card flagship-card--${tone}" href="${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="flagship-preview"><img src="${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : `<span class="preview-missing flagship-preview-missing" data-preview-for="${esc(demo.id)}"><span>Runtime preview pending</span><code>${esc(demo.id)}</code></span>`}
+        ${preview ? `<span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img src="${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo, 'flagship-preview-missing')}
         <div class="flagship-copy">
           <span class="flagship-kicker">${esc(domain)}</span>
           <h3>${esc(demo.title)}</h3>
@@ -622,7 +601,7 @@ const primaryLabHtml = primaryLabGroups.map((group) => `
         const preview = previewForPrimary(demo);
         return `
         <a class="lab-card" href="${demo.publishPath.replace(/^\/+/, '')}">
-          ${preview ? `<span class="lab-card-media" data-preview-for="${esc(demo.id)}" data-preview-classification="${esc(preview.classification)}"><img src="${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : `<span class="preview-missing" data-preview-for="${esc(demo.id)}"><span>Preview capture pending</span><code>${esc(demo.id)}</code></span>`}
+          ${preview ? `<span class="lab-card-media" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img src="${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
           <span class="lab-card-top"><span>${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
           <h4>${esc(primaryTitle(demo))}</h4>
           <p>${esc(skills[demo.skill]?.title ?? demo.skill)}</p>
@@ -743,9 +722,9 @@ h1 em{font-style:normal;color:var(--amber)}
 .hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:44px;display:inline-flex;align-items:center;padding:10px 16px;background:rgba(15,18,24,.78);border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition-property:scale,color,box-shadow;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}.hero-action:active{scale:.96}
 .hero-ledger{padding:clamp(24px,3.2vw,36px);border-radius:22px;background:rgba(9,12,17,.86);box-shadow:0 0 0 1px rgba(255,255,255,.1),0 28px 72px rgba(0,0,0,.28)}
-.hero-ledger-kicker{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase}.hero-ledger h2{max-width:16ch;margin-top:10px;font-size:clamp(24px,3vw,38px);line-height:1.08}
-.hero-ledger dl{margin-top:24px;border-top:1px solid var(--line)}.hero-ledger-row{display:grid;grid-template-columns:minmax(110px,.42fr) minmax(0,1fr);gap:20px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}.hero-ledger dt{color:var(--dim);font-size:14px}.hero-ledger dd{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--ink)}.hero-ledger dd[data-state="accepted"]{color:var(--cyan)}.hero-ledger dd[data-state="pending"]{color:var(--amber)}
-.hero-ledger-note{margin-top:20px;color:var(--dim);font-size:13px}.hero-ledger-link{display:inline-flex;min-height:44px;align-items:center;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--amber)}.hero-ledger-link:hover{text-decoration:underline}
+.hero-ledger-kicker{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase}.hero-ledger h2{max-width:18ch;margin-top:10px;font-size:clamp(24px,3vw,38px);line-height:1.08;text-wrap:balance}
+.hero-ledger dl{margin-top:24px;border-top:1px solid var(--line)}.hero-ledger-row{display:grid;grid-template-columns:minmax(118px,.38fr) minmax(0,1fr);gap:20px;align-items:start;padding:15px 0;border-bottom:1px solid var(--line)}.hero-ledger dt{padding-top:3px;color:var(--dim);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.hero-ledger dd{display:grid;gap:4px}.hero-ledger strong{font:600 clamp(20px,2vw,26px)/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}.hero-ledger dd[data-state="accepted"] strong{color:var(--cyan)}.hero-ledger dd[data-state="pending"] strong{color:var(--amber)}.hero-ledger dd span{color:var(--dim);font-size:12px;line-height:1.45;text-wrap:pretty}
+.hero-ledger-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.hero-ledger-link{display:inline-flex;min-height:40px;align-items:center;padding:8px 11px;border-radius:10px;background:rgba(255,180,84,.07);box-shadow:0 0 0 1px rgba(255,180,84,.18);font-family:var(--mono);font-size:10px;color:var(--amber);transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.hero-ledger-link:hover{color:var(--ink);background:rgba(255,180,84,.13);box-shadow:0 0 0 1px rgba(255,180,84,.34)}.hero-ledger-link:active{scale:.96}
 .stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.64)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:0}
 .stat{padding:20px clamp(10px,2vw,24px);border-left:1px solid var(--line)}.stat:first-child{border-left:0}
@@ -757,9 +736,9 @@ h1 em{font-style:normal;color:var(--amber)}
 .coverage-rail{display:grid;gap:9px}.rail-head{display:flex;justify-content:space-between;gap:20px;font-family:var(--mono);font-size:11px}.rail-head b{color:var(--ink);font-weight:500}.rail-head span{color:var(--dim);font-variant-numeric:tabular-nums}.rail-track{height:9px;overflow:hidden;border-radius:6px;background:#06080b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.rail-fill{height:100%;width:var(--value);border-radius:inherit;background:linear-gradient(90deg,var(--cyan),#b9f5e7);box-shadow:0 0 20px rgba(127,212,193,.34)}.coverage-rail--acceptance .rail-fill{background:linear-gradient(90deg,var(--amber),#ffd392);box-shadow:0 0 20px rgba(255,180,84,.3)}.rail-note{color:var(--dim);font-size:13px}
 .achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
 .flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{--tone:var(--amber);position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--tone) 8%,var(--bg3)),rgba(11,14,19,.97) 60%);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--cyan{--tone:var(--cyan)}.flagship-card--lime{--tone:var(--lime)}.flagship-card--violet{--tone:var(--violet)}.flagship-card--rose{--tone:var(--rose)}
-.flagship-preview{align-self:stretch;min-height:230px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}.flagship-preview-missing{min-height:230px;align-self:stretch}
+.flagship-preview{align-self:stretch;min-height:230px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}.flagship-preview-missing{min-height:230px;align-self:stretch;border-radius:14px}
 .flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--tone)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
-.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:330px;padding:14px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.88),rgba(12,15,21,.94));box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-media,.lab-card>.preview-missing{margin:-4px -4px 14px;border-radius:11px}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:14px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px dashed var(--line)}
+.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:330px;padding:14px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.88),rgba(12,15,21,.94));box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-media,.lab-card>.preview-missing,.lab-card>.primary-evidence-panel{margin:-4px -4px 14px;border-radius:11px}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:14px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px dashed var(--line)}
 .protocol-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.protocol-card{min-height:190px;padding:20px;border-radius:16px;background:var(--bg2);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.protocol-card code{font-size:10px;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.protocol-card h3{margin-top:14px;font-size:19px}.protocol-card p{margin-top:8px;color:var(--dim);font-size:14px}.protocol-flow{grid-column:span 2;background:linear-gradient(135deg,rgba(127,212,193,.08),rgba(15,18,24,.94))}.protocol-flow ol{list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:20px}.protocol-flow li{font-family:var(--mono);font-size:10px;color:var(--dim)}.protocol-flow li:not(:last-child):after{content:"→";margin-left:8px;color:var(--amber)}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}.step{background:var(--bg2);border-radius:18px;padding:26px 26px 22px;position:relative;box-shadow:var(--shadow-card)}.step .n{font-family:var(--mono);position:absolute;top:-12px;left:22px;background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.1);border-radius:7px;color:var(--amber);font-size:12px;padding:2px 10px;letter-spacing:.15em}.step h3{font-size:19px;margin-bottom:10px}.step p{color:var(--dim);font-size:15.5px;margin-bottom:14px}
 .install-console{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:24px;border-radius:20px;background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(15,18,24,.94));box-shadow:var(--shadow-card)}.install-console p{color:var(--dim);font-size:14px}.install-console pre{margin-top:14px}.install-console .hero-action{white-space:nowrap}
@@ -795,19 +774,19 @@ ${navHtml('')}
         <div class="hero-actions">
           <a class="hero-action" href="#matrix">Explore the matrix</a>
           <a class="hero-action" href="#flagships">Inspect flagships</a>
+          <a class="hero-action" href="about/">Read the methodology</a>
         </div>
       </div>
       <aside class="hero-ledger" aria-labelledby="hero-ledger-title">
-        <p class="hero-ledger-kicker">Current acceptance ledger</p>
-        <h2 id="hero-ledger-title">What the repository proves today</h2>
+        <p class="hero-ledger-kicker">Registry-derived repository state</p>
+        <h2 id="hero-ledger-title">Coverage you can inspect.</h2>
         <dl>
-          <div class="hero-ledger-row"><dt>Browser-wired</dt><dd>Route loads; runtime proof may still be pending</dd></div>
-          <div class="hero-ledger-row"><dt>Accepted evidence</dt><dd data-state="accepted">Readback, timing, lifecycle, and visuals passed</dd></div>
-          <div class="hero-ledger-row"><dt>Evidence pending</dt><dd data-state="pending">No accepted runtime claim</dd></div>
-          <div class="hero-ledger-row"><dt>Secondary demo</dt><dd>Never counted as primary proof</dd></div>
+          <div class="hero-ledger-row"><dt>Primary routes</dt><dd><strong>${primaryDemos.length} / ${primaryDemos.length}</strong><span>Browser entry and canonical source hash published</span></dd></div>
+          <div class="hero-ledger-row"><dt>Accepted</dt><dd data-state="accepted"><strong>${acceptedPrimaryDemos.length} / ${primaryDemos.length}</strong><span>Claim-specific evidence bundle passed</span></dd></div>
+          <div class="hero-ledger-row"><dt>Pending</dt><dd data-state="pending"><strong>${primaryDemos.length - acceptedPrimaryDemos.length}</strong><span>Current-adapter capture or review still required</span></dd></div>
+          <div class="hero-ledger-row"><dt>Fixed states</dt><dd><strong>${fixedRouteCount}</strong><span>${scenarioRouteCount} scenarios · ${mechanismRouteCount} mechanisms · ${tierRouteCount} tiers</span></dd></div>
         </dl>
-        <p class="hero-ledger-note">Browser-wired means loadable. Accepted requires the declared runtime, readback, timing, lifecycle, and visual evidence.</p>
-        <a class="hero-ledger-link" href="#labs">Inspect every lab and evidence state&nbsp;→</a>
+        <div class="hero-ledger-actions"><a class="hero-ledger-link" href="#labs">Inspect every lab&nbsp;→</a><a class="hero-ledger-link" href="demos/registry.json">Open registry JSON&nbsp;→</a></div>
       </aside>
     </div>
   </div>
@@ -943,6 +922,132 @@ ${footerHtml}
 
 writeFileSync(join(root, 'docs', 'index.html'), indexHtml);
 
+/* ------------------------- about / methodology ------------------------- */
+
+const aboutTitle = 'About the Three.js WebGPU Skill Pack Methodology';
+const aboutDescription = metaDescription('Meet the maintainers and review the open-source evidence methodology, licensing, update policy, and claim standards behind the Three.js WebGPU Skill Pack.');
+const aboutUrl = `${SITE}about/`;
+const aboutLastmod = latestPathDate(['scripts/build-pages.mjs', 'README.md', 'LICENSE', 'package.json']);
+const aboutHtml = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${aboutTitle}</title>
+<meta name="description" content="${esc(aboutDescription)}" />
+<link rel="canonical" href="${aboutUrl}" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+${assetHead('../')}
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="${SITE_NAME}" />
+<meta property="og:title" content="${aboutTitle}" />
+<meta property="og:description" content="${esc(aboutDescription)}" />
+<meta property="og:url" content="${aboutUrl}" />
+${socialImageMeta(OG_IMAGE, 'Generated crater-field asset preview representing the evidence-led Three.js WebGPU Skill Pack methodology')}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${aboutTitle}" />
+<meta name="twitter:description" content="${esc(aboutDescription)}" />
+<script type="application/ld+json">
+${JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    PUBLISHER,
+    {
+      '@type': 'AboutPage',
+      '@id': `${aboutUrl}#webpage`,
+      url: aboutUrl,
+      name: aboutTitle,
+      description: aboutDescription,
+      dateModified: aboutLastmod,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${SITE}#website` },
+      mainEntity: PUBLISHER_REF,
+      about: { '@id': `${SITE}#software` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: SITE_NAME, item: SITE },
+        { '@type': 'ListItem', position: 2, name: 'About and methodology', item: aboutUrl },
+      ],
+    },
+  ],
+}, null, 1)}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="${esc(FONTS)}" rel="stylesheet" />
+<style>
+${baseCss}
+.about-hero{padding:clamp(66px,9vw,120px) 0 clamp(52px,7vw,88px);background:radial-gradient(circle at 82% 18%,rgba(127,212,193,.12),transparent 27%),radial-gradient(circle at 10% 8%,rgba(255,180,84,.1),transparent 26%)}
+.about-hero .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
+.about-hero h1{max-width:15ch;margin-top:18px;font-size:clamp(42px,7vw,82px);line-height:1.01}
+.about-hero .lede{max-width:68ch;margin-top:26px;color:var(--dim);font-size:clamp(17px,1.6vw,20px);text-wrap:pretty}
+.about-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}.about-meta span,.about-meta a{min-height:40px;display:inline-flex;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(127,212,193,.07);box-shadow:0 0 0 1px rgba(127,212,193,.18);font:11px/1.35 var(--mono);color:var(--cyan);transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.about-meta a:hover{color:var(--ink);background:rgba(127,212,193,.14);box-shadow:0 0 0 1px rgba(127,212,193,.34)}.about-meta a:active{scale:.96}
+.about-section{padding:clamp(52px,7vw,92px) 0;border-top:1px solid var(--line)}.about-section h2{max-width:20ch;font-size:clamp(30px,4.5vw,54px)}.about-section>.wrap>p{max-width:72ch;margin-top:18px;color:var(--dim);text-wrap:pretty}
+.identity-grid,.method-grid,.policy-grid{display:grid;gap:16px;margin-top:34px}.identity-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.method-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.policy-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.about-card{min-width:0;padding:24px;border-radius:20px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}.about-card code{color:var(--cyan);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.about-card h3{margin-top:10px;font-size:22px}.about-card p,.about-card li{margin-top:10px;color:var(--dim);text-wrap:pretty}.about-card ul{padding-left:18px}.about-card a{color:var(--amber)}.about-card a:hover{text-decoration:underline}
+.method-step{position:relative;padding-left:72px}.method-step .step-number{position:absolute;left:22px;top:24px;font:600 12px/1 var(--mono);color:var(--amber);font-variant-numeric:tabular-nums}.method-step .step-number:after{content:"";position:absolute;left:-8px;top:-8px;width:32px;height:32px;border-radius:50%;box-shadow:0 0 0 1px rgba(255,180,84,.28);background:rgba(255,180,84,.07);z-index:-1}
+.principles{display:grid;gap:10px;margin-top:30px}.principles div{display:grid;grid-template-columns:minmax(150px,.34fr) 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}.principles dt{font-family:var(--mono);font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:.06em}.principles dd{color:var(--dim);text-wrap:pretty}
+.about-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.about-cta a{min-height:44px;display:inline-flex;align-items:center;padding:10px 15px;border-radius:11px;color:var(--ink);background:rgba(255,180,84,.09);box-shadow:0 0 0 1px rgba(255,180,84,.24);font:600 12px/1.35 var(--mono);transition-property:color,background-color,box-shadow,scale;transition-duration:160ms}.about-cta a:hover{background:rgba(255,180,84,.17);box-shadow:0 0 0 1px rgba(255,180,84,.4)}.about-cta a:active{scale:.96}
+@media(max-width:860px){.identity-grid,.policy-grid{grid-template-columns:1fr}.method-grid{grid-template-columns:1fr}}@media(max-width:620px){.principles div{grid-template-columns:1fr;gap:6px}.method-step{padding-left:58px}.method-step .step-number{left:18px}}
+</style>
+</head>
+<body>
+${navHtml('../')}
+<main id="main-content" tabindex="-1">
+  <header class="about-hero"><div class="wrap">
+    <p class="kicker">Open source · Evidence gated · Publicly versioned</p>
+    <h1>How this skill pack earns trust.</h1>
+    <p class="lede">The Three.js WebGPU Skill Pack is a public technical reference for AI coding agents and graphics engineers. This page identifies who maintains it, how claims are classified, what counts as evidence, and how published guidance stays synchronized with source.</p>
+    <div class="about-meta"><span>Three.js ${esc(DEMO_REGISTRY.threeRevision)}</span><span>${total} expert skills</span><span>${primaryDemos.length} primary implementations</span><a href="${REPO}">Public repository ↗</a></div>
+  </div></header>
+
+  <section class="about-section" aria-labelledby="identity-title"><div class="wrap">
+    <h2 id="identity-title">People and project identity</h2>
+    <p>The pack is maintained in the open. Authorship is attached to inspectable commits and contributor history rather than an anonymous content pipeline.</p>
+    <div class="identity-grid">
+      <article class="about-card"><code>maintainer</code><h3>linegel</h3><p>Repository owner and current public maintainer. Review the <a href="https://github.com/linegel">GitHub profile</a>, signed-in activity, and commit history directly.</p></article>
+      <article class="about-card"><code>contributors</code><h3>Repository contributors</h3><p>Every accepted change remains attributable through the public <a href="${REPO}/graphs/contributors">contributors graph</a> and per-file Git history.</p></article>
+      <article class="about-card"><code>license</code><h3>ISC licensed</h3><p>The source and generated presentation are distributed under the repository’s <a href="${REPO}/blob/main/LICENSE">ISC License</a>. Third-party dependencies retain their own licenses.</p></article>
+    </div>
+  </div></section>
+
+  <section class="about-section" aria-labelledby="method-title"><div class="wrap">
+    <h2 id="method-title">Evidence before acceptance</h2>
+    <p>A source file, a loading page, and an attractive screenshot prove different things. The pack keeps those claims separate so presentation quality cannot silently become runtime evidence.</p>
+    <div class="method-grid">
+      <article class="about-card method-step"><span class="step-number">01</span><code>authored</code><h3>Declare the contract</h3><p>Each skill names its domain, APIs, invariants, ownership boundaries, and explicit non-goals.</p></article>
+      <article class="about-card method-step"><span class="step-number">02</span><code>derived</code><h3>Build deterministic routes</h3><p>Canonical demos publish fixed scenario, mechanism, and quality-tier routes from versioned source.</p></article>
+      <article class="about-card method-step"><span class="step-number">03</span><code>measured</code><h3>Capture runtime facts</h3><p>GPU timing, resource inventory, readback, lifecycle, visual diagnostics, and error ledgers are measured rather than inferred.</p></article>
+      <article class="about-card method-step"><span class="step-number">04</span><code>gated</code><h3>Issue a falsifiable verdict</h3><p>PASS, FAIL, INSUFFICIENT_EVIDENCE, and NOT_CLAIMED remain distinct. Missing proof cannot collapse into success.</p></article>
+    </div>
+    <dl class="principles">
+      <div><dt>Implementation</dt><dd>The canonical source exists and its published route is loadable.</dd></div>
+      <div><dt>Presentation preview</dt><dd>A screenshot or generated asset explains the surface but is not automatically runtime evidence.</dd></div>
+      <div><dt>Accepted evidence</dt><dd>The declared mechanism, timing, lifecycle, and visual contracts passed against the named Three.js revision and adapter context.</dd></div>
+    </dl>
+  </div></section>
+
+  <section class="about-section" aria-labelledby="updates-title"><div class="wrap">
+    <h2 id="updates-title">Update and correction policy</h2>
+    <p>Published pages are generated from repository source. Search metadata, source hashes, dates, demo classifications, and discovery files are validated together before deployment.</p>
+    <div class="policy-grid">
+      <article class="about-card"><code>versioning</code><h3>Git is the ledger</h3><p>Skill publication and modification dates come from repository history. Every page links back to its current source and latest relevant commit.</p></article>
+      <article class="about-card"><code>corrections</code><h3>Fix source, then rebuild</h3><p>Technical corrections land in the owning skill or demo first. Generated HTML, sitemap metadata, and machine-readable indexes are rebuilt from that source.</p></article>
+      <article class="about-card"><code>review</code><h3>Claims remain reversible</h3><p>Acceptance can be withdrawn when APIs, evidence, or hardware behavior change. The registry preserves the current status instead of promising permanent validity.</p></article>
+    </div>
+    <div class="about-cta"><a href="${REPO}/issues">Report a technical issue ↗</a><a href="${REPO}/pulls">Review open contributions ↗</a><a href="../demos/registry.json">Inspect the demo registry</a><a href="../llms.txt">Read the LLM index</a></div>
+  </div></section>
+</main>
+${footerHtml}
+</body>
+</html>
+`;
+mkdirSync(join(root, 'docs', 'about'), { recursive: true });
+writeFileSync(join(root, 'docs', 'about', 'index.html'), aboutHtml);
+
 /* ---------------------------- skill pages ---------------------------- */
 
 mkdirSync(join(root, 'docs', 'skills'), { recursive: true });
@@ -961,7 +1066,7 @@ for (const slug of slugs) {
   const participatingFlagships = flagshipDemos.filter(({ demo }) => DEMO_REGISTRY.origins[demo.id]?.ownerSkills?.includes(slug));
   const externalFlagshipParticipation = participatingFlagships.filter(({ demo }) => !ownedPrimaryDemos.some((owned) => owned.id === demo.id));
   const pageUrl = `${SITE}skills/${slug}.html`;
-  const resolvedSkillPreview = skillPreview(slug);
+  const resolvedSkillPreview = canonicalSkillPreview(slug);
   const skillHeroImg = resolvedSkillPreview?.path ?? null;
   const ogImg = skillHeroImg ? `${SITE}${skillHeroImg}` : OG_IMAGE;
   const hasAcceptedEvidence = ownedPrimaryDemos.some((demo) => demo.status === 'accepted');
@@ -992,7 +1097,7 @@ for (const slug of slugs) {
       const preview = previewForPrimary(demo);
       return `
       <a class="card" href="../${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-classification="${esc(preview.classification)}"><img class="card-preview" src="../${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : `<span class="preview-missing" data-preview-for="${esc(demo.id)}"><span>Preview capture pending</span><code>${esc(demo.id)}</code></span>`}
+        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img class="card-preview" src="../${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
         <span class="card-head"><span class="card-index">${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
         <h3>${esc(primaryTitle(demo))}</h3>
         <p>${demo.scenarios.length} fixed scenarios, ${demo.mechanisms.length} mechanism routes, and ${demo.tiers.length} locked tiers.</p>
@@ -1010,7 +1115,7 @@ for (const slug of slugs) {
       const preview = previewForPrimary(demo);
       return `
       <a class="card" href="../${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-classification="${esc(preview.classification)}"><img class="card-preview" src="../${preview.path}" alt="${esc(preview.label)} for ${esc(demo.title)}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : ''}
+        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img class="card-preview" src="../${preview.path}" alt="${esc(preview.label)} for ${esc(demo.title)}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
         <span class="card-head"><span class="card-index">${esc(domain)}</span><span class="status status--pending">Evidence pending</span></span>
         <h3>${esc(demo.title)}</h3>
         <span class="card-meta">${demo.mechanisms.length} mechanisms · ${demo.tiers.length} locked tiers</span>
@@ -1172,6 +1277,7 @@ a.chip:active{scale:.96}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
 .hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
@@ -1242,6 +1348,7 @@ const llms = `# Three.js WebGPU Skill Pack
 
 Repository: ${REPO}
 Website: ${SITE} (each skill has a dedicated page at ${SITE}skills/<name>.html with the approach, math, validation gallery, and full skill text)
+About and evidence methodology: ${aboutUrl}
 Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/
 Install (skills CLI): ${SKILLS_ADD} --list; ${SKILLS_INSTALL_PACK}; or ${SKILLS_ADD} --skill '*' -g -a codex -y for non-interactive Codex setup.
 Install (any agent): clone the repo or use the skills CLI; each skill is a self-contained folder with SKILL.md (YAML frontmatter: name, description), references/, agents/, and examples/. Example-directory presence is not canonical runtime proof.
@@ -1287,6 +1394,7 @@ const skillManifest = {
   repository: REPO,
   source: REPO_SLUG,
   homepage: SITE,
+  methodology: aboutUrl,
   skillFormat: 'SKILL.md with YAML frontmatter (name, description) per folder',
   discovery: {
     primary: `${SKILLS_ADD} --list`,
@@ -1396,6 +1504,7 @@ const sitemapHomeLastmod = latestPathDate(['scripts/build-pages.mjs', ...slugs])
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>${SITE_NAME}</image:title></image:image></url>
+  <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>About the ${SITE_NAME} methodology</image:title></image:image></url>
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
   const image = VALIDATION[s] ? `${SITE}${VALIDATION[s][0][0]}` : OG_IMAGE;
@@ -1419,4 +1528,4 @@ writeFileSync(join(root, 'docs', '404.html'), `<!doctype html>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" /><style>html{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f0ede5;font:18px/1.6 system-ui,sans-serif}.wrap{width:min(680px,calc(100% - 48px))}p{color:#aaa99f}a{color:#7fd4c1}code{color:#ffb454}</style></head>
 <body><main class="wrap"><p><code>404</code></p><h1>That route does not exist.</h1><p>The skill pack, skill contracts, and published WebGPU labs are available from the catalog.</p><p><a href="/">Return to the Three.js WebGPU Skill Pack</a></p></main></body></html>\n`);
 
-console.log(`Wrote docs/index.html, ${slugs.length} skill pages, 404.html, llm.txt, llms.txt, skills.json, robots.txt, sitemap.xml.`);
+console.log(`Wrote docs/index.html, docs/about/index.html, ${slugs.length} skill pages, 404.html, llm.txt, llms.txt, skills.json, robots.txt, sitemap.xml.`);
