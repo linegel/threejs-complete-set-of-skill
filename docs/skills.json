@@ -4,6 +4,7 @@
   "repository": "https://github.com/linegel/threejs-complete-set-of-skill",
   "source": "linegel/threejs-complete-set-of-skill",
   "homepage": "https://threejs-skills.com/",
+  "methodology": "https://threejs-skills.com/about/",
   "skillFormat": "SKILL.md with YAML frontmatter (name, description) per folder",
   "discovery": {
     "primary": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",

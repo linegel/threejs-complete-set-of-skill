@@ -201,10 +201,12 @@ await mapConcurrent(urls, async (url) => {
     assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks mechanism inventory`);
     assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${url}: demo shell lacks evidence status`);
   }
-  const expectedType = pathname === '/' ? 'WebSite' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication');
+  const expectedType = pathname === '/'
+    ? 'WebSite'
+    : (pathname === '/about/' ? 'AboutPage' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication'));
   assert(schema.has(expectedType), `${url}: missing ${expectedType} structured data`);
   assert(schema.has('BreadcrumbList') || pathname === '/', `${url}: missing breadcrumb structured data`);
-  if (pathname === '/' || pathname.startsWith('/skills/')) {
+  if (pathname === '/' || pathname === '/about/' || pathname.startsWith('/skills/')) {
     assert(alternateValues(html, 'text/plain')[0] === new URL('llms.txt', SITE).href, `${url}: missing llms.txt discovery link`);
     assert(alternateValues(html, 'application/json')[0] === new URL('skills.json', SITE).href, `${url}: missing skills.json discovery link`);
   }

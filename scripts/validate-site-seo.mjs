@@ -102,6 +102,7 @@ function validateIndexablePage(path, expectedUrl, {
   requireArticle = false,
   requireCatalog = false,
   requireDemoShell = false,
+  requireAbout = false,
 } = {}) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
@@ -150,6 +151,11 @@ function validateIndexablePage(path, expectedUrl, {
     assert(!Number.isFinite(published) || !Number.isFinite(modified) || published <= modified, `${label}: datePublished is later than dateModified`);
     assert(headValue(html, 'property', 'article:published_time')[0] === article?.datePublished, `${label}: Open Graph publication time differs from JSON-LD`);
     assert(headValue(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${label}: Open Graph modification time differs from JSON-LD`);
+  }
+  if (requireAbout) {
+    assert(nodes.some((node) => hasType(node, 'AboutPage')), `${label}: missing AboutPage structured-data node`);
+    assert(nodes.some((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`), `${label}: missing publisher identity`);
+    assert(nodes.some((node) => hasType(node, 'BreadcrumbList')), `${label}: missing breadcrumb structured data`);
   }
 
   if (requireH1) {
@@ -220,14 +226,16 @@ for (const url of pageUrls) {
   const pathname = new URL(url).pathname;
   const isSkill = pathname.startsWith('/skills/');
   const isDemo = pathname.startsWith('/demos/');
+  const isAbout = pathname === '/about/';
   const record = validateIndexablePage(path, url, {
     requireH1: true,
     requireMain: true,
     validateImages: true,
-    requireDiscovery: isHome || isSkill,
+    requireDiscovery: isHome || isSkill || isAbout,
     requireArticle: isSkill,
     requireCatalog: isHome,
     requireDemoShell: isDemo,
+    requireAbout: isAbout,
   });
   pageRecords.push({ url, ...record });
 }
@@ -279,7 +287,7 @@ for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
   }
 }
 
-for (const path of [join(DOCS, 'index.html'), ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html'))]) {
+for (const path of [join(DOCS, 'index.html'), join(DOCS, 'about', 'index.html'), ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html'))]) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
   assert(!/href=["'][^"']*index\.html(?:[#"'])/i.test(html), `${label}: internal navigation reinforces duplicate index.html URLs`);
@@ -305,6 +313,8 @@ for (const name of ['llm.txt', 'llms.txt', 'skills.json', 'site.webmanifest', 'r
   const text = readFileSync(join(DOCS, name), 'utf8');
   assert(!text.includes(OLD_SITE), `${name}: contains the retired GitHub Pages origin`);
 }
+assert(readFileSync(join(DOCS, 'llms.txt'), 'utf8').includes(`${SITE}about/`), 'llms.txt: missing methodology URL');
+assert(JSON.parse(readFileSync(join(DOCS, 'skills.json'), 'utf8')).methodology === `${SITE}about/`, 'skills.json: missing canonical methodology URL');
 
 if (errors.length) {
   console.error(`Site SEO validation failed (${errors.length} errors):`);

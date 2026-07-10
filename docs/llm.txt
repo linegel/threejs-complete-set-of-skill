@@ -4,6 +4,7 @@
 
 Repository: https://github.com/linegel/threejs-complete-set-of-skill
 Website: https://threejs-skills.com/ (each skill has a dedicated page at https://threejs-skills.com/skills/<name>.html with the approach, math, validation gallery, and full skill text)
+About and evidence methodology: https://threejs-skills.com/about/
 Install (Claude Code): git clone https://github.com/linegel/threejs-complete-set-of-skill.git && ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/
 Install (skills CLI): npx skills@latest add linegel/threejs-complete-set-of-skill --list; npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'; or npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -g -a codex -y for non-interactive Codex setup.
 Install (any agent): clone the repo or use the skills CLI; each skill is a self-contained folder with SKILL.md (YAML frontmatter: name, description), references/, agents/, and examples/. Example-directory presence is not canonical runtime proof.

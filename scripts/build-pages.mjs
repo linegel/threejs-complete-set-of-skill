@@ -419,14 +419,14 @@ footer code{color:var(--cyan);font-size:11px}
 
 const navHtml = (depth) => `<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="${depth}">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
 </nav></div></div>`;
 
 const footerHtml = `<div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
   <span style="font-size:13px">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary implementations · registry <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="${REPO}">Repository</a> · <a href="${SITE}demos/registry.json">demo registry</a> · <a href="${SITE}llms.txt">llms.txt</a> · <a href="${SITE}skills.json">skills.json</a></span>
+  <span><a href="${SITE}about/">About &amp; methodology</a> · <a href="${REPO}">Repository</a> · <a href="${SITE}demos/registry.json">demo registry</a> · <a href="${SITE}llms.txt">llms.txt</a> · <a href="${SITE}skills.json">skills.json</a></span>
 </footer></div>`;
 
 const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" />
@@ -804,6 +804,7 @@ ${navHtml('')}
         <div class="hero-actions">
           <a class="hero-action" href="#matrix">Explore the matrix</a>
           <a class="hero-action" href="#flagships">Inspect flagships</a>
+          <a class="hero-action" href="about/">Read the methodology</a>
         </div>
       </div>
       <div class="pipeline-visual" aria-hidden="true">
@@ -945,6 +946,132 @@ ${footerHtml}
 `;
 
 writeFileSync(join(root, 'docs', 'index.html'), indexHtml);
+
+/* ------------------------- about / methodology ------------------------- */
+
+const aboutTitle = 'About the Three.js WebGPU Skill Pack Methodology';
+const aboutDescription = metaDescription('Meet the maintainers and review the open-source evidence methodology, licensing, update policy, and claim standards behind the Three.js WebGPU Skill Pack.');
+const aboutUrl = `${SITE}about/`;
+const aboutLastmod = latestPathDate(['scripts/build-pages.mjs', 'README.md', 'LICENSE', 'package.json']);
+const aboutHtml = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${aboutTitle}</title>
+<meta name="description" content="${esc(aboutDescription)}" />
+<link rel="canonical" href="${aboutUrl}" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+${assetHead('../')}
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="${SITE_NAME}" />
+<meta property="og:title" content="${aboutTitle}" />
+<meta property="og:description" content="${esc(aboutDescription)}" />
+<meta property="og:url" content="${aboutUrl}" />
+${socialImageMeta(OG_IMAGE, 'Generated crater-field asset preview representing the evidence-led Three.js WebGPU Skill Pack methodology')}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${aboutTitle}" />
+<meta name="twitter:description" content="${esc(aboutDescription)}" />
+<script type="application/ld+json">
+${JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    PUBLISHER,
+    {
+      '@type': 'AboutPage',
+      '@id': `${aboutUrl}#webpage`,
+      url: aboutUrl,
+      name: aboutTitle,
+      description: aboutDescription,
+      dateModified: aboutLastmod,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${SITE}#website` },
+      mainEntity: PUBLISHER_REF,
+      about: { '@id': `${SITE}#software` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: SITE_NAME, item: SITE },
+        { '@type': 'ListItem', position: 2, name: 'About and methodology', item: aboutUrl },
+      ],
+    },
+  ],
+}, null, 1)}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="${esc(FONTS)}" rel="stylesheet" />
+<style>
+${baseCss}
+.about-hero{padding:clamp(66px,9vw,120px) 0 clamp(52px,7vw,88px);background:radial-gradient(circle at 82% 18%,rgba(127,212,193,.12),transparent 27%),radial-gradient(circle at 10% 8%,rgba(255,180,84,.1),transparent 26%)}
+.about-hero .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
+.about-hero h1{max-width:15ch;margin-top:18px;font-size:clamp(42px,7vw,82px);line-height:1.01}
+.about-hero .lede{max-width:68ch;margin-top:26px;color:var(--dim);font-size:clamp(17px,1.6vw,20px);text-wrap:pretty}
+.about-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}.about-meta span,.about-meta a{min-height:40px;display:inline-flex;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(127,212,193,.07);box-shadow:0 0 0 1px rgba(127,212,193,.18);font:11px/1.35 var(--mono);color:var(--cyan);transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.about-meta a:hover{color:var(--ink);background:rgba(127,212,193,.14);box-shadow:0 0 0 1px rgba(127,212,193,.34)}.about-meta a:active{scale:.96}
+.about-section{padding:clamp(52px,7vw,92px) 0;border-top:1px solid var(--line)}.about-section h2{max-width:20ch;font-size:clamp(30px,4.5vw,54px)}.about-section>.wrap>p{max-width:72ch;margin-top:18px;color:var(--dim);text-wrap:pretty}
+.identity-grid,.method-grid,.policy-grid{display:grid;gap:16px;margin-top:34px}.identity-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.method-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.policy-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.about-card{min-width:0;padding:24px;border-radius:20px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}.about-card code{color:var(--cyan);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.about-card h3{margin-top:10px;font-size:22px}.about-card p,.about-card li{margin-top:10px;color:var(--dim);text-wrap:pretty}.about-card ul{padding-left:18px}.about-card a{color:var(--amber)}.about-card a:hover{text-decoration:underline}
+.method-step{position:relative;padding-left:72px}.method-step .step-number{position:absolute;left:22px;top:24px;font:600 12px/1 var(--mono);color:var(--amber);font-variant-numeric:tabular-nums}.method-step .step-number:after{content:"";position:absolute;left:-8px;top:-8px;width:32px;height:32px;border-radius:50%;box-shadow:0 0 0 1px rgba(255,180,84,.28);background:rgba(255,180,84,.07);z-index:-1}
+.principles{display:grid;gap:10px;margin-top:30px}.principles div{display:grid;grid-template-columns:minmax(150px,.34fr) 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}.principles dt{font-family:var(--mono);font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:.06em}.principles dd{color:var(--dim);text-wrap:pretty}
+.about-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.about-cta a{min-height:44px;display:inline-flex;align-items:center;padding:10px 15px;border-radius:11px;color:var(--ink);background:rgba(255,180,84,.09);box-shadow:0 0 0 1px rgba(255,180,84,.24);font:600 12px/1.35 var(--mono);transition-property:color,background-color,box-shadow,scale;transition-duration:160ms}.about-cta a:hover{background:rgba(255,180,84,.17);box-shadow:0 0 0 1px rgba(255,180,84,.4)}.about-cta a:active{scale:.96}
+@media(max-width:860px){.identity-grid,.policy-grid{grid-template-columns:1fr}.method-grid{grid-template-columns:1fr}}@media(max-width:620px){.principles div{grid-template-columns:1fr;gap:6px}.method-step{padding-left:58px}.method-step .step-number{left:18px}}
+</style>
+</head>
+<body>
+${navHtml('../')}
+<main id="main-content" tabindex="-1">
+  <header class="about-hero"><div class="wrap">
+    <p class="kicker">Open source · Evidence gated · Publicly versioned</p>
+    <h1>How this skill pack earns trust.</h1>
+    <p class="lede">The Three.js WebGPU Skill Pack is a public technical reference for AI coding agents and graphics engineers. This page identifies who maintains it, how claims are classified, what counts as evidence, and how published guidance stays synchronized with source.</p>
+    <div class="about-meta"><span>Three.js ${esc(DEMO_REGISTRY.threeRevision)}</span><span>${total} expert skills</span><span>${primaryDemos.length} primary implementations</span><a href="${REPO}">Public repository ↗</a></div>
+  </div></header>
+
+  <section class="about-section" aria-labelledby="identity-title"><div class="wrap">
+    <h2 id="identity-title">People and project identity</h2>
+    <p>The pack is maintained in the open. Authorship is attached to inspectable commits and contributor history rather than an anonymous content pipeline.</p>
+    <div class="identity-grid">
+      <article class="about-card"><code>maintainer</code><h3>linegel</h3><p>Repository owner and current public maintainer. Review the <a href="https://github.com/linegel">GitHub profile</a>, signed-in activity, and commit history directly.</p></article>
+      <article class="about-card"><code>contributors</code><h3>Repository contributors</h3><p>Every accepted change remains attributable through the public <a href="${REPO}/graphs/contributors">contributors graph</a> and per-file Git history.</p></article>
+      <article class="about-card"><code>license</code><h3>ISC licensed</h3><p>The source and generated presentation are distributed under the repository’s <a href="${REPO}/blob/main/LICENSE">ISC License</a>. Third-party dependencies retain their own licenses.</p></article>
+    </div>
+  </div></section>
+
+  <section class="about-section" aria-labelledby="method-title"><div class="wrap">
+    <h2 id="method-title">Evidence before acceptance</h2>
+    <p>A source file, a loading page, and an attractive screenshot prove different things. The pack keeps those claims separate so presentation quality cannot silently become runtime evidence.</p>
+    <div class="method-grid">
+      <article class="about-card method-step"><span class="step-number">01</span><code>authored</code><h3>Declare the contract</h3><p>Each skill names its domain, APIs, invariants, ownership boundaries, and explicit non-goals.</p></article>
+      <article class="about-card method-step"><span class="step-number">02</span><code>derived</code><h3>Build deterministic routes</h3><p>Canonical demos publish fixed scenario, mechanism, and quality-tier routes from versioned source.</p></article>
+      <article class="about-card method-step"><span class="step-number">03</span><code>measured</code><h3>Capture runtime facts</h3><p>GPU timing, resource inventory, readback, lifecycle, visual diagnostics, and error ledgers are measured rather than inferred.</p></article>
+      <article class="about-card method-step"><span class="step-number">04</span><code>gated</code><h3>Issue a falsifiable verdict</h3><p>PASS, FAIL, INSUFFICIENT_EVIDENCE, and NOT_CLAIMED remain distinct. Missing proof cannot collapse into success.</p></article>
+    </div>
+    <dl class="principles">
+      <div><dt>Implementation</dt><dd>The canonical source exists and its published route is loadable.</dd></div>
+      <div><dt>Presentation preview</dt><dd>A screenshot or generated asset explains the surface but is not automatically runtime evidence.</dd></div>
+      <div><dt>Accepted evidence</dt><dd>The declared mechanism, timing, lifecycle, and visual contracts passed against the named Three.js revision and adapter context.</dd></div>
+    </dl>
+  </div></section>
+
+  <section class="about-section" aria-labelledby="updates-title"><div class="wrap">
+    <h2 id="updates-title">Update and correction policy</h2>
+    <p>Published pages are generated from repository source. Search metadata, source hashes, dates, demo classifications, and discovery files are validated together before deployment.</p>
+    <div class="policy-grid">
+      <article class="about-card"><code>versioning</code><h3>Git is the ledger</h3><p>Skill publication and modification dates come from repository history. Every page links back to its current source and latest relevant commit.</p></article>
+      <article class="about-card"><code>corrections</code><h3>Fix source, then rebuild</h3><p>Technical corrections land in the owning skill or demo first. Generated HTML, sitemap metadata, and machine-readable indexes are rebuilt from that source.</p></article>
+      <article class="about-card"><code>review</code><h3>Claims remain reversible</h3><p>Acceptance can be withdrawn when APIs, evidence, or hardware behavior change. The registry preserves the current status instead of promising permanent validity.</p></article>
+    </div>
+    <div class="about-cta"><a href="${REPO}/issues">Report a technical issue ↗</a><a href="${REPO}/pulls">Review open contributions ↗</a><a href="../demos/registry.json">Inspect the demo registry</a><a href="../llms.txt">Read the LLM index</a></div>
+  </div></section>
+</main>
+${footerHtml}
+</body>
+</html>
+`;
+mkdirSync(join(root, 'docs', 'about'), { recursive: true });
+writeFileSync(join(root, 'docs', 'about', 'index.html'), aboutHtml);
 
 /* ---------------------------- skill pages ---------------------------- */
 
@@ -1245,6 +1372,7 @@ const llms = `# Three.js WebGPU Skill Pack
 
 Repository: ${REPO}
 Website: ${SITE} (each skill has a dedicated page at ${SITE}skills/<name>.html with the approach, math, validation gallery, and full skill text)
+About and evidence methodology: ${aboutUrl}
 Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/
 Install (skills CLI): ${SKILLS_ADD} --list; ${SKILLS_INSTALL_PACK}; or ${SKILLS_ADD} --skill '*' -g -a codex -y for non-interactive Codex setup.
 Install (any agent): clone the repo or use the skills CLI; each skill is a self-contained folder with SKILL.md (YAML frontmatter: name, description), references/, agents/, and examples/. Example-directory presence is not canonical runtime proof.
@@ -1290,6 +1418,7 @@ const skillManifest = {
   repository: REPO,
   source: REPO_SLUG,
   homepage: SITE,
+  methodology: aboutUrl,
   skillFormat: 'SKILL.md with YAML frontmatter (name, description) per folder',
   discovery: {
     primary: `${SKILLS_ADD} --list`,
@@ -1399,6 +1528,7 @@ const sitemapHomeLastmod = latestPathDate(['scripts/build-pages.mjs', ...slugs])
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>${SITE_NAME}</image:title></image:image></url>
+  <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>About the ${SITE_NAME} methodology</image:title></image:image></url>
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
   const image = VALIDATION[s] ? `${SITE}${VALIDATION[s][0][0]}` : OG_IMAGE;
@@ -1422,4 +1552,4 @@ writeFileSync(join(root, 'docs', '404.html'), `<!doctype html>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" /><style>html{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f0ede5;font:18px/1.6 system-ui,sans-serif}.wrap{width:min(680px,calc(100% - 48px))}p{color:#aaa99f}a{color:#7fd4c1}code{color:#ffb454}</style></head>
 <body><main class="wrap"><p><code>404</code></p><h1>That route does not exist.</h1><p>The skill pack, skill contracts, and published WebGPU labs are available from the catalog.</p><p><a href="/">Return to the Three.js WebGPU Skill Pack</a></p></main></body></html>\n`);
 
-console.log(`Wrote docs/index.html, ${slugs.length} skill pages, 404.html, llm.txt, llms.txt, skills.json, robots.txt, sitemap.xml.`);
+console.log(`Wrote docs/index.html, docs/about/index.html, ${slugs.length} skill pages, 404.html, llm.txt, llms.txt, skills.json, robots.txt, sitemap.xml.`);
