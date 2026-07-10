@@ -4,6 +4,7 @@
   "repository": "https://github.com/linegel/threejs-complete-set-of-skill",
   "source": "linegel/threejs-complete-set-of-skill",
   "homepage": "https://threejs-skills.com/",
+  "methodology": "https://threejs-skills.com/about/",
   "skillFormat": "SKILL.md with YAML frontmatter (name, description) per folder",
   "discovery": {
     "primary": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
@@ -23,7 +24,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+    "buildRevision": "sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425",
     "skills": 26,
     "primaryImplementations": 39,
     "loadablePrimaryImplementations": 39,
@@ -561,9 +562,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T19:39:52+03:00",
+        "commit": "6f8358fd64e839b6056fd01f546a140650d84a4f",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/6f8358fd64e839b6056fd01f546a140650d84a4f"
       },
       "page": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-camera-controls-and-rigs/SKILL.md",
@@ -625,7 +626,7 @@
             "scripts/provider-demos.mjs",
             "threejs-choose-skills/examples/router-contract.test.mjs"
           ],
-          "sourceHash": "sha256:940983723b138f64d42f9400455f36bef4e6d5074fe8ebe7753d4f4fdbfa7860",
+          "sourceHash": "sha256:e0e31e5ed5a4d1d656d212188d3c37bf04c78ee6c2777d7cb949148a8ece47a3",
           "proxyStatus": {
             "limitation": "The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
             "canonicalLabId": "router-manifest-lab"
@@ -633,10 +634,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T19:26:02+03:00",
-        "commit": "f88c621afbf894b4e7ea94f204f527419377477d",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/f88c621afbf894b4e7ea94f204f527419377477d"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T01:33:51+03:00",
+        "commit": "04f4897f0b5a40b8a06687c2d8fc6a1cd5fb119c",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/04f4897f0b5a40b8a06687c2d8fc6a1cd5fb119c"
       },
       "page": "https://threejs-skills.com/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
@@ -776,15 +777,15 @@
             "threejs-debugging/references/upstream-research.md",
             "threejs-debugging/SKILL.md"
           ],
-          "sourceHash": "sha256:f2bdc1ae6bdef99e8072c87235bb5fbbd0d89c1aaff0eb4a095824635fa9e989",
+          "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T19:00:16+03:00",
-        "commit": "ce20b8bd140942e57b579e2aadb77abf9a432926",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/ce20b8bd140942e57b579e2aadb77abf9a432926"
+        "datetime": "2026-07-10T20:48:56+03:00",
+        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
       },
       "page": "https://threejs-skills.com/skills/threejs-debugging.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-debugging/SKILL.md",
@@ -905,9 +906,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-dynamic-surface-effects/SKILL.md",
@@ -1444,9 +1445,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T20:48:56+03:00",
+        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
       },
       "page": "https://threejs-skills.com/skills/threejs-image-pipeline.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md",
@@ -1541,9 +1542,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-particles-trails-and-effects/SKILL.md",
@@ -1634,9 +1635,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/SKILL.md",
@@ -1687,7 +1688,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-creatures/SKILL.md"
           ],
-          "sourceHash": "sha256:03f6e4de4660774e3c9aa9545218e631ec152a132455c644e832b6576dec1969",
+          "sourceHash": "sha256:1471f26be2c58d73e992adf1008ee3bf99eae4f4c284ef0ccf231b2d41662c2a",
           "proxyStatus": {
             "limitation": "The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract. The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.",
             "canonicalLabId": "webgpu-procedural-creature-lab"
@@ -1710,9 +1711,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-creatures.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md",
@@ -1789,9 +1790,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-fields.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md",
@@ -1979,9 +1980,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:38:36+03:00",
+        "commit": "916e3776038dbfeb67c094ff8645cea44cb13437",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/916e3776038dbfeb67c094ff8645cea44cb13437"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-materials.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-materials/SKILL.md",
@@ -2076,9 +2077,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md",
@@ -2177,9 +2178,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-planets.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md",
@@ -2390,9 +2391,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T20:48:56+03:00",
+        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md",
@@ -2551,9 +2552,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md",
@@ -2709,9 +2710,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T20:48:56+03:00",
+        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
       },
       "page": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/SKILL.md",
@@ -2809,9 +2810,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-sky-atmosphere-and-haze/SKILL.md",
@@ -2936,9 +2937,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-spectral-ocean.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/SKILL.md",
@@ -2989,7 +2990,7 @@
             "scripts/provider-demos.mjs",
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:4163ff796a28cd7a092f78fe695a8272c5d8872f8fd24246b24212d9b8f1d5ce",
+          "sourceHash": "sha256:a2bc44a047d848c960f96a93c8ec06baea2ff598669830582455e13a13f726e2",
           "proxyStatus": {
             "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
             "canonicalLabId": "webgpu-validation-harness"
@@ -3006,15 +3007,15 @@
           "sourceHashInputs": [
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:44bfcf58370e5d312508fc0e0e7e4ad94c596b6f12254783625de76e93e77aa6",
+          "sourceHash": "sha256:33f8b500ed83443b5658c6cf56d1eb3916cbcea88245f6a59a925542976be706",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T19:10:06+03:00",
-        "commit": "4c4e333d8f1c5fe38119d50c56fd32728ee9eb71",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4c4e333d8f1c5fe38119d50c56fd32728ee9eb71"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T01:50:12+03:00",
+        "commit": "8b06660c5fade38e67614948852995cc791ce751",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/8b06660c5fade38e67614948852995cc791ce751"
       },
       "page": "https://threejs-skills.com/skills/threejs-visual-validation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md",
@@ -3114,9 +3115,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-volumetric-clouds/SKILL.md",
@@ -3264,9 +3265,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-water-optics.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md",

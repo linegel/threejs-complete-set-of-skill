@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-water-optics.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
+<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,22 +17,22 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/water-generated-caustics/final.design.png" fetchpriority="high" />
+
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Water Optics | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-water-optics.html" />
-<meta property="article:modified_time" content="2026-07-10T19:34:40+03:00" />
+<meta property="article:modified_time" content="2026-07-10T21:41:13+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Worlds and Environments" />
-<meta property="og:image" content="https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
 <meta property="og:image:alt" content="Water Optics evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
-<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
 <meta name="twitter:image:alt" content="Water Optics evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Water Optics | Three.js WebGPU Skill" />
@@ -61,9 +61,9 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-water-optics.html"
    },
-   "image": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png",
+   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-10T19:34:40+03:00",
+   "dateModified": "2026-07-10T21:41:13+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -180,8 +180,11 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
+.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -244,6 +247,7 @@ a.chip:active{scale:.96}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
 .hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
@@ -258,13 +262,11 @@ a.chip:active{scale:.96}
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
-<header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/water-generated-caustics/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
-  <span class="hero-preview-badge">Generated caustic-texture preview fixture</span>
+<header class="">
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Water Optics</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-water-optics">Water Optics</h1>
@@ -275,8 +277,8 @@ a.chip:active{scale:.96}
 <span class="chip">2 flagships</span>
 <span class="chip">2 secondary surfaces</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T21:41:13+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27">commit 3be3966 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-water-optics/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -289,7 +291,12 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-bounded-water/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-bounded-water" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/water-generated-caustics/final.design.png" alt="Related skill preview · Generated caustic-texture preview fixture for WebGPU Bounded Water" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated caustic-texture preview fixture</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-bounded-water">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>9995f2b2ec98</code> source hash</span>
+    <span>11 fixed states · 6 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Bounded Water</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 4 locked tiers.</p>
@@ -303,13 +310,23 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/weathered-world/">
-        <span class="card-preview-wrap" data-preview-for="weathered-world" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>c1dccbab60bc</code> source hash</span>
+    <span>10 fixed states · 5 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Weathered World</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/creature-habitat/">
-        <span class="card-preview-wrap" data-preview-for="creature-habitat" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Creature Habitat" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>23fd93054de8</code> source hash</span>
+    <span>9 fixed states · 5 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Creature Habitat</h3>
         <span class="card-meta">5 mechanisms · 3 locked tiers</span>
@@ -383,6 +400,9 @@ All physical water state lives in its SI physics frame. World/scene conversion,
 clock/instant/interval identity, graph ordering, interaction exchange, residency, version
 propagation, and presentation interpolation use that contract rather than a
 water-local dialect.</p>
+<p>One immutable <code>PhysicsContext</code> resolves the water provider&#39;s context ID, SI
+quantity system, frames, charts, clocks, gravity, origin epoch, material
+registry, and world/physics transform revision.</p>
 <h3>Canonical water-provider boundary</h3>
 <p>This skill publishes the canonical <code>WaterSurfaceProvider</code> interface and
 <code>WaterSurfaceSample</code>. A canonical <code>PhysicsSampleRequest</code> is batched and
@@ -657,6 +677,11 @@ input to water interval <code>n+1</code>. Water gathers it once into the provisi
 source assembly, and its exact-once application ledger advances only with the
 accepted atomic <code>n+1</code> commit; retry or rollback cannot apply it again, and
 newly written receiver state from <code>n+1</code> is never read in that same interval.
+Represent that state with the canonical <code>InteractionApplicationLedger</code>: key
+each prepared/committed application and deferred, rejected, or duplicate-no-op
+disposition by the interaction&#39;s <code>applicationLedgerKey</code>, execution overlap,
+batch/partition/version cursor, target prepared version, and commit transaction;
+the matching <code>InteractionBatchLedger.applicationLedgerIds</code> must close exactly.
 For a phase-only/no-solver branch,
 <code>m_wash</code> is an explicit prescribed beach-inundation mask; static water depth
 cannot wet exposed bed:</p>
@@ -713,9 +738,13 @@ the dependency chain</p>
 <p>Every CPU, GPU, or external dispatch that advances coupled water state is an
 execution of a declared <code>PhysicsGraphStage</code> with an exact
 <code>executionInterval</code>, versioned reads/writes, residency dependency, and commit
-group. A render callback may consume the sealed presentation publication and
-request work, but it never advances the water solver, applies runoff, injects a
-disturbance, or performs a private catch-up step.</p>
+group. Emit the exact <code>PhysicsStageExecution</code> for every attempted water advance,
+analytic/state-hold evaluation, iteration, or subcycle; a dispatch alone cannot
+satisfy coordination coverage or authorize publication, and dropped debt stays
+in the graph catch-up loss ledger. A render callback may consume the sealed
+presentation publication and request work, but it never advances the water
+solver, applies runoff, injects a disturbance, or performs a private catch-up
+step.</p>
 <p>Declare the coupling class as explicit, semi-implicit, scheduler-bounded
 iterated, or monolithic; do not let a body or water subsystem perform an
 unbounded private iteration.
@@ -750,10 +779,11 @@ bound on omitted feedback or explicitly narrows the claim; it emits no reaction
 and must not claim feedback. Keep
 coupled hot state on one execution side or in a validated shared mirror;
 synchronous frame-critical GPU readback is forbidden.</p>
-<p>Water contributes a per-binding/provider <code>PresentedStatePair</code> to the
-view-independent <code>PhysicsPresentationCandidate</code>, which contains committed
-state brackets, leases, and events but no camera, render origin, view matrix,
-shadow/cache state, or global-to-render transform. <code>previousPresented</code> and
+<p>Water publishes each per-binding/provider <code>PresentedStatePair</code> through the
+coordinator&#39;s view-independent <code>PhysicsPresentationCandidate</code>. The candidate
+contains committed state brackets, leases, and events but no camera, render
+origin, view matrix, shadow/cache state, or global-to-render transform.
+<code>previousPresented</code> and
 <code>currentPresented</code> each independently contain a
 <code>PresentationSampleProvenance</code>, <code>presentedInstant</code>, <code>PresentationStateHandle</code>,
 and <code>PresentationSpatialBinding</code>; <code>motionBinding</code> references the two state
@@ -928,11 +958,11 @@ solver and consume its versioned provider and presentation state here.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/water-integration-surface/"><figure>
-        <span class="preview-media"><img src="../visual-validation/water-integration-surface/integration-surface-readback.png" alt="Live concept proxy screenshot for Water Integration Surface; not canonical runtime evidence" width="640" height="400" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media" data-preview-classification="conceptproxy"><img src="../visual-validation/water-integration-surface/integration-surface-readback.png" alt="Live concept proxy screenshot for Water Integration Surface; not canonical runtime evidence" width="640" height="400" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Water Integration Surface</strong><span>Concept proxy · The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented. The host project owns post-processing, transparent ordering, and final output conversion.</span></figcaption>
       </figure></a>
       <a href="../demos/water-generated-caustics/"><figure>
-        <span class="preview-media"><img src="../visual-validation/water-generated-caustics/final.design.png" alt="Live generated asset preview screenshot for Bounded Water Caustic Projection; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
+        <span class="preview-media" data-preview-classification="generatedassetpreview"><img src="../visual-validation/water-generated-caustics/final.design.png" alt="Live generated asset preview screenshot for Bounded Water Caustic Projection; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Bounded Water Caustic Projection</strong><span>Generated asset preview · Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.</span></figcaption>
       </figure></a>
     </div>
@@ -942,9 +972,9 @@ solver and consume its versioned provider and presentation state here.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
+  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

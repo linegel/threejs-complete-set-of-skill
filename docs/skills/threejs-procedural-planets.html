@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-planets.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
+<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,14 +17,14 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/planet-generated-craters/final.design.png" fetchpriority="high" />
+
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Procedural Planets | Three.js WebGPU Skill" />
 <meta property="og:description" content="Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-planets.html" />
-<meta property="article:modified_time" content="2026-07-10T19:39:52+03:00" />
+<meta property="article:modified_time" content="2026-07-10T21:41:13+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-10T19:39:52+03:00",
+   "dateModified": "2026-07-10T21:41:13+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -180,8 +180,11 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
+.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -244,6 +247,7 @@ a.chip:active{scale:.96}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
 .hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
@@ -258,13 +262,11 @@ a.chip:active{scale:.96}
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
-<header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/planet-generated-craters/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
-  <span class="hero-preview-badge">Generated crater-asset preview fixture</span>
+<header class="">
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Planets</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-procedural-planets">Procedural Planets</h1>
@@ -275,8 +277,8 @@ a.chip:active{scale:.96}
 <span class="chip">1 flagship</span>
 <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T21:41:13+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27">commit 3be3966 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-planets/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -289,7 +291,12 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-quadtree-planet/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-quadtree-planet" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/planet-generated-craters/final.design.png" alt="Related skill preview · Generated crater-asset preview fixture for Native WebGPU Quadtree Planet" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated crater-asset preview fixture</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-quadtree-planet">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>6c5063ccb8e9</code> source hash</span>
+    <span>17 fixed states · 3 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Native WebGPU Quadtree Planet</h3>
         <p>7 fixed scenarios, 7 mechanism routes, and 3 locked tiers.</p>
@@ -303,7 +310,12 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/weathered-world/">
-        <span class="card-preview-wrap" data-preview-for="weathered-world" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>c1dccbab60bc</code> source hash</span>
+    <span>10 fixed states · 5 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Weathered World</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -368,8 +380,9 @@ or another physics domain must use the route&#39;s
 Publish typed <code>PhysicsSignalDescriptor</code> records bound to the active
 <code>PhysicsContext</code> through the canonical IDs, physics frame/origin epoch,
 transform/chart, <code>clockId</code>/<code>samplePhase</code>, channels, represented-footprint/
-filter, validity/<code>perChannelError</code>, residency/cadence/latency, state/resource
-version, and missing-channel envelope. Every <code>PhysicsSampleRequest</code> and
+filter, validity/<code>perChannelError</code>, residency/cadence/latency, and state/resource
+version. Encode unavailable channels through the descriptor&#39;s typed
+missing-channel envelope. Every <code>PhysicsSampleRequest</code> and
 returned <code>SampledChannel.actualPhysicsTime</code>, including static/analytic results,
 carries a direct canonical <code>PhysicsInstant | PhysicsTimeInterval</code>, never the
 generic <code>PhysicsTime</code> wrapper; time is not an extra descriptor field. A
@@ -377,13 +390,18 @@ quadtree tile, render LOD, TSL function, or cache texture is never the public
 physics ABI.
 The planet/body-field owner is the sole state-equation owner for its
 physics-facing body, gravity, static coast/bathymetry, and hydrology-analysis
-revisions. Its <code>PhysicsGraph</code> stages write provisional versions; exactly one
-all-or-none <code>PhysicsCommitGroup</code> publishes each accepted revision with
-<code>CommitPublicationLineage</code>. A project coordinator may commit those prepared
+revisions. Its <code>PhysicsGraph</code> stages write provisional versions; one
+exact <code>PhysicsStageExecution</code> records each attempted update or analytic/state-
+hold evaluation and its read/write version resolution. Dropped graph debt is a
+catch-up loss-ledger entry, not a planet execution. One
+<code>PhysicsCommitTransaction</code> prepares each accepted revision and one bijective
+<code>PhysicsCommitReceipt</code> plus <code>CommitPublicationLineage</code> publishes it atomically.
+A project coordinator may commit those prepared
 versions atomically but never becomes a second owner. Do not expose a new
 descriptor revision before that commit appears in <code>PhysicsExecutionLedger</code>.
 When committed state is rendered, publish the immutable
-<code>PhysicsPresentationCandidate -&gt; CameraViewPublication -&gt; ViewPreparationPublication -&gt; PhysicsPresentationSnapshot -&gt; FrameExecutionRecord</code> chain. The candidate stays view-independent; field
+<code>PresentationTimeCohort -&gt; PhysicsPresentationCandidate -&gt; CameraViewPublication -&gt; ViewPreparationPublication -&gt; PhysicsPresentationSnapshot -&gt; PresentationRenderPlan -&gt; admitted frame slot -&gt; FrameExecutionRecord</code> chain.
+The candidate stays view-independent; field
 bindings carry independent previous/current provenance and leased state
 handles. Camera publication owns render mapping, view preparation owns per-view
 LOD/caches/shadows/resets, and the sealed snapshot references binding IDs and
@@ -395,6 +413,14 @@ metric/Jacobian, domain/seam validity, and chart version; express physical
 vectors in a declared orthonormal body/world frame.
 When dynamics need gravity, publish a point/time vector signal in <code>m s^-2</code>;
 never substitute world <code>-Y</code>, radial up, or a normalized surface normal.</p>
+<p>Physics-facing rock, soil, ice, sediment, and seabed classes resolve through
+the route-selected <code>PhysicsMaterialRegistry</code>. Each exposed field or primitive
+binds a stable <code>PhysicsMaterialId</code> and exact material-record version; pair-law
+selection latches both participants, their state versions, contact frame, and
+resolver revision for the whole interaction interval. Time-varying temperature,
+liquid saturation, ice fraction, or compaction remains separately versioned
+<code>PhysicsMaterialState</code>; PBR color, roughness, and metalness carry no implicit
+constitutive meaning.</p>
 <p>Do not load this skill merely because a scene contains islands. A bounded
 archipelago, coastal site, bathymetric model, or isometric land tile whose
 planetary curvature, horizon, global geodesy, and orbit-to-ground transition are
@@ -499,10 +525,12 @@ tiles, CPU quadtree updates at a gated cadence, instanced topology-mask bins,
 no runtime readback, and simpler material channels. It is the same public
 field/LOD architecture, not an alternate renderer.</li>
 </ul>
-<p>Any change to physics state/equations, native cadence or coupling, represented
+<p>Every change to physics state/equations, native cadence or coupling, represented
 band/footprint/filter, physical error bound, conserved inventory, stable-ID/RNG/
-event policy, or physics residency is an exact <code>QualityTransition</code>, not render
-LOD. Declare source/destination <code>PhysicsQualityStateDescriptor</code>s; prepare
+event policy, or physics residency is represented by an exact
+<code>QualityTransition</code> admitted by the route physics coordinator at a safe step
+boundary. Render LOD leaves those authoritative properties unchanged. Declare
+source/destination <code>PhysicsQualityStateDescriptor</code>s; prepare
 without publication; commit a gated <code>ConservativeStateMap</code>, inventory and
 ID/RNG/event-cursor mappings atomically at a step boundary; increment the
 quality epoch; and retain the old leases until the declared completion join.
@@ -652,7 +680,7 @@ generates meteorology.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/planet-generated-craters/"><figure>
-        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/final.design.png" alt="Live generated asset preview screenshot for Reduced-Tier Crater Mask Planet; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
+        <span class="preview-media" data-preview-classification="generatedassetpreview"><img src="../visual-validation/planet-generated-craters/final.design.png" alt="Live generated asset preview screenshot for Reduced-Tier Crater Mask Planet; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Reduced-Tier Crater Mask Planet</strong><span>Generated asset preview · Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.</span></figcaption>
       </figure></a>
     </div>
@@ -662,9 +690,9 @@ generates meteorology.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
+  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

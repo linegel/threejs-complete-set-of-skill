@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-debugging.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
+<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Three.js Debugging | Three.js WebGPU Skill" />
 <meta property="og:description" content="Diagnose unexpected Three.js runtime, rendering, API, asset, and version-dependent behavior. Use when observed output disagrees with expected behavior…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-debugging.html" />
-<meta property="article:modified_time" content="2026-07-10T19:39:52+03:00" />
+<meta property="article:modified_time" content="2026-07-10T20:48:56+03:00" />
 <meta property="article:published_time" content="2026-07-10T17:49:59+03:00" />
 <meta property="article:section" content="Planning and Validation" />
 <meta property="og:image" content="https://threejs-skills.com/previews/primary/debugging-contract-lab.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/previews/primary/debugging-contract-lab.png",
    "datePublished": "2026-07-10T17:49:59+03:00",
-   "dateModified": "2026-07-10T19:39:52+03:00",
+   "dateModified": "2026-07-10T20:48:56+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -180,8 +180,11 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
+.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -244,6 +247,7 @@ a.chip:active{scale:.96}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
 .hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
@@ -258,7 +262,7 @@ a.chip:active{scale:.96}
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
@@ -275,8 +279,8 @@ a.chip:active{scale:.96}
 
 
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T19:00:16+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/ce20b8bd140942e57b579e2aadb77abf9a432926">commit ce20b8b ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-10T20:48:56+03:00">2026-07-10</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d">commit 357dd58 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-debugging/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-debugging/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -289,7 +293,7 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/debugging-contract-lab/">
-        <span class="card-preview-wrap" data-preview-for="debugging-contract-lab" data-preview-classification="non-rendering-lab-preview"><img class="card-preview" src="../previews/primary/debugging-contract-lab.png" alt="Deterministic contract-lab screenshot for Three.js Debugging Decision Lab" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Deterministic contract-lab screenshot</span></span>
+        <span class="card-preview-wrap" data-preview-for="debugging-contract-lab" data-preview-source="debugging-contract-lab" data-preview-classification="non-rendering-lab-preview"><img class="card-preview" src="../previews/primary/debugging-contract-lab.png" alt="Deterministic contract-lab screenshot for Three.js Debugging Decision Lab" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Deterministic contract-lab screenshot</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>Three.js Debugging Decision Lab</h3>
         <p>7 fixed scenarios, 5 mechanism routes, and 0 locked tiers.</p>
@@ -390,12 +394,16 @@ failing assertion, frame, pass, draw, dispatch, or resource transition.</li>
 systems and post effects, but preserve the API, material, geometry path,
 backend, projection, precision, and lifecycle behavior under investigation.
 For a physics-facing reduction, preserve the relevant <code>PhysicsContext</code>,
-<code>PhysicsGraph</code> stages/edges/intervals, provisional-to-committed
-<code>PhysicsCommitGroup</code> lineage, <code>InteractionRecord</code> sequence and exact-once
+<code>PhysicsGraph</code> stages/edges/intervals and every exact
+<code>PhysicsStageExecution</code> in its <code>PhysicsCoordinationAdvanceRecord</code>; preserve
+provisional-to-committed
+<code>PhysicsCommitTransaction</code>/receipt lineage, <code>InteractionRecord</code> sequence and exact-once
 <code>InteractionApplicationLedger</code> keys/versions/cursors, and the complete
-<code>PhysicsPresentationCandidate</code> -&gt; <code>CameraViewPublication</code> -&gt;
+<code>PresentationTimeCohort</code> -&gt; <code>PhysicsPresentationCandidate</code> -&gt;
+<code>CameraViewPublication</code> -&gt;
 <code>ViewPreparationPublication</code> -&gt; sealed <code>PhysicsPresentationSnapshot</code> -&gt;
-<code>FrameExecutionRecord</code> closure. Use the canonical records and typed absence
+<code>PresentationRenderPlan</code> -&gt; admitted frame slot -&gt; <code>FrameExecutionRecord</code>
+closure. Use the canonical records and typed absence
 unchanged; a smaller fixture may omit an owner only by removing its graph
 dependency, never by inventing a validation-local ABI.
 A different material or renderer may localize the fault; it cannot prove the
@@ -519,9 +527,9 @@ inside the case that proved their relevance.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
+  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
+<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,7 +17,7 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../previews/provider/compatibility-fallback-planner-demo.png" fetchpriority="high" />
+<link rel="preload" as="image" href="../previews/primary/browser-fallback-harness.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -27,12 +27,12 @@
 <meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Planning and Validation" />
-<meta property="og:image" content="https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.png" />
+<meta property="og:image" content="https://threejs-skills.com/previews/primary/browser-fallback-harness.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
 <meta property="og:image:alt" content="Three.js Compatibility Fallbacks evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
-<meta name="twitter:image" content="https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.png" />
+<meta name="twitter:image" content="https://threejs-skills.com/previews/primary/browser-fallback-harness.png" />
 <meta name="twitter:image:alt" content="Three.js Compatibility Fallbacks evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Three.js Compatibility Fallbacks | Three.js WebGPU Skill" />
@@ -61,7 +61,7 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html"
    },
-   "image": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.png",
+   "image": "https://threejs-skills.com/previews/primary/browser-fallback-harness.png",
    "datePublished": "2026-07-04T23:30:19+03:00",
    "dateModified": "2026-07-10T18:34:25+03:00",
    "author": {
@@ -180,8 +180,11 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
+.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -244,6 +247,7 @@ a.chip:active{scale:.96}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
 .hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
@@ -258,13 +262,13 @@ a.chip:active{scale:.96}
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../previews/provider/compatibility-fallback-planner-demo.png" alt="" aria-hidden="true" width="1440" height="757" fetchpriority="high" decoding="async" />
-  <span class="hero-preview-badge">Live concept-proxy screenshot · not canonical evidence</span>
+  <img class="skill-hero-bg" src="../previews/primary/browser-fallback-harness.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <span class="hero-preview-badge">Canonical implementation screenshot · runtime evidence pending</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Planning and Validation</a></li><li aria-current="page">Three.js Compatibility Fallbacks</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-compatibility-fallbacks">Three.js Compatibility Fallbacks</h1>
@@ -289,7 +293,7 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/browser-fallback-harness/">
-        <span class="card-preview-wrap" data-preview-for="browser-fallback-harness" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/compatibility-fallback-planner-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Explicit WebGPU Fallback Teaching Harness" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="browser-fallback-harness" data-preview-source="browser-fallback-harness" data-preview-classification="implementation-preview"><img class="card-preview" src="../previews/primary/browser-fallback-harness.png" alt="Canonical implementation screenshot · runtime evidence pending for Explicit WebGPU Fallback Teaching Harness" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Canonical implementation screenshot · runtime evidence pending</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Explicit WebGPU Fallback Teaching Harness</h3>
         <p>7 fixed scenarios, 6 mechanism routes, and 0 locked tiers.</p>
@@ -318,9 +322,9 @@ switching is a hard gate (fail loudly), never a silent downgrade mid-session.</p
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>1 published image</code></div>
     <div class="gallery">
-      <figure data-preview-classification="concept-proxy-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../previews/provider/compatibility-fallback-planner-demo.png" alt="Three.js Compatibility Fallbacks — Live concept-proxy screenshot · not canonical evidence" itemprop="contentUrl" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">concept proxy preview</span></span>
-        <figcaption itemprop="caption"><strong>Live concept-proxy screenshot · not canonical evidence</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
+      <figure data-preview-classification="implementation-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../previews/primary/browser-fallback-harness.png" alt="Three.js Compatibility Fallbacks — Canonical implementation screenshot · runtime evidence pending" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">implementation preview</span></span>
+        <figcaption itemprop="caption"><strong>Canonical implementation screenshot · runtime evidence pending</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
 
@@ -590,7 +594,7 @@ required.</li>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/compatibility-fallback-planner-demo/"><figure>
-        <span class="preview-media"><img src="../previews/provider/compatibility-fallback-planner-demo.png" alt="Live concept proxy screenshot for Fallback Loss Ledger; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media" data-preview-classification="conceptproxy"><img src="../previews/provider/compatibility-fallback-planner-demo.png" alt="Live concept proxy screenshot for Fallback Loss Ledger; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Fallback Loss Ledger</strong><span>Concept proxy · The docs page is a teaching visualization and intentionally shows a blocked mode when no explicit fallback request exists. The canonical skill must not weaken flagship WebGPU guidance or silently route to WebGL-compatible behavior.</span></figcaption>
       </figure></a>
     </div>
@@ -600,9 +604,9 @@ required.</li>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
+  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>

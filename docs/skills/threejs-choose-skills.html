@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-choose-skills.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
+<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Three.js WebGPU/TSL Choose Skills | Three.js WebGPU Skill" />
 <meta property="og:description" content="Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-choose-skills.html" />
-<meta property="article:modified_time" content="2026-07-10T19:39:52+03:00" />
+<meta property="article:modified_time" content="2026-07-11T01:33:51+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Planning and Validation" />
 <meta property="og:image" content="https://threejs-skills.com/previews/primary/router-manifest-lab.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/previews/primary/router-manifest-lab.png",
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-10T19:39:52+03:00",
+   "dateModified": "2026-07-11T01:33:51+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -180,8 +180,11 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
+.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -244,6 +247,7 @@ a.chip:active{scale:.96}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
 .hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
@@ -258,13 +262,13 @@ a.chip:active{scale:.96}
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../previews/provider/skill-router-manifest-demo.png" alt="" aria-hidden="true" width="1440" height="757" fetchpriority="high" decoding="async" />
-  <span class="hero-preview-badge">Live concept-proxy screenshot · not canonical evidence</span>
+  <img class="skill-hero-bg" src="../previews/primary/router-manifest-lab.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <span class="hero-preview-badge">Deterministic contract-lab screenshot</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Planning and Validation</a></li><li aria-current="page">Three.js WebGPU/TSL Choose Skills</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-choose-skills">Three.js WebGPU/TSL Choose Skills</h1>
@@ -275,8 +279,8 @@ a.chip:active{scale:.96}
 
 <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T19:26:02+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/f88c621afbf894b4e7ea94f204f527419377477d">commit f88c621 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T01:33:51+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/04f4897f0b5a40b8a06687c2d8fc6a1cd5fb119c">commit 04f4897 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-choose-skills/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -289,7 +293,7 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/router-manifest-lab/">
-        <span class="card-preview-wrap" data-preview-for="router-manifest-lab" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/skill-router-manifest-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Skill Router Manifest Lab" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
+        <span class="card-preview-wrap" data-preview-for="router-manifest-lab" data-preview-source="router-manifest-lab" data-preview-classification="non-rendering-lab-preview"><img class="card-preview" src="../previews/primary/router-manifest-lab.png" alt="Deterministic contract-lab screenshot for Skill Router Manifest Lab" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Deterministic contract-lab screenshot</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>Skill Router Manifest Lab</h3>
         <p>16 fixed scenarios, 8 mechanism routes, and 0 locked tiers.</p>
@@ -329,9 +333,9 @@ so composition conflicts surface at plan time instead of debug time.</p></div>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>1 published image</code></div>
     <div class="gallery">
-      <figure data-preview-classification="concept-proxy-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../previews/provider/skill-router-manifest-demo.png" alt="Three.js WebGPU/TSL Choose Skills — Live concept-proxy screenshot · not canonical evidence" itemprop="contentUrl" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">concept proxy preview</span></span>
-        <figcaption itemprop="caption"><strong>Live concept-proxy screenshot · not canonical evidence</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
+      <figure data-preview-classification="non-rendering-lab-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../previews/primary/router-manifest-lab.png" alt="Three.js WebGPU/TSL Choose Skills — Deterministic contract-lab screenshot" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">non rendering lab preview</span></span>
+        <figcaption itemprop="caption"><strong>Deterministic contract-lab screenshot</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
 
@@ -404,11 +408,15 @@ or maximal geometry is faster or more faithful.</li>
 one <code>PhysicsContext</code>, typed providers and <code>ErrorPropagationLedger</code> records,
 an ordered multi-rate <code>PhysicsGraph</code> with exact
 <code>PhysicsCoordinationAdvanceRecord</code> executions, explicit one-way/two-way
-interactions and <code>InteractionApplicationLedger</code> records, atomic
+<code>SurfaceExchange</code> batches with dimensioned <code>InteractionRecord</code> source/reaction
+ownership and exact <code>InteractionApplicationLedger</code> dispositions, atomic
 <code>PhysicsCommitTransaction</code> records, one immutable
 <code>PhysicsPresentationCandidate</code>, per-view camera/preparation publications, one
 sealed snapshot and <code>PresentationRenderPlan</code> per selected target/view,
-<code>QualityTransition</code> records for physical quality changes, and an active
+an append-only <code>FrameExecutionRecord</code> closing plan submission, reset results,
+completion tokens, leases, and slot retirement,
+an admitted <code>QualityChangeRequest</code> plus <code>QualityTransition</code> records for
+physical quality changes, and an active
 <code>PhysicsCostLedger</code>. A producer/consumer label alone is not an integration
 contract.</li>
 <li>Build a resource/pass ownership graph before selecting effects: scene color,
@@ -622,6 +630,7 @@ physicsErrorPropagationLedgers: {}
 physicsInteractions: []
 physicsInteractionApplicationLedgers: {}
 physicsCommitTransactions: {}
+physicsExternalSolverAdaptersById: {}
 physicsQualityTransitions: []
 physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
@@ -704,6 +713,17 @@ one <code>InteractionApplicationLedger</code> in
 stage execution, commit, candidate, <code>PresentationRenderPlan</code>, or frame execution
 resolves to the exact record and version in the route inventories; unresolved
 or stale references block publication.
+<code>physicsExternalSolverAdaptersById</code> is the route-owned authoritative adapter
+inventory. Key each active value by its exact <code>ExternalSolverAdapter.adapterId</code>
+and emit the complete canonical record at that key; use <code>{}</code> when the route has
+no external solver. A singular <code>externalSolverAdapter</code> block in a recipe is a
+nonserialized explanatory sketch only and never substitutes for this mapping.
+An admitted physical quality change that replaces an adapter boundary,
+transport, residency, capability, clock map, or owned equation keeps the old
+adapter resources and authority live through the transition&#39;s simulation,
+coupling, external, and presentation completion join. Remove the old inventory
+entry only after <code>QualityTransition.retireAfterCompletion.retirementEvidence</code>
+closes that join; rejection or rollback leaves the prior keyed record active.
 Every Candidate, frame-cohort admission, and render plan resolves its
 <code>timeCohortId</code> to one immutable <code>PresentationTimeCohort</code> in
 <code>physicsPresentationTimeCohortsById</code>; a target/view with different requested
@@ -1611,7 +1631,7 @@ evidence for every active physics edge;</li>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/skill-router-manifest-demo/"><figure>
-        <span class="preview-media"><img src="../previews/provider/skill-router-manifest-demo.png" alt="Live concept proxy screenshot for Skill Router Manifest Bench; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media" data-preview-classification="conceptproxy"><img src="../previews/provider/skill-router-manifest-demo.png" alt="Live concept proxy screenshot for Skill Router Manifest Bench; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Skill Router Manifest Bench</strong><span>Concept proxy · The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.</span></figcaption>
       </figure></a>
     </div>
@@ -1621,9 +1641,9 @@ evidence for every active physics edge;</li>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a79f750d2469</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
+  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
 </body>
 </html>
