@@ -59,6 +59,12 @@ aerosol loading, or wind drive atmosphere parameters, record that forcing
 revision and the transfer model; do not treat RGB extinction coefficients as a
 wind or humidity provider.
 
+Schedule every physics-facing LUT/provider update on the shared graph and emit
+an exact `PhysicsStageExecution` for each attempted recompute or analytic/state-
+hold evaluation. A queued compute dispatch alone proves neither stage coverage
+nor a publishable provider revision; dropped debt remains in the graph catch-up
+loss ledger.
+
 After every physical owner commits, publish one view-independent
 `PhysicsPresentationCandidate` with
 `requestedPresentationInstant: PhysicsInstant`, containing the atmosphere's

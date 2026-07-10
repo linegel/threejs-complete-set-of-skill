@@ -297,6 +297,11 @@ input to water interval `n+1`. Water gathers it once into the provisional
 source assembly, and its exact-once application ledger advances only with the
 accepted atomic `n+1` commit; retry or rollback cannot apply it again, and
 newly written receiver state from `n+1` is never read in that same interval.
+Represent that state with the canonical `InteractionApplicationLedger`: key
+each prepared/committed application and deferred, rejected, or duplicate-no-op
+disposition by the interaction's `applicationLedgerKey`, execution overlap,
+batch/partition/version cursor, target prepared version, and commit transaction;
+the matching `InteractionBatchLedger.applicationLedgerIds` must close exactly.
 For a phase-only/no-solver branch,
 `m_wash` is an explicit prescribed beach-inundation mask; static water depth
 cannot wet exposed bed:
@@ -369,9 +374,13 @@ body and water prediction
 Every CPU, GPU, or external dispatch that advances coupled water state is an
 execution of a declared `PhysicsGraphStage` with an exact
 `executionInterval`, versioned reads/writes, residency dependency, and commit
-group. A render callback may consume the sealed presentation publication and
-request work, but it never advances the water solver, applies runoff, injects a
-disturbance, or performs a private catch-up step.
+group. Emit the exact `PhysicsStageExecution` for every attempted water advance,
+analytic/state-hold evaluation, iteration, or subcycle; a dispatch alone cannot
+satisfy coordination coverage or authorize publication, and dropped debt stays
+in the graph catch-up loss ledger. A render callback may consume the sealed
+presentation publication and request work, but it never advances the water
+solver, applies runoff, injects a disturbance, or performs a private catch-up
+step.
 
 Declare the coupling class as explicit, semi-implicit, scheduler-bounded
 iterated, or monolithic; do not let a body or water subsystem perform an

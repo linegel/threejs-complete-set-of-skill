@@ -29,6 +29,9 @@ physics ABI.
 The planet/body-field owner is the sole state-equation owner for its
 physics-facing body, gravity, static coast/bathymetry, and hydrology-analysis
 revisions. Its `PhysicsGraph` stages write provisional versions; one
+exact `PhysicsStageExecution` records each attempted update or analytic/state-
+hold evaluation and its read/write version resolution. Dropped graph debt is a
+catch-up loss-ledger entry, not a planet execution. One
 `PhysicsCommitTransaction` prepares each accepted revision and one bijective
 `PhysicsCommitReceipt` plus `CommitPublicationLineage` publishes it atomically.
 A project coordinator may commit those prepared

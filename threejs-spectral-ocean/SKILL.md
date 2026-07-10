@@ -205,6 +205,10 @@ pipeline.render();
 In a coupled route, every coefficient, transform, assembly, coastal-boundary,
 and source dispatch that advances physical water state executes inside a
 declared `PhysicsGraphStage` with exact interval and versioned dependencies.
+The coordinator emits an exact `PhysicsStageExecution` for every admitted
+advance or stationary analytic/state-hold evaluation; dispatch submission alone
+cannot advance the provider or presentation version, and dropped debt remains
+in the graph catch-up loss ledger.
 The render loop consumes the sealed presentation state; it does not advance the
 FFT/coastal solver, resample mutable forcing, apply runoff, or inject a private
 disturbance step.

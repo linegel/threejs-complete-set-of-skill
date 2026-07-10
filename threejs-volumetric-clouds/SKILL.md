@@ -69,7 +69,10 @@ forcing under a cloud-owned revision or clock.
 - Version cloud density, precipitation emission, lighting input, and shadow
   output independently. The scheduler latches forcing and lighting, evolves a
   provisional cloud state, derives and validates emission from that state, then
-  commits density and emission generations atomically. It never mutates the
+  records each attempted advance or analytic/state-hold evaluation as an exact
+  `PhysicsStageExecution` and commits density and emission generations
+  atomically. A dispatch alone cannot authorize publication; dropped debt
+  remains in the graph catch-up loss ledger. It never mutates the
   consumed forcing snapshot. Downstream rain and surface lighting consume only
   completed committed publications.
 - Publish committed render-consumed, view-independent cloud state generations

@@ -210,7 +210,11 @@ discontinuities need a validated wrapper policy or node rebuild/disposal.
 ### Physics presentation and reactive radiance
 
 When the route manifest declares a physics-to-render boundary, it first
-publishes a view-independent immutable `PhysicsPresentationCandidate`, then one
+freezes a `PresentationTimeCohort` for the exact previous/current requested
+instants, clock-map revisions, context skew, and age gates. Views requesting a
+different instant pair require another cohort and Candidate. It then publishes
+a view-independent immutable `PhysicsPresentationCandidate` that references
+that cohort, then one
 `CameraViewPublication` per target/view, then `ViewPreparationPublication` for
 visibility/shadow/cache/reset results, and finally seals
 `PhysicsPresentationSnapshot`. Bind the scene pass to that exact publication
@@ -218,6 +222,9 @@ chain and bind the matching
 `LightingTransportSnapshot` through a provider-wide `PresentedStatePair`
 (`entityId: typed-absence`) referenced from the candidate by the Snapshot, from the
 [physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+Resolve every record against the route's exact `PhysicsContext`; reject a
+context/version, frame/chart, clock-map, unit-scale, or origin-epoch mismatch
+instead of converting it inside the image graph.
 Validate the exact central Candidate, camera publication, preparation
 publication, Snapshot, `PhysicsSignalDescriptor`, and lighting-channel schemas
 rather than defining a post-local subset. The target/view Snapshot contains
@@ -296,6 +303,13 @@ presentation candidate
   -> exposure adaptation
   -> bloom, tone map, grade, output
 ```
+
+After sealing each target/view Snapshot, author one `PresentationRenderPlan`
+that binds its cohort/Candidate/Snapshot, exact leased resource generations,
+phase/edge DAG, reset generations, shadow factors, and output ownership. Submit
+only after the separate cohort and frame-slot admissions close against that
+immutable plan; report observed actions and completion state in
+`FrameExecutionRecord`.
 
 Every planned edge names its writer, consumers, and action. The immutable
 snapshot does not claim completion; append actual rebuild/reseed/submission

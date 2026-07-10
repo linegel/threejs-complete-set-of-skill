@@ -119,7 +119,11 @@ in the canonical immutable `InteractionBatchLedger`; coalescing is a producer
 transformation with provenance. Bin sparse records into affected
 patches, update the contact/touch state after physics contact resolution, then
 evaluate structural wind/contact deformation and commit domain state over the
-declared `PhysicsGraphStage.executionInterval: PhysicsTimeInterval`.
+declared `PhysicsGraphStage.executionInterval: PhysicsTimeInterval`. The
+coordinator records each attempted structural update or analytic/state-hold
+evaluation as an exact `PhysicsStageExecution`; vegetation cannot infer
+execution or publication eligibility from a compute submission alone. Dropped
+debt remains in the graph catch-up loss ledger.
 
 Contribute each stable deformation binding as a `PresentedStatePair` to one
 view-independent `PhysicsPresentationCandidate` at

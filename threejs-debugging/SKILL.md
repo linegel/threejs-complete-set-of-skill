@@ -70,7 +70,9 @@ unknown values unknown; do not infer the runtime revision from a lockfile range.
    systems and post effects, but preserve the API, material, geometry path,
    backend, projection, precision, and lifecycle behavior under investigation.
    For a physics-facing reduction, preserve the relevant `PhysicsContext`,
-   `PhysicsGraph` stages/edges/intervals, provisional-to-committed
+   `PhysicsGraph` stages/edges/intervals and every exact
+   `PhysicsStageExecution` in its `PhysicsCoordinationAdvanceRecord`; preserve
+   provisional-to-committed
    `PhysicsCommitTransaction`/receipt lineage, `InteractionRecord` sequence and exact-once
    `InteractionApplicationLedger` keys/versions/cursors, and the complete
    `PresentationTimeCohort` -> `PhysicsPresentationCandidate` ->

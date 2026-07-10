@@ -119,7 +119,12 @@ never republishes forcing under a rain-owned revision.
   `partitionId`, `partitionMeasure`, and `closureGroupId`; disjoint partitions
   close their parent exchange exactly. Non-authoritative visual splashes use a
   presentation-event stream that references the exchange; neither path deposits
-  a second copy.
+  a second copy. The receiver records every prepared/committed application and
+  every deferred, rejected, or duplicate-no-op disposition in
+  `InteractionApplicationLedger`, keyed by the record's `applicationLedgerKey`,
+  execution overlap, batch/partition/version cursor, and target prepared state;
+  the batch ledger names those application-ledger IDs before receiver state can
+  commit.
 - Assign exactly one wetness/coverage owner per receiver. That owner integrates
   rain deposition, water run-up/inundation, melt, drainage, infiltration, and
   evaporation into one state. Water, this skill, and materials may not each
@@ -129,7 +134,9 @@ never republishes forcing under a rain-owned revision.
 Order coupled updates as follows: latch one immutable forcing snapshot at its
 `sampleInstant: PhysicsInstant` for the graph's
 `coordinationInterval: PhysicsTimeInterval`; give every participating
-`PhysicsGraphStage` an exact `executionInterval: PhysicsTimeInterval`; advance
+`PhysicsGraphStage` an exact `executionInterval: PhysicsTimeInterval` and emit
+one `PhysicsStageExecution` for each attempted advance or analytic/state-hold
+evaluation; record dropped debt in the graph catch-up loss ledger; advance
 analytic or recurrent precipitation; resolve/bin impacts; publish exchanges and
 interaction records with exact `applicationInterval: PhysicsTimeInterval`; let
 the selected receiver owner integrate wetness/snow/coverage; and commit domain

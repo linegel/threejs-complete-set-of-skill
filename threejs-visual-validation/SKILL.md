@@ -128,6 +128,12 @@ claimed. Validate the `PhysicsContext`, provider schemas, scheduler DAG,
 `CameraViewPublication`, `ViewPreparationPublication`,
 `PhysicsPresentationSnapshot`, `LightingTransportSnapshot`, and append-only
 `FrameExecutionRecord`; a polished coupled animation is not interface proof.
+For every scheduler row, validate the exact `PhysicsStageExecution`: resolved
+read/write versions, execution and coordination-coverage intervals,
+iteration/subcycle identity, completion status, dependency completions, queue
+evidence, and single coordination-record membership must agree with its
+`StateAdvanceClaim`, commits, and cost ledger. Dropped intervals must resolve to
+the catch-up loss ledger rather than a fabricated execution.
 
 The sealed Snapshot is per presentation target/view and deliberately contains
 references. Validate adjacent previous/current presented states and independent

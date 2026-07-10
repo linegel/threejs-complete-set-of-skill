@@ -41,8 +41,11 @@ from variable render delta.
 
 A local fixed-step accumulator is only for standalone/authored motion with no
 `PhysicsGraph` edge. Cross-domain recurrent motion advances exclusively through
-its scheduled `PhysicsGraphStage` executions; only the graph applies catch-up,
-drop, or discontinuity policy across the coordination interval. The render loop
+its scheduled `PhysicsGraphStage` executions. Record every admitted native
+advance or analytic/state-hold evaluation as an exact `PhysicsStageExecution`;
+dropped debt belongs to the graph catch-up loss ledger, not an invented
+execution. Only the graph applies catch-up, drop, or discontinuity
+policy across the coordination interval. The render loop
 may request work and consume presentation, but never advances coupled state.
 
 Throughput decision table:

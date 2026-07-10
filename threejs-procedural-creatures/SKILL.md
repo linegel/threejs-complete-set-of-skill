@@ -94,8 +94,12 @@ this order; every step ends in something renderable or assertable.
    local fixed-step accumulator (1/60 or 1/120, clamped input dt) and render
    interpolated pose — feet never pop on frame hitches. Cross-domain recurrent
    locomotion advances exclusively through its scheduled `PhysicsGraphStage`
-   executions; only `PhysicsGraph` owns catch-up, drop, and discontinuity, and
-   the render loop never steps that state. Root motion lives in the object
+   executions, with each attempted native advance or analytic/state-hold
+   evaluation represented by an exact `PhysicsStageExecution` in the
+   coordination record. Dropped debt remains in the graph catch-up loss ledger;
+   it is not a fake execution. Only
+   `PhysicsGraph` owns catch-up, drop, and discontinuity, and the render loop
+   never steps that state. Root motion lives in the object
    transform;
    primitives stay creature-local; support-planted feet convert through the
    inverse root transform for body-frame IK, then write creature-local leg

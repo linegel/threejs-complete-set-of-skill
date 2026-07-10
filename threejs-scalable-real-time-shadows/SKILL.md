@@ -228,6 +228,12 @@ radiometric provenance; downstream lighting/render-radiance provenance includes
 that ID exactly once in `attenuationFactorIds`. Never mutate the already
 published lighting snapshot to retrofit it.
 
+That entry is the canonical `ShadowViewPublicationRef`: it identifies the
+committed content, target/receiver view, camera publication and projection
+revision, factor provenance, leased resource generation, and any bounded delay
+consumed by this exact preparation. A desired, scheduled, or unsubmitted cache
+state may not occupy the reference.
+
 Keep `desiredCoverageEpoch` and update debt separate. Camera/snapped-center
 motion may leave the prior committed map correct within its committed domain;
 it is not a content/radiance change until containment fails or a new map

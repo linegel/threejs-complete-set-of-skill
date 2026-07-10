@@ -178,7 +178,11 @@ or silently sample a lower render LOD.
 
 Register every edited/simulated field owner, read/write version, cadence,
 sample phase, and CPU/GPU dependency on the route's `PhysicsGraph`; a texture
-dispatch is not an implicit scheduler edge. When a physics-owned field is also
+dispatch is not an implicit scheduler edge. Emit one exact
+`PhysicsStageExecution` for every attempted field update or analytic/state-hold
+evaluation so publication versions can be traced to coordination coverage
+rather than inferred from dispatch submission. Record dropped debt in the
+graph catch-up loss ledger, not as an execution. When a physics-owned field is also
 rendered, publish a view-independent `PhysicsPresentationCandidate` containing
 one leased `PresentedStatePair` per stable binding/provider. Its previous and
 current states each carry their own `PresentationSampleProvenance`,
