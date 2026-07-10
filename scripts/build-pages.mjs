@@ -27,7 +27,7 @@ const OG_IMAGE_HEIGHT = 760;
 const THEME_COLOR = '#0a0c10';
 
 const CATEGORIES = [
-  { name: 'Planning and Validation', blurb: 'Route requests to the right experts and prove the result with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
+  { name: 'Planning and Validation', blurb: 'Route requests to the right experts, diagnose version-dependent failures, and prove results with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-debugging', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
   { name: 'Cameras, Lighting, and Final Image', blurb: 'Who owns depth, tone mapping, and the last pass — the difference between a demo and an image.', slugs: ['threejs-camera-controls-and-rigs', 'threejs-scalable-real-time-shadows', 'threejs-ambient-contact-shading', 'threejs-bloom', 'threejs-exposure-color-grading', 'threejs-image-pipeline'] },
   { name: 'Worlds and Environments', blurb: 'Skies, oceans, weather, and water that share causes instead of fighting each other.', slugs: ['threejs-sky-atmosphere-and-haze', 'threejs-volumetric-clouds', 'threejs-spectral-ocean', 'threejs-water-optics', 'threejs-rain-snow-and-wet-surfaces'] },
   { name: 'Procedural Content', blurb: 'Fields, materials, geometry, buildings, planets, vegetation, creatures — authored systems, not noise soup.', slugs: ['threejs-procedural-fields', 'threejs-procedural-materials', 'threejs-procedural-geometry', 'threejs-procedural-buildings-and-cities', 'threejs-procedural-planets', 'threejs-procedural-vegetation', 'threejs-procedural-creatures'] },
@@ -165,7 +165,10 @@ for (const d of readdirSync(root)) {
   if (!d.startsWith('threejs-') || !existsSync(p)) continue;
   const t = readFileSync(p, 'utf8');
   const fm = t.match(/^---\n([\s\S]*?)\n---/)[1];
-  const desc = fm.match(/description:\s*([\s\S]*?)(?=\n\w|$)/)[1].replace(/\s*\n\s+/g, ' ').trim();
+  const desc = fm.match(/description:\s*([\s\S]*?)(?=\n\w|$)/)[1]
+    .replace(/\s*\n\s+/g, ' ')
+    .trim()
+    .replace(/^[\"']|[\"']$/g, '');
   const body = t.replace(/^---\n[\s\S]*?\n---\n/, '');
   const title = (t.split('\n').find((l) => l.startsWith('# ')) || `# ${d}`).slice(2).trim();
   const exDir = join(root, d, 'examples');

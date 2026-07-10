@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Debugging"
+  short_description: "Diagnose engine bugs and version fixes"
+  default_prompt: "Use $threejs-debugging to isolate this failure, verify any upstream issue or fix against the installed revision, and choose an evidence-backed application fix, upgrade, workaround, report, or blocker."

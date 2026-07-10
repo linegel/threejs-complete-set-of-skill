@@ -1,6 +1,6 @@
 ---
 name: threejs-choose-skills
-description: "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, procedural worlds, and version-specific renderer debugging. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance."
+description: "Choose the smallest expert skill set and the correct rendering architecture for general-purpose Three.js WebGPU/TSL work: scientific visualization, product/configurator scenes, architecture, cinematic art, digital twins, dense data scenes, and procedural worlds. Use when a request spans geometry, fields, materials, simulation, scale, temporal effects, shared passes, final-image treatment, or sustained low-end/mobile performance."
 ---
 
 # Three.js WebGPU/TSL Choose Skills
@@ -367,23 +367,6 @@ backend before coding.
 Record exact file/export proof in the manifest. A nearby release example is not
 proof for the installed package.
 
-### Known-Issue Investigation
-
-Use this only for a concrete bug, audit, or upgrade decision:
-
-1. Capture installed revision, imports, initialized backend, browser/GPU, error,
-   failing API, and minimal local repro.
-2. Inspect installed source and the matching official migration material before
-   searching upstream. Test stale imports, missing initialization, duplicated
-   output conversion, and backend mismatch as hypotheses, not folklore.
-3. Search upstream with the concrete symptom/API. Record issue state, affected
-   revision range, merge/fix release, and repro equivalence.
-4. Classify each candidate as `active`, `fixed-after-installed-revision`,
-   `not-reproduced`, `intentional-api-change`, or `unrelated`.
-5. Recommend upgrade, local workaround, or blocker only from this evidence.
-
-Never call an issue current merely because it is closed or memorable.
-
 ## Quality Tiers
 
 Every implementation defines canonical WebGPU tiers; no alternate renderer is a
@@ -659,6 +642,7 @@ with this repository roster:
 - `threejs-camera-controls-and-rigs`
 - `threejs-choose-skills`
 - `threejs-compatibility-fallbacks`
+- `threejs-debugging`
 - `threejs-dynamic-surface-effects`
 - `threejs-exposure-color-grading`
 - `threejs-image-pipeline`
@@ -686,6 +670,7 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 
 | Required result | Load | Tie-breaker |
 | --- | --- | --- |
+| Unexpected Three.js runtime/API behavior, documentation/source disagreement, suspected regression, known-issue research, or upgrade triage | `$threejs-debugging` | Load for local diagnosis and upstream/version proof. Add domain skills only when mechanism expertise is required; do not load debugging for ordinary scene design. |
 | Camera composition, orbit/free navigation, multi-scale framing, projection/depth ownership, handoffs, floating origins | `$threejs-camera-controls-and-rigs` | Load when camera policy changes scale, silhouette, precision, temporal validity, or interaction. |
 | Authored transform phases, kinematics, rotating frames, springs, staging, analytic motion | `$threejs-procedural-motion-systems` | Use for transform authorship; keep live-data interpolation in the application data layer unless procedural motion is the missing cause. |
 | Reusable scalar/vector fields, causal masks, domain warping, derived normals | `$threejs-procedural-fields` | Use when outputs share a field cause; external scientific/data ingestion remains outside the pack. |
@@ -796,7 +781,8 @@ Every handoff labels:
 
 ## Routing Constraints
 
-- The router owns generic installed-revision preflight; destination skills own
+- The router owns generic installed-revision preflight; `$threejs-debugging`
+  owns failure isolation and upstream fix/version proof; destination skills own
   domain algorithms.
 - Do not route “make it beautiful” directly to post. Find the missing cause.
 - Prefer a causal, inspectable visual rule over unrelated noise/effect layers.

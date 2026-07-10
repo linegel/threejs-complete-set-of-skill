@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "id": "ordinary-scene-design",
+      "request": "Choose ways to build a sun, moon, and land system.",
+      "activateDebugging": false,
+      "requiredOutcome": "route-domain-skills"
+    },
+    {
+      "id": "older-release-suspicious-output",
+      "request": "This API renders incorrectly on our installed Three.js release. Determine whether a later release fixed it.",
+      "activateDebugging": true,
+      "requiredOutcome": "research-fix-history"
+    },
+    {
+      "id": "merged-but-unreleased",
+      "request": "A matching pull request is merged to the development branch but no containing package release is proven.",
+      "activateDebugging": true,
+      "requiredOutcome": "fixed-unreleased"
+    },
+    {
+      "id": "closed-but-unrelated",
+      "request": "A closed issue shares one keyword but uses another backend and does not reproduce locally.",
+      "activateDebugging": true,
+      "requiredOutcome": "unrelated"
+    },
+    {
+      "id": "installed-source-docs-disagree",
+      "request": "The current documentation names an API that the resolved installed package does not export.",
+      "activateDebugging": true,
+      "requiredOutcome": "intentional-api-change-or-version-mismatch"
+    },
+    {
+      "id": "current-release-reproduces-without-match",
+      "request": "The minimal repro still fails on the current checked release and no equivalent upstream report exists.",
+      "activateDebugging": true,
+      "requiredOutcome": "upstream-report"
+    },
+    {
+      "id": "local-usage-error",
+      "request": "Installed source proves the application violated the API contract and the corrected repro passes.",
+      "activateDebugging": true,
+      "requiredOutcome": "application-fix"
+    }
+  ]
+}
