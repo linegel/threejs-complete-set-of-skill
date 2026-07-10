@@ -1294,9 +1294,7 @@ ${navHtml('../')}
 
 <main id="main-content" tabindex="-1">
 <header class="${skillHeroImg ? 'skill-hero' : ''}">
-  ${skillHeroImg ? `<img class="skill-hero-bg" src="../${skillHeroImg}" alt="" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async" />` : ''}
-  ${resolvedSkillPreview ? `<span class="hero-preview-badge">${esc(resolvedSkillPreview.label)}</span>` : ''}
-  <div class="wrap">
+${skillHeroImg ? `  <img class="skill-hero-bg" src="../${skillHeroImg}" alt="" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async" />\n` : ''}${resolvedSkillPreview ? `  <span class="hero-preview-badge">${esc(resolvedSkillPreview.label)}</span>\n` : ''}  <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">${esc(cat ? cat.name : 'Skills')}</a></li><li aria-current="page">${esc(s.title)}</li></ol></nav>
     <h1 style="view-transition-name:skill-${safeClass(slug)}">${esc(s.title)}</h1>
     <p class="lede">${esc(s.desc)}</p>
