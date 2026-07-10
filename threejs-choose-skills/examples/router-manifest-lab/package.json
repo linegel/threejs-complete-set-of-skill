@@ -1,0 +1,15 @@
+{
+  "name": "@threejs-skills/router-manifest-lab",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check router-core.mjs && node --check app.mjs && node --check router-manifest.test.mjs",
+    "validate:unit": "node router-manifest.test.mjs",
+    "test:mutations": "node router-manifest.test.mjs",
+    "capture": "node router-manifest.test.mjs",
+    "validate:artifacts": "node router-manifest.test.mjs",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run check && npm run validate:unit && npm run test:mutations"
+  }
+}
