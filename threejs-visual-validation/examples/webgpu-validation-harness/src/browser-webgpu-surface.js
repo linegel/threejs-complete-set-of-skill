@@ -1,6 +1,7 @@
 import { Scene, PerspectiveCamera } from 'three';
 import { WebGPURenderer, RenderPipeline, HalfFloatType } from 'three/webgpu';
 import { pass, mrt, output, normalView, emissive, renderOutput } from 'three/tsl';
+import { snapshotRendererInfo } from './renderer-info-snapshot.js';
 
 export const r185NodePipelineImports = {
 	WebGPURenderer,
@@ -77,7 +78,7 @@ export async function collectRendererInfo( renderer, THREE ) {
 		features: device?.features ? [ ...device.features ] : null,
 		limits: device?.limits ? { ...device.limits } : null,
 		unavailableReason: device ? null : 'renderer.backend.device is unavailable in this execution environment',
-		info: structuredClone( renderer.info )
+		info: snapshotRendererInfo( renderer.info )
 	};
 
 }

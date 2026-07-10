@@ -20,6 +20,7 @@ import {
 import { color, emissive, float, mrt, normalView, output, pass, renderOutput, vec4 } from 'three/tsl';
 
 import { unpackAlignedReadback } from './readback.js';
+import { snapshotRendererInfo } from './renderer-info-snapshot.js';
 
 const SCENARIO_IDS = [
 	'browser-capture',
@@ -405,6 +406,10 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		getMetrics() {
 
 			return {
+				backend: {
+					isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
+					type: renderer.backend?.constructor?.name ?? 'unknown'
+				},
 				scenario,
 				mode,
 				tier,
@@ -418,7 +423,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 					p95: percentile( cpuFrameSamples, 0.95 )
 				},
 				resetEvents: [ ...resetEvents ],
-				rendererInfo: structuredClone( renderer.info )
+				rendererInfo: snapshotRendererInfo( renderer.info )
 			};
 
 		},
