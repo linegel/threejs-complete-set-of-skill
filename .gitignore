@@ -1,6 +1,10 @@
 node_modules/
 .DS_Store
 artifacts/
+!threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/
+threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/*
+!threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/.gitignore
+!threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/manifest.schema.json
 .claude/settings.local.json
 .agent/
 __pycache__/
