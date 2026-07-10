@@ -8,12 +8,14 @@
 <link rel="canonical" href="https://threejs-skills.com/" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
+<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
 <link rel="icon" href="favicon.ico" sizes="any" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
+<link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
+<link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -35,6 +37,13 @@
  "@context": "https://schema.org",
  "@graph": [
   {
+   "@type": "Organization",
+   "@id": "https://threejs-skills.com/#publisher",
+   "name": "Three.js WebGPU Skill Pack contributors",
+   "url": "https://threejs-skills.com/",
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill"
+  },
+  {
    "@type": "WebSite",
    "@id": "https://threejs-skills.com/#website",
    "url": "https://threejs-skills.com/",
@@ -42,9 +51,7 @@
    "alternateName": "Three.js Skills",
    "inLanguage": "en",
    "publisher": {
-    "@type": "Organization",
-    "name": "Three.js WebGPU Skill Pack contributors",
-    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+    "@id": "https://threejs-skills.com/#publisher"
    }
   },
   {
@@ -75,9 +82,7 @@
     "@id": "https://threejs-skills.com/#webpage"
    },
    "author": {
-    "@type": "Organization",
-    "name": "Three.js WebGPU Skill Pack contributors",
-    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+    "@id": "https://threejs-skills.com/#publisher"
    },
    "programmingLanguage": [
     "JavaScript",

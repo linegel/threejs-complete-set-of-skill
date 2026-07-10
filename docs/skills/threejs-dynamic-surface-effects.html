@@ -9,12 +9,14 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128" />
+<meta name="skill-pack-build-revision" content="sha256:6ccf84e53b2560a3148d3af52b79534821a4ab0d04219ef3d04e6679b71b5b60" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
+<link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
 <link rel="preload" as="image" href="../visual-validation/frost-generated-crystals/final.design.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
@@ -23,6 +25,8 @@
 <meta property="og:description" content="Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html" />
 <meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
+<meta property="article:section" content="Motion and Effects" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
@@ -38,23 +42,33 @@
  "@context": "https://schema.org",
  "@graph": [
   {
-   "@type": "TechArticle",
+   "@type": "Organization",
+   "@id": "https://threejs-skills.com/#publisher",
+   "name": "Three.js WebGPU Skill Pack contributors",
+   "url": "https://threejs-skills.com/",
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill"
+  },
+  {
+   "@type": [
+    "Article",
+    "TechArticle"
+   ],
    "@id": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html#article",
-   "headline": "Dynamic Surface Effects | Three.js WebGPU Skill",
+   "headline": "Dynamic Surface Effects",
    "description": "Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
    "url": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
-   "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html"
+   },
    "image": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.png",
+   "datePublished": "2026-07-04T23:30:20+03:00",
    "dateModified": "2026-07-10T18:34:25+03:00",
    "author": {
-    "@type": "Organization",
-    "name": "Three.js WebGPU Skill Pack contributors",
-    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+    "@id": "https://threejs-skills.com/#publisher"
    },
    "publisher": {
-    "@type": "Organization",
-    "name": "Three.js WebGPU Skill Pack contributors",
-    "url": "https://github.com/linegel/threejs-complete-set-of-skill"
+    "@id": "https://threejs-skills.com/#publisher"
    },
    "inLanguage": "en",
    "isAccessibleForFree": true,
@@ -70,7 +84,8 @@
     "WebGPU",
     "TSL",
     "Dynamic Surface Effects"
-   ]
+   ],
+   "articleSection": "Motion and Effects"
   },
   {
    "@type": "BreadcrumbList",
