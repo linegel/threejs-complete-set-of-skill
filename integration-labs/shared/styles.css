@@ -1,0 +1,27 @@
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background: #07100f; color: #e9f3ef; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 12% 0, #164239 0, #07100f 42rem); }
+#app { width: min(1200px, calc(100% - 32px)); margin: auto; padding: 32px 0 64px; }
+.eyebrow { margin: 0 0 8px; color: #74dfbe; font: 700 12px/1.2 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
+h1 { margin: 0; font-size: clamp(32px, 5vw, 60px); letter-spacing: -.045em; }
+.lede { max-width: 820px; color: #a9bdb7; line-height: 1.6; }
+.warning { margin: 22px 0; padding: 14px 16px; border: 1px solid #99732f; border-radius: 10px; background: #30250e; color: #ffe1a0; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 22px 0; }
+label { display: flex; gap: 8px; align-items: center; }
+select { padding: 8px 12px; border: 1px solid #315e53; border-radius: 7px; background: #0d201c; color: inherit; }
+.status { padding: 8px 11px; border: 1px solid #366c5d; border-radius: 999px; color: #8eeecb; font: 700 12px/1 ui-monospace, monospace; }
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.card { grid-column: span 6; min-width: 0; padding: 18px; border: 1px solid #24473e; border-radius: 14px; background: rgba(8, 27, 23, .92); }
+.card.wide { grid-column: 1 / -1; }
+.card h2 { margin: 0 0 12px; color: #b8f0df; font-size: 15px; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px solid #1b3d34; }
+.row:last-child { border-bottom: 0; }
+.owner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.owner-grid > div { display: grid; gap: 5px; padding: 10px; border-radius: 7px; background: #071814; }
+.owner-grid span { color: #a4bbb4; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+code { color: #83e7c8; overflow-wrap: anywhere; }
+pre { max-height: 320px; overflow: auto; margin: 0; padding: 12px; border-radius: 7px; background: #030907; color: #cbdad5; font-size: 12px; }
+li + li { margin-top: 6px; }
+a { color: #83e7c8; }
+@media (max-width: 760px) { .card { grid-column: 1 / -1; } }
