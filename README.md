@@ -7,9 +7,9 @@ validation.
 
 [![skills.sh](https://skills.sh/b/linegel/threejs-complete-set-of-skill)](https://skills.sh/linegel/threejs-complete-set-of-skill)
 
-**Website:** <https://linegel.github.io/threejs-complete-set-of-skill/> ·
-**LLM overview:** [llms.txt](https://linegel.github.io/threejs-complete-set-of-skill/llms.txt) ·
-**Machine-readable index:** [skills.json](https://linegel.github.io/threejs-complete-set-of-skill/skills.json)
+**Website:** <https://threejs-skills.com/> ·
+**LLM overview:** [llms.txt](https://threejs-skills.com/llms.txt) ·
+**Machine-readable index:** [skills.json](https://threejs-skills.com/skills.json)
 
 ## Install
 
@@ -48,7 +48,7 @@ After installing the whole pack, use `threejs-choose-skills` as the in-pack
 router for broad requests. It is not the recommended standalone install target.
 
 Discovery metadata is available at [`skills.json`](skills.json) in the repo
-root and at <https://linegel.github.io/threejs-complete-set-of-skill/skills.json>.
+root and at <https://threejs-skills.com/skills.json>.
 
 This is not a generic Three.js tutorial. It is a practical skill pack for
 agents that need to design, implement, debug, and validate advanced real-time

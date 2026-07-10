@@ -15,7 +15,7 @@
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
-
+<link rel="preload" as="image" href="../previews/provider/camera-rig-handoff-demo.png" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -23,12 +23,12 @@
 <meta property="og:description" content="Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html" />
 <meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
-<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta property="og:image" content="https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="760" />
 <meta property="og:image:alt" content="Camera Controls And Rigs evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
-<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
+<meta name="twitter:image" content="https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.png" />
 <meta name="twitter:image:alt" content="Camera Controls And Rigs evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Camera Controls And Rigs | Three.js WebGPU Skill" />
@@ -44,7 +44,7 @@
    "description": "Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.",
    "url": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
    "mainEntityOfPage": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
-   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "image": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.png",
    "dateModified": "2026-07-10T18:34:25+03:00",
    "author": {
     "@type": "Organization",
@@ -162,6 +162,11 @@ code{font-family:var(--mono)}
 figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
+.preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -222,28 +227,16 @@ a.chip:active{scale:.96}
 .pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
 .pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
-.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
-  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.live-visual:before{content:"";position:absolute;inset:0;background:
-  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
-  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
-.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
-.live-visual>*{position:relative}
-.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
-.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
-.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
-.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
-.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
-.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
-.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
-.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
-.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
-.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
-.live-visual--validation{--accent:#b8a4ff}
+.hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
+.evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
+  .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
+  .evidence-ledger{align-items:flex-start;flex-direction:column}
 }
 </style>
 </head>
@@ -254,8 +247,9 @@ a.chip:active{scale:.96}
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
-<header class="">
-  
+<header class="skill-hero">
+  <img class="skill-hero-bg" src="../previews/provider/camera-rig-handoff-demo.png" alt="" aria-hidden="true" width="1440" height="757" fetchpriority="high" decoding="async" />
+  <span class="hero-preview-badge">Live concept-proxy screenshot · not canonical evidence</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Camera Controls And Rigs</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-camera-controls-and-rigs">Camera Controls And Rigs</h1>
@@ -280,6 +274,7 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-camera-rig/">
+        <span class="card-preview-wrap" data-preview-for="webgpu-camera-rig" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/camera-rig-handoff-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Camera Rig" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Camera Rig</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -293,16 +288,19 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Final Image Flight" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/creature-habitat/">
+        <span class="card-preview-wrap" data-preview-for="creature-habitat" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Creature Habitat" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Creature Habitat</h3>
         <span class="card-meta">5 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/relativistic-space-shot/">
+        <span class="card-preview-wrap" data-preview-for="relativistic-space-shot" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Relativistic Space Shot" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Relativistic Space Shot</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -327,6 +325,16 @@ buffer so camera-local coordinates stay in float32-safe range
   </div></div>
 
 
+  <div class="section" id="validation"><div class="wrap">
+    <h2>Preview and evidence ledger</h2>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>1 published image</code></div>
+    <div class="gallery">
+      <figure data-preview-classification="concept-proxy-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../previews/provider/camera-rig-handoff-demo.png" alt="Camera Controls And Rigs — Live concept-proxy screenshot · not canonical evidence" itemprop="contentUrl" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">concept proxy preview</span></span>
+        <figcaption itemprop="caption"><strong>Live concept-proxy screenshot · not canonical evidence</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
+      </figure></div>
+  </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
@@ -668,11 +676,7 @@ state, and camera-relative coordinates. Route shadow fitting to
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/camera-rig-handoff-demo/"><figure>
-        <div class="live-visual live-visual--camera" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>scale-aware chase + handoff pose</strong>
-        <span class="lv-m">final / side / handoff</span>
-      </div>
+        <span class="preview-media"><img src="../previews/provider/camera-rig-handoff-demo.png" alt="Live concept proxy screenshot for Scale-Aware Camera Rig; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Scale-Aware Camera Rig</strong><span>Concept proxy · The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path. The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.</span></figcaption>
       </figure></a>
     </div>

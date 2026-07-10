@@ -1,6 +1,6 @@
 # Three.js WebGPU Skill Pack
 
-> 26 specialized agent skills backed by 39 loadable primary Three.js WebGPU/TSL implementations: 27 canonical labs, 5 cross-skill flagships, and 7 focused integration/mechanism surfaces. Runtime acceptance is evidence-gated: 2 suite is accepted and 37 native-WebGPU suites remain pending current-adapter evidence.
+> 26 specialized agent skills backed by 39 loadable primary Three.js WebGPU/TSL implementations: 27 canonical labs, 5 cross-skill flagships, and 7 focused integration/mechanism surfaces. Runtime acceptance is evidence-gated: 2 suites are accepted and 37 native-WebGPU suites remain pending current-adapter evidence.
 
 Repository: https://github.com/linegel/threejs-complete-set-of-skill
 Website: https://threejs-skills.com/ (each skill has a dedicated page at https://threejs-skills.com/skills/<name>.html with the approach, math, validation gallery, and full skill text)

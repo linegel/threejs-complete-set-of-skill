@@ -625,7 +625,7 @@
             "scripts/provider-demos.mjs",
             "threejs-choose-skills/examples/router-contract.test.mjs"
           ],
-          "sourceHash": "sha256:87900d2ec1b540e0c9b3345caa24c832ab0323fa2aad55031ecd7cf5d3e8ca95",
+          "sourceHash": "sha256:940983723b138f64d42f9400455f36bef4e6d5074fe8ebe7753d4f4fdbfa7860",
           "proxyStatus": {
             "limitation": "The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
             "canonicalLabId": "router-manifest-lab"

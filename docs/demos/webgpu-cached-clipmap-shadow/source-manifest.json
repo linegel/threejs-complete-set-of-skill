@@ -15,7 +15,7 @@
     "docs/demos/webgpu-cached-clipmap-shadow",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:031cf8cfdd3109b921b431c33f2ccc2c8fd02699f4ddb20f19d4d7bc43db148e",
+  "publishedBundleHash": "sha256:326d5b6df11a8807dc953a986a2fc219028e6b5629a00dd3c4633ea0cf02bd73",
   "threeRevision": "0.185.1",
   "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
   "evidenceBundleId": null

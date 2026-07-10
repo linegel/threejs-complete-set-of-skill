@@ -162,6 +162,11 @@ code{font-family:var(--mono)}
 figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
+.preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -222,28 +227,16 @@ a.chip:active{scale:.96}
 .pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
 .pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
-.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;
-  background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.live-visual:before{content:"";position:absolute;inset:0;background:
-  repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),
-  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
-.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
-.live-visual>*{position:relative}
-.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
-.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}
-.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
-.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}
-.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}
-.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}
-.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}
-.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}
-.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}
-.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}
-.live-visual--validation{--accent:#b8a4ff}
+.hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
+.evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
+.evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
+  .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
+  .evidence-ledger{align-items:flex-start;flex-direction:column}
 }
 </style>
 </head>
@@ -256,6 +249,7 @@ a.chip:active{scale:.96}
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
   <img class="skill-hero-bg" src="../visual-validation/planet-generated-craters/final.design.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <span class="hero-preview-badge">Generated crater-asset preview fixture</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Planets</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-procedural-planets">Procedural Planets</h1>
@@ -280,6 +274,7 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-quadtree-planet/">
+        <span class="card-preview-wrap" data-preview-for="webgpu-quadtree-planet" data-preview-classification="related-generated-asset-preview"><img class="card-preview" src="../visual-validation/planet-generated-craters/final.design.png" alt="Related skill preview · Generated crater-asset preview fixture for Native WebGPU Quadtree Planet" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated crater-asset preview fixture</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Native WebGPU Quadtree Planet</h3>
         <p>7 fixed scenarios, 7 mechanism routes, and 3 locked tiers.</p>
@@ -293,6 +288,7 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/weathered-world/">
+        <span class="card-preview-wrap" data-preview-for="weathered-world" data-preview-classification="related-concept-proxy-preview"><img class="card-preview" src="../previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <span class="card-head"><span class="card-index">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Weathered World</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -318,26 +314,26 @@ with amplitude-sorted dominance so overlaps read as impact history.</p></div>
 
 
   <div class="section" id="validation"><div class="wrap">
-    <h2>Evidence and asset previews</h2>
-    <p class="sub">Preserved diagnostic or generated-asset frames. Consult the demo registry before treating any frame as canonical runtime evidence.</p>
+    <h2>Preview and evidence ledger</h2>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>4 published images</code></div>
     <div class="gallery">
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/planet-generated-craters/final.design.png" alt="Procedural Planets in Three.js WebGPU — Generated crater-asset preview fixture" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
-        <figcaption itemprop="caption"><span>Generated crater-asset preview fixture</span></figcaption>
+      <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/final.design.png" alt="Procedural Planets — Generated crater-asset preview fixture" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <figcaption itemprop="caption"><strong>Generated crater-asset preview fixture</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/planet-generated-craters/no-post.design.png" alt="Procedural Planets in Three.js WebGPU — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
-        <figcaption itemprop="caption"><span>Asset-preview baseline</span></figcaption>
+      <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/no-post.design.png" alt="Procedural Planets — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <figcaption itemprop="caption"><strong>Asset-preview baseline</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Procedural Planets in Three.js WebGPU — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
-        <figcaption itemprop="caption"><span>Generated-asset channel diagnostics</span></figcaption>
+      <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Procedural Planets — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <figcaption itemprop="caption"><strong>Generated-asset channel diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
-      <figure itemscope itemtype="https://schema.org/ImageObject">
-        <img src="../visual-validation/planet-generated-craters/camera.near.png" alt="Procedural Planets in Three.js WebGPU — Asset-preview near framing" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
-        <figcaption itemprop="caption"><span>Asset-preview near framing</span></figcaption>
-      </figure>
-    </div>
+      <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/camera.near.png" alt="Procedural Planets — Asset-preview near framing" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <figcaption itemprop="caption"><strong>Asset-preview near framing</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
@@ -641,7 +637,7 @@ generates meteorology.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/planet-generated-craters/"><figure>
-        <img src="../visual-validation/planet-generated-craters/final.design.png" alt="Reduced-Tier Crater Mask Planet" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/final.design.png" alt="Live generated asset preview screenshot for Reduced-Tier Crater Mask Planet; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Reduced-Tier Crater Mask Planet</strong><span>Generated asset preview · Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.</span></figcaption>
       </figure></a>
     </div>

@@ -367,6 +367,11 @@ code{font-family:var(--mono)}
 figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
+.preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
+.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:repeating-linear-gradient(135deg,#0b0f14 0 18px,#0d1219 18px 36px);outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{color:var(--dim)}
@@ -389,12 +394,6 @@ footer code{color:var(--cyan);font-size:11px}
   ::view-transition-old(root),::view-transition-new(root){animation:none!important}
 }
 
-.live-visual{--accent:#7fd4c1;aspect-ratio:16/10;position:relative;overflow:hidden;display:grid;align-content:space-between;padding:18px;background:#0b0f14;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.live-visual:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 33px,rgba(255,255,255,.055) 34px 35px),repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.045) 34px 35px)}
-.live-visual:after{content:"";position:absolute;left:18px;right:18px;top:52%;height:2px;background:var(--accent);box-shadow:0 0 22px var(--accent);opacity:.78}
-.live-visual>*{position:relative}.live-visual .lv-k{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
-.live-visual strong{font-family:var(--disp);font-size:clamp(20px,3vw,34px);line-height:1.05;max-width:12ch}.live-visual .lv-m{font-family:var(--mono);font-size:11px;color:var(--dim)}
-.live-visual--ao{--accent:#9de6c8}.live-visual--bloom{--accent:#ffb454}.live-visual--exposure{--accent:#8fb7ff}.live-visual--pipeline{--accent:#7fd4c1}.live-visual--shadow{--accent:#d5c182}.live-visual--sky{--accent:#8fd3ff}.live-visual--camera{--accent:#a6d7ff}.live-visual--motion{--accent:#f0c36a}.live-visual--effects{--accent:#ff8a68}.live-visual--geometry{--accent:#b8e08f}.live-visual--route{--accent:#c8d5ff}.live-visual--fallback{--accent:#ff938a}.live-visual--building{--accent:#d6bd84}.live-visual--creature{--accent:#8ee6a5}.live-visual--validation{--accent:#b8a4ff}
 header.hero{position:relative;overflow:hidden;min-height:calc(100svh - 76px);display:grid;align-items:center;padding:clamp(64px,8vw,112px) 0}
 .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 44%,rgba(127,212,193,.09),transparent 28%),radial-gradient(circle at 16% 22%,rgba(255,180,84,.1),transparent 28%),linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);background-size:auto,auto,52px 52px,52px 52px;mask-image:linear-gradient(to bottom,black 0%,rgba(0,0,0,.82) 72%,transparent 100%)}
 .hero .wrap{position:relative;z-index:2;width:100%}
@@ -432,9 +431,9 @@ h1 em{font-style:normal;color:var(--amber)}
 .coverage-rail{display:grid;gap:9px}.rail-head{display:flex;justify-content:space-between;gap:20px;font-family:var(--mono);font-size:11px}.rail-head b{color:var(--ink);font-weight:500}.rail-head span{color:var(--dim);font-variant-numeric:tabular-nums}.rail-track{height:9px;overflow:hidden;border-radius:6px;background:#06080b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.rail-fill{height:100%;width:var(--value);border-radius:inherit;background:linear-gradient(90deg,var(--cyan),#b9f5e7);box-shadow:0 0 20px rgba(127,212,193,.34)}.coverage-rail--acceptance .rail-fill{background:linear-gradient(90deg,var(--amber),#ffd392);box-shadow:0 0 20px rgba(255,180,84,.3)}.rail-note{color:var(--dim);font-size:13px}
 .achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
 .flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{--tone:var(--amber);position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--tone) 8%,var(--bg3)),rgba(11,14,19,.97) 60%);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--cyan{--tone:var(--cyan)}.flagship-card--lime{--tone:var(--lime)}.flagship-card--violet{--tone:var(--violet)}.flagship-card--rose{--tone:var(--rose)}
-.flagship-visual{position:relative;align-self:stretch;min-height:230px;border-radius:14px;background:radial-gradient(circle at center,color-mix(in srgb,var(--tone) 12%,transparent),transparent 38%),linear-gradient(rgba(255,255,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.032) 1px,transparent 1px);background-size:auto,22px 22px,22px 22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-orbit{position:absolute;inset:16%;border:1px dashed color-mix(in srgb,var(--tone) 52%,transparent);border-radius:50%}.flagship-core{position:absolute;left:50%;top:50%;translate:-50% -50%;width:70px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;font-family:var(--mono);font-size:9px;line-height:1.3;color:var(--tone);background:#0b0f14;box-shadow:0 0 0 1px color-mix(in srgb,var(--tone) 55%,transparent),0 0 28px color-mix(in srgb,var(--tone) 16%,transparent)}.flagship-node{position:absolute;font-family:var(--mono);font-size:8px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}.flagship-node--1{left:50%;top:8%;translate:-50% 0}.flagship-node--2{right:4%;top:34%}.flagship-node--3{right:12%;bottom:8%}.flagship-node--4{left:12%;bottom:8%}.flagship-node--5{left:4%;top:34%}
+.flagship-visual{position:relative;align-self:stretch;min-height:230px;border-radius:14px;background:radial-gradient(circle at center,color-mix(in srgb,var(--tone) 12%,transparent),transparent 38%),linear-gradient(rgba(255,255,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.032) 1px,transparent 1px);background-size:auto,22px 22px,22px 22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-preview{align-self:stretch;min-height:230px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}.flagship-orbit{position:absolute;inset:16%;border:1px dashed color-mix(in srgb,var(--tone) 52%,transparent);border-radius:50%}.flagship-core{position:absolute;left:50%;top:50%;translate:-50% -50%;width:70px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;font-family:var(--mono);font-size:9px;line-height:1.3;color:var(--tone);background:#0b0f14;box-shadow:0 0 0 1px color-mix(in srgb,var(--tone) 55%,transparent),0 0 28px color-mix(in srgb,var(--tone) 16%,transparent)}.flagship-node{position:absolute;font-family:var(--mono);font-size:8px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}.flagship-node--1{left:50%;top:8%;translate:-50% 0}.flagship-node--2{right:4%;top:34%}.flagship-node--3{right:12%;bottom:8%}.flagship-node--4{left:12%;bottom:8%}.flagship-node--5{left:4%;top:34%}
 .flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--tone)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
-.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:190px;padding:18px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.88),rgba(12,15,21,.94));box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:22px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px dashed var(--line)}
+.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:330px;padding:14px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.88),rgba(12,15,21,.94));box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-media,.lab-card>.preview-missing{margin:-4px -4px 14px;border-radius:11px}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:14px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px dashed var(--line)}
 .protocol-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.protocol-card{min-height:190px;padding:20px;border-radius:16px;background:var(--bg2);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.protocol-card code{font-size:10px;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.protocol-card h3{margin-top:14px;font-size:19px}.protocol-card p{margin-top:8px;color:var(--dim);font-size:14px}.protocol-flow{grid-column:span 2;background:linear-gradient(135deg,rgba(127,212,193,.08),rgba(15,18,24,.94))}.protocol-flow ol{list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:20px}.protocol-flow li{font-family:var(--mono);font-size:10px;color:var(--dim)}.protocol-flow li:not(:last-child):after{content:"→";margin-left:8px;color:var(--amber)}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}.step{background:var(--bg2);border-radius:18px;padding:26px 26px 22px;position:relative;box-shadow:var(--shadow-card)}.step .n{font-family:var(--mono);position:absolute;top:-12px;left:22px;background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.1);border-radius:7px;color:var(--amber);font-size:12px;padding:2px 10px;letter-spacing:.15em}.step h3{font-size:19px;margin-bottom:10px}.step p{color:var(--dim);font-size:15.5px;margin-bottom:14px}
 .install-console{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:24px;border-radius:20px;background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(15,18,24,.94));box-shadow:var(--shadow-card)}.install-console p{color:var(--dim);font-size:14px}.install-console pre{margin-top:14px}.install-console .hero-action{white-space:nowrap}
@@ -534,11 +533,7 @@ h1 em{font-style:normal;color:var(--amber)}
   <p class="sub">The flagships are where individually correct algorithms must share world units, temporal state, signals, render submissions, and final-image ownership without quietly duplicating expensive work.</p>
   <div class="flagship-grid">
       <a class="flagship-card flagship-card--amber" href="demos/final-image-flight/">
-        <div class="flagship-visual" aria-hidden="true">
-          <span class="flagship-orbit"></span>
-          <span class="flagship-core">ONE<br/>OWNER</span>
-          <span class="flagship-node flagship-node--1">camera</span><span class="flagship-node flagship-node--2">motion</span><span class="flagship-node flagship-node--3">AO</span><span class="flagship-node flagship-node--4">bloom</span><span class="flagship-node flagship-node--5">exposure</span>
-        </div>
+        <span class="flagship-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Final Image Flight" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <div class="flagship-copy">
           <span class="flagship-kicker">Final image systems</span>
           <h3>Final Image Flight</h3>
@@ -547,11 +542,7 @@ h1 em{font-style:normal;color:var(--amber)}
         </div>
       </a>
       <a class="flagship-card flagship-card--cyan" href="demos/weathered-world/">
-        <div class="flagship-visual" aria-hidden="true">
-          <span class="flagship-orbit"></span>
-          <span class="flagship-core">ONE<br/>OWNER</span>
-          <span class="flagship-node flagship-node--1">planet</span><span class="flagship-node flagship-node--2">sky</span><span class="flagship-node flagship-node--3">clouds</span><span class="flagship-node flagship-node--4">water</span><span class="flagship-node flagship-node--5">weather</span>
-        </div>
+        <span class="flagship-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <div class="flagship-copy">
           <span class="flagship-kicker">Planetary environment</span>
           <h3>Weathered World</h3>
@@ -560,11 +551,7 @@ h1 em{font-style:normal;color:var(--amber)}
         </div>
       </a>
       <a class="flagship-card flagship-card--lime" href="demos/procedural-district/">
-        <div class="flagship-visual" aria-hidden="true">
-          <span class="flagship-orbit"></span>
-          <span class="flagship-core">ONE<br/>OWNER</span>
-          <span class="flagship-node flagship-node--1">fields</span><span class="flagship-node flagship-node--2">geometry</span><span class="flagship-node flagship-node--3">city</span><span class="flagship-node flagship-node--4">materials</span><span class="flagship-node flagship-node--5">shadows</span>
-        </div>
+        <span class="flagship-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Procedural District" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <div class="flagship-copy">
           <span class="flagship-kicker">Authored procedural world</span>
           <h3>Procedural District</h3>
@@ -573,11 +560,7 @@ h1 em{font-style:normal;color:var(--amber)}
         </div>
       </a>
       <a class="flagship-card flagship-card--violet" href="demos/creature-habitat/">
-        <div class="flagship-visual" aria-hidden="true">
-          <span class="flagship-orbit"></span>
-          <span class="flagship-core">ONE<br/>OWNER</span>
-          <span class="flagship-node flagship-node--1">creatures</span><span class="flagship-node flagship-node--2">plants</span><span class="flagship-node flagship-node--3">water</span><span class="flagship-node flagship-node--4">weather</span><span class="flagship-node flagship-node--5">outline</span>
-        </div>
+        <span class="flagship-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Creature Habitat" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <div class="flagship-copy">
           <span class="flagship-kicker">Actors and environment</span>
           <h3>Creature Habitat</h3>
@@ -586,11 +569,7 @@ h1 em{font-style:normal;color:var(--amber)}
         </div>
       </a>
       <a class="flagship-card flagship-card--rose" href="demos/relativistic-space-shot/">
-        <div class="flagship-visual" aria-hidden="true">
-          <span class="flagship-orbit"></span>
-          <span class="flagship-core">ONE<br/>OWNER</span>
-          <span class="flagship-node flagship-node--1">rays</span><span class="flagship-node flagship-node--2">motion</span><span class="flagship-node flagship-node--3">effects</span><span class="flagship-node flagship-node--4">bloom</span><span class="flagship-node flagship-node--5">history</span>
-        </div>
+        <span class="flagship-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Relativistic Space Shot" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
         <div class="flagship-copy">
           <span class="flagship-kicker">Relativistic cinematic</span>
           <h3>Relativistic Space Shot</h3>
@@ -608,162 +587,189 @@ h1 em{font-style:normal;color:var(--amber)}
       <div class="lab-group-head"><div><h3 id="canonicalskilllabs-title">Canonical skill labs</h3><p>One native implementation surface per rendering skill, plus the non-rendering router and explicit fallback harness.</p></div><span>27 routes</span></div>
       <div class="lab-grid">
         <a class="lab-card" href="demos/browser-fallback-harness/">
+          <span class="lab-card-media" data-preview-for="browser-fallback-harness" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/compatibility-fallback-planner-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Explicit WebGPU Fallback Teaching Harness" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Explicit WebGPU Fallback Teaching Harness</h4>
           <p>Three.js Compatibility Fallbacks</p>
           <span class="lab-route-counts">7 scenarios · 6 mechanisms · 0 tiers</span>
         </a>
         <a class="lab-card" href="demos/debugging-contract-lab/">
+          <span class="preview-missing" data-preview-for="debugging-contract-lab"><span>Preview capture pending</span><code>debugging-contract-lab</code></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--accepted">Accepted</span></span>
           <h4>Three.js Debugging Decision Lab</h4>
           <p>Three.js Debugging</p>
           <span class="lab-route-counts">7 scenarios · 5 mechanisms · 0 tiers</span>
         </a>
         <a class="lab-card" href="demos/node-selective-bloom/">
+          <span class="lab-card-media" data-preview-for="node-selective-bloom" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/selective-bloom-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Node Selective Bloom" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Node Selective Bloom</h4>
           <p>Bloom</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 4 tiers</span>
         </a>
         <a class="lab-card" href="demos/router-manifest-lab/">
+          <span class="lab-card-media" data-preview-for="router-manifest-lab" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/skill-router-manifest-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Skill Router Manifest Lab" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--accepted">Accepted</span></span>
           <h4>Skill Router Manifest Lab</h4>
           <p>Three.js WebGPU/TSL Choose Skills</p>
           <span class="lab-route-counts">16 scenarios · 8 mechanisms · 0 tiers</span>
         </a>
         <a class="lab-card" href="demos/semantic-mesh-writer/">
+          <span class="lab-card-media" data-preview-for="semantic-mesh-writer" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/procedural-geometry-writer-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Semantic Mesh Writer" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Semantic Mesh Writer</h4>
           <p>Procedural Geometry</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/structured-ash-growth/">
+          <span class="lab-card-media" data-preview-for="structured-ash-growth" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Related skill preview · Generated meadow-mask asset preview for Native WebGPU Structured Ash Growth" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated meadow-mask asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU Structured Ash Growth</h4>
           <p>Procedural Vegetation</p>
           <span class="lab-route-counts">6 scenarios · 4 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/tsl-curved-ray/">
+          <span class="lab-card-media" data-preview-for="tsl-curved-ray" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/space-generated-starfields/final.design.png" alt="Related skill preview · Artistic starfield-tile asset preview for TSL Curved Ray" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Artistic starfield-tile asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>TSL Curved Ray</h4>
           <p>Black Holes and Space Effects</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 4 tiers</span>
         </a>
         <a class="lab-card" href="demos/tsl-procedural-pbr/">
+          <span class="lab-card-media" data-preview-for="tsl-procedural-pbr" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Related skill preview · Generated lava-cause asset preview for TSL Procedural PBR" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated lava-cause asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>TSL Procedural PBR</h4>
           <p>Procedural Materials</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-bounded-water/">
+          <span class="lab-card-media" data-preview-for="webgpu-bounded-water" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/water-generated-caustics/final.design.png" alt="Related skill preview · Generated caustic-texture preview fixture for WebGPU Bounded Water" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated caustic-texture preview fixture</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Bounded Water</h4>
           <p>Water Optics</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 4 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-cached-clipmap-shadow/">
+          <span class="lab-card-media" data-preview-for="webgpu-cached-clipmap-shadow" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/shadow-cascade-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Native WebGPU Cached Clipmap Shadow Lab" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU Cached Clipmap Shadow Lab</h4>
           <p>Scalable Real-Time Shadows</p>
           <span class="lab-route-counts">9 scenarios · 9 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-camera-rig/">
+          <span class="lab-card-media" data-preview-for="webgpu-camera-rig" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/camera-rig-handoff-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Camera Rig" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Camera Rig</h4>
           <p>Camera Controls And Rigs</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-dense-grass/">
+          <span class="lab-card-media" data-preview-for="webgpu-dense-grass" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Related skill preview · Generated meadow-mask asset preview for Native WebGPU Dense Grass" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated meadow-mask asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU Dense Grass</h4>
           <p>Procedural Vegetation</p>
           <span class="lab-route-counts">7 scenarios · 3 mechanisms · 4 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-exposure-color-pipeline/">
+          <span class="lab-card-media" data-preview-for="webgpu-exposure-color-pipeline" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/exposure-color-grading-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Exposure Color Pipeline" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Exposure Color Pipeline</h4>
           <p>Exposure And Color Grading</p>
           <span class="lab-route-counts">5 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-fft-ocean/">
+          <span class="lab-card-media" data-preview-for="webgpu-fft-ocean" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Related skill preview · Generated wave-seed asset preview for WebGPU FFT Ocean" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated wave-seed asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU FFT Ocean</h4>
           <p>Spectral Ocean</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 4 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-field-bake/">
+          <span class="lab-card-media" data-preview-for="webgpu-field-bake" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Related skill preview · Generated biome-map asset preview for WebGPU Field Bake" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated biome-map asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Field Bake</h4>
           <p>Procedural Fields</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-image-pipeline/">
+          <span class="lab-card-media" data-preview-for="webgpu-image-pipeline" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Image Pipeline" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Image Pipeline</h4>
           <p>Image Pipeline</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-lut-atmosphere/">
+          <span class="lab-card-media" data-preview-for="webgpu-lut-atmosphere" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/sky-atmosphere-haze-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Native WebGPU LUT Atmosphere" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU LUT Atmosphere</h4>
           <p>Sky, Atmosphere, and Haze</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-material-slot-compiler/">
+          <span class="lab-card-media" data-preview-for="webgpu-material-slot-compiler" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/procedural-building-compiler-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Material Slot Compiler" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Material Slot Compiler</h4>
           <p>Procedural Buildings and Cities</p>
           <span class="lab-route-counts">6 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-node-gtao/">
+          <span class="lab-card-media" data-preview-for="webgpu-node-gtao" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/ambient-contact-shading-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Node GTAO" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Node GTAO</h4>
           <p>Ambient Contact Shading</p>
           <span class="lab-route-counts">7 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-pooled-effects/">
+          <span class="lab-card-media" data-preview-for="webgpu-pooled-effects" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/pooled-particles-effects-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Pooled Effects" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Pooled Effects</h4>
           <p>Particles, Trails, and Effects</p>
           <span class="lab-route-counts">7 scenarios · 7 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-procedural-creature-lab/">
+          <span class="lab-card-media" data-preview-for="webgpu-procedural-creature-lab" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/procedural-creature-lab-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Procedural Creature Lab" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Procedural Creature Lab</h4>
           <p>Procedural Creatures</p>
           <span class="lab-route-counts">7 scenarios · 7 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-procedural-timelines/">
+          <span class="lab-card-media" data-preview-for="webgpu-procedural-timelines" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/procedural-motion-timeline-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Procedural Timelines" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Procedural Timelines</h4>
           <p>Procedural Motion Systems</p>
           <span class="lab-route-counts">3 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-quadtree-planet/">
+          <span class="lab-card-media" data-preview-for="webgpu-quadtree-planet" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/planet-generated-craters/final.design.png" alt="Related skill preview · Generated crater-asset preview fixture for Native WebGPU Quadtree Planet" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated crater-asset preview fixture</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU Quadtree Planet</h4>
           <p>Procedural Planets</p>
           <span class="lab-route-counts">7 scenarios · 7 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-rain-snow-and-wet-surfaces/">
+          <span class="lab-card-media" data-preview-for="webgpu-rain-snow-and-wet-surfaces" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/rain-generated-ripples/final.design.png" alt="Related skill preview · Generated ripple-normal asset preview for WebGPU Rain Snow And Wet Surfaces" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated ripple-normal asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Rain Snow And Wet Surfaces</h4>
           <p>Rain, Snow, and Wet Surfaces</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-touch-history-frost/">
+          <span class="lab-card-media" data-preview-for="webgpu-touch-history-frost" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/frost-generated-crystals/final.design.png" alt="Related skill preview · Generated frost-map asset preview for WebGPU Touch History Frost" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated frost-map asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Touch History Frost</h4>
           <p>Dynamic Surface Effects</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-validation-harness/">
+          <span class="lab-card-media" data-preview-for="webgpu-validation-harness" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Related skill preview · Generated crater-asset diagnostics for Native WebGPU validation harness" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated crater-asset diagnostics</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU validation harness</h4>
           <p>Visual Validation</p>
           <span class="lab-route-counts">8 scenarios · 6 mechanisms · 5 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-weather-volume-clouds/">
+          <span class="lab-card-media" data-preview-for="webgpu-weather-volume-clouds" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Related skill preview · Generated weather-map asset preview for Native WebGPU Weather Volume Clouds" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated weather-map asset preview</span></span>
           <span class="lab-card-top"><span>Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Native WebGPU Weather Volume Clouds</h4>
           <p>Volumetric Clouds</p>
@@ -775,30 +781,35 @@ h1 em{font-style:normal;color:var(--amber)}
       <div class="lab-group-head"><div><h3 id="cross-skillflagships-title">Cross-skill flagships</h3><p>The five ownership-critical scenes where independent systems must compose without duplicate render, signal, tone-map, or output owners.</p></div><span>5 routes</span></div>
       <div class="lab-grid">
         <a class="lab-card" href="demos/final-image-flight/">
+          <span class="lab-card-media" data-preview-for="final-image-flight" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Final Image Flight" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Final Image Flight</h4>
           <p>Image Pipeline</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/weathered-world/">
+          <span class="lab-card-media" data-preview-for="weathered-world" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Weathered World" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Weathered World</h4>
           <p>Image Pipeline</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/procedural-district/">
+          <span class="lab-card-media" data-preview-for="procedural-district" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Procedural District" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Procedural District</h4>
           <p>Image Pipeline</p>
           <span class="lab-route-counts">1 scenarios · 6 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/creature-habitat/">
+          <span class="lab-card-media" data-preview-for="creature-habitat" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Creature Habitat" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Creature Habitat</h4>
           <p>Image Pipeline</p>
           <span class="lab-route-counts">1 scenarios · 5 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/relativistic-space-shot/">
+          <span class="lab-card-media" data-preview-for="relativistic-space-shot" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Relativistic Space Shot" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Relativistic Space Shot</h4>
           <p>Image Pipeline</p>
@@ -810,42 +821,49 @@ h1 em{font-style:normal;color:var(--amber)}
       <div class="lab-group-head"><div><h3 id="focusedintegrationsandbenches-title">Focused integrations and benches</h3><p>Five focused integration hosts and two mechanism benches that prove temporal, AO, vegetation, precipitation, and shadow composition.</p></div><span>7 routes</span></div>
       <div class="lab-grid">
         <a class="lab-card" href="demos/integration-image-pipeline-ao/">
+          <span class="lab-card-media" data-preview-for="integration-image-pipeline-ao" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/ambient-contact-shading-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for Image Pipeline and Material-context AO Integration" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Image Pipeline and Material-context AO Integration</h4>
           <p>Ambient Contact Shading</p>
           <span class="lab-route-counts">2 scenarios · 3 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/integration-precipitation-image-pipeline/">
+          <span class="lab-card-media" data-preview-for="integration-precipitation-image-pipeline" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/rain-generated-ripples/final.design.png" alt="Related skill preview · Generated ripple-normal asset preview for Integration Precipitation Image Pipeline" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated ripple-normal asset preview</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Integration Precipitation Image Pipeline</h4>
           <p>Rain, Snow, and Wet Surfaces</p>
           <span class="lab-route-counts">2 scenarios · 4 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/integration-temporal-surface/">
+          <span class="lab-card-media" data-preview-for="integration-temporal-surface" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/frost-generated-crystals/final.design.png" alt="Related skill preview · Generated frost-map asset preview for Integration Temporal Surface" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated frost-map asset preview</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Integration Temporal Surface</h4>
           <p>Dynamic Surface Effects</p>
           <span class="lab-route-counts">2 scenarios · 5 mechanisms · 3 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-shadow-architecture-bench/">
+          <span class="lab-card-media" data-preview-for="webgpu-shadow-architecture-bench" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/shadow-cascade-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Directional Shadow Architecture Bench" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Mechanism bench</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Directional Shadow Architecture Bench</h4>
           <p>Scalable Real-Time Shadows</p>
           <span class="lab-route-counts">4 scenarios · 4 mechanisms · 1 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-shadow-pipeline-integration/">
+          <span class="lab-card-media" data-preview-for="webgpu-shadow-pipeline-integration" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/shadow-cascade-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Cached Shadow Pipeline Integration" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Cached Shadow Pipeline Integration</h4>
           <p>Scalable Real-Time Shadows</p>
           <span class="lab-route-counts">1 scenarios · 3 mechanisms · 1 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-temporal-history/">
+          <span class="lab-card-media" data-preview-for="webgpu-temporal-history" data-preview-classification="related-concept-proxy-preview"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Related skill preview · Live concept-proxy screenshot · not canonical evidence for WebGPU Temporal History" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Live concept-proxy screenshot · not canonical evidence</span></span>
           <span class="lab-card-top"><span>Mechanism bench</span><span class="status status--pending">Evidence pending</span></span>
           <h4>WebGPU Temporal History</h4>
           <p>Image Pipeline</p>
           <span class="lab-route-counts">1 scenarios · 1 mechanisms · 1 tiers</span>
         </a>
         <a class="lab-card" href="demos/webgpu-vegetation-integration/">
+          <span class="lab-card-media" data-preview-for="webgpu-vegetation-integration" data-preview-classification="related-generated-asset-preview"><img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Related skill preview · Generated meadow-mask asset preview for Host-Owned Planet, Terrain, Dense Grass, and Ash Integration" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Related skill preview · Generated meadow-mask asset preview</span></span>
           <span class="lab-card-top"><span>Integration</span><span class="status status--pending">Evidence pending</span></span>
           <h4>Host-Owned Planet, Terrain, Dense Grass, and Ash Integration</h4>
           <p>Procedural Vegetation</p>
@@ -856,7 +874,7 @@ h1 em{font-style:normal;color:var(--amber)}
 </div></section>
 
 <section class="section" id="skills" aria-labelledby="skills-title"><div class="wrap">
-  <h2 id="skills-title">The 25-skill expert system</h2>
+  <h2 id="skills-title">The 26-skill expert system</h2>
   <p class="sub">Each skill owns a bounded technical domain. Cards report implementation surface and evidence separately, so substantial source work is visible without laundering it into a runtime claim.</p>
 
     <section class="category">
@@ -1172,167 +1190,107 @@ curl -s https://threejs-skills.com/llms.txt</code></pre></div></div></details>
   <p class="sub">Concept proxies, generated-asset previews, fixtures, and the legacy reference retain their public URLs and explicit limitations. They contribute exactly zero primary acceptance.</p>
   <details class="archive"><summary>Open the secondary archive <span>26 published previews</span></summary><div class="gallery">
       <a href="demos/water-integration-surface/"><figure>
-        <img src="visual-validation/water-integration-surface/integration-surface-readback.png" alt="Water Integration Surface" width="640" height="400" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/water-integration-surface/integration-surface-readback.png" alt="Live concept proxy screenshot for Water Integration Surface; not canonical runtime evidence" width="640" height="400" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Water Integration Surface</strong><span>Concept proxy · threejs-water-optics · The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented. The host project owns post-processing, transparent ordering, and final output conversion.</span></figcaption>
       </figure></a>
       <a href="demos/ambient-contact-shading-demo/"><figure>
-        <div class="live-visual live-visual--ao" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>AO.r + direct light separation</strong>
-        <span class="lv-m">final / no-ao / ao-debug</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/ambient-contact-shading-demo.png" alt="Live concept proxy screenshot for Ambient Contact Shading Lab; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Ambient Contact Shading Lab</strong><span>Concept proxy · threejs-ambient-contact-shading · The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.</span></figcaption>
       </figure></a>
       <a href="demos/selective-bloom-demo/"><figure>
-        <div class="live-visual live-visual--bloom" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>emissive source + bloom contribution</strong>
-        <span class="lv-m">final / base-only / bloom-only</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/selective-bloom-demo.png" alt="Live concept proxy screenshot for Selective HDR Bloom Bench; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Selective HDR Bloom Bench</strong><span>Concept proxy · threejs-bloom · The live page uses additive response geometry for interaction and mode switching. The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.</span></figcaption>
       </figure></a>
       <a href="demos/exposure-color-grading-demo/"><figure>
-        <div class="live-visual live-visual--exposure" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>HDR meter + adapted exposure state</strong>
-        <span class="lv-m">final / identity-lut / meter-debug</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/exposure-color-grading-demo.png" alt="Live concept proxy screenshot for Scene-Referred Exposure Rig; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Scene-Referred Exposure Rig</strong><span>Concept proxy · threejs-exposure-color-grading · The docs page simulates the meter state in live scene controls for readability. The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.</span></figcaption>
       </figure></a>
       <a href="demos/image-pipeline-framegraph-demo/"><figure>
-        <div class="live-visual live-visual--pipeline" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>one pass feeding shared diagnostics</strong>
-        <span class="lv-m">final / signals / bypass-post</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/image-pipeline-framegraph-demo.png" alt="Live concept proxy screenshot for Shared Signal Framegraph; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Shared Signal Framegraph</strong><span>Concept proxy · threejs-image-pipeline · The docs page visualizes the signal contract with live panels rather than allocating production MRT targets. The production skill remains one RenderPipeline, one pass/MRT producer, and one tone-map/output conversion owner.</span></figcaption>
       </figure></a>
       <a href="demos/shadow-cascade-demo/"><figure>
-        <div class="live-visual live-visual--shadow" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>coverage levels + bounded shadow map</strong>
-        <span class="lv-m">final / cascade-debug / single-map</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/shadow-cascade-demo.png" alt="Live concept proxy screenshot for Scalable Shadow Coverage; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Scalable Shadow Coverage</strong><span>Concept proxy · threejs-scalable-real-time-shadows · The live page uses a single real shadow map plus debug coverage overlays. The production skill chooses one shadow, CSMShadowNode, TileShadowNode, or a measured custom cached clipmap from the target scene.</span></figcaption>
       </figure></a>
       <a href="demos/sky-atmosphere-haze-demo/"><figure>
-        <div class="live-visual live-visual--sky" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>shared sky, sun, haze, and LUT views</strong>
-        <span class="lv-m">final / no-haze / lut-debug</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/sky-atmosphere-haze-demo.png" alt="Live concept proxy screenshot for Atmosphere And Haze Stack; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Atmosphere And Haze Stack</strong><span>Concept proxy · threejs-sky-atmosphere-and-haze · The docs page uses procedural sky bands and haze layers for direct interaction. The production skill remains compute-generated transmittance, multiscatter, sky-view, and aerial-perspective LUT/froxel products.</span></figcaption>
       </figure></a>
       <a href="demos/camera-rig-handoff-demo/"><figure>
-        <div class="live-visual live-visual--camera" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>scale-aware chase + handoff pose</strong>
-        <span class="lv-m">final / side / handoff</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/camera-rig-handoff-demo.png" alt="Live concept proxy screenshot for Scale-Aware Camera Rig; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Scale-Aware Camera Rig</strong><span>Concept proxy · threejs-camera-controls-and-rigs · The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path. The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-motion-timeline-demo/"><figure>
-        <div class="live-visual live-visual--motion" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>phase timeline + seeded debris</strong>
-        <span class="lv-m">final / phase-debug / replay-slice</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/procedural-motion-timeline-demo.png" alt="Live concept proxy screenshot for Procedural Motion Timeline; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Procedural Motion Timeline</strong><span>Concept proxy · threejs-procedural-motion-systems · The docs page uses a small CPU-side hero actor set for readability. The production skill remains fixed-step replay, previous/current storage slots, compute dispatch ownership, and quaternion frame contracts.</span></figcaption>
       </figure></a>
       <a href="demos/pooled-particles-effects-demo/"><figure>
-        <div class="live-visual live-visual--effects" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>event pool + shell/wake/sparks</strong>
-        <span class="lv-m">final / pool-debug / bloom-off</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/pooled-particles-effects-demo.png" alt="Live concept proxy screenshot for Pooled Particles And Trails; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Pooled Particles And Trails</strong><span>Concept proxy · threejs-particles-trails-and-effects · The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-geometry-writer-demo/"><figure>
-        <div class="live-visual live-visual--geometry" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>profile sweep + material groups</strong>
-        <span class="lv-m">final / groups / wire</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/procedural-geometry-writer-demo.png" alt="Live concept proxy screenshot for Semantic Mesh Writer Bench; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Semantic Mesh Writer Bench</strong><span>Concept proxy · threejs-procedural-geometry · The docs page implements a compact runtime frame-profile writer for inspection. The production skill remains preallocated typed-array writers, exact group coverage, tangent validation, batching decisions, and targeted update ranges.</span></figcaption>
       </figure></a>
       <a href="demos/skill-router-manifest-demo/"><figure>
-        <div class="live-visual live-visual--route" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>route manifest + shared owners</strong>
-        <span class="lv-m">final / budget / ownership</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/skill-router-manifest-demo.png" alt="Live concept proxy screenshot for Skill Router Manifest Bench; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Skill Router Manifest Bench</strong><span>Concept proxy · threejs-choose-skills · The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.</span></figcaption>
       </figure></a>
       <a href="demos/compatibility-fallback-planner-demo/"><figure>
-        <div class="live-visual live-visual--fallback" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>explicit fallback + loss ledger</strong>
-        <span class="lv-m">final / loss-ledger / blocked</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/compatibility-fallback-planner-demo.png" alt="Live concept proxy screenshot for Fallback Loss Ledger; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Fallback Loss Ledger</strong><span>Concept proxy · threejs-compatibility-fallbacks · The docs page is a teaching visualization and intentionally shows a blocked mode when no explicit fallback request exists. The canonical skill must not weaken flagship WebGPU guidance or silently route to WebGL-compatible behavior.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-building-compiler-demo/"><figure>
-        <div class="live-visual live-visual--building" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>massing + exposed edges + slots</strong>
-        <span class="lv-m">final / exposed-edges / material-slots</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/procedural-building-compiler-demo.png" alt="Live concept proxy screenshot for Material-Slot Building Compiler; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Material-Slot Building Compiler</strong><span>Concept proxy · threejs-procedural-buildings-and-cities · The docs page uses compact runtime geometry instead of the full fixture compiler and BatchedMesh capacity accounting. The production skill remains plan validation, interval overlap checks, physical UV scale, material-slot mesh compilation, and city-chunk budget evidence.</span></figcaption>
       </figure></a>
       <a href="demos/procedural-creature-lab-demo/"><figure>
-        <div class="live-visual live-visual--creature" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>rig + gait + candidate fields</strong>
-        <span class="lv-m">final / rig-debug / field-debug</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/procedural-creature-lab-demo.png" alt="Live concept proxy screenshot for Reduced Creature Lab; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Reduced Creature Lab</strong><span>Concept proxy · threejs-procedural-creatures · The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract. The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.</span></figcaption>
       </figure></a>
       <a href="demos/visual-validation-harness-demo/"><figure>
-        <div class="live-visual live-visual--validation" aria-hidden="true">
-        <span class="lv-k">Concept proxy</span>
-        <strong>contract images + manifest evidence</strong>
-        <span class="lv-m">final / diagnostics / bundle</span>
-      </div>
+        <span class="preview-media"><img src="previews/provider/visual-validation-harness-demo.png" alt="Live concept proxy screenshot for Validation Evidence Harness; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Validation Evidence Harness</strong><span>Concept proxy · threejs-visual-validation · The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.</span></figcaption>
       </figure></a>
       <a href="demos/water-generated-caustics/"><figure>
-        <img src="visual-validation/water-generated-caustics/final.design.png" alt="Bounded Water Caustic Projection" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/water-generated-caustics/final.design.png" alt="Live generated asset preview screenshot for Bounded Water Caustic Projection; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Bounded Water Caustic Projection</strong><span>Generated asset preview · threejs-water-optics · Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.</span></figcaption>
       </figure></a>
       <a href="demos/cloud-generated-weather-maps/"><figure>
-        <img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Weather Map Cloud Layers" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/cloud-generated-weather-maps/final.design.png" alt="Live generated asset preview screenshot for Weather Map Cloud Layers; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Weather Map Cloud Layers</strong><span>Generated asset preview · threejs-volumetric-clouds · Generated weather maps are reduced-tier diagnostic inputs. The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.</span></figcaption>
       </figure></a>
       <a href="demos/fields-generated-biome-maps/"><figure>
-        <img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Biome Field Terrain" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/fields-generated-biome-maps/final.design.png" alt="Live generated asset preview screenshot for Biome Field Terrain; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Biome Field Terrain</strong><span>Generated asset preview · threejs-procedural-fields · Generated biome maps are reduced-tier diagnostics. The production field path remains shared CPU/TSL parity plus compute/storage bakes when reuse justifies it.</span></figcaption>
       </figure></a>
       <a href="demos/frost-generated-crystals/"><figure>
-        <img src="visual-validation/frost-generated-crystals/final.design.png" alt="Frost Crystal Surface" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/frost-generated-crystals/final.design.png" alt="Live generated asset preview screenshot for Frost Crystal Surface; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Frost Crystal Surface</strong><span>Generated asset preview · threejs-dynamic-surface-effects · Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.</span></figcaption>
       </figure></a>
       <a href="demos/materials-generated-lava-causes/"><figure>
-        <img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Lava Cause Material" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/materials-generated-lava-causes/final.design.png" alt="Live generated asset preview screenshot for Lava Cause Material; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Lava Cause Material</strong><span>Generated asset preview · threejs-procedural-materials · Generated lava maps are reduced-tier diagnostic inputs. The production material path remains NodeMaterial PBR slots with HDR emissive and BloomNode ownership.</span></figcaption>
       </figure></a>
       <a href="demos/ocean-generated-wave-seeds/"><figure>
-        <img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Directional Wave Seed Surface" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Live generated asset preview screenshot for Directional Wave Seed Surface; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Directional Wave Seed Surface</strong><span>Generated asset preview · threejs-spectral-ocean · Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.</span></figcaption>
       </figure></a>
       <a href="demos/space-generated-starfields/"><figure>
-        <img src="visual-validation/space-generated-starfields/final.design.png" alt="Curved-Ray Starfield Preview" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/space-generated-starfields/final.design.png" alt="Live generated asset preview screenshot for Curved-Ray Starfield Preview; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Curved-Ray Starfield Preview</strong><span>Generated asset preview · threejs-black-holes-and-space-effects · Generated star tiles are distant/background-tier inputs. The production space path remains bounded adaptive ray integration and final-direction environment lookup.</span></figcaption>
       </figure></a>
       <a href="demos/vegetation-generated-meadow-density/"><figure>
-        <img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Meadow Density Placement" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/vegetation-generated-meadow-density/final.design.png" alt="Live generated asset preview screenshot for Meadow Density Placement; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Meadow Density Placement</strong><span>Generated asset preview · threejs-procedural-vegetation · Generated meadow maps are reduced-tier diagnostic inputs. The production vegetation path remains chunked compute/storage instance data, patch culling, and rooted wind.</span></figcaption>
       </figure></a>
       <a href="demos/rain-generated-ripples/"><figure>
-        <img src="visual-validation/rain-generated-ripples/final.design.png" alt="Wet Surface Ripple Normals" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/rain-generated-ripples/final.design.png" alt="Live generated asset preview screenshot for Wet Surface Ripple Normals; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Wet Surface Ripple Normals</strong><span>Generated asset preview · threejs-rain-snow-and-wet-surfaces · The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.</span></figcaption>
       </figure></a>
       <a href="demos/planet-generated-craters/"><figure>
-        <img src="visual-validation/planet-generated-craters/final.design.png" alt="Reduced-Tier Crater Mask Planet" width="1200" height="760" loading="lazy" decoding="async" />
+        <span class="preview-media"><img src="visual-validation/planet-generated-craters/final.design.png" alt="Live generated asset preview screenshot for Reduced-Tier Crater Mask Planet; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Reduced-Tier Crater Mask Planet</strong><span>Generated asset preview · threejs-procedural-planets · Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.</span></figcaption>
       </figure></a></div></details>
 </div></section>

@@ -15,7 +15,7 @@
     "docs/demos/webgpu-procedural-creature-lab",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:76624b816010eb799f4400d28741b7ad918ef45045173da82a4e6e4d4b8ca96b",
+  "publishedBundleHash": "sha256:e54e5cf0d23eb529f283b9b359b64fbbaeac18ff36c7ed7798b153c6480ddc18",
   "threeRevision": "0.185.1",
   "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
   "evidenceBundleId": null

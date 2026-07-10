@@ -15,7 +15,7 @@
     "docs/demos/webgpu-material-slot-compiler",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:7c3353e8dc8b47fa8970c84c8cfc9b8eb00490cd22e956db7c94488e91432f65",
+  "publishedBundleHash": "sha256:9da9a6fa26b9355065c14b51135a6822fc6d1760fca50138ab3568a92474b762",
   "threeRevision": "0.185.1",
   "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
   "evidenceBundleId": null

@@ -4,9 +4,27 @@
   "description": "Agent skill pack for Three.js WebGPU/TSL procedural graphics, image pipelines, and visual validation.",
   "main": "index.js",
   "scripts": {
-    "build:pages": "node scripts/build-pages.mjs",
+    "build:pages": "npm run pages:build",
+    "labs:registry": "node scripts/validate-lab-manifests.mjs --write-registry",
+    "labs:check": "node scripts/validate-lab-manifests.mjs && node scripts/check-lab-implementation-matrix.mjs && node scripts/check-lab-sources.mjs && node scripts/check-capture-wiring.mjs && node --test tests/labs/*.test.mjs && node scripts/run-labs.mjs check",
+    "labs:test": "node scripts/run-labs.mjs test",
+    "labs:test:unit": "node --test tests/labs/*.test.mjs",
+    "labs:test:mutations": "node --test tests/labs/*.test.mjs && node scripts/run-labs.mjs mutations",
+    "labs:capture": "node scripts/run-labs.mjs capture",
+    "labs:capture:browser": "node scripts/capture-lab-browser.mjs",
+    "labs:validate": "node scripts/run-labs.mjs validate",
+    "labs:validate:quick": "node scripts/validate-lab-manifests.mjs && node scripts/run-labs.mjs quick",
+    "labs:validate:full": "node scripts/validate-lab-manifests.mjs --require-complete && node scripts/run-labs.mjs full",
+    "pages:build": "node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
+    "pages:capture-previews": "node scripts/capture-site-previews.mjs",
+    "pages:refresh-previews": "node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/capture-site-previews.mjs && node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
+    "pages:smoke": "node scripts/pages-smoke.mjs",
+    "pages:validate-presentation": "node scripts/validate-site-presentation.mjs",
+    "pages:validate-seo": "node scripts/validate-site-seo.mjs",
+    "pages:validate-source-hashes": "node scripts/validate-pages-source-hashes.mjs",
     "skills:list": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
-    "test": "node scripts/validate-skills-manifest.mjs"
+    "test:skills": "node scripts/validate-skills-manifest.mjs",
+    "test": "npm run test:skills && npm run labs:check"
   },
   "keywords": [
     "skills",
@@ -25,7 +43,7 @@
     "type": "git",
     "url": "git+https://github.com/linegel/threejs-complete-set-of-skill.git"
   },
-  "homepage": "https://linegel.github.io/threejs-complete-set-of-skill/",
+  "homepage": "https://threejs-skills.com/",
   "bugs": {
     "url": "https://github.com/linegel/threejs-complete-set-of-skill/issues"
   },
