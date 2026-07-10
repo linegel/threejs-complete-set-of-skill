@@ -207,10 +207,10 @@ footer code{color:var(--cyan);font-size:11px}
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
 .skill-hero .wrap{position:relative;z-index:2}
-.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.46;filter:saturate(1.08) contrast(1.04)}
+.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.78;filter:saturate(1.18) contrast(1.08) brightness(1.08);scale:1.015}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
-  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
+  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
+  linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
@@ -262,9 +262,9 @@ a.chip:active{scale:.96}
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
-<header class="">
-  
-  
+<header class="skill-hero">
+  <img class="skill-hero-bg" src="../previews/primary/debugging-contract-lab.png" alt="" aria-hidden="true" width="1200" height="760" fetchpriority="high" decoding="async" />
+  <span class="hero-preview-badge">Deterministic contract-lab screenshot</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Planning and Validation</a></li><li aria-current="page">Three.js Debugging</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-debugging">Three.js Debugging</h1>
@@ -289,7 +289,7 @@ a.chip:active{scale:.96}
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
       <a class="card" href="../demos/debugging-contract-lab/">
-        <span class="preview-missing" data-preview-for="debugging-contract-lab"><span>Preview capture pending</span><code>debugging-contract-lab</code></span>
+        <span class="card-preview-wrap" data-preview-for="debugging-contract-lab" data-preview-classification="non-rendering-lab-preview"><img class="card-preview" src="../previews/primary/debugging-contract-lab.png" alt="Deterministic contract-lab screenshot for Three.js Debugging Decision Lab" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Deterministic contract-lab screenshot</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>Three.js Debugging Decision Lab</h3>
         <p>7 fixed scenarios, 5 mechanism routes, and 0 locked tiers.</p>
@@ -322,8 +322,12 @@ a.chip:active{scale:.96}
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>0 published images</code></div>
-    <div class="preview-missing"><span>Preview capture pending</span><code>npm run pages:capture-previews</code></div>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>1 published image</code></div>
+    <div class="gallery">
+      <figure data-preview-classification="non-rendering-lab-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><img src="../previews/primary/debugging-contract-lab.png" alt="Three.js Debugging — Deterministic contract-lab screenshot" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">non rendering lab preview</span></span>
+        <figcaption itemprop="caption"><strong>Deterministic contract-lab screenshot</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
