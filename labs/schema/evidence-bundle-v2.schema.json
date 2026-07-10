@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linegel.github.io/threejs-complete-set-of-skill/schemas/evidence-bundle-v2.json",
+  "title": "Native-WebGPU evidence bundle v2 index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "labId", "bundleId", "claimVerdicts", "files", "images"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "labId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "bundleId": { "type": "string", "minLength": 1 },
+    "claimVerdicts": {
+      "type": "object",
+      "required": ["visualCorrectness", "mechanismCorrectness", "performanceCompliance", "gpuAttribution", "lifecycleStability"],
+      "additionalProperties": { "$ref": "#/$defs/verdict" }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 14,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "\\.json$" }
+    },
+    "images": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "\\.png$" }
+    }
+  },
+  "$defs": {
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "INSUFFICIENT_EVIDENCE", "NOT_CLAIMED"]
+    }
+  }
+}
