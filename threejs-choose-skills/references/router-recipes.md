@@ -349,6 +349,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -356,10 +362,20 @@ physicsPresentationTimeCohortsById:
   analytic-archipelago-cohort: { type: PresentationTimeCohort, timeCohortId: analytic-archipelago-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
   type: PhysicsPresentationCandidate
+  candidateId: runtime-id
+  contextId: physicsContext.contextId
+  presentationEpoch: exact route presentation epoch
   timeCohortId: analytic-archipelago-cohort
+  requestedPresentationInstant: physicsPresentationTimeCohortsById.analytic-archipelago-cohort.currentRequestedPresentationInstant
+  physicsOriginEpoch: physicsContext.physicsOriginEpoch
+  commitProvenance: exact CandidateCommitProvenance resolving analytic terrain/water versions to analytic-state commit receipt IDs/digests
+  candidateScope: committed-state-brackets-leases-and-events
   producer: route physics coordinator
   consumers: [design-view camera owner, route presentation assembler]
   contents: requestedPresentationInstant plus committed analytic per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics frame/origin/revision, immutable state handles, resource leases, and event ranges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
   qualityMigration: the coordinator admits one request only through a QualityTransition with commitInstant, conservative/reset map, error residuals, queue boundary, atomic provider/registry versions, ConsumerCompletionJoin retirement, scoped presentation/history actions, and rollback before candidate publication
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
@@ -385,7 +401,7 @@ frameExecutionRecord:
   backendGeneration: exact backend generation
   deviceLossGeneration: exact device-loss generation
   targetExecutions:
-    main/design-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId, renderPlanId: analytic-archipelago-design-render-plan, slotAdmissionId: exact admitted main/design-view slot ID, presentationTargetId: main, viewId: design-view, status: typed target status, submittedPasses: exact pass keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
+    main/design-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId, renderPlanId: analytic-archipelago-design-render-plan, slotAdmissionId: exact admitted main/design-view slot ID, presentationTargetId: main, viewId: design-view, status: typed target status, submittedPasses: exact pass keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, resetActionResults: exact planned reset results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
   leaseDispositionById:
     lease-id: { disposition: retained-until-join | retired-after-abort | invalidated-by-device-loss, consumingSnapshotIds: [physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId], completionJoin: { simulationConsumers: [typed tokens], couplingConsumers: [], externalConsumers: [], presentationConsumers: [typed tokens], deviceLossRetirementPath: typed rule }, retirementEvidence: typed completion-or-loss record }
   immutability: completion never mutates candidate, camera publication, view-preparation publication, or snapshot
@@ -551,6 +567,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -561,10 +583,20 @@ physicsPresentationTimeCohortsById:
   prescribed-vessel-archipelago-cohort: { type: PresentationTimeCohort, timeCohortId: prescribed-vessel-archipelago-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
   type: PhysicsPresentationCandidate
+  candidateId: runtime-id
+  contextId: physicsContext.contextId
+  presentationEpoch: exact route presentation epoch
   timeCohortId: prescribed-vessel-archipelago-cohort
+  requestedPresentationInstant: physicsPresentationTimeCohortsById.prescribed-vessel-archipelago-cohort.currentRequestedPresentationInstant
+  physicsOriginEpoch: physicsContext.physicsOriginEpoch
+  commitProvenance: exact CandidateCommitProvenance resolving water/foam/vessel versions to coastal-state commit receipt IDs/digests
+  candidateScope: committed-state-brackets-leases-and-events
   producer: route physics coordinator
   consumers: [design-view camera owner, route presentation assembler]
   contents: requestedPresentationInstant plus committed water/foam/vessel PresentedStatePair entries with independent provenance and physics-qualified state handles, exact leases, and consumed event ranges; contains no camera, render-origin, view/projection, shadow/cache, or global-to-render data
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
   qualityMigration: a QualityTransition commits at commitInstant with conservative map/reset, interaction-queue boundary, residuals, atomic provider versions, ConsumerCompletionJoin retirement, scoped resets, and rollback before candidate publication
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera, contents: previous/current PhysicsInstant, source-qualified RenderSimilarityTransforms, unjittered matrices, jitter, viewport/DPR/extent, depth, and projection validity/error }
@@ -590,7 +622,7 @@ frameExecutionRecord:
   backendGeneration: exact backend generation
   deviceLossGeneration: exact device-loss generation
   targetExecutions:
-    main/design-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId, renderPlanId: prescribed-vessel-design-render-plan, slotAdmissionId: exact admitted main/design-view slot ID, presentationTargetId: main, viewId: design-view, status: typed target status, submittedPasses: exact pass keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
+    main/design-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId, renderPlanId: prescribed-vessel-design-render-plan, slotAdmissionId: exact admitted main/design-view slot ID, presentationTargetId: main, viewId: design-view, status: typed target status, submittedPasses: exact pass keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, resetActionResults: exact planned reset results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
   leaseDispositionById:
     lease-id: { disposition: retained-until-join | retired-after-abort | invalidated-by-device-loss, consumingSnapshotIds: [physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId], completionJoin: { simulationConsumers: [typed tokens], couplingConsumers: [typed tokens], externalConsumers: [], presentationConsumers: [typed tokens], deviceLossRetirementPath: typed rule }, retirementEvidence: typed completion-or-loss record }
   immutability: append completion only; never mutate any prior publication or snapshot
@@ -798,6 +830,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -808,10 +846,20 @@ physicsPresentationTimeCohortsById:
   spectral-vessel-archipelago-cohort: { type: PresentationTimeCohort, timeCohortId: spectral-vessel-archipelago-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
   type: PhysicsPresentationCandidate
+  candidateId: runtime-id
+  contextId: physicsContext.contextId
+  presentationEpoch: exact route presentation epoch
   timeCohortId: spectral-vessel-archipelago-cohort
+  requestedPresentationInstant: physicsPresentationTimeCohortsById.spectral-vessel-archipelago-cohort.currentRequestedPresentationInstant
+  physicsOriginEpoch: physicsContext.physicsOriginEpoch
+  commitProvenance: exact CandidateCommitProvenance resolving offshore/coastal/foam/vessel versions to spectral-coastal commit receipt IDs/digests
+  candidateScope: committed-state-brackets-leases-and-events
   producer: route physics coordinator
   consumers: [design-view camera owner, route presentation assembler]
   contents: requestedPresentationInstant plus committed offshore/coastal/foam/vessel PresentedStatePair entries with independent provenance, physics-qualified state handles, exact leases, and consumed event ranges; contains no camera/render/view/shadow/cache data
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
   qualityMigration: a QualityTransition commits at commitInstant with conservative map/reset, queue boundary, conservation/covariance/error residuals, atomic provider versions, ConsumerCompletionJoin retirement, scoped resets, and rollback before candidate publication
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera, contents: previous/current PhysicsInstant, source-qualified RenderSimilarityTransforms, unjittered matrices, jitter, viewport/DPR/extent, depth, and projection validity/error }
@@ -837,7 +885,7 @@ frameExecutionRecord:
   backendGeneration: exact backend generation
   deviceLossGeneration: exact device-loss generation
   targetExecutions:
-    main/design-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId, renderPlanId: spectral-vessel-design-render-plan, slotAdmissionId: exact admitted main/design-view slot ID, presentationTargetId: main, viewId: design-view, status: typed target status, submittedPasses: exact pass keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
+    main/design-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId, renderPlanId: spectral-vessel-design-render-plan, slotAdmissionId: exact admitted main/design-view slot ID, presentationTargetId: main, viewId: design-view, status: typed target status, submittedPasses: exact pass keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, resetActionResults: exact planned reset results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
   leaseDispositionById:
     lease-id: { disposition: retained-until-join | retired-after-abort | invalidated-by-device-loss, consumingSnapshotIds: [physicsPresentationSnapshotsByTarget["main/design-view"].snapshotId], completionJoin: { simulationConsumers: [typed tokens], couplingConsumers: [typed tokens], externalConsumers: [], presentationConsumers: [typed tokens], deviceLossRetirementPath: typed rule }, retirementEvidence: typed completion-or-loss record }
   immutability: append completion only; never mutate prior records
@@ -1146,6 +1194,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -1169,6 +1223,7 @@ physicsPresentationCandidate:
   resourceLeases:
     - { type: PresentationResourceLease, leaseId: cloud-density-previous-lease, resourceId: cloud-density-previous-resource, deviceId: route WebGPU device, deviceLossGeneration: exact backend loss generation, resourceGeneration: exact previous cloud resource generation, layoutRevision: cloud-density-layout-v2, entitySlotMapVersion: cloud-volume-brick-identity-map-v2, residency: gpu, slotRangeStrideCount: exact previous volume subresources/strides/counts, owner: $threejs-volumetric-clouds, leaseScope: candidate, access: read, submissionAvailability: exact cloud-state production dependency, leaseBegin: candidate publication sequence, reuseProhibitedUntil: { type: ConsumerCompletionJoin, joinId: cloud-density-previous-completion-join, leaseId: cloud-density-previous-lease, requiredConsumerKeys: [design-view cloud shadow/raymarch, map-view cloud shadow/raymarch], simulationConsumers: exact cloud-owner tokens, couplingConsumers: [], externalConsumers: [], presentationConsumers: exact per-snapshot queue completion tokens, joinPredicate: all-required-consumers-complete-or-loss-invalidated, joinDigest: canonical join digest, deviceLossRetirementPath: generation-invalidated retirement } }
     - { type: PresentationResourceLease, leaseId: cloud-density-current-lease, resourceId: cloud-density-current-resource, deviceId: route WebGPU device, deviceLossGeneration: exact backend loss generation, resourceGeneration: exact current cloud resource generation, layoutRevision: cloud-density-layout-v2, entitySlotMapVersion: cloud-volume-brick-identity-map-v2, residency: gpu, slotRangeStrideCount: exact current volume subresources/strides/counts, owner: $threejs-volumetric-clouds, leaseScope: candidate, access: read, submissionAvailability: exact cloud-state production dependency, leaseBegin: candidate publication sequence, reuseProhibitedUntil: { type: ConsumerCompletionJoin, joinId: cloud-density-current-completion-join, leaseId: cloud-density-current-lease, requiredConsumerKeys: [design-view cloud shadow/raymarch, map-view cloud shadow/raymarch], simulationConsumers: exact cloud-owner tokens, couplingConsumers: [], externalConsumers: [], presentationConsumers: exact per-snapshot queue completion tokens, joinPredicate: all-required-consumers-complete-or-loss-invalidated, joinDigest: canonical join digest, deviceLossRetirementPath: generation-invalidated retirement } }
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records for consumed weather/water/body events or [])
   qualityMigration: coordinator-admitted QualityTransition with commitInstant, conservative map/reset, conservation/error gates, exact-once cursor policy, ConsumerCompletionJoin retirement, and rollback
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera generation, contents: exact previous/current PhysicsInstant, RenderSimilarityTransforms, matrices, jitter, viewport/DPR/extent, depth, validity/error }
@@ -1405,6 +1460,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -1415,10 +1476,20 @@ physicsPresentationTimeCohortsById:
   ocean-planet-cohort: { type: PresentationTimeCohort, timeCohortId: ocean-planet-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
   type: PhysicsPresentationCandidate
+  candidateId: runtime-id
+  contextId: physicsContext.contextId
+  presentationEpoch: exact route presentation epoch
   timeCohortId: ocean-planet-cohort
+  requestedPresentationInstant: physicsPresentationTimeCohortsById.ocean-planet-cohort.currentRequestedPresentationInstant
+  physicsOriginEpoch: physicsContext.physicsOriginEpoch
+  commitProvenance: exact CandidateCommitProvenance resolving planet/ocean/transport versions to planet-ocean-transport commit receipt IDs/digests
+  candidateScope: committed-state-brackets-leases-and-events
   producer: route physics coordinator
   consumers: [primary-view camera owner, route presentation assembler]
   contents: requestedPresentationInstant plus committed planet/ocean/transport per-binding/provider PresentedStatePair entries, independent previous/current provenance, physics-qualified immutable state handles, exact resource leases, and event ranges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
   qualityMigration: a prepared QualityTransition commits at a PhysicsInstant through its own all-or-none commit group with projection/reset map, geometric/radiometric/error residuals, queue boundary, atomic versions, ConsumerCompletionJoin retirement, scoped actions, and rollback before candidate publication
 physicsCameraViewPublicationsByTarget:
   main/primary-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: primary-view camera owner, presentationTargetId: main, viewId: primary-view, cameraId: primary-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
@@ -1444,7 +1515,7 @@ frameExecutionRecord:
   backendGeneration: exact backend generation
   deviceLossGeneration: exact device-loss generation
   targetExecutions:
-    main/primary-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/primary-view"].snapshotId, renderPlanId: ocean-planet-primary-render-plan, slotAdmissionId: exact admitted main/primary-view slot ID, presentationTargetId: main, viewId: primary-view, status: submitted | completed | failed | aborted | device-lost, submittedPasses: exact pass/dispatch keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
+    main/primary-view: { snapshotId: physicsPresentationSnapshotsByTarget["main/primary-view"].snapshotId, renderPlanId: ocean-planet-primary-render-plan, slotAdmissionId: exact admitted main/primary-view slot ID, presentationTargetId: main, viewId: primary-view, status: submitted | completed | failed | aborted | device-lost, submittedPasses: exact pass/dispatch keys, queueSubmissionEpochs: ordered epochs, actionResults: typed results, resetActionResults: exact planned reset results, completionTokens: exact tokens, presentedTimestamp: mapped presentation-clock record or TypedAbsence(not-presented, frame executor, execution interval, target status), failure: typed failure or TypedAbsence(no-failure, frame executor, execution interval, target status) }
   leaseDispositionById:
     lease-id: { disposition: retained-until-join | retired-after-abort | invalidated-by-device-loss, consumingSnapshotIds: [physicsPresentationSnapshotsByTarget["main/primary-view"].snapshotId], completionJoin: { simulationConsumers: [typed tokens], couplingConsumers: [], externalConsumers: [], presentationConsumers: [typed tokens], deviceLossRetirementPath: typed rule }, retirementEvidence: typed completion-or-loss record }
   immutability: completion never mutates candidate, camera publication, view-preparation publication, or snapshot
@@ -1736,6 +1807,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -1754,6 +1831,9 @@ physicsPresentationCandidate:
   commitProvenance: exact CandidateCommitProvenance resolving precipitation/receiver/puddle/range versions to rainy-city commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
   contents: requestedPresentationInstant plus committed forcing/receiver/puddle/precipitation per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics-qualified immutable state handles, exact resource leases, and eventSequenceRanges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records)
   qualityMigration: a prepared QualityTransition commits at commitInstant (PhysicsInstant) through its own all-or-none commit group with conservative map/reset, interaction/source-queue boundary, mass/momentum residual gates, atomic versions, ConsumerCompletionJoin retirement, scoped resets, and rollback before candidate publication
 physicsCameraViewPublicationsByTarget:
   main/street-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: street-view camera owner, presentationTargetId: main, viewId: street-view, cameraId: street-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
@@ -1994,6 +2074,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -2012,6 +2098,9 @@ physicsPresentationCandidate:
   commitProvenance: exact CandidateCommitProvenance resolving forcing/support/vegetation/range versions to their committed receipts/digests
   candidateScope: committed-state-brackets-leases-and-events
   contents: requestedPresentationInstant plus committed forcing/support/vegetation per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics-qualified immutable state handles, exact resource leases, and eventSequenceRanges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records)
   qualityMigration: a prepared QualityTransition commits at commitInstant (PhysicsInstant) through its own all-or-none commit group with projection/reset map, interaction-queue boundary, energy/error residuals, atomic versions, ConsumerCompletionJoin retirement, scoped invalidations, and rollback before candidate publication
 physicsCameraViewPublicationsByTarget:
   main/navigation-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: navigation-view camera owner, presentationTargetId: main, viewId: navigation-view, cameraId: navigation-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
@@ -2229,7 +2318,7 @@ physicsGraph:
     body-water-solve-subcycles: { type: PhysicsStageExecutionRule, activation: per-loop-iteration, partition: exact-subcycle-tile, maximumActivationsPerAdvance: iterationBound, maximumExecutionsPerActivation: Gated external/body/water subcycle count, nativeSubcycleSelection: stability-bound, ordering: monotonic-interval-then-native-sequence }
     body-water-reduce-and-correct: { type: PhysicsStageExecutionRule, activation: per-loop-iteration, partition: single, maximumActivationsPerAdvance: iterationBound, maximumExecutionsPerActivation: 2, nativeSubcycleSelection: not-applicable, ordering: monotonic-interval-then-native-sequence }
     commit-and-publish: { type: PhysicsStageExecutionRule, activation: per-advance, partition: single, maximumActivationsPerAdvance: 1, maximumExecutionsPerActivation: 1, nativeSubcycleSelection: not-applicable, ordering: monotonic-interval-then-native-sequence }
-  stateAdvanceClaimRule: all loop/subcycle PhysicsStageExecution records name their loopId, iterationIndex, subcycleIndex, and the single body/manifold/water StateAdvanceClaim for this coordination interval; only accepted iteration lineage prepares outputs, and a rejected/externally rejected advance records state-hold with outputPreparedVersion TypedAbsence(not-applicable, record authority, record interval, sketch provenance) plus rollback rather than republishing stale state as a new commit
+  stateAdvanceClaimRule: all loop/subcycle PhysicsStageExecution records name their loopId, iterationIndex, subcycleIndex, and the single body/manifold/water StateAdvanceClaim for this coordination interval; only accepted iteration lineage prepares outputs, and a rejected/externally unavailable advance records state-hold with outputPreparedVersion TypedAbsence(not-applicable, record authority, record interval, sketch provenance) plus rollback rather than republishing stale state as a new commit
   commitGroups:
     - { commitGroupId: body-water-state-commit-group, owner: route physics coordinator, interval: coordinationInterval, provisionalVersions: [bodyState.loop-provisional-accepted-iteration, contactManifoldSet.loop-provisional-accepted-iteration, waterSurface.loop-provisional-accepted-iteration, bodyWaterExchange.loop-provisional-accepted-iteration], preparedPublications: [{ type: PhysicsPreparedPublication, preparedPublicationId: body-state-prepared, commitGroupId: body-water-state-commit-group, stateEquationOwner: external rigid-body adapter, signalOrStateEquationId: bodyState, provisionalVersion: bodyState.loop-provisional-accepted-iteration, preparedVersion: bodyState.transaction-prepared, contentDigest: accepted body iteration digest, ownerApproval: external adapter and solver revision, prepareDependencyRefs: exact external-fence/coupling dependencies, visibility: transaction-private }, { type: PhysicsPreparedPublication, preparedPublicationId: manifold-set-prepared, commitGroupId: body-water-state-commit-group, stateEquationOwner: external rigid-body adapter, signalOrStateEquationId: contactManifoldSet, provisionalVersion: contactManifoldSet.loop-provisional-accepted-iteration, preparedVersion: contactManifoldSet.transaction-prepared, contentDigest: accepted manifold iteration digest, ownerApproval: external adapter and solver revision, prepareDependencyRefs: exact external-fence/coupling dependencies, visibility: transaction-private }, { type: PhysicsPreparedPublication, preparedPublicationId: water-surface-prepared, commitGroupId: body-water-state-commit-group, stateEquationOwner: $threejs-water-optics, signalOrStateEquationId: waterSurface, provisionalVersion: waterSurface.loop-provisional-accepted-iteration, preparedVersion: waterSurface.transaction-prepared, contentDigest: accepted water iteration digest, ownerApproval: water owner/build revision, prepareDependencyRefs: exact water/coupling dependencies, visibility: transaction-private }, { type: PhysicsPreparedPublication, preparedPublicationId: body-water-cursor-prepared, commitGroupId: body-water-state-commit-group, stateEquationOwner: project coupling adapter, signalOrStateEquationId: bodyWaterExchange, provisionalVersion: bodyWaterExchange.loop-provisional-accepted-iteration, preparedVersion: bodyWaterExchange.transaction-prepared-cursors, contentDigest: accepted interaction ranges/application-ledger digest, ownerApproval: coupling adapter revision, prepareDependencyRefs: exact reduction/conservation dependencies, visibility: transaction-private }], committedPublications: [bodyState.committed, contactManifoldSet.committed, waterSurface.committed, bodyWaterExchange.committed-cursors], publicationLineage: one exact CommitPublicationLineage per prepared publication and committed output using the accepted iteration digest, stateEquationOwners: { rigid-body-pose-twist-and-momentum: external rigid-body adapter, contact-manifold-lifecycle/warm-start/friction-state: external rigid-body adapter, bounded-water-state: $threejs-water-optics, exchange-sequence-publication: project coupling adapter }, conservationAndErrorGates: [finite-state, collider/material/manifold-version consistency, water-positivity, nonpenetration, added-mass-stability, loop-convergence, momentum-angular-momentum-interface-work-residuals, external-route error-ledger consumer gates], atomicity: all-or-none, failureDisposition: preserve-prior-commit, commitTransactionId: body-water-commit-transaction }
   commitTransactions:
@@ -2324,6 +2413,12 @@ physicsInteractionApplicationLedgers:
 physicsCommitTransactions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact PhysicsCommitTransaction records keyed by every commitGroup.commitTransactionId with prepared-publication bijection, gate results, one commit instant, receipt, and rollback disposition
+physicsQualityRequests:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact QualityChangeRequest records keyed by requestId; each transition requestId/requestSequence/scope/controls/evidence digest resolves one immutable request and its admission
+physicsQualityStates:
+  canonicalExpansion: required before emitted-manifest validation
+  records: exact PhysicsQualityStateDescriptor records keyed by qualityStateId for every active, source, and destination state referenced by a request, admission, transition, conservative map, or cost ledger
 physicsQualityTransitions:
   canonicalExpansion: required before emitted-manifest validation
   records: exact QualityTransition records for every admitted QualityChangeRequest; [] only when no quality transition is admitted in the covered interval
@@ -2342,6 +2437,9 @@ physicsPresentationCandidate:
   commitProvenance: exact CandidateCommitProvenance resolving body/manifold/water/support versions to body-water commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
   contents: requestedPresentationInstant plus committed body/water/support per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics-qualified immutable state handles, exact CPU/GPU/external leases, and eventSequenceRanges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
+  resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
+  eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records)
   qualityMigration: a prepared QualityTransition commits at commitInstant (PhysicsInstant) through its own all-or-none commit group with conservative restriction/prolongation/reset, interaction-queue boundary, conserved-value/error gates, collider/manifold/warm-start policy, atomic versions, ConsumerCompletionJoin retirement, scoped actions, and rollback before candidate publication; changing solver class or physical law is forbidden as a tier
 physicsCameraViewPublicationsByTarget:
   main/inspection-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: inspection-view camera owner, presentationTargetId: main, viewId: inspection-view, cameraId: inspection-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }

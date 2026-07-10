@@ -221,12 +221,12 @@ activePhysicalRouteScaffold:
   interactions:
     physicsInteractions: ["<SurfaceExchange with closed batch, records, reactions, conservation, and application lineage>"]
 
-  quality:
-    requests: { "<request-id>": "<QualityChangeRequest>" }
-    requestAdmissions: { "<admission-id>": "<QualityRequestAdmission>" }
-    allocationAdmissions: { "<allocation-admission-id>": "<QualityAllocationAdmission>" }
-    physicsQualityTransitions:
-      - "<QualityTransition embedding the exact requestAdmission and prepare.allocationAdmission>"
+  physicsQualityRequests: { "<request-id>": "<QualityChangeRequest>" }
+  physicsQualityStates: { "<quality-state-id>": "<PhysicsQualityStateDescriptor for every active/source/destination state>" }
+  physicsQualityRequestAdmissions: { "<admission-id>": "<QualityRequestAdmission>" }
+  physicsQualityAllocationAdmissions: { "<allocation-admission-id>": "<QualityAllocationAdmission>" }
+  physicsQualityTransitions:
+    - "<QualityTransition resolving its requestId/fromState/toState inventories and embedding the exact requestAdmission and prepare.allocationAdmission>"
 
   presentation:
     physicsPresentationTimeCohortsById: { "<cohort-id>": "<PresentationTimeCohort>" }
