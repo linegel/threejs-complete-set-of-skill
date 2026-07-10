@@ -294,29 +294,20 @@ export function compareGeneratedRgbaPngs( baselineBuffer, candidateBuffer ) {
 
 export function assertNonBlankGeneratedPng( buffer, pathLabel = 'PNG' ) {
 
-	const { width, height, raw } = decodeGeneratedRgbaPng( buffer );
-	const scanlineLength = 1 + width * 4;
+	const { width, height, pixels } = decodeGeneratedRgbaPixels( buffer );
 	let min = 255;
 	let max = 0;
 	let opaquePixels = 0;
 
 	for ( let y = 0; y < height; y ++ ) {
 
-		const rowOffset = y * scanlineLength;
-
-		if ( raw[ rowOffset ] !== 0 ) {
-
-			throw new Error( `${ pathLabel } uses an unsupported PNG row filter.` );
-
-		}
-
 		for ( let x = 0; x < width; x ++ ) {
 
-			const pixelOffset = rowOffset + 1 + x * 4;
-			const r = raw[ pixelOffset + 0 ];
-			const g = raw[ pixelOffset + 1 ];
-			const b = raw[ pixelOffset + 2 ];
-			const a = raw[ pixelOffset + 3 ];
+			const pixelOffset = ( y * width + x ) * 4;
+			const r = pixels[ pixelOffset + 0 ];
+			const g = pixels[ pixelOffset + 1 ];
+			const b = pixels[ pixelOffset + 2 ];
+			const a = pixels[ pixelOffset + 3 ];
 
 			min = Math.min( min, r, g, b );
 			max = Math.max( max, r, g, b );

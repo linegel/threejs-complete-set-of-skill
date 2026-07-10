@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { assertNonBlankGeneratedPng, compareGeneratedRgbaPngs } from '../png.js';
+import { assertDistinctBundleFiles, resolveConfinedPath } from '../path-confinement.js';
 
 export const artifactSchemas = {
 	'visual-contract.json': {
@@ -764,18 +765,6 @@ export function validateTimings( timings ) {
 
 }
 
-function resolveBundlePath( artifactDir, relativePath, label ) {
-
-	if ( relativePath.startsWith( '/' ) || relativePath.includes( '..' ) ) {
-
-		throw new Error( `${ label } must be a bundle-relative path without "..".` );
-
-	}
-
-	return join( artifactDir, relativePath );
-
-}
-
 async function evaluatePixelDiffSummary( artifactDir, manifest ) {
 
 	const records = manifest.thresholds.perViewPixelDiff;
@@ -783,8 +772,9 @@ async function evaluatePixelDiffSummary( artifactDir, manifest ) {
 
 	for ( const [ view, record ] of Object.entries( records ) ) {
 
-		const baseline = await readFile( resolveBundlePath( artifactDir, record.baseline, `perViewPixelDiff.${ view }.baseline` ) );
-		const candidate = await readFile( resolveBundlePath( artifactDir, record.candidate, `perViewPixelDiff.${ view }.candidate` ) );
+		const paths = await assertDistinctBundleFiles( artifactDir, record.baseline, record.candidate, `perViewPixelDiff.${ view }` );
+		const baseline = await readFile( paths.baseline );
+		const candidate = await readFile( paths.candidate );
 		const diff = compareGeneratedRgbaPngs( baseline, candidate );
 		const result = {
 			view,
@@ -983,7 +973,8 @@ export async function validateArtifactBundle( artifactDir, options = {} ) {
 	const nonblankImages = {};
 	for ( const imagePath of contract.requiredImages ) {
 
-		const png = await readFile( join( artifactDir, imagePath ) );
+		const pngPath = await resolveConfinedPath( artifactDir, imagePath, { label: `required image ${ imagePath }` } );
+		const png = await readFile( pngPath );
 		nonblankImages[ imagePath ] = assertNonBlankGeneratedPng( png, imagePath );
 
 	}

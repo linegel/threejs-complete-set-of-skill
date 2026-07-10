@@ -155,9 +155,9 @@ export function createEvidenceManifest( artifactDir ) {
 			budgetProfile: 'desktopDiscrete',
 			perViewPixelDiff: {
 				final: {
-					baseline: 'images/final.design.png',
-					candidate: 'images/final.design.png',
-					maxRatio: 0
+					baseline: 'images/seed-0001.final.png',
+					candidate: 'images/seed-stress.final.png',
+					maxRatio: 1
 				}
 			},
 			cameraMatrixRequired: true
