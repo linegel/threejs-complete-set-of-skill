@@ -85,6 +85,7 @@ assert(!/>\s*Live WebGPU\s*</i.test(homepage), 'secondary visual still claims Li
 assert(!homepage.includes('class="live-visual'), 'homepage still uses CSS title slates instead of real preview media');
 assert(!homepage.includes('class="preview-missing'), 'homepage contains a missing-preview panel');
 assert((homepage.match(/data-preview-for=/g) ?? []).length >= primary.length, 'homepage does not attach preview media to every primary lab card');
+assert(!homepage.includes('data-preview-classification="related-'), 'homepage reuses related-skill media as a primary preview');
 assert(!/\brunnable examples\b/i.test(homepage), 'homepage still uses directory-derived runnable-example language');
 assert(!/transition\s*:\s*all\b/i.test(homepage), 'homepage uses transition: all');
 assert(homepage.includes('<main id="main-content"'), 'homepage has no main landmark');
@@ -97,6 +98,13 @@ for (const demo of primary) {
   const relative = relativePublishPath(demo.publishPath);
   assert(homepage.includes(`href="${relative}"`), `homepage does not link primary route ${demo.id}`);
   assert(sitemap.includes(`<loc>${site}${relative}</loc>`), `sitemap does not include primary route ${demo.id}`);
+  const visualTags = [...homepage.matchAll(new RegExp(`<span[^>]*data-preview-for="${demo.id}"[^>]*>`, 'g'))]
+    .map((match) => match[0]);
+  assert(visualTags.length > 0, `homepage has no preview or evidence record for ${demo.id}`);
+  assert(
+    visualTags.every((tag) => !tag.includes('data-preview-source=') || tag.includes(`data-preview-source="${demo.id}"`)),
+    `homepage assigns unrelated preview media to ${demo.id}`,
+  );
 }
 
 for (const demo of flagships) {
@@ -112,8 +120,11 @@ for (const skill of skillManifest.skills) {
   const page = readFileSync(pagePath, 'utf8');
   assert(page.includes('<main id="main-content"'), `${skill.name} page has no main landmark`);
   assert(page.includes('Preview and evidence ledger'), `${skill.name} page has no preview/evidence ledger`);
-  assert(page.includes('data-preview-classification='), `${skill.name} page does not classify its preview media`);
-  assert(/<img\b/i.test(page), `${skill.name} page has no screenshot or evidence image`);
+  assert(
+    page.includes('data-preview-classification=') || page.includes('data-evidence-state='),
+    `${skill.name} page has neither classified preview media nor an evidence-status panel`,
+  );
+  assert(!page.includes('data-preview-classification="related-'), `${skill.name} page promotes related-skill media as primary preview`);
   for (const demo of primary.filter((entry) => entry.skill === skill.name)) {
     assert(page.includes(`href="../${relativePublishPath(demo.publishPath)}"`), `${skill.name} page does not link primary ${demo.id}`);
   }
