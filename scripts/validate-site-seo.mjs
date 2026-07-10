@@ -7,6 +7,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
 const SITE = 'https://threejs-skills.com/';
 const OLD_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
+const PUBLISHER_LOGO = `${SITE}icon-512.png`;
+const ARTICLE_IMAGE_SPECS = [
+  { id: '1x1', width: 1200, height: 1200 },
+  { id: '4x3', width: 1200, height: 900 },
+  { id: '16x9', width: 1200, height: 675 },
+];
 const errors = [];
 
 function assert(condition, message) {
@@ -57,6 +63,13 @@ function localPathForUrl(urlString) {
   if (pathname === '/') return join(DOCS, 'index.html');
   if (pathname.endsWith('/')) return join(DOCS, pathname, 'index.html');
   return join(DOCS, pathname);
+}
+
+function pngDimensions(path) {
+  if (!path || !existsSync(path)) return null;
+  const data = readFileSync(path);
+  if (data.length < 24 || data.toString('ascii', 1, 4) !== 'PNG') return null;
+  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
 }
 
 function validateJsonLd(html, label) {
@@ -128,6 +141,16 @@ function validateIndexablePage(path, expectedUrl, {
   assert(!html.includes(OLD_SITE), `${label}: contains the retired GitHub Pages origin`);
   const structuredData = validateJsonLd(html, label);
   const nodes = graphNodes(structuredData);
+  const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`);
+
+  if (requireCatalog || requireArticle || requireAbout) {
+    assert(Boolean(publisher), `${label}: missing canonical publisher Organization`);
+    assert(publisher?.logo?.['@type'] === 'ImageObject', `${label}: publisher logo is not an ImageObject`);
+    assert(publisher?.logo?.url === PUBLISHER_LOGO && publisher?.logo?.contentUrl === PUBLISHER_LOGO, `${label}: publisher logo URL is not canonical`);
+    assert(publisher?.logo?.width === 512 && publisher?.logo?.height === 512, `${label}: publisher logo dimensions are not declared as 512x512`);
+    const logoDimensions = pngDimensions(localPathForUrl(PUBLISHER_LOGO));
+    assert(logoDimensions?.width === 512 && logoDimensions?.height === 512, `${label}: publisher logo file is not a 512x512 PNG`);
+  }
 
   if (requireDiscovery) {
     assert(alternateValues(html, 'text/plain')[0] === `${SITE}llms.txt`, `${label}: missing canonical llms.txt discovery link`);
@@ -141,9 +164,17 @@ function validateIndexablePage(path, expectedUrl, {
   if (requireArticle) {
     const article = nodes.find((node) => hasType(node, 'Article'));
     assert(article && hasType(article, 'TechArticle'), `${label}: article is not typed as Article and TechArticle`);
-    const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`);
     assert(publisher?.url === SITE && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${label}: publisher identity is incomplete`);
     assert(article?.author?.['@id'] === `${SITE}#publisher` && article?.publisher?.['@id'] === `${SITE}#publisher`, `${label}: article author/publisher references are inconsistent`);
+    const slug = new URL(expectedUrl).pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
+    const expectedImages = ARTICLE_IMAGE_SPECS.map(({ id }) => `${SITE}seo/article/${slug}-${id}.png`);
+    assert(Array.isArray(article?.image) && article.image.length === ARTICLE_IMAGE_SPECS.length, `${label}: Article image must contain 1:1, 4:3, and 16:9 variants`);
+    for (const [index, spec] of ARTICLE_IMAGE_SPECS.entries()) {
+      const imageUrl = article?.image?.[index];
+      assert(imageUrl === expectedImages[index], `${label}: Article ${spec.id} image URL is not canonical`);
+      const dimensions = pngDimensions(imageUrl ? localPathForUrl(imageUrl) : null);
+      assert(dimensions?.width === spec.width && dimensions?.height === spec.height, `${label}: Article ${spec.id} image is not ${spec.width}x${spec.height}`);
+    }
     const published = Date.parse(article?.datePublished ?? '');
     const modified = Date.parse(article?.dateModified ?? '');
     assert(Number.isFinite(published), `${label}: missing or invalid datePublished`);
@@ -238,6 +269,11 @@ for (const url of pageUrls) {
     requireAbout: isAbout,
   });
   pageRecords.push({ url, ...record });
+}
+
+for (const url of pageUrls.filter((value) => new URL(value).pathname.startsWith('/skills/'))) {
+  const slug = new URL(url).pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
+  assert(sitemap.includes(`<image:loc>${SITE}seo/article/${slug}-16x9.png</image:loc>`), `sitemap.xml: ${slug} is missing its 16:9 Article image`);
 }
 
 for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {

@@ -3,8 +3,11 @@
 const SITE = new URL(process.env.SITE_URL ?? 'https://threejs-skills.com/');
 const RETIRED_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const CONCURRENCY = 8;
+const PUBLISHER_LOGO = new URL('icon-512.png', SITE).href;
+const ARTICLE_IMAGE_RATIOS = ['1x1', '4x3', '16x9'];
 const errors = [];
 const pageRecords = [];
+const structuredImageUrls = new Set([PUBLISHER_LOGO]);
 
 function assert(condition, message) {
   if (!condition) errors.push(message);
@@ -207,6 +210,10 @@ await mapConcurrent(urls, async (url) => {
   assert(schema.has(expectedType), `${url}: missing ${expectedType} structured data`);
   assert(schema.has('BreadcrumbList') || pathname === '/', `${url}: missing breadcrumb structured data`);
   if (pathname === '/' || pathname === '/about/' || pathname.startsWith('/skills/')) {
+    const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE.href}#publisher`);
+    assert(publisher?.logo?.['@type'] === 'ImageObject', `${url}: publisher logo is not an ImageObject`);
+    assert(publisher?.logo?.url === PUBLISHER_LOGO && publisher?.logo?.contentUrl === PUBLISHER_LOGO, `${url}: publisher logo URL is not canonical`);
+    assert(publisher?.logo?.width === 512 && publisher?.logo?.height === 512, `${url}: publisher logo dimensions are not 512x512`);
     assert(alternateValues(html, 'text/plain')[0] === new URL('llms.txt', SITE).href, `${url}: missing llms.txt discovery link`);
     assert(alternateValues(html, 'application/json')[0] === new URL('skills.json', SITE).href, `${url}: missing skills.json discovery link`);
   }
@@ -215,6 +222,14 @@ await mapConcurrent(urls, async (url) => {
     const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE.href}#publisher`);
     assert(article && hasType(article, 'TechArticle'), `${url}: article lacks dual Article/TechArticle typing`);
     assert(publisher?.url === SITE.href && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${url}: incomplete publisher identity`);
+    const slug = pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
+    const expectedImages = ARTICLE_IMAGE_RATIOS.map((ratio) => new URL(`seo/article/${slug}-${ratio}.png`, SITE).href);
+    assert(Array.isArray(article?.image) && article.image.length === expectedImages.length, `${url}: Article image does not contain three ratios`);
+    for (const [index, imageUrl] of expectedImages.entries()) {
+      assert(article?.image?.[index] === imageUrl, `${url}: Article ${ARTICLE_IMAGE_RATIOS[index]} image URL is not canonical`);
+      structuredImageUrls.add(imageUrl);
+    }
+    assert(sitemap.includes(`<image:loc>${expectedImages[2]}</image:loc>`), `${url}: sitemap is missing the 16:9 Article image`);
     const published = Date.parse(article?.datePublished ?? '');
     const modified = Date.parse(article?.dateModified ?? '');
     assert(Number.isFinite(published), `${url}: missing or invalid datePublished`);
@@ -224,6 +239,12 @@ await mapConcurrent(urls, async (url) => {
     assert(metaValues(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${url}: modification timestamps disagree`);
   }
   pageRecords.push({ url, title, description: description[0], links: internalLinks(html, url) });
+});
+
+await mapConcurrent([...structuredImageUrls], async (url) => {
+  const response = await request(url, { method: 'HEAD', redirect: 'manual' });
+  assert(response.status === 200, `${url}: structured image returned ${response.status}`);
+  assert(response.headers.get('content-type')?.startsWith('image/png'), `${url}: structured image is not served as PNG`);
 });
 
 for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
@@ -260,5 +281,5 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Live SEO audit passed: ${urls.length} sitemap pages, 3 permanent redirects, 2 LLM endpoints, and 1 crawl-safe 404.`);
+  console.log(`Live SEO audit passed: ${urls.length} sitemap pages, ${structuredImageUrls.size} structured images, 3 permanent redirects, 2 LLM endpoints, and 1 crawl-safe 404.`);
 }

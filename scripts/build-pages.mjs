@@ -28,12 +28,20 @@ const OG_IMAGE_HEIGHT = 760;
 const THEME_COLOR = '#0a0c10';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
 const PUBLISHER_ID = `${SITE}#publisher`;
+const PUBLISHER_LOGO = `${SITE}icon-512.png`;
 const PUBLISHER = {
   '@type': 'Organization',
   '@id': PUBLISHER_ID,
   name: `${SITE_NAME} contributors`,
   url: SITE,
   sameAs: REPO,
+  logo: {
+    '@type': 'ImageObject',
+    url: PUBLISHER_LOGO,
+    contentUrl: PUBLISHER_LOGO,
+    width: 512,
+    height: 512,
+  },
 };
 const PUBLISHER_REF = { '@id': PUBLISHER_ID };
 const DEMO_REGISTRY = buildDemoRegistry();
@@ -241,6 +249,8 @@ const imageSizeAttrs = (relativePath) => {
   }
   return '';
 };
+const articleImageUrls = (slug) => ['1x1', '4x3', '16x9']
+  .map((ratio) => `${SITE}seo/article/${slug}-${ratio}.png`);
 const rewriteSkillBodyLinks = (html, slug) => html
   .replace(/href="((?:references|examples|assets|agents)\/[^"?#]*)([?#][^"]*)?"/g, (_match, path, suffix = '') => {
     const view = path.endsWith('/') ? 'tree' : 'blob';
@@ -1094,6 +1104,7 @@ for (const slug of slugs) {
   const resolvedSkillPreview = skillPreview(slug);
   const skillHeroImg = resolvedSkillPreview?.path ?? null;
   const ogImg = skillHeroImg ? `${SITE}${skillHeroImg}` : OG_IMAGE;
+  const articleImages = articleImageUrls(slug);
   const hasAcceptedEvidence = ownedPrimaryDemos.some((demo) => demo.status === 'accepted');
   const previewGalleryEntries = [
     ...(resolvedSkillPreview ? [resolvedSkillPreview] : []),
@@ -1231,7 +1242,7 @@ ${JSON.stringify({
       description: s.desc,
       url: pageUrl,
       mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
-      image: ogImg,
+      image: articleImages,
       datePublished: s.published?.iso,
       dateModified: s.update?.iso,
       author: PUBLISHER_REF,
@@ -1531,7 +1542,7 @@ writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="
   <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>About the ${SITE_NAME} methodology</image:title></image:image></url>
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
-  const image = VALIDATION[s] ? `${SITE}${VALIDATION[s][0][0]}` : OG_IMAGE;
+  const image = articleImageUrls(s)[2];
   return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}<image:image><image:loc>${image}</image:loc><image:title>${esc(skills[s].title)}</image:title></image:image></url>`;
 }).join('\n')}
 ${DEMO_REGISTRY.demos.filter((demo) => demo.publishPath && (
