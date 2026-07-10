@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
+import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const docs = join(root, 'docs');
@@ -12,6 +13,7 @@ const homepage = readFileSync(join(docs, 'index.html'), 'utf8');
 const sitemap = readFileSync(join(docs, 'sitemap.xml'), 'utf8');
 const rootSkillsText = readFileSync(join(root, 'skills.json'), 'utf8');
 const docsSkillsText = readFileSync(join(docs, 'skills.json'), 'utf8');
+const previewManifest = JSON.parse(readFileSync(join(docs, 'previews', 'manifest.json'), 'utf8'));
 const skillManifest = JSON.parse(rootSkillsText);
 const errors = [];
 
@@ -80,6 +82,9 @@ for (const phrase of [
 assert(homepage.includes(`<dd>${uniqueRoutes.size}</dd><dt>unique primary URLs</dt>`), 'homepage unique primary URL metric drift');
 
 assert(!/>\s*Live WebGPU\s*</i.test(homepage), 'secondary visual still claims Live WebGPU');
+assert(!homepage.includes('class="live-visual'), 'homepage still uses CSS title slates instead of real preview media');
+assert(!homepage.includes('class="preview-missing'), 'homepage contains a missing-preview panel');
+assert((homepage.match(/data-preview-for=/g) ?? []).length >= primary.length, 'homepage does not attach preview media to every primary lab card');
 assert(!/\brunnable examples\b/i.test(homepage), 'homepage still uses directory-derived runnable-example language');
 assert(!/transition\s*:\s*all\b/i.test(homepage), 'homepage uses transition: all');
 assert(homepage.includes('<main id="main-content"'), 'homepage has no main landmark');
@@ -106,12 +111,51 @@ for (const skill of skillManifest.skills) {
   if (!existsSync(pagePath)) continue;
   const page = readFileSync(pagePath, 'utf8');
   assert(page.includes('<main id="main-content"'), `${skill.name} page has no main landmark`);
+  assert(page.includes('Preview and evidence ledger'), `${skill.name} page has no preview/evidence ledger`);
+  assert(page.includes('data-preview-classification='), `${skill.name} page does not classify its preview media`);
+  assert(/<img\b/i.test(page), `${skill.name} page has no screenshot or evidence image`);
   for (const demo of primary.filter((entry) => entry.skill === skill.name)) {
     assert(page.includes(`href="../${relativePublishPath(demo.publishPath)}"`), `${skill.name} page does not link primary ${demo.id}`);
   }
   for (const demo of flagships.filter((entry) => registry.origins[entry.id]?.ownerSkills?.includes(skill.name))) {
     assert(page.includes(`href="../${relativePublishPath(demo.publishPath)}"`), `${skill.name} page does not link participating flagship ${demo.id}`);
   }
+}
+
+assert(previewManifest.classification === 'site-preview-screenshot', 'site preview manifest has the wrong classification');
+assert(previewManifest.canonicalEvidence === false, 'site preview manifest must never claim canonical evidence');
+const capturedPreviewIds = new Set(previewManifest.results
+  .filter((entry) => entry.verdict === 'PREVIEW_CAPTURED')
+  .map((entry) => entry.id));
+for (const demo of PROVIDER_DEMOS.filter((entry) => !entry.poster)) {
+  assert(capturedPreviewIds.has(demo.id), `provider demo preview is missing or failed: ${demo.id}`);
+  const capture = previewManifest.results.find((entry) => entry.id === demo.id);
+  assert(capture?.captureSurface === 'interactive-chrome', `provider preview was not approved from interactive Chrome: ${demo.id}`);
+  const imagePath = join(docs, 'previews', 'provider', `${demo.id}.png`);
+  assert(existsSync(imagePath), `provider preview image is absent: ${demo.id}`);
+  if (existsSync(imagePath)) {
+    const image = readFileSync(imagePath);
+    const signature = image.subarray(1, 4).toString('ascii');
+    assert(signature === 'PNG', `provider preview is not encoded as PNG: ${demo.id}`);
+    if (signature === 'PNG') {
+      const width = image.readUInt32BE(16);
+      const height = image.readUInt32BE(20);
+      assert(width === capture.width && height === capture.height, `provider preview dimensions drifted from its manifest: ${demo.id}`);
+    }
+  }
+}
+
+const approvedHtmlUiPreviews = new Set([
+  'browser-fallback-harness',
+  'debugging-contract-lab',
+  'router-manifest-lab',
+]);
+for (const capture of previewManifest.results.filter((entry) => (
+  entry.verdict === 'PREVIEW_CAPTURED'
+  && entry.image?.startsWith('previews/primary/')
+))) {
+  assert(approvedHtmlUiPreviews.has(capture.id), `unreviewed headless primary screenshot was promoted: ${capture.id}`);
+  assert(capture.captureSurface === 'headless-playwright-html-ui', `primary HTML/UI preview has the wrong capture surface: ${capture.id}`);
 }
 
 if (errors.length) {

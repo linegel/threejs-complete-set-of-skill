@@ -37,6 +37,13 @@ const SOCIAL_IMAGE = `${SITE}visual-validation/planet-generated-craters/final.de
 const skillManifest = JSON.parse(readFileSync(join(REPO_ROOT, 'skills.json'), 'utf8'));
 const skillsByName = new Map(skillManifest.skills.map((skill) => [skill.name, skill]));
 const registry = buildDemoRegistry();
+const previewManifestPath = join(REPO_ROOT, 'docs', 'previews', 'manifest.json');
+const previewManifest = existsSync(previewManifestPath)
+  ? JSON.parse(readFileSync(previewManifestPath, 'utf8'))
+  : { results: [] };
+const usablePreviewPaths = new Set((previewManifest.results ?? [])
+  .filter((entry) => entry.verdict === 'PREVIEW_CAPTURED' && entry.image)
+  .map((entry) => entry.image));
 const publishedDemoTitles = new Map(skillManifest.skills.flatMap((skill) => [
   ...(skill.primaryImplementations ?? []),
   ...(skill.flagshipParticipation ?? []),
@@ -133,7 +140,10 @@ function demoPreview(lab) {
       label: 'Related skill concept-proxy screenshot; not evidence for this canonical lab',
     });
   }
-  const selected = candidates.find((candidate) => existsSync(join(REPO_ROOT, 'docs', candidate.path)));
+  const selected = candidates.find((candidate) => (
+    existsSync(join(REPO_ROOT, 'docs', candidate.path))
+    && (!candidate.path.startsWith('previews/') || usablePreviewPaths.has(candidate.path))
+  ));
   if (!selected) return {
     url: SOCIAL_IMAGE,
     width: 1200,

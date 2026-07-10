@@ -450,13 +450,23 @@ const galleryHtml = GALLERY.map((g) => `
 
 const safeClass = (s) => String(s ?? 'runtime').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'runtime';
 const registryDemoById = new Map(DEMO_REGISTRY.demos.map((demo) => [demo.id, demo]));
+const sitePreviewManifestPath = join(root, 'docs', 'previews', 'manifest.json');
+const sitePreviewManifest = existsSync(sitePreviewManifestPath)
+  ? JSON.parse(readFileSync(sitePreviewManifestPath, 'utf8'))
+  : { results: [] };
+const usableSitePreviews = new Map((sitePreviewManifest.results ?? [])
+  .filter((entry) => entry.verdict === 'PREVIEW_CAPTURED' && entry.image)
+  .map((entry) => [entry.image, entry]));
 const docsImageExists = (path) => Boolean(path && existsSync(join(root, 'docs', path)));
+const previewImageExists = (path) => docsImageExists(path) && (
+  !path.startsWith('previews/') || usableSitePreviews.has(path)
+);
 const providerPreviewPath = (demo) => `previews/provider/${demo.id}.png`;
 const primaryPreviewPath = (demo) => `previews/primary/${demo.id}.png`;
 const providerPosterPath = (demo) => {
   if (demo.poster && docsImageExists(demo.poster)) return demo.poster;
   const preview = providerPreviewPath(demo);
-  return docsImageExists(preview) ? preview : null;
+  return previewImageExists(preview) ? preview : null;
 };
 const providerPreviewForSkill = (slug) => {
   const demo = PROVIDER_DEMOS.find((entry) => entry.skill === slug && providerPosterPath(entry));
@@ -472,7 +482,7 @@ const providerPreviewForSkill = (slug) => {
 };
 const directPrimaryPreview = (demo) => {
   const screenshot = primaryPreviewPath(demo);
-  if (docsImageExists(screenshot)) {
+  if (previewImageExists(screenshot)) {
     return {
       path: screenshot,
       classification: demo.nonRenderingScenarioSuite ? 'non-rendering-lab-preview' : 'implementation-preview',
@@ -495,10 +505,12 @@ const directPrimaryPreview = (demo) => {
 };
 const skillPreview = (slug) => {
   const owned = primaryDemos.filter((demo) => demo.skill === slug);
-  const accepted = owned.find((demo) => demo.status === 'accepted' && directPrimaryPreview(demo));
+  const accepted = owned.find((demo) => (
+    demo.status === 'accepted'
+    && demo.nonRenderingScenarioSuite
+    && directPrimaryPreview(demo)
+  ));
   if (accepted) return directPrimaryPreview(accepted);
-  const canonical = owned.find((demo) => demo.kind === 'canonical-lab' && directPrimaryPreview(demo));
-  if (canonical) return directPrimaryPreview(canonical);
   const validation = VALIDATION[slug]?.find(([path]) => docsImageExists(path));
   if (validation) {
     return {
@@ -508,13 +520,16 @@ const skillPreview = (slug) => {
       sourceId: slug,
     };
   }
-  return providerPreviewForSkill(slug);
+  const provider = providerPreviewForSkill(slug);
+  if (provider) return provider;
+  const canonical = owned.find((demo) => demo.kind === 'canonical-lab' && directPrimaryPreview(demo));
+  return canonical ? directPrimaryPreview(canonical) : null;
 };
 const previewForPrimary = (demo) => {
   const direct = directPrimaryPreview(demo);
-  if (direct) return direct;
+  if (direct && (demo.status === 'accepted' || demo.nonRenderingScenarioSuite)) return direct;
   const related = skillPreview(demo.skill);
-  if (!related) return null;
+  if (!related) return direct;
   return {
     ...related,
     classification: `related-${related.classification}`,
@@ -918,6 +933,9 @@ for (const slug of slugs) {
   const hasAcceptedEvidence = ownedPrimaryDemos.some((demo) => demo.status === 'accepted');
   const previewGalleryEntries = [
     ...(resolvedSkillPreview ? [resolvedSkillPreview] : []),
+    ...ownedPrimaryDemos
+      .map((demo) => directPrimaryPreview(demo))
+      .filter((entry) => entry && entry.path !== resolvedSkillPreview?.path),
     ...(validation ?? [])
       .filter(([path]) => path !== resolvedSkillPreview?.path && docsImageExists(path))
       .map(([path, label]) => ({ path, label, classification: 'generated-asset-preview', sourceId: slug })),
@@ -1078,10 +1096,10 @@ ${baseCss}
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
 .skill-hero .wrap{position:relative;z-index:2}
-.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.46;filter:saturate(1.08) contrast(1.04)}
+.skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.78;filter:saturate(1.18) contrast(1.08) brightness(1.08);scale:1.015}
 .skill-hero:before{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.82) 46%,rgba(10,12,16,.48) 100%),
-  linear-gradient(0deg,rgba(10,12,16,.94) 0%,rgba(10,12,16,.3) 54%,rgba(10,12,16,.82) 100%);z-index:1}
+  linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
+  linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
 .crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
