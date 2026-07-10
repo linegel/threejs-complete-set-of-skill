@@ -1,0 +1,3013 @@
+{
+  "schemaVersion": 1,
+  "classification": "site-preview-screenshot",
+  "canonicalEvidence": false,
+  "viewport": {
+    "width": 1440,
+    "height": 757,
+    "dpr": 1
+  },
+  "results": [
+    {
+      "id": "ambient-contact-shading-demo",
+      "route": "demos/ambient-contact-shading-demo/",
+      "image": "previews/provider/ambient-contact-shading-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "selective-bloom-demo",
+      "route": "demos/selective-bloom-demo/",
+      "image": "previews/provider/selective-bloom-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "exposure-color-grading-demo",
+      "route": "demos/exposure-color-grading-demo/",
+      "image": "previews/provider/exposure-color-grading-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "image-pipeline-framegraph-demo",
+      "route": "demos/image-pipeline-framegraph-demo/",
+      "image": "previews/provider/image-pipeline-framegraph-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "shadow-cascade-demo",
+      "route": "demos/shadow-cascade-demo/",
+      "image": "previews/provider/shadow-cascade-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "sky-atmosphere-haze-demo",
+      "route": "demos/sky-atmosphere-haze-demo/",
+      "image": "previews/provider/sky-atmosphere-haze-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "camera-rig-handoff-demo",
+      "route": "demos/camera-rig-handoff-demo/",
+      "image": "previews/provider/camera-rig-handoff-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "procedural-motion-timeline-demo",
+      "route": "demos/procedural-motion-timeline-demo/",
+      "image": "previews/provider/procedural-motion-timeline-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "pooled-particles-effects-demo",
+      "route": "demos/pooled-particles-effects-demo/",
+      "image": "previews/provider/pooled-particles-effects-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "procedural-geometry-writer-demo",
+      "route": "demos/procedural-geometry-writer-demo/",
+      "image": "previews/provider/procedural-geometry-writer-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "skill-router-manifest-demo",
+      "route": "demos/skill-router-manifest-demo/",
+      "image": "previews/provider/skill-router-manifest-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "compatibility-fallback-planner-demo",
+      "route": "demos/compatibility-fallback-planner-demo/",
+      "image": "previews/provider/compatibility-fallback-planner-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "procedural-building-compiler-demo",
+      "route": "demos/procedural-building-compiler-demo/",
+      "image": "previews/provider/procedural-building-compiler-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "procedural-creature-lab-demo",
+      "route": "demos/procedural-creature-lab-demo/",
+      "image": "previews/provider/procedural-creature-lab-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "visual-validation-harness-demo",
+      "route": "demos/visual-validation-harness-demo/",
+      "image": "previews/provider/visual-validation-harness-demo.png",
+      "classification": "concept-proxy-preview",
+      "canonicalEvidence": false,
+      "width": 1440,
+      "height": 757,
+      "ready": {
+        "routeReady": true,
+        "controller": false,
+        "metrics": null
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "interactive-chrome"
+    },
+    {
+      "id": "browser-fallback-harness",
+      "route": "demos/browser-fallback-harness/",
+      "image": "previews/primary/browser-fallback-harness.png",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "width": 1200,
+      "height": 760,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "scenarioId": "blocked-default",
+          "explicitRequest": false,
+          "liveCapabilities": {
+            "tested": true,
+            "webgpu": true,
+            "compatibilityMode": false,
+            "threeRevision": "185",
+            "backendName": "jF"
+          },
+          "compatibilityRuntime": null,
+          "result": {
+            "status": "BLOCKED",
+            "code": "WEBGPU_UNAVAILABLE_BLOCKER",
+            "message": "WebGPU is unavailable and no explicit fallback-teaching request was supplied. No branch is activated.",
+            "details": {
+              "activated": false,
+              "owner": "threejs-water-optics"
+            }
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "headless-playwright-html-ui"
+    },
+    {
+      "id": "creature-habitat",
+      "route": "demos/creature-habitat/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [
+        "Error: Canonical bounded-water tiers are locked; tierOverrides/resolution drift is forbidden.\n    at new et (http://127.0.0.1:5174/demos/assets/webgpu-bounded-water-C8G6Ocmq.js:1:24402)\n    at Et (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:28322)\n    at async Vt.rebuildStages (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:41527)\n    at async Vt.ready (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:39438)\n    at async Ht (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:65196)\n    at async Wt (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:66509)",
+        "Error: Canonical bounded-water tiers are locked; tierOverrides/resolution drift is forbidden.\n    at new et (http://127.0.0.1:5174/demos/assets/webgpu-bounded-water-C8G6Ocmq.js:1:24402)\n    at Et (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:28322)\n    at async Vt.rebuildStages (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:41527)\n    at async Vt.ready (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:39438)\n    at async Ht (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:65196)\n    at async Wt (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:66509)"
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: Error: Error: Canonical bounded-water tiers are locked; tierOverrides/resolution drift is forbidden.\n    at new et (http://127.0.0.1:5174/demos/assets/webgpu-bounded-water-C8G6Ocmq.js:1:24402)\n    at Et (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:28322)\n    at async Vt.rebuildStages (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:41527)\n    at async Vt.ready (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:39438)\n    at async Ht (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:65196)\n    at async Wt (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:66509)\n    at new et (http://127.0.0.1:5174/demos/assets/webgpu-bounded-water-C8G6Ocmq.js:1:24402)\n    at Et (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:28322)\n    at async Vt.rebuildStages (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:41527)\n    at async Vt.ready (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:39438)\n    at async Ht (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:65196)\n    at async Wt (http://127.0.0.1:5174/demos/assets/index-jC-MKQCF.js:1:66509)\n    at eval (eval at evaluate (:303:30), <anonymous>:3:24)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "debugging-contract-lab",
+      "route": "demos/debugging-contract-lab/",
+      "image": "previews/primary/debugging-contract-lab.png",
+      "classification": "non-rendering-lab-preview",
+      "canonicalEvidence": false,
+      "width": 1200,
+      "height": 760,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "scenarioId": "older-release-suspicious-output",
+          "result": {
+            "scenarioId": "older-release-suspicious-output",
+            "activateDebugging": true,
+            "decision": "research-fix-history",
+            "verdict": "PASS",
+            "reason": "Concrete failure or version-dependent disagreement enters evidence-led debugging."
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "headless-playwright-html-ui"
+    },
+    {
+      "id": "final-image-flight",
+      "route": "demos/final-image-flight/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "threeRevision": "185",
+          "backend": "WebGPU",
+          "scenario": "flight",
+          "mode": "final",
+          "tier": "balanced",
+          "camera": "design",
+          "seed": 1,
+          "timeSeconds": 0.0679,
+          "frameId": 5,
+          "mechanism": null,
+          "routeSelection": {
+            "scenario": "flight",
+            "mechanism": null,
+            "tier": "balanced",
+            "mode": "final",
+            "camera": "design",
+            "seed": 1,
+            "time": 0.0679
+          },
+          "routeLocks": {
+            "scenario": false,
+            "mechanism": false,
+            "tier": false,
+            "mode": false,
+            "sources": {
+              "scenario": "default",
+              "mechanism": "default",
+              "tier": "default",
+              "mode": "default"
+            }
+          },
+          "cpuFrameSamples": [
+            63.5,
+            7.900000035762787,
+            4,
+            3.099999964237213,
+            1,
+            0.10000002384185791
+          ],
+          "resetEvents": [
+            {
+              "cause": "resize",
+              "timeSeconds": 0,
+              "frameId": -1
+            },
+            {
+              "cause": "resize",
+              "timeSeconds": 0.0008999999999999986,
+              "frameId": 1
+            },
+            {
+              "cause": "resize",
+              "timeSeconds": 0.0509,
+              "frameId": 2
+            }
+          ],
+          "tierTransitionEvents": [],
+          "qualityGovernor": {
+            "owner": "final-image-flight:image-pipeline-host",
+            "activeTier": "balanced",
+            "tierLocked": false,
+            "sampleSource": "renderer-timestamp-query",
+            "frameAggregationPolicy": "exactly-one-rendered-frame-per-resolve",
+            "composedFrameFormula": "renderMs + computeMs for exactly one host-rendered frame per timestamp resolve",
+            "policy": {
+              "targetFrameMs": {
+                "value": 16.67,
+                "unit": "ms",
+                "label": "Gated",
+                "source": "integration 60 Hz target"
+              },
+              "downgradeP95Ms": {
+                "value": 16.67,
+                "unit": "ms",
+                "label": "Authored",
+                "source": "quality-governor overrun gate"
+              },
+              "upgradeP95Ms": {
+                "value": 12.5,
+                "unit": "ms",
+                "label": "Authored",
+                "source": "quality-governor headroom gate"
+              },
+              "windowSize": {
+                "value": 30,
+                "unit": "frames",
+                "label": "Authored",
+                "source": "sustained p95 window"
+              },
+              "downgradeWindows": {
+                "value": 2,
+                "unit": "windows",
+                "label": "Authored",
+                "source": "overrun persistence"
+              },
+              "upgradeWindows": {
+                "value": 4,
+                "unit": "windows",
+                "label": "Authored",
+                "source": "headroom persistence"
+              },
+              "cooldownWindows": {
+                "value": 3,
+                "unit": "windows",
+                "label": "Authored",
+                "source": "post-transition cooldown"
+              }
+            },
+            "measuredSampleCount": {
+              "value": 0,
+              "unit": "frames",
+              "label": "Measured",
+              "source": "finite render and compute timestamp pairs"
+            },
+            "unavailableSampleCount": {
+              "value": 0,
+              "unit": "frames",
+              "label": "Measured",
+              "source": "missing timestamp pairs"
+            },
+            "pendingWindowSamples": {
+              "value": 0,
+              "unit": "frames",
+              "label": "Measured",
+              "source": "current p95 window"
+            },
+            "completedWindows": {
+              "value": 0,
+              "unit": "windows",
+              "label": "Derived",
+              "source": "completed p95 windows"
+            },
+            "cooldownRemaining": {
+              "value": 0,
+              "unit": "windows",
+              "label": "Derived",
+              "source": "governor state"
+            },
+            "transitionTrace": [],
+            "verdict": "INSUFFICIENT_EVIDENCE"
+          },
+          "shadowFrame": {
+            "scope": "single-render-frame",
+            "architecture": "bounded",
+            "frameId": 5,
+            "executed": true,
+            "provenance": "Derived-from-live-r185-shadow-targets-and-autoUpdate=true",
+            "sceneSubmissionCount": 1,
+            "rendererInvocationCount": 1,
+            "shadowViewCount": 1,
+            "backendLayerPassCount": 1,
+            "resourceTargetCount": 1,
+            "selectedLevelIndices": []
+          },
+          "gpuTimingVerdict": "INSUFFICIENT_EVIDENCE",
+          "motionGpuSeekParity": "INSUFFICIENT_EVIDENCE"
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "integration-image-pipeline-ao",
+      "route": "demos/integration-image-pipeline-ao/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "backend": "webgpu",
+          "threeRevision": "185",
+          "tier": "ultra",
+          "scenario": "wall-receiver",
+          "mode": "final",
+          "seed": 1,
+          "timeSeconds": 0.025000000000000355,
+          "gpuTiming": {
+            "verdict": "INSUFFICIENT_EVIDENCE",
+            "samples": []
+          },
+          "rendererInfo": {
+            "autoReset": true,
+            "frame": 3,
+            "calls": 15,
+            "render": {
+              "calls": 15,
+              "frameCalls": 8,
+              "drawCalls": 12,
+              "triangles": 58,
+              "points": 0,
+              "lines": 0,
+              "timestamp": 0
+            },
+            "compute": {
+              "calls": 0,
+              "frameCalls": 0,
+              "timestamp": 0
+            },
+            "memory": {
+              "attributes": 8,
+              "attributesSize": 1308,
+              "geometries": 4,
+              "indexAttributes": 3,
+              "indexAttributesSize": 312,
+              "indirectStorageAttributes": 0,
+              "indirectStorageAttributesSize": 0,
+              "programs": 14,
+              "programsSize": 119919,
+              "readbackBuffers": 0,
+              "readbackBuffersSize": 0,
+              "renderTargets": 4,
+              "storageAttributes": 0,
+              "storageAttributesSize": 0,
+              "textures": 11,
+              "texturesSize": 37637508,
+              "uniformBuffers": 18,
+              "uniformBuffersSize": 3856,
+              "total": 37762903
+            },
+            "memoryMap": {}
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "integration-precipitation-image-pipeline",
+      "route": "demos/integration-precipitation-image-pipeline/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: Error: primary page did not expose a LabController\n    at eval (eval at evaluate (:303:30), <anonymous>:14:13)\n    at async <anonymous>:329:30\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "integration-temporal-surface",
+      "route": "demos/integration-temporal-surface/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: Error: primary page did not expose a LabController\n    at eval (eval at evaluate (:303:30), <anonymous>:14:13)\n    at async <anonymous>:329:30\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "node-selective-bloom",
+      "route": "demos/node-selective-bloom/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "backend": "webgpu",
+          "threeRevision": "185",
+          "tier": "full",
+          "scenario": "shared-emissive-integration",
+          "mode": "combined",
+          "mechanism": null,
+          "seed": 1,
+          "timeSeconds": 0.03290000000000004,
+          "lastResetCause": "initialization",
+          "running": false,
+          "stageKind": "bloom",
+          "acceptanceMetrics": {
+            "schemaVersion": 2,
+            "claims": {
+              "nonEmissiveIsolation": {
+                "verdict": "INSUFFICIENT_EVIDENCE",
+                "provenance": "Measured",
+                "value": null,
+                "gate": {
+                  "comparison": "<=",
+                  "value": 0.01,
+                  "provenance": "Authored"
+                }
+              },
+              "emitterHierarchy": {
+                "verdict": "INSUFFICIENT_EVIDENCE",
+                "provenance": "Measured",
+                "value": null,
+                "gate": {
+                  "comparison": "strict-pair-order-preserved",
+                  "value": true,
+                  "provenance": "Authored"
+                }
+              },
+              "pointSpreadFalloff": {
+                "verdict": "INSUFFICIENT_EVIDENCE",
+                "provenance": "Measured",
+                "value": null,
+                "gate": {
+                  "comparison": "outer-rings-nonincreasing-with-normalized-tolerance",
+                  "value": 0.001,
+                  "provenance": "Authored"
+                }
+              },
+              "transparentOcclusion": {
+                "verdict": "INSUFFICIENT_EVIDENCE",
+                "provenance": "Measured",
+                "value": null,
+                "gate": {
+                  "comparison": "<=",
+                  "value": 0.02,
+                  "provenance": "Authored"
+                }
+              },
+              "noPostReadability": {
+                "verdict": "INSUFFICIENT_EVIDENCE",
+                "provenance": "Measured",
+                "value": null,
+                "gate": {
+                  "comparison": ">=",
+                  "value": 0.1,
+                  "provenance": "Authored"
+                }
+              }
+            }
+          },
+          "gpuTiming": {
+            "verdict": "INSUFFICIENT_EVIDENCE",
+            "samples": []
+          },
+          "rendererInfo": {
+            "autoReset": true,
+            "frame": 3,
+            "calls": 29,
+            "render": {
+              "calls": 29,
+              "frameCalls": 15,
+              "drawCalls": 42,
+              "triangles": 7594,
+              "points": 0,
+              "lines": 0,
+              "timestamp": 0
+            },
+            "compute": {
+              "calls": 0,
+              "frameCalls": 0,
+              "timestamp": 0
+            },
+            "memory": {
+              "attributes": 15,
+              "attributesSize": 52316,
+              "geometries": 8,
+              "indexAttributes": 6,
+              "indexAttributesSize": 39096,
+              "indirectStorageAttributes": 0,
+              "indirectStorageAttributesSize": 0,
+              "programs": 22,
+              "programsSize": 140551,
+              "readbackBuffers": 0,
+              "readbackBuffersSize": 0,
+              "renderTargets": 12,
+              "storageAttributes": 0,
+              "storageAttributesSize": 0,
+              "textures": 15,
+              "texturesSize": 24923040,
+              "uniformBuffers": 47,
+              "uniformBuffersSize": 7072,
+              "total": 25162075
+            },
+            "memoryMap": {}
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "procedural-district",
+      "route": "demos/procedural-district/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "schemaVersion": 2,
+          "backend": "webgpu",
+          "threeRevision": "185",
+          "scenario": "district",
+          "mechanism": null,
+          "mode": "final",
+          "tier": "balanced",
+          "seed": 1,
+          "camera": "district",
+          "timeSeconds": 0.06666666666666667,
+          "requestedDpr": 1,
+          "appliedDpr": 1,
+          "geometryBuildCount": 1,
+          "geometryDigest": "fnv32:41423839",
+          "causeFieldId": "district-shared-cause-field-v2",
+          "fieldDispatchCount": 8,
+          "facadeOwnershipCount": 1150,
+          "buildingCount": 7,
+          "sceneSubmissionCount": 2,
+          "shadowViewCount": 1,
+          "lastHistoryReset": "camera-change",
+          "readyResolved": true,
+          "invariantValidation": {
+            "ok": true,
+            "errors": []
+          },
+          "materialState": {
+            "owner": "threejs-procedural-materials",
+            "adapterContract": {
+              "id": "procedural-district-minimal-pbr-adapter-v1",
+              "implementationClass": "integration-local-minimal-node-pbr-adapter",
+              "canonicalHostStage": false,
+              "canonicalContractValidator": "validateProceduralPbrConfig",
+              "semanticOwner": "threejs-procedural-materials",
+              "adapterOwner": "procedural-district",
+              "acceptanceStatus": "incomplete",
+              "implementedChannels": [
+                "color",
+                "roughness",
+                "metalness",
+                "clearcoat",
+                "emissive-zero"
+              ],
+              "omittedCanonicalMechanisms": [
+                "derivative-normal-filtering",
+                "specular-aa",
+                "atlas-array-triplanar",
+                "instanced-dissolve"
+              ]
+            },
+            "mode": "final",
+            "causeFieldIds": [
+              "district-shared-cause-field-v2"
+            ],
+            "materialOwnerClaims": [
+              "threejs-procedural-materials"
+            ],
+            "slots": [
+              {
+                "id": "terrain",
+                "metalnessIdentity": 0,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "limestone",
+                "metalnessIdentity": 0,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "granite",
+                "metalnessIdentity": 0,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "terra-cotta",
+                "metalnessIdentity": 0,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "glass",
+                "metalnessIdentity": 0,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "bronze",
+                "metalnessIdentity": 1,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "black-metal",
+                "metalnessIdentity": 1,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "ornament",
+                "metalnessIdentity": 0,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              },
+              {
+                "id": "roof",
+                "metalnessIdentity": 1,
+                "coupledChannels": [
+                  "color",
+                  "roughness",
+                  "clearcoat"
+                ]
+              }
+            ]
+          },
+          "weatherState": {
+            "time": 0.06666666666666667,
+            "deltaTime": 0.06666666666666667,
+            "elapsedDeltaTime": 0.06666666666666667,
+            "wind": {
+              "x": 1.4,
+              "y": 0,
+              "z": 0.55
+            },
+            "windDisplacement": {
+              "x": 0.09333333333333332,
+              "y": 0,
+              "z": 0.03666666666666667
+            },
+            "temperatureC": 8,
+            "forcing": 0.2002092306635951,
+            "progress": 0.2002092306635951,
+            "precipitationRate": 0.72,
+            "wetness": 0.21091004765291566,
+            "puddleFill": 0.06584497851213428,
+            "snowCoverage": 0,
+            "qualityTier": "medium",
+            "debugMode": "final"
+          },
+          "rendererInfo": {
+            "autoReset": true,
+            "frame": 3,
+            "calls": 43,
+            "render": {
+              "calls": 35,
+              "frameCalls": 13,
+              "drawCalls": 179,
+              "triangles": 72093,
+              "points": 0,
+              "lines": 0,
+              "timestamp": 0
+            },
+            "compute": {
+              "calls": 8,
+              "frameCalls": 0,
+              "timestamp": 0
+            },
+            "memory": {
+              "attributes": 116,
+              "attributesSize": 1124436,
+              "geometries": 58,
+              "indexAttributes": 57,
+              "indexAttributesSize": 306768,
+              "indirectStorageAttributes": 0,
+              "indirectStorageAttributesSize": 0,
+              "programs": 46,
+              "programsSize": 710088,
+              "readbackBuffers": 0,
+              "readbackBuffersSize": 0,
+              "renderTargets": 6,
+              "storageAttributes": 0,
+              "storageAttributesSize": 0,
+              "textures": 24,
+              "texturesSize": 50111020,
+              "uniformBuffers": 209,
+              "uniformBuffersSize": 47712,
+              "total": 52300024
+            },
+            "memoryMap": {}
+          },
+          "claimVerdicts": {
+            "nativeWebGPU": "PASS",
+            "fullCanonicalMaterialHost": "NOT_CLAIMED",
+            "minimalMaterialAdapterContract": "PASS",
+            "renderTargetReadback": "INSUFFICIENT_EVIDENCE",
+            "currentAdapterTiming": "INSUFFICIENT_EVIDENCE",
+            "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+          },
+          "routeSelection": {
+            "kind": null,
+            "id": null,
+            "scenario": "district",
+            "mechanism": null,
+            "mode": "final",
+            "tier": "balanced"
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "relativistic-space-shot",
+      "route": "demos/relativistic-space-shot/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [
+        "TypeError: Cannot read properties of null (reading 'complete')\n    at OC.updateTexture (http://127.0.0.1:5174/demos/assets/three.webgpu-BLzGo2sq.js:23:101531)\n    at hC._createBindings (http://127.0.0.1:5174/demos/assets/three.webgpu-BLzGo2sq.js:23:93021)\n    at hC.getForRender (http://127.0.0.1:5174/demos/assets/three.webgpu-BLzGo2sq.js:23:92186)\n    at hC.updateForRender (http://127.0.0.1:5174/demos/assets/three.webgpu-BLzGo2sq.js:23:92565)\n    at FF.compileAsync (http://127.0.0.1:5174/demos/assets/three.webgpu-BLzGo2sq.js:29:45894)\n    at async e.compileAsync (http://127.0.0.1:5174/demos/assets/three.webgpu-BLzGo2sq.js:23:139521)\n    at async W (http://127.0.0.1:5174/demos/assets/index-BCk2J_46.js:2:476)\n    at async http://127.0.0.1:5174/demos/assets/index-BCk2J_46.js:2:5007"
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: Error: TypeError: Cannot read properties of null (reading 'complete')\n    at eval (eval at evaluate (:303:30), <anonymous>:3:24)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "router-manifest-lab",
+      "route": "demos/router-manifest-lab/",
+      "image": "previews/primary/router-manifest-lab.png",
+      "classification": "non-rendering-lab-preview",
+      "canonicalEvidence": false,
+      "width": 1200,
+      "height": 760,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "scenarioId": "ocean-planet",
+          "result": {
+            "verdict": "PASS",
+            "code": "ROUTE_ACCEPTED",
+            "path": null,
+            "message": "The route satisfies inventory, capability, ownership, ordering, tier-provenance, and budget gates.",
+            "details": {
+              "selectedSkills": [
+                "threejs-procedural-planets",
+                "threejs-spectral-ocean",
+                "threejs-sky-atmosphere-and-haze",
+                "threejs-image-pipeline",
+                "threejs-visual-validation"
+              ],
+              "primaryOwner": "threejs-procedural-planets",
+              "targetFrameMs": 16.67,
+              "stageBudgetMs": 14,
+              "headroomMs": 2.6700000000000017,
+              "ownership": {
+                "renderer": "threejs-image-pipeline",
+                "final-pipeline": "threejs-image-pipeline",
+                "tone-map": "threejs-image-pipeline",
+                "output-transform": "threejs-image-pipeline"
+              },
+              "signalIds": [
+                "main.scene-color"
+              ]
+            }
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_CAPTURED",
+      "captureSurface": "headless-playwright-html-ui"
+    },
+    {
+      "id": "semantic-mesh-writer",
+      "route": "demos/semantic-mesh-writer/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [
+        "RangeError: deltaSeconds must be finite and nonnegative\n    at Object.step (http://127.0.0.1:5174/demos/assets/index-Dbz92oTw.js:1:31208)\n    at ht (http://127.0.0.1:5174/demos/assets/index-Dbz92oTw.js:1:35524)"
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: DataCloneError: Failed to execute 'structuredClone' on 'Window': ()=>{this._destroyTexture(e)} could not be cloned.\n    at Object.getMetrics (http://127.0.0.1:5174/demos/assets/index-Dbz92oTw.js:1:33905)\n    at eval (eval at evaluate (:303:30), <anonymous>:18:26)\n    at async <anonymous>:329:30\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "structured-ash-growth",
+      "route": "demos/structured-ash-growth/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "backend": "webgpu",
+          "isWebGPUBackend": true,
+          "renderer": {
+            "threeRevision": "185",
+            "isWebGPUBackend": true
+          },
+          "scenario": "ash-contract",
+          "tier": "growth/hero",
+          "mode": "final",
+          "camera": "design",
+          "seed": 36330,
+          "elapsed": 0,
+          "frameCount": 1,
+          "worldUnitsPerMeter": 1,
+          "dpr": {
+            "width": 1200,
+            "height": 800,
+            "requestedDpr": 1,
+            "actualDpr": 1,
+            "cap": 2
+          },
+          "rendererInfo": {
+            "frame": 3,
+            "calls": 4,
+            "triangles": 0,
+            "points": 0,
+            "lines": 0,
+            "geometries": 1,
+            "textures": 4
+          },
+          "stats": {
+            "branchJobs": [
+              1,
+              8,
+              40,
+              160
+            ],
+            "continuations": [
+              1,
+              1,
+              8,
+              40
+            ],
+            "lateralChildren": [
+              0,
+              7,
+              32,
+              120
+            ],
+            "leafCards": 5440
+          },
+          "resources": {
+            "foreground": {
+              "branchVertices": 6639,
+              "branchTriangles": 9120,
+              "leafVertices": 21760,
+              "leafTriangles": 10880,
+              "visible": true,
+              "structuralDraws": 2,
+              "rootedDeformation": true,
+              "deformedNormal": true,
+              "shadowUsesVisibleMaterial": true,
+              "geometryResidentBytes": 2330504,
+              "uniqueBufferArrays": 21
+            },
+            "forest": {
+              "instances": 100,
+              "drawCount": 4,
+              "storageBytes": 3200,
+              "bands": 2,
+              "visible": false,
+              "visibleStructuralDraws": 0,
+              "storageIdentity": "fnv1a32:2d1b6475+fnv1a32:87f52357",
+              "storageImmutable": true,
+              "worldUnitsPerMeter": 1,
+              "sharedTopologyResidentBytes": 2330504,
+              "geometryObjects": 4
+            },
+            "tierLock": {
+              "id": "growth/hero",
+              "runtimeTier": "hero",
+              "dprCap": 2,
+              "requestedDpr": 1,
+              "actualDpr": 1
+            },
+            "rendererInfo": {
+              "frame": 3,
+              "calls": 4,
+              "triangles": 0,
+              "points": 0,
+              "lines": 0,
+              "geometries": 1,
+              "textures": 4
+            },
+            "shadows": {
+              "enabled": true,
+              "mapSize": [
+                1024,
+                1024
+              ]
+            },
+            "renderTargets": [
+              "scenePass.output",
+              "scenePass.normal"
+            ]
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "tsl-curved-ray",
+      "route": "demos/tsl-curved-ray/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.waitForFunction: Timeout 60000ms exceeded.\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:44:16)\n    at readiness (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:164:39)\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:25)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "tsl-procedural-pbr",
+      "route": "demos/tsl-procedural-pbr/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [
+        "TypeError: Cannot read properties of undefined (reading 'invSize')\n    at A.setSize (http://127.0.0.1:5174/demos/assets/BloomNode-Dex_Xd1i.js:1:2289)\n    at it (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:7504)\n    at ct (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:8715)\n    at x (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:15763)\n    at async http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:16272"
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: Error: TypeError: Cannot read properties of undefined (reading 'invSize')\n    at A.setSize (http://127.0.0.1:5174/demos/assets/BloomNode-Dex_Xd1i.js:1:2289)\n    at it (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:7504)\n    at ct (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:8715)\n    at x (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:15763)\n    at async http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:16272\n    at A.setSize (http://127.0.0.1:5174/demos/assets/BloomNode-Dex_Xd1i.js:1:2289)\n    at it (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:7504)\n    at ct (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:8715)\n    at x (http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:15763)\n    at async http://127.0.0.1:5174/demos/assets/index-BsgThTD5.js:1:16272\n    at eval (eval at evaluate (:303:30), <anonymous>:3:24)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "weathered-world",
+      "route": "demos/weathered-world/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [
+        "TypeError: Cannot read properties of undefined (reading 'planetUniforms')\n    at Ae (http://127.0.0.1:5174/demos/assets/index-C2K0IJ7L.js:1:9973)\n    at Q (http://127.0.0.1:5174/demos/assets/index-C2K0IJ7L.js:1:22506)\n    at http://127.0.0.1:5174/demos/assets/index-C2K0IJ7L.js:2:1136"
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.waitForFunction: Timeout 60000ms exceeded.\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:44:16)\n    at readiness (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:164:39)\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:25)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-bounded-water",
+      "route": "demos/webgpu-bounded-water/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "backend": "webgpu",
+          "isWebGPUBackend": true,
+          "threeRevision": "0.185.1",
+          "tier": "low",
+          "mechanism": "buoyancy-spray-and-masks",
+          "mechanismAcknowledged": true,
+          "mechanismProfile": {
+            "mode": "final",
+            "seedDrop": true,
+            "objectImpulse": true,
+            "receiverCaustics": true,
+            "opticalTransport": true,
+            "buoyancySprayMasks": true,
+            "underwaterView": false
+          },
+          "mode": "final",
+          "seed": 1,
+          "time": 0,
+          "opaqueInputsReachable": true,
+          "dispatchCount": 8,
+          "droppedTimeSeconds": 0,
+          "eventSnapshotVersion": 0,
+          "cfl": 0.5597928684393502,
+          "cflLimit": 0.85,
+          "resourceBytes": 22379072,
+          "evidenceVerdict": "INSUFFICIENT_EVIDENCE"
+        }
+      },
+      "pageErrors": [
+        "Error: Bounded-water delta must be finite and non-negative.\n    at K.step (http://127.0.0.1:5174/demos/assets/index-B2lCydnP.js:1:13175)\n    at n (http://127.0.0.1:5174/demos/assets/index-B2lCydnP.js:1:20968)"
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-cached-clipmap-shadow",
+      "route": "demos/webgpu-cached-clipmap-shadow/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "status": "runtime-implemented-evidence-pending",
+          "performanceVerdict": "INSUFFICIENT_EVIDENCE",
+          "backend": {
+            "isWebGPUBackend": true
+          },
+          "threeRevision": "185",
+          "frameCount": 5,
+          "time": 0,
+          "mode": "final",
+          "mechanismId": "cached-clipmap",
+          "tierId": "high",
+          "scenario": "persistent-coverage",
+          "camera": "design",
+          "route": {
+            "kind": "canonical-lab",
+            "mechanismId": "cached-clipmap",
+            "tierId": "high",
+            "architecture": "cached",
+            "scenario": "persistent-coverage",
+            "mode": "final",
+            "actions": [
+              "populate-cached-levels"
+            ]
+          },
+          "routeSelection": {
+            "mechanism": "cached-clipmap",
+            "tier": "high",
+            "scenario": "persistent-coverage",
+            "mode": "final",
+            "architecture": "cached"
+          },
+          "scenarioTrace": [
+            {
+              "mechanism": "cached-clipmap",
+              "scenario": "persistent-coverage",
+              "actions": [
+                "populate-cached-levels"
+              ],
+              "samples": [
+                {
+                  "action": "populate-cached-levels",
+                  "validLevels": 7,
+                  "frameMetrics": {
+                    "scope": "single-render-frame",
+                    "provenance": "Measured-runtime-counter",
+                    "frameId": 2,
+                    "nodeFrameId": 1,
+                    "renderId": 2,
+                    "executed": true,
+                    "sceneSubmissionCount": 7,
+                    "rendererInvocationCount": 7,
+                    "shadowViewCount": 7,
+                    "backendLayerPassCount": 7,
+                    "resourceTargetCount": 7,
+                    "correctnessInvalidationCount": 0,
+                    "selectedLevelIndices": [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6
+                    ],
+                    "architecture": "cached",
+                    "nodeRenderSerial": 1
+                  }
+                }
+              ]
+            }
+          ],
+          "parityCasterClasses": [
+            "alpha-tested",
+            "shared-wind-displacement",
+            "instanced",
+            "morph-target",
+            "skinned-two-bone"
+          ],
+          "architecture": {
+            "architecture": "cached",
+            "owner": "CachedClipmapShadowNodeV2",
+            "receiverTopology": "independent-textures-static-loop-frustum-gated",
+            "basisEpoch": 1,
+            "childShadowNodeCount": 7,
+            "selectedUpdates": [
+              0,
+              1
+            ],
+            "sceneSubmissionCount": 2,
+            "rendererInvocationCount": 2,
+            "frameMetrics": {
+              "scope": "single-render-frame",
+              "provenance": "Measured-runtime-counter",
+              "frameId": 5,
+              "nodeFrameId": 3,
+              "renderId": 14,
+              "executed": true,
+              "sceneSubmissionCount": 2,
+              "rendererInvocationCount": 2,
+              "shadowViewCount": 2,
+              "backendLayerPassCount": 2,
+              "resourceTargetCount": 7,
+              "correctnessInvalidationCount": 0,
+              "selectedLevelIndices": [
+                0,
+                1
+              ],
+              "architecture": "cached",
+              "nodeRenderSerial": 2
+            },
+            "cumulativeMetrics": {
+              "sceneSubmissionCount": 9,
+              "rendererInvocationCount": 9,
+              "childShadowUpdateCount": 9,
+              "correctnessInvalidationCount": 0,
+              "basisEpochCount": 1
+            },
+            "resourceTotals": {
+              "targetCount": 7,
+              "residentTargetCount": 7,
+              "nominalBytes": 33554432,
+              "transientAndStagingBytes": null,
+              "transientAndStagingVerdict": "INSUFFICIENT_EVIDENCE"
+            },
+            "resources": [
+              {
+                "level": 0,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  1024,
+                  1024
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-0",
+                "depthAttachment": "cached-clipmap-shadow-depth-0",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 8388608
+              },
+              {
+                "level": 1,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  1024,
+                  1024
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-1",
+                "depthAttachment": "cached-clipmap-shadow-depth-1",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 8388608
+              },
+              {
+                "level": 2,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  1024,
+                  1024
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-2",
+                "depthAttachment": "cached-clipmap-shadow-depth-2",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 8388608
+              },
+              {
+                "level": 3,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  512,
+                  512
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-3",
+                "depthAttachment": "cached-clipmap-shadow-depth-3",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 2097152
+              },
+              {
+                "level": 4,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  512,
+                  512
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-4",
+                "depthAttachment": "cached-clipmap-shadow-depth-4",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 2097152
+              },
+              {
+                "level": 5,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  512,
+                  512
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-5",
+                "depthAttachment": "cached-clipmap-shadow-depth-5",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 2097152
+              },
+              {
+                "level": 6,
+                "valid": true,
+                "resident": true,
+                "mapSize": [
+                  512,
+                  512
+                ],
+                "colorAttachment": "cached-clipmap-shadow-color-6",
+                "depthAttachment": "cached-clipmap-shadow-depth-6",
+                "colorFormat": 1023,
+                "depthFormat": 1026,
+                "nominalBytes": 2097152
+              }
+            ]
+          },
+          "rendererInfo": {
+            "render": {
+              "calls": 16,
+              "triangles": 5683,
+              "points": 0,
+              "lines": 0,
+              "timestamp": 0
+            },
+            "compute": {
+              "calls": 0,
+              "timestamp": 0
+            },
+            "memory": {
+              "geometries": 10,
+              "textures": 18
+            },
+            "programs": null,
+            "provenance": "selected finite counters copied from renderer.info"
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-camera-rig",
+      "route": "demos/webgpu-camera-rig/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "rendererBackend": "WebGPU",
+          "threeRevision": "185",
+          "mechanism": "scale-aware-framing",
+          "tier": "full",
+          "timeSeconds": 0.008199999999999819,
+          "originEpoch": 0,
+          "gpuTiming": "available-not-yet-resolved"
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-dense-grass",
+      "route": "demos/webgpu-dense-grass/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "backend": "webgpu",
+          "isWebGPUBackend": true,
+          "renderer": {
+            "threeRevision": "185",
+            "isWebGPUBackend": true
+          },
+          "scenario": "uniform-density",
+          "tier": "dense/medium",
+          "mode": "final",
+          "seed": 1,
+          "camera": "design",
+          "elapsed": 0,
+          "frameCount": 2,
+          "dpr": {
+            "width": 1200,
+            "height": 800,
+            "requestedDpr": 1,
+            "actualDpr": 1,
+            "cap": 1.25
+          },
+          "rendererInfo": {
+            "frame": 3,
+            "calls": 6,
+            "triangles": 2912003,
+            "points": 0,
+            "lines": 0,
+            "geometries": 11,
+            "textures": 5
+          },
+          "backendTier": "native WebGPU storage/compute",
+          "capabilities": {
+            "tier": "high",
+            "nativeStorage": true,
+            "initialized": true,
+            "isWebGPUBackend": true,
+            "hasCompute": true,
+            "storageNodesAllocated": true,
+            "missingRequirementReason": []
+          },
+          "debugMode": "final",
+          "patchCount": 25,
+          "bladesPerPatch": 8000,
+          "allocatedBlades": 200000,
+          "storageBytesPerBlade": 64,
+          "storageByteEstimate": 12800000,
+          "storageResidentBytes": 12800000,
+          "renderGeometryBytes": 40612,
+          "initDispatches": 25,
+          "perFrameComputeDispatches": 0,
+          "activeTouchCount": 0,
+          "touchCapacity": 8,
+          "centerGrid": {
+            "x": 1,
+            "z": 1
+          },
+          "streamingRecomputes": 25,
+          "worldUnitsPerMeter": 1,
+          "dprCap": 1.25,
+          "staticStorageRevision": 2,
+          "staticStorageIdentity": "fnv1a32:cd7869ac",
+          "staticStorageImmutable": true,
+          "rootedDeformation": true,
+          "deformedNormals": true,
+          "visibleShadowDeformationParity": true,
+          "visibleDrawObjects": 9,
+          "visibleDrawObjectCeiling": 25,
+          "activeBladeCount": 72000,
+          "patches": [
+            {
+              "key": "-2,-2",
+              "grid": {
+                "x": -1,
+                "z": -1
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -38.68,
+                  -2.7,
+                  -38.68
+                ],
+                "max": [
+                  -9.32,
+                  4.18,
+                  -9.32
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  -24,
+                  0.7399999999999998,
+                  -24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-1,-2",
+              "grid": {
+                "x": 0,
+                "z": -1
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -14.68,
+                  -2.7,
+                  -38.68
+                ],
+                "max": [
+                  14.68,
+                  4.18,
+                  -9.32
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  0,
+                  0.7399999999999998,
+                  -24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "0,-2",
+              "grid": {
+                "x": 1,
+                "z": -1
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  9.32,
+                  -2.7,
+                  -38.68
+                ],
+                "max": [
+                  38.68,
+                  4.18,
+                  -9.32
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  24,
+                  0.7399999999999998,
+                  -24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "1,-2",
+              "grid": {
+                "x": 2,
+                "z": -1
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  33.32,
+                  -2.7,
+                  -38.68
+                ],
+                "max": [
+                  62.68,
+                  4.18,
+                  -9.32
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  48,
+                  0.7399999999999998,
+                  -24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "2,-2",
+              "grid": {
+                "x": 3,
+                "z": -1
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  57.32,
+                  -2.7,
+                  -38.68
+                ],
+                "max": [
+                  86.68,
+                  4.18,
+                  -9.32
+                ],
+                "size": [
+                  29.360000000000007,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  72,
+                  0.7399999999999998,
+                  -24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-2,-1",
+              "grid": {
+                "x": -1,
+                "z": 0
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -38.68,
+                  -2.7,
+                  -14.68
+                ],
+                "max": [
+                  -9.32,
+                  4.18,
+                  14.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  -24,
+                  0.7399999999999998,
+                  0
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-1,-1",
+              "grid": {
+                "x": 0,
+                "z": 0
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -14.68,
+                  -2.7,
+                  -14.68
+                ],
+                "max": [
+                  14.68,
+                  4.18,
+                  14.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  0,
+                  0.7399999999999998,
+                  0
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "0,-1",
+              "grid": {
+                "x": 1,
+                "z": 0
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  9.32,
+                  -2.7,
+                  -14.68
+                ],
+                "max": [
+                  38.68,
+                  4.18,
+                  14.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  24,
+                  0.7399999999999998,
+                  0
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "1,-1",
+              "grid": {
+                "x": 2,
+                "z": 0
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  33.32,
+                  -2.7,
+                  -14.68
+                ],
+                "max": [
+                  62.68,
+                  4.18,
+                  14.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  48,
+                  0.7399999999999998,
+                  0
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "2,-1",
+              "grid": {
+                "x": 3,
+                "z": 0
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  57.32,
+                  -2.7,
+                  -14.68
+                ],
+                "max": [
+                  86.68,
+                  4.18,
+                  14.68
+                ],
+                "size": [
+                  29.360000000000007,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  72,
+                  0.7399999999999998,
+                  0
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-2,0",
+              "grid": {
+                "x": -1,
+                "z": 1
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -38.68,
+                  -2.7,
+                  9.32
+                ],
+                "max": [
+                  -9.32,
+                  4.18,
+                  38.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  -24,
+                  0.7399999999999998,
+                  24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-1,0",
+              "grid": {
+                "x": 0,
+                "z": 1
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -14.68,
+                  -2.7,
+                  9.32
+                ],
+                "max": [
+                  14.68,
+                  4.18,
+                  38.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  0,
+                  0.7399999999999998,
+                  24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "0,0",
+              "grid": {
+                "x": 1,
+                "z": 1
+              },
+              "visible": true,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": true,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  9.32,
+                  -2.7,
+                  9.32
+                ],
+                "max": [
+                  38.68,
+                  4.18,
+                  38.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  24,
+                  0.7399999999999998,
+                  24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "1,0",
+              "grid": {
+                "x": 2,
+                "z": 1
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  33.32,
+                  -2.7,
+                  9.32
+                ],
+                "max": [
+                  62.68,
+                  4.18,
+                  38.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  48,
+                  0.7399999999999998,
+                  24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "2,0",
+              "grid": {
+                "x": 3,
+                "z": 1
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  57.32,
+                  -2.7,
+                  9.32
+                ],
+                "max": [
+                  86.68,
+                  4.18,
+                  38.68
+                ],
+                "size": [
+                  29.360000000000007,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  72,
+                  0.7399999999999998,
+                  24
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-2,1",
+              "grid": {
+                "x": -1,
+                "z": 2
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -38.68,
+                  -2.7,
+                  33.32
+                ],
+                "max": [
+                  -9.32,
+                  4.18,
+                  62.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  -24,
+                  0.7399999999999998,
+                  48
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-1,1",
+              "grid": {
+                "x": 0,
+                "z": 2
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -14.68,
+                  -2.7,
+                  33.32
+                ],
+                "max": [
+                  14.68,
+                  4.18,
+                  62.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  0,
+                  0.7399999999999998,
+                  48
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "0,1",
+              "grid": {
+                "x": 1,
+                "z": 2
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  9.32,
+                  -2.7,
+                  33.32
+                ],
+                "max": [
+                  38.68,
+                  4.18,
+                  62.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  24,
+                  0.7399999999999998,
+                  48
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "1,1",
+              "grid": {
+                "x": 2,
+                "z": 2
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  33.32,
+                  -2.7,
+                  33.32
+                ],
+                "max": [
+                  62.68,
+                  4.18,
+                  62.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  48,
+                  0.7399999999999998,
+                  48
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "2,1",
+              "grid": {
+                "x": 3,
+                "z": 2
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  57.32,
+                  -2.7,
+                  33.32
+                ],
+                "max": [
+                  86.68,
+                  4.18,
+                  62.68
+                ],
+                "size": [
+                  29.360000000000007,
+                  6.88,
+                  29.36
+                ],
+                "center": [
+                  72,
+                  0.7399999999999998,
+                  48
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-2,2",
+              "grid": {
+                "x": -1,
+                "z": 3
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -38.68,
+                  -2.7,
+                  57.32
+                ],
+                "max": [
+                  -9.32,
+                  4.18,
+                  86.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.360000000000007
+                ],
+                "center": [
+                  -24,
+                  0.7399999999999998,
+                  72
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "-1,2",
+              "grid": {
+                "x": 0,
+                "z": 3
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  -14.68,
+                  -2.7,
+                  57.32
+                ],
+                "max": [
+                  14.68,
+                  4.18,
+                  86.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.360000000000007
+                ],
+                "center": [
+                  0,
+                  0.7399999999999998,
+                  72
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "0,2",
+              "grid": {
+                "x": 1,
+                "z": 3
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  9.32,
+                  -2.7,
+                  57.32
+                ],
+                "max": [
+                  38.68,
+                  4.18,
+                  86.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.360000000000007
+                ],
+                "center": [
+                  24,
+                  0.7399999999999998,
+                  72
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "1,2",
+              "grid": {
+                "x": 2,
+                "z": 3
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  33.32,
+                  -2.7,
+                  57.32
+                ],
+                "max": [
+                  62.68,
+                  4.18,
+                  86.68
+                ],
+                "size": [
+                  29.36,
+                  6.88,
+                  29.360000000000007
+                ],
+                "center": [
+                  48,
+                  0.7399999999999998,
+                  72
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            },
+            {
+              "key": "2,2",
+              "grid": {
+                "x": 3,
+                "z": 3
+              },
+              "visible": false,
+              "lodTier": 0,
+              "bladeCount": 8000,
+              "cardCount": 640,
+              "bladeVisible": false,
+              "cardVisible": false,
+              "densityCutoff": 1,
+              "bounds": {
+                "min": [
+                  57.32,
+                  -2.7,
+                  57.32
+                ],
+                "max": [
+                  86.68,
+                  4.18,
+                  86.68
+                ],
+                "size": [
+                  29.360000000000007,
+                  6.88,
+                  29.360000000000007
+                ],
+                "center": [
+                  72,
+                  0.7399999999999998,
+                  72
+                ]
+              },
+              "storageNames": {
+                "originTerrainHeight": "GrassOriginTerrainHeight",
+                "widthFacingBendSpecies": "GrassWidthFacingBendSpecies",
+                "densitySeedsNormal": "GrassDensitySeedsNormal",
+                "colorMaterial": "GrassColorMaterial"
+              }
+            }
+          ]
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-exposure-color-pipeline",
+      "route": "demos/webgpu-exposure-color-pipeline/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "No named-adapter timestamp capture has been accepted.",
+          "tier": "full-histogram",
+          "tierId": "full-histogram",
+          "mode": "final",
+          "scenario": "emitter",
+          "seed": 1,
+          "mechanism": null,
+          "routeSelection": {
+            "mechanism": null,
+            "tier": "full-histogram",
+            "mode": "final",
+            "scenario": "emitter",
+            "seed": 1
+          },
+          "meterMode": "histogram-percentile",
+          "rendererInfo": {
+            "autoReset": true,
+            "frame": 4,
+            "calls": 7,
+            "render": {
+              "calls": 4,
+              "frameCalls": 2,
+              "drawCalls": 4,
+              "triangles": 975,
+              "points": 0,
+              "lines": 0,
+              "timestamp": 0
+            },
+            "compute": {
+              "calls": 3,
+              "frameCalls": 1,
+              "timestamp": 0
+            },
+            "memory": {
+              "attributes": 8,
+              "attributesSize": 14196,
+              "geometries": 4,
+              "indexAttributes": 3,
+              "indexAttributesSize": 11688,
+              "indirectStorageAttributes": 0,
+              "indirectStorageAttributesSize": 0,
+              "programs": 14,
+              "programsSize": 69431,
+              "readbackBuffers": 0,
+              "readbackBuffersSize": 0,
+              "renderTargets": 1,
+              "storageAttributes": 6,
+              "storageAttributesSize": 872,
+              "textures": 4,
+              "texturesSize": 11076096,
+              "uniformBuffers": 13,
+              "uniformBuffersSize": 960,
+              "total": 11173243
+            },
+            "memoryMap": {}
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-fft-ocean",
+      "route": "demos/webgpu-fft-ocean/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: TypeError: Cannot read properties of null (reading 'render')\n    at k.renderOnce (http://127.0.0.1:5174/demos/assets/index-C3EvIljF.js:1:10456)\n    at eval (eval at evaluate (:303:30), <anonymous>:16:71)\n    at async <anonymous>:329:30\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-field-bake",
+      "route": "demos/webgpu-field-bake/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "renderCount": 2,
+          "computeDispatchCount": 11,
+          "tierTransitions": 1,
+          "modeTransitions": 0,
+          "scenarioTransitions": 0,
+          "resizeCount": 0,
+          "historyResetCount": 0,
+          "lastHistoryResetCause": null,
+          "scenario": "field-and-gradient-gallery",
+          "tier": "gpu-storage",
+          "mode": "final",
+          "camera": "design",
+          "seed": 17,
+          "timeSeconds": 0,
+          "nativeWebGPU": true
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-image-pipeline",
+      "route": "demos/webgpu-image-pipeline/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "ready": {
+        "routeReady": true,
+        "controller": true,
+        "metrics": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "Current-adapter timestamp and physical-allocation evidence have not been accepted.",
+          "seed": 1,
+          "rendererInfo": {
+            "backend": "jF",
+            "isWebGPUBackend": true,
+            "memory": {
+              "attributes": 8,
+              "attributesSize": 14196,
+              "geometries": 4,
+              "indexAttributes": 3,
+              "indexAttributesSize": 11688,
+              "indirectStorageAttributes": 0,
+              "indirectStorageAttributesSize": 0,
+              "programs": 32,
+              "programsSize": 155985,
+              "readbackBuffers": 0,
+              "readbackBuffersSize": 0,
+              "renderTargets": 15,
+              "storageAttributes": 6,
+              "storageAttributesSize": 872,
+              "textures": 23,
+              "texturesSize": 39646144,
+              "uniformBuffers": 35,
+              "uniformBuffersSize": 6528,
+              "total": 39835413
+            },
+            "render": {
+              "calls": 17,
+              "frameCalls": 17,
+              "drawCalls": 19,
+              "triangles": 990,
+              "points": 0,
+              "lines": 0,
+              "timestamp": 0
+            },
+            "compute": {
+              "calls": 3,
+              "frameCalls": 3,
+              "timestamp": 0
+            }
+          },
+          "exposure": {
+            "owner": "exposure-color-stage",
+            "tierId": "full-histogram",
+            "meterMode": "histogram-percentile",
+            "meterCadenceHz": 30,
+            "meterDispatchOrder": [
+              "clearHistogram",
+              "binHistogram",
+              "buildHistogramPrefix",
+              "resolveHistogramPercentiles",
+              "reduceHdrToPartials",
+              "reducePartialsToAggregate",
+              "resolveMeterTarget"
+            ],
+            "dispatchCounts": {
+              "adaptation": 2,
+              "meterStages": 7,
+              "meterUpdates": 1
+            },
+            "storageBytes": {
+              "partialCount": 18,
+              "partialsBytes": 288,
+              "stateBytes": 32,
+              "histogramCounterCount": 66,
+              "histogramBytes": 264,
+              "histogramPrefixBytes": 256,
+              "histogramStateBytes": 32,
+              "totalBytes": 872
+            },
+            "toneMapOwner": "toneMapping() node",
+            "outputTransformOwner": "renderOutput() node",
+            "lut": {
+              "variant": "creative",
+              "size": 32,
+              "domain": {
+                "input": "post-tone-map linear",
+                "output": "post-tone-map linear",
+                "workingPrimaries": "Three.js ColorManagement.workingColorSpace",
+                "transfer": "linear",
+                "legalRange": [
+                  0,
+                  1
+                ],
+                "interpolation": "trilinear via LinearFilter",
+                "toneMapDependency": "after toneMapping(), before renderOutput()",
+                "variant": "creative"
+              }
+            },
+            "performanceVerdict": "INSUFFICIENT_EVIDENCE"
+          },
+          "scenario": "pipeline-fixture",
+          "mechanism": null,
+          "tier": "full",
+          "tierId": "full",
+          "mode": "final",
+          "camera": "design",
+          "time": 0,
+          "routeSelection": {
+            "scenario": "pipeline-fixture",
+            "mechanism": null,
+            "tier": "full",
+            "mode": "final",
+            "seed": 1,
+            "camera": "design",
+            "time": 0
+          }
+        }
+      },
+      "pageErrors": [],
+      "verdict": "PREVIEW_NOT_PROMOTED",
+      "note": "Headless WebGPU canvas presentation is not reliable enough for publication; use the related interactive-Chrome preview until render-target evidence is accepted."
+    },
+    {
+      "id": "webgpu-lut-atmosphere",
+      "route": "demos/webgpu-lut-atmosphere/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.evaluate: DataCloneError: Failed to execute 'structuredClone' on 'Window': ()=>{this._destroyTexture(e)} could not be cloned.\n    at Object.getMetrics (http://127.0.0.1:5174/demos/assets/index-CUfs1ntZ.js:2:3256)\n    at eval (eval at evaluate (:303:30), <anonymous>:18:26)\n    at async <anonymous>:329:30\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:51:15)\n    at async captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:19)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-material-slot-compiler",
+      "route": "demos/webgpu-material-slot-compiler/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [
+        ""
+      ],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.waitForFunction: Target page, context or browser has been closed\n    at waitForPrimary (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:44:16)\n    at readiness (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:164:39)\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:80:25)\n    at async captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:22)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-node-gtao",
+      "route": "demos/webgpu-node-gtao/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-pooled-effects",
+      "route": "demos/webgpu-pooled-effects/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-procedural-creature-lab",
+      "route": "demos/webgpu-procedural-creature-lab/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-procedural-timelines",
+      "route": "demos/webgpu-procedural-timelines/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-quadtree-planet",
+      "route": "demos/webgpu-quadtree-planet/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-rain-snow-and-wet-surfaces",
+      "route": "demos/webgpu-rain-snow-and-wet-surfaces/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-shadow-architecture-bench",
+      "route": "demos/webgpu-shadow-architecture-bench/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-shadow-pipeline-integration",
+      "route": "demos/webgpu-shadow-pipeline-integration/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-temporal-history",
+      "route": "demos/webgpu-temporal-history/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-touch-history-frost",
+      "route": "demos/webgpu-touch-history-frost/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-validation-harness",
+      "route": "demos/webgpu-validation-harness/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-vegetation-integration",
+      "route": "demos/webgpu-vegetation-integration/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    },
+    {
+      "id": "webgpu-weather-volume-clouds",
+      "route": "demos/webgpu-weather-volume-clouds/",
+      "classification": "implementation-preview",
+      "canonicalEvidence": false,
+      "pageErrors": [],
+      "verdict": "PREVIEW_FAILED",
+      "error": "page.goto: Target page, context or browser has been closed\n    at captureRoute (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:79:16)\n    at captureSitePreviews (/Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:158:28)\n    at async file:///Users/linegel/_reps/threejs/scripts/capture-site-previews.mjs:189:18"
+    }
+  ],
+  "note": "Page screenshots are presentation previews only. Native WebGPU acceptance requires render-target readback and a schema-v2 evidence bundle.",
+  "providerCaptureSurface": "interactive Chrome at https://threejs-skills.com/"
+}
