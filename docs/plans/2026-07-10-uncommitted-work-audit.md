@@ -40,6 +40,7 @@ is still valid; generated publication remains downstream-only.
 | quality migration resources | `c5e549f` | syntax and integrated router suite pass |
 | semantic invariant execution | `04f4897` | 33 invariants, 123 cases, 5,230 record validations, 215 negative cases; PASS in 265 s |
 | skill ABI closure gate | `070bfcc` | `npm run test:skills` passes and invokes the executable router suite |
+| canonical implementation audit | `98e6b2b` | 27 canonical targets, five flagships, 39 primary source sets, and all 41 lab-unit tests pass |
 
 This reconciliation does not promote any rendering lab to accepted. The 37
 native-WebGPU primary surfaces still require their declared browser, readback,

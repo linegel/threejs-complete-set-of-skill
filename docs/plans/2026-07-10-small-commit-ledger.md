@@ -12,10 +12,14 @@ supersets into later lab commits.
 | A02–A18 | role closure landed, historical grouping differs from the proposed one-file split | `916e377`, `3be3966`, earlier lifecycle commits; live `npm run test:skills` passes |
 | A19 | complete | `070bfcc`; live `npm run test:skills` passes |
 | A20 | complete as six fixture commits | `9cbb5e4`, `359be02`, `a7519d2`, `5b0330f`, `c5e549f`, `04f4897`; full router suite passes |
-| A21 | pending | implementation-matrix and source auditors remain untracked |
+| A21 | complete | `98e6b2b`; implementation/source audits and 41 lab-unit tests pass |
 | A22 | complete locally | `1abe419`; rerun after source freeze |
 | A23 | complete | `438be92` |
 | B–F | pending | no proxy, lab, evidence, or generated publication row is accepted by this reconciliation |
+
+Phase A is closed at `98e6b2b`. Phase B remains secondary-only; canonical gap
+work proceeds through the Phase C dependency chain before any generated
+publication commit.
 
 ### A20 executed split
 
