@@ -99,6 +99,21 @@ LOD, visibility, shadows, caches, and resets belong to
 IDs and leases, and multi-target `FrameExecutionRecord` entries retire those
 leases only after every consumer completes.
 
+External dynamics cross one declared `ExternalSolverAdapter`: the site package
+serializes its adapter and proxy identities, while the adapter owns the exact
+unit/frame/time conversion, solver ownership split, synchronization proof, and
+step receipts. The site compiler does not synthesize physical exchange records.
+The selected domain solver publishes or accepts each dimensioned
+`InteractionRecord` with a target equation, physical footprint, application
+interval, exact-once key, and conservation membership.
+After atomic commit, each dynamic asset contributes its leased state pair to a
+camera-free `PhysicsPresentationCandidate`; render LOD never substitutes for
+that committed physical state. A physics-facing change to collider topology,
+body representation, material law, solver cadence, error bound, or stable-ID
+policy proceeds only through a coordinator-admitted `QualityTransition` with a
+conservative map or explicit reset at a safe step boundary and exactly one
+authoritative emitter throughout migration.
+
 Required reference families must resolve to a licensed compact asset kit or a
 tested procedural module/generator. A missing ruin, dock, boat, rock/reef,
 vegetation, cloud-silhouette, or other identity-bearing family is a blocker,

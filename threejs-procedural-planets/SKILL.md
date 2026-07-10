@@ -19,8 +19,9 @@ or another physics domain must use the route's
 Publish typed `PhysicsSignalDescriptor` records bound to the active
 `PhysicsContext` through the canonical IDs, physics frame/origin epoch,
 transform/chart, `clockId`/`samplePhase`, channels, represented-footprint/
-filter, validity/`perChannelError`, residency/cadence/latency, state/resource
-version, and missing-channel envelope. Every `PhysicsSampleRequest` and
+filter, validity/`perChannelError`, residency/cadence/latency, and state/resource
+version. Encode unavailable channels through the descriptor's typed
+missing-channel envelope. Every `PhysicsSampleRequest` and
 returned `SampledChannel.actualPhysicsTime`, including static/analytic results,
 carries a direct canonical `PhysicsInstant | PhysicsTimeInterval`, never the
 generic `PhysicsTime` wrapper; time is not an extra descriptor field. A
@@ -53,6 +54,15 @@ metric/Jacobian, domain/seam validity, and chart version; express physical
 vectors in a declared orthonormal body/world frame.
 When dynamics need gravity, publish a point/time vector signal in `m s^-2`;
 never substitute world `-Y`, radial up, or a normalized surface normal.
+
+Physics-facing rock, soil, ice, sediment, and seabed classes resolve through
+the route-selected `PhysicsMaterialRegistry`. Each exposed field or primitive
+binds a stable `PhysicsMaterialId` and exact material-record version; pair-law
+selection latches both participants, their state versions, contact frame, and
+resolver revision for the whole interaction interval. Time-varying temperature,
+liquid saturation, ice fraction, or compaction remains separately versioned
+`PhysicsMaterialState`; PBR color, roughness, and metalness carry no implicit
+constitutive meaning.
 
 Do not load this skill merely because a scene contains islands. A bounded
 archipelago, coastal site, bathymetric model, or isometric land tile whose
@@ -167,10 +177,12 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
   no runtime readback, and simpler material channels. It is the same public
   field/LOD architecture, not an alternate renderer.
 
-Any change to physics state/equations, native cadence or coupling, represented
+Every change to physics state/equations, native cadence or coupling, represented
 band/footprint/filter, physical error bound, conserved inventory, stable-ID/RNG/
-event policy, or physics residency is an exact `QualityTransition`, not render
-LOD. Declare source/destination `PhysicsQualityStateDescriptor`s; prepare
+event policy, or physics residency is represented by an exact
+`QualityTransition` admitted by the route physics coordinator at a safe step
+boundary. Render LOD leaves those authoritative properties unchanged. Declare
+source/destination `PhysicsQualityStateDescriptor`s; prepare
 without publication; commit a gated `ConservativeStateMap`, inventory and
 ID/RNG/event-cursor mappings atomically at a step boundary; increment the
 quality epoch; and retain the old leases until the declared completion join.

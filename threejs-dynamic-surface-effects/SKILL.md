@@ -28,7 +28,8 @@ Physics-driven frost may consume read-only signal channels described by
 `PhysicsSignalDescriptor`: dimensionless coverage/phase fraction, temperature
 in kelvin, and optional areal frost/ice loading, all reached through one sealed
 `PhysicsPresentationSnapshot` and its exact candidate/camera/view-preparation
-references. Resolve the candidate's `PresentedStatePair`; its previous and
+references. Resolve the referenced `PhysicsPresentationCandidate` and its
+`PresentedStatePair`; its previous and
 current states have independent `PresentationSampleProvenance`. Use that
 provenance and the associated
 `PhysicsSignalDescriptor` footprint/filter, source clock and mapped

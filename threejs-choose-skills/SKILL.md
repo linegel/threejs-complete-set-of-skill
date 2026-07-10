@@ -54,11 +54,15 @@ Complete this before loading a destination skill:
    one `PhysicsContext`, typed providers and `ErrorPropagationLedger` records,
    an ordered multi-rate `PhysicsGraph` with exact
    `PhysicsCoordinationAdvanceRecord` executions, explicit one-way/two-way
-   interactions and `InteractionApplicationLedger` records, atomic
+   `SurfaceExchange` batches with dimensioned `InteractionRecord` source/reaction
+   ownership and exact `InteractionApplicationLedger` dispositions, atomic
    `PhysicsCommitTransaction` records, one immutable
    `PhysicsPresentationCandidate`, per-view camera/preparation publications, one
    sealed snapshot and `PresentationRenderPlan` per selected target/view,
-   `QualityTransition` records for physical quality changes, and an active
+   an append-only `FrameExecutionRecord` closing plan submission, reset results,
+   completion tokens, leases, and slot retirement,
+   an admitted `QualityChangeRequest` plus `QualityTransition` records for
+   physical quality changes, and an active
    `PhysicsCostLedger`. A producer/consumer label alone is not an integration
    contract.
 5. Build a resource/pass ownership graph before selecting effects: scene color,

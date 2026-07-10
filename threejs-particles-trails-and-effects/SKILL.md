@@ -26,6 +26,17 @@ values only to the owning domain. A depth hit, visual spark, or wake ribbon is
 not an impulse, mass source, or equal-and-opposite reaction unless that record
 and schedule exist.
 
+On a contact-capable route, the declared collision owner publishes each
+`ContactManifoldRecord` with its manifold generation, lifecycle interval,
+collider features, material-state versions, solver-law revision, and emitted
+interaction IDs; an effect consumer does not own its warm start or impulses.
+Both contact sides resolve their `PhysicsMaterialId` and state versions through
+the route-owned `PhysicsMaterialRegistry`, whose pair resolver latches the
+constitutive laws for the application interval instead of inferring them from
+PBR appearance. The coordinator places collision, effect, and exchange work in
+the `PhysicsGraph` with typed version edges and dependency completions, so only
+committed outputs can feed later interaction or presentation stages.
+
 ## Conditional Shared-Physics Contract
 
 Apply this section only when particle/effect state participates in physical

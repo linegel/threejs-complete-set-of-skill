@@ -44,6 +44,13 @@ mapping and `renderOriginEpoch`; the view-independent candidate and physical
 field state do not change
 `physicsFrameId`, `physicsOriginEpoch`, values, IDs, or versions.
 
+When a field classifies substrate or another physical material, its published
+`PhysicsMaterialId` resolves to the route-owned `PhysicsMaterialRegistry` and
+the exact registry/material-state versions used for the sampling interval.
+The field supplies causal classification and uncertainty; the registry pair
+resolver supplies contact, transport, thermal, or wetting laws. Render color,
+roughness, and field masks never infer those laws or silently provide defaults.
+
 ## Numerical Provenance
 
 Every numerical claim emitted from this skill carries one label:

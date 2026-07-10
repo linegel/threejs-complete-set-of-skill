@@ -22,6 +22,9 @@ techniques replaced by the WebGPU/TSL architecture.
 For any material, cloud, water, vegetation, or weather consumer, first read the
 router's
 [physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+One immutable `PhysicsContext` resolves every snapshot descriptor, frame,
+chart, clock, origin epoch, material ID, and world/physics transform revision
+used by the atmosphere stage.
 Publish one versioned `LightingTransportSnapshot` from this atmosphere model.
 The snapshot declares:
 

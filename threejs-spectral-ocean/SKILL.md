@@ -320,7 +320,10 @@ The raw numerical sampler may return its solver-specific diagnostics:
 The omitted bound **[D]**, solver tolerance **[G]**, and GPU-versus-CPU probe
 error **[M]** are distinct fields. A public physics consumer never receives
 that raw shape. The spectral adapter publishes the canonical `WaterSurfaceProvider`
-sample in physics-frame metres: `freeSurfacePoint`, `freeSurfaceNormal`,
+sample as one exact `WaterSurfaceSample`; its descriptor, sample instant,
+parameterization, required channels, optional typed absences, footprint/filter,
+validity, and correlated per-channel error remain one atomic bundle. Its
+physics-frame-metre channels are `freeSurfacePoint`, `freeSurfaceNormal`,
 `geometricNormalVelocityMps`, its exact `WaterSurfaceParameterization`,
 optional fixed-coordinate `surfacePointVelocityMps`, optional
 `materialCurrentVelocityMps`, optional
@@ -356,12 +359,17 @@ terms to an already physical vector.
 The homogeneous spectral patch may drive one-way bodies through this provider
 only when the authoritative source is named and omitted body-to-water feedback
 has a `[G]` upper bound or the claim/regime is explicitly narrowed.
+An explicitly selected spatial interaction solver packages body/water coupling
+as one `SurfaceExchange`. Its source and reaction `InteractionRecord` entries
+carry dimensioned payloads, exact application intervals, physical footprints,
+target equations, state versions, and exact-once application-ledger keys.
 It does not accept two-way body/source `InteractionRecord` feedback unless an
 explicit spatial interaction solver owns that region; route such loads through
-`$threejs-water-optics` or a canonical `ExternalSolverAdapter`. Rendering uses the shared
-presentation lifecycle: the spectral owner contributes its `PresentedStatePair`
-to the view-independent `PhysicsPresentationCandidate`, which contains no
-camera or render transform. `previousPresented` and `currentPresented` each
+`$threejs-water-optics` or a canonical `ExternalSolverAdapter`. Rendering uses
+the shared presentation lifecycle: the spectral owner publishes its
+`PresentedStatePair` through a view-independent
+`PhysicsPresentationCandidate`. The candidate contains no camera or render
+transform. `previousPresented` and `currentPresented` each
 carry independent `PresentationSampleProvenance`, `presentedInstant`, state
 handle, and global spatial binding. The camera owner publishes
 `CameraViewPublication`; preparation owners publish

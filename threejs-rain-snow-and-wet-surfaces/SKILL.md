@@ -109,10 +109,11 @@ never republishes forcing under a rain-owned revision.
   Emit sparse impacts as `InteractionRecord` with impulse, footprint in the
   declared SI physics frame, source/receiver IDs, exact
   `applicationInterval: PhysicsTimeInterval`, frame/transform revision,
-  ordering key, reaction owner, and batch/partition identity. Put capacity
+  ordering key, reaction owner, and batch/partition identity. Publish capacity
   outcomes in this downstream `SurfaceExchange.batchLedger` as the canonical
-  immutable `InteractionBatchLedger`, never on the cloud emission or individual
-  records. Rendered streak/flake count never changes either integral. Every
+  immutable `InteractionBatchLedger`. Cloud emission and individual interaction
+  records do not carry those batch outcomes. Rendered streak/flake count never
+  changes either integral. Every
   causal physical impact carries
   `InteractionRecord.partitionMembership: InteractionPartitionMembership`
   with its `parentExchangeId`, `parentInteractionIds`, `partitionGroupId`,
@@ -130,6 +131,12 @@ never republishes forcing under a rain-owned revision.
   evaporation into one state. Water, this skill, and materials may not each
   integrate private copies. A material consumes the published receiver state;
   it never integrates precipitation in a fragment node.
+
+The route coordinator owns one canonical `PhysicsGraph`. This skill contributes
+the selected forcing-sample, precipitation-advance, exchange-emission,
+receiver-integration, commit, and presentation stages; graph edges name the
+exact signal/exchange version, sample phase, staleness gate, and completion
+dependency consumed by each stage execution.
 
 Order coupled updates as follows: latch one immutable forcing snapshot at its
 `sampleInstant: PhysicsInstant` for the graph's

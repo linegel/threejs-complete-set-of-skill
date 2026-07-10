@@ -31,6 +31,10 @@ clock/instant/interval identity, graph ordering, interaction exchange, residency
 propagation, and presentation interpolation use that contract rather than a
 water-local dialect.
 
+One immutable `PhysicsContext` resolves the water provider's context ID, SI
+quantity system, frames, charts, clocks, gravity, origin epoch, material
+registry, and world/physics transform revision.
+
 ### Canonical water-provider boundary
 
 This skill publishes the canonical `WaterSurfaceProvider` interface and
@@ -418,10 +422,11 @@ and must not claim feedback. Keep
 coupled hot state on one execution side or in a validated shared mirror;
 synchronous frame-critical GPU readback is forbidden.
 
-Water contributes a per-binding/provider `PresentedStatePair` to the
-view-independent `PhysicsPresentationCandidate`, which contains committed
-state brackets, leases, and events but no camera, render origin, view matrix,
-shadow/cache state, or global-to-render transform. `previousPresented` and
+Water publishes each per-binding/provider `PresentedStatePair` through the
+coordinator's view-independent `PhysicsPresentationCandidate`. The candidate
+contains committed state brackets, leases, and events but no camera, render
+origin, view matrix, shadow/cache state, or global-to-render transform.
+`previousPresented` and
 `currentPresented` each independently contain a
 `PresentationSampleProvenance`, `presentedInstant`, `PresentationStateHandle`,
 and `PresentationSpatialBinding`; `motionBinding` references the two state

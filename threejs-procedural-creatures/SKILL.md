@@ -26,6 +26,15 @@ the immutable `EnvironmentForcingSnapshot`,
 the immutable presentation publication chain. This skill consumes those boundaries;
 it does not fork them inside creature locomotion.
 
+Reactive locomotion consumes the complete `SupportSurfaceSample` selected for
+its requested physics instant, including stable support/feature identity,
+point kinematics, sidedness, footprint, validity, and correlated channel
+error; it does not turn that kinematic query into a contact impulse. Swimming
+and buoyancy consume the complete `WaterSurfaceSample` returned under the
+request's channel mask and latency/error gates. They preserve the distinctions
+among geometric interface motion, parameterization velocity, material current,
+depth, and pressure rather than filling absent channels with zero.
+
 For plants and foliage use `$threejs-procedural-vegetation`. For generic
 transform timelines, springs, and staging use
 `$threejs-procedural-motion-systems`. Imported glTF skinned-clip pipelines

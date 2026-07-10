@@ -24,6 +24,12 @@ multi-rate scheduler, `WaterSurfaceProvider`, `InteractionRecord`, residency,
 state/error versions, and `PhysicsPresentationSnapshot`. This skill owns motion
 algorithms behind that boundary; it does not create local substitutes.
 
+The route coordinator owns one canonical `PhysicsGraph`. This skill contributes
+named motion stages whose read/write version rules, dependencies, execution
+intervals, and commit groups are fixed by that graph; each admitted
+`PhysicsStageExecution` resolves those ports and joins the graph's atomic commit
+lineage before its output becomes sampleable.
+
 ## Build order
 
 Choose the time model before the throughput model:
@@ -96,12 +102,16 @@ Throughput decision table:
 Environment-coupled motion is an explicit algorithm boundary. Boats, buoys,
 floating debris, and swimmers consume the canonical batched,
 channel-requested `WaterSurfaceProvider`. Requests use physics-frame metres and
-declare footprint/filter, frame, and one canonical `PhysicsInstant`. Samples use the exact
-shared names `freeSurfacePoint`, `freeSurfaceNormal`,
+declare footprint/filter, frame, and one canonical `PhysicsInstant`. The
+provider returns one canonical `WaterSurfaceSample`; the motion stage validates
+its descriptor and generation, bundle `sampleInstant`, parameterization,
+represented footprint/filter, atomic validity, and per-channel error against
+the request before advancing actor state. Its channels use the exact shared
+names `freeSurfacePoint`, `freeSurfaceNormal`,
 `geometricNormalVelocityMps`, `surfacePointVelocityMps`,
 `materialCurrentVelocityMps`,
 `waterColumnDepthMeters`, optional `densityKgPerM3`,
-and the returned shared `PhysicsSignalDescriptor` and bundle `sampleInstant`.
+and the returned shared `PhysicsSignalDescriptor`.
 Each channel is the complete shared `SampledChannel` and retains
 `actualPhysicsTime` resolving to a `PhysicsInstant`; the requested and actual
 instants may differ only within the

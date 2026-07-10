@@ -122,7 +122,10 @@ a non-WebGPU fallback.
 Use the canonical
 [physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
 whenever two or more physical domains or a physics-to-render boundary is
-claimed. Validate the `PhysicsContext`, provider schemas, scheduler DAG,
+claimed. Validate the exact `PhysicsGraph`: its stages, edges, dependencies,
+bounded loops, commit groups and transactions, execution ledger, catch-up debt,
+and loss ledger must close over one coordination advance. Validate the
+`PhysicsContext`, provider schemas, scheduler DAG,
 `InteractionBatchLedger`, `InteractionReactionGroup`, `ConservationGroup`,
 `PhysicsPresentationCandidate`, sealed
 `CameraViewPublication`, `ViewPreparationPublication`,
