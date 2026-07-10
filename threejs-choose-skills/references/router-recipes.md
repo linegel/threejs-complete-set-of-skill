@@ -361,7 +361,7 @@ physicsQualityTransitions:
 physicsPresentationTimeCohortsById:
   analytic-archipelago-cohort: { type: PresentationTimeCohort, timeCohortId: analytic-archipelago-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -370,13 +370,12 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving analytic terrain/water versions to analytic-state commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  producer: route physics coordinator
-  consumers: [design-view camera owner, route presentation assembler]
-  contents: requestedPresentationInstant plus committed analytic per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics frame/origin/revision, immutable state handles, resource leases, and event ranges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  # Ownership note: the route physics coordinator publishes for the design-view camera owner and presentation assembler.
+  # Content note: only committed analytic pairs/leases/event ranges; never camera, render-origin, view/projection, shadow/cache, or global-to-render state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
-  qualityMigration: the coordinator admits one request only through a QualityTransition with commitInstant, conservative/reset map, error residuals, queue boundary, atomic provider/registry versions, ConsumerCompletionJoin retirement, scoped presentation/history actions, and rollback before candidate publication
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
 physicsViewPreparationPublicationsByTarget:
@@ -582,7 +581,7 @@ physicsErrorPropagationLedgers:
 physicsPresentationTimeCohortsById:
   prescribed-vessel-archipelago-cohort: { type: PresentationTimeCohort, timeCohortId: prescribed-vessel-archipelago-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -591,13 +590,12 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving water/foam/vessel versions to coastal-state commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  producer: route physics coordinator
-  consumers: [design-view camera owner, route presentation assembler]
-  contents: requestedPresentationInstant plus committed water/foam/vessel PresentedStatePair entries with independent provenance and physics-qualified state handles, exact leases, and consumed event ranges; contains no camera, render-origin, view/projection, shadow/cache, or global-to-render data
+  # Ownership note: the route physics coordinator publishes for the design-view camera owner and presentation assembler.
+  # Content note: only committed water/foam/vessel pairs/leases/event ranges; never camera, render-origin, view/projection, shadow/cache, or global-to-render state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
-  qualityMigration: a QualityTransition commits at commitInstant with conservative map/reset, interaction-queue boundary, residuals, atomic provider versions, ConsumerCompletionJoin retirement, scoped resets, and rollback before candidate publication
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera, contents: previous/current PhysicsInstant, source-qualified RenderSimilarityTransforms, unjittered matrices, jitter, viewport/DPR/extent, depth, and projection validity/error }
 physicsViewPreparationPublicationsByTarget:
@@ -845,7 +843,7 @@ physicsErrorPropagationLedgers:
 physicsPresentationTimeCohortsById:
   spectral-vessel-archipelago-cohort: { type: PresentationTimeCohort, timeCohortId: spectral-vessel-archipelago-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -854,13 +852,12 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving offshore/coastal/foam/vessel versions to spectral-coastal commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  producer: route physics coordinator
-  consumers: [design-view camera owner, route presentation assembler]
-  contents: requestedPresentationInstant plus committed offshore/coastal/foam/vessel PresentedStatePair entries with independent provenance, physics-qualified state handles, exact leases, and consumed event ranges; contains no camera/render/view/shadow/cache data
+  # Ownership note: the route physics coordinator publishes for the design-view camera owner and presentation assembler.
+  # Content note: only committed offshore/coastal/foam/vessel pairs/leases/event ranges; never camera/render/view/shadow/cache state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
-  qualityMigration: a QualityTransition commits at commitInstant with conservative map/reset, queue boundary, conservation/covariance/error residuals, atomic provider versions, ConsumerCompletionJoin retirement, scoped resets, and rollback before candidate publication
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera, contents: previous/current PhysicsInstant, source-qualified RenderSimilarityTransforms, unjittered matrices, jitter, viewport/DPR/extent, depth, and projection validity/error }
 physicsViewPreparationPublicationsByTarget:
@@ -1206,8 +1203,8 @@ physicsQualityTransitions:
 physicsPresentationTimeCohortsById:
   archipelago-design-map-cohort: { type: PresentationTimeCohort, timeCohortId: archipelago-design-map-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous presentation PhysicsInstant, currentRequestedPresentationInstant: exact current presentation PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact coastal discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: bounded-mapped-skew, cohortSpecificationDigest: canonical cohort specification digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
-  producer: route physics coordinator
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
+  # Ownership note: the route physics coordinator publishes for the declared target/view camera owners and presentation assembler.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -1216,7 +1213,7 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving every presented version to spectral-coastal-weather-body commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  contents: requestedPresentationInstant plus committed static terrain/coast/bathymetry field binding, offshore/coastal/foam/body/cloud-density/cloud-emission/receiver/vegetation PresentedStatePairs with independent provenance, physics-qualified immutable handles, exact Candidate leases, and event ranges; no camera/render-origin/view/projection/shadow/cache data
+  # Content note: only committed terrain/water/body/weather/receiver/vegetation pairs, leases, and event ranges; never camera/render/view/shadow/cache state.
   presentedStatePairs:
     cloud-density-field:
       { type: PresentedStatePair, bindingId: cloud-density-field, entityId: TypedAbsence(not-applicable, record authority, record interval, sketch provenance), providerId: $threejs-volumetric-clouds, signalId: cloudDensity, previousPresented: { provenance: { sourceClockId: cloud-clock, requestedPresentationInstant: exact requested previous instant, mappedSourceInstant: exact mapped previous cloud instant, clockMapRevision: cloud-clock-map-v2, clockMapError: cloud presentation mapping error, lowerBracket: exact cloud state/version/frame/origin/transform/resource generation, upperBracket: exact cloud state/version/frame/origin/transform/resource generation, interpolation: density-preserving field interpolation plus error, extrapolation: TypedAbsence(not-applicable, record authority, record interval, sketch provenance) }, presentedInstant: exact previous presentation instant, stateHandle: { leaseId: cloud-density-previous-lease, resourceGeneration: exact cloud resource generation, deviceLossGeneration: exact backend loss generation, layoutRevision: cloud-density-layout-v2, subresourceOrCpuSlice: exact previous field range }, globalBinding: { kind: field, sourcePhysicsFrameId: physicsContext.physicsRootFrameId, physicsOriginEpoch: physicsContext.physicsOriginEpoch, transformRevision: physicsContext.worldTransformRevision, bindingPayload: cloud volume transform/domain/majorant binding }, originEpochBridge: TypedAbsence(not-applicable, record authority, record interval, sketch provenance) }, currentPresented: { provenance: { sourceClockId: cloud-clock, requestedPresentationInstant: exact requested current instant, mappedSourceInstant: exact mapped current cloud instant, clockMapRevision: cloud-clock-map-v2, clockMapError: cloud presentation mapping error, lowerBracket: exact cloud state/version/frame/origin/transform/resource generation, upperBracket: exact cloud state/version/frame/origin/transform/resource generation, interpolation: density-preserving field interpolation plus error, extrapolation: TypedAbsence(not-applicable, record authority, record interval, sketch provenance) }, presentedInstant: exact current presentation instant, stateHandle: { leaseId: cloud-density-current-lease, resourceGeneration: exact cloud resource generation, deviceLossGeneration: exact backend loss generation, layoutRevision: cloud-density-layout-v2, subresourceOrCpuSlice: exact current field range }, globalBinding: { kind: field, sourcePhysicsFrameId: physicsContext.physicsRootFrameId, physicsOriginEpoch: physicsContext.physicsOriginEpoch, transformRevision: physicsContext.worldTransformRevision, bindingPayload: cloud volume transform/domain/majorant binding }, originEpochBridge: TypedAbsence(not-applicable, record authority, record interval, sketch provenance) }, motionBinding: { kind: field, storageRepresentation: texture-field, previousStateHandle: cloud-density-previous state handle above, currentStateHandle: cloud-density-current state handle above, identitySlotMap: cloud-volume-brick-identity-map-v2, motionVectorValidity: valid } }
@@ -1224,7 +1221,7 @@ physicsPresentationCandidate:
     - { type: PresentationResourceLease, leaseId: cloud-density-previous-lease, resourceId: cloud-density-previous-resource, deviceId: route WebGPU device, deviceLossGeneration: exact backend loss generation, resourceGeneration: exact previous cloud resource generation, layoutRevision: cloud-density-layout-v2, entitySlotMapVersion: cloud-volume-brick-identity-map-v2, residency: gpu, slotRangeStrideCount: exact previous volume subresources/strides/counts, owner: $threejs-volumetric-clouds, leaseScope: candidate, access: read, submissionAvailability: exact cloud-state production dependency, leaseBegin: candidate publication sequence, reuseProhibitedUntil: { type: ConsumerCompletionJoin, joinId: cloud-density-previous-completion-join, leaseId: cloud-density-previous-lease, requiredConsumerKeys: [design-view cloud shadow/raymarch, map-view cloud shadow/raymarch], simulationConsumers: exact cloud-owner tokens, couplingConsumers: [], externalConsumers: [], presentationConsumers: exact per-snapshot queue completion tokens, joinPredicate: all-required-consumers-complete-or-loss-invalidated, joinDigest: canonical join digest, deviceLossRetirementPath: generation-invalidated retirement } }
     - { type: PresentationResourceLease, leaseId: cloud-density-current-lease, resourceId: cloud-density-current-resource, deviceId: route WebGPU device, deviceLossGeneration: exact backend loss generation, resourceGeneration: exact current cloud resource generation, layoutRevision: cloud-density-layout-v2, entitySlotMapVersion: cloud-volume-brick-identity-map-v2, residency: gpu, slotRangeStrideCount: exact current volume subresources/strides/counts, owner: $threejs-volumetric-clouds, leaseScope: candidate, access: read, submissionAvailability: exact cloud-state production dependency, leaseBegin: candidate publication sequence, reuseProhibitedUntil: { type: ConsumerCompletionJoin, joinId: cloud-density-current-completion-join, leaseId: cloud-density-current-lease, requiredConsumerKeys: [design-view cloud shadow/raymarch, map-view cloud shadow/raymarch], simulationConsumers: exact cloud-owner tokens, couplingConsumers: [], externalConsumers: [], presentationConsumers: exact per-snapshot queue completion tokens, joinPredicate: all-required-consumers-complete-or-loss-invalidated, joinDigest: canonical join digest, deviceLossRetirementPath: generation-invalidated retirement } }
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records for consumed weather/water/body events or [])
-  qualityMigration: coordinator-admitted QualityTransition with commitInstant, conservative map/reset, conservation/error gates, exact-once cursor policy, ConsumerCompletionJoin retirement, and rollback
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/design-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: design-view camera owner, presentationTargetId: main, viewId: design-view, cameraId: design-camera generation, contents: exact previous/current PhysicsInstant, RenderSimilarityTransforms, matrices, jitter, viewport/DPR/extent, depth, validity/error }
   minimap/map-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: map-view camera owner, presentationTargetId: minimap, viewId: map-view, cameraId: map-camera generation, contents: independent exact previous/current PhysicsInstant, RenderSimilarityTransforms, matrices, jitter, viewport/DPR/extent, depth, validity/error }
@@ -1475,7 +1472,7 @@ physicsErrorPropagationLedgers:
 physicsPresentationTimeCohortsById:
   ocean-planet-cohort: { type: PresentationTimeCohort, timeCohortId: ocean-planet-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous PhysicsInstant, currentRequestedPresentationInstant: exact current PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact current discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: exact-instant, cohortSpecificationDigest: canonical cohort digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -1484,13 +1481,12 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving planet/ocean/transport versions to planet-ocean-transport commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  producer: route physics coordinator
-  consumers: [primary-view camera owner, route presentation assembler]
-  contents: requestedPresentationInstant plus committed planet/ocean/transport per-binding/provider PresentedStatePair entries, independent previous/current provenance, physics-qualified immutable state handles, exact resource leases, and event ranges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  # Ownership note: the route physics coordinator publishes for the primary-view camera owner and presentation assembler.
+  # Content note: only committed planet/ocean/transport pairs/leases/event ranges; never camera, render-origin, view/projection, shadow/cache, or global-to-render state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records or [])
-  qualityMigration: a prepared QualityTransition commits at a PhysicsInstant through its own all-or-none commit group with projection/reset map, geometric/radiometric/error residuals, queue boundary, atomic versions, ConsumerCompletionJoin retirement, scoped actions, and rollback before candidate publication
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/primary-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: primary-view camera owner, presentationTargetId: main, viewId: primary-view, cameraId: primary-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
 physicsViewPreparationPublicationsByTarget:
@@ -1819,9 +1815,8 @@ physicsQualityTransitions:
 physicsPresentationTimeCohortsById:
   rainy-city-street-cohort: { type: PresentationTimeCohort, timeCohortId: rainy-city-street-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous presentation PhysicsInstant, currentRequestedPresentationInstant: exact current presentation PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact rainy-city discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: bounded-mapped-skew, cohortSpecificationDigest: canonical cohort specification digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
-  producer: route physics coordinator
-  consumers: [street-view camera owner, route presentation assembler]
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
+  # Ownership note: the route physics coordinator publishes for the street-view camera owner and presentation assembler.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -1830,11 +1825,11 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving precipitation/receiver/puddle/range versions to rainy-city commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  contents: requestedPresentationInstant plus committed forcing/receiver/puddle/precipitation per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics-qualified immutable state handles, exact resource leases, and eventSequenceRanges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  # Content note: only committed forcing/receiver/puddle/precipitation pairs, leases, and event ranges; never camera, render-origin, view/projection, shadow/cache, or global-to-render state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records)
-  qualityMigration: a prepared QualityTransition commits at commitInstant (PhysicsInstant) through its own all-or-none commit group with conservative map/reset, interaction/source-queue boundary, mass/momentum residual gates, atomic versions, ConsumerCompletionJoin retirement, scoped resets, and rollback before candidate publication
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/street-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: street-view camera owner, presentationTargetId: main, viewId: street-view, cameraId: street-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
 physicsViewPreparationPublicationsByTarget:
@@ -2086,9 +2081,8 @@ physicsQualityTransitions:
 physicsPresentationTimeCohortsById:
   forest-navigation-cohort: { type: PresentationTimeCohort, timeCohortId: forest-navigation-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous presentation PhysicsInstant, currentRequestedPresentationInstant: exact current presentation PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact forest discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: bounded-mapped-skew, cohortSpecificationDigest: canonical cohort specification digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
-  producer: route physics coordinator
-  consumers: [navigation-view camera owner, route presentation assembler]
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
+  # Ownership note: the route physics coordinator publishes for the navigation-view camera owner and presentation assembler.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -2097,11 +2091,11 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving forcing/support/vegetation/range versions to their committed receipts/digests
   candidateScope: committed-state-brackets-leases-and-events
-  contents: requestedPresentationInstant plus committed forcing/support/vegetation per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics-qualified immutable state handles, exact resource leases, and eventSequenceRanges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  # Content note: only committed forcing/support/vegetation pairs, leases, and event ranges; never camera, render-origin, view/projection, shadow/cache, or global-to-render state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records)
-  qualityMigration: a prepared QualityTransition commits at commitInstant (PhysicsInstant) through its own all-or-none commit group with projection/reset map, interaction-queue boundary, energy/error residuals, atomic versions, ConsumerCompletionJoin retirement, scoped invalidations, and rollback before candidate publication
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically.
 physicsCameraViewPublicationsByTarget:
   main/navigation-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: navigation-view camera owner, presentationTargetId: main, viewId: navigation-view, cameraId: navigation-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
 physicsViewPreparationPublicationsByTarget:
@@ -2425,9 +2419,8 @@ physicsQualityTransitions:
 physicsPresentationTimeCohortsById:
   external-body-water-inspection-cohort: { type: PresentationTimeCohort, timeCohortId: external-body-water-inspection-cohort, presentationClockId: presentation-clock, presentationOpportunitySequence: exact monotonic integer, previousRequestedPresentationInstant: exact previous presentation PhysicsInstant, currentRequestedPresentationInstant: exact current presentation PhysicsInstant, requestedPresentationInstant: same current PhysicsInstant, requiredContextIds: [physicsContext.contextId], requiredDiscontinuityEpochs: { physicsContext.contextId: exact body-water discontinuity epoch }, maximumInterContextSkew: zero for one context, maximumCandidateAge: Gated PhysicsDuration, admissionPolicy: bounded-mapped-skew, cohortSpecificationDigest: canonical cohort specification digest }
 physicsPresentationCandidate:
-  type: PhysicsPresentationCandidate
-  producer: route physics coordinator
-  consumers: [inspection-view camera owner, route presentation assembler]
+  # ABI envelope recordType: PhysicsPresentationCandidate; not a value key.
+  # Ownership note: the route physics coordinator publishes for the inspection-view camera owner and presentation assembler.
   candidateId: runtime-id
   contextId: physicsContext.contextId
   presentationEpoch: exact route presentation epoch
@@ -2436,11 +2429,11 @@ physicsPresentationCandidate:
   physicsOriginEpoch: physicsContext.physicsOriginEpoch
   commitProvenance: exact CandidateCommitProvenance resolving body/manifold/water/support versions to body-water commit receipt IDs/digests
   candidateScope: committed-state-brackets-leases-and-events
-  contents: requestedPresentationInstant plus committed body/water/support per-binding/provider PresentedStatePair entries with independent previous/current provenance, physics-qualified immutable state handles, exact CPU/GPU/external leases, and eventSequenceRanges; contains no camera, render origin, view/projection matrix, shadow/cache epoch, or global-to-render transform
+  # Content note: only committed body/water/support pairs, CPU/GPU/external leases, and event ranges; never camera, render-origin, view/projection, shadow/cache, or global-to-render state.
   presentedStatePairs: canonicalExpansion(required complete per-binding PresentedStatePair records)
   resourceLeases: canonicalExpansion(required complete Candidate-scoped PresentationResourceLease records)
   eventSequenceRanges: canonicalExpansion(required complete PresentationEventRange records)
-  qualityMigration: a prepared QualityTransition commits at commitInstant (PhysicsInstant) through its own all-or-none commit group with conservative restriction/prolongation/reset, interaction-queue boundary, conserved-value/error gates, collider/manifold/warm-start policy, atomic versions, ConsumerCompletionJoin retirement, scoped actions, and rollback before candidate publication; changing solver class or physical law is forbidden as a tier
+  # Quality note: publish only after an admitted QualityTransition commits or rolls back atomically; changing solver class or physical law is not a visual tier.
 physicsCameraViewPublicationsByTarget:
   main/inspection-view: { type: CameraViewPublication, cameraPublicationId: runtime-id, candidateId: physicsPresentationCandidate.candidateId, owner: inspection-view camera owner, presentationTargetId: main, viewId: inspection-view, cameraId: inspection-camera, contents: previous/current PhysicsInstant, source-qualified previous/current RenderSimilarityTransform, unjittered view/projection matrices, jitter convention, viewport/DPR/extent, depth convention, projection validity/error }
 physicsViewPreparationPublicationsByTarget:
