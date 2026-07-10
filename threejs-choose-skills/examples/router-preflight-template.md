@@ -163,6 +163,101 @@ spaceAndOwnerHandoff:
   owner-boundary: "<producer, consumers, lifetime, invalidation>"
 ```
 
+## active physical route scaffold
+
+Keep the nonphysical defaults above unchanged. For an active physical route,
+replace every placeholder below with a schema-valid, closed ABI record and make
+the normal `npm run test:skills` gate pass. Every reference must resolve to the
+exact version, digest, generation, receipt, lease, or completion it names.
+Inactive union arms use the complete `TypedAbsence` record shown here; never
+serialize a bare `absent`, `typed-absence`, `not used`, `null`, empty handle, or
+implicit zero.
+
+```yaml
+activePhysicalRouteScaffold:
+  abiSchemaId: threejs-physics-domain-and-interaction-abi/v1
+  typedAbsenceExample:
+    kind: absent
+    reason: not-requested
+    authority: "<authoritative owner-id>"
+    schemaId: typed-absence-v1
+    effectiveTime: timeless
+    provenance: "<source-and-revision>"
+
+  contextAndProviders:
+    physicsContext: "<PhysicsContext>"
+    requiredContextMembers:
+      quantitySystem: "<PhysicsQuantitySystem>"
+      worldToPhysicsTransform: "<WorldPhysicsTransform>"
+      physicsFrameRegistry: "<PhysicsFrameRegistry with closed frame DAG>"
+      chartRegistry: "<PhysicsChartRegistry with resolved anchors>"
+      physicsClockRegistry: "<PhysicsClockRegistry with closed mapping DAG>"
+      gravityProvider: "<PhysicsSignalDescriptorRef resolving in physicsSignals>"
+      idNamespaces: "<PhysicsIdentityRegistry>"
+      physicsMaterialRegistry: "<PhysicsMaterialRegistry with deterministic pair-law resolution>"
+    physicsSignals: { "<signal-key>": "<PhysicsSignalDescriptor>" }
+    physicsErrorPropagationLedgers: { "<ledger-id>": "<ErrorPropagationLedger>" }
+
+  schedulingAndCommit:
+    physicsGraph: "<PhysicsGraph>"
+    graphInventories:
+      stages: ["<PhysicsGraphStage>"]
+      edges: ["<PhysicsGraphEdge>"]
+      dependencies: ["<PhysicsDependency>"]
+      dependencyCompletions: ["<PhysicsDependencyCompletion in PhysicsExecutionLedger>"]
+      catchUpPolicy: "<PhysicsCatchUpPolicy>"
+      catchUpBatch: "<PhysicsCatchUpBatch or complete TypedAbsence>"
+      coordinationAdvances: ["<PhysicsCoordinationAdvanceRecord; same records as physicsCoordinationAdvanceRecords>"]
+      stageExecutions: ["<PhysicsStageExecution in PhysicsExecutionLedger>"]
+      stateAdvanceClaims: ["<StateAdvanceClaim in PhysicsExecutionLedger>"]
+      executionLedger: "<PhysicsExecutionLedger>"
+      interactionApplicationLedgers: ["<InteractionApplicationLedger; same records as physicsInteractionApplicationLedgers>"]
+      commitTransactions: ["<PhysicsCommitTransaction; same records as physicsCommitTransactions>"]
+      commitReceipts: ["<PhysicsCommitReceipt embedded in each committed transaction and execution ledger>"]
+    physicsCoordinationAdvanceRecords: ["<PhysicsCoordinationAdvanceRecord>"]
+    physicsInteractionApplicationLedgers: { "<ledger-id>": "<InteractionApplicationLedger>" }
+    physicsCommitTransactions: { "<transaction-id>": "<PhysicsCommitTransaction with matching PhysicsCommitReceipt>" }
+
+  interactions:
+    physicsInteractions: ["<SurfaceExchange with closed batch, records, reactions, conservation, and application lineage>"]
+
+  quality:
+    requests: { "<request-id>": "<QualityChangeRequest>" }
+    requestAdmissions: { "<admission-id>": "<QualityRequestAdmission>" }
+    allocationAdmissions: { "<allocation-admission-id>": "<QualityAllocationAdmission>" }
+    physicsQualityTransitions:
+      - "<QualityTransition embedding the exact requestAdmission and prepare.allocationAdmission>"
+
+  presentation:
+    physicsPresentationTimeCohortsById: { "<cohort-id>": "<PresentationTimeCohort>" }
+    physicsPresentationCandidate: "<PhysicsPresentationCandidate with committed receipt provenance>"
+    physicsCameraViewPublicationsByTarget: { "<target-view-key>": "<CameraViewPublication>" }
+    physicsViewPreparationPublicationsByTarget: { "<target-view-key>": "<ViewPreparationPublication>" }
+    physicsPresentationSnapshotsByTarget:
+      "<target-view-key>": "<PhysicsPresentationSnapshot with exact PresentationClosureManifest>"
+    physicsPresentationRenderPlansByTarget: { "<target-view-key>": "<PresentationRenderPlan>" }
+    frameCohortAdmission: "<FrameCohortAdmission embedded in frameExecutionRecord>"
+    frameSlotAdmissions: ["<FrameSlotAdmission embedded in frameExecutionRecord>"]
+    frameExecutionRecord: "<FrameExecutionRecord closing every required target/view and lease join>"
+
+  exactPerformanceEvidence:
+    physicsCostLedger: "<PhysicsCostLedger>"
+    cadenceTraceTotals: "<CadenceTraceTotals whose counts and bytes reconcile to one trace interval>"
+    memoryLedgers:
+      hotState: "<PhysicsMemoryLedger>"
+      peakTransient: "<PhysicsMemoryLedger>"
+      migrationOverlap: "<PhysicsMemoryLedger>"
+      frameCohort: "<PhysicsMemoryLedger covering admitted slots and frames in flight>"
+    trafficRecords: { "<traffic-record-id>": "<TrafficRecord counted exactly in CadenceTraceTotals>" }
+    closureChecks:
+      - every-stage-execution-count-reconciles
+      - every-interaction-application-count-reconciles
+      - every-work-occurrence-count-reconciles
+      - every-traffic-occurrence-and-logical-byte-total-reconciles
+      - every-live-allocation-has-one-lifetime-and-retirement-proof
+      - shared-work-counts-once-and-per-view-work-counts-only-for-executed-views
+```
+
 ## performance contract
 
 ```yaml
