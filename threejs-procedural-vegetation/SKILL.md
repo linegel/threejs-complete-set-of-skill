@@ -161,6 +161,15 @@ fields. On budgeted/mobile tiers retain analytic vertex wind, compact sparse
 interaction records, bounded dirty patches, lower-rate receiver fields, and
 explicit stream-loss/per-channel-error accounting.
 
+A tier change that alters physics-facing state, cadence, represented support or
+band/filter, error bounds, inventories, stable IDs/RNG streams, or event and
+exact-once application-ledger cursors requires the shared `QualityTransition`:
+request it, conservatively map and atomically commit it at a safe graph-step
+boundary, then retire the old state through its completion join. A change may
+remain vegetation-local only when it is render-only and leaves every provider,
+`PhysicsGraph` ownership, interaction, committed state, ID, cursor, and physical
+error contract unchanged.
+
 ## Capability Gate And Tiers
 
 Initialize the renderer before allocating storage resources:

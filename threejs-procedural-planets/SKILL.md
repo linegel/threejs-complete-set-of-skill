@@ -26,12 +26,24 @@ carries a direct canonical `PhysicsInstant | PhysicsTimeInterval`, never the
 generic `PhysicsTime` wrapper; time is not an extra descriptor field. A
 quadtree tile, render LOD, TSL function, or cache texture is never the public
 physics ABI.
-When that state is rendered, the candidate stays view-independent and each
-field binding publishes independent previous/current provenance and leased
-state handles. `CameraViewPublication` owns render mapping,
-`ViewPreparationPublication` owns per-view LOD/caches/shadows/resets, and the
-sealed snapshot references candidate binding IDs and leases rather than copying
-state or transforms.
+The planet/body-field owner is the sole state-equation owner for its
+physics-facing body, gravity, static coast/bathymetry, and hydrology-analysis
+revisions. Its `PhysicsGraph` stages write provisional versions; one
+`PhysicsCommitTransaction` prepares each accepted revision and one bijective
+`PhysicsCommitReceipt` plus `CommitPublicationLineage` publishes it atomically.
+A project coordinator may commit those prepared
+versions atomically but never becomes a second owner. Do not expose a new
+descriptor revision before that commit appears in `PhysicsExecutionLedger`.
+When committed state is rendered, publish the immutable
+`PresentationTimeCohort -> PhysicsPresentationCandidate -> CameraViewPublication ->
+ViewPreparationPublication -> PhysicsPresentationSnapshot ->
+PresentationRenderPlan -> admitted frame slot -> FrameExecutionRecord` chain.
+The candidate stays view-independent; field
+bindings carry independent previous/current provenance and leased state
+handles. Camera publication owns render mapping, view preparation owns per-view
+LOD/caches/shadows/resets, and the sealed snapshot references binding IDs and
+leases rather than copying state or transforms. Never mutate an earlier record
+to report a later phase or completion.
 Treat cube-face UV, longitude/latitude, geodetic coordinates, and tangent
 parameterizations as nonlinear charts, not Cartesian frames. Publish their
 metric/Jacobian, domain/seam validity, and chart version; express physical
@@ -95,6 +107,12 @@ Legacy WebGL implementation (deprecated, do not extend): `examples/procedural-pl
    Register every physics-facing body/coast/hydrology field as a typed
    `PhysicsSignalDescriptor`; the descriptor's analysis revision and error
    bounds, not the visible patch level, determine whether a consumer may use it.
+   The environment/project coordinator publishes the immutable
+   `EnvironmentForcingSnapshot`. Planet fields consume its exact committed
+   version through graph edges; they do not synthesize a second weather state.
+   `$threejs-rain-snow-and-wet-surfaces` owns precipitation transport and
+   receiver-side deposition/splash/ripple/wetness/snow effects, not
+   meteorological generation.
 7. Filter detail by represented vertex spacing and pixel footprint. Camera
    altitude may choose policy but is not a frequency filter. Fade contribution
    strength before aliasing; do not change procedural frequency abruptly.
@@ -145,6 +163,15 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
   tiles, CPU quadtree updates at a gated cadence, instanced topology-mask bins,
   no runtime readback, and simpler material channels. It is the same public
   field/LOD architecture, not an alternate renderer.
+
+Any change to physics state/equations, native cadence or coupling, represented
+band/footprint/filter, physical error bound, conserved inventory, stable-ID/RNG/
+event policy, or physics residency is an exact `QualityTransition`, not render
+LOD. Declare source/destination `PhysicsQualityStateDescriptor`s; prepare
+without publication; commit a gated `ConservativeStateMap`, inventory and
+ID/RNG/event-cursor mappings atomically at a step boundary; increment the
+quality epoch; and retain the old leases until the declared completion join.
+Reject the transition when no conservative/error-bounded map exists.
 
 ## Workload And Performance Evidence
 
@@ -227,6 +254,11 @@ Validate at fixed cameras and **[Authored]** at least three seeds:
   neighbor invariant, and all 16 transition-mask crack tests;
 - biome-mask, crater-topology, normal-only, roughness-only, and patch-error
   views;
+- `PhysicsGraph` stage/edge/execution rows, commit-group atomicity, and
+  publication lineage for every physics-facing body/gravity/coast/hydrology
+  revision;
+- prepare/commit/retire evidence for every supported runtime physics-quality
+  transition, including inventory, error/filter, cadence, and stable-ID maps;
 - CPU query versus TSL compute parity samples with per-channel max, mean, p95,
   worst direction, and metric height error. Report normal angular error only
   after derivative correctness is independently established;
@@ -248,10 +280,12 @@ large-world shadow policy, `$threejs-image-pipeline` for shared gbuffer,
 velocity, and output ownership, `$threejs-visual-validation` for screenshot
 and GPU proof, `$threejs-exposure-color-grading` for metering and tone-map
 ownership, `$threejs-water-optics` for water volume optics, `$threejs-volumetric-clouds`
-for cloud volumes, `$threejs-rain-snow-and-wet-surfaces` for weather envelopes
-and precipitation masks, and `$threejs-sky-atmosphere-and-haze` for scattering
+for cloud volumes, `$threejs-rain-snow-and-wet-surfaces` for precipitation
+transport and receiver effects, and `$threejs-sky-atmosphere-and-haze` for scattering
 independent of planet generation. This skill owns the coupled planetary surface
 and its LOD/parity architecture. For a planetary ocean, it owns the static
 reference surface, coastline, bathymetry, seabed classes, and their error
 metadata; the water skill owns the time-varying free surface, flow/wave state,
-foam, and optics.
+foam, and optics. The environment/project coordinator owns the shared
+`EnvironmentForcingSnapshot`; neither the planet nor rain skill independently
+generates meteorology.

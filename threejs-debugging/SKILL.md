@@ -14,6 +14,19 @@ intended graphics or physics mechanism. `$threejs-visual-validation` owns formal
 image, timing, resource, and regression evidence when those proofs are required;
 it does not own issue archaeology.
 
+When the failing path participates in a routed physical domain or a
+physics-to-render boundary, first read the router's canonical
+[physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+It remains the exact ABI during diagnosis; this skill defines no reduced
+physics, interaction, commit, or presentation dialect.
+
+A proposed quality fix that changes physics-facing state or provider semantics,
+cadence, represented support/band/filter, error bounds, inventories, stable
+IDs/RNG streams, or event and exact-once application-ledger cursors must be
+reproduced through the shared `QualityTransition`. A render-only tier change may
+remain local only when every physical contract and committed version is
+unchanged.
+
 ## Investigation Contract
 
 Keep one compact working record. This is diagnostic output, not an extension of
@@ -56,6 +69,17 @@ unknown values unknown; do not infer the runtime revision from a lockfile range.
 3. **Reduce without replacing the suspected mechanism.** Remove unrelated scene
    systems and post effects, but preserve the API, material, geometry path,
    backend, projection, precision, and lifecycle behavior under investigation.
+   For a physics-facing reduction, preserve the relevant `PhysicsContext`,
+   `PhysicsGraph` stages/edges/intervals, provisional-to-committed
+   `PhysicsCommitTransaction`/receipt lineage, `InteractionRecord` sequence and exact-once
+   `InteractionApplicationLedger` keys/versions/cursors, and the complete
+   `PresentationTimeCohort` -> `PhysicsPresentationCandidate` ->
+   `CameraViewPublication` ->
+   `ViewPreparationPublication` -> sealed `PhysicsPresentationSnapshot` ->
+   `PresentationRenderPlan` -> admitted frame slot -> `FrameExecutionRecord`
+   closure. Use the canonical records and typed absence
+   unchanged; a smaller fixture may omit an owner only by removing its graph
+   dependency, never by inventing a validation-local ABI.
    A different material or renderer may localize the fault; it cannot prove the
    original path correct.
 4. **Partition local hypotheses.** Test application misuse, stale imports or

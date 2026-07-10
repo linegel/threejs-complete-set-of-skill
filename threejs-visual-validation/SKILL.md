@@ -177,14 +177,38 @@ ordering; step/subcycle convergence for numerical solvers; provider validity,
 uncertainty, and error propagation; source/flux/conservation and equal-and-
 opposite reaction residuals for claimed conserved quantities; rebase
 invariance; deterministic reset; and conservative quality-state migration.
-Validate the exact central `QualityTransition` record for every migration.
+Require the exact central `QualityTransition` when a migration changes
+physics-facing state or provider semantics, cadence, represented
+support/band/filter, error bounds, inventories, stable IDs/RNG streams, or event
+and exact-once application-ledger cursors. A render-only tier change may remain
+local only when those contracts and every committed physical version are
+unchanged; the trace must prove that exclusion.
 Every unsupported channel must remain explicitly unavailable rather than
 becoming zero or an invented adapter default.
+
+Validate exact ledger and publication closure, not record presence. Every
+`ErrorPropagationLedger` input, transform/filter/interpolation, local term,
+correlation rule, output error, and consumer gate must resolve. Every applied
+`InteractionRecord.applicationLedgerKey` must resolve to exactly one accepted
+row in the canonical `InteractionApplicationLedger`, matching its batch's
+sequence range, per-consumer cursor, and `exactOnceApplicationLedgerVersion`.
+Every successful commit must close its `PhysicsStageWrite` and
+`StateAdvanceClaim` through `PhysicsPreparedPublication`, `PhysicsCommitGroup`,
+`PhysicsCommitTransaction`, `PhysicsCommitReceipt`, and exact
+`CommitPublicationLineage`, including content/publication digests, dependency
+completions, gate results, and the single atomic registry swap. The Candidate,
+Camera, ViewPreparation, sealed Snapshot `closureManifest`,
+`plannedConsumerActions`, submitted pass/dispatch keys, action results,
+completion tokens, and lease dispositions are one immutable render-plan closure
+through `FrameExecutionRecord`; no orphan, duplicate, subset, or superset is
+accepted.
 
 Run one deterministic end-to-end interaction fixture:
 
 ```text
-cloud/atmosphere precipitation flux
+exactly one precipitation ingress per interval:
+  causal-cloud PrecipitationEmissionSnapshot
+  OR external EnvironmentForcingSnapshot precipitation channels
   -> rain ground/water flux
   -> water mass and momentum source
   -> boat buoyancy/drag/reaction
@@ -202,6 +226,13 @@ dependencies. This fixture must also cross an origin rebase, simulation-rate
 change, quality migration, resize/DPR transition, and an external pose-stream
 gap or error.
 
+The two precipitation ingress arms are mutually exclusive over one
+`PhysicsTimeInterval`. Never consume or merge both: record the selected source/version and
+make the other arm typed absence. Cloud-owned precipitation must traverse its
+`PrecipitationEmissionSnapshot` and transport delay; externally prescribed
+precipitation must use the forcing snapshot's mass-flux, phase, and velocity
+channels without fabricating a cloud emission.
+
 For every domain and target, record coordination intervals, per-owner native
 ticks/subcycles, compute dispatches, render passes, queue submissions,
 executions per presented frame, barriers,
@@ -210,6 +241,13 @@ set bytes, resident and peak/migration-overlap bytes, compulsory reads/writes
 per execution, traffic per presented frame, upload volume, timing-query resolve
 latency, CPU/GPU/presentation distributions, and settled quality. A mobile
 claim requires this evidence on the named physical low-power device.
+Separate route-shared simulation/provider/Candidate work and resources from
+per-target/view Camera/ViewPreparation, pass, attachment, history, and output
+work in the canonical `PhysicsCostLedger`. Validate each view, count shared
+costs once, apply exact multiview and
+frames-in-flight multipliers, and report both the per-view rows and composed
+mobile total; neither multiplying shared work by view count nor hiding
+view-local cost in an amortized aggregate is valid.
 
 ## Refresh-Derived Performance Envelope
 

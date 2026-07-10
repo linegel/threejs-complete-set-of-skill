@@ -87,6 +87,16 @@ identity, target/view scope, seal metadata, and scoped `eventSequenceRanges`, th
 copies `PresentedStatePair` records or `globalToRender` transforms. Leases
 remain live through every consumer.
 
+Any tier transition that changes physics-facing state or providers, update
+cadence, represented support or spectral/spatial/temporal filter, error bounds,
+inventories, stable IDs/RNG streams, or event and exact-once
+application-ledger cursors requires the contract's shared `QualityTransition`.
+Commit its conservative map atomically at a safe graph-step boundary and retain
+old resources through the completion join. A strictly render-only LUT,
+resolution, sampling, or composition change may remain local only when all
+physics-provider semantics, `PhysicsGraph` ownership, committed physical
+versions, IDs, cursors, and physical error bounds remain unchanged.
+
 Canonical implementation contract: `examples/webgpu-lut-atmosphere/`.
 Run `node examples/webgpu-lut-atmosphere/validation.js` after edits.
 

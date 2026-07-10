@@ -26,6 +26,40 @@ values only to the owning domain. A depth hit, visual spark, or wake ribbon is
 not an impulse, mass source, or equal-and-opposite reaction unless that record
 and schedule exist.
 
+## Conditional Shared-Physics Contract
+
+Apply this section only when particle/effect state participates in physical
+coupling; a purely visual analytic effect remains local.
+
+- Register coupled ingest, forcing, solve, exchange, commit, and publication
+  work as explicit `PhysicsGraphStage` entries. Each `PhysicsStageExecution`
+  carries exact native and coordination-coverage intervals inside one
+  `PhysicsCoordinationAdvanceRecord`; the render loop consumes
+  publications and must not double-dispatch a stage, discard catch-up debt, or
+  derive solver progress from rendered-frame delta.
+- Treat forcing and provider inputs as immutable graph reads with exact signal,
+  version, frame, origin epoch, interval, validity, and error. A draw callback,
+  material node, or pool kernel does not ad hoc sample or mutate the provider.
+- Cross-owner transfer uses one `SurfaceExchange` containing typed
+  `InteractionRecord` values. Source and reaction directions are explicit;
+  required reactions are atomic through `InteractionReactionGroup`. The batch
+  publisher owns sequence allocation and `InteractionBatchLedger`; the target
+  state-equation owner records exact-once acceptance in
+  `InteractionApplicationLedger`. Repeated render frames cannot replay a batch,
+  and skipped frames cannot drop it.
+- Publish coupled pool state through `PresentationTimeCohort`,
+  `PhysicsPresentationCandidate`, `PresentedStatePair`, and
+  `PresentationResourceLease`; publish Camera/ViewPreparation records, seal the
+  target/view `PhysicsPresentationSnapshot`, admit its
+  `PresentationRenderPlan` and frame slot, then append `FrameExecutionRecord`.
+  Never render from mutable authoritative pool state
+  or reuse a leased generation before its completion join.
+- A physics-facing change to pool capacity, cadence, filter, stable-ID policy,
+  error bound, event delivery, or presentation representation requires an
+  admitted `QualityTransition`. Render-only density, shading, or post quality
+  remains local only when physical observables, provider contracts, IDs, event
+  cursors, and error bounds are unchanged.
+
 ## Choose Simulation And Compaction Classes First
 
 | State or coupling | Fastest correct representation | Reject |

@@ -94,8 +94,10 @@ The sealed Snapshot is deliberately small: it references candidate binding IDs,
 `cameraPublicationId`, `viewPreparationId`, lease refs, and event ranges. Render
 consumers resolve the matrices/transforms through `cameraPublicationId` and the
 reactive/reset plan through `viewPreparationId`; they do not copy mutable local
-subsets. A separate temporal owner supplies `jitterSampleAndConvention`. Motion
-vectors never use jittered projections.
+subsets. A separate temporal owner supplies
+`previousJitterSampleAndConvention`, `currentJitterSampleAndConvention`, and one
+immutable `jitterSequenceRevision`; each sample binds to its corresponding
+unjittered matrices. Motion vectors never use jittered projections.
 
 Each per-binding/provider `PresentedStatePair` contains independent
 `previousPresented` and `currentPresented` provenance, presented instants, state
@@ -117,7 +119,11 @@ Spawn, despawn, teleport, reparent, incompatible LOD, stream discontinuity, or
 identity change invalidates follow smoothing and temporal motion according to
 the `ViewPreparationPublication.resetDependencies`; it is not interpolated as
 ordinary locomotion. The reset record is a plan. Actual completion/failure belongs in the append-only
-`FrameExecutionRecord`, not a mutation of the sealed snapshot.
+`ScopedResetActionResult` inside `FrameExecutionRecord`, not a mutation of the
+sealed snapshot. After sealing, the route builds an immutable
+`PresentationRenderPlan` with exact phase/resource/history generations and
+admits the target frame slot; the camera owner cannot add a hidden render
+dependency or overwrite a live history slot.
 
 The camera owner returns `CameraViewPublication`; preparation owners return
 `ViewPreparationPublication`; neither mutates an earlier record. Same-frame

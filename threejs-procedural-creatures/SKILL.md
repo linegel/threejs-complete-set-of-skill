@@ -13,7 +13,9 @@ surface source. The stable-topology default is a field-extracted reference mesh
 with skinning and optional bounded local correction; the per-slot snapped shell
 is diagnostic only. Distant bodies may use view-constrained impostors. No path
 raymarches the body. Pose is a compact primitive buffer sampled from an
-analytic clock or advanced by a fixed-step solver when state is recurrent.
+analytic clock, advanced by a local fixed-step solver only when recurrent state
+is standalone/authored, or advanced by its owning `PhysicsGraphStage` when
+recurrent state is cross-domain.
 
 Read the shared
 [physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
@@ -88,9 +90,13 @@ this order; every step ends in something renderable or assertable.
    raise K/rebuild or reject the tier; they never silently change grouping.
 4. **Pose runtime.** The runtime pose is a typed-array SoA buffer
    (`a.xyz|ra`, `b.xyz|rb`, `k|rgb` per slot), not object graphs re-copied
-   into per-material vectors. Locomotion advances on a fixed-step accumulator
-   (1/60 or 1/120, clamped input dt) and renders interpolated pose — feet
-   never pop on frame hitches. Root motion lives in the object transform;
+   into per-material vectors. Standalone/authored locomotion may advance on a
+   local fixed-step accumulator (1/60 or 1/120, clamped input dt) and render
+   interpolated pose — feet never pop on frame hitches. Cross-domain recurrent
+   locomotion advances exclusively through its scheduled `PhysicsGraphStage`
+   executions; only `PhysicsGraph` owns catch-up, drop, and discontinuity, and
+   the render loop never steps that state. Root motion lives in the object
+   transform;
    primitives stay creature-local; support-planted feet convert through the
    inverse root transform for body-frame IK, then write creature-local leg
    slots before storage upload and posed-bounds update. Maintain a real
@@ -176,14 +182,17 @@ this order; every step ends in something renderable or assertable.
     staleness, acceptable residency/latency, and batch extent; descriptor
     discovery supplies a stable descriptor-table reference rather than a deep
     copy. Samples use
-    `freeSurfacePoint`, `freeSurfaceNormal`, `surfacePointVelocityMps`,
+    `freeSurfacePoint`, `freeSurfaceNormal`, `geometricNormalVelocityMps`,
+    `surfacePointVelocityMps`,
     `materialCurrentVelocityMps`, `waterColumnDepthMeters`, optional
     `densityKgPerM3`, and return the complete `PhysicsSignalDescriptor`, bundle
     `sampleInstant`, and per-channel `actualPhysicsTime` resolving to a
     `PhysicsInstant`. Requested and actual instants may differ only within
     declared latency/staleness gates. Each channel
     is the complete shared `SampledChannel`.
-    Surface-point velocity and material current are distinct;
+    `geometricNormalVelocityMps` is mandatory even when the parameterization-
+    dependent full `surfacePointVelocityMps` is absent. Surface-point velocity
+    and material current are distinct;
     unrepresented channels are absent, not zero, and a dependent tier is
     blocked rather than inventing them. Consumers do not subset, rename, or
     independently clock the shared envelope. An injected
@@ -210,12 +219,15 @@ this order; every step ends in something renderable or assertable.
     emits source `InteractionRecord` entries and consumes reduced reaction
     records in the shared both-owner-predict/sample/load-scatter/water-advance/
     reaction-reduce/correct/check/atomic-commit graph; local
-    decals or ripple calls are not feedback. Coupling declares explicit,
-    semi-implicit, scheduler-bounded iterated, or monolithic ownership; its
-    gather/scatter pair preserves zeroth/first moments and gates force, torque,
-    interface work, and added-mass stability. Source/reaction records form an
-    all-or-none `InteractionReactionGroup`; many-to-many reduction is legal and
-    balance is tested in its declared frame/reference point. The accepted pose is contributed
+    decals or ripple calls are not feedback. Coupling inside one state-equation
+    owner may be explicit, semi-implicit, scheduler-bounded iterated, or
+    monolithic; monolithic means that owner advances every coupled unknown. Any
+    cross-owner route publishes `SurfaceExchange` with exact mode `one-way`,
+    `two-way-explicit`, or `two-way-iterated`; it is never labelled monolithic.
+    Its gather/scatter pair preserves zeroth/first moments and gates force,
+    torque, interface work, and added-mass stability. Source/reaction records
+    form an all-or-none `InteractionReactionGroup`; many-to-many reduction is
+    legal and balance is tested in its declared frame/reference point. The accepted pose is contributed
     as a per-binding/provider `PresentedStatePair` to the view-independent
     `PhysicsPresentationCandidate`, which contains no camera or render
     transform. `previousPresented` and `currentPresented` each carry independent
@@ -223,7 +235,9 @@ this order; every step ends in something renderable or assertable.
     spatial binding. The camera owner publishes `CameraViewPublication`,
     preparation owners publish `ViewPreparationPublication`, and the sealed
     `PhysicsPresentationSnapshot` references candidate binding IDs and lease
-    refs. `FrameExecutionRecord` records multi-target execution and lease
+    refs under one `PresentationTimeCohort`. `PresentationRenderPlan` binds exact
+    pass/resource/history generations and frame-slot admission before
+    `FrameExecutionRecord` records multi-target execution and lease
     disposition keyed by lease ID. The presented states are not assumed solver
     `n/n+1`. Visible deformation, bounds, shadows, motion vectors, and temporal
     history resolve through this chain with separately tracked instants/frame/
@@ -330,6 +344,17 @@ tick with state projection, queue boundary, conserved-value/error ledger,
 atomic provider/identity generation, history action, rollback, and measured
 old/new peak residency. Visual mesh/LOD crossfades never duplicate an
 authoritative body or its reactions.
+Any physics-facing change to
+`PhysicsQualityStateDescriptor.nativeStepAndCouplingControls`,
+`.stateVariablesAndInventories`, `.representedBandsFootprintsAndFilters`,
+`.stableIdPolicy`, or `.presentationRepresentation` requires that exact
+`QualityTransition`; it maps every `InteractionRecord.applicationLedgerKey`
+and `InteractionBatchLedger.exactOnceApplicationLedgerVersion`, commits through
+`PhysicsCommitTransaction`, and publishes new versioned state only through
+`PresentationTimeCohort`, `PhysicsPresentationCandidate`,
+`CameraViewPublication`, `ViewPreparationPublication`, sealed
+`PhysicsPresentationSnapshot`, and `PresentationRenderPlan`.
+In-place mutation or an unledgered presentation crossfade is invalid.
 
 Boot side: all shippable material variants `compileAsync`-warmed before
 reveal; build work is time-sliced to a declared main-thread gate or off-thread;
@@ -381,6 +406,9 @@ snapped shell remains diagnostic even after that closure.
 - `frustumCulled = false` instead of per-instance posed bounds;
 - locomotion consumes raw render dt, so foot plants and hop phases pop under
   frame hitches;
+- cross-owner recurrent locomotion advances from a creature-local/render-loop
+  accumulator, so it diverges from `PhysicsGraph` catch-up and exact-once
+  interaction application;
 - part-id sorting defines a repeated smooth-min fold, so a rename changes the
   field, or candidate leaves are folded outside their declared blend ancestry;
 - proximity skin weights leak across contacting limbs, influences are not

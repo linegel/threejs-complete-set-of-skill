@@ -133,9 +133,11 @@ render transforms in `CameraViewPublication`, the reset/reactive plan in
 The camera owner writes the exact target/view `CameraViewPublication`: IDs and
 view scope; camera/projection versions; previous/current render-sample instants;
 complete previous/current `RenderSimilarityTransform`s; *unjittered* view and
-projection matrices; `jitterSampleAndConvention`; viewport; DPR/extent; depth
-convention; and projection validity/error. Velocity consumes the unjittered
-pair; the temporal owner applies jitter once.
+projection matrices; `previousJitterSampleAndConvention`,
+`currentJitterSampleAndConvention`, and `jitterSequenceRevision`; viewport;
+DPR/extent; depth convention; and projection validity/error. Velocity consumes
+the unjittered pair; the temporal owner applies each matching jitter sample
+once.
 
 Camera pose/constraint first consumes the view-independent immutable
 `PhysicsPresentationCandidate`. The camera owner publishes
@@ -165,7 +167,8 @@ source frame/units/time/IDs
   -> ordered sample buffer and discontinuity detection
   -> independent previous/current presentation-instant mappings
   -> PresentedStatePair provenance, poses, validity, and error bounds
-  -> immutable candidate -> camera -> preparation -> snapshot chain
+  -> immutable candidate -> camera -> preparation -> snapshot
+  -> PresentationRenderPlan -> admitted frame slot -> FrameExecutionRecord
 ```
 
 Extrapolation is legal only with a declared horizon and error gate. Missing,
@@ -173,9 +176,10 @@ late, reordered, or frame-incompatible samples set `validity`/`error` or hold a
 declared last-valid pose; they never trigger an unversioned transform write.
 Spawn/despawn, teleport, reparent, incompatible LOD, and stable-ID change are
 discontinuities with explicit history/follow validity; never smooth through
-them as if they were consecutive samples. Append executed reset actions to
-`FrameExecutionRecord`; `ViewPreparationPublication.resetDependencies` remains
-immutable.
+them as if they were consecutive samples. Append typed
+`ScopedResetActionResult` receipts to `FrameExecutionRecord` and match their
+input/output history generations to the immutable `PresentationRenderPlan`;
+`ViewPreparationPublication.resetDependencies` remains immutable.
 
 If required camera/projection preparation or sealing fails, append a
 `FrameExecutionRecord` with `overallStatus: aborted` (or `partial-failure` when

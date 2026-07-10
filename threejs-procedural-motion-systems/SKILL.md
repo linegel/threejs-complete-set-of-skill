@@ -39,6 +39,12 @@ Do not dispatch fixed-step compute for a transform already expressible in
 closed form. Conversely, do not sample recurrent spring or constraint state
 from variable render delta.
 
+A local fixed-step accumulator is only for standalone/authored motion with no
+`PhysicsGraph` edge. Cross-domain recurrent motion advances exclusively through
+its scheduled `PhysicsGraphStage` executions; only the graph applies catch-up,
+drop, or discontinuity policy across the coordination interval. The render loop
+may request work and consume presentation, but never advances coupled state.
+
 Throughput decision table:
 
 | State/reuse shape | Route | Notes |
@@ -54,8 +60,9 @@ Throughput decision table:
    `StorageBufferAttribute`, `storage()` nodes, and `renderer.compute()`.
 2. Create one renderer loop with `await renderer.init()`,
    `timer.connect(document)`, and `timer.update(timestamp)`. Sample analytic
-   timelines from authoritative seconds directly. Only recurrent simulations
-   use fixed-step accumulation, previous/current state, and interpolated
+   timelines from authoritative seconds directly. Only standalone recurrent
+   simulations use local fixed-step accumulation; coupled recurrent simulations
+   use graph executions. Both retain previous/current state and interpolated
    presentation.
 3. Define phase contracts, event boundaries, seed ownership, phase-local time,
    replay reset/disposal, and a `DeltaPolicy` with raw delta, clamped delta,
@@ -65,7 +72,8 @@ Throughput decision table:
    hull frame, or camera-authored presentation frame.
 5. Encode high-count transforms as compact state: previous position, current
    position, velocity, base quaternion, angular velocity, phase id, seed, and
-   flags in storage buffers; dispatch compute from the fixed-step loop and
+   flags in storage buffers; dispatch compute from the standalone fixed-step
+   loop or its owning `PhysicsGraphStage` execution and
    evaluate render pose in vertex TSL from previous/current storage plus alpha
    instead of walking thousands of `Object3D` transforms.
 6. Use frame-rate-independent smoothing with `alpha = 1 - pow(k, dt)` for
@@ -87,7 +95,8 @@ floating debris, and swimmers consume the canonical batched,
 channel-requested `WaterSurfaceProvider`. Requests use physics-frame metres and
 declare footprint/filter, frame, and one canonical `PhysicsInstant`. Samples use the exact
 shared names `freeSurfacePoint`, `freeSurfaceNormal`,
-`surfacePointVelocityMps`, `materialCurrentVelocityMps`,
+`geometricNormalVelocityMps`, `surfacePointVelocityMps`,
+`materialCurrentVelocityMps`,
 `waterColumnDepthMeters`, optional `densityKgPerM3`,
 and the returned shared `PhysicsSignalDescriptor` and bundle `sampleInstant`.
 Each channel is the complete shared `SampledChannel` and retains
@@ -96,7 +105,9 @@ instants may differ only within the
 declared latency/staleness gates. Missing channels
 follow `missingChannelPolicy` and are never synthesized as zero; geometric
 surface velocity and material current remain distinct. Consumers do not
-redeclare or subset the descriptor/time envelope.
+redeclare or subset the descriptor/time envelope. The scalar
+`geometricNormalVelocityMps` channel is mandatory even when the parameterization-
+dependent full `surfacePointVelocityMps` is absent.
 
 Declare one-way coupling (water drives the actor but receives no load) or
 two-way coupling. One-way mode identifies the authoritative source and records
@@ -105,9 +116,12 @@ claim/regime. The latter uses the shared scheduler order: both owners
 predict, sample one coupling-time water bracket, emit source
 `InteractionRecord` entries, conservatively scatter loads by conservation
 group, advance water/subcycles, reduce reaction records, correct both owners,
-check conservation/stability, and atomically commit. Declare explicit,
-semi-implicit, scheduler-bounded iterated, or
-monolithic coupling. Gather/scatter are discrete adjoints preserving zeroth/
+check conservation/stability, and atomically commit. Inside one state-equation
+owner, coupling may be explicit, semi-implicit, scheduler-bounded iterated, or
+monolithic; monolithic means that owner advances every coupled unknown. Any
+cross-owner coupling publishes `SurfaceExchange` with exact mode `one-way`,
+`two-way-explicit`, or `two-way-iterated`; it is never labelled monolithic.
+Gather/scatter are discrete adjoints preserving zeroth/
 first moments and gating force, torque, interface work, and added-mass
 stability. Conservation covers represented mass, linear/angular momentum,
 energy/work, and species; volume is only a fixed-density incompressible
@@ -129,7 +143,9 @@ which contains no camera or render transform. `previousPresented` and
 references both handles and records identity mapping and validity. The camera
 owner publishes `CameraViewPublication`, preparation owners publish
 `ViewPreparationPublication`, and the sealed `PhysicsPresentationSnapshot`
-references candidate binding IDs and lease refs. `FrameExecutionRecord` records
+references candidate binding IDs and lease refs under one
+`PresentationTimeCohort`. `PresentationRenderPlan` binds exact pass/resource/
+history generations and frame-slot admission before `FrameExecutionRecord` records
 multi-target execution and lease disposition keyed by lease ID. Those poses
 need not be solver states `n` and `n+1`. Visible transforms, motion vectors,
 shadows, bounds, and temporal history resolve through that immutable chain.
@@ -197,6 +213,18 @@ Quality tiers:
   boundary with state projection, conserved-value/error ledger, interaction-
   queue boundary, atomic provider generation, history action, rollback, and
   peak old/new residency. Visual crossfades never duplicate forces/reactions.
+- Any physics-facing change to
+  `PhysicsQualityStateDescriptor.nativeStepAndCouplingControls`,
+  `.stateVariablesAndInventories`, `.representedBandsFootprintsAndFilters`,
+  `.stableIdPolicy`, or `.presentationRepresentation` requires that exact
+  `QualityTransition`; it maps every
+  `InteractionRecord.applicationLedgerKey` and
+  `InteractionBatchLedger.exactOnceApplicationLedgerVersion`, commits through
+  `PhysicsCommitTransaction`, and publishes new versioned state only through
+  `PresentationTimeCohort`, `PhysicsPresentationCandidate`,
+  `CameraViewPublication`, `ViewPreparationPublication`, sealed
+  `PhysicsPresentationSnapshot`, and `PresentationRenderPlan`.
+  In-place mutation or an unledgered presentation crossfade is invalid.
 - Memory: derive hot state as `activeCapacity * alignedDynamicStrideBytes` plus
   history/scan slots. Split immutable parameters from dynamic state and upload
   dirty ranges only.
@@ -224,6 +252,8 @@ Quality tiers:
 
 - Use elapsed seconds, fixed simulation seconds, and presentation seconds; never
   make motion frame-count based.
+- A local accumulator never advances a `PhysicsGraph` participant; render delta
+  is not cross-domain scheduler time.
 - Derive orientation from a declared frame, then apply authored roll/spin as a
   separate quaternion with explicit multiplication order.
 - Normalize input axes, guard zero-length vectors and antiparallel unit-vector

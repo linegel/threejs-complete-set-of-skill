@@ -51,11 +51,16 @@ Complete this before loading a destination skill:
    or maximal geometry is faster or more faithful.
 4. When physical domains interact, instantiate the shared
    [physics domain and interaction contract](references/physics-domain-and-interaction-contract.md):
-   one `PhysicsContext`, typed providers, an ordered multi-rate `PhysicsGraph`,
-   explicit one-way/two-way interaction edges, one immutable presentation
-   candidate, per-view camera/preparation publications, one sealed snapshot per
-   selected presentation target/view, and an active `PhysicsCostLedger`.
-   A producer/consumer label alone is not an integration contract.
+   one `PhysicsContext`, typed providers and `ErrorPropagationLedger` records,
+   an ordered multi-rate `PhysicsGraph` with exact
+   `PhysicsCoordinationAdvanceRecord` executions, explicit one-way/two-way
+   interactions and `InteractionApplicationLedger` records, atomic
+   `PhysicsCommitTransaction` records, one immutable
+   `PhysicsPresentationCandidate`, per-view camera/preparation publications, one
+   sealed snapshot and `PresentationRenderPlan` per selected target/view,
+   `QualityTransition` records for physical quality changes, and an active
+   `PhysicsCostLedger`. A producer/consumer label alone is not an integration
+   contract.
 5. Build a resource/pass ownership graph before selecting effects: scene color,
    depth, normal, velocity, identifiers, history, tone map, output transform,
    and adaptive quality each need an owner or an explicit `not used` value.
@@ -133,7 +138,7 @@ no-post baseline are already proven.
 | Local terrain/coast or planetary body | Use fields + semantic geometry for a local height/bathymetry domain; use the planet skill only when curvature, horizon, spherical continuity, or planet-scale precision is observable. | A cube-sphere/quadtree adds no visible contract, or a planar domain cannot satisfy the required horizon/precision error. |
 | Geometry, displacement, material normal/parallax, or screen-space cue | Use geometry for silhouette, intersections, section cuts, cast shadows, and close parallax; use cheaper representations only when the view/error contract permits. | The representation cannot reproduce the observable it is supposed to cause. |
 | Analytic, sampled-data, numerical simulation, or stochastic model | Match the required conservation law, controllability, uncertainty, and update cadence. | A more complex solver adds no observable contract or a shortcut violates the error bound. |
-| Independent or coupled physical domains | Keep each domain's least-cost valid solver; exchange only typed, versioned signals and source/reaction records through an ordered graph. | Units, frame, clock, footprint, validity, error, latency, reaction ownership, or synchronization is implicit; a universal state buffer/timestep would waste sparse or analytic work. |
+| Independent or coupled physical domains | Keep each domain's least-cost valid solver; exchange only typed, versioned signals and source/reaction records through an ordered graph. Represent recurrent/adaptive coupled work as exact `PhysicsStageExecution` records in one `PhysicsCoordinationAdvanceRecord`; use the graph-wide `PhysicsCatchUpPolicy`. | Units, frame, clock, footprint, validity, error, latency, reaction ownership, application ledger, commit dependency, or synchronization is implicit; a universal state buffer/timestep or domain-local catch-up would waste work or double-step state. |
 | CPU update, vertex/fragment evaluation, or compute/storage | Compare state volume, reuse across passes, synchronization, upload/readback, and target-device timings. | Compute merely moves small or rarely reused work behind dispatch and storage overhead. |
 | `BatchedMesh`, `InstancedMesh`, merged geometry, or chunked/streamed LOD | Match geometry reuse, material compatibility, per-entity identity, transform/update frequency, culling granularity, and measured backend draw entries. | Batching destroys required culling/selection identity, dynamic updates rewrite excessive data, or the route makes the forbidden `[Gated]` assumption of one GPU draw per BatchedMesh family. |
 | Minimal forward attachments or shared MRT | Enumerate downstream consumers and compare composed variants on the target GPU. | An attachment has no proven consumer or its store/read bandwidth exceeds saved geometry/pass work. |
@@ -198,13 +203,20 @@ requiredSignals:
 domainSignals: {}
 physicsContext: not used
 physicsGraph: not used
+physicsCoordinationAdvanceRecords: []
 physicsCostLedger: not used
 physicsSignals: {}
+physicsErrorPropagationLedgers: {}
 physicsInteractions: []
+physicsInteractionApplicationLedgers: {}
+physicsCommitTransactions: {}
+physicsQualityTransitions: []
+physicsPresentationTimeCohortsById: {}
 physicsPresentationCandidate: not used
 physicsCameraViewPublicationsByTarget: {}
 physicsViewPreparationPublicationsByTarget: {}
 physicsPresentationSnapshotsByTarget: {}
+physicsPresentationRenderPlansByTarget: {}
 frameExecutionRecord: not used
 # Deprecated compatibility projection. It never carries allocated state.
 physicsPresentationSnapshot: not used
@@ -273,11 +285,28 @@ Every signal in a recipe has a producer and consumers or `not used`.
 When any selected domain consumes another domain's physical state, every
 declared `physics...` field plus `frameExecutionRecord` is mandatory and follows the
 [shared ABI](references/physics-domain-and-interaction-contract.md).
+Every `PhysicsSampleResponseEnvelope.errorPropagationLedgerRef` resolves to
+exactly one `ErrorPropagationLedger` in `physicsErrorPropagationLedgers`.
+Every `InteractionBatchLedger.exactOnceApplicationLedgerVersion` resolves to
+one `InteractionApplicationLedger` in
+`physicsInteractionApplicationLedgers`. Every `PhysicsDependencyRef` used by a
+stage execution, commit, candidate, `PresentationRenderPlan`, or frame execution
+resolves to the exact record and version in the route inventories; unresolved
+or stale references block publication.
+Every Candidate, frame-cohort admission, and render plan resolves its
+`timeCohortId` to one immutable `PresentationTimeCohort` in
+`physicsPresentationTimeCohortsById`; a target/view with different requested
+previous/current instants uses another cohort rather than mutating or sharing
+the wrong Candidate.
 `domainSignals` remains a routing index; every physical entry points to a
 `PhysicsSignalDescriptor` rather than redefining units, clocks, validity, or
 errors locally. Missing channels are absent and can block a consumer; they are
 never implicit zero. External solvers use the same boundary contract without
 ceding their internal representation or timestep.
+Represent every recurrent or adaptive coupled advance as exact
+`PhysicsStageExecution` records in one `PhysicsCoordinationAdvanceRecord`.
+Only the graph-wide `PhysicsCatchUpPolicy` may catch up, drop, or discontinue a
+physical interval; domain-local render-loop recurrence and catch-up are invalid.
 `sharedResourceOwners` is retained as a compatibility projection for existing
 route tooling. It mirrors actual `requiredSignals`, `domainSignals`, and
 `outputOwnersByPresentationTarget`; assigning a name there never authorizes allocation. `history`
@@ -295,7 +324,7 @@ names match.
 | backend manifest | Installed revision, initialized backend, browser/device/GPU, output buffer type, feature gates, and blocker. |
 | workload profile | Classification axes, truth contract, target views, data/update behavior, and error bounds. |
 | cause ledger | Earliest missing layer, candidate algorithms, selected algorithm, rejected alternatives, and no-post contract. |
-| physics contract | For interacting physical domains: context, typed signals, clocks/stages, interactions/reactions, material/proxy IDs, presentation snapshot, quality migration, and blockers. |
+| physics contract | For interacting physical domains: context, typed signals/error ledgers, exact graph executions, interactions/application ledgers, commit transactions/dependencies, material/proxy IDs, snapshot/render plan, quality transitions, and blockers. |
 | route manifest | Selected/omitted/deferred skills, causal/data/render owners, allocated signals, API proof, and acceptance evidence. |
 | performance contract | Evidence-labelled budgets, cost scopes, unique-pass ledger, quality ladder, and controller. |
 | diagnostics | No-post baseline and every field, buffer, pass, and identity view needed to prove the mechanism. |
@@ -664,9 +693,11 @@ transitions; frequent DPR or pass-scale changes can trigger target reallocation.
 Each transition declares history reset/resample, settling, lifecycle, and
 dispose ownership. These inequalities create hysteresis without inventing
 device-independent thresholds.
-For physical state, a transition is valid only when its `QualityTransition`
-declares state projection/reset, provider-version publication, conservation
-correction or residual, simultaneous residency, and consumer invalidation.
+Every physical quality change—including cadence, discretization, state, filter,
+identity, residency, or coupling—must use a `QualityTransition` that declares
+state projection/reset, provider-version publication, conservation correction
+or residual, simultaneous residency, and consumer invalidation. A render
+governor may request the transition but cannot mutate physical state directly.
 Changing solver class to meet a budget is a new truth contract, not a tier.
 
 Choose the downgrade axis from the measured bottleneck:
@@ -732,10 +763,10 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | Procedural buildings, facade/roof grammars, profiles, ornaments, city kits | `$threejs-procedural-buildings-and-cities` | Imported BIM/AEC review is not procedural-building ownership. |
 | Planetary bodies, terrain, craters, biomes, coastlines, spherical LOD | `$threejs-procedural-planets` | Pair with atmosphere only after body scale/horizon and precision policy are fixed. |
 | Sky scattering, atmospheric shells, aerial perspective, haze | `$threejs-sky-atmosphere-and-haze` | Use image pipeline only for final exposure/color ownership. |
-| Weather-driven volumetric clouds and cloud shadows | `$threejs-volumetric-clouds` | Use only for volumetric density/transport; generic scientific volume rendering remains a gap. |
+| Weather-driven volumetric clouds and cloud shadows | `$threejs-volumetric-clouds` | Consume the project/environment coordinator's `EnvironmentForcingSnapshot`; own volumetric density/transport and, only with causal microphysics, `PrecipitationEmissionSnapshot`, never general meteorology. Generic scientific volume rendering remains a gap. |
 | Horizon-scale, statistically specified directional sea over multiple wavelength decades | `$threejs-spectral-ocean` | Keep periodic homogeneous FFT synthesis in deep/open water; hand coastal bathymetry, run-up, and wet/dry behavior to the coastal-water contract. |
 | Bounded/analytic/coastal water, local heightfields, shoreline transformation, object ripples, caustics, refraction/absorption | `$threejs-water-optics` | Select the least complex solver that reproduces the required shoreline observable; use screen-history surfaces only for screen-anchored effects. |
-| Rain/snow particles, accumulation, surface wetness, puddles/splashes, shared weather envelope | `$threejs-rain-snow-and-wet-surfaces` | Route optical water coupling only when refraction/caustics are causal. |
+| Rain/snow transport, receiver accumulation, surface wetness, puddles, and splashes | `$threejs-rain-snow-and-wet-surfaces` | Consume `EnvironmentForcingSnapshot` from the project/environment coordinator. Own only precipitation transport/deposition, receiver accumulation, puddles, and splashes; never synthesize meteorological state. Route optical water coupling only when refraction/caustics are causal. |
 | Curved-ray black holes, accretion disks, wormholes | `$threejs-black-holes-and-space-effects` | Exposure/bloom are consumers after the HDR transport signal is correct. |
 | Particles, trails, plasma, shockwaves, transient event layers | `$threejs-particles-trails-and-effects` | Route object transforms to motion systems; preserve stable data identity in data/digital-twin scenes. |
 | Accumulated screen frost, touch clearing, reduced blur, history/refraction masks | `$threejs-dynamic-surface-effects` | Use only for screen-space history surfaces, not world/object-anchored weather. |
@@ -743,7 +774,7 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | GTAO, bent normals, bilateral reconstruction | `$threejs-ambient-contact-shading` | Route through the shared depth/normal owner; reject AO when it obscures quantitative color or identity. |
 | HDR bloom/selective emission | `$threejs-bloom` | Prove HDR emission and exposure policy first. |
 | Exposure adaptation, tone map, LUT grading, output color | `$threejs-exposure-color-grading` | Scientific/data displays may require a fixed transfer function instead of eye adaptation. |
-| Shared depth/normal/velocity/ID, MRT, history, pass ordering, final presentation | `$threejs-image-pipeline` | Plan early only when sharing exists; load for final assembly after the no-post baseline. |
+| Shared depth/normal/velocity/ID, MRT, history, pass ordering, final presentation | `$threejs-image-pipeline` | Plan early only when sharing exists; load for final assembly after the no-post baseline. For physical routes, bind the sealed snapshot, exact resources, leases, pass dependencies, histories, and output owner through `PresentationRenderPlan`. |
 | Fixed-view/trajectory evidence, seed/data sweeps, temporal stability, budgets, regression artifacts | `$threejs-visual-validation` | Required for ambitious compute, temporal, adaptive, quantitative, or sustained-performance work. |
 
 See `references/router-recipes.md` for general-purpose domain routes.
@@ -785,8 +816,10 @@ recipe.
 3. Run the cause/algorithm gate and assign the primary causal owner.
 4. Establish coordinate/precision/camera policy when scale, projection, or
    navigation affects representation.
-5. For interacting physical domains, freeze `PhysicsContext`, signal schemas,
-   clocks/stages, source/reaction ownership, and presentation interpolation.
+5. For interacting physical domains, freeze `PhysicsContext`, signal/error
+   inventories, exact `PhysicsGraph` executions and graph-wide catch-up,
+   source/reaction/application-ledger ownership, commit dependencies,
+   presentation interpolation/render plans, and `QualityTransition` admission.
 6. Implement subject/data representation, fields, material identity, and motion;
    prove no-post diagnostics.
 7. Build the unique pass/resource graph and A/B minimal-forward versus shared-MRT
@@ -834,6 +867,7 @@ state version, and residency.
 | WebXR | Use official WebXR/Three.js guidance unless a dedicated skill exists. |
 | Deployment/editor/tooling | Use platform and project conventions. |
 | Physics engines | Keep the selected engine/domain solver authoritative internally, but require its adapter to publish the shared `PhysicsContext`, typed provider/state epochs, interactions, and `PhysicsPresentationSnapshot`; unsupported channels remain explicit blockers. |
+| Meteorological-state synthesis and `EnvironmentForcingSnapshot` production | No current skill synthesizes meteorological state. Require a supplied project/environment coordinator or a dedicated environment-forcing capability; block dependent weather coupling when neither exists. Clouds, rain, water, vegetation, and particles are consumers, not substitute owners. |
 | General authored prop libraries, mesh repair, UV unwrapping, texture baking, compression, and source-asset LOD production | Treat these as an explicit asset-pipeline input. Procedural skills may define anchors, variants, and runtime compilation, but they do not make an unvalidated source asset production-ready. |
 | Generic app architecture | Keep framework/state/router decisions outside visual skills. |
 | Teaching fallback when WebGPU is unavailable | Use `$threejs-compatibility-fallbacks` only for an explicit fallback-teaching request. |
@@ -869,10 +903,13 @@ A routed implementation is incomplete without:
 - unique resource/pass ledger with formats, resolution, lifetimes, consumers,
   and shared-pass deduplication;
 - for every interacting physical route, a serialized `PhysicsContext`, typed
-  signal/provider inventory, ordered multi-rate `PhysicsGraph`, interaction and
-  conservation ledger, external-solver adapter evidence where applicable,
-  physics-material/proxy identities, the immutable presentation publication chain,
-  conservative quality-transition records, and an active `PhysicsCostLedger`
+  signal/provider and error-ledger inventory, ordered multi-rate `PhysicsGraph`
+  with exact coordination advances and graph-wide catch-up, interaction,
+  application and conservation ledgers, atomic commit transactions/dependencies,
+  external-solver adapter evidence where applicable, physics-material/proxy
+  identities, the immutable
+  presentation publication chain and `PresentationRenderPlan`, conservative
+  `QualityTransition` records, and an active `PhysicsCostLedger`
   covering coordination intervals, native owner steps, worst permitted catch-up,
   stage executions/hot bytes, critical queue path, traffic/readbacks, multiview/
   frames-in-flight multiplication, migration overlap, and sustained thermal state;
