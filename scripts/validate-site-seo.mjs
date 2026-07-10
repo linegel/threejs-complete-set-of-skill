@@ -43,6 +43,13 @@ function canonicalValues(html) {
     .map(([tag]) => attribute(tag, 'href'));
 }
 
+function alternateValues(html, type) {
+  return matches(html, /<link\b[^>]*>/gi)
+    .filter(([tag]) => attribute(tag, 'rel')?.toLowerCase().split(/\s+/).includes('alternate'))
+    .filter(([tag]) => attribute(tag, 'type')?.toLowerCase() === type.toLowerCase())
+    .map(([tag]) => attribute(tag, 'href'));
+}
+
 function localPathForUrl(urlString) {
   const url = new URL(urlString);
   if (url.origin !== new URL(SITE).origin) return null;
@@ -55,16 +62,33 @@ function localPathForUrl(urlString) {
 function validateJsonLd(html, label) {
   const scripts = matches(html, /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
   assert(scripts.length > 0, `${label}: missing JSON-LD`);
+  const parsed = [];
   for (const [, source] of scripts) {
     try {
-      JSON.parse(source);
+      parsed.push(JSON.parse(source));
     } catch (error) {
       errors.push(`${label}: invalid JSON-LD (${error.message})`);
     }
   }
+  return parsed;
 }
 
-function validateIndexablePage(path, expectedUrl, { requireH1 = false, validateImages = false } = {}) {
+function graphNodes(values) {
+  return values.flatMap((value) => Array.isArray(value?.['@graph']) ? value['@graph'] : [value]);
+}
+
+function hasType(node, type) {
+  const types = Array.isArray(node?.['@type']) ? node['@type'] : [node?.['@type']];
+  return types.includes(type);
+}
+
+function validateIndexablePage(path, expectedUrl, {
+  requireH1 = false,
+  validateImages = false,
+  requireDiscovery = false,
+  requireArticle = false,
+  requireCatalog = false,
+} = {}) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
   const titles = matches(html, /<title>([\s\S]*?)<\/title>/gi).map((match) => match[1].replace(/<[^>]+>/g, '').trim());
@@ -87,7 +111,32 @@ function validateIndexablePage(path, expectedUrl, { requireH1 = false, validateI
   assert(headValue(html, 'property', 'og:image').length === 1, `${label}: missing or duplicate og:image`);
   assert(headValue(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${label}: twitter card is not summary_large_image`);
   assert(!html.includes(OLD_SITE), `${label}: contains the retired GitHub Pages origin`);
-  validateJsonLd(html, label);
+  const structuredData = validateJsonLd(html, label);
+  const nodes = graphNodes(structuredData);
+
+  if (requireDiscovery) {
+    assert(alternateValues(html, 'text/plain')[0] === `${SITE}llms.txt`, `${label}: missing canonical llms.txt discovery link`);
+    assert(alternateValues(html, 'application/json')[0] === `${SITE}skills.json`, `${label}: missing canonical skills.json discovery link`);
+  }
+  if (requireCatalog) {
+    for (const type of ['Organization', 'WebSite', 'CollectionPage', 'SoftwareSourceCode', 'ItemList']) {
+      assert(nodes.some((node) => hasType(node, type)), `${label}: missing ${type} structured-data node`);
+    }
+  }
+  if (requireArticle) {
+    const article = nodes.find((node) => hasType(node, 'Article'));
+    assert(article && hasType(article, 'TechArticle'), `${label}: article is not typed as Article and TechArticle`);
+    const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`);
+    assert(publisher?.url === SITE && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${label}: publisher identity is incomplete`);
+    assert(article?.author?.['@id'] === `${SITE}#publisher` && article?.publisher?.['@id'] === `${SITE}#publisher`, `${label}: article author/publisher references are inconsistent`);
+    const published = Date.parse(article?.datePublished ?? '');
+    const modified = Date.parse(article?.dateModified ?? '');
+    assert(Number.isFinite(published), `${label}: missing or invalid datePublished`);
+    assert(Number.isFinite(modified), `${label}: missing or invalid dateModified`);
+    assert(!Number.isFinite(published) || !Number.isFinite(modified) || published <= modified, `${label}: datePublished is later than dateModified`);
+    assert(headValue(html, 'property', 'article:published_time')[0] === article?.datePublished, `${label}: Open Graph publication time differs from JSON-LD`);
+    assert(headValue(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${label}: Open Graph modification time differs from JSON-LD`);
+  }
 
   if (requireH1) {
     const h1 = matches(html, /<h1\b[^>]*>/gi).length;
@@ -121,7 +170,13 @@ for (const url of pageUrls) {
   if (!path || !existsSync(path)) continue;
   const isHome = url === SITE;
   const isSkill = new URL(url).pathname.startsWith('/skills/');
-  validateIndexablePage(path, url, { requireH1: isHome || isSkill, validateImages: isHome || isSkill });
+  validateIndexablePage(path, url, {
+    requireH1: isHome || isSkill,
+    validateImages: isHome || isSkill,
+    requireDiscovery: isHome || isSkill,
+    requireArticle: isSkill,
+    requireCatalog: isHome,
+  });
 }
 
 const sitemapSet = new Set(pageUrls);

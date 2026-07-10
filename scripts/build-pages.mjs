@@ -27,11 +27,15 @@ const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 760;
 const THEME_COLOR = '#0a0c10';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
+const PUBLISHER_ID = `${SITE}#publisher`;
 const PUBLISHER = {
   '@type': 'Organization',
+  '@id': PUBLISHER_ID,
   name: `${SITE_NAME} contributors`,
-  url: REPO,
+  url: SITE,
+  sameAs: REPO,
 };
+const PUBLISHER_REF = { '@id': PUBLISHER_ID };
 const DEMO_REGISTRY = buildDemoRegistry();
 
 const CATEGORIES = [
@@ -155,6 +159,27 @@ const latestSkillUpdate = (slug) => {
   }
 };
 
+const earliestSkillUpdate = (slug) => {
+  try {
+    const out = execFileSync('git', ['log', '--reverse', '--format=%H%x00%cI%x00%cs', '--', slug], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim().split('\n').find(Boolean);
+    const [hash, iso, date] = (out ?? '').split('\0');
+    if (!hash || !iso) return null;
+    return {
+      hash,
+      shortHash: hash.slice(0, 7),
+      iso,
+      date: date || iso.slice(0, 10),
+      url: `${REPO}/commit/${hash}`,
+    };
+  } catch {
+    return null;
+  }
+};
+
 const latestPathDate = (paths) => {
   try {
     return execFileSync('git', ['log', '-1', '--format=%cs', '--', ...paths], {
@@ -185,7 +210,16 @@ for (const d of readdirSync(root)) {
     .flatMap((demo) => demo.canonicalSource)
     .map((source) => source.match(new RegExp(`^${d}/examples/([^/]+)`))?.[1])
     .filter(Boolean))];
-  skills[d] = { slug: d, title, desc, body, examples, demoRecords, update: latestSkillUpdate(d) };
+  skills[d] = {
+    slug: d,
+    title,
+    desc,
+    body,
+    examples,
+    demoRecords,
+    published: earliestSkillUpdate(d),
+    update: latestSkillUpdate(d),
+  };
 }
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -401,7 +435,9 @@ const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" 
 <link rel="icon" href="${depth}favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="${depth}favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="${depth}apple-touch-icon.png" />
-<link rel="manifest" href="${depth}site.webmanifest" />`;
+<link rel="manifest" href="${depth}site.webmanifest" />
+<link rel="alternate" type="text/plain" href="${SITE}llms.txt" title="LLM-readable skill catalog" />
+<link rel="alternate" type="application/json" href="${SITE}skills.json" title="Machine-readable skill catalog" />`;
 
 const socialImageMeta = (image, alt) => `<meta property="og:image" content="${image}" />
 <meta property="og:image:type" content="image/png" />
@@ -638,6 +674,7 @@ ${socialImageMeta(OG_IMAGE, 'Generated crater-field asset preview from the Three
 ${JSON.stringify({
   '@context': 'https://schema.org',
   '@graph': [
+    PUBLISHER,
     {
       '@type': 'WebSite',
       '@id': `${SITE}#website`,
@@ -645,7 +682,7 @@ ${JSON.stringify({
       name: SITE_NAME,
       alternateName: 'Three.js Skills',
       inLanguage: 'en',
-      publisher: PUBLISHER,
+      publisher: PUBLISHER_REF,
     },
     {
       '@type': 'CollectionPage',
@@ -666,7 +703,7 @@ ${JSON.stringify({
       codeRepository: REPO,
       url: SITE,
       mainEntityOfPage: { '@id': `${SITE}#webpage` },
-      author: PUBLISHER,
+      author: PUBLISHER_REF,
       programmingLanguage: ['JavaScript', 'TSL'],
       runtimePlatform: 'Three.js WebGPURenderer',
       keywords: 'three.js, webgpu, TSL, agent skills, procedural graphics, visual validation',
@@ -1049,6 +1086,8 @@ ${skillHeroImg ? `<link rel="preload" as="image" href="../${skillHeroImg}" fetch
 <meta property="og:description" content="${esc(skillDescription)}" />
 <meta property="og:url" content="${pageUrl}" />
 ${s.update ? `<meta property="article:modified_time" content="${esc(s.update.iso)}" />` : ''}
+${s.published ? `<meta property="article:published_time" content="${esc(s.published.iso)}" />` : ''}
+${cat ? `<meta property="article:section" content="${esc(cat.name)}" />` : ''}
 ${socialImageMeta(ogImg, `${s.title} evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status`)}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${esc(skillTitle)}" />
@@ -1057,21 +1096,24 @@ ${socialImageMeta(ogImg, `${s.title} evidence or generated-asset preview; consul
 ${JSON.stringify({
   '@context': 'https://schema.org',
   '@graph': [
+    PUBLISHER,
     {
-      '@type': 'TechArticle',
+      '@type': ['Article', 'TechArticle'],
       '@id': `${pageUrl}#article`,
-      headline: skillTitle,
+      headline: s.title,
       description: s.desc,
       url: pageUrl,
-      mainEntityOfPage: pageUrl,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
       image: ogImg,
+      datePublished: s.published?.iso,
       dateModified: s.update?.iso,
-      author: PUBLISHER,
-      publisher: PUBLISHER,
+      author: PUBLISHER_REF,
+      publisher: PUBLISHER_REF,
       inLanguage: 'en',
       isAccessibleForFree: true,
       isPartOf: { '@type': 'SoftwareSourceCode', '@id': `${SITE}#software`, name: SITE_NAME, codeRepository: REPO, url: SITE },
       about: ['Three.js', 'WebGPU', 'TSL', s.title],
+      articleSection: cat?.name,
     },
     {
       '@type': 'BreadcrumbList',

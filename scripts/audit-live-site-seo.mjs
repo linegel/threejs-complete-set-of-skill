@@ -34,6 +34,15 @@ function canonicals(html) {
     .filter(Boolean);
 }
 
+function alternateValues(html, type) {
+  return [...html.matchAll(/<link\b[^>]*>/gi)]
+    .map((match) => match[0])
+    .filter((tag) => /\brel=["'][^"']*\balternate\b[^"']*["']/i.test(tag))
+    .filter((tag) => tag.match(/\btype=["']([^"']+)["']/i)?.[1]?.toLowerCase() === type.toLowerCase())
+    .map((tag) => tag.match(/\bhref=["']([^"']+)["']/i)?.[1])
+    .filter(Boolean);
+}
+
 function jsonLd(html, label) {
   const values = [];
   for (const [, source] of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
@@ -52,6 +61,15 @@ function schemaTypes(values) {
     const graph = Array.isArray(value?.['@graph']) ? value['@graph'] : [value];
     return graph.flatMap((entry) => Array.isArray(entry?.['@type']) ? entry['@type'] : [entry?.['@type']]).filter(Boolean);
   }));
+}
+
+function schemaNodes(values) {
+  return values.flatMap((value) => Array.isArray(value?.['@graph']) ? value['@graph'] : [value]);
+}
+
+function hasType(node, type) {
+  const types = Array.isArray(node?.['@type']) ? node['@type'] : [node?.['@type']];
+  return types.includes(type);
 }
 
 async function mapConcurrent(values, worker) {
@@ -120,7 +138,9 @@ await mapConcurrent(urls, async (url) => {
   const description = metaValues(html, 'name', 'description');
   const robotsMeta = metaValues(html, 'name', 'robots');
   const canonical = canonicals(html);
-  const schema = schemaTypes(jsonLd(html, url));
+  const structuredData = jsonLd(html, url);
+  const schema = schemaTypes(structuredData);
+  const nodes = schemaNodes(structuredData);
 
   assert(title && title.length >= 20 && title.length <= 65, `${url}: invalid title length ${title?.length ?? 0}`);
   assert(description.length === 1 && description[0].length >= 80 && description[0].length <= 165, `${url}: invalid meta description`);
@@ -134,6 +154,23 @@ await mapConcurrent(urls, async (url) => {
   const expectedType = pathname === '/' ? 'WebSite' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication');
   assert(schema.has(expectedType), `${url}: missing ${expectedType} structured data`);
   assert(schema.has('BreadcrumbList') || pathname === '/', `${url}: missing breadcrumb structured data`);
+  if (pathname === '/' || pathname.startsWith('/skills/')) {
+    assert(alternateValues(html, 'text/plain')[0] === new URL('llms.txt', SITE).href, `${url}: missing llms.txt discovery link`);
+    assert(alternateValues(html, 'application/json')[0] === new URL('skills.json', SITE).href, `${url}: missing skills.json discovery link`);
+  }
+  if (pathname.startsWith('/skills/')) {
+    const article = nodes.find((node) => hasType(node, 'Article'));
+    const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE.href}#publisher`);
+    assert(article && hasType(article, 'TechArticle'), `${url}: article lacks dual Article/TechArticle typing`);
+    assert(publisher?.url === SITE.href && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${url}: incomplete publisher identity`);
+    const published = Date.parse(article?.datePublished ?? '');
+    const modified = Date.parse(article?.dateModified ?? '');
+    assert(Number.isFinite(published), `${url}: missing or invalid datePublished`);
+    assert(Number.isFinite(modified), `${url}: missing or invalid dateModified`);
+    assert(!Number.isFinite(published) || !Number.isFinite(modified) || published <= modified, `${url}: publication date is later than modification date`);
+    assert(metaValues(html, 'property', 'article:published_time')[0] === article?.datePublished, `${url}: publication timestamps disagree`);
+    assert(metaValues(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${url}: modification timestamps disagree`);
+  }
 });
 
 const indexDuplicate = await request(new URL('index.html', SITE), { redirect: 'manual' });
