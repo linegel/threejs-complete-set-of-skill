@@ -8,6 +8,7 @@
   <style>.classification-banner{position:fixed;z-index:20;top:12px;left:50%;transform:translateX(-50%);max-width:min(760px,calc(100vw - 24px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.94);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.classification-banner a{color:#7fd4c1}</style>
   <meta name="description" content="Interactive Three.js WebGPU concept demo for Particles, Trails, and Effects. The docs page uses instanced visual particles and authored shells rather than the…">
   <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="owning-skill" content="threejs-particles-trails-and-effects">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://threejs-skills.com/demos/pooled-particles-effects-demo/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -34,13 +35,35 @@
   <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BLzGo2sq.js">
   <link rel="modulepreload" crossorigin href="../assets/OrbitControls-B9POmq7-.js">
   <link rel="stylesheet" crossorigin href="../assets/index-9UBVqAHj.css">
+  <style data-demo-seo-shell-style>
+.demo-seo-shell{position:fixed;z-index:2147483000;left:12px;bottom:12px;display:block;box-sizing:border-box;width:min(460px,calc(100vw - 24px));max-height:min(58vh,560px);margin:0;color:#f3efe6;background:rgba(8,11,16,.94);border-radius:20px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 18px 60px rgba(0,0,0,.42);font:14px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;backdrop-filter:blur(18px) saturate(1.15);overflow:auto}.demo-seo-shell *{box-sizing:border-box}.demo-seo-shell details{margin:0}.demo-seo-shell summary{min-height:44px;display:flex;align-items:center;padding:10px 16px;cursor:pointer;color:#ffca80;font-weight:700;text-wrap:balance;list-style:none;transition-property:color,background-color,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell summary::-webkit-details-marker{display:none}.demo-seo-shell summary:after{content:"+";margin-left:auto;font:700 18px/1 ui-monospace,monospace}.demo-seo-shell details[open] summary:after{content:"−"}.demo-seo-shell summary:hover{color:#fff;background:rgba(255,255,255,.045)}.demo-seo-shell summary:active{scale:.96}.demo-seo-shell summary:focus-visible,.demo-seo-shell a:focus-visible{outline:2px solid #7fd4c1;outline-offset:-3px}.demo-seo-shell__body{padding:2px 16px 16px}.demo-seo-shell h1,.demo-seo-shell h2,.demo-seo-shell h3{margin:0 0 8px;color:#fff;line-height:1.14;text-wrap:balance}.demo-seo-shell h1,.demo-seo-shell h2{font-size:clamp(21px,4vw,29px)}.demo-seo-shell h3{margin-top:15px;font-size:15px;color:#ffca80}.demo-seo-shell p,.demo-seo-shell li,.demo-seo-shell dd{margin:0;text-wrap:pretty}.demo-seo-shell p+p{margin-top:9px}.demo-seo-shell strong{color:#ffca80;font:inherit;font-weight:750}.demo-seo-shell__kicker{margin-bottom:7px!important;color:#7fd4c1;font:600 10px/1.4 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}.demo-seo-shell__evidence{color:#d6d0c4}.demo-seo-shell dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 0}.demo-seo-shell dl div{min-width:0;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.045);box-shadow:0 0 0 1px rgba(255,255,255,.07)}.demo-seo-shell dt{color:#9a988f;font:600 9px/1.35 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase}.demo-seo-shell dd{margin-top:3px;color:#f3efe6;font-size:12px}.demo-seo-shell ul{display:grid;gap:4px;margin:0;padding-left:18px;color:#d6d0c4}.demo-seo-shell code{color:#7fd4c1;font:600 11px/1.4 ui-monospace,monospace}.demo-seo-shell nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.demo-seo-shell a{min-height:40px;display:inline-flex;align-items:center;padding:8px 11px;border-radius:10px;color:#f3efe6;background:rgba(127,212,193,.08);box-shadow:0 0 0 1px rgba(127,212,193,.2);text-decoration:none;font-weight:650;transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell a:hover{color:#fff;background:rgba(127,212,193,.16);box-shadow:0 0 0 1px rgba(127,212,193,.36)}.demo-seo-shell a:active{scale:.96}@media(max-width:560px){.demo-seo-shell{max-height:52vh}.demo-seo-shell dl{grid-template-columns:1fr}.demo-seo-shell__body{padding-inline:14px}}@media(prefers-reduced-motion:reduce){.demo-seo-shell summary,.demo-seo-shell a{transition-duration:0ms}}
+</style>
 </head>
 <body data-demo="pooled-particles-effects-demo" data-demo-kind="proxy-demo">
+<aside class="demo-seo-shell" data-demo-seo-shell data-demo-id="pooled-particles-effects-demo" data-owning-skill="threejs-particles-trails-and-effects">
+  <details open>
+    <summary>About this WebGPU demo</summary>
+    <div class="demo-seo-shell__body">
+      <p class="demo-seo-shell__kicker">Proxy Demo · Three.js 0.185.1</p>
+      <h2>Pooled Particles And Trails</h2>
+      <p>Interactive Three.js WebGPU concept demo for Particles, Trails, and Effects. The docs page uses instanced visual particles and authored shells rather than the…</p>
+      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> This is a secondary presentation surface, not canonical runtime evidence. The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.</p>
+      <p>Use the linked skill, registry, and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
+      <dl>
+        <div><dt>Owning skill</dt><dd>Particles, Trails, and Effects</dd></div>
+        <div><dt>Published routes</dt><dd>0 scenarios · 0 mechanisms · 0 quality tiers</dd></div>
+      </dl>
+      <h3>Supported mechanisms</h3>
+      <ul data-demo-mechanisms><li>Interactive presentation linked to the owning production skill contract.</li></ul>
+      <nav aria-label="Demo documentation and provenance"><a href="../../skills/threejs-particles-trails-and-effects.html">Owning skill</a><a href="../webgpu-pooled-effects/">Canonical lab</a><a href="../registry.json">Demo registry</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-particles-trails-and-effects">Source repository</a></nav>
+    </div>
+  </details>
+</aside>
   <aside class="classification-banner"><strong>Concept proxy.</strong> The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof. <a href="../webgpu-pooled-effects/">Canonical lab or contract</a>.</aside>
   <main>
     <canvas id="demo-canvas"></canvas>
     <section class="hud">
-      <div class="panel"><p class="meta" id="demo-skill"></p><h1 class="title" id="demo-title"></h1><p class="claim" id="demo-claim"></p><div class="controls" id="demo-controls"></div></div>
+      <div class="panel"><p class="meta" id="demo-skill"></p><h1 class="title" id="demo-title">Pooled Particles And Trails</h1><p class="claim" id="demo-claim"></p><div class="controls" id="demo-controls"></div></div>
       <div class="panel"><p class="status" id="demo-status">Initializing WebGPU...</p><p class="links"><a id="demo-evidence" href="../webgpu-pooled-effects/">Canonical lab or contract</a></p></div>
     </section>
   </main>

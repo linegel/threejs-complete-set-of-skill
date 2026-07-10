@@ -96,6 +96,18 @@ function internalLinks(html, baseUrl) {
     });
 }
 
+function staticMarkup(html) {
+  return html.replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/gi, '');
+}
+
+function visibleText(html) {
+  return staticMarkup(html)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z#0-9]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function mapConcurrent(values, worker) {
   let cursor = 0;
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, values.length) }, async () => {
@@ -175,6 +187,20 @@ await mapConcurrent(urls, async (url) => {
   assert(!html.includes(RETIRED_SITE), `${url}: contains the retired origin`);
 
   const pathname = new URL(url).pathname;
+  const rawMarkup = staticMarkup(html);
+  const headings = [...rawMarkup.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
+  const mainLandmarks = [...rawMarkup.matchAll(/<main\b[^>]*>/gi)];
+  assert(headings.length === 1 && Boolean(visibleText(headings[0]?.[1] ?? '')), `${url}: expected one non-empty static h1`);
+  assert(mainLandmarks.length === 1, `${url}: expected one static main landmark, found ${mainLandmarks.length}`);
+  if (pathname.startsWith('/demos/')) {
+    const shell = rawMarkup.match(/<(aside|main)\b[^>]*data-demo-seo-shell[^>]*>([\s\S]*?)<\/\1>/i);
+    const words = visibleText(shell?.[2] ?? '').split(/\s+/).filter(Boolean).length;
+    assert(Boolean(shell), `${url}: missing static demo SEO shell`);
+    assert(words >= 80, `${url}: static demo SEO shell has only ${words} words`);
+    assert(/\bdata-owning-skill=["'][^"']+["']/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks owning-skill identity`);
+    assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks mechanism inventory`);
+    assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${url}: demo shell lacks evidence status`);
+  }
   const expectedType = pathname === '/' ? 'WebSite' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication');
   assert(schema.has(expectedType), `${url}: missing ${expectedType} structured data`);
   assert(schema.has('BreadcrumbList') || pathname === '/', `${url}: missing breadcrumb structured data`);
