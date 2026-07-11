@@ -891,6 +891,7 @@ assert.deepEqual(TARGET_IDS, ["articulated-desk-lamp", "potted-bonsai", "ceramic
     },
   }], "initial route state must drive the first and only target allocation");
   let metrics = controller.getMetrics();
+  assert.equal(metrics.labId, "webgpu-object-sculptor-corpus");
   assert.equal(metrics.subjectId, "ceramic-teapot");
   assert.equal(metrics.mode, "materials");
   assert.equal(metrics.tier, "minimum");

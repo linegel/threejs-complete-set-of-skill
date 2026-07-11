@@ -3596,6 +3596,7 @@ export async function createObjectSculptorCorpusController({
       const physicsHandoffCount = activeTarget.runtime.colliders?.size ?? summary.colliders ?? 0;
       return {
         ...summary,
+        labId: "webgpu-object-sculptor-corpus",
         subjectId: currentSubjectId,
         scenario: currentSubjectId,
         mode: currentMode,
