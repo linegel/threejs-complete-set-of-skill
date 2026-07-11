@@ -61,6 +61,8 @@ function rawManifestFixture() {
   };
 }
 import {
+  LAB_CONTROLLER_GLOBALS,
+  awaitLockedRouteController,
   lockedRouteContract,
   lockedRouteSelectionMatches,
   plannedPublishedRoutes,
@@ -205,6 +207,68 @@ test('empty-startup mechanism wrappers select by query without calling setMode',
   assert.throws(() => lockedRouteContract({
     labId: 'fixture-lab', kind: 'mechanism', id: 'velocity-and-history', startup: { mechanism: 'velocity' },
   }), /unsupported locked startup keys: mechanism/);
+});
+
+test('locked route controller discovery accepts exposure after iframe load', async () => {
+  const expected = { ready: async () => {} };
+  const emittedWaiter = Function(`return (${awaitLockedRouteController.toString()})`)();
+  let clockMs = 0;
+  let reads = 0;
+  const controller = await emittedWaiter(
+    () => {
+      reads += 1;
+      return reads < 3 ? null : expected;
+    },
+    {
+      timeoutMs: 120,
+      pollIntervalMs: 50,
+      now: () => clockMs,
+      sleep: async (milliseconds) => { clockMs += milliseconds; },
+    },
+  );
+  assert.equal(controller, expected);
+  assert.equal(reads, 3);
+  assert.equal(clockMs, 100);
+});
+
+test('locked route controller discovery resolves a promised controller', async () => {
+  const expected = { ready: async () => {} };
+  assert.equal(
+    await awaitLockedRouteController(() => Promise.resolve(expected), { timeoutMs: 120 }),
+    expected,
+  );
+});
+
+test('locked route controller discovery fails closed at its exact deadline', async () => {
+  let clockMs = 0;
+  await assert.rejects(
+    awaitLockedRouteController(
+      () => null,
+      {
+        timeoutMs: 120,
+        pollIntervalMs: 50,
+        now: () => clockMs,
+        sleep: async (milliseconds) => { clockMs += milliseconds; },
+      },
+    ),
+    new RegExp(`LabController alias.*${LAB_CONTROLLER_GLOBALS.join(', ')}.*120 ms`),
+  );
+  assert.equal(clockMs, 120);
+});
+
+test('locked route controller discovery surfaces child blockers before polling', async () => {
+  let sleepCalls = 0;
+  await assert.rejects(
+    awaitLockedRouteController(
+      () => null,
+      {
+        resolveBlocker: () => 'renderer initialization failed',
+        sleep: async () => { sleepCalls += 1; },
+      },
+    ),
+    /initialization blocker: renderer initialization failed/,
+  );
+  assert.equal(sleepCalls, 0);
 });
 
 test('browser-free quick validation permits capture syntax checks but rejects execution', () => {

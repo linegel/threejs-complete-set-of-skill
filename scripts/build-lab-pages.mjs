@@ -26,7 +26,12 @@ import {
   buildDemoRegistry,
   registryJson,
 } from './lib/lab-registry.mjs';
-import { lockedRouteContract, plannedPublishedRoutes } from './lib/page-routes.mjs';
+import {
+  LAB_CONTROLLER_GLOBALS,
+  awaitLockedRouteController,
+  lockedRouteContract,
+  plannedPublishedRoutes,
+} from './lib/page-routes.mjs';
 import { computePublishedBundleHash, publishedHashInputs } from './lib/published-pages.mjs';
 import { labViteAliases } from './lib/vite-lab-config.mjs';
 
@@ -420,24 +425,41 @@ function routeWrapper({ lab, routeKind, routeId, startup, canonicalDir }) {
   <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#080b10;color:#ece8de}body{overflow:hidden}.route-blocker{box-sizing:border-box;max-width:760px;height:auto;margin:10vh auto;padding:28px;border:1px solid #ff6b6b;background:#111722;font:15px/1.55 system-ui,sans-serif}.route-blocker code{color:#ffb454}</style>
 </head>
 <body>
-  <iframe id="canonical-lab" title="${safeTitle}" src="${canonicalHref}" allow="fullscreen"></iframe>
+  <iframe id="canonical-lab" title="${safeTitle}" allow="fullscreen"></iframe>
   <script type="module">
     const frame = document.querySelector('#canonical-lab');
+    const canonicalHref = ${JSON.stringify(canonicalHref)};
     const startup = ${JSON.stringify(lockedStartup)};
     const setterCalls = ${JSON.stringify(lockedSetterCalls)};
     const routeKind = ${JSON.stringify(routeKind)};
     const routeId = ${JSON.stringify(routeId)};
     const acknowledgementKeys = ${JSON.stringify(acknowledgementKeys)};
     const startupAcknowledgementKeys = ${JSON.stringify(startupAcknowledgementKeys)};
+    const controllerGlobals = ${JSON.stringify(LAB_CONTROLLER_GLOBALS)};
+    const awaitLockedRouteController = ${awaitLockedRouteController.toString()};
+    let routeInitializationStarted = false;
     frame.addEventListener('load', async () => {
+      if (routeInitializationStarted) return;
+      routeInitializationStarted = true;
       try {
-        const controller = await Promise.resolve(
-          frame.contentWindow.labController
-          ?? frame.contentWindow.__LAB_CONTROLLER__
-          ?? frame.contentWindow.__labController
-          ?? null
+        const controller = await awaitLockedRouteController(
+          () => {
+            for (const name of controllerGlobals) {
+              const candidate = frame.contentWindow[name];
+              if (candidate !== undefined && candidate !== null) return candidate;
+            }
+            return null;
+          },
+          {
+            controllerGlobals,
+            resolveBlocker: () => (
+              frame.contentWindow.__LAB_ERROR__
+              ?? frame.contentWindow.__labError
+              ?? frame.contentWindow.__lab?.error
+              ?? null
+            ),
+          },
         );
-        if (!controller) throw new Error('Canonical lab did not expose labController or __LAB_CONTROLLER__.');
         if (typeof controller.ready !== 'function') throw new Error('Canonical lab controller has no ready() method.');
         await controller.ready();
         for (const call of setterCalls) {
@@ -473,6 +495,7 @@ function routeWrapper({ lab, routeKind, routeId, startup, canonicalDir }) {
         document.body.innerHTML = '<main class="route-blocker"><h1>Locked route failed</h1><p>This route cannot silently fall back to a default state.</p><pre><code>' + message + '</code></pre></main>';
       }
     });
+    frame.src = canonicalHref;
   </script>
 </body>
 </html>

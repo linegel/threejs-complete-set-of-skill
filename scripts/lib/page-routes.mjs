@@ -28,6 +28,78 @@ const STARTUP_ACKNOWLEDGEMENT_KEYS = Object.freeze({
   time: Object.freeze(['time', 'timeSeconds', 'currentTime']),
 });
 
+export const LAB_CONTROLLER_GLOBALS = Object.freeze([
+  'labController',
+  '__LAB_CONTROLLER__',
+  '__labController',
+  '__imagePipelineValidation',
+  '__THREEJS_LAB__',
+  '__THREE_LAB__',
+]);
+
+export async function awaitLockedRouteController(resolveCandidate, {
+  resolveBlocker = () => null,
+  controllerGlobals = [
+    'labController',
+    '__LAB_CONTROLLER__',
+    '__labController',
+    '__imagePipelineValidation',
+    '__THREEJS_LAB__',
+    '__THREE_LAB__',
+  ],
+  timeoutMs = 60_000,
+  pollIntervalMs = 50,
+  now = () => performance.now(),
+  sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+  settleCandidate = (candidate, remainingMs) => new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Canonical LabController promise did not settle within ${remainingMs} ms.`)),
+      remainingMs,
+    );
+    Promise.resolve(candidate).then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  }),
+} = {}) {
+  if (typeof resolveCandidate !== 'function') throw new TypeError('resolveCandidate must be a function');
+  if (typeof resolveBlocker !== 'function') throw new TypeError('resolveBlocker must be a function');
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new RangeError('timeoutMs must be finite and positive');
+  if (!Number.isFinite(pollIntervalMs) || pollIntervalMs <= 0) throw new RangeError('pollIntervalMs must be finite and positive');
+  if (!Array.isArray(controllerGlobals) || controllerGlobals.length === 0) {
+    throw new TypeError('controllerGlobals must be a non-empty array');
+  }
+
+  const deadline = now() + timeoutMs;
+  while (true) {
+    const blocker = resolveBlocker();
+    if (blocker) throw new Error(`Canonical lab reported an initialization blocker: ${String(blocker)}`);
+
+    const candidate = resolveCandidate();
+    if (candidate !== undefined && candidate !== null) {
+      const remainingMs = Math.max(0, deadline - now());
+      const controller = typeof candidate?.then === 'function'
+        ? await settleCandidate(candidate, remainingMs)
+        : candidate;
+      if (controller) return controller;
+    }
+
+    const remainingMs = deadline - now();
+    if (remainingMs <= 0) break;
+    await sleep(Math.min(pollIntervalMs, remainingMs));
+  }
+
+  throw new Error(
+    `Canonical lab did not expose any LabController alias (${controllerGlobals.join(', ')}) within ${timeoutMs} ms.`,
+  );
+}
+
 function routeValue(value) {
   if (value && typeof value === 'object') return value.id ?? value.name ?? null;
   return value;
