@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { extname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -69,7 +69,6 @@ const contentTypes = {
 function parseArgs(argv) {
 	return {
 		headed: argv.includes('--headed'),
-		keep: argv.includes('--keep'),
 	};
 }
 
@@ -379,7 +378,9 @@ async function fileList(dir) {
 
 async function main() {
 	const options = parseArgs(process.argv.slice(2));
-	if (!options.keep) await rm(artifactDir, { recursive: true, force: true });
+	// Regenerate every manifest-declared output in place. The artifact validator
+	// accepts only files named by the current manifest, so directory deletion is
+	// neither necessary for freshness nor permitted by repository policy.
 	await mkdir(imageDir, { recursive: true });
 	await writeArtifactControlFiles();
 
@@ -585,6 +586,7 @@ async function main() {
 		const manifest = {
 			kind: 'creature-lab-webgpu-artifacts',
 			version: 2,
+			outputPolicy: 'overwrite-manifest-declared-files-without-directory-deletion',
 			url,
 			generatedAt: new Date().toISOString(),
 			labRoot: relative(repoRoot, labRoot),
@@ -624,6 +626,7 @@ async function main() {
 		console.log(JSON.stringify({
 			status: 'pass',
 			artifactDir,
+			outputPolicy: manifest.outputPolicy,
 			images: images.length,
 			nonUniformCheck: images.find((image) => image.path === 'images/final-biped.png')?.stats ?? null,
 			artifacts: artifactList,
