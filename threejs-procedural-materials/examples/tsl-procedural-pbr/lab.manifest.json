@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "id": "tsl-procedural-pbr",
+  "skill": "threejs-procedural-materials",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-materials/examples/tsl-procedural-pbr"
+  ],
+  "browserEntry": "threejs-procedural-materials/examples/tsl-procedural-pbr/index.html",
+  "publishPath": "/demos/tsl-procedural-pbr/",
+  "scenarios": [
+    { "id": "pbr-identity", "route": "/demos/tsl-procedural-pbr/mechanism/pbr-identity/", "startup": { "scenario": "pbr-identity" }, "acceptanceStatus": "incomplete" },
+    { "id": "specular-aa-and-filtering", "route": "/demos/tsl-procedural-pbr/mechanism/specular-aa-and-filtering/", "startup": { "scenario": "specular-aa-and-filtering" }, "acceptanceStatus": "incomplete" },
+    { "id": "atlas-array-and-triplanar", "route": "/demos/tsl-procedural-pbr/mechanism/atlas-array-and-triplanar/", "startup": { "scenario": "atlas-array-and-triplanar" }, "acceptanceStatus": "incomplete" },
+    { "id": "instanced-dissolve", "route": "/demos/tsl-procedural-pbr/mechanism/instanced-dissolve/", "startup": { "scenario": "instanced-dissolve" }, "acceptanceStatus": "incomplete" },
+    { "id": "shadow-parity", "route": "/demos/tsl-procedural-pbr/mechanism/shadow-parity/", "startup": { "scenario": "shadow-parity" }, "acceptanceStatus": "incomplete" },
+    { "id": "wet-rock-and-occlusion", "route": "/demos/tsl-procedural-pbr/mechanism/wet-rock-and-occlusion/", "startup": { "scenario": "wet-rock-and-occlusion" }, "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "pbr-identity", "route": "/demos/tsl-procedural-pbr/mechanism/pbr-identity/", "startup": { "scenario": "pbr-identity" }, "acceptanceStatus": "incomplete" },
+    { "id": "specular-aa-and-filtering", "route": "/demos/tsl-procedural-pbr/mechanism/specular-aa-and-filtering/", "startup": { "scenario": "specular-aa-and-filtering" }, "acceptanceStatus": "incomplete" },
+    { "id": "atlas-array-and-triplanar", "route": "/demos/tsl-procedural-pbr/mechanism/atlas-array-and-triplanar/", "startup": { "scenario": "atlas-array-and-triplanar" }, "acceptanceStatus": "incomplete" },
+    { "id": "instanced-dissolve", "route": "/demos/tsl-procedural-pbr/mechanism/instanced-dissolve/", "startup": { "scenario": "instanced-dissolve" }, "acceptanceStatus": "incomplete" },
+    { "id": "shadow-parity", "route": "/demos/tsl-procedural-pbr/mechanism/shadow-parity/", "startup": { "scenario": "shadow-parity" }, "acceptanceStatus": "incomplete" },
+    { "id": "wet-rock-and-occlusion", "route": "/demos/tsl-procedural-pbr/mechanism/wet-rock-and-occlusion/", "startup": { "scenario": "wet-rock-and-occlusion" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "ultra",
+      "targetClass": "current-adapter close inspection",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 2, "bloomScale": 0.5 },
+      "mechanismLimits": { "normalStrength": 1, "varianceScale": 1 },
+      "resourceLimits": { "validationMrtAttachments": 7, "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["PBR identity", "shared causes", "dissolve parity", "color-space ownership"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "high",
+      "targetClass": "current-adapter authored workload",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 1.5, "bloomScale": 0.33 },
+      "mechanismLimits": { "normalStrength": 0.8, "varianceScale": 1 },
+      "resourceLimits": { "validationMrtAttachments": 7, "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["reduce DPR cap", "reduce bloom resolution", "attenuate micro-normal amplitude"],
+      "preservedInvariants": ["PBR identity", "shared causes", "dissolve parity", "color-space ownership"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "mobile",
+      "targetClass": "native-WebGPU minimum correctness",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 1, "bloomScale": 0.25 },
+      "mechanismLimits": { "normalStrength": 0.55, "varianceScale": 1.15 },
+      "resourceLimits": { "validationMrtAttachments": 7, "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["reduce DPR cap", "reduce bloom resolution", "further attenuate unresolved normal detail"],
+      "preservedInvariants": ["PBR identity", "shared causes", "dissolve parity", "color-space ownership"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": [
+    "final", "no-post", "raw-emissive", "bloom-only", "material-albedo",
+    "material-params", "material-normal", "material-footprint", "material-normal-variance",
+    "roughness-aa", "normal-variance",
+    "dissolve", "triplanar-weights"
+  ],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "node-material", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mrt", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "texture-array", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "shadow-depth-texture", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "material-channel-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "atlas-gutter-mip-runtime", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "dissolve-shadow-atlas-parity", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "supersampled-specular-error", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "current-adapter-timing", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "node threejs-procedural-materials/examples/tsl-procedural-pbr/validate-procedural-pbr.mjs",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

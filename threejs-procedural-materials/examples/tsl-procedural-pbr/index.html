@@ -33,6 +33,16 @@
         font: 12px system-ui, sans-serif;
       }
     </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../../../node_modules/three/build/three.webgpu.js",
+          "three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
+          "three/tsl": "../../../node_modules/three/build/three.tsl.js",
+          "three/addons/": "../../../node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
   </head>
   <body>
     <canvas id="scene"></canvas>

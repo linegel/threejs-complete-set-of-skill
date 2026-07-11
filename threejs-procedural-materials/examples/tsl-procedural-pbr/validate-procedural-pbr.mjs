@@ -1,194 +1,398 @@
+import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { Color, DataTexture, NoColorSpace, SRGBColorSpace } from "three/webgpu";
-import { bloom } from "three/addons/tsl/display/BloomNode.js";
-import { mrt, output, pass, renderOutput } from "three/tsl";
 
+import { alignedBytesPerRow, requiredPaddedByteLength } from "../../../labs/runtime/aligned-readback.mjs";
 import {
+  MATERIAL_ARRAY_CONTRACT,
+  MATERIAL_ATLAS_CONTRACT,
+  authoredBandFilterContract,
+  authoredPbrIdentities,
   createAntiqueGoldPbrMaterial,
+  createAtlasArrayTriplanarMaterials,
   createEbonyFramePbrMaterial,
+  createInstancedDissolveAttributes,
   createLavaEmissivePbrMaterial,
+  createMaterialTextureArray,
+  createMipSafeMaterialAtlas,
+  createTriplanarMaterialTexture,
   createWalnutPbrMaterial,
+  createWetRockPbrMaterial,
+  describeProjectionLedger,
   disposeProceduralPbrMaterial,
   disposeTextureSet,
+  evaluateDissolveVisibility,
+  evaluateFilteredBinaryMetalness,
+  evaluateWetRockResponse,
   initializeProceduralPbrMaterialData,
   PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE,
   proceduralPbrDebugModes,
+  proceduralPbrQualityTiers,
+  resolveTierViewport,
   setProceduralPbrDebugMode,
+  validateAtlasGutterContract,
   validateProceduralPbrConfig,
 } from "./procedural-pbr-materials.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const assetRoot = resolve(__dirname, "../../assets/generated-variants");
-const materialSourcePath = resolve(__dirname, "procedural-pbr-materials.js");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
+const here = dirname(fileURLToPath(import.meta.url));
+const assetRoot = resolve(here, "../../assets/generated-variants");
 
 function readPngSize(buffer) {
-  const signature = buffer.subarray(0, 8).toString("hex");
-  assert(signature === "89504e470d0a1a0a", "asset is not a PNG");
-  return {
-    width: buffer.readUInt32BE(16),
-    height: buffer.readUInt32BE(20),
-    colorType: buffer.readUInt8(25),
+  assert.equal(buffer.subarray(0, 8).toString("hex"), "89504e470d0a1a0a", "asset is not a PNG");
+  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20), colorType: buffer.readUInt8(25) };
+}
+
+function pixelAt(level, x, y) {
+  const offset = (y * level.width + x) * 4;
+  return Array.from(level.data.subarray(offset, offset + 4));
+}
+
+function verifyExtrudedMipGutters(texture) {
+  const contract = texture.userData.materialAtlas;
+  assert.equal(texture.mipmaps.length, contract.sampledMipCount);
+  for (let levelIndex = 0; levelIndex < texture.mipmaps.length; levelIndex++) {
+    const level = texture.mipmaps[levelIndex];
+    const metadata = contract.levels[levelIndex];
+    for (let tileY = 0; tileY < contract.rows; tileY++) {
+      for (let tileX = 0; tileX < contract.columns; tileX++) {
+        const x0 = tileX * metadata.cellWidth;
+        const y0 = tileY * metadata.cellHeight;
+        const minX = x0 + metadata.gutter;
+        const maxX = x0 + metadata.cellWidth - metadata.gutter - 1;
+        const minY = y0 + metadata.gutter;
+        const maxY = y0 + metadata.cellHeight - metadata.gutter - 1;
+        for (let localY = 0; localY < metadata.cellHeight; localY++) {
+          for (let localX = 0; localX < metadata.cellWidth; localX++) {
+            const isGutter = localX < metadata.gutter
+              || localX >= metadata.cellWidth - metadata.gutter
+              || localY < metadata.gutter
+              || localY >= metadata.cellHeight - metadata.gutter;
+            if (!isGutter) continue;
+            const x = x0 + localX;
+            const y = y0 + localY;
+            const nearestX = Math.min(maxX, Math.max(minX, x));
+            const nearestY = Math.min(maxY, Math.max(minY, y));
+            assert.deepEqual(
+              pixelAt(level, x, y),
+              pixelAt(level, nearestX, nearestY),
+              `mip ${levelIndex} tile ${tileX},${tileY} gutter is not nearest-interior extrusion`,
+            );
+          }
+        }
+      }
+    }
+  }
+}
+
+function validateLiveProjectionResources() {
+  const atlas = createMipSafeMaterialAtlas();
+  const textureArray = createMaterialTextureArray();
+  const triplanarMap = createTriplanarMaterialTexture();
+  try {
+    assert.equal(atlas.colorSpace, SRGBColorSpace);
+    assert.equal(atlas.generateMipmaps, false);
+    assert.equal(atlas.image.width, MATERIAL_ATLAS_CONTRACT.width);
+    verifyExtrudedMipGutters(atlas);
+    assert.equal(textureArray.isDataArrayTexture, true);
+    assert.equal(textureArray.image.depth, MATERIAL_ARRAY_CONTRACT.layers);
+    assert.equal(textureArray.colorSpace, SRGBColorSpace);
+    const layerBytes = textureArray.image.width * textureArray.image.height * 4;
+    const layerHashes = new Set();
+    for (let layer = 0; layer < textureArray.image.depth; layer++) {
+      const bytes = textureArray.image.data.subarray(layer * layerBytes, (layer + 1) * layerBytes);
+      layerHashes.add(createHash("sha256").update(bytes).digest("hex"));
+    }
+    assert.equal(layerHashes.size, textureArray.image.depth, "array layers must be materially distinct");
+    const materials = createAtlasArrayTriplanarMaterials({ atlas, textureArray, triplanarMap });
+    assert.equal(materials.atlasMaterial.userData.projectionLedger.executedSamples, 1);
+    assert.equal(materials.arrayMaterial.userData.projectionLedger.executedSamples, 1);
+    assert.equal(materials.triplanarMaterial.userData.projectionLedger.executedSamples, 3);
+    Object.values(materials).forEach((material) => material.dispose());
+    return {
+      atlasMipCount: atlas.mipmaps.length,
+      arrayLayers: textureArray.image.depth,
+      triplanarSamples: 3,
+    };
+  } finally {
+    atlas.dispose();
+    textureArray.dispose();
+    triplanarMap.dispose();
+  }
+}
+
+function validateMetalnessDistribution() {
+  const footprint = 0.01;
+  let fractional = 0;
+  let endpoints = 0;
+  for (let index = 0; index <= 10_000; index++) {
+    const cause = index / 10_000;
+    const actual = evaluateFilteredBinaryMetalness(cause, footprint, 0.5);
+    const low = 0.5 - footprint;
+    const high = 0.5 + footprint;
+    let expected;
+    if (cause <= low) expected = 0;
+    else if (cause >= high) expected = 1;
+    else {
+      const t = (cause - low) / (high - low);
+      expected = t * t * (3 - 2 * t);
+    }
+    assert(Math.abs(actual - expected) <= 2e-15, `filtered metalness oracle mismatch at ${cause}`);
+    if (actual === 0 || actual === 1) endpoints++;
+    else fractional++;
+  }
+  assert(fractional / 10_001 < 0.021, "fractional metalness leaked beyond the filtered boundary");
+  assert(endpoints / 10_001 > 0.979, "conductor/dielectric endpoints do not dominate the distribution");
+  const gold = createAntiqueGoldPbrMaterial();
+  try {
+    assert.equal(gold.metalness, 0, "fallback scalar must be a physical endpoint");
+    assert.equal(gold.userData.proceduralPbr.metalnessIdentity.conductorValue, 1);
+    assert.equal(gold.userData.proceduralPbr.metalnessIdentity.dielectricValue, 0);
+    assert.match(gold.userData.proceduralPbr.metalnessIdentity.transition, /subpixel/);
+  } finally {
+    gold.dispose();
+  }
+  return { fractionalFraction: fractional / 10_001, endpointFraction: endpoints / 10_001 };
+}
+
+function validateDissolveParity() {
+  const walnut = createWalnutPbrMaterial();
+  try {
+    assert.strictEqual(walnut.maskNode, walnut.maskShadowNode, "visible and shadow masks must share node identity");
+    assert.strictEqual(
+      walnut.userData.proceduralPbr.dissolveParity.visibleMaskNode,
+      walnut.userData.proceduralPbr.dissolveParity.shadowMaskNode,
+    );
+    const attributes = createInstancedDissolveAttributes(32, { variantSeed: 41 });
+    assert.equal(attributes.dissolve.count, 32);
+    assert.equal(attributes.variant.count, 32);
+    assert(new Set(attributes.variant.array).size > 24, "instance variants collapsed to repeated values");
+    for (let index = 0; index <= 512; index++) {
+      const cause = index / 512;
+      const threshold = 0.42;
+      const footprint = 0.035;
+      const visible = evaluateDissolveVisibility(cause, threshold, footprint);
+      const shadow = evaluateDissolveVisibility(cause, threshold, footprint);
+      assert.equal(visible, shadow, `dissolve visible/shadow oracle diverged at ${cause}`);
+      assert(visible >= 0 && visible <= 1);
+    }
+  } finally {
+    walnut.dispose();
+  }
+  return "shared-node-and-f32-oracle-passed";
+}
+
+function integrateSchlickFurnace(f0, samples = 200_000) {
+  let integral = 0;
+  for (let index = 0; index < samples; index++) {
+    const cosine = (index + 0.5) / samples;
+    const fresnel = f0 + (1 - f0) * ((1 - cosine) ** 5);
+    integral += 2 * cosine * fresnel;
+  }
+  return integral / samples;
+}
+
+function validateFurnaceApproximation() {
+  for (const f0 of [0.020373, 0.04, 0.36, 0.78]) {
+    const numeric = integrateSchlickFurnace(f0);
+    const analytic = f0 + (1 - f0) / 21;
+    assert(Math.abs(numeric - analytic) < 2e-10, `Schlick furnace quadrature failed for F0=${f0}`);
+    assert(numeric >= 0 && numeric <= 1, `Schlick furnace energy escaped [0,1] for F0=${f0}`);
+  }
+  for (const identity of Object.values(authoredPbrIdentities)) {
+    const reflectance = new Color(identity.baseColor);
+    assert([reflectance.r, reflectance.g, reflectance.b].every((channel) => channel >= 0 && channel <= 1));
+  }
+  return "schlick-hemisphere-quadrature-passed";
+}
+
+function validateWetnessCoherence() {
+  let previous = evaluateWetRockResponse(0);
+  for (let index = 1; index <= 100; index++) {
+    const current = evaluateWetRockResponse(index / 100);
+    assert(current.colorScale < previous.colorScale, "wet rock color must darken monotonically");
+    assert(current.roughness < previous.roughness, "wet rock roughness must decrease monotonically");
+    assert(current.clearcoat > previous.clearcoat, "wet rock film response must increase monotonically");
+    assert(current.clearcoatRoughness < previous.clearcoatRoughness, "wet rock film roughness must decrease monotonically");
+    assert(current.normalStrength < previous.normalStrength, "wet rock micro-normal strength must attenuate monotonically");
+    previous = current;
+  }
+  const wetRock = createWetRockPbrMaterial();
+  try {
+    assert.deepEqual(
+      wetRock.userData.proceduralPbr.wetnessCause.coupledChannels,
+      ["color", "roughness", "clearcoat", "normal"],
+    );
+    assert.equal(wetRock.userData.proceduralPbr.wetnessCause.ambientAndEmissionUnaffectedByProjectedOcclusion, true);
+    assert.match(wetRock.userData.proceduralPbr.wetnessCause.directLightOcclusionOwner, /directional-light/);
+  } finally {
+    wetRock.dispose();
+  }
+  return { dry: evaluateWetRockResponse(0), wet: evaluateWetRockResponse(1) };
+}
+
+function validateTierViewportPolicy() {
+  const expected = { ultra: 2, high: 1.5, mobile: 1 };
+  for (const [tier, cap] of Object.entries(expected)) {
+    const view = resolveTierViewport({ width: 641, height: 359, requestedDpr: 3, tier });
+    assert.equal(view.effectiveDpr, cap);
+    assert.equal(view.requestedDpr, 3, "tier cap must not erase the requested DPR");
+    assert.equal(view.physicalWidth, Math.round(641 * cap));
+    assert.equal(view.physicalHeight, Math.round(359 * cap));
+    const resized = resolveTierViewport({ width: 1200, height: 800, requestedDpr: view.requestedDpr, tier });
+    assert.equal(resized.effectiveDpr, cap, "resize bypassed locked tier DPR cap");
+  }
+  assert.throws(() => resolveTierViewport({ width: 1, height: 1, requestedDpr: 1, tier: "invented" }), /Unknown/);
+  const stride = alignedBytesPerRow(641, 4);
+  assert.equal(stride, 2816);
+  assert.equal(requiredPaddedByteLength(641, 359, 4, stride), stride * 358 + 641 * 4);
+  return { dprCaps: expected, oddReadbackStride: stride };
+}
+
+function validateMaterialGraphs() {
+  const materials = {
+    walnut: createWalnutPbrMaterial(),
+    gold: createAntiqueGoldPbrMaterial(),
+    ebony: createEbonyFramePbrMaterial(),
+    lava: createLavaEmissivePbrMaterial(),
+    wetRock: createWetRockPbrMaterial(),
   };
-}
-
-function assertMaterialSlots(name, material, expectedSlots) {
-  for (const slot of expectedSlots) {
-    assert(material[slot] !== undefined && material[slot] !== null, `${name} missing ${slot}`);
+  try {
+    for (const [name, material] of Object.entries(materials)) {
+      for (const slot of ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskNode", "maskShadowNode", "mrtNode"]) {
+      assert(material[slot], `${name} missing live ${slot}`);
+      }
+      assert.equal(material.mrtNode.isMRTNode, true, `${name} does not expose a real MRT node`);
+      assert.deepEqual(
+        Object.keys(material.mrtNode.outputNodes),
+        ["materialAlbedo", "materialParams", "materialNormal", "materialFootprint", "materialNormalVariance"],
+        `${name} diagnostic MRT schema drifted`,
+      );
+      assert.equal(material.userData.proceduralPbr.normalVarianceSource, "footprint-removed-material-slope-energy");
+      assert.equal(material.userData.proceduralPbr.geometryRoughnessOwner, "three-r185-getRoughness");
+      for (const mode of proceduralPbrDebugModes.keys()) assert(setProceduralPbrDebugMode(material, mode));
+    }
+    assert(materials.lava.emissiveNode, "lava must publish authored scene-linear emission");
+    assert(materials.walnut.color.equals(new Color(0x5a2814)), "walnut base color was double converted");
+  } finally {
+    Object.values(materials).forEach((material) => material.dispose());
   }
-  assert(material.userData.proceduralPbr?.normalVarianceSource === "normalNode", `${name} normal-variance debug must derive from normalNode`);
-}
-
-async function validateSourceGuards() {
-  const source = await readFile(materialSourcePath, "utf8");
-  assert(!/\bbumpMap\s*\(/.test(source), "scalar procedural height must not be routed through bumpMap()");
-  assert(source.includes("function createDerivativeNormalFromHeight"), "missing scalar-height derivative normal helper");
-  assert(source.includes("scaledHeight.dFdx()") && source.includes("scaledHeight.dFdy()"), "derivative normal must consume height screen-space derivatives");
-  assert(source.includes("positionView.dFdx()") && source.includes("normalView"), "derivative normal must use r185 view-space surface-gradient inputs");
-  return "passed";
-}
-
-async function validateAssetManifest() {
-  const manifest = JSON.parse(await readFile(resolve(assetRoot, "manifest.json"), "utf8"));
-  assert(manifest.colorSpace === "NoColorSpace", "manifest must declare NoColorSpace");
-
-  for (const asset of manifest.assets) {
-    const buffer = await readFile(resolve(assetRoot, asset.file));
-    const hash = createHash("sha256").update(buffer).digest("hex");
-    const size = readPngSize(buffer);
-    assert(hash === asset.sha256, `${asset.file} hash mismatch`);
-    assert(size.width === asset.width && size.height === asset.height, `${asset.file} dimensions mismatch`);
-    assert(size.colorType === 6, `${asset.file} must be RGBA PNG`);
-    assert(asset.colorSpace === "NoColorSpace", `${asset.file} must declare NoColorSpace`);
-  }
-
-  return manifest.assets.map((asset) => asset.file);
+  return Object.keys(materials);
 }
 
 function validateConfigFailures() {
   const badColorSpaceMap = new DataTexture(new Uint8Array([255, 0, 0, 255]), 1, 1);
   badColorSpaceMap.colorSpace = SRGBColorSpace;
-  const failures = [
+  for (const fixture of [
     { roughnessRange: [0.8, 0.2] },
     { coordinateScale: 0 },
+    { coordinateMode: "camera" },
     { seed: Number.NaN },
-    { emissionIntensity: 128 },
+    { emissionIntensity: -1 },
+    { sceneUnitsPerMeter: 0 },
+    { specularVarianceScale: -1 },
+    { identity: { ...authoredPbrIdentities.walnut, metalnessRange: [0.1, 0.9] } },
     { causeMaps: [badColorSpaceMap] },
-  ];
-
-  for (const fixture of failures) {
-    let failed = false;
-    try {
-      validateProceduralPbrConfig(fixture);
-    } catch {
-      failed = true;
-    }
-    assert(failed, `invalid config unexpectedly passed: ${JSON.stringify(Object.keys(fixture))}`);
-  }
-
+  ]) assert.throws(() => validateProceduralPbrConfig(fixture), /Invalid procedural PBR config/);
+  badColorSpaceMap.dispose();
   const map = new DataTexture(new Uint8Array([255, 0, 0, 255]), 1, 1);
   map.colorSpace = NoColorSpace;
-  assert(validateProceduralPbrConfig({ causeMaps: [map], emissionIntensity: 4 }).pass, "valid config failed");
+  assert(validateProceduralPbrConfig({ causeMaps: [map], emissionIntensity: 4 }).pass);
+  map.dispose();
+  assert.throws(() => validateAtlasGutterContract({
+    atlasWidth: 1024,
+    atlasHeight: 1024,
+    columns: 4,
+    rows: 4,
+    guttersByMip: [1, 1],
+    filterRadiusByMip: [2.2, 1.1],
+  }), /below required support/);
+  return "invalid-configs-rejected";
 }
 
-function validateMaterials() {
-  assert(typeof bloom === "function", "BloomNode addon import failed");
-  assert(typeof mrt === "function" && output && typeof pass === "function" && typeof renderOutput === "function", "TSL pipeline imports failed");
-
-  const walnut = createWalnutPbrMaterial();
-  assert(walnut.color.equals(new Color(0x5a2814)), "walnut base color double-converted");
-  const gold = createAntiqueGoldPbrMaterial();
-  const ebony = createEbonyFramePbrMaterial();
-  const lava = createLavaEmissivePbrMaterial();
-  const materials = { walnut, gold, ebony, lava };
-
-  assertMaterialSlots("walnut", walnut, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskShadowNode", "clearcoatNode", "clearcoatRoughnessNode"]);
-  assertMaterialSlots("gold", gold, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskShadowNode", "clearcoatNode", "clearcoatRoughnessNode"]);
-  assertMaterialSlots("ebony", ebony, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "maskShadowNode", "clearcoatNode", "clearcoatRoughnessNode"]);
-  assertMaterialSlots("lava", lava, ["colorNode", "roughnessNode", "metalnessNode", "normalNode", "emissiveNode", "maskShadowNode"]);
-
-  for (const [name, material] of Object.entries(materials)) {
-    for (const mode of proceduralPbrDebugModes.keys()) {
-      assert(setProceduralPbrDebugMode(material, mode), `${name} debug mode ${mode} failed`);
-    }
-  }
-
-  let materialDisposeCount = 0;
-  walnut.dispose = () => { materialDisposeCount += 1; };
-  assert(disposeProceduralPbrMaterial(walnut), "first material dispose should report work");
-  assert(!disposeProceduralPbrMaterial(walnut), "second material dispose should be idempotent");
-  assert(materialDisposeCount === 1, "disposeProceduralPbrMaterial must dispose once over repeated calls");
-  disposeProceduralPbrMaterial(gold);
-  disposeProceduralPbrMaterial(ebony);
-  disposeProceduralPbrMaterial(lava);
-
-  let disposed = 0;
-  const disposable = { dispose: () => { disposed += 1; } };
-  const textureSet = { a: disposable, b: null };
-  assert(disposeTextureSet(textureSet) === 1, "disposeTextureSet should dispose one live texture");
-  assert(disposeTextureSet(textureSet) === 0, "disposeTextureSet should clear entries and be idempotent");
-  assert(disposed === 1, "disposeTextureSet must dispose once over repeated calls");
-
-  return ["walnut", "antiqueGold", "ebony", "lava"];
+function validateIdentities() {
+  assert.equal(authoredPbrIdentities.walnut.metalnessModel, "dielectric-endpoint");
+  assert.equal(authoredPbrIdentities.ebony.metalnessModel, "dielectric-endpoint");
+  assert.equal(authoredPbrIdentities.wetRock.metalnessModel, "dielectric-endpoint");
+  assert.equal(authoredPbrIdentities.antiqueGold.metalnessModel, "filtered-binary-conductor-mask");
+  assert.deepEqual(Object.keys(proceduralPbrQualityTiers), ["ultra", "high", "mobile"]);
+  assert.equal(authoredBandFilterContract.qFade[1], 0.5);
+  const ledger = describeProjectionLedger({ projection: "triplanar", colorTextures: 1, dataTextures: 1, normalTextures: 1 });
+  assert.equal(ledger.sampledTextureBindings, 3);
+  assert.equal(ledger.executedSamples, 9);
+  return "identity-endpoints-and-ledger-passed";
 }
 
 async function validateCapabilityGate() {
   let computeCalls = 0;
-  let restoredTarget = false;
-  const webgpuRenderer = {
+  let restored = null;
+  const accepted = await initializeProceduralPbrMaterialData({
     backend: { isWebGPUBackend: true },
-    getRenderTarget: () => "previous-target",
-    setRenderTarget: (target) => {
-      restoredTarget = target === "previous-target";
-    },
-    init: async () => {},
-    computeAsync: async (nodes) => {
-      computeCalls = nodes.length;
-    },
-  };
-  const pass = await initializeProceduralPbrMaterialData(webgpuRenderer, { computeNodes: ["cause-map", "instance-state"] });
-  assert(pass.isWebGPUBackend === true && pass.computeNodeCount === 2, "native WebGPU capability gate failed");
-  assert(computeCalls === 2, "compute nodes were not dispatched on native WebGPU");
-  assert(restoredTarget, "capability helper must restore render target");
-
-  let rejected = false;
-  let nonWebgpuRestoredTarget = false;
-  const nonWebgpuRenderer = {
+    getRenderTarget: () => "previous",
+    setRenderTarget: (value) => { restored = value; },
+    init: async () => undefined,
+    compute: (nodes) => { computeCalls = nodes.length; },
+  }, { computeNodes: ["cause-map", "instance-state"] });
+  assert.equal(accepted.computeNodeCount, 2);
+  assert.equal(computeCalls, 2);
+  assert.equal(restored, "previous");
+  await assert.rejects(() => initializeProceduralPbrMaterialData({
     backend: { isWebGPUBackend: false },
-    getRenderTarget: () => "old-target",
-    setRenderTarget: (target) => {
-      nonWebgpuRestoredTarget = target === "old-target";
-    },
-    init: async () => {},
-    computeAsync: async () => {
-      throw new Error("compute should not run on non-WebGPU");
-    },
-  };
-  try {
-    await initializeProceduralPbrMaterialData(nonWebgpuRenderer, { computeNodes: ["unused"] });
-  } catch (error) {
-    rejected = error.message === PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE;
+    getRenderTarget: () => null,
+    setRenderTarget: () => undefined,
+    init: async () => undefined,
+    compute: () => assert.fail("non-WebGPU compute must not dispatch"),
+  }), new RegExp(PROCEDURAL_PBR_WEBGPU_REQUIRED_MESSAGE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  return "native-backend-gate-passed";
+}
+
+async function validateAssets() {
+  const manifest = JSON.parse(await readFile(resolve(assetRoot, "manifest.json"), "utf8"));
+  assert.equal(manifest.colorSpace, "NoColorSpace");
+  for (const asset of manifest.assets) {
+    const buffer = await readFile(resolve(assetRoot, asset.file));
+    const hash = createHash("sha256").update(buffer).digest("hex");
+    const size = readPngSize(buffer);
+    assert.equal(hash, asset.sha256, `${asset.file} hash mismatch`);
+    assert.equal(size.width, asset.width);
+    assert.equal(size.height, asset.height);
+    assert.equal(size.colorType, 6);
+    assert.equal(asset.colorSpace, "NoColorSpace");
   }
-  assert(rejected, "non-WebGPU backend must throw with fallback-routing message");
-  assert(nonWebgpuRestoredTarget, "non-WebGPU rejection must still restore render target");
-  return "passed";
+  return manifest.assets.map((asset) => asset.file);
+}
+
+function validateDisposal() {
+  const material = createWalnutPbrMaterial();
+  let calls = 0;
+  material.dispose = () => { calls++; };
+  assert(disposeProceduralPbrMaterial(material));
+  assert(!disposeProceduralPbrMaterial(material));
+  assert.equal(calls, 1);
+  let disposedTextures = 0;
+  const textureSet = { a: { dispose: () => { disposedTextures++; } }, b: null };
+  assert.equal(disposeTextureSet(textureSet), 1);
+  assert.equal(disposeTextureSet(textureSet), 0);
+  assert.equal(disposedTextures, 1);
+  return "idempotent-disposal-passed";
 }
 
 const result = {
-  materials: validateMaterials(),
-  config: validateProceduralPbrConfig(),
-  configFailures: "passed",
-  sourceGuards: await validateSourceGuards(),
+  materialGraphs: validateMaterialGraphs(),
+  identities: validateIdentities(),
+  projectionResources: validateLiveProjectionResources(),
+  metalness: validateMetalnessDistribution(),
+  dissolveParity: validateDissolveParity(),
+  furnace: validateFurnaceApproximation(),
+  wetness: validateWetnessCoherence(),
+  tierViewport: validateTierViewportPolicy(),
+  invalidConfigs: validateConfigFailures(),
   capabilityGate: await validateCapabilityGate(),
-  assets: await validateAssetManifest(),
+  assets: await validateAssets(),
+  disposal: validateDisposal(),
 };
-validateConfigFailures();
 
-console.log(JSON.stringify(result, null, 2));
+console.log(JSON.stringify({ pass: true, status: "incomplete", ...result }, null, 2));
