@@ -130,7 +130,7 @@ test('fixture-driven non-rendering suites and fallback harness use explicit exce
 
 test('the live registry has one statically auditable capture policy per primary demo', () => {
   const result = auditCaptureWiring();
-  assert.equal(result.primaryCount, 39);
+  assert.equal(result.primaryCount, 40);
   assert.deepEqual(result.records.map(({ id }) => id).sort(), [...new Set(result.records.map(({ id }) => id))].sort());
   assert.deepEqual(result.errors, []);
   assert.equal(result.records.filter(({ policy }) => policy === NON_RENDERING_CAPTURE_POLICY).length, 2);

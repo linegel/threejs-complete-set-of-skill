@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "skillsExpected": 26,
+  "skillsExpected": 27,
   "integrations": [
     {
       "id": "final-image-flight",
@@ -84,6 +84,14 @@
       "scenarios": ["browser-capture", "pipeline-graph-inspector", "resource-ledger", "timing-and-governor", "lifecycle-and-leaks", "visual-error-metrics", "mutation-gallery", "artifact-inspector"],
       "mechanisms": ["aligned-readback", "claim-verdicts", "gpu-timestamps", "resource-inventory", "visual-errors", "lifecycle-trend"],
       "tiers": ["schema-fixture", "webgpu-correctness", "target-performance", "governor-stress", "release"]
+    },
+    {
+      "skill": "threejs-object-sculptor",
+      "id": "webgpu-tower-ship-sculptor",
+      "canonicalDir": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor",
+      "scenarios": ["reference-reconstruction", "staged-sculpt", "action-ready"],
+      "mechanisms": ["final", "blockout", "hierarchy", "materials", "interaction"],
+      "tiers": ["full", "budgeted", "minimum"]
     },
     {
       "skill": "threejs-camera-controls-and-rigs",

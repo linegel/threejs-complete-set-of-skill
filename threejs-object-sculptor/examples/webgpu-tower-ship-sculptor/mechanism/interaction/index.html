@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tower Ship · Locked interaction route</title>
+    <style>
+      *{box-sizing:border-box}html,body,#scene{width:100%;height:100%;margin:0;display:block}body{overflow:hidden;background:#091012;color:#f2eadb;font:12px/1.4 ui-sans-serif,system-ui}#panel{position:fixed;z-index:3;inset:16px 16px auto auto;width:300px;padding:14px;border:1px solid #e7d4af2b;border-radius:12px;background:#0a1112df;backdrop-filter:blur(16px)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}label{display:grid;gap:4px;margin-top:8px;color:#9ca9aa;font-size:9px;text-transform:uppercase}label:first-child{grid-column:1/-1}select,button{min-height:36px;border:1px solid #e7d4af2b;border-radius:8px;background:#ffffff0b;color:#f2eadb;padding:0 8px}#status{margin-top:10px;color:#e7b66a}#reference-panel{display:none}#reference-panel[data-open]{display:block;position:fixed;z-index:2;left:16px;bottom:16px;width:min(420px,calc(100vw - 32px));padding:8px;background:#0a1112df;border:1px solid #e7d4af2b;border-radius:10px}#reference-panel img{width:100%;display:block}footer{font-size:9px;color:#9ca9aa}a{color:#e7b66a}.metrics{display:flex;gap:10px;margin:10px 0}.metric b{display:block}.metric span{font-size:8px;color:#9ca9aa;text-transform:uppercase}
+    </style>
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Tower Ship locked route"></canvas>
+    <div id="panel">
+      <strong>Tower Ship · locked interaction</strong>
+      <div class="row">
+        <label>Mode<select id="mode"></select></label>
+        <label>Tier<select id="tier"></select></label>
+        <label>Camera<select id="camera"></select></label>
+      </div>
+      <div><b id="mode-title"></b><span id="mode-description"></span></div>
+      <div class="metrics"><div class="metric"><b id="metric-nodes">—</b><span>nodes</span></div><div class="metric"><b id="metric-triangles">—</b><span>triangles</span></div><div class="metric"><b id="metric-oars">—</b><span>oars</span></div></div>
+      <button id="compare" aria-pressed="false">Compare reference</button>
+      <div id="status">initializing native WebGPU…</div>
+    </div>
+    <figure id="reference-panel"><img id="reference-image" alt="Original Tower Ship reference" /><footer>Reference by <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin">Vinh Hiển</a>.</footer></figure>
+    <script type="module" src="../../app.js"></script>
+  </body>
+</html>

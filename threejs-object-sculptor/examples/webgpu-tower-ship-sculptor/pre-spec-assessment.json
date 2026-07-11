@@ -1,0 +1,130 @@
+{
+  "targetName": "Tower Ship",
+  "sourceImage": "reference/tower-ship-reference.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "fortified river vessel",
+      "formLanguage": ["hard-surface", "architectural", "sculptural"],
+      "structureKind": ["compound object", "branching hierarchy", "repeated modules", "articulated assembly"],
+      "motionPotential": ["whole-object transform", "articulated", "detachable"],
+      "materialFamilies": ["wood", "cloth", "metal", "paper-like panels", "mixed"],
+      "notes": "The image presents a stylized procedural reconstruction. Hidden port-side and lower-hull forms are inferred by bilateral structure and maritime construction logic."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 3,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 12,
+        "microFeatureGroups": 8,
+        "materialLayers": 5,
+        "repetitionSystems": 5
+      },
+      "reasoning": [
+        "The long crescent hull, two-storey cabin, two roof tiers, mast, sail, and rigging create a heavily interrupted silhouette.",
+        "Twenty-four visible or symmetry-inferred oars plus shields, rail posts, shoji grids, roof ribs, and lanterns require deterministic repetition systems.",
+        "Oars, sail, lanterns, cabin, and roof tiers require stable pivots, sockets, colliders, and detachable groups."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Reference identity depends on repeated articulated parts and nested architectural masses, so a flat or merged representation is insufficient."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": "reference/tower-ship-reference.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "At the design camera the model must read as the pictured tower ship: a long upward-curving timber hull carrying a two-storey shoji cabin, layered dark roofs, a tall tan sail, shields, lanterns, railings, and a dense articulated oar bank.",
+      "Blockout, hierarchy, material, and interaction modes must expose the same semantic object factory without rebuilding unrelated scene infrastructure.",
+      "Every oar pivots from a named gunwale socket; cabin, roof, mast, sail, lanterns, and shield banks remain independently targetable."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 8,
+      "microFeatureGroups": 6,
+      "materialLayers": 5,
+      "repetitionSystems": 5,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "curved-fortified-hull",
+        "name": "Curved fortified hull and raised end posts",
+        "required": true,
+        "qualityCriteria": ["The hull spans roughly 20 world units, narrows toward both ends, rises at bow and stern, and retains a continuous upper gunwale."],
+        "evidenceRefs": ["ship-body"],
+        "failureModes": ["box-like barge silhouette", "flat ends", "cabin wider than the hull"]
+      },
+      {
+        "id": "tower-cabin-roofs",
+        "name": "Two-storey shoji cabin and layered pagoda roofs",
+        "required": true,
+        "qualityCriteria": ["Two white gridded wall tiers sit over a dark timber frame, each capped by an overhanging segmented roof with upturned corners."],
+        "evidenceRefs": ["tower-cabin"],
+        "failureModes": ["single generic box cabin", "missing shoji grids", "flat slab roofs"]
+      },
+      {
+        "id": "sail-rigging-system",
+        "name": "Mast, segmented tan sail, and rigging system",
+        "required": true,
+        "qualityCriteria": ["The tall mast rises above the cabin, the sail occupies the upper-right silhouette, and at least four tension lines connect mast, hull, and sail corners."],
+        "evidenceRefs": ["mast-sail"],
+        "failureModes": ["sail detached from mast", "sail too small", "rigging lines floating"]
+      },
+      {
+        "id": "articulated-oar-bank",
+        "name": "Twenty-four articulated oars",
+        "required": true,
+        "qualityCriteria": ["Twelve oars per side are distributed along the hull, share consistent hinge sockets, and move from their roots without visible gaps."],
+        "evidenceRefs": ["oar-bank"],
+        "failureModes": ["decorative sticks without pivots", "irregular count or spacing", "oars intersect cabin supports"]
+      },
+      {
+        "id": "ornament-and-defense-system",
+        "name": "Shields, lanterns, railings, stairs, and prow ornament",
+        "required": true,
+        "qualityCriteria": ["Secondary systems preserve the reference rhythm and remain subordinate to the four primary masses."],
+        "evidenceRefs": ["deck-details"],
+        "failureModes": ["empty deck silhouette", "details overwhelm the cabin", "floating attachments"]
+      },
+      {
+        "id": "aged-material-zones",
+        "name": "Aged timber, cloth, paper, and metal response",
+        "required": true,
+        "qualityCriteria": ["Independent material zones provide dark structural timber, warm planks, pale panels, tan cloth, and restrained metal highlights with nonuniform roughness."],
+        "evidenceRefs": ["full-object"],
+        "failureModes": ["single brown plastic material", "uniform roughness", "lighting-painted color treated as exact PBR"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "hull length-to-cabin-height and bow/stern rise",
+      "cabin tier spacing, roof overhang, and corner lift",
+      "mast/sail height and rigging attachment continuity",
+      "24-oar count, hinge alignment, and repeated spacing",
+      "warm wood versus pale panel versus tan sail material separation"
+    ],
+    "antiShallowSpecRules": [
+      "Reject a merged decorative mesh that removes oar, sail, cabin, roof, or lantern pivots.",
+      "Reject a hull generated from one box or capsule without station-based taper and end rise.",
+      "Reject material acceptance based on flat colors or exact-PBR claims from the single composite screenshot.",
+      "Reject any oar, rigging line, rail, lantern, or mast attachment with a visible air gap at its parent socket."
+    ]
+  },
+  "authoringInstruction": "Use the assessment as the shared acceptance contract for the spec, demo factory, routes, and evidence capture."
+}

@@ -43,9 +43,7 @@ assert(registry.counts.skills === skillManifest.skills.length, 'registry skill c
 assert(primary.length === registry.counts.primary, 'primary demo count does not match registry counts');
 assert(loadable.length === primary.length, `${primary.length - loadable.length} primary implementation(s) are not loadable`);
 const canonicalSkillNames = new Set(canonical.map((demo) => demo.skill));
-const skillsWithoutCanonicalLabs = skillManifest.skills.filter((skill) => (
-  !canonicalSkillNames.has(skill.name) && !skill.attribution
-));
+const skillsWithoutCanonicalLabs = skillManifest.skills.filter((skill) => !canonicalSkillNames.has(skill.name));
 assert(skillsWithoutCanonicalLabs.length === 0, `skills lack canonical labs: ${skillsWithoutCanonicalLabs.map((skill) => skill.name).join(', ')}`);
 assert(flagships.length === 5, `expected five flagships; received ${flagships.length}`);
 assert(support.length === 7, `expected seven focused support primaries; received ${support.length}`);
