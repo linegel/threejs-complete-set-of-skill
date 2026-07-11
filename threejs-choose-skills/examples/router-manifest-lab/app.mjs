@@ -1,7 +1,7 @@
 import { evaluateScenario, getScenario } from './router-core.mjs';
+import { scenarioHref } from './route-urls.mjs';
 
 const catalogUrl = new URL( './router-fixtures.json', import.meta.url );
-const scenarioBaseUrl = new URL( './scenario/', import.meta.url );
 
 function readFixedScenario() {
 
@@ -95,13 +95,30 @@ function renderApp( controller, fixture, result ) {
 	const catalog = controller._catalogForRender ?? null;
 	const routes = catalog?.routes ?? window.__routerCatalog.routes;
 	const stageTotal = fixture.performance.stages.reduce( ( sum, stage ) => sum + stage.budgetMs.value, 0 );
-	const options = routes.map( ( route ) => `<option value="${ escapeHtml( route.id ) }" ${ route.id === fixture.id ? 'selected' : '' }>${ escapeHtml( route.id ) }</option>` ).join( '' );
-	const routeLinks = routes.map( ( route ) => `<li><a href="${ new URL( `${ route.id }/`, scenarioBaseUrl ).href }">${ escapeHtml( route.id ) }</a></li>` ).join( '' );
+	const routeResults = new Map( routes.map( ( route ) => [ route.id, evaluateScenario( window.__routerCatalog, route.id ) ] ) );
+	const options = routes.map( ( route ) => {
+
+		const routeResult = routeResults.get( route.id );
+		return `<option value="${ escapeHtml( route.id ) }" ${ route.id === fixture.id ? 'selected' : '' }>${ escapeHtml( route.id ) } — ${ escapeHtml( routeResult.verdict ) }</option>`;
+
+	} ).join( '' );
+	const routeLinks = routes.map( ( route ) => {
+
+		const routeResult = routeResults.get( route.id );
+		const verdictClass = routeResult.verdict.toLowerCase();
+		return `<li><a href="${ scenarioHref( route.id, location.href ) }"><span>${ escapeHtml( route.id ) }</span><span class="route-verdict ${ verdictClass }">${ escapeHtml( routeResult.verdict ) }</span></a></li>`;
+
+	} ).join( '' );
 
 	app.innerHTML = `
-		<p class="eyebrow">Canonical non-rendering scenario suite · schema v2</p>
-		<h1>WebGPU route manifest lab</h1>
-		<p class="lede">The UI and contract tests consume the same fixture file. The router rejects capability, ownership, inventory, ordering, provenance, and budget violations with stable machine-readable reasons.</p>
+		<p class="eyebrow">Routing contract tests · no 3D rendering</p>
+		<h1>WebGPU skill-routing lab</h1>
+		<p class="lede">This is a decision test bench, not a gallery of rendered scenes. Each scenario asks which Three.js skills should own a workload, then checks that plan against capability, ownership, ordering, provenance, inventory, and frame-budget rules.</p>
+		<aside class="explainer" aria-label="How to read this lab">
+			<div><strong>Choose a fixture</strong><span>Each name represents a routing decision, including deliberately invalid ones.</span></div>
+			<div><strong>Read the verdict</strong><span><code>PASS</code> is an accepted plan. <code>FAIL</code> is an intentional guardrail test, not a crashed demo.</span></div>
+			<div><strong>Share the state</strong><span>Scenario permalinks reopen this lab locked to the same fixture.</span></div>
+		</aside>
 		<div class="toolbar">
 			<label for="scenario">Scenario</label>
 			<select id="scenario">${ options }</select>
@@ -109,7 +126,7 @@ function renderApp( controller, fixture, result ) {
 		</div>
 		<section class="grid">
 			<article class="card">
-				<h2>Route</h2>
+				<h2>Selected skill plan</h2>
 				<div class="metric-row"><span class="muted">Primary owner</span><code>${ escapeHtml( fixture.route.primaryOwner ) }</code></div>
 				<div class="metric-row"><span class="muted">Native WebGPU observed</span><code>${ escapeHtml( fixture.observedCapabilities.webgpu ) }</code></div>
 				<div class="metric-row"><span class="muted">Selected skill count</span><code>${ fixture.route.selectedSkills.length }</code></div>
@@ -126,12 +143,13 @@ function renderApp( controller, fixture, result ) {
 				<ul>${ fixture.requiredSignals.map( ( signal ) => `<li><code>${ escapeHtml( signal.id ) }</code>: ${ escapeHtml( signal.producer ) } → ${ escapeHtml( signal.consumers.join( ', ' ) ) }</li>` ).join( '' ) }</ul>
 				<ul>${ fixture.ownershipClaims.map( ( claim ) => `<li><code>${ escapeHtml( claim.semantic ) }</code>: ${ escapeHtml( claim.owner ) }</li>` ).join( '' ) }</ul>
 			</article>
-			<article class="card">
-				<h2>Fixed route URLs</h2>
-				<ul>${ routeLinks }</ul>
+			<article class="card wide">
+				<h2>Scenario permalinks</h2>
+				<p class="card-note">These are stable views of this same contract lab; they are not separate graphical demos.</p>
+				<ul class="route-links">${ routeLinks }</ul>
 			</article>
 			<article class="card wide">
-				<h2>Machine result</h2>
+				<h2>Machine-readable verdict</h2>
 				<pre>${ escapeHtml( JSON.stringify( result, null, 2 ) ) }</pre>
 			</article>
 		</section>`;
