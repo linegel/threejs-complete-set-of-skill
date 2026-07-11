@@ -19,6 +19,7 @@ function rejects( callback, token ) {
 
 const source = await readFile( new URL( './canonical-main.js', import.meta.url ), 'utf8' );
 const browser = await readFile( new URL( './canonical-browser-app.js', import.meta.url ), 'utf8' );
+const captureSource = await readFile( new URL( './canonical-capture.mjs', import.meta.url ), 'utf8' );
 const stageSource = await readFile( new URL( './stage.js', import.meta.url ), 'utf8' );
 const manifest = JSON.parse( await readFile( new URL( './lab.manifest.json', import.meta.url ), 'utf8' ) );
 assert( typeof createCanonicalImagePipeline === 'function', 'Canonical owner factory is missing.' );
@@ -52,13 +53,19 @@ assert( source.includes( "application: 'diagnostic-only'" ) && source.includes( 
 assert( source.indexOf( 'const stableInput = rtt( hdr' ) < source.indexOf( 'const bloomNode =' ), 'Stable pre-bloom materialization must preserve unmodified scene HDR.' );
 assert( source.indexOf( 'temporalNode = traa' ) < source.indexOf( 'const hdrComposite =' ), 'Temporal resolve must precede bloom composition.' );
 assert( source.includes( 'temporalNode._historyRenderTarget.texture' ), 'Temporal history diagnostic does not reach the actual TRAANode history target.' );
-assert( source.includes( 'bypass( compress( temporalHistoryTexture ), temporalTexture )' ), 'Temporal history route does not execute TRAANode before sampling history.' );
-assert( source.includes( 'exposure: bypass(' ) && source.includes( '), preBloom )' ), 'Exposure diagnostic does not execute its meter-source graph.' );
+assert( source.includes( 'const withDependency = ( value, dependency ) => value.add( dependency.mul( float( 0 ) ) )' ), 'Storage-only diagnostics lack a valid scene dependency helper.' );
+assert( source.includes( 'withDependency( compress( temporalHistoryTexture ), temporalTexture )' ), 'Temporal history route does not execute TRAANode before sampling history.' );
+assert( source.includes( 'exposure: withDependency(' ) && source.includes( '), preBloom )' ), 'Exposure diagnostic does not execute its meter-source graph.' );
+assert( ! source.includes( 'bypass( compress( temporalHistoryTexture )' ), 'BypassNode texture calls emit invalid bare WGSL uniforms in r185.' );
+assert( ! source.includes( 'await scenePass.compileAsync( renderer )' ), 'Canonical MRT warmup must compile through the complete RenderPipeline graph.' );
 assert( source.includes( "'temporal-current'" ) && source.includes( "'temporal-history'" ) && source.includes( "'temporal-resolved'" ), 'Temporal current/history/resolved diagnostics are incomplete.' );
 assert( source.includes( "resetStrategy: 'dispose and rebuild TRAANode; first render seeds fresh history'" ), 'Temporal reset ownership is not executable.' );
 assert( source.includes( "'view-z':" ) && source.includes( 'viewZDiagnosticEncoding' ), 'View-Z reconstruction diagnostic is missing.' );
 assert( browser.includes( 'bytesPerRow' ) && browser.includes( 'Math.ceil( compact / 256 ) * 256' ), 'Browser capture lacks aligned WebGPU row-stride handling.' );
 assert( browser.includes( 'readRenderTargetPixelsAsync' ), 'Canonical capture must use render-target readback.' );
+assert( captureSource.includes( 'labViteAliases( options.repoRoot )' ) && captureSource.includes( "dedupe: [ 'three' ]" ), 'Canonical capture can compose duplicate Three/TSL module instances.' );
+assert( captureSource.includes( 'browserErrors' ) && captureSource.includes( 'queue.onSubmittedWorkDone()' ), 'Canonical capture does not block browser or GPU validation errors.' );
+assert( captureSource.includes( 'resize rebuilds TRAA and exposure storage' ) && captureSource.includes( 'await window.__labController.renderOnce();' ), 'Canonical capture reads rebuilt storage before initializing the new resource generation.' );
 assert( ! stageSource.includes( 'new WebGPURenderer' ) && ! stageSource.includes( 'new RenderPipeline' ), 'Host adapter creates a private renderer or RenderPipeline owner.' );
 assert( stageSource.includes( 'meterSourceTextureNode: preGradeTexture' ) && stageSource.includes( 'bloomTextureNode.rgb' ), 'Host adapter does not meter composed pre-grade HDR.' );
 assert( stageSource.includes( 'temporalNode._historyRenderTarget.texture' ) && stageSource.includes( 'temporalConfidence' ), 'Host adapter lacks temporal history/confidence diagnostics.' );

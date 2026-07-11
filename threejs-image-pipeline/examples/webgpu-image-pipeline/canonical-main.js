@@ -16,7 +16,6 @@ import {
 	WebGPURenderer
 } from 'three/webgpu';
 import {
-	bypass,
 	color,
 	diffuseColor,
 	emissive,
@@ -178,6 +177,7 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 		} );
 		finalNode = exposureStage.outputNode;
 		const compress = ( value ) => vec4( value.rgb.div( value.rgb.add( 1 ) ), 1 );
+		const withDependency = ( value, dependency ) => value.add( dependency.mul( float( 0 ) ) );
 		modes = {
 			final: finalNode,
 			'no-post': renderOutput( hdr ),
@@ -190,9 +190,9 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 			velocity: velocityTexture ? vec4( velocityTexture.xy.mul( 0.5 ).add( 0.5 ), 0, 1 ) : vec4( vec3( 0 ), 1 ),
 			ao: vec4( vec3( visibility ), 1 ),
 			bloom: bloomTexture ? compress( bloomTexture ) : vec4( vec3( 0 ), 1 ),
-			exposure: bypass( vec4( vec3( exposureStage.reduction.floatState.element( uint( 0 ) ).z.add( 4 ).div( 8 ).clamp( 0, 1 ) ), 1 ), preBloom ),
+			exposure: withDependency( vec4( vec3( exposureStage.reduction.floatState.element( uint( 0 ) ).z.add( 4 ).div( 8 ).clamp( 0, 1 ) ), 1 ), preBloom ),
 			'temporal-current': compress( stableInput ),
-			'temporal-history': temporalHistoryTexture ? bypass( compress( temporalHistoryTexture ), temporalTexture ) : vec4( vec3( 0 ), 1 ),
+			'temporal-history': temporalHistoryTexture ? withDependency( compress( temporalHistoryTexture ), temporalTexture ) : vec4( vec3( 0 ), 1 ),
 			'temporal-resolved': tier.temporal ? compress( temporalTexture ) : compress( stableInput ),
 			'albedo-extra-pass': albedoTexture ? vec4( albedoTexture.rgb, 1 ) : vec4( vec3( 0 ), 1 )
 		};
@@ -205,7 +205,9 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 	}
 
 	buildDynamicGraph( 'initialization' );
-	await scenePass.compileAsync( renderer );
+	// Warm the complete graph through RenderPipeline.render(). In r185,
+	// PassNode.compileAsync() compiles only the scene variants and can build
+	// NodeMaterial outside the TSL stack used by this MRT graph.
 
 	function setMode( id ) {
 

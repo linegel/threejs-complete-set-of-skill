@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
 
 import { createRgbaPng } from '../../../threejs-visual-validation/examples/webgpu-validation-harness/src/png.js';
+import { labViteAliases } from '../../../scripts/lib/vite-lab-config.mjs';
 
 function parseArgs( values ) {
 
@@ -83,7 +84,12 @@ try {
 	let url = options.url;
 	if ( ! url ) {
 
-		server = await createServer( { root: options.repoRoot, logLevel: 'error', server: { host: '127.0.0.1', port: 0, strictPort: false } } );
+		server = await createServer( {
+			root: options.repoRoot,
+			logLevel: 'error',
+			resolve: { alias: labViteAliases( options.repoRoot ), dedupe: [ 'three' ] },
+			server: { host: '127.0.0.1', port: 0, strictPort: false }
+		} );
 		await server.listen();
 		const base = server.resolvedUrls?.local?.[ 0 ];
 		if ( ! base ) throw new Error( 'Vite did not expose a local URL for image-pipeline capture.' );
@@ -96,6 +102,13 @@ try {
 		args: [ '--enable-unsafe-webgpu', '--enable-features=Vulkan,UseSkiaRenderer', '--disable-gpu-sandbox' ]
 	} );
 	const page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
+	const browserErrors = [];
+	page.on( 'pageerror', ( error ) => browserErrors.push( String( error.stack ?? error.message ) ) );
+	page.on( 'console', ( message ) => {
+
+		if ( message.type() === 'error' ) browserErrors.push( message.text() );
+
+	} );
 	await page.goto( url, { waitUntil: 'networkidle' } );
 	await page.waitForFunction( () => window.__labController?.ready );
 	await page.evaluate( () => window.__labController.ready() );
@@ -105,6 +118,8 @@ try {
 	async function capture( mode, filename ) {
 
 		const pixels = await page.evaluate( ( selectedMode ) => window.__labController.capturePixels( selectedMode ), mode );
+		await page.evaluate( () => window.__canonicalImagePipeline.app.renderer.backend.device.queue.onSubmittedWorkDone() );
+		if ( browserErrors.length > 0 ) throw new Error( `Image-pipeline browser validation failed:\n${ browserErrors.join( '\n' ) }` );
 		await writeFile( resolve( imageDirectory, filename ), encode( pixels ) );
 		return pixels;
 
@@ -189,6 +204,14 @@ try {
 	await capture( 'final', 'odd-641x359.final.png' );
 	await page.setViewportSize( viewport );
 	await page.waitForFunction( ( extent ) => innerWidth === extent.width && innerHeight === extent.height, viewport );
+	// The resize rebuilds TRAA and exposure storage. Initialize the new resource
+	// generation before any diagnostic storage readback.
+	await page.evaluate( async () => {
+
+		await window.__labController.renderOnce();
+		await window.__labController.renderOnce();
+
+	} );
 
 	const evidence = await page.evaluate( async () => ( {
 		pipeline: window.__labController.describePipeline(),
