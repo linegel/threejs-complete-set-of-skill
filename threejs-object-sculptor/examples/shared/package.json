@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "node --check sculpt-runtime.js && node --check sculpt-runtime.test.mjs",
+    "test": "node sculpt-runtime.test.mjs"
+  }
+}
