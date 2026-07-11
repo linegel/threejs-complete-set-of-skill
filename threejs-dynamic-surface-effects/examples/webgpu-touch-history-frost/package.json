@@ -1,12 +1,18 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check *.js && node --check validate-generated-frost-crystals.mjs && node --check generated-frost-crystals-browser.mjs",
-    "validate": "node validate-temporal-surface.js && node validate-generated-frost-crystals.mjs",
+    "check": "node --check *.js && node --check *.mjs",
+    "validate": "npm run validate:quick",
+    "validate:unit": "node validate-temporal-surface.js",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-touch-history-frost --target final",
+    "validate:artifacts": "node capture-status.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts",
     "validate:generated-assets": "node validate-generated-frost-crystals.mjs"
   },
   "dependencies": {
-    "playwright": "^1.45.0",
-    "three": "^0.185.1"
+    "playwright": "1.61.1",
+    "three": "0.185.1"
   }
 }
