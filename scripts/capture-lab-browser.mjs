@@ -5,6 +5,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { platform } from 'node:os';
 import {
   isAbsolute,
   join,
@@ -37,6 +38,12 @@ export const LAB_CONTROLLER_GLOBALS = Object.freeze([
   '__THREEJS_LAB__',
   '__THREE_LAB__',
 ]);
+
+export function chromiumWebGpuLaunchArgs() {
+  const args = ['--enable-unsafe-webgpu', '--disable-gpu-sandbox'];
+  if (platform() !== 'darwin') args.splice(1, 0, '--enable-features=Vulkan,UseSkiaRenderer');
+  return args;
+}
 
 function optionValue(argv, name) {
   const index = argv.indexOf(name);
@@ -407,11 +414,7 @@ export async function captureLabBrowser({
     const url = `http://127.0.0.1:${address.port}/${browserPath}?capture=1&profile=${encodeURIComponent(profile)}`;
     browser = await chromium.launch({
       headless: true,
-      args: [
-        '--enable-unsafe-webgpu',
-        '--enable-features=Vulkan,UseSkiaRenderer',
-        '--disable-gpu-sandbox',
-      ],
+      args: chromiumWebGpuLaunchArgs(),
     });
     const context = await browser.newContext({
       viewport: { width: profileConfig.width, height: profileConfig.height },

@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { platform } from 'node:os';
 import { extname, join, normalize, sep } from 'node:path';
 import { chromium } from '/Users/linegel/_reps/threejs/threejs-image-pipeline/examples/webgpu-image-pipeline/node_modules/playwright/index.mjs';
 
@@ -42,13 +43,19 @@ async function serveStatic(root) {
 	return server;
 }
 
+function chromiumLaunchArgs() {
+	const args = ['--enable-unsafe-webgpu', '--disable-gpu-sandbox'];
+	if (platform() !== 'darwin') args.splice(1, 0, '--enable-features=Vulkan,UseSkiaRenderer');
+	return args;
+}
+
 async function main() {
 	const server = await serveStatic(repoRoot);
 	const address = server.address();
 	const url = `http://127.0.0.1:${address.port}${labPath}`;
 	const browser = await chromium.launch({
 		headless: true,
-		args: ['--enable-unsafe-webgpu', '--enable-features=Vulkan,UseSkiaRenderer', '--disable-gpu-sandbox'],
+		args: chromiumLaunchArgs(),
 	});
 	const page = await browser.newPage({ viewport: { width: 1280, height: 840 }, deviceScaleFactor: 1 });
 	const pageErrors = [];

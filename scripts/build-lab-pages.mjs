@@ -111,102 +111,6 @@ function demoDescription(lab) {
   return clipText(`Interactive Three.js WebGPU/TSL demo for ${demoTitle(lab)}, with ${routeSummary} and evidence-gated validation.`);
 }
 
-function demoEvidenceSummary(lab) {
-  if (lab.status === 'accepted') {
-    return 'Accepted runtime evidence is available for the published contract represented by this demo.';
-  }
-  if (lab.status === 'secondary') {
-    return `This is a secondary presentation surface, not canonical runtime evidence. ${lab.proxyStatus?.limitation ?? ''}`.trim();
-  }
-  if (lab.status === 'blocked') {
-    return 'The implementation is blocked from accepted coverage until its declared runtime and evidence gates pass.';
-  }
-  return 'The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.';
-}
-
-function transformStaticMarkup(html, transform) {
-  return html.split(/(<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>)/gi)
-    .map((chunk, index) => index % 2 === 0 ? transform(chunk) : chunk)
-    .join('');
-}
-
-function staticMarkup(html) {
-  return html.replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/gi, '');
-}
-
-function normalizeStaticDemoHeadings(html, lab) {
-  const title = escapeHtml(demoTitle(lab));
-  let output = transformStaticMarkup(html, (markup) => markup.replace(
-    /<main([^>]*)>\s*<\/main>/i,
-    `<main$1><h1 class="demo-static-title">${title}</h1><p class="demo-static-loading">Interactive demonstration loading…</p></main>`,
-  ));
-  let headingCount = 0;
-  output = transformStaticMarkup(output, (markup) => markup.replace(
-    /<h1([^>]*)>([\s\S]*?)<\/h1>/gi,
-    (_match, attributes, body) => {
-      headingCount += 1;
-      const content = body.replace(/<[^>]+>/g, '').trim() ? body : title;
-      return headingCount === 1
-        ? `<h1${attributes}>${content}</h1>`
-        : `<h2${attributes}>${content}</h2>`;
-    },
-  ));
-  return { html: output, hasH1: headingCount > 0 };
-}
-
-function demoSeoShell(lab, { hasH1, hasMain }) {
-  const root = hasMain ? 'aside' : 'main';
-  const titleTag = hasH1 ? 'h2' : 'h1';
-  const sectionTag = hasH1 ? 'h3' : 'h2';
-  const skill = skillsByName.get(lab.skill);
-  const mechanisms = lab.mechanisms.length
-    ? [
-      ...lab.mechanisms.slice(0, 6).map((entry) => `<li><code>${escapeHtml(entry.id)}</code> — ${escapeHtml(humanize(entry.id))}</li>`),
-      ...(lab.mechanisms.length > 6 ? [`<li>${lab.mechanisms.length - 6} additional mechanisms are listed in the registry.</li>`] : []),
-    ]
-    : [`<li>${escapeHtml(lab.kind === 'generated-asset-demo' ? 'Generated asset presentation and provenance review.' : 'Interactive presentation linked to the owning production skill contract.')}</li>`];
-  const canonicalLabLink = lab.proxyStatus?.canonicalLabId
-    ? `<a href="../${escapeHtml(lab.proxyStatus.canonicalLabId)}/">Canonical lab</a>`
-    : '';
-  const links = [
-    `<a href="../../skills/${escapeHtml(lab.skill)}.html">Owning skill</a>`,
-    canonicalLabLink,
-    '<a href="../registry.json">Demo registry</a>',
-    `<a href="${REPOSITORY}/tree/main/${escapeHtml(lab.skill)}">Source repository</a>`,
-  ].filter(Boolean).join('');
-  return `<${root} class="demo-seo-shell" data-demo-seo-shell data-demo-id="${escapeHtml(lab.id)}" data-owning-skill="${escapeHtml(lab.skill)}">
-  <details open>
-    <summary>About this WebGPU demo</summary>
-    <div class="demo-seo-shell__body">
-      <p class="demo-seo-shell__kicker">${escapeHtml(humanize(lab.kind))} · Three.js ${escapeHtml(lab.threeRevision)}</p>
-      <${titleTag}>${escapeHtml(demoTitle(lab))}</${titleTag}>
-      <p>${escapeHtml(demoDescription(lab))}</p>
-      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> ${escapeHtml(demoEvidenceSummary(lab))}</p>
-      <p>Use the linked skill, registry, and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
-      <dl>
-        <div><dt>Owning skill</dt><dd>${escapeHtml(skill?.title ?? humanize(lab.skill))}</dd></div>
-        <div><dt>Published routes</dt><dd>${lab.scenarios.length} scenarios · ${lab.mechanisms.length} mechanisms · ${lab.tiers.length} quality tiers</dd></div>
-      </dl>
-      <${sectionTag}>Supported mechanisms</${sectionTag}>
-      <ul data-demo-mechanisms>${mechanisms.join('')}</ul>
-      <nav aria-label="Demo documentation and provenance">${links}</nav>
-    </div>
-  </details>
-</${root}>`;
-}
-
-function injectDemoSeoShell(html, lab) {
-  const normalized = normalizeStaticDemoHeadings(html, lab);
-  const hasMain = /<main\b/i.test(staticMarkup(normalized.html));
-  const shell = demoSeoShell(lab, { hasH1: normalized.hasH1, hasMain });
-  const styles = `<style data-demo-seo-shell-style>
-.demo-seo-shell{position:fixed;z-index:2147483000;left:12px;bottom:12px;display:block;box-sizing:border-box;width:min(460px,calc(100vw - 24px));max-height:min(58vh,560px);margin:0;color:#f3efe6;background:rgba(8,11,16,.94);border-radius:20px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 18px 60px rgba(0,0,0,.42);font:14px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;backdrop-filter:blur(18px) saturate(1.15);overflow:auto}.demo-seo-shell *{box-sizing:border-box}.demo-seo-shell details{margin:0}.demo-seo-shell summary{min-height:44px;display:flex;align-items:center;padding:10px 16px;cursor:pointer;color:#ffca80;font-weight:700;text-wrap:balance;list-style:none;transition-property:color,background-color,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell summary::-webkit-details-marker{display:none}.demo-seo-shell summary:after{content:"+";margin-left:auto;font:700 18px/1 ui-monospace,monospace}.demo-seo-shell details[open] summary:after{content:"−"}.demo-seo-shell summary:hover{color:#fff;background:rgba(255,255,255,.045)}.demo-seo-shell summary:active{scale:.96}.demo-seo-shell summary:focus-visible,.demo-seo-shell a:focus-visible{outline:2px solid #7fd4c1;outline-offset:-3px}.demo-seo-shell__body{padding:2px 16px 16px}.demo-seo-shell h1,.demo-seo-shell h2,.demo-seo-shell h3{margin:0 0 8px;color:#fff;line-height:1.14;text-wrap:balance}.demo-seo-shell h1,.demo-seo-shell h2{font-size:clamp(21px,4vw,29px)}.demo-seo-shell h3{margin-top:15px;font-size:15px;color:#ffca80}.demo-seo-shell p,.demo-seo-shell li,.demo-seo-shell dd{margin:0;text-wrap:pretty}.demo-seo-shell p+p{margin-top:9px}.demo-seo-shell strong{color:#ffca80;font:inherit;font-weight:750}.demo-seo-shell__kicker{margin-bottom:7px!important;color:#7fd4c1;font:600 10px/1.4 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}.demo-seo-shell__evidence{color:#d6d0c4}.demo-seo-shell dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 0}.demo-seo-shell dl div{min-width:0;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.045);box-shadow:0 0 0 1px rgba(255,255,255,.07)}.demo-seo-shell dt{color:#9a988f;font:600 9px/1.35 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase}.demo-seo-shell dd{margin-top:3px;color:#f3efe6;font-size:12px}.demo-seo-shell ul{display:grid;gap:4px;margin:0;padding-left:18px;color:#d6d0c4}.demo-seo-shell code{color:#7fd4c1;font:600 11px/1.4 ui-monospace,monospace}.demo-seo-shell nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.demo-seo-shell a{min-height:40px;display:inline-flex;align-items:center;padding:8px 11px;border-radius:10px;color:#f3efe6;background:rgba(127,212,193,.08);box-shadow:0 0 0 1px rgba(127,212,193,.2);text-decoration:none;font-weight:650;transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell a:hover{color:#fff;background:rgba(127,212,193,.16);box-shadow:0 0 0 1px rgba(127,212,193,.36)}.demo-seo-shell a:active{scale:.96}@media(max-width:560px){.demo-seo-shell{max-height:52vh}.demo-seo-shell dl{grid-template-columns:1fr}.demo-seo-shell__body{padding-inline:14px}}@media(prefers-reduced-motion:reduce){.demo-seo-shell summary,.demo-seo-shell a{transition-duration:0ms}}
-</style>`;
-  return normalized.html
-    .replace('</head>', `  ${styles}\n</head>`)
-    .replace(/<body([^>]*)>/i, `<body$1>\n${shell}`);
-}
-
 function pngDimensions(path) {
   try {
     const data = readFileSync(path);
@@ -261,7 +165,6 @@ function demoSeoHead(lab, { indexable = true } = {}) {
   const skill = skillsByName.get(lab.skill);
   const skillUrl = `${SITE}skills/${lab.skill}.html`;
   const preview = demoPreview(lab);
-  const canonicalUrl = indexable ? url : skillUrl;
   const robots = indexable ? 'index, follow, max-image-preview:large' : 'noindex, follow';
   const schema = {
     '@context': 'https://schema.org',
@@ -300,9 +203,8 @@ function demoSeoHead(lab, { indexable = true } = {}) {
   };
   return `<meta name="description" content="${escapeHtml(description)}">
   <meta name="author" content="${SITE_NAME} contributors">
-  <meta name="owning-skill" content="${escapeHtml(lab.skill)}">
   <meta name="robots" content="${robots}">
-  <link rel="canonical" href="${canonicalUrl}">
+  <link rel="canonical" href="${url}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/site.webmanifest">
   <meta property="og:type" content="website">
@@ -310,7 +212,7 @@ function demoSeoHead(lab, { indexable = true } = {}) {
   <meta property="og:site_name" content="${SITE_NAME}">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
-  <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:url" content="${url}">
   <meta property="og:image" content="${preview.url}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="${preview.width}">
@@ -539,10 +441,10 @@ if (bundledPrimary.length + secondaryProviders.length > 0) {
       const stagedEntry = join(stagedDir, 'index.html');
       mkdirSync(stagedDir, { recursive: true });
       const html = readFileSync(canonicalEntry, 'utf8');
-      const rewritten = injectDemoSeoShell(injectDemoSeo(injectPrimaryClassification(
+      const rewritten = injectDemoSeo(injectPrimaryClassification(
         normalizeHtmlDocument(rewriteEntryReferences(html, canonicalEntry, stagedEntry)),
         lab,
-      ), lab), lab);
+      ), lab);
       writeFileSync(stagedEntry, rewritten);
       inputs.push(stagedEntry);
     }
@@ -578,7 +480,7 @@ if (bundledPrimary.length + secondaryProviders.length > 0) {
 </body>
 </html>
 `;
-      writeFileSync(stagedEntry, injectDemoSeoShell(injectDemoSeo(providerHtml, lab), lab));
+      writeFileSync(stagedEntry, injectDemoSeo(providerHtml, lab));
       inputs.push(stagedEntry);
     }
 
@@ -627,7 +529,7 @@ for (const lab of placeholderPrimary) {
   const sources = lab.canonicalSource.map((source) => `<li><code>${escapeHtml(source)}</code></li>`).join('');
   const placeholderHtml = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="demo-kind" content="${lab.kind}"><meta name="acceptance-status" content="${lab.status}"><title>${escapeHtml(lab.title ?? lab.id)} — ${statusLabel}</title><style>body{margin:0;background:#080b10;color:#ece8de;font:16px/1.6 system-ui,sans-serif}.wrap{max-width:760px;margin:10vh auto;padding:32px;border:1px solid #353a46;background:#0f131b}h1{font-size:clamp(28px,6vw,52px);line-height:1.05}strong{color:#ffb454}code{color:#7fd4c1}a{color:#7fd4c1}</style></head><body><main class="wrap"><p><strong>Canonical lab ${statusLabel}.</strong></p><h1>${escapeHtml(lab.title ?? lab.id)}</h1><p>This route is reserved by the schema-v2 completion matrix, but it is not accepted runtime evidence. It remains excluded from primary completion counts until native-WebGPU execution, aligned readback, v2 artifacts, lifecycle validation, and source-hash equivalence pass.</p><h2>Canonical source</h2><ul>${sources}</ul><p><a href="../../skills/${lab.skill}.html">Read the owning skill contract</a> · <a href="../registry.json">Inspect the demo registry</a></p></main></body></html>\n`;
-  writeFileSync(join(outputDir, 'index.html'), injectDemoSeoShell(injectDemoSeo(placeholderHtml, lab, { indexable: false }), lab));
+  writeFileSync(join(outputDir, 'index.html'), injectDemoSeo(placeholderHtml, lab, { indexable: false }));
 }
 
 const publishedById = new Map();
