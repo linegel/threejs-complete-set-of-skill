@@ -1,12 +1,18 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check constants.js && node --check webgpu-bounded-water.js && node --check cpu-water-height.js && node --check index.js && node --check validate-water-contracts.mjs && node --check generated-caustics-browser.mjs && node --check validate-generated-caustics.mjs",
-    "validate": "node validate-water-contracts.mjs && node validate-generated-caustics.mjs",
+    "check": "node --check *.js && node --check *.mjs && node -e \"JSON.parse(require('node:fs').readFileSync('lab.manifest.json','utf8'))\"",
+    "validate:unit": "node validate-water-contracts.mjs",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts",
+    "validate": "npm run validate:quick",
     "validate:generated-assets": "node validate-generated-caustics.mjs"
   },
   "dependencies": {
-    "playwright": "^1.45.0",
-    "three": "^0.185.1"
+    "playwright": "1.61.1",
+    "three": "0.185.1"
   }
 }

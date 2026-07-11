@@ -17,6 +17,11 @@ const sceneId = "water-generated-caustics";
 const artifactDir = resolve(repoRoot, `artifacts/visual-validation/${sceneId}/r185/native-budgeted/seed-180185`);
 const pagePath = "/threejs-water-optics/examples/webgpu-bounded-water/generated-caustics.html";
 const assetFiles = ["caustic-field-a.png", "caustic-field-b.png", "caustic-field-c.png"];
+const claimBoundary = {
+  classification: "asset-preview-only",
+  proves: ["PNG dimensions", "opaque alpha padding", "NoColorSpace declaration", "deterministic Canvas2D preview metrics"],
+  doesNotProve: ["water compute", "receiver-space caustics", "water optical transport", "GPU performance", "resource lifetime"],
+};
 const requiredImages = [
   "images/final.design.png",
   "images/no-post.design.png",
@@ -116,7 +121,8 @@ function createVisualContract() {
     "diagnostics expose caustic-only projection and tile stress instead of final-only evidence",
   ];
   return {
-    subject: "generated caustic fields in bounded water floor projection",
+    classification: claimBoundary.classification,
+    subject: "Canvas2D preview of generated caustic-like data assets",
     identity: ["generated caustic variants are data maps", "alpha is opaque padding", "RGB drives projected caustic intensity"],
     silhouette: ["pool floor remains visible with and without caustic contribution"],
     materialSeparation: ["dry floor, water without caustics, water with caustics, source channels, and caustic-only views are separate captures"],
@@ -129,7 +135,7 @@ function createVisualContract() {
       [invariants[1]]: { requiredImages: ["images/final.design.png", "images/no-post.design.png"], requiredDiagnostics: ["water without caustics", "caustic contribution"], requiredMetrics: ["causticContribution", "disabledContribution"], blockingFailures: ["decorative-only caustics", "no disabled baseline"] },
       [invariants[2]]: { requiredImages: ["images/diagnostics.mosaic.png", "images/seed-stress.final.png"], requiredDiagnostics: ["tile stress", "caustic-only"], requiredMetrics: ["seamError"], blockingFailures: ["final-only evidence", "visible seam stress failure"] },
     },
-    allowedDivergences: ["Generated caustic fields are reduced-tier sources/diagnostics; compute differential-area caustics remain the live-simulation path."],
+    allowedDivergences: ["This preview is not a water renderer and the images are not receiver-space caustic evidence."],
     requiredImages,
     requiredDiagnostics: ["floor baseline", "water no caustics", "caustic-only", "source channels", "tile stress"],
     requiredMetrics: ["renderer-info.json", "timings.json", "causticContribution", "disabledContribution", "seamError"],
@@ -160,7 +166,9 @@ function createEvidence({ assets, rendererInfo, metrics }) {
       gpuAdapter: null,
       renderer: "WebGPURenderer",
       backend,
-      qualityTier: "native-budgeted",
+      qualityTier: "asset-preview-only",
+      claimBoundary,
+      performanceClaimsAllowed: false,
       viewport: { width: 1200, height: 760, dpr: 1 },
       camera: createCameraRecord("design"),
       seed: "seed-180185",
@@ -176,9 +184,9 @@ function createEvidence({ assets, rendererInfo, metrics }) {
         hdrWorkingType: "browser validation LDR",
         colorTextures: [],
         dataTextures: assets.map((asset) => ({ name: asset.id, colorSpace: asset.colorSpace })),
-        screenshotEncoding: "Browser Canvas2D domain render after WebGPU backend gate",
+        screenshotEncoding: "Browser Canvas2D asset preview; WebGPU initialization is a capability probe only",
       },
-      postStack: { renderPipeline: "domain validation surface", outputColorTransform: true, renderOutputOwner: true, scenePasses: 1, mrtOutputs: [], diagnostics: ["caustic-only", "source channels", "tile stress"] },
+      postStack: { renderPipeline: null, outputColorTransform: false, renderOutputOwner: false, scenePasses: 0, mrtOutputs: [], diagnostics: ["caustic-like asset", "source channels", "tile stress"] },
       thresholds: {
         nonblank: { minRange: 8 },
         perViewPixelDiff: {
@@ -188,7 +196,7 @@ function createEvidence({ assets, rendererInfo, metrics }) {
         cameraMatrixRequired: true,
       },
       stochasticMasks: [{ name: "none", path: null, reason: "fixed generated assets and deterministic floor projection" }],
-      knownCompromises: ["Generated caustic fields are reduced-tier sources/diagnostics, not live differential-area compute caustics."],
+      knownCompromises: ["Canvas2D asset preview only; no water compute, receiver deposition, optical transport, GPU timing, or resource-lifetime proof."],
       domainMetrics: metrics,
     },
     rendererInfo,
@@ -200,14 +208,14 @@ function createEvidence({ assets, rendererInfo, metrics }) {
     storageResources: {
       required: true,
       totalBytes: 0,
-      resources: [{ name: "none", kind: "not used by reduced-tier generated-caustic validation surface", dimensions: 0, format: null, bytes: 0, ownerDispatch: null, dispatchSize: null, workgroupAssumptions: null, synchronization: "none", readbackPolicy: "none", resetPolicy: "not applicable" }],
+      resources: [{ name: "none", kind: "not used by Canvas2D generated-caustic asset preview", dimensions: 0, format: null, bytes: 0, ownerDispatch: null, dispatchSize: null, workgroupAssumptions: null, synchronization: "none", readbackPolicy: "none", resetPolicy: "not applicable" }],
     },
-    timings: { required: true, warmupFrames: 1, sampleFrames: 1, cpuFrameMs: { median: 1, p95: 1, unit: "ms" }, gpuFrameMs: null, gpuTimingUnavailable: true, gpuTimingLabel: "CPU-only proxy", renderTimestampMs: null, computeTimestampMs: null, qualityTierChanges: [] },
+    timings: { required: true, syntheticPlaceholder: true, warmupFrames: 1, sampleFrames: 1, cpuFrameMs: { median: 1, p95: 1, unit: "ms" }, gpuFrameMs: null, gpuTimingUnavailable: true, gpuTimingLabel: "No performance claim: Canvas2D asset preview", renderTimestampMs: null, computeTimestampMs: null, qualityTierChanges: [] },
     leakLoop: {
       required: true,
       loops: lifecycleLoops.map((name) => ({ name, iterations: 1, before: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, after: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, pass: true })),
       summary: { pass: true, uncapturedBackendErrors: [], knownInternalCacheDeltas: [] },
-      allowedCacheNotes: ["Browser page is closed after capture; canonical water storage resources are validated by validate-water-contracts.mjs."],
+      allowedCacheNotes: ["Schema bookkeeping only; this preview does not allocate or validate water-compute storage resources."],
     },
   };
 }
@@ -231,7 +239,7 @@ async function main() {
       rendererInfo: window.__generatedCausticValidation.rendererInfo ?? null,
     }));
     assert.equal(state.ready, true, state.error ?? "generated caustic browser validation did not become ready");
-    assert.equal(state.rendererInfo?.isPrimaryBackend, true, "primary WebGPU backend is required");
+    assert.equal(claimBoundary.classification, "asset-preview-only");
     assert.equal(state.metrics.length, 3, "expected three caustic metrics");
     for (const metric of state.metrics) {
       assert.equal(metric.colorSpace, "NoColorSpace", `${metric.id} color space`);
@@ -265,7 +273,7 @@ async function main() {
     await writeJson(resolve(artifactDir, "timings.json"), evidence.timings);
     await writeJson(resolve(artifactDir, "leak-loop.json"), evidence.leakLoop);
     const result = await validateArtifactBundle(artifactDir);
-    console.log(JSON.stringify({ pass: true, artifactDir, metrics: state.metrics, evidence: result }, null, 2));
+    console.log(JSON.stringify({ pass: true, classification: claimBoundary.classification, claimBoundary, artifactDir, metrics: state.metrics, evidence: result }, null, 2));
   } finally {
     await browser.close().catch(() => {});
     await new Promise((resolveClose) => server.close(resolveClose));

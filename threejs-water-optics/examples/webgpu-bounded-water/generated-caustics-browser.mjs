@@ -193,6 +193,7 @@ async function init() {
       renderer: "WebGPURenderer",
       initialized: true,
       isPrimaryBackend: renderer.backend?.isWebGPUBackend === true,
+      capabilityProbeOnly: true,
       coordinateSystem: renderer.coordinateSystem,
       outputBufferType: renderer.outputBufferType ?? "unknown",
       compatibilityMode: false,
@@ -203,7 +204,7 @@ async function init() {
       unavailableReason: null,
     };
   } catch (error) {
-    rendererInfo = { threeRevision: "185", renderer: "WebGPURenderer", initialized: false, isPrimaryBackend: false, coordinateSystem: null, outputBufferType: null, compatibilityMode: false, trackTimestamp: false, unavailableReason: error.message, features: [], limits: {}, info: renderer.info ?? {} };
+    rendererInfo = { threeRevision: "185", renderer: "WebGPURenderer", initialized: false, isPrimaryBackend: false, capabilityProbeOnly: true, coordinateSystem: null, outputBufferType: null, compatibilityMode: false, trackTimestamp: false, unavailableReason: error.message, features: [], limits: {}, info: renderer.info ?? {} };
   }
   const records = await Promise.all(ASSETS.map(loadImage));
   window.__generatedCausticValidation = { ready: true, records, metrics: computeMetrics(records), rendererInfo, capture };

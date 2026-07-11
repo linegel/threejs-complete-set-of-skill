@@ -1,147 +1,240 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Vector2 } from "three/webgpu";
-import { float, linearDepth, viewportLinearDepth } from "three/tsl";
 import {
+  AUTHORED_WAVES,
+  BOUNDED_WATER_LAB_MANIFEST,
+  CANONICAL_WATER_TIER_IDS,
   DEFAULT_WATER_PARAMETERS,
+  WATER_CFL_LIMIT,
+  WATER_EXAMPLE_CLAIM_BOUNDARY,
+  WATER_MECHANISM_PROFILES,
+  WATER_MECHANISM_ROUTES,
   WATER_QUALITY_TIERS,
+  WebGPUBoundedWaterHeightfield,
   analyticSurfaceHeightAt,
+  beerLambertTransmission,
+  boundedCausticQuantizationContract,
+  boundedWaterPersistentBytes,
   createBoundedWaterHeightQuery,
+  createBoundedWaterMaterial,
+  createBoundedWaterMesh,
   createWebGPUBoundedWaterSystem,
-  estimateHeightfieldResidualBound,
-  getWaterHeight,
+  depositReceiverCaustics,
+  equalDurationSchedules,
+  exactDielectricFresnel,
+  getParametricWaterHeight,
+  receiverAreaDeterminant,
+  replayBoundedWaterFixedSteps,
+  sampleAnalyticSurfaceAtParameter,
+  validateFiniteWaterParameters,
+  validateRefractedRaySample,
   validateWaterConfig,
   waterCourantNumber,
+  waterGridUvForWorldCoordinate,
+  waterGridWorldCoordinateForUv,
 } from "./index.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "webgpu-bounded-water.js"), "utf8");
-const cpuHeightSource = readFileSync(join(here, "cpu-water-height.js"), "utf8");
-const readme = readFileSync(join(here, "README.md"), "utf8");
-const skill = readFileSync(join(here, "../../SKILL.md"), "utf8");
-const reference = readFileSync(join(here, "../../references/water-surface-system.md"), "utf8");
+const appSource = readFileSync(join(here, "lab-app.js"), "utf8");
+const captureSource = readFileSync(join(here, "capture.mjs"), "utf8");
+const artifactValidatorSource = readFileSync(join(here, "validate-artifacts.mjs"), "utf8");
+const manifest = JSON.parse(readFileSync(join(here, "lab.manifest.json"), "utf8"));
+const packageJson = JSON.parse(readFileSync(join(here, "package.json"), "utf8"));
 
 function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message);
+  if (!condition) throw new Error(message);
+}
+
+function assertThrows(fn, expression, message) {
+  let thrown = null;
+  try { fn(); } catch (error) { thrown = error; }
+  assert(thrown && expression.test(thrown.message), message);
+}
+
+function maxVectorError(a, b) {
+  return Math.max(...a.map((value, index) => Math.abs(value - b[index])));
+}
+
+assert(manifest.schemaVersion === 2 && manifest.id === "webgpu-bounded-water", "Bounded-water lab manifest must use schema v2 and canonical id.");
+assert(manifest.kind === "canonical-lab" && manifest.status === "incomplete", "Bounded-water must remain an incomplete canonical lab pending runtime evidence.");
+assert(manifest.canonicalSource[0] === "threejs-water-optics/examples/webgpu-bounded-water"
+  && manifest.canonicalSource.includes("scripts/capture-lab-browser.mjs")
+  && manifest.canonicalSource.includes("scripts/lib/evidence-v2.mjs"), "Canonical source hashing must cover the whole normative directory and shared capture/evidence contracts.");
+assert(JSON.stringify(BOUNDED_WATER_LAB_MANIFEST.canonicalSource) === JSON.stringify(manifest.canonicalSource), "Runtime and JSON canonicalSource declarations drifted.");
+assert(packageJson.dependencies.three === "0.185.1" && packageJson.dependencies.playwright === "1.61.1", "Local dependency declarations must exactly match the root pins.");
+
+assert(JSON.stringify(Object.keys(WATER_QUALITY_TIERS)) === JSON.stringify(CANONICAL_WATER_TIER_IDS), "No hidden or compatibility tier may extend the canonical ultra/high/medium/low set.");
+assert(manifest.tiers.map((tier) => tier.id).join(",") === CANONICAL_WATER_TIER_IDS.join(","), "Manifest tier order drifted from runtime.");
+const tiers = Object.fromEntries(CANONICAL_WATER_TIER_IDS.map((id) => [id, validateWaterConfig({ tier: WATER_QUALITY_TIERS[id], parameters: DEFAULT_WATER_PARAMETERS })]));
+for (const [id, validation] of Object.entries(tiers)) {
+  assert(validation.courant <= WATER_CFL_LIMIT, `${id} exceeds the gated CFL margin.`);
+  assert(validation.persistentBytes === boundedWaterPersistentBytes(WATER_QUALITY_TIERS[id].resolution), `${id} persistent byte accounting drifted.`);
+  assert(manifest.tiers.find((tier) => tier.id === id).resourceLimits.derivedPersistentGpuBytes === validation.persistentBytes, `${id} manifest bytes do not equal the runtime allocation formula.`);
+}
+assert(tiers.ultra.courant > 0.7 && WATER_CFL_LIMIT === 0.85, "The ultra tier must prove a real reserved CFL margin, not the exact instability boundary.");
+
+assert(WATER_MECHANISM_ROUTES.length === 6 && new Set(WATER_MECHANISM_ROUTES).size === 6, "Water mechanism route ids must be unique.");
+assert(Object.keys(WATER_MECHANISM_PROFILES).join(",") === WATER_MECHANISM_ROUTES.join(","), "Every mechanism route needs one exact runtime profile.");
+assert(WATER_MECHANISM_PROFILES["heightfield-simulation"].receiverCaustics === false, "Heightfield route must not retain hidden caustic dispatches.");
+assert(WATER_MECHANISM_PROFILES["differential-caustics"].receiverCaustics === true, "Caustic route must enable receiver deposition.");
+assert(WATER_MECHANISM_PROFILES["refraction-and-absorption"].opticalTransport === true, "Refraction route must enable opaque color/depth consumption.");
+assert(WATER_MECHANISM_PROFILES["refraction-and-absorption"].mode === "final", "Refraction route must display transported scene color rather than only a scalar label.");
+assert(WATER_MECHANISM_PROFILES["fresnel-and-tir"].underwaterView === true, "TIR route requires a locked underwater camera family.");
+assert(WATER_MECHANISM_PROFILES["buoyancy-spray-and-masks"].buoyancySprayMasks === true, "Interaction route must enable buoyancy, spray, and masks.");
+
+validateFiniteWaterParameters(DEFAULT_WATER_PARAMETERS);
+assertThrows(() => validateFiniteWaterParameters({ ...DEFAULT_WATER_PARAMETERS, waveSpeed: Number.NaN }), /waveSpeed/, "NaN wave speed survived finite-domain validation.");
+assertThrows(() => validateFiniteWaterParameters({ ...DEFAULT_WATER_PARAMETERS, waterIor: 0 }), /waterIor/, "Non-positive IOR survived validation.");
+assertThrows(() => validateFiniteWaterParameters({ ...DEFAULT_WATER_PARAMETERS, causticLightTransmission: 1.1 }), /causticLightTransmission/, "Out-of-range caustic transmission survived validation.");
+assertThrows(() => validateWaterConfig({ tier: WATER_QUALITY_TIERS.high, parameters: { ...DEFAULT_WATER_PARAMETERS, worldSize: new Vector2(1, 1) } }), /CFL|Courant/, "Unsafe water config survived the CFL gate.");
+
+for (const id of CANONICAL_WATER_TIER_IDS) {
+  const tier = WATER_QUALITY_TIERS[id];
+  for (const worldExtent of [3.25, DEFAULT_WATER_PARAMETERS.worldSize.x]) {
+    for (const gridIndex of [0, 1, Math.floor((tier.resolution - 1) / 2), tier.resolution - 2, tier.resolution - 1]) {
+      const worldCoordinate = -0.5 * worldExtent + gridIndex * worldExtent / (tier.resolution - 1);
+      const uv = waterGridUvForWorldCoordinate(worldCoordinate, worldExtent, tier.resolution);
+      const recovered = waterGridWorldCoordinateForUv(uv, worldExtent, tier.resolution);
+      assert(Math.abs(recovered - worldCoordinate) < 2e-14, `${id} node-centred grid round trip failed.`);
+    }
   }
 }
 
-const tiers = Object.fromEntries(
-  Object.entries(WATER_QUALITY_TIERS).map(([name, tier]) => [
-    name,
-    validateWaterConfig({ tier, parameters: DEFAULT_WATER_PARAMETERS }),
-  ]),
-);
+const parameterProbe = { qx: 0.37, qz: -0.81, time: 0.22 };
+const analytic = sampleAnalyticSurfaceAtParameter(parameterProbe.qx, parameterProbe.qz, parameterProbe.time);
+const epsilon = 1e-6;
+const plusX = sampleAnalyticSurfaceAtParameter(parameterProbe.qx + epsilon, parameterProbe.qz, parameterProbe.time).position;
+const minusX = sampleAnalyticSurfaceAtParameter(parameterProbe.qx - epsilon, parameterProbe.qz, parameterProbe.time).position;
+const plusZ = sampleAnalyticSurfaceAtParameter(parameterProbe.qx, parameterProbe.qz + epsilon, parameterProbe.time).position;
+const minusZ = sampleAnalyticSurfaceAtParameter(parameterProbe.qx, parameterProbe.qz - epsilon, parameterProbe.time).position;
+const finiteTangentX = plusX.map((value, index) => (value - minusX[index]) / (2 * epsilon));
+const finiteTangentZ = plusZ.map((value, index) => (value - minusZ[index]) / (2 * epsilon));
+const tangentError = Math.max(maxVectorError(analytic.tangentX, finiteTangentX), maxVectorError(analytic.tangentZ, finiteTangentZ));
+assert(tangentError < 1e-8 && analytic.horizontalJacobian > 0, "Exact authored surface differential failed its CPU oracle.");
+assert(Math.abs(getParametricWaterHeight(parameterProbe.qx, parameterProbe.qz, parameterProbe.time) - analyticSurfaceHeightAt(parameterProbe.qx, parameterProbe.qz, parameterProbe.time)) < 1e-12, "Parametric height evaluators drifted.");
+assert(AUTHORED_WAVES.every((wave) => Math.abs(wave.direction.length() - 1) < 1e-12), "Authored wave directions must be normalized.");
 
-assert(Object.values(tiers).every((tier) => tier.courant <= tier.maxCourant), "Default water tiers must satisfy CFL/Courant stability.");
-
-let rejectedUnsafeConfig = false;
-try {
-  validateWaterConfig({
-    tier: WATER_QUALITY_TIERS.high,
-    parameters: {
-      ...DEFAULT_WATER_PARAMETERS,
-      worldSize: new Vector2(1, 1),
-    },
-  });
-} catch (error) {
-  rejectedUnsafeConfig = /CFL|Courant/.test(error.message);
-}
-
-assert(rejectedUnsafeConfig, "Unsafe water config must fail the CFL/Courant gate.");
-assert(waterCourantNumber({
-  resolution: WATER_QUALITY_TIERS.high.resolution,
-  fixedTimeStep: WATER_QUALITY_TIERS.high.fixedTimeStep,
-  waveSpeed: DEFAULT_WATER_PARAMETERS.waveSpeed,
-  worldSize: DEFAULT_WATER_PARAMETERS.worldSize,
-}) === tiers.high.courant, "waterCourantNumber must match validateWaterConfig output.");
-
-const analyticProbe = { x: 1.25, z: -0.75, time: 2.5 };
 const query = createBoundedWaterHeightQuery();
-const directHeight = getWaterHeight(analyticProbe.x, analyticProbe.z, analyticProbe.time);
-const queryHeight = query.getWaterHeight(analyticProbe.x, analyticProbe.z, analyticProbe.time);
-const existingHeight = analyticSurfaceHeightAt(analyticProbe.x, analyticProbe.z, analyticProbe.time);
-assert(Math.abs(directHeight - existingHeight) < 1e-12, "getWaterHeight must exactly match the authored analytic wave evaluator.");
-assert(Math.abs(queryHeight - existingHeight) < 1e-12, "createBoundedWaterHeightQuery must expose the same getWaterHeight contract.");
-assert(estimateHeightfieldResidualBound() === DEFAULT_WATER_PARAMETERS.dropStrength + DEFAULT_WATER_PARAMETERS.objectDisplacementScale, "Heightfield residual bound must match the declared drop/object amplitude budget.");
-assert(!cpuHeightSource.includes("copyTextureToBuffer") && !cpuHeightSource.includes("readRenderTargetPixels"), "Bounded CPU water-height contract must not use GPU readback.");
+const worldProbe = query.sampleAtWorldXZ(analytic.position[0], analytic.position[2], parameterProbe.time);
+assert(worldProbe.status === "converged" && worldProbe.horizontalResidual <= 1e-7, "Eulerian authored-wave inversion failed.");
 
-const linearDepthProbe = linearDepth(float(0.5));
-assert(typeof viewportLinearDepth !== "function", "viewportLinearDepth is a const node in Three.js r185, not a callable function.");
-assert(linearDepthProbe !== undefined, "linearDepth(float(...)) must construct a TSL depth conversion node.");
+const normalFresnel = exactDielectricFresnel(1, DEFAULT_WATER_PARAMETERS.airIor, DEFAULT_WATER_PARAMETERS.waterIor);
+const tirProbe = exactDielectricFresnel(0.5, DEFAULT_WATER_PARAMETERS.waterIor, DEFAULT_WATER_PARAMETERS.airIor);
+assert(Math.abs(normalFresnel.reflectance - 0.02033) < 1e-4, "Normal-incidence exact Fresnel is wrong.");
+assert(tirProbe.reflectance === 1 && tirProbe.totalInternalReflection, "Water-to-air TIR classification is wrong.");
+const transmission = beerLambertTransmission(DEFAULT_WATER_PARAMETERS.absorptionCoefficientPerMeter, 2);
+assert(transmission.x < transmission.y && transmission.y < transmission.z, "Beer-Lambert channel ordering drifted.");
+assert(receiverAreaDeterminant({ x: 2, y: 1 }, { x: 1, y: 3 }) === 5, "Receiver area must use a determinant.");
 
-assert(source.includes("linearDepth(sampledDepth)"), "Depth-aware refraction must call linearDepth(sampledDepth).");
-assert(source.includes("linearDepth(currentDepth)"), "Depth-aware refraction must call linearDepth(currentDepth).");
-assert(!source.includes("viewportLinearDepth("), "Depth-aware refraction must not call viewportLinearDepth(...); it is not callable in r185.");
-assert(source.includes("perspectiveDepthToViewZ"), "Depth-aware refraction must convert raw depth to view-Z meters.");
-assert(!source.includes("mul(80.0)"), "Raw nonlinear depth deltas must not be scaled by a magic meter factor.");
-assert(source.includes("const f0Base") && source.includes("f0Base.mul(f0Base)"), "Fresnel F0 must square the eta ratio with multiplication for WGSL validity.");
-assert(!source.includes("pow(float(parameters.airIor)"), "Fresnel F0 must not emit pow(negativeAbstractFloat, 2.0).");
-assert(!source.includes("frustumCulled = false"), "Water mesh must use computed bounds instead of disabling frustum culling.");
-assert(source.includes("createBoundedWaterRenderPipeline(renderer, sceneColorScene, camera)"), "System must build refraction inputs from a separate sceneColorScene.");
-assert(source.includes("pass(opaqueScene, camera)"), "Render pipeline must render an opaque scene, not the live water scene.");
-assert(source.includes("sceneColorNode: pipeline?.colorNode"), "Material must consume pipeline-owned scene color when available.");
-assert(source.includes("sceneDepthNode: pipeline?.depthNode"), "Material must consume pipeline-owned depth when available.");
-assert(source.includes("refract(lightIncident"), "Caustic kernels must use refracted ray-bundle sampling.");
-assert(!source.includes("explicitFallbackWhenWebGPUUnavailable"), "Flagship water skill must not carry an in-skill fallback teaching branch.");
-assert(!source.includes("createReducedBoundedWaterMaterial"), "Flagship water skill must not export reduced fallback material recipes.");
-assert(!source.includes("createReducedBoundedWaterMesh"), "Flagship water skill must not export reduced fallback mesh recipes.");
-assert(source.includes("../threejs-compatibility-fallbacks/"), "Non-WebGPU routing message must point to the compatibility fallback skill.");
+const deposition = depositReceiverCaustics([
+  { hitX: 1.25, hitY: 1.75, power: 2 },
+  { hitX: 2.5, hitY: 2.5, power: 1 },
+], { width: 5, height: 5, receiverCellAreaMeters2: 0.04, footprintAreaEpsilonMeters2: 0.01 });
+assert(deposition.energyClosureError < 1e-14 && Math.abs(deposition.depositedPower - 3) < 1e-14, "CPU receiver deposition is nonconservative.");
+const causticQuantization = boundedCausticQuantizationContract(WATER_QUALITY_TIERS.ultra.resolution);
+assert(causticQuantization.worstCaseReceiverUnits <= 0xffffffff, "Atomic receiver accumulation can overflow uint32 under its source clamp.");
+assert(causticQuantization.maxUnitsPerSource > 0 && causticQuantization.maximumRoundingLossWatts > 0, "Caustic quantization error bound is absent.");
 
-for (const row of ["`coord`", "`coordUv`", "`world`", "`height/velocity`", "`normalCaustic.rg`", "`refractedUv`", "depth samples", "color samples", "data textures"]) {
-  assert(reference.includes(row), `Reference interface-space table missing ${row}.`);
+const validRefraction = validateRefractedRaySample({
+  waterViewPosition: { x: 0, y: 0, z: -2 },
+  refractedViewDirection: { x: 0, y: -0.1, z: -1 },
+  sampledViewPosition: { x: 0, y: -0.2, z: -4 },
+  candidateUv: { x: 0.5, y: 0.5 },
+  maxCrossTrackMeters: 0.01,
+});
+const foreground = validateRefractedRaySample({
+  waterViewPosition: { x: 0, y: 0, z: -2 },
+  refractedViewDirection: { x: 0, y: 0, z: -1 },
+  sampledViewPosition: { x: 0, y: 0, z: -1 },
+  candidateUv: { x: 0.5, y: 0.5 },
+  maxCrossTrackMeters: 0.01,
+});
+assert(validRefraction.valid && foreground.reason === "foreground", "Refraction ray/foreground CPU gates failed.");
+
+const schedules = equalDurationSchedules(0.5);
+const replays = Object.fromEntries(Object.entries(schedules).map(([hz, schedule]) => [hz, replayBoundedWaterFixedSteps({ tierId: "high", schedule })]));
+assert(replays[30].fixedStepIndex === replays[60].fixedStepIndex && replays[60].fixedStepIndex === replays[120].fixedStepIndex, "Equal-duration schedules executed different fixed-step counts.");
+assert(replays[30].stateHash === replays[60].stateHash && replays[60].stateHash === replays[120].stateHash, "30/60/120 Hz fixed-step replays diverged.");
+
+const heightfield = new WebGPUBoundedWaterHeightfield({}, { tier: "low", causticsEnabled: true });
+heightfield.setDrop({ x: 0.2, z: -0.1, radius: 0.25, strength: 0.4 });
+heightfield.setObjectImpulse({
+  oldCenter: { x: -0.1, y: 0, z: 0 },
+  newCenter: { x: 0.1, y: 0, z: 0.2 },
+  radius: 0.4,
+  strength: 0.7,
+});
+const snapshot = heightfield.snapshotPendingEvents();
+const snapshotBytes = Array.from(heightfield.eventSnapshotBuffer.array);
+heightfield.resetImpulseUniforms();
+assert(snapshot.drop.strength === 0.4 && snapshot.impulse.strength === 0.7, "Immutable event snapshot lost submitted values.");
+assert(Math.abs(snapshotBytes[3] - 0.4) < 1e-6 && Math.abs(snapshotBytes[11] - 0.7) < 1e-6, "GPU event snapshot layout drifted.");
+assert(snapshotBytes[15] === 0, "Default event mask must be disabled.");
+assert(heightfield.causticAccumulationBuffer.array.byteLength === WATER_QUALITY_TIERS.low.resolution ** 2 * 4, "Atomic caustic buffer allocation is wrong.");
+assert(heightfield.diagnosticBuffer.array.length === 8 && heightfield.probeBuffer.array.length === 16, "GPU diagnostic/probe buffer layout is wrong.");
+assertThrows(() => heightfield.setDrop({ x: 100, z: 0, radius: 1, strength: 1 }), /outside/, "Out-of-domain drop survived validation.");
+assertThrows(() => heightfield.setDrop({ x: 0, z: 0, radius: Number.NaN, strength: 1 }), /finite/, "NaN drop survived validation.");
+const material = createBoundedWaterMaterial({ heightfield });
+const mesh = createBoundedWaterMesh({ heightfield, material });
+assert(mesh.frustumCulled === false && mesh.userData.geometryBytes > 0, "Unbounded forced grid must not use an invented culling bound.");
+assertThrows(() => createBoundedWaterMesh({ heightfield, width: 7, material }), /must equal/, "Mesh/simulation extent mismatch survived.");
+mesh.geometry.dispose();
+material.dispose();
+heightfield.dispose();
+
+assert(source.includes("causticAccumulationNode") && source.includes("atomicAdd(causticAccumulationNode.element"), "GPU caustics must use source-driven atomic receiver deposition.");
+assert(!source.includes("causticGatherRadiusCells") && !source.includes("createReceiverCausticNode"), "The unbounded-loss receiver gather must not remain reachable.");
+assert(source.includes("combinedSurfaceHit") && source.includes("analyticSurfacePosition") && source.includes("slopeFromState"), "Caustics must share the visible analytic+heightfield cause.");
+assert(source.includes("If(transmissionPossible") && source.indexOf("If(transmissionPossible") < source.indexOf("refractedWorldRaw = refract"), "TIR must branch before refraction projection.");
+assert(!source.includes("normalize(refract("), "A potentially zero TIR refracted vector must never be normalized.");
+assert(source.includes("captureGpuState") && source.includes("getArrayBufferAsync(this.probeBuffer"), "Actual GPU storage readback contract is missing.");
+assert(source.includes("this.dispatchCount += 3") && source.includes("clearCausticAccumulation"), "Caustic dispatch accounting must include clear/deposit/resolve.");
+assert(appSource.includes("this.opaquePass = pass(this.opaqueScene, this.camera)"), "Canonical app must build a real opaque-without-water pass.");
+assert(appSource.includes("getTextureNode(\"output\")") && appSource.includes("getTextureNode(\"depth\")"), "Opaque color and depth must feed the water material.");
+assert(appSource.includes("makeReceiverMaterial") && appSource.includes("bounded-water-caustic-receiver"), "Receiver caustics must be applied to the receiver material.");
+assert(appSource.includes("setMechanism") && appSource.includes("WATER_MECHANISM_PROFILES"), "Mechanism routes must alter runtime implementation state.");
+assert(appSource.includes("runGpuMutationProbe") && appSource.includes("async-impulse-loss") && appSource.includes("receiver-energy-closure"), "GPU mutation/readback hooks are missing.");
+assert(appSource.includes("alignedBytesPerRow") && appSource.includes("bytesPerPixel: 4"), "Render-target capture must use the shared aligned RGBA8 contract.");
+assert(captureSource.includes("captureLabBrowser") && captureSource.includes("capture-hook.mjs"), "Local capture must delegate to the shared browser wrapper and hook.");
+assert(artifactValidatorSource.includes("validateEvidenceBundle") && artifactValidatorSource.includes("requireRequiredClaimsPass: true"), "Artifact validation must use strict shared v2 validation.");
+
+for (const id of WATER_MECHANISM_ROUTES) {
+  const wrapper = join(here, "canonical-targets", "mechanism", id, "index.html");
+  assert(existsSync(wrapper) && readFileSync(wrapper, "utf8").includes("../../../lab-app.js"), `Mechanism wrapper ${id} does not load the canonical app.`);
 }
-assert(reference.includes("linearDepth(value)") && reference.includes("view-Z meters"), "Reference must define raw depth to view-Z meter conversion.");
-for (const phrase of [
-  "Host Integration Contract",
-  "Presets are data",
-  "active sample budget defaults to 128",
-  "Networked scenes use integer ticks",
-  "Spray is an emitter/probe system",
-  "Transparent host objects are excluded",
-  "Screen-space masking requires a mask texture",
-  "Host post-processing order",
-]) {
-  assert(reference.includes(phrase) || skill.includes(phrase), `Water integration docs missing phrase: ${phrase}.`);
+for (const id of CANONICAL_WATER_TIER_IDS) {
+  const wrapper = join(here, "canonical-targets", "tier", id, "index.html");
+  assert(existsSync(wrapper) && readFileSync(wrapper, "utf8").includes("../../../lab-app.js"), `Tier wrapper ${id} does not load the canonical app.`);
 }
 
-const checkpointCount = (readme.match(/You must see/g) ?? []).length;
-const mistakeCount = (readme.match(/if /g) ?? []).length;
-assert(checkpointCount >= 7, `README must contain at least seven build checkpoints, got ${checkpointCount}.`);
-assert(mistakeCount >= 7, `README checkpoints must include likely mistakes, got ${mistakeCount}.`);
+const fakeNonWebGpuRenderer = { backend: { isWebGPUBackend: false }, async init() {} };
+let rejectedNonWebGpu = false;
+try { await createWebGPUBoundedWaterSystem(fakeNonWebGpuRenderer, { tier: "ultra" }); } catch (error) { rejectedNonWebGpu = /WebGPU backend required/.test(error.message); }
+assert(rejectedNonWebGpu, "Missing WebGPU must block without fallback.");
 
-const fakeReducedRenderer = {
-  backend: { isWebGPUBackend: false },
-  outputColorSpace: "srgb",
-  async init() {},
-};
-
-let rejectedNonWebGPU = false;
-try {
-  await createWebGPUBoundedWaterSystem(fakeReducedRenderer, { tier: "ultra" });
-} catch (error) {
-  rejectedNonWebGPU = /WebGPU backend required/.test(error.message) &&
-    /threejs-compatibility-fallbacks/.test(error.message);
-}
-
-assert(rejectedNonWebGPU, "Missing WebGPU must throw and route fallback teaching to the compatibility skill.");
+assert(WATER_EXAMPLE_CLAIM_BOUNDARY.classification === "canonical-native-webgpu-lab-incomplete", "Claim boundary must match the canonical incomplete status.");
 
 console.log(JSON.stringify({
   pass: true,
+  classification: WATER_EXAMPLE_CLAIM_BOUNDARY.classification,
   tiers,
-  rejectedUnsafeConfig,
-  rejectedNonWebGPU,
-  checks: [
-    "CFL/Courant gate",
-    "depth-to-viewZ meters",
-    "pipeline-owned scene color/depth",
-    "computed culling bounds",
-    "refracted ray-bundle caustics",
-    "CPU analytic getWaterHeight contract",
-    "interface-space table",
-    "checkpointed README",
-    "WebGPU-unavailable routing to compatibility fallbacks",
-  ],
+  mechanisms: WATER_MECHANISM_PROFILES,
+  deterministicReplay: Object.fromEntries(Object.entries(replays).map(([hz, replay]) => [hz, { steps: replay.fixedStepIndex, hash: replay.stateHash }])),
+  numericalChecks: {
+    tangentError,
+    inversionResidual: worldProbe.horizontalResidual,
+    normalIncidenceFresnel: normalFresnel.reflectance,
+    tirClassified: tirProbe.totalInternalReflection,
+    receiverEnergyClosureError: deposition.energyClosureError,
+    causticWorstCaseUnits: causticQuantization.worstCaseReceiverUnits,
+    cflLimit: WATER_CFL_LIMIT,
+    highTierCourant: waterCourantNumber({
+      resolution: WATER_QUALITY_TIERS.high.resolution,
+      fixedTimeStep: WATER_QUALITY_TIERS.high.fixedTimeStep,
+    }),
+  },
+  verdict: "browser-free-contract-pass; runtime evidence remains INSUFFICIENT_EVIDENCE",
 }, null, 2));
