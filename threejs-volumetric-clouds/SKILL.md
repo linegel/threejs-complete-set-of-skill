@@ -33,23 +33,33 @@ The project/environment coordinator is the sole owner and publisher of
 publish a distinct `PrecipitationEmissionSnapshot`; they never republish
 forcing under a cloud-owned revision or clock.
 
+Both `PhysicsSampleRequest.requestedPhysicsTime` and
+`PhysicsSampleResponseEnvelope.requestedPhysicsTime` retain `PhysicsTime`: an
+instant request sets `kind: instant`, carries the requested `PhysicsInstant` in
+`instant`, and sets `interval: TypedAbsence`; an interval request reverses those
+arms. Narrow snapshot fields such as `sampleInstant` and `emissionInterval`
+remain raw `PhysicsInstant` and `PhysicsTimeInterval` records, respectively.
+
 - Sample environmental air velocity in meters per second from
   `EnvironmentForcingSnapshot.sampleInstant: PhysicsInstant`, with its declared
   frame, altitude/support domain, cadence, interpolation policy,
   requested/actual oriented spatial footprint, spatial/temporal filter or band,
   and per-channel error. Every forcing channel has
-  `SampledChannel.actualPhysicsTime: PhysicsInstant`. Cloud-relative evolution
-  is a separately named velocity relative to the air. It is not water current
-  or vegetation deformation.
+  `SampledChannel.actualPhysicsTime: PhysicsTime` with `kind: instant`, its
+  `instant` arm exactly equal to the enclosing snapshot's `sampleInstant`, and
+  `interval: TypedAbsence`. Cloud-relative evolution is a separately named
+  velocity relative to the air. It is not water current or vegetation
+  deformation.
 - Select `appearance-only` or `causal-precipitation` explicitly. An
   appearance-only density field may expose an artistic precipitation bias but
   exposes no physical emission channel. A causal producer publishes dimensioned
   phase-fraction-resolved liquid/ice `PrecipitationEmissionSnapshot` with
   `emissionInterval: PhysicsTimeInterval` and canonical oriented mass-area flux;
   every emission channel has
-  `SampledChannel.actualPhysicsTime: PhysicsTimeInterval` equal to that
-  interval. A volume-source cloud model projects through its support/Jacobian
-  before publication. Include
+  `SampledChannel.actualPhysicsTime: PhysicsTime` with `kind: interval`, its
+  `interval` arm exactly equal to that `emissionInterval`, and
+  `instant: TypedAbsence`. A volume-source cloud model projects through its
+  support/Jacobian before publication. Include
   fall-delay or transport model, cadence, uncertainty/error, typed
   `ConservationGroup.boundaryFluxes`, a closing `ConservationGroup`, and an
   `ErrorPropagationLedger` for the emitted state version. Delivery accounting
@@ -61,9 +71,10 @@ forcing under a cloud-owned revision or clock.
   quantity, unit, spectral/working basis, filter, error, and atmospheric
   transmittance from `LightingTransportSnapshot.sampleInstant: PhysicsInstant`;
   every lighting channel has
-  `SampledChannel.actualPhysicsTime: PhysicsInstant`. Apply
-  atmospheric attenuation exactly once using its versioned
-  `attenuationFactorIds`, not a boolean.
+  `SampledChannel.actualPhysicsTime: PhysicsTime` with `kind: instant`, its
+  `instant` arm exactly equal to the enclosing snapshot's `sampleInstant`, and
+  `interval: TypedAbsence`. Apply atmospheric attenuation exactly once using
+  its versioned `attenuationFactorIds`, not a boolean.
   Cloud self-shadowing contributes a separate cloud optical-depth/transmittance
   factor; it never bakes atmospheric attenuation into that factor.
 - Version cloud density, precipitation emission, lighting input, and shadow

@@ -481,11 +481,18 @@ missingChannelPolicy
 
 Channel metadata supplies SI unit and scalar/vector/tensor basis. Each error
 supplies unit, basis, norm, and hard-bound/measured/statistical/unknown class.
-Requests/results use the exact canonical `PhysicsInstant` or
-`PhysicsTimeInterval` required by the query; the generic `PhysicsTime` alias is
-only the discriminated union for boundaries that truly allow either. Body ID,
-analysis revision, source resolution, reconstruction, and domain/singularity
-masks are channel/provider provenance, not renamed common-envelope fields.
+`PhysicsSampleRequest.requestedPhysicsTime`, response-envelope
+`requestedPhysicsTime`/`actualBundleTime`, and every
+`SampledChannel.actualPhysicsTime` remain canonical `PhysicsTime`
+discriminated wrappers. For `kind: instant`, the `instant` arm contains the
+`PhysicsInstant` and the `interval` arm contains `TypedAbsence`; for
+`kind: interval`, the `interval` arm contains the `PhysicsTimeInterval` and the
+`instant` arm contains `TypedAbsence`. The active arm specializes the value; it
+does not change the declared field type. Narrow fields declared as
+`sampleInstant: PhysicsInstant` or `emissionInterval: PhysicsTimeInterval`
+remain raw. Body ID, analysis revision, source resolution, reconstruction, and
+domain/singularity masks are channel/provider provenance, not renamed common-
+envelope fields.
 
 Optional channels absent from a descriptor remain absent; never zero-fill an
 unavailable gradient, velocity, temperature, humidity, gravity, or category.

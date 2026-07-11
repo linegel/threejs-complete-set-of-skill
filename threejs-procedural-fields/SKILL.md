@@ -28,11 +28,14 @@ texture handle, or undocumented callback. It references the active
 `PhysicsContext` through canonical `contextId`, `physicsFrameId`,
 `physicsOriginEpoch`, `transformRevision`, `clockId`, channel/unit,
 represented-footprint/filter, validity, `perChannelError`, cadence/latency,
-`stateVersion`, residency, and `resourceGeneration` fields. Requests name the
-exact `PhysicsInstant` or `PhysicsTimeInterval` they accept; returned
-`SampledChannel.actualPhysicsTime` uses that direct instant-or-interval wire
-shape, not the generic `PhysicsTime` wrapper. Do not add time
-to the descriptor or create a field-local timestamp dialect. Convert from
+`stateVersion`, residency, and `resourceGeneration` fields.
+`PhysicsSampleRequest.requestedPhysicsTime` and
+`SampledChannel.actualPhysicsTime` both use the canonical `PhysicsTime`
+wrapper `{ kind, instant, interval }`. Query semantics select `kind: instant`
+or `kind: interval`; exactly that arm is present and the other arm is a
+canonical `TypedAbsence` record. Do not retype either boundary as a raw
+`PhysicsInstant | PhysicsTimeInterval`, add time to the descriptor, or create a
+field-local timestamp dialect. Convert from
 Three.js world coordinates exactly once through
 `PhysicsContext.worldToPhysicsTransform` and its sole positive
 `metersPerWorldUnit`; no field serializes the reciprocal or another scale.
@@ -176,12 +179,13 @@ The contract must record:
 For every physics-facing output, emit its `PhysicsSignalDescriptor` and batched
 adapter. Static fields publish an immutable `stateVersion` with
 `analytic-on-demand` or `event-driven` cadence as appropriate; every request
-and returned channel, including a static/analytic result, carries a canonical
-requested/actual `PhysicsInstant` or `PhysicsTimeInterval` directly. Edited or simulated fields additionally publish
-their cadence, latency, and invalidation state. Missing, stale, ambiguous, or
-out-of-domain samples remain explicit validity states. Optional channels that
-do not exist remain absent. Never substitute zero, reuse an old origin epoch,
-or silently sample a lower render LOD.
+and returned channel, including a static/analytic result, carries canonical
+`requestedPhysicsTime` or `actualPhysicsTime` as a `PhysicsTime` wrapper with
+one active semantic arm and one `TypedAbsence` arm. Edited or simulated fields
+additionally publish their cadence, latency, and invalidation state. Missing,
+stale, ambiguous, or out-of-domain samples remain explicit validity states.
+Optional channels that do not exist remain absent. Never substitute zero,
+reuse an old origin epoch, or silently sample a lower render LOD.
 
 Register every edited/simulated field owner, read/write version, cadence,
 sample phase, and CPU/GPU dependency on the route's `PhysicsGraph`; a texture

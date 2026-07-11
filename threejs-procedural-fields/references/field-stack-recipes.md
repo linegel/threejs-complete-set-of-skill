@@ -992,9 +992,9 @@ portable boundary is a typed descriptor and provider:
 ```text
 physics-facing field provider
   -> PhysicsSignalDescriptor
-  -> batched PhysicsSampleRequest with PhysicsInstant | PhysicsTimeInterval
+  -> batched PhysicsSampleRequest with requestedPhysicsTime: PhysicsTime
   -> samples carrying context/frame/footprint, state/resource versions,
-     actual PhysicsInstant | PhysicsTimeInterval, validity/error
+     actualPhysicsTime: PhysicsTime, validity/error
 ```
 
 Use the common envelope verbatim: `signalId`, `providerId`, `schemaId`,
@@ -1004,13 +1004,24 @@ Use the common envelope verbatim: `signalId`, `providerId`, `schemaId`,
 residency, cadence, latency, `stateVersion`, `resourceGeneration`, and
 `missingChannelPolicy`. Channel records carry SI unit and scalar/vector/tensor
 basis; errors carry unit, basis, norm, and hard-bound/measured/statistical/
-unknown classification. Requests use the exact `PhysicsInstant` or
-`PhysicsTimeInterval` their query requires. `SampledChannel.actualPhysicsTime`
-stores that direct `PhysicsInstant | PhysicsTimeInterval` arm; it never wraps it
-in the generic `PhysicsTime` alias or flattens the two shapes. A packed
-texture channel, TSL `Fn`, CPU mirror, or render-LOD mesh may implement the
-provider, but none is the ABI. The adapter performs conversion once and returns
-the direct actual instant/interval, `stateVersion`, and `resourceGeneration` with every batch.
+unknown classification. `PhysicsSampleRequest.requestedPhysicsTime` and
+`SampledChannel.actualPhysicsTime` both use the canonical discriminated
+wrapper:
+
+```yaml
+PhysicsTime:
+  kind: instant | interval
+  instant: PhysicsInstant | TypedAbsence
+  interval: PhysicsTimeInterval | TypedAbsence
+```
+
+The query semantics select the discriminant; exactly the selected arm is
+present and the other arm is a canonical `TypedAbsence` record. Do not retype
+either field as a raw `PhysicsInstant | PhysicsTimeInterval` or flatten the two
+shapes. A packed texture channel, TSL `Fn`, CPU mirror, or render-LOD mesh may
+implement the provider, but none is the ABI. The adapter performs conversion
+once and returns the canonical `actualPhysicsTime` wrapper, `stateVersion`, and
+`resourceGeneration` with every batch.
 `stateVersion` is logical state, not GPU completion. The descriptor carries
 `resourceGeneration` and `PhysicsResidencyDescriptor`; actual queue ordering
 and completion use canonical `GpuStatePublication`. A host consumer needs an

@@ -382,25 +382,28 @@ provider-specific dependency revision, encoding, cadence and per-channel referen
 ```
 
 Every request carries the snapshot/context revision, `physicsFrameId`, transform
-revision, physics-origin epoch, `PhysicsInstant`, requested filter/footprint,
-maximum staleness, and consistency policy. Positions/endpoints are SI metres in
-that physics frame. Responses return the actual represented footprint/filter,
-sample instant, latency, and per-channel error through the canonical
+revision, physics-origin epoch, `requestedPhysicsTime: PhysicsTime`, requested
+filter/footprint, maximum staleness, and consistency policy. These lighting
+queries select the wrapper's `instant: PhysicsInstant` arm and encode its
+inverse `interval` arm as a canonical `TypedAbsence` record; a raw instant is
+not substituted at this generic request boundary. Positions/endpoints are SI
+metres in that physics frame. Responses return the actual represented
+footprint/filter, latency, and per-channel time/error through the canonical
 `PhysicsSignalDescriptor` envelope. The minimum semantic signatures are:
 
 ```text
 sampleSunTransmittance(positionPhysicsMeters, toSunPhysics,
                        spatialFootprintMeters,
-                       solarAngularFootprintSteradians, physicsInstant)
+                       solarAngularFootprintSteradians, requestedPhysicsTime)
 sampleDirectSun(positionPhysicsMeters, toSunPhysics,
                 spatialFootprintMeters,
-                solarAngularFootprintSteradians, physicsInstant)
+                solarAngularFootprintSteradians, requestedPhysicsTime)
 sampleSkyRadiance(positionPhysicsMeters, incomingPropagationPhysics,
-                  angularFootprintSteradians, physicsInstant)
+                  angularFootprintSteradians, requestedPhysicsTime)
 sampleSkyIrradiance(positionPhysicsMeters, receiverNormalPhysics,
-                    spatialFootprintMeters, physicsInstant)
+                    spatialFootprintMeters, requestedPhysicsTime)
 sampleCameraSegment(startPhysicsMeters, endPhysicsMeters,
-                    spatialFootprintMeters, physicsInstant)
+                    spatialFootprintMeters, requestedPhysicsTime)
 ```
 
 The actual ABI may batch queries or expose textures/LUTs, but its adapter must
@@ -418,9 +421,17 @@ Every returned `SampledChannel` includes
 ```text
 channelId; quantity kind; SI unit
 spectral/angular basis and conversion revision where applicable
-actualPhysicsTime: PhysicsInstant; actual support/filter; validity and error
+actualPhysicsTime: PhysicsTime {
+  kind: instant,
+  instant: PhysicsInstant,
+  interval: TypedAbsence
+}; actual support/filter; validity and error
 stateVersion
 ```
+
+The instant and absence records are the canonical wrapper arms, not shorthand
+strings or nullable fields. Lighting channels do not encode their instantaneous
+sample as a zero-length interval.
 
 The enclosing `LightingTransportSnapshot` carries atomic bundle validity, the
 per-channel error map and correlation, explicit `absentChannels`, and
@@ -496,9 +507,12 @@ declares a bounded approximation; it does not guess channel wavelengths.
 
 `EnvironmentForcingSnapshot` carries thermodynamic/mechanical state such as air
 velocity, temperature K, pressure, and canonical specific humidity in
-`kg kg^-1`. Its `sampleInstant: PhysicsInstant`, and every atmosphere request
-against it carries a `PhysicsInstant`; `PhysicsTimeInterval` is used only for an
-actual validity interval or
+`kg kg^-1`. Its `sampleInstant: PhysicsInstant`, while every atmosphere request
+against its instantaneous channels carries `requestedPhysicsTime: PhysicsTime`
+with the `instant` arm selected and the `interval` arm a canonical
+`TypedAbsence` record. Returned forcing channels use the same arm selection in
+`actualPhysicsTime`; raw `PhysicsTimeInterval` is used only for an actual
+validity interval or
 `PhysicsGraphStage.executionInterval: PhysicsTimeInterval`. This skill does not
 become the wind or weather owner merely because it models an atmosphere. When forcing changes
 optical parameters, record the forcing revision and the transfer model into the
@@ -1030,8 +1044,10 @@ Required tests:
 - payload tests proving chromatic segment transmittance for the accepted aerial
   representation.
 - typed-provider fixtures over position, direction/normal, segment endpoints,
-  spatial/solid-angle footprint, frame/origin epoch, and `PhysicsInstant`,
-  including stale, interval-as-instant, and unsupported-footprint rejection;
+  spatial/solid-angle footprint, frame/origin epoch, and
+  `requestedPhysicsTime: PhysicsTime` selecting the instant arm with a
+  `TypedAbsence` interval arm, including stale, interval-arm, malformed-absence,
+  and unsupported-footprint rejection;
 - factor-ledger tests proving atmosphere, cloud, geometry, water, and aerial
   segment factors are each applied once and duplicate factor IDs are rejected;
 - sky-radiance/irradiance fixtures with the direct solar disc both excluded and

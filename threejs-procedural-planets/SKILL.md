@@ -21,10 +21,14 @@ Publish typed `PhysicsSignalDescriptor` records bound to the active
 transform/chart, `clockId`/`samplePhase`, channels, represented-footprint/
 filter, validity/`perChannelError`, residency/cadence/latency, and state/resource
 version. Encode unavailable channels through the descriptor's typed
-missing-channel envelope. Every `PhysicsSampleRequest` and
+missing-channel envelope. `PhysicsSampleRequest.requestedPhysicsTime` and every
 returned `SampledChannel.actualPhysicsTime`, including static/analytic results,
-carries a direct canonical `PhysicsInstant | PhysicsTimeInterval`, never the
-generic `PhysicsTime` wrapper; time is not an extra descriptor field. A
+remain canonical `PhysicsTime` discriminated wrappers. For `kind: instant`,
+the `instant` arm contains the `PhysicsInstant` and the `interval` arm contains
+`TypedAbsence`; for `kind: interval`, the `interval` arm contains the
+`PhysicsTimeInterval` and the `instant` arm contains `TypedAbsence`. The active
+arm specializes the value without changing the field type, and time is not an
+extra descriptor field. A
 quadtree tile, render LOD, TSL function, or cache texture is never the public
 physics ABI.
 The planet/body-field owner is the sole state-equation owner for its

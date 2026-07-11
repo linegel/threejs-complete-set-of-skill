@@ -37,13 +37,17 @@ The snapshot declares:
   radiance, including its per-channel SI unit and solid-angle conversion; an
   authored dimensionless relative scale is an internal nonphysical model input
   only and leaves snapshot radiance/irradiance channels absent;
-- each returned `SampledChannel`'s quantity kind, SI unit, filter/error, and,
-  where applicable, spectral/angular basis and conversion revision; a
-  provider-level transform registry never overrides channel metadata;
+- each returned `SampledChannel`'s quantity kind, SI unit, filter/error,
+  `actualPhysicsTime: PhysicsTime` selecting the `instant` arm while its
+  `interval` arm is a canonical `TypedAbsence` record, and, where applicable,
+  spectral/angular basis and conversion revision; a provider-level transform
+  registry never overrides channel metadata;
 - atmospheric direct-sun transmittance/irradiance, sky radiance/irradiance, and
   segment transmittance/inscattering providers with their domain and error;
 - typed provider request signatures with position, direction/normal or segment
-  endpoints, footprint/solid-angle support, frame, and `PhysicsInstant`;
+  endpoints, footprint/solid-angle support, frame, and
+  `requestedPhysicsTime: PhysicsTime` selecting the `instant` arm while its
+  `interval` arm is a canonical `TypedAbsence` record;
 - applied versioned `attenuationFactorIds` for every output and explicit
   `skyIncludesDirectSolarDisc` state for sky irradiance. A boolean
   "attenuated" flag is insufficient.
@@ -56,11 +60,14 @@ cloud attenuation into this atmosphere snapshot or let a material reapply
 aerial perspective already owned by the image path.
 
 `EnvironmentForcingSnapshot` is a separate thermodynamic/mechanical interface
-sampled at `sampleInstant: PhysicsInstant`; use `PhysicsTimeInterval` only for
-an actual validity or graph-stage interval. If temperature, humidity, pressure,
-aerosol loading, or wind drive atmosphere parameters, record that forcing
-revision and the transfer model; do not treat RGB extinction coefficients as a
-wind or humidity provider.
+sampled at `sampleInstant: PhysicsInstant`. Requests for its instantaneous
+lighting/forcing channels use `requestedPhysicsTime: PhysicsTime` with the
+`instant` arm selected and the `interval` arm a canonical `TypedAbsence` record;
+returned channels use the same discrimination in `actualPhysicsTime`. Use raw
+`PhysicsTimeInterval` only for an actual validity or graph-stage interval. If
+temperature, humidity, pressure, aerosol loading, or wind drive atmosphere
+parameters, record that forcing revision and the transfer model; do not treat
+RGB extinction coefficients as a wind or humidity provider.
 
 Schedule every physics-facing LUT/provider update on the shared graph and emit
 an exact `PhysicsStageExecution` for each attempted recompute or analytic/state-

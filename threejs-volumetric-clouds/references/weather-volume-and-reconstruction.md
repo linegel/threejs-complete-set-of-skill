@@ -263,9 +263,17 @@ per-channel error, residency/cadence/latency, state version, resource
 generation, and missing-channel policy. `EnvironmentForcingSnapshot` and
 `LightingTransportSnapshot` use `sampleInstant: PhysicsInstant`;
 `PrecipitationEmissionSnapshot` uses
-`emissionInterval: PhysicsTimeInterval`. Their `SampledChannel.actualPhysicsTime`
-fields use the corresponding exact `PhysicsInstant` or `PhysicsTimeInterval`
-type. The cloud fields below specialize channels only.
+`emissionInterval: PhysicsTimeInterval`. Those narrow snapshot fields remain
+raw records. Each channel instead retains
+`SampledChannel.actualPhysicsTime: PhysicsTime`: forcing and lighting channels
+set `kind: instant`, put the enclosing snapshot's exact `sampleInstant` in
+`instant`, and set `interval: TypedAbsence`; precipitation-emission channels set
+`kind: interval`, put the enclosing snapshot's exact `emissionInterval` in
+`interval`, and set `instant: TypedAbsence`. Both
+`PhysicsSampleRequest.requestedPhysicsTime` and
+`PhysicsSampleResponseEnvelope.requestedPhysicsTime` likewise retain
+`PhysicsTime`; the selected request kind activates exactly one arm and the
+inverse arm is `TypedAbsence`. The cloud fields below specialize channels only.
 
 ### Air motion and thermodynamic forcing
 
@@ -275,8 +283,9 @@ Cartesian SI physics frame, altitude/support domain, actual temporal validity
 in descriptor `validity` as a `PhysicsTimeInterval`, cadence,
 interpolator, requested oriented physical footprint and spatial/temporal filter
 or band, returned actual footprint/filter, and per-channel error. The returned
-air-velocity channel has `actualPhysicsTime: PhysicsInstant`. Advect a material
-cloud feature with
+air-velocity channel has `actualPhysicsTime: PhysicsTime` with `kind: instant`,
+its `instant` arm exactly equal to the enclosing snapshot's `sampleInstant`, and
+`interval: TypedAbsence`. Advect a material cloud feature with
 
 ```text
 dx_feature/dt = u_air(x_feature,t) + u_relative(x_feature,t)
@@ -322,9 +331,10 @@ A causal cloud model first discriminates its internal measure:
 It also publishes nonnegative liquid/ice phase fractions that sum to one,
 emission altitude/depth distribution,
 `emissionInterval: PhysicsTimeInterval`, cadence, and uncertainty/error. Every
-emission channel has `actualPhysicsTime: PhysicsTimeInterval` equal to that
-interval. A layer parameter alone is neither an area nor a volume; the
-measure/Jacobian is
+emission channel has `actualPhysicsTime: PhysicsTime` with `kind: interval`, its
+`interval` arm exactly equal to that `emissionInterval`, and
+`instant: TypedAbsence`. A layer parameter alone is neither an area nor a
+volume; the measure/Jacobian is
 mandatory before integration. The emitter publishes one transport choice:
 
 - explicit airborne particles/parcels owned by the precipitation system;
@@ -418,10 +428,12 @@ Consume the atmosphere-owned `LightingTransportSnapshot` through its canonical
 descriptor. Each selected `incidentRadiance`, `directSolarIrradiance`,
 `skyIrradiance`, `transmittance`, and `sourceDirection` `SampledChannel`
 preserves its own quantity kind, SI unit, applicable spectral/angular basis,
-`actualPhysicsTime: PhysicsInstant`, actual support/filter, validity, error, and
-state version. Snapshot-level `sampleInstant: PhysicsInstant`, atomic validity,
-and error correlation do not override channel metadata. Choose one direct-light
-path per channel:
+`actualPhysicsTime: PhysicsTime` with `kind: instant`, its `instant` arm exactly
+equal to the enclosing snapshot's `sampleInstant`, and
+`interval: TypedAbsence`, plus actual support/filter, validity, error, and state
+version. Snapshot-level `sampleInstant: PhysicsInstant`, atomic validity, and
+error correlation do not override channel metadata. Choose one direct-light path
+per channel:
 
 ```text
 Path A: unattenuated solar source * T_atmosphere(sample->sun)
@@ -439,8 +451,10 @@ the declared angular model. Query the typed provider with SI sample position,
 physics frame/transform revision,
 sample-to-sun direction plus solar-disc angular footprint, or incoming
 sky-propagation direction/receiver normal, requested spatial/solid-angle
-footprint and filter, canonical `PhysicsInstant`, and maximum staleness. Do not
-reuse a point result outside its returned support/error.
+footprint and filter, a `PhysicsSampleRequest.requestedPhysicsTime: PhysicsTime`
+with `kind: instant`, the requested `PhysicsInstant` in `instant`, and
+`interval: TypedAbsence`, plus maximum staleness. Do not reuse a point result
+outside its returned support/error.
 
 Cloud lighting then applies only cloud-local transport:
 
