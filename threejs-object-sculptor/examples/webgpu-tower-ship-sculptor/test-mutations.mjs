@@ -40,9 +40,9 @@ ship.runtime.colliders.set("hull-compound", hullProxy);
 const towerProxy = ship.runtime.colliders.get("tower-box");
 ship.runtime.colliders.set("tower-box", {
   ...towerProxy,
-  shape: { ...towerProxy.shape, sizeMeters: [6.6, Number.NaN, 4.2] },
+  shape: { ...towerProxy.shape, sizeWorldUnits: [6.6, Number.NaN, 4.2] },
 });
-assert.throws(() => validateTowerShipActionReady(sculptSpec, ship.root), /sizeMeters must contain 3 finite values/, "the production validator must reject nonfinite SI collider dimensions");
+assert.throws(() => validateTowerShipActionReady(sculptSpec, ship.root), /sizeWorldUnits must contain 3 finite values/, "the production validator must reject nonfinite authoring dimensions");
 ship.runtime.colliders.set("tower-box", towerProxy);
 
 const lowerRoof = ship.runtime.destructionGroups.get("lower-roof");
@@ -52,4 +52,4 @@ ship.runtime.destructionGroups.set("lower-roof", lowerRoof);
 validateTowerShipActionReady(sculptSpec, ship.root);
 
 ship.dispose();
-console.log(JSON.stringify({ ok: true, negativeControls: ["oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-si-dimensions", "destruction-group"] }, null, 2));
+console.log(JSON.stringify({ ok: true, negativeControls: ["oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));

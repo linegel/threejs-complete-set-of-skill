@@ -22,22 +22,22 @@ function validateShape(shape, label, errors) {
     errors.push(`${label}.shape is required`);
     return;
   }
-  if (shape.units !== "metre") errors.push(`${label}.shape.units must be metre`);
+  if (shape.units !== "world-unit") errors.push(`${label}.shape.units must remain world-unit until a PhysicsContext adapter converts it`);
   if (shape.kind === "box") {
-    finiteArray(shape.centerMeters, 3, `${label}.shape.centerMeters`, errors);
-    if (finiteArray(shape.sizeMeters, 3, `${label}.shape.sizeMeters`, errors) && shape.sizeMeters.some((value) => value <= 0)) {
-      errors.push(`${label}.shape.sizeMeters must be positive`);
+    finiteArray(shape.centerWorldUnits, 3, `${label}.shape.centerWorldUnits`, errors);
+    if (finiteArray(shape.sizeWorldUnits, 3, `${label}.shape.sizeWorldUnits`, errors) && shape.sizeWorldUnits.some((value) => value <= 0)) {
+      errors.push(`${label}.shape.sizeWorldUnits must be positive`);
     }
   } else if (shape.kind === "capsule") {
-    finiteArray(shape.startMeters, 3, `${label}.shape.startMeters`, errors);
-    finiteArray(shape.endMeters, 3, `${label}.shape.endMeters`, errors);
-    if (!Number.isFinite(shape.radiusMeters) || shape.radiusMeters <= 0) errors.push(`${label}.shape.radiusMeters must be positive`);
+    finiteArray(shape.startWorldUnits, 3, `${label}.shape.startWorldUnits`, errors);
+    finiteArray(shape.endWorldUnits, 3, `${label}.shape.endWorldUnits`, errors);
+    if (!Number.isFinite(shape.radiusWorldUnits) || shape.radiusWorldUnits <= 0) errors.push(`${label}.shape.radiusWorldUnits must be positive`);
   } else if (shape.kind === "compound-boxes") {
     if (!Array.isArray(shape.boxes) || shape.boxes.length === 0) errors.push(`${label}.shape.boxes must be nonempty`);
     for (const [index, box] of (shape.boxes ?? []).entries()) {
-      finiteArray(box.centerMeters, 3, `${label}.shape.boxes[${index}].centerMeters`, errors);
-      if (finiteArray(box.sizeMeters, 3, `${label}.shape.boxes[${index}].sizeMeters`, errors) && box.sizeMeters.some((value) => value <= 0)) {
-        errors.push(`${label}.shape.boxes[${index}].sizeMeters must be positive`);
+      finiteArray(box.centerWorldUnits, 3, `${label}.shape.boxes[${index}].centerWorldUnits`, errors);
+      if (finiteArray(box.sizeWorldUnits, 3, `${label}.shape.boxes[${index}].sizeWorldUnits`, errors) && box.sizeWorldUnits.some((value) => value <= 0)) {
+        errors.push(`${label}.shape.boxes[${index}].sizeWorldUnits must be positive`);
       }
     }
   } else {
@@ -94,8 +94,9 @@ export function validateTowerShipActionReady(spec, root) {
   const colliderEntityIds = new Set();
   for (const [mapId, proxy] of runtime.colliders) {
     const label = `collider ${mapId}`;
-    if (proxy.recordType !== "ColliderProxy") errors.push(`${label}.recordType must be ColliderProxy`);
-    if (proxy.claimStatus !== "authoring-input" || proxy.solverAuthority !== false) errors.push(`${label} must remain a non-solver authoring input`);
+    if (proxy.recordType !== "ColliderConstructionInput") errors.push(`${label}.recordType must be ColliderConstructionInput`);
+    if (proxy.claimStatus !== "authoring-input" || proxy.solverAuthority !== false || proxy.canonicalProxyStatus !== "blocked") errors.push(`${label} must remain a blocked non-solver authoring input`);
+    if (!Array.isArray(proxy.blockingRequirements) || !proxy.blockingRequirements.includes("PhysicsContext.metersPerWorldUnit")) errors.push(`${label} must name the missing PhysicsContext scale`);
     const colliderLocalId = stableId(proxy.colliderId, `${label}.colliderId`, errors);
     const entityLocalId = stableId(proxy.entityId, `${label}.entityId`, errors);
     stableId(proxy.shapeId, `${label}.shapeId`, errors);
@@ -103,12 +104,12 @@ export function validateTowerShipActionReady(spec, root) {
     if (entityLocalId) colliderEntityIds.add(entityLocalId);
     if (entityLocalId && !runtime.nodes.has(entityLocalId)) errors.push(`${label}.entityId ${entityLocalId} does not resolve to a runtime node`);
     if (!proxy.localFrame || typeof proxy.localFrame.frameId !== "string") errors.push(`${label}.localFrame.frameId is required`);
-    finiteArray(proxy.localFrame?.positionMeters, 3, `${label}.localFrame.positionMeters`, errors);
+    finiteArray(proxy.localFrame?.positionWorldUnits, 3, `${label}.localFrame.positionWorldUnits`, errors);
     finiteArray(proxy.localFrame?.rotationQuaternion, 4, `${label}.localFrame.rotationQuaternion`, errors);
     validateShape(proxy.shape, label, errors);
     const materialId = stableId(proxy.physicsMaterialId, `${label}.physicsMaterialId`, errors);
     if (materialId && !runtime.physicsMaterials.has(materialId)) errors.push(`${label}.physicsMaterialId ${materialId} does not resolve`);
-    if (!Number.isFinite(proxy.approximationError?.maxSurfaceDeviationMeters) || proxy.approximationError.maxSurfaceDeviationMeters < 0) {
+    if (!Number.isFinite(proxy.approximationError?.maxSurfaceDeviationWorldUnits) || proxy.approximationError.maxSurfaceDeviationWorldUnits < 0) {
       errors.push(`${label}.approximationError must be finite and nonnegative`);
     }
     if (proxy.validity?.visualLodIndependent !== true) errors.push(`${label}.validity must be visual-LOD independent`);
@@ -117,11 +118,13 @@ export function validateTowerShipActionReady(spec, root) {
 
   for (const material of runtime.physicsMaterials.values()) {
     const materialId = stableId(material.physicsMaterialId, "physics material ID", errors);
-    if (materialId && material.claimStatus !== "insufficient-evidence") errors.push(`physics material ${materialId} must not invent constitutive evidence`);
+    if (materialId && (material.recordType !== "PhysicsMaterialBindingInput" || material.claimStatus !== "insufficient-evidence" || material.canonicalRegistryStatus !== "blocked")) {
+      errors.push(`physics material ${materialId} must remain a blocked binding input without invented constitutive evidence`);
+    }
   }
   for (const component of components) {
     if (component.actionProfile?.collider?.type === "none") continue;
-    if (!colliderEntityIds.has(component.id)) errors.push(`physics-relevant component ${component.id} has no ColliderProxy`);
+    if (!colliderEntityIds.has(component.id)) errors.push(`physics-relevant component ${component.id} has no collider construction input`);
   }
 
   if (errors.length) throw new Error(`Tower Ship action-ready validation failed:\n- ${errors.join("\n- ")}`);

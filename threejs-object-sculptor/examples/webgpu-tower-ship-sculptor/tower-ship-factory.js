@@ -109,27 +109,35 @@ function generatedId(namespace, localId) {
 
 function physicsMaterialBinding(localId, visualMaterialId) {
   return Object.freeze({
-    recordType: "PhysicsMaterialBinding",
+    recordType: "PhysicsMaterialBindingInput",
     physicsMaterialId: generatedId("tower-ship.physics-material", localId),
     visualMaterialId,
     claimStatus: "insufficient-evidence",
+    canonicalRegistryStatus: "blocked",
     missingEvidence: Object.freeze(["density", "friction-law", "restitution-law", "compliance-damping-law"]),
     sourceRevision: "tower-ship-object-sculpt-spec-v2",
   });
 }
 
-function colliderProxy({ id, entityId, shape, physicsMaterialId, collisionRole = "solid", errorMeters }) {
+function colliderConstructionInput({ id, entityId, shape, physicsMaterialId, collisionRole = "solid", errorWorldUnits }) {
   return Object.freeze({
-    recordType: "ColliderProxy",
+    recordType: "ColliderConstructionInput",
     claimStatus: "authoring-input",
     solverAuthority: false,
+    canonicalProxyStatus: "blocked",
+    blockingRequirements: Object.freeze([
+      "PhysicsContext.metersPerWorldUnit",
+      "physics frame, origin epoch, and transform revision",
+      "pose signal and committed pose version",
+      "collision filter, cadence, residency, and validity interval",
+    ]),
     colliderId: generatedId("tower-ship.collider", id),
     entityId: generatedId("tower-ship.entity", entityId),
     shapeId: generatedId("tower-ship.collider-shape", id),
     localFrame: Object.freeze({
       frameId: `tower-ship.frame/${entityId}`,
       parentFrameId: "tower-ship.frame/root",
-      positionMeters: Object.freeze([0, 0, 0]),
+      positionWorldUnits: Object.freeze([0, 0, 0]),
       rotationQuaternion: Object.freeze([0, 0, 0, 1]),
     }),
     shape: Object.freeze(shape),
@@ -143,15 +151,15 @@ function colliderProxy({ id, entityId, shape, physicsMaterialId, collisionRole =
       invalidation: "component topology, source scale, or attachment frame revision",
     }),
     approximationError: Object.freeze({
-      maxSurfaceDeviationMeters: errorMeters,
+      maxSurfaceDeviationWorldUnits: errorWorldUnits,
       label: "Authored",
-      source: "single-reference conservative envelope; not measured contact evidence",
+      source: "single-reference conservative envelope in authoring world units; not measured contact evidence",
     }),
   });
 }
 
 function addCollider(runtime, fields) {
-  const proxy = colliderProxy(fields);
+  const proxy = colliderConstructionInput(fields);
   runtime.colliders.set(proxy.colliderId.localId, proxy);
   return proxy;
 }
@@ -405,7 +413,7 @@ function applySemanticMaterial(runtime, mode, materials) {
   }
 }
 
-function populateColliderProxies(runtime) {
+function populateColliderConstructionInputs(runtime) {
   const agedWood = runtime.physicsMaterials.get("aged-wood").physicsMaterialId;
   const structuralWood = runtime.physicsMaterials.get("structural-wood").physicsMaterialId;
   const sailCloth = runtime.physicsMaterials.get("sail-cloth").physicsMaterialId;
@@ -414,21 +422,21 @@ function populateColliderProxies(runtime) {
     id: "root-envelope",
     entityId: "root",
     physicsMaterialId: agedWood,
-    errorMeters: 0.75,
-    shape: { kind: "box", units: "metre", centerMeters: [0, 2, 0], sizeMeters: [20, 6, 5] },
+    errorWorldUnits: 0.75,
+    shape: { kind: "box", units: "world-unit", centerWorldUnits: [0, 2, 0], sizeWorldUnits: [20, 6, 5] },
   });
   addCollider(runtime, {
     id: "hull-compound",
     entityId: "hull",
     physicsMaterialId: agedWood,
-    errorMeters: 0.35,
+    errorWorldUnits: 0.35,
     shape: {
       kind: "compound-boxes",
-      units: "metre",
+      units: "world-unit",
       boxes: [
-        { centerMeters: [0, 1.1, 0], sizeMeters: [15, 3, 4.5] },
-        { centerMeters: [-8.8, 2, 0], sizeMeters: [3, 3, 2.8] },
-        { centerMeters: [8.8, 2, 0], sizeMeters: [3, 3, 2.8] },
+        { centerWorldUnits: [0, 1.1, 0], sizeWorldUnits: [15, 3, 4.5] },
+        { centerWorldUnits: [-8.8, 2, 0], sizeWorldUnits: [3, 3, 2.8] },
+        { centerWorldUnits: [8.8, 2, 0], sizeWorldUnits: [3, 3, 2.8] },
       ],
     },
   });
@@ -441,38 +449,38 @@ function populateColliderProxies(runtime) {
     ["upper-roof-box", "roof-upper", [0, 7.39, 0], [5.35, 0.85, 3.35], structuralWood, 0.24],
     ["deck-details-trigger", "deck-details", [0, 3.75, 0], [16, 2.4, 4.4], deckProps, 0.5],
   ];
-  for (const [id, entityId, centerMeters, sizeMeters, physicsMaterialId, errorMeters] of boxes) {
+  for (const [id, entityId, centerWorldUnits, sizeWorldUnits, physicsMaterialId, errorWorldUnits] of boxes) {
     addCollider(runtime, {
       id,
       entityId,
       physicsMaterialId,
-      errorMeters,
+      errorWorldUnits,
       collisionRole: id.endsWith("trigger") ? "trigger" : "solid",
-      shape: { kind: "box", units: "metre", centerMeters, sizeMeters },
+      shape: { kind: "box", units: "world-unit", centerWorldUnits, sizeWorldUnits },
     });
   }
   addCollider(runtime, {
     id: "mast-capsule",
     entityId: "mast",
     physicsMaterialId: structuralWood,
-    errorMeters: 0.03,
-    shape: { kind: "capsule", units: "metre", startMeters: [0, 0, 0], endMeters: [0, 9.65, 0], radiusMeters: 0.2 },
+    errorWorldUnits: 0.03,
+    shape: { kind: "capsule", units: "world-unit", startWorldUnits: [0, 0, 0], endWorldUnits: [0, 9.65, 0], radiusWorldUnits: 0.2 },
   });
   addCollider(runtime, {
     id: "sail-trigger",
     entityId: "sail",
     physicsMaterialId: sailCloth,
     collisionRole: "trigger",
-    errorMeters: 0.18,
-    shape: { kind: "box", units: "metre", centerMeters: [2.7, 3.2, 0], sizeMeters: [5.4, 6.4, 0.1] },
+    errorWorldUnits: 0.18,
+    shape: { kind: "box", units: "world-unit", centerWorldUnits: [2.7, 3.2, 0], sizeWorldUnits: [5.4, 6.4, 0.1] },
   });
   addCollider(runtime, {
     id: "oar-bank-trigger",
     entityId: "oar-bank",
     physicsMaterialId: agedWood,
     collisionRole: "trigger",
-    errorMeters: 0.45,
-    shape: { kind: "box", units: "metre", centerMeters: [0, 0, 0], sizeMeters: [15.2, 4.4, 8.2] },
+    errorWorldUnits: 0.45,
+    shape: { kind: "box", units: "world-unit", centerWorldUnits: [0, 0, 0], sizeWorldUnits: [15.2, 4.4, 8.2] },
   });
   for (const oar of runtime.oars) {
     const side = oar.name.includes("starboard") ? 1 : -1;
@@ -481,8 +489,8 @@ function populateColliderProxies(runtime) {
       entityId: oar.name,
       physicsMaterialId: agedWood,
       collisionRole: "trigger",
-      errorMeters: 0.08,
-      shape: { kind: "capsule", units: "metre", startMeters: [0, 0, 0], endMeters: [side * -0.12, -2.35, side * 3.1], radiusMeters: 0.09 },
+      errorWorldUnits: 0.08,
+      shape: { kind: "capsule", units: "world-unit", startWorldUnits: [0, 0, 0], endWorldUnits: [side * -0.12, -2.35, side * 3.1], radiusWorldUnits: 0.09 },
     });
   }
 }
@@ -574,7 +582,7 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
 
   const worldSocket = socket(runtime, "camera-interest", root, [0, 4.2, 0]);
   worldSocket.visible = false;
-  populateColliderProxies(runtime);
+  populateColliderConstructionInputs(runtime);
   runtime.nodes.set("deck-details", details);
   root.updateMatrixWorld(true);
 

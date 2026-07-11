@@ -29,7 +29,7 @@ for (const tier of TOWER_SHIP_TIERS) {
   assert.equal(summary.oars, 24, `${tier} must preserve 24 articulated oars`);
   assert(summary.nodes > 70, `${tier} must expose a deep semantic hierarchy`);
   assert(summary.sockets >= 32, `${tier} must expose declared attachment, camera, and per-oar sockets`);
-  assert.equal(summary.colliders, 36, `${tier} must expose stable component and per-oar ColliderProxy inputs`);
+  assert.equal(summary.colliders, 36, `${tier} must expose stable component and per-oar collider construction inputs`);
   assert(ship.runtime.destructionGroups.has("hull-shell"), `${tier} needs hull destruction group`);
   assert(ship.runtime.destructionGroups.has("oar-bank"), `${tier} needs oar destruction group`);
   for (const mode of TOWER_SHIP_MODES) ship.setMode(mode);
