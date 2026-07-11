@@ -224,8 +224,30 @@ function pngDimensions(path) {
   return null;
 }
 
+function runtimeEvidencePreview(lab) {
+  const summaryPath = join(REPO_ROOT, 'docs', 'visual-validation', lab.id, 'evidence-summary.json');
+  if (!existsSync(summaryPath)) return null;
+  const summary = JSON.parse(readFileSync(summaryPath, 'utf8'));
+  if (
+    summary.schemaVersion !== 1
+    || summary.labId !== lab.id
+    || summary.classification !== 'inspected-runtime-evidence-preview'
+    || summary.acceptanceStatus !== lab.status
+    || summary.canonicalSourceHash !== lab.sourceHash
+    || summary.runtime?.isWebGPUBackend !== true
+  ) throw new Error(`Runtime evidence preview summary is invalid or stale for ${lab.id}`);
+  const image = summary.images?.find((entry) => entry.file === summary.primaryImage);
+  if (!image) throw new Error(`Runtime evidence preview has no declared primary image for ${lab.id}`);
+  return {
+    path: `visual-validation/${lab.id}/${image.file}`,
+    label: summary.primaryImageLabel,
+  };
+}
+
 function demoPreview(lab) {
+  const runtimeEvidence = runtimeEvidencePreview(lab);
   const candidates = [
+    ...(runtimeEvidence ? [runtimeEvidence] : []),
     { path: `previews/primary/${lab.id}.png`, label: 'Canonical implementation screenshot; evidence status is reported separately' },
     { path: `visual-validation/${lab.id}/final.design.png`, label: 'Published render-target evidence or explicitly classified evidence preview' },
     { path: `previews/provider/${lab.id}.png`, label: 'Live concept-proxy screenshot; not canonical evidence' },

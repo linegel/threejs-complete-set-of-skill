@@ -520,7 +520,48 @@ const providerPosterPath = (demo) => {
   const preview = providerPreviewPath(demo);
   return previewImageExists(preview) ? preview : null;
 };
+const runtimeEvidenceSummaries = new Map();
+const runtimeEvidenceSummary = (demo) => {
+  if (runtimeEvidenceSummaries.has(demo.id)) return runtimeEvidenceSummaries.get(demo.id);
+  const summaryPath = join(root, 'docs', 'visual-validation', demo.id, 'evidence-summary.json');
+  if (!existsSync(summaryPath)) {
+    runtimeEvidenceSummaries.set(demo.id, null);
+    return null;
+  }
+  const summary = JSON.parse(readFileSync(summaryPath, 'utf8'));
+  const invalid = summary.schemaVersion !== 1
+    || summary.labId !== demo.id
+    || summary.classification !== 'inspected-runtime-evidence-preview'
+    || summary.acceptanceStatus !== demo.status
+    || summary.canonicalSourceHash !== demo.sourceHash
+    || summary.runtime?.isWebGPUBackend !== true
+    || !Array.isArray(summary.images)
+    || !summary.images.some((image) => image.file === summary.primaryImage);
+  if (invalid) throw new Error(`Runtime evidence preview summary is invalid or stale for ${demo.id}`);
+  for (const image of summary.images) {
+    if (!docsImageExists(`visual-validation/${demo.id}/${image.file}`)) {
+      throw new Error(`Runtime evidence preview image is missing for ${demo.id}: ${image.file}`);
+    }
+  }
+  runtimeEvidenceSummaries.set(demo.id, summary);
+  return summary;
+};
+const runtimeEvidenceEntries = (demo) => {
+  const summary = runtimeEvidenceSummary(demo);
+  if (!summary) return [];
+  return summary.images.map((image) => ({
+    path: `visual-validation/${demo.id}/${image.file}`,
+    classification: summary.classification,
+    label: image.file === summary.primaryImage ? summary.primaryImageLabel : image.meaning,
+    detail: demo.status === 'accepted'
+      ? 'Accepted runtime evidence image from the published bundle.'
+      : 'Native render-target readback preview; lab timing and lifecycle acceptance remain pending.',
+    sourceId: demo.id,
+  }));
+};
 const directPrimaryPreview = (demo) => {
+  const runtimeEvidence = runtimeEvidenceEntries(demo);
+  if (runtimeEvidence.length > 0) return runtimeEvidence.find((entry) => entry.path.endsWith(`/${runtimeEvidenceSummary(demo).primaryImage}`));
   const screenshot = primaryPreviewPath(demo);
   if (previewImageExists(screenshot)) {
     return {
@@ -529,6 +570,7 @@ const directPrimaryPreview = (demo) => {
       label: demo.nonRenderingScenarioSuite
         ? 'Deterministic contract-lab screenshot'
         : 'Canonical implementation screenshot · runtime evidence pending',
+      detail: 'Published implementation screenshot; runtime acceptance is reported separately.',
       sourceId: demo.id,
     };
   }
@@ -538,6 +580,9 @@ const directPrimaryPreview = (demo) => {
       path: evidence,
       classification: demo.status === 'accepted' ? 'accepted-evidence' : 'evidence-preview',
       label: demo.status === 'accepted' ? 'Accepted render-target evidence' : 'Evidence preview · acceptance pending',
+      detail: demo.status === 'accepted'
+        ? 'Accepted runtime evidence image from the published bundle.'
+        : 'Runtime evidence preview; lab acceptance remains pending.',
       sourceId: demo.id,
     };
   }
@@ -1087,11 +1132,11 @@ for (const slug of slugs) {
   const previewGalleryEntries = [
     ...(resolvedSkillPreview ? [resolvedSkillPreview] : []),
     ...ownedPrimaryDemos
-      .map((demo) => directPrimaryPreview(demo))
+      .flatMap((demo) => runtimeEvidenceEntries(demo).length > 0 ? runtimeEvidenceEntries(demo) : [directPrimaryPreview(demo)])
       .filter((entry) => entry && entry.path !== resolvedSkillPreview?.path),
     ...(validation ?? [])
       .filter(([path]) => path !== resolvedSkillPreview?.path && docsImageExists(path))
-      .map(([path, label]) => ({ path, label, classification: 'generated-asset-preview', sourceId: slug })),
+      .map(([path, label]) => ({ path, label, classification: 'generated-asset-preview', detail: 'Presentation preview only; this image is not canonical runtime evidence.', sourceId: slug })),
   ];
   const skillBodyHtml = rewriteSkillBodyLinks(marked.parse(s.body)
     .replace(/<h1([^>]*)>/g, '<h2$1>')
@@ -1173,10 +1218,10 @@ for (const slug of slugs) {
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--${hasAcceptedEvidence ? 'accepted' : 'pending'}">${hasAcceptedEvidence ? 'Accepted runtime evidence available' : 'Canonical runtime evidence pending'}</span><code>${previewGalleryEntries.length} published image${previewGalleryEntries.length === 1 ? '' : 's'}</code></div>
-    ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification }) => `
+    ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification, detail }) => `
       <figure data-preview-classification="${esc(classification)}" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><img src="../${path}" alt="${esc(`${s.title} — ${label}`)}" itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
-        <figcaption itemprop="caption"><strong>${esc(label)}</strong><span>${classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'}</span></figcaption>
+        <figcaption itemprop="caption"><strong>${esc(label)}</strong><span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span></figcaption>
       </figure>`).join('')}</div>` : `<div class="preview-missing"><span>Preview capture pending</span><code>npm run pages:capture-previews</code></div>`}
   </div></div>`;
 

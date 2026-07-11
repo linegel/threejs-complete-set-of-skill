@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,12 +16,14 @@ const rootSkillsText = readFileSync(join(root, 'skills.json'), 'utf8');
 const docsSkillsText = readFileSync(join(docs, 'skills.json'), 'utf8');
 const previewManifest = JSON.parse(readFileSync(join(docs, 'previews', 'manifest.json'), 'utf8'));
 const skillManifest = JSON.parse(rootSkillsText);
+const evidencePreviewConfig = JSON.parse(readFileSync(join(root, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
 const errors = [];
 
 const assert = (condition, message) => {
   if (!condition) errors.push(message);
 };
 const relativePublishPath = (path) => path.replace(/^\/+/, '');
+const sha256 = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 
 const primary = registry.demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
 const canonical = primary.filter((demo) => demo.kind === 'canonical-lab');
@@ -105,6 +108,39 @@ for (const demo of primary) {
     visualTags.every((tag) => !tag.includes('data-preview-source=') || tag.includes(`data-preview-source="${demo.id}"`)),
     `homepage assigns unrelated preview media to ${demo.id}`,
   );
+}
+
+assert(evidencePreviewConfig.schemaVersion === 1, 'runtime evidence preview config has an unsupported schema version');
+for (const configured of evidencePreviewConfig.previews ?? []) {
+  const demo = primary.find((entry) => entry.id === configured.labId);
+  assert(Boolean(demo), `runtime evidence preview references a non-primary demo: ${configured.labId}`);
+  const summaryPath = join(docs, 'visual-validation', configured.labId, 'evidence-summary.json');
+  assert(existsSync(summaryPath), `runtime evidence preview summary is missing: ${configured.labId}`);
+  if (!demo || !existsSync(summaryPath)) continue;
+  const evidence = JSON.parse(readFileSync(summaryPath, 'utf8'));
+  assert(evidence.labId === demo.id, `runtime evidence preview lab id drift: ${configured.labId}`);
+  assert(evidence.classification === 'inspected-runtime-evidence-preview', `runtime evidence preview classification drift: ${configured.labId}`);
+  assert(evidence.acceptanceStatus === demo.status, `runtime evidence preview acceptance status drift: ${configured.labId}`);
+  assert(evidence.canonicalSourceHash === demo.sourceHash, `runtime evidence preview source hash drift: ${configured.labId}`);
+  assert(evidence.runtime?.isWebGPUBackend === true, `runtime evidence preview lacks native-WebGPU proof: ${configured.labId}`);
+  assert(Array.isArray(evidence.images) && evidence.images.length > 0, `runtime evidence preview has no images: ${configured.labId}`);
+  assert(evidence.images?.some((image) => image.file === evidence.primaryImage), `runtime evidence preview has no declared primary image: ${configured.labId}`);
+  for (const image of evidence.images ?? []) {
+    const imagePath = join(docs, 'visual-validation', configured.labId, image.file);
+    assert(existsSync(imagePath), `runtime evidence preview image is missing: ${configured.labId}/${image.file}`);
+    if (existsSync(imagePath)) {
+      assert(sha256(readFileSync(imagePath)) === image.outputSha256, `runtime evidence preview output hash drift: ${configured.labId}/${image.file}`);
+    }
+  }
+  assert(homepage.includes(`visual-validation/${configured.labId}/${evidence.primaryImage}`), `homepage does not use the reviewed primary evidence image: ${configured.labId}`);
+  assert(homepage.includes(`data-preview-classification="${evidence.classification}"`), `homepage omits runtime evidence classification: ${configured.labId}`);
+  const skillPage = readFileSync(join(docs, 'skills', `${demo.skill}.html`), 'utf8');
+  for (const image of evidence.images ?? []) {
+    assert(skillPage.includes(`visual-validation/${configured.labId}/${image.file}`), `${demo.skill} omits evidence image ${configured.labId}/${image.file}`);
+  }
+  if (demo.status !== 'accepted') {
+    assert(skillPage.includes('Native render-target readback preview; lab timing and lifecycle acceptance remain pending.'), `${demo.skill} does not disclose incomplete evidence limitations`);
+  }
 }
 
 for (const demo of flagships) {
