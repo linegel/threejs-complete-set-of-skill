@@ -1,5 +1,6 @@
 import { evaluateScenario, getScenario } from './router-core.mjs';
 import { scenarioHref } from './route-urls.mjs';
+import { runnableDemosForFixture } from './runnable-demos.mjs';
 
 const catalogUrl = new URL( './router-fixtures.json', import.meta.url );
 
@@ -95,6 +96,7 @@ function renderApp( controller, fixture, result ) {
 	const catalog = controller._catalogForRender ?? null;
 	const routes = catalog?.routes ?? window.__routerCatalog.routes;
 	const stageTotal = fixture.performance.stages.reduce( ( sum, stage ) => sum + stage.budgetMs.value, 0 );
+	const runnableDemos = runnableDemosForFixture( fixture );
 	const routeResults = new Map( routes.map( ( route ) => [ route.id, evaluateScenario( window.__routerCatalog, route.id ) ] ) );
 	const options = routes.map( ( route ) => {
 
@@ -124,6 +126,22 @@ function renderApp( controller, fixture, result ) {
 			<select id="scenario">${ options }</select>
 			<span class="status ${ result.verdict.toLowerCase() }">${ escapeHtml( result.verdict ) } · ${ escapeHtml( result.code ) }</span>
 		</div>
+		<section class="demo-launcher" aria-labelledby="demo-launcher-title">
+			<div class="demo-launcher-copy">
+				<p class="demo-launcher-kicker">Runnable WebGPU implementation</p>
+				<h2 id="demo-launcher-title">Open the primary owner’s canonical lab</h2>
+				<p>This page validates the routing decision; it does not render the workload. The primary action opens the closest runnable implementation owned by <code>${ escapeHtml( fixture.route.primaryOwner ) }</code>.</p>
+			</div>
+			<a class="run-demo-button" data-testid="run-primary-demo" href="${ escapeHtml( runnableDemos.primary.href ) }" target="_top" aria-label="Run ${ escapeHtml( runnableDemos.primary.title ) }">
+				<span>Run demo</span>
+				<strong>${ escapeHtml( runnableDemos.primary.title ) }</strong>
+				<span aria-hidden="true">↗</span>
+			</a>
+			${ runnableDemos.supporting.length > 0 ? `<nav class="supporting-demos" aria-label="Supporting system demos">
+				<span>Supporting systems</span>
+				${ runnableDemos.supporting.map( ( demo ) => `<a href="${ escapeHtml( demo.href ) }" target="_top">${ escapeHtml( demo.title ) }<span aria-hidden="true">↗</span></a>` ).join( '' ) }
+			</nav>` : '' }
+		</section>
 		<section class="grid">
 			<article class="card">
 				<h2>Selected skill plan</h2>

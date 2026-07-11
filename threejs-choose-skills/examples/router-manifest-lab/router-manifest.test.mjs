@@ -10,6 +10,7 @@ import {
 	getScenario
 } from './router-core.mjs';
 import { scenarioHref } from './route-urls.mjs';
+import { RUNNABLE_DEMOS_BY_SKILL, runnableDemosForFixture } from './runnable-demos.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 import { listSkillDirs } from '../../../scripts/lib/lab-registry.mjs';
 
@@ -17,6 +18,7 @@ const here = dirname( fileURLToPath( import.meta.url ) );
 const catalog = JSON.parse( await readFile( join( here, 'router-fixtures.json' ), 'utf8' ) );
 const manifest = JSON.parse( await readFile( join( here, 'lab.manifest.json' ), 'utf8' ) );
 const appSource = await readFile( join( here, 'app.mjs' ), 'utf8' );
+const registry = JSON.parse( await readFile( join( here, '../../../docs/demos/registry.json' ), 'utf8' ) );
 
 const expectedIds = [
 	'ocean-planet',
@@ -63,6 +65,21 @@ assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).e
 assert.match( appSource, /fetch\( catalogUrl \)/, 'browser UI must consume the same fixture JSON as tests' );
 assert.match( appSource, /evaluateScenario/, 'browser UI must execute the tested router core' );
 assert.match( appSource, /window\.labController = controllerPromise/, 'route wrappers need an awaitable controller during top-level initialization' );
+assert.match( appSource, /data-testid="run-primary-demo"/, 'every scenario needs an obvious primary demo action' );
+assert.match( appSource, /target="_top"/, 'demo actions must escape the published scenario iframe' );
+assert.deepEqual( Object.keys( RUNNABLE_DEMOS_BY_SKILL ).sort(), catalog.skillInventory, 'every skill needs one explicit runnable-demo mapping' );
+
+const demosById = new Map( registry.demos.map( ( demo ) => [ demo.id, demo ] ) );
+for ( const [ skillId, target ] of Object.entries( RUNNABLE_DEMOS_BY_SKILL ) ) {
+
+	const demo = demosById.get( target.id );
+	assert.ok( demo, `${ skillId } targets an unknown published demo: ${ target.id }` );
+	assert.equal( demo.skill, skillId );
+	assert.equal( demo.publishPath, target.href );
+	assert.ok( demo.browserEntry, `${ target.id } has no browser entry` );
+	await access( join( here, '../../../docs', target.href, 'index.html' ) );
+
+}
 assert.equal(
 	scenarioHref( 'ocean-planet', 'https://threejs-skills.com/demos/router-manifest-lab/' ),
 	'https://threejs-skills.com/demos/router-manifest-lab/scenario/ocean-planet/'
@@ -98,8 +115,19 @@ for ( const id of expectedIds ) {
 	assert.equal( result.verdict, fixture.expected.verdict, `${ id } verdict drift` );
 	assert.equal( result.code, fixture.expected.code, `${ id } reason drift` );
 	await access( join( here, 'scenario', id, 'index.html' ) );
+	const runnable = runnableDemosForFixture( fixture );
+	assert.equal( runnable.primary.skillId, fixture.route.primaryOwner, `${ id } primary demo must follow the primary owner` );
+	assert.notEqual( runnable.primary.id, 'router-manifest-lab', `${ id } must leave the routing lab` );
 
 }
+
+const oceanFaunaDemos = runnableDemosForFixture( getScenario( catalog, 'ocean-fauna' ) );
+assert.deepEqual(
+	{ id: oceanFaunaDemos.primary.id, href: oceanFaunaDemos.primary.href },
+	{ id: 'webgpu-procedural-creature-lab', href: '/demos/webgpu-procedural-creature-lab/' }
+);
+assert.ok( oceanFaunaDemos.supporting.some( ( demo ) => demo.id === 'webgpu-fft-ocean' ) );
+assert.ok( oceanFaunaDemos.supporting.some( ( demo ) => demo.id === 'webgpu-bounded-water' ) );
 
 const accepted = expectedIds.filter( ( id ) => evaluateScenario( catalog, id ).verdict === 'PASS' );
 assert.deepEqual( accepted, [
