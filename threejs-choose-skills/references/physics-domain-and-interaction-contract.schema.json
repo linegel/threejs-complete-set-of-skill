@@ -96,6 +96,7 @@
         "PhysicsCatchUpCostWitness",
         "PhysicsComposedCostGateSet",
         "PhysicsComposedCostTrace",
+        "PhysicsContactCost",
         "PhysicsCostAttribution",
         "PhysicsCostHarness",
         "PhysicsCostLedger",
@@ -108,6 +109,7 @@
         "PhysicsDependencyRef",
         "PhysicsDuration",
         "PhysicsErrorDescriptor",
+        "PhysicsExternalAdapterCost",
         "PhysicsExecutionLedger",
         "PhysicsFilterDescriptor",
         "PhysicsFrameDescriptor",
@@ -140,6 +142,7 @@
         "PhysicsSampleRequest",
         "PhysicsSampleResponseEnvelope",
         "PhysicsSignalDescriptor",
+        "PhysicsSparseActiveDomainCost",
         "PhysicsStageExecution",
         "PhysicsStageExecutionRule",
         "PhysicsStageRead",
@@ -2807,6 +2810,27 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": { "recordType": { "const": "PhysicsContactCost" } },
+        "required": [ "recordType" ]
+      },
+      "then": { "properties": { "value": { "$ref": "#/$defs/PhysicsContactCost" } } }
+    },
+    {
+      "if": {
+        "properties": { "recordType": { "const": "PhysicsExternalAdapterCost" } },
+        "required": [ "recordType" ]
+      },
+      "then": { "properties": { "value": { "$ref": "#/$defs/PhysicsExternalAdapterCost" } } }
+    },
+    {
+      "if": {
+        "properties": { "recordType": { "const": "PhysicsSparseActiveDomainCost" } },
+        "required": [ "recordType" ]
+      },
+      "then": { "properties": { "value": { "$ref": "#/$defs/PhysicsSparseActiveDomainCost" } } }
     },
     {
       "if": {
@@ -12963,6 +12987,9 @@
         "worstPermittedCatchUpCost",
         "hotBytesReadWrittenPerExecution",
         "solverDispatches",
+        "sparseActiveDomainCosts",
+        "contactCosts",
+        "externalAdapterCosts",
         "queueSubmissionsAndPassBreaks",
         "dependencyCriticalPaths",
         "tileGpuTraffic",
@@ -13058,6 +13085,18 @@
         },
         "solverDispatches": {
           "$ref": "#/$defs/AnyAbiValue"
+        },
+        "sparseActiveDomainCosts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PhysicsSparseActiveDomainCost" }
+        },
+        "contactCosts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PhysicsContactCost" }
+        },
+        "externalAdapterCosts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PhysicsExternalAdapterCost" }
         },
         "queueSubmissionsAndPassBreaks": {
           "$ref": "#/$defs/AnyAbiValue"
@@ -16723,6 +16762,7 @@
       "required": [
         "qualityStateAndEpoch",
         "graphAndResourceRevisionDigest",
+        "evidenceResourceDigest",
         "harnessId",
         "gateSetId",
         "steadyCostLedgerId",
@@ -16735,6 +16775,7 @@
       "properties": {
         "qualityStateAndEpoch": { "$ref": "#/$defs/AnyAbiValue" },
         "graphAndResourceRevisionDigest": { "$ref": "#/$defs/Id" },
+        "evidenceResourceDigest": { "$ref": "#/$defs/Id" },
         "harnessId": { "$ref": "#/$defs/Id" },
         "gateSetId": { "$ref": "#/$defs/Id" },
         "steadyCostLedgerId": { "$ref": "#/$defs/Id" },
@@ -16779,6 +16820,94 @@
         "conservationConstraintAndVisualErrorResults": { "type": "array", "items": { "$ref": "#/$defs/AnyAbiValue" }, "minItems": 1 },
         "composedGateResultsDuringTransition": { "$ref": "#/$defs/AnyAbiValue" },
         "status": { "enum": [ "accepted", "rejected", "insufficient-evidence" ] }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsSparseActiveDomainCost": {
+      "type": "object",
+      "required": [
+        "sparseCostId",
+        "ownerAndStateEquationIds",
+        "algorithmAndRevision",
+        "measurementIntervalAndOpportunityTableId",
+        "representedDomain",
+        "activationPipeline",
+        "lifecycle",
+        "catchUpAndMigrationWitnessRefs",
+        "gateResults"
+      ],
+      "properties": {
+        "sparseCostId": { "$ref": "#/$defs/Id" },
+        "ownerAndStateEquationIds": { "$ref": "#/$defs/AnyAbiValue" },
+        "algorithmAndRevision": { "$ref": "#/$defs/Id" },
+        "measurementIntervalAndOpportunityTableId": { "$ref": "#/$defs/AnyAbiValue" },
+        "representedDomain": { "$ref": "#/$defs/AnyAbiValue" },
+        "activationPipeline": { "$ref": "#/$defs/AnyAbiValue" },
+        "lifecycle": { "$ref": "#/$defs/AnyAbiValue" },
+        "catchUpAndMigrationWitnessRefs": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "minItems": 1, "uniqueItems": true },
+        "gateResults": { "$ref": "#/$defs/AnyAbiValue" }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsContactCost": {
+      "type": "object",
+      "required": [
+        "contactCostId",
+        "contactOwnerSolverAndRevision",
+        "measurementIntervalAndOpportunityTableId",
+        "bodyShapeAndProxyPopulation",
+        "broadphase",
+        "narrowphase",
+        "solve",
+        "lifecycleEventsAndReactionApplications",
+        "stressFixtureRefs",
+        "gateResults"
+      ],
+      "properties": {
+        "contactCostId": { "$ref": "#/$defs/Id" },
+        "contactOwnerSolverAndRevision": { "$ref": "#/$defs/AnyAbiValue" },
+        "measurementIntervalAndOpportunityTableId": { "$ref": "#/$defs/AnyAbiValue" },
+        "bodyShapeAndProxyPopulation": { "$ref": "#/$defs/AnyAbiValue" },
+        "broadphase": { "$ref": "#/$defs/AnyAbiValue" },
+        "narrowphase": { "$ref": "#/$defs/AnyAbiValue" },
+        "solve": { "$ref": "#/$defs/AnyAbiValue" },
+        "lifecycleEventsAndReactionApplications": { "$ref": "#/$defs/AnyAbiValue" },
+        "stressFixtureRefs": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "minItems": 4, "uniqueItems": true },
+        "gateResults": { "$ref": "#/$defs/AnyAbiValue" }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsExternalAdapterCost": {
+      "type": "object",
+      "required": [
+        "externalCostId",
+        "adapterIdVersionProcessAndDevice",
+        "measurementIntervalAndOpportunityTableId",
+        "requestResponseAndBatchCounts",
+        "ingressEgressLogicalAndPhysicalBytes",
+        "serializationDeserializationAndConversion",
+        "transport",
+        "remoteSolveAndCommit",
+        "retriesTimeoutsDuplicatesDropsAndExactOnceResults",
+        "inFlightStagingSharedAndRecoveryBytes",
+        "clockMappingSamplingAndStalenessCost",
+        "catchUpMigrationProcessFailureAndDeviceLossWitnessRefs",
+        "gateResults"
+      ],
+      "properties": {
+        "externalCostId": { "$ref": "#/$defs/Id" },
+        "adapterIdVersionProcessAndDevice": { "$ref": "#/$defs/AnyAbiValue" },
+        "measurementIntervalAndOpportunityTableId": { "$ref": "#/$defs/AnyAbiValue" },
+        "requestResponseAndBatchCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "ingressEgressLogicalAndPhysicalBytes": { "$ref": "#/$defs/AnyAbiValue" },
+        "serializationDeserializationAndConversion": { "$ref": "#/$defs/AnyAbiValue" },
+        "transport": { "$ref": "#/$defs/AnyAbiValue" },
+        "remoteSolveAndCommit": { "$ref": "#/$defs/AnyAbiValue" },
+        "retriesTimeoutsDuplicatesDropsAndExactOnceResults": { "$ref": "#/$defs/AnyAbiValue" },
+        "inFlightStagingSharedAndRecoveryBytes": { "$ref": "#/$defs/AnyAbiValue" },
+        "clockMappingSamplingAndStalenessCost": { "$ref": "#/$defs/AnyAbiValue" },
+        "catchUpMigrationProcessFailureAndDeviceLossWitnessRefs": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "minItems": 4, "uniqueItems": true },
+        "gateResults": { "$ref": "#/$defs/AnyAbiValue" }
       },
       "additionalProperties": false
     },
@@ -21525,6 +21654,9 @@
         "worstPermittedCatchUpCost",
         "hotBytesReadWrittenPerExecution",
         "solverDispatches",
+        "sparseActiveDomainCosts",
+        "contactCosts",
+        "externalAdapterCosts",
         "queueSubmissionsAndPassBreaks",
         "dependencyCriticalPaths",
         "tileGpuTraffic",
@@ -21658,6 +21790,7 @@
       "required": [
         "qualityStateAndEpoch",
         "graphAndResourceRevisionDigest",
+        "evidenceResourceDigest",
         "harnessId",
         "gateSetId",
         "steadyCostLedgerId",
@@ -21684,6 +21817,50 @@
         "conservationConstraintAndVisualErrorResults",
         "composedGateResultsDuringTransition",
         "status"
+      ]
+    },
+    "PhysicsSparseActiveDomainCost": {
+      "required": [
+        "sparseCostId",
+        "ownerAndStateEquationIds",
+        "algorithmAndRevision",
+        "measurementIntervalAndOpportunityTableId",
+        "representedDomain",
+        "activationPipeline",
+        "lifecycle",
+        "catchUpAndMigrationWitnessRefs",
+        "gateResults"
+      ]
+    },
+    "PhysicsContactCost": {
+      "required": [
+        "contactCostId",
+        "contactOwnerSolverAndRevision",
+        "measurementIntervalAndOpportunityTableId",
+        "bodyShapeAndProxyPopulation",
+        "broadphase",
+        "narrowphase",
+        "solve",
+        "lifecycleEventsAndReactionApplications",
+        "stressFixtureRefs",
+        "gateResults"
+      ]
+    },
+    "PhysicsExternalAdapterCost": {
+      "required": [
+        "externalCostId",
+        "adapterIdVersionProcessAndDevice",
+        "measurementIntervalAndOpportunityTableId",
+        "requestResponseAndBatchCounts",
+        "ingressEgressLogicalAndPhysicalBytes",
+        "serializationDeserializationAndConversion",
+        "transport",
+        "remoteSolveAndCommit",
+        "retriesTimeoutsDuplicatesDropsAndExactOnceResults",
+        "inFlightStagingSharedAndRecoveryBytes",
+        "clockMappingSamplingAndStalenessCost",
+        "catchUpMigrationProcessFailureAndDeviceLossWitnessRefs",
+        "gateResults"
       ]
     },
     "MassInventory": {
@@ -23323,10 +23500,31 @@
           "frontier-missing-objective",
           "catchup-policy-mismatch",
           "stale-harness-digest",
+          "opaque-quality-cost-resource",
+          "quality-epoch-evidence-reuse",
           "migration-evidence-omitted"
         ]
       },
       "contractLines": "3565-3996"
+    },
+    {
+      "id": "PHY-WORKLOAD-SHAPE-COST-003",
+      "appliesTo": [
+        "PhysicsCostLedger",
+        "PhysicsSparseActiveDomainCost",
+        "PhysicsContactCost",
+        "PhysicsExternalAdapterCost"
+      ],
+      "validator": "validateWorkloadShapeCosts",
+      "fixtures": {
+        "accept": [ "sparse-contact-external-cost-closure" ],
+        "reject": [
+          "sparse-compaction-omitted",
+          "contact-pileup-stress-omitted",
+          "external-transport-tail-omitted"
+        ]
+      },
+      "contractLines": "3789-4015"
     },
     {
       "id": "PHY-REGISTRY-AUTHORITY-001",

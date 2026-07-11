@@ -740,6 +740,7 @@ function assertInlineNumericEvidenceObject( value, label ) {
 let physicsAbiSchema;
 const clockMappingResourceFixtures = new Map();
 const costOpportunityTableResourceFixtures = new Map();
+const qualityCostEvidenceResourceFixtures = new Map();
 
 function abiRecord( name ) {
 
@@ -4354,6 +4355,42 @@ function validateCanonicalComposedCostEvidence( ledger, graph, context, route ) 
 		const state = route.physicsQualityStates[ ref.qualityStateAndEpoch.qualityStateId ];
 		assert.equal( ref.qualityStateAndEpoch.qualityEpoch, state.qualityEpoch, `quality cost evidence ${ state.qualityStateId } epoch mismatch` );
 		assert.equal( ref.status, 'accepted', `quality cost evidence ${ state.qualityStateId } is not accepted` );
+		const resource = qualityCostEvidenceResourceFixtures.get( ref.evidenceResourceDigest );
+		assert.ok( resource, `quality cost evidence ${ state.qualityStateId } references an opaque resource` );
+		assert.equal( ref.evidenceResourceDigest, sha256Canonical( resource ), `quality cost evidence ${ state.qualityStateId } resource digest mismatch` );
+		assert.deepEqual( resource.qualityStateAndEpoch, ref.qualityStateAndEpoch, `quality cost evidence ${ state.qualityStateId } resource reuses another quality epoch` );
+		assert.equal( resource.graphAndResourceRevisionDigest, ref.graphAndResourceRevisionDigest, `quality cost evidence ${ state.qualityStateId } graph/resource digest mismatch` );
+		const resourceHarness = requireAbiRecord( resource.harness, 'PhysicsCostHarness', `quality cost resource ${ state.qualityStateId }.harness` );
+		const resourceGates = requireAbiRecord( resource.gateSet, 'PhysicsComposedCostGateSet', `quality cost resource ${ state.qualityStateId }.gateSet` );
+		const resourceTable = requireAbiRecord( resource.opportunityTable, 'PhysicsCostOpportunityTable', `quality cost resource ${ state.qualityStateId }.opportunityTable` );
+		const resourceTotals = requireAbiRecord( resource.cadenceTraceTotals, 'CadenceTraceTotals', `quality cost resource ${ state.qualityStateId }.cadenceTraceTotals` );
+		const resourceTrace = requireAbiRecord( resource.composedTrace, 'PhysicsComposedCostTrace', `quality cost resource ${ state.qualityStateId }.composedTrace` );
+		const resourceCatchUp = requireAbiRecord( resource.worstPermittedCatchUpCost, 'PhysicsWorstPermittedCatchUpCost', `quality cost resource ${ state.qualityStateId }.worstPermittedCatchUpCost` );
+		assert.equal( resourceHarness.harnessDigest, sha256CanonicalExcluding( resourceHarness, [ 'harnessDigest' ] ), `quality cost evidence ${ state.qualityStateId } harness digest mismatch` );
+		assert.deepEqual( resourceHarness.workload.qualityStateAndEpoch, ref.qualityStateAndEpoch, `quality cost evidence ${ state.qualityStateId } harness epoch mismatch` );
+		assert.deepEqual( resourceGates.qualityStateAndEpoch, ref.qualityStateAndEpoch, `quality cost evidence ${ state.qualityStateId } gate epoch mismatch` );
+		assert.deepEqual( [ resourceGates.harnessId, resourceTable.harnessId ], [ resourceHarness.harnessId, resourceHarness.harnessId ], `quality cost evidence ${ state.qualityStateId } harness closure mismatch` );
+		assert.equal( resourceTable.tableDigest, sha256CanonicalExcluding( resourceTable, [ 'tableDigest' ] ), `quality cost evidence ${ state.qualityStateId } opportunity-table digest mismatch` );
+		const resourceRows = costOpportunityTableResourceFixtures.get( resourceTable.resource.contentDigest );
+		assert.ok( resourceRows, `quality cost evidence ${ state.qualityStateId } opportunity rows are opaque` );
+		assert.equal( resourceTable.resource.contentDigest, sha256Canonical( resourceRows ), `quality cost evidence ${ state.qualityStateId } opportunity-row digest mismatch` );
+		assert.ok( resourceRows.runs.every( ( run ) => JSON.stringify( run.pattern.qualityStateAndEpoch ) === JSON.stringify( ref.qualityStateAndEpoch ) ), `quality cost evidence ${ state.qualityStateId } opportunity rows reuse another quality epoch` );
+		assert.equal( resourceTotals.exactTotalsDigest, sha256CanonicalExcluding( resourceTotals, [ 'exactTotalsDigest' ] ), `quality cost evidence ${ state.qualityStateId } cadence digest mismatch` );
+		assert.deepEqual( [ resourceTrace.harnessId, resourceTrace.gateSetId, resourceTrace.opportunityTableId, resourceTrace.cadenceTraceTotalsId ], [ resourceHarness.harnessId, resourceGates.gateSetId, resourceTable.opportunityTableId, resourceTotals.traceTotalsId ], `quality cost evidence ${ state.qualityStateId } composed-trace closure mismatch` );
+		assert.equal( resourceTrace.status, 'measured-valid', `quality cost evidence ${ state.qualityStateId } composed trace is not measured-valid` );
+		assert.deepEqual( [ resourceCatchUp.harnessId, resourceCatchUp.gateSetId ], [ resourceHarness.harnessId, resourceGates.gateSetId ], `quality cost evidence ${ state.qualityStateId } catch-up closure mismatch` );
+		assert.equal( resourceCatchUp.requiredDisposition, 'admit', `quality cost evidence ${ state.qualityStateId } catch-up envelope is not admitted` );
+		for ( const witness of resourceCatchUp.frontierWitnesses ) {
+
+			assert.deepEqual( witness.opportunityRow.qualityStateAndEpoch, ref.qualityStateAndEpoch, `quality cost evidence ${ state.qualityStateId } catch-up witness reuses another quality epoch` );
+			assert.equal( witness.opportunityRow.rowDigest, sha256CanonicalExcluding( witness.opportunityRow, [ 'rowDigest' ] ), `quality cost evidence ${ state.qualityStateId } catch-up row digest mismatch` );
+			assert.equal( witness.witnessDigest, sha256CanonicalExcluding( witness, [ 'witnessDigest' ] ), `quality cost evidence ${ state.qualityStateId } catch-up witness digest mismatch` );
+
+		}
+		const steady = resource.steadyCostLedger;
+		assert.equal( steady.recordDigest, sha256CanonicalExcluding( steady, [ 'recordDigest' ] ), `quality cost evidence ${ state.qualityStateId } steady-ledger digest mismatch` );
+		assert.deepEqual( [ steady.qualityStateAndEpoch, steady.graphAndResourceRevisionDigest ], [ ref.qualityStateAndEpoch, ref.graphAndResourceRevisionDigest ], `quality cost evidence ${ state.qualityStateId } steady-ledger identity mismatch` );
+		assert.deepEqual( [ ref.harnessId, ref.gateSetId, ref.steadyCostLedgerId, ref.composedTraceId, ref.worstPermittedCatchUpCostId ], [ resourceHarness.harnessId, resourceGates.gateSetId, steady.steadyCostLedgerId, resourceTrace.composedTraceId, resourceCatchUp.catchUpCostId ], `quality cost evidence ${ state.qualityStateId } references do not close to its resource` );
 		if ( state.qualityStateId === ledger.qualityState ) assert.deepEqual( [ ref.harnessId, ref.gateSetId, ref.steadyCostLedgerId, ref.composedTraceId, ref.worstPermittedCatchUpCostId ], [ harness.harnessId, gateSet.gateSetId, ledger.ledgerId, trace.composedTraceId, catchUp.catchUpCostId ], 'active quality cost evidence does not close to active records' );
 
 	}
@@ -4387,6 +4424,59 @@ function validateCanonicalComposedCostEvidence( ledger, graph, context, route ) 
 	for ( const ref of qualityRefs ) for ( const id of [ ...ref.incomingMigrationCostEvidenceIds, ...ref.outgoingMigrationCostEvidenceIds ] ) assert.ok( evidenceById.has( id ), `quality cost evidence references missing migration ${ id}` );
 	const allReferencedMigrationIds = new Set( qualityRefs.flatMap( ( ref ) => [ ...ref.incomingMigrationCostEvidenceIds, ...ref.outgoingMigrationCostEvidenceIds ] ) );
 	assert.deepEqual( [ ...allReferencedMigrationIds ].sort(), [ ...evidenceById.keys() ].sort(), 'quality cost evidence omits or invents migration references' );
+	return true;
+
+}
+
+function validateCanonicalWorkloadShapeCosts( ledger, route ) {
+
+	assert.ok( ledger.sparseActiveDomainCosts.length > 0, 'physical sparse route has no sparse active-domain cost record' );
+	assert.ok( ledger.contactCosts.length > 0, 'physical contact route has no contact cost record' );
+	assert.deepEqual( ledger.externalAdapterCosts.map( ( cost ) => cost.adapterIdVersionProcessAndDevice.adapterId ).sort(), Object.keys( route.physicsExternalSolverAdaptersById ).sort(), 'external adapter cost inventory closure mismatch' );
+	for ( const [ index, cost ] of ledger.sparseActiveDomainCosts.entries() ) {
+
+		requireAbiRecord( cost, 'PhysicsSparseActiveDomainCost', `physicsCostLedger.sparseActiveDomainCosts[${ index }]` );
+		assert.equal( cost.measurementIntervalAndOpportunityTableId.opportunityTableId, ledger.opportunityTable.opportunityTableId, `sparse cost ${ cost.sparseCostId } opportunity table mismatch` );
+		assert.deepEqual( Object.keys( cost.activationPipeline ).sort(), [ 'allocationGrowthAndIndirectArguments', 'detectionClassification', 'haloBoundaryAndNeighborRebuild', 'prefixScanSortOrCompaction', 'solverWorkOverActiveAndHaloSets' ], `sparse cost ${ cost.sparseCostId } activation pipeline closure mismatch` );
+		const eligible = quantityValue( cost.representedDomain.totalEligibleElements, `${ cost.sparseCostId }.eligible` );
+		const activeP95 = quantityValue( cost.representedDomain.activeCoreElements.p95, `${ cost.sparseCostId }.activeP95` );
+		const capacity = quantityValue( cost.representedDomain.allocatedCapacityAndHighWater.capacity, `${ cost.sparseCostId }.capacity` );
+		const highWater = quantityValue( cost.representedDomain.allocatedCapacityAndHighWater.highWater, `${ cost.sparseCostId }.highWater` );
+		assert.ok( activeP95 <= highWater && highWater <= capacity && capacity <= eligible, `sparse cost ${ cost.sparseCostId } active/high-water/capacity/domain ordering fails` );
+		assert.ok( [ 'grow', 'backpressure', 'conservative-merge', 'fail-visible' ].includes( cost.lifecycle.overflowDisposition ), `sparse cost ${ cost.sparseCostId } hides overflow disposition` );
+		assert.ok( cost.lifecycle.inactiveRegionModelAndErrorGate.model && cost.lifecycle.inactiveRegionModelAndErrorGate.maximumDepthError, `sparse cost ${ cost.sparseCostId } lacks inactive-region model/error gate` );
+		assert.ok( cost.catchUpAndMigrationWitnessRefs.includes( ledger.worstPermittedCatchUpCost.catchUpCostId ), `sparse cost ${ cost.sparseCostId } omits catch-up witness` );
+		assert.ok( Object.values( cost.gateResults ).every( ( result ) => result === 'pass' ), `sparse cost ${ cost.sparseCostId } contains failed gates` );
+
+	}
+	for ( const [ index, cost ] of ledger.contactCosts.entries() ) {
+
+		requireAbiRecord( cost, 'PhysicsContactCost', `physicsCostLedger.contactCosts[${ index }]` );
+		assert.equal( cost.measurementIntervalAndOpportunityTableId.opportunityTableId, ledger.opportunityTable.opportunityTableId, `contact cost ${ cost.contactCostId } opportunity table mismatch` );
+		const candidates = quantityValue( cost.broadphase.candidatePairsAndPairBytes.p95, `${ cost.contactCostId }.candidatePairs` );
+		const contacts = quantityValue( cost.narrowphase.generatedContactsAndRejectedPairs.contactsP95, `${ cost.contactCostId }.contacts` );
+		const manifolds = quantityValue( cost.narrowphase.manifoldCountPointCountAndFeatureRemaps.manifoldsP95, `${ cost.contactCostId }.manifolds` );
+		const points = quantityValue( cost.narrowphase.manifoldCountPointCountAndFeatureRemaps.pointsP95, `${ cost.contactCostId }.points` );
+		assert.ok( manifolds <= contacts && contacts <= candidates && points >= manifolds, `contact cost ${ cost.contactCostId } pair/contact/manifold ordering fails` );
+		const stressText = cost.stressFixtureRefs.join( ' ' );
+		for ( const required of [ /pileup/i, /high-speed/i, /topology|proxy-change/i, /migration/i ] ) assert.match( stressText, required, `contact cost ${ cost.contactCostId } omits required stress fixture` );
+		assert.ok( cost.solve.warmStartHitsMissesInvalidationsAndCacheBytes.cacheBytes, `contact cost ${ cost.contactCostId } omits warm-start cache bytes` );
+		assert.ok( Object.values( cost.gateResults ).every( ( result ) => result === 'pass' ), `contact cost ${ cost.contactCostId } contains failed gates` );
+
+	}
+	for ( const [ index, cost ] of ledger.externalAdapterCosts.entries() ) {
+
+		requireAbiRecord( cost, 'PhysicsExternalAdapterCost', `physicsCostLedger.externalAdapterCosts[${ index }]` );
+		assert.equal( cost.measurementIntervalAndOpportunityTableId.opportunityTableId, ledger.opportunityTable.opportunityTableId, `external cost ${ cost.externalCostId } opportunity table mismatch` );
+		assert.ok( route.physicsExternalSolverAdaptersById[ cost.adapterIdVersionProcessAndDevice.adapterId ], `external cost ${ cost.externalCostId } references unknown adapter` );
+		assert.deepEqual( Object.keys( cost.transport ).sort(), [ 'enqueueQueueWaitTransportAndRemoteWait', 'kind', 'ownershipTransitionsFencesMapsAndCacheEffects' ], `external cost ${ cost.externalCostId } transport closure mismatch` );
+		for ( const key of [ 'enqueueP95', 'queueWaitP95', 'transportP95', 'remoteWaitP95' ] ) assert.ok( cost.transport.enqueueQueueWaitTransportAndRemoteWait[ key ], `external cost ${ cost.externalCostId } omits ${ key }` );
+		assert.ok( cost.remoteSolveAndCommit.commitPublicationTail, `external cost ${ cost.externalCostId } omits commit-publication tail` );
+		const witnessText = cost.catchUpMigrationProcessFailureAndDeviceLossWitnessRefs.join( ' ' );
+		for ( const required of [ /catch-up/i, /migration/i, /process-failure/i, /device-loss/i ] ) assert.match( witnessText, required, `external cost ${ cost.externalCostId } omits required failure/catch-up witness` );
+		assert.ok( Object.values( cost.gateResults ).every( ( result ) => result === 'pass' ), `external cost ${ cost.externalCostId } contains failed gates` );
+
+	}
 	return true;
 
 }
@@ -4824,6 +4914,8 @@ function validatePhysicalRouteManifest( route ) {
 	validateCanonicalExecution( route.frameExecutionRecord, route, presentation );
 	markPhase( 'presentation' );
 	validateCanonicalCostLedger( route.physicsCostLedger, route.physicsGraph, route.physicsContext, route );
+	validateCanonicalComposedCostEvidence( route.physicsCostLedger, route.physicsGraph, route.physicsContext, route );
+	if ( [ route.physicsCostLedger.sparseActiveDomainCosts, route.physicsCostLedger.contactCosts, route.physicsCostLedger.externalAdapterCosts ].some( ( records ) => records.length > 0 ) ) validateCanonicalWorkloadShapeCosts( route.physicsCostLedger, route );
 	markPhase( 'cost' );
 	validateQualityInventories( route );
 	markPhase( 'quality' );
@@ -5038,6 +5130,13 @@ function validateComposedCostEnvelope( fixture ) {
 
 	validateCanonicalCostLedger( fixture.route.physicsCostLedger, fixture.route.physicsGraph, fixture.route.physicsContext, fixture.route );
 	return validateCanonicalComposedCostEvidence( fixture.route.physicsCostLedger, fixture.route.physicsGraph, fixture.route.physicsContext, fixture.route );
+
+}
+
+function validateWorkloadShapeCosts( fixture ) {
+
+	validateCanonicalCostLedger( fixture.route.physicsCostLedger, fixture.route.physicsGraph, fixture.route.physicsContext, fixture.route );
+	return validateCanonicalWorkloadShapeCosts( fixture.route.physicsCostLedger, fixture.route );
 
 }
 
@@ -5999,6 +6098,7 @@ function attachCanonicalCostLedger( route ) {
 		worstPermittedCatchUpCost,
 		hotBytesReadWrittenPerExecution: Object.fromEntries( stages.map( ( stage ) => [ stage.stageId, { read: evidence( 262144, 'byte', 'Derived', 'resource-layout' ), written: evidence( 131072, 'byte', 'Derived', 'resource-layout' ) } ] ) ),
 		solverDispatches: stages.map( ( stage ) => ( { stageId: stage.stageId, owner: stage.owner, cadence: evidence( executionCountPerInterval[ stage.stageId ] * exactIntervals / exactDurationSeconds, 'dispatch-per-second', 'Measured', 'mobile-sustained-trace' ), occurrenceCount: clone( stageExecutionCounts[ stage.stageId ] ) } ) ),
+		sparseActiveDomainCosts: [], contactCosts: [], externalAdapterCosts: [],
 		queueSubmissionsAndPassBreaks: { submissions: evidence( 1, 'submission-per-frame', 'Measured', 'mobile-sustained-trace' ), breaks: evidence( 2, 'break-per-frame', 'Measured', 'mobile-sustained-trace' ) },
 		dependencyCriticalPaths: [ { path: 'water-solve-to-atomic-commit', p95: evidence( 2.4, 'millisecond', 'Measured', 'mobile-sustained-trace' ) } ],
 		tileGpuTraffic: { attachmentStoreLoadResolveBytes: { p95: evidence( 12582912, 'byte-per-frame', 'Measured', 'tile-counters' ) }, tileSpillEvidence: 'no spill observed', renderComputePassBreaks: { p95: evidence( 2, 'break-per-frame', 'Measured', 'mobile-sustained-trace' ) } },
@@ -6009,6 +6109,101 @@ function attachCanonicalCostLedger( route ) {
 		workAttribution, sharedWorkKeys: [ sharedWorkKey ], perViewWorkKeys, hotState, peakTransient, migrationOverlap, qualityCostEvidence: [], qualityMigrationCostEvidence: [],
 		multiviewAndFramesInFlightMultipliers: { viewCount: evidence( 2, 'view', 'Measured', 'fixture-route' ), framesInFlight: evidence( 2, 'frame', 'Measured', 'backend-trace' ), resourceMultiplier: evidence( 1.4, 'ratio', 'Derived', 'resource-ledger' ), workMultiplier: evidence( 1.25, 'ratio', 'Measured', 'mobile-sustained-trace' ) }, thermalPowerState: { state: 'sustained nominal', duration: evidence( 300, 'second', 'Measured', 'mobile-sustained-trace' ) }
 	};
+
+}
+
+function createQualityCostEvidenceResource( route, state ) {
+
+	const ledger = route.physicsCostLedger;
+	const identity = { qualityStateId: state.qualityStateId, qualityEpoch: state.qualityEpoch };
+	const suffix = state.qualityStateId;
+	const active = state.qualityStateId === ledger.qualityState && state.qualityEpoch === ledger.qualityEpoch;
+	const graphAndResourceRevisionDigest = sha256Canonical( {
+		graphRevision: ledger.graphRevision,
+		stateResourceCosts: state.hotTransientTrafficAndSynchronizationCosts,
+		qualityEpoch: state.qualityEpoch
+	} );
+	const harness = clone( ledger.harness );
+	const gateSet = clone( ledger.composedGateSet );
+	const opportunityTable = clone( ledger.opportunityTable );
+	const cadenceTraceTotals = clone( ledger.cadenceTraceTotals );
+	const composedTrace = clone( ledger.composedTrace );
+	const catchUp = clone( ledger.worstPermittedCatchUpCost );
+
+	if ( active === false ) {
+
+		harness.harnessId = `harness-${ suffix }`;
+		harness.workload.qualityStateAndEpoch = clone( identity );
+		harness.workload.resourceAndPipelineGraphDigest = graphAndResourceRevisionDigest;
+		harness.harnessDigest = sha256CanonicalExcluding( harness, [ 'harnessDigest' ] );
+		gateSet.gateSetId = `gate-set-${ suffix }`;
+		gateSet.harnessId = harness.harnessId;
+		gateSet.qualityStateAndEpoch = clone( identity );
+		gateSet.frozenBeforeTraceDigest = sha256Canonical( { qualityStateAndEpoch: identity, gates: gateSet } );
+		opportunityTable.opportunityTableId = `opportunity-table-${ suffix }`;
+		opportunityTable.harnessId = harness.harnessId;
+		const opportunityPayload = clone( costOpportunityTableResourceFixtures.get( ledger.opportunityTable.resource.contentDigest ) );
+		assert.ok( opportunityPayload, `active opportunity resource is unavailable while building ${ suffix } quality evidence` );
+		for ( const run of opportunityPayload.runs ) run.pattern.qualityStateAndEpoch = clone( identity );
+		const opportunityDigest = sha256Canonical( opportunityPayload );
+		costOpportunityTableResourceFixtures.set( opportunityDigest, opportunityPayload );
+		opportunityTable.resource.contentDigest = opportunityDigest;
+		opportunityTable.resource.canonicalByteLayout = opportunityPayload.layout;
+		opportunityTable.resource.orderedRowDigestRoot = sha256Canonical( opportunityPayload.runs );
+		opportunityTable.tableDigest = sha256CanonicalExcluding( opportunityTable, [ 'tableDigest' ] );
+		cadenceTraceTotals.traceTotalsId = `trace-totals-${ suffix }`;
+		cadenceTraceTotals.traceRef = `sha256:contract-fixture-trace-${ suffix }`;
+		cadenceTraceTotals.exactTotalsDigest = sha256CanonicalExcluding( cadenceTraceTotals, [ 'exactTotalsDigest' ] );
+		composedTrace.composedTraceId = `composed-trace-${ suffix }`;
+		composedTrace.harnessId = harness.harnessId;
+		composedTrace.gateSetId = gateSet.gateSetId;
+		composedTrace.opportunityTableId = opportunityTable.opportunityTableId;
+		composedTrace.cadenceTraceTotalsId = cadenceTraceTotals.traceTotalsId;
+		catchUp.catchUpCostId = `catch-up-cost-${ suffix }`;
+		catchUp.harnessId = harness.harnessId;
+		catchUp.gateSetId = gateSet.gateSetId;
+		for ( const [ index, witness ] of catchUp.frontierWitnesses.entries() ) {
+
+			witness.witnessId = `catch-up-witness-${ suffix }-${ index }`;
+			witness.opportunityRow.qualityStateAndEpoch = clone( identity );
+			witness.opportunityRow.rowDigest = sha256CanonicalExcluding( witness.opportunityRow, [ 'rowDigest' ] );
+			witness.witnessDigest = sha256CanonicalExcluding( witness, [ 'witnessDigest' ] );
+
+		}
+
+	}
+
+	const steadyCostLedger = {
+		steadyCostLedgerId: active ? ledger.ledgerId : `steady-ledger-${ suffix }`,
+		graphId: ledger.graphId,
+		graphRevision: ledger.graphRevision,
+		graphAndResourceRevisionDigest,
+		qualityStateAndEpoch: clone( identity ),
+		harnessId: harness.harnessId,
+		gateSetId: gateSet.gateSetId,
+		opportunityTableId: opportunityTable.opportunityTableId,
+		cadenceTraceTotalsId: cadenceTraceTotals.traceTotalsId,
+		composedTraceId: composedTrace.composedTraceId,
+		worstPermittedCatchUpCostId: catchUp.catchUpCostId,
+		status: 'accepted',
+		recordDigest: 'pending'
+	};
+	steadyCostLedger.recordDigest = sha256CanonicalExcluding( steadyCostLedger, [ 'recordDigest' ] );
+	const resource = {
+		resourceType: 'PhysicsQualityCostEvidenceResource',
+		qualityStateAndEpoch: clone( identity ),
+		graphAndResourceRevisionDigest,
+		harness,
+		gateSet,
+		opportunityTable,
+		cadenceTraceTotals,
+		composedTrace,
+		worstPermittedCatchUpCost: catchUp,
+		steadyCostLedger
+	};
+	const evidenceResourceDigest = sha256Canonical( resource );
+	qualityCostEvidenceResourceFixtures.set( evidenceResourceDigest, resource );
+	return { resource, evidenceResourceDigest };
 
 }
 
@@ -6059,11 +6254,11 @@ function attachCanonicalQualityCostEvidence( route ) {
 
 		const incoming = transitions.filter( ( transition ) => transition.toState === state.qualityStateId ).map( ( transition ) => migrationByTransition.get( transition.transitionId ).migrationCostEvidenceId );
 		const outgoing = transitions.filter( ( transition ) => transition.fromState === state.qualityStateId ).map( ( transition ) => migrationByTransition.get( transition.transitionId ).migrationCostEvidenceId );
-		const isActiveLedgerState = state.qualityStateId === ledger.qualityState && state.qualityEpoch === ledger.qualityEpoch;
+		const { resource, evidenceResourceDigest } = createQualityCostEvidenceResource( route, state );
 		return {
-			qualityStateAndEpoch: { qualityStateId: state.qualityStateId, qualityEpoch: state.qualityEpoch }, graphAndResourceRevisionDigest: sha256Canonical( { graphRevision: ledger.graphRevision, stateResourceCosts: state.hotTransientTrafficAndSynchronizationCosts, qualityEpoch: state.qualityEpoch } ),
-			harnessId: isActiveLedgerState ? ledger.harness.harnessId : `harness-${ state.qualityStateId }`, gateSetId: isActiveLedgerState ? ledger.composedGateSet.gateSetId : `gate-set-${ state.qualityStateId }`, steadyCostLedgerId: isActiveLedgerState ? ledger.ledgerId : `steady-ledger-${ state.qualityStateId }`,
-			composedTraceId: isActiveLedgerState ? ledger.composedTrace.composedTraceId : `composed-trace-${ state.qualityStateId }`, worstPermittedCatchUpCostId: isActiveLedgerState ? ledger.worstPermittedCatchUpCost.catchUpCostId : `catch-up-cost-${ state.qualityStateId }`, incomingMigrationCostEvidenceIds: incoming, outgoingMigrationCostEvidenceIds: outgoing, status: 'accepted'
+			qualityStateAndEpoch: clone( resource.qualityStateAndEpoch ), graphAndResourceRevisionDigest: resource.graphAndResourceRevisionDigest, evidenceResourceDigest,
+			harnessId: resource.harness.harnessId, gateSetId: resource.gateSet.gateSetId, steadyCostLedgerId: resource.steadyCostLedger.steadyCostLedgerId,
+			composedTraceId: resource.composedTrace.composedTraceId, worstPermittedCatchUpCostId: resource.worstPermittedCatchUpCost.catchUpCostId, incomingMigrationCostEvidenceIds: incoming, outgoingMigrationCostEvidenceIds: outgoing, status: 'accepted'
 		};
 
 	} );
@@ -6073,8 +6268,22 @@ function attachCanonicalQualityCostEvidence( route ) {
 function refreshCanonicalComposedCostEvidence( route ) {
 
 	const ledger = route.physicsCostLedger;
+	const qualityStateAndEpoch = { qualityStateId: ledger.qualityState, qualityEpoch: ledger.qualityEpoch };
+	ledger.harness.workload.presentationTargetsAndViews = [ ...ledger.presentationTargetsAndViews ];
+	ledger.harness.workload.qualityStateAndEpoch = clone( qualityStateAndEpoch );
+	ledger.harness.workload.contextGraphAndRegistryRevisions.graphRevision = ledger.graphRevision;
+	ledger.harness.workload.resourceAndPipelineGraphDigest = sha256Canonical( {
+		graphId: ledger.graphId,
+		graphRevision: ledger.graphRevision,
+		trafficRecordIds: ledger.uploadsCopiesMaps.map( ( record ) => record.trafficRecordId ),
+		memoryLedgerIds: [ ledger.hotState.memoryLedgerId, ledger.peakTransient.memoryLedgerId, ledger.migrationOverlap.memoryLedgerId ]
+	} );
+	ledger.harness.harnessDigest = sha256CanonicalExcluding( ledger.harness, [ 'harnessDigest' ] );
+	ledger.composedGateSet.harnessId = ledger.harness.harnessId;
+	ledger.composedGateSet.qualityStateAndEpoch = clone( qualityStateAndEpoch );
 	const table = ledger.opportunityTable;
 	assert.equal( table.storage, 'immutable-resource', 'canonical composed-cost refresh expects an immutable opportunity table' );
+	table.harnessId = ledger.harness.harnessId;
 	const rowCount = quantityValue( table.exactRowCount, 'canonical opportunity row count' );
 	const totals = ledger.cadenceTraceTotals;
 	const priorPayload = costOpportunityTableResourceFixtures.get( table.resource.contentDigest );
@@ -6090,6 +6299,7 @@ function refreshCanonicalComposedCostEvidence( route ) {
 	pattern.presentedFrameCounts = dividedCounts( totals.presentedFrameCounts, 'presentedFrameCounts' );
 	pattern.workOccurrenceCounts = dividedCounts( totals.workOccurrenceCounts, 'workOccurrenceCounts' );
 	pattern.trafficOccurrenceAndLogicalByteTotals = Object.fromEntries( Object.entries( totals.trafficOccurrenceAndLogicalByteTotals ).map( ( [ trafficId, record ] ) => [ trafficId, { occurrenceCount: quantityValue( record.occurrenceCount, `${ trafficId }.occurrenceCount` ) / rowCount, logicalByteTotal: quantityValue( record.logicalByteTotal, `${ trafficId }.logicalByteTotal` ) / rowCount } ] ) );
+	pattern.qualityStateAndEpoch = clone( qualityStateAndEpoch );
 	const digest = sha256Canonical( payload );
 	costOpportunityTableResourceFixtures.set( digest, payload );
 	table.resource.contentDigest = digest;
@@ -6097,17 +6307,83 @@ function refreshCanonicalComposedCostEvidence( route ) {
 	table.resource.rowCount.value = payload.rowCount;
 	table.resource.orderedRowDigestRoot = sha256Canonical( payload.runs );
 	table.tableDigest = sha256CanonicalExcluding( table, [ 'tableDigest' ] );
+	ledger.composedTrace.harnessId = ledger.harness.harnessId;
+	ledger.composedTrace.gateSetId = ledger.composedGateSet.gateSetId;
+	ledger.composedTrace.opportunityTableId = table.opportunityTableId;
+	ledger.composedTrace.cadenceTraceTotalsId = totals.traceTotalsId;
 	const catchUp = ledger.worstPermittedCatchUpCost;
 	const exactAdvances = quantityValue( totals.coordinationAdvanceCount, 'exact coordination advances' );
+	catchUp.harnessId = ledger.harness.harnessId;
+	catchUp.gateSetId = ledger.composedGateSet.gateSetId;
+	catchUp.catchUpPolicyIdentity = {
+		graphId: route.physicsGraph.graphId,
+		graphRevision: route.physicsGraph.executionLedger.graphRevision,
+		policyDigest: sha256Canonical( route.physicsGraph.catchUpPolicy ),
+		debtClockId: route.physicsGraph.catchUpPolicy.debtClockId,
+		maximumDebt: clone( route.physicsGraph.catchUpPolicy.maximumDebt ),
+		maximumCoordinationAdvancesPerPresentationOpportunity: clone( route.physicsGraph.catchUpPolicy.maximumCoordinationAdvancesPerPresentationOpportunity ),
+		maximumNativeExecutionsPerOpportunity: clone( route.physicsGraph.catchUpPolicy.maximumNativeExecutionsPerOpportunity ),
+		debtDisposition: route.physicsGraph.catchUpPolicy.debtDisposition
+	};
+	catchUp.admissibleScheduleModel.constraintsDigest = sha256Canonical( {
+		catchUpPolicy: route.physicsGraph.catchUpPolicy,
+		stageRules: route.physicsGraph.stages.map( ( stage ) => stage.executionRule ),
+		loopBounds: route.physicsGraph.loopMacros.map( ( loop ) => loop.iterationBound )
+	} );
+	const scaledCounts = ( records, admittedAdvances, unit, label ) => Object.fromEntries( Object.entries( records ).map( ( [ key, count ] ) => [ key, evidence( quantityValue( count, `${ label }.${ key}` ) / exactAdvances * admittedAdvances, unit, 'Derived', 'worst-permitted-catch-up-schedule' ) ] ) );
+	const nativeExecutionsPerAdvance = Object.values( totals.stageExecutionCounts ).reduce( ( sum, count ) => sum + quantityValue( count, 'trace stage execution count' ), 0 ) / exactAdvances;
+	const maximumFeasibleWholeAdvances = Math.min(
+		quantityValue( route.physicsGraph.catchUpPolicy.maximumCoordinationAdvancesPerPresentationOpportunity, 'maximum catch-up advances' ),
+		Math.floor( quantityValue( route.physicsGraph.catchUpPolicy.maximumNativeExecutionsPerOpportunity, 'maximum native executions' ) / nativeExecutionsPerAdvance )
+	);
 	for ( const witness of catchUp.frontierWitnesses ) {
 
 		const row = witness.opportunityRow;
-		const admittedAdvances = row.coordinationAdvanceIds.length;
-		row.interactionApplicationCounts = Object.fromEntries( Object.entries( totals.interactionApplicationCounts ).map( ( [ tag, count ] ) => [ tag, evidence( quantityValue( count, `${ tag }.applicationCount` ) / exactAdvances * admittedAdvances, 'application', 'Derived', 'worst-permitted-catch-up-schedule' ) ] ) );
+		row.coordinationAdvanceIds = Array.from( { length: maximumFeasibleWholeAdvances }, ( _, index ) => `refreshed-catch-up-advance-${ index }` );
+		const admittedAdvances = maximumFeasibleWholeAdvances;
+		row.stageExecutionCounts = scaledCounts( totals.stageExecutionCounts, admittedAdvances, 'execution', 'stageExecutionCounts' );
+		row.nativeSubcycleCounts = scaledCounts( totals.nativeSubcycleCounts, admittedAdvances, 'subcycle', 'nativeSubcycleCounts' );
+		row.couplingIterationCounts = scaledCounts( totals.couplingIterationCounts, admittedAdvances, 'iteration', 'couplingIterationCounts' );
+		row.interactionApplicationCounts = scaledCounts( totals.interactionApplicationCounts, admittedAdvances, 'application', 'interactionApplicationCounts' );
+		row.presentedFrameCounts = Object.fromEntries( Object.keys( totals.presentedFrameCounts ).map( ( key ) => [ key, evidence( 1, 'frame', 'Derived', 'one-catch-up-presentation-opportunity' ) ] ) );
+		row.qualityStateAndEpoch = clone( qualityStateAndEpoch );
+		row.queueDispatchPassAndBarrierCounts.dispatches = evidence( Object.values( row.stageExecutionCounts ).reduce( ( sum, count ) => sum + quantityValue( count, 'catch-up refreshed stage execution count' ), 0 ), 'dispatch', 'Derived', 'refreshed-catch-up-stage-closure' );
 		row.rowDigest = sha256CanonicalExcluding( row, [ 'rowDigest' ] );
 		witness.witnessDigest = sha256CanonicalExcluding( witness, [ 'witnessDigest' ] );
 
 	}
+	catchUp.frontierCoverage.componentwiseDominationDigest = sha256Canonical( { witnessIds: catchUp.frontierWitnesses.map( ( witness ) => witness.witnessId ), maximumAdvances: maximumFeasibleWholeAdvances, dimensions: catchUp.frontierCoverage.coveredObjectiveDimensions } );
+
+}
+
+function attachCanonicalWorkloadShapeCosts( route ) {
+
+	const ledger = route.physicsCostLedger;
+	const opportunityTableId = ledger.opportunityTable.opportunityTableId;
+	const measurementInterval = clone( ledger.measurementInterval );
+	const catchUpId = ledger.worstPermittedCatchUpCost.catchUpCostId;
+	const migrationIds = ledger.qualityMigrationCostEvidence.map( ( evidenceRecord ) => evidenceRecord.migrationCostEvidenceId );
+	ledger.sparseActiveDomainCosts = [ {
+		sparseCostId: 'coastal-water-sparse-cost-42', ownerAndStateEquationIds: { owner: '$threejs-water-optics', stateEquationIds: [ 'water-state' ] }, algorithmAndRevision: 'wet-dry-active-tile-prefix-compaction-v4', measurementIntervalAndOpportunityTableId: { measurementInterval, opportunityTableId },
+		representedDomain: { totalEligibleElements: evidence( 262144, 'cell', 'Derived', 'coastal-grid-extent' ), probeCandidates: { p50: evidence( 32768, 'cell', 'Measured', 'sparse-water-trace' ), p95: evidence( 65536, 'cell', 'Measured', 'sparse-water-trace' ) }, activeCoreElements: { p50: evidence( 12288, 'cell', 'Measured', 'sparse-water-trace' ), p95: evidence( 24576, 'cell', 'Measured', 'sparse-water-trace' ) }, haloGhostAndBoundaryElements: { p95: evidence( 8192, 'cell', 'Measured', 'sparse-water-trace' ) }, allocatedCapacityAndHighWater: { capacity: evidence( 49152, 'cell', 'Measured', 'sparse-water-allocation-trace' ), highWater: evidence( 32768, 'cell', 'Measured', 'sparse-water-allocation-trace' ) }, activeConnectedComponentsAndExtent: { componentP95: evidence( 96, 'component', 'Measured', 'fragmented-archipelago-trace' ), maximumExtent: evidence( 1800, 'metre', 'Measured', 'fragmented-archipelago-trace' ) } },
+		activationPipeline: { detectionClassification: { p95: evidence( 0.0003, 'second', 'Measured', 'sparse-water-trace' ), bytes: evidence( 1048576, 'byte', 'Derived', 'probe-layout' ) }, prefixScanSortOrCompaction: { p95: evidence( 0.00022, 'second', 'Measured', 'sparse-water-trace' ), bytes: evidence( 524288, 'byte', 'Derived', 'active-list-layout' ) }, allocationGrowthAndIndirectArguments: { p95: evidence( 0.00008, 'second', 'Measured', 'sparse-water-trace' ), bytes: evidence( 4096, 'byte', 'Derived', 'indirect-argument-layout' ) }, haloBoundaryAndNeighborRebuild: { p95: evidence( 0.00018, 'second', 'Measured', 'sparse-water-trace' ), bytes: evidence( 786432, 'byte', 'Derived', 'halo-neighbor-layout' ) }, solverWorkOverActiveAndHaloSets: { p95: evidence( 0.0018, 'second', 'Measured', 'sparse-water-trace' ), bytes: evidence( 4194304, 'byte', 'Derived', 'water-state-layout' ) } },
+		lifecycle: { activationAndDeactivationCounts: { activatedP95: evidence( 2048, 'cell', 'Measured', 'advancing-front-trace' ), deactivatedP95: evidence( 1024, 'cell', 'Measured', 'advancing-front-trace' ) }, expansionVelocityAndResidence: { expansionP95: evidence( 18, 'metre-per-second', 'Measured', 'advancing-front-trace' ), minimumResidence: evidence( 0.5, 'second', 'Gated', 'active-tile-hysteresis' ) }, deactivationHysteresis: { policy: 'minimum-residence-plus-depth-band' }, inactiveRegionModelAndErrorGate: { model: 'lake-at-rest-and-dry-bed-analytic-state', maximumDepthError: evidence( 0.002, 'metre', 'Gated', 'inactive-water-error-gate' ) }, overflowDisposition: 'backpressure' },
+		catchUpAndMigrationWitnessRefs: [ catchUpId, ...migrationIds ], gateResults: { counts: 'pass', pipeline: 'pass', overflow: 'pass', inactiveError: 'pass', stress: 'pass' }
+	} ];
+	ledger.contactCosts = [ {
+		contactCostId: 'body-water-contact-cost-42', contactOwnerSolverAndRevision: { owner: 'contact-solver-owner', solverIdAndRevision: 'deterministic-sequential-impulse-v4' }, measurementIntervalAndOpportunityTableId: { measurementInterval, opportunityTableId },
+		bodyShapeAndProxyPopulation: { bodies: evidence( 2048, 'body', 'Measured', 'contact-stress-trace' ), shapes: evidence( 2304, 'shape', 'Measured', 'contact-stress-trace' ), proxies: evidence( 2304, 'proxy', 'Measured', 'contact-stress-trace' ) },
+		broadphase: { algorithmAndRevision: 'sweep-and-prune-with-deterministic-pair-sort-v3', updatedBoundsAndMovedProxies: { p95: evidence( 1200, 'proxy', 'Measured', 'contact-stress-trace' ) }, candidatePairsAndPairBytes: { p95: evidence( 8192, 'pair', 'Measured', 'contact-stress-trace' ), bytesP95: evidence( 262144, 'byte', 'Derived', 'pair-buffer-layout' ) }, rebuildRefitSortAndTraversalWork: { p95: evidence( 0.0008, 'second', 'Measured', 'contact-stress-trace' ) } },
+		narrowphase: { testedPairsByShapePair: { capsuleTerrain: evidence( 4096, 'pair', 'Measured', 'contact-stress-trace' ), hullWaterBoundary: evidence( 1024, 'pair', 'Measured', 'contact-stress-trace' ) }, generatedContactsAndRejectedPairs: { contactsP95: evidence( 1536, 'contact', 'Measured', 'contact-stress-trace' ), rejectedP95: evidence( 6656, 'pair', 'Measured', 'contact-stress-trace' ) }, manifoldCountPointCountAndFeatureRemaps: { manifoldsP95: evidence( 1024, 'manifold', 'Measured', 'contact-stress-trace' ), pointsP95: evidence( 2048, 'point', 'Measured', 'contact-stress-trace' ), featureRemapsP95: evidence( 64, 'remap', 'Measured', 'contact-stress-trace' ) } },
+		solve: { islandCountAndLargestIsland: { islandsP95: evidence( 128, 'island', 'Measured', 'contact-stress-trace' ), largestIslandP95: evidence( 256, 'body', 'Measured', 'pileup-stress-trace' ) }, scalarConstraintRowsByLaw: { normal: evidence( 2048, 'constraint-row', 'Measured', 'contact-stress-trace' ), friction: evidence( 4096, 'constraint-row', 'Measured', 'contact-stress-trace' ) }, iterationsSubstepsAndResiduals: { iterationsP95: evidence( 12, 'iteration', 'Measured', 'contact-stress-trace' ), residualP95: evidence( 0.001, 'newton-second', 'Measured', 'contact-stress-trace' ) }, warmStartHitsMissesInvalidationsAndCacheBytes: { hits: evidence( 900, 'manifold', 'Measured', 'contact-stress-trace' ), misses: evidence( 124, 'manifold', 'Measured', 'contact-stress-trace' ), invalidations: evidence( 64, 'manifold', 'Measured', 'topology-change-trace' ), cacheBytes: evidence( 262144, 'byte', 'Derived', 'warm-start-cache-layout' ) }, deterministicSortReductionAndAtomicContention: { sort: 'stable-pair-feature-key', reduction: 'fixed-tree', atomicContentionP95: evidence( 4, 'retry', 'Measured', 'contact-stress-trace' ) } },
+		lifecycleEventsAndReactionApplications: { begin: evidence( 256, 'event', 'Measured', 'contact-stress-trace' ), persist: evidence( 900, 'event', 'Measured', 'contact-stress-trace' ), end: evidence( 128, 'event', 'Measured', 'contact-stress-trace' ), exactOnceLedgerRef: 'sha256:contact-reaction-application-ledger-42' }, stressFixtureRefs: [ 'sha256:pileup-stress', 'sha256:high-speed-crossing-stress', 'sha256:sleep-wake-stress', 'sha256:topology-proxy-change-stress', 'sha256:cold-warm-start-cache-stress', 'sha256:quality-migration-contact-stress' ], gateResults: { broadphase: 'pass', narrowphase: 'pass', solve: 'pass', cache: 'pass', lifecycle: 'pass', stress: 'pass' }
+	} ];
+	ledger.externalAdapterCosts = Object.values( route.physicsExternalSolverAdaptersById ).map( ( adapter ) => ( {
+		externalCostId: `external-cost-${ adapter.adapterId }`, adapterIdVersionProcessAndDevice: { adapterId: adapter.adapterId, adapterVersion: adapter.adapterVersion ?? adapter.boundaryRevision, processId: 'fixture-external-process', deviceId: 'fixture-external-device' }, measurementIntervalAndOpportunityTableId: { measurementInterval: clone( measurementInterval ), opportunityTableId },
+		requestResponseAndBatchCounts: { requestsP95: evidence( 4, 'request', 'Measured', 'external-adapter-trace' ), responsesP95: evidence( 4, 'response', 'Measured', 'external-adapter-trace' ), batchP95: evidence( 256, 'item', 'Measured', 'external-adapter-trace' ) }, ingressEgressLogicalAndPhysicalBytes: { ingressLogicalP95: evidence( 65536, 'byte', 'Derived', 'external-layout' ), ingressPhysicalP95: evidence( 65536, 'byte', 'Measured', 'external-transport-counters' ), egressLogicalP95: evidence( 32768, 'byte', 'Derived', 'external-layout' ), egressPhysicalP95: evidence( 32768, 'byte', 'Measured', 'external-transport-counters' ) },
+		serializationDeserializationAndConversion: { serializeP95: evidence( 0.00015, 'second', 'Measured', 'external-adapter-trace' ), deserializeP95: evidence( 0.00012, 'second', 'Measured', 'external-adapter-trace' ), frameUnitConversionP95: evidence( 0.00008, 'second', 'Measured', 'external-adapter-trace' ) }, transport: { kind: 'shared-resource', enqueueQueueWaitTransportAndRemoteWait: { enqueueP95: evidence( 0.00005, 'second', 'Measured', 'external-adapter-trace' ), queueWaitP95: evidence( 0.0004, 'second', 'Measured', 'external-adapter-trace' ), transportP95: evidence( 0.0002, 'second', 'Measured', 'external-adapter-trace' ), remoteWaitP95: evidence( 0.0003, 'second', 'Measured', 'external-adapter-trace' ) }, ownershipTransitionsFencesMapsAndCacheEffects: { ownershipTransitions: evidence( 2, 'transition', 'Measured', 'external-adapter-trace' ), fenceWaitP95: evidence( 0.00025, 'second', 'Measured', 'external-adapter-trace' ), maps: evidence( 0, 'map', 'Measured', 'external-adapter-trace' ), cachePolicy: 'explicit-flush-invalidate' } },
+		remoteSolveAndCommit: { remoteComputeDistribution: { p95: evidence( 0.0018, 'second', 'Measured', 'external-adapter-trace' ) }, externalCompletionAndHostVisibility: { completionRef: 'external-completion-42', hostVisibility: 'not-required-on-critical-path' }, commitPublicationTail: { p95: evidence( 0.00035, 'second', 'Measured', 'external-adapter-trace' ) } }, retriesTimeoutsDuplicatesDropsAndExactOnceResults: { retries: evidence( 0, 'retry', 'Measured', 'external-adapter-trace' ), timeouts: evidence( 0, 'timeout', 'Measured', 'external-adapter-trace' ), duplicatesRejected: evidence( 2, 'message', 'Measured', 'external-failure-trace' ), drops: evidence( 0, 'message', 'Measured', 'external-failure-trace' ), exactOnceStatus: 'pass' }, inFlightStagingSharedAndRecoveryBytes: { inFlight: evidence( 196608, 'byte', 'Derived', 'external-layout' ), staging: evidence( 65536, 'byte', 'Derived', 'external-layout' ), shared: evidence( 262144, 'byte', 'Measured', 'external-allocation-trace' ), recovery: evidence( 131072, 'byte', 'Measured', 'external-recovery-trace' ) }, clockMappingSamplingAndStalenessCost: { clockMapP95: evidence( 0.00004, 'second', 'Measured', 'external-adapter-trace' ), maximumStaleness: evidence( 0.008, 'second', 'Gated', 'external-latency-contract' ) }, catchUpMigrationProcessFailureAndDeviceLossWitnessRefs: [ catchUpId, ...migrationIds, 'sha256:external-quality-migration-witness', 'sha256:external-process-failure-witness', 'sha256:external-device-loss-witness' ], gateResults: { bytes: 'pass', transport: 'pass', latency: 'pass', exactOnce: 'pass', recovery: 'pass' }
+	} ) );
 
 }
 
@@ -6364,7 +6640,7 @@ function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
 		}
 		for ( const key of Object.keys( value ) ) {
 
-			const rewrittenKey = rewriteStrings( key, replacements );
+			const rewrittenKey = key === 'bodyShapeAndProxyPopulation' ? key : rewriteStrings( key, replacements );
 			const rewrittenValue = rewriteStrings( value[ key ], replacements, visited );
 			if ( rewrittenKey !== key ) delete value[ key ];
 			value[ rewrittenKey ] = rewrittenValue;
@@ -6460,12 +6736,14 @@ function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
 	} ] ) );
 
 	const ledger = route.physicsCostLedger;
+	ledger.sparseActiveDomainCosts = [];
+	ledger.contactCosts = [];
+	ledger.externalAdapterCosts = [];
 	ledger.ledgerId = 'generic-cost-ledger-1';
 	ledger.graphRevision = graph.executionLedger.graphRevision;
 	ledger.presentationTargetsAndViews = [ keepView ];
 	ledger.measurementProtocolRefs = [ ledger.cadenceTraceTotals.traceRef ];
 	ledger.harness.target.deviceId = 'single-view-generic-WebGPU-trace';
-	ledger.qualityState = 'fixed-quality';
 	const exactIntervals = quantityValue( ledger.cadenceTraceTotals.coordinationAdvanceCount, 'singleView.exactIntervals' );
 	const keepStageId = stage.stageId;
 	const retainStageKey = ( mapping ) => ( { [ keepStageId ]: mapping[ keepStageId ] } );
@@ -6504,16 +6782,18 @@ function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
 	ledger.multiviewAndFramesInFlightMultipliers.viewCount.value = 1;
 	ledger.subcyclesAndCouplingIterationsPerPresentedFrame = {};
 	ledger.dependencyCriticalPaths[ 0 ].path = 'field-advance-to-atomic-commit';
-	rewriteStrings( ledger, [ [ '$threejs-water-optics', 'environment-owner' ], [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
+	rewriteStrings( ledger, [ [ '$threejs-water-optics', 'environment-owner' ], [ 'hullWaterBoundary', 'probeFieldBoundary' ], [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
 	const totalsDigestPayload = clone( ledger.cadenceTraceTotals );
 	delete totalsDigestPayload.exactTotalsDigest;
 	ledger.cadenceTraceTotals.exactTotalsDigest = sha256Canonical( totalsDigestPayload );
+	refreshCanonicalComposedCostEvidence( route );
+	attachCanonicalQualityCostEvidence( route );
 	const coupledResidue = [];
 	const collectCoupledResidue = ( value, path = '$', visited = new WeakSet() ) => {
 
 		if ( typeof value === 'string' ) {
 
-			if ( /water|body-water|rigid-body-state|\$threejs-water-optics/i.test( value ) ) coupledResidue.push( `${ path }=${ value }` );
+			if ( /(?:^|[-_$])water(?:$|[-_$])|body-water|hullWaterBoundary|rigid-body-state|\$threejs-water-optics/i.test( value ) ) coupledResidue.push( `${ path }=${ value }` );
 			return;
 
 		}
@@ -6522,7 +6802,7 @@ function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
 		if ( Array.isArray( value ) ) for ( let index = 0; index < value.length; index ++ ) collectCoupledResidue( value[ index ], `${ path }[${ index }]`, visited );
 		else for ( const [ key, child ] of Object.entries( value ) ) {
 
-			if ( /water|body-water|rigid-body-state|\$threejs-water-optics/i.test( key ) ) coupledResidue.push( `${ path }.<key:${ key }>` );
+			if ( /(?:^|[-_$])water(?:$|[-_$])|body-water|hullWaterBoundary|rigid-body-state|\$threejs-water-optics/i.test( key ) ) coupledResidue.push( `${ path }.<key:${ key }>` );
 			collectCoupledResidue( child, `${ path }.${ key }`, visited );
 
 		}
@@ -6605,6 +6885,8 @@ function makeOneToOnePhysicalExchangeRouteFixture( canonicalRoute ) {
 		for ( const snapshot of Object.values( route.physicsPresentationSnapshotsByTarget ) ) snapshot.eventSequenceRanges = snapshot.eventSequenceRanges.map( ( range ) => range.rangeId === candidateRange.rangeId ? clone( candidateRange ) : range );
 
 	}
+	refreshCanonicalComposedCostEvidence( route );
+	attachCanonicalQualityCostEvidence( route );
 	return route;
 
 }
@@ -6644,6 +6926,8 @@ function makeCatchUpPhysicalRouteFixture( sourceRoute ) {
 	const totalsDigestPayload = clone( route.physicsCostLedger.cadenceTraceTotals );
 	delete totalsDigestPayload.exactTotalsDigest;
 	route.physicsCostLedger.cadenceTraceTotals.exactTotalsDigest = sha256Canonical( totalsDigestPayload );
+	refreshCanonicalComposedCostEvidence( route );
+	attachCanonicalQualityCostEvidence( route );
 	return route;
 
 }
@@ -6979,7 +7263,9 @@ const externalGpuBundle = buildExternalGpuFixtureBundle( fixtureModuleHelpers, c
 const activeExternalAdapter = clone( externalGpuBundle.externalAdapterVariants.sharedResource );
 coupledPhysicsFixture.physicsExternalSolverAdaptersById = { [ activeExternalAdapter.adapterId ]: activeExternalAdapter };
 const qualityTransitionBundle = buildQualityTransitionBundle( fixtureModuleHelpers, coupledPhysicsFixture );
+refreshCanonicalComposedCostEvidence( coupledPhysicsFixture );
 attachCanonicalQualityCostEvidence( coupledPhysicsFixture );
+attachCanonicalWorkloadShapeCosts( coupledPhysicsFixture );
 refreshCanonicalComposedCostEvidence( coupledPhysicsFixture );
 markPhysicsSetup( 'coupledRouteAndModuleBuilds' );
 validateRouteManifest( coupledPhysicsFixture );
@@ -7439,6 +7725,7 @@ const semanticInvariantChecks = Object.freeze( {
 	validateConservativeQualityMigration,
 	validateAlignedCostTraceAndNoCriticalReadback,
 	validateComposedCostEnvelope,
+	validateWorkloadShapeCosts,
 	validateRegistryAuthorityAndDagClosure,
 	validateCoordinationAdvanceAndCatchUp,
 	validateDependencyCompletionInstances,
@@ -7476,6 +7763,7 @@ const semanticInvariantAcceptCases = Object.freeze( {
 	validateConservativeQualityMigration: { 'prepare-commit-retire': semanticIdentityCase },
 	validateAlignedCostTraceAndNoCriticalReadback: { 'aligned-sustained-trace': semanticIdentityCase },
 	validateComposedCostEnvelope: { 'digest-closed-opportunity-frontier-and-migration': semanticIdentityCase },
+	validateWorkloadShapeCosts: { 'sparse-contact-external-cost-closure': semanticIdentityCase },
 	validateRegistryAuthorityAndDagClosure: { 'single-atomic-registry-revision': semanticIdentityCase },
 	validateCoordinationAdvanceAndCatchUp: { 'digest-linked-adjacent-advances': semanticIdentityCase },
 	validateDependencyCompletionInstances: { 'exact-producer-consumer-completion': semanticIdentityCase },
@@ -7627,7 +7915,20 @@ const semanticInvariantRejectCases = Object.freeze( {
 		'frontier-missing-objective': semanticRouteCase( ( route ) => { route.physicsCostLedger.worstPermittedCatchUpCost.frontierCoverage.coveredObjectiveDimensions.pop(); } ),
 		'catchup-policy-mismatch': semanticRouteCase( ( route ) => { route.physicsCostLedger.worstPermittedCatchUpCost.catchUpPolicyIdentity.maximumCoordinationAdvancesPerPresentationOpportunity.value ++; } ),
 		'stale-harness-digest': semanticRouteCase( ( route ) => { route.physicsCostLedger.harness.target.deviceId = 'different-device-with-stale-digest'; } ),
+		'opaque-quality-cost-resource': semanticRouteCase( ( route ) => { route.physicsCostLedger.qualityCostEvidence[ 0 ].evidenceResourceDigest = 'sha256:missing-quality-cost-resource'; } ),
+		'quality-epoch-evidence-reuse': semanticRouteCase( ( route ) => {
+
+			const active = route.physicsCostLedger.qualityCostEvidence.find( ( ref ) => ref.qualityStateAndEpoch.qualityStateId === route.physicsCostLedger.qualityState );
+			const inactive = route.physicsCostLedger.qualityCostEvidence.find( ( ref ) => ref.qualityStateAndEpoch.qualityStateId !== route.physicsCostLedger.qualityState );
+			for ( const key of [ 'evidenceResourceDigest', 'harnessId', 'gateSetId', 'steadyCostLedgerId', 'composedTraceId', 'worstPermittedCatchUpCostId' ] ) inactive[ key ] = active[ key ];
+
+		} ),
 		'migration-evidence-omitted': semanticRouteCase( ( route ) => { route.physicsCostLedger.qualityCostEvidence.find( ( ref ) => ref.outgoingMigrationCostEvidenceIds.length > 0 ).outgoingMigrationCostEvidenceIds.pop(); } )
+	},
+	validateWorkloadShapeCosts: {
+		'sparse-compaction-omitted': semanticRouteCase( ( route ) => { delete route.physicsCostLedger.sparseActiveDomainCosts[ 0 ].activationPipeline.prefixScanSortOrCompaction; } ),
+		'contact-pileup-stress-omitted': semanticRouteCase( ( route ) => { route.physicsCostLedger.contactCosts[ 0 ].stressFixtureRefs = route.physicsCostLedger.contactCosts[ 0 ].stressFixtureRefs.filter( ( ref ) => ! /pileup/i.test( ref ) ); } ),
+		'external-transport-tail-omitted': semanticRouteCase( ( route ) => { delete route.physicsCostLedger.externalAdapterCosts[ 0 ].transport.enqueueQueueWaitTransportAndRemoteWait.transportP95; } )
 	},
 	validateRegistryAuthorityAndDagClosure: {
 		'cyclic-parent': semanticRouteCase( ( route ) => { route.physicsContext.physicsFrameRegistry.framesById[ 'body-frame-1' ].parentFrameId = 'body-frame-1'; } ),
@@ -7906,6 +8207,8 @@ for ( const [ leaseId, disposition ] of Object.entries( abortedExecutionFixture.
 abortedExecutionFixture.physicsQualityRequests = {};
 abortedExecutionFixture.physicsQualityStates = {};
 abortedExecutionFixture.physicsQualityTransitions = [];
+abortedExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
+abortedExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( abortedExecutionFixture );
 
 const deviceLossExecutionFixture = clone( coupledPhysicsFixture );
@@ -7931,6 +8234,8 @@ for ( const [ leaseId, disposition ] of Object.entries( deviceLossExecutionFixtu
 deviceLossExecutionFixture.physicsQualityRequests = {};
 deviceLossExecutionFixture.physicsQualityStates = {};
 deviceLossExecutionFixture.physicsQualityTransitions = [];
+deviceLossExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
+deviceLossExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( deviceLossExecutionFixture );
 
 expectPhysicsReject( 'physics schema required context key', ( route ) => {
