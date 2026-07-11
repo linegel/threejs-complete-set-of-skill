@@ -24,7 +24,6 @@ import {
 	WebGPURenderer
 } from 'three/webgpu';
 import {
-	bypass,
 	color,
 	exp2,
 	float,
@@ -90,7 +89,9 @@ const AUTHORED_SCENE = Object.freeze( {
 	emitterColor: 0x22060c,
 	emitterEmissive: 0xff2f56,
 	emitterIntensity: 10,
-	rotationRadiansPerSecond: 0.24
+	rotationRadiansPerSecond: 0.24,
+	brightWindowMeterRegionMin: [ 0.62, 0.44 ],
+	brightWindowMeterRegionMax: [ 0.72, 0.78 ]
 } );
 
 export const EXPOSURE_MECHANISM_ROUTES = Object.freeze( {
@@ -328,12 +329,18 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 				.select( 1, 0 )
 		), 1 )
 		: vec4( vec3( 0 ), 1 );
+	// Keep the scene PassNode reachable while displaying storage-only meter
+	// diagnostics. BypassNode builds its callNode as `void`; a texture node then
+	// becomes an invalid bare WGSL uniform statement in r185. A zero-weighted
+	// color dependency preserves the pass edge while producing valid WGSL and
+	// leaving the diagnostic value unchanged.
+	const withMeterSourceDependency = ( node ) => node.add( hdrColor.mul( float( 0 ) ) );
 	const modeNodes = Object.freeze( {
 		final: finalNode,
 		'meter-source': compressHdr,
-		histogram: bypass( histogramDisplay, hdrColor ),
-		adaptation: bypass( vec4( vec3( adaptationDisplay ), 1 ), hdrColor ),
-		'meter-mask': bypass( meterMaskDisplay, hdrColor ),
+		histogram: withMeterSourceDependency( histogramDisplay ),
+		adaptation: withMeterSourceDependency( vec4( vec3( adaptationDisplay ), 1 ) ),
+		'meter-mask': withMeterSourceDependency( meterMaskDisplay ),
 		'tone-map': vec4( postToneMapLinear.rgb, 1 ),
 		lut: vec4( outputGraph.gradedStraight.rgb, 1 )
 	} );
@@ -432,13 +439,17 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		grayCard.visible = scenario === 'gray-card';
 		brightWindow.visible = scenario === 'bright-window';
 		maskedUiPanel.visible = scenario === 'masked-ui';
-		if ( scenario === 'masked-ui' ) {
+		setMeterRegion( {
+			regionMin: [ 0, 0 ],
+			regionMax: [ 1, 1 ],
+			exclusionMin: [ 0.72, 0 ],
+			exclusionMax: [ 1, 0.22 ]
+		} );
+		if ( scenario === 'bright-window' ) {
 
 			setMeterRegion( {
-				regionMin: [ 0, 0 ],
-				regionMax: [ 1, 1 ],
-				exclusionMin: [ 0.72, 0 ],
-				exclusionMax: [ 1, 0.22 ]
+				regionMin: AUTHORED_SCENE.brightWindowMeterRegionMin,
+				regionMax: AUTHORED_SCENE.brightWindowMeterRegionMax
 			} );
 
 		}

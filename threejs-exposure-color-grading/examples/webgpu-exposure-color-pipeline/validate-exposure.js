@@ -540,7 +540,9 @@ function assertSourceContracts() {
 	assert( nodeSource.includes( 'weight.mul( HISTOGRAM_WEIGHT_SCALE )' ), 'Histogram bins are not weighted with the declared fixed-point policy.' );
 	assert( mainSource.includes( 'renderer.compute( meterDispatches )' ), 'Metered frames should submit the selected ordered compute nodes as one r185 compute group.' );
 	assert( mainSource.includes( 'renderer.compute( exposureNodes.adaptExposureState )' ), 'Every rendered frame must adapt EV.' );
-	assert( mainSource.includes( 'histogram: bypass( histogramDisplay, hdrColor )' ) && mainSource.includes( "'meter-mask': bypass( meterMaskDisplay, hdrColor )" ), 'Storage-only diagnostics do not force the meter-source scene pass to execute.' );
+	assert( mainSource.includes( 'const withMeterSourceDependency = ( node ) => node.add( hdrColor.mul( float( 0 ) ) )' ), 'Storage-only diagnostics do not force the meter-source scene pass to execute.' );
+	assert( mainSource.includes( 'histogram: withMeterSourceDependency( histogramDisplay )' ) && mainSource.includes( "'meter-mask': withMeterSourceDependency( meterMaskDisplay )" ), 'Storage-only diagnostic routes do not retain the validated scene dependency.' );
+	assert( ! mainSource.includes( 'bypass( histogramDisplay, hdrColor )' ), 'BypassNode emits an invalid bare WGSL uniform when its callNode is a texture node in r185.' );
 	assert(
 		mainSource.indexOf( 'renderer.compute( exposureNodes.adaptExposureState )' ) < mainSource.indexOf( 'renderPipeline.render()' )
 		&& mainSource.indexOf( 'renderPipeline.render()' ) < mainSource.indexOf( 'renderer.compute( meterDispatches )' ),
@@ -556,6 +558,7 @@ function assertSourceContracts() {
 	assert( mainSource.includes( 'stratifiedJitterForMeterUpdate' ), 'Runtime meter must advance jitter by meter updates, not render-frame cadence.' );
 	assert( mainSource.includes( 'meterUpdateIndex += 1' ), 'Runtime must own a dedicated meter-update sequence index.' );
 	assert( mainSource.includes( 'maskedUiPanel.visible = scenario === \'masked-ui\'' ) && mainSource.includes( 'function resetMeterState( cause )' ), 'Meter-mask A/B fixture is not live or repeatable.' );
+	assert( mainSource.includes( 'brightWindowMeterRegionMin' ) && mainSource.includes( 'regionMin: AUTHORED_SCENE.brightWindowMeterRegionMin' ), 'Bright-window adaptation fixture lacks an authored meter region.' );
 	assert( mainSource.includes( 'EXPOSURE_EXAMPLE_CONTRACT' ), 'Runtime diagnostics must expose the claim boundary.' );
 	assert( mainSource.includes( 'ColorManagement.workingColorSpace !== LinearSRGBColorSpace' ), 'Frozen luminance coefficients require an executable working-space gate.' );
 	assert( readmeSource.includes( 'Claim boundary' ), 'README must retain an explicit claim boundary.' );

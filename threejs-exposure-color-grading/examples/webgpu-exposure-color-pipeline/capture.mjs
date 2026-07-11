@@ -62,6 +62,13 @@ try {
 	} );
 	const viewport = options.profile === 'performance' ? { width: 1920, height: 1080 } : { width: 1200, height: 800 };
 	const page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
+	const browserErrors = [];
+	page.on( 'pageerror', ( error ) => browserErrors.push( String( error.stack ?? error.message ) ) );
+	page.on( 'console', ( message ) => {
+
+		if ( message.type() === 'error' ) browserErrors.push( message.text() );
+
+	} );
 	await page.goto( url, { waitUntil: 'networkidle' } );
 	await page.waitForFunction( () => window.__labController?.ready );
 	await page.evaluate( () => window.__labController.ready() );
@@ -78,9 +85,11 @@ try {
 	for ( const [ mode, name ] of modes ) {
 
 		const capture = await page.evaluate( ( selectedMode ) => window.__labController.capturePixels( selectedMode ), mode );
+		await page.evaluate( () => window.__exposureLab.app.renderer.backend.device.queue.onSubmittedWorkDone() );
 		await writeFile( resolve( options.output, 'images', name ), pngFromCapture( capture ) );
 
 	}
+	if ( browserErrors.length > 0 ) throw new Error( `Exposure browser validation failed:\n${ browserErrors.join( '\n' ) }` );
 	await page.evaluate( async () => { await window.__labController.setScenario( 'emitter' ); await window.__labController.setSeed( 1 ); } );
 	const baselineSeedCapture = await page.evaluate( () => window.__labController.capturePixels( 'final' ) );
 	await writeFile( resolve( options.output, 'images/seed-0001.final.png' ), pngFromCapture( baselineSeedCapture ) );
