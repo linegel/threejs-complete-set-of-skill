@@ -110,6 +110,12 @@
       "required": true,
       "evidence": "visible and cast-shadow materials share the owner-masked deformation node; current-source atlas evidence is pending",
       "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-performance",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE: measureSteadyFrames times renderAsync submission rather than timestamp-resolved GPU completion; WebGPURenderer is constructed without trackTimestamp; every tier has frameTargetMs null. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused, so that environment cannot attribute cadence cost to the lab.",
+      "status": "incomplete"
     }
   ],
   "evidenceContract": "v2",

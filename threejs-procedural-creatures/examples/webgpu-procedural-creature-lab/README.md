@@ -6,6 +6,8 @@ This lab proves the local `threejs-procedural-creatures` package contracts throu
 
 Current status: the pure core, TSL adapter module boundaries, deterministic browser API, capture harness, and numeric/artifact gates execute end to end. The visible capture path is a deterministic canvas lab that exercises the same core and adapter metadata; replacing that with a true `WebGPURenderer` snapped-shell scene remains the next canonical-renderer closure item.
 
+Performance status: `INSUFFICIENT_EVIDENCE`. The current `measureSteadyFrames()` helper measures CPU submission around `renderAsync`, not timestamp-resolved GPU completion; the renderer does not enable timestamp tracking; and every published tier has a null frame target. See `LAB_FINDINGS.md` and the public **Readiness & remaining fixes** panel for the ordered closure plan.
+
 ## Run
 
 ```bash
