@@ -13,7 +13,7 @@ export function validateTangents(geometry) {
   return {
     ok: errors.length === 0,
     errors,
-    generatedBy: "computeMikkTSpaceTangents",
+    generatedBy: "analytic-generator",
   };
 }
 

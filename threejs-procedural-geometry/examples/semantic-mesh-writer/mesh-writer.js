@@ -6,8 +6,28 @@ import {
   Uint32BufferAttribute,
 } from "three/webgpu";
 
+export function selectIndexArrayType(vertexCapacity) {
+  if (!Number.isInteger(vertexCapacity) || vertexCapacity <= 0) {
+    throw new TypeError("vertexCapacity must be a positive integer");
+  }
+  return vertexCapacity - 1 > 65535 ? Uint32Array : Uint16Array;
+}
+
 export function createWriter(capacity, materialSlots) {
-  const indexArrayType = capacity.vertices > 65535 ? Uint32Array : Uint16Array;
+  if (!Number.isInteger(capacity.vertices) || capacity.vertices <= 0) {
+    throw new TypeError("capacity.vertices must be a positive integer");
+  }
+  if (!Number.isInteger(capacity.indices) || capacity.indices <= 0) {
+    throw new TypeError("capacity.indices must be a positive integer");
+  }
+  if (!Array.isArray(materialSlots) || new Set(materialSlots).size !== materialSlots.length) {
+    throw new TypeError("materialSlots must be an array of unique slot names");
+  }
+
+  // 65,536 vertices still fit a Uint16 index because the largest index is
+  // 65,535. The representation must switch only when the largest referenced
+  // vertex no longer fits.
+  const indexArrayType = selectIndexArrayType(capacity.vertices);
   const positions = new Float32Array(capacity.vertices * 3);
   const normals = new Float32Array(capacity.vertices * 3);
   const tangents = new Float32Array(capacity.vertices * 4);
@@ -20,6 +40,15 @@ export function createWriter(capacity, materialSlots) {
   const vertexMeta = [];
   let vertexCount = 0;
   let indexCount = 0;
+
+  function finiteTuple(value, length, label) {
+    if (!Array.isArray(value) && !ArrayBuffer.isView(value)) {
+      throw new TypeError(`${label} must be an array-like tuple`);
+    }
+    if (value.length !== length || Array.from(value).some((entry) => !Number.isFinite(entry))) {
+      throw new TypeError(`${label} must contain ${length} finite values`);
+    }
+  }
 
   function assertCapacity(extraVertices, extraIndices = 0) {
     if (vertexCount + extraVertices > capacity.vertices) {
@@ -40,6 +69,11 @@ export function createWriter(capacity, materialSlots) {
     boundary = 0,
   }) {
     assertCapacity(1);
+    finiteTuple(position, 3, "position");
+    finiteTuple(normal, 3, "normal");
+    finiteTuple(tangent, 4, "tangent");
+    finiteTuple(uv, 2, "uv");
+    finiteTuple(debug, 2, "debugUv");
     const id = vertexCount;
     positions.set(position, id * 3);
     normals.set(normal, id * 3);
@@ -69,6 +103,11 @@ export function createWriter(capacity, materialSlots) {
 
   function addTriangle(a, b, c) {
     assertCapacity(0, 3);
+    for (const vertex of [a, b, c]) {
+      if (!Number.isInteger(vertex) || vertex < 0 || vertex >= vertexCount) {
+        throw new RangeError(`triangle index ${vertex} is outside [0, ${vertexCount})`);
+      }
+    }
     indices[indexCount] = a;
     indices[indexCount + 1] = b;
     indices[indexCount + 2] = c;
@@ -84,6 +123,15 @@ export function createWriter(capacity, materialSlots) {
     if (!materialSlots.includes(materialSlot)) {
       throw new Error(`Unknown material slot "${materialSlot}"`);
     }
+    if (!Number.isInteger(startIndex) || !Number.isInteger(indexCountForGroup)) {
+      throw new TypeError("group ranges must be integer index-component offsets");
+    }
+    if (startIndex % 3 !== 0 || indexCountForGroup % 3 !== 0) {
+      throw new RangeError("group ranges must start and end on triangle boundaries");
+    }
+    if (startIndex < 0 || indexCountForGroup <= 0 || startIndex + indexCountForGroup > indexCount) {
+      throw new RangeError("group range is outside emitted indices");
+    }
     groups.push({
       start: startIndex,
       count: indexCountForGroup,
@@ -92,7 +140,29 @@ export function createWriter(capacity, materialSlots) {
     });
   }
 
-  function finishGeometry() {
+  function finishGeometry({ requireExact = true } = {}) {
+    if (requireExact && vertexCount !== capacity.vertices) {
+      throw new Error(`vertex capacity mismatch: planned ${capacity.vertices}, wrote ${vertexCount}`);
+    }
+    if (requireExact && indexCount !== capacity.indices) {
+      throw new Error(`index capacity mismatch: planned ${capacity.indices}, wrote ${indexCount}`);
+    }
+
+    const coverage = new Uint8Array(indexCount);
+    for (const group of groups) {
+      if (group.start % 3 !== 0 || group.count % 3 !== 0) {
+        throw new Error("group range is not triangle-aligned");
+      }
+      for (let component = group.start; component < group.start + group.count; component += 1) {
+        coverage[component] += 1;
+      }
+    }
+    const uncovered = coverage.reduce((count, value) => count + Number(value === 0), 0);
+    const overlaps = coverage.reduce((count, value) => count + Number(value > 1), 0);
+    if (uncovered || overlaps) {
+      throw new Error(`group coverage invalid: ${uncovered} uncovered, ${overlaps} overlapping indices`);
+    }
+
     const geometry = new BufferGeometry();
     geometry.setAttribute(
       "position",
@@ -133,6 +203,8 @@ export function createWriter(capacity, materialSlots) {
     geometry.userData.writer = {
       vertexCount,
       indexCount,
+      capacity: { ...capacity },
+      exactCapacity: vertexCount === capacity.vertices && indexCount === capacity.indices,
       indexType: indexArrayType.name,
       groups,
       vertexMeta,
@@ -151,6 +223,7 @@ export function createWriter(capacity, materialSlots) {
     addQuad,
     addGroup,
     finishGeometry,
+    capacity: Object.freeze({ ...capacity }),
     get vertexCount() {
       return vertexCount;
     },
