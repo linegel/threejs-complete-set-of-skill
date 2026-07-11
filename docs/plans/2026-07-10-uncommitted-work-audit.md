@@ -3,27 +3,29 @@
 ## Live reconciliation — 2026-07-11
 
 The frozen snapshot below remains the preservation baseline, but it is no
-longer the current staging inventory. At `04f4897` the live checkout contains
-1,059 changed paths:
+longer the current staging inventory. At reviewed HEAD `5733bd1` the live
+checkout contains 1,026 changed paths:
 
-- 68 paths have both staged and unstaged differences;
-- 303 tracked paths have unstaged differences;
-- one tracked path is deleted;
-- 687 paths are untracked.
+- 67 paths have both staged and unstaged differences;
+- 274 additional tracked paths have unstaged differences;
+- two tracked paths are deleted;
+- 685 paths are untracked.
 
-Relative to the 18:14Z snapshot, 886 shared paths are byte-identical, 168
-shared paths changed content, five new dirty paths appeared, and eight paths
-left the dirty inventory because they were committed. The five additions are
-`LICENSE`, `docs/about/index.html`, `docs/llm.txt`, `docs/llms.txt`, and
-`scripts/build-pages.mjs`. The committed removals include the router test,
-provider/water, external/GPU, and quality fixture modules plus the Pages hash
-and smoke validators and the deduplicated root ignore policy.
+This is 36 fewer dirty paths than the 18:14Z snapshot and 33 fewer than the
+prior `04f4897` reconciliation. The largest current groups are 152
+`integration-labs/` paths, 146 generated `docs/` paths, 52 vegetation paths,
+43 planet paths, 42 creature paths, 38 AO paths, 35 image-pipeline paths, 34
+atmosphere paths, and 33 paths each under spectral ocean and `labs/`.
+Therefore the original Core / Contracts / Evidence split remains valid;
+generated publication remains downstream-only.
 
-The current top-level distribution still matches the original architecture:
-176 generated `docs/` paths, 152 integration-lab paths, 33 provider/registry
-paths, nine scripts, one generated root catalog, and the remaining skill-owned
-lab implementations. Therefore the original Core / Contracts / Evidence split
-is still valid; generated publication remains downstream-only.
+The local branch is 36 commits ahead of and eight commits behind `origin/main`.
+The custom domain is consequently not a current-source verification surface.
+On 2026-07-11 the deployed router lab still served the pre-fix bundle: every
+scenario permalink pointed under `/demos/assets/scenario/`, and the inspected
+`ocean-planet` link returned the site's 404 page. Local router repairs must not
+be described as deployed until remote history is reconciled, pushed, Pages has
+published it, and the custom domain is rechecked.
 
 ### Verified progress since the frozen snapshot
 
@@ -41,10 +43,18 @@ is still valid; generated publication remains downstream-only.
 | semantic invariant execution | `04f4897` | 33 invariants, 123 cases, 5,230 record validations, 215 negative cases; PASS in 265 s |
 | skill ABI closure gate | `070bfcc` | `npm run test:skills` passes and invokes the executable router suite |
 | canonical implementation audit | `98e6b2b` | 27 canonical targets, five flagships, 39 primary source sets, and all 41 lab-unit tests pass |
+| generic route closure | `af059c4` | 12 recipes, 33 invariants, 123 cases, 5,230 subject-record validations, and 216 negative cases pass |
+| provider/presentation time shape | `4fc4131`, `8440c7f`, `1a25667` | provider boundaries retain `PhysicsTime`; narrow presentation instants remain direct |
+| validation capture provenance | `33e754e`, `3003d16`, `df8b480`, `53774d6` | native 1200×800 and odd-size readback pass; original aligned-copy bytes remain distinct from compact transport bytes |
+| router permalink source fix | `a7a8f5e`, `cb577c2`, `5733bd1` | focused route suite passes; directly loaded source scenarios no longer nest `/scenario/` paths |
 
-This reconciliation does not promote any rendering lab to accepted. The 37
-native-WebGPU primary surfaces still require their declared browser, readback,
-timing, lifecycle, and visual evidence.
+This reconciliation does not promote any rendering lab to accepted. C01 now
+has real current-adapter final/no-post/diagnostic/camera/seed/temporal/odd-size
+captures, native-backend proof, aligned readback, and timestamp availability,
+but it still lacks a real v2 artifact assembly, sustained timing, GPU stage
+attribution, and 50–100 lifecycle cycles. The other native-WebGPU primary
+surfaces still require their declared browser, readback, timing, lifecycle, and
+visual evidence.
 
 ## Scope and preservation
 

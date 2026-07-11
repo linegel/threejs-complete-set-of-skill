@@ -15,11 +15,47 @@ supersets into later lab commits.
 | A21 | complete | `98e6b2b`; implementation/source audits and 41 lab-unit tests pass |
 | A22 | complete locally | `1abe419`; rerun after source freeze |
 | A23 | complete | `438be92` |
-| B–F | pending | no proxy, lab, evidence, or generated publication row is accepted by this reconciliation |
+| post-A physics closure | complete | `af059c4`, `4fc4131`; direct router suite passes 12 recipes, 33 invariants, 123 cases, 5,230 record validations, and 216 negative cases |
+| C01 Core | complete | `4c4e333`, `09644c4`, `df8b480`; native WebGPU subject, safe renderer metrics, and aligned readback metadata browser-verified |
+| C01 Contracts | complete | `8b06660`, `33e754e`, `3003d16`, `53774d6`; routes/mutations, compact-copy provenance, and truthful incomplete capture boundary pass |
+| C01 Evidence | pending | real current-adapter images exist only under ignored artifacts; v2 assembly, 50–100 lifecycle cycles, sustained timing, and acceptance validation remain open |
+| router publication repair | source verified, not deployed | `a7a8f5e`, `cb577c2`, `0a8b2c6`, `5733bd1`; live custom-domain links still point to `/demos/assets/scenario/` and 404 |
+| B, C02–F | pending | no proxy, later lab, accepted evidence, or final generated publication row is accepted by this reconciliation |
 
-Phase A is closed at `98e6b2b`. Phase B remains secondary-only; canonical gap
-work proceeds through the Phase C dependency chain before any generated
+Phase A is closed at `98e6b2b` with the generic-route and PhysicsTime follow-up
+closure recorded above. Phase B remains secondary-only; canonical gap work
+proceeds through the Phase C dependency chain before any final generated
 publication commit.
+
+### C01 executed split
+
+C01 is intentionally not represented by one broad commit:
+
+1. `4c4e333` — native WebGPU validation subject.
+2. `09644c4` — safe initialized renderer/backend metric serialization.
+3. `8b06660` — route, mutation, and metric-transport contracts.
+4. `33e754e` — original padded GPU-copy length preserved separately from
+   compact browser transport bytes.
+5. `3003d16` — readback provenance regressions.
+6. `df8b480` — subject-level logical/aligned row and color metadata.
+7. `53774d6` — real final/no-post/diagnostic/camera/seed/temporal/odd-size
+   capture with non-publishable claim-specific verdicts.
+
+The correctness run proved initialized native WebGPU, 1200×800 RGBA8 readback,
+4864-byte aligned source rows, 3,891,136 source bytes versus 3,840,000 compact
+transport bytes, a 641×359 odd-size readback, distinct diagnostics, and GPU
+timestamp availability. It did not claim mechanism acceptance, sustained
+performance, GPU attribution, or lifecycle stability.
+
+### Publication state
+
+The router source and generated local bundle are not deployed evidence. At the
+reviewed head, `main` is 36 commits ahead of and eight commits behind
+`origin/main`; the dirty worktree prevents an automatic history reconciliation.
+The live custom domain was inspected directly and still served the old bundle,
+whose `ocean-planet` scenario link resolves to a confirmed 404. Publication
+remains pending until remote reconciliation, push, Pages completion, and a
+fresh live route check all pass.
 
 ### A20 executed split
 
