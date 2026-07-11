@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-exposure-color-pipeline",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "webgpu-exposure-color-pipeline-v2",
+  "canonicalSource": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
+  ],
+  "canonicalSourceHash": "sha256:6030ee02f228505590a3a9c61ed20a8fc2955e63d64396fe6c098d18e82a5759",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
+    "isWebGPUBackend": true,
+    "threeRevision": "185"
+  },
+  "claimVerdicts": {
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Exposure and grading render-target readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final exposure, tone-map, LUT, and output-transform readback.",
+      "source": "images/final.design.png",
+      "sourceSha256": "sha256:fe08f16a1076862bc019175eb990eef3ba275871605efc10d70cdb73c3802f42",
+      "outputSha256": "sha256:fe08f16a1076862bc019175eb990eef3ba275871605efc10d70cdb73c3802f42",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "meter-source.png",
+      "meaning": "Weighted log-luminance meter source diagnostic.",
+      "source": "images/meter-source.png",
+      "sourceSha256": "sha256:0b4b2630aaacd5c9439b988f3908a982ed9aadae9d133eb205523cd8df6c92d4",
+      "outputSha256": "sha256:0b4b2630aaacd5c9439b988f3908a982ed9aadae9d133eb205523cd8df6c92d4",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "histogram-percentiles.png",
+      "meaning": "Histogram and percentile diagnostic.",
+      "source": "images/histogram-percentiles.png",
+      "sourceSha256": "sha256:e2e1431f129d4e83296185f43d3bfe6e9cb908bb616a0b43661c9e422b2fb8ad",
+      "outputSha256": "sha256:e2e1431f129d4e83296185f43d3bfe6e9cb908bb616a0b43661c9e422b2fb8ad",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "meter-mask.png",
+      "meaning": "Metering-mask diagnostic.",
+      "source": "images/meter-mask.png",
+      "sourceSha256": "sha256:0ba25f69d6905f2c637ba7b09aa3f1ea39b2f87fa3f9314d3fc4c295c4b52092",
+      "outputSha256": "sha256:0ba25f69d6905f2c637ba7b09aa3f1ea39b2f87fa3f9314d3fc4c295c4b52092",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "tone-map.png",
+      "meaning": "Tone-map stage diagnostic before the creative LUT.",
+      "source": "images/tone-map.png",
+      "sourceSha256": "sha256:0be426a3713547e6469d4452988f0fed36f5a6a71a48dcde9b3c62ea4589dd33",
+      "outputSha256": "sha256:0be426a3713547e6469d4452988f0fed36f5a6a71a48dcde9b3c62ea4589dd33",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "lut.png",
+      "meaning": "Creative LUT stage diagnostic.",
+      "source": "images/lut.png",
+      "sourceSha256": "sha256:5f461c04d8de208879e522a3df53ad28a9952993d22e7a9f943f986700846a61",
+      "outputSha256": "sha256:5f461c04d8de208879e522a3df53ad28a9952993d22e7a9f943f986700846a61",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.",
+    "Lifecycle stability remains unaccepted."
+  ]
+}

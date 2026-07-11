@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-image-pipeline",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "webgpu-image-pipeline-v2",
+  "canonicalSource": [
+    "threejs-image-pipeline/examples/webgpu-image-pipeline"
+  ],
+  "canonicalSourceHash": "sha256:3f4e180bd7ed3802f25020df37f654d2e8359b39b16271f28664ad7d8d144bbc",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
+    "isWebGPUBackend": true,
+    "threeRevision": null
+  },
+  "claimVerdicts": {
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Final image-pipeline render-target readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final composed output after the single tone map and output transform.",
+      "source": "images/final.design.png",
+      "sourceSha256": "sha256:494ca78d45b7d6f038f633da172c5365f67a43a802e01c3c56b4321778e6f732",
+      "outputSha256": "sha256:494ca78d45b7d6f038f633da172c5365f67a43a802e01c3c56b4321778e6f732",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "Readable scene baseline without the post stack.",
+      "source": "images/no-post.design.png",
+      "sourceSha256": "sha256:df560a96dbda1eb0d173999f59c3063d570b46d4af48f63025361f88a79f7805",
+      "outputSha256": "sha256:df560a96dbda1eb0d173999f59c3063d570b46d4af48f63025361f88a79f7805",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Mosaic assembled from live diagnostic graph outputs.",
+      "source": "images/diagnostics.mosaic.png",
+      "sourceSha256": "sha256:3551b43b73c1d7f3849596c8f233bef7c2fe455c262a2847a323b40c8f2a18fc",
+      "outputSha256": "sha256:3551b43b73c1d7f3849596c8f233bef7c2fe455c262a2847a323b40c8f2a18fc",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "normal.png",
+      "meaning": "Shared normal signal readback.",
+      "source": "images/normal.png",
+      "sourceSha256": "sha256:b9552246b0e78707b2368ab850206d24002827d14134f3427d64c49649c1034e",
+      "outputSha256": "sha256:b9552246b0e78707b2368ab850206d24002827d14134f3427d64c49649c1034e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "emissive.png",
+      "meaning": "Shared emissive signal readback.",
+      "source": "images/emissive.png",
+      "sourceSha256": "sha256:6fd583f6d313d44b48d40af4b06f394ae42ba504e9301d614a61b4f39b632897",
+      "outputSha256": "sha256:6fd583f6d313d44b48d40af4b06f394ae42ba504e9301d614a61b4f39b632897",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "bloom.png",
+      "meaning": "BloomNode diagnostic readback.",
+      "source": "images/bloom.png",
+      "sourceSha256": "sha256:b561afc5a6e6be9595df688adf2d12eaefb43ff00bd0dba11a7c8628e51f0f85",
+      "outputSha256": "sha256:b561afc5a6e6be9595df688adf2d12eaefb43ff00bd0dba11a7c8628e51f0f85",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "velocity.moving-positive-x.png",
+      "meaning": "Moving-velocity fixture with expected positive NDC X sign.",
+      "source": "images/velocity.moving-positive-x.png",
+      "sourceSha256": "sha256:b63e11098811ad4db5205321e48b1e1a434fc95311d251e48f3cbc89e0a1b594",
+      "outputSha256": "sha256:b63e11098811ad4db5205321e48b1e1a434fc95311d251e48f3cbc89e0a1b594",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.history.png",
+      "meaning": "Temporal history target before camera-cut reset.",
+      "source": "images/temporal.history.png",
+      "sourceSha256": "sha256:2d9d12931a82d48de7a27c7838c0366d40e19c82db358335b169fe0f8a1de1b4",
+      "outputSha256": "sha256:2d9d12931a82d48de7a27c7838c0366d40e19c82db358335b169fe0f8a1de1b4",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Signal, velocity, temporal-reset, and diagnostic readbacks passed the lab artifact validator.",
+    "Current-adapter GPU timestamp and lifecycle evidence remain INSUFFICIENT_EVIDENCE."
+  ]
+}

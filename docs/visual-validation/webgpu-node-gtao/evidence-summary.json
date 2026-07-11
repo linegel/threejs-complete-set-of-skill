@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-node-gtao",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "webgpu-node-gtao",
+  "canonicalSource": [
+    "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
+  ],
+  "canonicalSourceHash": "sha256:13b12376bae7428325bcf963253dd9a063e46f1191f7cb3db038604f35c093bc",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
+    "isWebGPUBackend": true,
+    "threeRevision": "185"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "AO-applied lit render-target readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Display-referred lit output with GTAO applied.",
+      "source": "final-lit-display.raw",
+      "sourceSha256": "sha256:c07ca8fafb29602b49a6d9cfb3c9276a6c15d18e981e1e9fe03d19857c580cba",
+      "outputSha256": "sha256:19eceb9c725c27fa73a29b714163440f23bcc46775c4873d1762ba96d205ba34",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba8",
+      "readbackId": "final-lit-display",
+      "readbackRoute": "explicit-single-attachment-staging-target"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "Display-referred lit baseline with AO disabled.",
+      "source": "no-ao-baseline-display.raw",
+      "sourceSha256": "sha256:33b7c77e8ddace9a1170130d8f8cdd6022eb024dbcf6736f4c29d2d76ede7f46",
+      "outputSha256": "sha256:6c6b7455fc56d07988a0d3fa0e336d667eb30c22fd000422ca7eb93417b8f2ce",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba8",
+      "readbackId": "no-ao-baseline-display",
+      "readbackRoute": "explicit-single-attachment-staging-target"
+    },
+    {
+      "file": "raw-gtao.png",
+      "meaning": "Raw GTAO visibility diagnostic.",
+      "source": "raw-gtao.raw",
+      "sourceSha256": "sha256:5cad21b488f264a2837de82bb6700bd61dddef2c2fa975e874abfebad3b56487",
+      "outputSha256": "sha256:41e4c6d98e680b424f64d74ac6423909a029a76d5af5b40e9abdd337cb5791af",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba8",
+      "readbackId": "raw-gtao",
+      "readbackRoute": "explicit-single-attachment-staging-target"
+    },
+    {
+      "file": "reconstructed-gtao.png",
+      "meaning": "Reconstructed and denoised GTAO visibility diagnostic.",
+      "source": "reconstructed-gtao.raw",
+      "sourceSha256": "sha256:68fe23faf037f4d8c56c638b6ce55bb35905ffa7360f23e7e48e2ad70a72530e",
+      "outputSha256": "sha256:a2272ccade3f9e17a54f53dc2c54ac7296ca0ed573f8f9b3813003c0e4d51e09",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba8",
+      "readbackId": "reconstructed-gtao",
+      "readbackRoute": "explicit-single-attachment-staging-target"
+    },
+    {
+      "file": "normal.png",
+      "meaning": "Shared g-buffer normal diagnostic.",
+      "source": "gbuffer-normal.raw",
+      "sourceSha256": "sha256:7ec00a43f41af726496f379eb9c6d1a38a1583b5323ca4bee274dce60b232868",
+      "outputSha256": "sha256:66899dc0fa554f9368d17da3cf0e36013d8a3f555c0582faec0af5f62a42829f",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba8",
+      "readbackId": "gbuffer-normal",
+      "readbackRoute": "explicit-single-attachment-staging-target"
+    },
+    {
+      "file": "velocity.png",
+      "meaning": "Shared g-buffer velocity diagnostic.",
+      "source": "gbuffer-velocity.raw",
+      "sourceSha256": "sha256:210e770cf7c8e49dc9be70629cb8ca6981f887e02b71f6d8f5a80d9abd1cf4cd",
+      "outputSha256": "sha256:64a37973240a6b255a61d5abca96d2ba0f417ce8ab4fe73d6829930da72959a2",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba8",
+      "readbackId": "gbuffer-velocity",
+      "readbackRoute": "explicit-single-attachment-staging-target"
+    }
+  ],
+  "limitations": [
+    "Mechanism and visual-correctness claims remain INSUFFICIENT_EVIDENCE.",
+    "No accepted named-adapter GPU timestamps or lifecycle loop are present."
+  ]
+}

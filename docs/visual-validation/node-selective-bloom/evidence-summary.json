@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "labId": "node-selective-bloom",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "node-selective-bloom",
+  "canonicalSource": [
+    "threejs-bloom/examples/node-selective-bloom"
+  ],
+  "canonicalSourceHash": "sha256:b81b7b546366f221d40f1c049810b0261aea89b9daa54519ec7f57da3b513d84",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
+    "isWebGPUBackend": true,
+    "threeRevision": "185"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "bloom-only.png",
+  "primaryImageLabel": "Bloom-only render-target readback visualization",
+  "images": [
+    {
+      "file": "bloom-only.png",
+      "meaning": "Bloom-only composite target, visualized with a documented Reinhard display transform.",
+      "source": "bloom-composite-target.raw",
+      "sourceSha256": "sha256:48066c53973c589ca9fb5c7ba2684cd1b48fafa407f8c63f1288971dbbdb59cd",
+      "outputSha256": "sha256:f99c68251b8e788fcf51dc8e47d76b715a7165d4dfc70f545fd4f07c8783e8ce",
+      "width": 600,
+      "height": 400,
+      "encoding": "rgba16float-reinhard-srgb",
+      "readbackId": "bloom-composite-target",
+      "readbackRoute": null,
+      "visualization": {
+        "transfer": "max(0, linear) / (1 + max(0, linear)), then linear-sRGB transfer",
+        "nonFiniteValues": 0,
+        "negativeValuesClamped": 0
+      }
+    },
+    {
+      "file": "scene-no-bloom.png",
+      "meaning": "Scene-linear HDR target before bloom, visualized with a documented Reinhard display transform.",
+      "source": "scene-hdr-no-bloom.raw",
+      "sourceSha256": "sha256:d34513e92ea70eb34778840258ae6babd90ff3c242d7f4182afe2a34c9283168",
+      "outputSha256": "sha256:26f7d81fdf7f1beb5314a4afa09615ea10afa0eb850dbc66cfddb1b002fc51a9",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba16float-reinhard-srgb",
+      "readbackId": "scene-hdr-no-bloom",
+      "readbackRoute": null,
+      "visualization": {
+        "transfer": "max(0, linear) / (1 + max(0, linear)), then linear-sRGB transfer",
+        "nonFiniteValues": 0,
+        "negativeValuesClamped": 0
+      }
+    },
+    {
+      "file": "emissive.png",
+      "meaning": "Selective emissive MRT attachment, visualized with a documented Reinhard display transform.",
+      "source": "selective-emissive.raw",
+      "sourceSha256": "sha256:9cc739af68146c67b74b9668e781f7dbe0f2b5e1bd872a7502db20b3a82bd1fd",
+      "outputSha256": "sha256:034841463831a4523c951155f497cac156784b85e97be9d7b013e4bca04711da",
+      "width": 1200,
+      "height": 800,
+      "encoding": "rgba16float-reinhard-srgb",
+      "readbackId": "selective-emissive",
+      "readbackRoute": null,
+      "visualization": {
+        "transfer": "max(0, linear) / (1 + max(0, linear)), then linear-sRGB transfer",
+        "nonFiniteValues": 0,
+        "negativeValuesClamped": 0
+      }
+    },
+    {
+      "file": "bright-pass.png",
+      "meaning": "BloomNode bright-pass target, visualized with a documented Reinhard display transform.",
+      "source": "bright-pass.raw",
+      "sourceSha256": "sha256:56af48d272546bbda3245bc41b086d60aaaa1515c519db45230b804173efec0c",
+      "outputSha256": "sha256:f23a61326c22b07aa1bc84e42dbb5c0f09ea7dd22c18e1498834fb961ea1f7df",
+      "width": 600,
+      "height": 400,
+      "encoding": "rgba16float-reinhard-srgb",
+      "readbackId": "bright-pass",
+      "readbackRoute": null,
+      "visualization": {
+        "transfer": "max(0, linear) / (1 + max(0, linear)), then linear-sRGB transfer",
+        "nonFiniteValues": 0,
+        "negativeValuesClamped": 0
+      }
+    }
+  ],
+  "limitations": [
+    "The promoted primary image is the bloom-only target, not a final scene composite.",
+    "Final-composite, GPU-timing, and lifecycle claims remain INSUFFICIENT_EVIDENCE."
+  ]
+}
