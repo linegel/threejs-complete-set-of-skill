@@ -162,8 +162,17 @@ function renderApp( controller, fixture, result ) {
 
 }
 
-const catalog = await ( await fetch( catalogUrl ) ).json();
-window.__routerCatalog = catalog;
-const controller = new RouterLabController( catalog, readFixedScenario() );
+async function createController() {
+
+	const catalog = await ( await fetch( catalogUrl ) ).json();
+	window.__routerCatalog = catalog;
+	const controller = new RouterLabController( catalog, readFixedScenario() );
+	await controller.ready();
+	return controller;
+
+}
+
+const controllerPromise = createController();
+window.labController = controllerPromise;
+const controller = await controllerPromise;
 window.labController = controller;
-await controller.ready();
