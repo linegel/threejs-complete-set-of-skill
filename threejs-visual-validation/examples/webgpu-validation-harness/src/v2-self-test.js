@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -29,35 +29,26 @@ async function mutateJson( dir, name, mutator ) {
 async function expectMutationRejects( id, expected, mutate ) {
 
 	const dir = await mkdtemp( join( tmpdir(), `threejs-v2-${ id }-` ) );
+	await writeV2ContractFixture( dir );
+	await mutate( dir );
 
 	try {
 
-		await writeV2ContractFixture( dir );
-		await mutate( dir );
+		await validateV2ArtifactBundle( dir );
 
-		try {
+	} catch ( error ) {
 
-			await validateV2ArtifactBundle( dir );
+		if ( expected.test( error.message ) === false ) {
 
-		} catch ( error ) {
-
-			if ( expected.test( error.message ) === false ) {
-
-				throw new Error( `${ id } rejected for the wrong reason: ${ error.message }` );
-
-			}
-
-			return { id, verdict: 'PASS', detected: error.message };
+			throw new Error( `${ id } rejected for the wrong reason: ${ error.message }` );
 
 		}
 
-		throw new Error( `${ id } mutation unexpectedly passed.` );
-
-	} finally {
-
-		await rm( dir, { recursive: true, force: true } );
+		return { id, verdict: 'PASS', detected: error.message, retainedFixture: dir };
 
 	}
+
+	throw new Error( `${ id } mutation unexpectedly passed; retained fixture: ${ dir }.` );
 
 }
 
