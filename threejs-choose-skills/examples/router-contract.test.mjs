@@ -621,6 +621,7 @@ function abiNativeNumericFieldKinds() {
 function validateNumericEvidence( value, path = 'route' ) {
 
 	if ( path === 'route.physicsExternalSolverAdaptersById' ) return;
+	if ( /\.qualityCostEvidenceResourcesByDigest\.[^.]+\.opportunityRowsResource$/.test( path ) ) return;
 	if ( typeof value === 'number' || ( typeof value === 'string' && /^-?\d+(\.\d+)?$/.test( value ) ) ) {
 
 		const structuralComponent = path.match( /\.([A-Za-z][A-Za-z0-9]*)(?:\[\d+\])*$/ );
@@ -740,7 +741,6 @@ function assertInlineNumericEvidenceObject( value, label ) {
 let physicsAbiSchema;
 const clockMappingResourceFixtures = new Map();
 const costOpportunityTableResourceFixtures = new Map();
-const qualityCostEvidenceResourceFixtures = new Map();
 
 function abiRecord( name ) {
 
@@ -4417,14 +4417,17 @@ function validateCanonicalComposedCostEvidence( ledger, graph, context, route ) 
 	assert.ok( Object.values( catchUp.gateResults ).every( ( result ) => result === 'pass' ) && catchUp.requiredDisposition === 'admit', 'catch-up frontier does not pass its gate set' );
 	const qualityRefs = ledger.qualityCostEvidence;
 	assert.deepEqual( qualityRefs.map( ( ref ) => ref.qualityStateAndEpoch.qualityStateId ).sort(), Object.keys( route.physicsQualityStates ).sort(), 'quality cost evidence state closure mismatch' );
+	assert.ok( isPlainObject( ledger.qualityCostEvidenceResourcesByDigest ), 'quality cost evidence resources must be a serialized digest-keyed mapping' );
+	assert.deepEqual( Object.keys( ledger.qualityCostEvidenceResourcesByDigest ).sort(), qualityRefs.map( ( ref ) => ref.evidenceResourceDigest ).sort(), 'quality cost evidence resource catalog does not equal the referenced digest set' );
 	for ( const [ index, ref ] of qualityRefs.entries() ) {
 
 		requireAbiRecord( ref, 'PhysicsQualityCostEvidenceRef', `physicsCostLedger.qualityCostEvidence[${ index }]` );
 		const state = route.physicsQualityStates[ ref.qualityStateAndEpoch.qualityStateId ];
 		assert.equal( ref.qualityStateAndEpoch.qualityEpoch, state.qualityEpoch, `quality cost evidence ${ state.qualityStateId } epoch mismatch` );
 		assert.equal( ref.status, 'accepted', `quality cost evidence ${ state.qualityStateId } is not accepted` );
-		const resource = qualityCostEvidenceResourceFixtures.get( ref.evidenceResourceDigest );
+		const resource = ledger.qualityCostEvidenceResourcesByDigest[ ref.evidenceResourceDigest ];
 		assert.ok( resource, `quality cost evidence ${ state.qualityStateId } references an opaque resource` );
+		requireAbiRecord( resource, 'PhysicsQualityCostEvidenceResource', `quality cost evidence ${ state.qualityStateId } resource` );
 		assert.equal( ref.evidenceResourceDigest, sha256Canonical( resource ), `quality cost evidence ${ state.qualityStateId } resource digest mismatch` );
 		assert.deepEqual( resource.qualityStateAndEpoch, ref.qualityStateAndEpoch, `quality cost evidence ${ state.qualityStateId } resource reuses another quality epoch` );
 		assert.equal( resource.graphAndResourceRevisionDigest, ref.graphAndResourceRevisionDigest, `quality cost evidence ${ state.qualityStateId } graph/resource digest mismatch` );
@@ -4439,8 +4442,8 @@ function validateCanonicalComposedCostEvidence( ledger, graph, context, route ) 
 		assert.deepEqual( resourceGates.qualityStateAndEpoch, ref.qualityStateAndEpoch, `quality cost evidence ${ state.qualityStateId } gate epoch mismatch` );
 		assert.deepEqual( [ resourceGates.harnessId, resourceTable.harnessId ], [ resourceHarness.harnessId, resourceHarness.harnessId ], `quality cost evidence ${ state.qualityStateId } harness closure mismatch` );
 		assert.equal( resourceTable.tableDigest, sha256CanonicalExcluding( resourceTable, [ 'tableDigest' ] ), `quality cost evidence ${ state.qualityStateId } opportunity-table digest mismatch` );
-		const resourceRows = costOpportunityTableResourceFixtures.get( resourceTable.resource.contentDigest );
-		assert.ok( resourceRows, `quality cost evidence ${ state.qualityStateId } opportunity rows are opaque` );
+		const resourceRows = resource.opportunityRowsResource;
+		assert.ok( isPlainObject( resourceRows ), `quality cost evidence ${ state.qualityStateId } opportunity rows are opaque` );
 		assert.equal( resourceTable.resource.contentDigest, sha256Canonical( resourceRows ), `quality cost evidence ${ state.qualityStateId } opportunity-row digest mismatch` );
 		assert.ok( resourceRows.runs.every( ( run ) => JSON.stringify( run.pattern.qualityStateAndEpoch ) === JSON.stringify( ref.qualityStateAndEpoch ) ), `quality cost evidence ${ state.qualityStateId } opportunity rows reuse another quality epoch` );
 		assert.equal( resourceTotals.exactTotalsDigest, sha256CanonicalExcluding( resourceTotals, [ 'exactTotalsDigest' ] ), `quality cost evidence ${ state.qualityStateId } cadence digest mismatch` );
@@ -6177,7 +6180,7 @@ function attachCanonicalCostLedger( route ) {
 		cpuWork: [ { task: 'graph-schedule', p95: evidence( 0.5, 'millisecond', 'Measured', 'mobile-sustained-trace' ) } ], allocationGcAndCompilation: [ { category: 'steady-runtime', allocations: evidence( 0, 'allocation-per-frame', 'Measured', 'mobile-sustained-trace' ) } ],
 		uploadsCopiesMaps: trafficRecords,
 		hostCompletionsReadbacksPerPresentedFrame: evidence( 0, 'readback-per-frame', 'Measured', 'mobile-sustained-trace' ), synchronization: [ { kind: 'same-queue', p95: evidence( 0, 'millisecond', 'Measured', 'mobile-sustained-trace' ) } ],
-		workAttribution, sharedWorkKeys: [ sharedWorkKey ], perViewWorkKeys, hotState, peakTransient, migrationOverlap, qualityCostEvidence: [], qualityMigrationCostEvidence: [],
+		workAttribution, sharedWorkKeys: [ sharedWorkKey ], perViewWorkKeys, hotState, peakTransient, migrationOverlap, qualityCostEvidence: [], qualityCostEvidenceResourcesByDigest: {}, qualityMigrationCostEvidence: [],
 		multiviewAndFramesInFlightMultipliers: { viewCount: evidence( 2, 'view', 'Measured', 'fixture-route' ), framesInFlight: evidence( 2, 'frame', 'Measured', 'backend-trace' ), resourceMultiplier: evidence( 1.4, 'ratio', 'Derived', 'resource-ledger' ), workMultiplier: evidence( 1.25, 'ratio', 'Measured', 'mobile-sustained-trace' ) }, thermalPowerState: { state: 'sustained nominal', duration: evidence( 300, 'second', 'Measured', 'mobile-sustained-trace' ) }
 	};
 
@@ -6260,6 +6263,8 @@ function createQualityCostEvidenceResource( route, state ) {
 		recordDigest: 'pending'
 	};
 	steadyCostLedger.recordDigest = sha256CanonicalExcluding( steadyCostLedger, [ 'recordDigest' ] );
+	const opportunityRowsResource = clone( costOpportunityTableResourceFixtures.get( opportunityTable.resource.contentDigest ) );
+	assert.ok( opportunityRowsResource, `quality cost evidence ${ state.qualityStateId } cannot serialize its opportunity rows` );
 	const resource = {
 		resourceType: 'PhysicsQualityCostEvidenceResource',
 		qualityStateAndEpoch: clone( identity ),
@@ -6267,13 +6272,13 @@ function createQualityCostEvidenceResource( route, state ) {
 		harness,
 		gateSet,
 		opportunityTable,
+		opportunityRowsResource,
 		cadenceTraceTotals,
 		composedTrace,
 		worstPermittedCatchUpCost: catchUp,
 		steadyCostLedger
 	};
 	const evidenceResourceDigest = sha256Canonical( resource );
-	qualityCostEvidenceResourceFixtures.set( evidenceResourceDigest, resource );
 	return { resource, evidenceResourceDigest };
 
 }
@@ -6285,6 +6290,7 @@ function attachCanonicalQualityCostEvidence( route ) {
 	if ( transitions.length === 0 ) {
 
 		ledger.qualityCostEvidence = [];
+		ledger.qualityCostEvidenceResourcesByDigest = {};
 		ledger.qualityMigrationCostEvidence = [];
 		return;
 
@@ -6321,11 +6327,13 @@ function attachCanonicalQualityCostEvidence( route ) {
 	} );
 	const migrationByTransition = new Map( migrationEvidence.map( ( evidenceRecord ) => [ evidenceRecord.transitionId, evidenceRecord ] ) );
 	ledger.qualityMigrationCostEvidence = migrationEvidence;
+	ledger.qualityCostEvidenceResourcesByDigest = {};
 	ledger.qualityCostEvidence = Object.values( route.physicsQualityStates ).map( ( state ) => {
 
 		const incoming = transitions.filter( ( transition ) => transition.toState === state.qualityStateId ).map( ( transition ) => migrationByTransition.get( transition.transitionId ).migrationCostEvidenceId );
 		const outgoing = transitions.filter( ( transition ) => transition.fromState === state.qualityStateId ).map( ( transition ) => migrationByTransition.get( transition.transitionId ).migrationCostEvidenceId );
 		const { resource, evidenceResourceDigest } = createQualityCostEvidenceResource( route, state );
+		ledger.qualityCostEvidenceResourcesByDigest[ evidenceResourceDigest ] = resource;
 		return {
 			qualityStateAndEpoch: clone( resource.qualityStateAndEpoch ), graphAndResourceRevisionDigest: resource.graphAndResourceRevisionDigest, evidenceResourceDigest,
 			harnessId: resource.harness.harnessId, gateSetId: resource.gateSet.gateSetId, steadyCostLedgerId: resource.steadyCostLedger.steadyCostLedgerId,
@@ -7986,6 +7994,13 @@ const semanticInvariantRejectCases = Object.freeze( {
 		'catchup-policy-mismatch': semanticRouteCase( ( route ) => { route.physicsCostLedger.worstPermittedCatchUpCost.catchUpPolicyIdentity.maximumCoordinationAdvancesPerPresentationOpportunity.value ++; } ),
 		'stale-harness-digest': semanticRouteCase( ( route ) => { route.physicsCostLedger.harness.target.deviceId = 'different-device-with-stale-digest'; } ),
 		'opaque-quality-cost-resource': semanticRouteCase( ( route ) => { route.physicsCostLedger.qualityCostEvidence[ 0 ].evidenceResourceDigest = 'sha256:missing-quality-cost-resource'; } ),
+		'unreferenced-quality-cost-resource': semanticRouteCase( ( route ) => {
+
+			const resource = Object.values( route.physicsCostLedger.qualityCostEvidenceResourcesByDigest )[ 0 ];
+			route.physicsCostLedger.qualityCostEvidenceResourcesByDigest[ 'sha256:unreferenced-quality-cost-resource' ] = clone( resource );
+
+		} ),
+		'embedded-quality-rows-digest-mismatch': semanticRouteCase( ( route ) => { Object.values( route.physicsCostLedger.qualityCostEvidenceResourcesByDigest )[ 0 ].opportunityRowsResource.rowCount ++; } ),
 		'quality-epoch-evidence-reuse': semanticRouteCase( ( route ) => {
 
 			const active = route.physicsCostLedger.qualityCostEvidence.find( ( ref ) => ref.qualityStateAndEpoch.qualityStateId === route.physicsCostLedger.qualityState );
@@ -8283,6 +8298,7 @@ abortedExecutionFixture.physicsQualityRequests = {};
 abortedExecutionFixture.physicsQualityStates = {};
 abortedExecutionFixture.physicsQualityTransitions = [];
 abortedExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
+abortedExecutionFixture.physicsCostLedger.qualityCostEvidenceResourcesByDigest = {};
 abortedExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( abortedExecutionFixture );
 
@@ -8317,6 +8333,7 @@ candidatePairSubsetFixture.physicsQualityRequests = {};
 candidatePairSubsetFixture.physicsQualityStates = {};
 candidatePairSubsetFixture.physicsQualityTransitions = [];
 candidatePairSubsetFixture.physicsCostLedger.qualityCostEvidence = [];
+candidatePairSubsetFixture.physicsCostLedger.qualityCostEvidenceResourcesByDigest = {};
 candidatePairSubsetFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( candidatePairSubsetFixture );
 
@@ -8354,6 +8371,7 @@ allTargetPreSealAbortFixture.physicsQualityRequests = {};
 allTargetPreSealAbortFixture.physicsQualityStates = {};
 allTargetPreSealAbortFixture.physicsQualityTransitions = [];
 allTargetPreSealAbortFixture.physicsCostLedger.qualityCostEvidence = [];
+allTargetPreSealAbortFixture.physicsCostLedger.qualityCostEvidenceResourcesByDigest = {};
 allTargetPreSealAbortFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( allTargetPreSealAbortFixture );
 const fabricatedPreSealResetResult = clone( allTargetPreSealAbortFixture );
@@ -8386,6 +8404,7 @@ deviceLossExecutionFixture.physicsQualityRequests = {};
 deviceLossExecutionFixture.physicsQualityStates = {};
 deviceLossExecutionFixture.physicsQualityTransitions = [];
 deviceLossExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
+deviceLossExecutionFixture.physicsCostLedger.qualityCostEvidenceResourcesByDigest = {};
 deviceLossExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( deviceLossExecutionFixture );
 const mismatchedDeviceLossGenerationFixture = clone( deviceLossExecutionFixture );
@@ -8445,6 +8464,7 @@ mixedDeviceLossExecutionFixture.physicsQualityRequests = {};
 mixedDeviceLossExecutionFixture.physicsQualityStates = {};
 mixedDeviceLossExecutionFixture.physicsQualityTransitions = [];
 mixedDeviceLossExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
+mixedDeviceLossExecutionFixture.physicsCostLedger.qualityCostEvidenceResourcesByDigest = {};
 mixedDeviceLossExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( mixedDeviceLossExecutionFixture );
 

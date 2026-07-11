@@ -135,6 +135,7 @@
         "PhysicsPresentationCandidate",
         "PhysicsPresentationSnapshot",
         "PhysicsQualityStateDescriptor",
+        "PhysicsQualityCostEvidenceResource",
         "PhysicsQualityCostEvidenceRef",
         "PhysicsQualityMigrationCostEvidence",
         "PhysicsQuantitySystem",
@@ -2522,6 +2523,25 @@
         "properties": {
           "value": {
             "$ref": "#/$defs/PhysicsQualityStateDescriptor"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsQualityCostEvidenceResource"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsQualityCostEvidenceResource"
           }
         }
       }
@@ -13047,6 +13067,7 @@
         "peakTransient",
         "migrationOverlap",
         "qualityCostEvidence",
+        "qualityCostEvidenceResourcesByDigest",
         "qualityMigrationCostEvidence",
         "thermalPowerState"
       ],
@@ -13184,6 +13205,15 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/PhysicsQualityCostEvidenceRef"
+          }
+        },
+        "qualityCostEvidenceResourcesByDigest": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyString"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/PhysicsQualityCostEvidenceResource"
           }
         },
         "qualityMigrationCostEvidence": {
@@ -16804,6 +16834,36 @@
         "composedMeasuredDistributions": { "$ref": "#/$defs/AnyAbiValue" },
         "derivedUpperBoundsAndAssumptions": { "$ref": "#/$defs/AnyAbiValue" },
         "witnessDigest": { "$ref": "#/$defs/Id" }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsQualityCostEvidenceResource": {
+      "type": "object",
+      "required": [
+        "resourceType",
+        "qualityStateAndEpoch",
+        "graphAndResourceRevisionDigest",
+        "harness",
+        "gateSet",
+        "opportunityTable",
+        "opportunityRowsResource",
+        "cadenceTraceTotals",
+        "composedTrace",
+        "worstPermittedCatchUpCost",
+        "steadyCostLedger"
+      ],
+      "properties": {
+        "resourceType": { "const": "PhysicsQualityCostEvidenceResource" },
+        "qualityStateAndEpoch": { "$ref": "#/$defs/AnyAbiValue" },
+        "graphAndResourceRevisionDigest": { "$ref": "#/$defs/Id" },
+        "harness": { "$ref": "#/$defs/PhysicsCostHarness" },
+        "gateSet": { "$ref": "#/$defs/PhysicsComposedCostGateSet" },
+        "opportunityTable": { "$ref": "#/$defs/PhysicsCostOpportunityTable" },
+        "opportunityRowsResource": { "$ref": "#/$defs/AnyAbiValue" },
+        "cadenceTraceTotals": { "$ref": "#/$defs/CadenceTraceTotals" },
+        "composedTrace": { "$ref": "#/$defs/PhysicsComposedCostTrace" },
+        "worstPermittedCatchUpCost": { "$ref": "#/$defs/PhysicsWorstPermittedCatchUpCost" },
+        "steadyCostLedger": { "$ref": "#/$defs/AnyAbiValue" }
       },
       "additionalProperties": false
     },
@@ -21732,6 +21792,7 @@
         "peakTransient",
         "migrationOverlap",
         "qualityCostEvidence",
+        "qualityCostEvidenceResourcesByDigest",
         "qualityMigrationCostEvidence",
         "thermalPowerState"
       ]
@@ -21842,6 +21903,21 @@
         "composedMeasuredDistributions",
         "derivedUpperBoundsAndAssumptions",
         "witnessDigest"
+      ]
+    },
+    "PhysicsQualityCostEvidenceResource": {
+      "required": [
+        "resourceType",
+        "qualityStateAndEpoch",
+        "graphAndResourceRevisionDigest",
+        "harness",
+        "gateSet",
+        "opportunityTable",
+        "opportunityRowsResource",
+        "cadenceTraceTotals",
+        "composedTrace",
+        "worstPermittedCatchUpCost",
+        "steadyCostLedger"
       ]
     },
     "PhysicsQualityCostEvidenceRef": {
@@ -23547,6 +23623,7 @@
         "PhysicsComposedCostTrace",
         "PhysicsWorstPermittedCatchUpCost",
         "PhysicsCatchUpCostWitness",
+        "PhysicsQualityCostEvidenceResource",
         "PhysicsQualityCostEvidenceRef",
         "PhysicsQualityMigrationCostEvidence"
       ],
@@ -23562,6 +23639,8 @@
           "catchup-policy-mismatch",
           "stale-harness-digest",
           "opaque-quality-cost-resource",
+          "unreferenced-quality-cost-resource",
+          "embedded-quality-rows-digest-mismatch",
           "quality-epoch-evidence-reuse",
           "migration-evidence-omitted"
         ]

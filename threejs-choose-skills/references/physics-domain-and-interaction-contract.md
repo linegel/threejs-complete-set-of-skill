@@ -3647,6 +3647,7 @@ PhysicsCostLedger:
   peakTransient: PhysicsMemoryLedger
   migrationOverlap: PhysicsMemoryLedger
   qualityCostEvidence: [PhysicsQualityCostEvidenceRef]
+  qualityCostEvidenceResourcesByDigest: { content-digest: PhysicsQualityCostEvidenceResource }
   qualityMigrationCostEvidence: [PhysicsQualityMigrationCostEvidence]
   thermalPowerState: measured-or-unavailable
 
@@ -3783,9 +3784,23 @@ PhysicsCatchUpCostWitness:
   derivedUpperBoundsAndAssumptions: typed-record
   witnessDigest: collision-resistant-digest
 
+PhysicsQualityCostEvidenceResource:
+  resourceType: PhysicsQualityCostEvidenceResource
+  qualityStateAndEpoch: typed-quality-identity
+  graphAndResourceRevisionDigest: collision-resistant-digest
+  harness: PhysicsCostHarness
+  gateSet: PhysicsComposedCostGateSet
+  opportunityTable: PhysicsCostOpportunityTable
+  opportunityRowsResource: typed-canonical-opportunity-row-resource
+  cadenceTraceTotals: CadenceTraceTotals
+  composedTrace: PhysicsComposedCostTrace
+  worstPermittedCatchUpCost: PhysicsWorstPermittedCatchUpCost
+  steadyCostLedger: typed-steady-cost-ledger
+
 PhysicsQualityCostEvidenceRef:
   qualityStateAndEpoch: typed-quality-identity
   graphAndResourceRevisionDigest: collision-resistant-digest
+  evidenceResourceDigest: collision-resistant-digest
   harnessId: PhysicsCostHarnessId
   gateSetId: PhysicsComposedCostGateSetId
   steadyCostLedgerId: PhysicsCostLedgerId
@@ -4154,7 +4169,12 @@ the router's single hysteretic controller; physics domains do not independently
 oscillate tiers. A controller may enter a state only when its
 `PhysicsQualityCostEvidenceRef` is accepted for the active harness and both the
 steady and worst-permitted catch-up gates pass. A transition is separately
-admissible only when its migration-cost evidence passes.
+admissible only when its migration-cost evidence passes. Every quality-cost
+reference resolves through `qualityCostEvidenceResourcesByDigest`; that mapping
+has exactly the referenced digest key set, each value validates as a
+`PhysicsQualityCostEvidenceResource`, and the key equals the digest of the full
+resource including its canonical opportunity rows. Test-process globals or an
+out-of-band resolver cannot satisfy this closure.
 
 ## Validation Scenarios And Failure Gates
 
