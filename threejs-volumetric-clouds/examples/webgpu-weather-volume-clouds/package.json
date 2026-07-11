@@ -1,12 +1,19 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check *.js && node --check validate-generated-weather-maps.mjs && node --check generated-weather-maps-browser.mjs",
-    "validate": "node validation.js && node validate-generated-weather-maps.mjs",
+    "check": "node check.mjs",
+    "validate": "node validation.js",
+    "validate:unit": "node validation.js",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-weather-volume-clouds --target final",
+    "capture:evidence": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts",
     "validate:generated-assets": "node validate-generated-weather-maps.mjs"
   },
   "dependencies": {
-    "playwright": "^1.45.0",
-    "three": "^0.185.1"
+    "playwright": "1.61.1",
+    "three": "0.185.1"
   }
 }

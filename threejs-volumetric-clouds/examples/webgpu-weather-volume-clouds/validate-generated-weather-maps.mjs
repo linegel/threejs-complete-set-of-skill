@@ -128,13 +128,18 @@ function createVisualContract() {
       [invariants[1]]: { requiredImages: ["images/final.design.png", "images/no-post.design.png"], requiredDiagnostics: ["density after alpha erosion"], requiredMetrics: ["weatherDelta", "densityRange", "erosionEffect"], blockingFailures: ["flat weather response", "alpha ignored"] },
       [invariants[2]]: { requiredImages: ["images/diagnostics.mosaic.png", "images/seed-stress.final.png"], requiredDiagnostics: ["weather RGB", "erosion"], requiredMetrics: ["densityRange"], blockingFailures: ["final-only evidence"] },
     },
-    allowedDivergences: ["Canvas2D evidence isolates generated weather-map usefulness after WebGPU backend gate; full cloud rendering remains reduced-resolution TSL/storage raymarch with temporal reconstruction."],
+    allowedDivergences: ["Canvas2D evidence isolates generated weather-map usefulness after the WebGPU backend gate; the separate cloud package remains a scaffold and this artifact check does not validate its raymarch, history, shadows, or composite."],
     requiredImages,
     requiredDiagnostics: ["weather RGB", "alpha erosion", "density", "temporal advection"],
     requiredMetrics: ["renderer-info.json", "timings.json", "weatherDelta", "densityRange", "erosionEffect"],
     blockingFailures: ["missing WebGPU backend", "wrong asset color space", "lost alpha", "blank capture", "final-only evidence"],
-    frameBudgetMs: { desktopDiscrete: 12, desktopIntegrated: 24, mobile: 33 },
-    memoryBudgetMB: 128,
+    performanceClaim: "none: this Canvas2D artifact check does not benchmark the cloud GPU workload",
+    benchmarkContract: {
+      workloadTuple: ["viewportWidth", "viewportHeight", "dpr", "resolutionScale", "primarySteps", "lightSteps", "activePixels", "historyArchitecture"],
+      requiredStatistics: ["whole-frame p50/p95", "paired same-frame marginal p50/p95 against an effect-disabled control"],
+      forbiddenInference: "do not route by device label or add/subtract independently sampled percentiles",
+    },
+    memoryAccounting: { required: true, authoredCeilingBytes: null },
   };
 }
 
@@ -187,7 +192,7 @@ function createEvidence({ assets, rendererInfo, metrics }) {
         cameraMatrixRequired: true,
       },
       stochasticMasks: [{ name: "none", path: null, reason: "fixed generated assets and deterministic cloud weather sampling" }],
-      knownCompromises: ["Generated weather maps are reduced-tier diagnostic inputs; canonical clouds still require bounded raymarch, temporal reprojection, and cloud-shadow products."],
+      knownCompromises: ["Generated weather maps are diagnostic inputs; a conforming cloud renderer still requires bounded ray intervals, completed temporal reconstruction, and receiver-correct shadow products."],
       domainMetrics: metrics,
     },
     rendererInfo,
@@ -206,7 +211,7 @@ function createEvidence({ assets, rendererInfo, metrics }) {
       required: true,
       loops: lifecycleLoops.map((name) => ({ name, iterations: 1, before: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, after: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, pass: true })),
       summary: { pass: true, uncapturedBackendErrors: [], knownInternalCacheDeltas: [] },
-      allowedCacheNotes: ["Browser page is closed after capture; canonical cloud storage resources are validated by validation.js."],
+      allowedCacheNotes: ["Browser page is closed after capture; validation.js checks scaffold resource plans, not live cloud allocation or disposal."],
     },
   };
 }

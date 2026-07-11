@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-weather-volume-clouds",
+  "title": "Native WebGPU Weather Volume Clouds",
+  "skill": "threejs-volumetric-clouds",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-config.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-domains.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-nodes.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-history.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-shadows.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-composite.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/browser-app.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/lab-routes.js",
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/route-shell.js"
+  ],
+  "browserEntry": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/index.html",
+  "publishPath": "/demos/webgpu-weather-volume-clouds/",
+  "scenarios": [
+    { "id": "spherical-shell", "route": "scenario/spherical-shell/", "startup": { "scenario": "spherical-shell", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "planar-slab", "route": "scenario/planar-slab/", "startup": { "scenario": "planar-slab", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "obb-cloud-bank", "route": "scenario/obb-cloud-bank/", "startup": { "scenario": "obb-cloud-bank", "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "atmosphere-composition", "route": "scenario/atmosphere-composition/", "startup": { "scenario": "spherical-shell", "mode": "final" }, "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "flagship-transport", "route": "mechanism/flagship-transport/", "startup": { "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "density-and-bounds", "route": "mechanism/density-and-bounds/", "startup": { "mode": "ray-near-far" }, "acceptanceStatus": "incomplete" },
+    { "id": "cloud-shadows", "route": "mechanism/cloud-shadows/", "startup": { "mode": "cloud-shadow" }, "acceptanceStatus": "incomplete" },
+    { "id": "temporal-and-upsample", "route": "mechanism/temporal-and-upsample/", "startup": { "mode": "history-rejection" }, "acceptanceStatus": "incomplete" },
+    { "id": "tier-benchmark", "route": "mechanism/tier-benchmark/", "startup": { "mode": "storage-budget" }, "acceptanceStatus": "incomplete" },
+    { "id": "atmosphere-composition", "route": "mechanism/atmosphere-composition/", "startup": { "mode": "final" }, "acceptanceStatus": "incomplete" },
+    { "id": "failure-diagnostics", "route": "mechanism/failure-diagnostics/", "startup": { "mode": "sample-counts" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "ultra",
+      "targetClass": "current-adapter-unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "linearScale": 0.5 },
+      "mechanismLimits": { "primarySteps": 160, "lightSteps": 8, "shadowCascades": 3, "shadowResolution": 1024 },
+      "resourceLimits": { "representativeDepth": "R32F", "cloudHistory": "RGBA16F" },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["bounded-domain-march", "beer-lambert-transfer", "advected-temporal-history", "single-output-owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "high",
+      "targetClass": "current-adapter-unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "linearScale": 0.5 },
+      "mechanismLimits": { "primarySteps": 96, "lightSteps": 6, "shadowCascades": 3, "shadowResolution": 512 },
+      "resourceLimits": { "representativeDepth": "R32F", "cloudHistory": "RGBA16F" },
+      "degradationFromPrevious": ["fewer primary and light samples", "lower shadow resolution"],
+      "preservedInvariants": ["bounded-domain-march", "beer-lambert-transfer", "advected-temporal-history", "single-output-owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "default",
+      "targetClass": "current-adapter-unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "linearScale": 0.25 },
+      "mechanismLimits": { "primarySteps": 64, "lightSteps": 4, "shadowCascades": 2, "shadowResolution": 384 },
+      "resourceLimits": { "representativeDepth": "R32F", "cloudHistory": "RGBA16F" },
+      "degradationFromPrevious": ["quarter-linear cloud grid", "fewer light samples", "two shadow cascades"],
+      "preservedInvariants": ["bounded-domain-march", "beer-lambert-transfer", "advected-temporal-history", "single-output-owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "mobile",
+      "targetClass": "mobile-class-unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "linearScale": 0.25 },
+      "mechanismLimits": { "primarySteps": 32, "lightSteps": 2, "shadowCascades": 1, "shadowResolution": 256 },
+      "resourceLimits": { "representativeDepth": "R32F", "cloudHistory": "RGBA16F" },
+      "degradationFromPrevious": ["fewer primary and light samples", "disable unresolved detail", "one shadow cascade"],
+      "preservedInvariants": ["bounded-domain-march", "beer-lambert-transfer", "advected-temporal-history", "single-output-owner"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "density", "ray-near-far", "sample-counts", "sun-optical-depth", "cloud-shadow", "transmittance", "representative-depth", "velocity", "history-uv", "variance-bounds", "history-rejection", "upsample-depth-weights", "storage-budget"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "storage-textures", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "bounded-compute-dispatch", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "metric-r32f-depth-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "temporal-disocclusion-rejection", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "current-adapter-gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "node threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/validation.js",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "Generated weather-map pages remain generated-asset previews and are not canonical mechanism evidence.",
+    "Node structural and float64 oracle validation passes; browser/GPU capture is blocked in the current execution policy, so acceptance remains incomplete."
+  ]
+}

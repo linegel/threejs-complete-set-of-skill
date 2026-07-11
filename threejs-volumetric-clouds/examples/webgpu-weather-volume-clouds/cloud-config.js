@@ -20,7 +20,7 @@ export const EXPECTED_ASSET_CONTRACT = Object.freeze({
  * @property {number} weatherExponent
  * @property {number} coverageFilterWidth
  * @property {number} shapeAlteringBias
- * @property {number} densityScale
+ * @property {number} densityAmplitude
  * @property {number} shapeAmount
  * @property {number} detailAmount
  * @property {boolean} castsCloudShadow
@@ -46,7 +46,7 @@ export const EXPECTED_ASSET_CONTRACT = Object.freeze({
 
 /**
  * @typedef {object} TemporalSettings
- * @property {number} temporalAlpha
+ * @property {number} responseTimeSeconds
  * @property {number} depthRejectMeters
  * @property {number} velocityRejectPixels
  * @property {number} varianceClipSigma
@@ -73,7 +73,7 @@ export const DEFAULT_CLOUD_LAYERS = Object.freeze([
     weatherExponent: 1,
     coverageFilterWidth: 0.6,
     shapeAlteringBias: 1,
-    densityScale: 0.2,
+    densityAmplitude: 0.2,
     shapeAmount: 1,
     detailAmount: 1,
     castsCloudShadow: true,
@@ -96,7 +96,7 @@ export const DEFAULT_CLOUD_LAYERS = Object.freeze([
     weatherExponent: 1,
     coverageFilterWidth: 0.6,
     shapeAlteringBias: 1,
-    densityScale: 0.2,
+    densityAmplitude: 0.2,
     shapeAmount: 1,
     detailAmount: 1,
     castsCloudShadow: true,
@@ -119,7 +119,7 @@ export const DEFAULT_CLOUD_LAYERS = Object.freeze([
     weatherExponent: 1.35,
     coverageFilterWidth: 0.5,
     shapeAlteringBias: 1.8,
-    densityScale: 0.003,
+    densityAmplitude: 0.003,
     shapeAmount: 0.4,
     detailAmount: 0,
     castsCloudShadow: false,
@@ -170,6 +170,18 @@ export const CLOUD_QUALITY_TIERS = Object.freeze({
     groundBounce: false,
     multiScatteringOctaves: 4,
   },
+  mobile: {
+    name: "mobile",
+    linearResolutionScale: 0.25,
+    primarySteps: 32,
+    lightSteps: 2,
+    temporalFrames: 16,
+    detail: false,
+    turbulence: false,
+    groundBounce: false,
+    multiScatteringOctaves: 2,
+  },
+  // Compatibility alias. Public canonical routes use "mobile".
   reduced: {
     name: "reduced",
     linearResolutionScale: 0.25,
@@ -199,6 +211,11 @@ export const CLOUD_TIER_BUDGETS = Object.freeze({
     primarySteps: [48, 80],
     lightSteps: [3, 4],
   },
+  mobile: {
+    linearResolutionScale: [0.25, 0.25],
+    primarySteps: [24, 32],
+    lightSteps: [1, 2],
+  },
   reduced: {
     linearResolutionScale: [0.125, 0.25],
     primarySteps: [24, 48],
@@ -207,11 +224,11 @@ export const CLOUD_TIER_BUDGETS = Object.freeze({
 });
 
 export const DEFAULT_TEMPORAL_SETTINGS = Object.freeze({
-  temporalAlpha: 0.12,
+  responseTimeSeconds: 0.13,
   depthRejectMeters: 120,
   velocityRejectPixels: 48,
   varianceClipSigma: 1.5,
-  representativeDepthTarget: "cloudRepresentativeDepthMeters",
+  representativeDepthTarget: "cloudRepresentativeDepthMetersR32F",
   velocityTarget: "cloudVelocityPixels",
   resetCauses: [
     "camera-cut",
@@ -228,12 +245,79 @@ export const DEFAULT_CLOUD_SHADOW_SETTINGS = Object.freeze({
   shadowUpdateCadence: 4,
   maxSamples: 40,
   minTransmittance: 0.0001,
-  channelLayout: [
-    "frontDepth",
-    "meanExtinction",
-    "maxOpticalDepth",
-    "tailEstimate",
-  ],
+  depthRangeMeters: 8000,
+  betaExtinctionPerMeter: 0.001,
+  receiverDomain: "opaque-or-ground-after-full-column",
+  format: "R16F",
+  channelLayout: ["opticalDepth"],
+});
+
+export const CLOUD_SHADOW_TIER_SETTINGS = Object.freeze({
+  ultra: Object.freeze({ cascadeCount: 3, resolution: 1024, maxSamples: 64 }),
+  high: Object.freeze({ cascadeCount: 3, resolution: 512, maxSamples: 48 }),
+  default: Object.freeze({ cascadeCount: 2, resolution: 384, maxSamples: 32 }),
+  mobile: Object.freeze({ cascadeCount: 1, resolution: 256, maxSamples: 16 }),
+  reduced: Object.freeze({ cascadeCount: 1, resolution: 256, maxSamples: 16 }),
+});
+
+export const DEFAULT_CLOUD_OPTICS = Object.freeze({
+  betaScatteringPerMeter: 0.0008,
+  betaAbsorptionPerMeter: 0.0002,
+  phaseConvention: "solid-angle-normalized",
+  sourceUnits: "linear-radiance-per-meter",
+});
+
+const CURRENT_AND_HISTORY_SLOTS = Object.freeze([
+  "current",
+  "history-read",
+  "history-write",
+]);
+
+export const CLOUD_STORAGE_RESOURCE_LAYOUT = Object.freeze({
+  lowResolution: Object.freeze({
+    currentRadiance: Object.freeze({
+      format: "RGBA16F",
+      bytesPerTexel: 8,
+      slots: Object.freeze(["current"]),
+      updateCadenceFrames: 1,
+    }),
+    historyRadiance: Object.freeze({
+      format: "RGBA16F",
+      bytesPerTexel: 8,
+      slots: Object.freeze(["history-read", "history-write"]),
+      updateCadenceFrames: 1,
+    }),
+    representativeDepthCurrentAndHistory: Object.freeze({
+      format: "R32F",
+      bytesPerTexel: 4,
+      slots: CURRENT_AND_HISTORY_SLOTS,
+      updateCadenceFrames: 1,
+    }),
+    velocityCurrentAndHistory: Object.freeze({
+      format: "RG16F",
+      bytesPerTexel: 4,
+      slots: CURRENT_AND_HISTORY_SLOTS,
+      updateCadenceFrames: 1,
+    }),
+    depthMomentsCurrentAndHistory: Object.freeze({
+      format: "RG16F",
+      bytesPerTexel: 4,
+      slots: CURRENT_AND_HISTORY_SLOTS,
+      updateCadenceFrames: 1,
+    }),
+    rejectionMask: Object.freeze({
+      format: "RGBA16F",
+      bytesPerTexel: 8,
+      slots: Object.freeze(["current"]),
+      updateCadenceFrames: 1,
+    }),
+  }),
+  shadowCascades: Object.freeze({
+    format: "R16F",
+    bytesPerTexel: 2,
+    slotsFrom: "cascadeCount",
+    updateCadenceFrom: "shadowUpdateCadence",
+  }),
 });
 
 export function cloneCloudLayer(layer) {
@@ -288,18 +372,45 @@ export function createDefaultCloudConfig(overrides = {}) {
     : DEFAULT_CLOUD_LAYERS.map(cloneCloudLayer);
   const intervalContract =
     overrides.intervalContract ?? packCloudLayerIntervals(layers);
+  const qualityTier = overrides.qualityTier ?? "default";
+  const shadowTier = CLOUD_SHADOW_TIER_SETTINGS[qualityTier];
+  const cloudShadow = {
+    ...structuredClone(DEFAULT_CLOUD_SHADOW_SETTINGS),
+    ...shadowTier,
+    ...(overrides.cloudShadow ?? {}),
+  };
 
   return {
     layers,
-    qualityTier: "default",
+    qualityTier,
     qualityTiers: structuredClone(CLOUD_QUALITY_TIERS),
     temporal: structuredClone(DEFAULT_TEMPORAL_SETTINGS),
-    cloudShadow: structuredClone(DEFAULT_CLOUD_SHADOW_SETTINGS),
+    cloudShadow,
+    optics: structuredClone(DEFAULT_CLOUD_OPTICS),
     storageBudgetMB: 96,
     referenceViewport: { width: 1920, height: 1080 },
     fieldAssets: Object.keys(EXPECTED_ASSET_CONTRACT),
     intervalContract,
+    worldUnitsPerMeter: 1,
+    domain: {
+      type: "spherical-shell",
+      center: [0, -6360000, 0],
+      planetRadiusMeters: 6360000,
+      innerRadiusMeters: 6360750,
+      outerRadiusMeters: 6368000,
+    },
+    camera: {
+      positionMeters: [0, 200, 18000],
+      forward: [0, 0.12, -0.9927738917],
+      right: [1, 0, 0],
+      up: [0, 0.9927738917, 0.12],
+      verticalFovRadians: Math.PI / 3,
+      nearMeters: 0.1,
+      farMeters: 200000,
+    },
     ...overrides,
+    qualityTier,
+    cloudShadow,
   };
 }
 
@@ -321,31 +432,51 @@ export function estimateCloudStorageBytes(
 ) {
   const tier = config.qualityTiers[config.qualityTier];
   const low = computeCloudTargetSize(viewport, tier);
-  const rgba16fBytes = 8;
-  const rg16fBytes = 4;
-  const r16Bytes = 2;
   const lowPixels = low.width * low.height;
   const shadow = config.cloudShadow;
-
-  const currentRadiance = lowPixels * rgba16fBytes;
-  const historyRadiance = lowPixels * rgba16fBytes * 2;
-  const representativeDepthVelocity = lowPixels * rg16fBytes * 2;
-  const rejectionMask = lowPixels * r16Bytes;
+  const lowResolutionParts = Object.fromEntries(
+    Object.entries(CLOUD_STORAGE_RESOURCE_LAYOUT.lowResolution).map(
+      ([name, resource]) => [
+        name,
+        lowPixels * resource.bytesPerTexel * resource.slots.length,
+      ],
+    ),
+  );
+  const {
+    currentRadiance,
+    historyRadiance,
+    representativeDepthCurrentAndHistory,
+    velocityCurrentAndHistory,
+    depthMomentsCurrentAndHistory,
+    rejectionMask,
+  } = lowResolutionParts;
+  const depthMotionCurrentAndHistory =
+    representativeDepthCurrentAndHistory +
+    velocityCurrentAndHistory +
+    depthMomentsCurrentAndHistory;
+  const shadowLayout = CLOUD_STORAGE_RESOURCE_LAYOUT.shadowCascades;
   const shadowCascades =
-    shadow.cascadeCount * shadow.resolution * shadow.resolution * rgba16fBytes;
+    shadow[shadowLayout.slotsFrom] *
+    shadow.resolution *
+    shadow.resolution *
+    shadowLayout.bytesPerTexel;
 
   return {
     bytes:
       currentRadiance +
       historyRadiance +
-      representativeDepthVelocity +
+      depthMotionCurrentAndHistory +
       rejectionMask +
       shadowCascades,
     lowResolution: low,
+    resourceLayout: CLOUD_STORAGE_RESOURCE_LAYOUT,
     parts: {
       currentRadiance,
       historyRadiance,
-      representativeDepthVelocity,
+      depthMotionCurrentAndHistory,
+      representativeDepthCurrentAndHistory,
+      velocityCurrentAndHistory,
+      depthMomentsCurrentAndHistory,
       rejectionMask,
       shadowCascades,
     },
@@ -478,6 +609,46 @@ export function validateCloudConfig(config, manifest) {
     errors.push("at least one cloud layer is required");
   }
 
+  if (!(config.worldUnitsPerMeter > 0)) {
+    errors.push("worldUnitsPerMeter must be positive");
+  }
+  const supportedDomains = new Set(["spherical-shell", "planar-slab", "obb"]);
+  if (!supportedDomains.has(config.domain?.type)) {
+    errors.push(`unsupported cloud domain ${config.domain?.type}`);
+  }
+  if (
+    config.domain?.type === "spherical-shell" &&
+    !(
+      config.domain.innerRadiusMeters > 0 &&
+      config.domain.outerRadiusMeters > config.domain.innerRadiusMeters &&
+      config.domain.planetRadiusMeters <= config.domain.innerRadiusMeters
+    )
+  ) {
+    errors.push("spherical cloud domain requires ordered planet/inner/outer radii");
+  }
+  for (const key of ["positionMeters", "forward", "right", "up"]) {
+    if (!Array.isArray(config.camera?.[key]) || config.camera[key].length !== 3 ||
+        !config.camera[key].every(Number.isFinite)) {
+      errors.push(`camera.${key} must be a finite three-component vector`);
+    }
+  }
+  if (!(config.camera?.verticalFovRadians > 0 && config.camera.verticalFovRadians < Math.PI)) {
+    errors.push("camera.verticalFovRadians must be in (0, pi)");
+  }
+  if (!(config.camera?.nearMeters > 0 && config.camera?.farMeters > config.camera.nearMeters)) {
+    errors.push("camera nearMeters/farMeters must be positive and ordered");
+  }
+  const cameraBasis = [config.camera?.forward, config.camera?.right, config.camera?.up];
+  if (cameraBasis.every((axis) => Array.isArray(axis) && axis.length === 3 && axis.every(Number.isFinite))) {
+    const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    for (const [index, axis] of cameraBasis.entries()) {
+      if (Math.abs(dot3(axis, axis) - 1) > 1e-3) errors.push(`camera basis axis ${index} is not unit length`);
+    }
+    for (const [a, b] of [[0, 1], [0, 2], [1, 2]]) {
+      if (Math.abs(dot3(cameraBasis[a], cameraBasis[b])) > 1e-3) errors.push(`camera basis axes ${a}/${b} are not orthogonal`);
+    }
+  }
+
   for (const layer of config.layers ?? []) {
     if (layer.heightMeters <= 0) {
       errors.push(`${layer.name ?? layer.weatherChannel} has no height`);
@@ -487,6 +658,12 @@ export function validateCloudConfig(config, manifest) {
     }
     if (!layer.densityProfile) {
       errors.push(`${layer.name ?? layer.weatherChannel} lacks densityProfile`);
+    }
+    if (!(layer.densityAmplitude >= 0)) {
+      errors.push(`${layer.name ?? layer.weatherChannel} has invalid densityAmplitude`);
+    }
+    if (!(layer.weatherExponent > 0) || !(layer.coverageFilterWidth > 0)) {
+      errors.push(`${layer.name ?? layer.weatherChannel} has invalid weather shaping controls`);
     }
     if (!layer.weatherWindMetersPerSecond || !layer.shapeWindMetersPerSecond) {
       errors.push(`${layer.name ?? layer.weatherChannel} lacks field winds`);
@@ -519,6 +696,18 @@ export function validateCloudConfig(config, manifest) {
   if (!config.temporal?.resetCauses?.includes("camera-cut")) {
     errors.push("temporal reconstruction must define camera-cut reset");
   }
+  if (!(config.temporal?.responseTimeSeconds > 0)) {
+    errors.push("temporal reconstruction requires positive responseTimeSeconds");
+  }
+
+  const betaScattering = config.optics?.betaScatteringPerMeter;
+  const betaAbsorption = config.optics?.betaAbsorptionPerMeter;
+  if (!(betaScattering >= 0) || !(betaAbsorption >= 0) || betaScattering + betaAbsorption <= 0) {
+    errors.push("cloud optics require nonnegative inverse-meter scattering/absorption coefficients");
+  }
+  if (config.optics?.phaseConvention !== "solid-angle-normalized") {
+    errors.push("cloud optics phaseConvention must be solid-angle-normalized");
+  }
 
   const tierBudget = validateQualityTierBudgets(
     config.qualityTiers,
@@ -531,7 +720,7 @@ export function validateCloudConfig(config, manifest) {
     !sameStringSet(config.cloudShadow?.channelLayout, requiredShadowChannels)
   ) {
     errors.push(
-      "cloud shadow channelLayout must be frontDepth/meanExtinction/maxOpticalDepth/tailEstimate",
+      "cloud shadow channelLayout must contain only opticalDepth",
     );
   }
   if (config.cloudShadow?.cascadeCount < 1 || config.cloudShadow?.resolution < 128) {
@@ -539,6 +728,18 @@ export function validateCloudConfig(config, manifest) {
   }
   if (config.cloudShadow?.cascadeCount > 4 || config.cloudShadow?.resolution > 1024) {
     errors.push("cloud shadow cascade layout exceeds Phase 1 bounds");
+  }
+  if (
+    config.cloudShadow?.format !== "R16F" ||
+    config.cloudShadow?.receiverDomain !== "opaque-or-ground-after-full-column"
+  ) {
+    errors.push("cloud shadow scaffold must be an R16F full-column product for opaque/ground receivers");
+  }
+  if (
+    !(config.cloudShadow?.depthRangeMeters > 0) ||
+    !(config.cloudShadow?.betaExtinctionPerMeter > 0)
+  ) {
+    errors.push("cloud shadow optical depth requires positive length and inverse-meter extinction scales");
   }
 
   if (manifest) {
