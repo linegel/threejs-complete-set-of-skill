@@ -137,6 +137,13 @@ export async function captureLab( session ) {
 		if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
 	}
 
+	await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
+	await session.controllerCall( 'setCamera', 'design' );
+	await session.controllerCall( 'setSeed', 0x00000001 );
+	await session.controllerCall( 'setTime', 0 );
+	await session.controllerCall( 'setMode', 'final' );
+	await session.controllerCall( 'renderOnce' );
+
 	const runtime = {
 		metrics: await session.controllerCall( 'getMetrics' ),
 		pipeline: await session.controllerCall( 'describePipeline' ),
