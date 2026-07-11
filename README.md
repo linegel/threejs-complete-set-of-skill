@@ -149,6 +149,7 @@ system with HDR emission and bloom ownership.
 | [`threejs-procedural-fields`](threejs-procedural-fields/SKILL.md) | Shared scalar/vector fields, domain warping, masks, procedural normals, storage bakes, and CPU/GPU parity. |
 | [`threejs-procedural-materials`](threejs-procedural-materials/SKILL.md) | NodeMaterial PBR identities, triplanar/atlas filtering, specular AA, terrain wetness, lava, emissive surfaces, and dissolve. |
 | [`threejs-procedural-geometry`](threejs-procedural-geometry/SKILL.md) | Semantic mesh writers, indexed BufferGeometry, UV density, normals, material slots, BatchedMesh, and InstancedMesh choices. |
+| [`threejs-object-sculptor`](threejs-object-sculptor/SKILL.md) | Quality-gated reconstruction of reference objects as procedural, action-ready Three.js models. Adapted from [Three.js Object Sculptor](https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin) by [Vinh Hiển](https://github.com/vinhhien112). |
 | [`threejs-procedural-buildings-and-cities`](threejs-procedural-buildings-and-cities/SKILL.md) | Building grammars, facades, profiles, ornaments, roofs, city chunks, and material-slot mesh compilation. |
 | [`threejs-procedural-planets`](threejs-procedural-planets/SKILL.md) | Cube-sphere quadtree planets, crater fields, biome/climate masks, GPU displacement, analytic normals, and atmosphere handoff. |
 | [`threejs-procedural-vegetation`](threejs-procedural-vegetation/SKILL.md) | Trees, grass, foliage, roots, branches, leaf cards, rooted wind, species presets, chunked LOD, and vegetation diagnostics. |
@@ -600,6 +601,16 @@ and migration context for the pack.
 - Node.js for examples and local Three.js inspection.
 - Three.js `^0.185.1` as pinned in [`package.json`](package.json).
 - A browser/device with WebGPU support for full runtime validation.
+
+## Imported Work And Attribution
+
+The standalone [`threejs-object-sculptor`](threejs-object-sculptor/SKILL.md)
+skill and the complete
+[`threejs-object-sculptor` Codex plugin](plugins/threejs-object-sculptor/)
+incorporate [Three.js Object Sculptor](https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin)
+by [Vinh Hiển](https://github.com/vinhhien112), pinned at upstream commit
+`4194e9ad436a0dff4e1ec982fac1ac64dfded241`. The incorporated files retain
+Vinh Hiển's MIT license and copyright notice.
 
 Install package dependencies when working with examples:
 

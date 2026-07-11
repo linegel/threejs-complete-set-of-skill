@@ -1,6 +1,6 @@
 {
   "name": "threejs-webgpu-skill-pack",
-  "description": "26 agent skills with 39 primary Three.js WebGPU/TSL implementations, 5 cross-skill flagships, and evidence-gated validation",
+  "description": "27 agent skills with 39 primary Three.js WebGPU/TSL implementations, 5 cross-skill flagships, and evidence-gated validation",
   "repository": "https://github.com/linegel/threejs-complete-set-of-skill",
   "source": "linegel/threejs-complete-set-of-skill",
   "homepage": "https://threejs-skills.com/",
@@ -24,7 +24,7 @@
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
     "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
-    "skills": 26,
+    "skills": 27,
     "primaryImplementations": 39,
     "loadablePrimaryImplementations": 39,
     "canonicalLabs": 27,
@@ -162,6 +162,7 @@
         "threejs-procedural-fields",
         "threejs-procedural-materials",
         "threejs-procedural-geometry",
+        "threejs-object-sculptor",
         "threejs-procedural-buildings-and-cities",
         "threejs-procedural-planets",
         "threejs-procedural-vegetation",
@@ -1451,6 +1452,29 @@
       "page": "https://threejs-skills.com/skills/threejs-image-pipeline.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md",
       "raw": "https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-image-pipeline/SKILL.md"
+    },
+    {
+      "name": "threejs-object-sculptor",
+      "title": "Three.js Object Sculptor",
+      "description": "Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image suitability checks, ObjectSculptSpec extraction, geometry/material/lighting planning, code-native model implementation, staged visual comparison, animation-ready hierarchy, or destruction-ready component design. Adapted from Three.js Object Sculptor by Vinh Hiển.",
+      "examples": [],
+      "attribution": {
+        "author": "Vinh Hiển",
+        "authorUrl": "https://github.com/vinhhien112",
+        "sourceName": "Three.js Object Sculptor Codex Plugin",
+        "sourceUrl": "https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin",
+        "revision": "4194e9ad436a0dff4e1ec982fac1ac64dfded241",
+        "license": "MIT",
+        "importedDate": "2026-07-11",
+        "importedIso": "2026-07-11T00:00:00+03:00"
+      },
+      "primaryImplementations": [],
+      "flagshipParticipation": [],
+      "demos": [],
+      "latestUpdate": null,
+      "page": "https://threejs-skills.com/skills/threejs-object-sculptor.html",
+      "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/SKILL.md",
+      "raw": "https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-object-sculptor/SKILL.md"
     },
     {
       "name": "threejs-particles-trails-and-effects",

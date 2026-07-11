@@ -37,12 +37,24 @@ const PUBLISHER = {
 };
 const PUBLISHER_REF = { '@id': PUBLISHER_ID };
 const DEMO_REGISTRY = buildDemoRegistry();
+const ATTRIBUTIONS = {
+  'threejs-object-sculptor': {
+    author: 'Vinh Hiển',
+    authorUrl: 'https://github.com/vinhhien112',
+    sourceName: 'Three.js Object Sculptor Codex Plugin',
+    sourceUrl: 'https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin',
+    revision: '4194e9ad436a0dff4e1ec982fac1ac64dfded241',
+    license: 'MIT',
+    importedDate: '2026-07-11',
+    importedIso: '2026-07-11T00:00:00+03:00',
+  },
+};
 
 const CATEGORIES = [
   { name: 'Planning and Validation', blurb: 'Route requests to the right experts, diagnose version-dependent failures, and prove results with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-debugging', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
   { name: 'Cameras, Lighting, and Final Image', blurb: 'Who owns depth, tone mapping, and the last pass — the difference between a demo and an image.', slugs: ['threejs-camera-controls-and-rigs', 'threejs-scalable-real-time-shadows', 'threejs-ambient-contact-shading', 'threejs-bloom', 'threejs-exposure-color-grading', 'threejs-image-pipeline'] },
   { name: 'Worlds and Environments', blurb: 'Skies, oceans, weather, and water that share causes instead of fighting each other.', slugs: ['threejs-sky-atmosphere-and-haze', 'threejs-volumetric-clouds', 'threejs-spectral-ocean', 'threejs-water-optics', 'threejs-rain-snow-and-wet-surfaces'] },
-  { name: 'Procedural Content', blurb: 'Fields, materials, geometry, buildings, planets, vegetation, creatures — authored systems, not noise soup.', slugs: ['threejs-procedural-fields', 'threejs-procedural-materials', 'threejs-procedural-geometry', 'threejs-procedural-buildings-and-cities', 'threejs-procedural-planets', 'threejs-procedural-vegetation', 'threejs-procedural-creatures'] },
+  { name: 'Procedural Content', blurb: 'Fields, materials, geometry, object reconstruction, buildings, planets, vegetation, creatures — authored systems, not noise soup.', slugs: ['threejs-procedural-fields', 'threejs-procedural-materials', 'threejs-procedural-geometry', 'threejs-object-sculptor', 'threejs-procedural-buildings-and-cities', 'threejs-procedural-planets', 'threejs-procedural-vegetation', 'threejs-procedural-creatures'] },
   { name: 'Motion and Effects', blurb: 'Kinematics, particles, surface history, and spacetime — motion with frame-rate-independent discipline.', slugs: ['threejs-procedural-motion-systems', 'threejs-particles-trails-and-effects', 'threejs-dynamic-surface-effects', 'threejs-black-holes-and-space-effects'] },
 ];
 
@@ -217,6 +229,7 @@ for (const d of readdirSync(root)) {
     body,
     examples,
     demoRecords,
+    attribution: ATTRIBUTIONS[d] ?? null,
     published: earliestSkillUpdate(d),
     update: latestSkillUpdate(d),
   };
@@ -1010,6 +1023,7 @@ ${navHtml('../')}
     <div class="identity-grid">
       <article class="about-card"><code>maintainer</code><h3>linegel</h3><p>Repository owner and current public maintainer. Review the <a href="https://github.com/linegel">GitHub profile</a>, signed-in activity, and commit history directly.</p></article>
       <article class="about-card"><code>contributors</code><h3>Repository contributors</h3><p>Every accepted change remains attributable through the public <a href="${REPO}/graphs/contributors">contributors graph</a> and per-file Git history.</p></article>
+      <article class="about-card"><code>incorporated work</code><h3>Vinh Hiển</h3><p>The <a href="${SITE}skills/threejs-object-sculptor.html">Three.js Object Sculptor skill</a> and plugin are adapted from <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin">Vinh Hiển's original MIT-licensed project</a> at pinned commit <code>4194e9ad436a</code>.</p></article>
       <article class="about-card"><code>license</code><h3>ISC licensed</h3><p>The source and generated presentation are distributed under the repository’s <a href="${REPO}/blob/main/LICENSE">ISC License</a>. Third-party dependencies retain their own licenses.</p></article>
     </div>
   </div></section>
@@ -1088,6 +1102,12 @@ for (const slug of slugs) {
   const demoChipHtml = skillDemos.length ? `<span class="chip">${skillDemos.length} secondary surface${skillDemos.length > 1 ? 's' : ''}</span>` : '';
   const primaryChipHtml = `<span class="chip">${ownedPrimaryDemos.length} primary implementation${ownedPrimaryDemos.length === 1 ? '' : 's'}</span>`;
   const flagshipChipHtml = participatingFlagships.length ? `<span class="chip">${participatingFlagships.length} flagship${participatingFlagships.length === 1 ? '' : 's'}</span>` : '';
+  const attributionChipHtml = s.attribution ? `<a class="chip" href="${esc(s.attribution.authorUrl)}">Original author: ${esc(s.attribution.author)} ↗</a>` : '';
+  const attributionHtml = s.attribution ? `
+  <section class="section" id="attribution" aria-labelledby="attribution-title"><div class="wrap">
+    <h2 id="attribution-title">Origin and attribution</h2>
+    <p class="sub">Adapted from <a href="${esc(s.attribution.sourceUrl)}">${esc(s.attribution.sourceName)}</a> by <a href="${esc(s.attribution.authorUrl)}">${esc(s.attribution.author)}</a>, imported from upstream commit <code>${esc(s.attribution.revision)}</code> under the ${esc(s.attribution.license)} license.</p>
+  </div></section>` : '';
 
   const primarySurfaceHtml = ownedPrimaryDemos.length ? `
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
@@ -1176,7 +1196,7 @@ for (const slug of slugs) {
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(skillTitle)}</title>
 <meta name="description" content="${esc(skillDescription)}" />
-<meta name="author" content="${SITE_NAME} contributors" />
+<meta name="author" content="${esc(s.attribution ? `${SITE_NAME} contributors; original work by ${s.attribution.author}` : `${SITE_NAME} contributors`)}" />
 <link rel="canonical" href="${pageUrl}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 ${assetHead('../')}
@@ -1187,8 +1207,8 @@ ${skillHeroImg ? `<link rel="preload" as="image" href="../${skillHeroImg}" fetch
 <meta property="og:title" content="${esc(skillTitle)}" />
 <meta property="og:description" content="${esc(skillDescription)}" />
 <meta property="og:url" content="${pageUrl}" />
-${s.update ? `<meta property="article:modified_time" content="${esc(s.update.iso)}" />` : ''}
-${s.published ? `<meta property="article:published_time" content="${esc(s.published.iso)}" />` : ''}
+${s.update || s.attribution ? `<meta property="article:modified_time" content="${esc(s.update?.iso ?? s.attribution.importedIso)}" />` : ''}
+${s.published || s.attribution ? `<meta property="article:published_time" content="${esc(s.published?.iso ?? s.attribution.importedIso)}" />` : ''}
 ${cat ? `<meta property="article:section" content="${esc(cat.name)}" />` : ''}
 ${socialImageMeta(ogImg, `${s.title} evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status`)}
 <meta name="twitter:card" content="summary_large_image" />
@@ -1207,9 +1227,14 @@ ${JSON.stringify({
       url: pageUrl,
       mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
       image: ogImg,
-      datePublished: s.published?.iso,
-      dateModified: s.update?.iso,
+      datePublished: s.published?.iso ?? s.attribution?.importedIso,
+      dateModified: s.update?.iso ?? s.attribution?.importedIso,
       author: PUBLISHER_REF,
+      contributor: s.attribution ? {
+        '@type': 'Person',
+        name: s.attribution.author,
+        url: s.attribution.authorUrl,
+      } : undefined,
       publisher: PUBLISHER_REF,
       inLanguage: 'en',
       isAccessibleForFree: true,
@@ -1303,6 +1328,7 @@ ${skillHeroImg ? `  <img class="skill-hero-bg" src="../${skillHeroImg}" alt="" a
       ${primaryChipHtml}
 ${flagshipChipHtml}
 ${demoChipHtml}
+      ${attributionChipHtml}
       ${ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>'}
       ${updateHtml}
       <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
@@ -1314,6 +1340,7 @@ ${demoChipHtml}
 ${primarySurfaceHtml}
 ${flagshipParticipationHtml}
 ${scienceHtml}
+${attributionHtml}
 ${examplesHtml}
 ${validationHtml}
 
@@ -1443,6 +1470,7 @@ const skillManifest = {
   categories: CATEGORIES.map((c) => ({ name: c.name, skills: c.slugs.filter((s) => skills[s]) })),
   skills: Object.values(skills).map((s) => ({
     name: s.slug, title: s.title, description: s.desc, examples: s.examples,
+    attribution: s.attribution,
     primaryImplementations: s.demoRecords.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind)).map((demo) => ({
       id: demo.id,
       title: primaryTitle(demo),
