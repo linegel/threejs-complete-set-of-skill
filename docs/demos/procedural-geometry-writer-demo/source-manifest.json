@@ -18,13 +18,13 @@
     "threejs-procedural-geometry/examples/semantic-mesh-writer"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:e9c97609abfe6e39fa501c23558f603edcd1c9dd32ff1437192b70893b976e81",
+  "sourceHash": "sha256:064012816fd80d75880b795959db68580bef421f9c384b64ea2ccce63370dd00",
   "publishedHashInputs": [
     "docs/demos/procedural-geometry-writer-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:14017b16174ff8538a30e259c0ff5bd0a2ab946f3313392e26a844894b96198b",
+  "publishedBundleHash": "sha256:35cc473f7c7d0fd63eba2310dff9a1c1b196e1098305ba8c5293476606485915",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

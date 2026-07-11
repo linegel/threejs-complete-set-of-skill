@@ -10,13 +10,13 @@
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
   "browserEntry": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/index.html",
-  "sourceHash": "sha256:4a896359be4a21d22a8009e04ba9253a95b63168be13916b23420740123381c5",
+  "sourceHash": "sha256:6030ee02f228505590a3a9c61ed20a8fc2955e63d64396fe6c098d18e82a5759",
   "publishedHashInputs": [
     "docs/demos/webgpu-exposure-color-pipeline",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8b4c343edbcf39755c761cc833750a934f64b54f1e5941dbaf7895a77178f5a4",
+  "publishedBundleHash": "sha256:79347f1e4177398feda105c250bc03cf9e7b64806115c3e43b852981f1970b03",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

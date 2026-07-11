@@ -30,8 +30,8 @@
     "docs/demos/webgpu-procedural-timelines",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:095bd1a793d1843c1b8983ba004d601be7f9013484c72a13a72d958e1e1eae61",
+  "publishedBundleHash": "sha256:8cd13706e3613620246712c97af87ca7dbb23968cfc4f6a069b0e0d3e360b0ae",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

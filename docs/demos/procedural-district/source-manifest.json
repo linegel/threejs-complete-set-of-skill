@@ -30,13 +30,13 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
   ],
   "browserEntry": "integration-labs/procedural-district/index.html",
-  "sourceHash": "sha256:0610238964bdd587347cd5ba8298565de173bdf582676ca262d4c80cb81b9fd1",
+  "sourceHash": "sha256:a1cda560058b7c6988bae1020fa4a18bb444204920cd3b7831ff2edfc92182fc",
   "publishedHashInputs": [
     "docs/demos/procedural-district",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:561012fb0fd5dad641c295529fd8b65f0ef95cd3b71ca7f7e5e88a6e372e6e04",
+  "publishedBundleHash": "sha256:08c8e12f943d39e1d130f5f095757fb29d3191b72834129af4a72570b8599458",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

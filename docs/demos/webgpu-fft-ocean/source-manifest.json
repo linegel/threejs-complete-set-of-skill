@@ -10,13 +10,13 @@
     "threejs-spectral-ocean/examples/webgpu-fft-ocean"
   ],
   "browserEntry": "threejs-spectral-ocean/examples/webgpu-fft-ocean/index.html",
-  "sourceHash": "sha256:17514de947361852f2dfbec7cd8f8aeae3a79676f4a2981328a2f12892b4befa",
+  "sourceHash": "sha256:8e5b5f310de4938e4041daac7f9688054085f68004fba69e6d560b9e30acf125",
   "publishedHashInputs": [
     "docs/demos/webgpu-fft-ocean",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:f54f95b48ed7f2d54af668b993d59ffd62d401e2d8a581d37ef4b1d28317c17c",
+  "publishedBundleHash": "sha256:b0a4ed6dfc26b7feaa5ddda1693b56a628f9e60fc427391fbeef06b8a8fa44b3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

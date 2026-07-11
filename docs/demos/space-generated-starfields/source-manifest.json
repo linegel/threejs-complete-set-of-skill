@@ -18,13 +18,13 @@
     "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:513fd70c0595a2c92e34333f4f8ce06b527e03da729dfb423e8387cea5ccda9e",
+  "sourceHash": "sha256:b9b84d2dbeda7aeebe9ff223b6f8b88d757a61416a1facda982917fce8095b98",
   "publishedHashInputs": [
     "docs/demos/space-generated-starfields",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:de94f4077fa9ef6490351bc980e0c052f4932c160824b22b6618cba4e5a6e209",
+  "publishedBundleHash": "sha256:12478fd54e215c16f35d5e8d1f754ed51f9a85e55d7ee42fab591d37e6a8c56b",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

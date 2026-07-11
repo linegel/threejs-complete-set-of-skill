@@ -15,8 +15,8 @@
     "docs/demos/node-selective-bloom",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:c93935356b6d8ec4a6a835e07b95ecf6c50754d668a3fb5006c5b7b159eaa4ef",
+  "publishedBundleHash": "sha256:faffbc9cac8275b2821498a386bfa5c860594756e28080c7d4ab942be00f8434",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

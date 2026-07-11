@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 2,
+  "skillInventory": [
+    "threejs-ambient-contact-shading",
+    "threejs-black-holes-and-space-effects",
+    "threejs-bloom",
+    "threejs-camera-controls-and-rigs",
+    "threejs-choose-skills",
+    "threejs-compatibility-fallbacks",
+    "threejs-debugging",
+    "threejs-dynamic-surface-effects",
+    "threejs-exposure-color-grading",
+    "threejs-image-pipeline",
+    "threejs-object-sculptor",
+    "threejs-particles-trails-and-effects",
+    "threejs-procedural-buildings-and-cities",
+    "threejs-procedural-creatures",
+    "threejs-procedural-fields",
+    "threejs-procedural-geometry",
+    "threejs-procedural-materials",
+    "threejs-procedural-motion-systems",
+    "threejs-procedural-planets",
+    "threejs-procedural-vegetation",
+    "threejs-rain-snow-and-wet-surfaces",
+    "threejs-scalable-real-time-shadows",
+    "threejs-sky-atmosphere-and-haze",
+    "threejs-spectral-ocean",
+    "threejs-visual-validation",
+    "threejs-volumetric-clouds",
+    "threejs-water-optics"
+  ],
+  "tierCatalog": {
+    "threejs-image-pipeline": ["full", "reduced", "debug"],
+    "threejs-procedural-vegetation": ["high", "medium", "low"],
+    "threejs-spectral-ocean": ["ultra", "high", "medium", "low"],
+    "threejs-volumetric-clouds": ["ultra", "high", "default", "mobile"]
+  },
+  "routeDefaults": {
+    "observedCapabilities": {
+      "threeRevision": "0.185.1",
+      "webgpu": true,
+      "timestampQuery": true
+    },
+    "observedInventory": "$catalog",
+    "route": {
+      "selectedSkills": [
+        "threejs-image-pipeline",
+        "threejs-visual-validation"
+      ],
+      "primaryOwner": "threejs-image-pipeline",
+      "physicalCauseReady": true,
+      "postConsumersSelected": false,
+      "explicitFallbackRequest": false,
+      "unsupportedCause": null,
+      "routeAway": null
+    },
+    "requiredSignals": [
+      {
+        "id": "main.scene-color",
+        "producer": "main.scene-pass",
+        "consumers": ["main.presentation"]
+      }
+    ],
+    "ownershipClaims": [
+      {"semantic": "renderer", "owner": "threejs-image-pipeline"},
+      {"semantic": "final-pipeline", "owner": "threejs-image-pipeline"},
+      {"semantic": "tone-map", "owner": "threejs-image-pipeline"},
+      {"semantic": "output-transform", "owner": "threejs-image-pipeline"}
+    ],
+    "performance": {
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "scenario product contract"
+      },
+      "stages": [
+        {
+          "id": "scene-and-domain",
+          "budgetMs": {
+            "value": 9.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "scenario stage envelope"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 4.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "scenario stage envelope"
+          }
+        }
+      ]
+    },
+    "tierSelection": {
+      "owner": "threejs-image-pipeline",
+      "id": "full",
+      "provenance": "owner-manifest"
+    },
+    "expected": {
+      "verdict": "PASS",
+      "code": "ROUTE_ACCEPTED"
+    }
+  },
+  "routes": [
+    {
+      "id": "ocean-planet",
+      "title": "Ocean planet",
+      "route": {
+        "selectedSkills": [
+          "threejs-procedural-planets",
+          "threejs-spectral-ocean",
+          "threejs-sky-atmosphere-and-haze",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-procedural-planets"
+      },
+      "tierSelection": {
+        "owner": "threejs-spectral-ocean",
+        "id": "high",
+        "provenance": "owner-manifest"
+      }
+    },
+    {
+      "id": "rainy-city",
+      "title": "Rainy city",
+      "route": {
+        "selectedSkills": [
+          "threejs-procedural-buildings-and-cities",
+          "threejs-rain-snow-and-wet-surfaces",
+          "threejs-water-optics",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-rain-snow-and-wet-surfaces"
+      }
+    },
+    {
+      "id": "forest",
+      "title": "Forest",
+      "route": {
+        "selectedSkills": [
+          "threejs-procedural-vegetation",
+          "threejs-procedural-fields",
+          "threejs-camera-controls-and-rigs",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-procedural-vegetation"
+      },
+      "tierSelection": {
+        "owner": "threejs-procedural-vegetation",
+        "id": "medium",
+        "provenance": "owner-manifest"
+      }
+    },
+    {
+      "id": "black-hole-shot",
+      "title": "Black-hole shot",
+      "route": {
+        "selectedSkills": [
+          "threejs-black-holes-and-space-effects",
+          "threejs-camera-controls-and-rigs",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-black-holes-and-space-effects"
+      }
+    },
+    {
+      "id": "post-pipeline-dashboard",
+      "title": "Post-pipeline dashboard",
+      "route": {
+        "selectedSkills": [
+          "threejs-procedural-geometry",
+          "threejs-procedural-materials",
+          "threejs-camera-controls-and-rigs",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-procedural-geometry",
+        "postConsumersSelected": true,
+        "physicalCauseReady": true
+      },
+      "requiredSignals": [
+        {
+          "id": "dashboard.scene-color",
+          "producer": "dashboard.scene-pass",
+          "consumers": ["dashboard.presentation"]
+        },
+        {
+          "id": "dashboard.object-id",
+          "producer": "dashboard.scene-pass",
+          "consumers": ["dashboard.selection"]
+        }
+      ]
+    },
+    {
+      "id": "ocean-fauna",
+      "title": "Ocean fauna",
+      "route": {
+        "selectedSkills": [
+          "threejs-procedural-creatures",
+          "threejs-spectral-ocean",
+          "threejs-water-optics",
+          "threejs-camera-controls-and-rigs",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-procedural-creatures"
+      },
+      "tierSelection": {
+        "owner": "threejs-spectral-ocean",
+        "id": "medium",
+        "provenance": "owner-manifest"
+      }
+    },
+    {
+      "id": "route-away-unsupported",
+      "title": "Route away unsupported lighting",
+      "route": {
+        "selectedSkills": [
+          "threejs-procedural-materials",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-procedural-materials",
+        "unsupportedCause": "general-studio-lighting-and-reflections",
+        "routeAway": {
+          "supported": false,
+          "externalOwner": "official-threejs-lighting-guidance",
+          "reason": "No pack skill owns studio IBL, PMREM, or reflection-probe design."
+        }
+      }
+    },
+    {
+      "id": "over-budget-17.5-to-16.5",
+      "title": "Over-budget route",
+      "performance": {
+        "targetFrameMs": {
+          "value": 16.5,
+          "unit": "ms",
+          "label": "Gated",
+          "source": "scenario product contract"
+        },
+        "stages": [
+          {
+            "id": "scene",
+            "budgetMs": {
+              "value": 12,
+              "unit": "ms",
+              "label": "Gated",
+              "source": "scenario stage envelope"
+            }
+          },
+          {
+            "id": "presentation",
+            "budgetMs": {
+              "value": 5.5,
+              "unit": "ms",
+              "label": "Gated",
+              "source": "scenario stage envelope"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "verdict": "FAIL",
+        "code": "BUDGET_EXCEEDS_TARGET"
+      }
+    },
+    {
+      "id": "missing-webgpu",
+      "title": "Missing WebGPU",
+      "observedCapabilities": {
+        "threeRevision": "0.185.1",
+        "webgpu": false,
+        "timestampQuery": false
+      },
+      "expected": {
+        "verdict": "FAIL",
+        "code": "BACKEND_WEBGPU_REQUIRED"
+      }
+    },
+    {
+      "id": "duplicate-output-owner",
+      "title": "Duplicate output owner",
+      "ownershipClaims": [
+        {"semantic": "renderer", "owner": "threejs-image-pipeline"},
+        {"semantic": "final-pipeline", "owner": "threejs-image-pipeline"},
+        {"semantic": "tone-map", "owner": "threejs-image-pipeline"},
+        {"semantic": "output-transform", "owner": "threejs-image-pipeline"},
+        {"semantic": "output-transform", "owner": "threejs-exposure-color-grading"}
+      ],
+      "expected": {
+        "verdict": "FAIL",
+        "code": "DUPLICATE_EXCLUSIVE_OWNER"
+      }
+    },
+    {
+      "id": "duplicate-velocity-owner",
+      "title": "Duplicate velocity owner",
+      "ownershipClaims": [
+        {"semantic": "renderer", "owner": "threejs-image-pipeline"},
+        {"semantic": "final-pipeline", "owner": "threejs-image-pipeline"},
+        {"semantic": "tone-map", "owner": "threejs-image-pipeline"},
+        {"semantic": "output-transform", "owner": "threejs-image-pipeline"},
+        {"semantic": "velocity", "owner": "threejs-camera-controls-and-rigs"},
+        {"semantic": "velocity", "owner": "threejs-procedural-motion-systems"}
+      ],
+      "expected": {
+        "verdict": "FAIL",
+        "code": "DUPLICATE_EXCLUSIVE_OWNER"
+      }
+    },
+    {
+      "id": "fabricated-tier",
+      "title": "Fabricated tier",
+      "tierSelection": {
+        "owner": "threejs-image-pipeline",
+        "id": "magically-cheaper",
+        "provenance": "router-invention"
+      },
+      "expected": {
+        "verdict": "FAIL",
+        "code": "FABRICATED_TIER"
+      }
+    },
+    {
+      "id": "post-before-physical-cause",
+      "title": "Post before physical cause",
+      "route": {
+        "selectedSkills": [
+          "threejs-bloom",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-bloom",
+        "physicalCauseReady": false,
+        "postConsumersSelected": true
+      },
+      "expected": {
+        "verdict": "FAIL",
+        "code": "POST_BEFORE_PHYSICAL_CAUSE"
+      }
+    },
+    {
+      "id": "inventory-drift",
+      "title": "Inventory drift",
+      "observedInventory": ["threejs-choose-skills"],
+      "expected": {
+        "verdict": "FAIL",
+        "code": "INVENTORY_DRIFT"
+      }
+    },
+    {
+      "id": "unsupported-route-away",
+      "title": "Unsupported cause assigned locally",
+      "route": {
+        "unsupportedCause": "generic-scientific-volume-ingestion",
+        "routeAway": {
+          "supported": true,
+          "externalOwner": null,
+          "reason": "The fixture incorrectly treats a pack gap as locally owned."
+        }
+      },
+      "expected": {
+        "verdict": "FAIL",
+        "code": "UNSUPPORTED_CAUSE_REQUIRES_ROUTE_AWAY"
+      }
+    },
+    {
+      "id": "automatic-fallback",
+      "title": "Automatic fallback",
+      "route": {
+        "selectedSkills": [
+          "threejs-compatibility-fallbacks",
+          "threejs-water-optics",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-water-optics",
+        "explicitFallbackRequest": false
+      },
+      "expected": {
+        "verdict": "FAIL",
+        "code": "AUTOMATIC_FALLBACK_FORBIDDEN"
+      }
+    }
+  ]
+}

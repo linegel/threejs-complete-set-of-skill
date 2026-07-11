@@ -18,13 +18,13 @@
     "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:fa7d7b297a96955a48f967e6730518b219a55a703a62cde8e8f39ea8aa89b0b5",
+  "sourceHash": "sha256:02200f2842cf1f2df66ff2d9b97dd4217f10200bcdcf47c84c4c085a9327e3df",
   "publishedHashInputs": [
     "docs/demos/pooled-particles-effects-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:526274477e2a210c76d225fd60b2bc429fdcc49d639e5e3402f36e11e9642dcc",
+  "publishedBundleHash": "sha256:4de3336d7833e2ec71fb6e99fc5f7fade76945864fa1da6847d5ce5c5e2d8a16",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

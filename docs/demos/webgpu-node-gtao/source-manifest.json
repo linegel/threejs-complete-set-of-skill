@@ -10,13 +10,13 @@
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
   "browserEntry": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/index.html",
-  "sourceHash": "sha256:20fb14a2e099cf0047b8eddfdb5f5fd4a38dbf336bcb80cf1bdf60adee772f24",
+  "sourceHash": "sha256:13b12376bae7428325bcf963253dd9a063e46f1191f7cb3db038604f35c093bc",
   "publishedHashInputs": [
     "docs/demos/webgpu-node-gtao",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:67832cd252e8765f91458883cda2ccc754a4ea9556bd7f9ab2d9fb0322bec868",
+  "publishedBundleHash": "sha256:4a42b6cb62504aac58c5e6841c11838837daeadd421cc95b8f3fcaf434d7654a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

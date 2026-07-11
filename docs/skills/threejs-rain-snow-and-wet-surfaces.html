@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
+<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html" />
-<meta property="article:modified_time" content="2026-07-10T21:41:13+03:00" />
+<meta property="article:modified_time" content="2026-07-11T12:53:58+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Worlds and Environments" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-10T21:41:13+03:00",
+   "dateModified": "2026-07-11T12:53:58+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -278,8 +278,8 @@ a.chip:active{scale:.96}
 <span class="chip">1 secondary surface</span>
       
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T21:41:13+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27">commit 3be3966 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:58+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/9ee91ebcf9f3bf4753c0a1b4401a05c6977116eb">commit 9ee91eb ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-rain-snow-and-wet-surfaces/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -337,7 +337,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>0610238964bd</code> source hash</span>
+    <span><code>a1cda560058b</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
@@ -348,7 +348,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>23fd93054de8</code> source hash</span>
+    <span><code>2d9df5888e47</code> source hash</span>
     <span>9 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -685,6 +685,13 @@ and CPU p50/p95, hot bytes/frame, transparent overdraw, impact-field work, peak
 live memory, and thermal behavior on the named target. On tile GPUs compare
 analytic/no-history, reduced field, and recurrent tiers under the same visual
 error contract; instance count alone says nothing about mobile suitability.</p>
+<p>When impacts, receiver coverage, snow, or splash state uses an active subset of
+a larger eligible cell/tile domain, publish <code>PhysicsSparseActiveDomainCost</code> in
+the same exact opportunity rows. Include candidates probed, active core,
+halo/boundary/neighbors, capacity/high-water, detection/classification,
+scan/sort/compaction, allocation/indirect arguments, receiver/solver traffic,
+activation/deactivation hysteresis, inactive-region model/error, and overflow.
+<code>dirtyImpactTiles</code> alone does not account for sparse-domain cost.</p>
 <h2>Color And Output</h2>
 <ul>
 <li>LDR albedo/emissive textures encoded as sRGB use <code>SRGBColorSpace</code>; HDR/EXR
@@ -765,7 +772,7 @@ owner owns integrated wetness/coverage; surface materials only consume it.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

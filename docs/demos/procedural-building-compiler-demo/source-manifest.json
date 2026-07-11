@@ -18,13 +18,13 @@
     "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:7871ff6a259f26e44ee0da80dc54b6aac5e7a4a6479138dedee80eb9ff94f635",
+  "sourceHash": "sha256:e132388671b9b4ef442f603b2025c4d179236ef88671ce667ed123ea27d5abed",
   "publishedHashInputs": [
     "docs/demos/procedural-building-compiler-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:47be8b72b3d65f1517badb9319b62b27aacc04c14643fe14cc30a26afa7c03cf",
+  "publishedBundleHash": "sha256:371977cf19bee00c8ea2f705b10f0519ed39bba73597b97cc57954f2c1b1dde6",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

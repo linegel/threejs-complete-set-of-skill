@@ -18,13 +18,13 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:55c4cd97c49ab7157f8eec431487e238b76b239ebd8f2ee634147fd5494124db",
+  "sourceHash": "sha256:1a18d0f532f1973e357d40f97af5f91ab07a7171dd1d466cb78a36d1433e9e20",
   "publishedHashInputs": [
     "docs/demos/shadow-cascade-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:c4451ff4848e26d28659648b201a44594a1dea60ecb8d41766931ead443e5da8",
+  "publishedBundleHash": "sha256:7220fdac9f3fa14cbc9879d502f54e4dde81385334a2395afb72f8797ef8fa2f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

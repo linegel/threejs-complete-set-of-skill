@@ -18,13 +18,13 @@
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:aae11b11004a57015726c6caba0c65b4aaabfdd23493b8980f4ddf8ca83c0e23",
+  "sourceHash": "sha256:427e087ccd0548581a35b21f00e0f6aba2afcef8dacaced02f8f38aaeda0f4ac",
   "publishedHashInputs": [
     "docs/demos/exposure-color-grading-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:29343f60963b2ce59bbb79388e1c0c42d97ee2512da07c639a397a9b660ceabc",
+  "publishedBundleHash": "sha256:9926c5f14944728d6a67aad441d7157118f6922effd1e6a62db3300a820a0b7b",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

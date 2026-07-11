@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-motion-systems.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
+<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Motion Systems | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-motion-systems.html" />
-<meta property="article:modified_time" content="2026-07-11T04:41:20+03:00" />
+<meta property="article:modified_time" content="2026-07-11T12:53:41+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Motion and Effects" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-11T04:41:20+03:00",
+   "dateModified": "2026-07-11T12:53:41+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -278,8 +278,8 @@ a.chip:active{scale:.96}
 <span class="chip">1 secondary surface</span>
       
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T04:41:20+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323">commit 091f731 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:41+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2749e9527f2f66e3c0875d3539f75efbcf88e52f">commit 2749e95 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-motion-systems/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -314,7 +314,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>2fc27a668cad</code> source hash</span>
+    <span><code>f5f18643cb1d</code> source hash</span>
     <span>10 fixed states · 12 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
@@ -544,6 +544,21 @@ pose through the canonical <code>ExternalSolverAdapter</code>.</p>
 <p>Two-way source/reaction records form an all-or-none
 <code>InteractionReactionGroup</code>; many-to-many reduction is legal, and balance is
 tested after transport to its declared frame/reference point.</p>
+<p>Every motion stage that applies a source or reduced reaction record resolves
+the record&#39;s <code>applicationLedgerKey</code> to a canonical
+<code>InteractionApplicationLedger</code>. The row names the current
+<code>PhysicsStageExecution</code>, exact declared interval and execution overlap, payload
+time semantics and applied integral/fraction, target owner/entity/equation and
+expected state version, cursor before/after, prepared version, commit
+transaction, disposition, <code>applicationContentDigest</code>, and <code>receiptDigest</code>. Rate payloads
+integrate only over the exact overlap; interval-integrated payloads commit once.
+Only a <code>committed</code> receipt may authorize the corresponding target-state
+advance. <code>duplicate-no-op</code>, replayed, disjoint, deferred, and rejected rows
+cannot mutate motion state or become presentation-eligible. The ledger ID must
+resolve from the batch and route inventories and appear in the stage execution,
+<code>StateAdvanceClaim</code>, accepted coupling iteration when present, and atomic commit
+lineage; reading an <code>InteractionRecord</code> or advancing a consumer cursor alone is
+not application authority.</p>
 <p>Presentation is not another physics query. Motion contributes a per-binding/provider
 <code>PresentedStatePair</code> to the view-independent <code>PhysicsPresentationCandidate</code>,
 which contains no camera or render transform. <code>previousPresented</code> and
@@ -619,6 +634,14 @@ Measure dependency-aligned p50/p95 under steady, worst catch-up, migration,
 process-failure, and device-loss fixtures. “Zero copy” and unavailable remote
 timers do not mean zero transport cost; unavailable remote attribution stays
 unavailable while the observable adapter tail remains measured.</li>
+<li>A route that owns physical collision/constraint resolution publishes
+<code>PhysicsContactCost</code>: body/shape/proxy population, moved bounds and broadphase
+pairs, shape-pair narrowphase tests, manifolds/points/feature remaps, islands,
+constraint rows/iterations/residuals, warm-start cache behavior,
+deterministic reduction/atomic contention, lifecycle application receipts,
+and pileup/high-speed/topology/migration stress tails. Actor count or average
+contact count alone is not a contact cost model; an external contact owner is
+referenced from the same opportunity rows instead of double-attributed.</li>
 <li>Presentation bindings reference immutable resource generations under a
 frame-in-flight lease/reuse rule; no solver overwrites a pose generation
 still used by a sealed snapshot.</li>
@@ -746,7 +769,7 @@ interaction contract.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

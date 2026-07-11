@@ -19,8 +19,8 @@
     "docs/demos/tsl-procedural-pbr",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:aaeeac380b4964908540b9ac2f74d0bc5fc3daa1259460ba3557b5acfcb05f43",
+  "publishedBundleHash": "sha256:7f532eb6a2f86223f1f15a2fa456aea1bb922c07e1ca524caddb8a9c62de3e35",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

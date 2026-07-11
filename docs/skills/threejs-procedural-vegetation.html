@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-vegetation.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
+<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Vegetation | Three.js WebGPU Skill" />
 <meta property="og:description" content="Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-vegetation.html" />
-<meta property="article:modified_time" content="2026-07-10T20:48:56+03:00" />
+<meta property="article:modified_time" content="2026-07-11T12:53:58+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Procedural Content" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-10T20:48:56+03:00",
+   "dateModified": "2026-07-11T12:53:58+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -278,8 +278,8 @@ a.chip:active{scale:.96}
 <span class="chip">1 secondary surface</span>
       
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T20:48:56+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d">commit 357dd58 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:58+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/def0cb1ae489f14e1b43b92cb88b52f1bf9c840e">commit def0cb1 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-vegetation/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -349,7 +349,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>23fd93054de8</code> source hash</span>
+    <span><code>2d9df5888e47</code> source hash</span>
     <span>9 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -518,7 +518,21 @@ or load units, deterministic ordering keys, canonical source/target ownership,
 <code>SurfaceExchange.mode</code>, reaction-group identity, and batch/partition identity.
 Keep sequence ranges, consumer cursors, overflow, and lost/deferred commodities
 in the canonical immutable <code>InteractionBatchLedger</code>; coalescing is a producer
-transformation with provenance. Bin sparse records into affected
+transformation with provenance. Before a completed record changes trampling,
+sweep, support-load, impact, touch, or structural state, the vegetation stage
+resolves its <code>applicationLedgerKey</code> to a canonical
+<code>InteractionApplicationLedger</code>. The row binds the current
+<code>PhysicsStageExecution</code>, exact declared interval and execution overlap, payload
+time semantics and applied integral/fraction, target patch/entity/equation and
+expected state version, cursor before/after, prepared version, commit
+transaction, disposition, <code>applicationContentDigest</code>, and <code>receiptDigest</code>. Only
+a <code>committed</code> receipt authorizes the state advance; rate payloads integrate over
+their exact overlap and interval-integrated payloads commit once. Duplicate or
+replayed, disjoint, deferred, and rejected rows do not mutate touch/load state.
+The ledger ID resolves from the batch and route inventories and appears in the
+stage execution, <code>StateAdvanceClaim</code>, accepted coupling iteration when present,
+and atomic commit lineage; a record or cursor advance alone is not application
+authority. Bin sparse records into affected
 patches, update the contact/touch state after physics contact resolution, then
 evaluate structural wind/contact deformation and commit domain state over the
 declared <code>PhysicsGraphStage.executionInterval: PhysicsTimeInterval</code>. The
@@ -664,8 +678,9 @@ overdraw/over-submission and culling granularity.</p>
 <h2>Creature Composition</h2>
 <p>Vegetation and creatures consume the same <code>EnvironmentForcingSnapshot</code> air
 velocity but own different structural response models. Creature stance/contact
-resolution publishes typed <code>InteractionRecord</code>s; vegetation bins completed
-records into its dynamic touch texture or compact patch storage before blade
+resolution publishes typed <code>InteractionRecord</code>s; vegetation applies only
+records with matching committed <code>InteractionApplicationLedger</code> receipts into
+its dynamic touch texture or compact patch storage before blade
 deformation. The current WebGPU dense-grass example exposes only wind uniforms
 and static density storage, so it is not evidence that contact ingestion is
 implemented. A production route must instantiate the shared record adapter,
@@ -758,6 +773,12 @@ are compile/update costs unless the placement actually changes every frame.</p>
 actual packed layout and include duplicate LOD/impostor records.</li>
 <li>Dynamic fields: sum exact wind/contact texture or storage extents, formats,
 history slots, dirty update traffic, and cadence per active region.</li>
+<li>A route that discovers or compacts sparse physical touch, load, breakage, or
+structural patches publishes <code>PhysicsSparseActiveDomainCost</code>: eligible and
+probed patches, active core, halo/neighbors, capacity/high-water,
+detect/classify, scan/sort/compact, allocation/indirect arguments, structural
+solve traffic, activation/deactivation hysteresis, inactive-response error,
+and overflow. Dirty patch count alone omits the mobile-critical work.</li>
 <li>Tree geometry: compile once into typed buffers; do not allocate vector objects in runtime wind or per-frame LOD loops.</li>
 <li>Node post: one scene pass with <code>mrt()</code> when normals/depth/emissive are reused, reduced-resolution AO/bloom via <code>setResolutionScale()</code>, and no duplicate scene re-render for diagnostics unless explicitly requested.</li>
 </ul>
@@ -817,7 +838,7 @@ air velocity; the authoritative contact solver supplies interaction records.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

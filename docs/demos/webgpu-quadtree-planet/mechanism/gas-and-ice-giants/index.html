@@ -11,24 +11,102 @@
   <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#080b10;color:#ece8de}body{overflow:hidden}.route-blocker{box-sizing:border-box;max-width:760px;height:auto;margin:10vh auto;padding:28px;border:1px solid #ff6b6b;background:#111722;font:15px/1.55 system-ui,sans-serif}.route-blocker code{color:#ffb454}</style>
 </head>
 <body>
-  <iframe id="canonical-lab" title="Native WebGPU Quadtree Planet — mechanism gas-and-ice-giants" src="../../?mechanism=gas-and-ice-giants" allow="fullscreen"></iframe>
+  <iframe id="canonical-lab" title="Native WebGPU Quadtree Planet — mechanism gas-and-ice-giants" allow="fullscreen"></iframe>
   <script type="module">
     const frame = document.querySelector('#canonical-lab');
+    const canonicalHref = "../../?mechanism=gas-and-ice-giants";
     const startup = {"scenario":"gas-and-ice-giants","mode":"final","camera":"giants"};
     const setterCalls = [{"setter":"setScenario","value":"gas-and-ice-giants"},{"setter":"setMode","value":"final"},{"setter":"setCamera","value":"giants"}];
     const routeKind = "mechanism";
     const routeId = "gas-and-ice-giants";
     const acknowledgementKeys = ["mechanism","mechanismId","activeMechanism","scenario","scenarioId","mode"];
     const startupAcknowledgementKeys = {"scenario":["scenario","scenarioId","activeScenario"],"mode":["mode","modeId","activeMode"],"tier":["tier","tierId","activeTier","quality","qualityTier"],"seed":["seed","currentSeed"],"camera":["camera","cameraId","activeCamera"],"time":["time","timeSeconds","currentTime"]};
+    const controllerGlobals = ["labController","__LAB_CONTROLLER__","__labController","__imagePipelineValidation","__THREEJS_LAB__","__THREE_LAB__"];
+    const awaitLockedRouteController = async function awaitLockedRouteController(resolveCandidate, {
+  resolveBlocker = () => null,
+  controllerGlobals = [
+    'labController',
+    '__LAB_CONTROLLER__',
+    '__labController',
+    '__imagePipelineValidation',
+    '__THREEJS_LAB__',
+    '__THREE_LAB__',
+  ],
+  timeoutMs = 60_000,
+  pollIntervalMs = 50,
+  now = () => performance.now(),
+  sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+  settleCandidate = (candidate, remainingMs) => new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Canonical LabController promise did not settle within ${remainingMs} ms.`)),
+      remainingMs,
+    );
+    Promise.resolve(candidate).then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  }),
+} = {}) {
+  if (typeof resolveCandidate !== 'function') throw new TypeError('resolveCandidate must be a function');
+  if (typeof resolveBlocker !== 'function') throw new TypeError('resolveBlocker must be a function');
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new RangeError('timeoutMs must be finite and positive');
+  if (!Number.isFinite(pollIntervalMs) || pollIntervalMs <= 0) throw new RangeError('pollIntervalMs must be finite and positive');
+  if (!Array.isArray(controllerGlobals) || controllerGlobals.length === 0) {
+    throw new TypeError('controllerGlobals must be a non-empty array');
+  }
+
+  const deadline = now() + timeoutMs;
+  while (true) {
+    const blocker = resolveBlocker();
+    if (blocker) throw new Error(`Canonical lab reported an initialization blocker: ${String(blocker)}`);
+
+    const candidate = resolveCandidate();
+    if (candidate !== undefined && candidate !== null) {
+      const remainingMs = Math.max(0, deadline - now());
+      const controller = typeof candidate?.then === 'function'
+        ? await settleCandidate(candidate, remainingMs)
+        : candidate;
+      if (controller) return controller;
+    }
+
+    const remainingMs = deadline - now();
+    if (remainingMs <= 0) break;
+    await sleep(Math.min(pollIntervalMs, remainingMs));
+  }
+
+  throw new Error(
+    `Canonical lab did not expose any LabController alias (${controllerGlobals.join(', ')}) within ${timeoutMs} ms.`,
+  );
+};
+    let routeInitializationStarted = false;
     frame.addEventListener('load', async () => {
+      if (routeInitializationStarted) return;
+      routeInitializationStarted = true;
       try {
-        const controller = await Promise.resolve(
-          frame.contentWindow.labController
-          ?? frame.contentWindow.__LAB_CONTROLLER__
-          ?? frame.contentWindow.__labController
-          ?? null
+        const controller = await awaitLockedRouteController(
+          () => {
+            for (const name of controllerGlobals) {
+              const candidate = frame.contentWindow[name];
+              if (candidate !== undefined && candidate !== null) return candidate;
+            }
+            return null;
+          },
+          {
+            controllerGlobals,
+            resolveBlocker: () => (
+              frame.contentWindow.__LAB_ERROR__
+              ?? frame.contentWindow.__labError
+              ?? frame.contentWindow.__lab?.error
+              ?? null
+            ),
+          },
         );
-        if (!controller) throw new Error('Canonical lab did not expose labController or __LAB_CONTROLLER__.');
         if (typeof controller.ready !== 'function') throw new Error('Canonical lab controller has no ready() method.');
         await controller.ready();
         for (const call of setterCalls) {
@@ -64,6 +142,7 @@
         document.body.innerHTML = '<main class="route-blocker"><h1>Locked route failed</h1><p>This route cannot silently fall back to a default state.</p><pre><code>' + message + '</code></pre></main>';
       }
     });
+    frame.src = canonicalHref;
   </script>
 </body>
 </html>

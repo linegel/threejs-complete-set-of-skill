@@ -25,8 +25,8 @@
     "docs/demos/integration-precipitation-image-pipeline",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:7e471ac1211567bde0f16d00cdd594f1d3f5741b79e2b208c16e47d48e285549",
+  "publishedBundleHash": "sha256:180c01bc91e54160b824821b10b3ef8558dfe1f2e37d6421c24b69f11129af41",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

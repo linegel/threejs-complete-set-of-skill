@@ -15,8 +15,8 @@
     "docs/demos/webgpu-validation-harness",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:7d17b0e060f74812cb5c430adeb495761c808111c75c113db56710e1df1decfa",
+  "publishedBundleHash": "sha256:a8a454efdabc9a21c6b6ff7d3202e5944457aa232f54e002f3ed8b92564a6fa6",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

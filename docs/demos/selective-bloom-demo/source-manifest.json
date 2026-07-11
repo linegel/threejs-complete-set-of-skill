@@ -18,13 +18,13 @@
     "threejs-bloom/examples/node-selective-bloom"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:1ef52d6683e6463e6ee0ddd773ee2266af748c23bf98d5a942ad6f87bcc55de8",
+  "sourceHash": "sha256:2a23b080e24bee0f40ab92bc6b0433d597dde8a793f28408710c6775a4e5d969",
   "publishedHashInputs": [
     "docs/demos/selective-bloom-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:a425f37d8f2ce3ee1099bea225990a89ac45e7194fc8a9d5354b78d1341c0fef",
+  "publishedBundleHash": "sha256:dbb00a2014263bc3abe273db8d6ff4eff6f7c242214d31a8523503b8bdda1627",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

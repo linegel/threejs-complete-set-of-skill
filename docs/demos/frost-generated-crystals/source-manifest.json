@@ -18,13 +18,13 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:da568d7fd4651e62cb87fe3d06465df20d3bf1c301483308bf53b50894884a0f",
+  "sourceHash": "sha256:81a87fcc387fe5946e44f4d9504ce881b0721d1db066fe6a116abe73cd40d92f",
   "publishedHashInputs": [
     "docs/demos/frost-generated-crystals",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:9b180678cad87174b50c1793528d43452883a425357e838962e9c062d515310b",
+  "publishedBundleHash": "sha256:9354716b371cdbf92c54e005b7bcd14a2675540219e3917714f90fbfdc2bd7b1",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

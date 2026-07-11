@@ -18,13 +18,13 @@
     "threejs-procedural-fields/examples/webgpu-field-bake"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:673c7ab179bba44bca8b3c5f4b43a983d50d57e3849af2af063235a938b1063a",
+  "sourceHash": "sha256:83899d9151b53b4d484b1a941e33dc6da4beefe8ed1b0f5e30df95ab1a118e8f",
   "publishedHashInputs": [
     "docs/demos/fields-generated-biome-maps",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:9bc3903af3f28f161aca04e4415641dc019560d3cffec47d20bff4a05e1d8160",
+  "publishedBundleHash": "sha256:a136748c009ca93e5f62e89a58ed94efb5defa2d251b15d807943467fdcf4272",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

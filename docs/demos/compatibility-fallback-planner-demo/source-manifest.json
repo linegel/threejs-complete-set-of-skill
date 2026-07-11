@@ -18,13 +18,13 @@
     "threejs-compatibility-fallbacks/examples/tier-planner"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:0ccd0dfb3838faa4112489cc77e204876db8378dd602fc5c9e3857830aa32363",
+  "sourceHash": "sha256:6553fa7df9761f056a5bca942ad10ed22e16af61494d3b884ed845c7bd0bb7ba",
   "publishedHashInputs": [
     "docs/demos/compatibility-fallback-planner-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:de8a90cf34effb784137a65a4573a350242a65890c171660132a68662575b2ba",
+  "publishedBundleHash": "sha256:08a2992fdc4c7889475748834e21fd611f095bc11f597106f4822c83bff94598",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

@@ -18,13 +18,13 @@
     "threejs-water-optics/EXPERIMENTAL/water-integration-surface"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:4b2959fc6e37bf7f39eadb3d08ddac108bb6d9418bc4e47ba4a6c0f2d0d1f8f8",
+  "sourceHash": "sha256:f762947428cf4a4212351e4c7d0474947e91e9993c09f1dacb0fa63946286dad",
   "publishedHashInputs": [
     "docs/demos/water-integration-surface",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:c51937c2cdb424a54c9bc8b29e8b52f25e9603bb4f5f875cd77b4b7c2f5dc4b0",
+  "publishedBundleHash": "sha256:d4f7ec63a001fdd5e70446a81ec35a174f713e7bf424e7caf2dc04f20d182966",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

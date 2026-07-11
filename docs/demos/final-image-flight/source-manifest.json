@@ -46,13 +46,13 @@
     "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
   ],
   "browserEntry": "integration-labs/final-image-flight/index.html",
-  "sourceHash": "sha256:2fc27a668cad3236daa8e5274566ad8022a308fb4052241d1d312c304c949d68",
+  "sourceHash": "sha256:f5f18643cb1d8aa1a40a9cd2dd978f1ac4fcc5bf5b1263b6ebad774d259032d2",
   "publishedHashInputs": [
     "docs/demos/final-image-flight",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:a24943248d9550dde39588045f6aab4630313886ed45ae8d6e90d4b3b66b5459",
+  "publishedBundleHash": "sha256:c2f7f961a6c9746ff09ce14785b3cd318fe072141c07633fa346c888abb438aa",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

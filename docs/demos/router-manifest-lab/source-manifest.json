@@ -12,13 +12,13 @@
     "threejs-choose-skills/examples/router-manifest-lab"
   ],
   "browserEntry": "threejs-choose-skills/examples/router-manifest-lab/index.html",
-  "sourceHash": "sha256:b91bed1079a3f90e84c33537e5ed50677b94a3215cb3b2a9dba6ea42e958720c",
+  "sourceHash": "sha256:dc8411db4bdc256d962223f4a3341baf00086af4be16a010a562ec415a62519d",
   "publishedHashInputs": [
     "docs/demos/router-manifest-lab",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:decff008a24b7564c37b701707b4c12b7a3b1a8a81b5bcbc0a6d36d41bfa64b2",
+  "publishedBundleHash": "sha256:b2c051963ff6f4bb1c41f0e4de3d083087f533e81c559c3f88cf0f094f9527c0",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

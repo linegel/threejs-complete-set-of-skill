@@ -18,13 +18,13 @@
     "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:4bbf15952bced678c76059dc9038a457734aa89e39cf831bb0c96c6f63c49797",
+  "sourceHash": "sha256:77cd5c258b2b8d9f34456aa525e0868de6abd77fe8b467d169ed7b3c44b05731",
   "publishedHashInputs": [
     "docs/demos/rain-generated-ripples",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:dbf6746d923b17ab11056ccf5f6a1e58e4d4c36eb8f476e51f591592435ecc11",
+  "publishedBundleHash": "sha256:88a1b09d261d9caa87a9702a159772ed23201336dd01c0800be1191f94c5a472",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

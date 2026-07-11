@@ -17,13 +17,13 @@
     "threejs-image-pipeline/examples/webgpu-temporal-history"
   ],
   "browserEntry": "threejs-image-pipeline/examples/webgpu-temporal-history/index.html",
-  "sourceHash": "sha256:488b22e084958397dd5c1677b050b3d75723e96a1ff4b01ea3c1bd49dca2401f",
+  "sourceHash": "sha256:432b825e938de8915f5e3d442fd6a41f288a7975870af1ba51d96698ee88ef0f",
   "publishedHashInputs": [
     "docs/demos/webgpu-temporal-history",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:0054bc758713eb0e6dca728feabc8e36a39597363e3ce493917e8b778b981be0",
+  "publishedBundleHash": "sha256:e88ed5f846a9cfecd6ad1b14e075a8e1557bc00473970fbb38e64afd766f5ced",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

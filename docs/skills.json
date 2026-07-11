@@ -24,7 +24,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+    "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
     "skills": 27,
     "primaryImplementations": 40,
     "loadablePrimaryImplementations": 40,
@@ -243,7 +243,7 @@
             "scripts/provider-demos.mjs",
             "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
           ],
-          "sourceHash": "sha256:a89a693c0ac6a1c9cddff3d872475ac2adda17a9ce4cbf39387be6b1fe12bc42",
+          "sourceHash": "sha256:f48721db1c4a344e37ed61863cf4bd2b4e8cfb0e04cf2fb042a9b7ef06452735",
           "proxyStatus": {
             "limitation": "The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.",
             "canonicalLabId": "webgpu-node-gtao"
@@ -263,7 +263,7 @@
             "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao",
             "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js"
           ],
-          "sourceHash": "sha256:4d88113f290e8e53ad49edf55808870f57372d200559e3f8dfac503a08a707ca",
+          "sourceHash": "sha256:4f519ceaaaed9f1aeeed000c6321cae4ae5ff56108821d261b7f4a98c981eaba",
           "proxyStatus": null
         },
         {
@@ -277,15 +277,15 @@
           "sourceHashInputs": [
             "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
           ],
-          "sourceHash": "sha256:20fb14a2e099cf0047b8eddfdb5f5fd4a38dbf336bcb80cf1bdf60adee772f24",
+          "sourceHash": "sha256:13b12376bae7428325bcf963253dd9a063e46f1191f7cb3db038604f35c093bc",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T13:00:02+03:00",
+        "commit": "fd36bd6640c0ea8f3b3fc3ac0539c87489470119",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/fd36bd6640c0ea8f3b3fc3ac0539c87489470119"
       },
       "page": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/SKILL.md",
@@ -354,7 +354,7 @@
             "scripts/provider-demos.mjs",
             "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
           ],
-          "sourceHash": "sha256:513fd70c0595a2c92e34333f4f8ce06b527e03da729dfb423e8387cea5ccda9e",
+          "sourceHash": "sha256:b9b84d2dbeda7aeebe9ff223b6f8b88d757a61416a1facda982917fce8095b98",
           "proxyStatus": {
             "limitation": "Generated star tiles are distant/background-tier inputs. The production space path remains bounded adaptive ray integration and final-direction environment lookup.",
             "canonicalLabId": "tsl-curved-ray"
@@ -380,10 +380,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:52:06+03:00",
+        "commit": "63d611c6334e22c990a555d818ea1548765ede65",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/63d611c6334e22c990a555d818ea1548765ede65"
       },
       "page": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-black-holes-and-space-effects/SKILL.md",
@@ -455,7 +455,7 @@
             "scripts/provider-demos.mjs",
             "threejs-bloom/examples/node-selective-bloom"
           ],
-          "sourceHash": "sha256:1ef52d6683e6463e6ee0ddd773ee2266af748c23bf98d5a942ad6f87bcc55de8",
+          "sourceHash": "sha256:2a23b080e24bee0f40ab92bc6b0433d597dde8a793f28408710c6775a4e5d969",
           "proxyStatus": {
             "limitation": "The live page uses additive response geometry for interaction and mode switching. The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.",
             "canonicalLabId": "node-selective-bloom"
@@ -464,9 +464,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:52:59+03:00",
-        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
+        "datetime": "2026-07-11T12:52:06+03:00",
+        "commit": "804b0d4161fedf5c5b7df59aaebd25025390515a",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/804b0d4161fedf5c5b7df59aaebd25025390515a"
       },
       "page": "https://threejs-skills.com/skills/threejs-bloom.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-bloom/SKILL.md",
@@ -530,7 +530,7 @@
             "scripts/provider-demos.mjs",
             "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
           ],
-          "sourceHash": "sha256:960d7fd221155e33c8e58573a98bcecd6ec0f0207b5a340efcb73aea3d91247d",
+          "sourceHash": "sha256:4de7a3c2e31c69c2e416b1e51c554d66ef547d60a514060ab5e78ab9b1e4dc2b",
           "proxyStatus": {
             "limitation": "The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path. The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.",
             "canonicalLabId": "webgpu-camera-rig"
@@ -566,10 +566,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T19:39:52+03:00",
-        "commit": "6f8358fd64e839b6056fd01f546a140650d84a4f",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/6f8358fd64e839b6056fd01f546a140650d84a4f"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:52:06+03:00",
+        "commit": "2a1e3170ad175b43fe5815fc4aa8d1cc1bfb4532",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2a1e3170ad175b43fe5815fc4aa8d1cc1bfb4532"
       },
       "page": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-camera-controls-and-rigs/SKILL.md",
@@ -610,7 +610,7 @@
           "sourceHashInputs": [
             "threejs-choose-skills/examples/router-manifest-lab"
           ],
-          "sourceHash": "sha256:b91bed1079a3f90e84c33537e5ed50677b94a3215cb3b2a9dba6ea42e958720c",
+          "sourceHash": "sha256:dc8411db4bdc256d962223f4a3341baf00086af4be16a010a562ec415a62519d",
           "proxyStatus": null
         },
         {
@@ -632,7 +632,7 @@
             "scripts/provider-demos.mjs",
             "threejs-choose-skills/examples/router-contract.test.mjs"
           ],
-          "sourceHash": "sha256:1974b0c2bfb65d33e7072a6c28efc893e30ee2d5083f635d09ab8326f7798cbc",
+          "sourceHash": "sha256:7222569a7448e0782ac8d1aadfdbec5e633cdc22c34b3304c3d1c15e30ae49ea",
           "proxyStatus": {
             "limitation": "The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
             "canonicalLabId": "router-manifest-lab"
@@ -641,9 +641,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T04:41:20+03:00",
-        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
+        "datetime": "2026-07-11T12:37:30+03:00",
+        "commit": "72f468614be79628e732fc4cd0ff169bdae724fe",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/72f468614be79628e732fc4cd0ff169bdae724fe"
       },
       "page": "https://threejs-skills.com/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
@@ -707,7 +707,7 @@
             "scripts/provider-demos.mjs",
             "threejs-compatibility-fallbacks/examples/tier-planner"
           ],
-          "sourceHash": "sha256:0ccd0dfb3838faa4112489cc77e204876db8378dd602fc5c9e3857830aa32363",
+          "sourceHash": "sha256:6553fa7df9761f056a5bca942ad10ed22e16af61494d3b884ed845c7bd0bb7ba",
           "proxyStatus": {
             "limitation": "The docs page is a teaching visualization and intentionally shows a blocked mode when no explicit fallback request exists. The canonical skill must not weaken flagship WebGPU guidance or silently route to WebGL-compatible behavior.",
             "canonicalLabId": "browser-fallback-harness"
@@ -732,10 +732,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:51:25+03:00",
+        "commit": "22c1a110f7bea18335d29dfbc0cc872380319b7f",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/22c1a110f7bea18335d29dfbc0cc872380319b7f"
       },
       "page": "https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-compatibility-fallbacks/SKILL.md",
@@ -865,7 +865,7 @@
             "scripts/provider-demos.mjs",
             "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
           ],
-          "sourceHash": "sha256:da568d7fd4651e62cb87fe3d06465df20d3bf1c301483308bf53b50894884a0f",
+          "sourceHash": "sha256:81a87fcc387fe5946e44f4d9504ce881b0721d1db066fe6a116abe73cd40d92f",
           "proxyStatus": {
             "limitation": "Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.",
             "canonicalLabId": "webgpu-touch-history-frost"
@@ -914,10 +914,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T21:41:13+03:00",
-        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:24+03:00",
+        "commit": "1ace549ac3920cc883d7fe2d5037825f3000b7aa",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1ace549ac3920cc883d7fe2d5037825f3000b7aa"
       },
       "page": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-dynamic-surface-effects/SKILL.md",
@@ -975,7 +975,7 @@
             "scripts/provider-demos.mjs",
             "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
           ],
-          "sourceHash": "sha256:aae11b11004a57015726c6caba0c65b4aaabfdd23493b8980f4ddf8ca83c0e23",
+          "sourceHash": "sha256:427e087ccd0548581a35b21f00e0f6aba2afcef8dacaced02f8f38aaeda0f4ac",
           "proxyStatus": {
             "limitation": "The docs page simulates the meter state in live scene controls for readability. The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.",
             "canonicalLabId": "webgpu-exposure-color-pipeline"
@@ -992,15 +992,15 @@
           "sourceHashInputs": [
             "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
           ],
-          "sourceHash": "sha256:4a896359be4a21d22a8009e04ba9253a95b63168be13916b23420740123381c5",
+          "sourceHash": "sha256:6030ee02f228505590a3a9c61ed20a8fc2955e63d64396fe6c098d18e82a5759",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:52:59+03:00",
-        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
+        "datetime": "2026-07-11T13:30:23+03:00",
+        "commit": "d508c69a72089690a6801144692591b8a1fe0e11",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/d508c69a72089690a6801144692591b8a1fe0e11"
       },
       "page": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/SKILL.md",
@@ -1181,7 +1181,7 @@
             "threejs-water-optics/examples/webgpu-bounded-water/cpu-water-height.js",
             "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
           ],
-          "sourceHash": "sha256:23fd93054de8c4ebf99c95239a06e43816a2c8b9f43e94c56c7c04d3d1bb2e15",
+          "sourceHash": "sha256:2d9df5888e47d42dd29081948c6414797956d6a20bdbdb3d69fa263af207f0cb",
           "proxyStatus": null
         },
         {
@@ -1231,7 +1231,7 @@
             "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
             "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
           ],
-          "sourceHash": "sha256:2fc27a668cad3236daa8e5274566ad8022a308fb4052241d1d312c304c949d68",
+          "sourceHash": "sha256:f5f18643cb1d8aa1a40a9cd2dd978f1ac4fcc5bf5b1263b6ebad774d259032d2",
           "proxyStatus": null
         },
         {
@@ -1253,7 +1253,7 @@
             "scripts/provider-demos.mjs",
             "threejs-image-pipeline/examples/webgpu-image-pipeline"
           ],
-          "sourceHash": "sha256:48fd78a732d2f8b0ba32cc219fd9bb69ecc2885c9ea6c2cf8ab378d422b849f2",
+          "sourceHash": "sha256:3dab91c32b99ce77c76377b935ab2ad11cae91665052901ec23dc1a7ae7e7236",
           "proxyStatus": {
             "limitation": "The docs page visualizes the signal contract with live panels rather than allocating production MRT targets. The production skill remains one RenderPipeline, one pass/MRT producer, and one tone-map/output conversion owner.",
             "canonicalLabId": "webgpu-image-pipeline"
@@ -1307,7 +1307,7 @@
             "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
             "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
           ],
-          "sourceHash": "sha256:0610238964bdd587347cd5ba8298565de173bdf582676ca262d4c80cb81b9fd1",
+          "sourceHash": "sha256:a1cda560058b7c6988bae1020fa4a18bb444204920cd3b7831ff2edfc92182fc",
           "proxyStatus": null
         },
         {
@@ -1429,7 +1429,7 @@
             "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
             "threejs-image-pipeline/examples/webgpu-image-pipeline"
           ],
-          "sourceHash": "sha256:d50e5b0ce11ff03b4f8d95eaf17a18b99d275759de12bb63e39b818d263b50d4",
+          "sourceHash": "sha256:3f4e180bd7ed3802f25020df37f654d2e8359b39b16271f28664ad7d8d144bbc",
           "proxyStatus": null
         },
         {
@@ -1450,15 +1450,15 @@
             "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
             "threejs-image-pipeline/examples/webgpu-temporal-history"
           ],
-          "sourceHash": "sha256:488b22e084958397dd5c1677b050b3d75723e96a1ff4b01ea3c1bd49dca2401f",
+          "sourceHash": "sha256:432b825e938de8915f5e3d442fd6a41f288a7975870af1ba51d96698ee88ef0f",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:52:59+03:00",
-        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
+        "datetime": "2026-07-11T13:19:44+03:00",
+        "commit": "2b9373783139b1182dd194c2a453f95e5a4e7a80",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2b9373783139b1182dd194c2a453f95e5a4e7a80"
       },
       "page": "https://threejs-skills.com/skills/threejs-image-pipeline.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md",
@@ -1504,15 +1504,15 @@
           "sourceHashInputs": [
             "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
           ],
-          "sourceHash": "sha256:5c5f8a86ef59bf3b3d658b9392c667bc37f256c960e0af3fdbb3b3e678a96134",
+          "sourceHash": "sha256:9c2765b515f5c32d367ec11cb0170b5c16a5b20344518c1d8a441b6509b23002",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T04:29:27+03:00",
-        "commit": "76a206dc01700af4dacf01d0e1d98fdac6adb969",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/76a206dc01700af4dacf01d0e1d98fdac6adb969"
+        "datetime": "2026-07-11T13:07:21+03:00",
+        "commit": "c2dfb388ba46774a6f3611413bc71e9ea426979f",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/c2dfb388ba46774a6f3611413bc71e9ea426979f"
       },
       "page": "https://threejs-skills.com/skills/threejs-object-sculptor.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/SKILL.md",
@@ -1581,7 +1581,7 @@
             "scripts/provider-demos.mjs",
             "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
           ],
-          "sourceHash": "sha256:fa7d7b297a96955a48f967e6730518b219a55a703a62cde8e8f39ea8aa89b0b5",
+          "sourceHash": "sha256:02200f2842cf1f2df66ff2d9b97dd4217f10200bcdcf47c84c4c085a9327e3df",
           "proxyStatus": {
             "limitation": "The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.",
             "canonicalLabId": "webgpu-pooled-effects"
@@ -1607,10 +1607,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T21:41:13+03:00",
-        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:24+03:00",
+        "commit": "328ff089eb9d3044c570c171e5657b29ddc35ea7",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/328ff089eb9d3044c570c171e5657b29ddc35ea7"
       },
       "page": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-particles-trails-and-effects/SKILL.md",
@@ -1662,7 +1662,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
           ],
-          "sourceHash": "sha256:7871ff6a259f26e44ee0da80dc54b6aac5e7a4a6479138dedee80eb9ff94f635",
+          "sourceHash": "sha256:e132388671b9b4ef442f603b2025c4d179236ef88671ce667ed123ea27d5abed",
           "proxyStatus": {
             "limitation": "The docs page uses compact runtime geometry instead of the full fixture compiler and BatchedMesh capacity accounting. The production skill remains plan validation, interval overlap checks, physical UV scale, material-slot mesh compilation, and city-chunk budget evidence.",
             "canonicalLabId": "webgpu-material-slot-compiler"
@@ -1701,10 +1701,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T21:41:13+03:00",
-        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:24+03:00",
+        "commit": "364338260dc76bccc805823f7f1b88dea79d5e00",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/364338260dc76bccc805823f7f1b88dea79d5e00"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/SKILL.md",
@@ -1756,7 +1756,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-creatures/SKILL.md"
           ],
-          "sourceHash": "sha256:285acf7a53603dfcf13c06cfe3e7078fb30956a039805f90ca5b19917c52638d",
+          "sourceHash": "sha256:416a5a1d74a0fdc08544a713a63d04b186594fb53c77f6d756a8badb761630e9",
           "proxyStatus": {
             "limitation": "The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract. The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.",
             "canonicalLabId": "webgpu-procedural-creature-lab"
@@ -1773,15 +1773,15 @@
           "sourceHashInputs": [
             "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
           ],
-          "sourceHash": "sha256:49685873c12aeb57f13b1f1d6ce4df2033e65cb9361daa0b4c3be930a99778f0",
+          "sourceHash": "sha256:57a64ea5b294dec8b22aecfee95241fe224f5646a872ea7289c4792e194679ff",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T04:41:20+03:00",
-        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
+        "datetime": "2026-07-11T13:05:44+03:00",
+        "commit": "2ff0330bddd014563d17542eb7938515938bc7e5",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2ff0330bddd014563d17542eb7938515938bc7e5"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-creatures.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md",
@@ -1833,7 +1833,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-fields/examples/webgpu-field-bake"
           ],
-          "sourceHash": "sha256:673c7ab179bba44bca8b3c5f4b43a983d50d57e3849af2af063235a938b1063a",
+          "sourceHash": "sha256:83899d9151b53b4d484b1a941e33dc6da4beefe8ed1b0f5e30df95ab1a118e8f",
           "proxyStatus": {
             "limitation": "Generated biome maps are reduced-tier diagnostics. The production field path remains shared CPU/TSL parity plus compute/storage bakes when reuse justifies it.",
             "canonicalLabId": "webgpu-field-bake"
@@ -1859,9 +1859,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:16:43+03:00",
-        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
+        "datetime": "2026-07-11T12:53:40+03:00",
+        "commit": "3222a6adb0adaa6e570570bdd350ed9d4327b05b",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3222a6adb0adaa6e570570bdd350ed9d4327b05b"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-fields.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md",
@@ -1930,7 +1930,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-geometry/examples/semantic-mesh-writer"
           ],
-          "sourceHash": "sha256:e9c97609abfe6e39fa501c23558f603edcd1c9dd32ff1437192b70893b976e81",
+          "sourceHash": "sha256:064012816fd80d75880b795959db68580bef421f9c384b64ea2ccce63370dd00",
           "proxyStatus": {
             "limitation": "The docs page implements a compact runtime frame-profile writer for inspection. The production skill remains preallocated typed-array writers, exact group coverage, tangent validation, batching decisions, and targeted update ranges.",
             "canonicalLabId": "semantic-mesh-writer"
@@ -1952,10 +1952,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:41+03:00",
+        "commit": "2b0c5974f1ebe5a276a5a8ef2831c2027d9c9294",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2b0c5974f1ebe5a276a5a8ef2831c2027d9c9294"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-geometry.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-geometry/SKILL.md",
@@ -2007,7 +2007,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-materials/examples/tsl-procedural-pbr"
           ],
-          "sourceHash": "sha256:ff190486a7ec06195ed87864bc6a256a99d041dac07ca53c543a77de44877603",
+          "sourceHash": "sha256:a54ffead3072431a91904f03970cdeef9761721c816d02a917106c70f0ebe157",
           "proxyStatus": {
             "limitation": "Generated lava maps are reduced-tier diagnostic inputs. The production material path remains NodeMaterial PBR slots with HDR emissive and BloomNode ownership.",
             "canonicalLabId": "tsl-procedural-pbr"
@@ -2050,10 +2050,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T21:38:36+03:00",
-        "commit": "916e3776038dbfeb67c094ff8645cea44cb13437",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/916e3776038dbfeb67c094ff8645cea44cb13437"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:41+03:00",
+        "commit": "fb4d12844e6895cd62b6988e990cb4936c80ef9b",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/fb4d12844e6895cd62b6988e990cb4936c80ef9b"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-materials.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-materials/SKILL.md",
@@ -2111,7 +2111,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
           ],
-          "sourceHash": "sha256:577c7252836a83e69bef32c47b612a4baca536bb035cd3aa1d63d472acc447ef",
+          "sourceHash": "sha256:e0d840c58ab70d36a9c2035457a7d48f3c998f420224c60d2ea1c83a4e2a54a9",
           "proxyStatus": {
             "limitation": "The docs page uses a small CPU-side hero actor set for readability. The production skill remains fixed-step replay, previous/current storage slots, compute dispatch ownership, and quaternion frame contracts.",
             "canonicalLabId": "webgpu-procedural-timelines"
@@ -2149,9 +2149,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T04:41:20+03:00",
-        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
+        "datetime": "2026-07-11T12:53:41+03:00",
+        "commit": "2749e9527f2f66e3c0875d3539f75efbcf88e52f",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2749e9527f2f66e3c0875d3539f75efbcf88e52f"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md",
@@ -2203,7 +2203,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-planets/examples/webgpu-quadtree-planet"
           ],
-          "sourceHash": "sha256:06bf9efd5d64e399aeee6cef790af08b3ef43074302d4dd6d20242ec8fd15979",
+          "sourceHash": "sha256:3235eb575b7c7ea1ea59ba8eabe2eee42261ec68ac4baea8cddc1d1e4b30d412",
           "proxyStatus": {
             "limitation": "Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.",
             "canonicalLabId": "webgpu-quadtree-planet"
@@ -2251,9 +2251,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:16:43+03:00",
-        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
+        "datetime": "2026-07-11T12:53:41+03:00",
+        "commit": "7d9a328a7ddd3fe1bd5e449b2a8159562c7c6c0e",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/7d9a328a7ddd3fe1bd5e449b2a8159562c7c6c0e"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-planets.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md",
@@ -2404,7 +2404,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-vegetation/examples/webgpu-dense-grass"
           ],
-          "sourceHash": "sha256:e9eeaa8b8624b2388316aac1d3ae6938580b8e3e28ed019c512ff40a3746389e",
+          "sourceHash": "sha256:4be000db0d682b5ef9b935433bc892edf6cb6b04ea9bb458d4d6acc2b92cd72e",
           "proxyStatus": {
             "limitation": "Generated meadow maps are reduced-tier diagnostic inputs. The production vegetation path remains chunked compute/storage instance data, patch culling, and rooted wind.",
             "canonicalLabId": "webgpu-dense-grass"
@@ -2464,10 +2464,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T20:48:56+03:00",
-        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:58+03:00",
+        "commit": "def0cb1ae489f14e1b43b92cb88b52f1bf9c840e",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/def0cb1ae489f14e1b43b92cb88b52f1bf9c840e"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md",
@@ -2565,7 +2565,7 @@
             "scripts/provider-demos.mjs",
             "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
           ],
-          "sourceHash": "sha256:4bbf15952bced678c76059dc9038a457734aa89e39cf831bb0c96c6f63c49797",
+          "sourceHash": "sha256:77cd5c258b2b8d9f34456aa525e0868de6abd77fe8b467d169ed7b3c44b05731",
           "proxyStatus": {
             "limitation": "The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.",
             "canonicalLabId": "webgpu-rain-snow-and-wet-surfaces"
@@ -2626,10 +2626,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T21:41:13+03:00",
-        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T12:53:58+03:00",
+        "commit": "9ee91ebcf9f3bf4753c0a1b4401a05c6977116eb",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/9ee91ebcf9f3bf4753c0a1b4401a05c6977116eb"
       },
       "page": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md",
@@ -2719,7 +2719,7 @@
             "scripts/provider-demos.mjs",
             "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
           ],
-          "sourceHash": "sha256:55c4cd97c49ab7157f8eec431487e238b76b239ebd8f2ee634147fd5494124db",
+          "sourceHash": "sha256:1a18d0f532f1973e357d40f97af5f91ab07a7171dd1d466cb78a36d1433e9e20",
           "proxyStatus": {
             "limitation": "The live page uses a single real shadow map plus debug coverage overlays. The production skill chooses one shadow, CSMShadowNode, TileShadowNode, or a measured custom cached clipmap from the target scene.",
             "canonicalLabId": "webgpu-cached-clipmap-shadow"
@@ -2786,9 +2786,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:52:59+03:00",
-        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
+        "datetime": "2026-07-11T12:53:58+03:00",
+        "commit": "5d79faad0c4a1ac3ba6f0952f848f315c8f7ffb7",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/5d79faad0c4a1ac3ba6f0952f848f315c8f7ffb7"
       },
       "page": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/SKILL.md",
@@ -2857,7 +2857,7 @@
             "scripts/provider-demos.mjs",
             "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
           ],
-          "sourceHash": "sha256:61cce1f93d01278d105b77547a037caf639b32fc5fa76d6a5f5e13e56bc4a290",
+          "sourceHash": "sha256:9692474b579da00d1fdd1492a84dc239511de4afae85b7f93d2f0706189e1550",
           "proxyStatus": {
             "limitation": "The docs page uses procedural sky bands and haze layers for direct interaction. The production skill remains compute-generated transmittance, multiscatter, sky-view, and aerial-perspective LUT/froxel products.",
             "canonicalLabId": "webgpu-lut-atmosphere"
@@ -2887,9 +2887,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:16:43+03:00",
-        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
+        "datetime": "2026-07-11T12:53:58+03:00",
+        "commit": "3fb04585eba3a88e65419f7d5a288459427c174c",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3fb04585eba3a88e65419f7d5a288459427c174c"
       },
       "page": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-sky-atmosphere-and-haze/SKILL.md",
@@ -2941,7 +2941,7 @@
             "scripts/provider-demos.mjs",
             "threejs-spectral-ocean/examples/webgpu-fft-ocean"
           ],
-          "sourceHash": "sha256:d0a0f069602883e7bb644a45c10a9dfd8201de4193d4ab32c9a203a66cb528bd",
+          "sourceHash": "sha256:f783e45cac904d2767382f5c8b88706ee32e1e3d99c4315813dd90bbde7069e1",
           "proxyStatus": {
             "limitation": "Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.",
             "canonicalLabId": "webgpu-fft-ocean"
@@ -3009,15 +3009,15 @@
           "sourceHashInputs": [
             "threejs-spectral-ocean/examples/webgpu-fft-ocean"
           ],
-          "sourceHash": "sha256:17514de947361852f2dfbec7cd8f8aeae3a79676f4a2981328a2f12892b4befa",
+          "sourceHash": "sha256:8e5b5f310de4938e4041daac7f9688054085f68004fba69e6d560b9e30acf125",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:47:52+03:00",
-        "commit": "8440c7f60865771c62f55fb6e2e34f28bf535387",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/8440c7f60865771c62f55fb6e2e34f28bf535387"
+        "datetime": "2026-07-11T12:53:59+03:00",
+        "commit": "df4b1ff8ba9ca2fed80fe7729db4c0aaac38f755",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/df4b1ff8ba9ca2fed80fe7729db4c0aaac38f755"
       },
       "page": "https://threejs-skills.com/skills/threejs-spectral-ocean.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/SKILL.md",
@@ -3069,7 +3069,7 @@
             "scripts/provider-demos.mjs",
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:dc60f87e461c5b3844cb0aa0265eb50c06de9386058615bf3927fe9e02f24cf9",
+          "sourceHash": "sha256:a949ead8d435d53f0c13a81762d0dc863c79f6b08d420b1bc37354c05f2aa0fd",
           "proxyStatus": {
             "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
             "canonicalLabId": "webgpu-validation-harness"
@@ -3146,7 +3146,7 @@
             "scripts/provider-demos.mjs",
             "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
           ],
-          "sourceHash": "sha256:cabfdd5fa44b66a2c53e2eb30c4d951284c3c8ec0b164f7dec278b7ad5512685",
+          "sourceHash": "sha256:6515eccca7aec1ff9fbdbb3d8fcae9570e639564449ed1c2030cfea09369571e",
           "proxyStatus": {
             "limitation": "Generated weather maps are reduced-tier diagnostic inputs. The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.",
             "canonicalLabId": "webgpu-weather-volume-clouds"
@@ -3195,9 +3195,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T03:16:43+03:00",
-        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
+        "datetime": "2026-07-11T12:54:15+03:00",
+        "commit": "1a85cdab534a4fdb9ee8c38516a9c0a24d3858e0",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a85cdab534a4fdb9ee8c38516a9c0a24d3858e0"
       },
       "page": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-volumetric-clouds/SKILL.md",
@@ -3255,7 +3255,7 @@
             "scripts/provider-demos.mjs",
             "threejs-water-optics/examples/webgpu-bounded-water"
           ],
-          "sourceHash": "sha256:f60dee74d84cd37b8d1048a720c8788f0c4a66abe76ab070f57f05941ae0925b",
+          "sourceHash": "sha256:904ae4eb1bfed1d75e9af4505351b2c78a67c3de108c463dea9238dacf1e6b89",
           "proxyStatus": {
             "limitation": "Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.",
             "canonicalLabId": "webgpu-bounded-water"
@@ -3280,7 +3280,7 @@
             "scripts/provider-demos.mjs",
             "threejs-water-optics/EXPERIMENTAL/water-integration-surface"
           ],
-          "sourceHash": "sha256:4b2959fc6e37bf7f39eadb3d08ddac108bb6d9418bc4e47ba4a6c0f2d0d1f8f8",
+          "sourceHash": "sha256:f762947428cf4a4212351e4c7d0474947e91e9993c09f1dacb0fa63946286dad",
           "proxyStatus": {
             "limitation": "The mask registry is intentionally shown as incomplete until a screen-space mask texture and water-material hook are implemented. The host project owns post-processing, transparent ordering, and final output conversion.",
             "canonicalLabId": "webgpu-bounded-water"
@@ -3340,15 +3340,15 @@
             "scripts/provider-demos.mjs",
             "threejs-water-optics/examples/webgpu-bounded-water"
           ],
-          "sourceHash": "sha256:a49e6113d3fe009657c163da6061996d4d6e8eb5d3e88363b677904fdabb3f1b",
+          "sourceHash": "sha256:e8633e8c9f83c081d41f9ef7a5c589dae230915598f29d26e10ecf2b14f6cb92",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T04:41:20+03:00",
-        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
+        "datetime": "2026-07-11T12:54:15+03:00",
+        "commit": "bff69a366ef41bbf23e97b1fc1ee7b19da82beb9",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/bff69a366ef41bbf23e97b1fc1ee7b19da82beb9"
       },
       "page": "https://threejs-skills.com/skills/threejs-water-optics.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md",

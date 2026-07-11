@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-creatures.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
+<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Creatures | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build workload-selected procedural and generated creatures in Three.js r185 WebGPU/TSL. Use for spec-driven bodies, semantic rigs, field-extracted skinned…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-creatures.html" />
-<meta property="article:modified_time" content="2026-07-11T04:41:20+03:00" />
+<meta property="article:modified_time" content="2026-07-11T13:05:44+03:00" />
 <meta property="article:published_time" content="2026-07-05T02:51:00+03:00" />
 <meta property="article:section" content="Procedural Content" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-05T02:51:00+03:00",
-   "dateModified": "2026-07-11T04:41:20+03:00",
+   "dateModified": "2026-07-11T13:05:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -278,8 +278,8 @@ a.chip:active{scale:.96}
 <span class="chip">1 secondary surface</span>
       
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T04:41:20+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323">commit 091f731 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T13:05:44+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ff0330bddd014563d17542eb7938515938bc7e5">commit 2ff0330 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-creatures/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -295,7 +295,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-procedural-creature-lab">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>49685873c12a</code> source hash</span>
+    <span><code>57a64ea5b294</code> source hash</span>
     <span>17 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
@@ -314,7 +314,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>23fd93054de8</code> source hash</span>
+    <span><code>2d9df5888e47</code> source hash</span>
     <span>9 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -618,7 +618,22 @@ cross-owner route publishes <code>SurfaceExchange</code> with exact mode <code>o
 Its gather/scatter pair preserves zeroth/first moments and gates force,
 torque, interface work, and added-mass stability. Source/reaction records
 form an all-or-none <code>InteractionReactionGroup</code>; many-to-many reduction is
-legal and balance is tested in its declared frame/reference point. The accepted pose is contributed
+legal and balance is tested in its declared frame/reference point. Each
+creature stage that applies a water/contact source or reduced reaction
+record resolves its <code>applicationLedgerKey</code> to a canonical
+<code>InteractionApplicationLedger</code>. The row binds the current
+<code>PhysicsStageExecution</code>, declared interval and exact execution overlap,
+payload time semantics and applied integral/fraction, target creature
+owner/entity/equation and expected state version, cursor before/after,
+prepared version, commit transaction, disposition,
+<code>applicationContentDigest</code>, and <code>receiptDigest</code>. Only a <code>committed</code> receipt authorizes the pose,
+velocity, support/contact, or swimmer-state advance; rate payloads integrate
+over their exact overlap and interval-integrated payloads commit once.
+Duplicate/replayed, disjoint, deferred, or rejected rows are no-ops, not
+informal deduplication. The ledger ID resolves from the batch and route
+inventories and appears in the stage execution, <code>StateAdvanceClaim</code>,
+accepted coupling iteration when present, and atomic commit lineage. The
+accepted pose is contributed
 as a per-binding/provider <code>PresentedStatePair</code> to the view-independent
 <code>PhysicsPresentationCandidate</code>, which contains no camera or render
 transform. <code>previousPresented</code> and <code>currentPresented</code> each carry independent
@@ -908,7 +923,7 @@ pack — do not stretch this skill over them.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

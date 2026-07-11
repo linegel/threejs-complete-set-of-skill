@@ -18,13 +18,13 @@
     "threejs-choose-skills/examples/router-contract.test.mjs"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:1974b0c2bfb65d33e7072a6c28efc893e30ee2d5083f635d09ab8326f7798cbc",
+  "sourceHash": "sha256:7222569a7448e0782ac8d1aadfdbec5e633cdc22c34b3304c3d1c15e30ae49ea",
   "publishedHashInputs": [
     "docs/demos/skill-router-manifest-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:018b5868eb8c16a32d6825a48883793a8aaf6edebc147f1de568a70236fa175a",
+  "publishedBundleHash": "sha256:7fff1eea48607825ae59a697ec456b0227133e93a505dc2a7bc2383810082d30",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

@@ -18,13 +18,13 @@
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:48fd78a732d2f8b0ba32cc219fd9bb69ecc2885c9ea6c2cf8ab378d422b849f2",
+  "sourceHash": "sha256:3dab91c32b99ce77c76377b935ab2ad11cae91665052901ec23dc1a7ae7e7236",
   "publishedHashInputs": [
     "docs/demos/image-pipeline-framegraph-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8a7335888257bd24d27b2d7e4229b1959e8d758b4b1832aaaed0225f947833cd",
+  "publishedBundleHash": "sha256:616ced36830902a0368709611600f2fe030b402150a1201b1c0af92368eb028e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

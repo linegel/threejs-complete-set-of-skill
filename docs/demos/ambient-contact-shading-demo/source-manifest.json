@@ -18,13 +18,13 @@
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:a89a693c0ac6a1c9cddff3d872475ac2adda17a9ce4cbf39387be6b1fe12bc42",
+  "sourceHash": "sha256:f48721db1c4a344e37ed61863cf4bd2b4e8cfb0e04cf2fb042a9b7ef06452735",
   "publishedHashInputs": [
     "docs/demos/ambient-contact-shading-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:244e8994eeca30060254690a5ea83945769c966298e8fbba91310744d8396893",
+  "publishedBundleHash": "sha256:8286a3eb9c3c25275c8ad93051c31391f9b2a2315c2f7ea06c1f0b13f2e53542",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }

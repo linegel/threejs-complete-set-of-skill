@@ -18,13 +18,13 @@
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:960d7fd221155e33c8e58573a98bcecd6ec0f0207b5a340efcb73aea3d91247d",
+  "sourceHash": "sha256:4de7a3c2e31c69c2e416b1e51c554d66ef547d60a514060ab5e78ab9b1e4dc2b",
   "publishedHashInputs": [
     "docs/demos/camera-rig-handoff-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:1f0757266c165cf472f26505b58af9c477bc18f984c4e12a45e1e642513fb26e",
+  "publishedBundleHash": "sha256:a6fb356324f0da8f65952ecb475ed0b6363c3da5b6c0f803ab58ea2e0777e568",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
   "evidenceBundleId": null
 }
