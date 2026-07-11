@@ -21,6 +21,7 @@ import {
   manifestCommandPrefixDrift,
   obviousNoOpCommand,
   quickCommandStartsBrowser,
+  quickCommandWritesTrackedSources,
   rootBrowserToolchainDrift,
 } from '../../scripts/lib/lab-command-policy.mjs';
 
@@ -316,6 +317,19 @@ test('browser-free quick validation permits capture syntax checks but rejects ex
   assert.equal(quickCommandStartsBrowser('bash capture.sh'), true);
   assert.equal(quickCommandStartsBrowser('node browser.mjs'), true);
   assert.equal(quickCommandStartsBrowser('node --input-type=module -e "await import(\'./browser-module.mjs\')"'), false);
+});
+
+test('check-only quick validation rejects tracked-source generators', () => {
+  assert.equal(quickCommandWritesTrackedSources('node --check generate-routes.mjs && node validate-routes.mjs'), false);
+  assert.equal(quickCommandWritesTrackedSources('node validate-generated-starfields.mjs'), false);
+  assert.equal(quickCommandWritesTrackedSources('npm run generate:routes:check'), false);
+  assert.equal(quickCommandWritesTrackedSources('node generate-routes.mjs --check'), false);
+  assert.equal(quickCommandWritesTrackedSources('npm run generate:routes:check (node generate-routes.mjs)'), true);
+  assert.equal(quickCommandWritesTrackedSources('npm run generate:routes && node validate-routes.mjs'), true);
+  assert.equal(quickCommandWritesTrackedSources('node generate-routes.mjs'), true);
+  assert.equal(quickCommandWritesTrackedSources('node scripts/generate-routes.mjs'), true);
+  assert.equal(quickCommandWritesTrackedSources('node build-pages.mjs'), true);
+  assert.equal(quickCommandWritesTrackedSources('node promote-runtime-evidence.mjs'), true);
 });
 
 test('canonical packages may omit root browser dependencies but cannot range or drift them', () => {

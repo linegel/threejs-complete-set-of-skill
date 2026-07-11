@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   REPO_ROOT,
   buildDemoRegistry,
   manifestSourceDirectory,
 } from './lib/lab-registry.mjs';
-import { appendCaptureProfile } from './lib/lab-command-policy.mjs';
+import {
+  appendCaptureProfile,
+  expandLocalPackageScript,
+  quickCommandWritesTrackedSources,
+} from './lib/lab-command-policy.mjs';
 
 function readOption(name) {
   const index = process.argv.indexOf(name);
@@ -117,6 +121,19 @@ for (const manifest of labs) {
   if (!command) {
     if (requestedLab || manifest.status === 'accepted') failures.push(`${manifest.id}: no ${operation} command declared`);
     continue;
+  }
+  if (operation === 'quick') {
+    const canonicalDir = registry.origins?.[manifest.id]?.canonicalDir;
+    const packageDir = canonicalDir ? join(REPO_ROOT, canonicalDir) : null;
+    const packagePath = packageDir ? join(packageDir, 'package.json') : null;
+    if (packagePath && existsSync(packagePath)) {
+      const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+      const expandedQuick = expandLocalPackageScript(packageJson, 'validate:quick', packageDir);
+      if (quickCommandWritesTrackedSources(`${command}\n${expandedQuick}`)) {
+        failures.push(`${manifest.id}: validate:quick is not check-only and can generate or rewrite tracked source`);
+        continue;
+      }
+    }
   }
   const tokens = tokenize(command);
   if (!['node', 'npm', 'npx', 'bash'].includes(tokens[0])) {

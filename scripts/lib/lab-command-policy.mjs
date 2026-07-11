@@ -18,6 +18,21 @@ export function quickCommandStartsBrowser(command) {
   ].some((pattern) => pattern.test(executable));
 }
 
+/** Return true when quick validation can rewrite canonical or published source. */
+export function quickCommandWritesTrackedSources(command) {
+  const executable = stripNodeSyntaxChecks(command);
+  const segments = executable.split(/&&|\|\||[;|()]/).map((segment) => segment.trim()).filter(Boolean);
+  for (const segment of segments) {
+    const packageScript = /\b(?:npm|pnpm|yarn)\b.*?\b(?:run\s+)?((?:generate|build|promote)(?::[a-z0-9:_-]+)?)\b/i.exec(segment)?.[1];
+    if (packageScript && !/(?::|^)(?:check|verify)$/.test(packageScript)) return true;
+
+    const sourceGenerator = /\bnode\s+(?:--[^\s]+\s+)*(?!-)(?:[^\s]*\/)?(?:generate|build|promote)(?:[-_][^\s]*)?\.(?:[cm]?js|ts)\b/i.test(segment);
+    const explicitCheck = /(?:^|\s)--(?:check|check-only|verify)(?:\s|$)/.test(segment);
+    if (sourceGenerator && !explicitCheck) return true;
+  }
+  return false;
+}
+
 export function obviousNoOpCommand(command) {
   const normalized = String(command ?? '').trim().replace(/\s+/g, ' ');
   return normalized === ''

@@ -15,6 +15,7 @@ import {
   manifestCommandPrefixDrift,
   obviousNoOpCommand,
   quickCommandStartsBrowser,
+  quickCommandWritesTrackedSources,
   rootBrowserToolchainDrift,
 } from './lib/lab-command-policy.mjs';
 import { plannedPublishedRoutes } from './lib/page-routes.mjs';
@@ -77,6 +78,9 @@ function checkCommandRecursion(targetId, raw, packageJson, packageDir, errors) {
   const quick = expandLocalPackageScript(packageJson, 'validate:quick', packageDir);
   if (quickCommandStartsBrowser(quick)) {
     errors.push(`${targetId}: validate:quick must remain browser-free`);
+  }
+  if (quickCommandWritesTrackedSources(quick)) {
+    errors.push(`${targetId}: validate:quick must be check-only and cannot generate or rewrite tracked source`);
   }
   if (!raw.nonRenderingScenarioSuite) {
     const full = expandLocalPackageScript(packageJson, 'validate:full', packageDir);
