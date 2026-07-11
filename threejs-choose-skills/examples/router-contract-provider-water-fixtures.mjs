@@ -1,6 +1,17 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 
+const ENVIRONMENT_FORCING_SKILL_CONSUMERS = Object.freeze( [
+	'$threejs-particles-trails-and-effects',
+	'$threejs-procedural-creatures',
+	'$threejs-procedural-planets',
+	'$threejs-procedural-vegetation',
+	'$threejs-rain-snow-and-wet-surfaces',
+	'$threejs-sky-atmosphere-and-haze',
+	'$threejs-spectral-ocean',
+	'$threejs-volumetric-clouds'
+] );
+
 const ENVIRONMENT_CHANNEL_FIELDS = Object.freeze( [
 	'airVelocityMps',
 	'airDensityKgPerM3',
@@ -729,7 +740,7 @@ export function buildProviderWaterBundle( helpers, route ) {
 	const environmentDescriptor = makeDescriptor( h, {
 		...descriptorCommon,
 		signalId: 'environment-forcing-snapshot', providerId: 'project-environment-coordinator', schemaId: 'physics/environment-forcing/v1',
-		owner: 'project-environment-coordinator', consumers: [ '$threejs-rain-snow-and-wet-surfaces', '$threejs-water-optics' ],
+		owner: 'project-environment-coordinator', consumers: [ ...ENVIRONMENT_FORCING_SKILL_CONSUMERS ],
 		specs: ENVIRONMENT_SPECS, support: environmentSupport, filter: environmentFilter, chartId: h.clone( noChart ),
 		samplePhase: 'interval-start', cadenceKind: 'fixed', cadenceEvidence: 'one immutable forcing latch per coordination interval',
 		residency: commonCpuResidency( 'project-environment-coordinator', 'environment-forcing-host-snapshot-v7' ),
@@ -1443,6 +1454,9 @@ function validateEnvironmentForcing( h, bundle, route ) {
 	assert.equal( snapshot.temperatureK.unit, 'kelvin', 'environment temperature must be kelvin' );
 	for ( const channelId of [ 'precipitationMassFluxKgPerM2S', 'precipitationPhase', 'precipitationVelocityMps' ] ) assertTypedAbsence( h, snapshot[ channelId ], `environmentForcingSnapshot.${ channelId }` );
 	assert.equal( snapshot.descriptor.owner, 'project-environment-coordinator', 'environment owner cannot become a second precipitation-emission authority' );
+	assertSetEqual( snapshot.descriptor.consumers, ENVIRONMENT_FORCING_SKILL_CONSUMERS, 'environment forcing must fan out to the exact actual-skill consumer set' );
+	assert.equal( new Set( snapshot.descriptor.consumers ).size, snapshot.descriptor.consumers.length, 'environment forcing consumer fanout contains duplicate skill identities' );
+	for ( const consumer of snapshot.descriptor.consumers ) assert.match( consumer, /^\$threejs-[a-z0-9-]+$/, `environment forcing consumer ${ consumer } is not an exact installed skill identity` );
 	assert.equal( bundle.precipitationEmissionSnapshot.descriptor.owner, 'causal-cloud-microphysics-provider', 'cloud microphysics must be the sole precipitation-emission authority' );
 	assert.deepEqual( route.physicsSignals.environmentForcing, snapshot.descriptor, 'environment forcing descriptor is not installed in route.physicsSignals' );
 	assert.notDeepEqual( snapshot.airVelocityMps.value, bundle.waterSurfaceSample.materialCurrentVelocityMps.value, 'atmospheric wind cannot alias water material current' );
@@ -1973,6 +1987,37 @@ export function mismatchedEnvironmentDescriptorUnit( helpers, bundle ) {
 
 }
 
+export function missingEnvironmentForcingSkillConsumer( helpers, bundle ) {
+
+	return mutateBundle( helpers, bundle, ( copy ) => {
+
+		copy.environmentForcingSnapshot.descriptor.consumers = copy.environmentForcingSnapshot.descriptor.consumers.filter( ( consumer ) => consumer !== '$threejs-procedural-vegetation' );
+
+	} );
+
+}
+
+export function aliasedEnvironmentForcingSkillConsumer( helpers, bundle ) {
+
+	return mutateBundle( helpers, bundle, ( copy ) => {
+
+		const index = copy.environmentForcingSnapshot.descriptor.consumers.indexOf( '$threejs-particles-trails-and-effects' );
+		copy.environmentForcingSnapshot.descriptor.consumers[ index ] = '$weather-water-skill';
+
+	} );
+
+}
+
+export function duplicateEnvironmentForcingSkillConsumer( helpers, bundle ) {
+
+	return mutateBundle( helpers, bundle, ( copy ) => {
+
+		copy.environmentForcingSnapshot.descriptor.consumers.push( '$threejs-procedural-creatures' );
+
+	} );
+
+}
+
 export function mismatchedPrecipitationDescriptorUnit( helpers, bundle ) {
 
 	return mutateBundle( helpers, bundle, ( copy ) => { copy.precipitationEmissionSnapshot.descriptor.channels.emittedMassFluxKgPerM2S.unit = 'kilogram-per-second'; } );
@@ -2214,6 +2259,9 @@ export const providerWaterRejectMutations = Object.freeze( {
 	mismatchedWaterParameterizationRevision,
 	duplicateEnvironmentPrecipitationAuthority,
 	mismatchedEnvironmentDescriptorUnit,
+	missingEnvironmentForcingSkillConsumer,
+	aliasedEnvironmentForcingSkillConsumer,
+	duplicateEnvironmentForcingSkillConsumer,
 	mismatchedPrecipitationDescriptorUnit,
 	mismatchedWaterDescriptorUnit,
 	omittedWaterProjectionBilinearBound,
