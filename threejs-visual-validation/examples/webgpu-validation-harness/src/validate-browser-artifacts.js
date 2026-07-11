@@ -26,7 +26,7 @@ try {
 const result = await validateVersionedArtifactBundle( artifactDir );
 if ( result.schemaVersion !== 2 || result.bundleKind !== 'browser-capture' || result.publishable !== true ) {
 
-	throw new Error( 'INSUFFICIENT_EVIDENCE: contract fixtures and schema-v1 bundles cannot satisfy canonical artifact validation.' );
+	throw new Error( 'INSUFFICIENT_EVIDENCE: canonical artifact validation requires a publishable browser-capture bundle; fixtures, schema-v1 bundles, and browser-capture-incomplete bundles cannot satisfy acceptance.' );
 
 }
 

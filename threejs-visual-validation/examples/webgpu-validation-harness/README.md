@@ -44,6 +44,13 @@ artifacts and standard images, then runs the blocking mutation suite.
 `INSUFFICIENT_EVIDENCE` while only fixtures exist. `validate:quick` remains
 browser-free.
 
+The correctness `capture` command writes the ten standard PNGs under
+`images/`, assembles all fourteen JSON artifacts from live controller and
+readback facts, validates the result as `browser-capture-incomplete`, and keeps
+it non-publishable. `validate:artifacts` continues to reject that bundle until
+mechanism, sustained performance, GPU attribution, and lifecycle verdicts all
+become `PASS` from their required runs.
+
 ## Browser subject
 
 Serve the repository through the root Vite toolchain and open this directory's

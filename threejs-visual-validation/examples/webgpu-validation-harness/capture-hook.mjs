@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import { encodeRgbaPng } from '../../../scripts/lib/png-rgba.mjs';
+import { writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
 
@@ -181,8 +182,13 @@ export async function captureLab( session ) {
 		captures,
 		runtime
 	};
-	await writeFile( resolve( session.outputDir, 'evidence-manifest.incomplete.json' ), `${ JSON.stringify( boundary, null, 2 ) }\n` );
-	return { status: 'incomplete', publishable: false, captures, gpuTiming: runtime.gpuTiming };
+	const bundle = await writeIncompleteV2RuntimeBundle( session, {
+		captures,
+		runtime,
+		diagnosticDifference: boundary.diagnosticDifference.value
+	} );
+	await writeFile( resolve( session.outputDir, 'capture-boundary.json' ), `${ JSON.stringify( boundary, null, 2 ) }\n` );
+	return { status: 'incomplete', publishable: false, captures, gpuTiming: runtime.gpuTiming, bundle };
 
 }
 
