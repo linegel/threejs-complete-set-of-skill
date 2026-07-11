@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
 from pathlib import Path
 from typing import Any
 
-from visual_feature_gate import feature_gate_failures, feature_review_policy
+from visual_feature_gate import feature_gate_failures, feature_review_policy, feature_targets_for_pass
 
 
 REQUIRED_TOP_LEVEL = {
@@ -74,6 +75,8 @@ ATTACHMENT_ROLES = {
     "pipe",
 }
 ATTACHMENT_PRIMITIVES = {"cylinder", "cone", "capsule", "tube", "curve-sweep"}
+SHA256_PATTERN = re.compile(r"^[a-f0-9]{64}$")
+AUTHORED_CONTRACT_REVIEW_SCHEMA = "object-sculpt-authored-contract-review-v1"
 
 
 def is_number(value: Any) -> bool:
@@ -961,6 +964,36 @@ def validate_visual_evidence_item(item: Any, label: str, errors: list[str]) -> N
     threshold = item.get("visualAcceptanceThreshold")
     if threshold is not None:
         validate_unit_interval(threshold, f"{label}.visualAcceptanceThreshold", errors)
+    render_digest = item.get("renderScreenshotSha256")
+    if render_digest is not None and (
+        not isinstance(render_digest, str) or not SHA256_PATTERN.fullmatch(render_digest)
+    ):
+        errors.append(f"{label}.renderScreenshotSha256 must be lowercase 64-hex SHA-256")
+    authored_review = item.get("authoredContractReview")
+    if authored_review is not None:
+        if not isinstance(authored_review, dict):
+            errors.append(f"{label}.authoredContractReview must be an object")
+        else:
+            for field in ("reviewId", "reviewBasis", "status", "artifactPath"):
+                value = authored_review.get(field)
+                if not isinstance(value, str) or not value.strip():
+                    errors.append(f"{label}.authoredContractReview.{field} must be a non-empty string")
+            for field in ("artifactSha256", "bindingSha256"):
+                value = authored_review.get(field)
+                if not isinstance(value, str) or not SHA256_PATTERN.fullmatch(value):
+                    errors.append(
+                        f"{label}.authoredContractReview.{field} must be lowercase 64-hex SHA-256"
+                    )
+            for field in ("requiredReviewIds", "requiredEvidenceIds"):
+                value = authored_review.get(field)
+                if not (
+                    isinstance(value, list)
+                    and all(isinstance(entry, str) and entry.strip() for entry in value)
+                    and len(value) == len(set(value))
+                ):
+                    errors.append(
+                        f"{label}.authoredContractReview.{field} must be an array of unique non-empty strings"
+                    )
     layer_scores = item.get("layerScores")
     if layer_scores is not None:
         if not isinstance(layer_scores, dict):
@@ -971,6 +1004,142 @@ def validate_visual_evidence_item(item: Any, label: str, errors: list[str]) -> N
                     errors.append(f"{label}.layerScores keys must be strings")
                 if not is_number(value) or value < 0 or value > 1:
                     errors.append(f"{label}.layerScores.{key} must be a number from 0 to 1")
+
+
+def comparison_artifact_required(spec: dict[str, Any]) -> bool:
+    loop = spec.get("selfCorrectLoop")
+    acceptance = loop.get("visualAcceptance") if isinstance(loop, dict) else None
+    if not isinstance(acceptance, dict):
+        return True
+    return acceptance.get("comparisonArtifactRequired") is not False
+
+
+def authored_contract_requirements(
+    spec: dict[str, Any],
+    pass_id: str,
+) -> tuple[list[str], list[str], list[dict[str, Any]]]:
+    targets = [
+        target
+        for target in feature_targets_for_pass(spec, pass_id)
+        if target.get("tier") == "critical" or target.get("mustPass") is True
+    ]
+    targets.sort(key=lambda target: str(target.get("id") or ""))
+    review_ids = [
+        str(target["id"])
+        for target in targets
+        if isinstance(target.get("id"), str) and target["id"].strip()
+    ]
+    evidence_ids = sorted({
+        evidence_id
+        for target in targets
+        for evidence_id in target.get("evidenceRefs", [])
+        if isinstance(evidence_id, str) and evidence_id.strip()
+    })
+    return review_ids, evidence_ids, targets
+
+
+def authored_contract_review_binding_sha256(
+    spec: dict[str, Any],
+    entry: dict[str, Any],
+    pass_id: str,
+) -> str:
+    visual = entry.get("visualEvidence") if isinstance(entry.get("visualEvidence"), dict) else {}
+    review = visual.get("authoredContractReview") if isinstance(visual, dict) else {}
+    if not isinstance(review, dict):
+        review = {}
+    review_ids, evidence_ids, targets = authored_contract_requirements(spec, pass_id)
+    feature_reviews = entry.get("featureReviews", [])
+    normalized_feature_reviews = sorted(
+        [item for item in feature_reviews if isinstance(item, dict)],
+        key=lambda item: str(item.get("id") or ""),
+    ) if isinstance(feature_reviews, list) else []
+    payload = {
+        "schema": AUTHORED_CONTRACT_REVIEW_SCHEMA,
+        "passId": pass_id,
+        "reviewId": review.get("reviewId"),
+        "reviewBasis": review.get("reviewBasis"),
+        "status": review.get("status"),
+        "artifactPath": review.get("artifactPath"),
+        "artifactSha256": review.get("artifactSha256"),
+        "renderScreenshot": visual.get("renderScreenshot"),
+        "renderScreenshotSha256": visual.get("renderScreenshotSha256"),
+        "requiredReviewIds": review_ids,
+        "requiredEvidenceIds": evidence_ids,
+        "featureContracts": targets,
+        "aiVisionScore": entry.get("aiVisionScore"),
+        "visualAcceptanceThreshold": entry.get("visualAcceptanceThreshold", 0.7),
+        "layerScores": entry.get("layerScores"),
+        "featureReviews": normalized_feature_reviews,
+    }
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def authored_contract_review_failures(
+    spec: dict[str, Any],
+    entry: dict[str, Any],
+    pass_id: str,
+) -> list[str]:
+    failures: list[str] = []
+    visual = entry.get("visualEvidence")
+    if not isinstance(visual, dict):
+        return ["authored-contract review requires visualEvidence"]
+    if spec.get("referenceSourceKind") != "authored-procedural-brief" or has_non_empty_detail(spec.get("sourceImage")):
+        failures.append("comparison-free review is only valid for an authored-procedural-brief without a source image")
+    render_path = visual.get("renderScreenshot")
+    render_digest = visual.get("renderScreenshotSha256")
+    if not isinstance(render_path, str) or not render_path.strip():
+        failures.append("authored-contract review requires a render screenshot")
+    if not isinstance(render_digest, str) or not SHA256_PATTERN.fullmatch(render_digest):
+        failures.append("authored-contract review requires a digest-bound render screenshot")
+    if has_non_empty_detail(visual.get("referenceScreenshot")):
+        failures.append("authored-contract review must not invent a reference screenshot")
+    if has_non_empty_detail(visual.get("comparisonImage")):
+        if visual.get("comparisonImage") == render_path:
+            failures.append("render screenshot must not masquerade as a comparison image")
+        else:
+            failures.append("authored-contract review must not invent a comparison image")
+    review = visual.get("authoredContractReview")
+    if not isinstance(review, dict):
+        failures.append("authored-contract review artifact is missing")
+        return failures
+    if review.get("reviewBasis") != "authored-contract":
+        failures.append("authored-contract reviewBasis must be 'authored-contract'")
+    if review.get("status") != "pass":
+        failures.append("authored-contract review status must be 'pass'")
+    artifact_path = review.get("artifactPath")
+    if not isinstance(artifact_path, str) or not artifact_path.strip():
+        failures.append("authored-contract review artifactPath is missing")
+    elif artifact_path == render_path:
+        failures.append("render screenshot must not masquerade as the authored-contract review artifact")
+    artifact_digest = review.get("artifactSha256")
+    if not isinstance(artifact_digest, str) or not SHA256_PATTERN.fullmatch(artifact_digest):
+        failures.append("authored-contract review artifactSha256 must bind the review artifact")
+    required_review_ids, required_evidence_ids, _targets = authored_contract_requirements(spec, pass_id)
+    if review.get("requiredReviewIds") != required_review_ids:
+        failures.append("authored-contract requiredReviewIds do not match the pass contract")
+    if review.get("requiredEvidenceIds") != required_evidence_ids:
+        failures.append("authored-contract requiredEvidenceIds do not match the pass contract")
+    reviewed_ids = {
+        item.get("id")
+        for item in entry.get("featureReviews", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    } if isinstance(entry.get("featureReviews"), list) else set()
+    missing_reviews = [review_id for review_id in required_review_ids if review_id not in reviewed_ids]
+    if missing_reviews:
+        failures.append("authored-contract review is missing required review IDs: " + ", ".join(missing_reviews))
+    declared_evidence_ids = {
+        item.get("id")
+        for item in spec.get("viewEvidence", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    } if isinstance(spec.get("viewEvidence"), list) else set()
+    missing_evidence = [evidence_id for evidence_id in required_evidence_ids if evidence_id not in declared_evidence_ids]
+    if missing_evidence:
+        failures.append("authored-contract review cites missing evidence IDs: " + ", ".join(missing_evidence))
+    expected_binding = authored_contract_review_binding_sha256(spec, entry, pass_id)
+    if review.get("bindingSha256") != expected_binding:
+        failures.append("authored-contract review bindingSha256 drifted from the pass, render, and review evidence")
+    return failures
 
 
 def validate_feature_review_targets(
@@ -1137,10 +1306,24 @@ def validate_review_history(spec: dict[str, Any], errors: list[str], warnings: l
                 f"reviewHistory[{index}] continues visual pass {pass_id!r} without a render screenshot"
             )
         if pass_id in VISUAL_PASS_IDS and action == "continue":
-            if not isinstance(visual, dict) or not visual.get("comparisonImage"):
-                warnings.append(
-                    f"quality: reviewHistory[{index}] continues visual pass {pass_id!r} without an AI vision comparison image"
-                )
+            if comparison_artifact_required(spec):
+                if not isinstance(visual, dict) or not visual.get("comparisonImage"):
+                    warnings.append(
+                        f"quality: reviewHistory[{index}] continues visual pass {pass_id!r} without an AI vision comparison image"
+                    )
+                elif visual.get("comparisonImage") == visual.get("renderScreenshot"):
+                    warnings.append(
+                        f"quality: reviewHistory[{index}] render screenshot aliases its comparison image"
+                    )
+                if isinstance(visual, dict) and visual.get("authoredContractReview") is not None:
+                    warnings.append(
+                        f"quality: reviewHistory[{index}] cannot substitute an authored-contract review for a required comparison artifact"
+                    )
+            else:
+                for failure in authored_contract_review_failures(spec, entry, str(pass_id)):
+                    warnings.append(
+                        f"quality: reviewHistory[{index}] authored-contract gate failed: {failure}"
+                    )
             score = entry.get("aiVisionScore")
             threshold = entry.get("visualAcceptanceThreshold", 0.7)
             if not is_number(score):
@@ -1235,11 +1418,16 @@ def review_completes_pass(
         return False
     visual = entry.get("visualEvidence")
     if pass_id in VISUAL_PASS_IDS:
-        if not (
-            isinstance(visual, dict)
-            and visual.get("renderScreenshot")
-            and visual.get("comparisonImage")
-        ):
+        if not isinstance(visual, dict) or not visual.get("renderScreenshot"):
+            return False
+        if comparison_artifact_required(spec):
+            if not visual.get("comparisonImage"):
+                return False
+            if visual.get("comparisonImage") == visual.get("renderScreenshot"):
+                return False
+            if visual.get("authoredContractReview") is not None:
+                return False
+        elif authored_contract_review_failures(spec, entry, pass_id):
             return False
         score = entry.get("aiVisionScore")
         threshold = entry.get("visualAcceptanceThreshold", 0.7)
