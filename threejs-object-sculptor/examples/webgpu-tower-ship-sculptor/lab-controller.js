@@ -18,6 +18,10 @@ export const TOWER_SHIP_SCENARIOS = Object.freeze({
 export const TOWER_SHIP_CAMERAS = Object.freeze(["design", "profile", "bow", "close-material"]);
 export const TOWER_SHIP_SEEDS = Object.freeze([1, 2654435769]);
 export const TOWER_SHIP_DPR_CAPS = Object.freeze({ full: 2, budgeted: 1.5, minimum: 1 });
+export const TOWER_SHIP_RENDER_POLICY = Object.freeze({
+  trackTimestamp: false,
+  timingReason: "Continuous presentation does not claim GPU timing; timestamp evidence is captured by the validation owner.",
+});
 
 const CAMERA_POSES = Object.freeze({
   design: { position: [18.5, 11.8, 21.5], target: [0, 4.5, 0], fov: 38 },
@@ -42,6 +46,26 @@ function align(value, alignment) {
   return Math.ceil(value / alignment) * alignment;
 }
 
+export function describeTowerShipReadback(width, height, outputColorSpace) {
+  if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
+    throw new RangeError("capture dimensions must be positive integers");
+  }
+  if (typeof outputColorSpace !== "string" || outputColorSpace.length === 0) {
+    throw new TypeError("capture output color space is required");
+  }
+  const rowBytes = width * 4;
+  return Object.freeze({
+    width,
+    height,
+    format: "rgba8unorm",
+    bytesPerPixel: 4,
+    rowBytes,
+    bytesPerRow: align(rowBytes, 256),
+    colorManaged: true,
+    outputColorSpace,
+  });
+}
+
 export function resolveTowerShipDpr(tier, requestedDpr) {
   assertKnown(tier, TOWER_SHIP_TIERS, "tier");
   if (!(requestedDpr > 0) || !Number.isFinite(requestedDpr)) throw new RangeError("requested DPR must be finite and positive");
@@ -54,6 +78,12 @@ export function resolveFrameDeltaSeconds(nowMs, previousMs) {
   }
   return Math.min(Math.max((nowMs - previousMs) / 1000, 0), 0.1);
 }
+
+export function towerShipStateChanged(currentValue, nextValue, allowedValues, label) {
+  assertKnown(nextValue, allowedValues, label);
+  return currentValue !== nextValue;
+}
+
 export async function createTowerShipLabController({
   canvas,
   width = 1280,
@@ -69,7 +99,11 @@ export async function createTowerShipLabController({
   assertKnown(seed, TOWER_SHIP_SEEDS, "seed");
   assertKnown(camera, TOWER_SHIP_CAMERAS, "camera");
 
-  const renderer = new THREE.WebGPURenderer({ canvas, antialias: true, trackTimestamp: true });
+  const renderer = new THREE.WebGPURenderer({
+    canvas,
+    antialias: true,
+    trackTimestamp: TOWER_SHIP_RENDER_POLICY.trackTimestamp,
+  });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -135,6 +169,12 @@ export async function createTowerShipLabController({
   let ship = null;
   let summary = null;
   let disposed = false;
+  let initialized = false;
+  let stepCount = 0;
+  let renderSubmissions = 0;
+  let completedFrames = 0;
+  let rebuildCount = 0;
+  let lastFrameError = null;
 
   function applyCamera(id) {
     const pose = CAMERA_POSES[id];
@@ -166,11 +206,13 @@ export async function createTowerShipLabController({
     ship.setMode(currentMode);
     ship.setTime(currentTime, currentMode === "interaction");
     summary = summarizeTowerShip(ship.root);
+    rebuildCount += 1;
   }
 
   applyResolutionPolicy();
   applyCamera(currentCamera);
   rebuild();
+  initialized = true;
 
   const controller = {
     async ready() {},
@@ -180,24 +222,24 @@ export async function createTowerShipLabController({
       await this.setMode(scenarioMode);
     },
     async setMode(id) {
-      assertKnown(id, TOWER_SHIP_MODES, "mode");
+      if (!towerShipStateChanged(currentMode, id, TOWER_SHIP_MODES, "mode")) return;
       currentMode = id;
       ship.setMode(id);
       ship.setTime(currentTime, id === "interaction");
     },
     async setTier(id) {
-      assertKnown(id, TOWER_SHIP_TIERS, "tier");
+      if (!towerShipStateChanged(currentTier, id, TOWER_SHIP_TIERS, "tier")) return;
       currentTier = id;
       applyResolutionPolicy();
       rebuild();
     },
     async setSeed(value) {
-      assertKnown(value, TOWER_SHIP_SEEDS, "seed");
+      if (!towerShipStateChanged(currentSeed, value, TOWER_SHIP_SEEDS, "seed")) return;
       currentSeed = value;
       rebuild();
     },
     async setCamera(id) {
-      assertKnown(id, TOWER_SHIP_CAMERAS, "camera");
+      if (!towerShipStateChanged(currentCamera, id, TOWER_SHIP_CAMERAS, "camera")) return;
       currentCamera = id;
       applyCamera(id);
     },
@@ -211,6 +253,7 @@ export async function createTowerShipLabController({
       controls.update();
       currentTime += deltaSeconds;
       ship.setTime(currentTime, currentMode === "interaction");
+      stepCount += 1;
     },
     async resetHistory() {
       currentTime = 0;
@@ -225,7 +268,15 @@ export async function createTowerShipLabController({
     },
     async renderOnce() {
       if (disposed) throw new Error("Tower Ship controller is disposed");
-      await renderer.renderAsync(scene, perspectiveCamera);
+      renderSubmissions += 1;
+      try {
+        renderer.render(scene, perspectiveCamera);
+        completedFrames += 1;
+        lastFrameError = null;
+      } catch (error) {
+        lastFrameError = error instanceof Error ? error.message : String(error);
+        throw error;
+      }
     },
     async capturePixels(target = "presentation") {
       if (!new Set(["presentation", "output"]).has(target)) throw new RangeError(`Unknown capture target "${target}"`);
@@ -233,22 +284,19 @@ export async function createTowerShipLabController({
       const previous = renderer.getRenderTarget();
       try {
         renderer.setRenderTarget(captureTarget);
-        await renderer.renderAsync(scene, perspectiveCamera);
+        renderer.render(scene, perspectiveCamera);
         const tight = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, captureTarget.width, captureTarget.height);
-        const tightRowBytes = captureTarget.width * 4;
-        const rowStride = align(tightRowBytes, 256);
-        const pixels = new Uint8Array(rowStride * captureTarget.height);
+        const layout = describeTowerShipReadback(captureTarget.width, captureTarget.height, renderer.outputColorSpace);
+        const pixels = new Uint8Array(layout.bytesPerRow * captureTarget.height);
         for (let y = 0; y < captureTarget.height; y += 1) {
-          const source = y * tightRowBytes;
-          pixels.set(tight.subarray(source, source + tightRowBytes), y * rowStride);
+          const source = y * layout.rowBytes;
+          pixels.set(tight.subarray(source, source + layout.rowBytes), y * layout.bytesPerRow);
         }
         return {
           target,
-          width: captureTarget.width,
-          height: captureTarget.height,
-          channels: 4,
-          rowStride,
-          bytesPerPixel: 4,
+          ...layout,
+          sourceBytesPerRow: layout.bytesPerRow,
+          sourceByteLength: pixels.byteLength,
           origin: "bottom-left",
           pixels: Array.from(pixels),
         };
@@ -266,9 +314,17 @@ export async function createTowerShipLabController({
         backend: "webgpu",
         nativeWebGPU: renderer.backend.isWebGPUBackend === true,
         dpr: appliedDpr,
-        timestampQueriesRequested: true,
+        timestampQueriesRequested: TOWER_SHIP_RENDER_POLICY.trackTimestamp,
+        timingPolicy: TOWER_SHIP_RENDER_POLICY.timingReason,
         sustainedGpuTimingAvailable: false,
         performanceAcceptance: "insufficient-evidence",
+        initialized,
+        firstFrameCompleted: completedFrames > 0,
+        stepCount,
+        renderSubmissions,
+        completedFrames,
+        rebuildCount,
+        lastFrameError,
         ...summary,
       };
     },

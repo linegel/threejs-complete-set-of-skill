@@ -21,6 +21,8 @@ for (const tier of manifest.tiers) {
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert.match(app, /Unknown mechanism route/, "unknown mechanism routes must throw");
 assert.match(app, /Unknown tier route/, "unknown tier routes must throw");
+assert.match(app, /window\.__LAB_ERROR__/, "runtime failures must be exposed to browser validation");
+assert.match(app, /createTowerShipFrameDriver/, "the app must use the serialized frame owner");
 assert.deepEqual(
   towerShipRouteFromLocation({ pathname: "/tier/minimum/", search: "" }),
   { mechanism: null, tier: "minimum" },

@@ -1,10 +1,10 @@
 import {
   createTowerShipLabController,
-  resolveFrameDeltaSeconds,
   TOWER_SHIP_CAMERAS,
   TOWER_SHIP_MODES,
   TOWER_SHIP_TIERS,
 } from "./lab-controller.js";
+import { createTowerShipFrameDriver } from "./frame-driver.js";
 import { towerShipRouteFromLocation } from "./route-state.js";
 
 const MODE_COPY = Object.freeze({
@@ -63,35 +63,48 @@ function updateModeCopy() {
   modeDescription.textContent = description;
 }
 
-modeSelect.addEventListener("change", async () => {
+function updateHud(metrics) {
+  const lifecycle = metrics.firstFrameCompleted ? "ready" : "starting first frame";
+  status.dataset.state = metrics.firstFrameCompleted ? "ready" : "starting";
+  status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU · ${lifecycle}`;
+  metricNodes.textContent = metrics.nodes.toLocaleString();
+  metricTriangles.textContent = Math.round(metrics.triangles).toLocaleString();
+  metricOars.textContent = metrics.oars;
+}
+
+function reportRuntimeError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  window.__LAB_ERROR__ = Object.freeze({
+    name: error instanceof Error ? error.name : "Error",
+    message,
+  });
+  status.dataset.state = "error";
+  status.textContent = `WebGPU runtime failed · ${message}`;
+  console.error(error);
+}
+
+const frameDriver = createTowerShipFrameDriver({
+  controller,
+  onMetrics: updateHud,
+  onError: reportRuntimeError,
+});
+
+modeSelect.addEventListener("change", () => frameDriver.mutate(async () => {
   await controller.setMode(modeSelect.value);
   updateModeCopy();
-});
-tierSelect.addEventListener("change", async () => controller.setTier(tierSelect.value));
-cameraSelect.addEventListener("change", async () => controller.setCamera(cameraSelect.value));
+}));
+tierSelect.addEventListener("change", () => frameDriver.mutate(() => controller.setTier(tierSelect.value)));
+cameraSelect.addEventListener("change", () => frameDriver.mutate(() => controller.setCamera(cameraSelect.value)));
 compareButton.addEventListener("click", () => {
   const open = referencePanel.toggleAttribute("data-open");
   compareButton.setAttribute("aria-pressed", String(open));
   compareButton.textContent = open ? "Hide reference" : "Compare reference";
 });
-window.addEventListener("resize", () => controller.resize(window.innerWidth, window.innerHeight, Math.min(window.devicePixelRatio, 2)));
+window.addEventListener("resize", () => frameDriver.mutate(() => controller.resize(
+  window.innerWidth,
+  window.innerHeight,
+  Math.min(window.devicePixelRatio, 2),
+)));
+window.addEventListener("beforeunload", () => frameDriver.stop(), { once: true });
 updateModeCopy();
-
-let previous = performance.now();
-let lastHudUpdate = 0;
-async function frame(now) {
-  const delta = resolveFrameDeltaSeconds(now, previous);
-  previous = now;
-  await controller.step(delta);
-  await controller.renderOnce();
-  if (now - lastHudUpdate > 240) {
-    lastHudUpdate = now;
-    const metrics = controller.getMetrics();
-    status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU`;
-    metricNodes.textContent = metrics.nodes.toLocaleString();
-    metricTriangles.textContent = Math.round(metrics.triangles).toLocaleString();
-    metricOars.textContent = metrics.oars;
-  }
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
+frameDriver.start();
