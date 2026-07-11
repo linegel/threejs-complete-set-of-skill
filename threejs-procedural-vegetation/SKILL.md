@@ -346,6 +346,12 @@ Storage budget targets:
   actual packed layout and include duplicate LOD/impostor records.
 - Dynamic fields: sum exact wind/contact texture or storage extents, formats,
   history slots, dirty update traffic, and cadence per active region.
+- A route that discovers or compacts sparse physical touch, load, breakage, or
+  structural patches publishes `PhysicsSparseActiveDomainCost`: eligible and
+  probed patches, active core, halo/neighbors, capacity/high-water,
+  detect/classify, scan/sort/compact, allocation/indirect arguments, structural
+  solve traffic, activation/deactivation hysteresis, inactive-response error,
+  and overflow. Dirty patch count alone omits the mobile-critical work.
 - Tree geometry: compile once into typed buffers; do not allocate vector objects in runtime wind or per-frame LOD loops.
 - Node post: one scene pass with `mrt()` when normals/depth/emissive are reused, reduced-resolution AO/bloom via `setResolutionScale()`, and no duplicate scene re-render for diagnostics unless explicitly requested.
 

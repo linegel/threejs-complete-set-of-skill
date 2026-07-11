@@ -808,6 +808,44 @@ if (JSON.stringify(matrixDirs) !== JSON.stringify(skillDirs)) {
   fail(`physics boundary matrix must equal discovered skills exactly (missing: ${missing.join(', ') || 'none'}; extra/aliases: ${extra.join(', ') || 'none'})`);
 }
 
+const physicsWorkloadShapeCostRoles = {
+  'threejs-choose-skills': ['coordinator'],
+  'threejs-object-sculptor': ['external-adapter'],
+  'threejs-particles-trails-and-effects': ['sparse-active-domain', 'contact'],
+  'threejs-procedural-buildings-and-cities': ['external-adapter'],
+  'threejs-procedural-creatures': ['contact'],
+  'threejs-procedural-motion-systems': ['contact', 'external-adapter'],
+  'threejs-procedural-vegetation': ['sparse-active-domain'],
+  'threejs-rain-snow-and-wet-surfaces': ['sparse-active-domain'],
+  'threejs-visual-validation': ['observer'],
+  'threejs-water-optics': ['sparse-active-domain', 'external-adapter']
+};
+const allowedWorkloadShapeCostRoles = new Set([
+  'coordinator', 'sparse-active-domain', 'contact', 'external-adapter', 'observer'
+]);
+const abiTokensByWorkloadShapeCostRole = {
+  coordinator: ['PhysicsCostLedger'],
+  'sparse-active-domain': ['PhysicsSparseActiveDomainCost'],
+  contact: ['PhysicsContactCost'],
+  'external-adapter': ['PhysicsExternalAdapterCost'],
+  observer: ['PhysicsCostLedger']
+};
+for (const [dir, roles] of Object.entries(physicsWorkloadShapeCostRoles)) {
+  if (!skillDirs.includes(dir)) fail(`workload-shape cost roles reference unknown skill ${dir}`);
+  if (!Array.isArray(roles) || roles.length === 0 || new Set(roles).size !== roles.length) {
+    fail(`${dir} has invalid or duplicate workload-shape cost roles`);
+  }
+  for (const role of roles) {
+    if (!allowedWorkloadShapeCostRoles.has(role)) fail(`${dir} declares unknown workload-shape cost role ${role}`);
+  }
+}
+const workloadShapeCostCoordinators = Object.entries(physicsWorkloadShapeCostRoles)
+  .filter(([, roles]) => roles.includes('coordinator'))
+  .map(([dir]) => dir);
+if (workloadShapeCostCoordinators.length !== 1) {
+  fail(`workload-shape cost coordinator must have exactly one owner; found ${workloadShapeCostCoordinators.join(', ') || 'none'}`);
+}
+
 const allowedRoleValues = {
   coordinator: new Set(['route', 'context', 'graph', 'interaction', 'presentation', 'quality']),
   interaction: new Set(['coordinator', 'producer', 'consumer', 'exchange-owner', 'adapter', 'preserve', 'observer']),
@@ -918,6 +956,9 @@ for (const [dir, boundary] of Object.entries(physicsBoundaryMatrix)) {
     for (const role of boundary[roleKey]) {
       for (const token of requirementsByValue[role] ?? []) effectiveAbiTokens.add(token);
     }
+  }
+  for (const role of physicsWorkloadShapeCostRoles[dir] ?? []) {
+    for (const token of abiTokensByWorkloadShapeCostRole[role] ?? []) effectiveAbiTokens.add(token);
   }
   for (const direction of ['provider', 'consumer']) {
     for (const family of boundary[direction]) {

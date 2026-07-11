@@ -542,6 +542,13 @@ For tile/mobile GPUs:
   halo, and solver phase timings/traffic, activation/deactivation hysteresis,
   inactive-water model/error, and visible overflow disposition. A dense coast
   probe followed by a sparse solve is not a wholly sparse algorithm;
+- when an external free-surface/VOF/particle/FSI owner is selected, publish
+  `PhysicsExternalAdapterCost` through the adapter owner in the same opportunity
+  rows: request/response/batch counts, logical and physical ingress/egress,
+  serialization and frame/unit conversion, queue/transport/ownership/fence
+  dependencies, remote solve and commit tail, retries/exact-once outcomes,
+  in-flight/recovery memory, clock mapping, and catch-up/process/device-loss
+  witnesses. Remote solver time alone is not end-to-end water adapter cost;
 - use a separate halo/boundary pass before any whole-tile stencil and a later
   dispatch for each global producer/consumer dependency;
 - retain one canonical face flux when claiming shallow-water conservation;

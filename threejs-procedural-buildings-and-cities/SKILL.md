@@ -106,6 +106,13 @@ step receipts. The site compiler does not synthesize physical exchange records.
 The selected domain solver publishes or accepts each dimensioned
 `InteractionRecord` with a target equation, physical footprint, application
 interval, exact-once key, and conservation membership.
+Every selected external dynamics route publishes `PhysicsExternalAdapterCost`
+through its adapter owner and binds it to the same opportunity rows as site
+state and presentation. Record request/response/batch counts, logical and
+physical bytes, serialization plus frame/unit conversion, queue/transport/
+ownership/fence dependencies, remote solve and commit tail, retries/exact-once
+results, in-flight/recovery memory, clock mapping, and process/device-loss
+witnesses. Site compile time or remote-solver time alone is not adapter cost.
 After atomic commit, each dynamic asset contributes its leased state pair to a
 camera-free `PhysicsPresentationCandidate`; render LOD never substitutes for
 that committed physical state. A physics-facing change to collider topology,

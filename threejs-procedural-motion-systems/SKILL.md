@@ -249,6 +249,14 @@ Quality tiers:
   process-failure, and device-loss fixtures. “Zero copy” and unavailable remote
   timers do not mean zero transport cost; unavailable remote attribution stays
   unavailable while the observable adapter tail remains measured.
+- A route that owns physical collision/constraint resolution publishes
+  `PhysicsContactCost`: body/shape/proxy population, moved bounds and broadphase
+  pairs, shape-pair narrowphase tests, manifolds/points/feature remaps, islands,
+  constraint rows/iterations/residuals, warm-start cache behavior,
+  deterministic reduction/atomic contention, lifecycle application receipts,
+  and pileup/high-speed/topology/migration stress tails. Actor count or average
+  contact count alone is not a contact cost model; an external contact owner is
+  referenced from the same opportunity rows instead of double-attributed.
 - Presentation bindings reference immutable resource generations under a
   frame-in-flight lease/reuse rule; no solver overwrites a pose generation
   still used by a sealed snapshot.

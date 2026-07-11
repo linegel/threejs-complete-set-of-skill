@@ -251,6 +251,14 @@ object-sculptor owns semantic pivots, sockets, collider construction inputs,
 fracture groups, and visual component identity; it does not become a contact or
 rigid-body solver merely because a model is action-ready.
 
+The adapter owner publishes `PhysicsExternalAdapterCost` in the same route
+opportunity rows as solver-driven state and presentation. Evidence includes
+request/response/batch counts, logical and physical bytes, serialization plus
+frame/unit conversion, queue/transport/ownership/fence dependencies, remote
+solve and commit tail, retries/exact-once results, in-flight/recovery memory,
+clock mapping, and process/device-loss witnesses. Geometry build time or the
+external solver's compute time alone is not the end-to-end adapter cost.
+
 Solver-driven transforms and fracture visibility contribute stable bindings as
 `PresentedStatePair` entries in a view-independent
 `PhysicsPresentationCandidate`. Rendering consumes the sealed per-target/view

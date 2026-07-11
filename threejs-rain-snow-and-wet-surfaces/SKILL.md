@@ -297,6 +297,14 @@ live memory, and thermal behavior on the named target. On tile GPUs compare
 analytic/no-history, reduced field, and recurrent tiers under the same visual
 error contract; instance count alone says nothing about mobile suitability.
 
+When impacts, receiver coverage, snow, or splash state uses an active subset of
+a larger eligible cell/tile domain, publish `PhysicsSparseActiveDomainCost` in
+the same exact opportunity rows. Include candidates probed, active core,
+halo/boundary/neighbors, capacity/high-water, detection/classification,
+scan/sort/compaction, allocation/indirect arguments, receiver/solver traffic,
+activation/deactivation hysteresis, inactive-region model/error, and overflow.
+`dirtyImpactTiles` alone does not account for sparse-domain cost.
+
 ## Color And Output
 
 - LDR albedo/emissive textures encoded as sRGB use `SRGBColorSpace`; HDR/EXR

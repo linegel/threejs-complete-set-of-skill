@@ -239,6 +239,18 @@ the named target. Include scan/scatter, transparent fragments, attachment
 traffic, peak live memory, and sustained thermal behavior. Choose the largest
 workload whose visual-error gates and complete scene allocation both pass.
 
+When a physical particle route discovers or compacts an active subset from a
+larger eligible pool/domain, publish `PhysicsSparseActiveDomainCost` in the
+route's exact opportunity rows. Include probe candidates, active core,
+halo/neighbors, capacity/high-water, detection, scan/sort/compaction,
+allocation/indirect arguments, solve traffic, hysteresis, inactive-model error,
+and overflow; `N_active` alone is not the sparse cost. A collision-owning route
+also publishes `PhysicsContactCost` for body/proxy population, broadphase pairs,
+shape-pair tests, manifolds, islands/constraint rows, iterations, warm-start
+cache, deterministic reduction, lifecycle applications, and stress tails. If
+another solver owns contact, reference that owner's cost row from the same
+opportunity rather than duplicating attribution.
+
 ## Color And Output
 
 - LDR color textures encoded as sRGB use `SRGBColorSpace`; HDR/EXR radiance
