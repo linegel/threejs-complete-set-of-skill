@@ -2577,7 +2577,7 @@ committed physics/origin transaction
   -> PresentationTimeCohort
   -> view-independent PhysicsPresentationCandidate
   -> per-view CameraViewPublication
-  -> per-view ViewPreparationPublication (visibility, shadows, caches, resets)
+  -> per-view ViewPreparationPublication (visibility, shadows, caches, reset plans)
   -> sealed PhysicsPresentationSnapshot
   -> per-target PresentationRenderPlan
   -> FrameExecutionRecord
@@ -2837,7 +2837,6 @@ ViewPreparationPublication:
   reactiveEpochs: [scoped-epoch]
   reactivePublications: [ReactivePublication]
   resetDependencies: [ScopedResetAction]
-  resetActionResults: [ScopedResetActionResult]
   requiredPreparationEdges: [PresentationPreparationEdge]
   resourceLeases: [PresentationResourceLease] # full records created by this view preparation
   resourceLeaseRefs: [PresentationResourceLeaseRef]
@@ -2854,25 +2853,6 @@ PresentationPreparationEdge:
   completionRequiredBefore: first-consumer-pass-or-seal
   status: satisfied | failed
 
-ScopedResetActionResult:
-  resultId: ScopedResetActionResultId
-  actionId: scoped-action-id
-  presentationTargetId: presentation-target-id
-  viewId: view-id
-  historyKey: view-signal-encoding-resolution-jitter-key
-  causeEpochs: [scoped-epoch]
-  appliedRegion: AffectedRegionDescriptor
-  policyApplied: preserve-with-proof | reset | reject-region | reproject-with-proof | reseed | rebuild | bypass | hold-prior | convert-with-proof
-  inputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
-  outputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
-  inputHistoryGeneration: opaque-version | TypedAbsence
-  outputHistoryGeneration: opaque-version | TypedAbsence
-  dependencyCompletionRefs: [PhysicsDependencyCompletionRef]
-  queueSubmissionEpoch: opaque-sequence | TypedAbsence
-  status: completed | failed | bypassed-with-proof
-  residualAndError: typed-residual-and-error
-  failure: typed-failure-record | TypedAbsence
-  resultDigest: collision-resistant-digest
 ```
 
 Shadow views are explicit publications, not inferred global epochs. A shadow,
@@ -2942,12 +2922,15 @@ PresentationClosureManifest:
   closureDigest: collision-resistant-digest
 ```
 
-The snapshot references candidate pairs; it does not copy independently mutable
-pairs or transforms. IDs, target/view scope, device/resource generations,
+The snapshot references the unique subset of Candidate pairs consumed by this
+target/view; it does not copy independently mutable pairs or transforms or
+force a sibling view's unused pair into its closure. Every referenced binding
+ID resolves exactly once in the Candidate, and pair-state leases are derived
+from that subset. IDs, target/view scope, device/resource generations,
 events, reactive actions, and leases must resolve transitively through the exact
 candidate, camera, and view-preparation publications. The
 `closureManifest` is exact: its required lease IDs equal the union of referenced
-pair-state handles and every preparation/shadow/cache/reactive/reset dependency,
+pair-state handles and every preparation/shadow/cache/reactive/reset-plan dependency,
 not a subset or superset; its event IDs equal every Candidate range addressed
 to that target/view or a declared shared consumer. Digests cover canonical
 sorted IDs and dependency edges. `resetDependencies` is an
@@ -3133,6 +3116,7 @@ PresentationRenderPlan:
   requiredPreparationEdgeIds: [PresentationPreparationEdgeId]
   renderResourceLeaseIds: [RenderResourceLeaseId]
   plannedResetActionIds: [scoped-action-id]
+  resetActionPhaseById: { scoped-action-id: RenderPlanPhaseId }
   expectedResetHistoryGenerations:
     scoped-action-id: { inputHistoryGeneration, outputHistoryGeneration }
   shadowFactorIds: [ShadowFactorId]
@@ -3168,6 +3152,28 @@ RenderPlanEdge:
   consumerAccess: typed-resource-access
   completionRef: PhysicsDependencyCompletionRef
   externalFence: typed-fence-and-generation-proof | TypedAbsence
+
+ScopedResetActionResult:
+  resultId: ScopedResetActionResultId
+  actionId: scoped-action-id
+  renderPlanId: PresentationRenderPlanId
+  executionPhaseId: RenderPlanPhaseId
+  presentationTargetId: presentation-target-id
+  viewId: view-id
+  historyKey: view-signal-encoding-resolution-jitter-key
+  causeEpochs: [scoped-epoch]
+  appliedRegion: AffectedRegionDescriptor
+  policyApplied: preserve-with-proof | reset | reject-region | reproject-with-proof | reseed | rebuild | bypass | hold-prior | convert-with-proof
+  inputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
+  outputHistoryLeaseRef: PresentationResourceLeaseRef | TypedAbsence
+  inputHistoryGeneration: opaque-version | TypedAbsence
+  outputHistoryGeneration: opaque-version | TypedAbsence
+  dependencyCompletionRefs: [PhysicsDependencyCompletionRef]
+  queueSubmissionEpoch: opaque-sequence | TypedAbsence
+  status: completed | failed | bypassed-with-proof
+  residualAndError: typed-residual-and-error
+  failure: typed-failure-record | TypedAbsence
+  resultDigest: collision-resistant-digest
 
 FrameCohortAdmission:
   cohortAdmissionId: FrameCohortAdmissionId
@@ -3234,6 +3240,8 @@ FrameExecutionRecord:
       resetActionResults: [ScopedResetActionResult]
       completionTokens: [CompletionTokenRef]
       presentedTimestamp: PhysicsInstant | TypedAbsence
+      loss: { deviceId, backendGeneration, deviceLossGeneration,
+              lossTransactionId } | TypedAbsence
       failure: typed-failure-record-or-TypedAbsence
   leaseDispositionById:
     lease-id:
@@ -3258,12 +3266,28 @@ bind every inter-phase resource/subresource generation to a concrete completion
 or fence. Each phase output-generation set equals the key set of its owner,
 encoding, and extent maps. The render plan contains every required preparation
 edge, planned reset action/expected generation, shadow factor, and render-
-resource lifetime; later phases cannot add a mutable hidden dependency. Each
-actual `ScopedResetActionResult` matches one planned action and its expected
-input/output generations, queue epoch, residual/error, and typed failure arm.
+resource lifetime; later phases cannot add a mutable hidden dependency.
+`resetActionPhaseById` has exactly the same key set as
+`plannedResetActionIds`. Its phase exists in this plan, writes the expected
+output history generation, and precedes every phase that reads that generation
+under the plan DAG. Each actual `ScopedResetActionResult` exists only in the
+matching `TargetExecution`, names that exact plan and phase, matches one planned
+action and its expected input/output generations, resolves its dependency
+completions to that phase's edges, and uses a queue submission epoch recorded by
+that target execution. This makes reset work and traffic visible through the
+same phase/work-attribution evidence as its first consumer; neither preparation
+nor the Snapshot claims that execution occurred.
 Each `ShadowFactorId` is applied exactly once by its lighting owner
 to the named direct-light term and never again by a material or final-image
 phase.
+
+For a completed target, reset results close the planned action set exactly and
+every result is `completed` or `bypassed-with-proof`; those statuses require a
+typed-absent failure arm. A submitted target may contain only a duplicate-free
+terminal-success subset whose phases have completed. A failed result requires a
+present failure arm and cannot satisfy a completed target. A pre-seal failed,
+aborted, or lost target has no reset result, submission epoch, or completion
+token.
 
 Never mutate a candidate or snapshot to record completion. A pre-seal failure
 uses an empty snapshot list for that target, cancels dependent actions, and
@@ -3284,9 +3308,14 @@ all required targets completed; `partial-failure` means at least one target
 completed or remains valid and at least one is failed, aborted, or device-lost;
 `aborted` means no target submitted and all targets aborted/failed before useful
 submission; `device-lost` means every required target/resource generation in
-this execution is invalidated by the same loss transaction. Mixed target loss
-therefore uses `partial-failure`, and only leases on the lost device/generation
-take `invalidated-by-device-loss`. Other leases retain their exact joins.
+this execution is invalidated by the same loss transaction. Every target has a
+typed `loss` arm: it is present exactly for `device-lost` and binds the device,
+backend generation, device-loss generation, and loss transaction; all other
+target statuses carry typed absence. Mixed target loss therefore uses
+`partial-failure`, and lease invalidation is selected from each lease's exact
+device/backend/resource generation against the matching target loss record—not
+from `overallStatus`. Only matching lost-generation leases take
+`invalidated-by-device-loss`; other leases retain their exact joins.
 
 For every lease, the disposition's `consumingSnapshotIds` is the exact closure
 consumer set, its `completionJoin` equals the lease's

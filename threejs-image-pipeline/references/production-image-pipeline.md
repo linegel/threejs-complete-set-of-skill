@@ -345,6 +345,11 @@ declared one-frame-deferred alternative may publish late cache feedback on the
 next frame only; this frame keeps sampling the prior committed resource/version
 named by its snapshot.
 
+Each target/view Snapshot references only the unique subset of Candidate pairs
+that its phases consume. Its closure derives pair-state leases from that subset;
+unused sibling-view pairs remain Candidate publications but do not inflate this
+view's lease, memory, or traffic closure.
+
 Every `PhysicsSignalDescriptor` supplies the central per-channel/frame/time/
 version/residency/error metadata, and each stable binding/provider supplies its
 central `PresentedStatePair` in the Candidate. The Snapshot references these by
@@ -445,7 +450,7 @@ Required order is:
 ```text
 validate presentation candidate and lighting input
   -> CameraViewPublication with render transforms/matrices/jitter/depth
-  -> ViewPreparationPublication with committed visibility/shadows/reactive/reset records
+  -> ViewPreparationPublication with committed visibility/shadows/reactive/reset plans
   -> seal PhysicsPresentationSnapshot references
   -> validate and latch the exact publication chain
   -> render depth, velocity, and scene-linear radiance
@@ -458,9 +463,14 @@ validate presentation candidate and lighting input
 
 Each immutable plan edge uses the exact canonical `ScopedResetAction.policy`:
 `preserve-with-proof`, `reset`, `reject-region`, `reproject-with-proof`,
-`reseed`, `rebuild`, `bypass`, `hold-prior`, or `convert-with-proof`. Actual
-completion/failure and queue submission are appended to `FrameExecutionRecord`,
-not written back into the preparation record or Snapshot. The graph must be acyclic for a frame; a
+`reseed`, `rebuild`, `bypass`, `hold-prior`, or `convert-with-proof`. The plan
+maps every action ID to one phase that writes its expected output
+history generation and precedes every reader. Actual completion/failure and
+queue submission are appended only to the matching target execution in
+`FrameExecutionRecord`, never written back into the preparation record or
+Snapshot. Each result names its plan/phase, resolves the phase dependencies,
+and uses a queue epoch recorded by that target execution, making reset work and
+traffic measurable in the same pass ledger. The graph must be acyclic for a frame; a
 producer completed after its consumer is deferred to the next snapshot,
 never retroactively published. Stock r185 `TRAANode` cannot consume a reactive
 mask and exposes no public general reset; use a validated custom/patched node,
@@ -474,10 +484,12 @@ appends a `FrameExecutionRecord` with `overallStatus: aborted` (or
 `snapshotIds`, stores typed absence in its target execution's `snapshotId`,
 cancels or defers actions, retires only failed-target-exclusive preparation
 leases, and retains Candidate leases until every surviving snapshot consumer
-joins through `leaseDispositionById`. Device loss appends `overallStatus: device-lost` and
-affected target statuses `device-lost`, advances the
-device-loss generation, cancels actions, and invalidates lost-generation
-resources/leases without fabricating normal completion. Candidate/Snapshot
+joins through `leaseDispositionById`. Device loss gives each affected target an
+exact device/backend/loss-generation tuple and status `device-lost`; only
+leases matching that tuple are invalidated. `overallStatus: device-lost` is
+reserved for a loss covering every target under one transaction; mixed
+surviving/lost targets use `partial-failure`. Loss cancels actions without
+fabricating normal completion. Candidate/Snapshot
 records remain immutable evidence; only their lost-generation bindings become
 unusable until the route rebuilds and reseeds under a new generation.
 

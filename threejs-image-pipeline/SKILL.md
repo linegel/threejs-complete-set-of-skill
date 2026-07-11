@@ -216,7 +216,7 @@ different instant pair require another cohort and Candidate. It then publishes
 a view-independent immutable `PhysicsPresentationCandidate` that references
 that cohort, then one
 `CameraViewPublication` per target/view, then `ViewPreparationPublication` for
-visibility/shadow/cache/reset results, and finally seals
+visibility/shadow/cache/reset plans, and finally seals
 `PhysicsPresentationSnapshot`. Bind the scene pass to that exact publication
 chain and bind the matching
 `LightingTransportSnapshot` through a provider-wide `PresentedStatePair`
@@ -227,8 +227,9 @@ context/version, frame/chart, clock-map, unit-scale, or origin-epoch mismatch
 instead of converting it inside the image graph.
 Validate the exact central Candidate, camera publication, preparation
 publication, Snapshot, `PhysicsSignalDescriptor`, and lighting-channel schemas
-rather than defining a post-local subset. The target/view Snapshot contains
-references, not copied pairs, transforms, or reset records. Resolve stable
+rather than defining a post-local subset. The target/view Snapshot contains the
+unique subset of Candidate pairs used by that view and references, not copied
+pairs, transforms, or reset records. Resolve stable
 binding pairs through `presentedStatePairRefs`, previous/current render instants
 and complete transforms/matrices through `cameraPublicationId`, and reactive/
 reset records through `viewPreparationId`. A post node may not sample a different provider bracket
@@ -301,7 +302,7 @@ Execute the dependency DAG before the first consumer of the new epoch:
 ```text
 presentation candidate
   -> CameraViewPublication with transforms/matrices/jitter/depth
-  -> ViewPreparationPublication with visibility/shadows/reactive/reset records
+  -> ViewPreparationPublication with visibility/shadows/reactive/reset plans
   -> seal snapshot references
   -> depth + velocity + scene-linear radiance
   -> AO/surface/volumetric/color history rejection or reseed
@@ -312,14 +313,19 @@ presentation candidate
 
 After sealing each target/view Snapshot, author one `PresentationRenderPlan`
 that binds its cohort/Candidate/Snapshot, exact leased resource generations,
-phase/edge DAG, reset generations, shadow factors, and output ownership. Submit
+phase/edge DAG, every reset action to one exact phase, reset generations, shadow
+factors, and output ownership. The mapped reset phase writes the expected
+history generation and precedes every reader in the plan DAG. Submit
 only after the separate cohort and frame-slot admissions close against that
 immutable plan; report observed actions and completion state in
 `FrameExecutionRecord`.
 
 Every planned edge names its writer, consumers, and action. The immutable
 snapshot does not claim completion; append actual rebuild/reseed/submission
-results to a separate `FrameExecutionRecord`. GPU descriptors pin resource
+results only to the matching target execution in a separate
+`FrameExecutionRecord`. Each result identifies its plan and execution phase,
+resolves that phase's dependency completions, and uses a queue epoch present in
+the target execution; preparation owns no result. GPU descriptors pin resource
 generation, layout, entity map, slot/range, and a central
 `PresentationResourceLease` until all consumers submit and its
 `reuseProhibitedUntil` completion join is satisfied; retirement is recorded in
@@ -334,11 +340,13 @@ other targets survive), omits that target's snapshot from `snapshotIds`, stores
 typed absence in its `targetExecutions.snapshotId`, cancels or defers actions,
 retires only failed-target-exclusive preparation leases, and retains
 Candidate/shared leases until all surviving snapshot consumers join through
-`leaseDispositionById`. Device loss
-appends `overallStatus: device-lost` and affected target statuses
-`device-lost`, advances
-`deviceLossGeneration`, cancels dependent actions, and invalidates resources
-and leases from the lost generation without inventing a completion token. The
+`leaseDispositionById`. Device loss gives every affected target an exact loss
+tuple and status `device-lost`, advances its `deviceLossGeneration`, cancels
+dependent actions, and invalidates only resources and leases whose device/
+backend/loss generation matches that tuple, without inventing a completion
+token. `overallStatus` is `device-lost` only when every required target is lost
+under the same transaction; mixed surviving/lost targets use
+`partial-failure`. The
 immutable Candidate/Snapshot remain audit records; their lost-generation
 resource references are no longer bindable. Rebuild histories and timing proof
 under the new backend/resource generation.
