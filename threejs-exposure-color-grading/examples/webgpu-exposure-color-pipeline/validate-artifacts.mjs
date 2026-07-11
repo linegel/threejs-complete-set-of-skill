@@ -34,6 +34,8 @@ const resources = JSON.parse( await readFile( resolve( output, 'storage-resource
 const metrics = JSON.parse( await readFile( resolve( output, 'mechanism-metrics.json' ), 'utf8' ) );
 const readback = JSON.parse( await readFile( resolve( output, 'exposure-readback.json' ), 'utf8' ) );
 if ( contract.schemaVersion !== 2 || ! [ 'correctness', 'performance' ].includes( contract.profile ) ) throw new Error( 'Exposure capture contract is invalid.' );
+if ( metrics.renderer !== 'WebGPURenderer' || metrics.backend?.isWebGPUBackend !== true ) throw new Error( 'Exposure artifact does not prove a native WebGPURenderer backend.' );
+if ( metrics.threeRevision !== '185' ) throw new Error( `Exposure artifact was captured with Three.js revision ${ metrics.threeRevision ?? 'unknown' }; expected 185.` );
 if ( pipeline.finalToneMapOwner !== 'toneMapping() node' ) throw new Error( 'Artifact has the wrong tone-map owner.' );
 if ( pipeline.finalOutputTransformOwner !== 'renderOutput() node' ) throw new Error( 'Artifact has the wrong output-transform owner.' );
 if ( ! resources.resources.some( ( resource ) => resource.id === 'histogram-counters' ) ) throw new Error( 'Full-tier artifact omitted histogram storage.' );

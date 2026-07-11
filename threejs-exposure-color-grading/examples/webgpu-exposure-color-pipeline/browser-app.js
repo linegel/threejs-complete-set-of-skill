@@ -1,4 +1,4 @@
-import { NoColorSpace, RenderTarget, UnsignedByteType } from 'three/webgpu';
+import { NoColorSpace, REVISION, RenderTarget, UnsignedByteType } from 'three/webgpu';
 
 import {
 	EXPOSURE_MECHANISM_ROUTES,
@@ -144,6 +144,12 @@ async function initialize() {
 
 			const pipeline = app.describePipeline();
 			return {
+				renderer: 'WebGPURenderer',
+				backend: {
+					name: app.renderer.backend?.constructor?.name ?? 'unknown',
+					isWebGPUBackend: app.renderer.backend?.isWebGPUBackend === true
+				},
+				threeRevision: REVISION,
 				verdict: 'INSUFFICIENT_EVIDENCE',
 				reason: 'No named-adapter timestamp capture has been accepted.',
 				tier: app.tierId,
