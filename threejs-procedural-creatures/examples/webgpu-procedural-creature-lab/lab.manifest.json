@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-procedural-creature-lab",
+  "skill": "threejs-procedural-creatures",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
+  ],
+  "browserEntry": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
+  "publishPath": "/demos/webgpu-procedural-creature-lab/",
+  "scenarios": [
+    { "id": "field-and-surface-certification", "startup": { "scenario": "field-and-surface-certification" } },
+    { "id": "snap-and-ownership", "startup": { "scenario": "snap-and-ownership" } },
+    { "id": "locomotion-and-foot-planting", "startup": { "scenario": "locomotion-and-foot-planting" } },
+    { "id": "tails-ears-and-secondary-motion", "startup": { "scenario": "tails-ears-and-secondary-motion" } },
+    { "id": "crowd-and-culling", "startup": { "scenario": "crowd-and-culling" } },
+    { "id": "outline-and-shadow", "startup": { "scenario": "outline-and-shadow" } },
+    { "id": "genome-variation", "startup": { "scenario": "genome-variation" } }
+  ],
+  "mechanisms": [
+    { "id": "field-and-surface-certification", "route": "mechanism/field-and-surface-certification/", "startup": { "scenario": "field-and-surface-certification" } },
+    { "id": "snap-and-ownership", "route": "mechanism/snap-and-ownership/", "startup": { "scenario": "snap-and-ownership" } },
+    { "id": "locomotion-and-foot-planting", "route": "mechanism/locomotion-and-foot-planting/", "startup": { "scenario": "locomotion-and-foot-planting" } },
+    { "id": "tails-ears-and-secondary-motion", "route": "mechanism/tails-ears-and-secondary-motion/", "startup": { "scenario": "tails-ears-and-secondary-motion" } },
+    { "id": "crowd-and-culling", "route": "mechanism/crowd-and-culling/", "startup": { "scenario": "crowd-and-culling" } },
+    { "id": "outline-and-shadow", "route": "mechanism/outline-and-shadow/", "startup": { "scenario": "outline-and-shadow" } },
+    { "id": "genome-variation", "route": "mechanism/genome-variation/", "startup": { "scenario": "genome-variation" } }
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetClass": "close-subject",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 2 },
+      "mechanismLimits": { "candidateK": "certified per genome; authored start 8", "snapTrials": 2, "outline": "hero or shared post" },
+      "resourceLimits": { "population": 4, "fixedPageCapacity": 64 },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["field parity", "deterministic ownership", "fixed-step locomotion", "shadow deformation parity"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "crowd",
+      "targetClass": "repeated-population",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 1.5 },
+      "mechanismLimits": { "candidateK": "certified per genome; authored start 6", "snapTrials": 1, "outline": "shared post" },
+      "resourceLimits": { "population": 64, "fixedPageCapacity": 64 },
+      "degradationFromPrevious": ["reduced diagnostic-shell tessellation", "reduced correction trials"],
+      "preservedInvariants": ["field parity", "deterministic ownership", "fixed-step locomotion", "shadow deformation parity"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "background",
+      "targetClass": "small-projected-silhouette",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 1 },
+      "mechanismLimits": { "candidateK": "certified per genome; authored start 4", "snapTrials": 1, "outline": "none" },
+      "resourceLimits": { "population": 96, "fixedPageCapacity": 96 },
+      "degradationFromPrevious": ["reduced diagnostic-shell tessellation", "outline disabled"],
+      "preservedInvariants": ["field parity", "deterministic ownership", "fixed-step locomotion", "primary silhouette"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["off", "unsnapped", "distance", "weights", "normals", "ownership"],
+  "cameras": ["near", "design", "far", "population"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "src/lab/browser-app.js blocks unless renderer.backend.isWebGPUBackend is true; current-source capture is pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "storage-buffers",
+      "required": true,
+      "evidence": "src/tsl/pose-storage.js defines pose, root, and owner-inclusive candidate storage; current-source readback evidence is pending",
+      "status": "incomplete"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "src/lab/browser-app.js awaits renderer.init() before capability checks; matching source-hash evidence is pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "native-backend",
+      "required": true,
+      "evidence": "src/lab/browser-app.js requires renderer.backend.isWebGPUBackend === true; matching source-hash evidence is pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "candidate-certification",
+      "required": true,
+      "evidence": "candidate-set-sweep and raise-k-policy-fixture prove frozen-corpus K/storage agreement on CPU; GPU binding recapture is pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "render-target-readback",
+      "required": true,
+      "evidence": "captureFrame implements integer 256-byte-aligned WebGPU readback; current-source images are pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "shadow-parity",
+      "required": true,
+      "evidence": "visible and cast-shadow materials share the owner-masked deformation node; current-source atlas evidence is pending",
+      "status": "incomplete"
+    }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate",
+  "sourceHash": null,
+  "proxyStatus": null,
+  "commands": {
+    "check": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run check",
+    "test": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:unit",
+    "mutations": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run test:mutations",
+    "capture": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run capture",
+    "validateArtifacts": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
+    "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
+  }
+}
