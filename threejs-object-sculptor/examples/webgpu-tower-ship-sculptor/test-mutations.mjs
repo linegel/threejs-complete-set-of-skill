@@ -1,10 +1,23 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-import { createTowerShip, summarizeTowerShip } from "./tower-ship-factory.js";
+import {
+  analyzeIndexedSurfaceTopology,
+  buildHullGeometry,
+  createTowerShip,
+  summarizeTowerShip,
+} from "./tower-ship-factory.js";
 import { validateTowerShipActionReady } from "./validate-action-ready.mjs";
 
 const sculptSpec = JSON.parse(readFileSync(new URL("./object-sculpt-spec.json", import.meta.url), "utf8"));
+
+const puncturedHull = buildHullGeometry(17, 12);
+const puncturedIndices = Array.from(puncturedHull.getIndex().array);
+puncturedHull.setIndex(puncturedIndices.slice(0, -3));
+const puncturedTopology = analyzeIndexedSurfaceTopology(puncturedHull);
+assert.equal(puncturedTopology.closedTwoManifold, false, "the production topology check must reject a missing cap triangle");
+assert(puncturedTopology.boundaryEdges > 0, "a removed cap triangle must expose boundary edges");
+puncturedHull.dispose();
 
 const ship = createTowerShip({ tier: "full", seed: 1 });
 const baseline = summarizeTowerShip(ship.root);
@@ -52,4 +65,4 @@ ship.runtime.destructionGroups.set("lower-roof", lowerRoof);
 validateTowerShipActionReady(sculptSpec, ship.root);
 
 ship.dispose();
-console.log(JSON.stringify({ ok: true, negativeControls: ["oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));
+console.log(JSON.stringify({ ok: true, negativeControls: ["punctured-hull", "oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));

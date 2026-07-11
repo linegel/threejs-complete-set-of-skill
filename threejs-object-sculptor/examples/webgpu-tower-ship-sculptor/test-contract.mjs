@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import {
+  analyzeIndexedSurfaceTopology,
+  buildHullGeometry,
   createTowerShip,
   summarizeTowerShip,
   TOWER_SHIP_MODES,
@@ -22,6 +24,21 @@ import { validateTowerShipActionReady } from "./validate-action-ready.mjs";
 
 const sculptSpec = JSON.parse(readFileSync(new URL("./object-sculpt-spec.json", import.meta.url), "utf8"));
 const actionReadyContracts = [];
+
+for (const [stations, radial] of [[17, 12], [13, 10], [9, 8]]) {
+  const hull = buildHullGeometry(stations, radial);
+  const topology = analyzeIndexedSurfaceTopology(hull);
+  assert.equal(hull.getAttribute("position").count, stations * radial + 2, "hull needs one cap-center vertex per terminal ring");
+  assert.equal(topology.triangles, (stations - 1) * radial * 2 + radial * 2, "hull triangle count must include both cap fans");
+  assert.equal(topology.boundaryEdges, 0, "hull must not expose open terminal-ring edges");
+  assert.equal(topology.nonManifoldEdges, 0, "hull edges must have exactly two incident triangles");
+  assert.equal(topology.degenerateTriangles, 0, "hull caps must not introduce zero-area triangles");
+  assert.equal(topology.closedTwoManifold, true, "hull must be a closed two-manifold indexed surface");
+  const normals = hull.getAttribute("normal");
+  assert(normals.getX(stations * radial) < -0.99, "bow cap must face outward along -X");
+  assert(normals.getX(stations * radial + 1) > 0.99, "stern cap must face outward along +X");
+  hull.dispose();
+}
 
 for (const tier of TOWER_SHIP_TIERS) {
   const ship = createTowerShip({ tier, seed: TOWER_SHIP_SEEDS[0] });

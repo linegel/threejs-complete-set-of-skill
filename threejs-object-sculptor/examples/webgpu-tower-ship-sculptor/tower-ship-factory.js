@@ -174,16 +174,49 @@ function cylinderBetween(runtime, id, start, end, radius, material, segments, pa
   return value;
 }
 
-function buildHullGeometry(stations, radial) {
+export function analyzeIndexedSurfaceTopology(geometry) {
+  const index = geometry?.index?.array;
+  if (!index || index.length % 3 !== 0) throw new TypeError("indexed triangle geometry is required");
+  const edgeUses = new Map();
+  let degenerateTriangles = 0;
+  function addEdge(a, b) {
+    const key = a < b ? `${a}:${b}` : `${b}:${a}`;
+    edgeUses.set(key, (edgeUses.get(key) ?? 0) + 1);
+  }
+  for (let offset = 0; offset < index.length; offset += 3) {
+    const a = index[offset];
+    const b = index[offset + 1];
+    const c = index[offset + 2];
+    if (a === b || b === c || c === a) degenerateTriangles += 1;
+    addEdge(a, b);
+    addEdge(b, c);
+    addEdge(c, a);
+  }
+  const counts = [...edgeUses.values()];
+  return Object.freeze({
+    triangles: index.length / 3,
+    edges: edgeUses.size,
+    boundaryEdges: counts.filter((count) => count === 1).length,
+    nonManifoldEdges: counts.filter((count) => count > 2).length,
+    degenerateTriangles,
+    closedTwoManifold: counts.every((count) => count === 2) && degenerateTriangles === 0,
+  });
+}
+
+export function buildHullGeometry(stations, radial) {
+  if (!Number.isInteger(stations) || stations < 2) throw new RangeError("hull stations must be an integer >= 2");
+  if (!Number.isInteger(radial) || radial < 3) throw new RangeError("hull radial segments must be an integer >= 3");
   const positions = [];
   const uvs = [];
   const indices = [];
+  const stationCenters = [];
   for (let i = 0; i < stations; i += 1) {
     const u = i / (stations - 1);
     const x = THREE.MathUtils.lerp(-10, 10, u);
     const edge = Math.pow(Math.abs(u * 2 - 1), 2.4);
     const beam = 0.55 + 1.82 * Math.pow(Math.sin(Math.PI * u), 0.55);
     const centerY = 0.72 + 1.4 * edge;
+    stationCenters.push([x, centerY, 0]);
     for (let j = 0; j < radial; j += 1) {
       const v = j / radial;
       const angle = v * Math.PI * 2;
@@ -204,6 +237,18 @@ function buildHullGeometry(stations, radial) {
       indices.push(a, b, d, b, c, d);
     }
   }
+  const bowCenter = positions.length / 3;
+  positions.push(...stationCenters[0]);
+  uvs.push(0.5, 0.5);
+  const sternCenter = positions.length / 3;
+  positions.push(...stationCenters[stations - 1]);
+  uvs.push(0.5, 0.5);
+  const sternRing = (stations - 1) * radial;
+  for (let j = 0; j < radial; j += 1) {
+    const next = (j + 1) % radial;
+    indices.push(bowCenter, j, next);
+    indices.push(sternCenter, sternRing + next, sternRing + j);
+  }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
@@ -211,6 +256,7 @@ function buildHullGeometry(stations, radial) {
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
+  geometry.userData.topology = analyzeIndexedSurfaceTopology(geometry);
   return geometry;
 }
 
