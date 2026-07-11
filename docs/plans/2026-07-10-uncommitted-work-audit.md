@@ -1,60 +1,97 @@
 # Uncommitted Worktree Audit — 2026-07-10
 
-## Live reconciliation — 2026-07-11
+## Authoritative live reconciliation — 2026-07-11
 
-The frozen snapshot below remains the preservation baseline, but it is no
-longer the current staging inventory. At reviewed HEAD `5733bd1` the live
-checkout contains 1,026 changed paths:
+The frozen snapshot below remains the preservation baseline, but it is not the
+current staging inventory. At reviewed HEAD
+`e64763bb3920ef5af23d4319966c3bb1db0af48e`, the live checkout contains 1,287
+changed paths:
 
-- 67 paths have both staged and unstaged differences;
-- 274 additional tracked paths have unstaged differences;
-- two tracked paths are deleted;
-- 685 paths are untracked.
+- 70 paths have staged changes;
+- 1,286 paths have unstaged changes;
+- 69 paths contain both staged and unstaged changes;
+- 803 paths are untracked;
+- 103 tracked paths are deleted, primarily superseded generated demo assets.
 
-This is 36 fewer dirty paths than the 18:14Z snapshot and 33 fewer than the
-prior `04f4897` reconciliation. The largest current groups are 152
-`integration-labs/` paths, 146 generated `docs/` paths, 52 vegetation paths,
-43 planet paths, 42 creature paths, 38 AO paths, 35 image-pipeline paths, 34
-atmosphere paths, and 33 paths each under spectral ocean and `labs/`.
-Therefore the original Core / Contracts / Evidence split remains valid;
-generated publication remains downstream-only.
+The largest groups are 395 generated `docs/` paths, 152
+`integration-labs/` paths, 52 vegetation paths, 43 planet paths, 42 creature
+paths, 38 AO paths, 35 image-pipeline paths, 34 paths each under atmosphere
+and `labs/`, and 32 paths each under black holes, weather, and clouds. The
+Core / Contracts / Evidence split is still mandatory. Generated publication
+remains downstream-only and must not absorb unfinished canonical work.
 
-The local branch is 36 commits ahead of and eight commits behind `origin/main`.
-The custom domain is consequently not a current-source verification surface.
-On 2026-07-11 the deployed router lab still served the pre-fix bundle: every
-scenario permalink pointed under `/demos/assets/scenario/`, and the inspected
-`ocean-planet` link returned the site's 404 page. Local router repairs must not
-be described as deployed until remote history is reconciled, pushed, Pages has
-published it, and the custom domain is rechecked.
+The local `main` branch is 52 commits ahead of and eight commits behind
+`origin/main`. The custom domain is therefore a deployed-history review
+surface, not proof of the current checkout. In particular, the meaningless CSS
+pipeline-orbit graphic reported by the reviewer is absent from current source:
+`91c90e5` replaced it and `6c34265` replaced ornamental/related media with
+registry-derived evidence states. The deployed screenshot is stale. The site
+must not be called updated until remote history is reconciled, pushed, Pages
+finishes, and `https://threejs-skills.com/` is rechecked.
 
-### Verified progress since the frozen snapshot
+### Current registry truth
 
-| Unit | Commit(s) | Current verification |
+| Measure | Current value |
+| --- | ---: |
+| skill directories | 27 |
+| demo registry records | 87 |
+| primary records | 40 |
+| canonical labs | 28 |
+| integration demos | 10 |
+| mechanism demos | 2 |
+| accepted primary records | 2 |
+| incomplete primary records | 38 |
+| secondary records | 47 |
+
+The accepted primary records are the non-rendering router and debugging
+contract suites. No rendering lab is currently accepted. All 38 other primary
+records intentionally publish `incomplete`; a screenshot, a loading browser
+route, and a v2 evidence verdict remain different claims.
+
+### Verification run against the current checkout
+
+| Gate | Result | Exact implication |
 | --- | --- | --- |
-| audit and preservation | `1f56368` | committed without generated output |
-| physics role prose | `916e377`, `3be3966`, `0033683`, `845264a` | `npm run test:skills` passes in the live checkout |
-| Pages local/hash gates | `1abe419` | committed; publication still waits for source freeze |
-| creature ignore policy | `438be92` | committed without creature source changes |
-| provider/water causality | `9cbb5e4` | syntax and integrated router suite pass |
-| contact/material identity | `359be02` | syntax and integrated router suite pass |
-| external/GPU ownership | `a7519d2` | syntax and integrated router suite pass |
-| physical impact partitions | `5b0330f` | syntax and integrated router suite pass |
-| quality migration resources | `c5e549f` | syntax and integrated router suite pass |
-| semantic invariant execution | `04f4897` | 33 invariants, 123 cases, 5,230 record validations, 215 negative cases; PASS in 265 s |
-| skill ABI closure gate | `070bfcc` | `npm run test:skills` passes and invokes the executable router suite |
-| canonical implementation audit | `98e6b2b` | 27 canonical targets, five flagships, 39 primary source sets, and all 41 lab-unit tests pass |
-| generic route closure | `af059c4` | 12 recipes, 33 invariants, 123 cases, 5,230 subject-record validations, and 216 negative cases pass |
-| provider/presentation time shape | `4fc4131`, `8440c7f`, `1a25667` | provider boundaries retain `PhysicsTime`; narrow presentation instants remain direct |
-| validation capture provenance | `33e754e`, `3003d16`, `df8b480`, `53774d6` | native 1200×800 and odd-size readback pass; original aligned-copy bytes remain distinct from compact transport bytes |
-| router permalink source fix | `a7a8f5e`, `cb577c2`, `5733bd1` | focused route suite passes; directly loaded source scenarios no longer nest `/scenario/` paths |
+| `node scripts/check-lab-implementation-matrix.mjs` | PASS | 28 canonical targets and five flagships have strict source/entry/script/route contracts |
+| `node scripts/check-lab-sources.mjs` | PASS | all 40 primary records resolve their declared canonical source paths |
+| `node scripts/check-capture-wiring.mjs` | PASS | all 40 primary records have a declared capture policy; this is wiring, not accepted evidence |
+| `node --test tests/labs/*.test.mjs` | PASS, 42/42 | root structural contracts pass |
+| `node scripts/run-labs.mjs check` | PASS, 40/40 | all declared check commands complete |
+| `npm run labs:test` | FAIL, 2 focused rows | router inventory still expects 26 rather than 27 skills; bounded-water mechanism wrapper does not import the canonical app |
+| `npm run labs:test:mutations` | FAIL, 3 focused rows | the same router and water gaps plus an FFT-ocean mechanism wrapper that does not import the canonical app |
+| manifest validator with `--require-complete` | FAIL, 30 blockers | 25 rendering/feature skills and all five flagships lack accepted primary evidence |
+| `npm run pages:validate-source-hashes` | FAIL, 3 drift rows | generated registry and router demo/index hashes do not match current source |
+| `npm run pages:validate-presentation` | PASS | current generated presentation reports 27 skills, 40 primary records, five flagships, and 545 primary URLs |
+| `npm run pages:validate-seo` | PASS | 95 indexable pages and 603 HTML files meet the local static-content gate |
+| `npm run pages:smoke` | environment-blocked in sandbox | local server could not bind `127.0.0.1:4173` (`EPERM`); rerun with approved host execution |
 
-This reconciliation does not promote any rendering lab to accepted. C01 now
-has real current-adapter final/no-post/diagnostic/camera/seed/temporal/odd-size
-captures, native-backend proof, aligned readback, and timestamp availability,
-but it still lacks a real v2 artifact assembly, sustained timing, GPU stage
-attribution, and 50–100 lifecycle cycles. The other native-WebGPU primary
-surfaces still require their declared browser, readback, timing, lifecycle, and
-visual evidence.
+These results define the next three source commits before any publication
+regeneration:
+
+1. migrate router inventory fixtures from 26 to the actual 27-skill catalog;
+2. make every bounded-water mechanism wrapper load the canonical lab app;
+3. make every FFT-ocean mechanism wrapper load the canonical lab app.
+
+### Verified C01 progress since the frozen snapshot
+
+The native validation subject has advanced beyond the earlier note. Current
+adapter evidence now includes:
+
+- real native-WebGPU correctness captures at 1200×800 and odd 641×359;
+- aligned RGBA8 readback with 4,864-byte and 2,816-byte source rows compacted
+  to 4,800-byte and 2,564-byte transport rows;
+- 14 schema-v2 JSON artifacts and all ten required standard images;
+- a materially different diagnostics image (approximately 0.864 differing
+  pixel ratio);
+- 50/50 fresh create/render/resize/mode/tier/dispose cycles;
+- zero numeric renderer-memory counters after every disposal;
+- measured render-target resource range of 6,443,332–60,480,000 bytes.
+
+Its claim verdicts remain deliberately separated: visual correctness and
+lifecycle stability pass; mechanism correctness, performance compliance, and
+GPU-stage attribution remain `INSUFFICIENT_EVIDENCE`. The bundle is therefore
+`browser-capture-incomplete`, not publishable, and does not promote the lab to
+accepted.
 
 ## Scope and preservation
 

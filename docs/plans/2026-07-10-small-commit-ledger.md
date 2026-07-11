@@ -1,6 +1,33 @@
 # Small Thematic Commit Ledger — 2026-07-10
 
-## Execution status — 2026-07-11
+## Authoritative execution status — 2026-07-11
+
+The current reviewed HEAD is `e64763b`. The worktree contains 1,287 changed
+paths, so every commit below must use an exact path list; directory-wide staging
+is prohibited. Local `main` is 52 commits ahead of and eight behind
+`origin/main`, which blocks truthful deployment until history is reconciled.
+
+The current registry contains 27 skills, 87 demos, and 40 primary records: 28
+canonical labs, ten integrations, and two mechanism benches. Only router and
+debugging are accepted; 38 primary records remain incomplete.
+
+### Immediate commit queue
+
+| Order | Proposed commit | Exact content | Verification before commit |
+| ---: | --- | --- | --- |
+| R00 | `docs(audit): reconcile current lab worktree` | only these two audit/ledger Markdown files | inspect rendered Markdown; `git diff --check` |
+| R01 | `fix(physics): close composed workload cost evidence` | `router-contract-provider-water-fixtures.mjs`, `router-contract.test.mjs`, `physics-domain-and-interaction-contract.schema.json` | syntax plus full router suite: 12 recipes, 35 invariants, 136 cases, 5,500 subject validations, 216 negative cases |
+| R02 | `fix(router): include object sculptor in inventory` | only router inventory fixture/test/manifest paths proven necessary after review | focused router unit and mutation suites; expected skill count 27 |
+| R03 | `fix(water): load canonical app from mechanism routes` | only bounded-water wrapper/import contract paths | bounded-water unit and mutation suites |
+| R04 | `fix(ocean): load canonical app from mechanism routes` | only FFT-ocean wrapper/import contract paths | FFT-ocean unit and mutation suites |
+| R05 | `chore(labs): refresh source-derived registry` | `labs/demo-registry.json` only | `npm run labs:check`; no source drift |
+| R06 | `docs(site): publish source-equivalent evidence states` | generated Pages output only after R01–R05 and hash gates pass | Pages build, source hashes, presentation, SEO, smoke, then direct custom-domain inspection |
+
+R06 must contain no decorative substitute for absent evidence. A primary card
+may show only, in priority order: accepted render-target evidence; a clearly
+labelled implementation screenshot whose provenance is recorded; or a compact
+textual `runtime evidence pending` panel. Unrelated skill images, ornamental
+pipeline diagrams, and CSS-only pseudo-evidence are forbidden.
 
 The ledger remains the source-to-publication order, but Phase A has advanced.
 Do not recreate already landed commits or fold their remaining working-tree
@@ -18,7 +45,7 @@ supersets into later lab commits.
 | post-A physics closure | complete | `af059c4`, `4fc4131`; direct router suite passes 12 recipes, 33 invariants, 123 cases, 5,230 record validations, and 216 negative cases |
 | C01 Core | complete | `4c4e333`, `09644c4`, `df8b480`; native WebGPU subject, safe renderer metrics, and aligned readback metadata browser-verified |
 | C01 Contracts | complete | `8b06660`, `33e754e`, `3003d16`, `53774d6`; routes/mutations, compact-copy provenance, and truthful incomplete capture boundary pass |
-| C01 Evidence | pending | real current-adapter images exist only under ignored artifacts; v2 assembly, 50–100 lifecycle cycles, sustained timing, and acceptance validation remain open |
+| C01 Evidence | partially complete, still unaccepted | v2 assembly and 50/50 fresh lifecycle cycles now pass; visual correctness and lifecycle pass, but mechanism correctness, sustained performance, GPU attribution, adapter/presentation identity, and publishability remain open |
 | router publication repair | source verified, not deployed | `a7a8f5e`, `cb577c2`, `0a8b2c6`, `5733bd1`; live custom-domain links still point to `/demos/assets/scenario/` and 404 |
 | B, C02–F | pending | no proxy, later lab, accepted evidence, or final generated publication row is accepted by this reconciliation |
 
@@ -44,18 +71,21 @@ C01 is intentionally not represented by one broad commit:
 The correctness run proved initialized native WebGPU, 1200×800 RGBA8 readback,
 4864-byte aligned source rows, 3,891,136 source bytes versus 3,840,000 compact
 transport bytes, a 641×359 odd-size readback, distinct diagnostics, and GPU
-timestamp availability. It did not claim mechanism acceptance, sustained
-performance, GPU attribution, or lifecycle stability.
+timestamp availability. Follow-up work assembled all 14 v2 ledgers and ten
+required images and completed 50/50 fresh lifecycle cycles with zero numeric
+renderer-memory counters after disposal. It still does not claim mechanism
+acceptance, sustained performance, GPU-stage attribution, or publishability.
 
 ### Publication state
 
 The router source and generated local bundle are not deployed evidence. At the
-reviewed head, `main` is 36 commits ahead of and eight commits behind
+current reviewed head, `main` is 52 commits ahead of and eight commits behind
 `origin/main`; the dirty worktree prevents an automatic history reconciliation.
-The live custom domain was inspected directly and still served the old bundle,
-whose `ocean-planet` scenario link resolves to a confirmed 404. Publication
-remains pending until remote reconciliation, push, Pages completion, and a
-fresh live route check all pass.
+The custom domain still represents older history. The ornamental pipeline
+graphic visible in the reviewer screenshot was already removed in source by
+`91c90e5`, and `6c34265` replaced ornamental preview selection with
+registry-derived evidence records. Publication remains pending until remote
+reconciliation, push, Pages completion, and a fresh live route check all pass.
 
 ### A20 executed split
 
@@ -260,6 +290,7 @@ drift.
 
 | Commit | Boundary | Verification |
 | --- | --- | --- |
+| `91c90e5` | remove decorative pipeline graphic and replace it with claim-bearing content | source and generated-page inspection |
 | `6c34265` | evidence-first generator and methodology route | desktop and 390×844 visual inspection; exact primary-preview source policy |
 | `1779978` | unrelated-preview regression gate | presentation validator rejects related-skill primary media |
 | `4bd64cd` | optional hero markup cleanup | generated-output whitespace check |
