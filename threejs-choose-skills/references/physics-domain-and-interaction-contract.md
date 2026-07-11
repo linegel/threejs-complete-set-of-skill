@@ -83,6 +83,10 @@ owner entitled to say that the value does not exist; `reason` distinguishes a
 capability limit from a request choice. A bare string is only expository
 shorthand in prose and is rejected in a serialized ABI record.
 
+<a id="phy-context-owner-001"></a>
+<a id="phy-frame-proper-001"></a>
+<a id="phy-identity-generation-001"></a>
+<a id="phy-registry-authority-001"></a>
 ## `PhysicsContext`, Frames, Charts, Clocks, And Identity
 
 ### Canonical context
@@ -323,6 +327,9 @@ slots, draw indices, frame IDs, render-material IDs, or recycled without a new
 generation. Compaction publishes an explicit old-to-new slot map while stable
 IDs remain unchanged.
 
+<a id="phy-time-rational-001"></a>
+<a id="phy-time-interval-001"></a>
+<a id="phy-clock-mapping-001"></a>
 ### Canonical time
 
 Ticks, rational numerators/denominators, mapping revisions, and sequence IDs are
@@ -462,6 +469,12 @@ mapping revision; `tickCount` alone is insufficient. Analytic, fixed-step,
 adaptive, event-driven, streamed, and presentation clocks may coexist. No
 clock is silently promoted to a universal timestep.
 
+<a id="phy-graph-dag-001"></a>
+<a id="phy-graph-commit-001"></a>
+<a id="phy-coordination-catchup-001"></a>
+<a id="phy-dependency-completion-001"></a>
+<a id="phy-commit-transaction-001"></a>
+<a id="phy-loop-lineage-001"></a>
 ## `PhysicsGraph` And Multi-Rate Scheduling
 
 ```yaml
@@ -944,6 +957,7 @@ late, duplicate, overflow, cancellation, and retry policies. Deterministic
 replay requires a fixed reduction tree/order and declared floating-point mode;
 unordered floating-point atomics are not deterministic evidence.
 
+<a id="phy-signal-closure-001"></a>
 ## `PhysicsSignalDescriptor` And Provider Protocol
 
 ```yaml
@@ -1424,6 +1438,11 @@ depth, geometric snow height, and visual coverage through declared density,
 compaction, and coverage maps; do not use a dimensionless mask as a conserved
 inventory.
 
+<a id="phy-interaction-dimension-001"></a>
+<a id="phy-interaction-exact-once-001"></a>
+<a id="phy-partition-closure-001"></a>
+<a id="phy-application-ledger-001"></a>
+<a id="phy-conservation-001"></a>
 ## `SurfaceExchange`, Interactions, Reactions, And Conservation
 
 ### Exchange envelope
@@ -1964,6 +1983,7 @@ stoichiometric/constitutive map. Conservation does not imply energy preservation
 for a dissipative law: record physically modeled dissipation separately from
 conversion, boundary loss, and numerical residual.
 
+<a id="phy-proxy-boundary-001"></a>
 ## Physics Materials And Physical Proxies
 
 ### `PhysicsMaterialRegistry`
@@ -2281,6 +2301,9 @@ wave-excitation terms require a stability/convergence gate and may not duplicate
 forces already present in the water solver. A visual hull is eligible only
 after watertightness/orientation/volume and approximation errors pass.
 
+<a id="phy-gpu-recovery-001"></a>
+<a id="phy-external-ownership-001"></a>
+<a id="phy-external-capability-001"></a>
 ## Coupling Schedules, CPU/GPU Ordering, And External Solvers
 
 ### One-way and two-way schedules
@@ -2568,6 +2591,11 @@ conservation, quality migration, presentation snapshots, or evidence gates. If
 it cannot expose a required channel or synchronization fact, mark it absent and
 block or narrow the coupled claim.
 
+<a id="phy-presentation-closure-001"></a>
+<a id="phy-lease-join-001"></a>
+<a id="phy-origin-rebase-001"></a>
+<a id="phy-presentation-admission-001"></a>
+<a id="phy-render-plan-closure-001"></a>
 ## Physics Presentation And Reactive State
 
 Presentation is an explicit acyclic publication chain:
@@ -3383,6 +3411,8 @@ origins or projections—for example, a stock reconstruction whose previous-dept
 path assumes one render frame—its `ScopedResetAction` requires a conservative
 history reset. Do not claim origin-rebase preservation without mechanism proof.
 
+<a id="phy-quality-migration-001"></a>
+<a id="phy-quality-admission-001"></a>
 ## `QualityTransition` And Mobile Performance
 
 ### Quality-state contract
@@ -3590,6 +3620,11 @@ one representation per named state-equation term or conserved source channel
 emits forces/sources `[G]`; independent equations may retain different
 authoritative owners. Otherwise the system double-couples.
 
+<a id="phy-cost-trace-001"></a>
+<a id="phy-composed-cost-002"></a>
+<a id="phy-workload-shape-cost-003"></a>
+<a id="phy-memory-traffic-attribution-001"></a>
+<a id="phy-cadence-totals-001"></a>
 ### Cost, traffic, and hot state
 
 Do not assign budgets by device-class folklore. Freeze `[G]` CPU, GPU,

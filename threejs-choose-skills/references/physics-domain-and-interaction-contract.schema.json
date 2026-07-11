@@ -23266,7 +23266,7 @@
           "missing-owner"
         ]
       },
-      "contractLines": "46-67, 548-556"
+      "contractAnchors": ["phy-context-owner-001"]
     },
     {
       "id": "PHY-FRAME-PROPER-001",
@@ -23286,7 +23286,7 @@
           "scaled-basis"
         ]
       },
-      "contractLines": "136-236, 2176-2190"
+      "contractAnchors": ["phy-frame-proper-001"]
     },
     {
       "id": "PHY-TIME-RATIONAL-001",
@@ -23303,7 +23303,7 @@
           "nonreduced-rational"
         ]
       },
-      "contractLines": "271-304"
+      "contractAnchors": ["phy-time-rational-001"]
     },
     {
       "id": "PHY-TIME-INTERVAL-001",
@@ -23322,7 +23322,7 @@
           "mixed-epoch"
         ]
       },
-      "contractLines": "297-304, 330-336"
+      "contractAnchors": ["phy-time-interval-001"]
     },
     {
       "id": "PHY-CLOCK-MAPPING-001",
@@ -23341,7 +23341,7 @@
           "unlogged-external-query"
         ]
       },
-      "contractLines": "338-406"
+      "contractAnchors": ["phy-clock-mapping-001"]
     },
     {
       "id": "PHY-GRAPH-DAG-001",
@@ -23361,7 +23361,7 @@
           "stage-order-regression"
         ]
       },
-      "contractLines": "408-597"
+      "contractAnchors": ["phy-graph-dag-001"]
     },
     {
       "id": "PHY-GRAPH-COMMIT-001",
@@ -23380,7 +23380,7 @@
           "escaped-provisional-version"
         ]
       },
-      "contractLines": "506-584"
+      "contractAnchors": ["phy-graph-commit-001"]
     },
     {
       "id": "PHY-SIGNAL-CLOSURE-001",
@@ -23399,7 +23399,7 @@
           "stale-generation"
         ]
       },
-      "contractLines": "599-860"
+      "contractAnchors": ["phy-signal-closure-001"]
     },
     {
       "id": "PHY-INTERACTION-DIMENSION-001",
@@ -23418,7 +23418,7 @@
           "bad-kernel-normalization"
         ]
       },
-      "contractLines": "1120-1330"
+      "contractAnchors": ["phy-interaction-dimension-001"]
     },
     {
       "id": "PHY-INTERACTION-EXACT-ONCE-001",
@@ -23438,7 +23438,7 @@
           "partial-reaction"
         ]
       },
-      "contractLines": "1366-1421"
+      "contractAnchors": ["phy-interaction-exact-once-001"]
     },
     {
       "id": "PHY-CONSERVATION-001",
@@ -23456,7 +23456,7 @@
           "residual-over-gate"
         ]
       },
-      "contractLines": "1481-1528"
+      "contractAnchors": ["phy-conservation-001"]
     },
     {
       "id": "PHY-IDENTITY-GENERATION-001",
@@ -23476,7 +23476,7 @@
           "recycle-without-generation"
         ]
       },
-      "contractLines": "262-267, 1423-1474, 2125-2128"
+      "contractAnchors": ["phy-identity-generation-001"]
     },
     {
       "id": "PHY-GPU-RECOVERY-001",
@@ -23497,7 +23497,7 @@
           "lost-generation-reuse"
         ]
       },
-      "contractLines": "1807-1893"
+      "contractAnchors": ["phy-gpu-recovery-001"]
     },
     {
       "id": "PHY-EXTERNAL-OWNERSHIP-001",
@@ -23514,7 +23514,7 @@
           "half-commit"
         ]
       },
-      "contractLines": "1895-1985"
+      "contractAnchors": ["phy-external-ownership-001"]
     },
     {
       "id": "PHY-PRESENTATION-CLOSURE-001",
@@ -23536,7 +23536,7 @@
           "invented-event-range"
         ]
       },
-      "contractLines": "1987-2289"
+      "contractAnchors": ["phy-presentation-closure-001"]
     },
     {
       "id": "PHY-LEASE-JOIN-001",
@@ -23556,7 +23556,7 @@
           "sibling-view-retirement"
         ]
       },
-      "contractLines": "2356-2478"
+      "contractAnchors": ["phy-lease-join-001"]
     },
     {
       "id": "PHY-ORIGIN-REBASE-001",
@@ -23574,7 +23574,7 @@
           "stale-epoch-bridge"
         ]
       },
-      "contractLines": "2488-2537"
+      "contractAnchors": ["phy-origin-rebase-001"]
     },
     {
       "id": "PHY-QUALITY-MIGRATION-001",
@@ -23594,7 +23594,7 @@
           "silent-inventory-loss"
         ]
       },
-      "contractLines": "2539-2677"
+      "contractAnchors": ["phy-quality-migration-001"]
     },
     {
       "id": "PHY-COST-TRACE-001",
@@ -23611,7 +23611,7 @@
           "frame-critical-readback"
         ]
       },
-      "contractLines": "2679-2766"
+      "contractAnchors": ["phy-cost-trace-001"]
     },
     {
       "id": "PHY-COMPOSED-COST-002",
@@ -23645,7 +23645,7 @@
           "migration-evidence-omitted"
         ]
       },
-      "contractLines": "3565-3996"
+      "contractAnchors": ["phy-composed-cost-002"]
     },
     {
       "id": "PHY-WORKLOAD-SHAPE-COST-003",
@@ -23664,7 +23664,7 @@
           "external-transport-tail-omitted"
         ]
       },
-      "contractLines": "3789-4015"
+      "contractAnchors": ["phy-workload-shape-cost-003"]
     },
     {
       "id": "PHY-REGISTRY-AUTHORITY-001",
@@ -23685,7 +23685,7 @@
           "retired-generation-alias"
         ]
       },
-      "contractLines": "262-347"
+      "contractAnchors": ["phy-registry-authority-001"]
     },
     {
       "id": "PHY-COORDINATION-CATCHUP-001",
@@ -23706,7 +23706,7 @@
           "drop-without-loss-ledger"
         ]
       },
-      "contractLines": "477-913"
+      "contractAnchors": ["phy-coordination-catchup-001"]
     },
     {
       "id": "PHY-DEPENDENCY-COMPLETION-001",
@@ -23726,7 +23726,7 @@
           "missing-acquire"
         ]
       },
-      "contractLines": "575-657"
+      "contractAnchors": ["phy-dependency-completion-001"]
     },
     {
       "id": "PHY-COMMIT-TRANSACTION-001",
@@ -23746,7 +23746,7 @@
           "digest-mismatch"
         ]
       },
-      "contractLines": "746-887"
+      "contractAnchors": ["phy-commit-transaction-001"]
     },
     {
       "id": "PHY-LOOP-LINEAGE-001",
@@ -23766,7 +23766,7 @@
           "accepted-digest-mismatch"
         ]
       },
-      "contractLines": "699-858"
+      "contractAnchors": ["phy-loop-lineage-001"]
     },
     {
       "id": "PHY-PARTITION-CLOSURE-001",
@@ -23786,7 +23786,7 @@
           "visual-child-authority"
         ]
       },
-      "contractLines": "1450-1515"
+      "contractAnchors": ["phy-partition-closure-001"]
     },
     {
       "id": "PHY-APPLICATION-LEDGER-001",
@@ -23805,7 +23805,7 @@
           "replay-committed-key"
         ]
       },
-      "contractLines": "1780-1875"
+      "contractAnchors": ["phy-application-ledger-001"]
     },
     {
       "id": "PHY-PROXY-BOUNDARY-001",
@@ -23825,7 +23825,7 @@
           "unlatched-material-selection"
         ]
       },
-      "contractLines": "2075-2225"
+      "contractAnchors": ["phy-proxy-boundary-001"]
     },
     {
       "id": "PHY-EXTERNAL-CAPABILITY-001",
@@ -23844,7 +23844,7 @@
           "receipt-dependency-mismatch"
         ]
       },
-      "contractLines": "2460-2590"
+      "contractAnchors": ["phy-external-capability-001"]
     },
     {
       "id": "PHY-PRESENTATION-ADMISSION-001",
@@ -23867,7 +23867,7 @@
           "jitter-sequence-drift"
         ]
       },
-      "contractLines": "2615-3215"
+      "contractAnchors": ["phy-presentation-admission-001"]
     },
     {
       "id": "PHY-RENDER-PLAN-CLOSURE-001",
@@ -23892,7 +23892,7 @@
           "reset-result-queue-epoch-mismatch"
         ]
       },
-      "contractLines": "2790-3245"
+      "contractAnchors": ["phy-render-plan-closure-001"]
     },
     {
       "id": "PHY-QUALITY-ADMISSION-001",
@@ -23913,7 +23913,7 @@
           "insufficient-overlap-capacity"
         ]
       },
-      "contractLines": "3290-3515"
+      "contractAnchors": ["phy-quality-admission-001"]
     },
     {
       "id": "PHY-MEMORY-TRAFFIC-ATTRIBUTION-001",
@@ -23934,7 +23934,7 @@
           "shared-work-double-count"
         ]
       },
-      "contractLines": "3515-3695"
+      "contractAnchors": ["phy-memory-traffic-attribution-001"]
     },
     {
       "id": "PHY-CADENCE-TOTALS-001",
@@ -23953,7 +23953,7 @@
           "mixed-trace"
         ]
       },
-      "contractLines": "3515-3715"
+      "contractAnchors": ["phy-cadence-totals-001"]
     }
   ]
 }

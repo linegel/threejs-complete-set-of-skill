@@ -437,9 +437,16 @@ if (abiAbsencePolicy?.typedAbsenceOnly !== true ||
 }
 
 const declaredAbiTargets = new Set([...recordNames, ...Object.keys(physicsAbi.$defs)]);
+const contractAnchorCounts = new Map();
+for (const match of physicsContract.matchAll(/<a id="(phy-[a-z0-9-]+)"><\/a>/g)) {
+  contractAnchorCounts.set(match[1], (contractAnchorCounts.get(match[1]) ?? 0) + 1);
+}
 const semanticInvariantIds = new Set();
 const semanticInvariantByValidator = new Map();
 for (const [index, invariant] of semanticInvariants.entries()) {
+  if (!sameStringSet(Object.keys(invariant), ['id', 'appliesTo', 'validator', 'fixtures', 'contractAnchors'])) {
+    fail(`${physicsAbiRelative} semantic invariant at index ${index} has missing or legacy trace metadata`);
+  }
   if (typeof invariant.id !== 'string' || invariant.id.trim() !== invariant.id || invariant.id.length < 8) {
     fail(`${physicsAbiRelative} x-semantic-invariants[${index}] has an invalid id`);
   }
@@ -459,7 +466,21 @@ for (const [index, invariant] of semanticInvariants.entries()) {
       invariant.appliesTo.some((target) => typeof target !== 'string' || !declaredAbiTargets.has(target))) {
     fail(`${physicsAbiRelative} semantic invariant ${invariant.id} has unresolved or duplicate appliesTo targets`);
   }
+  const expectedAnchor = invariant.id.toLowerCase();
+  if (!Array.isArray(invariant.contractAnchors) ||
+      !sameStringSet(invariant.contractAnchors, [expectedAnchor]) ||
+      invariant.contractAnchors.some((anchor) => !/^phy-[a-z0-9-]+$/.test(anchor))) {
+    fail(`${physicsAbiRelative} semantic invariant ${invariant.id} must name its stable lowercase contract anchor`);
+  }
+  if (contractAnchorCounts.get(expectedAnchor) !== 1) {
+    fail(`${physicsContractRelative} must define stable anchor ${expectedAnchor} exactly once`);
+  }
   semanticInvariantByValidator.set(invariant.validator, invariant);
+}
+const unreferencedContractAnchors = [...contractAnchorCounts.keys()]
+  .filter((anchor) => !semanticInvariantIds.has(anchor.toUpperCase()));
+if (unreferencedContractAnchors.length > 0) {
+  fail(`${physicsContractRelative} has unreferenced semantic anchors: ${unreferencedContractAnchors.join(', ')}`);
 }
 
 const provePhysicsTimeExclusiveArms = () => {
