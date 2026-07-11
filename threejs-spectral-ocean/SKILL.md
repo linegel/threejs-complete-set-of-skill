@@ -140,9 +140,14 @@ The offshore/coastal handoff also carries the canonical
 `freeSurfacePoint`, `freeSurfaceNormal`, `geometricNormalVelocityMps`, and the
 exact `WaterSurfaceParameterization`, with optional fixed-parameterization
 `surfacePointVelocityMps`, material `materialCurrentVelocityMps`, and only the
-other channels actually represented. Descriptor, requested/actual
-`PhysicsInstant`, footprint/filter, frame/origin/transform, state/resource
-version, validity/error, latency, and residency cross unchanged. A
+other channels actually represented. The generic request, response, and
+channel time fields remain complete `PhysicsTime` wrappers. An instantaneous
+water query selects `kind: instant`, fills `instant: PhysicsInstant`, and puts a
+complete `TypedAbsence` in `interval` for request/response
+`requestedPhysicsTime`, response `actualBundleTime`, and each instantaneous
+channel's `actualPhysicsTime`; `WaterSurfaceSample.sampleInstant` remains the
+raw `PhysicsInstant`. Descriptor, footprint/filter, frame/origin/transform,
+state/resource version, validity/error, latency, and residency cross unchanged. A
 phase-averaged handoff needs a separately owned display-phase synthesis before
 it can satisfy this instantaneous provider ABI.
 
@@ -161,8 +166,10 @@ Foam crosses the handoff as one versioned provider signal. Its complete
 transform revision, footprint/filter, cadence/latency/residency, state/resource
 generation, validity, and per-channel error; canonical channels carry coverage,
 carrier velocity, source rate, diffusion, and decay state at
-`sampleInstant: PhysicsInstant`, with each source-rate channel declaring its actual sampling
-interval.
+`sampleInstant: PhysicsInstant`. Each channel's `actualPhysicsTime` selects the
+arm required by its descriptor's `timeSemantics`: an instantaneous channel uses
+the `instant` arm, while a source-rate channel with an actual sampling interval
+uses the `interval` arm. The inactive arm is always a complete `TypedAbsence`.
 Attribute whitecap and depth-breaking dissipation to exactly one owner, combine
 the disjoint dissipation terms, then map them once into one foam source/history.
 Never partition or saturated-add evolved coverage histories. A coordinate/atlas
@@ -331,9 +338,11 @@ optional fixed-coordinate `surfacePointVelocityMps`, optional
 shared `SampledChannel`; the parameterization remains its own exact canonical record.
 The result returns the complete shared
 `PhysicsSignalDescriptor`, bundle `sampleInstant`, and each channel's
-`actualPhysicsTime` resolving to a `PhysicsInstant`. The requested
-`PhysicsInstant` remains distinct from those returned actual instants and may
-differ only within declared latency/staleness gates. Unrepresented current,
+`actualPhysicsTime`. For an instantaneous water query, request and response
+generic time fields use the complete instant-selected `PhysicsTime` wrapper,
+while bundle `sampleInstant` remains a raw `PhysicsInstant`. The requested and
+returned actual instants remain distinct and may differ only within declared
+latency/staleness gates. Unrepresented current,
 depth, or density channels are absent under
 `missingChannelPolicy`, not zero. The adapter composes coefficient omission, horizontal inversion,
 floating-point, transform/probe, filtering, and latency error without

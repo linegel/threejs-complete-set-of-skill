@@ -326,7 +326,8 @@ The FFT and its reduced CPU sampler are internal representations. External
 motion, creature, force, and contact consumers query the shared
 batched, channel-requested `WaterSurfaceProvider`, in physics-frame metres,
 with a declared footprint/filter,
-frame and one canonical `PhysicsInstant`. The adapter returns:
+frame and one canonical instant-selected `PhysicsTime` request. The adapter
+returns:
 
 ```text
 domain channel records:
@@ -348,9 +349,14 @@ sample bundle/envelope:
 Every channel is the complete shared `SampledChannel`, including actual time,
 support/filter, validity, error, and `stateVersion`. The complete
 shared `PhysicsSignalDescriptor` and bundle `sampleInstant` are returned without
-a spectral-local subset; each channel's `actualPhysicsTime` resolves to a
-`PhysicsInstant`. The requested and returned actual instants may differ only
-within declared latency/staleness gates. Descriptor discovery supplies a stable table ID/version, and
+a spectral-local subset. For an instantaneous water query,
+`PhysicsSampleRequest.requestedPhysicsTime`, response `requestedPhysicsTime` and
+`actualBundleTime`, and every instantaneous channel's `actualPhysicsTime` are
+complete `PhysicsTime` wrappers with `kind: instant`, a populated
+`instant: PhysicsInstant`, and a complete `TypedAbsence` in `interval`.
+`WaterSurfaceSample.sampleInstant` remains the raw `PhysicsInstant`. The
+requested and returned actual instants may differ only within declared
+latency/staleness gates. Descriptor discovery supplies a stable table ID/version, and
 packed hot batches use that reference plus SoA channels rather than deep-copying
 the descriptor. The descriptor owns
 the footprint/filter actually represented, validity, per-channel error,
@@ -404,9 +410,11 @@ transform revision, chart when applicable, footprint/filter, cadence/latency/
 residency, state/resource generation, validity, missing-channel policy, and
 per-channel error. Its canonical `SampledChannel`s carry coverage `[1]`, source
 rate `[s^-1]`, carrier velocity `[m s^-1]`, diffusion `[m^2 s^-1]`, and decay
-rate `[s^-1]`, with bundle `sampleInstant: PhysicsInstant` and channel
-`actualPhysicsTime`; source-rate channels declare their actual sample interval.
-No
+rate `[s^-1]`, with bundle `sampleInstant: PhysicsInstant`. Each channel's
+`actualPhysicsTime` selects the arm required by its descriptor's
+`timeSemantics`: instantaneous channels use the `instant` arm; source-rate
+channels with an actual sampling interval use the `interval` arm. The inactive
+arm is a complete `TypedAbsence`. No
 independent seconds timestamp is legal. An atlas/coordinate ownership change
 uses a declared conservative state map and records remap, clamp, and lost-
 coverage residuals.

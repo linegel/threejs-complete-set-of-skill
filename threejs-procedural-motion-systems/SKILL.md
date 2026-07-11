@@ -102,8 +102,10 @@ Throughput decision table:
 Environment-coupled motion is an explicit algorithm boundary. Boats, buoys,
 floating debris, and swimmers consume the canonical batched,
 channel-requested `WaterSurfaceProvider`. Requests use physics-frame metres and
-declare footprint/filter, frame, and one canonical `PhysicsInstant`. The
-provider returns one canonical `WaterSurfaceSample`; the motion stage validates
+declare footprint/filter, frame, and `requestedPhysicsTime: PhysicsTime` with
+`kind: instant`, a present `instant: PhysicsInstant`, and a typed-absent
+`interval` arm. The provider returns one canonical `WaterSurfaceSample`; the
+motion stage validates
 its descriptor and generation, bundle `sampleInstant`, parameterization,
 represented footprint/filter, atomic validity, and per-channel error against
 the request before advancing actor state. Its channels use the exact shared
@@ -113,9 +115,10 @@ names `freeSurfacePoint`, `freeSurfaceNormal`,
 `waterColumnDepthMeters`, optional `densityKgPerM3`,
 and the returned shared `PhysicsSignalDescriptor`.
 Each channel is the complete shared `SampledChannel` and retains
-`actualPhysicsTime` resolving to a `PhysicsInstant`; the requested and actual
-instants may differ only within the
-declared latency/staleness gates. Missing channels
+`actualPhysicsTime: PhysicsTime` with the same instant-arm shape; the
+`WaterSurfaceSample.sampleInstant` bundle field remains a raw `PhysicsInstant`.
+The requested and actual instant-arm values may differ only within the declared
+latency/staleness gates. Missing channels
 follow `missingChannelPolicy` and are never synthesized as zero; geometric
 surface velocity and material current remain distinct. Consumers do not
 redeclare or subset the descriptor/time envelope. The scalar

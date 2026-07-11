@@ -424,20 +424,32 @@ queryHabitat(...) -> HabitatSample
 querySupport(...) -> SupportSurfaceSample
 ```
 
+All three provider paths use the canonical instantaneous envelope.
+`PhysicsSampleRequest.requestedPhysicsTime` is a `PhysicsTime` selecting
+`kind: instant`, with a raw `PhysicsInstant` in `instant` and a full canonical
+`TypedAbsence` record in `interval`.
+`PhysicsSampleResponseEnvelope.requestedPhysicsTime`, `.actualBundleTime`, and
+each `SampledChannel.actualPhysicsTime` remain `PhysicsTime` wrappers with that
+same arm selection. A domain sample's `sampleInstant` remains a raw
+`PhysicsInstant`; it does not replace those wrappers. Requested and actual
+instant-arm values may differ only within declared latency/staleness gates.
+
 Both calls are semantic abbreviations, not local provider ABIs. Habitat uses the
-canonical `PhysicsSampleRequest`: context/provider/signal/schema IDs, requested
-`PhysicsInstant`, a physics-frame-metre probe/footprint, channel masks, filter,
+canonical `PhysicsSampleRequest`: context/provider/signal/schema IDs,
+instant-arm `requestedPhysicsTime`, a physics-frame-metre probe/footprint,
+channel masks, filter,
 tolerances, staleness, acceptable residency/latency, and batch extent.
 Descriptor discovery supplies a stable descriptor-table reference; the result
-returns the complete `PhysicsSignalDescriptor` and per-channel actual time/error.
+returns the complete `PhysicsSignalDescriptor` and each channel's
+`actualPhysicsTime` wrapper and error.
 Requested domain channels may include typed coast distance, water-column depth,
 slope, substrate weights, moisture, and exposure. Errors remain per channel
 rather than one scalar `errorBound`.
 
 The support provider uses the same request protocol. Its returned
-`SupportSurfaceSample` carries the complete descriptor and bundle
-`sampleInstant`, while every channel's `actualPhysicsTime` resolves to a
-`PhysicsInstant`; it also returns stable
+`SupportSurfaceSample` carries the complete descriptor and raw bundle
+`sampleInstant`; the response and channel times retain the `PhysicsTime`
+wrappers above. It also returns stable
 generation-bearing support/feature identity distinct from frame identity,
 moving-frame kinematics, and per-channel error. Any legacy scalar/tuple helper
 is an internal adapter input and cannot bypass that envelope.
@@ -445,7 +457,8 @@ is an internal adapter input and cannot bypass that envelope.
 Water is not a third creature-local schema. Swimmers and buoyant bodies consume
 the shared batched, channel-requested `WaterSurfaceProvider`. A request uses a
 physics-frame-metre position and declares channels, response footprint/filter,
-context/provider/signal/schema IDs, requested `PhysicsInstant`, tolerances,
+context/provider/signal/schema IDs, instant-arm `requestedPhysicsTime`,
+tolerances,
 staleness, acceptable residency/latency, and batch extent; it references
 descriptor discovery rather than deep-copying a complete descriptor. Creature
 locomotion requests the following subset of the canonical `WaterSurfaceSample`
@@ -460,13 +473,12 @@ Optional requested channels that are unrepresented are absent, not zero. Zero
 is a valid represented physical value.
 
 Every named channel is the complete shared `SampledChannel`. The
-result returns the complete shared descriptor and bundle `sampleInstant`, while
-each channel's `actualPhysicsTime` resolves to a `PhysicsInstant`; requested and
-actual instants may differ
-only within declared latency/staleness gates. Creature code may not subset,
-rename, or re-clock the returned envelope. It owns actual footprint/filter, validity/
-per-channel error, state/resource generation, cadence/latency/residency,
-frame/transform/source epochs, and missing-channel policy.
+result returns the complete shared descriptor and raw `sampleInstant`, while
+the response and channel times retain the wrappers above. Creature code may not
+subset, rename, or re-clock the returned envelope. It owns actual
+footprint/filter, validity/per-channel error, state/resource generation,
+cadence/latency/residency, frame/transform/source epochs, and missing-channel
+policy.
 The `WaterSurfaceSample` bundle's actual represented footprint/filter, atomic
 validity/error, and `absentChannels` also remain intact.
 
@@ -499,8 +511,8 @@ micro-normal detail can inject macroscopic roll and steering.
 Providers may use an analytic CPU mirror, a deterministic shared field, or a
 batched asynchronous query service with a declared latency contract. They may
 not perform frame-critical GPU readback. Placement and locomotion acceptance
-include the descriptor's per-channel error/state/residency plus the requested
-and actual `PhysicsInstant`;
+include the descriptor's per-channel error/state/residency, the request and
+response `PhysicsTime` wrappers, and the raw domain `sampleInstant`;
 a precise IK solve against an
 under-resolved coast or water sample is not precise world coupling.
 
@@ -580,8 +592,9 @@ component. Gate relative length residual across scale and precision sweeps;
 decimal-string equality and one fixture's absolute threshold are not valid
 contracts.
 
-Query the shared gravity provider at the creature physics point and
-`PhysicsInstant`; let the returned `gMps2` have units m/s² and
+Query the shared gravity provider at the creature physics point using the same
+instant-arm `PhysicsTime` request/response contract; let the returned `gMps2`
+have units m/s² and
 `gMagMps2=|gMps2|`. Transform it as a vector and never rescale it inside
 locomotion. A legacy scene-
 unit preset is converted once through the exact context adapter before entering

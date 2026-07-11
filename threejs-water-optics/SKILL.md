@@ -39,12 +39,12 @@ registry, and world/physics transform revision.
 
 This skill publishes the canonical `WaterSurfaceProvider` interface and
 `WaterSurfaceSample`. A canonical `PhysicsSampleRequest` is batched and
-channel-requested. It carries context/provider/signal/schema IDs, the requested
-`PhysicsInstant`, physics-frame-metre points or oriented footprints, channel
-masks, filter/frequency response, per-channel tolerances, maximum staleness,
-acceptable residency/latency, and batch extent. Descriptor discovery supplies
-a stable descriptor-table reference; the request does not deep-copy a complete
-descriptor. The returned sample always exposes `freeSurfacePoint`,
+channel-requested. It carries context/provider/signal/schema IDs,
+`requestedPhysicsTime: PhysicsTime`, physics-frame-metre points or oriented
+footprints, channel masks, filter/frequency response, per-channel tolerances,
+maximum staleness, acceptable residency/latency, and batch extent. Descriptor
+discovery supplies a stable descriptor-table reference; the request does not
+deep-copy a complete descriptor. The returned sample always exposes `freeSurfacePoint`,
 `freeSurfaceNormal`, the gauge-invariant scalar
 `geometricNormalVelocityMps`, and the exact
 `WaterSurfaceParameterization`; only when represented it exposes
@@ -54,12 +54,20 @@ descriptor. The returned sample always exposes `freeSurfacePoint`,
 Each channel is a complete `SampledChannel` with actual time/support/filter,
 validity, error, and `stateVersion`. The result returns the complete canonical
 `PhysicsSignalDescriptor`, bundle `sampleInstant`, and each channel's
-`actualPhysicsTime` resolving to a `PhysicsInstant`; requested and actual
-instants may differ only within the
-declared latency/staleness gates. Consumers preserve that result envelope rather
-than copying a water-local subset. Packed GPU batches use stable descriptor-table
-handles plus SoA channels, not per-sample descriptor copies. Missing channels
-follow `missingChannelPolicy` and are never zero-filled. For a parameterized
+`actualPhysicsTime`. The generic request and response-envelope fields retain
+their canonical wrapper types: `PhysicsSampleRequest.requestedPhysicsTime`,
+`PhysicsSampleResponseEnvelope.requestedPhysicsTime`, and
+`PhysicsSampleResponseEnvelope.actualBundleTime` are each `PhysicsTime` with
+`kind: instant`, a present `instant: PhysicsInstant`, and an `interval` arm
+containing the complete canonical `TypedAbsence` record. Every
+`SampledChannel.actualPhysicsTime` has the same instant-arm shape. The narrower
+`WaterSurfaceSample.sampleInstant` alone remains a raw `PhysicsInstant` and is
+exactly equal to `actualBundleTime.instant`; requested and actual instant-arm
+values may differ only within the declared latency/staleness gates. Consumers
+preserve that result envelope rather than copying a water-local subset. Packed
+GPU batches use stable descriptor-table handles plus SoA channels, not
+per-sample descriptor copies. Missing channels follow `missingChannelPolicy`
+and are never zero-filled. For a parameterized
 surface `r(u,v,t)`, the exact projection identity is
 `geometricNormalVelocityMps = dot(surfacePointVelocityMps,
 freeSurfaceNormal)` whenever the optional full fixed-coordinate velocity is
@@ -222,7 +230,8 @@ linear phenomena are required over fixed bathymetry.
 
 At an offshore/nearshore handoff, choose one contract. A phase-resolved handoff
 transfers frequency, direction, complex surface-elevation amplitude, wavenumber,
-intrinsic frequency, energy, and phase-reference `PhysicsInstant`. A phase-averaged handoff transfers
+intrinsic frequency, energy, and a raw
+`phaseReferenceInstant: PhysicsInstant`. A phase-averaged handoff transfers
 action/energy quadrature and direction with no crest-phase claim; local phase is
 a separate owner. Match model validity before blending. Do not alpha-crossfade
 independently phased geometric surfaces; one owner supplies height and
@@ -239,8 +248,12 @@ uses the same canonical `WaterSurfaceProvider` ABI: mandatory
 fixed-parameterization `surfacePointVelocityMps`, material
 `materialCurrentVelocityMps`, depth, density, acceleration, pressure,
 bathymetry, and wet/dry channels. The handoff preserves the complete descriptor,
-requested/actual `PhysicsInstant`, footprint/filter, frame/origin/transform,
-state/resource version, validity, error, latency, and residency envelope. A
+the request and response-envelope `requestedPhysicsTime: PhysicsTime`, response
+`actualBundleTime: PhysicsTime`, raw bundle `sampleInstant: PhysicsInstant`,
+per-channel `actualPhysicsTime: PhysicsTime`, footprint/filter,
+frame/origin/transform, state/resource version, validity, error, latency, and
+residency envelope. Every generic time wrapper selects the `instant` arm and
+carries the complete canonical `TypedAbsence` record in its `interval` arm. A
 phase-averaged owner without a separately versioned display-phase synthesis
 cannot publish an instantaneous surface bundle and reports that provider query
 invalid instead of inventing phase.

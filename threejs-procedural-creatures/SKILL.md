@@ -26,8 +26,9 @@ the immutable `EnvironmentForcingSnapshot`,
 the immutable presentation publication chain. This skill consumes those boundaries;
 it does not fork them inside creature locomotion.
 
-Reactive locomotion consumes the complete `SupportSurfaceSample` selected for
-its requested physics instant, including stable support/feature identity,
+Reactive locomotion consumes the complete `SupportSurfaceSample` selected by
+the instant arm of its request's `requestedPhysicsTime: PhysicsTime`, including
+stable support/feature identity,
 point kinematics, sidedness, footprint, validity, and correlated channel
 error; it does not turn that kinematic query into a contact impulse. Swimming
 and buoyancy consume the complete `WaterSurfaceSample` returned under the
@@ -189,20 +190,25 @@ this order; every step ends in something renderable or assertable.
     edge, preserving channel time/support/filter/error and never owning private
     wind state;
     fixed-step verlet ropes; buoyancy response against the shared batched,
-    channel-requested `WaterSurfaceProvider`. The canonical request uses
-    physics-frame metres and carries context/provider/signal/schema IDs,
-    requested `PhysicsInstant`, channel masks, footprint/filter, tolerances,
-    staleness, acceptable residency/latency, and batch extent; descriptor
+    channel-requested `WaterSurfaceProvider`. Habitat, support, and water use
+    canonical `PhysicsSampleRequest` records in physics-frame metres with
+    context/provider/signal/schema IDs. `requestedPhysicsTime: PhysicsTime`
+    selects `kind: instant`, carries a raw `PhysicsInstant` in `instant`, and a
+    full canonical `TypedAbsence` record in `interval`; requests also carry
+    channel masks, footprint/filter, tolerances, staleness, acceptable
+    residency/latency, and batch extent. Descriptor
     discovery supplies a stable descriptor-table reference rather than a deep
     copy. Samples use
     `freeSurfacePoint`, `freeSurfaceNormal`, `geometricNormalVelocityMps`,
     `surfacePointVelocityMps`,
     `materialCurrentVelocityMps`, `waterColumnDepthMeters`, optional
-    `densityKgPerM3`, and return the complete `PhysicsSignalDescriptor`, bundle
-    `sampleInstant`, and per-channel `actualPhysicsTime` resolving to a
-    `PhysicsInstant`. Requested and actual instants may differ only within
-    declared latency/staleness gates. Each channel
-    is the complete shared `SampledChannel`.
+    `densityKgPerM3`. The response envelope retains `requestedPhysicsTime` and
+    `actualBundleTime` as `PhysicsTime` wrappers using that instant arm and
+    canonical `TypedAbsence` interval arm; every
+    `SampledChannel.actualPhysicsTime` retains the same wrapper. The domain
+    sample's `sampleInstant` remains a raw `PhysicsInstant`. Requested and
+    actual instant-arm values may differ only within declared latency/staleness
+    gates. Each channel is the complete shared `SampledChannel`.
     `geometricNormalVelocityMps` is mandatory even when the parameterization-
     dependent full `surfacePointVelocityMps` is absent. Surface-point velocity
     and material current are distinct;

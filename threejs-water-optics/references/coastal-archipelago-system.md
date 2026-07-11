@@ -150,8 +150,11 @@ all-owner rebase transaction.
 Every analytic, bounded, coastal, spectral, or external implementation adapts
 to the one batched, channel-requested provider defined by the shared contract.
 A request declares the
-physics-frame point, represented footprint, filter, frame identity, and one
-canonical `PhysicsInstant`. The response contains:
+physics-frame point, represented footprint, filter, frame identity, and
+`requestedPhysicsTime: PhysicsTime`. An instantaneous water query sets
+`kind: instant`, carries the requested `PhysicsInstant` in `instant`, and
+carries the complete canonical `TypedAbsence` record in `interval`; neither
+union arm is omitted. The response contains:
 
 ```text
 domain channel records:
@@ -167,15 +170,17 @@ domain channel records:
   bathymetryPoint?             optional physics-frame bed point
   wetDryState?                 optional classified wet/dry state
 
-sample bundle/envelope:
+WaterSurfaceSample domain bundle:
   descriptor: PhysicsSignalDescriptor
   sampleInstant: PhysicsInstant
   representedFootprint, filter, validity, error, absentChannels
 ```
 
 Every channel is the complete shared `SampledChannel`: channel ID, value, unit/
-basis, `actualPhysicsTime` resolving to a `PhysicsInstant`, support/filter,
-validity, error, and `stateVersion`.
+basis, `actualPhysicsTime: PhysicsTime`, support/filter, validity, error, and
+`stateVersion`. For an instantaneous water query, `actualPhysicsTime` has
+`kind: instant`, contains its actual `PhysicsInstant` in `instant`, and contains
+the complete canonical `TypedAbsence` record in `interval`.
 The result returns the complete shared `PhysicsSignalDescriptor` without a
 water-local subset: `signalId`, `providerId`, `schemaId`, `contextId`, `owner`,
 `consumers`, `channels`, `physicsFrameId`, `physicsOriginEpoch`,
@@ -187,12 +192,15 @@ canonical `rationalSubstep`, `clockMappingRevision`, `discontinuityEpoch`, and
 derived `timeSecondsDerived`; it has no interval arm or independently
 authoritative seconds field.
 
-The request's `PhysicsInstant` is the requested sample instant. The bundle
-`sampleInstant` and each channel's `actualPhysicsTime` are returned facts and
-may differ from it only within declared latency/staleness gates. Descriptor
-discovery supplies stable descriptor-table IDs/versions; packed hot batches use
-those references and SoA channels rather than deep-copying the complete
-descriptor into every query.
+`PhysicsSampleResponseEnvelope.requestedPhysicsTime` echoes the request's
+`PhysicsTime` wrapper, and its `actualBundleTime: PhysicsTime` uses the same
+instant-arm shape with the actual bundle instant. The narrower
+`WaterSurfaceSample.sampleInstant` remains a raw `PhysicsInstant` and is exactly
+equal to `actualBundleTime.instant`. Each channel's `actualPhysicsTime.instant`
+is a returned fact. Requested and actual instant-arm values may differ only
+within declared latency/staleness gates. Descriptor discovery supplies stable
+descriptor-table IDs/versions; packed hot batches use those references and SoA
+channels rather than deep-copying the complete descriptor into every query.
 
 For parameterized `r(u,v,t)`, the bundle carries its exact
 `WaterSurfaceParameterization`; `surfacePointVelocityMps` is `partial_t r` at
@@ -758,7 +766,8 @@ The archipelago stack normally has one offshore donor and one nearshore owner:
 far field:
   spectral FFT or a small parametric set
     -> choose one boundary contract:
-       phase-resolved mode record (H, k, sigma_i, phase-reference PhysicsInstant)
+       phase-resolved mode record (H, k, sigma_i,
+                                   phaseReferenceInstant: PhysicsInstant)
        phase-averaged action/energy quadrature (no crest phase)
 near field:
   phase-resolved mild-slope/linear transformation
@@ -775,8 +784,9 @@ Place a coupling boundary in a depth/frequency range where both donor and
 receiver meet their dispersion/error gates. A deep-water FFT mode cannot be
 injected unchanged into hydrostatic SWE at arbitrary depth. For each transferred
 phase-resolved mode, record frequency, direction, complex surface-elevation
-amplitude `H`, wavenumber, intrinsic frequency, energy, and coordinate/time
-origin. This branch can test phase parity. For a phase-averaged handoff, transfer
+amplitude `H`, wavenumber, intrinsic frequency, energy, coordinate origin, and
+raw `phaseReferenceInstant: PhysicsInstant`. This branch can test phase parity.
+For a phase-averaged handoff, transfer
 action/energy with its spectral integration measure, quadrature weight,
 direction, intrinsic frequency, and group velocity. It carries no instantaneous
 phase; a separate local phase/synthesis owner may match directional statistics
@@ -1112,7 +1122,7 @@ detail supplement.
 | Land/solid mask | Required for clipping/solver | Relationship to bathymetry, obstacle boundary type, conservative rasterization/padding rule |
 | Coast SDF plus nearest-coast ID/coordinate | Derived or authored cache | Sign, texel footprint, zero-contour error, eikonal residual, medial-axis/ambiguity mask |
 | Substrate/material IDs | Required for reference-like shallow water | Sand/rock/reef/mud classes, linear-data encoding, seam policy, mip semantics |
-| Open-boundary wave record | Required for transformed/live waves | Frequencies, directions, complex phase/amplitude, energy units, phase-reference `PhysicsInstant`, current/depth convention |
+| Open-boundary wave record | Required for transformed/live waves | Frequencies, directions, complex phase/amplitude, energy units, raw `phaseReferenceInstant: PhysicsInstant`, current/depth convention |
 | Current/tide field | Optional causal input | Metres/second or metres, coordinate/time basis, divergence/source policy, update cadence |
 | Obstacle SDF/porosity/drag | Required when obstacles affect flow | World footprint, sub-cell treatment, boundary/drag model, motion version |
 | Sand/rock/reef receiver materials | Required visual assets or procedural bundles | Albedo color space, normal/roughness data encoding, world scale, LOD/filtering |

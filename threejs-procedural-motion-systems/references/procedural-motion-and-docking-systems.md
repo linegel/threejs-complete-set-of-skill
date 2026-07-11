@@ -742,8 +742,10 @@ Water is an injected causal system, not a transform curve. Motion consumes the
 shared batched, channel-requested `WaterSurfaceProvider`; it does not define a
 local scalar query record. The request position is in physics-frame
 metres. The exact `PhysicsSampleRequest` carries context/provider/signal/schema
-IDs, requested `PhysicsInstant`, channel masks, oriented footprint/filter,
-tolerances, staleness, acceptable residency/latency, and batch extent; descriptor
+IDs, channel masks, oriented footprint/filter, tolerances, staleness,
+acceptable residency/latency, batch extent, and
+`requestedPhysicsTime: PhysicsTime` with `kind: instant`, a present
+`instant: PhysicsInstant`, and a typed-absent `interval` arm; descriptor
 discovery supplies a stable descriptor-table reference rather than a deep copy.
 These motion tiers request the following subset of the canonical
 `WaterSurfaceSample` domain payload:
@@ -772,10 +774,11 @@ coordinate-rate type and carries origin/`omega x r` transport terms. Never add
 those terms to an already physical velocity vector.
 
 Every named channel is the complete shared `SampledChannel`. The
-result returns the complete `PhysicsSignalDescriptor`, bundle `sampleInstant`,
-and per-channel `actualPhysicsTime` resolving to a `PhysicsInstant`; requested
-and actual instants may differ only
-within declared latency/staleness gates. Motion cannot rename, subset, or
+result returns the complete `PhysicsSignalDescriptor`, raw bundle
+`sampleInstant: PhysicsInstant`, and per-channel
+`actualPhysicsTime: PhysicsTime` with the same instant-arm shape. The requested
+and actual instant-arm values may differ only within declared latency/staleness
+gates. Motion cannot rename, subset, or
 re-clock that result. In particular the shared descriptor
 owns represented footprint/filter, validity/per-channel error, frame/transform/
 source epochs, state/resource generation, cadence/latency/residency, and
