@@ -1,14 +1,18 @@
 import {
 	REVISION,
+	NoColorSpace,
 	RenderTarget,
-	SRGBColorSpace,
 	UnsignedByteType,
 	Vector3
 } from 'three/webgpu';
 
 import { createWebGpuImagePipeline } from './main.js';
 import {
+	ARTIFACT_CONTRACT_VERSION,
+	ARTIFACT_NUMERIC_PROVENANCE,
 	ARTIFACT_RELATIVE_DIR,
+	CAPTURE_PROFILE,
+	DIAGNOSTIC_IMAGES,
 	FIXED_SEED,
 	QUALITY_TIER,
 	REQUIRED_IMAGES,
@@ -19,19 +23,36 @@ import {
 const canvas = document.getElementById( 'view' );
 const status = document.getElementById( 'status' );
 
-const cameraBookmarks = {
+const CAMERA_BOOKMARKS = Object.freeze( {
 	near: { position: [ 0, 1.1, 3.5 ], target: [ 0, 0, 0 ], fov: 44 },
 	design: { position: [ 0, 1.3, 5.5 ], target: [ 0, 0, 0 ], fov: 50 },
 	far: { position: [ 0, 1.7, 8.2 ], target: [ 0, 0, 0 ], fov: 54 }
-};
+} );
+
+const ARTIFACT_GATES = Object.freeze( {
+	frameBudgetMs: {
+		desktopDiscrete: 50,
+		desktopIntegrated: 75,
+		mobile: 100
+	},
+	memoryBudgetMiB: 512,
+	textureCacheAllowance: 2,
+	nonblankRange: 8,
+	repeatViewMaxPixelRatio: 0.02,
+	diagnosticFinalMeanDifference: 6,
+	postFinalMeanDifference: 0.25,
+	minimumDiagnosticRange: 2,
+	minimumNormalUniqueColors: 4,
+	minimumDepthUniqueValues: 4,
+	minimumCrossSignalDifference: 0.05
+} );
 
 const captureState = {
 	camera: 'design',
 	mode: 'final',
-	seed: FIXED_SEED,
 	timeSeconds: 0,
 	frame: 0,
-	staticControl: false
+	variantLabel: 'design'
 };
 
 function setStatus( message ) {
@@ -46,14 +67,13 @@ function modeToDebugMode( mode ) {
 	if ( mode === 'diagnostics' ) return 'normal';
 	if ( [
 		'normal',
-		'velocity',
-		'linear depth',
-		'albedo',
-		'AO.r',
 		'emissive',
+		'linear depth',
+		'AO.r',
 		'bloom contribution',
 		'pre-tone-map HDR',
 		'post-tone-map output',
+		'authored AO split scaffold',
 		'debug baseline AO final-color multiply'
 	].includes( mode ) ) return mode;
 	return 'final';
@@ -62,7 +82,7 @@ function modeToDebugMode( mode ) {
 
 function setCameraBookmark( app, name ) {
 
-	const bookmark = cameraBookmarks[ name ] ?? cameraBookmarks.design;
+	const bookmark = CAMERA_BOOKMARKS[ name ] ?? CAMERA_BOOKMARKS.design;
 	const camera = app.camera;
 
 	camera.fov = bookmark.fov;
@@ -79,6 +99,8 @@ function applyCameraMotion( app, bookmark, seconds ) {
 	const camera = app.camera;
 	const target = new Vector3().fromArray( bookmark.target );
 
+	// [Authored] Small deterministic motion makes the two legacy seed-named
+	// time variants visibly distinct. It is not temporal-reconstruction proof.
 	camera.position.x += Math.sin( seconds * 0.45 ) * 0.18;
 	camera.position.y += Math.cos( seconds * 0.55 ) * 0.06;
 	target.x += Math.sin( seconds * 0.7 ) * 0.08;
@@ -87,23 +109,19 @@ function applyCameraMotion( app, bookmark, seconds ) {
 
 }
 
-function setTime( app, seconds, staticControl ) {
+function applyCaptureState( app, nextState = {} ) {
 
-	app.setTime?.( seconds );
-
-	if ( staticControl !== true ) {
-
-		const bookmark = cameraBookmarks[ captureState.camera ] ?? cameraBookmarks.design;
-		applyCameraMotion( app, bookmark, seconds );
-
-	}
+	Object.assign( captureState, nextState );
+	const bookmark = setCameraBookmark( app, captureState.camera );
+	app.setTime( captureState.timeSeconds );
+	applyCameraMotion( app, bookmark, captureState.timeSeconds );
+	app.setDebugMode( modeToDebugMode( captureState.mode ) );
 
 }
 
 function makeCameraRecord( app, bookmarkName = captureState.camera ) {
 
 	setCameraBookmark( app, bookmarkName );
-
 	return {
 		bookmark: bookmarkName,
 		matrixWorld: Array.from( app.camera.matrixWorld.elements ),
@@ -137,20 +155,34 @@ function rendererInfoRecord( app ) {
 
 }
 
-function applyCaptureState( app, nextState = {} ) {
+function backendFailures() {
 
-	Object.assign( captureState, nextState );
-	captureState.staticControl = nextState.staticControl === true;
-	setCameraBookmark( app, captureState.camera );
-	setTime( app, captureState.timeSeconds, captureState.staticControl );
-	app.setDebugMode( modeToDebugMode( captureState.mode ) );
+	const gpu = window.__imagePipelineGpuEvents ?? { uncapturedErrors: [], deviceLoss: null };
+	return [
+		...( window.__imagePipelineErrors ?? [] ),
+		...gpu.uncapturedErrors,
+		...( gpu.deviceLoss ? [ `device-lost: ${ gpu.deviceLoss.reason ?? 'unknown' }: ${ gpu.deviceLoss.message }` ] : [] )
+	];
 
 }
 
-async function renderOnce( app ) {
+async function renderOnce( app, waitForPresentation = true ) {
 
-	await app.render();
-	await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+	app.render();
+	if ( waitForPresentation ) await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+
+}
+
+async function drainTimestampQueries( app ) {
+
+	if (
+		app.renderer.backend.trackTimestamp === true
+		&& app.renderer.hasFeature( 'timestamp-query' ) === true
+	) {
+
+		await app.renderer.resolveTimestampsAsync( 'render' );
+
+	}
 
 }
 
@@ -175,7 +207,7 @@ function leakSnapshot( app ) {
 
 	return {
 		rendererInfoMemory: rendererMemorySnapshot( app ),
-		targetBytes: app.estimateTargetBytes?.() ?? 0,
+		targetBytes: app.estimateTargetBytes(),
 		storageBytes: 0
 	};
 
@@ -183,18 +215,23 @@ function leakSnapshot( app ) {
 
 function leakDeltas( before, after ) {
 
+	const rendererInfoMemory = {};
+	for ( const key of new Set( [
+		...Object.keys( before.rendererInfoMemory ),
+		...Object.keys( after.rendererInfoMemory )
+	] ) ) {
+
+		rendererInfoMemory[ key ] = ( after.rendererInfoMemory[ key ] ?? 0 ) - ( before.rendererInfoMemory[ key ] ?? 0 );
+
+	}
+
 	return {
 		geometries: after.rendererInfoMemory.geometries - before.rendererInfoMemory.geometries,
 		textures: after.rendererInfoMemory.textures - before.rendererInfoMemory.textures,
 		targetBytes: after.targetBytes - before.targetBytes,
-		storageBytes: after.storageBytes - before.storageBytes
+		storageBytes: after.storageBytes - before.storageBytes,
+		rendererInfoMemory
 	};
-
-}
-
-function leakPass( deltas, thresholds ) {
-
-	return [ 'geometries', 'textures', 'targetBytes', 'storageBytes' ].every( ( key ) => deltas[ key ] <= thresholds[ key ] );
 
 }
 
@@ -204,144 +241,126 @@ function thresholdRecord( textures = 0 ) {
 
 }
 
-async function runLifecycleLoop( app, name, operation, thresholds, iterations = 3 ) {
+function leakPass( deltas, thresholds ) {
 
+	return [ 'geometries', 'textures', 'targetBytes', 'storageBytes' ]
+		.every( ( key ) => deltas[ key ] <= thresholds[ key ] );
+
+}
+
+async function runLifecycleLoop( app, name, operation, thresholds ) {
+
+	await app.renderer.backend.device.queue.onSubmittedWorkDone();
 	const before = leakSnapshot( app );
 	const operations = [];
 	let operationPass = true;
 
-	for ( let i = 0; i < iterations; i ++ ) {
+	for ( let i = 0; i < CAPTURE_PROFILE.lifecycleIterations; i ++ ) {
 
 		const operationRecord = await operation( i );
 		await renderOnce( app );
-		const restoredSnapshot = leakSnapshot( app );
-
+		await app.renderer.backend.device.queue.onSubmittedWorkDone();
 		operations.push( {
 			iteration: i + 1,
 			...operationRecord,
-			restoredSnapshot
+			restoredSnapshot: leakSnapshot( app )
 		} );
-
 		if ( operationRecord?.pass === false ) operationPass = false;
 
 	}
 
+	await app.renderer.backend.device.queue.onSubmittedWorkDone();
 	const after = leakSnapshot( app );
 	const deltas = leakDeltas( before, after );
-
+	// [Gated: timestamp-query] Prevent the fixed-size r185 query pool from
+	// overflowing during long artifact lifecycle sequences. These drains are not
+	// added to the recorded performance sample.
+	await drainTimestampQueries( app );
 	return {
 		name,
-		iterations,
+		iterations: CAPTURE_PROFILE.lifecycleIterations,
 		before,
 		after,
 		deltas,
 		thresholds,
 		pass: operationPass && leakPass( deltas, thresholds ),
-		operations
+		operations,
+		counterClassification: 'All r185 renderer.info.memory counters are recorded in deltas.rendererInfoMemory; shared-schema pass/fail still gates only its four legacy counters.'
 	};
 
 }
 
 async function buildLeakLoopEvidence( app ) {
 
-	const viewport = app.getViewport?.() ?? { width: window.innerWidth, height: window.innerHeight, dpr: window.devicePixelRatio || 1 };
-	const baseWidth = viewport.width;
-	const baseHeight = viewport.height;
-	const baseDpr = viewport.dpr;
-	const baseSceneScale = app.scenePass.getResolutionScale?.() ?? 1;
-	const resizeThresholds = thresholdRecord( 2 );
-	const dprThresholds = thresholdRecord( 2 );
-	const qualityThresholds = thresholdRecord( 2 );
-	const debugThresholds = thresholdRecord( 2 );
-	const historyThresholds = thresholdRecord( 2 );
-	const assetThresholds = thresholdRecord( 2 );
-	const sceneThresholds = thresholdRecord( 0 );
-	const disposeThresholds = thresholdRecord( 0 );
-	const knownInternalCacheDeltas = [
-		{ loop: 'resize', key: 'textures', allowance: resizeThresholds.textures, reason: 'Renderer/pass resize can keep a bounded replacement attachment cache until renderer disposal.' },
-		{ loop: 'dpr-change', key: 'textures', allowance: dprThresholds.textures, reason: 'Drawing-buffer DPR changes can keep a bounded replacement attachment cache until renderer disposal.' },
-		{ loop: 'quality-tier-switch', key: 'textures', allowance: qualityThresholds.textures, reason: 'Resolution-scale changes can keep a bounded replacement attachment cache until renderer disposal.' },
-		{ loop: 'debug-mode-switch', key: 'textures', allowance: debugThresholds.textures, reason: 'First diagnostic graph activation may retain a bounded material/pass texture binding cache.' },
-		{ loop: 'history-reset', key: 'textures', allowance: historyThresholds.textures, reason: 'The documented resize reset path can keep a bounded replacement attachment cache until renderer disposal.' },
-		{ loop: 'asset-reload', key: 'textures', allowance: assetThresholds.textures, reason: 'Checker DataTexture replacement may retain one old/new texture pair until renderer disposal.' }
-	];
-
+	const viewport = app.getViewport();
+	const baseSceneScale = app.scenePass.getResolutionScale();
+	const boundedCache = thresholdRecord( ARTIFACT_GATES.textureCacheAllowance );
+	const strict = thresholdRecord();
 	const loops = [];
 
 	loops.push( await runLifecycleLoop( app, 'resize', async ( iteration ) => {
 
-		const changedWidth = Math.max( 320, baseWidth + ( iteration % 2 === 0 ? 96 : - 72 ) );
-		const changedHeight = Math.max( 240, baseHeight + ( iteration % 2 === 0 ? 48 : - 54 ) );
-
-		app.resize( changedWidth, changedHeight, baseDpr );
-		await renderOnce( app );
-		const changedSnapshot = leakSnapshot( app );
-		app.resize( baseWidth, baseHeight, baseDpr );
-
-		return {
-			operation: 'renderer/canvas size changed and restored',
-			changed: { width: changedWidth, height: changedHeight, dpr: baseDpr },
-			changedSnapshot,
-			pass: true
+		const widthDelta = iteration % 2 === 0 ? 96 : - 72;
+		const heightDelta = iteration % 2 === 0 ? 48 : - 54;
+		const changed = {
+			width: Math.max( 320, viewport.width + widthDelta ),
+			height: Math.max( 240, viewport.height + heightDelta ),
+			dpr: viewport.dpr
 		};
 
-	}, resizeThresholds ) );
+		app.resize( changed.width, changed.height, changed.dpr );
+		await renderOnce( app );
+		const changedSnapshot = leakSnapshot( app );
+		app.resize( viewport.width, viewport.height, viewport.dpr );
+		return { operation: 'renderer/canvas extent changed and restored', changed, changedSnapshot, pass: true };
+
+	}, boundedCache ) );
 
 	loops.push( await runLifecycleLoop( app, 'dpr-change', async ( iteration ) => {
 
-		const changedDpr = Math.max( 0.5, baseDpr * ( iteration % 2 === 0 ? 1.25 : 0.75 ) );
-
-		app.resize( baseWidth, baseHeight, changedDpr );
+		const changedDpr = Math.max( 0.5, viewport.dpr * ( iteration % 2 === 0 ? 1.25 : 0.75 ) );
+		app.resize( viewport.width, viewport.height, changedDpr );
 		await renderOnce( app );
 		const changedSnapshot = leakSnapshot( app );
-		app.resize( baseWidth, baseHeight, baseDpr );
-
+		app.resize( viewport.width, viewport.height, viewport.dpr );
 		return {
-			operation: 'renderer pixel ratio changed with app.resize() and restored',
-			changed: { width: baseWidth, height: baseHeight, dpr: changedDpr },
+			operation: 'renderer DPR changed and restored',
+			changed: { ...viewport, dpr: changedDpr },
 			changedSnapshot,
 			pass: true
 		};
 
-	}, dprThresholds ) );
+	}, boundedCache ) );
 
 	loops.push( await runLifecycleLoop( app, 'quality-tier-switch', async ( iteration ) => {
 
 		const changedScale = iteration % 2 === 0 ? 0.75 : 0.5;
-
 		app.setSceneResolutionScale( changedScale );
 		await renderOnce( app );
 		const changedSnapshot = leakSnapshot( app );
 		app.setSceneResolutionScale( baseSceneScale );
-
 		return {
-			operation: 'scenePass.setResolutionScale() changed and restored',
+			operation: 'authored scene resolution scale changed and restored; no adaptive controller is claimed',
 			changed: { sceneResolutionScale: changedScale },
 			changedSnapshot,
 			pass: true
 		};
 
-	}, qualityThresholds ) );
+	}, boundedCache ) );
 
-	// Warm every diagnostic graph once BEFORE the baseline snapshot: first
-	// activation lazily allocates that mode's pass targets, which is
-	// initialization, not leakage. A leak is growth AFTER warm-up.
-	const debugModes = [ 'normal', 'velocity', 'linear depth', 'AO.r', 'bloom contribution' ];
-
+	const debugModes = [ 'normal', 'emissive', 'linear depth', 'AO.r', 'bloom contribution', 'pre-tone-map HDR' ];
 	for ( const mode of debugModes ) {
 
 		app.setDebugMode( mode );
 		await renderOnce( app );
 
 	}
-
 	app.setDebugMode( 'final' );
 	await renderOnce( app );
 
 	loops.push( await runLifecycleLoop( app, 'debug-mode-switch', async () => {
 
 		let changedSnapshot = null;
-
 		for ( const mode of debugModes ) {
 
 			app.setDebugMode( mode );
@@ -349,112 +368,152 @@ async function buildLeakLoopEvidence( app ) {
 			changedSnapshot = leakSnapshot( app );
 
 		}
-
 		app.setDebugMode( 'final' );
-
 		return {
-			operation: 'RenderPipeline outputNode debug modes fully cycled after warm-up and restored',
+			operation: 'actual RenderPipeline diagnostic outputs cycled after warm-up and restored',
 			changed: { debugModes: [ ...debugModes ] },
 			changedSnapshot,
 			pass: true
 		};
 
-	}, debugThresholds ) );
+	}, boundedCache ) );
 
-	loops.push( await runLifecycleLoop( app, 'history-reset', async ( iteration ) => {
+	// The shared artifact schema requires these stable loop names. The graph has
+	// no temporal history and no external assets, so these are explicit N/A
+	// steady-render sentinels and are never cited as feature proof.
+	loops.push( await runLifecycleLoop( app, 'history-reset', async () => ( {
+		operation: 'not applicable: temporal history is disabled; steady-render leak sentinel only',
+		claimStatus: 'N/A; does not prove a reset path',
+		pass: app.diagnostics.claimBoundary.temporal.includes( 'not-implemented' )
+	} ), strict ) );
 
-		const resetWidth = Math.max( 320, baseWidth + 1 + iteration );
-
-		app.resize( resetWidth, baseHeight, baseDpr );
-		await renderOnce( app );
-		const changedSnapshot = leakSnapshot( app );
-		app.resize( baseWidth, baseHeight, baseDpr );
-
-		return {
-			operation: 'temporal path is disabled; documented resize reset event is retriggered',
-			resetEvents: [ 'resize' ],
-			changed: { width: resetWidth, height: baseHeight, dpr: baseDpr },
-			changedSnapshot,
-			pass: true
-		};
-
-	}, historyThresholds ) );
-
-	loops.push( await runLifecycleLoop( app, 'asset-reload', async () => {
-
-		const texture = app.reloadCheckerTexture();
-		await renderOnce( app );
-		const changedSnapshot = leakSnapshot( app );
-
-		return {
-			operation: 'checker DataTexture disposed, recreated, reassigned, and rendered',
-			changed: { checkerTexture: texture },
-			changedSnapshot,
-			pass: true
-		};
-
-	}, assetThresholds ) );
+	loops.push( await runLifecycleLoop( app, 'asset-reload', async () => ( {
+		operation: 'not applicable: fixture has no external/reloadable assets; steady-render leak sentinel only',
+		claimStatus: 'N/A; does not prove asset reload lifecycle',
+		pass: true
+	} ), strict ) );
 
 	loops.push( await runLifecycleLoop( app, 'scene-teardown', async () => {
 
-		const hiddenCount = app.setMotionSubjectsVisible( false );
+		const fixtures = [ ...app.fixtureMeshes ];
+		for ( const fixture of fixtures ) app.scene.remove( fixture );
 		await renderOnce( app );
 		const changedSnapshot = leakSnapshot( app );
-		const restoredCount = app.setMotionSubjectsVisible( true );
-
+		for ( const fixture of fixtures ) app.scene.add( fixture );
+		const restoredCount = fixtures.filter( ( fixture ) => fixture.parent === app.scene ).length;
 		return {
-			operation: 'motion-subject meshes removed from scene and re-added',
-			changed: { visibleMotionSubjects: hiddenCount },
-			restored: { visibleMotionSubjects: restoredCount },
+			operation: 'all fixture meshes removed from the scene and reattached without disposal',
+			changed: { attachedFixtureMeshes: 0 },
+			restored: { attachedFixtureMeshes: restoredCount },
 			changedSnapshot,
-			pass: hiddenCount === 0 && restoredCount === 3
+			pass: restoredCount === fixtures.length
 		};
 
-	}, sceneThresholds ) );
+	}, strict ) );
 
 	loops.push( await runLifecycleLoop( app, 'dispose-recreate', async () => {
 
 		const secondaryCanvas = document.createElement( 'canvas' );
-		const secondary = await createWebGpuImagePipeline( secondaryCanvas );
-
+		const secondary = await createWebGpuImagePipeline( secondaryCanvas, { preset: 'feature-demo' } );
 		secondary.resize( 320, 180, 1 );
-		const createdSnapshot = leakSnapshot( secondary );
-		await renderOnce( secondary );
+		await renderOnce( secondary, false );
+		await secondary.renderer.backend.device.queue.onSubmittedWorkDone();
 		const renderedSnapshot = leakSnapshot( secondary );
-		secondary.dispose();
+		const firstDispose = secondary.dispose();
+		const secondDispose = secondary.dispose();
 		const disposedSnapshot = leakSnapshot( secondary );
-		const secondaryDeltas = leakDeltas( createdSnapshot, disposedSnapshot );
-		const secondaryPass = secondaryDeltas.geometries <= 0 && secondaryDeltas.textures <= 0;
-
+		const deltas = leakDeltas( renderedSnapshot, disposedSnapshot );
 		return {
-			operation: 'secondary offscreen pipeline created, rendered once, disposed fully',
-			secondary: {
-				createdSnapshot,
-				renderedSnapshot,
-				disposedSnapshot,
-				deltas: secondaryDeltas,
-				pass: secondaryPass
-			},
-			pass: secondaryPass
+			operation: 'secondary offscreen pipeline created, rendered, and disposed',
+			secondary: { renderedSnapshot, disposedSnapshot, deltas, firstDispose, secondDispose },
+			pass: firstDispose === true && secondDispose === false && deltas.geometries <= 0 && deltas.textures <= 0
 		};
 
-	}, disposeThresholds ) );
+	}, strict ) );
 
-	app.resize( baseWidth, baseHeight, baseDpr );
+	app.resize( viewport.width, viewport.height, viewport.dpr );
 	app.setSceneResolutionScale( baseSceneScale );
-	app.setDebugMode( 'final' );
 	applyCaptureState( app, { camera: 'design', mode: 'final', timeSeconds: 0, frame: 0 } );
 	await renderOnce( app );
+
+	const knownInternalCacheDeltas = [
+		'resize.textures: authored allowance for bounded replacement attachments after warm-up',
+		'dpr-change.textures: authored allowance for bounded replacement attachments after warm-up',
+		'quality-tier-switch.textures: authored allowance for bounded replacement attachments after warm-up',
+		'debug-mode-switch.textures: authored allowance for bounded first-use diagnostic bindings after warm-up'
+	];
 
 	return {
 		required: true,
 		loops,
 		summary: {
-			pass: loops.every( ( loop ) => loop.pass === true ) && ( window.__imagePipelineErrors ?? [] ).length === 0,
-			uncapturedBackendErrors: window.__imagePipelineErrors ?? [],
-			knownInternalCacheDeltas
+			pass: loops.every( ( loop ) => loop.pass === true ) && backendFailures().length === 0,
+			uncapturedBackendErrors: backendFailures(),
+			claimBoundary: 'Only actual resize/DPR/scale/debug/scene/dispose operations are evidence; history and asset loops are explicit N/A schema sentinels.'
 		},
-		allowedCacheNotes: knownInternalCacheDeltas.map( ( entry ) => `${ entry.loop }.${ entry.key }: ${ entry.reason }` )
+		allowedCacheNotes: knownInternalCacheDeltas
+	};
+
+}
+
+function metricFromSamples( samples ) {
+
+	const sorted = [ ...samples ].sort( ( a, b ) => a - b );
+	const nearestRank = ( probability ) => sorted[ Math.max( 0, Math.ceil( probability * sorted.length ) - 1 ) ];
+	return {
+		median: Number( nearestRank( 0.5 ).toFixed( 3 ) ),
+		p95: Number( nearestRank( 0.95 ).toFixed( 3 ) ),
+		unit: 'ms'
+	};
+
+}
+
+async function measureFrames( app ) {
+
+	for ( let i = 0; i < CAPTURE_PROFILE.warmupFrames; i ++ ) {
+
+		applyCaptureState( app, { camera: 'design', mode: 'final', timeSeconds: 0, frame: i } );
+		await renderOnce( app, false );
+
+	}
+
+	const cpuSamples = [];
+	const gpuSamples = [];
+	const timestampSupported = app.renderer.hasFeature( 'timestamp-query' ) === true && app.renderer.backend.trackTimestamp === true;
+
+	for ( let i = 0; i < CAPTURE_PROFILE.sampleFrames; i ++ ) {
+
+		applyCaptureState( app, { timeSeconds: i / 30, frame: i } );
+		const start = performance.now();
+		await renderOnce( app, false );
+		cpuSamples.push( performance.now() - start );
+
+		if ( timestampSupported ) {
+
+			const duration = await app.renderer.resolveTimestampsAsync( 'render' );
+			if ( Number.isFinite( duration ) && duration > 0 ) gpuSamples.push( duration );
+
+		}
+
+	}
+
+	const gpuMetric = gpuSamples.length === CAPTURE_PROFILE.sampleFrames ? metricFromSamples( gpuSamples ) : null;
+	return {
+		cpuFrameMs: metricFromSamples( cpuSamples ),
+		gpuFrameMs: gpuMetric,
+		gpuTimingUnavailable: gpuMetric === null,
+		gpuTimingUnavailableReason: gpuMetric === null
+			? 'timestamp-query unsupported or did not yield one finite positive sample per measured frame'
+			: null,
+		readbackCaptureMs: null,
+		measurementContract: {
+			cpu: 'Measured JS graph submission only; excludes presentation and timestamp-readback stalls.',
+			gpu: gpuMetric === null
+				? 'Optional timestamp diagnostic unavailable; no GPU claim.'
+				: 'Raw serialized r185 timestamp diagnostic only; named-adapter and complete-residency evidence are absent.',
+			promotion: 'INSUFFICIENT_EVIDENCE',
+			quantile: 'nearest-rank over the recorded sample array'
+		}
 	};
 
 }
@@ -463,78 +522,88 @@ function buildEvidence( app, timing, leakLoop ) {
 
 	const rendererInfo = rendererInfoRecord( app );
 	const graph = app.diagnostics.configValidation;
-	const viewport = {
-		width: window.innerWidth,
-		height: window.innerHeight,
-		dpr: window.devicePixelRatio || 1
-	};
-	const captureTargetBytes = viewport.width * viewport.height * 4;
-	const renderTargetBytes = graph.estimatedBytes + captureTargetBytes;
+	const viewport = app.getViewport();
+	const sceneScale = app.scenePass.getResolutionScale();
+	const physicalSceneWidth = Math.floor( viewport.width * viewport.dpr * sceneScale );
+	const physicalSceneHeight = Math.floor( viewport.height * viewport.dpr * sceneScale );
+	const captureTargetBytes = viewport.width * viewport.height * CAPTURE_PROFILE.readbackBytesPerTexel;
+	const selectedMrtLogicalBytes = app.estimateTargetBytes();
+	const accountedRenderTargetBytes = selectedMrtLogicalBytes + captureTargetBytes;
+	const diagnosticImages = [ ...DIAGNOSTIC_IMAGES ];
+	const requiredImages = [ ...REQUIRED_IMAGES, ...diagnosticImages ];
+	const gpuEvents = window.__imagePipelineGpuEvents ?? { uncapturedErrors: [], deviceLoss: null };
+	const cameraEnvelope = Object.fromEntries(
+		Object.entries( CAMERA_BOOKMARKS ).map( ( [ name, value ] ) => [ name, value.position[ 2 ] ] )
+	);
 
 	return {
 		visualContract: {
 			subject: SCENE_ID,
+			contractVersion: ARTIFACT_CONTRACT_VERSION,
+			claimBoundary: app.diagnostics.claimBoundary,
+			numericProvenance: {
+				...ARTIFACT_NUMERIC_PROVENANCE,
+				ARTIFACT_GATES: 'Authored fixed-fixture falsifiability/liveness gates; never product performance recommendations.'
+			},
 			identity: [
-				'one WebGPU RenderPipeline owns final image output',
-				'one scene pass owns shared MRT output/normal/emissive/velocity signals',
-				'diagnostic modes expose no-post, depth, normal, debug-only albedo, velocity, AO, bloom, and output ownership'
+				'one native-WebGPU RenderPipeline owns final image presentation',
+				'one primary scene pass exposes output plus the authored normal/emissive demonstration attachments; depth remains separate',
+				'actual diagnostics expose normal, emissive, linear depth, GTAO visibility, bloom contribution, and pre-tone-map HDR'
 			],
-			silhouette: [ 'grounded objects, a corner occluder, and contact surfaces remain visible in final, no-post, near, design, and far captures' ],
-			materialSeparation: [ 'textured non-emissive albedo remains separate from emissive and bloom diagnostics' ],
-			motion: [ 'temporal captures use deterministic object and camera motion; static velocity control renders the same state twice' ],
-			cameraEnvelope: { near: 3.5, design: 5.5, far: 8.2 },
-			lightingEnvelope: [ 'scene HDR is visible without bloom, AO, or final presentation treatment' ],
+			silhouette: [ 'ground, shaded box, and emissive sphere remain visible across fixed camera captures' ],
+			materialSeparation: [ 'non-emissive shaded surfaces remain distinguishable from the selective emissive/bloom fixture' ],
+			motion: [ 'legacy seed-named captures are deterministic authored-time variants; no temporal reconstruction or stochastic-seed claim is made' ],
+			cameraEnvelope,
+			lightingEnvelope: [ 'scene HDR and no-post output remain nonblank under authored key plus ambient lighting' ],
 			invariants: [
-				'shared MRT graph remains one scene render',
-				'no-post evidence remains nonblank',
-				'diagnostics expose albedo, velocity, AO contact, bloom selectivity, and linear-depth contracts'
+				'primary graph records one scene render and keeps depth outside MRT color outputs',
+				'no-post output remains independently inspectable',
+				'only implemented diagnostic signals are required'
 			],
 			invariantArtifacts: {
-				'shared MRT graph remains one scene render': {
+				'primary graph records one scene render and keeps depth outside MRT color outputs': {
 					requiredImages: [ 'images/final.design.png', 'images/diagnostics.mosaic.png' ],
 					requiredDiagnostics: [ 'pipelineConfig.js', 'validateImagePipelineConfig.js' ],
-					requiredMetrics: [ 'evidence-manifest.json.postStack', 'render-targets.json.totalBytes' ],
-					blockingFailures: [ 'duplicate scene render', 'missing MRT producer', 'missing diagnostic mode' ]
+					requiredMetrics: [ 'evidence-manifest.json.postStack', 'render-targets.json.accountingStatus' ],
+					blockingFailures: [ 'duplicate scene render', 'depth in MRT color outputs', 'undeclared attachment consumer' ]
 				},
-				'no-post evidence remains nonblank': {
+				'no-post output remains independently inspectable': {
 					requiredImages: [ 'images/no-post.design.png' ],
 					requiredDiagnostics: [ 'no-post baseline' ],
-					requiredMetrics: [ 'timings.json.cpuFrameMs' ],
+					requiredMetrics: [ 'timings.json.measurementContract' ],
 					blockingFailures: [ 'blank no-post capture', 'final-only evidence' ]
 				},
-				'diagnostics expose albedo, velocity, AO contact, bloom selectivity, and linear-depth contracts': {
-					requiredImages: [ 'images/diagnostics.mosaic.png', 'images/temporal.t001.png', 'images/velocity.static.png', 'images/velocity.motion.png', 'images/AO.static.png', 'images/bloom.static.png', 'images/normal.static.png', 'images/albedo.static.png' ],
-					requiredDiagnostics: [ 'velocity', 'linear depth', 'normal', 'debug-only albedo', 'AO.r', 'bloom contribution' ],
-					requiredMetrics: [ 'renderer-info.json.info', 'evidence-manifest.json.postStack.mrtOutputs' ],
-					blockingFailures: [ 'missing velocity MRT', 'raw depth used as linear depth', 'missing albedo diagnostic', 'missing diagnostic mosaic' ]
+				'only implemented diagnostic signals are required': {
+					requiredImages: [ 'images/diagnostics.mosaic.png', ...diagnosticImages ],
+					requiredDiagnostics: [ 'normal', 'emissive', 'linear depth', 'AO.r', 'bloom contribution', 'pre-tone-map HDR' ],
+					requiredMetrics: [ 'evidence-manifest.json.postStack.mrtOutputs', 'evidence-manifest.json.claimBoundary' ],
+					blockingFailures: [ 'missing selected MRT producer', 'raw depth relabelled as linear', 'unimplemented signal cited as evidence' ]
 				}
 			},
-			requiredImages: [
-				...REQUIRED_IMAGES,
-				'images/velocity.static.png',
-				'images/velocity.motion.png',
-				'images/AO.static.png',
-				'images/bloom.static.png',
-				'images/normal.static.png',
-				'images/albedo.static.png'
-			],
-			// The static-velocity control proves its claim BY being flat; it is
-			// exempt from the blanket nonblank gate and asserted near-zero by
-			// validate-image-pipeline-artifacts.mjs instead.
-			flatControlImages: [ 'images/velocity.static.png' ],
-			requiredDiagnostics: [ 'no-post baseline', 'normal diagnostic', 'debug-only albedo diagnostic', 'velocity MRT', 'linear depth', 'AO.r', 'bloom contribution' ],
+			requiredImages,
+			requiredDiagnostics: [ 'no-post baseline', 'normal', 'emissive', 'linear depth', 'AO.r', 'bloom contribution', 'pre-tone-map HDR' ],
 			requiredMetrics: [ 'renderer-info.json', 'render-targets.json', 'storage-resources.json', 'timings.json', 'leak-loop.json' ],
-			blockingFailures: [ 'non-primary WebGPU backend', 'blank PNG', 'final-only evidence', 'duplicate tone/output owner' ],
+			blockingFailures: [ 'non-primary WebGPU backend', 'blank PNG', 'final-only evidence', 'duplicate output owner', 'stale artifact contract version' ],
 			allowedDivergences: [
-				'This example validates the shared image-pipeline graph; domain-specific AO/bloom/exposure quality remains in atomic skills.',
-				'GPU timestamp timing may be unavailable and is labelled as CPU-only proxy.'
+				'The selected MRT is an authored feature-demo choice, not a target-performance conclusion.',
+				'Physical target residency excludes private GTAO/Bloom allocations and is therefore not proven.',
+				'Raw timestamp diagnostics do not promote performance without a named adapter and complete residency evidence.'
 			],
-			frameBudgetMs: { desktopDiscrete: 12, desktopIntegrated: 24, mobile: 33 },
-			memoryBudgetMB: 256
+			performancePromotion: {
+				state: 'INSUFFICIENT_EVIDENCE',
+				reason: 'GPU adapter identity and complete physical residency are unavailable; this feature fixture cannot be promoted as a performance tier.'
+			},
+			frameBudgetMs: ARTIFACT_GATES.frameBudgetMs,
+			frameBudgetClassification: 'Authored capture-liveness ceilings required by the shared schema; not product frame budgets.',
+			memoryBudgetMB: ARTIFACT_GATES.memoryBudgetMiB,
+			memoryBudgetClassification: 'Authored lower-bound-accounting gate required by the shared schema; not physical residency proof.'
 		},
 		evidenceManifest: {
 			skill: 'threejs-visual-validation',
 			sceneId: SCENE_ID,
+			contractVersion: ARTIFACT_CONTRACT_VERSION,
+			claimBoundary: app.diagnostics.claimBoundary,
+			numericProvenance: ARTIFACT_NUMERIC_PROVENANCE,
 			threeRevision: THREE_REVISION_LABEL.replace( 'r', '' ),
 			browser: navigator.userAgent,
 			os: navigator.platform,
@@ -544,102 +613,125 @@ function buildEvidence( app, timing, leakLoop ) {
 				isPrimaryBackend: rendererInfo.isPrimaryBackend,
 				coordinateSystem: rendererInfo.coordinateSystem,
 				initialized: rendererInfo.initialized,
-				deviceLostObserved: false,
-				uncapturedErrors: window.__imagePipelineErrors ?? [],
+				deviceLostObserved: gpuEvents.deviceLoss !== null,
+				deviceLoss: gpuEvents.deviceLoss,
+				uncapturedErrors: [ ...gpuEvents.uncapturedErrors ],
 				features: rendererInfo.features,
 				limits: rendererInfo.limits,
 				unavailableReason: rendererInfo.unavailableReason
 			},
 			qualityTier: QUALITY_TIER,
+			qualityTierClassification: 'Shared-schema label only; bundle is an explicit unmeasured feature fixture.',
 			viewport,
 			camera: makeCameraRecord( app, 'design' ),
 			seed: FIXED_SEED,
+			seedClassification: 'Stable artifact identity only; this deterministic fixture has no stochastic seed input.',
 			time: { fixed: true, seconds: captureState.timeSeconds, frame: captureState.frame },
 			assets: [],
 			colorPipeline: {
-				toneMapOwner: 'renderOutput',
+				toneMapOwner: 'renderOutput using renderer NeutralToneMapping context',
 				outputTransformOwner: 'renderOutput',
 				outputColorTransform: false,
-				lutDomain: app.diagnostics.configValidation ? 'display-referred sRGB' : 'not configured',
+				lutDomain: null,
 				hdrWorkingType: 'HalfFloatType',
-				dataSignals: [ 'normal', 'velocity', 'depth', 'linearDepth' ],
-				screenshotEncoding: 'WebGPU RenderTarget readback encoded as PNG'
+				dataSignals: [ 'normal', 'depth', 'linearDepth' ],
+				sceneLinearSignals: [ 'output', 'emissive', 'bloom contribution', 'pre-tone-map HDR' ],
+				screenshotEncoding: 'RGBA8 WebGPU RenderTarget readback encoded as PNG'
 			},
 			postStack: {
 				renderPipeline: 'RenderPipeline',
 				scenePasses: graph.sceneRenderCount,
 				mrtOutputs: graph.requiredMRT,
-				debugOnlyAlbedo: 'diagnostic diffuse-color capture; not a production MRT attachment',
+				depthOwner: 'PassNode depth texture; not an MRT color output',
 				diagnosticModes: graph.diagnosticModes,
-				outputNodeOwner: 'RenderPipeline.outputNode'
+				outputNodeOwner: 'RenderPipeline.outputNode',
+				temporal: 'unsupported; no executable reset/reseed owner',
+				exposure: 'not implemented',
+				gradingLut: 'not implemented'
 			},
 			thresholds: {
-				nonblank: { minRange: 8 },
+				budgetProfile: 'desktopDiscrete',
+				classification: 'Authored artifact falsifiability/liveness gates only.',
+				nonblank: { minRange: ARTIFACT_GATES.nonblankRange },
 				cameraMatrixRequired: true,
-				perViewPixelDiff: { final: 0.01, diagnostics: 0.02 },
+				perViewPixelDiff: {
+					designRepeat: {
+						baseline: 'images/final.design.png',
+						candidate: 'images/camera.design.png',
+						maxRatio: ARTIFACT_GATES.repeatViewMaxPixelRatio
+					}
+				},
 				falsifiability: {
-					aoContactVariance: 0.5,
-					velocityStaticMean: 3,
-					velocityMotionMean: 4,
-					temporalMeanDiff: 2,
-					bloomOutsideMean: 8,
-					normalUniqueColors: 24,
-					albedoUniqueColors: 12
+					diagnosticFinalMeanDifference: ARTIFACT_GATES.diagnosticFinalMeanDifference,
+					postFinalMeanDifference: ARTIFACT_GATES.postFinalMeanDifference,
+					minimumDiagnosticRange: ARTIFACT_GATES.minimumDiagnosticRange,
+					minimumNormalUniqueColors: ARTIFACT_GATES.minimumNormalUniqueColors,
+					minimumDepthUniqueValues: ARTIFACT_GATES.minimumDepthUniqueValues,
+					minimumCrossSignalDifference: ARTIFACT_GATES.minimumCrossSignalDifference
 				}
 			},
 			stochasticMasks: [
-				{ name: 'none', path: null, reason: 'fixed camera, fixed seed, fixed capture time' }
+				{ name: 'none', path: null, reason: 'fixed camera and authored time; fixture has no stochastic input' }
 			],
 			knownCompromises: [
-				'Browser evidence records CPU timing; GPU timestamp availability remains target-dependent.'
+				'MRT selection lacks a paired target measurement and is not a performance recommendation.',
+				'Browser AO uses the explicitly-authored split scaffold; it is not physical direct/indirect-light proof.',
+				'Target-byte accounting is a selected-color lower bound and excludes depth, private effects, padding, compression, and allocator behavior.',
+				'Legacy seed-named image slots are deterministic time variants, not seed or temporal-AA evidence.'
 			]
 		},
 		rendererInfo,
 		renderTargets: {
 			required: true,
-			totalBytes: renderTargetBytes,
+			totalBytes: null,
+			accountingStatus: 'Logical selected-MRT color lower bound plus RGBA8 capture target; not total physical GPU residency.',
+			accountedLowerBoundBytes: accountedRenderTargetBytes,
+			performanceGate: { state: 'INSUFFICIENT_EVIDENCE', reason: 'Depth, private effect targets, alignment, allocator behavior, and physical residency are not measured.' },
+			excludedFromTotal: [ 'scene depth', 'GTAONode private targets', 'BloomNode private targets', 'backend alignment', 'allocator granularity', 'compression' ],
 			targets: [
 				{
-					name: 'scene-pass-mrt',
-					role: 'output/normal/emissive/velocity shared gbuffer; albedo is a debug-only diffuse capture',
-					owner: 'scene pass',
-					width: viewport.width,
-					height: viewport.height,
-					dprScale: 'full',
-					format: 'RGBA16F/RG16F/depth mix',
-					type: 'HalfFloatType plus depth',
-					colorSpace: 'scene-linear HDR plus data/no-color',
-					samples: app.renderer.samples ?? 1,
-					depthStencil: 'depth texture owned by PassNode',
+					name: 'scene-pass-selected-color-attachments',
+					role: `${ graph.requiredMRT.join( '/' ) } selected color outputs; depth is separately owned and excluded from this lower bound`,
+					owner: 'primary PassNode',
+					width: physicalSceneWidth,
+					height: physicalSceneHeight,
+					dprScale: viewport.dpr * sceneScale,
+					format: 'RGBA16F per selected default attachment',
+					type: 'HalfFloatType',
+					colorSpace: 'scene-linear color or no-color data according to signal semantics',
+					samples: 1,
+					depthStencil: 'separate PassNode depth texture; bytes excluded',
 					mrtCount: graph.requiredMRT.length,
-					lifetime: 'browser validation page',
-					memoryBytes: graph.estimatedBytes
+					lifetime: 'persistent PassNode ownership until dispose',
+					memoryBytes: selectedMrtLogicalBytes
 				},
 				{
 					name: 'capture-target',
-					role: 'PNG readback',
-					owner: 'capture.mjs',
+					role: 'PNG readback staging render target',
+					owner: 'browser-app capturePixels',
 					width: viewport.width,
 					height: viewport.height,
-					dprScale: 'full',
-					format: 'RGBA8 readback',
+					dprScale: 1,
+					format: 'RGBA8',
 					type: 'UnsignedByteType',
-					colorSpace: 'SRGBColorSpace',
+					colorSpace: 'NoColorSpace storage; final mode already contains explicit sRGB output codes from renderOutput',
 					samples: 1,
 					depthStencil: 'none',
 					mrtCount: 1,
-					lifetime: 'capture only',
+					lifetime: 'artifact capture session',
 					memoryBytes: captureTargetBytes
 				}
 			]
 		},
 		storageResources: {
 			required: true,
-			totalBytes: 0,
+			totalBytes: null,
+			accountedApplicationStorageBytes: 0,
+			performanceGate: { state: 'INSUFFICIENT_EVIDENCE', reason: 'Zero application-owned storage is not total GPU residency evidence.' },
 			resources: [
 				{
 					name: 'none',
-					kind: 'not used by this image-pipeline Phase 1 example',
+					kind: 'no application-owned storage buffer/texture in this feature fixture',
 					dimensions: 0,
 					format: null,
 					bytes: 0,
@@ -654,108 +746,94 @@ function buildEvidence( app, timing, leakLoop ) {
 		},
 		timings: {
 			required: true,
-			warmupFrames: 4,
-			sampleFrames: 16,
+			warmupFrames: CAPTURE_PROFILE.warmupFrames,
+			sampleFrames: CAPTURE_PROFILE.sampleFrames,
 			cpuFrameMs: timing.cpuFrameMs,
 			gpuFrameMs: null,
 			renderTimestampMs: null,
 			computeTimestampMs: null,
 			gpuTimingUnavailable: true,
 			gpuTimingLabel: 'CPU-only proxy',
-			unavailableReason: 'renderer constructed without trackTimestamp; timestamp-query capture is a Wave C item',
+			unavailableReason: 'INSUFFICIENT_EVIDENCE: GPU adapter identity is unavailable, so raw timestamps cannot promote a required performance claim.',
+			rawRenderTimestampDiagnosticMs: timing.gpuFrameMs,
+			performanceGate: { state: 'INSUFFICIENT_EVIDENCE', reason: 'Named adapter plus complete required timing profile is absent.' },
 			readbackCaptureMs: timing.readbackCaptureMs,
+			measurementContract: timing.measurementContract,
 			qualityTierChanges: [],
-			passCount: 1,
-			dispatchCount: app.renderer.info.compute?.calls ?? 0,
-			drawCalls: app.renderer.info.render.calls,
-			triangles: app.renderer.info.render.triangles
+			sceneRenderCount: graph.sceneRenderCount,
+			dispatchCountSnapshot: app.renderer.info.compute?.calls ?? 0,
+			drawCallsSnapshot: app.renderer.info.render.drawCalls,
+			trianglesSnapshot: app.renderer.info.render.triangles
 		},
 		leakLoop
 	};
 
 }
 
-function metricFromSamples( samples ) {
-
-	const sorted = [ ...samples ].sort( ( a, b ) => a - b );
-
-	return {
-		median: Number( sorted[ Math.floor( sorted.length / 2 ) ].toFixed( 3 ) ),
-		p95: Number( sorted[ Math.min( sorted.length - 1, Math.floor( sorted.length * 0.95 ) ) ].toFixed( 3 ) ),
-		unit: 'ms'
-	};
-
-}
-
 function packedReadbackBytesPerRow( width, height, pixelLength ) {
 
-	const rowBytes = width * 4;
+	const rowBytes = width * CAPTURE_PROFILE.readbackBytesPerTexel;
 	const compactLength = rowBytes * height;
-
 	if ( pixelLength === compactLength ) return rowBytes;
 
-	const alignedRowBytes = Math.ceil( rowBytes / 256 ) * 256;
+	const alignment = CAPTURE_PROFILE.webgpuCopyRowAlignment;
+	const alignedRowBytes = Math.ceil( rowBytes / alignment ) * alignment;
 	const paddedLength = alignedRowBytes * ( height - 1 ) + rowBytes;
-
 	if ( pixelLength !== paddedLength ) {
 
 		throw new Error( `Unexpected WebGPU readback length ${ pixelLength }; expected ${ compactLength } or ${ paddedLength }.` );
 
 	}
-
 	return alignedRowBytes;
-
-}
-
-async function measureFrames( app ) {
-
-	const samples = [];
-
-	for ( let i = 0; i < 16; i ++ ) {
-
-		const start = performance.now();
-		applyCaptureState( app, { timeSeconds: i / 30, frame: i } );
-		await renderOnce( app );
-		samples.push( performance.now() - start );
-
-	}
-
-	return {
-		cpuFrameMs: metricFromSamples( samples ),
-		readbackCaptureMs: { median: 0, p95: 0, unit: 'ms' }
-	};
 
 }
 
 async function initialize() {
 
 	window.__imagePipelineErrors = [];
+	window.__imagePipelineGpuEvents = { uncapturedErrors: [], deviceLoss: null };
 	window.addEventListener( 'unhandledrejection', ( event ) => {
 
 		window.__imagePipelineErrors.push( String( event.reason?.message ?? event.reason ) );
 
 	} );
 
-	if ( ! navigator.gpu ) {
-
-		throw new Error( 'WebGPU is unavailable; image-pipeline validation requires a primary WebGPU backend.' );
-
-	}
-
-	const app = await createWebGpuImagePipeline( canvas );
-
+	if ( ! navigator.gpu ) throw new Error( 'WebGPU is unavailable; image-pipeline validation requires native WebGPU.' );
+	const app = await createWebGpuImagePipeline( canvas, { preset: 'feature-demo' } );
 	if ( app.renderer.backend?.isWebGPUBackend !== true ) {
 
 		throw new Error( 'Image-pipeline validation requires renderer.backend.isWebGPUBackend === true.' );
 
 	}
+	const device = app.renderer.backend.device;
+	device.addEventListener( 'uncapturederror', ( event ) => {
+
+		window.__imagePipelineGpuEvents.uncapturedErrors.push( {
+			type: event.error?.constructor?.name ?? 'GPUError',
+			message: event.error?.message ?? 'Unknown uncaptured GPU error'
+		} );
+
+	} );
+	device.lost.then( ( info ) => {
+
+		if ( info.reason === 'destroyed' ) return;
+		window.__imagePipelineGpuEvents.deviceLoss = {
+			reason: info.reason ?? null,
+			message: info.message ?? 'Unknown device-loss reason'
+		};
+
+	} );
 
 	app.resize( window.innerWidth, window.innerHeight, window.devicePixelRatio || 1 );
 	const captureTarget = new RenderTarget( window.innerWidth, window.innerHeight, {
 		samples: 1,
 		type: UnsignedByteType
 	} );
-	captureTarget.texture.colorSpace = SRGBColorSpace;
+	// The final graph already executes renderOutput(..., renderer.outputColorSpace).
+	// Store those encoded codes in unorm data; an sRGB render-target format could
+	// apply an additional hardware transfer. Data diagnostics also require no
+	// color transform.
+	captureTarget.texture.colorSpace = NoColorSpace;
 	app.renderer.initRenderTarget?.( captureTarget );
 	const timing = await measureFrames( app );
 
@@ -763,36 +841,20 @@ async function initialize() {
 
 		const readbackStart = performance.now();
 		applyCaptureState( app, nextState );
+		await renderOnce( app, false );
 
-		if ( captureState.staticControl === true ) {
-
-			await renderOnce( app );
-			applyCaptureState( app, nextState );
-
-		} else {
-
-			// Velocity is a two-frame signal: VelocityNode differences current and
-			// previous matrices, so the captured frame needs a deterministic
-			// previous frame on the same motion curve. The static control instead
-			// renders the SAME state twice, proving the zero-delta side.
-			const warmupSeconds = Math.max( 0, ( nextState.timeSeconds ?? 0 ) - 0.25 );
-			applyCaptureState( app, { ...nextState, timeSeconds: warmupSeconds } );
-			await renderOnce( app );
-			applyCaptureState( app, nextState );
-
-		}
-
-		const width = window.innerWidth;
-		const height = window.innerHeight;
+		const viewport = app.getViewport();
+		const width = viewport.width;
+		const height = viewport.height;
 		captureTarget.setSize( width, height );
 		app.renderer.setRenderTarget( captureTarget );
-		await app.render();
+		await renderOnce( app, false );
 		const pixels = await app.renderer.readRenderTargetPixelsAsync( captureTarget, 0, 0, width, height );
 		app.renderer.setRenderTarget( null );
-		await renderOnce( app );
+		await renderOnce( app, false );
+		await drainTimestampQueries( app );
 
 		timing.readbackCaptureMs = metricFromSamples( [ performance.now() - readbackStart ] );
-
 		return {
 			width,
 			height,
@@ -804,7 +866,7 @@ async function initialize() {
 
 	applyCaptureState( app, { camera: 'design', mode: 'final', timeSeconds: 0, frame: 0 } );
 	await renderOnce( app );
-	setStatus( `${ SCENE_ID } ready\n${ ARTIFACT_RELATIVE_DIR }\n${ app.diagnostics.configValidation.requiredMRT.join( ', ' ) }` );
+	setStatus( `${ SCENE_ID } ready\n${ ARTIFACT_RELATIVE_DIR }\nselected MRT: ${ app.diagnostics.configValidation.requiredMRT.join( ', ' ) }` );
 	let cachedLeakLoop = null;
 
 	window.__imagePipelineValidation = {
@@ -831,9 +893,6 @@ initialize().catch( ( error ) => {
 
 	console.error( error );
 	setStatus( error.message );
-	window.__imagePipelineValidation = {
-		ready: false,
-		error: error.message
-	};
+	window.__imagePipelineValidation = { ready: false, error: error.message };
 
 } );

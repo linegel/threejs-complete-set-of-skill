@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Native WebGPU Temporal History</title>
+		<style>html,body,canvas{width:100%;height:100%;margin:0}body{overflow:hidden;background:#070b14;color:#fff;font:12px system-ui}canvas{display:block}#status{position:fixed;left:12px;bottom:12px;padding:8px;background:#000c;white-space:pre-wrap}</style>
+		<script type="importmap">
+			{"imports":{"three":"../../../node_modules/three/build/three.webgpu.js","three/webgpu":"../../../node_modules/three/build/three.webgpu.js","three/tsl":"../../../node_modules/three/build/three.tsl.js","three/addons/":"../../../node_modules/three/examples/jsm/"}}
+		</script>
+	</head>
+	<body>
+		<canvas id="view"></canvas><div id="status">initializing temporal history</div>
+		<script type="module">history.replaceState(null,'',`${location.pathname}?tier=full&mode=temporal-history&mechanism=temporal-velocity-and-history`); await import('../webgpu-image-pipeline/canonical-browser-app.js');</script>
+	</body>
+</html>

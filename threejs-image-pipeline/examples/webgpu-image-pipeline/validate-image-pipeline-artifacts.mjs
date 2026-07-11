@@ -5,55 +5,35 @@ import { fileURLToPath } from 'node:url';
 
 import { validateArtifactBundle } from '../../../threejs-visual-validation/examples/webgpu-validation-harness/src/schema/artifact-schemas.js';
 import { decodeGeneratedRgbaPng } from '../../../threejs-visual-validation/examples/webgpu-validation-harness/src/png.js';
-import { ARTIFACT_RELATIVE_DIR, REQUIRED_IMAGES, SCENE_ID } from './artifact-config.js';
+import {
+	ARTIFACT_CONTRACT_VERSION,
+	ARTIFACT_NUMERIC_PROVENANCE,
+	ARTIFACT_RELATIVE_DIR,
+	DIAGNOSTIC_IMAGES,
+	REQUIRED_IMAGES,
+	SCENE_ID
+} from './artifact-config.js';
+import { IMAGE_PIPELINE_EXAMPLE_CONTRACT } from './pipelineConfig.js';
 import { runSelfTest } from './validateImagePipelineConfig.js';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const repoRoot = resolve( here, '../../..' );
 const defaultArtifactDir = resolve( repoRoot, ARTIFACT_RELATIVE_DIR );
-const supplementalFalsifiabilityImages = [
-	'images/velocity.static.png',
-	'images/velocity.motion.png',
-	'images/AO.static.png',
-	'images/bloom.static.png',
-	'images/normal.static.png',
-	'images/albedo.static.png'
-];
 
 function parseArgs( argv ) {
 
-	const options = {
-		artifactDir: defaultArtifactDir,
-		requireArtifacts: false
-	};
+	const options = { artifactDir: defaultArtifactDir, requireArtifacts: false };
 
 	for ( let i = 0; i < argv.length; i ++ ) {
 
 		const arg = argv[ i ];
-
-		if ( arg === '--artifact-dir' ) {
-
-			options.artifactDir = resolve( argv[ ++ i ] );
-
-		} else if ( arg === '--require-artifacts' ) {
-
-			options.requireArtifacts = true;
-
-		} else {
-
-			throw new Error( `Unknown argument: ${ arg }` );
-
-		}
+		if ( arg === '--artifact-dir' ) options.artifactDir = resolve( argv[ ++ i ] );
+		else if ( arg === '--require-artifacts' ) options.requireArtifacts = true;
+		else throw new Error( `Unknown argument: ${ arg }` );
 
 	}
 
 	return options;
-
-}
-
-async function readJson( path ) {
-
-	return JSON.parse( await readFile( path, 'utf8' ) );
 
 }
 
@@ -63,16 +43,17 @@ function assert( condition, message ) {
 
 }
 
+async function readJson( path ) {
+
+	return JSON.parse( await readFile( path, 'utf8' ) );
+
+}
+
 function imagePixel( image, x, y ) {
 
 	const scanlineLength = 1 + image.width * 4;
 	const offset = y * scanlineLength + 1 + x * 4;
-	return [
-		image.raw[ offset ],
-		image.raw[ offset + 1 ],
-		image.raw[ offset + 2 ],
-		image.raw[ offset + 3 ]
-	];
+	return [ image.raw[ offset ], image.raw[ offset + 1 ], image.raw[ offset + 2 ] ];
 
 }
 
@@ -82,118 +63,42 @@ function luminance( pixel ) {
 
 }
 
-function quantizedUniqueRgbCount( image ) {
+function imageStatistics( image ) {
 
-	const colors = new Set();
-
-	for ( let y = 0; y < image.height; y ++ ) {
-
-		for ( let x = 0; x < image.width; x ++ ) {
-
-			const pixel = imagePixel( image, x, y );
-			colors.add( `${ pixel[ 0 ] >> 4 },${ pixel[ 1 ] >> 4 },${ pixel[ 2 ] >> 4 }` );
-
-		}
-
-	}
-
-	return colors.size;
-
-}
-
-function lowerHalfVariance( image ) {
-
-	const values = [];
-	const startY = Math.floor( image.height * 0.42 );
-	const endY = Math.floor( image.height * 0.88 );
-	const startX = Math.floor( image.width * 0.12 );
-	const endX = Math.floor( image.width * 0.88 );
-
-	for ( let y = startY; y < endY; y ++ ) {
-
-		for ( let x = startX; x < endX; x ++ ) {
-
-			values.push( luminance( imagePixel( image, x, y ) ) );
-
-		}
-
-	}
-
-	const mean = values.reduce( ( sum, value ) => sum + value, 0 ) / values.length;
-	const variance = values.reduce( ( sum, value ) => sum + ( value - mean ) ** 2, 0 ) / values.length;
-	return variance;
-
-}
-
-function meanVelocityNorm( image ) {
-
+	let min = Infinity;
+	let max = - Infinity;
 	let sum = 0;
+	let sumSquared = 0;
 	let count = 0;
+	const quantizedColors = new Set();
+	const quantizedLuminance = new Set();
 
 	for ( let y = 0; y < image.height; y ++ ) {
 
 		for ( let x = 0; x < image.width; x ++ ) {
 
 			const pixel = imagePixel( image, x, y );
-			sum += Math.hypot( pixel[ 0 ] - 128, pixel[ 1 ] - 128 );
+			const value = luminance( pixel );
+			min = Math.min( min, value );
+			max = Math.max( max, value );
+			sum += value;
+			sumSquared += value * value;
 			count ++;
+			quantizedColors.add( `${ pixel[ 0 ] >> 4 },${ pixel[ 1 ] >> 4 },${ pixel[ 2 ] >> 4 }` );
+			quantizedLuminance.add( Math.round( value / 4 ) );
 
 		}
 
 	}
 
-	return sum / count;
-
-}
-
-function bloomOutsideMean( image ) {
-
-	let minX = image.width;
-	let minY = image.height;
-	let maxX = - 1;
-	let maxY = - 1;
-
-	for ( let y = 0; y < image.height; y ++ ) {
-
-		for ( let x = 0; x < image.width; x ++ ) {
-
-			if ( luminance( imagePixel( image, x, y ) ) > 18 ) {
-
-				minX = Math.min( minX, x );
-				minY = Math.min( minY, y );
-				maxX = Math.max( maxX, x );
-				maxY = Math.max( maxY, y );
-
-			}
-
-		}
-
-	}
-
-	assert( maxX >= minX && maxY >= minY, 'Bloom diagnostic has no bright emissive-region pixels.' );
-
-	const pad = 18;
-	minX = Math.max( 0, minX - pad );
-	minY = Math.max( 0, minY - pad );
-	maxX = Math.min( image.width - 1, maxX + pad );
-	maxY = Math.min( image.height - 1, maxY + pad );
-
-	let outsideSum = 0;
-	let outsideCount = 0;
-
-	for ( let y = 0; y < image.height; y ++ ) {
-
-		for ( let x = 0; x < image.width; x ++ ) {
-
-			if ( x >= minX && x <= maxX && y >= minY && y <= maxY ) continue;
-			outsideSum += luminance( imagePixel( image, x, y ) );
-			outsideCount ++;
-
-		}
-
-	}
-
-	return outsideSum / Math.max( 1, outsideCount );
+	const mean = sum / count;
+	return {
+		range: max - min,
+		mean,
+		variance: sumSquared / count - mean * mean,
+		quantizedColorCount: quantizedColors.size,
+		quantizedLuminanceCount: quantizedLuminance.size
+	};
 
 }
 
@@ -201,7 +106,6 @@ async function meanRgbDifference( pathA, pathB ) {
 
 	const imageA = decodeGeneratedRgbaPng( await readFile( pathA ) );
 	const imageB = decodeGeneratedRgbaPng( await readFile( pathB ) );
-
 	assert( imageA.width === imageB.width && imageA.height === imageB.height, 'Compared PNGs must have matching dimensions.' );
 
 	const scanlineLength = 1 + imageA.width * 4;
@@ -211,14 +115,12 @@ async function meanRgbDifference( pathA, pathB ) {
 	for ( let y = 0; y < imageA.height; y ++ ) {
 
 		const rowOffset = y * scanlineLength;
-
 		for ( let x = 0; x < imageA.width; x ++ ) {
 
 			const pixelOffset = rowOffset + 1 + x * 4;
+			for ( let channel = 0; channel < 3; channel ++ ) {
 
-			for ( let c = 0; c < 3; c ++ ) {
-
-				sum += Math.abs( imageA.raw[ pixelOffset + c ] - imageB.raw[ pixelOffset + c ] );
+				sum += Math.abs( imageA.raw[ pixelOffset + channel ] - imageB.raw[ pixelOffset + channel ] );
 				count ++;
 
 			}
@@ -235,112 +137,169 @@ async function validateSourceContracts() {
 
 	const mainSource = await readFile( resolve( here, 'main.js' ), 'utf8' );
 	const composeSource = await readFile( resolve( here, 'composeFinalGraph.js' ), 'utf8' );
+	const browserSource = await readFile( resolve( here, 'browser-app.js' ), 'utf8' );
+	const captureSource = await readFile( resolve( here, 'capture.mjs' ), 'utf8' );
+	const artifactConfigSource = await readFile( resolve( here, 'artifact-config.js' ), 'utf8' );
 	const skillSource = await readFile( resolve( here, '../../SKILL.md' ), 'utf8' );
 	const readmeSource = await readFile( resolve( here, 'README.md' ), 'utf8' );
 
-	assert( ! mainSource.includes( 'options.temporal === true ? traa' ), 'main.js still enables TRAA directly from options.temporal.' );
-	assert( mainSource.includes( 'composeFinalGraph' ), 'main.js must use the shared final graph composer.' );
-	assert( composeSource.includes( 'config.temporal.enabled === true' ), 'composeFinalGraph.js must drive TRAA from validated config.temporal.enabled.' );
-	assert( composeSource.includes( 'const lightingAwareAoComposite = directLightingEstimate.add( indirectLightingEstimate );' ), 'composeFinalGraph.js must preserve the lighting-aware AO composite.' );
-	assert( composeSource.includes( 'const hdrComposite = lightingAwareAoComposite.add( bloomPass.getTextureNode() );' ), 'composeFinalGraph.js must feed the AO composite into bloom before final output.' );
-	assert( ! mainSource.includes( "getTextureNode( 'albedo' )" ), 'main.js still reads albedo from the production MRT.' );
-	assert( mainSource.includes( 'Debug-only albedo capture' ), 'main.js must label albedo as a debug-only diagnostic pass.' );
-	assert( mainSource.includes( 'scenePass.dispose?.()' ), 'main.js disposal must call scenePass.dispose?.().' );
-	assert( mainSource.includes( 'debugAlbedoPass.dispose?.()' ), 'main.js disposal must call debugAlbedoPass.dispose?.().' );
-	assert( mainSource.includes( 'gtao.dispose?.()' ), 'main.js disposal must call gtao.dispose?.().' );
-	assert( mainSource.includes( 'bloomPass.dispose?.()' ), 'main.js disposal must call bloomPass.dispose?.().' );
-	assert( mainSource.includes( 'graph.temporal?.dispose?.()' ), 'main.js disposal must call graph.temporal?.dispose?.().' );
-	assert( ! skillSource.includes( 'requiredMRT: 3' ), 'SKILL.md still documents requiredMRT: 3.' );
-	assert( skillSource.includes( 'Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4' ), 'SKILL.md must document the rgba8unorm byte-cost trap.' );
-	assert( ! skillSource.includes( 'precomputed LUTs, static variants' ), 'SKILL.md still teaches reduced-tier fallback assets inside the flagship skill.' );
-	assert( readmeSource.includes( 'current-minus-previous NDC' ), 'README.md must document r185 VelocityNode as current-minus-previous NDC.' );
-	assert( readmeSource.includes( 'Trap: rgba8unorm renderTargetPixelByteCost is 8, not 4' ), 'README.md must document the rgba8unorm byte-cost trap.' );
-
-	return { pass: true };
-
-}
-
-async function validateFalsifiabilityArtifacts( artifactDir ) {
-
-	for ( const imagePath of supplementalFalsifiabilityImages ) {
-
-		assert( existsSync( resolve( artifactDir, imagePath ) ), `Artifact bundle is missing ${ imagePath }.` );
-
-	}
-
-	const aoImage = decodeGeneratedRgbaPng( await readFile( resolve( artifactDir, 'images/AO.static.png' ) ) );
-	const velocityStatic = decodeGeneratedRgbaPng( await readFile( resolve( artifactDir, 'images/velocity.static.png' ) ) );
-	const velocityMotion = decodeGeneratedRgbaPng( await readFile( resolve( artifactDir, 'images/velocity.motion.png' ) ) );
-	const normalImage = decodeGeneratedRgbaPng( await readFile( resolve( artifactDir, 'images/normal.static.png' ) ) );
-	const albedoImage = decodeGeneratedRgbaPng( await readFile( resolve( artifactDir, 'images/albedo.static.png' ) ) );
-	const bloomImage = decodeGeneratedRgbaPng( await readFile( resolve( artifactDir, 'images/bloom.static.png' ) ) );
-
-	const aoVariance = lowerHalfVariance( aoImage );
-	const staticVelocity = meanVelocityNorm( velocityStatic );
-	const motionVelocity = meanVelocityNorm( velocityMotion );
-	const normalUnique = quantizedUniqueRgbCount( normalImage );
-	const albedoUnique = quantizedUniqueRgbCount( albedoImage );
-	const bloomOutside = bloomOutsideMean( bloomImage );
-	const temporalDifference = await meanRgbDifference(
-		resolve( artifactDir, 'images/temporal.t000.png' ),
-		resolve( artifactDir, 'images/temporal.t001.png' )
-	);
-
-	assert( aoVariance > 0.5, `AO channel lacks contact-region variance (${ aoVariance.toFixed( 3 ) }).` );
-	assert( staticVelocity < 3, `Static velocity control is not near zero (${ staticVelocity.toFixed( 3 ) }).` );
-	assert( motionVelocity > 4, `Motion velocity channel is too weak (${ motionVelocity.toFixed( 3 ) }).` );
-	assert( temporalDifference > 2, `temporal.t000 and temporal.t001 are too similar (${ temporalDifference.toFixed( 3 ) }).` );
-	assert( bloomOutside < 8, `Bloom diagnostic leaks outside the emissive region (${ bloomOutside.toFixed( 3 ) }).` );
-	assert( normalUnique >= 24, `Normal diagnostic has too few unique colors (${ normalUnique }).` );
-	assert( albedoUnique >= 12, `Albedo diagnostic has too few unique colors (${ albedoUnique }).` );
+	assert( mainSource.includes( 'trackTimestamp: true' ), 'Browser fixture must request timestamps before classifying GPU timing.' );
+	assert( mainSource.includes( 'fixtureMeshes' ), 'Browser fixture must expose its actual mesh lifecycle set.' );
+	assert( mainSource.includes( "config.requiredMRT.includes( 'normal' )" ), 'main.js must construct optional MRT outputs conditionally.' );
+	assert( ! mainSource.includes( "getTextureNode( 'albedo' )" ), 'main.js must not fabricate an albedo diagnostic.' );
+	assert( composeSource.includes( "scenePass.getLinearDepthNode( 'depth' )" ), 'Linear-depth diagnostic must use the r185 PassNode helper.' );
+	assert( composeSource.indexOf( 'const temporal =' ) < composeSource.indexOf( 'const hdrComposite =' ), 'Temporal scaffold must precede bloom composition.' );
+	assert( composeSource.includes( 'stableSceneHdr.rgb.add( bloomTextureNode.rgb )' ), 'Bloom graph must add RGB without changing alpha.' );
+	assert( composeSource.includes( 'stableSceneHdr.a' ), 'Bloom graph must preserve stable scene alpha.' );
+	assert( mainSource.includes( 'graph.normalTex.xyz.mul( 0.5 ).add( 0.5 )' ), 'Normal diagnostics must remap signed components into display range.' );
+	assert( mainSource.includes( 'graph.linearDepth.oneMinus()' ), 'Linear-depth diagnostics must use an explicit visualization transfer.' );
+	assert( mainSource.includes( 'compressHdrForInspection' ), 'HDR/emissive/bloom diagnostics must use an explicit inspection transform.' );
+	assert( mainSource.includes( 'diagnostics.mode === mode' ), 'Repeated timing samples must not rebuild an unchanged output graph.' );
+	assert( browserSource.includes( 'claimBoundary: app.diagnostics.claimBoundary' ), 'Browser evidence must carry the executable claim boundary.' );
+	assert( browserSource.includes( "temporal: 'unsupported; no executable reset/reseed owner'" ), 'Browser evidence must reject temporal reconstruction proof.' );
+	assert( browserSource.includes( "exposure: 'not implemented'" ), 'Browser evidence must reject exposure proof.' );
+	assert( browserSource.includes( 'resolveTimestampsAsync' ), 'GPU timing must use the r185 timestamp resolver when available.' );
+	assert( browserSource.includes( 'captureTarget.texture.colorSpace = NoColorSpace' ), 'Explicitly encoded output/data diagnostics must use a no-color RGBA8 readback target.' );
+	assert( ! captureSource.includes( 'velocity.static.png' ), 'Capture harness still requests an unimplemented velocity artifact.' );
+	assert( ! captureSource.includes( 'albedo.static.png' ), 'Capture harness still requests an unimplemented albedo artifact.' );
+	assert( ! captureSource.includes( 'temporal.t000.png' ), 'Capture harness still labels authored motion as temporal evidence.' );
+	assert( ! artifactConfigSource.includes( 'images/temporal.t000.png' ), 'Artifact contract still requires unimplemented temporal evidence.' );
+	assert( ! skillSource.includes( 'maximum-performance' ), 'SKILL frontmatter still makes an unprovable maximum-performance claim.' );
+	assert( readmeSource.includes( 'Browser artifacts from older' ), 'README must quarantine stale browser claims.' );
+	assert( Object.keys( ARTIFACT_NUMERIC_PROVENANCE ).length > 0, 'Artifact numeric provenance is missing.' );
 
 	return {
-		aoVariance,
-		staticVelocity,
-		motionVelocity,
-		temporalDifference,
-		bloomOutside,
-		normalUnique,
-		albedoUnique
+		pass: true,
+		claimBoundary: IMAGE_PIPELINE_EXAMPLE_CONTRACT,
+		artifactContractVersion: ARTIFACT_CONTRACT_VERSION,
+		numericProvenance: ARTIFACT_NUMERIC_PROVENANCE
 	};
 
 }
 
-async function validateImagePipelineArtifacts( artifactDir, requireArtifacts ) {
+async function validateDiagnosticArtifacts( artifactDir, manifest ) {
 
-	if ( ! existsSync( resolve( artifactDir, 'visual-contract.json' ) ) ) {
+	const statistics = {};
+	for ( const imagePath of DIAGNOSTIC_IMAGES ) {
 
-		return null;
+		const path = resolve( artifactDir, imagePath );
+		assert( existsSync( path ), `Artifact bundle is missing ${ imagePath }.` );
+		statistics[ imagePath ] = imageStatistics( decodeGeneratedRgbaPng( await readFile( path ) ) );
 
 	}
+
+	const gates = manifest.thresholds.falsifiability;
+	for ( const imagePath of DIAGNOSTIC_IMAGES ) {
+
+		assert(
+			statistics[ imagePath ].range >= gates.minimumDiagnosticRange,
+			`${ imagePath } lacks signal range (${ statistics[ imagePath ].range.toFixed( 3 ) }).`
+		);
+
+	}
+
+	assert(
+		statistics[ 'images/normal.static.png' ].quantizedColorCount >= gates.minimumNormalUniqueColors,
+		`Normal diagnostic has too few quantized colors (${ statistics[ 'images/normal.static.png' ].quantizedColorCount }).`
+	);
+	assert(
+		statistics[ 'images/linear-depth.static.png' ].quantizedLuminanceCount >= gates.minimumDepthUniqueValues,
+		`Linear-depth diagnostic has too few quantized values (${ statistics[ 'images/linear-depth.static.png' ].quantizedLuminanceCount }).`
+	);
+
+	const diagnosticFinalDifference = await meanRgbDifference(
+		resolve( artifactDir, 'images/final.design.png' ),
+		resolve( artifactDir, 'images/diagnostics.mosaic.png' )
+	);
+	const postFinalDifference = await meanRgbDifference(
+		resolve( artifactDir, 'images/final.design.png' ),
+		resolve( artifactDir, 'images/no-post.design.png' )
+	);
+	const crossSignalPairs = [
+		[ 'images/normal.static.png', 'images/linear-depth.static.png' ],
+		[ 'images/emissive.static.png', 'images/bloom.static.png' ],
+		[ 'images/AO.static.png', 'images/linear-depth.static.png' ],
+		[ 'images/pre-tone-map.static.png', 'images/emissive.static.png' ]
+	];
+	const crossSignalDifferences = {};
+	for ( const [ left, right ] of crossSignalPairs ) {
+
+		const difference = await meanRgbDifference( resolve( artifactDir, left ), resolve( artifactDir, right ) );
+		crossSignalDifferences[ `${ left } != ${ right }` ] = difference;
+		assert( difference >= gates.minimumCrossSignalDifference, `${ left} and ${ right } are semantically indistinguishable (${ difference.toFixed( 3 ) }).` );
+
+	}
+
+	assert(
+		diagnosticFinalDifference >= gates.diagnosticFinalMeanDifference,
+		`Diagnostic mosaic is too similar to final (${ diagnosticFinalDifference.toFixed( 3 ) }).`
+	);
+	assert(
+		postFinalDifference >= gates.postFinalMeanDifference,
+		`Final and no-post captures do not falsify active post composition (${ postFinalDifference.toFixed( 3 ) }).`
+	);
+
+	return { statistics, diagnosticFinalDifference, postFinalDifference, crossSignalDifferences };
+
+}
+
+async function validateImagePipelineArtifacts( artifactDir ) {
+
+	if ( ! existsSync( resolve( artifactDir, 'visual-contract.json' ) ) ) return null;
 
 	const bundle = await validateArtifactBundle( artifactDir );
 	const manifest = await readJson( resolve( artifactDir, 'evidence-manifest.json' ) );
 	const contract = await readJson( resolve( artifactDir, 'visual-contract.json' ) );
+	const targets = await readJson( resolve( artifactDir, 'render-targets.json' ) );
+	const timings = await readJson( resolve( artifactDir, 'timings.json' ) );
 
 	assert( manifest.sceneId === SCENE_ID, `Unexpected sceneId ${ manifest.sceneId }.` );
-	assert( manifest.backend.isPrimaryBackend === true, 'Artifact bundle did not record a primary WebGPU backend.' );
-	assert( manifest.postStack.scenePasses === 1, 'Image pipeline evidence must record one scene pass.' );
-	assert( manifest.postStack.mrtOutputs.includes( 'velocity' ), 'Image pipeline evidence must include velocity MRT.' );
-	assert( ! manifest.postStack.mrtOutputs.includes( 'albedo' ), 'Image pipeline evidence must not record albedo as a production MRT.' );
-	assert( manifest.postStack.debugOnlyAlbedo, 'Image pipeline evidence must record albedo as a debug-only capture.' );
-	assert( manifest.colorPipeline.outputColorTransform === false, 'Image pipeline evidence must keep RenderPipeline.outputColorTransform disabled for renderOutput ownership.' );
+	assert( manifest.contractVersion === ARTIFACT_CONTRACT_VERSION, 'Artifact manifest is stale.' );
+	assert( contract.contractVersion === ARTIFACT_CONTRACT_VERSION, 'Visual contract is stale.' );
+	assert( contract.claimBoundary.profile === IMAGE_PIPELINE_EXAMPLE_CONTRACT.profile, 'Artifact claim boundary does not match the executable example.' );
+	assert( manifest.backend.isPrimaryBackend === true, 'Artifact bundle did not record native WebGPU.' );
+	assert( manifest.postStack.scenePasses === 1, 'Image-pipeline evidence must record one primary scene render.' );
+	assert(
+		JSON.stringify( manifest.postStack.mrtOutputs ) === JSON.stringify( [ 'output', 'normal', 'emissive' ] ),
+		`Unexpected authored MRT selection: ${ JSON.stringify( manifest.postStack.mrtOutputs ) }.`
+	);
+	assert( manifest.postStack.mrtOutputs.includes( 'depth' ) === false, 'Depth must not be an MRT color output.' );
+	assert( manifest.postStack.mrtOutputs.includes( 'velocity' ) === false, 'Default artifact graph must not claim velocity.' );
+	assert( manifest.postStack.mrtOutputs.includes( 'albedo' ) === false, 'Default artifact graph must not claim albedo.' );
+	assert( manifest.postStack.temporal.startsWith( 'unsupported' ), 'Artifact must not claim temporal reconstruction.' );
+	assert( manifest.postStack.exposure === 'not implemented', 'Artifact must not claim exposure.' );
+	assert( manifest.colorPipeline.lutDomain === null, 'Artifact must not claim LUT grading.' );
+	assert( manifest.colorPipeline.outputColorTransform === false, 'renderOutput ownership requires RenderPipeline.outputColorTransform=false.' );
+	assert( targets.accountingStatus.includes( 'lower bound' ) || targets.accountingStatus.includes( 'lower-bound' ), 'Target accounting must be labelled as a lower bound.' );
+	assert( targets.performanceGate?.state === 'INSUFFICIENT_EVIDENCE', 'Incomplete physical memory evidence must block performance promotion.' );
+	assert( timings.performanceGate?.state === 'INSUFFICIENT_EVIDENCE', 'Unnamed/incomplete GPU timing must block performance promotion.' );
+	assert( timings.measurementContract !== undefined, 'Timing evidence lacks its measurement boundary.' );
+	assert( contract.performancePromotion?.state === 'INSUFFICIENT_EVIDENCE', 'Feature artifact must not promote itself to a measured performance tier.' );
+	assert(
+		artifactBudgetResult( bundle, 'gpuFrameMs.median' )?.state === 'SKIP',
+		'Shared optional GPU budget evaluation must remain SKIP under insufficient evidence.'
+	);
+	assert( artifactBudgetResult( bundle, 'totalGpuMemoryBytes' ) === null, 'Incomplete memory lower bounds must not produce an automated PASS.' );
 
-	for ( const imagePath of [ ...REQUIRED_IMAGES, ...supplementalFalsifiabilityImages ] ) {
+	for ( const imagePath of [ ...REQUIRED_IMAGES, ...DIAGNOSTIC_IMAGES ] ) {
 
 		assert( contract.requiredImages.includes( imagePath ), `visual-contract.json is missing ${ imagePath }.` );
 
 	}
+	for ( const staleImage of [ 'images/velocity.static.png', 'images/albedo.static.png', 'images/temporal.t000.png' ] ) {
 
-	const diagnosticDifference = await meanRgbDifference(
-		resolve( artifactDir, 'images/final.design.png' ),
-		resolve( artifactDir, 'images/diagnostics.mosaic.png' )
-	);
-	assert( diagnosticDifference > 6, `diagnostics.mosaic.png is too similar to final.design.png (${ diagnosticDifference.toFixed( 3 ) }).` );
+		assert( contract.requiredImages.includes( staleImage ) === false, `visual-contract.json still requires stale ${ staleImage }.` );
 
-	const falsifiability = requireArtifacts === true ? await validateFalsifiabilityArtifacts( artifactDir ) : null;
+	}
 
-	return { bundle, falsifiability };
+	const diagnostics = await validateDiagnosticArtifacts( artifactDir, manifest );
+	return { bundle, diagnostics };
+
+}
+
+function artifactBudgetResult( bundle, name ) {
+
+	return bundle.summary.budgets.results.find( ( result ) => result.name === name ) ?? null;
 
 }
 
@@ -349,8 +308,9 @@ async function main() {
 	const options = parseArgs( process.argv.slice( 2 ) );
 	const graph = runSelfTest();
 	const sourceContracts = await validateSourceContracts();
-	const artifact = options.requireArtifacts === true
-		? await validateImagePipelineArtifacts( options.artifactDir, true )
+	const artifactPresent = existsSync( resolve( options.artifactDir, 'visual-contract.json' ) );
+	const artifact = options.requireArtifacts
+		? await validateImagePipelineArtifacts( options.artifactDir )
 		: null;
 
 	if ( options.requireArtifacts && artifact === null ) {
@@ -361,6 +321,7 @@ async function main() {
 
 	console.log( JSON.stringify( {
 		pass: true,
+		validationScope: 'static graph/source contracts',
 		graph: {
 			requiredMRT: graph.valid.requiredMRT,
 			diagnosticModes: graph.valid.diagnosticModes,
@@ -369,6 +330,9 @@ async function main() {
 		},
 		sourceContracts,
 		artifactDir: options.artifactDir,
+		artifactGate: artifact !== null
+			? { state: 'PASS', required: true }
+			: { state: artifactPresent ? 'NOT_RUN' : 'ABSENT', required: false, promotion: 'INSUFFICIENT_EVIDENCE' },
 		artifactValidated: artifact !== null,
 		artifacts: artifact
 	}, null, 2 ) );

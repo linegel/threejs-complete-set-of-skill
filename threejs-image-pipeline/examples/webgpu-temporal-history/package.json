@@ -1,0 +1,14 @@
+{
+  "name": "threejs-webgpu-temporal-history",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "npm --prefix ../webgpu-image-pipeline run check",
+    "validate:unit": "npm --prefix ../webgpu-image-pipeline run validate:canonical",
+    "test:mutations": "npm --prefix ../webgpu-image-pipeline run test:mutations",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-temporal-history --target final",
+    "validate:artifacts": "npm --prefix ../webgpu-image-pipeline run validate:artifacts",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts"
+  }
+}

@@ -1,54 +1,108 @@
 {
-  "sceneId": "wave-d-shared-framegraph",
-  "qualityStage": "Phase 2 / Wave D static contract",
+  "sceneId": "shared-framegraph-static-contract",
   "evidenceStatus": "static-contract-only",
-  "blockedBy": "../../../artifacts/visual-validation/wave-c-status.md",
+  "claimBoundary": {
+    "proves": [
+      "the checked manifest has one declared owner for each required shared resource",
+      "output is represented only as the required primary pass color and is not a selected named MRT output",
+      "depth is represented as the primary pass depth texture rather than an MRT color output",
+      "normal, albedo, emissive, and velocity are conditional named MRT candidates rather than a required attachment set",
+      "the declared exposure, tone-map, grading, and output-conversion order has one graph owner"
+    ],
+    "doesNotProve": [
+      "that a WebGPURenderer or RenderPipeline was constructed, compiled, or rendered",
+      "that any conditional MRT candidate should be selected for a concrete workload",
+      "physical attachment formats, allocation, aliasing, bandwidth, memory, or timing",
+      "temporal velocity coverage, rejection, jitter, reset behavior, or history quality",
+      "exposure-meter accuracy, adaptation behavior, tone-map appearance, LUT correctness, or output pixels",
+      "browser, GPU, mobile, or low-end-device acceptance"
+    ]
+  },
+  "numericProvenance": {
+    "rule": "Every numeric literal in this manifest is carried by a record with a Derived, Gated, Measured, or Authored tag.",
+    "tagDefinitions": {
+      "Derived": "follows from a formula, data layout, or verified API consequence",
+      "Gated": "valid only after a named capability or correctness gate",
+      "Measured": "captured on a named target and complete graph",
+      "Authored": "a deliberate contract or quality starting point, not a performance result"
+    },
+    "contractCounts": {
+      "rendererOwnerCount": {
+        "value": 1,
+        "tag": "Authored",
+        "basis": "single-owner integration constraint; not a runtime observation"
+      },
+      "renderPipelineOwnerCount": {
+        "value": 1,
+        "tag": "Authored",
+        "basis": "single-owner integration constraint; not a runtime observation"
+      },
+      "primaryScenePassOwnerCount": {
+        "value": 1,
+        "tag": "Authored",
+        "basis": "single primary scene-pass owner is the baseline architecture, not a runtime observation; extra traversals need separate measured justification"
+      }
+    }
+  },
   "rendering": {
-    "renderer": "WebGPURenderer",
+    "rendererType": "WebGPURenderer",
+    "rendererOwner": "threejs-image-pipeline",
     "renderPipelineOwner": "threejs-image-pipeline",
-    "sceneRenderCount": 1,
-    "renderPipelineCount": 1,
+    "primaryScenePassOwner": "threejs-image-pipeline",
     "outputNodeOwner": "threejs-image-pipeline",
-    "outputTransformOwner": "renderOutput"
+    "countRecords": "numericProvenance.contractCounts"
   },
   "sharedResources": {
-    "gbuffer": {
+    "primaryScenePass": {
       "owner": "threejs-image-pipeline",
       "writers": [
         "threejs-image-pipeline"
       ],
-      "resource": "scenePass.setMRT(mrt(...))",
-      "outputs": [
-        "output",
-        "depth",
-        "normal",
-        "albedo",
-        "emissive",
-        "velocity"
-      ],
-      "consumers": [
-        "threejs-ambient-contact-shading",
-        "threejs-bloom",
-        "threejs-exposure-color-grading",
-        "threejs-sky-atmosphere-and-haze",
-        "threejs-volumetric-clouds",
-        "threejs-rain-snow-and-wet-surfaces",
-        "threejs-visual-validation"
-      ]
-    },
-    "velocity": {
-      "owner": "threejs-image-pipeline",
-      "writers": [
-        "threejs-image-pipeline"
-      ],
-      "convention": "current-minus-previous NDC velocity in data/no-color MRT; velocity.xy = currentNdc.xy - previousNdc.xy",
-      "consumers": [
-        "threejs-procedural-motion-systems",
-        "threejs-camera-controls-and-rigs",
-        "threejs-volumetric-clouds",
-        "threejs-procedural-vegetation",
-        "threejs-visual-validation"
-      ]
+      "resource": "pass(scene, camera)",
+      "primaryColor": {
+        "signal": "output",
+        "resource": "scenePass.getTextureNode('output')",
+        "attachmentClass": "primary-pass-color",
+        "namedMrtCandidate": false,
+        "domain": "scene-linear HDR working color"
+      },
+      "depth": {
+        "resource": "scenePass.getTextureNode('depth')",
+        "attachmentClass": "pass-depth-texture",
+        "mrtColorOutput": false,
+        "domain": "depth data/no-color"
+      },
+      "selectedNamedMrtOutputs": [],
+      "candidateNamedMrtOutputs": {
+        "normal": {
+          "status": "conditional-unselected",
+          "domain": "normal data/no-color",
+          "selectOnlyWhen": "[Measured] attachment export, store, and read cost is lower than depth reconstruction or a narrow alternative on the named target and complete graph"
+        },
+        "albedo": {
+          "status": "conditional-unselected",
+          "domain": "scene-linear working color",
+          "producerContract": "map diffuseColor.rgb to the named albedo output explicitly",
+          "selectOnlyWhen": "[Measured] a concrete composite consumes it and its attachment cost is lower than reconstruction or a narrow alternative"
+        },
+        "emissive": {
+          "status": "conditional-unselected",
+          "domain": "scene-linear HDR working color",
+          "selectOnlyWhen": "[Measured] selective bloom or another declared consumer beats deriving its signal from primary HDR color"
+        },
+        "velocity": {
+          "status": "conditional-unselected",
+          "domain": "motion data/no-color",
+          "convention": "current-minus-previous NDC with consumer-specific NDC-to-UV conversion",
+          "selectOnlyWhen": "[Measured] an enabled temporal consumer justifies the attachment and rigid, instanced, skinned, and procedural deformation coverage is validated"
+        }
+      },
+      "selectionPolicy": {
+        "rule": "select each named MRT candidate independently for the concrete workload",
+        "costComparison": "costMRT(signal) versus reconstruction or narrow-rerender cost",
+        "requiredEvidence": "paired measurements on the named browser, GPU, physical pixels, and complete enabled graph",
+        "tileGpuNote": "saved traversal does not imply lower off-chip bandwidth on a tile-based GPU"
+      }
     },
     "weatherEnvelope": {
       "owner": "threejs-rain-snow-and-wet-surfaces",
@@ -65,14 +119,6 @@
         "seaState",
         "qualityTier",
         "debugMode"
-      ],
-      "consumers": [
-        "threejs-spectral-ocean",
-        "threejs-volumetric-clouds",
-        "threejs-procedural-vegetation",
-        "threejs-water-optics",
-        "threejs-procedural-materials",
-        "threejs-visual-validation"
       ]
     },
     "toneMap": {
@@ -81,11 +127,8 @@
         "threejs-exposure-color-grading"
       ],
       "graphOwner": "threejs-image-pipeline",
-      "domainIn": "scene-linear HDR",
-      "domainOut": "tone-mapped linear",
-      "consumers": [
-        "threejs-image-pipeline"
-      ]
+      "domainIn": "exposed scene-linear HDR",
+      "domainOut": "tone-mapped linear working primaries"
     },
     "outputTransform": {
       "owner": "renderOutput",
@@ -93,35 +136,79 @@
         "renderOutput"
       ],
       "graphOwner": "threejs-image-pipeline",
-      "domainIn": "tone-mapped linear",
-      "domainOut": "display-referred sRGB",
-      "consumers": [
-        "browser-canvas",
-        "threejs-visual-validation"
-      ]
+      "domainIn": "tone-mapped linear working primaries",
+      "domainOut": "declared display/output encoding"
     }
   },
+  "conditionalResources": {
+    "temporalHistory": {
+      "status": "conditional-unselected",
+      "requires": [
+        "selected velocity signal",
+        "validated velocity coverage",
+        "jitter ownership",
+        "depth convention and rejection domain",
+        "stable pre-exposure history domain",
+        "reset or rebuild policy for discontinuities"
+      ],
+      "defaultOrder": "resolve stable scene radiance before the exposure meter tap and bloom"
+    },
+    "exposureControl": {
+      "owner": "threejs-exposure-color-grading",
+      "graphOwner": "threejs-image-pipeline",
+      "status": "ownership-and-order-only",
+      "defaultMeterTap": "resolved pre-bloom scene-linear HDR",
+      "meterSelection": "fixed, stratified, exact reduction, reusable pyramid, or histogram according to the workload decision tree",
+      "adaptationDomain": "EV/log space",
+      "cpuReadbackPolicy": "diagnostics only; never current-frame exposure control"
+    },
+    "gradingLut": {
+      "owner": "threejs-exposure-color-grading",
+      "graphOwner": "threejs-image-pipeline",
+      "status": "conditional-unselected",
+      "requiredContract": [
+        "input and output primaries",
+        "transfer function",
+        "scene-linear shaper when the input is unbounded HDR",
+        "legal range and out-of-range policy",
+        "interpolation",
+        "tone-map dependency"
+      ],
+      "defaultPlacementWhenToneMappedLinear": "after tone mapping and before the sole output conversion"
+    }
+  },
+  "defaultGraphOrder": [
+    "stable scene-linear lighting, AO, atmosphere, and eligible layers",
+    "optional temporal reconstruction of stable scene radiance",
+    "transparent or refractive layers excluded from temporal history",
+    "optional exposure meter tap from resolved pre-bloom scene-linear HDR",
+    "optional bloom and other scene-linear optical effects",
+    "optional adapted exposure",
+    "tone map",
+    "optional grading in its declared domain",
+    "single output conversion"
+  ],
   "systems": {
     "ocean": {
       "skill": "threejs-spectral-ocean",
       "consumes": [
-        "gbuffer",
-        "weatherEnvelope",
-        "toneMap"
+        "weatherEnvelope"
       ],
+      "conditionalConsumes": [],
       "publishes": [
         "waterNormal",
         "foamMask",
-        "emissive"
+        "sceneLinearRadiance"
       ],
       "privatePostOwner": false
     },
     "atmosphere": {
       "skill": "threejs-sky-atmosphere-and-haze",
       "consumes": [
-        "gbuffer",
-        "weatherEnvelope",
-        "toneMap"
+        "weatherEnvelope"
+      ],
+      "conditionalConsumes": [
+        "primaryScenePass.depth for depth-aware aerial perspective"
       ],
       "publishes": [
         "skyRadiance",
@@ -132,41 +219,45 @@
     "clouds": {
       "skill": "threejs-volumetric-clouds",
       "consumes": [
-        "gbuffer",
-        "velocity",
-        "weatherEnvelope",
-        "toneMap"
+        "weatherEnvelope"
+      ],
+      "conditionalConsumes": [
+        "velocity only when cloud temporal reconstruction is enabled and coverage is validated"
       ],
       "publishes": [
         "cloudRadiance",
         "cloudTransmittance",
-        "cloudVelocity"
+        "cloudVelocityWhenTemporal"
       ],
       "privatePostOwner": false
     },
     "vegetation": {
       "skill": "threejs-procedural-vegetation",
       "consumes": [
-        "gbuffer",
-        "velocity",
         "weatherEnvelope"
+      ],
+      "conditionalConsumes": [
+        "velocity contract only when a temporal consumer is enabled"
       ],
       "publishes": [
         "alpha",
         "normal",
         "wetness",
-        "shadowCasterDeformation"
+        "shadowCasterDeformation",
+        "temporalVelocityCoverageWhenRequired"
       ],
       "privatePostOwner": false
     },
     "validation": {
       "skill": "threejs-visual-validation",
       "consumes": [
-        "gbuffer",
-        "velocity",
+        "primaryScenePass",
         "weatherEnvelope",
         "toneMap",
         "outputTransform"
+      ],
+      "conditionalConsumes": [
+        "only the named MRT outputs and histories selected by the runtime graph"
       ],
       "publishes": [
         "visual-contract.json",
@@ -179,9 +270,10 @@
     }
   },
   "browserProof": {
-    "required": true,
-    "availableInThisSession": false,
-    "blockedBy": "../../../artifacts/visual-validation/wave-c-status.md",
+    "requiredForRuntimeAcceptance": true,
+    "presentInThisFolder": false,
+    "status": "not-provided-by-static-contract",
+    "priorAttemptStatus": "../../../artifacts/visual-validation/wave-c-status.md",
     "requiredArtifacts": [
       "renderer-info.json",
       "render-targets.json",

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-temporal-history",
+  "skill": "threejs-image-pipeline",
+  "threeRevision": "0.185.1",
+  "kind": "mechanism-demo",
+  "status": "incomplete",
+  "canonicalSource": ["threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js", "threejs-image-pipeline/examples/webgpu-temporal-history"],
+  "browserEntry": "index.html",
+  "publishPath": "/demos/webgpu-temporal-history/",
+  "scenarios": [{"id":"moving-rigid-subject","acceptanceStatus":"incomplete"}],
+  "mechanisms": [{"id":"velocity-history-rejection-reset","acceptanceStatus":"incomplete"}],
+  "tiers": [{"id":"full","targetClass":"current-adapter correctness","frameTargetMs":null,"resolutionPolicy":{"scene":1},"mechanismLimits":{"temporal":true},"resourceLimits":{"physicalBytes":null},"degradationFromPrevious":[],"preservedInvariants":["current-minus-previous NDC velocity","TRAA jitter owner","rebuild-on-reset"],"acceptanceStatus":"incomplete"}],
+  "modes": ["final","velocity","temporal-current","temporal-history","temporal-resolved"],
+  "cameras": ["near","design","far"],
+  "seeds": [1,2654435769],
+  "capabilityRequirements": [{"id":"native-webgpu","required":true,"evidence":null,"status":"incomplete"}],
+  "runtimeProof": [{"id":"static-velocity-zero","required":true,"evidence":"INSUFFICIENT_EVIDENCE","status":"incomplete"},{"id":"moving-velocity-sign","required":true,"evidence":"INSUFFICIENT_EVIDENCE","status":"incomplete"},{"id":"fresh-history-after-reset","required":true,"evidence":"INSUFFICIENT_EVIDENCE","status":"incomplete"}],
+  "evidenceContract": "v2",
+  "validationCommand": "npm run validate:full",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

@@ -1,55 +1,75 @@
-import { renderOutput } from 'three/tsl';
+import { float, renderOutput, vec4 } from 'three/tsl';
 
 export function composeFinalGraph( {
 	config,
 	scenePass,
-	gtao,
-	bloomPass,
-	traaFactory = null,
-	velocityNode = null,
-	camera = null
+	gtao = null,
+	bloomPass = null
 } ) {
 
 	const hdrColor = scenePass.getTextureNode( 'output' );
-	const normalTex = scenePass.getTextureNode( 'normal' );
-	const emissiveTex = scenePass.getTextureNode( 'emissive' );
+	const normalTex = config.requiredMRT.includes( 'normal' )
+		? scenePass.getTextureNode( 'normal' )
+		: null;
+	const emissiveTex = config.requiredMRT.includes( 'emissive' )
+		? scenePass.getTextureNode( 'emissive' )
+		: null;
 	const depthTex = scenePass.getTextureNode( 'depth' );
-	const aoTextureNode = gtao.getTextureNode();
-	const indirectVisibility = aoTextureNode.r;
-	const debugFinalColorMultiplyBaseline = hdrColor.mul( indirectVisibility );
-	const directLightingEstimate = hdrColor.mul( 1 - config.aoIndirectFraction );
-	const indirectLightingEstimate = hdrColor.mul( config.aoIndirectFraction ).mul( indirectVisibility );
-	const lightingAwareAoComposite = directLightingEstimate.add( indirectLightingEstimate );
-	const hdrComposite = lightingAwareAoComposite.add( bloomPass.getTextureNode() );
+	const linearDepth = scenePass.getLinearDepthNode( 'depth' );
+	const aoTextureNode = gtao?.getTextureNode() ?? null;
+	const indirectVisibility = aoTextureNode?.r ?? float( 1 );
+	const debugFinalColorMultiplyBaseline = vec4(
+		hdrColor.rgb.mul( indirectVisibility ),
+		hdrColor.a
+	);
 
-	if ( config.temporal.enabled === true && typeof traaFactory !== 'function' ) {
+	// [Authored scaffold] This fixture has no physical direct/indirect buffers.
+	// The split demonstrates graph ownership only and is never cited as AO
+	// correctness evidence.
+	const directLightingEstimate = hdrColor.rgb.mul( 1 - config.aoIndirectFraction );
+	const indirectLightingEstimate = hdrColor.rgb
+		.mul( config.aoIndirectFraction )
+		.mul( indirectVisibility );
+	const authoredAoSplitComposite = vec4(
+		directLightingEstimate.add( indirectLightingEstimate ),
+		hdrColor.a
+	);
 
-		throw new Error( 'Temporal image-pipeline composition requires traaFactory.' );
+	if ( config.temporal.enabled === true || config.features.temporal === true ) {
+
+		throw new Error( 'Temporal output is unsupported by this example because it has no executable reset/reseed owner.' );
 
 	}
 
-	const temporal = config.temporal.enabled === true
-		? traaFactory( { hdrComposite, depthTex, velocityNode, camera } )
-		: null;
-	const finalNode = temporal ? temporal.getTextureNode() : hdrComposite;
-	const finalOutputNode = renderOutput( finalNode );
+	const temporal = null;
+	const stableSceneHdr = authoredAoSplitComposite;
+	const bloomTextureNode = bloomPass?.getTextureNode() ?? null;
+	const hdrComposite = bloomTextureNode
+		? vec4( stableSceneHdr.rgb.add( bloomTextureNode.rgb ), stableSceneHdr.a )
+		: stableSceneHdr;
+	const noPostOutputNode = renderOutput( hdrColor );
+	const finalOutputNode = renderOutput( hdrComposite );
 
 	return {
 		finalOutputNode,
-		finalNode,
+		noPostOutputNode,
+		finalNode: hdrComposite,
 		aoTextureNode,
 		indirectVisibility,
 		hdrColor,
 		normalTex,
 		emissiveTex,
 		depthTex,
+		linearDepth,
 		debugFinalColorMultiplyBaseline,
 		directLightingEstimate,
 		indirectLightingEstimate,
-		lightingAwareAoComposite,
+		authoredAoSplitComposite,
+		stableSceneHdr,
 		hdrComposite,
 		temporal,
-		bloomTextureNode: bloomPass.getTextureNode()
+		bloomTextureNode,
+		claimBoundary: config.contract
 	};
 
 }

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-image-pipeline",
+  "skill": "threejs-image-pipeline",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": ["threejs-image-pipeline/examples/webgpu-image-pipeline"],
+  "browserEntry": "index.html",
+  "publishPath": "/demos/webgpu-image-pipeline/",
+  "scenarios": [{"id": "pipeline-fixture", "acceptanceStatus": "incomplete"}],
+  "mechanisms": [
+    {"id": "signal-inspector", "route": "mechanism/signal-inspector/", "startup": {"tier": "debug", "mode": "normal"}, "acceptanceStatus": "incomplete"},
+    {"id": "ao-bloom-exposure-order", "route": "mechanism/ao-bloom-exposure-order/", "startup": {"tier": "full", "mode": "ao"}, "acceptanceStatus": "incomplete"},
+    {"id": "temporal-velocity-and-history", "route": "mechanism/temporal-velocity-and-history/", "startup": {"tier": "full", "mode": "temporal-history"}, "acceptanceStatus": "incomplete"},
+    {"id": "output-and-color-ownership", "route": "mechanism/output-and-color-ownership/", "startup": {"tier": "full", "mode": "final"}, "acceptanceStatus": "incomplete"},
+    {"id": "resource-budget", "route": "mechanism/resource-budget/", "startup": {"tier": "debug", "mode": "final"}, "acceptanceStatus": "incomplete"},
+    {"id": "diagnostic-extra-pass", "route": "mechanism/diagnostic-extra-pass/", "startup": {"tier": "debug", "mode": "albedo-extra-pass"}, "acceptanceStatus": "incomplete"}
+  ],
+  "tiers": [
+    {"id": "full", "targetClass": "current-adapter correctness", "frameTargetMs": null, "resolutionPolicy": {"scene": 1, "ao": 0.5, "bloom": 0.5}, "mechanismLimits": {"temporal": true, "normalMrt": true, "emissiveMrt": true}, "resourceLimits": {"physicalBytes": null}, "degradationFromPrevious": [], "preservedInvariants": ["one renderer", "one primary scene pass", "one tone map", "one output transform"], "acceptanceStatus": "incomplete"},
+    {"id": "reduced", "targetClass": "bandwidth-reduced correctness", "frameTargetMs": null, "resolutionPolicy": {"scene": 1, "ao": 0.5, "bloom": 0.33}, "mechanismLimits": {"temporal": false, "normalMrt": false, "emissiveMrt": true}, "resourceLimits": {"physicalBytes": null}, "degradationFromPrevious": ["remove velocity/history", "reconstruct AO normals from depth", "reduce bloom scale"], "preservedInvariants": ["one renderer", "one primary scene pass", "one tone map", "one output transform"], "acceptanceStatus": "incomplete"},
+    {"id": "debug", "targetClass": "diagnostics", "frameTargetMs": null, "resolutionPolicy": {"scene": 1, "ao": 1, "bloom": 0.5}, "mechanismLimits": {"temporal": true, "diagnosticAlbedoPass": true}, "resourceLimits": {"physicalBytes": null}, "degradationFromPrevious": [], "preservedInvariants": ["explicit extra scene cost only when albedo diagnostic is reachable"], "acceptanceStatus": "incomplete"}
+  ],
+  "modes": ["final", "no-post", "output", "depth", "view-z", "linear-depth", "normal", "emissive", "velocity", "ao", "bloom", "exposure", "temporal-current", "temporal-history", "temporal-resolved", "albedo-extra-pass"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [{"id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete"}, {"id": "timestamp-query", "required": true, "evidence": "required for performance claims", "status": "incomplete"}],
+  "runtimeProof": [{"id": "renderer-init", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"}, {"id": "mrt-readback", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"}, {"id": "temporal-reset", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"}, {"id": "current-adapter-timing", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"}],
+  "evidenceContract": "v2",
+  "validationCommand": "npm run validate:full",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

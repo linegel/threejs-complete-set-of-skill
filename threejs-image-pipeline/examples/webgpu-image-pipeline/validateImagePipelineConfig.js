@@ -1,14 +1,21 @@
-import {
-	createCapabilityTier,
-	createDefaultImagePipelineConfig,
-	evaluateLightingAwareAoComposite
-} from './pipelineConfig.js';
+import { readFileSync } from 'node:fs';
 import { PerspectiveCamera, Scene } from 'three/webgpu';
-import { pass, mrt, output, normalView, emissive, renderOutput } from 'three/tsl';
+import { emissive, mrt, normalView, output, pass } from 'three/tsl';
 import { ao } from 'three/addons/tsl/display/GTAONode.js';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 import { composeFinalGraph } from './composeFinalGraph.js';
+import {
+	IMAGE_PIPELINE_EXAMPLE_CONTRACT,
+	IMAGE_PIPELINE_NUMERIC_PROVENANCE,
+	createCapabilityTier,
+	createDefaultImagePipelineConfig,
+	createFeatureDemoImagePipelineConfig,
+	estimateMrtLogicalBytes,
+	evaluateSeparatedLightingAoComposite
+} from './pipelineConfig.js';
+
+const EXAMPLE_ROOT = new URL( './', import.meta.url );
 
 function fail( message ) {
 
@@ -20,19 +27,36 @@ function collectReachableNodes( rootNode ) {
 
 	if ( ! rootNode || typeof rootNode.traverse !== 'function' ) {
 
-		fail( 'Live graph validation requires a RenderPipeline.outputNode with node.traverse().' );
+		fail( 'Live graph validation requires a node output with traverse().' );
 
 	}
 
 	const reachable = new Set();
-
-	rootNode.traverse( ( node ) => {
-
-		reachable.add( node );
-
-	} );
-
+	rootNode.traverse( ( node ) => reachable.add( node ) );
 	return reachable;
+
+}
+
+function diagnosticModesForConfig( config ) {
+
+	const modes = [
+		'final',
+		'no-post baseline',
+		'scene HDR',
+		'depth raw',
+		'linear depth',
+		'pre-tone-map HDR',
+		'post-tone-map output',
+		'authored AO split scaffold',
+		'debug baseline AO final-color multiply'
+	];
+
+	if ( config.requiredMRT.includes( 'normal' ) ) modes.push( 'normal' );
+	if ( config.requiredMRT.includes( 'emissive' ) ) modes.push( 'emissive' );
+	if ( config.requiredMRT.includes( 'velocity' ) ) modes.push( 'velocity' );
+	if ( config.features.gtao ) modes.push( 'AO.r' );
+	if ( config.features.selectiveBloom ) modes.push( 'bloom contribution' );
+	return modes;
 
 }
 
@@ -40,166 +64,148 @@ export function validateImagePipelineGraph( config, graph ) {
 
 	const outputNode = graph?.renderPipeline?.outputNode ?? graph?.outputNode;
 	const finalOutputNode = graph?.finalOutputNode ?? outputNode;
-	const aoTextureNode = graph?.aoTextureNode;
 	const reachable = collectReachableNodes( outputNode );
-	const finalReachable = finalOutputNode === outputNode ? reachable : collectReachableNodes( finalOutputNode );
+	const finalReachable = finalOutputNode === outputNode
+		? reachable
+		: collectReachableNodes( finalOutputNode );
 	const passNodes = [ ...reachable ].filter( ( node ) => node?.isPassNode === true );
 
-	if ( passNodes.length !== 1 ) {
+	if ( passNodes.length !== config.sceneRenderCount ) {
 
-		fail( `Live output node graph must reach exactly one PassNode, got ${ passNodes.length }.` );
-
-	}
-
-	if ( config.sceneRenderCount !== passNodes.length ) {
-
-		fail( `Config sceneRenderCount ${ config.sceneRenderCount } disagrees with live graph PassNode count ${ passNodes.length }.` );
+		fail( `Live graph reaches ${ passNodes.length } scene passes; config declares ${ config.sceneRenderCount }.` );
 
 	}
 
-	if ( ! aoTextureNode ) {
+	if ( config.features.gtao ) {
 
-		fail( 'Live graph validation requires the GTAO texture node used by the final composite.' );
+		if ( ! graph?.aoTextureNode || ! finalReachable.has( graph.aoTextureNode ) ) {
+
+			fail( 'GTAO-enabled final graph must consume the actual GTAO texture node.' );
+
+		}
 
 	}
+	if ( config.features.selectiveBloom ) {
 
-	if ( ! finalReachable.has( aoTextureNode ) ) {
+		if ( ! graph?.bloomTextureNode || ! finalReachable.has( graph.bloomTextureNode ) ) {
 
-		fail( 'Final non-debug output graph must consume the GTAO texture node.' );
+			fail( 'Selective-bloom final graph must consume the actual BloomNode texture.' );
+
+		}
 
 	}
 
 	return {
 		pass: true,
 		scenePassCount: passNodes.length,
-		aoTextureReachableFromFinal: true
+		aoTextureReachableFromFinal: config.features.gtao,
+		bloomTextureReachableFromFinal: config.features.selectiveBloom
 	};
+
+}
+
+function validateClaimBoundary( config ) {
+
+	if ( config.contract.profile !== 'minimal-public-api-baseline' ) fail( 'Example profile claim boundary is missing.' );
+	if ( ! /not[- ]measured/.test( config.contract.mrtDecisionEvidence ) ) fail( 'MRT demo must not claim measured selection.' );
+	if ( ! config.contract.directIndirectSeparation.includes( 'not-implemented' ) ) fail( 'AO split scaffold boundary is missing.' );
+
+	for ( const unsupported of [ 'temporal', 'exposure', 'gradingLut', 'adaptiveDpr', 'transientAliasing' ] ) {
+
+		if ( config.features[ unsupported ] === true ) {
+
+			fail( `This example cannot enable ${ unsupported }; its claim boundary marks that feature unimplemented.` );
+
+		}
+
+	}
+	if ( config.temporal.enabled === true ) fail( 'Temporal output is unsupported until an executable reset/reseed owner exists.' );
+
+	if ( config.lutDomain !== null ) fail( 'No LUT exists in this example; lutDomain must remain null.' );
+	return config.contract;
+
+}
+
+function validateNumericProvenance( config ) {
+
+	for ( const [ name, classification ] of Object.entries( IMAGE_PIPELINE_NUMERIC_PROVENANCE ) ) {
+
+		if ( ! /^(Authored|Derived|Gated|Measured)/.test( classification ) ) {
+
+			fail( `Numeric provenance ${ name } lacks an allowed classification.` );
+
+		}
+
+	}
+
+	if ( config.numericProvenance !== IMAGE_PIPELINE_NUMERIC_PROVENANCE ) {
+
+		fail( 'Config must expose the canonical numeric-provenance registry.' );
+
+	}
+
+	return IMAGE_PIPELINE_NUMERIC_PROVENANCE;
 
 }
 
 export function validateImagePipelineConfig( config = createDefaultImagePipelineConfig(), graph = null ) {
 
-	if ( config.sceneRenderCount !== 1 ) {
+	validateClaimBoundary( config );
+	validateNumericProvenance( config );
 
-		fail( 'Image pipeline must use exactly one scene render by default.' );
-
-	}
-
-	if ( ! config.toneMapOwner || ! config.outputTransformOwner ) {
-
-		fail( 'Both toneMapOwner and outputTransformOwner are required.' );
-
-	}
-
-	if ( config.outputTransformOwner === 'renderOutput' && config.outputColorTransform !== false ) {
-
-		fail( 'renderOutput() output ownership requires RenderPipeline.outputColorTransform = false.' );
-
-	}
-
-	if ( config.outputTransformOwner === 'RenderPipeline.outputColorTransform' && config.outputColorTransform !== true ) {
-
-		fail( 'RenderPipeline output ownership requires outputColorTransform = true.' );
-
-	}
-
-	if ( config.toneMapOwner !== config.outputTransformOwner && config.outputColorTransform !== false ) {
-
-		fail( 'Split output ownership requires RenderPipeline.outputColorTransform = false.' );
-
-	}
-
-	if ( config.toneMapOwner === 'RenderPipeline' && config.outputTransformOwner === 'renderOutput' ) {
-
-		fail( 'Tone mapping and output conversion cannot be split across RenderPipeline and renderOutput().' );
-
-	}
-
-	for ( const consumerName of Object.keys( config.consumers ) ) {
-
-		if ( ! config.producers[ consumerName ] ) {
-
-			fail( `Consumer list "${ consumerName }" has no matching producer.` );
-
-		}
-
-		if ( ! config.colorDomains[ consumerName ] ) {
-
-			fail( `Consumer list "${ consumerName }" has no matching color/domain declaration.` );
-
-		}
-
-	}
+	if ( config.sceneRenderCount !== 1 ) fail( 'Example baseline requires one primary scene pass.' );
+	if ( config.toneMapOwner !== 'renderOutput' || config.outputTransformOwner !== 'renderOutput' ) fail( 'Tone map and output conversion must share renderOutput ownership.' );
+	if ( config.toneMappingMode !== 'NeutralToneMapping' ) fail( 'Executable example must exercise NeutralToneMapping.' );
+	if ( config.outputColorTransform !== false ) fail( 'Explicit renderOutput ownership requires outputColorTransform false.' );
+	if ( config.requiredMRT[ 0 ] !== 'output' ) fail( 'First selected MRT output must be scene HDR output.' );
+	if ( config.requiredMRT.includes( 'depth' ) ) fail( 'Depth is the PassNode depth texture, not an MRT color output.' );
+	if ( config.requiredMRT.includes( 'velocity' ) ) fail( 'Velocity is unsupported while the temporal path is quarantined.' );
+	if ( new Set( config.requiredMRT ).size !== config.requiredMRT.length ) fail( 'Selected MRT outputs must be unique.' );
+	if ( ! Number.isFinite( config.resolutionScales.scene ) || config.resolutionScales.scene <= 0 ) fail( 'Scene resolution scale must be finite and positive.' );
 
 	for ( const mrtName of config.requiredMRT ) {
 
-		if ( ! config.producers[ mrtName ] ) {
-
-			fail( `MRT "${ mrtName }" is missing a producer.` );
-
-		}
-
-		if ( ! Array.isArray( config.consumers[ mrtName ] ) || config.consumers[ mrtName ].length === 0 ) {
-
-			fail( `MRT "${ mrtName }" is missing declared consumers.` );
-
-		}
-
-		if ( ! config.colorDomains[ mrtName ] ) {
-
-			fail( `MRT "${ mrtName }" is missing a color/domain declaration.` );
-
-		}
+		if ( ! config.producers[ mrtName ] ) fail( `Selected MRT "${ mrtName }" has no producer.` );
+		if ( ! config.consumers[ mrtName ]?.length ) fail( `Selected MRT "${ mrtName }" has no consumer.` );
+		if ( ! config.colorDomains[ mrtName ] ) fail( `Selected MRT "${ mrtName }" has no domain.` );
+		if ( ! Number.isFinite( config.memory.bytesPerPixelBySignal[ mrtName ] ) ) fail( `Selected MRT "${ mrtName }" has no physical byte classification.` );
 
 	}
 
-	if ( config.temporal.enabled === true ) {
+	if ( config.features.selectiveBloom && config.requiredMRT.includes( 'emissive' ) === false ) {
 
-		if ( ! config.temporal.velocityConvention ) {
-
-			fail( 'Temporal mode requires a velocity convention.' );
-
-		}
-
-		if ( ! config.temporal.jitterOwner ) {
-
-			fail( 'Temporal mode requires a jitter owner.' );
-
-		}
+		fail( 'Selective bloom requires a selected emissive MRT.' );
 
 	}
 
-	const estimatedBytes = config.requiredMRT.length * config.memory.hdrAttachmentBytes;
+	const estimatedBytes = estimateMrtLogicalBytes( config );
+	if ( estimatedBytes > config.memory.memoryBudget ) fail( 'Authored logical MRT budget gate exceeded.' );
+	if ( ! config.memory.accountingStatus.includes( 'lower bound' ) ) fail( 'Memory estimate must identify its logical lower-bound status.' );
 
-	if ( estimatedBytes > config.memory.memoryBudget ) {
+	if ( ! config.resize.updatesRendererPixelRatio || ! config.resize.updatesRendererSize ) {
 
-		fail( `Estimated MRT memory ${ estimatedBytes } exceeds budget ${ config.memory.memoryBudget }.` );
-
-	}
-
-	if ( config.resize.updatesRenderer !== true || config.resize.updatesScenePass !== true ) {
-
-		fail( 'Resize path must update renderer and scene pass.' );
+		fail( 'Resize path must update renderer pixel ratio and size.' );
 
 	}
 
-	if ( config.disposal.disposesRenderPipeline !== true || config.disposal.disposesTargets !== true ) {
+	if ( ! config.disposal.disposesRenderPipeline || ! config.disposal.disposesTargets ) {
 
-		fail( 'Disposal path must own RenderPipeline and target teardown.' );
+		fail( 'Disposal path must own graph and target teardown.' );
 
 	}
 
-	const aoComposite = validateAoCompositeContract();
 	const liveGraph = graph ? validateImagePipelineGraph( config, graph ) : null;
 
 	return {
 		pass: true,
+		claimBoundary: config.contract,
 		sceneRenderCount: config.sceneRenderCount,
 		toneMapOwner: config.toneMapOwner,
 		outputTransformOwner: config.outputTransformOwner,
 		requiredMRT: config.requiredMRT,
 		estimatedBytes,
-		aoComposite,
+		estimatedBytesStatus: config.memory.accountingStatus,
+		diagnosticModes: diagnosticModesForConfig( config ),
 		liveGraph
 	};
 
@@ -207,11 +213,11 @@ export function validateImagePipelineConfig( config = createDefaultImagePipeline
 
 function assertRgbEqual( actual, expected, label ) {
 
-	for ( let index = 0; index < 3; index += 1 ) {
+	for ( let index = 0; index < expected.length; index += 1 ) {
 
-		if ( Math.abs( actual[ index ] - expected[ index ] ) > 1e-9 ) {
+		if ( Math.abs( actual[ index ] - expected[ index ] ) > Number.EPSILON * 16 ) {
 
-			fail( `${ label } changed at channel ${ index }: expected ${ expected[ index ] }, got ${ actual[ index ] }.` );
+			fail( `${ label } changed at channel ${ index }.` );
 
 		}
 
@@ -219,8 +225,9 @@ function assertRgbEqual( actual, expected, label ) {
 
 }
 
-export function validateAoCompositeContract() {
+export function validateSeparatedLightingEquationOnly() {
 
+	// [Authored numeric fixture] This validates the equation, not scene signals.
 	const pixelTerms = {
 		direct: [ 1.2, 0.7, 0.35 ],
 		indirect: [ 0.4, 0.25, 0.12 ],
@@ -228,141 +235,115 @@ export function validateAoCompositeContract() {
 		atmosphere: [ 0.18, 0.22, 0.31 ],
 		ui: [ 0.9, 0.9, 0.9 ]
 	};
-	const aoForcedZero = evaluateLightingAwareAoComposite( pixelTerms, 0 );
-	const aoForcedOne = evaluateLightingAwareAoComposite( pixelTerms, 1 );
+	const aoForcedZero = evaluateSeparatedLightingAoComposite( pixelTerms, 0 );
+	const aoForcedOne = evaluateSeparatedLightingAoComposite( pixelTerms, 1 );
 
 	assertRgbEqual( aoForcedZero.direct, pixelTerms.direct, 'Direct light' );
 	assertRgbEqual( aoForcedZero.emissive, pixelTerms.emissive, 'Emissive light' );
 	assertRgbEqual( aoForcedZero.atmosphere, pixelTerms.atmosphere, 'Atmosphere' );
 	assertRgbEqual( aoForcedZero.ui, pixelTerms.ui, 'UI overlay' );
-	assertRgbEqual( aoForcedZero.indirect, [ 0, 0, 0 ], 'Indirect light under zero AO' );
+	assertRgbEqual( aoForcedZero.indirect, [ 0, 0, 0 ], 'Indirect light under zero visibility' );
 
-	const removedByAo = aoForcedOne.color.map( ( component, index ) => component - aoForcedZero.color[ index ] );
-	assertRgbEqual( removedByAo, pixelTerms.indirect, 'AO visibility must remove only indirect light' );
+	const delta = aoForcedOne.color.map( ( value, index ) => value - aoForcedZero.color[ index ] );
+	assertRgbEqual( delta, pixelTerms.indirect, 'Visibility equation' );
 
 	return {
 		pass: true,
-		aoForcedZeroPreserves: [ 'direct', 'emissive', 'atmosphere', 'ui' ],
-		aoForcedZeroRemoves: [ 'indirect' ]
+		proofBoundary: 'numeric separated-lighting equation only; browser scene uses authored split scaffold'
 	};
 
 }
 
-const fixtureFactories = {
-	valid: () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture() } ),
-	'duplicate-scene-render': () => ( { config: createDefaultImagePipelineConfig( { sceneRenderCount: 2 } ), graph: createLiveGraphFixture() } ),
-	'duplicate-scene-pass-graph': () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture( { duplicateScenePass: true } ) } ),
-	'missing-final-ao-graph': () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture( { omitAoFromFinal: true } ) } ),
-	'duplicate-output-owner': () => ( { config: createDefaultImagePipelineConfig( {
-		toneMapOwner: 'RenderPipeline',
-		outputTransformOwner: 'renderOutput',
-		outputColorTransform: true
-	} ) } ),
-	'double-output-transform': () => ( { config: createDefaultImagePipelineConfig( {
-		outputColorTransform: true
-	} ) } ),
-	'missing-velocity-convention': () => ( { config: createDefaultImagePipelineConfig( {
-		requiredMRT: [ 'output', 'normal', 'emissive', 'velocity' ],
-		producers: {
-			output: 'scene-pass',
-			normal: 'scene-pass',
-			emissive: 'scene-pass',
-			depth: 'scene-pass',
-			velocity: 'scene-pass'
-		},
-		consumers: {
-			output: [ 'lighting-composite' ],
-			normal: [ 'GTAONode' ],
-			emissive: [ 'BloomNode' ],
-			depth: [ 'GTAONode' ],
-			velocity: [ 'TRAANode' ]
-		},
-		colorDomains: {
-			output: 'scene-linear HDR',
-			normal: 'data/no-color',
-			emissive: 'scene-linear HDR',
-			depth: 'data/no-color',
-			velocity: 'data/no-color',
-			final: 'display-referred sRGB'
-		},
-		temporal: {
-			enabled: true,
-			velocityConvention: null,
-			jitterOwner: null,
-			resetEvents: [ 'resize' ]
-		}
-	} ) } ),
-	'undeclared-mrt-consumer': () => ( { config: createDefaultImagePipelineConfig( {
-		consumers: {
-			output: [ 'lighting-composite' ],
-			normal: [],
-			emissive: [ 'BloomNode' ],
-			depth: [ 'GTAONode' ]
-		}
-	} ) } )
-};
-
-function createLiveGraphFixture( options = {} ) {
+function createLiveGraphFixture( { duplicateScenePass = false, omitAo = true } = {} ) {
 
 	const scene = new Scene();
 	const camera = new PerspectiveCamera();
 	const scenePass = pass( scene, camera );
 	const hdrColor = scenePass.getTextureNode( 'output' );
 	const aoTextureNode = scenePass.getTextureNode( 'depth' );
-	const indirectVisibility = aoTextureNode.r;
-	let composite = options.omitAoFromFinal === true ? hdrColor : hdrColor.mul( indirectVisibility );
+	let composite = omitAo ? hdrColor : hdrColor.mul( aoTextureNode.r );
 
-	if ( options.duplicateScenePass === true ) {
+	if ( duplicateScenePass ) {
 
-		const duplicatePass = pass( new Scene(), new PerspectiveCamera() );
-		composite = composite.add( duplicatePass.getTextureNode( 'output' ) );
+		const duplicate = pass( new Scene(), new PerspectiveCamera() );
+		composite = composite.add( duplicate.getTextureNode( 'output' ) );
 
 	}
 
-	const finalOutputNode = renderOutput( composite );
-
 	return {
-		renderPipeline: { outputNode: finalOutputNode },
-		finalOutputNode,
+		renderPipeline: { outputNode: composite },
+		finalOutputNode: composite,
 		aoTextureNode
 	};
 
 }
 
+const fixtureFactories = {
+	valid: () => ( { config: createDefaultImagePipelineConfig(), graph: createLiveGraphFixture() } ),
+	'duplicate-scene-render': () => ( {
+		config: createDefaultImagePipelineConfig( { sceneRenderCount: 2 } ),
+		graph: createLiveGraphFixture( { duplicateScenePass: true } )
+	} ),
+	'duplicate-scene-pass-graph': () => ( {
+		config: createDefaultImagePipelineConfig(),
+		graph: createLiveGraphFixture( { duplicateScenePass: true } )
+	} ),
+	'missing-final-ao-graph': () => ( {
+		config: createFeatureDemoImagePipelineConfig(),
+		graph: createLiveGraphFixture( { omitAo: true } )
+	} ),
+	'duplicate-output-owner': () => ( {
+		config: createDefaultImagePipelineConfig( { outputTransformOwner: 'second-output-owner' } )
+	} ),
+	'double-output-transform': () => ( {
+		config: createDefaultImagePipelineConfig( { outputColorTransform: true } )
+	} ),
+	'missing-velocity-convention': () => ( {
+		config: createDefaultImagePipelineConfig( {
+			requiredMRT: [ 'output', 'normal', 'emissive', 'velocity' ],
+			features: { temporal: true },
+			producers: { velocity: 'scene-pass' },
+			consumers: { velocity: [ 'TRAANode' ] },
+			colorDomains: { velocity: 'data/no-color' },
+			temporal: { enabled: true }
+		} )
+	} ),
+	'undeclared-mrt-consumer': () => ( {
+		config: createFeatureDemoImagePipelineConfig( { consumers: { normal: [] } } )
+	} ),
+	'depth-in-mrt': () => ( {
+		config: createDefaultImagePipelineConfig( {
+			requiredMRT: [ 'output', 'normal', 'emissive', 'depth' ],
+			memory: { bytesPerPixelBySignal: { depth: 4 } }
+		} )
+	} ),
+	'false-exposure-claim': () => ( {
+		config: createDefaultImagePipelineConfig( { features: { exposure: true } } )
+	} )
+};
+
 export function createRealImagePipelineGraph( config = createDefaultImagePipelineConfig() ) {
 
 	const scene = new Scene();
-	const camera = new PerspectiveCamera( 50, 1, 0.1, 100 );
+	const camera = new PerspectiveCamera();
 	const scenePass = pass( scene, camera );
-	scenePass.setResolutionScale( config.resolutionScales.scene );
+	const outputs = { output };
+	if ( config.requiredMRT.includes( 'normal' ) ) outputs.normal = normalView;
+	if ( config.requiredMRT.includes( 'emissive' ) ) outputs.emissive = emissive;
+	scenePass.setMRT( mrt( outputs ) );
 
-	scenePass.setMRT( mrt( {
-		output,
-		normal: normalView,
-		emissive
-	} ) );
-
-	const normalTex = scenePass.getTextureNode( 'normal' );
-	const emissiveTex = scenePass.getTextureNode( 'emissive' );
 	const depthTex = scenePass.getTextureNode( 'depth' );
-	const gtao = ao( depthTex, normalTex, camera );
-	const bloomPass = bloom( emissiveTex );
-
-	gtao.resolutionScale = config.resolutionScales.ao;
-	bloomPass.setResolutionScale( config.resolutionScales.bloom );
-
-	const graph = composeFinalGraph( {
-		config,
-		scenePass,
-		gtao,
-		bloomPass,
-		camera
-	} );
+	const normalTex = config.requiredMRT.includes( 'normal' ) ? scenePass.getTextureNode( 'normal' ) : null;
+	const emissiveTex = config.requiredMRT.includes( 'emissive' ) ? scenePass.getTextureNode( 'emissive' ) : null;
+	const gtao = config.features.gtao ? ao( depthTex, normalTex, camera ) : null;
+	const bloomPass = config.features.selectiveBloom ? bloom( emissiveTex ) : null;
+	const graph = composeFinalGraph( { config, scenePass, gtao, bloomPass, camera } );
 
 	return {
 		renderPipeline: { outputNode: graph.finalOutputNode },
 		finalOutputNode: graph.finalOutputNode,
 		aoTextureNode: graph.aoTextureNode,
+		bloomTextureNode: graph.bloomTextureNode,
 		scene,
 		camera,
 		scenePass,
@@ -377,43 +358,49 @@ export function runRealGraphValidation() {
 
 	const config = createDefaultImagePipelineConfig();
 	const realGraph = createRealImagePipelineGraph( config );
-	const validation = validateImagePipelineConfig( config, realGraph );
-
-	return {
-		validation,
-		constructorEscape: null
-	};
+	return validateImagePipelineConfig( config, realGraph );
 
 }
 
 export function runValidationFixture( fixtureName ) {
 
 	const factory = fixtureFactories[ fixtureName ];
-
-	if ( ! factory ) {
-
-		fail( `Unknown fixture "${ fixtureName }".` );
-
-	}
-
+	if ( ! factory ) fail( `Unknown fixture "${ fixtureName }".` );
 	const fixture = factory();
 	return validateImagePipelineConfig( fixture.config, fixture.graph ?? null );
+
+}
+
+function validateSourceContracts() {
+
+	const mainSource = readFileSync( new URL( 'main.js', EXAMPLE_ROOT ), 'utf8' );
+	const composeSource = readFileSync( new URL( 'composeFinalGraph.js', EXAMPLE_ROOT ), 'utf8' );
+	const readmeSource = readFileSync( new URL( 'README.md', EXAMPLE_ROOT ), 'utf8' );
+
+	if ( ! mainSource.includes( 'renderer.toneMapping = NeutralToneMapping' ) ) fail( 'main.js must exercise a nontrivial tone mapper.' );
+	if ( ! mainSource.includes( "config.requiredMRT.includes( 'normal' )" ) ) fail( 'main.js must build MRT conditionally.' );
+	if ( ! mainSource.includes( "scenePass.getLinearDepthNode( 'depth' )" ) && ! composeSource.includes( "scenePass.getLinearDepthNode( 'depth' )" ) ) fail( 'Linear-depth diagnostic must use the r185 helper.' );
+	if ( ! mainSource.includes( 'renderer.setPixelRatio( safeDpr )' ) ) fail( 'Resize must apply DPR to renderer.' );
+	if ( composeSource.indexOf( 'const temporal =' ) > composeSource.indexOf( 'const hdrComposite =' ) ) fail( 'Temporal resolve must precede bloom composite.' );
+	if ( ! composeSource.includes( 'authoredAoSplitComposite' ) ) fail( 'AO split scaffold must be named honestly.' );
+	if ( ! composeSource.includes( 'stableSceneHdr.rgb.add( bloomTextureNode.rgb )' ) || ! composeSource.includes( 'stableSceneHdr.a' ) ) fail( 'Bloom composition must preserve stable scene alpha.' );
+	if ( ! composeSource.includes( 'hdrColor.a' ) ) fail( 'AO diagnostics/composition must preserve source alpha.' );
+	if ( readmeSource.includes( 'previousUV = currentUV - velocity.xy * 0.5' ) ) fail( 'README still omits the r185 velocity Y flip.' );
+	if ( ! readmeSource.includes( 'Claim boundary' ) ) fail( 'README must state its executable claim boundary.' );
+
+	return { pass: true };
 
 }
 
 export function runSelfTest() {
 
 	const valid = runValidationFixture( 'valid' );
-	const aoComposite = validateAoCompositeContract();
-	const invalidFixtures = [
-		'duplicate-scene-render',
-		'duplicate-scene-pass-graph',
-		'missing-final-ao-graph',
-		'duplicate-output-owner',
-		'double-output-transform',
-		'missing-velocity-convention',
-		'undeclared-mrt-consumer'
-	];
+	const featureDemo = validateImagePipelineConfig( createFeatureDemoImagePipelineConfig() );
+	const fullScaleBytes = estimateMrtLogicalBytes( createDefaultImagePipelineConfig() );
+	const halfScaleBytes = estimateMrtLogicalBytes( createDefaultImagePipelineConfig( { resolutionScales: { scene: 0.5 } } ) );
+	if ( halfScaleBytes * 4 !== fullScaleBytes ) fail( 'Logical MRT accounting must follow pixel area under exact half scale.' );
+	const equationOnly = validateSeparatedLightingEquationOnly();
+	const invalidFixtures = Object.keys( fixtureFactories ).filter( ( name ) => name !== 'valid' );
 
 	for ( const fixture of invalidFixtures ) {
 
@@ -432,21 +419,28 @@ export function runSelfTest() {
 
 	const fakeRenderer = {
 		initialized: true,
-		backend: { isWebGPUBackend: true },
+		backend: {
+			isWebGPUBackend: true,
+			device: { limits: { maxColorAttachments: 8, maxColorAttachmentBytesPerSample: 32 } }
+		},
 		hasFeature: ( name ) => name === 'timestamp-query',
-		getOutputBufferType: () => 'HalfFloatType',
-		computeAsync: async () => {}
+		getOutputBufferType: () => 'HalfFloatType'
 	};
+	const capability = createCapabilityTier( fakeRenderer, {
+		selectedMrt: valid.requiredMRT,
+		bytesPerPixelBySignal: createDefaultImagePipelineConfig().memory.bytesPerPixelBySignal
+	} );
+	if ( capability.status !== 'capability-gated-not-performance-proven' ) fail( 'Capability boundary is incorrect.' );
 
-	const tier = createCapabilityTier( fakeRenderer, { requiredMRT: 3, requiredStorage: true } );
-
-	if ( tier.tier !== 'full' || tier.timestampQuery !== true || tier.budgetReason.length !== 0 ) {
-
-		fail( 'Capability tier validation failed for full fake renderer.' );
-
-	}
-
-	return { valid, invalidFixtures, tier, aoComposite };
+	return {
+		valid,
+		featureDemoOptIn: featureDemo,
+		invalidFixtures,
+		capability,
+		equationOnly,
+		claimBoundary: IMAGE_PIPELINE_EXAMPLE_CONTRACT,
+		sourceContracts: validateSourceContracts()
+	};
 
 }
 
@@ -458,7 +452,7 @@ if ( import.meta.url === `file://${ process.argv[ 1 ] }` ) {
 
 	try {
 
-		const result = expectInvalidIndex !== -1
+		const result = expectInvalidIndex !== - 1
 			? process.argv.slice( expectInvalidIndex + 1 ).map( ( fixture ) => {
 
 				try {
@@ -474,11 +468,11 @@ if ( import.meta.url === `file://${ process.argv[ 1 ] }` ) {
 				}
 
 			} )
-			: realGraph === true
+			: realGraph
 				? runRealGraphValidation()
-				: fixtureIndex === -1
-				? runSelfTest()
-				: runValidationFixture( process.argv[ fixtureIndex + 1 ] );
+				: fixtureIndex === - 1
+					? runSelfTest()
+					: runValidationFixture( process.argv[ fixtureIndex + 1 ] );
 
 		console.log( JSON.stringify( result, null, 2 ) );
 
