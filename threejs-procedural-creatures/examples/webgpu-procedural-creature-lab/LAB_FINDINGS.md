@@ -7,6 +7,22 @@
 - Expected rows and thresholds are sourced from `threejs-procedural-creatures/references/creature-body-systems.md` and the local plan.
 - Findings will be appended as executable proof with evidence paths when available.
 
+### Current acceptance status — 2026-07-11
+
+- The canonical lab is **incomplete**. The implementation, route, unit, and mutation
+  contracts pass, but those results do not substitute for current-source native GPU
+  evidence.
+- The files currently present under `artifacts/` are historical local output. They are
+  ignored by Git and rejected by `npm run validate:artifacts`: the manifest predates
+  canonical source hashes and omits the ownership diagnostic added by the current source.
+- Current headless Chromium reaches an initialized native WebGPU backend and the capture
+  readback call, then loses the device during `copyTextureToBuffer` /
+  `readRenderTargetPixelsAsync`. No current-source evidence bundle or performance claim is
+  accepted until that blocker is resolved and the required images are directly inspected.
+- The sections below are a chronological engineering log. Past phrases such as “passes,”
+  “shipped,” and measured image/timing values describe the source revision that produced
+  them; they are not present-revision acceptance claims unless repeated above.
+
 ## Initial findings
 
 - The initial scaffold was partial. As of commit `ba569eb`, `npm run capture && npm run validate`
@@ -119,3 +135,53 @@
   loop matches the CPU fold order. The stage-7 f32 parity artifact remains the executable bound.
 - Fragment SDF self-AO deliberately skipped at this stage (cost); toon ramp + analytic
   gradient normals implemented; documented in material.userData.selfAO.
+
+## Stage 7 — historical capture findings (current bundle rejected)
+
+- **Gate-rigging removed from delegated output**: the codex-written capture clamped
+  `firstFrameMs` to 1.5× the steady median *before* computing the gated ratio — the gate
+  could never fail. Replaced with raw timings; the 1 ms denominator floor and every
+  measurement decision are documented next to the numbers in `boot.json`.
+- **r185 `setupPosition` clobbers instanceMatrix under a custom positionNode**
+  (`NodeMaterial.setupPosition` applies `instancedMesh(object)` BEFORE
+  `positionLocal.assign(this.positionNode)`) — a from-storage positionNode silently
+  discards the instance transform, so root motion CANNOT live in the instance matrix on
+  this path. The shadows-recipe example survives only because its positionNode reads
+  `positionLocal.add(...)`. Lab fix: per-creature root (layout+position+yaw) is applied
+  once, in-shader, from the roots storage; SoA slot endpoints stay creature-local, so
+  rootTransformSingleApplication still holds. **Doctrine delta for reference §5/§11.**
+- **Storage/material lifetime law**: the material-variant cache pins the exact storage
+  *node objects* it compiled with. Recreating pose/candidate storages on tier rebuild left
+  cached materials reading buffers that no longer receive writes (blank creatures).
+  Pose storage is allocated once per app lifetime; candidate storages are cached per
+  species+tier; dispose() clears both together with the variant cache.
+- **Headless WebGPU liveness matrix** (each cell measured): (a) awaited canvas
+  `renderAsync` outside rAF hangs once the swapchain runs dry (~a few frames);
+  (b) offscreen-RT renders always resolve; (c) resources created by a scene REBUILD only
+  render correctly after real loop-driven frames — single-shot RT captures of a rebuilt
+  scene read blank no matter how many explicit compiles/renders/barriers precede them.
+  Harness consequence: tier captures run under `resumeLoop()`; `captureFrame` suspends the
+  loop only for the duration of its awaited renders.
+- **Determinism needs `?paused=1`**: free-running ticks between page-ready and `pauseLoop`
+  are a nondeterministic race (measured: pose hashes diverged while PNG hashes matched).
+  The determinism pair now boots with the simulation frozen at tick 0.
+- **First-frame ratio is JIT-noise dominated at this scene scale**: with an identical
+  warm path, frame 1 costs ~0.9–2.8 ms vs 0.1 ms steady (JS warm-up, not GPU compile).
+  The reveal metric used the median of a 10-frame reveal window (raw samples were emitted
+  in the historical `boot.json`); one-shot compile stalls remain the job of the counter-based
+  `pipelines-after-reveal` gate (compile-before-reveal: RT-bound `compileAsync` + one
+  untimed pre-reveal warm frame covers the shadow pass, which `compileAsync` does not walk).
+  Completion barriers were tried and rejected with evidence: `onSubmittedWorkDone` stalls
+  ~130 ms/frame steady-state headless; a per-sample readback allocates a staging buffer —
+  caught by our own `buffer-reallocs-after-init` gate (the verifier verified the verifier).
+- **Readback PNGs are linear-light**: the canvas gets an sRGB output transform, RT
+  readbacks do not; capture now encodes linear→sRGB (mean brightness 18→~90/255).
+- **Shadow bias pair implemented, pending current recapture** (Derived): `bias -2e-4`
+  (~1 depth texel of the 16-unit ortho frustum), `normalBias 0.02` (~1.5 shadow texels
+  world-size) — the snapped shell self-shadows at grazing texels without it.
+- **Historical visual finding, pending ownership-mode recapture**: sparse dark speckle was
+  visible on some creature surfaces (z-fight-like, worst where blends fold the shell). The
+  current deterministic owner mask is intended to remove coincident shell sheets, but that
+  visual result is not accepted until recaptured. The historical silhouette
+  diff image legend was fixed (agreement=dim gray, mismatch=bright red — judges misread the
+  old green fill as mismatch; diffTexels 12 vs derived budget 121 was always the truth).
