@@ -1,38 +1,94 @@
 # WebGPU Dense Grass
 
-Canonical dense-grass example for `threejs-procedural-vegetation`. It demonstrates chunked deterministic meadow patches, one-time TSL compute initialization into storage-backed instanced attributes, patch-level frustum culling, distance density LOD, far clump cards, debug overlays, optional generated meadow density masks, and full disposal.
+Canonical source scaffold for `threejs-procedural-vegetation`: spatial patches,
+one-time TSL storage initialization, instanced geometry without per-instance
+matrices, patch frustum culling, density LOD, far clump cards, debug views, and
+disposal. It is not GPU-performance or visual-acceptance evidence. The package
+validator exercises source/configuration contracts; it does not compile the TSL
+graph on a WebGPU adapter or read initialized storage back from the GPU.
 
-This example is WebGPU/TSL-first. It imports from `three/webgpu` and `three/tsl`, uses `MeshStandardNodeMaterial`/`MeshBasicNodeMaterial`, and keeps custom rendering in node materials plus compute/storage data.
+The example requires an initialized r185 `WebGPURenderer`. It has no alternate
+backend path. `renderer.compute()` queues each initialization dispatch after
+`renderer.init()`; neither `compute()` nor `computeAsync()` is a GPU-completion
+fence.
 
-## Pipeline
+## Data And Draw Architecture
 
-1. Bounds checkpoint: `createPatchRecord()` chooses deterministic 16-32 m patch descriptors and expanded local/world bounds. In `bounds` mode you must see one stable box per patch, expanded beyond the blade footprint; if boxes hug the raw patch square, wind/terrain displacement is not in the culling bound.
-2. Storage checkpoint: `createStaticStorage()` allocates 16-byte aligned storage groups: `originTerrainHeight`, `widthFacingBendSpecies`, `densitySeedsNormal`, and `colorMaterial`. Diagnostics must list all four names per patch; if a name is missing, material nodes are reading private or mismatched storage.
-3. Density checkpoint: `makeStaticInitCompute()` builds one `Fn().compute(count, [128])` dispatch per patch. It writes origin, terrain height, height, width, facing, bend, species trend, clump density, blade seed, terrain-normal XZ, color seed, clump seed, and visibility flags. In `density` mode you must see coherent clumps and paths; if the field is white noise, seed/cell coordinates are drifting.
-4. Mask checkpoint: Optional `loadMeadowDensityMask()` loads `../../assets/generated-variants/meadow-density-*.png` as `NoColorSpace` data. With a mask supplied you must see the same authored paths in density and final modes; if colors follow a different pattern than density, the material is using a detached field.
-5. Wind checkpoint: `makeGrassMaterial()` consumes the storage via `.toAttribute()` in a shared `MeshStandardNodeMaterial`. `positionNode` keeps roots anchored while folding blades with bend, wind, terrain tilt, and camera-facing yaw. In `wind` mode you must see tip-weighted gust/chop with fixed roots; if roots slide, the deformation is not weighted by blade UV from base to tip.
-6. Runtime checkpoint: `update()` changes only wind time, debug mode, patch visibility, instance counts, and LOD uniforms. Validation must report `perFrameComputeDispatches: 0`; if this increases in vertex-wind mode, static blade/clump/species data is being regenerated.
-7. LOD checkpoint: `updatePatchCullingAndLOD()` tests expanded patch bounds against the camera frustum before draw submission. In `lod` mode you must see near/mid/far colors by patch; if every patch remains near-tier, distance thresholds or camera-space measurement is wrong.
-8. Final checkpoint: `makeImpostorMaterial()` switches far patches to clump cards rather than individual blades. In `final` mode you must see dense near grass, reduced mid density, and far cards without a draw-object explosion; if far patches still draw individual blades, impostor transition is not patch-owned.
+1. `createPatchRecord()` produces stable integer patch coordinates, a u32 patch
+   seed, and conservative local/world bounds expanded for terrain and wind.
+2. Four `vec4` storage arrays hold origin/terrain/height,
+   width/facing/bend/species, density/phase/terrain-normal XZ, and material
+   variation/visibility. Their logical payload is exactly 64 bytes per blade.
+3. `makeStaticInitCompute()` issues one `Fn().compute(count, [128])` node per
+   patch. It writes static placement once. Runtime wind is vertex-node work, so
+   this implementation declares zero per-frame compute dispatches.
+4. Blade and card draws use `Mesh` with `InstancedBufferGeometry`. The storage
+   nodes reconstruct placement, so allocating unread identity `instanceMatrix`
+   buffers would add bandwidth and memory while also risking zero-matrix normal
+   transforms.
+5. `updatePatchCullingAndLOD()` rejects whole patches, changes
+   `geometry.instanceCount`, and selects blade or card representation. Two draw
+   objects are allocated per patch, but blade and card visibility are mutually
+   exclusive, so final rendering submits at most one vegetation representation
+   per visible patch. Bounds helpers add diagnostic-only draws.
+6. `makeGrassMaterial()` consumes the same density and variation fields for
+   placement, color, wind phase, and LOD thinning. `positionNode` weights bending
+   by blade UV so the root remains fixed.
+7. Optional meadow masks are `NoColorSpace` data textures. Density and final
+   diagnostic views must show the same mask topology.
 
-## Quality Tiers
+## Deterministic Integer Hash Contract
 
-| Tier | Patch budget | Blade budget | Runtime budget |
-| --- | ---: | ---: | --- |
-| `ultra` | 81 patches at 20 m | 18k blades each | 81 init dispatches per streamed region, 0 per-frame compute, vertex-node wind |
-| `high` | 49 patches at 20 m | 12k blades each | storage init once, typical 2-12 visible patch draws after culling |
-| `medium` | 25 patches at 24 m | 8k blades each | lower visibility and density LOD |
-| `low` | 9 patches at 28 m | 3k blades each | native WebGPU minimal render budget |
+`DENSE_GRASS_HASH_CONTRACT` specifies one lowbias32-style mixer:
 
-Static storage target is 64 bytes per blade in this readable example. A production pack can reduce that toward 32 bytes per blade with normalized ranges once visual error is below one pixel.
+- all arithmetic is u32 wraparound;
+- blade keys are `{patchSeed, instanceIndex}`;
+- clump keys are `{globalSeed, integerClumpCellX, integerClumpCellZ}`;
+- independent random channels use an integer lane and the fixed
+  `0x9e3779b9` step;
+- conversion to `[0, 1)` takes the upper 24 bits and multiplies by `2^-24`,
+  avoiding the `u32 -> f32` rounding that can otherwise map large hashes to
+  exactly `1`;
+- negative clump coordinates are converted through signed `i32` and bitcast to
+  `u32` in TSL, matching JavaScript bit semantics.
 
-## Debug Modes
+The JavaScript validator gates fixed CPU vectors and the presence of the same
+TSL multipliers, shifts, bit operations, typed u32 uniforms, and keys. Exact
+CPU↔GPU parity remains unproven until a real WebGPU run reads representative
+storage records back and compares them with the CPU oracle. No `sin/fract`
+pseudo-random hash is used for placement.
 
-- `final`: authored grass color, density, wind, and PBR response.
-- `bounds`: expanded patch bounds for frustum culling.
-- `density`: clump/mask density visualization.
-- `lod`: patch LOD tier colors, with bounds visible.
-- `wind`: gust/chop/root weighting visualization.
+## Derived Source Workloads
+
+These are arithmetic consequences of the presets, not device recommendations
+or measured budgets. Logical storage excludes geometry, textures, render
+targets, allocator padding, staging, and driver residency.
+
+| Tier | Patches | Blades/patch | Blades | Init dispatches | Allocated draw objects | Final representation submit ceiling | Logical static storage |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `ultra` | 81 | 18,000 | 1,458,000 | 81 | 162 | 81 | 93,312,000 B |
+| `high` | 49 | 12,000 | 588,000 | 49 | 98 | 49 | 37,632,000 B |
+| `medium` | 25 | 8,000 | 200,000 | 25 | 50 | 25 | 12,800,000 B |
+| `low` | 9 | 3,000 | 27,000 | 9 | 18 | 9 | 1,728,000 B |
+
+Choose a preset only after measuring the complete scene on the target workload.
+For constrained targets, first reduce visible patch submission, projected alpha
+coverage, shadow representation, and hot storage traffic. A smaller label is
+not evidence that a tier fits a device.
+
+## Required Visual Checks
+
+- `bounds`: stable expanded patch boxes; displaced tips stay inside.
+- `density`: coherent seeded clumps and optional mask paths, not white noise.
+- `lod`: patch-owned transitions with hysteresis/dwell added by the host when
+  the fixed thresholds visibly pop.
+- `wind`: tip-weighted motion with stationary roots and matching shadow
+  deformation.
+- `final`: near blades, reduced mid density, and far cards preserve the declared
+  silhouette/error contract.
+
+These are acceptance requirements, not claims that the repository currently
+contains qualifying captures.
 
 ## Usage
 
@@ -65,10 +121,3 @@ grass.setDebugMode("lod");
 grass.dispose();
 densityMaskTexture.dispose();
 ```
-
-The CPU-filled static storage path is teaching material only for cases where
-the user explicitly asks how to apply fallback when WebGPU is unavailable. It
-is not a default route or a separate primary implementation path. In that
-requested fallback case, if `renderer.backend.isWebGPUBackend` is false after
-`renderer.init()`, the example fills deterministic storage on the CPU and keeps
-the same node-material rendering surface.

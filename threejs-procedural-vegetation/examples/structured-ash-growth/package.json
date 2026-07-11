@@ -1,18 +1,13 @@
 {
   "type": "module",
+  "private": true,
   "scripts": {
     "check": "node --check *.js && node --check *.mjs && node validate-routes.mjs",
-    "validate:unit": "node validation.js && node validate-routes.mjs",
+    "validate:unit": "node validate-runtime-contracts.mjs && node validate-routes.mjs",
     "test:mutations": "node validate-routes.mjs --mutations && node validate-mutations.mjs",
     "capture": "node capture.mjs",
     "validate:artifacts": "node validate-artifacts.mjs",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
-    "validate:full": "npm run validate:unit && npm run validate:artifacts",
-    "validate": "node validation.js && node validate-generated-meadow-density.mjs",
-    "validate:generated-assets": "node validate-generated-meadow-density.mjs"
-  },
-  "dependencies": {
-    "playwright": "1.61.1",
-    "three": "0.185.1"
+    "validate:full": "npm run validate:unit && npm run validate:artifacts"
   }
 }

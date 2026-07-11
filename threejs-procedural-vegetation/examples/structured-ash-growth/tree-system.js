@@ -49,6 +49,8 @@ function createLeafBuffers() {
     origins: [],
     leafRoots: [],
     leafUvY: [],
+    leafTangentU: [],
+    leafTangentV: [],
     windDisplacement: [],
   };
 }
@@ -78,7 +80,7 @@ function pushBranchVertex(
   return index;
 }
 
-function pushLeafVertex(buffers, position, normal, uv, level, root) {
+function pushLeafVertex(buffers, position, normal, uv, level, root, tangentU, tangentV) {
   const index = buffers.positions.length / 3;
   buffers.positions.push(position.x, position.y, position.z);
   buffers.normals.push(normal.x, normal.y, normal.z);
@@ -86,6 +88,8 @@ function pushLeafVertex(buffers, position, normal, uv, level, root) {
   buffers.levels.push(level);
   buffers.leafRoots.push(root.x, root.y, root.z);
   buffers.leafUvY.push(uv.y);
+  buffers.leafTangentU.push(tangentU.x, tangentU.y, tangentU.z);
+  buffers.leafTangentV.push(tangentV.x, tangentV.y, tangentV.z);
   buffers.windDisplacement.push(0);
   return index;
 }
@@ -160,6 +164,14 @@ function buildGeometry(buffers, includeContinuation = false) {
       new THREE.Float32BufferAttribute(buffers.leafUvY, 1),
     );
     geometry.setAttribute(
+      "leafTangentU",
+      new THREE.Float32BufferAttribute(buffers.leafTangentU, 3),
+    );
+    geometry.setAttribute(
+      "leafTangentV",
+      new THREE.Float32BufferAttribute(buffers.leafTangentV, 3),
+    );
+    geometry.setAttribute(
       "windDisplacement",
       new THREE.Float32BufferAttribute(buffers.windDisplacement, 1),
     );
@@ -221,8 +233,16 @@ export function compileAshTree(preset) {
         new THREE.Vector2(1, 0),
         new THREE.Vector2(1, 1),
       ];
-      const cardNormal = new THREE.Vector3(0, 0, 1)
+      const tangentU = new THREE.Vector3(1, 0, 0)
+        .applyAxisAngle(new THREE.Vector3(0, 1, 0), cardRotation)
         .applyEuler(orientation)
+        .multiplyScalar(size);
+      const tangentV = new THREE.Vector3(0, 1, 0)
+        .applyAxisAngle(new THREE.Vector3(0, 1, 0), cardRotation)
+        .applyEuler(orientation)
+        .multiplyScalar(size);
+      const cardNormal = new THREE.Vector3()
+        .crossVectors(tangentU, tangentV)
         .normalize();
 
       for (let vertexIndex = 0; vertexIndex < 4; vertexIndex += 1) {
@@ -232,7 +252,7 @@ export function compileAshTree(preset) {
           .add(origin);
         const roundedNormal = cardNormal
           .clone()
-          .add(vertex.clone().sub(origin))
+          .addScaledVector(vertex.clone().sub(origin).normalize(), 0.35)
           .normalize();
         pushLeafVertex(
           leaves,
@@ -241,6 +261,8 @@ export function compileAshTree(preset) {
           uv[vertexIndex],
           level / preset.branchLevels,
           origin,
+          tangentU,
+          tangentV,
         );
       }
       leaves.indices.push(
@@ -545,9 +567,17 @@ function copyBox3(box) {
   };
 }
 
-export function reportAshForegroundBoundsAndFrustum(tree, camera = null) {
-  const branchBox = tree.branchGeometry.boundingBox;
-  const leafBox = tree.leafGeometry.boundingBox;
+export function reportAshForegroundBoundsAndFrustum(tree, camera = null, worldUnitsPerMeter = 1) {
+  if (!(worldUnitsPerMeter > 0) || !Number.isFinite(worldUnitsPerMeter)) {
+    throw new Error("Ash bounds worldUnitsPerMeter must be finite and positive");
+  }
+  const scale = new THREE.Vector3(worldUnitsPerMeter, worldUnitsPerMeter, worldUnitsPerMeter);
+  const branchBox = tree.branchGeometry.boundingBox.clone();
+  const leafBox = tree.leafGeometry.boundingBox.clone();
+  branchBox.min.multiply(scale);
+  branchBox.max.multiply(scale);
+  leafBox.min.multiply(scale);
+  leafBox.max.multiply(scale);
   const unionBox = branchBox.clone().union(leafBox);
   const report = {
     branchBounds: copyBox3(branchBox),

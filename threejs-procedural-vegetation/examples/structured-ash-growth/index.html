@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Native WebGPU Structured Ash Growth</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #98b8cf; }
+    #view { display: block; width: 100%; height: 100%; }
+    #status { position: fixed; left: 12px; bottom: 10px; color: #122719; font: 12px/1.4 ui-monospace, monospace; }
+  </style>
+  <script type="importmap">
+  { "imports": {
+    "three": "/node_modules/three/build/three.webgpu.js",
+    "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+    "three/tsl": "/node_modules/three/build/three.tsl.js",
+    "three/addons/": "/node_modules/three/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <canvas id="view" width="1200" height="800"></canvas>
+  <output id="status">initializing native WebGPU…</output>
+  <script type="module" src="./browser-lab.js"></script>
+</body>
+</html>

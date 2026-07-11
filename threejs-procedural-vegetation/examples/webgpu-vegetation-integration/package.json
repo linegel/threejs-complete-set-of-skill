@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "node --check *.js && node --check *.mjs && node validate-routes.mjs",
+    "validate:unit": "node validate-integration.mjs && node validate-routes.mjs",
+    "test:mutations": "node validate-integration.mjs --mutations && node validate-routes.mjs --mutations",
+    "capture": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts"
+  }
+}

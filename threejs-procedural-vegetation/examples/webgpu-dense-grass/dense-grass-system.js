@@ -3,11 +3,10 @@ import {
   Box3Helper,
   Color,
   DoubleSide,
-  DynamicDrawUsage,
   Frustum,
   FrontSide,
   Group,
-  InstancedMesh,
+  InstancedBufferGeometry,
   Matrix4,
   Mesh,
   MeshBasicNodeMaterial,
@@ -18,11 +17,13 @@ import {
   TextureLoader,
   Vector2,
   Vector3,
+  Vector4,
 } from "three/webgpu";
 import {
   Fn,
   abs,
   atan,
+  bitcast,
   cameraPosition,
   clamp,
   color,
@@ -30,7 +31,7 @@ import {
   dot,
   float,
   floor,
-  fract,
+  int,
   instanceIndex,
   instancedArray,
   length,
@@ -46,6 +47,7 @@ import {
   smoothstep,
   step,
   texture,
+  uint,
   uniform,
   uv,
   vec2,
@@ -56,6 +58,19 @@ import {
 export const DEFAULT_PATCH_SIZE = 20;
 export const DEFAULT_BLADES_PER_PATCH = 18000;
 export const DEFAULT_BLADE_SEGMENTS = 14;
+
+export const DENSE_GRASS_HASH_CONTRACT = Object.freeze({
+  mixer: "lowbias32",
+  mixMultipliers: Object.freeze([0x7feb352d, 0x846ca68b]),
+  mixShifts: Object.freeze([16, 15, 16]),
+  laneStep: 0x9e3779b9,
+  bladeIndexMultiplier: 747796405,
+  clumpCoordinateMultipliers: Object.freeze([374761393, 668265263]),
+  clumpSeedMultiplier: 2246822519,
+  clumpCoordinateOffset: 8192,
+  outputShift: 8,
+  outputScale: 1 / 16777216,
+});
 
 export const webgpuDenseGrassDebugModes = new Map([
   ["final", 0],
@@ -73,6 +88,7 @@ export const meadowDensityMaskPaths = {
 
 export const denseGrassQualityTiers = {
   ultra: {
+    dprCap: 2,
     patchGridRadius: 4,
     patchSize: 20,
     bladesPerPatch: 18000,
@@ -80,10 +96,12 @@ export const denseGrassQualityTiers = {
     midDistance: 62,
     farDistance: 118,
     midDensity: 0.48,
-    // Budget: 81 patches, up to 1.46M visible blades, 1 init dispatch per streamed patch,
-    // 2 draw objects per visible patch, per-frame compute 0 ms because wind is vertex-node.
+    // Derived source workload: 81 allocated patches, 1.458M blades, 81 queued init
+    // dispatches, 162 allocated draw objects, 81 submitted-representation
+    // ceiling, and zero per-frame compute dispatches.
   },
   high: {
+    dprCap: 1.5,
     patchGridRadius: 3,
     patchSize: 20,
     bladesPerPatch: 12000,
@@ -91,10 +109,12 @@ export const denseGrassQualityTiers = {
     midDistance: 54,
     farDistance: 96,
     midDensity: 0.42,
-    // Budget: 49 patches, up to 588k visible blades, static storage 32-64 B/blade,
-    // 2-12 submitted patch draws typical after culling.
+    // Derived source workload: 49 allocated patches, 588k blades, 49 queued init
+    // dispatches, 98 allocated draw objects, 49 submitted-representation
+    // ceiling, and 37.632 MB logical storage payload.
   },
   medium: {
+    dprCap: 1.25,
     patchGridRadius: 2,
     patchSize: 24,
     bladesPerPatch: 8000,
@@ -102,10 +122,12 @@ export const denseGrassQualityTiers = {
     midDistance: 44,
     farDistance: 78,
     midDensity: 0.32,
-    // Budget: 25 patches, 200k blades before culling; static CPU-filled
-    // storage is documented only for explicit fallback teaching requests.
+    // Derived source workload: 25 allocated patches, 200k blades, 25 queued init
+    // dispatches, 50 allocated draw objects, 25 submitted-representation
+    // ceiling, and 12.8 MB logical storage payload.
   },
   low: {
+    dprCap: 1,
     patchGridRadius: 1,
     patchSize: 28,
     bladesPerPatch: 3000,
@@ -113,35 +135,108 @@ export const denseGrassQualityTiers = {
     midDistance: 32,
     farDistance: 58,
     midDensity: 0.22,
-    // Budget: 9 patches, 27k blades plus impostor cards, no dynamic compute.
+    // Derived source workload: 9 allocated patches, 27k blades, 9 queued init
+    // dispatches, 18 allocated draw objects, 9 submitted-representation
+    // ceiling, and 1.728 MB logical storage payload.
   },
 };
 
-const _matrix = new Matrix4();
 const _frustum = new Frustum();
 const _cameraProjectionView = new Matrix4();
 const _vector = new Vector3();
 
-function clamp01(value) {
-  return Math.min(1, Math.max(0, value));
-}
-
-function hashUint(value) {
+export function hashDenseGrassUintCPU(value) {
+  const { mixMultipliers, mixShifts } = DENSE_GRASS_HASH_CONTRACT;
   let state = value >>> 0;
-  state ^= state >>> 16;
-  state = Math.imul(state, 0x7feb352d);
-  state ^= state >>> 15;
-  state = Math.imul(state, 0x846ca68b);
-  state ^= state >>> 16;
+  state = (state ^ (state >>> mixShifts[0])) >>> 0;
+  state = Math.imul(state, mixMultipliers[0]) >>> 0;
+  state = (state ^ (state >>> mixShifts[1])) >>> 0;
+  state = Math.imul(state, mixMultipliers[1]) >>> 0;
+  state = (state ^ (state >>> mixShifts[2])) >>> 0;
   return state >>> 0;
 }
 
-function hashFloat(seed, salt = 0) {
-  return hashUint((seed + Math.imul(salt + 1, 0x9e3779b9)) >>> 0) / 4294967295;
+export function hashDenseGrassLaneCPU(seed, lane = 0) {
+  const salted = (seed + Math.imul((lane + 1) >>> 0, DENSE_GRASS_HASH_CONTRACT.laneStep)) >>> 0;
+  const mantissa = hashDenseGrassUintCPU(salted) >>> DENSE_GRASS_HASH_CONTRACT.outputShift;
+  return mantissa * DENSE_GRASS_HASH_CONTRACT.outputScale;
 }
 
 function buildPatchSeed(seed, x, z) {
-  return hashUint((seed >>> 0) ^ Math.imul(x + 4096, 73856093) ^ Math.imul(z + 4096, 19349663));
+  return hashDenseGrassUintCPU(
+    (seed >>> 0) ^ Math.imul(x + 4096, 73856093) ^ Math.imul(z + 4096, 19349663),
+  );
+}
+
+export function buildDenseGrassBladeSeedCPU(patchSeed, bladeIndex) {
+  return hashDenseGrassUintCPU(
+    (patchSeed >>> 0) ^ Math.imul((bladeIndex + 1) >>> 0, DENSE_GRASS_HASH_CONTRACT.bladeIndexMultiplier),
+  );
+}
+
+export function buildDenseGrassClumpSeedCPU(seed, clumpCellX, clumpCellZ) {
+  const { clumpCoordinateMultipliers, clumpCoordinateOffset, clumpSeedMultiplier } = DENSE_GRASS_HASH_CONTRACT;
+  const x = (Math.floor(clumpCellX) + clumpCoordinateOffset) | 0;
+  const z = (Math.floor(clumpCellZ) + clumpCoordinateOffset) | 0;
+  return hashDenseGrassUintCPU(
+    Math.imul(x, clumpCoordinateMultipliers[0]) ^
+    Math.imul(z, clumpCoordinateMultipliers[1]) ^
+    Math.imul(seed >>> 0, clumpSeedMultiplier),
+  );
+}
+
+function gcd(a, b) {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y !== 0) [x, y] = [y, x % y];
+  return x;
+}
+
+export function denseGrassSpatialPermutationStep(columns) {
+  if (!Number.isInteger(columns) || columns < 1) {
+    throw new Error("dense grass columns must be a positive integer");
+  }
+  const cellCount = columns * columns;
+  let candidate = Math.max(1, Math.floor(cellCount * 0.6180339887498949));
+  if ((candidate & 1) === 0) candidate += 1;
+  while (gcd(candidate, cellCount) !== 1) candidate += 2;
+  return candidate;
+}
+
+export function denseGrassSpatialGridSlot(bladeIndex, columns) {
+  const cellCount = columns * columns;
+  if (!Number.isInteger(bladeIndex) || bladeIndex < 0 || bladeIndex >= cellCount) {
+    throw new Error("dense grass bladeIndex must address the ranked grid");
+  }
+  return (bladeIndex * denseGrassSpatialPermutationStep(columns)) % cellCount;
+}
+
+/** CPU oracle for the root/normal invariants implemented by the vertex node. */
+export function evaluateDenseGrassRootedDeformationCPU({
+  t,
+  height,
+  forward,
+  touchX = 0,
+  touchZ = 0,
+  terrainTiltX = 0,
+  terrainTiltZ = 0,
+} = {}) {
+  if (![t, height, forward, touchX, touchZ, terrainTiltX, terrainTiltZ].every(Number.isFinite)) {
+    throw new Error("dense-grass deformation inputs must be finite");
+  }
+  if (t < 0 || t > 1 || height <= 0) {
+    throw new Error("dense-grass deformation requires t in [0,1] and positive height");
+  }
+  const rootWeight = t ** 1.65;
+  const x = (touchX - terrainTiltX) * rootWeight;
+  const z = (touchZ - terrainTiltZ) * rootWeight;
+  const slope = (forward + Math.hypot(x, z)) / Math.max(height, 0.05);
+  const inverseLength = 1 / Math.hypot(slope, 1);
+  return Object.freeze({
+    rootWeight,
+    offset: Object.freeze([x, 0, z]),
+    normalLength: Math.hypot(slope * inverseLength, inverseLength),
+  });
 }
 
 function makeExpandedPatchBounds(patchSize, maxHeight, terrainAmplitude, windBend) {
@@ -153,14 +248,18 @@ function makeExpandedPatchBounds(patchSize, maxHeight, terrainAmplitude, windBen
 }
 
 function makeBladeStripGeometry({ segments = DEFAULT_BLADE_SEGMENTS } = {}) {
-  const geometry = new PlaneGeometry(1, 1, 1, segments);
-  geometry.translate(0, 0.5, 0);
+  const source = new PlaneGeometry(1, 1, 1, segments);
+  source.translate(0, 0.5, 0);
+  const geometry = new InstancedBufferGeometry().copy(source);
+  source.dispose();
   return geometry;
 }
 
 function makeClumpCardGeometry() {
-  const geometry = new PlaneGeometry(1, 1, 1, 3);
-  geometry.translate(0, 0.5, 0);
+  const source = new PlaneGeometry(1, 1, 1, 3);
+  source.translate(0, 0.5, 0);
+  const geometry = new InstancedBufferGeometry().copy(source);
+  source.dispose();
   return geometry;
 }
 
@@ -169,6 +268,7 @@ export function loadMeadowDensityMask(url = meadowDensityMaskPaths.a, manager) {
   textureMap.colorSpace = NoColorSpace;
   textureMap.generateMipmaps = true;
   textureMap.flipY = false;
+  textureMap.userData.densityMaskUrl = String(url);
   return textureMap;
 }
 
@@ -181,100 +281,33 @@ function createStaticStorage(bladesPerPatch) {
   };
 }
 
-function markStorageForUpload(storageSet) {
-  for (const node of Object.values(storageSet)) {
-    node.value.needsUpdate = true;
-  }
-}
-
-function fillReducedStorageOnCPU(patch, storageSet, options) {
-  const {
-    bladesPerPatch,
-    patchSize,
-    terrainAmplitude,
-    bladeHeightMin,
-    bladeHeightMax,
-    bladeWidthMin,
-    bladeWidthMax,
-    bendAmountMin,
-    bendAmountMax,
-    clumpSize,
-    clumpRadius,
-  } = options;
-  const columns = Math.ceil(Math.sqrt(bladesPerPatch));
-  const half = patchSize * 0.5;
-  const originArray = storageSet.originTerrainHeight.value.array;
-  const shapeArray = storageSet.widthFacingBendSpecies.value.array;
-  const densityArray = storageSet.densitySeedsNormal.value.array;
-  const colorArray = storageSet.colorMaterial.value.array;
-
-  for (let index = 0; index < bladesPerPatch; index += 1) {
-    const gx = index % columns;
-    const gz = Math.floor(index / columns);
-    const seedBase = hashUint(patch.seed ^ Math.imul(index + 1, 747796405));
-    const jitterX = hashFloat(seedBase, 1) - 0.5;
-    const jitterZ = hashFloat(seedBase, 2) - 0.5;
-    const localX = (gx + 0.5 + jitterX * 0.78) / columns * patchSize - half;
-    const localZ = (gz + 0.5 + jitterZ * 0.78) / columns * patchSize - half;
-    const worldX = patch.center.x + localX;
-    const worldZ = patch.center.y + localZ;
-    const terrain = terrainAmplitude * 0.5 * (
-      Math.sin((worldX + options.seed) * options.terrainFrequency) +
-      Math.sin((worldZ - options.seed) * options.terrainFrequency * 1.37)
-    );
-    const clumpCellX = Math.floor(worldX / clumpSize);
-    const clumpCellZ = Math.floor(worldZ / clumpSize);
-    const clumpSeed = hashUint(Math.imul(clumpCellX + 8192, 374761393) ^ Math.imul(clumpCellZ + 8192, 668265263));
-    const clumpCenterX = (clumpCellX + hashFloat(clumpSeed, 3)) * clumpSize;
-    const clumpCenterZ = (clumpCellZ + hashFloat(clumpSeed, 4)) * clumpSize;
-    const distToClump = Math.hypot(clumpCenterX - worldX, clumpCenterZ - worldZ);
-    const density = 1 - smoothstepCPU(0.68, 1, clamp01(distToClump / clumpRadius));
-    const height = lerp(bladeHeightMin, bladeHeightMax, hashFloat(clumpSeed, 5)) * lerp(0.72, 1.28, hashFloat(seedBase, 6));
-    const width = lerp(bladeWidthMin, bladeWidthMax, hashFloat(clumpSeed, 7)) * lerp(0.7, 1.3, hashFloat(seedBase, 8));
-    const bend = lerp(bendAmountMin, bendAmountMax, hashFloat(clumpSeed, 9)) * lerp(0.8, 1.2, hashFloat(seedBase, 10));
-    const facing = Math.atan2(clumpCenterZ - worldZ, clumpCenterX - worldX) + (hashFloat(seedBase, 11) - 0.5) * options.bladeYaw;
-    const species = Math.floor(hashFloat(clumpSeed, 12) * 3);
-    const normalX = clamp((Math.sin(worldX * options.terrainFrequency) * terrainAmplitude) / 6, -0.7, 0.7);
-    const normalZ = clamp((Math.cos(worldZ * options.terrainFrequency) * terrainAmplitude) / 6, -0.7, 0.7);
-    const o = index * 4;
-    originArray[o + 0] = localX;
-    originArray[o + 1] = localZ;
-    originArray[o + 2] = terrain;
-    originArray[o + 3] = height;
-    shapeArray[o + 0] = width;
-    shapeArray[o + 1] = facing;
-    shapeArray[o + 2] = bend;
-    shapeArray[o + 3] = species / 2;
-    densityArray[o + 0] = density;
-    densityArray[o + 1] = hashFloat(seedBase, 13);
-    densityArray[o + 2] = normalX;
-    densityArray[o + 3] = normalZ;
-    colorArray[o + 0] = hashFloat(seedBase, 14);
-    colorArray[o + 1] = hashFloat(clumpSeed, 15);
-    colorArray[o + 2] = hashFloat(seedBase, 16);
-    colorArray[o + 3] = density > 0.18 ? 1 : 0;
-  }
-
-  markStorageForUpload(storageSet);
-}
-
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
-
-function smoothstepCPU(edge0, edge1, x) {
-  const t = clamp01((x - edge0) / (edge1 - edge0));
-  return t * t * (3 - 2 * t);
-}
-
-const hash11 = Fn(([value]) => {
-  return fract(sin(value.mul(127.1)).mul(43758.5453123));
+const hashDenseGrassUintNode = Fn(([value]) => {
+  const { mixMultipliers, mixShifts } = DENSE_GRASS_HASH_CONTRACT;
+  let state = uint(value);
+  state = state.bitXor(state.shiftRight(uint(mixShifts[0])));
+  state = state.mul(uint(mixMultipliers[0]));
+  state = state.bitXor(state.shiftRight(uint(mixShifts[1])));
+  state = state.mul(uint(mixMultipliers[1]));
+  state = state.bitXor(state.shiftRight(uint(mixShifts[2])));
+  return state;
 });
 
-const hash21 = Fn(([p]) => {
-  return vec2(
-    hash11(dot(p, vec2(127.1, 311.7))),
-    hash11(dot(p, vec2(269.5, 183.3))),
+const hashDenseGrassLaneNode = Fn(([seed, lane]) => {
+  const salted = uint(seed).add(
+    uint(lane).add(uint(1)).mul(uint(DENSE_GRASS_HASH_CONTRACT.laneStep)),
+  );
+  const mantissa = hashDenseGrassUintNode(salted).shiftRight(uint(DENSE_GRASS_HASH_CONTRACT.outputShift));
+  return float(mantissa).mul(DENSE_GRASS_HASH_CONTRACT.outputScale);
+});
+
+const buildDenseGrassClumpSeedNode = Fn(([seed, clumpCell]) => {
+  const { clumpCoordinateMultipliers, clumpCoordinateOffset, clumpSeedMultiplier } = DENSE_GRASS_HASH_CONTRACT;
+  const x = bitcast(int(clumpCell.x.add(clumpCoordinateOffset)), "uint");
+  const z = bitcast(int(clumpCell.y.add(clumpCoordinateOffset)), "uint");
+  return hashDenseGrassUintNode(
+    x.mul(uint(clumpCoordinateMultipliers[0]))
+      .bitXor(z.mul(uint(clumpCoordinateMultipliers[1])))
+      .bitXor(uint(seed).mul(uint(clumpSeedMultiplier))),
   );
 });
 
@@ -309,6 +342,8 @@ function makeStaticInitCompute(patch, storageSet, options, densityMaskTexture) {
     clumpYaw,
   } = options;
   const columns = Math.ceil(Math.sqrt(bladesPerPatch));
+  const cellCount = columns * columns;
+  const spatialStep = denseGrassSpatialPermutationStep(columns);
   const invColumns = 1 / columns;
   const halfPatch = patchSize * 0.5;
   const origin = storageSet.originTerrainHeight;
@@ -316,48 +351,90 @@ function makeStaticInitCompute(patch, storageSet, options, densityMaskTexture) {
   const density = storageSet.densitySeedsNormal;
   const colorMaterial = storageSet.colorMaterial;
   const patchCenterNode = uniform(new Vector2(patch.center.x, patch.center.y));
-  const patchSeedNode = uniform(patch.seed + seed * 101);
+  const patchSeedNode = uniform(patch.seed >>> 0, "uint");
+  const globalSeedNode = uniform(seed >>> 0, "uint");
   const densityTextureNode = densityMaskTexture ? texture(densityMaskTexture) : null;
 
-  // Dense Grass Build Order 3: one deterministic init dispatch per chunk writes static
-  // origin, terrain, blade/clump/species, normal, and color material data to storage.
-  return Fn(() => {
+  // Every random lane is keyed by a u32 patch/cell seed plus an integer lane.
+  // DENSE_GRASS_HASH_CONTRACT and the exported CPU functions are the parity
+  // specification; no floating sin/fract hash participates in placement.
+  const computeNode = Fn(() => {
     const idx = instanceIndex;
-    const gx = float(idx.mod(columns));
-    const gz = floor(float(idx).mul(invColumns));
+    // The prefix of this permutation spans the field instead of selecting a
+    // row-major strip. Mid-LOD instanceCount can therefore reduce work while
+    // retaining deterministic occupancy in every spatial quadrant.
+    const rankedSlot = idx.mul(uint(spatialStep)).mod(uint(cellCount));
+    const gx = float(rankedSlot.mod(uint(columns)));
+    const gz = float(rankedSlot.div(uint(columns)));
     const grid = vec2(gx, gz);
-    const cellSeed = grid.add(patchSeedNode);
-    const jitter = hash21(cellSeed).sub(0.5).mul(0.78);
+    const bladeSeedU32 = hashDenseGrassUintNode(
+      patchSeedNode.bitXor(
+        idx.add(uint(1)).mul(uint(DENSE_GRASS_HASH_CONTRACT.bladeIndexMultiplier)),
+      ),
+    );
+    const jitter = vec2(
+      hashDenseGrassLaneNode(bladeSeedU32, uint(1)),
+      hashDenseGrassLaneNode(bladeSeedU32, uint(2)),
+    ).sub(0.5).mul(0.78);
     const localXZ = grid.add(0.5).add(jitter).mul(invColumns).mul(patchSize).sub(halfPatch);
     const worldXZ = patchCenterNode.add(localXZ);
     const terrainY = terrainHeightNode(worldXZ, float(terrainAmplitude), float(terrainFrequency), float(seed));
     const clumpCell = floor(worldXZ.div(clumpSize));
-    const clumpRandom = hash21(clumpCell.add(patchSeedNode.mul(0.013)));
+    const clumpSeedU32 = buildDenseGrassClumpSeedNode(globalSeedNode, clumpCell);
+    const clumpRandom = vec2(
+      hashDenseGrassLaneNode(clumpSeedU32, uint(3)),
+      hashDenseGrassLaneNode(clumpSeedU32, uint(4)),
+    );
     const clumpCenter = clumpCell.add(clumpRandom).mul(clumpSize);
     const toClump = clumpCenter.sub(worldXZ);
     const distToClump = length(toClump);
-    const clumpPresence = smoothstep(1.0, 0.68, clamp(distToClump.div(clumpRadius), 0.0, 1.0));
+    const clumpPresence = float(1).sub(
+      smoothstep(0.68, 1.0, clamp(distToClump.div(clumpRadius), 0.0, 1.0)),
+    );
     const maskUv = worldXZ.div(patchSize * (options.patchGridRadius * 2 + 1)).add(0.5);
     const maskDensity = densityTextureNode ? densityTextureNode.sample(maskUv).r : float(1.0);
     const finalDensity = clamp(clumpPresence.mul(maskDensity), 0.0, 1.0);
-    const bladeSeed = hash11(dot(worldXZ, vec2(37.0, 17.0)).add(patchSeedNode));
-    const colorSeed = hash11(dot(worldXZ, vec2(19.3, 53.7)).add(patchSeedNode));
-    const clumpSeed = hash11(dot(clumpCell, vec2(47.3, 61.7)).add(patchSeedNode));
-    const typeTrend = hash11(dot(clumpCell, vec2(11.0, 23.0)).add(patchSeedNode));
-    const height = mix(bladeHeightMin, bladeHeightMax, hash11(clumpSeed.add(1.7))).mul(mix(0.72, 1.28, bladeSeed));
-    const width = mix(bladeWidthMin, bladeWidthMax, hash11(clumpSeed.add(3.1))).mul(mix(0.7, 1.3, colorSeed));
-    const bend = mix(bendAmountMin, bendAmountMax, hash11(clumpSeed.add(5.3))).mul(mix(0.8, 1.2, bladeSeed));
+    const bladePhaseSeed = hashDenseGrassLaneNode(bladeSeedU32, uint(13));
+    const colorSeed = hashDenseGrassLaneNode(bladeSeedU32, uint(14));
+    const clumpColorSeed = hashDenseGrassLaneNode(clumpSeedU32, uint(15));
+    const typeTrend = floor(hashDenseGrassLaneNode(clumpSeedU32, uint(12)).mul(3)).div(2);
+    const height = mix(
+      bladeHeightMin,
+      bladeHeightMax,
+      hashDenseGrassLaneNode(clumpSeedU32, uint(5)),
+    ).mul(mix(0.72, 1.28, hashDenseGrassLaneNode(bladeSeedU32, uint(6))));
+    const width = mix(
+      bladeWidthMin,
+      bladeWidthMax,
+      hashDenseGrassLaneNode(clumpSeedU32, uint(7)),
+    ).mul(mix(0.7, 1.3, hashDenseGrassLaneNode(bladeSeedU32, uint(8))));
+    const bend = mix(
+      bendAmountMin,
+      bendAmountMax,
+      hashDenseGrassLaneNode(clumpSeedU32, uint(9)),
+    ).mul(mix(0.8, 1.2, hashDenseGrassLaneNode(bladeSeedU32, uint(10))));
     const facing = atan(toClump.y, toClump.x)
-      .add(bladeSeed.sub(0.5).mul(bladeYaw))
-      .add(clumpSeed.sub(0.5).mul(clumpYaw));
+      .add(hashDenseGrassLaneNode(bladeSeedU32, uint(11)).sub(0.5).mul(bladeYaw))
+      .add(hashDenseGrassLaneNode(clumpSeedU32, uint(17)).sub(0.5).mul(clumpYaw));
     const normalXZ = terrainNormalXZNode(worldXZ, float(terrainAmplitude), float(terrainFrequency), float(seed));
     const visibleFlag = step(0.18, finalDensity);
 
     origin.element(idx).assign(vec4(localXZ.x, localXZ.y, terrainY, height));
     shape.element(idx).assign(vec4(width, facing, bend, typeTrend));
-    density.element(idx).assign(vec4(finalDensity, bladeSeed, normalXZ.x, normalXZ.y));
-    colorMaterial.element(idx).assign(vec4(colorSeed, clumpSeed, hash11(bladeSeed.add(9.0)), visibleFlag));
+    density.element(idx).assign(vec4(finalDensity, bladePhaseSeed, normalXZ.x, normalXZ.y));
+    colorMaterial.element(idx).assign(vec4(
+      colorSeed,
+      clumpColorSeed,
+      hashDenseGrassLaneNode(bladeSeedU32, uint(16)),
+      visibleFlag,
+    ));
   })().compute(bladesPerPatch, [128]).setName(`Init dense grass patch ${patch.key}`);
+
+  computeNode.userData = {
+    denseGrassUniforms: { patchCenterNode, patchSeedNode, globalSeedNode },
+    spatialRanking: { columns, cellCount, spatialStep },
+  };
+  return computeNode;
 }
 
 function makeGrassMaterial(patch, storageSet, options) {
@@ -377,6 +454,11 @@ function makeGrassMaterial(patch, storageSet, options) {
   const patchCenterNode = uniform(new Vector2(patch.center.x, patch.center.y));
   const windDirNode = uniform(new Vector2(options.windDirection.x, options.windDirection.y).normalize());
   const windStrengthNode = uniform(options.windStrength);
+  const windSpeedNode = uniform(options.windSpeed);
+  const touchNodes = Array.from(
+    { length: options.maxTouchPoints },
+    () => uniform(new Vector4(0, 0, 0.001, 0)),
+  );
   const cameraFacingNode = uniform(options.cameraFacing);
   const material = new MeshStandardNodeMaterial();
   material.side = DoubleSide;
@@ -403,8 +485,8 @@ function makeGrassMaterial(patch, storageSet, options) {
   const yaw = mix(baseFacing, cameraYaw, cameraFacingNode.mul(smoothstep(0.25, 1.0, t)));
   const windTravel = dot(worldBaseXZ, windDirNode).mul(0.18);
   const bladePhase = density.y.mul(6.28318530718);
-  const gust = sin(windTimeNode.mul(options.windSpeed).add(windTravel).add(bladePhase)).mul(0.5).add(0.5);
-  const chop = sin(windTimeNode.mul(options.windSpeed * 4.7).add(bladePhase.mul(3.1))).mul(0.5).add(0.5);
+  const gust = sin(windTimeNode.mul(windSpeedNode).add(windTravel).add(bladePhase)).mul(0.5).add(0.5);
+  const chop = sin(windTimeNode.mul(windSpeedNode.mul(4.7)).add(bladePhase.mul(3.1))).mul(0.5).add(0.5);
   const windWeight = pow(t, 1.65);
   const windAmp = windStrengthNode.mul(mix(0.45, 1.25, gust)).mul(mix(0.85, 1.2, chop));
   const speciesFold = mix(0.48, 1.05, shape.w);
@@ -417,16 +499,34 @@ function makeGrassMaterial(patch, storageSet, options) {
     localBlade.x.mul(yawCos).sub(localBlade.y.mul(yawSin)),
     localBlade.x.mul(yawSin).add(localBlade.y.mul(yawCos)),
   );
+  let touchOffset = vec2(0);
+  for (const touchNode of touchNodes) {
+    const delta = worldBaseXZ.sub(touchNode.xy);
+    const distance = length(delta);
+    const falloff = float(1).sub(
+      smoothstep(touchNode.z.mul(0.2), touchNode.z, distance),
+    ).mul(touchNode.w);
+    const direction = delta.div(max(distance, 0.001));
+    touchOffset = touchOffset.add(
+      direction.mul(falloff).mul(height).mul(0.55).mul(windWeight),
+    );
+  }
   const drop = forward.mul(forward).div(max(height, 0.05)).mul(0.18);
   const terrainTilt = vec2(density.z, density.w).mul(t).mul(height).mul(0.35);
 
   // Dense Grass Build Order 5 and 6: the root stays fixed, blade fold and wind
   // are vertex-node work, and update() only changes wind/touch/LOD uniforms.
   material.positionNode = vec3(
-    origin.x.add(rotatedXZ.x).sub(terrainTilt.x),
+    origin.x.add(rotatedXZ.x).add(touchOffset.x).sub(terrainTilt.x),
     origin.z.add(height.mul(localVertex.y).sub(drop)),
-    origin.y.add(rotatedXZ.y).sub(terrainTilt.y),
+    origin.y.add(rotatedXZ.y).add(touchOffset.y).sub(terrainTilt.y),
   );
+  const deformationSlope = forward.add(length(touchOffset)).div(max(height, 0.05));
+  material.normalNode = normalize(vec3(
+    yawSin.mul(deformationSlope),
+    float(1),
+    yawCos.mul(deformationSlope).negate(),
+  ));
 
   const grad = pow(t, 1.25);
   const speciesColor = mix(mix(rootA, tipA, grad), mix(rootB, tipB, grad), colorMaterial.x);
@@ -455,6 +555,10 @@ function makeGrassMaterial(patch, storageSet, options) {
     densityCutoffNode,
     lodTierNode,
     patchCenterNode,
+    windDirNode,
+    windStrengthNode,
+    windSpeedNode,
+    touchNodes,
   };
   material.userData.storageSet = storageSet;
   material.userData.buildOrder = "5: MeshStandardNodeMaterial position/color/roughness/opacity nodes";
@@ -470,6 +574,11 @@ function makeImpostorMaterial(patch, storageSet, options) {
   const debugModeNode = uniform(0);
   const lodTierNode = uniform(2);
   const densityCutoffNode = uniform(1);
+  const windTimeNode = uniform(0);
+  const windDirNode = uniform(new Vector2(options.windDirection.x, options.windDirection.y).normalize());
+  const windStrengthNode = uniform(options.windStrength);
+  const windSpeedNode = uniform(options.windSpeed);
+  const patchCenterNode = uniform(new Vector2(patch.center.x, patch.center.y));
   const material = new MeshBasicNodeMaterial();
   material.side = FrontSide;
   material.alphaHash = true;
@@ -479,17 +588,32 @@ function makeImpostorMaterial(patch, storageSet, options) {
   const width = mix(0.75, 1.8, density.x);
   const height = mix(0.52, 1.35, density.x);
   const local = positionLocal;
+  const worldBaseXZ = patchCenterNode.add(origin.xy);
+  const phase = dot(worldBaseXZ, windDirNode).mul(0.12).add(density.y.mul(6.28318530718));
+  const sway = sin(windTimeNode.mul(windSpeedNode).add(phase))
+    .mul(windStrengthNode)
+    .mul(height)
+    .mul(pow(t, 1.6));
   material.positionNode = vec3(
-    origin.x.add(local.x.mul(width)),
+    origin.x.add(local.x.mul(width)).add(windDirNode.x.mul(sway)),
     origin.z.add(local.y.mul(height)),
-    origin.y,
+    origin.y.add(windDirNode.y.mul(sway)),
   );
   const base = mix(root, tip, pow(t, 1.2)).mul(mix(0.75, 1.15, colorMaterial.y));
   const densityDebug = mix(color(0x334016), color(0xd2de67), density.x);
   const lodDebug = color(0xb5c46c);
   material.colorNode = select(debugModeNode.equal(2), densityDebug, select(debugModeNode.equal(3), lodDebug, base));
   material.opacityNode = clamp(density.x.mul(colorMaterial.w).mul(densityCutoffNode), 0.0, 1.0);
-  material.userData.grassUniforms = { debugModeNode, lodTierNode, densityCutoffNode };
+  material.userData.grassUniforms = {
+    debugModeNode,
+    lodTierNode,
+    densityCutoffNode,
+    windTimeNode,
+    windDirNode,
+    windStrengthNode,
+    windSpeedNode,
+    patchCenterNode,
+  };
   material.userData.storageSet = storageSet;
   material.userData.buildOrder = "8: far patch impostor/clump cards";
   patch.impostorMaterials.push(material);
@@ -509,11 +633,14 @@ function createPatchRecord(x, z, seed, options) {
   return {
     key: `${x},${z}`,
     grid: { x, z },
+    localGrid: { x, z },
     center,
     seed: patchSeed,
     bounds,
     worldBounds,
     lodTier: 0,
+    pendingLodTier: 0,
+    pendingSince: 0,
     visible: true,
     bladeMaterials: [],
     impostorMaterials: [],
@@ -528,13 +655,13 @@ function setGeometryBounds(geometry, bounds) {
 
 function createPatchMeshes(patch, storageSet, options) {
   const bladeGeometry = makeBladeStripGeometry({ segments: options.bladeSegments });
+  bladeGeometry.instanceCount = options.bladesPerPatch;
   setGeometryBounds(bladeGeometry, patch.bounds);
   const bladeMaterial = makeGrassMaterial(patch, storageSet, options);
-  const blades = new InstancedMesh(bladeGeometry, bladeMaterial, options.bladesPerPatch);
+  const blades = new Mesh(bladeGeometry, bladeMaterial);
   blades.name = `dense-grass-blades-${patch.key}`;
   blades.frustumCulled = true;
   blades.position.set(patch.center.x, 0, patch.center.y);
-  blades.instanceMatrix.setUsage(DynamicDrawUsage);
   blades.castShadow = true;
   blades.receiveShadow = true;
   blades.boundingBox = patch.worldBounds.clone();
@@ -543,9 +670,10 @@ function createPatchMeshes(patch, storageSet, options) {
   patch.bladeMaterials.push(bladeMaterial);
 
   const cardGeometry = makeClumpCardGeometry();
+  cardGeometry.instanceCount = Math.max(1, Math.floor(options.bladesPerPatch * 0.08));
   setGeometryBounds(cardGeometry, patch.bounds);
   const cardMaterial = makeImpostorMaterial(patch, storageSet, options);
-  const cards = new InstancedMesh(cardGeometry, cardMaterial, Math.max(1, Math.floor(options.bladesPerPatch * 0.08)));
+  const cards = new Mesh(cardGeometry, cardMaterial);
   cards.name = `dense-grass-impostors-${patch.key}`;
   cards.frustumCulled = true;
   cards.position.copy(blades.position);
@@ -562,11 +690,11 @@ function createPatchMeshes(patch, storageSet, options) {
   return { blades, cards, boundsHelper };
 }
 
-async function withPreservedRendererState(renderer, callback) {
+function withPreservedRendererState(renderer, callback) {
   const renderTarget = renderer.getRenderTarget?.() ?? null;
   const xrEnabled = renderer.xr ? renderer.xr.enabled : undefined;
   try {
-    return await callback();
+    return callback();
   } finally {
     if (renderer.setRenderTarget) renderer.setRenderTarget(renderTarget);
     if (renderer.xr && xrEnabled !== undefined) renderer.xr.enabled = xrEnabled;
@@ -574,33 +702,43 @@ async function withPreservedRendererState(renderer, callback) {
 }
 
 function normalizeOptions(options = {}) {
+  if (options.__denseGrassNormalized === true) return options;
   const tier = denseGrassQualityTiers[options.tier ?? "high"] ?? denseGrassQualityTiers.high;
+  const worldUnitsPerMeter = options.worldUnitsPerMeter ?? 1;
+  if (!(worldUnitsPerMeter > 0) || !Number.isFinite(worldUnitsPerMeter)) {
+    throw new Error("worldUnitsPerMeter must be finite and positive");
+  }
+  const meters = (value) => value * worldUnitsPerMeter;
   return {
+    __denseGrassNormalized: true,
     tierName: options.tier ?? "high",
+    dprCap: options.dprCap ?? tier.dprCap,
+    worldUnitsPerMeter,
     patchGridRadius: options.patchGridRadius ?? tier.patchGridRadius,
-    patchSize: options.patchSize ?? tier.patchSize,
+    patchSizeMeters: options.patchSize ?? tier.patchSize,
+    patchSize: meters(options.patchSize ?? tier.patchSize),
     bladesPerPatch: options.bladesPerPatch ?? tier.bladesPerPatch,
     bladeSegments: options.bladeSegments ?? DEFAULT_BLADE_SEGMENTS,
     seed: options.seed ?? 7331,
-    bladeHeightMin: options.bladeHeightMin ?? 0.4,
-    bladeHeightMax: options.bladeHeightMax ?? 0.8,
-    bladeWidthMin: options.bladeWidthMin ?? 0.01,
-    bladeWidthMax: options.bladeWidthMax ?? 0.05,
-    bendAmountMin: options.bendAmountMin ?? 0.2,
-    bendAmountMax: options.bendAmountMax ?? 0.6,
-    clumpSize: options.clumpSize ?? 0.8,
-    clumpRadius: options.clumpRadius ?? 1.5,
+    bladeHeightMin: meters(options.bladeHeightMin ?? 0.4),
+    bladeHeightMax: meters(options.bladeHeightMax ?? 0.8),
+    bladeWidthMin: meters(options.bladeWidthMin ?? 0.01),
+    bladeWidthMax: meters(options.bladeWidthMax ?? 0.05),
+    bendAmountMin: meters(options.bendAmountMin ?? 0.2),
+    bendAmountMax: meters(options.bendAmountMax ?? 0.6),
+    clumpSize: meters(options.clumpSize ?? 0.8),
+    clumpRadius: meters(options.clumpRadius ?? 1.5),
     cameraFacing: options.cameraFacing ?? 0.28,
     bladeYaw: options.bladeYaw ?? 1.2,
     clumpYaw: options.clumpYaw ?? 0.5,
     windDirection: options.windDirection ?? new Vector2(1, 0),
     windStrength: options.windStrength ?? 0.35,
     windSpeed: options.windSpeed ?? 0.6,
-    terrainAmplitude: options.terrainAmplitude ?? 2.5,
-    terrainFrequency: options.terrainFrequency ?? 0.1,
-    nearDistance: options.nearDistance ?? tier.nearDistance,
-    midDistance: options.midDistance ?? tier.midDistance,
-    farDistance: options.farDistance ?? tier.farDistance,
+    terrainAmplitude: meters(options.terrainAmplitude ?? 2.5),
+    terrainFrequency: (options.terrainFrequency ?? 0.1) / worldUnitsPerMeter,
+    nearDistance: meters(options.nearDistance ?? tier.nearDistance),
+    midDistance: meters(options.midDistance ?? tier.midDistance),
+    farDistance: meters(options.farDistance ?? tier.farDistance),
     midDensity: options.midDensity ?? tier.midDensity,
     rootColor: options.rootColor ?? 0x0f280f,
     tipColor: options.tipColor ?? 0x3e8d2f,
@@ -608,7 +746,10 @@ function normalizeOptions(options = {}) {
     tipColorB: options.tipColorB ?? 0xcddc52,
     groundColor: options.groundColor ?? 0x1a3310,
     densityMaskTexture: options.densityMaskTexture ?? null,
-    explicitFallbackWhenWebGPUUnavailable: options.explicitFallbackWhenWebGPUUnavailable === true,
+    maxTouchPoints: options.maxTouchPoints ?? 8,
+    streaming: options.streaming ?? true,
+    lodHysteresis: options.lodHysteresis ?? 0.06,
+    lodDwellSeconds: options.lodDwellSeconds ?? 0.18,
   };
 }
 
@@ -634,6 +775,50 @@ function storageNodeNames(storageSet) {
   );
 }
 
+function geometryResidentBytes(geometry) {
+  const arrays = new Set();
+  for (const attribute of Object.values(geometry.attributes)) {
+    if (attribute?.array) arrays.add(attribute.array);
+  }
+  if (geometry.index?.array) arrays.add(geometry.index.array);
+  return [...arrays].reduce((total, array) => total + array.byteLength, 0);
+}
+
+function hashStaticStorageIdentity(options, patches) {
+  let hash = 0x811c9dc5;
+  const feed = (value) => {
+    hash ^= value >>> 0;
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  };
+  const feedFloat = (value) => feed(Math.round(value * 1e6));
+  const feedString = (value) => {
+    for (let index = 0; index < value.length; index += 1) feed(value.charCodeAt(index));
+  };
+  feed(options.seed);
+  feed(options.bladesPerPatch);
+  for (const value of [
+    options.worldUnitsPerMeter,
+    options.patchSize,
+    options.bladeHeightMin,
+    options.bladeHeightMax,
+    options.bladeWidthMin,
+    options.bladeWidthMax,
+    options.bendAmountMin,
+    options.bendAmountMax,
+    options.clumpSize,
+    options.clumpRadius,
+    options.terrainAmplitude,
+    options.terrainFrequency,
+  ]) feedFloat(value);
+  feedString(options.densityMaskTexture?.userData?.densityMaskUrl ?? "uniform-density");
+  for (const patch of patches) {
+    feed(patch.grid.x);
+    feed(patch.grid.z);
+    feed(patch.seed);
+  }
+  return `fnv1a32:${hash.toString(16).padStart(8, "0")}`;
+}
+
 export function validateDenseGrassConfig(config = {}) {
   const options = normalizeOptions(config);
   const patchCount = patchCountForRadius(options.patchGridRadius);
@@ -645,8 +830,14 @@ export function validateDenseGrassConfig(config = {}) {
   if (!Number.isInteger(options.patchGridRadius) || options.patchGridRadius < 0) {
     errors.push("patchGridRadius must be a non-negative integer");
   }
-  if (!Number.isFinite(options.patchSize) || options.patchSize < 8 || options.patchSize > 64) {
+  if (!Number.isFinite(options.patchSizeMeters) || options.patchSizeMeters < 8 || options.patchSizeMeters > 64) {
     errors.push("patchSize must be finite and in the 8-64 m chunk range");
+  }
+  if (!(options.worldUnitsPerMeter > 0) || !Number.isFinite(options.worldUnitsPerMeter)) {
+    errors.push("worldUnitsPerMeter must be finite and positive");
+  }
+  if (!(options.dprCap > 0) || !Number.isFinite(options.dprCap)) {
+    errors.push("dprCap must be finite and positive");
   }
   if (!Number.isInteger(options.bladesPerPatch) || options.bladesPerPatch < 1) {
     errors.push("bladesPerPatch must be a positive integer");
@@ -665,6 +856,15 @@ export function validateDenseGrassConfig(config = {}) {
   if (!Number.isFinite(options.midDensity) || options.midDensity <= 0 || options.midDensity > 1) {
     errors.push("midDensity must be in (0, 1]");
   }
+  if (!Number.isInteger(options.maxTouchPoints) || options.maxTouchPoints < 0 || options.maxTouchPoints > 16) {
+    errors.push("maxTouchPoints must be an integer in [0, 16]");
+  }
+  if (!Number.isFinite(options.lodHysteresis) || options.lodHysteresis < 0 || options.lodHysteresis >= 0.5) {
+    errors.push("lodHysteresis must be finite and in [0, 0.5)");
+  }
+  if (!Number.isFinite(options.lodDwellSeconds) || options.lodDwellSeconds < 0) {
+    errors.push("lodDwellSeconds must be finite and non-negative");
+  }
   if (storageBytesPerBlade !== 64) {
     errors.push("storageBytesPerBlade contract changed from 64");
   }
@@ -675,8 +875,11 @@ export function validateDenseGrassConfig(config = {}) {
 
   return {
     tier: options.tierName,
+    dprCap: options.dprCap,
+    worldUnitsPerMeter: options.worldUnitsPerMeter,
     patchGridRadius: options.patchGridRadius,
     patchCount,
+    patchSizeMeters: options.patchSizeMeters,
     patchSize: options.patchSize,
     bladesPerPatch: options.bladesPerPatch,
     allocatedBladeCount,
@@ -684,8 +887,8 @@ export function validateDenseGrassConfig(config = {}) {
     storageByteEstimate,
     initDispatches: patchCount,
     perFrameComputeDispatches: 0,
-    visibleDrawObjectCeiling: patchCount * 2,
-    reducedActiveBladesPerPatch: Math.min(options.bladesPerPatch, denseGrassQualityTiers.low.bladesPerPatch),
+    allocatedDrawObjectCount: patchCount * 2,
+    visibleDrawObjectCeiling: patchCount,
   };
 }
 
@@ -693,7 +896,7 @@ export function validateDenseGrassCapabilities(renderer, options = {}) {
   const missingRequirementReason = [];
   const initialized = renderer?.initialized === true || renderer?.backend != null || typeof renderer?.init !== "function";
   const isWebGPUBackend = renderer?.backend?.isWebGPUBackend === true;
-  const hasComputeAsync = typeof renderer?.computeAsync === "function";
+  const hasCompute = typeof renderer?.compute === "function";
   let storageNodesAllocated = false;
 
   try {
@@ -705,25 +908,18 @@ export function validateDenseGrassCapabilities(renderer, options = {}) {
 
   if (!initialized) missingRequirementReason.push("renderer not initialized");
   if (!isWebGPUBackend) missingRequirementReason.push("WebGPU backend required");
-  if (!hasComputeAsync) missingRequirementReason.push("renderer.computeAsync required");
+  if (!hasCompute) missingRequirementReason.push("renderer.compute required");
 
   const nativeStorage = missingRequirementReason.length === 0;
 
   return {
-    tier: nativeStorage ? (options.tier ?? "high") : "fallback-teaching-static-storage",
+    tier: options.tier ?? "high",
     nativeStorage,
     initialized,
     isWebGPUBackend,
-    hasComputeAsync,
+    hasCompute,
     storageNodesAllocated,
     missingRequirementReason,
-    fallbackTeachingTier: nativeStorage
-      ? null
-      : {
-          dynamicCompute: false,
-          cpuFilledStaticStorage: true,
-          activeBladesPerPatch: denseGrassQualityTiers.low.bladesPerPatch,
-        },
   };
 }
 
@@ -738,6 +934,14 @@ export class DenseGrassSystem {
     this.nativeStorageTier = false;
     this.capabilities = null;
     this.initialized = false;
+    this.centerGrid = { x: 0, z: 0 };
+    this.touchPoints = [];
+    this.streamingRecomputes = 0;
+    this.staticStorageRevision = 0;
+    this.staticStorageIdentity = null;
+    this.staticStorageArrays = [];
+    this.initDispatchCount = 0;
+    this.elapsed = 0;
   }
 
   async initialize() {
@@ -745,8 +949,10 @@ export class DenseGrassSystem {
     const radius = options.patchGridRadius;
     this.capabilities = validateDenseGrassCapabilities(this.renderer, options);
     this.nativeStorageTier = this.capabilities.nativeStorage;
-    if (!this.nativeStorageTier && options.explicitFallbackWhenWebGPUUnavailable !== true) {
-      throw new Error("WebGPU backend required for the canonical dense grass path. If the user explicitly asks how to apply fallback when WebGPU is unavailable, pass explicitFallbackWhenWebGPUUnavailable and route the teaching to threejs-compatibility-fallbacks.");
+    if (!this.nativeStorageTier) {
+      throw new Error(
+        `Canonical dense grass requires initialized WebGPU storage/compute: ${this.capabilities.missingRequirementReason.join(", ")}`,
+      );
     }
 
     // Dense Grass Build Order 1 and 2: deterministic chunk descriptors first,
@@ -762,30 +968,26 @@ export class DenseGrassSystem {
         patch.initCompute = makeStaticInitCompute(patch, storageSet, options, options.densityMaskTexture);
         this.patches.push(patch);
         this.object.add(meshes.blades, meshes.cards, meshes.boundsHelper);
+        for (const node of Object.values(storageSet)) this.staticStorageArrays.push(node.value.array);
       }
     }
 
-    if (this.nativeStorageTier) {
-      await withPreservedRendererState(this.renderer, async () => {
-        for (const patch of this.patches) {
-          await this.renderer.computeAsync(patch.initCompute);
-        }
-      });
-    } else {
+    withPreservedRendererState(this.renderer, () => {
       for (const patch of this.patches) {
-        fillReducedStorageOnCPU(patch, patch.storageSet, {
-          ...options,
-          bladesPerPatch: Math.min(options.bladesPerPatch, denseGrassQualityTiers.low.bladesPerPatch),
-        });
-        patch.meshes.blades.count = Math.min(options.bladesPerPatch, denseGrassQualityTiers.low.bladesPerPatch);
+        this.renderer.compute(patch.initCompute);
+        this.initDispatchCount += 1;
       }
-    }
+    });
+
+    this.staticStorageRevision = 1;
+    this.staticStorageIdentity = hashStaticStorageIdentity(options, this.patches);
 
     this.initialized = true;
     return this;
   }
 
   update({ elapsed = 0, camera = null } = {}) {
+    this.elapsed = elapsed;
     for (const patch of this.patches) {
       for (const material of [...patch.bladeMaterials, ...patch.impostorMaterials]) {
         const uniforms = material.userData.grassUniforms;
@@ -793,10 +995,13 @@ export class DenseGrassSystem {
         if (uniforms.debugModeNode) uniforms.debugModeNode.value = webgpuDenseGrassDebugModes.get(this.debugMode) ?? 0;
       }
     }
-    if (camera) this.updatePatchCullingAndLOD(camera);
+    if (camera) {
+      if (this.options.streaming) this.recenterAround(camera.position);
+      this.updatePatchCullingAndLOD(camera, elapsed);
+    }
   }
 
-  updatePatchCullingAndLOD(camera) {
+  updatePatchCullingAndLOD(camera, elapsed = this.elapsed) {
     camera.updateMatrixWorld();
     _cameraProjectionView.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     _frustum.setFromProjectionMatrix(_cameraProjectionView);
@@ -814,16 +1019,33 @@ export class DenseGrassSystem {
 
       _vector.set(patch.center.x, 0, patch.center.y);
       const distance = camera.position.distanceTo(_vector);
-      const tier = distance > this.options.midDistance ? 2 : distance > this.options.nearDistance ? 1 : 0;
-      patch.lodTier = tier;
+      const hysteresis = this.options.lodHysteresis;
+      let desiredTier = patch.lodTier;
+      if (patch.lodTier === 0 && distance > this.options.nearDistance * (1 + hysteresis)) {
+        desiredTier = 1;
+      } else if (patch.lodTier === 1) {
+        if (distance < this.options.nearDistance * (1 - hysteresis)) desiredTier = 0;
+        else if (distance > this.options.midDistance * (1 + hysteresis)) desiredTier = 2;
+      } else if (patch.lodTier === 2 && distance < this.options.midDistance * (1 - hysteresis)) {
+        desiredTier = 1;
+      }
 
-      const farVisible = distance > this.options.midDistance;
+      if (desiredTier !== patch.pendingLodTier) {
+        patch.pendingLodTier = desiredTier;
+        patch.pendingSince = elapsed;
+      } else if (desiredTier !== patch.lodTier &&
+          elapsed - patch.pendingSince >= this.options.lodDwellSeconds) {
+        patch.lodTier = desiredTier;
+      }
+      const tier = patch.lodTier;
+
+      const farVisible = tier === 2;
       blades.visible = !farVisible && distance < this.options.farDistance;
       cards.visible = farVisible && distance < this.options.farDistance;
-      blades.count = tier === 0
+      blades.geometry.instanceCount = tier === 0
         ? this.options.bladesPerPatch
         : Math.max(1, Math.floor(this.options.bladesPerPatch * this.options.midDensity));
-      cards.count = Math.max(1, Math.floor(this.options.bladesPerPatch * 0.08));
+      cards.geometry.instanceCount = Math.max(1, Math.floor(this.options.bladesPerPatch * 0.08));
 
       for (const material of patch.bladeMaterials) {
         material.userData.grassUniforms.densityCutoffNode.value = tier === 0 ? 1 : this.options.midDensity;
@@ -841,7 +1063,10 @@ export class DenseGrassSystem {
   }
 
   setDebugMode(mode = "final") {
-    this.debugMode = webgpuDenseGrassDebugModes.has(mode) ? mode : "final";
+    if (!webgpuDenseGrassDebugModes.has(mode)) {
+      throw new Error(`unknown dense-grass debug mode "${mode}"`);
+    }
+    this.debugMode = mode;
     for (const patch of this.patches) {
       patch.meshes.boundsHelper.visible = this.debugMode === "bounds" || this.debugMode === "lod";
       for (const material of [...patch.bladeMaterials, ...patch.impostorMaterials]) {
@@ -854,22 +1079,135 @@ export class DenseGrassSystem {
     if (direction) this.options.windDirection.copy(direction).normalize();
     if (typeof strength === "number") this.options.windStrength = strength;
     if (typeof speed === "number") this.options.windSpeed = speed;
+    for (const patch of this.patches) {
+      for (const material of [...patch.bladeMaterials, ...patch.impostorMaterials]) {
+        const uniforms = material.userData.grassUniforms;
+        uniforms.windDirNode?.value.copy(this.options.windDirection);
+        if (uniforms.windStrengthNode) uniforms.windStrengthNode.value = this.options.windStrength;
+        if (uniforms.windSpeedNode) uniforms.windSpeedNode.value = this.options.windSpeed;
+      }
+    }
+  }
+
+  setTouches(touches = []) {
+    if (!Array.isArray(touches)) throw new Error("dense-grass touches must be an array");
+    if (touches.length > this.options.maxTouchPoints) {
+      throw new Error(`dense-grass supports at most ${this.options.maxTouchPoints} touch points`);
+    }
+    this.touchPoints = touches.map((touch, index) => {
+      const x = touch.position?.x ?? touch.x;
+      const z = touch.position?.z ?? touch.z;
+      const radius = touch.radius;
+      const weight = touch.weight ?? 1;
+      if (![x, z, radius, weight].every(Number.isFinite) || radius <= 0 || weight < 0) {
+        throw new Error(`invalid dense-grass touch at index ${index}`);
+      }
+      return { x, z, radius, weight };
+    });
+    for (const patch of this.patches) {
+      for (const material of patch.bladeMaterials) {
+        const touchNodes = material.userData.grassUniforms.touchNodes ?? [];
+        for (let index = 0; index < touchNodes.length; index += 1) {
+          const touch = this.touchPoints[index];
+          touchNodes[index].value.set(
+            touch?.x ?? 0,
+            touch?.z ?? 0,
+            touch?.radius ?? 0.001,
+            touch?.weight ?? 0,
+          );
+        }
+      }
+    }
+  }
+
+  recenterAround(position) {
+    const nextCenter = {
+      x: Math.round(position.x / this.options.patchSize),
+      z: Math.round(position.z / this.options.patchSize),
+    };
+    if (nextCenter.x === this.centerGrid.x && nextCenter.z === this.centerGrid.z) return false;
+    this.centerGrid = nextCenter;
+
+    withPreservedRendererState(this.renderer, () => {
+      for (const patch of this.patches) {
+        const gridX = patch.localGrid.x + nextCenter.x;
+        const gridZ = patch.localGrid.z + nextCenter.z;
+        patch.grid.x = gridX;
+        patch.grid.z = gridZ;
+        patch.center.set(gridX * this.options.patchSize, gridZ * this.options.patchSize);
+        patch.seed = buildPatchSeed(this.options.seed, gridX, gridZ);
+        patch.worldBounds.copy(patch.bounds).translate(
+          new Vector3(patch.center.x, 0, patch.center.y),
+        );
+        const { blades, cards, boundsHelper } = patch.meshes;
+        blades.position.set(patch.center.x, 0, patch.center.y);
+        cards.position.copy(blades.position);
+        blades.boundingBox = patch.worldBounds.clone();
+        cards.boundingBox = patch.worldBounds.clone();
+        patch.worldBounds.getBoundingSphere(blades.boundingSphere);
+        cards.boundingSphere.copy(blades.boundingSphere);
+        boundsHelper.box = patch.worldBounds;
+        const initUniforms = patch.initCompute.userData.denseGrassUniforms;
+        initUniforms.patchCenterNode.value.copy(patch.center);
+        initUniforms.patchSeedNode.value = patch.seed >>> 0;
+        for (const material of [...patch.bladeMaterials, ...patch.impostorMaterials]) {
+          material.userData.grassUniforms.patchCenterNode?.value.copy(patch.center);
+        }
+        this.renderer.compute(patch.initCompute);
+        this.streamingRecomputes += 1;
+      }
+    });
+    this.staticStorageRevision += 1;
+    this.staticStorageIdentity = hashStaticStorageIdentity(this.options, this.patches);
+    return true;
   }
 
   getStats() {
     const patchCount = this.patches.length;
     const bladesPerPatch = this.options.bladesPerPatch;
+    const storageResidentBytes = this.patches.reduce(
+      (patchTotal, patch) => patchTotal + Object.values(patch.storageSet).reduce(
+        (laneTotal, node) => laneTotal + (node.value.array?.byteLength ?? 0),
+        0,
+      ),
+      0,
+    );
+    const storageBytesPerBlade = patchCount > 0
+      ? storageResidentBytes / (patchCount * bladesPerPatch)
+      : 0;
+    const renderGeometryBytes = this.patches.reduce(
+      (total, patch) => total + geometryResidentBytes(patch.meshes.blades.geometry) +
+        geometryResidentBytes(patch.meshes.cards.geometry) +
+        geometryResidentBytes(patch.meshes.boundsHelper.geometry),
+      0,
+    );
     return {
-      backendTier: this.nativeStorageTier ? "native WebGPU storage/compute" : "explicit fallback teaching static storage",
+      backendTier: "native WebGPU storage/compute",
       seed: this.options.seed,
+      worldUnitsPerMeter: this.options.worldUnitsPerMeter,
+      dprCap: this.options.dprCap,
       patchCount,
       patchSize: this.options.patchSize,
       bladesPerPatch,
       allocatedBlades: patchCount * bladesPerPatch,
-      storageBytesPerBlade: 64,
-      initDispatches: this.nativeStorageTier ? patchCount : 0,
+      storageBytesPerBlade,
+      storageResidentBytes,
+      renderGeometryBytes,
+      initDispatches: this.initDispatchCount,
       perFrameComputeDispatches: 0,
       drawObjectsPerPatch: 2,
+      submittedRepresentationsPerVisiblePatch: 1,
+      spatialRanking: "coprime golden-step grid permutation",
+      touchCapacity: this.options.maxTouchPoints,
+      activeTouchCount: this.touchPoints.length,
+      streamingRecomputes: this.streamingRecomputes,
+      staticStorageRevision: this.staticStorageRevision,
+      staticStorageIdentity: this.staticStorageIdentity,
+      staticStorageImmutable: this.patches.every((patch, patchIndex) =>
+        Object.values(patch.storageSet).every((node, lane) =>
+          node.value.array === this.staticStorageArrays[patchIndex * 4 + lane],
+        ),
+      ),
     };
   }
 
@@ -882,8 +1220,8 @@ export class DenseGrassSystem {
         grid: patch.grid,
         visible: patch.visible,
         lodTier: patch.lodTier,
-        bladeCount: patch.meshes.blades.count,
-        cardCount: patch.meshes.cards.count,
+        bladeCount: patch.meshes.blades.geometry.instanceCount,
+        cardCount: patch.meshes.cards.geometry.instanceCount,
         bladeVisible: patch.meshes.blades.visible,
         cardVisible: patch.meshes.cards.visible,
         densityCutoff: uniforms.densityCutoffNode?.value ?? null,
@@ -901,20 +1239,34 @@ export class DenseGrassSystem {
       allocatedBlades: stats.allocatedBlades,
       storageBytesPerBlade: stats.storageBytesPerBlade,
       storageByteEstimate: stats.allocatedBlades * stats.storageBytesPerBlade,
+      storageResidentBytes: stats.storageResidentBytes,
+      renderGeometryBytes: stats.renderGeometryBytes,
       initDispatches: stats.initDispatches,
       perFrameComputeDispatches: stats.perFrameComputeDispatches,
+      activeTouchCount: stats.activeTouchCount,
+      touchCapacity: stats.touchCapacity,
+      centerGrid: { ...this.centerGrid },
+      streamingRecomputes: stats.streamingRecomputes,
+      worldUnitsPerMeter: stats.worldUnitsPerMeter,
+      dprCap: stats.dprCap,
+      staticStorageRevision: stats.staticStorageRevision,
+      staticStorageIdentity: stats.staticStorageIdentity,
+      staticStorageImmutable: stats.staticStorageImmutable,
+      rootedDeformation: this.patches.every((patch) => Boolean(patch.meshes.blades.material.positionNode)),
+      deformedNormals: this.patches.every((patch) => Boolean(patch.meshes.blades.material.normalNode)),
+      visibleShadowDeformationParity: this.patches.every((patch) =>
+        patch.meshes.blades.castShadow && patch.meshes.blades.customDepthMaterial == null &&
+        patch.meshes.cards.castShadow && patch.meshes.cards.customDepthMaterial == null,
+      ),
       visibleDrawObjects: patches.reduce(
         (total, patch) => total + (patch.bladeVisible ? 1 : 0) + (patch.cardVisible ? 1 : 0),
         0,
       ),
-      visibleDrawObjectCeiling: patches.length * 2,
+      visibleDrawObjectCeiling: patches.length,
       activeBladeCount: patches.reduce(
         (total, patch) => total + (patch.bladeVisible ? patch.bladeCount : 0),
         0,
       ),
-      fallbackTeachingActiveBladeCount: this.nativeStorageTier
-        ? null
-        : patches.reduce((total, patch) => total + patch.bladeCount, 0),
       patches,
     };
   }
@@ -938,6 +1290,7 @@ export class DenseGrassSystem {
     }
     this.object.clear();
     this.patches.length = 0;
+    this.staticStorageArrays.length = 0;
     this.initialized = false;
   }
 }
@@ -959,6 +1312,15 @@ export function validateDenseGrassSystem(system) {
   if (diagnostics.perFrameComputeDispatches !== 0) {
     errors.push(`per-frame compute dispatches must be 0 in vertex-wind mode, got ${diagnostics.perFrameComputeDispatches}`);
   }
+  if (!diagnostics.staticStorageImmutable) {
+    errors.push("static placement storage backing arrays changed after initialization");
+  }
+  if (!diagnostics.rootedDeformation || !diagnostics.deformedNormals || !diagnostics.visibleShadowDeformationParity) {
+    errors.push("visible, normal, and shadow deformation contracts must share the live NodeMaterial path");
+  }
+  if (diagnostics.worldUnitsPerMeter !== system.options.worldUnitsPerMeter) {
+    errors.push("world-unit contract drifted between options and diagnostics");
+  }
   if (diagnostics.visibleDrawObjects > expected.visibleDrawObjectCeiling) {
     errors.push(`visible draw objects ${diagnostics.visibleDrawObjects} exceed ceiling ${expected.visibleDrawObjectCeiling}`);
   }
@@ -971,16 +1333,6 @@ export function validateDenseGrassSystem(system) {
     const [sizeX, sizeY, sizeZ] = patch.bounds.size;
     if (!(sizeX > system.options.patchSize && sizeY > system.options.bladeHeightMax && sizeZ > system.options.patchSize)) {
       errors.push(`patch ${patch.key} bounds are not expanded around grass motion`);
-    }
-  }
-
-  if (!system.nativeStorageTier) {
-    const maxReduced = expected.reducedActiveBladesPerPatch * expected.patchCount;
-    if (diagnostics.fallbackTeachingActiveBladeCount > maxReduced) {
-      errors.push(`fallback teaching active blades ${diagnostics.fallbackTeachingActiveBladeCount} exceed ${maxReduced}`);
-    }
-    if (diagnostics.initDispatches !== 0) {
-      errors.push(`fallback teaching static storage should not report live init dispatches, got ${diagnostics.initDispatches}`);
     }
   }
 

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-vegetation-integration",
+  "title": "Host-Owned Planet, Terrain, Dense Grass, and Ash Integration",
+  "skill": "threejs-procedural-vegetation",
+  "threeRevision": "0.185.1",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/browser-lab.js",
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/route-contract.js",
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/vegetation-integration.js",
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
+    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js"
+  ],
+  "browserEntry": "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/index.html",
+  "publishPath": "/demos/webgpu-vegetation-integration/",
+  "scenarios": [
+    { "id": "weathered-world-host", "route": "/demos/webgpu-vegetation-integration/?scenario=weathered-world-host", "startup": { "scenario": "weathered-world-host" }, "acceptanceStatus": "incomplete" },
+    { "id": "creature-habitat-host", "route": "/demos/webgpu-vegetation-integration/?scenario=creature-habitat-host", "startup": { "scenario": "creature-habitat-host" }, "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "host-ownership", "route": "/demos/webgpu-vegetation-integration/mechanism/host-ownership/", "startup": { "mode": "owner-graph" }, "acceptanceStatus": "incomplete" },
+    { "id": "shared-weather", "route": "/demos/webgpu-vegetation-integration/mechanism/shared-weather/", "startup": { "mode": "weather-diagnostics" }, "acceptanceStatus": "incomplete" },
+    { "id": "shared-contacts", "route": "/demos/webgpu-vegetation-integration/mechanism/shared-contacts/", "startup": { "mode": "contact-diagnostics" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetClass": "Integration correctness workload; performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": { "value": 2, "unit": "ratio", "label": "Authored", "source": "integration hero tier" } },
+      "mechanismLimits": { "denseTier": "high", "ashForestCount": { "value": 100, "unit": "trees", "label": "Authored", "source": "integration hero fixture" } },
+      "resourceLimits": { "vegetationForestDraws": { "value": 4, "unit": "draws", "label": "Gated", "source": "two materials across two Ash LOD bands" }, "denseStorageBytes": { "value": 37632000, "unit": "bytes", "label": "Derived", "source": "49*12000*64" }, "ashForestStorageBytes": { "value": 3200, "unit": "bytes", "label": "Derived", "source": "100*2*vec4<f32>" } },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["host-owned planet and terrain", "one host pipeline", "one tone map", "one output transform", "shared weather and units"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balanced",
+      "targetClass": "Integration correctness workload; performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": { "value": 1.5, "unit": "ratio", "label": "Authored", "source": "integration balanced tier" } },
+      "mechanismLimits": { "denseTier": "medium", "ashForestCount": { "value": 100, "unit": "trees", "label": "Authored", "source": "integration balanced fixture" } },
+      "resourceLimits": { "vegetationForestDraws": { "value": 4, "unit": "draws", "label": "Gated", "source": "two materials across two Ash LOD bands" }, "denseStorageBytes": { "value": 12800000, "unit": "bytes", "label": "Derived", "source": "25*8000*64" }, "ashForestStorageBytes": { "value": 3200, "unit": "bytes", "label": "Derived", "source": "100*2*vec4<f32>" } },
+      "degradationFromPrevious": ["reduce dense placement tier"],
+      "preservedInvariants": ["host-owned planet and terrain", "one host pipeline", "one tone map", "one output transform", "shared weather and units"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "budgeted",
+      "targetClass": "Minimum integration correctness workload; performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": { "value": 1, "unit": "ratio", "label": "Authored", "source": "integration budgeted tier" } },
+      "mechanismLimits": { "denseTier": "low", "ashForestCount": { "value": 50, "unit": "trees", "label": "Authored", "source": "integration budgeted fixture" } },
+      "resourceLimits": { "vegetationForestDraws": { "value": 4, "unit": "draws", "label": "Gated", "source": "two materials across two Ash LOD bands" }, "denseStorageBytes": { "value": 1728000, "unit": "bytes", "label": "Derived", "source": "9*3000*64" }, "ashForestStorageBytes": { "value": 1600, "unit": "bytes", "label": "Derived", "source": "50*2*vec4<f32>" } },
+      "degradationFromPrevious": ["reduce dense placement tier", "reduce background Ash instances"],
+      "preservedInvariants": ["host-owned planet and terrain", "one host pipeline", "one tone map", "one output transform", "shared weather and units"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "owner-graph", "weather-diagnostics", "contact-diagnostics"],
+  "cameras": ["host-camera"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": "host renderer backend contract", "status": "incomplete" },
+    { "id": "host-pipeline", "required": true, "evidence": "pipeline/tone/output share one injected owner id", "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "owner-graph", "required": true, "evidence": "validate-integration.mjs duplicate-owner mutations", "status": "incomplete" },
+    { "id": "shared-world-units", "required": true, "evidence": "planet and terrain unit equality gate", "status": "incomplete" },
+    { "id": "shared-weather", "required": true, "evidence": "same host weather object drives dense grass and Ash", "status": "incomplete" },
+    { "id": "shared-contacts", "required": true, "evidence": "host contacts update dense touch channel without static topology regeneration", "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:unit",
+  "commands": {
+    "check": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run check",
+    "test": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:unit",
+    "mutations": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run test:mutations",
+    "capture": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run capture",
+    "validateArtifacts": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:quick",
+    "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "The browser entry is a native-WebGPU host proof with one renderer, one RenderPipeline, one tone map, and one output conversion.",
+    "Status remains incomplete until a current-adapter v2 evidence bundle is captured and consumed by Weathered World and Creature Habitat."
+  ]
+}
