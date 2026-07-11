@@ -23,6 +23,7 @@ assert.match(app, /Unknown mechanism route/, "unknown mechanism routes must thro
 assert.match(app, /Unknown tier route/, "unknown tier routes must throw");
 assert.match(app, /window\.__LAB_ERROR__/, "runtime failures must be exposed to browser validation");
 assert.match(app, /createTowerShipFrameDriver/, "the app must use the serialized frame owner");
+assert.match(app, /towerShipFrameOwner/, "capture and live presentation must select exactly one frame owner");
 assert.deepEqual(
   towerShipRouteFromLocation({ pathname: "/tier/minimum/", search: "" }),
   { mechanism: null, tier: "minimum" },

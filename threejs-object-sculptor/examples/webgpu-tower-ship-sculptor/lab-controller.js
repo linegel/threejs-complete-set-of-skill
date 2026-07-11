@@ -69,6 +69,23 @@ export function describeTowerShipReadback(width, height, outputColorSpace) {
   });
 }
 
+export function preserveTowerShipReadbackRows(source, layout) {
+  if (!(source instanceof Uint8Array)) throw new TypeError("capture readback must be a Uint8Array");
+  const compactByteLength = layout.rowBytes * layout.height;
+  if (source.byteLength === layout.minimumByteLength || source.byteLength === layout.fullyPaddedByteLength) {
+    return source;
+  }
+  if (source.byteLength !== compactByteLength) {
+    throw new RangeError(`unexpected capture byte length ${source.byteLength}`);
+  }
+  const padded = new Uint8Array(layout.fullyPaddedByteLength);
+  for (let y = 0; y < layout.height; y += 1) {
+    const sourceOffset = y * layout.rowBytes;
+    padded.set(source.subarray(sourceOffset, sourceOffset + layout.rowBytes), y * layout.bytesPerRow);
+  }
+  return padded;
+}
+
 export function resolveTowerShipDpr(tier, requestedDpr) {
   assertKnown(tier, TOWER_SHIP_TIERS, "tier");
   if (!(requestedDpr > 0) || !Number.isFinite(requestedDpr)) throw new RangeError("requested DPR must be finite and positive");
@@ -288,13 +305,9 @@ export async function createTowerShipLabController({
       try {
         renderer.setRenderTarget(captureTarget);
         renderer.render(scene, perspectiveCamera);
-        const tight = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, captureTarget.width, captureTarget.height);
+        const readback = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, captureTarget.width, captureTarget.height);
         const layout = describeTowerShipReadback(captureTarget.width, captureTarget.height, renderer.outputColorSpace);
-        const pixels = new Uint8Array(layout.fullyPaddedByteLength);
-        for (let y = 0; y < captureTarget.height; y += 1) {
-          const source = y * layout.rowBytes;
-          pixels.set(tight.subarray(source, source + layout.rowBytes), y * layout.bytesPerRow);
-        }
+        const pixels = preserveTowerShipReadbackRows(readback, layout);
         return {
           target,
           ...layout,
@@ -353,6 +366,8 @@ export async function createTowerShipLabController({
           colliders: ship.runtime.colliders.size,
           physicsMaterials: ship.runtime.physicsMaterials.size,
           destructionGroups: ship.runtime.destructionGroups.size,
+          colliderContract: "world-unit construction inputs",
+          canonicalPhysicsProxyStatus: "blocked pending a route-owned PhysicsContext and pose publication",
         },
         preservedInvariants: ["24 articulated oars", "semantic IDs", "primary silhouette", "single scene render"],
       };
@@ -366,9 +381,9 @@ export async function createTowerShipLabController({
         socketBindings: [...ship.runtime.sockets.entries()].map(([id, value]) => ({
           id,
           parentId: value.parent?.userData?.sculptId ?? value.parent?.name ?? null,
-          localPositionMeters: value.position.toArray(),
+          localPositionWorldUnits: value.position.toArray(),
         })).sort((a, b) => a.id.localeCompare(b.id)),
-        colliderProxies: [...ship.runtime.colliders.values()],
+        colliderConstructionInputs: [...ship.runtime.colliders.values()],
         physicsMaterialBindings: [...ship.runtime.physicsMaterials.values()],
         destructionGroupRecords: [...ship.runtime.destructionGroups.entries()].map(([id, members]) => ({
           id,

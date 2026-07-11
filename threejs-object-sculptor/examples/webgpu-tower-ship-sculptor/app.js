@@ -4,7 +4,7 @@ import {
   TOWER_SHIP_MODES,
   TOWER_SHIP_TIERS,
 } from "./lab-controller.js";
-import { createTowerShipFrameDriver } from "./frame-driver.js";
+import { createTowerShipFrameDriver, towerShipFrameOwner } from "./frame-driver.js";
 import { towerShipRouteFromLocation } from "./route-state.js";
 
 const MODE_COPY = Object.freeze({
@@ -88,6 +88,7 @@ const frameDriver = createTowerShipFrameDriver({
   onMetrics: updateHud,
   onError: reportRuntimeError,
 });
+const frameOwner = towerShipFrameOwner(window.location.search);
 
 modeSelect.addEventListener("change", () => frameDriver.mutate(async () => {
   await controller.setMode(modeSelect.value);
@@ -107,4 +108,5 @@ window.addEventListener("resize", () => frameDriver.mutate(() => controller.resi
 )));
 window.addEventListener("beforeunload", () => frameDriver.stop(), { once: true });
 updateModeCopy();
-frameDriver.start();
+if (frameOwner === "live-page") frameDriver.start();
+else updateHud(controller.getMetrics());

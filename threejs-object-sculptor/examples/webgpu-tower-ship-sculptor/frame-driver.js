@@ -4,6 +4,10 @@ function asError(value) {
   return value instanceof Error ? value : new Error(String(value));
 }
 
+export function towerShipFrameOwner(search = "") {
+  return new URLSearchParams(search).get("capture") === "1" ? "capture-harness" : "live-page";
+}
+
 export function createTowerShipFrameDriver({
   controller,
   now = () => performance.now(),

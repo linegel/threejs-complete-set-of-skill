@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 
-import { createTowerShipFrameDriver } from "./frame-driver.js";
+import { createTowerShipFrameDriver, towerShipFrameOwner } from "./frame-driver.js";
+
+assert.equal(towerShipFrameOwner(""), "live-page");
+assert.equal(towerShipFrameOwner("?profile=correctness"), "live-page");
+assert.equal(towerShipFrameOwner("?capture=1&profile=correctness"), "capture-harness");
+assert.equal(towerShipFrameOwner("?capture=0"), "live-page");
 
 function makeMetrics(overrides = {}) {
   return {

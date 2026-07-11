@@ -1,13 +1,25 @@
 import assert from "node:assert/strict";
 
 import { normalizePixelCapture } from "../../../scripts/capture-lab-browser.mjs";
-import { describeTowerShipReadback } from "./lab-controller.js";
+import { describeTowerShipReadback, preserveTowerShipReadbackRows } from "./lab-controller.js";
 
 const layout = describeTowerShipReadback(3, 2, "srgb");
 const expected = Uint8Array.from({ length: 24 }, (_, index) => index + 1);
-const pixels = new Uint8Array(layout.fullyPaddedByteLength);
-pixels.set(expected.subarray(0, layout.rowBytes), 0);
-pixels.set(expected.subarray(layout.rowBytes), layout.bytesPerRow);
+const pixels = preserveTowerShipReadbackRows(expected, layout);
+assert.equal(pixels.byteLength, layout.fullyPaddedByteLength, "compact readback must be padded exactly once");
+
+const alreadyPadded = new Uint8Array(layout.fullyPaddedByteLength);
+alreadyPadded.set(expected.subarray(0, layout.rowBytes), 0);
+alreadyPadded.set(expected.subarray(layout.rowBytes), layout.bytesPerRow);
+assert.equal(
+  preserveTowerShipReadbackRows(alreadyPadded, layout),
+  alreadyPadded,
+  "an already padded WebGPU readback must not be padded a second time",
+);
+assert.throws(
+  () => preserveTowerShipReadbackRows(new Uint8Array(layout.rowBytes + 1), layout),
+  /unexpected capture byte length/,
+);
 
 const capture = {
   target: "presentation",
