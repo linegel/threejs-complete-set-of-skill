@@ -1,10 +1,18 @@
-import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { createRgbaPng } from './png.js';
 import { writeDefaultEvidenceBundle } from './harness.js';
 import { readJson, validateArtifactBundle } from './schema/artifact-schemas.js';
+
+const retainedFixtures = [];
+
+function retainFixture( dir ) {
+
+	retainedFixtures.push( dir );
+
+}
 
 async function expectRejects( label, fn, pattern ) {
 
@@ -68,7 +76,7 @@ async function testFinalOnlyContractRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -91,7 +99,7 @@ async function testBlankPngRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -116,7 +124,7 @@ async function testGpuTimingLabelRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -144,7 +152,7 @@ async function testGpuTimingTimestampRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -164,7 +172,7 @@ async function testStrictGpuTimingUnavailableRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -187,7 +195,7 @@ async function testOverBudgetRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -224,7 +232,7 @@ async function testPixelDiffIdenticalPasses() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -256,7 +264,7 @@ async function testPixelDiffRejects( label, baseline, candidate ) {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -281,7 +289,7 @@ async function testManifestRequiredFieldRejects( field ) {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -306,7 +314,7 @@ async function testStaleReducedTierRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -331,7 +339,7 @@ async function testManualCameraRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -357,7 +365,7 @@ async function testLeakDeltaRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -382,7 +390,7 @@ async function testMissingLeakLoopRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -408,7 +416,7 @@ async function testReadbackStrideRejects() {
 
 	} finally {
 
-		await rm( dir, { recursive: true, force: true } );
+		retainFixture( dir );
 
 	}
 
@@ -416,7 +424,9 @@ async function testReadbackStrideRejects() {
 
 export async function runSelfTest() {
 
-	return {
+	retainedFixtures.length = 0;
+
+	const result = {
 		pass: true,
 		rejections: [
 			await testFinalOnlyContractRejects(),
@@ -438,6 +448,8 @@ export async function runSelfTest() {
 			await testReadbackStrideRejects(),
 		],
 	};
+
+	return { ...result, retainedFixtures: [ ...retainedFixtures ] };
 
 }
 
