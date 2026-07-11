@@ -1,0 +1,2265 @@
+{
+  "targetName": "Potted Bonsai",
+  "targetId": "potted-bonsai",
+  "schemaVersion": "2.0",
+  "sourceImage": null,
+  "referenceSourceKind": "authored-procedural-brief",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 0,
+    "silhouette_readability": 0,
+    "depth_inference": 0,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 0,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time procedural botanical benchmark",
+    "geometryTerms": [
+      "rotation-minimizing ring",
+      "branch-root pivot",
+      "embedded attachment",
+      "root flare",
+      "opaque canopy cluster"
+    ],
+    "materialTerms": [
+      "clearcoat",
+      "bark roughness",
+      "soil cavity response",
+      "opaque foliage albedo"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Dimensions are metres in the declared right-handed asset frame; botanical form is authored intent rather than species or image evidence."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "stylized potted bonsai",
+      "formLanguage": [
+        "organic",
+        "botanical-like",
+        "sculptural"
+      ],
+      "structureKind": [
+        "compound object",
+        "branching hierarchy",
+        "repeated foliage",
+        "rooted articulated assembly"
+      ],
+      "motionPotential": [
+        "whole-object transform",
+        "articulated sway",
+        "detachable",
+        "destructible"
+      ],
+      "materialFamilies": [
+        "glazed ceramic",
+        "soil",
+        "bark",
+        "leaf"
+      ],
+      "notes": "Authored benchmark brief with no external image reference."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 8,
+        "microFeatureGroups": 8,
+        "materialLayers": 5,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "One tapered trunk, six authored branch pivots, and repeated foliage create a deep deterministic hierarchy.",
+        "The minimum tier changes foliage representation while preserving semantics and rooted motion."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Organic attachment continuity and mobile representation changes require explicit hierarchy and invariants."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": null
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "Pot, soil, root flare, tapered trunk, asymmetrical branches, and foliage pads read as one rooted miniature tree.",
+      "The action-ready authored sway preview preserves the root anchor and resets every authored rotation exactly without claiming environmental wind physics.",
+      "All tiers preserve protected runtime and physics-authoring identities."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 8,
+      "microFeatureGroups": 8,
+      "materialLayers": 4,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "rooted-base",
+        "name": "Pot, soil, and root flare",
+        "required": true,
+        "qualityCriteria": [
+          "Oval ceramic support, exposed soil, and embedded radial roots form a stable base."
+        ],
+        "evidenceRefs": [
+          "brief-rooted-base"
+        ],
+        "failureModes": [
+          "floating trunk",
+          "missing foot",
+          "root gap"
+        ]
+      },
+      {
+        "id": "branch-topology",
+        "name": "Oriented trunk and six-branch hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Tapered rotation-minimizing rings preserve branch attachment and asymmetry."
+        ],
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ],
+        "failureModes": [
+          "frame twist",
+          "floating branch",
+          "uniform radial star"
+        ]
+      },
+      {
+        "id": "foliage-tiers",
+        "name": "Opaque foliage tier system",
+        "required": true,
+        "qualityCriteria": [
+          "Full and budgeted use merged leaf solids; minimum uses six opaque clusters and zero alpha-sorted fragments."
+        ],
+        "evidenceRefs": [
+          "brief-foliage-tiers"
+        ],
+        "failureModes": [
+          "alpha overdraw",
+          "lost crown pads",
+          "semantic ID change"
+        ]
+      },
+      {
+        "id": "sway-preview-contract",
+        "name": "Rooted authored sway preview",
+        "required": true,
+        "qualityCriteria": [
+          "Deterministic diagnostic sway rotates rigid branch-root pivots, leaves the root anchor fixed, preserves shadow parity, and resets exactly without claiming continuous deformation or consuming environmental forcing."
+        ],
+        "evidenceRefs": [
+          "brief-action-contract"
+        ],
+        "failureModes": [
+          "pot motion",
+          "root drift",
+          "reset drift"
+        ]
+      },
+      {
+        "id": "botanical-materials",
+        "name": "Ceramic, soil, bark, and foliage zones",
+        "required": true,
+        "qualityCriteria": [
+          "Material families remain physically distinct under neutral and grazing light."
+        ],
+        "evidenceRefs": [
+          "brief-material-contract"
+        ],
+        "failureModes": [
+          "uniform plastic",
+          "glaze/bark collapse"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "pot ovality and support contact",
+      "root embedding",
+      "trunk taper and branch sockets",
+      "crown-pad rhythm and negative spaces",
+      "diagnostic sway/reset and material separation"
+    ],
+    "antiShallowSpecRules": [
+      "Reject floating branch cylinders.",
+      "Reject alpha-card foliage or one full-tier canopy sphere.",
+      "Reject diagnostic sway that moves the root anchor or is presented as a production wind solver.",
+      "Reject tier-dependent protected identities.",
+      "Reject species, solver, or visual-acceptance claims without evidence."
+    ]
+  },
+  "runtimeContract": {
+    "modes": [
+      "final",
+      "blockout",
+      "hierarchy",
+      "materials",
+      "action-ready"
+    ],
+    "tiers": [
+      "full",
+      "budgeted",
+      "minimum"
+    ],
+    "cameras": [
+      "design",
+      "profile",
+      "attachment",
+      "close-material"
+    ],
+    "protectedComponentIds": [
+      "root",
+      "pot",
+      "pot-body",
+      "pot-rim",
+      "pot-foot",
+      "soil",
+      "root-flare",
+      "trunk",
+      "branch-left",
+      "branch-right",
+      "branch-back",
+      "branch-left-secondary",
+      "branch-right-secondary",
+      "branch-back-secondary",
+      "branch-left-foliage",
+      "branch-right-foliage",
+      "branch-back-foliage",
+      "branch-left-secondary-foliage",
+      "branch-right-secondary-foliage",
+      "branch-back-secondary-foliage"
+    ],
+    "protectedNodeIds": [
+      "root",
+      "pot",
+      "pot-body",
+      "pot-rim",
+      "pot-foot",
+      "soil",
+      "root-flare",
+      "trunk",
+      "branch-left",
+      "branch-right",
+      "branch-back",
+      "branch-left-secondary",
+      "branch-right-secondary",
+      "branch-back-secondary",
+      "branch-left-foliage",
+      "branch-right-foliage",
+      "branch-back-foliage",
+      "branch-left-secondary-foliage",
+      "branch-right-secondary-foliage",
+      "branch-back-secondary-foliage"
+    ],
+    "protectedSocketIds": [
+      "root-anchor",
+      "root-flare-front",
+      "root-flare-back",
+      "trunk-crown",
+      "branch-left-root-socket",
+      "branch-left-tip-socket",
+      "branch-right-root-socket",
+      "branch-right-tip-socket",
+      "branch-back-root-socket",
+      "branch-back-tip-socket",
+      "branch-left-secondary-root-socket",
+      "branch-left-secondary-tip-socket",
+      "branch-right-secondary-root-socket",
+      "branch-right-secondary-tip-socket",
+      "branch-back-secondary-root-socket",
+      "branch-back-secondary-tip-socket"
+    ],
+    "protectedColliderIds": [
+      "pot-solid",
+      "trunk-capsule",
+      "branch-left-capsule",
+      "branch-right-capsule",
+      "branch-back-capsule",
+      "canopy-trigger"
+    ],
+    "protectedDestructionGroupIds": [
+      "pot-shell",
+      "root-system",
+      "trunk-core",
+      "fracture.branch-left",
+      "fracture.branch-right",
+      "fracture.branch-back"
+    ]
+  },
+  "physicsHandoff": {
+    "recordType": "ColliderConstructionInput",
+    "authority": "authoring-input-only",
+    "units": "metre",
+    "solverAuthority": false,
+    "canonicalProxyStatus": "blocked",
+    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "visualLodIndependent": true,
+    "requiredAdapterEvidence": [
+      "PhysicsContext",
+      "registered frame",
+      "pose version",
+      "validity interval",
+      "collision owner",
+      "physics-material registry binding"
+    ],
+    "colliderMaxSurfaceDeviationMeters": {
+      "pot-solid": 0.16,
+      "trunk-capsule": 0.17,
+      "branch-left-capsule": 0.1,
+      "branch-right-capsule": 0.1,
+      "branch-back-capsule": 0.1,
+      "canopy-trigger": 0.92
+    },
+    "blockedClaims": [
+      "contact response",
+      "mass",
+      "center of mass",
+      "inertia",
+      "dynamic rigid body",
+      "wind solver"
+    ]
+  },
+  "motionContract": {
+    "kind": "deterministic-authored-rooted-sway-preview",
+    "claimStatus": "authoring-preview",
+    "owner": "object-sculptor-transform-preview",
+    "enabledMode": "action-ready",
+    "fixedNodeIds": [
+      "pot",
+      "soil",
+      "root-flare"
+    ],
+    "animatedNodeIds": [
+      "trunk",
+      "branch-left",
+      "branch-right",
+      "branch-back",
+      "branch-left-secondary",
+      "branch-right-secondary",
+      "branch-back-secondary"
+    ],
+    "exactReset": true,
+    "environmentForcingConsumed": false,
+    "productionWindPhysics": false,
+    "solverAuthority": false
+  },
+  "proceduralScope": {
+    "implementation": "authored deterministic bonsai branching grammar",
+    "growthSolver": false,
+    "ecologySolver": false,
+    "dynamicsSolver": false,
+    "excludedClaims": ["botanical growth simulation", "ecology or placement solver", "environment-forced structural dynamics", "rigid-body contact or fracture solver"]
+  },
+  "seedContract": {
+    "domain": "uint32",
+    "minimum": 0,
+    "maximum": 4294967295,
+    "outsideDomain": "reject",
+    "normalization": "none",
+    "branchInteriorOffsetPerAxisMeters": 0.022,
+    "matchedLeafCenterDeltaMeters": 0.16,
+    "leafSeedVariation": {
+      "azimuthRadians": 0.08,
+      "verticalFraction": 0.04,
+      "shellFraction": 0.035,
+      "localOffsetPerAxisMeters": 0.012,
+      "maxMatchedCenterDeltaMeters": 0.16
+    },
+    "identityContinuity": {
+      "signatureInputs": ["base continuity token", "target id", "source revision", "uint32 seed"],
+      "visualTierAffectsGeneration": false,
+      "changedSeedOrSourceRequiresNewGeneration": true
+    }
+  },
+  "geometryContract": {
+    "orientedRingWriter": "rotation-minimizing-oriented-rings",
+    "branchEnds": "explicit closed caps",
+    "seamAndCapBoundaryWeldPairs": true,
+    "closedManifoldAfterSeamWeld": true,
+    "fullAndBudgetedFoliage": "merged-closed-leaf-octahedra",
+    "minimumFoliage": "closed-pole-ring-ellipsoid",
+    "degenerateTrianglesAllowed": false,
+    "alphaSortedFragments": 0
+  },
+  "workloadContract": {
+    "seed": 24301,
+    "full": {"renderItems": 21, "storedVertices": 2229, "triangles": 2952},
+    "budgeted": {"renderItems": 21, "storedVertices": 1377, "triangles": 1688},
+    "minimum": {"renderItems": 21, "storedVertices": 858, "triangles": 1042},
+    "timingClaim": "none until sustained named-device evidence"
+  },
+  "actionReadiness": {
+    "contract": "Stable branch-root pivots, parent-local sockets, destruction groups, and ColliderConstructionInput records remain identical across visual tiers.",
+    "defaultRigType": "rooted-botanical-prop",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "actionProfile",
+      "attachment for trunk and branches"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Place branch pivots at attachment roots.",
+      "Share Object3D transforms between color and shadow rendering.",
+      "Do not adapt construction inputs inside the asset factory."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Protected branch-root groups",
+      "debrisStrategy": "Detach authored branches before any solver-owned fragments."
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "interactive-demo-fidelity",
+    "materialPass": {
+      "independentMapChannels": [
+        "albedo",
+        "roughness",
+        "height",
+        "normal",
+        "ambient-occlusion"
+      ],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "acceptedLimitation": "No source image or species-accuracy evidence exists."
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ]
+    }
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "rooted base",
+      "tapered branch topology",
+      "opaque foliage tiers",
+      "rooted exact-reset motion",
+      "material separation"
+    ],
+    "niceToHave": [
+      "subtle asymmetry",
+      "controlled leaf color variation"
+    ],
+    "reviewViewpoints": [
+      "design",
+      "profile",
+      "attachment",
+      "close-material"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.75,
+      "comparisonArtifactRequired": false,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision reviews authored visual contracts; no reference-image similarity claim is possible.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": false,
+        "selectionRule": "Review object-specific authored systems from named cameras."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "ambiguous authored crown rhythm",
+      "missing protected identity",
+      "unsupported physics claim"
+    ],
+    "codeRefineTriggers": [
+      "factory differs from spec",
+      "visible branch gap",
+      "root drift",
+      "reset drift"
+    ],
+    "stopCriteria": [
+      "accepted authored-contract review",
+      "external botanical reference required"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "Codex in-app Browser",
+      "fallbackCapture": "none",
+      "minimumEvidence": "Named PNG, renderer/backend record, camera, mode, tier, seed, AI-vision scores, and notes.",
+      "reviewPairRule": "No reference pair exists; compare named views to authored feature contracts.",
+      "acceptanceAuthority": "AI-vision review record plus technical evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "bonsai-silhouette",
+      "name": "Rooted bonsai silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "pot",
+        "trunk",
+        "branch-left",
+        "branch-right",
+        "branch-back"
+      ],
+      "evidenceRefs": [
+        "brief-rooted-base",
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-attachments",
+      "name": "Trunk and branch attachment continuity",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.82,
+      "mustPass": true,
+      "componentRefs": [
+        "trunk",
+        "branch-left",
+        "branch-left-secondary"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "opaque-foliage",
+      "name": "Opaque foliage representation",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": [
+        "branch-left-foliage"
+      ],
+      "evidenceRefs": [
+        "brief-foliage-tiers"
+      ]
+    },
+    {
+      "id": "rooted-sway-preview",
+      "name": "Rooted exact-reset authored sway",
+      "tier": "critical",
+      "passIds": [
+        "interaction-pass"
+      ],
+      "minimumScore": 0.82,
+      "mustPass": true,
+      "componentRefs": [
+        "root-flare",
+        "trunk",
+        "branch-left"
+      ],
+      "evidenceRefs": [
+        "brief-action-contract"
+      ]
+    },
+    {
+      "id": "bonsai-materials",
+      "name": "Botanical material separation",
+      "tier": "critical",
+      "passIds": [
+        "material-pass",
+        "surface-pass",
+        "lighting-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "pot",
+        "root-flare",
+        "trunk",
+        "branch-left-foliage"
+      ],
+      "evidenceRefs": [
+        "brief-material-contract"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "Awaiting first native-WebGPU authored-contract capture and AI-vision review.",
+    "nextRequiredEvidence": [
+      "design-camera blockout PNG",
+      "renderer/backend record",
+      "AI-vision layer and feature scores"
+    ]
+  },
+  "coordinateFrame": {
+    "front": "+Z",
+    "up": "+Y",
+    "root": "pot-foot center on the support plane",
+    "scaleReference": "Maximum authored envelope is 2.16 x 2.32 x 1.55 metres"
+  },
+  "silhouette": {
+    "boundingShape": "2.16 x 2.32 x 1.55 metre rooted botanical envelope",
+    "aspectRatios": [
+      "width:height = 0.93:1",
+      "pot width:overall width approximately 0.56:1"
+    ],
+    "symmetry": "Pot is approximately bilateral; trunk and crown are deliberately asymmetric.",
+    "dominantCurves": [
+      "tapered trunk sweep",
+      "three primary branch arcs",
+      "three secondary branch arcs",
+      "overlapping crown pads"
+    ],
+    "negativeSpaces": [
+      "under primary pads",
+      "between left/right crowns",
+      "trunk reveal above pot"
+    ],
+    "landmarks": [
+      "oval pot rim",
+      "radial root flare",
+      "trunk bend",
+      "left pad",
+      "right pad",
+      "back crown"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "brief-rooted-base",
+      "sourceKind": "authored-procedural-brief",
+      "view": "design intent",
+      "observations": [
+        "Oval pot, soil, and four radial roots define the authored support system."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-branch-topology",
+      "sourceKind": "authored-procedural-brief",
+      "view": "profile and attachment intent",
+      "observations": [
+        "One trunk, three primary branches, and three secondary branches use named root and tip sockets."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-foliage-tiers",
+      "sourceKind": "authored-procedural-brief",
+      "view": "tier intent",
+      "observations": [
+        "Full/budgeted merged leaf solids and minimum opaque clusters preserve six foliage identities with no alpha-sorted fragments."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-action-contract",
+      "sourceKind": "authored-procedural-brief",
+      "view": "action-ready intent",
+      "observations": [
+        "Deterministic authored sway leaves the root anchor fixed and resets exact authored rotations without claiming production wind."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-material-contract",
+      "sourceKind": "authored-procedural-brief",
+      "view": "close-material intent",
+      "observations": [
+        "Glazed ceramic, unglazed foot, soil, bark, and foliage are distinct zones."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Bonsai root",
+      "level": "macro",
+      "role": "root",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "box",
+      "parent": null,
+      "dimensions": {
+        "width": 2.16,
+        "height": 2.32,
+        "depth": 1.55,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "support-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "construction-input-set"
+        },
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root-system",
+          "seamRefs": [
+            "pot and branch seams"
+          ],
+          "detachableFragments": [
+            "branch assemblies"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "glazed-ceramic",
+      "materialLayers": [
+        "glazed-ceramic",
+        "soil",
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "fixed root anchor"
+      ],
+      "evidenceRefs": [
+        "brief-rooted-base"
+      ]
+    },
+    {
+      "id": "pot",
+      "name": "Oval glazed pot assembly",
+      "level": "macro",
+      "role": "base",
+      "importance": 0.9,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "root",
+      "dimensions": {
+        "width": 1.18,
+        "height": 0.47,
+        "depth": 0.92,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          0.78
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {
+          "mode": "support-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "cylinder-construction-input",
+          "id": "pot-solid"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "pot-shell",
+          "seamRefs": [
+            "rim and foot"
+          ],
+          "detachableFragments": [
+            "pot-shell"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "glazed-ceramic",
+      "materialLayers": [
+        "glazed-ceramic",
+        "unglazed-foot",
+        "soil"
+      ],
+      "localFeatures": [
+        "oval body",
+        "raised rim",
+        "unglazed foot",
+        "soil inset"
+      ],
+      "evidenceRefs": [
+        "brief-rooted-base"
+      ]
+    },
+    {
+      "id": "pot-body",
+      "name": "Pot body",
+      "level": "meso",
+      "role": "shell",
+      "importance": 0.75,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "pot",
+      "dimensions": {
+        "width": 1.18,
+        "height": 0.41,
+        "depth": 0.92,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          0.78
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {
+          "mode": "parent",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "owned-by-pot"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "pot-shell",
+          "seamRefs": [
+            "rim"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "glazed-ceramic",
+      "materialLayers": [
+        "glazed-ceramic"
+      ],
+      "localFeatures": [
+        "clearcoat silhouette"
+      ],
+      "evidenceRefs": [
+        "brief-rooted-base"
+      ]
+    },
+    {
+      "id": "root-flare",
+      "name": "Radial root flare",
+      "level": "macro",
+      "role": "root",
+      "importance": 0.9,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "root-anchor",
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0.38,
+          -0.005,
+          0.07
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.02,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-rooted-base"
+        ]
+      },
+      "dimensions": {
+        "width": 0.8,
+        "height": 0.14,
+        "depth": 0.72,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0.43,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static-root",
+        "pivot": {
+          "mode": "root-anchor",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "trunk-envelope-shared"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "root-system",
+          "seamRefs": [
+            "root-to-soil contacts"
+          ],
+          "detachableFragments": [
+            "root-system"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark-light",
+      "materialLayers": [
+        "bark-light",
+        "soil"
+      ],
+      "localFeatures": [
+        "four tapered roots",
+        "soil overlap"
+      ],
+      "evidenceRefs": [
+        "brief-rooted-base"
+      ]
+    },
+    {
+      "id": "trunk",
+      "name": "Tapered trunk",
+      "level": "macro",
+      "role": "trunk",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "root-anchor",
+        "localStart": [
+          0,
+          -0.025,
+          0
+        ],
+        "localEnd": [
+          0.04,
+          1.48,
+          -0.03
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.31,
+        "height": 1.55,
+        "depth": 0.31,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0.43,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-sway",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "trunk-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "trunk-core",
+          "seamRefs": [
+            "root collar",
+            "branch roots"
+          ],
+          "detachableFragments": [
+            "primary branches"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "bark-light"
+      ],
+      "localFeatures": [
+        "taper",
+        "controlled bend",
+        "root overlap"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-left",
+      "name": "Left primary branch",
+      "level": "meso",
+      "role": "branch",
+      "importance": 0.85,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "trunk",
+      "attachment": {
+        "parentId": "trunk",
+        "parentSocket": "branch-left-root-socket",
+        "localStart": [
+          0.02,
+          -0.025,
+          0
+        ],
+        "localEnd": [
+          -0.74,
+          0.47,
+          0.18
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.82,
+        "height": 0.52,
+        "depth": 0.22,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          -0.02,
+          0.67,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-detachable",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "branch-left-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-left",
+          "seamRefs": [
+            "branch-left root"
+          ],
+          "detachableFragments": [
+            "branch-left"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "root taper",
+        "asymmetric arc"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-right",
+      "name": "Right primary branch",
+      "level": "meso",
+      "role": "branch",
+      "importance": 0.84,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "trunk",
+      "attachment": {
+        "parentId": "trunk",
+        "parentSocket": "branch-right-root-socket",
+        "localStart": [
+          -0.015,
+          -0.025,
+          0
+        ],
+        "localEnd": [
+          0.68,
+          0.41,
+          -0.16
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.75,
+        "height": 0.46,
+        "depth": 0.2,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.015,
+          0.91,
+          -0.005
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-detachable",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "branch-right-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-right",
+          "seamRefs": [
+            "branch-right root"
+          ],
+          "detachableFragments": [
+            "branch-right"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "opposed arc"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-back",
+      "name": "Back primary branch",
+      "level": "meso",
+      "role": "branch",
+      "importance": 0.8,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "trunk",
+      "attachment": {
+        "parentId": "trunk",
+        "parentSocket": "branch-back-root-socket",
+        "localStart": [
+          0,
+          -0.025,
+          0.02
+        ],
+        "localEnd": [
+          -0.12,
+          0.45,
+          -0.56
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.25,
+        "height": 0.5,
+        "depth": 0.62,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          1.14,
+          -0.005
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-detachable",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "branch-back-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-back",
+          "seamRefs": [
+            "branch-back root"
+          ],
+          "detachableFragments": [
+            "branch-back"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "depth crown"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-left-secondary",
+      "name": "Left secondary branch",
+      "level": "meso",
+      "role": "branch",
+      "importance": 0.7,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "branch-left",
+      "attachment": {
+        "parentId": "branch-left",
+        "parentSocket": "branch-left-secondary-root-socket",
+        "localStart": [
+          0.018,
+          -0.018,
+          0
+        ],
+        "localEnd": [
+          -0.36,
+          0.27,
+          0.22
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.42,
+        "height": 0.31,
+        "depth": 0.26,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          -0.42,
+          0.24,
+          0.07
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-detachable",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "parent-primary-envelope"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-left",
+          "seamRefs": [
+            "secondary root"
+          ],
+          "detachableFragments": [
+            "branch-left-secondary"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "fine taper"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-right-secondary",
+      "name": "Right secondary branch",
+      "level": "meso",
+      "role": "branch",
+      "importance": 0.69,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "branch-right",
+      "attachment": {
+        "parentId": "branch-right",
+        "parentSocket": "branch-right-secondary-root-socket",
+        "localStart": [
+          -0.015,
+          -0.018,
+          0
+        ],
+        "localEnd": [
+          0.26,
+          0.27,
+          0.28
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.31,
+        "height": 0.31,
+        "depth": 0.32,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.37,
+          0.2,
+          -0.07
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-detachable",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "parent-primary-envelope"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-right",
+          "seamRefs": [
+            "secondary root"
+          ],
+          "detachableFragments": [
+            "branch-right-secondary"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "fine taper"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-back-secondary",
+      "name": "Back secondary branch",
+      "level": "meso",
+      "role": "branch",
+      "importance": 0.68,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "branch-back",
+      "attachment": {
+        "parentId": "branch-back",
+        "parentSocket": "branch-back-secondary-root-socket",
+        "localStart": [
+          0,
+          -0.018,
+          0.015
+        ],
+        "localEnd": [
+          0.3,
+          0.25,
+          -0.18
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.006,
+        "evidenceRefs": [
+          "brief-branch-topology"
+        ]
+      },
+      "dimensions": {
+        "width": 0.34,
+        "height": 0.29,
+        "depth": 0.23,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          -0.075,
+          0.25,
+          -0.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated-detachable",
+        "pivot": {
+          "mode": "branch-root",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "parent-primary-envelope"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-back",
+          "seamRefs": [
+            "secondary root"
+          ],
+          "detachableFragments": [
+            "branch-back-secondary"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "bark"
+        }
+      },
+      "material": "bark",
+      "materialLayers": [
+        "bark",
+        "foliage"
+      ],
+      "localFeatures": [
+        "fine taper"
+      ],
+      "evidenceRefs": [
+        "brief-branch-topology"
+      ]
+    },
+    {
+      "id": "branch-left-foliage",
+      "name": "Left opaque foliage pad",
+      "level": "meso",
+      "role": "canopy",
+      "importance": 0.78,
+      "confidence": 1,
+      "primitive": "instanced-cluster",
+      "parent": "branch-left",
+      "dimensions": {
+        "width": 0.75,
+        "height": 0.5,
+        "depth": 0.65,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented-to-articulated-branch",
+        "pivot": {
+          "mode": "parent",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "canopy-trigger",
+          "id": "canopy-trigger"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "fracture.branch-left",
+          "seamRefs": [
+            "foliage branch attachment"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "foliage"
+        }
+      },
+      "material": "foliage",
+      "materialLayers": [
+        "foliage"
+      ],
+      "localFeatures": [
+        "opaque overlapping pad",
+        "zero alpha-sorted fragments"
+      ],
+      "evidenceRefs": [
+        "brief-foliage-tiers"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": "glazed-ceramic",
+      "name": "Blue-green glazed pot",
+      "type": "node-physical",
+      "shaderModel": "MeshPhysicalNodeMaterial",
+      "baseColor": "#1D6770",
+      "albedo": {
+        "dominant": "#1D6770",
+        "secondary": [
+          "#185A63",
+          "#287781"
+        ]
+      },
+      "roughness": {
+        "base": 0.19,
+        "variation": 0.04,
+        "map": "independent glaze field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "fine ceramic orange peel",
+        "strength": 0.035,
+        "scale": 90,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.12,
+        "contactShadowBias": 0.2
+      },
+      "localOverrides": [
+        "darker lower wall and rim pooling"
+      ]
+    },
+    {
+      "id": "unglazed-foot",
+      "name": "Unglazed ceramic foot",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#69453B",
+      "roughness": {
+        "base": 0.76,
+        "variation": 0.08,
+        "map": "independent clay tooth"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "clay grain",
+        "strength": 0.07,
+        "scale": 68,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.16,
+        "contactShadowBias": 0.3
+      },
+      "localOverrides": [
+        "support-contact darkening"
+      ]
+    },
+    {
+      "id": "soil",
+      "name": "Dark organic soil",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#2E2118",
+      "roughness": {
+        "base": 0.96,
+        "variation": 0.03,
+        "map": "independent clump field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "granular clumps",
+        "strength": 0.16,
+        "scale": 40,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.3,
+        "contactShadowBias": 0.4
+      },
+      "localOverrides": [
+        "darker around embedded roots"
+      ]
+    },
+    {
+      "id": "bark",
+      "name": "Tapered trunk bark",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#60442D",
+      "albedo": {
+        "dominant": "#60442D",
+        "secondary": [
+          "#4E3725",
+          "#79573A"
+        ]
+      },
+      "roughness": {
+        "base": 0.82,
+        "variation": 0.12,
+        "map": "independent longitudinal bark field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "longitudinal ridges",
+        "strength": 0.14,
+        "scale": 32,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.22,
+        "contactShadowBias": 0.3
+      },
+      "localOverrides": [
+        "lighter root flare and darker inner forks"
+      ]
+    },
+    {
+      "id": "bark-light",
+      "name": "Root-flare bark",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#79573A",
+      "roughness": {
+        "base": 0.78,
+        "variation": 0.1,
+        "map": "independent root field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "root ridges",
+        "strength": 0.12,
+        "scale": 28,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.22,
+        "contactShadowBias": 0.35
+      },
+      "localOverrides": [
+        "soil-contact darkening"
+      ]
+    },
+    {
+      "id": "foliage",
+      "name": "Opaque green foliage",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#356B32",
+      "albedo": {
+        "dominant": "#356B32",
+        "secondary": [
+          "#2A5C2B",
+          "#477B3D"
+        ]
+      },
+      "roughness": {
+        "base": 0.62,
+        "variation": 0.1,
+        "map": "independent leaf field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "bounded leaf convexity",
+        "strength": 0.08,
+        "scale": 58,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.18,
+        "contactShadowBias": 0.22
+      },
+      "localOverrides": [
+        "darker inner pad and lighter top leaves"
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "radial-root-flare",
+      "count": 4,
+      "distribution": "Four oriented-ring roots overlap the soil from the root-flare pivot.",
+      "componentRef": "root-flare",
+      "stableIdRule": "root-flare-{front|back|left|right}-surface"
+    },
+    {
+      "id": "authored-branch-family",
+      "count": 6,
+      "distribution": "Three primary and three secondary branches with root/tip sockets.",
+      "componentRef": "trunk",
+      "stableIdRule": "branch-{side}[-secondary]"
+    },
+    {
+      "id": "opaque-foliage-family",
+      "count": 6,
+      "distribution": "One foliage identity per branch; geometry representation changes by tier without alpha cards.",
+      "componentRef": "branch-left-foliage",
+      "stableIdRule": "{branch-id}-foliage"
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Prove pot/tree proportion and crown silhouette.",
+      "componentRefs": [
+        "pot",
+        "root-flare",
+        "trunk",
+        "branch-left",
+        "branch-right",
+        "branch-back"
+      ],
+      "acceptance": [
+        "Named design capture exists.",
+        "Authored silhouette feature passes."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Prove branch hierarchy, sockets, and root attachments.",
+      "componentRefs": [
+        "root-flare",
+        "trunk",
+        "branch-left",
+        "branch-left-secondary"
+      ],
+      "acceptance": [
+        "Protected IDs match runtime.",
+        "No attachment gaps are visible."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine oriented rings, taper, and crown-pad rhythm.",
+      "componentRefs": [
+        "trunk",
+        "branch-left",
+        "branch-right",
+        "branch-back",
+        "branch-left-foliage"
+      ],
+      "acceptance": [
+        "Profile and attachment captures show no frame twist."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Separate ceramic, soil, bark, and foliage.",
+      "componentRefs": [
+        "pot",
+        "root-flare",
+        "trunk",
+        "branch-left-foliage"
+      ],
+      "acceptance": [
+        "Close-material capture preserves all material families."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add scale-aware glaze, soil, bark, and leaf response.",
+      "componentRefs": [
+        "pot",
+        "trunk",
+        "branch-left-foliage"
+      ],
+      "acceptance": [
+        "Grazing light reveals bounded response without texture swimming."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Establish neutral botanical readability.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Key, fill, rim, ACES exposure, and contact shadow are recorded."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Prove rooted authored sway and exact reset without a production-wind claim.",
+      "componentRefs": [
+        "root-flare",
+        "trunk",
+        "branch-left",
+        "branch-left-secondary"
+      ],
+      "acceptance": [
+        "Fixed-time captures differ, root anchor remains fixed, and reset is exact."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Prove tier monotonicity and opaque minimum canopy.",
+      "componentRefs": [
+        "root",
+        "branch-left-foliage"
+      ],
+      "acceptance": [
+        "Geometry decreases by tier, minimum uses six opaque clusters, and protected IDs are exact."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "full",
+      "distance": 0,
+      "strategy": "High-section closed oriented rings and 84 merged closed opaque leaf solids; seed 0x5eed source metrics are 21 render items, 2,229 stored vertices, and 2,952 triangles."
+    },
+    {
+      "tier": "budgeted",
+      "distance": 7,
+      "strategy": "Reduced closed ring sampling and 48 merged closed opaque leaf solids; seed 0x5eed source metrics are 21 render items, 1,377 stored vertices, and 1,688 triangles."
+    },
+    {
+      "tier": "minimum",
+      "distance": 15,
+      "strategy": "Minimum closed ring sampling and six closed pole-ring opaque canopy clusters with zero alpha-sorted fragments; seed 0x5eed source metrics are 21 render items, 858 stored vertices, and 1,042 triangles."
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "mobile-aware botanical inspection",
+    "targetTriangles": 4000,
+    "maxDrawCalls": 21,
+    "textureSize": 1024,
+    "fpsTarget": 60,
+    "optimizationPolicy": "No sustained-performance claim passes without named-device CPU/GPU/presentation evidence. Preserve one scene render, opaque minimum foliage, and no post-processing passes."
+  },
+  "lightingFromPhoto": [
+    "No source photo exists; use neutral key, soft fill, and restrained rim light for authored form inspection.",
+    "Use explicit ACES tone mapping, recorded exposure, and one output transform.",
+    "Use a receiving plane for contact shadow; do not add a post-processing pipeline."
+  ],
+  "proceduralStrategy": [
+    "Build pot forms from lathe/cylinder primitives and roots/trunk/branches from rotation-minimizing oriented rings.",
+    "Root every branch at a named parent-local socket and keep six foliage identities stable.",
+    "Use merged opaque leaf solids at full/budgeted and six opaque canopy clusters at minimum.",
+    "Drive deterministic rooted diagnostic sway through shared Object3D transforms and exact reset; consume no environmental forcing.",
+    "Publish ColliderConstructionInput records only; canonical physics remains blocked.",
+    "Render native WebGPU NodeMaterials in one scene render with no post-processing passes."
+  ],
+  "animationAnchors": [
+    "root-anchor",
+    "trunk",
+    "branch-left",
+    "branch-right",
+    "branch-back",
+    "branch-left-secondary",
+    "branch-right-secondary",
+    "branch-back-secondary"
+  ],
+  "destructionAnchors": [
+    "pot-shell",
+    "root-system",
+    "trunk-core",
+    "fracture.branch-left",
+    "fracture.branch-right",
+    "fracture.branch-back"
+  ],
+  "risks": [
+    "No external reference image exists, so reconstruction fidelity and species accuracy cannot be evaluated.",
+    "Crown readability and material acceptance require future native-WebGPU browser inspection.",
+    "ColliderConstructionInput records are not canonical collision proxies or solver authority."
+  ]
+}

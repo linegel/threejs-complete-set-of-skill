@@ -1,0 +1,2774 @@
+{
+  "targetName": "Articulated Desk Lamp",
+  "targetId": "articulated-desk-lamp",
+  "schemaVersion": "2.0",
+  "sourceImage": null,
+  "referenceSourceKind": "authored-procedural-brief",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 0,
+    "silhouette_readability": 0,
+    "depth_inference": 0,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 0,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time articulated mechanical-product benchmark",
+    "geometryTerms": [
+      "serial hinge chain",
+      "paired structural rail",
+      "bell reflector",
+      "tension spring",
+      "parent-local socket"
+    ],
+    "materialTerms": [
+      "powder-coat roughness",
+      "brushed-metal response",
+      "rubber roughness",
+      "warm stylized opaque emissive envelope"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Dimensions are metres and joint limits are radians in the declared right-handed asset frame; authored intent is not reference-image or solver evidence."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "four-axis articulated desk lamp",
+      "formLanguage": [
+        "hard-surface",
+        "mechanical",
+        "product-form"
+      ],
+      "structureKind": [
+        "compound object",
+        "serial hinge hierarchy",
+        "paired structural links",
+        "articulated assembly"
+      ],
+      "motionPotential": [
+        "whole-object transform",
+        "articulated",
+        "detachable",
+        "destructible"
+      ],
+      "materialFamilies": [
+        "powder-coated metal",
+        "brushed metal",
+        "brass",
+        "rubber",
+        "stylized opaque emissive bulb"
+      ],
+      "notes": "Authored benchmark brief with no external image reference."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 8,
+        "microFeatureGroups": 8,
+        "materialLayers": 7,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "Four nested pivots, paired rails, springs, cables, and a bell head require stable local frames.",
+        "Tier reductions must preserve all semantic and construction-input identities."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Serial articulation and visible attachments require explicit hierarchy, action, material, and tier contracts."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": null
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "A weighted base supports a readable four-axis serial arm and bell reflector with exposed warm bulb.",
+      "Action-ready mode exercises authored joint channels and exact reset restores seed-bounded rest transforms.",
+      "All tiers preserve every exported protected identity."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 8,
+      "microFeatureGroups": 8,
+      "materialLayers": 5,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "base-chain",
+        "name": "Weighted base and offset yaw chain",
+        "required": true,
+        "qualityCriteria": [
+          "The base establishes support and the offset yaw post clearly starts the articulation chain."
+        ],
+        "evidenceRefs": [
+          "brief-base-chain"
+        ],
+        "failureModes": [
+          "floating base",
+          "top-heavy silhouette"
+        ]
+      },
+      {
+        "id": "serial-hinges",
+        "name": "Four-axis serial hinge hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Yaw, shoulder, elbow, and shade pivots retain local axes, limits, sockets, and readable hardware."
+        ],
+        "evidenceRefs": [
+          "brief-articulation"
+        ],
+        "failureModes": [
+          "world-axis motion",
+          "joint gap",
+          "missing socket"
+        ]
+      },
+      {
+        "id": "paired-links",
+        "name": "Paired arm, spring, and cable systems",
+        "required": true,
+        "qualityCriteria": [
+          "Two rails per arm stage retain spacing while six decorative parent-local spring/cable sweeps publish 12 named endpoint sockets, overlap, and gap tolerances without claiming cross-joint mechanics."
+        ],
+        "evidenceRefs": [
+          "brief-structural-links"
+        ],
+        "failureModes": [
+          "single-stick arm",
+          "floating spring",
+          "cable discontinuity"
+        ]
+      },
+      {
+        "id": "bell-head",
+        "name": "Bell shade, reflector, and bulb",
+        "required": true,
+        "qualityCriteria": [
+          "Paired exterior-enamel and underside-reflector crown annuli with rolled overlap, deliberately open lower aperture, inner reflector, rim, socket, stylized opaque bulb, and emitter socket form a coherent lamp head."
+        ],
+        "evidenceRefs": [
+          "brief-head-materials"
+        ],
+        "failureModes": [
+          "flat head",
+          "missing reflector",
+          "bulb intersection",
+          "unintended crown hole",
+          "sealed lower aperture"
+        ]
+      },
+      {
+        "id": "action-boundary",
+        "name": "Diagnostic motion and physics boundary",
+        "required": true,
+        "qualityCriteria": [
+          "Four deterministic absolute-time channels reset exactly and all collider/constraint records remain complete authoring inputs with solver authority false."
+        ],
+        "evidenceRefs": [
+          "brief-action-contract"
+        ],
+        "failureModes": [
+          "solver claim",
+          "reset drift",
+          "tier-dependent physical identity"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "base support and yaw offset",
+      "hinge chain proportions",
+      "paired rail spacing",
+      "spring/cable continuity",
+      "shade/reflector/bulb separation"
+    ],
+    "antiShallowSpecRules": [
+      "Reject a single bent tube in place of serial pivots.",
+      "Reject hinges without named sockets.",
+      "Reject floating links, springs, or cables.",
+      "Reject tier-dependent protected IDs.",
+      "Reject solver or visual-acceptance claims without evidence."
+    ]
+  },
+  "runtimeContract": {
+    "sourceRevision": "articulated-desk-lamp.corpus-v4",
+    "modes": [
+      "final",
+      "blockout",
+      "hierarchy",
+      "materials",
+      "action-ready"
+    ],
+    "tiers": [
+      "full",
+      "budgeted",
+      "minimum"
+    ],
+    "cameras": [
+      "design",
+      "profile",
+      "attachment",
+      "close-material"
+    ],
+    "protectedComponentIds": [
+      "root",
+      "base-pivot",
+      "base-yaw-pivot",
+      "shoulder-hinge-pivot",
+      "elbow-hinge-pivot",
+      "shade-hinge-pivot",
+      "base-shell",
+      "lower-arm-left",
+      "lower-arm-right",
+      "upper-arm-left",
+      "upper-arm-right",
+      "lower-spring-start-collar",
+      "lower-spring-end-collar",
+      "upper-spring-start-collar",
+      "upper-spring-end-collar",
+      "shade-shell",
+      "shade-crown-annulus",
+      "shade-crown-inner-annulus",
+      "shade-crown-roll",
+      "reflector-shell",
+      "bulb"
+    ],
+    "protectedNodeIds": [
+      "root",
+      "base-pivot",
+      "base-yaw-pivot",
+      "shoulder-hinge-pivot",
+      "elbow-hinge-pivot",
+      "shade-hinge-pivot",
+      "base-shell",
+      "lower-arm-left",
+      "lower-arm-right",
+      "upper-arm-left",
+      "upper-arm-right",
+      "lower-spring-start-collar",
+      "lower-spring-end-collar",
+      "upper-spring-start-collar",
+      "upper-spring-end-collar",
+      "shade-shell",
+      "shade-crown-annulus",
+      "shade-crown-inner-annulus",
+      "shade-crown-roll",
+      "reflector-shell",
+      "bulb"
+    ],
+    "protectedSocketIds": [
+      "desk-contact-socket",
+      "power-input-socket",
+      "shoulder-joint-socket",
+      "elbow-joint-socket",
+      "shade-joint-socket",
+      "light-emitter-socket",
+      "shade-accessory-socket",
+      "lower-spring-start-socket",
+      "lower-spring-end-socket",
+      "upper-spring-start-socket",
+      "upper-spring-end-socket",
+      "lower-cable-start-socket",
+      "lower-cable-end-socket",
+      "upper-cable-start-socket",
+      "upper-cable-end-socket",
+      "shade-cable-start-socket",
+      "shade-cable-end-socket",
+      "power-cable-start-socket",
+      "power-cable-end-socket"
+    ],
+    "protectedConstraintIds": [
+      "base-yaw-hinge-constraint",
+      "shoulder-hinge-constraint",
+      "elbow-hinge-constraint",
+      "shade-hinge-constraint"
+    ],
+    "protectedColliderIds": [
+      "base-cylinder",
+      "lower-arm-left-capsule",
+      "lower-arm-right-capsule",
+      "upper-arm-left-capsule",
+      "upper-arm-right-capsule",
+      "shade-neck-cylinder",
+      "shade-shell-rib-00-capsule",
+      "shade-shell-rib-01-capsule",
+      "shade-shell-rib-02-capsule",
+      "shade-shell-rib-03-capsule",
+      "shade-shell-rib-04-capsule",
+      "shade-shell-rib-05-capsule",
+      "shade-shell-rib-06-capsule",
+      "shade-shell-rib-07-capsule",
+      "bulb-trigger"
+    ],
+    "protectedDestructionGroupIds": [
+      "weighted-base",
+      "lower-arm-assembly",
+      "upper-arm-assembly",
+      "lamp-head"
+    ]
+  },
+  "physicsHandoff": {
+    "recordType": "ColliderConstructionInput",
+    "constraintRecordType": "ConstraintConstructionInput",
+    "authority": "authoring-input-only",
+    "units": "metre-and-radian",
+    "solverAuthority": false,
+    "canonicalProxyStatus": "blocked",
+    "canonicalConstraintStatus": "blocked",
+    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "visualLodIndependent": true,
+    "colliderMaxSurfaceDeviationMeters": {
+      "base-cylinder": 0.021,
+      "lower-arm-left-capsule": 0.017,
+      "lower-arm-right-capsule": 0.017,
+      "upper-arm-left-capsule": 0.017,
+      "upper-arm-right-capsule": 0.017,
+      "shade-neck-cylinder": 0.0017,
+      "shade-shell-rib-00-capsule": 0.062,
+      "shade-shell-rib-01-capsule": 0.062,
+      "shade-shell-rib-02-capsule": 0.062,
+      "shade-shell-rib-03-capsule": 0.062,
+      "shade-shell-rib-04-capsule": 0.062,
+      "shade-shell-rib-05-capsule": 0.062,
+      "shade-shell-rib-06-capsule": 0.062,
+      "shade-shell-rib-07-capsule": 0.062,
+      "bulb-trigger": 0.023
+    },
+    "shadeBoundaryProxy": {
+      "composition": "eight tier-invariant capsule construction inputs intended for one adapter-side compound boundary body; the solid neck is deliberately excluded",
+      "filledApertureProxy": false,
+      "includesSolidNeck": false,
+      "ribCount": 8,
+      "ribRadiusMeters": 0.012,
+      "sampledVisualToProxyLowerBoundMeters": 0.0574,
+      "declaredBidirectionalMeters": 0.062,
+      "samplingConvergenceAllowanceMeters": 0.002,
+      "lowerApertureClearRadiusMeters": 0.168,
+      "evidenceStatus": "source-tested-authoring-bound; canonical collision acceptance remains blocked"
+    },
+    "shadeNeckProxy": {
+      "colliderId": "shade-neck-cylinder",
+      "meshId": "shade-neck",
+      "shapeKind": "cylinder",
+      "startMeters": [0, -0.015, 0],
+      "endMeters": [0, -0.075, 0],
+      "radiusMeters": 0.032,
+      "includesVisualAndProxyCaps": true,
+      "minimumTierSampledLowerBoundMeters": 0.00155,
+      "declaredBidirectionalMeters": 0.0017,
+      "collisionRole": "solid",
+      "errorMetric": "sampled bidirectional actual-BufferGeometry-to-analytic-capped-cylinder Hausdorff envelope",
+      "evidenceStatus": "source-tested-authoring-bound; canonical collision acceptance remains blocked"
+    },
+    "bulbTriggerPurpose": "proximity trigger only; no solid-contact authority",
+    "requiredAdapterEvidence": [
+      "PhysicsContext",
+      "registered frame",
+      "pose version",
+      "validity interval",
+      "collision/constraint owner",
+      "physics-material registry binding"
+    ],
+    "blockedClaims": [
+      "contact response",
+      "joint solve",
+      "mass",
+      "center of mass",
+      "inertia",
+      "dynamic rigid body"
+    ]
+  },
+  "motionContract": {
+    "kind": "serial-articulation-demonstration",
+    "owner": "authored diagnostic transform timeline",
+    "enabledMode": "action-ready",
+    "channels": [
+      "base-yaw-pivot.rotation.y",
+      "shoulder-hinge-pivot.rotation.z",
+      "elbow-hinge-pivot.rotation.z",
+      "shade-hinge-pivot.rotation.z"
+    ],
+    "bindings": [
+      {"constraintId": "base-yaw-hinge-constraint", "nodeId": "base-yaw-pivot", "channel": "rotation.y", "axisLocal": [0, 1, 0], "amplitudeRadians": 0.2, "angularFrequencyRadPerS": 0.47},
+      {"constraintId": "shoulder-hinge-constraint", "nodeId": "shoulder-hinge-pivot", "channel": "rotation.z", "axisLocal": [0, 0, 1], "amplitudeRadians": 0.14, "angularFrequencyRadPerS": 0.71},
+      {"constraintId": "elbow-hinge-constraint", "nodeId": "elbow-hinge-pivot", "channel": "rotation.z", "axisLocal": [0, 0, 1], "amplitudeRadians": 0.22, "angularFrequencyRadPerS": 0.89},
+      {"constraintId": "shade-hinge-constraint", "nodeId": "shade-hinge-pivot", "channel": "rotation.z", "axisLocal": [0, 0, 1], "amplitudeRadians": 0.18, "angularFrequencyRadPerS": 1.13}
+    ],
+    "resetContract": "resetPose(), setTime(_, false), and leaving action-ready restore exact seed-specific rest angles",
+    "exactReset": true,
+    "solverAuthority": false
+  },
+  "constraintConstructionContract": {
+    "recordType": "ConstraintConstructionInput",
+    "claimStatus": "authoring-input-only",
+    "canonicalConstraintStatus": "blocked",
+    "solverAuthority": false,
+    "constraints": [
+      {"id": "base-yaw-hinge-constraint", "parentEntityId": "base-pivot", "childEntityId": "base-yaw-pivot", "parentAnchorPositionMeters": [-0.095, 0.078, -0.01], "childAnchorPositionMeters": [0, 0, 0], "axisLocal": [0, 1, 0], "limitRadians": [-1.35, 1.35], "restRadians": 0},
+      {"id": "shoulder-hinge-constraint", "parentEntityId": "base-yaw-pivot", "childEntityId": "shoulder-hinge-pivot", "parentAnchorPositionMeters": [0, 0.085, 0], "childAnchorPositionMeters": [0, 0, 0], "axisLocal": [0, 0, 1], "limitRadians": [-0.35, 1.25], "restRadians": 0},
+      {"id": "elbow-hinge-constraint", "parentEntityId": "shoulder-hinge-pivot", "childEntityId": "elbow-hinge-pivot", "parentAnchorPositionMeters": [0.13, 0.34, 0], "childAnchorPositionMeters": [0, 0, 0], "axisLocal": [0, 0, 1], "limitRadians": [-1.45, 0.65], "restRadians": "seed-bounded ±0.018"},
+      {"id": "shade-hinge-constraint", "parentEntityId": "elbow-hinge-pivot", "childEntityId": "shade-hinge-pivot", "parentAnchorPositionMeters": [0.18, 0.3, 0], "childAnchorPositionMeters": [0, 0, 0], "axisLocal": [0, 0, 1], "limitRadians": [-1.1, 0.75], "restRadians": "-0.16 plus seed-bounded ±0.025"}
+    ],
+    "blockingRequirements": ["PhysicsContext and registered frames", "committed participant pose versions", "selected constraint/motion owner", "validity interval and clock mapping", "body/inertia/compliance/damping/material evidence"]
+  },
+  "attachmentConstructionContract": {
+    "recordType": "SculptAttachmentInput",
+    "solverAuthority": false,
+    "geometryUpdate": "static parent-local authored sweeps with explicit endpoint sockets",
+    "perFrameGeometryAllocation": false,
+    "crossJoint": false,
+    "mechanicalLoadAuthority": false,
+    "productionSpringCableDynamics": false,
+    "springSurfaceContactContract": {
+      "wireRadiusSource": "exact TubeGeometry.parameters.radius per authored sweep; no nominal-radius substitution",
+      "wireRadiiMeters": {
+        "lower-arm-tension-spring": 0.0036211379426914964,
+        "upper-arm-tension-spring": 0.0034802689551240145
+      },
+      "attachmentIdsBySpring": {
+        "lower-arm-tension-spring": "lower-arm-tension-spring-attachment",
+        "upper-arm-tension-spring": "upper-arm-tension-spring-attachment"
+      },
+      "attachmentOverlapMeters": 0.002,
+      "washerCenterZMeters": 0.058,
+      "washerHalfDepthMeters": 0.006,
+      "washerFrontFaceZMeters": 0.064,
+      "springEndpointZMeters": 0.062,
+      "endpointCenterEmbedDepthMeters": 0.002,
+      "maximumPhysicalSurfaceGapMeters": 0.001,
+      "endpointBoundaryPolicy": "open TubeGeometry endpoint ring embedded in collar/front-washer volume",
+      "collarRadiusMeters": 0.009,
+      "collarDepthMeters": 0.008,
+      "collarRole": "spring-hook-collar-embedded-through-washer-face",
+      "cases": [
+        {"springId": "lower-arm-tension-spring", "collarId": "lower-spring-start-collar", "washerId": "shoulder-hinge-washer-front", "endpointIndex": 0},
+        {"springId": "lower-arm-tension-spring", "collarId": "lower-spring-end-collar", "washerId": "elbow-hinge-washer-front", "endpointIndex": 1},
+        {"springId": "upper-arm-tension-spring", "collarId": "upper-spring-start-collar", "washerId": "elbow-hinge-washer-front", "endpointIndex": 0},
+        {"springId": "upper-arm-tension-spring", "collarId": "upper-spring-end-collar", "washerId": "shade-hinge-washer-front", "endpointIndex": 1}
+      ]
+    },
+    "attachments": [
+      {"id": "lower-arm-tension-spring-attachment", "startSocketId": "lower-spring-start-socket", "endSocketId": "lower-spring-end-socket"},
+      {"id": "upper-arm-tension-spring-attachment", "startSocketId": "upper-spring-start-socket", "endSocketId": "upper-spring-end-socket"},
+      {"id": "lower-arm-cable-attachment", "startSocketId": "lower-cable-start-socket", "endSocketId": "lower-cable-end-socket"},
+      {"id": "upper-arm-cable-attachment", "startSocketId": "upper-cable-start-socket", "endSocketId": "upper-cable-end-socket"},
+      {"id": "shade-cable-attachment", "startSocketId": "shade-cable-start-socket", "endSocketId": "shade-cable-end-socket"},
+      {"id": "power-cable-tail-attachment", "startSocketId": "power-cable-start-socket", "endSocketId": "power-cable-end-socket"}
+    ]
+  },
+  "boundsContract": {
+    "dimensionsMeters": [0.915, 0.94, 0.56],
+    "envelopeMinMeters": [-0.445, 0, -0.28],
+    "envelopeMaxMeters": [0.47, 0.94, 0.28],
+    "sampledUnionMinMeters": [-0.43230812670951124, -1.0430817667939074e-10, -0.27000001072883606],
+    "sampledUnionMaxMeters": [0.4559837909051156, 0.9271251630379932, 0.27000001072883606],
+    "safetyMarginMeters": 0.01,
+    "contactPlane": {"axis": "+Y", "yMeters": 0, "toleranceMeters": 0.000001}
+  },
+  "shadeTopologyContract": {
+    "crown": "paired FrontSide enamel and BackSide reflector annuli close the crown with rolled overlap into shade-shell",
+    "exteriorCrownMeshId": "shade-crown-annulus",
+    "interiorCrownMeshId": "shade-crown-inner-annulus",
+    "interiorMaterialSide": "BackSide",
+    "undersideVisibleThroughLowerAperture": true,
+    "crownRingInnerRadiusMeters": 0.03,
+    "crownRingOuterRadiusMeters": 0.075,
+    "crownRingLocalYMeters": -0.055,
+    "lowerAperture": "intentionally open at shade local Y=-0.275 m",
+    "lowerApertureRadiusMeters": 0.18
+  },
+  "materialImplementationContract": {
+    "coating": "dielectric powder-coat/enamel; exposed hardware uses separate metal materials",
+    "reflector": "dielectric warm enamel reflector proxy",
+    "bulb": "stylized opaque emissive envelope; no glass transmission, IOR, or optical-thickness claim",
+    "textureMaps": false,
+    "surfaceFrequencyTargetsBelow": "future material-pass authoring targets, not current implementation evidence"
+  },
+  "workloadContract": {
+    "full": {"renderItems": 46, "storedVertices": 7519, "triangles": 8528, "shadowCasters": 13},
+    "budgeted": {"renderItems": 42, "storedVertices": 4367, "triangles": 4408, "shadowCasters": 13},
+    "minimum": {"renderItems": 38, "storedVertices": 2308, "triangles": 1964, "shadowCasters": 13},
+    "timingClaim": "none until sustained named-device evidence"
+  },
+  "seedContract": {"kind": "uint32", "minimum": 0, "maximum": 4294967295},
+  "continuityContract": {
+    "signatureSchema": "sculpt-continuity-signature-v1",
+    "identityInputs": ["targetId", "sourceRevision", "seed", "baseContinuityToken"],
+    "excludedVisualInputs": ["tier"],
+    "policy": "same base token, source revision, and seed preserve generation across visual tiers; changed source or seed changes the effective signature",
+    "solverStateContinuityClaim": "blocked"
+  },
+  "actionReadiness": {
+    "contract": "Stable serial pivots, parent-local sockets, destruction groups, ConstraintConstructionInput records, and ColliderConstructionInput records remain identical across visual tiers.",
+    "defaultRigType": "serial-articulated-product-prop",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "actionProfile",
+      "attachment for hinges and links"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Place each pivot at its named mechanical joint.",
+      "Keep paired arm links under the same joint owner.",
+      "Do not adapt construction inputs inside the asset factory."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Exported assembly IDs",
+      "debrisStrategy": "Detach authored assemblies before solver-owned fragment generation."
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "interactive-demo-fidelity",
+    "materialPass": {
+      "independentMapChannels": [
+        "albedo",
+        "roughness",
+        "height",
+        "normal",
+        "ambient-occlusion"
+      ],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "acceptedLimitation": "No source image or reference-derived PBR evidence exists."
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ]
+    }
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.78,
+    "mustMatch": [
+      "weighted-base support",
+      "four-axis serial chain",
+      "paired arm rails",
+      "bell reflector and bulb",
+      "exact-reset action boundary"
+    ],
+    "niceToHave": [
+      "spring coil readability",
+      "subtle enamel wear"
+    ],
+    "reviewViewpoints": [
+      "design",
+      "profile",
+      "attachment",
+      "close-material"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.78,
+      "comparisonArtifactRequired": false,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision reviews authored visual contracts; no reference-image similarity claim is possible.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": false,
+        "selectionRule": "Review object-specific authored systems from named cameras."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "ambiguous authored proportions",
+      "missing protected identity",
+      "unsupported physics claim"
+    ],
+    "codeRefineTriggers": [
+      "factory differs from spec",
+      "visible joint gap",
+      "link separation",
+      "reset drift"
+    ],
+    "stopCriteria": [
+      "accepted authored-contract review",
+      "external product reference required"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "Codex in-app Browser",
+      "fallbackCapture": "none",
+      "minimumEvidence": "Named PNG, renderer/backend record, camera, mode, tier, seed, AI-vision scores, and notes.",
+      "reviewPairRule": "No reference pair exists; compare named views to authored feature contracts.",
+      "acceptanceAuthority": "AI-vision review record plus technical evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "lamp-silhouette",
+      "name": "Weighted-base articulated silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
+      "minimumScore": 0.82,
+      "mustPass": true,
+      "componentRefs": [
+        "base-pivot",
+        "shoulder-hinge-pivot",
+        "elbow-hinge-pivot",
+        "shade-hinge-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-base-chain"
+      ]
+    },
+    {
+      "id": "joint-chain",
+      "name": "Serial hinge and socket continuity",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "interaction-pass"
+      ],
+      "minimumScore": 0.84,
+      "mustPass": true,
+      "componentRefs": [
+        "base-yaw-pivot",
+        "shoulder-hinge-pivot",
+        "elbow-hinge-pivot",
+        "shade-hinge-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-articulation"
+      ]
+    },
+    {
+      "id": "link-systems",
+      "name": "Paired rails, springs, and cables",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "lower-arm-left",
+        "lower-arm-right",
+        "upper-arm-left",
+        "upper-arm-right"
+      ],
+      "evidenceRefs": [
+        "brief-structural-links"
+      ]
+    },
+    {
+      "id": "lamp-head-system",
+      "name": "Bell reflector and bulb assembly",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement",
+        "material-pass",
+        "lighting-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "shade-shell",
+        "reflector-shell",
+        "bulb"
+      ],
+      "evidenceRefs": [
+        "brief-head-materials"
+      ]
+    },
+    {
+      "id": "lamp-action-reset",
+      "name": "Four-channel action and exact reset",
+      "tier": "critical",
+      "passIds": [
+        "interaction-pass"
+      ],
+      "minimumScore": 0.84,
+      "mustPass": true,
+      "componentRefs": [
+        "base-yaw-pivot",
+        "shoulder-hinge-pivot",
+        "elbow-hinge-pivot",
+        "shade-hinge-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-action-contract"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "Awaiting first native-WebGPU authored-contract capture and AI-vision review.",
+    "nextRequiredEvidence": [
+      "design-camera blockout PNG",
+      "renderer/backend record",
+      "AI-vision layer and feature scores"
+    ]
+  },
+  "coordinateFrame": {
+    "handedness": "right-handed",
+    "front": "+Z",
+    "up": "+Y",
+    "origin": "weighted-base center at desk-contact plane",
+    "scaleReference": "Conservative authored envelope is 0.915 x 0.94 x 0.56 metres over declared tiers, uint32 seed witnesses, and authored motion witnesses"
+  },
+  "silhouette": {
+    "boundingShape": "0.915 x 0.94 x 0.56 metre conservative articulated product envelope",
+    "aspectRatios": [
+      "maximum width:height approximately 0.97:1",
+      "base diameter:overall height approximately 0.57:1"
+    ],
+    "symmetry": "Base and shade are rotational; paired rails mirror across local Z; articulated chain is offset and asymmetric.",
+    "dominantCurves": [
+      "low weighted base",
+      "two-stage angled linkage",
+      "bell shade flare",
+      "spring helices"
+    ],
+    "negativeSpaces": [
+      "between paired lower rails",
+      "between paired upper rails",
+      "inside bell reflector",
+      "under raised arm"
+    ],
+    "landmarks": [
+      "power dial",
+      "shoulder hinge",
+      "elbow hinge",
+      "shade hinge",
+      "shade rim",
+      "warm bulb"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "brief-base-chain",
+      "sourceKind": "authored-procedural-brief",
+      "view": "design intent",
+      "observations": [
+        "Weighted circular base and offset yaw post define the support and serial-chain origin."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-articulation",
+      "sourceKind": "authored-procedural-brief",
+      "view": "attachment intent",
+      "observations": [
+        "Yaw, shoulder, elbow, and shade pivots own local hinge axes, limits, and sockets."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-structural-links",
+      "sourceKind": "authored-procedural-brief",
+      "view": "profile intent",
+      "observations": [
+        "Each arm stage has paired structural rails plus a cable and tension spring."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-head-materials",
+      "sourceKind": "authored-procedural-brief",
+      "view": "close-material intent",
+      "observations": [
+        "Powder-coated shade, warm reflector, brass socket, and emissive bulb are separate zones."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-action-contract",
+      "sourceKind": "authored-procedural-brief",
+      "view": "action-ready intent",
+      "observations": [
+        "Four authored rotation channels animate deterministically and reset to seed-bounded rest transforms."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Desk lamp root",
+      "level": "macro",
+      "role": "root",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "box",
+      "parent": null,
+      "dimensions": {
+        "width": 0.915,
+        "height": 0.94,
+        "depth": 0.56,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "desk-contact-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "construction-input-set"
+        },
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "weighted-base",
+          "seamRefs": [
+            "assembly joints"
+          ],
+          "detachableFragments": [
+            "lower-arm-assembly",
+            "upper-arm-assembly",
+            "lamp-head"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal",
+        "brushed-metal",
+        "brass",
+        "rubber",
+        "reflector",
+        "stylized-opaque-emissive-bulb"
+      ],
+      "localFeatures": [
+        "desk-contact origin"
+      ],
+      "evidenceRefs": [
+        "brief-base-chain"
+      ]
+    },
+    {
+      "id": "base-pivot",
+      "name": "Weighted base assembly",
+      "level": "macro",
+      "role": "base",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "desk-contact-socket",
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0,
+          0.078,
+          0
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-base-chain"
+        ]
+      },
+      "dimensions": {
+        "width": 0.54,
+        "height": 0.09,
+        "depth": 0.54,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {
+          "mode": "support-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "cylinder-construction-input",
+          "id": "base-cylinder"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "weighted-base",
+          "seamRefs": [
+            "upper bezel",
+            "rubber foot"
+          ],
+          "detachableFragments": [
+            "weighted-base"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal",
+        "enamel-edge",
+        "brass",
+        "rubber"
+      ],
+      "localFeatures": [
+        "low taper",
+        "upper bezel",
+        "rubber foot",
+        "power dial"
+      ],
+      "evidenceRefs": [
+        "brief-base-chain"
+      ]
+    },
+    {
+      "id": "base-yaw-pivot",
+      "name": "Base yaw pivot",
+      "level": "macro",
+      "role": "hinge",
+      "importance": 0.9,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "base-pivot",
+      "attachment": {
+        "parentId": "base-pivot",
+        "parentSocket": "offset yaw mount",
+        "localStart": [
+          -0.095,
+          0.078,
+          -0.01
+        ],
+        "localEnd": [
+          -0.095,
+          0.163,
+          -0.01
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-articulation"
+        ]
+      },
+      "dimensions": {
+        "width": 0.08,
+        "height": 0.085,
+        "depth": 0.08,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          -0.095,
+          0.078,
+          -0.01
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated",
+        "pivot": {
+          "mode": "hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "base-envelope-shared"
+        },
+        "constraints": [
+          {
+            "recordType": "ConstraintConstructionInput",
+            "axisLocal": [
+              0,
+              1,
+              0
+            ],
+            "limitRadians": [
+              -1.35,
+              1.35
+            ],
+            "solverAuthority": false
+          }
+        ],
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lower-arm-assembly",
+          "seamRefs": [
+            "yaw post mount"
+          ],
+          "detachableFragments": [
+            "lower-arm-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-metal"
+        }
+      },
+      "material": "dark-metal",
+      "materialLayers": [
+        "dark-metal"
+      ],
+      "localFeatures": [
+        "offset yaw axis"
+      ],
+      "evidenceRefs": [
+        "brief-articulation"
+      ]
+    },
+    {
+      "id": "shoulder-hinge-pivot",
+      "name": "Shoulder hinge",
+      "level": "macro",
+      "role": "hinge",
+      "importance": 0.95,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "base-yaw-pivot",
+      "attachment": {
+        "parentId": "base-yaw-pivot",
+        "parentSocket": "shoulder-joint-socket",
+        "localStart": [
+          0,
+          0.085,
+          0
+        ],
+        "localEnd": [
+          0.13,
+          0.425,
+          0
+        ],
+        "contactType": "hinge",
+        "overlap": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-articulation"
+        ]
+      },
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.4,
+        "depth": 0.16,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0.085,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated",
+        "pivot": {
+          "mode": "hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "paired-capsule-construction-inputs",
+          "ids": [
+            "lower-arm-left-capsule",
+            "lower-arm-right-capsule"
+          ]
+        },
+        "constraints": [
+          {
+            "recordType": "ConstraintConstructionInput",
+            "axisLocal": [
+              0,
+              0,
+              1
+            ],
+            "limitRadians": [
+              -0.35,
+              1.25
+            ],
+            "solverAuthority": false
+          }
+        ],
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lower-arm-assembly",
+          "seamRefs": [
+            "shoulder barrel"
+          ],
+          "detachableFragments": [
+            "lower-arm-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal",
+        "brushed-metal",
+        "brass"
+      ],
+      "localFeatures": [
+        "barrel",
+        "paired washers",
+        "rail roots"
+      ],
+      "evidenceRefs": [
+        "brief-articulation"
+      ]
+    },
+    {
+      "id": "elbow-hinge-pivot",
+      "name": "Elbow hinge",
+      "level": "meso",
+      "role": "hinge",
+      "importance": 0.95,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "shoulder-hinge-pivot",
+      "attachment": {
+        "parentId": "shoulder-hinge-pivot",
+        "parentSocket": "elbow-joint-socket",
+        "localStart": [
+          0.13,
+          0.34,
+          0
+        ],
+        "localEnd": [
+          0.31,
+          0.64,
+          0
+        ],
+        "contactType": "hinge",
+        "overlap": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-articulation"
+        ]
+      },
+      "dimensions": {
+        "width": 0.26,
+        "height": 0.36,
+        "depth": 0.16,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.13,
+          0.34,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated",
+        "pivot": {
+          "mode": "hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "paired-capsule-construction-inputs",
+          "ids": [
+            "upper-arm-left-capsule",
+            "upper-arm-right-capsule"
+          ]
+        },
+        "constraints": [
+          {
+            "recordType": "ConstraintConstructionInput",
+            "axisLocal": [
+              0,
+              0,
+              1
+            ],
+            "limitRadians": [
+              -1.45,
+              0.65
+            ],
+            "solverAuthority": false
+          }
+        ],
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "upper-arm-assembly",
+          "seamRefs": [
+            "elbow barrel"
+          ],
+          "detachableFragments": [
+            "upper-arm-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal",
+        "brushed-metal",
+        "brass"
+      ],
+      "localFeatures": [
+        "barrel",
+        "seed-bounded rest angle"
+      ],
+      "evidenceRefs": [
+        "brief-articulation"
+      ]
+    },
+    {
+      "id": "shade-hinge-pivot",
+      "name": "Shade hinge and head",
+      "level": "meso",
+      "role": "hinge",
+      "importance": 0.96,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "elbow-hinge-pivot",
+      "attachment": {
+        "parentId": "elbow-hinge-pivot",
+        "parentSocket": "shade-joint-socket",
+        "localStart": [
+          0.18,
+          0.3,
+          0
+        ],
+        "localEnd": [
+          0.18,
+          0.025,
+          0
+        ],
+        "contactType": "hinge",
+        "overlap": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-articulation"
+        ]
+      },
+      "dimensions": {
+        "width": 0.37,
+        "height": 0.34,
+        "depth": 0.37,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.18,
+          0.3,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          -0.16
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "articulated",
+        "pivot": {
+          "mode": "hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "solid-neck-plus-eight-boundary-capsules-plus-trigger-construction-inputs",
+          "ids": [
+            "shade-neck-cylinder",
+            "shade-shell-rib-00-capsule",
+            "shade-shell-rib-01-capsule",
+            "shade-shell-rib-02-capsule",
+            "shade-shell-rib-03-capsule",
+            "shade-shell-rib-04-capsule",
+            "shade-shell-rib-05-capsule",
+            "shade-shell-rib-06-capsule",
+            "shade-shell-rib-07-capsule",
+            "bulb-trigger"
+          ]
+        },
+        "constraints": [
+          {
+            "recordType": "ConstraintConstructionInput",
+            "axisLocal": [
+              0,
+              0,
+              1
+            ],
+            "limitRadians": [
+              -1.1,
+              0.75
+            ],
+            "solverAuthority": false
+          }
+        ],
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lamp-head",
+          "seamRefs": [
+            "shade barrel",
+            "neck"
+          ],
+          "detachableFragments": [
+            "lamp-head"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal",
+        "reflector",
+        "brass",
+        "stylized-opaque-emissive-bulb"
+      ],
+      "localFeatures": [
+        "seed-bounded shade angle",
+        "emitter socket"
+      ],
+      "evidenceRefs": [
+        "brief-articulation"
+      ]
+    },
+    {
+      "id": "lower-arm-left",
+      "name": "Lower left structural rail",
+      "level": "meso",
+      "role": "support",
+      "importance": 0.78,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "shoulder-hinge-pivot",
+      "attachment": {
+        "parentId": "shoulder-hinge-pivot",
+        "parentSocket": "shoulder-joint-socket",
+        "localStart": [
+          0,
+          0,
+          0.031
+        ],
+        "localEnd": [
+          0.13,
+          0.34,
+          0.031
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-structural-links"
+        ]
+      },
+      "dimensions": {
+        "radius": 0.014,
+        "length": 0.364,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.065,
+          0.17,
+          0.031
+        ],
+        "rotation": [
+          0,
+          0,
+          -0.365
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "lower-arm-left-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lower-arm-assembly",
+          "seamRefs": [
+            "shoulder and elbow endpoints"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal"
+      ],
+      "localFeatures": [
+        "paired spacing"
+      ],
+      "evidenceRefs": [
+        "brief-structural-links"
+      ]
+    },
+    {
+      "id": "lower-arm-right",
+      "name": "Lower right structural rail",
+      "level": "meso",
+      "role": "support",
+      "importance": 0.78,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "shoulder-hinge-pivot",
+      "attachment": {
+        "parentId": "shoulder-hinge-pivot",
+        "parentSocket": "shoulder-joint-socket",
+        "localStart": [
+          0,
+          0,
+          -0.031
+        ],
+        "localEnd": [
+          0.13,
+          0.34,
+          -0.031
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-structural-links"
+        ]
+      },
+      "dimensions": {
+        "radius": 0.014,
+        "length": 0.364,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.065,
+          0.17,
+          -0.031
+        ],
+        "rotation": [
+          0,
+          0,
+          -0.365
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "lower-arm-right-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lower-arm-assembly",
+          "seamRefs": [
+            "shoulder and elbow endpoints"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal"
+      ],
+      "localFeatures": [
+        "paired spacing"
+      ],
+      "evidenceRefs": [
+        "brief-structural-links"
+      ]
+    },
+    {
+      "id": "upper-arm-left",
+      "name": "Upper left structural rail",
+      "level": "meso",
+      "role": "support",
+      "importance": 0.78,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "elbow-hinge-pivot",
+      "attachment": {
+        "parentId": "elbow-hinge-pivot",
+        "parentSocket": "elbow-joint-socket",
+        "localStart": [
+          0,
+          0,
+          0.031
+        ],
+        "localEnd": [
+          0.18,
+          0.3,
+          0.031
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-structural-links"
+        ]
+      },
+      "dimensions": {
+        "radius": 0.014,
+        "length": 0.35,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.09,
+          0.15,
+          0.031
+        ],
+        "rotation": [
+          0,
+          0,
+          -0.54
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "upper-arm-left-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "upper-arm-assembly",
+          "seamRefs": [
+            "elbow and shade endpoints"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal"
+      ],
+      "localFeatures": [
+        "paired spacing"
+      ],
+      "evidenceRefs": [
+        "brief-structural-links"
+      ]
+    },
+    {
+      "id": "upper-arm-right",
+      "name": "Upper right structural rail",
+      "level": "meso",
+      "role": "support",
+      "importance": 0.78,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "elbow-hinge-pivot",
+      "attachment": {
+        "parentId": "elbow-hinge-pivot",
+        "parentSocket": "elbow-joint-socket",
+        "localStart": [
+          0,
+          0,
+          -0.031
+        ],
+        "localEnd": [
+          0.18,
+          0.3,
+          -0.031
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-structural-links"
+        ]
+      },
+      "dimensions": {
+        "radius": 0.014,
+        "length": 0.35,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.09,
+          0.15,
+          -0.031
+        ],
+        "rotation": [
+          0,
+          0,
+          -0.54
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "capsule-construction-input",
+          "id": "upper-arm-right-capsule"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "upper-arm-assembly",
+          "seamRefs": [
+            "elbow and shade endpoints"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal"
+      ],
+      "localFeatures": [
+        "paired spacing"
+      ],
+      "evidenceRefs": [
+        "brief-structural-links"
+      ]
+    },
+    {
+      "id": "shade-neck",
+      "name": "Capped solid shade neck",
+      "level": "meso",
+      "role": "connector",
+      "importance": 0.86,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "shade-hinge-pivot",
+      "attachment": {
+        "parentId": "shade-hinge-pivot",
+        "parentSocket": "shade-joint-socket",
+        "localStart": [0, -0.015, 0],
+        "localEnd": [0, -0.075, 0],
+        "contactType": "capped-solid-connector",
+        "overlap": 0.002,
+        "gapTolerance": 0.001,
+        "evidenceRefs": ["brief-head-materials", "brief-action-contract"]
+      },
+      "dimensions": {
+        "width": 0.064,
+        "height": 0.06,
+        "depth": 0.064,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [0, -0.045, 0],
+        "rotation": [0, 0, 3.141592653589793],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "parented-detachable",
+        "pivot": {"mode": "parent-hinge", "localPosition": [0, -0.045, 0], "axis": [0, 0, 1], "confidence": 1},
+        "collider": {"type": "cylinder-construction-input", "id": "shade-neck-cylinder"},
+        "destruction": {"breakable": true, "fractureGroup": "lamp-head", "seamRefs": ["shade hinge", "crown pass-through"], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "dark-metal"}
+      },
+      "material": "dark-metal",
+      "materialLayers": ["dark-metal"],
+      "localFeatures": [
+        "actual indexed capped CylinderGeometry from [0,-0.015,0] to [0,-0.075,0] metres",
+        "0.032 metre radius",
+        "visual and proxy endpoint disks included",
+        "0.0017 metre sampled bidirectional authoring bound"
+      ],
+      "evidenceRefs": ["brief-head-materials", "brief-action-contract"]
+    },
+    {
+      "id": "shade-shell",
+      "name": "Bell shade shell",
+      "level": "meso",
+      "role": "shell",
+      "importance": 0.92,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "shade-hinge-pivot",
+      "attachment": {
+        "parentId": "shade-hinge-pivot",
+        "parentSocket": "shade-joint-socket",
+        "localStart": [
+          0,
+          -0.075,
+          0
+        ],
+        "localEnd": [
+          0,
+          -0.275,
+          0
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.01,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-head-materials"
+        ]
+      },
+      "dimensions": {
+        "width": 0.36,
+        "height": 0.22,
+        "depth": 0.36,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          -0.165,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented-detachable",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "eight-capsule-boundary-construction-input-set",
+          "ids": [
+            "shade-shell-rib-00-capsule",
+            "shade-shell-rib-01-capsule",
+            "shade-shell-rib-02-capsule",
+            "shade-shell-rib-03-capsule",
+            "shade-shell-rib-04-capsule",
+            "shade-shell-rib-05-capsule",
+            "shade-shell-rib-06-capsule",
+            "shade-shell-rib-07-capsule"
+          ]
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lamp-head",
+          "seamRefs": [
+            "shade neck",
+            "rim"
+          ],
+          "detachableFragments": [
+            "shade-shell"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "powder-coated-metal"
+        }
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": [
+        "powder-coated-metal",
+        "brushed-metal"
+      ],
+      "localFeatures": [
+        "bell flare",
+        "crown closed by paired shade-crown-annulus and shade-crown-inner-annulus faces",
+        "rolled crown overlap",
+        "intentional 0.18 metre lower aperture",
+        "metal rim"
+      ],
+      "evidenceRefs": [
+        "brief-head-materials"
+      ]
+    },
+    {
+      "id": "shade-crown-annulus",
+      "name": "Exterior shade crown annulus",
+      "level": "meso",
+      "role": "shell",
+      "importance": 0.88,
+      "confidence": 1,
+      "primitive": "plane-card",
+      "parent": "shade-hinge-pivot",
+      "dimensions": {"innerRadius": 0.03, "outerRadius": 0.075, "height": 0.001, "units": "metre", "confidence": 1},
+      "transform": {"position": [0, -0.055, 0], "rotation": [-1.5707963267948966, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {
+        "animationRole": "parented-detachable",
+        "pivot": {"mode": "parent-hinge", "localPosition": [0, -0.055, 0], "axis": [0, 0, 1], "confidence": 1},
+        "collider": {"type": "shared-solid-neck-and-eight-rib-boundary-construction-inputs", "ids": ["shade-neck-cylinder", "shade-shell-rib-00-capsule", "shade-shell-rib-01-capsule", "shade-shell-rib-02-capsule", "shade-shell-rib-03-capsule", "shade-shell-rib-04-capsule", "shade-shell-rib-05-capsule", "shade-shell-rib-06-capsule", "shade-shell-rib-07-capsule"]},
+        "destruction": {"breakable": true, "fractureGroup": "lamp-head", "seamRefs": ["neck pass-through", "shade-shell overlap"], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "powder-coated-metal"}
+      },
+      "material": "powder-coated-metal",
+      "materialLayers": ["powder-coated-metal"],
+      "localFeatures": ["FrontSide exterior face", "paired BackSide interior face", "0.03 metre neck pass-through", "0.075 metre outer closure", "0.002 metre neck and shell overlaps"],
+      "evidenceRefs": ["brief-head-materials"]
+    },
+    {
+      "id": "shade-crown-inner-annulus",
+      "name": "Underside reflector crown annulus",
+      "level": "meso",
+      "role": "shell",
+      "importance": 0.88,
+      "confidence": 1,
+      "primitive": "plane-card",
+      "parent": "shade-hinge-pivot",
+      "dimensions": {"innerRadius": 0.03, "outerRadius": 0.075, "height": 0.001, "units": "metre", "confidence": 1},
+      "transform": {"position": [0, -0.055, 0], "rotation": [-1.5707963267948966, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {
+        "animationRole": "parented-detachable",
+        "pivot": {"mode": "parent-hinge", "localPosition": [0, -0.055, 0], "axis": [0, 0, 1], "confidence": 1},
+        "collider": {"type": "shared-solid-neck-and-eight-rib-boundary-construction-inputs", "ids": ["shade-neck-cylinder", "shade-shell-rib-00-capsule", "shade-shell-rib-01-capsule", "shade-shell-rib-02-capsule", "shade-shell-rib-03-capsule", "shade-shell-rib-04-capsule", "shade-shell-rib-05-capsule", "shade-shell-rib-06-capsule", "shade-shell-rib-07-capsule"]},
+        "destruction": {"breakable": true, "fractureGroup": "lamp-head", "seamRefs": ["coincident exterior crown face", "shade-shell overlap"], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "reflector"}
+      },
+      "material": "reflector",
+      "materialLayers": ["reflector"],
+      "localFeatures": ["BackSide reflector face visible upward through the open lower aperture", "coincident topology with the exterior crown annulus", "lower aperture remains open"],
+      "evidenceRefs": ["brief-head-materials"]
+    },
+    {
+      "id": "shade-crown-roll",
+      "name": "Rolled shade crown overlap",
+      "level": "micro",
+      "role": "rim",
+      "importance": 0.7,
+      "confidence": 1,
+      "primitive": "torus",
+      "parent": "shade-hinge-pivot",
+      "dimensions": {"majorRadius": 0.073, "minorRadius": 0.006, "units": "metre", "confidence": 1},
+      "transform": {"position": [0, -0.055, 0], "rotation": [-1.5707963267948966, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {
+        "animationRole": "parented-detachable",
+        "pivot": {"mode": "parent-hinge", "localPosition": [0, -0.055, 0], "axis": [0, 0, 1], "confidence": 1},
+        "collider": {"type": "shared-solid-neck-and-eight-rib-boundary-construction-inputs", "ids": ["shade-neck-cylinder", "shade-shell-rib-00-capsule", "shade-shell-rib-01-capsule", "shade-shell-rib-02-capsule", "shade-shell-rib-03-capsule", "shade-shell-rib-04-capsule", "shade-shell-rib-05-capsule", "shade-shell-rib-06-capsule", "shade-shell-rib-07-capsule"]},
+        "destruction": {"breakable": true, "fractureGroup": "lamp-head", "seamRefs": ["crown roll"], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "enamel-edge"}
+      },
+      "material": "enamel-edge",
+      "materialLayers": ["enamel-edge"],
+      "localFeatures": ["rolled crown edge"],
+      "evidenceRefs": ["brief-head-materials"]
+    },
+    {
+      "id": "reflector-shell",
+      "name": "Warm inner reflector",
+      "level": "meso",
+      "role": "shell",
+      "importance": 0.86,
+      "confidence": 1,
+      "primitive": "cylinder",
+      "parent": "shade-hinge-pivot",
+      "attachment": {
+        "parentId": "shade-hinge-pivot",
+        "parentSocket": "shade-joint-socket",
+        "localStart": [
+          0,
+          -0.075,
+          0
+        ],
+        "localEnd": [
+          0,
+          -0.27,
+          0
+        ],
+        "contactType": "overlap",
+        "overlap": 0.004,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-head-materials"
+        ]
+      },
+      "dimensions": {
+        "width": 0.34,
+        "height": 0.208,
+        "depth": 0.34,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          -0.169,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "shared-eight-rib-boundary-construction-inputs",
+          "ids": [
+            "shade-shell-rib-00-capsule",
+            "shade-shell-rib-01-capsule",
+            "shade-shell-rib-02-capsule",
+            "shade-shell-rib-03-capsule",
+            "shade-shell-rib-04-capsule",
+            "shade-shell-rib-05-capsule",
+            "shade-shell-rib-06-capsule",
+            "shade-shell-rib-07-capsule"
+          ]
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lamp-head",
+          "seamRefs": [
+            "reflector lip"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "reflector"
+        }
+      },
+      "material": "reflector",
+      "materialLayers": [
+        "reflector"
+      ],
+      "localFeatures": [
+        "warm inner response"
+      ],
+      "evidenceRefs": [
+        "brief-head-materials"
+      ]
+    },
+    {
+      "id": "bulb",
+      "name": "Warm exposed bulb",
+      "level": "micro",
+      "role": "emitter",
+      "importance": 0.82,
+      "confidence": 1,
+      "primitive": "sphere",
+      "parent": "shade-hinge-pivot",
+      "dimensions": {
+        "width": 0.107,
+        "height": 0.151,
+        "depth": 0.107,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          -0.218,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.82,
+          1.16,
+          0.82
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "effect-emitter",
+        "pivot": {
+          "mode": "parent-hinge",
+          "localPosition": [
+            0,
+            -0.218,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "sphere-trigger-construction-input",
+          "id": "bulb-trigger"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lamp-head",
+          "seamRefs": [
+            "bulb socket"
+          ],
+          "detachableFragments": [
+            "bulb"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "stylized-opaque-emissive-bulb"
+        }
+      },
+      "material": "stylized-opaque-emissive-bulb",
+      "materialLayers": [
+        "stylized-opaque-emissive-bulb",
+        "brass"
+      ],
+      "localFeatures": [
+        "warm emissive response"
+      ],
+      "evidenceRefs": [
+        "brief-head-materials"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": "powder-coated-metal",
+      "name": "Deep blue-green powder coat",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#18303A",
+      "albedo": {
+        "dominant": "#18303A",
+        "secondary": [
+          "#132831",
+          "#22424D"
+        ]
+      },
+      "roughness": {
+        "base": 0.34,
+        "variation": 0.07,
+        "map": "independent powder-coat field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "fine powder texture",
+        "strength": 0.045,
+        "scale": 86,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.14,
+        "contactShadowBias": 0.22
+      },
+      "localOverrides": [
+        "lighter worn hinge and shade edges"
+      ]
+    },
+    {
+      "id": "enamel-edge",
+      "name": "Worn enamel edge",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#2F5963",
+      "roughness": {
+        "base": 0.39,
+        "variation": 0.08,
+        "map": "independent edge field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "bounded edge wear",
+        "strength": 0.04,
+        "scale": 72,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.1,
+        "contactShadowBias": 0.18
+      },
+      "localOverrides": [
+        "bezel and shade lip"
+      ]
+    },
+    {
+      "id": "brushed-metal",
+      "name": "Brushed steel hardware",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#879399",
+      "roughness": {
+        "base": 0.38,
+        "variation": 0.1,
+        "map": "independent brushed field"
+      },
+      "metalness": {
+        "base": 0.94,
+        "variation": 0.03
+      },
+      "normal": {
+        "pattern": "directional brushing",
+        "strength": 0.055,
+        "scale": 90,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.12,
+        "contactShadowBias": 0.2
+      },
+      "localOverrides": [
+        "polished washer contact bands"
+      ]
+    },
+    {
+      "id": "dark-metal",
+      "name": "Dark hinge steel",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#21292D",
+      "roughness": {
+        "base": 0.46,
+        "variation": 0.08,
+        "map": "independent dark-steel field"
+      },
+      "metalness": {
+        "base": 0.86,
+        "variation": 0.04
+      },
+      "normal": {
+        "pattern": "fine machine marks",
+        "strength": 0.04,
+        "scale": 80,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.16,
+        "contactShadowBias": 0.25
+      },
+      "localOverrides": [
+        "darker hinge cavities"
+      ]
+    },
+    {
+      "id": "brass",
+      "name": "Brass electrical hardware",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#B48138",
+      "roughness": {
+        "base": 0.32,
+        "variation": 0.08,
+        "map": "independent brass patina field"
+      },
+      "metalness": {
+        "base": 0.9,
+        "variation": 0.04
+      },
+      "normal": {
+        "pattern": "fine turned marks",
+        "strength": 0.035,
+        "scale": 84,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.12,
+        "contactShadowBias": 0.2
+      },
+      "localOverrides": [
+        "brighter dial and washer contacts"
+      ]
+    },
+    {
+      "id": "rubber",
+      "name": "Rubber feet and cable",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#111619",
+      "roughness": {
+        "base": 0.9,
+        "variation": 0.04,
+        "map": "independent rubber field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "fine rubber grain",
+        "strength": 0.05,
+        "scale": 72,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.12,
+        "contactShadowBias": 0.2
+      },
+      "localOverrides": [
+        "handled cable sheen"
+      ]
+    },
+    {
+      "id": "reflector",
+      "name": "Warm inner reflector",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#F1E8D0",
+      "roughness": {
+        "base": 0.31,
+        "variation": 0.05,
+        "map": "independent reflector field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "subtle enamel surface",
+        "strength": 0.025,
+        "scale": 96,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.1,
+        "contactShadowBias": 0.16
+      },
+      "localOverrides": [
+        "warmer near bulb"
+      ]
+    },
+    {
+      "id": "stylized-opaque-emissive-bulb",
+      "name": "Warm stylized opaque emissive bulb",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#FFD18C",
+      "roughness": {
+        "base": 0.22,
+        "variation": 0.03,
+        "map": "future surface target; current factory uses flat scalar response"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "future subtle envelope variation target",
+        "strength": 0.018,
+        "scale": 100,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.05,
+        "contactShadowBias": 0.1
+      },
+      "localOverrides": [
+        "orange emissive core"
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "paired-arm-rails",
+      "count": 4,
+      "distribution": "Two rails per lower/upper arm stage at local Z offsets ±0.031 metres.",
+      "componentRef": "shoulder-hinge-pivot",
+      "stableIdRule": "{lower|upper}-arm-{left|right}"
+    },
+    {
+      "id": "hinge-hardware",
+      "count": 9,
+      "distribution": "Barrel and paired washer hardware at shoulder, elbow, and shade hinges.",
+      "componentRef": "shoulder-hinge-pivot",
+      "stableIdRule": "{joint}-hinge-{barrel|washer-front|washer-back}"
+    },
+    {
+      "id": "shade-fasteners",
+      "count": 8,
+      "distribution": "Full tier uses eight radial fasteners, budgeted four, minimum zero; protected head identity is unchanged.",
+      "componentRef": "shade-shell",
+      "stableIdRule": "shade-fastener-{00..07}"
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Prove base, serial chain, and bell-head silhouette.",
+      "componentRefs": [
+        "base-pivot",
+        "base-yaw-pivot",
+        "shoulder-hinge-pivot",
+        "elbow-hinge-pivot",
+        "shade-hinge-pivot"
+      ],
+      "acceptance": [
+        "Named design capture exists.",
+        "Authored silhouette feature passes."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Prove pivots, sockets, paired links, springs, cables, and construction inputs.",
+      "componentRefs": [
+        "base-yaw-pivot",
+        "shoulder-hinge-pivot",
+        "elbow-hinge-pivot",
+        "lower-arm-left",
+        "upper-arm-left"
+      ],
+      "acceptance": [
+        "Protected IDs match runtime.",
+        "No attachment gaps are visible."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine arm spacing, hinge hardware, springs, and shade flare.",
+      "componentRefs": [
+        "lower-arm-left",
+        "lower-arm-right",
+        "upper-arm-left",
+        "upper-arm-right",
+        "shade-shell"
+      ],
+      "acceptance": [
+        "Profile and attachment captures preserve mechanical continuity."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Separate powder coat, metal hardware, rubber, reflector, and bulb.",
+      "componentRefs": [
+        "base-pivot",
+        "shoulder-hinge-pivot",
+        "shade-shell",
+        "reflector-shell",
+        "bulb"
+      ],
+      "acceptance": [
+        "Close-material capture preserves all physical-response zones."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add scale-aware coating, brushing, patina, rubber, and optional opaque bulb-envelope response without a glass-transmission claim.",
+      "componentRefs": [
+        "base-pivot",
+        "shoulder-hinge-pivot",
+        "shade-shell",
+        "bulb"
+      ],
+      "acceptance": [
+        "Grazing light reveals bounded response without texture swimming."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Establish neutral product and warm-bulb readability.",
+      "componentRefs": [
+        "root",
+        "bulb"
+      ],
+      "acceptance": [
+        "Key, fill, rim, ACES exposure, bulb emission, and contact shadow are recorded."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Prove four-channel diagnostic articulation and exact reset.",
+      "componentRefs": [
+        "base-yaw-pivot",
+        "shoulder-hinge-pivot",
+        "elbow-hinge-pivot",
+        "shade-hinge-pivot"
+      ],
+      "acceptance": [
+        "Fixed-time captures differ and reset returns exact seed-bounded rest transforms."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Prove monotonic tessellation reduction and identity preservation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Geometry decreases by tier and protected IDs remain exact."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "full",
+      "distance": 0,
+      "strategy": "32-sided shells, detailed hinge hardware, high-segment springs, and eight shade fasteners; source metrics are 46 render items, 7,519 stored vertices, 8,528 triangles, and 13 shadow casters."
+    },
+    {
+      "tier": "budgeted",
+      "distance": 3,
+      "strategy": "20-sided shells, reduced springs, and four shade fasteners while preserving all action identities; source metrics are 42 render items, 4,367 stored vertices, 4,408 triangles, and 13 shadow casters."
+    },
+    {
+      "tier": "minimum",
+      "distance": 7,
+      "strategy": "12-sided shells, four-sided rails, short springs, and no shade fasteners; preserve silhouette and protected IDs; source metrics are 38 render items, 2,308 stored vertices, 1,964 triangles, and 13 shadow casters."
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "mobile-aware articulated product inspection",
+    "targetTriangles": 15000,
+    "maxDrawCalls": 46,
+    "textureSize": 1024,
+    "fpsTarget": 60,
+    "optimizationPolicy": "No sustained-performance claim passes without named-device CPU/GPU/presentation evidence. Preserve one scene render and no post-processing passes."
+  },
+  "lightingFromPhoto": [
+    "No source photo exists; use neutral key, soft fill, and restrained rim light for authored product inspection.",
+    "Use explicit ACES tone mapping, recorded exposure, and one output transform; keep bulb emission in-scene without bloom.",
+    "Use a receiving plane for contact shadow; do not add a post-processing pipeline."
+  ],
+  "proceduralStrategy": [
+    "Build the weighted base, hinge hardware, paired rails, shade, reflector, and bulb from deterministic primitives.",
+    "Nest yaw, shoulder, elbow, and shade pivots at mechanical joints and attach named sockets in parent-local metres.",
+    "Build tension springs as deterministic helix tubes and cables as attached low-radial tubes.",
+    "Drive four authored diagnostic rotation channels with exact reset and no solver claim.",
+    "Publish ColliderConstructionInput and ConstraintConstructionInput records only; canonical physics remains blocked.",
+    "Reduce radial, spring, and fastener geometry by tier while preserving all protected identities.",
+    "Render native WebGPU NodeMaterials in one scene render with no post-processing passes."
+  ],
+  "animationAnchors": [
+    "base-yaw-pivot",
+    "shoulder-hinge-pivot",
+    "elbow-hinge-pivot",
+    "shade-hinge-pivot",
+    "shoulder-joint-socket",
+    "elbow-joint-socket",
+    "shade-joint-socket"
+  ],
+  "destructionAnchors": [
+    "weighted-base",
+    "lower-arm-assembly",
+    "upper-arm-assembly",
+    "lamp-head"
+  ],
+  "risks": [
+    "No external reference image exists, so reconstruction fidelity cannot be evaluated.",
+    "Serial-joint readability and materials require future native-WebGPU browser inspection.",
+    "ColliderConstructionInput and ConstraintConstructionInput records are not canonical solver authority."
+  ]
+}

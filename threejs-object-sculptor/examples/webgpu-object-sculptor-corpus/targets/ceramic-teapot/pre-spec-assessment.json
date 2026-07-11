@@ -1,0 +1,126 @@
+{
+  "targetName": "Celadon Hinge-Lid Teapot",
+  "targetId": "ceramic-teapot",
+  "sourceImage": null,
+  "referenceSourceKind": "authored-procedural-brief",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "hinge-lid ceramic teapot",
+      "formLanguage": ["hard-surface", "sculptural", "product-form"],
+      "structureKind": ["compound object", "lathed shells", "swept appendages", "articulated assembly"],
+      "motionPotential": ["whole-object transform", "articulated", "detachable"],
+      "materialFamilies": ["glazed ceramic", "unglazed clay", "metal"],
+      "notes": "This is a repository-authored procedural brief, not an image reconstruction. Form and dimensions are authoring targets awaiting browser visual review."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 5,
+        "mesoComponents": 10,
+        "microFeatureGroups": 5,
+        "materialLayers": 3,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "A lathed body must connect cleanly to two curve-swept appendages while preserving a readable product silhouette.",
+        "The lid requires a hinge-local pivot, detach socket, construction collider input, and exact reset behavior.",
+        "Full, budgeted, and minimum representations must reduce sweep and lathe tessellation without changing semantic identities."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Smooth form continuity, a movable lid, multiple material zones, and cross-tier identity require explicit component and runtime contracts."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": null
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "The design and profile cameras show a coherent lathed belly, genuinely open neck with inner wall and recessed cavity, rising spout, rear handle, seated lid, foot ring, and restrained product-scale proportions.",
+      "Action-ready mode proves the lid hinge and exact reset without claiming rigid-body or fluid-solver authority.",
+      "Every visual tier preserves the exported protected node, socket, collider-construction-input, and destruction-group IDs."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 5,
+      "mesoComponents": 7,
+      "microFeatureGroups": 5,
+      "materialLayers": 3,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "lathed-body-and-lid",
+        "name": "Lathed body, neck, lid, foot, and knob",
+        "required": true,
+        "qualityCriteria": ["The semantic-indexed lathe keeps a continuous outer volume, open neck, inner rim wall, and a recessed cavity disk whose declared open rim overlaps the inner-wall footprint; the lid remains seated at the authored neck before motion."],
+        "evidenceRefs": ["brief-main-form"],
+        "failureModes": ["faceted product silhouette", "sealed fake mouth", "missing inner wall or cavity", "annular crack between inner wall and cavity floor", "false closed-boundary claim for the cavity disk", "floating lid", "collapsed foot ring"]
+      },
+      {
+        "id": "swept-spout",
+        "name": "Rising tapered spout with outlet",
+        "required": true,
+        "qualityCriteria": ["Parallel-transport frames keep the tapered sweep continuous and the outlet socket follows the authored pour direction."],
+        "evidenceRefs": ["brief-spout-handle"],
+        "failureModes": ["frame twist", "blocked outlet", "detached root collar"]
+      },
+      {
+        "id": "swept-handle",
+        "name": "Rear swept handle and mounts",
+        "required": true,
+        "qualityCriteria": ["The grip arc remains readable and both mounts visibly overlap the body."],
+        "evidenceRefs": ["brief-spout-handle"],
+        "failureModes": ["floating handle", "pinched sweep", "missing grip socket"]
+      },
+      {
+        "id": "hinged-lid",
+        "name": "Hinge-local detachable lid",
+        "required": true,
+        "qualityCriteria": ["Action-ready motion originates at the named hinge, opens visibly, and restores the exact authored transform."],
+        "evidenceRefs": ["brief-action-contract"],
+        "failureModes": ["center rotation", "translation drift", "non-deterministic reset"]
+      },
+      {
+        "id": "material-zones",
+        "name": "Glaze, clay, and brass separation",
+        "required": true,
+        "qualityCriteria": ["Clearcoated celadon, rough clay, dark outlet, and metallic fittings remain distinct under neutral light."],
+        "evidenceRefs": ["brief-material-contract"],
+        "failureModes": ["single plastic response", "clay reads as metal", "glaze clips to white"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "body width-to-height and foot contact",
+      "spout rise, taper, outlet direction, and root overlap",
+      "handle negative space and mount continuity",
+      "lid hinge location, open angle, and exact reset",
+      "celadon, clay, outlet, and brass material separation"
+    ],
+    "antiShallowSpecRules": [
+      "Reject a generic sphere body or straight-cylinder spout in place of lathe and parallel-transport sweep construction.",
+      "Reject a lid mesh without an independently targetable hinge pivot and detach socket.",
+      "Reject visual-tier changes that alter protected semantic or construction-input IDs.",
+      "Reject continuity signatures that omit identity-changing seed or source revision inputs, or that treat a visual tier change as a new authored generation.",
+      "Reject any canonical collider, rigid-body, contact, or fluid-simulation claim from authoring metadata alone.",
+      "Reject visual acceptance while reference and browser evidence remain unavailable."
+    ]
+  },
+  "authoringInstruction": "Use this assessment as an authored benchmark contract. It does not constitute reference-image or visual-acceptance evidence."
+}

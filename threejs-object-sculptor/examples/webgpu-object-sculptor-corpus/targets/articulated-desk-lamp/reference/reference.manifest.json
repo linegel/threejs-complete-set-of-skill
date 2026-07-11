@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "targetId": "articulated-desk-lamp",
+  "targetName": "Articulated Desk Lamp",
+  "sourceKind": "authored-procedural-brief",
+  "sourceUrl": null,
+  "authoringIntent": "Repository-authored articulated mechanical-product benchmark; no external image was used as reconstruction evidence.",
+  "referenceImage": {
+    "available": false,
+    "path": null,
+    "sha256": null,
+    "mediaType": null,
+    "widthPixels": null,
+    "heightPixels": null,
+    "license": null,
+    "provenanceStatus": "unavailable"
+  },
+  "allowedClaims": [
+    "The brief defines intended serial articulation, product silhouette, material zones, tier limits, and protected identities.",
+    "Source and unit validation may prove implementation conformance to the authored brief.",
+    "Deterministic source tests may establish crown-side visibility intent, spring-contact geometry, separate solid-neck and hollow-boundary proxy bounds, continuity signatures, and workload counts without constituting visual or solver acceptance."
+  ],
+  "blockedClaims": [
+    "reference-image reconstruction fidelity",
+    "reference-derived PBR accuracy",
+    "licensed or hashed image evidence",
+    "solver-driven constraint behavior",
+    "accepted visual similarity"
+  ],
+  "visualAcceptance": {
+    "status": "incomplete",
+    "reason": "No reference image, browser comparison sheet, or AI-vision acceptance record exists."
+  },
+  "evidence": {
+    "status": "incomplete",
+    "imageArtifacts": [],
+    "comparisonArtifacts": [],
+    "reviewRecords": []
+  }
+}

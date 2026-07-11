@@ -1,0 +1,197 @@
+{
+  "targetName": "Articulated Desk Lamp",
+  "targetId": "articulated-desk-lamp",
+  "sourceImage": null,
+  "referenceSourceKind": "authored-procedural-brief",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "four-axis articulated desk lamp",
+      "formLanguage": [
+        "hard-surface",
+        "mechanical",
+        "product-form"
+      ],
+      "structureKind": [
+        "compound object",
+        "serial hinge hierarchy",
+        "paired structural links",
+        "articulated assembly"
+      ],
+      "motionPotential": [
+        "whole-object transform",
+        "articulated",
+        "detachable",
+        "destructible"
+      ],
+      "materialFamilies": [
+        "powder-coated metal",
+        "brushed metal",
+        "brass",
+        "rubber",
+        "stylized opaque emissive bulb"
+      ],
+      "notes": "This is a repository-authored procedural benchmark, not an image reconstruction. Constraint limits are authoring inputs and the preview timeline is not solver authority."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 5,
+        "mesoComponents": 12,
+        "microFeatureGroups": 8,
+        "materialLayers": 6,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "A serial base-yaw, shoulder, elbow, and shade hierarchy must preserve local axes, limits, sockets, and exact authored rest transforms.",
+        "Paired structural rails, tension springs, cable paths, hinge hardware, and a bell reflector create an interrupted product silhouette.",
+        "Three visual tiers must reduce radial, spring, and fastener geometry while preserving every protected semantic and collider-construction-input ID."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Serial articulation, visible attachments, multiple material zones, and mobile tessellation require an explicit action-ready hierarchy."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": null
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "The design and profile cameras read as a weighted-base articulated task lamp with paired lower/upper arms, exposed hardware, paired exterior/interior annular crown faces and rolled overlap, an intentionally open lower reflector aperture, and a warm stylized opaque bulb.",
+      "Action-ready mode visibly exercises all four authored rotation channels and exact reset restores seed-bounded rest transforms.",
+      "Every tier preserves protected components, 19 attachment/joint sockets, four ConstraintConstructionInput records, 15 ColliderConstructionInput records, destruction groups, and one-render/no-post ownership."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 8,
+      "microFeatureGroups": 8,
+      "materialLayers": 5,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "weighted-base-yaw",
+        "name": "Weighted base and yaw post",
+        "required": true,
+        "qualityCriteria": [
+          "The low circular base establishes stable support and the offset yaw post reads as the serial-chain root."
+        ],
+        "evidenceRefs": [
+          "brief-base-chain"
+        ],
+        "failureModes": [
+          "top-heavy silhouette",
+          "floating post",
+          "lost desk contact"
+        ]
+      },
+      {
+        "id": "serial-hinge-chain",
+        "name": "Yaw, shoulder, elbow, and shade hinges",
+        "required": true,
+        "qualityCriteria": [
+          "All pivots use named local axes, readable joint hardware, authored limits, and stable parent-child ownership."
+        ],
+        "evidenceRefs": [
+          "brief-articulation"
+        ],
+        "failureModes": [
+          "world-axis rotation",
+          "centered whole-lamp motion",
+          "joint gap"
+        ]
+      },
+      {
+        "id": "paired-arm-systems",
+        "name": "Paired arms, springs, and cables",
+        "required": true,
+        "qualityCriteria": [
+          "Two rails per stage preserve spacing while every decorative parent-local spring and cable sweep publishes named start/end sockets, actual sweep radii, overlap, and gap tolerances; spring collars visibly penetrate the receiving washer region without claiming cross-joint mechanics or load transfer."
+        ],
+        "evidenceRefs": [
+          "brief-structural-links"
+        ],
+        "failureModes": [
+          "single-stick arm",
+          "floating spring",
+          "metadata-only contact that disagrees with the rendered spring radius",
+          "cable discontinuity"
+        ]
+      },
+      {
+        "id": "lamp-head",
+        "name": "Bell reflector and warm bulb",
+        "required": true,
+        "qualityCriteria": [
+          "The shade retains paired exterior-enamel and underside-reflector crown annuli with rolled shell overlap, a deliberately open lower aperture, inner reflector, rim, socket, stylized opaque bulb, and emission socket."
+        ],
+        "evidenceRefs": [
+          "brief-head-materials"
+        ],
+        "failureModes": [
+          "flat cylinder head",
+          "missing inner reflector",
+          "front-sided crown disappearing from the underside view",
+          "bulb outside shade",
+          "unintended crown hole",
+          "sealed lower aperture"
+        ]
+      },
+      {
+        "id": "action-and-physics-boundary",
+        "name": "Action-ready preview and physics boundary",
+        "required": true,
+        "qualityCriteria": [
+          "Four deterministic absolute-time channels reset exactly; all four constraints and 15 colliders remain complete construction inputs with solver authority false. One exact capped cylinder owns the solid shade neck while eight separate tier-invariant capsules approximate only the hollow shade boundary and preserve the open lower aperture."
+        ],
+        "evidenceRefs": [
+          "brief-action-contract"
+        ],
+        "failureModes": [
+          "solver claim",
+          "missing solid shade-neck collider",
+          "shade ribs incorrectly absorbing the neck collision role",
+          "non-resetting timeline",
+          "tier-dependent physical identity"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "base-to-chain support",
+      "four hinge positions and axes",
+      "paired rail spacing",
+      "spring/cable continuity",
+      "shade/bulb material and silhouette"
+    ],
+    "antiShallowSpecRules": [
+      "Reject a single bent tube in place of the serial hierarchy.",
+      "Reject hinges without named pivots and sockets.",
+      "Reject floating cables, springs, or paired arm rails.",
+      "Reject a shade proxy that fills the authored open aperture or lacks a declared bidirectional surface-deviation bound.",
+      "Reject a missing shade-neck cylinder or a neck proxy whose caps, frame, or 0.0017 metre bidirectional bound do not match the actual indexed neck mesh.",
+      "Reject tier-dependent protected IDs.",
+      "Reject solver or visual-acceptance claims without adapters and evidence."
+    ]
+  },
+  "authoringInstruction": "Use this assessment as an authored benchmark contract. It does not constitute reference-image, solver, or visual-acceptance evidence."
+}

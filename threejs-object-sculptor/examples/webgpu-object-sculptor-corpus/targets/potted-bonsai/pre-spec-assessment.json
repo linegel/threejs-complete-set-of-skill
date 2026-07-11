@@ -1,0 +1,84 @@
+{
+  "targetName": "Potted Bonsai",
+  "targetId": "potted-bonsai",
+  "sourceImage": null,
+  "referenceSourceKind": "authored-procedural-brief",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "stylized potted bonsai",
+      "formLanguage": ["organic", "botanical-like", "sculptural"],
+      "structureKind": ["compound object", "branching hierarchy", "repeated foliage", "rooted articulated assembly"],
+      "motionPotential": ["whole-object transform", "articulated sway", "detachable", "destructible"],
+      "materialFamilies": ["glazed ceramic", "soil", "bark", "leaf"],
+      "notes": "This authored benchmark targets branching construction and rooted motion, not exact reconstruction or species identification."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 12,
+        "microFeatureGroups": 8,
+        "materialLayers": 5,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "A rotation-minimizing trunk and six authored branch pivots form a deep attachment hierarchy.",
+        "Foliage representation changes from merged opaque leaf solids to six opaque canopy clusters at minimum tier.",
+        "The deterministic authored sway preview must move branch transforms while preserving pot, soil, root anchor, colliders, and exact reset; it does not consume environmental forcing or claim wind dynamics."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Organic attachment continuity, repeated foliage, tier-specific representation, and rigid-pivot rooted articulation require explicit hierarchy and invariants."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": null
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "The design camera reads as a deliberately trained miniature tree with pot, soil, radial root flare, tapered trunk, asymmetrical branch pads, and visible negative spaces.",
+      "Every branch begins at a named root socket, ends at a named tip socket, and rotates from its authored branch-root pivot without claiming continuous bending deformation.",
+      "Full, budgeted, and minimum tiers reduce geometry while retaining all protected semantic and physics-authoring identities."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 8,
+      "microFeatureGroups": 8,
+      "materialLayers": 4,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {"id": "pot-soil-root-base", "name": "Pot, soil, and radial root base", "required": true, "qualityCriteria": ["The oval pot, soil surface, foot, rim, and embedded root flare establish stable scale and support."], "evidenceRefs": ["brief-rooted-base"], "failureModes": ["floating trunk", "circular pot silhouette", "missing root contact"]},
+      {"id": "oriented-trunk-branches", "name": "Oriented trunk and branch hierarchy", "required": true, "qualityCriteria": ["Rotation-minimizing rings preserve taper and attachment continuity through one trunk, three primary branches, and three secondary branches."], "evidenceRefs": ["brief-branch-topology"], "failureModes": ["frame twist", "floating branch", "uniform radial star"]},
+      {"id": "foliage-pad-system", "name": "Opaque foliage pads", "required": true, "qualityCriteria": ["Overlapping asymmetric pads retain crown readability without alpha-sorted fragments; minimum uses six opaque clusters."], "evidenceRefs": ["brief-foliage-tiers"], "failureModes": ["transparent-card overdraw", "single sphere crown", "lost negative spaces"]},
+      {"id": "rooted-sway-preview", "name": "Rooted authored sway preview", "required": true, "qualityCriteria": ["Action-ready diagnostic motion rotates rigid branch-root pivots, keeps the root anchor fixed, shares color/shadow transforms, and resets exactly without claiming continuous deformation or environmental wind physics."], "evidenceRefs": ["brief-action-contract"], "failureModes": ["pot sway", "root drift", "shadow mismatch", "reset drift", "continuous-deformation claim", "production wind claim"]},
+      {"id": "botanical-material-zones", "name": "Ceramic, soil, bark, and foliage response", "required": true, "qualityCriteria": ["Distinct physical-response zones remain readable under neutral and grazing light."], "evidenceRefs": ["brief-material-contract"], "failureModes": ["uniform plastic", "bark/soil collapse", "glaze without clearcoat cue"]}
+    ],
+    "visualDeltaChecks": ["pot ovality and support contact", "root flare overlap", "trunk taper and branch sockets", "crown-pad rhythm and negative spaces", "diagnostic sway/reset and material separation"],
+    "antiShallowSpecRules": [
+      "Reject a cylinder trunk with floating branch cylinders.",
+      "Reject alpha-card foliage or one undifferentiated canopy sphere at full and budgeted tiers.",
+      "Reject diagnostic sway that moves the pot, root anchor, or independent shadow geometry, or that is presented as a production wind solver.",
+      "Reject tier changes that alter protected semantic or construction-input IDs.",
+      "Reject solver, species-accuracy, or visual-acceptance claims without corresponding evidence."
+    ]
+  },
+  "authoringInstruction": "Use this assessment as an authored benchmark contract. It does not constitute reference-image, species-accuracy, or visual-acceptance evidence."
+}

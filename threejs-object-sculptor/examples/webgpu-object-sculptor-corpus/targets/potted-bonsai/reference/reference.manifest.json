@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "targetId": "potted-bonsai",
+  "targetName": "Potted Bonsai",
+  "sourceKind": "authored-procedural-brief",
+  "sourceUrl": null,
+  "authoringIntent": "Repository-authored botanical benchmark; no external image was used as reconstruction evidence.",
+  "referenceImage": {
+    "available": false,
+    "path": null,
+    "sha256": null,
+    "mediaType": null,
+    "widthPixels": null,
+    "heightPixels": null,
+    "license": null,
+    "provenanceStatus": "unavailable"
+  },
+  "allowedClaims": [
+    "The brief defines intended branch topology, material families, rooted motion, tier representations, and semantic identities.",
+    "Source and unit validation may prove conformance to the authored brief."
+  ],
+  "blockedClaims": [
+    "reference-image reconstruction fidelity",
+    "species-level botanical accuracy",
+    "reference-derived PBR accuracy",
+    "licensed or hashed image evidence",
+    "accepted visual similarity"
+  ],
+  "visualAcceptance": {
+    "status": "incomplete",
+    "reason": "No reference image, browser comparison sheet, or AI-vision acceptance record exists."
+  },
+  "evidence": {
+    "status": "incomplete",
+    "imageArtifacts": [],
+    "comparisonArtifacts": [],
+    "reviewRecords": []
+  }
+}

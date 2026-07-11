@@ -1,0 +1,1833 @@
+{
+  "targetName": "Celadon Hinge-Lid Teapot",
+  "targetId": "ceramic-teapot",
+  "schemaVersion": "2.0",
+  "sourceImage": null,
+  "referenceSourceKind": "authored-procedural-brief",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 0,
+    "silhouette_readability": 0,
+    "depth_inference": 0,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 0,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time procedural product-form benchmark",
+    "geometryTerms": [
+      "lathe profile",
+      "parallel-transport sweep",
+      "root collar",
+      "hinge-local pivot",
+      "semantic socket"
+    ],
+    "materialTerms": [
+      "clearcoat",
+      "roughness zone",
+      "metalness",
+      "glaze pooling",
+      "clay exposure"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Dimensions are metres in the declared right-handed asset frame; authored intent is not reference-image evidence."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "hinge-lid ceramic teapot",
+      "formLanguage": [
+        "hard-surface",
+        "sculptural",
+        "product-form"
+      ],
+      "structureKind": [
+        "compound object",
+        "lathed shells",
+        "swept appendages",
+        "articulated assembly"
+      ],
+      "motionPotential": [
+        "whole-object transform",
+        "articulated",
+        "detachable"
+      ],
+      "materialFamilies": [
+        "glazed ceramic",
+        "unglazed clay",
+        "metal"
+      ],
+      "notes": "Authored benchmark brief with no external image reference."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 6,
+        "mesoComponents": 7,
+        "microFeatureGroups": 5,
+        "materialLayers": 5,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "The target combines a lathed shell, two curved sweeps, independently addressable fittings, and an articulated lid.",
+        "Product-scale inspection requires smooth normals and stable silhouette under three tessellation tiers."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Form continuity and hinge behavior require explicit geometry, material, attachment, and runtime contracts."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": null
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "A semantic-indexed lathed body with an open neck, inner wall, and recessed cavity supports a rising swept spout, rear swept handle, seated lid, foot, and knob.",
+      "Action-ready mode visibly opens the hinge-local lid and exact reset restores its authored transform.",
+      "All tiers retain the exported protected nodes, sockets, collider construction inputs, and destruction groups."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 5,
+      "mesoComponents": 2,
+      "microFeatureGroups": 4,
+      "materialLayers": 4,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "lathed-shell",
+        "name": "Lathed shell and lid family",
+        "required": true,
+        "qualityCriteria": [
+          "Body, foot, neck, lid, and knob retain continuous rotational profiles while the body mouth stays genuinely open with an inner wall and recessed cavity."
+        ],
+        "evidenceRefs": [
+          "brief-main-form"
+        ],
+        "failureModes": [
+          "faceted silhouette",
+          "sealed fake mouth",
+          "missing inner wall or cavity",
+          "floating lid"
+        ]
+      },
+      {
+        "id": "spout-system",
+        "name": "Rising tapered spout",
+        "required": true,
+        "qualityCriteria": [
+          "The spout sweep retains continuous frames, root overlap, lip, and outlet direction."
+        ],
+        "evidenceRefs": [
+          "brief-spout-handle"
+        ],
+        "failureModes": [
+          "frame twist",
+          "detached collar"
+        ]
+      },
+      {
+        "id": "handle-system",
+        "name": "Rear swept handle",
+        "required": true,
+        "qualityCriteria": [
+          "The handle arc and two mounts create readable grip clearance."
+        ],
+        "evidenceRefs": [
+          "brief-spout-handle"
+        ],
+        "failureModes": [
+          "floating mount",
+          "collapsed negative space"
+        ]
+      },
+      {
+        "id": "lid-action",
+        "name": "Hinged detachable lid",
+        "required": true,
+        "qualityCriteria": [
+          "Motion originates at the hinge and reset is exact."
+        ],
+        "evidenceRefs": [
+          "brief-action-contract"
+        ],
+        "failureModes": [
+          "center rotation",
+          "reset drift"
+        ]
+      },
+      {
+        "id": "product-materials",
+        "name": "Glaze, clay, outlet, and brass zones",
+        "required": true,
+        "qualityCriteria": [
+          "Material response remains distinct under neutral and grazing light."
+        ],
+        "evidenceRefs": [
+          "brief-material-contract"
+        ],
+        "failureModes": [
+          "single plastic material",
+          "metal/clay ambiguity"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "body proportion and foot contact",
+      "spout rise and outlet",
+      "handle clearance and mounts",
+      "lid hinge and reset",
+      "material-zone separation"
+    ],
+    "antiShallowSpecRules": [
+      "Reject primitive substitution that removes the lathe or swept silhouettes.",
+      "Reject a non-semantic or center-pivoted lid.",
+      "Reject tier-dependent semantic or physics-authoring identity.",
+      "Reject canonical physics or visual acceptance claims without adapters and evidence."
+    ]
+  },
+  "runtimeContract": {
+    "sourceRevision": "ceramic-teapot-corpus-v3",
+    "modes": [
+      "final",
+      "blockout",
+      "hierarchy",
+      "materials",
+      "action-ready"
+    ],
+    "tiers": [
+      "full",
+      "budgeted",
+      "minimum"
+    ],
+    "cameras": [
+      "design",
+      "profile",
+      "attachment",
+      "close-material"
+    ],
+    "protectedComponentIds": [
+      "root",
+      "body-pivot",
+      "spout-pivot",
+      "handle-pivot",
+      "lid-pivot"
+    ],
+    "protectedNodeIds": [
+      "root",
+      "body-pivot",
+      "body-shell",
+      "neck-rim-inner-wall",
+      "body-cavity",
+      "foot-ring",
+      "neck-band",
+      "spout-pivot",
+      "spout-sweep",
+      "spout-root-collar",
+      "spout-lip",
+      "spout-outlet-inset",
+      "handle-pivot",
+      "handle-sweep",
+      "handle-upper-mount",
+      "handle-lower-mount",
+      "lid-pivot",
+      "lid-surface",
+      "lid-band",
+      "lid-knob",
+      "lid-joint-pin"
+    ],
+    "protectedSocketIds": [
+      "lid-hinge-socket",
+      "lid-detach-socket",
+      "pour-outlet-socket",
+      "handle-grip-socket",
+      "camera-interest"
+    ],
+    "protectedColliderIds": [
+      "body-envelope",
+      "lid-cylinder",
+      "spout-lower-capsule",
+      "spout-upper-capsule",
+      "handle-upper-capsule",
+      "handle-outer-capsule",
+      "handle-lower-capsule"
+    ],
+    "protectedDestructionGroupIds": [
+      "ceramic-shell",
+      "foot-ring",
+      "spout-assembly",
+      "handle-assembly",
+      "lid-assembly",
+      "metal-fittings"
+    ]
+  },
+  "physicsHandoff": {
+    "recordType": "ColliderConstructionInput",
+    "authority": "authoring-input-only",
+    "units": "metre",
+    "solverAuthority": false,
+    "canonicalProxyStatus": "blocked",
+    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "visualLodIndependent": true,
+    "colliderMaxSurfaceDeviationMeters": {
+      "body-envelope": 0.07,
+      "lid-cylinder": 0.036,
+      "spout-lower-capsule": 0.04,
+      "spout-upper-capsule": 0.04,
+      "handle-upper-capsule": 0.04,
+      "handle-outer-capsule": 0.04,
+      "handle-lower-capsule": 0.04
+    },
+    "colliderEvidenceLowerBoundsMeters": {
+      "body-envelope": 0.0625,
+      "lid-cylinder": 0.0321,
+      "spout-lower-capsule": 0.0269,
+      "spout-upper-capsule": 0.0269,
+      "handle-upper-capsule": 0.0297,
+      "handle-outer-capsule": 0.0297,
+      "handle-lower-capsule": 0.0297
+    },
+    "colliderEvidenceMethod": "deterministic directed visual-vertex to authored-primitive surface lower-bound regression; not symmetric Hausdorff proof",
+    "requiredAdapterEvidence": [
+      "PhysicsContext",
+      "registered frame",
+      "pose version",
+      "validity interval",
+      "collision owner",
+      "physics-material registry binding"
+    ],
+    "blockedClaims": [
+      "contact response",
+      "mass",
+      "center of mass",
+      "inertia",
+      "dynamic rigid body",
+      "fluid simulation"
+    ]
+  },
+  "motionContract": {
+    "kind": "detachable-fixed-hinge-demonstration",
+    "owner": "object-sculptor-transform-preview",
+    "nodeId": "lid-pivot",
+    "hingeOriginMeters": [-0.066, 0.159, 0],
+    "hingeAxisLocal": [0, 0, 1],
+    "detachApi": "setDetached(boolean)",
+    "detachedPositionMeters": [-0.066, 0.234, 0.035],
+    "fluidSimulation": false,
+    "enabledMode": "action-ready",
+    "exactReset": true,
+    "solverAuthority": false
+  },
+  "topologyContract": {
+    "writer": "semantic-indexed-lathe-v2",
+    "uvSeam": "duplicated-0-1",
+    "seamUvComponent": "u",
+    "bodyMouth": "open",
+    "innerNeckWall": "present",
+    "recessedBodyCavity": "present",
+    "singlePoleVertices": true,
+    "seamAndCapWeldPairs": true,
+    "degenerateTrianglesAllowed": false,
+    "closedSurfaceClaim": false,
+    "intentionalOpenings": ["body-neck-mouth", "neck-outer-overlap", "neck-inner-wall-bottom", "body-cavity-rim-overlap", "spout outlet", "handle sweep endpoints"],
+    "bodyCavityOverlap": {
+      "writer": "indexed-overlapped-circle-disk-v1",
+      "diskRadiusScaleCoefficient": 0.051,
+      "diskYMeters": 0.1365,
+      "innerWallBottomRadiusScaleCoefficient": 0.05,
+      "innerWallBottomYMeters": 0.136,
+      "minimumRadialOverlapScaleCoefficient": 0.001,
+      "verticalOverlapMeters": 0.0005,
+      "boundaryKind": "open-overlap",
+      "boundaryId": "body-cavity-rim-overlap",
+      "expectedGeometricBoundaryLoops": 1,
+      "expectedEulerCharacteristic": 1,
+      "seamVertexPairWelded": true,
+      "assemblyClaim": "The disk overlaps the inner-wall footprint; it is not claimed as a standalone closed manifold."
+    },
+    "sweeps": {"framePolicy": "parallel-transport", "seamUvComponent": "v", "explicitOpenBoundaryIds": true}
+  },
+  "materialImplementationContract": {
+    "currentRepresentation": "one shared low-frequency object-space TSL cause couples subtle celadon base-color pooling and roughness; brass/patina uses a separate shared conductor/dielectric cause",
+    "objectSpaceProceduralShader": true,
+    "textureMaps": false,
+    "textureSamples": 0,
+    "structuralBands": 1,
+    "bandLimit": "authored single low-frequency band; no micro-normal or displacement",
+    "executedResponseBundles": [
+      {
+        "id": "celadon-glaze-dielectric",
+        "cause": "mx_noise_float(positionLocal * frequencyPerMeter + seedOffset)",
+        "frequenciesPerMeter": [7.5, 8.5],
+        "sharedSlots": ["colorNode", "roughnessNode"],
+        "metalnessEndpoint": 0
+      },
+      {
+        "id": "brass-conductor-with-dielectric-patina",
+        "cause": "mx_noise_float(positionLocal * 11 + seedOffset)",
+        "frequenciesPerMeter": [11],
+        "sharedSlots": ["colorNode", "roughnessNode", "metalnessNode"],
+        "conductorMetalnessEndpoint": 1,
+        "patinaMetalnessEndpoint": 0
+      }
+    ],
+    "surfaceFrequencyTargetsBelow": "future material-pass authoring targets, not current implementation evidence"
+  },
+  "continuityContract": {
+    "signatureRevision": "ceramic-teapot-continuity-v1",
+    "includedInputs": ["subjectId", "sourceRevision", "seed", "baseContinuityToken"],
+    "excludedVisualInputs": ["tier"],
+    "rule": "same explicit instance/base token/source revision/seed preserves generation across visual tiers; a changed source revision or seed starts a new generation",
+    "solverStateContinuityClaim": "blocked"
+  },
+  "visualLodContract": {
+    "policy": "tessellation-only",
+    "drawCountPreserved": true,
+    "renderItemsPerTier": 16,
+    "protectedIdentityPreserved": true
+  },
+  "workloadContract": {
+    "seed": 24301,
+    "full": {"renderItems": 16, "storedVertices": 5464, "triangles": 9024},
+    "budgeted": {"renderItems": 16, "storedVertices": 3224, "triangles": 5120},
+    "minimum": {"renderItems": 16, "storedVertices": 1838, "triangles": 2772},
+    "timingClaim": "none until sustained named-device evidence"
+  },
+  "actionReadiness": {
+    "contract": "Stable pivots, parent-local sockets, destruction groups, and ColliderConstructionInput records remain identical across visual tiers.",
+    "defaultRigType": "articulated-product-prop",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "actionProfile",
+      "attachment for swept appendages and hinge"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Keep the lid under lid-pivot.",
+      "Keep spout and handle seams semantic.",
+      "Do not adapt construction inputs into canonical proxies inside the asset factory."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Exported protected group IDs",
+      "debrisStrategy": "Detach authored assemblies before any solver-owned fragment generation."
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "interactive-demo-fidelity",
+    "materialPass": {
+      "independentMapChannels": [
+        "albedo",
+        "roughness",
+        "height",
+        "normal",
+        "ambient-occlusion"
+      ],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "acceptedLimitation": "No source image exists and no reference-derived PBR claim is permitted."
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ]
+    }
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "lathed product silhouette",
+      "spout and handle continuity",
+      "hinge-local lid motion",
+      "material-zone separation",
+      "cross-tier identity"
+    ],
+    "niceToHave": [
+      "subtle glaze pooling",
+      "restrained ceramic orange peel"
+    ],
+    "reviewViewpoints": [
+      "design",
+      "profile",
+      "attachment",
+      "close-material"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.75,
+      "comparisonArtifactRequired": false,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "With no external reference image, AI vision reviews authored visual contracts across named cameras; status remains incomplete until records exist.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": false,
+        "selectionRule": "Review the authored contract from the named camera; do not call it reference similarity."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "authored silhouette ambiguity",
+      "missing protected identity",
+      "unsupported physics claim"
+    ],
+    "codeRefineTriggers": [
+      "factory differs from spec",
+      "visible attachment gap",
+      "reset drift"
+    ],
+    "stopCriteria": [
+      "accepted authored-contract review",
+      "new external reference required"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "Codex in-app Browser",
+      "fallbackCapture": "none",
+      "minimumEvidence": "Named PNG, renderer/backend record, camera, mode, tier, seed, AI-vision scores, and notes.",
+      "reviewPairRule": "No reference pair exists; compare named views to authored feature contracts.",
+      "acceptanceAuthority": "AI-vision review record plus technical evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "teapot-silhouette",
+      "name": "Lathed product silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "body-shell",
+        "spout-pivot",
+        "handle-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-main-form"
+      ]
+    },
+    {
+      "id": "appendage-joints",
+      "name": "Spout and handle attachments",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "spout-pivot",
+        "handle-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-spout-handle"
+      ]
+    },
+    {
+      "id": "lid-hinge",
+      "name": "Hinge-local lid action",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "interaction-pass"
+      ],
+      "minimumScore": 0.82,
+      "mustPass": true,
+      "componentRefs": [
+        "lid-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-action-contract"
+      ]
+    },
+    {
+      "id": "teapot-materials",
+      "name": "Product material separation",
+      "tier": "critical",
+      "passIds": [
+        "material-pass",
+        "surface-pass",
+        "lighting-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "body-shell",
+        "foot-ring",
+        "lid-pivot"
+      ],
+      "evidenceRefs": [
+        "brief-material-contract"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "Awaiting first native-WebGPU authored-contract capture and AI-vision review.",
+    "nextRequiredEvidence": [
+      "design-camera blockout PNG",
+      "renderer/backend record",
+      "AI-vision layer and feature scores"
+    ]
+  },
+  "coordinateFrame": {
+    "front": "+Z",
+    "up": "+Y",
+    "longitudinal": "+X points toward the spout and -X toward the handle",
+    "scaleReference": "Maximum authored envelope is 0.67 x 0.38 x 0.32 metres"
+  },
+  "silhouette": {
+    "boundingShape": "0.67 x 0.38 x 0.32 metre product-form envelope",
+    "aspectRatios": [
+      "width:height = 1.76:1",
+      "body diameter:overall width approximately 0.47:1"
+    ],
+    "symmetry": "Body and lid are rotational; spout and handle oppose along X.",
+    "dominantCurves": [
+      "lathed belly",
+      "rising tapered spout",
+      "rear grip arc",
+      "domed lid"
+    ],
+    "negativeSpaces": [
+      "handle grip opening",
+      "spout/body undercut",
+      "lid knob clearance"
+    ],
+    "landmarks": [
+      "spout lip",
+      "lid knob",
+      "brass lid band",
+      "handle apex",
+      "foot ring"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "brief-main-form",
+      "sourceKind": "authored-procedural-brief",
+      "view": "design and profile intent",
+      "imageRegion": null,
+      "observations": [
+        "Authored dimensions and the lathed/swept construction define the intended main silhouette."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-spout-handle",
+      "sourceKind": "authored-procedural-brief",
+      "view": "attachment intent",
+      "imageRegion": null,
+      "observations": [
+        "The spout and handle must overlap the body at named semantic mounts."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-action-contract",
+      "sourceKind": "authored-procedural-brief",
+      "view": "action-ready intent",
+      "imageRegion": null,
+      "observations": [
+        "The lid pivots at lid-hinge-socket, may detach, and resets exactly."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    },
+    {
+      "id": "brief-material-contract",
+      "sourceKind": "authored-procedural-brief",
+      "view": "close-material intent",
+      "imageRegion": null,
+      "observations": [
+        "Celadon glaze, unglazed clay, dark outlet, and brass fittings are separate material zones."
+      ],
+      "confidence": 1,
+      "evidenceStatus": "authoring-intent-only"
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Teapot root",
+      "level": "macro",
+      "role": "root",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "box",
+      "parent": null,
+      "dimensions": {
+        "width": 0.67,
+        "height": 0.38,
+        "depth": 0.32,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "support-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "construction-input-set",
+          "claimStatus": "authoring-input-only"
+        },
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "ceramic-shell",
+          "seamRefs": [
+            "component seams"
+          ],
+          "detachableFragments": [
+            "lid-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "celadon-glaze",
+      "materialLayers": [
+        "celadon-glaze",
+        "unglazed-clay",
+        "brass-fitting"
+      ],
+      "localFeatures": [
+        "support-plane foot contact"
+      ],
+      "evidenceRefs": [
+        "brief-main-form"
+      ]
+    },
+    {
+      "id": "body-pivot",
+      "name": "Lathed body assembly",
+      "level": "macro",
+      "role": "body",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "root",
+      "dimensions": {
+        "width": 0.316,
+        "height": 0.287,
+        "depth": 0.316,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "sphere-construction-input",
+          "id": "body-envelope"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "ceramic-shell",
+          "seamRefs": [
+            "foot and neck rings"
+          ],
+          "detachableFragments": [
+            "foot-ring"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "celadon-glaze",
+      "materialLayers": [
+        "celadon-glaze",
+        "glaze-edge"
+      ],
+      "localFeatures": [
+        "lathed belly",
+        "neck transition"
+      ],
+      "evidenceRefs": [
+        "brief-main-form"
+      ]
+    },
+    {
+      "id": "body-shell",
+      "name": "Celadon body shell",
+      "level": "meso",
+      "role": "shell",
+      "importance": 1,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "body-pivot",
+      "dimensions": {
+        "width": 0.316,
+        "height": 0.263,
+        "depth": 0.316,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {
+          "mode": "parent",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "owned-by-body-pivot"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "ceramic-shell",
+          "seamRefs": [
+            "neck band"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "celadon-glaze",
+      "materialLayers": [
+        "celadon-glaze"
+      ],
+      "localFeatures": [
+        "semantic-indexed-lathe-v2 outer curvature",
+        "open neck mouth",
+        "inner neck wall",
+        "recessed body cavity"
+      ],
+      "evidenceRefs": [
+        "brief-main-form"
+      ]
+    },
+    {
+      "id": "neck-rim-inner-wall",
+      "name": "Open neck rim and inner wall",
+      "level": "meso",
+      "role": "shell",
+      "importance": 0.88,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "body-pivot",
+      "dimensions": {"width": 0.144, "height": 0.031, "depth": 0.144, "units": "metre", "confidence": 1},
+      "transform": {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {"mode": "parent", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1},
+        "collider": {"type": "owned-by-body-pivot"},
+        "destruction": {"breakable": true, "fractureGroup": "ceramic-shell", "seamRefs": ["open neck rim"], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "unglazed-clay"}
+      },
+      "material": "unglazed-clay",
+      "materialLayers": ["unglazed-clay"],
+      "localFeatures": ["open outer overlap", "inner vertical wall", "unsealed mouth boundary"],
+      "evidenceRefs": ["brief-main-form"]
+    },
+    {
+      "id": "body-cavity",
+      "name": "Recessed body cavity floor",
+      "level": "micro",
+      "role": "surface detail",
+      "importance": 0.76,
+      "confidence": 1,
+      "primitive": "plane-card",
+      "parent": "body-pivot",
+      "dimensions": {"width": 0.102, "height": 0.001, "depth": 0.102, "units": "metre", "confidence": 1},
+      "transform": {"position": [0, 0.1365, 0], "rotation": [-1.5707963267948966, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {"mode": "parent", "localPosition": [0, 0.1365, 0], "axis": [0, 1, 0], "confidence": 1},
+        "collider": {"type": "owned-by-body-pivot"},
+        "destruction": {"breakable": true, "fractureGroup": "ceramic-shell", "seamRefs": ["cavity floor"], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "unglazed-clay"}
+      },
+      "material": "dark-outlet",
+      "materialLayers": ["dark-outlet"],
+      "localFeatures": ["indexed recessed disk with one declared open-overlap rim", "0.001 radius-scale-coefficient radial overlap with inner wall", "0.0005 metre vertical overlap", "visible cavity depth cue"],
+      "evidenceRefs": ["brief-main-form"]
+    },
+    {
+      "id": "foot-ring",
+      "name": "Unglazed foot ring",
+      "level": "meso",
+      "role": "base",
+      "importance": 0.72,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "body-pivot",
+      "dimensions": {
+        "width": 0.238,
+        "height": 0.032,
+        "depth": 0.238,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "detachable",
+        "pivot": {
+          "mode": "parent",
+          "localPosition": [
+            0,
+            -0.112,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "body-envelope-shared"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "foot-ring",
+          "seamRefs": [
+            "foot/body seam"
+          ],
+          "detachableFragments": [
+            "foot-ring"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "unglazed-clay"
+        }
+      },
+      "material": "unglazed-clay",
+      "materialLayers": [
+        "unglazed-clay"
+      ],
+      "localFeatures": [
+        "support rim"
+      ],
+      "evidenceRefs": [
+        "brief-main-form"
+      ]
+    },
+    {
+      "id": "spout-pivot",
+      "name": "Spout assembly pivot",
+      "level": "macro",
+      "role": "appendage",
+      "importance": 0.96,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "spout root authored overlap",
+        "localStart": [
+          0.108,
+          0.042,
+          0
+        ],
+        "localEnd": [
+          0.342,
+          0.218,
+          0
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.008,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-spout-handle"
+        ]
+      },
+      "dimensions": {
+        "width": 0.25,
+        "height": 0.22,
+        "depth": 0.09,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "detachable",
+        "pivot": {
+          "mode": "root",
+          "localPosition": [
+            0.108,
+            0.042,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "two-capsule-construction-inputs",
+          "ids": [
+            "spout-lower-capsule",
+            "spout-upper-capsule"
+          ]
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "spout-assembly",
+          "seamRefs": [
+            "spout-root-collar"
+          ],
+          "detachableFragments": [
+            "spout-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "celadon-glaze",
+      "materialLayers": [
+        "celadon-glaze",
+        "glaze-edge",
+        "dark-outlet"
+      ],
+      "localFeatures": [
+        "taper",
+        "lip",
+        "outlet inset"
+      ],
+      "evidenceRefs": [
+        "brief-spout-handle"
+      ]
+    },
+    {
+      "id": "handle-pivot",
+      "name": "Handle assembly pivot",
+      "level": "macro",
+      "role": "handle",
+      "importance": 0.92,
+      "confidence": 1,
+      "primitive": "curve-sweep",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "upper and lower authored mounts",
+        "localStart": [
+          -0.108,
+          0.097,
+          0
+        ],
+        "localEnd": [
+          -0.109,
+          -0.061,
+          0
+        ],
+        "contactType": "embedded",
+        "embedDepth": 0.006,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-spout-handle"
+        ]
+      },
+      "dimensions": {
+        "width": 0.17,
+        "height": 0.23,
+        "depth": 0.08,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "detachable",
+        "pivot": {
+          "mode": "dual-mount",
+          "localPosition": [
+            -0.11,
+            0.018,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "three-capsule-construction-inputs",
+          "ids": [
+            "handle-upper-capsule",
+            "handle-outer-capsule",
+            "handle-lower-capsule"
+          ]
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "handle-assembly",
+          "seamRefs": [
+            "upper mount",
+            "lower mount"
+          ],
+          "detachableFragments": [
+            "handle-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "glaze-edge",
+      "materialLayers": [
+        "celadon-glaze",
+        "glaze-edge"
+      ],
+      "localFeatures": [
+        "grip sweep",
+        "two mount collars"
+      ],
+      "evidenceRefs": [
+        "brief-spout-handle"
+      ]
+    },
+    {
+      "id": "lid-pivot",
+      "name": "Hinged lid assembly",
+      "level": "macro",
+      "role": "hinge",
+      "importance": 0.95,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "lid-hinge-socket",
+        "localStart": [
+          -0.066,
+          0.159,
+          0
+        ],
+        "localEnd": [
+          0.143,
+          0.197,
+          0
+        ],
+        "contactType": "hinge",
+        "overlap": 0.003,
+        "gapTolerance": 0.002,
+        "evidenceRefs": [
+          "brief-action-contract"
+        ]
+      },
+      "dimensions": {
+        "width": 0.22,
+        "height": 0.1,
+        "depth": 0.16,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          -0.066,
+          0.159,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "detachable",
+        "pivot": {
+          "mode": "hinge",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "cylinder-construction-input",
+          "id": "lid-cylinder"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lid-assembly",
+          "seamRefs": [
+            "lid joint"
+          ],
+          "detachableFragments": [
+            "lid-assembly"
+          ],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "celadon-glaze",
+      "materialLayers": [
+        "celadon-glaze",
+        "brass-fitting"
+      ],
+      "localFeatures": [
+        "domed surface",
+        "band",
+        "knob",
+        "joint pin"
+      ],
+      "evidenceRefs": [
+        "brief-action-contract"
+      ]
+    },
+    {
+      "id": "lid-knob",
+      "name": "Lid knob",
+      "level": "micro",
+      "role": "ornament",
+      "importance": 0.62,
+      "confidence": 1,
+      "primitive": "lathe",
+      "parent": "lid-pivot",
+      "dimensions": {
+        "width": 0.044,
+        "height": 0.031,
+        "depth": 0.044,
+        "units": "metre",
+        "confidence": 1
+      },
+      "transform": {
+        "position": [
+          0.066,
+          0.036,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "parented",
+        "pivot": {
+          "mode": "parent",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        "collider": {
+          "type": "none"
+        },
+        "destruction": {
+          "breakable": true,
+          "fractureGroup": "lid-assembly",
+          "seamRefs": [
+            "knob base"
+          ],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "glazed-ceramic"
+        }
+      },
+      "material": "glaze-edge",
+      "materialLayers": [
+        "glaze-edge"
+      ],
+      "localFeatures": [
+        "lathed crown"
+      ],
+      "evidenceRefs": [
+        "brief-main-form"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": "celadon-glaze",
+      "name": "Clearcoated celadon glaze",
+      "type": "node-physical",
+      "shaderModel": "MeshPhysicalNodeMaterial",
+      "baseColor": "#3F8F87",
+      "albedo": {
+        "dominant": "#3F8F87",
+        "secondary": [
+          "#347D77",
+          "#509D93"
+        ]
+      },
+      "roughness": {
+        "base": 0.21,
+        "variation": 0.04,
+        "map": "independent bounded ceramic field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "ceramic orange peel",
+        "strength": 0.04,
+        "scale": 90,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.12,
+        "contactShadowBias": 0.2
+      },
+      "localOverrides": [
+        "darker pooling at neck and attachment collars"
+      ],
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.03
+        },
+        {
+          "id": "meso",
+          "frequency": 14,
+          "amplitude": 0.015
+        },
+        {
+          "id": "micro",
+          "frequency": 90,
+          "amplitude": 0.006
+        }
+      ],
+      "textureProjection": {
+        "mode": "object-space procedural",
+        "repeat": [
+          1,
+          1
+        ],
+        "anisotropy": 4
+      },
+      "textureResolution": 1024
+    },
+    {
+      "id": "glaze-edge",
+      "name": "Darker glaze edge",
+      "type": "node-physical",
+      "shaderModel": "MeshPhysicalNodeMaterial",
+      "baseColor": "#34756F",
+      "roughness": {
+        "base": 0.27,
+        "variation": 0.05,
+        "map": "independent edge-zone field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "fine ceramic texture",
+        "strength": 0.035,
+        "scale": 100,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.14,
+        "contactShadowBias": 0.2
+      },
+      "localOverrides": [
+        "collar and lip emphasis"
+      ]
+    },
+    {
+      "id": "unglazed-clay",
+      "name": "Unglazed clay foot",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#8E5D43",
+      "roughness": {
+        "base": 0.78,
+        "variation": 0.1,
+        "map": "independent clay grain"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "fine clay tooth",
+        "strength": 0.08,
+        "scale": 70,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.18,
+        "contactShadowBias": 0.3
+      },
+      "localOverrides": [
+        "darker support-contact edge"
+      ]
+    },
+    {
+      "id": "dark-outlet",
+      "name": "Dark spout outlet",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#302821",
+      "roughness": {
+        "base": 0.86,
+        "variation": 0.03,
+        "map": "independent interior field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "none",
+        "strength": 0,
+        "scale": 1,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.5,
+        "contactShadowBias": 0.5
+      },
+      "localOverrides": [
+        "outlet inset only"
+      ]
+    },
+    {
+      "id": "brass-fitting",
+      "name": "Brass lid fitting",
+      "type": "node-physical",
+      "shaderModel": "MeshPhysicalNodeMaterial",
+      "baseColor": "#B58A42",
+      "roughness": {
+        "base": 0.31,
+        "variation": 0.08,
+        "map": "independent patina field"
+      },
+      "metalness": {
+        "base": 0.78,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "fine brushed fitting",
+        "strength": 0.035,
+        "scale": 80,
+        "space": "object"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.16,
+        "contactShadowBias": 0.25
+      },
+      "localOverrides": [
+        "joint-pin contact polish"
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "radial-product-sampling",
+      "count": 48,
+      "distribution": "Tier-selected rotational sampling on body, lid, rings, and knob; budgeted and minimum reduce only visual tessellation.",
+      "componentRef": "body-pivot",
+      "stableIdRule": "Semantic IDs are independent of radial sample count."
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Prove product envelope and opposed appendage silhouette.",
+      "componentRefs": [
+        "body-pivot",
+        "spout-pivot",
+        "handle-pivot",
+        "lid-pivot"
+      ],
+      "acceptance": [
+        "Named camera capture exists.",
+        "AI-vision feature scores meet authored-contract thresholds."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Prove semantic hierarchy, mounts, sockets, and construction inputs.",
+      "componentRefs": [
+        "root",
+        "spout-pivot",
+        "handle-pivot",
+        "lid-pivot"
+      ],
+      "acceptance": [
+        "Protected ID arrays match the runtime contract.",
+        "Attachments show no visible gaps."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine lathe profiles and parallel-transport sweeps.",
+      "componentRefs": [
+        "body-shell",
+        "spout-pivot",
+        "handle-pivot",
+        "lid-knob"
+      ],
+      "acceptance": [
+        "Profile and attachment captures show continuous normals and silhouette."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Separate glaze, clay, outlet, and brass zones.",
+      "componentRefs": [
+        "body-shell",
+        "foot-ring",
+        "lid-pivot"
+      ],
+      "acceptance": [
+        "Close-material capture keeps zones physically legible."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add bounded macro, meso, and micro response.",
+      "componentRefs": [
+        "body-shell"
+      ],
+      "acceptance": [
+        "Grazing light shows restrained response without texture swimming."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Establish neutral product readability.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Key, fill, rim, ACES exposure, and contact shadow are recorded."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Prove lid hinge animation and exact reset.",
+      "componentRefs": [
+        "lid-pivot"
+      ],
+      "acceptance": [
+        "Fixed-time captures differ in action-ready mode and reset is exact."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Prove tier monotonicity and identity preservation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangles and vertices decrease full to budgeted to minimum while protected IDs remain exact."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "full",
+      "distance": 0,
+      "strategy": "48-segment lathe and 12-sided long sweeps for close product inspection; seed 0x5eed source evidence is 9,024 triangles, 5,464 stored vertices, and 16 render items."
+    },
+    {
+      "tier": "budgeted",
+      "distance": 3,
+      "strategy": "32-segment lathe and 8-sided sweeps; preserve all semantic and action contracts; seed 0x5eed source evidence is 5,120 triangles, 3,224 stored vertices, and 16 render items."
+    },
+    {
+      "tier": "minimum",
+      "distance": 7,
+      "strategy": "20-segment lathe and 6-sided sweeps; preserve silhouette landmarks and all IDs; seed 0x5eed source evidence is 2,772 triangles, 1,838 stored vertices, and 16 render items."
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "mobile-aware product inspection",
+    "targetTriangles": 10000,
+    "maxDrawCalls": 16,
+    "textureSize": 1024,
+    "fpsTarget": 60,
+    "optimizationPolicy": "No sustained-performance claim is accepted without named-device CPU/GPU/presentation evidence. One scene render and no post-processing passes are permitted."
+  },
+  "lightingFromPhoto": [
+    "No source photo exists; use a neutral key, soft fill, and restrained rim for authored material inspection.",
+    "Use explicit ACES tone mapping and one output transform.",
+    "Use a receiving plane for contact shadow; do not add a post-processing pipeline."
+  ],
+  "proceduralStrategy": [
+    "Compile the body with semantic-indexed-lathe-v2, including an open mouth, inner neck wall, and recessed cavity; lathe the foot, lid, and knob from authored metre-scale profiles.",
+    "Build spout and handle with parallel-transport swept tubes and embedded mounts.",
+    "Keep the lid under a hinge-local pivot with detach and hinge sockets.",
+    "Publish ColliderConstructionInput records only; leave canonical physics adaptation blocked.",
+    "Reduce only visual tessellation by tier while preserving draw count and every protected identity.",
+    "Render with native WebGPU NodeMaterials in one scene render and no post-processing passes."
+  ],
+  "animationAnchors": [
+    "lid-pivot",
+    "lid-hinge-socket",
+    "lid-detach-socket"
+  ],
+  "destructionAnchors": [
+    "ceramic-shell",
+    "foot-ring",
+    "spout-assembly",
+    "handle-assembly",
+    "lid-assembly",
+    "metal-fittings"
+  ],
+  "risks": [
+    "No external reference image exists, so reference-image fidelity cannot be evaluated.",
+    "Smooth-form acceptance depends on future native-WebGPU browser inspection.",
+    "ColliderConstructionInput records are not canonical collision proxies or solver authority."
+  ]
+}

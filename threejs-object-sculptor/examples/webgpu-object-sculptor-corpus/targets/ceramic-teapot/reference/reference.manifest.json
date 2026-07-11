@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "targetId": "ceramic-teapot",
+  "targetName": "Celadon Hinge-Lid Teapot",
+  "sourceKind": "authored-procedural-brief",
+  "sourceUrl": null,
+  "authoringIntent": "Repository-authored procedural product-form benchmark; no external image was used as reconstruction evidence.",
+  "referenceImage": {
+    "available": false,
+    "path": null,
+    "sha256": null,
+    "mediaType": null,
+    "widthPixels": null,
+    "heightPixels": null,
+    "license": null,
+    "provenanceStatus": "unavailable"
+  },
+  "allowedClaims": [
+    "The authored brief defines intended dimensions, semantic parts, material zones, motion, and performance invariants.",
+    "Source and unit validation may prove implementation conformance to the authored brief.",
+    "Deterministic source tests may establish the declared cavity-overlap, identity-continuity, material-response, and authoring-input contracts without constituting visual acceptance."
+  ],
+  "blockedClaims": [
+    "reference-image reconstruction fidelity",
+    "reference-derived PBR accuracy",
+    "licensed or hashed image evidence",
+    "accepted visual similarity"
+  ],
+  "visualAcceptance": {
+    "status": "incomplete",
+    "reason": "No reference image, browser comparison sheet, or AI-vision acceptance record exists."
+  },
+  "evidence": {
+    "status": "incomplete",
+    "imageArtifacts": [],
+    "comparisonArtifacts": [],
+    "reviewRecords": []
+  }
+}
