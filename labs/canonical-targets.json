@@ -94,6 +94,14 @@
       "tiers": ["full", "budgeted", "minimum"]
     },
     {
+      "skill": "threejs-object-sculptor",
+      "id": "webgpu-object-sculptor-corpus",
+      "canonicalDir": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus",
+      "scenarios": ["articulated-desk-lamp", "potted-bonsai", "ceramic-teapot"],
+      "mechanisms": ["final", "blockout", "hierarchy", "materials", "action-ready"],
+      "tiers": ["full", "budgeted", "minimum"]
+    },
+    {
       "skill": "threejs-camera-controls-and-rigs",
       "id": "webgpu-camera-rig",
       "canonicalDir": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig",

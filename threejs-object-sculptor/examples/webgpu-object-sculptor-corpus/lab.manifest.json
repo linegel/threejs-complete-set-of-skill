@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-object-sculptor-corpus",
+  "title": "Object Sculptor Multi-Subject Corpus",
+  "skill": "threejs-object-sculptor",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-object-sculptor/examples/shared/sculpt-runtime.js",
+    "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus",
+    "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/corpus.contract.json"
+  ],
+  "browserEntry": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
+  "publishPath": "/demos/webgpu-object-sculptor-corpus/",
+  "scenarios": [
+    {
+      "id": "articulated-desk-lamp",
+      "route": "scenario/articulated-desk-lamp/",
+      "startup": {"scenario": "articulated-desk-lamp", "mode": "action-ready", "tier": "budgeted", "camera": "design", "seed": 1},
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "potted-bonsai",
+      "route": "scenario/potted-bonsai/",
+      "startup": {"scenario": "potted-bonsai", "mode": "action-ready", "tier": "budgeted", "camera": "design", "seed": 1},
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "ceramic-teapot",
+      "route": "scenario/ceramic-teapot/",
+      "startup": {"scenario": "ceramic-teapot", "mode": "action-ready", "tier": "budgeted", "camera": "design", "seed": 1},
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "mechanisms": [
+    {"id": "final", "route": "mechanism/final/", "startup": {"mode": "final"}, "acceptanceStatus": "incomplete"},
+    {"id": "blockout", "route": "mechanism/blockout/", "startup": {"mode": "blockout"}, "acceptanceStatus": "incomplete"},
+    {"id": "hierarchy", "route": "mechanism/hierarchy/", "startup": {"mode": "hierarchy"}, "acceptanceStatus": "incomplete"},
+    {"id": "materials", "route": "mechanism/materials/", "startup": {"mode": "materials"}, "acceptanceStatus": "incomplete"},
+    {"id": "action-ready", "route": "mechanism/action-ready/", "startup": {"mode": "action-ready"}, "acceptanceStatus": "incomplete"}
+  ],
+  "tiers": [
+    {
+      "id": "full",
+      "targetClass": "close inspection on capable desktop",
+      "frameTargetMs": null,
+      "resolutionPolicy": {"dprCap": 1.5},
+      "mechanismLimits": {
+        "articulated-desk-lamp": "highest authored radial, spring, hinge-hardware, and fastener detail",
+        "potted-bonsai": "highest oriented-ring sampling with merged opaque leaf solids",
+        "ceramic-teapot": "highest lathe and parallel-transport sweep sampling"
+      },
+      "resourceLimits": {"maxVertices": null, "maxTriangles": null, "maxRenderItems": null, "maxPeakLiveBytes": null},
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["protected semantic IDs", "parent-local sockets", "ColliderConstructionInput identity", "destruction groups", "action reset", "one scene render", "no post-processing passes"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "budgeted",
+      "targetClass": "ordinary desktop, tablet, and conservative default",
+      "frameTargetMs": null,
+      "resolutionPolicy": {"dprCap": 1.25},
+      "mechanismLimits": {
+        "articulated-desk-lamp": "reduced radial, spring, and fastener tessellation",
+        "potted-bonsai": "reduced oriented-ring sampling and fewer merged opaque leaf solids",
+        "ceramic-teapot": "reduced lathe and sweep tessellation"
+      },
+      "resourceLimits": {"maxVertices": null, "maxTriangles": null, "maxRenderItems": null, "maxPeakLiveBytes": null},
+      "degradationFromPrevious": ["reduce visual tessellation and non-protected repeated detail"],
+      "preservedInvariants": ["protected semantic IDs", "parent-local sockets", "ColliderConstructionInput identity", "destruction groups", "action reset", "one scene render", "no post-processing passes"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "minimum",
+      "targetClass": "low-end/mobile and distant inspection",
+      "frameTargetMs": null,
+      "resolutionPolicy": {"dprCap": 1},
+      "mechanismLimits": {
+        "articulated-desk-lamp": "minimum silhouette-safe radial/spring detail and no optional shade fasteners",
+        "potted-bonsai": "minimum oriented-ring sampling and six opaque canopy clusters with no alpha-sorted fragments",
+        "ceramic-teapot": "minimum silhouette-safe lathe and sweep sampling"
+      },
+      "resourceLimits": {"maxVertices": null, "maxTriangles": null, "maxRenderItems": null, "maxPeakLiveBytes": null},
+      "degradationFromPrevious": ["replace bonsai leaf solids with opaque canopy clusters", "remove optional lamp fasteners", "reduce silhouette-safe visual tessellation"],
+      "preservedInvariants": ["protected semantic IDs", "parent-local sockets", "ColliderConstructionInput identity", "destruction groups", "action reset", "opaque foliage", "one scene render", "no post-processing passes"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "cameras": ["design", "profile", "attachment", "close-material"],
+  "modes": ["final", "blockout", "hierarchy", "materials", "action-ready"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    {"id": "native-webgpu", "required": true, "evidence": "Controller must await WebGPURenderer.init() and reject a backend where isWebGPUBackend is not true; no fallback is activated.", "status": "incomplete"},
+    {"id": "single-scene-render", "required": true, "evidence": "Frame execution must report exactly one scene render and no duplicate diagnostic or presentation render.", "status": "incomplete"},
+    {"id": "no-post-processing", "required": true, "evidence": "Runtime graph and frame record must report zero post-processing passes.", "status": "incomplete"},
+    {"id": "mobile-resource-accounting", "required": true, "evidence": "Named-device sustained evidence must report CPU/GPU/presentation timing, render items, submissions, shadow casters, materials/pipelines, and peak live bytes.", "status": "incomplete"}
+  ],
+  "runtimeProof": [
+    {"id": "renderer-init", "required": true, "evidence": "Await controller readiness after WebGPURenderer.init().", "status": "incomplete"},
+    {"id": "backend-is-webgpu", "required": true, "evidence": "Capture controller metrics with nativeWebGPU true.", "status": "incomplete"},
+    {"id": "physical-routes", "required": true, "evidence": "Load all 15 scenario/mechanism/tier/camera physical routes and prove each locks exactly one route dimension.", "status": "incomplete"},
+    {"id": "target-contracts", "required": true, "evidence": "Capture protected node, socket, ColliderConstructionInput, destruction-group, mode, tier, and exact-reset inventories for all three targets.", "status": "incomplete"},
+    {"id": "render-ownership", "required": true, "evidence": "Capture one renderer owner, one scene render, one tone-map owner, one output-transform owner, and zero post-processing passes.", "status": "incomplete"},
+    {"id": "visual-contracts", "required": true, "evidence": "Inspect final and diagnostic PNGs for each target and record AI-vision authored-contract scores; no reference-image similarity claim is permitted.", "status": "incomplete"},
+    {"id": "sustained-performance", "required": true, "evidence": "Record named-device sustained CPU/GPU/presentation evidence and mobile resource accounting without inventing a universal frame target.", "status": "incomplete"}
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
+  "sourceHash": null,
+  "proxyStatus": null,
+  "commands": {
+    "check": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run check",
+    "test": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run test",
+    "mutations": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run test:mutations",
+    "capture": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run capture",
+    "validateArtifacts": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
+    "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:full"
+  },
+  "notes": [
+    "Deep multi-subject, route, physics, workload, provenance, and visual-acceptance metadata is owned by corpus.contract.json."
+  ]
+}

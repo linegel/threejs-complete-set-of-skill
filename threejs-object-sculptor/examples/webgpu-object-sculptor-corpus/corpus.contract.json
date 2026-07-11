@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-object-sculptor-corpus-contract",
+  "manifestId": "webgpu-object-sculptor-corpus",
+  "manifestPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/lab.manifest.json",
+  "canonicalSchemaPath": "labs/schema/lab-manifest.schema.json",
+  "status": "incomplete",
+  "defaultStartup": {
+    "scenario": "potted-bonsai",
+    "mechanism": "action-ready",
+    "tier": "budgeted",
+    "camera": "design",
+    "seed": 1
+  },
+  "scenarios": [
+    {
+      "id": "articulated-desk-lamp",
+      "route": "scenario/articulated-desk-lamp/",
+      "category": "articulated-mechanical-product",
+      "formLanguage": ["industrial", "hard-surface", "serial-hinge"],
+      "startup": {"scenario": "articulated-desk-lamp", "mechanism": "action-ready", "tier": "budgeted", "camera": "design", "seed": 1},
+      "spec": "targets/articulated-desk-lamp/object-sculpt-spec.json",
+      "referenceManifest": "targets/articulated-desk-lamp/reference/reference.manifest.json",
+      "factory": "targets/articulated-desk-lamp/articulated-desk-lamp-factory.js",
+      "status": "incomplete"
+    },
+    {
+      "id": "potted-bonsai",
+      "route": "scenario/potted-bonsai/",
+      "category": "organic-botanical-sculpture",
+      "formLanguage": ["organic", "branching", "rooted-articulated", "authored-sway"],
+      "startup": {"scenario": "potted-bonsai", "mechanism": "action-ready", "tier": "budgeted", "camera": "design", "seed": 1},
+      "spec": "targets/potted-bonsai/object-sculpt-spec.json",
+      "referenceManifest": "targets/potted-bonsai/reference/reference.manifest.json",
+      "factory": "targets/potted-bonsai/potted-bonsai-factory.js",
+      "status": "incomplete"
+    },
+    {
+      "id": "ceramic-teapot",
+      "route": "scenario/ceramic-teapot/",
+      "category": "lathed-ceramic-product",
+      "formLanguage": ["sculptural", "rotational", "swept-appendage"],
+      "startup": {"scenario": "ceramic-teapot", "mechanism": "action-ready", "tier": "budgeted", "camera": "design", "seed": 1},
+      "spec": "targets/ceramic-teapot/object-sculpt-spec.json",
+      "referenceManifest": "targets/ceramic-teapot/reference/reference.manifest.json",
+      "factory": "targets/ceramic-teapot/ceramic-teapot-factory.js",
+      "status": "incomplete"
+    }
+  ],
+  "mechanisms": [
+    {"id": "final", "route": "mechanism/final/", "startup": {"mechanism": "final"}, "status": "incomplete"},
+    {"id": "blockout", "route": "mechanism/blockout/", "startup": {"mechanism": "blockout"}, "status": "incomplete"},
+    {"id": "hierarchy", "route": "mechanism/hierarchy/", "startup": {"mechanism": "hierarchy"}, "status": "incomplete"},
+    {"id": "materials", "route": "mechanism/materials/", "startup": {"mechanism": "materials"}, "status": "incomplete"},
+    {"id": "action-ready", "route": "mechanism/action-ready/", "startup": {"mechanism": "action-ready"}, "status": "incomplete"}
+  ],
+  "tiers": [
+    {
+      "id": "full",
+      "route": "tier/full/",
+      "sourceWorkloadEvidence": {
+        "articulated-desk-lamp": {"seed": 17, "storedVertices": 7519, "triangles": 8528, "renderItems": 46, "shadowCasters": 13},
+        "potted-bonsai": {"seed": 24301, "storedVertices": 2229, "triangles": 2952, "renderItems": 21},
+        "ceramic-teapot": {"seed": 24301, "storedVertices": 5464, "triangles": 9024, "renderItems": 16}
+      },
+      "status": "incomplete"
+    },
+    {
+      "id": "budgeted",
+      "route": "tier/budgeted/",
+      "sourceWorkloadEvidence": {
+        "articulated-desk-lamp": {"seed": 17, "storedVertices": 4367, "triangles": 4408, "renderItems": 42, "shadowCasters": 13},
+        "potted-bonsai": {"seed": 24301, "storedVertices": 1377, "triangles": 1688, "renderItems": 21},
+        "ceramic-teapot": {"seed": 24301, "storedVertices": 3224, "triangles": 5120, "renderItems": 16}
+      },
+      "status": "incomplete"
+    },
+    {
+      "id": "minimum",
+      "route": "tier/minimum/",
+      "sourceWorkloadEvidence": {
+        "articulated-desk-lamp": {"seed": 17, "storedVertices": 2308, "triangles": 1964, "renderItems": 38, "shadowCasters": 13},
+        "potted-bonsai": {"seed": 24301, "storedVertices": 858, "triangles": 1042, "renderItems": 21},
+        "ceramic-teapot": {"seed": 24301, "storedVertices": 1838, "triangles": 2772, "renderItems": 16}
+      },
+      "status": "incomplete"
+    }
+  ],
+  "cameras": [
+    {"id": "design", "route": "camera/design/", "purpose": "overall authored silhouette and proportion", "status": "incomplete"},
+    {"id": "profile", "route": "camera/profile/", "purpose": "depth, taper, linkage, and negative-space review", "status": "incomplete"},
+    {"id": "attachment", "route": "camera/attachment/", "purpose": "joint, socket, overlap, and action-pivot review", "status": "incomplete"},
+    {"id": "close-material", "route": "camera/close-material/", "purpose": "material-zone and surface-response review", "status": "incomplete"}
+  ],
+  "corpusDiversityContract": {
+    "preexistingBoatBaseline": "webgpu-tower-ship-sculptor",
+    "boatBaselineCountsTowardMinimum": false,
+    "minimumNonBoatTargets": 2,
+    "actualNonBoatTargets": 3,
+    "requiresOrganicTarget": true,
+    "organicTarget": "potted-bonsai",
+    "requiresDistinctConstructionFamilies": true,
+    "constructionFamilies": ["serial articulated primitives", "rotation-minimizing botanical rings", "lathe plus parallel-transport sweeps"],
+    "status": "incomplete"
+  },
+  "physicalRouteContract": {
+    "required": true,
+    "dimensions": {"scenario": 3, "mechanism": 5, "tier": 3, "camera": 4},
+    "routeCount": 15,
+    "generationPolicy": "deletion-free idempotent generation",
+    "status": "incomplete"
+  },
+  "renderArchitecture": {
+    "renderer": "WebGPURenderer",
+    "requiredBackend": "native WebGPU",
+    "fallback": "none",
+    "sceneRendersPerFrame": 1,
+    "postProcessingPasses": 0,
+    "presentationOwner": "WebGPURenderer render output",
+    "toneMappingOwners": 1,
+    "outputTransformOwners": 1,
+    "claimStatus": "source-contract-awaiting-runtime-evidence"
+  },
+  "physicsBoundary": {
+    "assetRecordType": "ColliderConstructionInput",
+    "constraintRecordType": "ConstraintConstructionInput where articulated targets need it",
+    "units": "SI metre and radian authoring values",
+    "solverAuthority": false,
+    "canonicalProxyStatus": "blocked",
+    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "visualLodIndependent": true,
+    "requiredAdapterBeforePhysicalClaims": "route-selected PhysicsContext and external/native solver adapter",
+    "authoredColliderCeilingsMeters": {
+      "articulated-desk-lamp": {"base-cylinder": 0.021, "lower-arm-left-capsule": 0.017, "lower-arm-right-capsule": 0.017, "upper-arm-left-capsule": 0.017, "upper-arm-right-capsule": 0.017, "shade-neck-cylinder": 0.0017, "shade-shell-rib-00-capsule": 0.062, "shade-shell-rib-01-capsule": 0.062, "shade-shell-rib-02-capsule": 0.062, "shade-shell-rib-03-capsule": 0.062, "shade-shell-rib-04-capsule": 0.062, "shade-shell-rib-05-capsule": 0.062, "shade-shell-rib-06-capsule": 0.062, "shade-shell-rib-07-capsule": 0.062, "bulb-trigger": 0.023},
+      "potted-bonsai": {"pot-solid": 0.16, "trunk-capsule": 0.17, "branch-left-capsule": 0.1, "branch-right-capsule": 0.1, "branch-back-capsule": 0.1, "canopy-trigger": 0.92},
+      "ceramic-teapot": {"body-envelope": 0.07, "lid-cylinder": 0.036, "spout-lower-capsule": 0.04, "spout-upper-capsule": 0.04, "handle-upper-capsule": 0.04, "handle-outer-capsule": 0.04, "handle-lower-capsule": 0.04}
+    },
+    "status": "incomplete"
+  },
+  "identityContinuity": {
+    "semanticIdsStableAcrossVisualTiers": true,
+    "continuityTokenRequiredForTierRebuild": true,
+    "changedSeedOrSourceRequiresNewGeneration": true,
+    "solverStateContinuityClaim": "blocked-without-route-selected physics adapter",
+    "status": "incomplete"
+  },
+  "referencePolicy": {
+    "sourceKind": "authored-procedural-brief",
+    "referenceImageAvailable": false,
+    "referenceImageLicense": null,
+    "referenceImageHash": null,
+    "referenceSimilarityClaim": "blocked",
+    "visualAcceptanceStatus": "incomplete"
+  },
+  "visualAcceptance": {
+    "status": "incomplete",
+    "acceptedScenarios": [],
+    "reason": "No native-WebGPU visual evidence bundle or AI-vision authored-contract review is accepted."
+  },
+  "commands": {
+    "specs": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:specs",
+    "targets": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:targets",
+    "unit": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:unit",
+    "generateRoutes": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run generate:routes",
+    "routes": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:routes"
+  }
+}
