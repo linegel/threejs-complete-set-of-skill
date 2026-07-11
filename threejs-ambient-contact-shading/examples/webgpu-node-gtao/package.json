@@ -3,10 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check *.js",
-    "validate": "node validate.js"
+    "check": "node --check main.js && node --check browser.js && node --check routes.js && node --check fixtures.js && node --check validate.js && node --check capture.mjs && node --check validate-artifacts.mjs",
+    "validate": "node validate.js && node test.mjs",
+    "validate:unit": "node test.mjs",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-node-gtao --target presentation",
+    "capture:evidence": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run validate && npm run test:mutations",
+    "validate:full": "npm run validate:quick && node validate-artifacts.mjs --require-all-claims"
   },
   "dependencies": {
-    "three": "^0.185.1"
+    "three": "0.185.1"
   }
 }

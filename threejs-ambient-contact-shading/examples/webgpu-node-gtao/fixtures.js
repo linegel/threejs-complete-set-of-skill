@@ -1,7 +1,9 @@
 export const AO_FIXTURE_IDS = Object.freeze( [
 	'wall-receiver',
 	'thin-silhouette',
+	'uv-invariance',
 	'sky-edge',
+	'transparent-occluder',
 	'emissive-object',
 	'hard-sun',
 	'non-square-viewport',
@@ -24,9 +26,19 @@ export const AO_FIXTURES = Object.freeze( [
 		expected: 'Normal-aware reconstruction keeps the far background from inheriting foreground contact.'
 	},
 	{
+		id: 'uv-invariance',
+		purpose: 'Material-context AO screen-coordinate invariance.',
+		expected: 'Changing or removing mesh UV attributes does not alter screen-space AO.'
+	},
+	{
 		id: 'sky-edge',
 		purpose: 'Sky/background classification at depth discontinuities.',
 		expected: 'Sky pixels remain visibility 1 and do not pull extreme view-Z into neighbours.'
+	},
+	{
+		id: 'transparent-occluder',
+		purpose: 'Opaque-only AO input ownership.',
+		expected: 'Transparent surfaces do not enter the GTAO depth/normal input pass and are not assumed to receive builtinAOContext.'
 	},
 	{
 		id: 'emissive-object',

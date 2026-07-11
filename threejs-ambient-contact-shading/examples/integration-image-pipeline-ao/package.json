@@ -1,0 +1,19 @@
+{
+  "name": "threejs-integration-image-pipeline-ao",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check main.js && node --check host-adapter.js && node --check browser.js && node --check test.mjs && node --check test-mutations.mjs",
+    "validate": "node test.mjs && node test-mutations.mjs",
+    "validate:unit": "node test.mjs",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab integration-image-pipeline-ao --target presentation",
+    "capture:status": "node evidence-status.mjs capture",
+    "validate:artifacts": "node evidence-status.mjs validate:artifacts",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  }
+}

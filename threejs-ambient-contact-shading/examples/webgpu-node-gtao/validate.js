@@ -5,19 +5,23 @@ import {
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const DEPTH_MODES = new Set( [ 'standard', 'reversed', 'logarithmic' ] );
+const SUPPORTED_DEPTH_MODES = new Set( [ 'standard' ] );
 const EXAMPLE_SOURCE_PATH = fileURLToPath( new URL( './main.js', import.meta.url ) );
 
 export const DEFAULT_AO_CONFIG = Object.freeze( {
 	enabled: true,
 	targetScale: 0.5,
 	samples: 16,
-	radiusMeters: 0.5,
-	radiusUnits: 'world-meters',
+	radiusSceneUnits: 0.5,
+	radiusUnits: 'project-world-units',
 	directLightExcluded: true,
 	emissiveExcluded: true,
 	uiExcluded: true,
 	bloomExcluded: true,
+	inputPassSamples: 0,
+	opaqueOnlyInput: true,
+	reconstruction: 'materialized-rtt',
+	visibilityCoordinates: 'screenUV',
 	viewport: Object.freeze( {
 		width: 1280,
 		height: 720,
@@ -26,21 +30,23 @@ export const DEFAULT_AO_CONFIG = Object.freeze( {
 		projectionY: 2.414,
 		texelSize: Object.freeze( [ 1 / 1280, 1 / 720 ] )
 	} ),
-	depthMode: 'reversed',
+	depthMode: 'standard',
 	renderer: Object.freeze( {
-		reversedDepthBuffer: true
+		reversedDepthBuffer: false
 	} ),
 	temporal: Object.freeze( {
 		enabled: false,
 		velocitySource: null,
 		depthRejection: true,
-		cameraCutReset: true
+		cameraCutPolicy: 'recreate-traa'
 	} ),
 	disabledPassBypass: true,
 	customBentNormal: Object.freeze( {
 		enabled: false,
 		oneWallFixtureStatus: 'disabled',
-		directionalTintEnabled: false
+		directionalTintEnabled: false,
+		algorithmClass: 'heuristic-screen-space-directional-visibility',
+		acceptanceStatus: 'INSUFFICIENT_EVIDENCE'
 	} )
 } );
 
@@ -58,7 +64,7 @@ function normalizeTemporalConfig( config ) {
 			enabled: true,
 			velocitySource: config.velocitySource ?? null,
 			depthRejection: config.depthRejection === true,
-			cameraCutReset: config.cameraCutReset === true
+			cameraCutPolicy: config.cameraCutPolicy ?? DEFAULT_AO_CONFIG.temporal.cameraCutPolicy
 		};
 	}
 
@@ -81,16 +87,76 @@ export function validateExampleSourceContracts( source = readExampleSource() ) {
 		errors.push( 'builtinAOContext must be assigned to a scene pass context, not wrapped around an already-rendered pass texture.' );
 	}
 
-	if ( ! /litScenePass\.contextNode\s*=\s*builtinAOContext\s*\(\s*visibility\s*\)/.test( source ) ) {
-		errors.push( 'litScenePass.contextNode must apply builtinAOContext( visibility ) before the lit scene render.' );
+	if ( ! /litScenePass\.contextNode\s*=\s*builtinAOContext\s*\(/.test( source ) ) {
+		errors.push( 'litScenePass.contextNode must apply builtinAOContext before the lit scene render.' );
 	}
 
-	if ( ! /gbufferPass\s*=\s*pass\s*\(\s*scene\s*,\s*camera\s*\)/.test( source ) ) {
-		errors.push( 'example must keep a depth/normal gbuffer prepass for GTAO inputs.' );
+	if ( ! /baselineScenePass\s*=\s*pass\s*\(\s*scene\s*,\s*camera\s*\)/.test( source ) ||
+		! /case\s+AO_DEBUG_MODES\.disabled[\s\S]*?return\s+stage\.baselineOutput/.test( source ) ) {
+		errors.push( 'disabled AO must select an unmodified full-scene baseline pass.' );
 	}
 
-	if ( rendererOptionsMatch === null || ! /reversedDepthBuffer\s*:\s*true/.test( rendererOptionsMatch[ 0 ] ) ) {
-		errors.push( 'renderer must set reversedDepthBuffer: true when validator depthMode is reversed.' );
+	if ( ! /gbufferPass\s*=\s*pass\s*\(\s*scene\s*,\s*camera\s*,\s*\{\s*samples\s*:\s*0\s*\}\s*\)/.test( source ) ) {
+		errors.push( 'AO input pass must explicitly disable MSAA with { samples: 0 }.' );
+	}
+
+	if ( ! /gbufferPass\.transparent\s*=\s*false/.test( source ) ) {
+		errors.push( 'AO input pass must exclude transparent draws.' );
+	}
+
+	if ( ! /rtt\s*\(\s*denoisedAO[\s\S]*?format\s*:\s*THREE\.RedFormat[\s\S]*?type\s*:\s*THREE\.UnsignedByteType/.test( source ) ) {
+		errors.push( 'DenoiseNode must be materialized once through an R8 rtt target.' );
+	}
+
+	if ( ! /reconstructedAO\.sample\s*\(\s*screenUV\s*\)\.r/.test( source ) ) {
+		errors.push( 'material-context visibility must sample the reconstructed texture with screenUV.' );
+	}
+
+	if ( /const\s+visibility\s*=\s*(?:denoisedAO|rawAO|reconstructedAO)\.r/.test( source ) ) {
+		errors.push( 'implicit TextureNode coordinates are forbidden for material-context AO.' );
+	}
+
+	if ( rendererOptionsMatch === null || ! /reversedDepthBuffer\s*:\s*false/.test( rendererOptionsMatch[ 0 ] ) ) {
+		errors.push( 'r185 GTAONode scaffold must use standard depth.' );
+	}
+
+	if ( rendererOptionsMatch === null || ! /antialias\s*:\s*false/.test( rendererOptionsMatch[ 0 ] ) ) {
+		errors.push( 'diagnostic scaffold must not inherit renderer MSAA into scene passes.' );
+	}
+
+	if ( ! /resetTemporalHistory\s*\(\s*\)\s*\{/.test( source ) ||
+		! /previous\.dispose\?\.\(\)/.test( source ) ||
+		! /traaNode\.dispose\?\.\(\)/.test( source ) ) {
+		errors.push( 'camera-cut handling must recreate and dispose TRAANode; r185 exposes no public reset API.' );
+	}
+
+	if ( ! /renderPipeline\.outputColorTransform\s*=\s*false/.test( source ) ||
+		! /renderPipeline\.outputNode\s*=\s*renderOutput\s*\(/.test( source ) ) {
+		errors.push( 'renderOutput must be the sole tone-map/output-transform owner.' );
+	}
+
+	if ( ! /describeAOModeReachability\s*\(\s*mode/.test( source ) ||
+		! /sceneSubmissionCount\s*:\s*reachability\.sceneSubmissionCount/.test( source ) ) {
+		errors.push( 'runtime graph must derive mode-specific one, two, or three scene submissions from reachable passes.' );
+	}
+
+	if ( ! /calculateAOResourceInventory\s*\(\s*width\s*,\s*height\s*,\s*dpr/.test( source ) ||
+		! /traa-history-depth/.test( source ) || ! /baseline-depth/.test( source ) ) {
+		errors.push( 'runtime resource accounting must include graph-owned depth, lit, baseline, bent-normal, and TRAA resources.' );
+	}
+
+	if ( ! /heuristic-screen-space-directional-visibility/.test( source ) ||
+		! /directionalTintEnabled\s*:\s*false/.test( source ) ||
+		! /acceptanceStatus\s*:\s*'INSUFFICIENT_EVIDENCE'/.test( source ) ) {
+		errors.push( 'experimental bent-normal output must be classified honestly and kept out of directional lighting.' );
+	}
+
+	if ( ! /inferPaddedLayout/.test( source ) || /pixels\.length\s*\/\s*height/.test( source ) ) {
+		errors.push( 'render-target readback must infer an integer 256-byte-aligned row stride.' );
+	}
+
+	if ( /traaNode\??\.reset\s*\(/.test( source ) ) {
+		errors.push( 'TRAANode.reset() is not an r185 API.' );
 	}
 
 	if ( errors.length > 0 ) {
@@ -132,8 +198,8 @@ export function validateAOConfig( config = {} ) {
 		errors.push( 'samples must be an integer between 4 and 64.' );
 	}
 
-	if ( ! isPositiveFinite( merged.radiusMeters ) || merged.radiusUnits !== 'world-meters' ) {
-		errors.push( 'radius must be declared in positive world-meters.' );
+	if ( ! isPositiveFinite( merged.radiusSceneUnits ) || merged.radiusUnits !== 'project-world-units' ) {
+		errors.push( 'radius must be positive and use declared project world units.' );
 	}
 
 	for ( const flag of [ 'directLightExcluded', 'emissiveExcluded', 'uiExcluded', 'bloomExcluded' ] ) {
@@ -141,6 +207,11 @@ export function validateAOConfig( config = {} ) {
 			errors.push( `${ flag } must be true; AO may not darken that contribution.` );
 		}
 	}
+
+	if ( merged.inputPassSamples !== 0 ) errors.push( 'AO input pass must be single-sampled.' );
+	if ( merged.opaqueOnlyInput !== true ) errors.push( 'AO input pass must exclude transparent draws.' );
+	if ( merged.reconstruction !== 'materialized-rtt' ) errors.push( 'denoise must be materialized before material-context use.' );
+	if ( merged.visibilityCoordinates !== 'screenUV' ) errors.push( 'visibility must use screenUV coordinates.' );
 
 	if ( ! isPositiveFinite( viewport.width ) || ! isPositiveFinite( viewport.height ) ) {
 		errors.push( 'viewport width and height must be positive.' );
@@ -159,22 +230,18 @@ export function validateAOConfig( config = {} ) {
 		}
 	}
 
-	if ( ! DEPTH_MODES.has( merged.depthMode ) ) {
-		errors.push( 'depthMode must be one of standard, reversed, or logarithmic.' );
-	}
-
-	if ( merged.depthMode === 'reversed' && merged.renderer.reversedDepthBuffer !== true ) {
-		errors.push( 'reversed depthMode requires renderer.reversedDepthBuffer === true.' );
+	if ( ! SUPPORTED_DEPTH_MODES.has( merged.depthMode ) || merged.renderer.reversedDepthBuffer !== false ) {
+		errors.push( 'canonical r185 GTAO scaffold supports standard non-reversed depth only.' );
 	}
 
 	if ( temporal.enabled === true ) {
 		if ( ! temporal.velocitySource ) errors.push( 'temporal AO requires a velocity source.' );
 		if ( temporal.depthRejection !== true ) errors.push( 'temporal AO requires depth rejection.' );
-		if ( temporal.cameraCutReset !== true ) errors.push( 'temporal AO requires camera-cut reset.' );
+		if ( temporal.cameraCutPolicy !== 'recreate-traa' ) errors.push( 'camera cuts must recreate TRAANode; r185 exposes no reset API.' );
 	}
 
 	if ( merged.enabled === false && merged.disabledPassBypass !== true ) {
-		errors.push( 'disabled AO must bypass the AO node instead of setting intensity to zero.' );
+		errors.push( 'disabled AO must bypass the AO graph instead of setting intensity to zero.' );
 	}
 
 	if ( customBentNormal.enabled === true ) {
@@ -185,9 +252,12 @@ export function validateAOConfig( config = {} ) {
 			errors.push( 'directional bent-normal tint must stay disabled until the one-wall fixture passes.' );
 		}
 	}
+	if ( customBentNormal.algorithmClass !== 'heuristic-screen-space-directional-visibility' ||
+		customBentNormal.acceptanceStatus !== 'INSUFFICIENT_EVIDENCE' ) {
+		errors.push( 'bent-normal diagnostic must remain heuristic and insufficient until measured one-wall evidence exists.' );
+	}
 
 	const fixtureIds = assertFixtureManifestMatchesReference( AO_FIXTURE_IDS );
-
 	validateExampleSourceContracts( config.exampleSource );
 
 	if ( errors.length > 0 ) {
@@ -207,7 +277,16 @@ function fixtureConfig( name ) {
 			temporal: true,
 			velocitySource: null,
 			depthRejection: true,
-			cameraCutReset: true
+			cameraCutPolicy: 'recreate-traa'
+		};
+	}
+
+	if ( name === 'temporal-invalid-cut-policy' ) {
+		return {
+			temporal: true,
+			velocitySource: 'mrt-velocity',
+			depthRejection: true,
+			cameraCutPolicy: 'reset-method'
 		};
 	}
 
@@ -228,22 +307,31 @@ function fixtureConfig( name ) {
 		};
 	}
 
-	if ( name === 'broken-builtin-ao-context' ) {
+	if ( name === 'broken-screen-coordinate-contract' ) {
 		return {
 			exampleSource: [
-				'const gbufferPass = pass( scene, camera );',
-				'const sceneColor = gbufferPass.getTextureNode( "output" );',
-				'const materialContextOutput = builtinAOContext( visibility' + ', sceneColor );',
-				'const renderer = new THREE.WebGPURenderer( { reversedDepthBuffer: true } );'
+				'const gbufferPass = pass( scene, camera, { samples: 0 } );',
+				'gbufferPass.transparent = false;',
+				'const denoisedAO = denoise( rawAO, sceneDepth, sceneNormal, camera );',
+				'const reconstructedAO = rtt( denoisedAO, null, null, { format: THREE.RedFormat, type: THREE.UnsignedByteType } );',
+				'const visibility = reconstructedAO.r;',
+				'litScenePass.contextNode = builtinAOContext( visibility );',
+				'const baselineScenePass = pass( scene, camera );',
+				'const baselineOutput = baselineScenePass.getTextureNode( "output" );',
+				'[ AO_DEBUG_MODES.disabled ]: baselineOutput',
+				'const renderer = new THREE.WebGPURenderer( { antialias: false, reversedDepthBuffer: false } );',
+				'function resetTemporalHistory() {}',
+				'previousTRAANode?.dispose?.();',
+				'traaNode?.dispose?.();'
 			].join( '\n' )
 		};
 	}
 
-	if ( name === 'renderer-depth-mismatch' ) {
+	if ( name === 'unsupported-reversed-depth' ) {
 		return {
 			depthMode: 'reversed',
 			renderer: {
-				reversedDepthBuffer: false
+				reversedDepthBuffer: true
 			}
 		};
 	}
