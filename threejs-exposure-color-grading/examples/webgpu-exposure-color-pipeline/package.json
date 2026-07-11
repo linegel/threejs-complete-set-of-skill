@@ -1,7 +1,13 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check *.js",
-    "validate": "node validate-exposure.js"
+	"check": "node --check *.js && node --check *.mjs && node --input-type=module -e \"await import('./main.js')\"",
+	"validate": "node validate-exposure.js",
+	"validate:unit": "node validate-exposure.js && node validate-routes.mjs",
+	"test:mutations": "node validate-exposure.js --mutations && node validate-routes.mjs",
+	"capture": "node capture.mjs",
+	"validate:artifacts": "node validate-artifacts.mjs",
+	"validate:quick": "npm run check && npm run validate:unit",
+	"validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts"
   }
 }

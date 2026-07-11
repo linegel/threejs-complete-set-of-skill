@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-exposure-color-pipeline",
+  "skill": "threejs-exposure-color-grading",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
+  ],
+  "browserEntry": "index.html",
+  "publishPath": "/demos/webgpu-exposure-color-pipeline/",
+  "scenarios": [
+    { "id": "emitter", "acceptanceStatus": "incomplete" },
+    { "id": "gray-card", "acceptanceStatus": "incomplete" },
+    { "id": "swatches", "acceptanceStatus": "incomplete" },
+    { "id": "bright-window", "acceptanceStatus": "incomplete" },
+    { "id": "masked-ui", "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "log-luminance-reduction", "route": "mechanism/log-luminance-reduction/", "startup": { "tier": "balanced-log-reduction", "mode": "meter-source", "scenario": "emitter" }, "acceptanceStatus": "incomplete" },
+    { "id": "histogram-and-percentiles", "route": "mechanism/histogram-and-percentiles/", "startup": { "tier": "full-histogram", "mode": "histogram", "scenario": "emitter" }, "acceptanceStatus": "incomplete" },
+    { "id": "adaptation", "route": "mechanism/adaptation/", "startup": { "tier": "balanced-log-reduction", "mode": "adaptation", "scenario": "bright-window" }, "acceptanceStatus": "incomplete" },
+    { "id": "metering-masks", "route": "mechanism/metering-masks/", "startup": { "tier": "full-histogram", "mode": "meter-mask", "scenario": "masked-ui" }, "acceptanceStatus": "incomplete" },
+    { "id": "tone-mapping", "route": "mechanism/tone-mapping/", "startup": { "tier": "balanced-log-reduction", "mode": "tone-map", "scenario": "swatches" }, "acceptanceStatus": "incomplete" },
+    { "id": "lut-grading", "route": "mechanism/lut-grading/", "startup": { "tier": "full-histogram", "mode": "lut", "scenario": "swatches" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "full-histogram",
+      "targetClass": "current-adapter correctness",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "meterGrid": [64, 36], "lutEdge": 32 },
+      "mechanismLimits": { "meter": "histogram-percentile", "histogramBins": 64 },
+      "resourceLimits": { "storageBytes": 872 },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["GPU EV ownership", "single tone map", "single output transform"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balanced-log-reduction",
+      "targetClass": "current-adapter correctness",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "meterGrid": [64, 36], "lutEdge": 32 },
+      "mechanismLimits": { "meter": "weighted-log" },
+      "resourceLimits": { "storageBytes": 320 },
+      "degradationFromPrevious": ["remove histogram clear/bin/prefix/percentile dispatches"],
+      "preservedInvariants": ["GPU EV ownership", "single tone map", "single output transform"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "minimum-fixed-shot",
+      "targetClass": "controlled shot",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "meterGrid": null, "lutEdge": 32 },
+      "mechanismLimits": { "meter": "fixed-shot" },
+      "resourceLimits": { "storageBytes": 320 },
+      "degradationFromPrevious": ["disable meter updates", "retain authored fixed EV"],
+      "preservedInvariants": ["single tone map", "single output transform"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "meter-source", "histogram", "adaptation", "meter-mask", "tone-map", "lut"],
+  "cameras": ["design"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "storage-buffers", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "storage-atomics", "required": true, "evidence": "required by full-histogram tier", "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "renderer-init", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete" },
+    { "id": "compute-readback", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete" },
+    { "id": "current-adapter-timing", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "npm run validate:full",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

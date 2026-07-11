@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Native WebGPU Exposure and Color Pipeline</title>
+		<style>
+			html, body, canvas { width: 100%; height: 100%; margin: 0; }
+			body { overflow: hidden; background: #05070a; color: #eef3ff; font: 12px/1.4 system-ui, sans-serif; }
+			canvas { display: block; }
+			#status { position: fixed; inset: auto 12px 12px 12px; max-width: 720px; padding: 9px 11px; border: 1px solid #ffffff2b; background: #05070add; white-space: pre-wrap; }
+		</style>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../../node_modules/three/build/three.webgpu.js",
+					"three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
+					"three/tsl": "../../../node_modules/three/build/three.tsl.js",
+					"three/addons/": "../../../node_modules/three/examples/jsm/"
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<canvas id="view"></canvas>
+		<div id="status">initializing native WebGPU</div>
+		<script type="module" src="./browser-app.js"></script>
+	</body>
+</html>
