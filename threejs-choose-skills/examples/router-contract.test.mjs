@@ -739,6 +739,7 @@ function assertInlineNumericEvidenceObject( value, label ) {
 
 let physicsAbiSchema;
 const clockMappingResourceFixtures = new Map();
+const costOpportunityTableResourceFixtures = new Map();
 
 function abiRecord( name ) {
 
@@ -3947,7 +3948,7 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	assert.ok( ledger.presentationTargetsAndViews.length > 0 && ledger.measurementProtocolRefs.length > 0, 'physicsCostLedger omits target/view or trace identity' );
 	assertUnique( ledger.presentationTargetsAndViews, 'physicsCostLedger.presentationTargetsAndViews' );
 	assert.deepEqual( [ ...ledger.presentationTargetsAndViews ].sort(), Object.keys( route.physicsCameraViewPublicationsByTarget ).sort(), 'physicsCostLedger target/view closure differs from presentation cameras' );
-	requireNonEmptyString( ledger.targetAndHarness, 'physicsCostLedger.targetAndHarness' );
+	requireAbiRecord( ledger.harness, 'PhysicsCostHarness', 'physicsCostLedger.harness' );
 	const totals = requireAbiRecord( ledger.cadenceTraceTotals, 'CadenceTraceTotals', 'physicsCostLedger.cadenceTraceTotals' );
 	assert.equal( canonicalIntervalIdentity( totals.measurementInterval ), canonicalIntervalIdentity( ledger.measurementInterval ), 'cadence trace and cost ledger use different measurement intervals' );
 	assert.ok( ledger.measurementProtocolRefs.includes( totals.traceRef ), 'cadence trace is absent from the cost-ledger protocol refs' );
@@ -4074,7 +4075,7 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 		assert.ok( Number.isSafeInteger( exactApplications ) && exactApplications >= currentAdvanceCount, `cadence trace ${ tag } application total omits the serialized advance` );
 
 	}
-	requireObjectKeys( ledger.worstPermittedCatchUpBurst, [ 'triggerAndIntervalDebt', 'executionsDispatchesAndTraffic', 'latencyMemoryAndErrorGate' ], 'physicsCostLedger.worstPermittedCatchUpBurst' );
+	requireAbiRecord( ledger.worstPermittedCatchUpCost, 'PhysicsWorstPermittedCatchUpCost', 'physicsCostLedger.worstPermittedCatchUpCost' );
 	requireObjectKeys( ledger.tileGpuTraffic, [ 'attachmentStoreLoadResolveBytes', 'tileSpillEvidence', 'renderComputePassBreaks' ], 'physicsCostLedger.tileGpuTraffic' );
 	assert.ok( ledger.dependencyCriticalPaths.length > 0, 'physicsCostLedger has no dependency critical-path evidence' );
 	for ( const [ index, path ] of ledger.dependencyCriticalPaths.entries() ) assert.ok( quantityValue( path.p95, `physicsCostLedger.dependencyCriticalPaths[${ index }].p95` ) >= 0, 'dependency critical-path time is invalid' );
@@ -4212,6 +4213,181 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	assert.ok( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.workMultiplier, 'physicsCostLedger.workMultiplier' ) >= 1, 'work multiplier cannot erase submitted work' );
 	assert.equal( quantityValue( ledger.thermalPowerState.duration, 'physicsCostLedger.thermalPowerState.duration' ), exactDuration, 'thermal/power evidence does not span the exact trace duration' );
 	assert.equal( graph.executionLedger.physicsCostLedgerId, ledger.ledgerId, 'physicsGraph.executionLedger does not bind the active PhysicsCostLedger' );
+
+}
+
+function validateCanonicalComposedCostEvidence( ledger, graph, context, route ) {
+
+	const harness = requireAbiRecord( ledger.harness, 'PhysicsCostHarness', 'physicsCostLedger.harness' );
+	const gateSet = requireAbiRecord( ledger.composedGateSet, 'PhysicsComposedCostGateSet', 'physicsCostLedger.composedGateSet' );
+	const table = requireAbiRecord( ledger.opportunityTable, 'PhysicsCostOpportunityTable', 'physicsCostLedger.opportunityTable' );
+	const trace = requireAbiRecord( ledger.composedTrace, 'PhysicsComposedCostTrace', 'physicsCostLedger.composedTrace' );
+	const catchUp = requireAbiRecord( ledger.worstPermittedCatchUpCost, 'PhysicsWorstPermittedCatchUpCost', 'physicsCostLedger.worstPermittedCatchUpCost' );
+	assert.equal( harness.harnessDigest, sha256CanonicalExcluding( harness, [ 'harnessDigest' ] ), 'physics cost harness digest mismatch' );
+	assert.deepEqual( [ ...harness.workload.presentationTargetsAndViews ].sort(), [ ...ledger.presentationTargetsAndViews ].sort(), 'physics cost harness target/view closure mismatch' );
+	assert.deepEqual( harness.workload.qualityStateAndEpoch, { qualityStateId: ledger.qualityState, qualityEpoch: ledger.qualityEpoch }, 'physics cost harness quality identity mismatch' );
+	assert.equal( gateSet.harnessId, harness.harnessId, 'composed gate set uses another harness' );
+	assert.deepEqual( gateSet.qualityStateAndEpoch, harness.workload.qualityStateAndEpoch, 'composed gate set uses another quality identity' );
+	assert.equal( table.harnessId, harness.harnessId, 'opportunity table uses another harness' );
+	assert.equal( canonicalIntervalIdentity( table.measurementInterval ), canonicalIntervalIdentity( ledger.measurementInterval ), 'opportunity table uses another measurement interval' );
+	assert.equal( table.tableDigest, sha256CanonicalExcluding( table, [ 'tableDigest' ] ), 'opportunity table digest mismatch' );
+	assert.deepEqual( [ trace.harnessId, trace.gateSetId, trace.opportunityTableId, trace.cadenceTraceTotalsId ], [ harness.harnessId, gateSet.gateSetId, table.opportunityTableId, ledger.cadenceTraceTotals.traceTotalsId ], 'composed trace identity closure mismatch' );
+	assert.equal( trace.status, 'measured-valid', 'composed trace is not measured-valid' );
+	assert.ok( Object.values( trace.gateResults ).every( ( result ) => result === 'pass' ), 'composed trace contains a failed or insufficient gate' );
+	assert.ok( quantityValue( trace.cpuCriticalPathDistribution.p95, 'composed CPU p95' ) <= quantityValue( gateSet.cpuCriticalPathP95, 'CPU critical-path gate' ), 'composed CPU critical path exceeds its frozen gate' );
+	if ( ! isTypedAbsence( gateSet.gpuCriticalPathP95 ) ) {
+
+		assert.ok( ! isTypedAbsence( trace.gpuCriticalPathDistribution ), 'GPU gate has no composed GPU evidence' );
+		assert.ok( quantityValue( trace.gpuCriticalPathDistribution.p95, 'composed GPU p95' ) <= quantityValue( gateSet.gpuCriticalPathP95, 'GPU critical-path gate' ), 'composed GPU critical path exceeds its frozen gate' );
+
+	}
+	const totals = ledger.cadenceTraceTotals;
+	const exactRowCount = quantityValue( table.exactRowCount, 'opportunity table exactRowCount' );
+	assert.ok( Number.isSafeInteger( exactRowCount ) && exactRowCount > 0, 'opportunity table exactRowCount must be a positive integer' );
+	let runs;
+	if ( table.storage === 'inline' ) {
+
+		assert.ok( Array.isArray( table.inlineRows ) && isTypedAbsence( table.resource ), 'inline opportunity table arm mismatch' );
+		assert.equal( table.inlineRows.length, exactRowCount, 'inline opportunity row count mismatch' );
+		runs = table.inlineRows.map( ( row, index ) => {
+
+			requireAbiRecord( row, 'PhysicsCostOpportunityRow', `physicsCostLedger.opportunityTable.inlineRows[${ index }]` );
+			assert.equal( row.rowDigest, sha256CanonicalExcluding( row, [ 'rowDigest' ] ), `opportunity row ${ index } digest mismatch` );
+			return { count: 1, pattern: row };
+
+		} );
+
+	} else {
+
+		assert.equal( table.storage, 'immutable-resource', 'unknown opportunity table storage arm' );
+		assert.ok( isTypedAbsence( table.inlineRows ) && ! isTypedAbsence( table.resource ), 'immutable opportunity table arm mismatch' );
+		const payload = costOpportunityTableResourceFixtures.get( table.resource.contentDigest );
+		assert.ok( payload, 'opportunity table resource is opaque or unavailable' );
+		assert.equal( table.resource.contentDigest, sha256Canonical( payload ), 'opportunity table resource content digest mismatch' );
+		assert.equal( payload.layout, table.resource.canonicalByteLayout, 'opportunity table byte layout mismatch' );
+		assert.equal( payload.rowCount, exactRowCount, 'opportunity resource row count mismatch' );
+		assert.equal( quantityValue( table.resource.rowCount, 'opportunity resource declared rowCount' ), exactRowCount, 'opportunity resource declared row count mismatch' );
+		assert.equal( table.resource.orderedRowDigestRoot, sha256Canonical( payload.runs ), 'opportunity row digest root mismatch' );
+		runs = payload.runs;
+
+	}
+	assert.equal( runs.reduce( ( sum, run ) => sum + run.count, 0 ), exactRowCount, 'opportunity run lengths do not equal exactRowCount' );
+	const numeric = ( value, label ) => isPlainObject( value ) && Object.hasOwn( value, 'value' ) ? quantityValue( value, label ) : value;
+	const summedMap = ( field ) => {
+
+		const sums = {};
+		for ( const run of runs ) for ( const [ key, value ] of Object.entries( run.pattern[ field ] ?? {} ) ) sums[ key ] = ( sums[ key ] ?? 0 ) + run.count * numeric( value, `${ field}.${ key}` );
+		return sums;
+
+	};
+	const assertCountMapClosure = ( field, expected ) => {
+
+		const sums = summedMap( field );
+		assert.deepEqual( Object.keys( sums ).sort(), Object.keys( expected ).sort(), `opportunity ${ field} key closure mismatch` );
+		for ( const [ key, value ] of Object.entries( expected ) ) {
+
+			const expectedValue = quantityValue( value, `cadenceTraceTotals.${ field}.${ key}` );
+			assert.ok( Math.abs( sums[ key ] - expectedValue ) <= Math.max( 1e-9, Math.abs( expectedValue ) * 1e-12 ), `opportunity ${ field}.${ key} total mismatch` );
+
+		}
+
+	};
+	for ( const field of [ 'stageExecutionCounts', 'nativeSubcycleCounts', 'couplingIterationCounts', 'interactionApplicationCounts', 'presentedFrameCounts', 'workOccurrenceCounts' ] ) assertCountMapClosure( field, totals[ field ] );
+	const trafficOccurrenceSums = {};
+	const trafficByteSums = {};
+	for ( const run of runs ) for ( const [ trafficId, record ] of Object.entries( run.pattern.trafficOccurrenceAndLogicalByteTotals ?? {} ) ) {
+
+		trafficOccurrenceSums[ trafficId ] = ( trafficOccurrenceSums[ trafficId ] ?? 0 ) + run.count * numeric( record.occurrenceCount, `${ trafficId }.occurrenceCount` );
+		trafficByteSums[ trafficId ] = ( trafficByteSums[ trafficId ] ?? 0 ) + run.count * numeric( record.logicalByteTotal, `${ trafficId }.logicalByteTotal` );
+
+	}
+	assert.deepEqual( Object.keys( trafficOccurrenceSums ).sort(), Object.keys( totals.trafficOccurrenceAndLogicalByteTotals ).sort(), 'opportunity traffic key closure mismatch' );
+	for ( const [ trafficId, record ] of Object.entries( totals.trafficOccurrenceAndLogicalByteTotals ) ) {
+
+		const expectedOccurrences = quantityValue( record.occurrenceCount, `${ trafficId }.traceOccurrenceCount` );
+		const expectedBytes = quantityValue( record.logicalByteTotal, `${ trafficId }.traceLogicalBytes` );
+		assert.ok( Math.abs( trafficOccurrenceSums[ trafficId ] - expectedOccurrences ) <= Math.max( 1e-9, Math.abs( expectedOccurrences ) * 1e-12 ), `opportunity traffic occurrence mismatch for ${ trafficId }` );
+		assert.ok( Math.abs( trafficByteSums[ trafficId ] - expectedBytes ) <= Math.max( 1e-9, Math.abs( expectedBytes ) * 1e-12 ), `opportunity traffic byte mismatch for ${ trafficId }` );
+
+	}
+	assert.equal( summedMap( 'coordinationAdvanceCount' ).coordinationAdvanceCount ?? runs.reduce( ( sum, run ) => sum + run.count * numeric( run.pattern.coordinationAdvanceCount, 'coordinationAdvanceCount' ), 0 ), quantityValue( totals.coordinationAdvanceCount, 'trace coordinationAdvanceCount' ), 'opportunity coordination advance total mismatch' );
+	const policy = graph.catchUpPolicy;
+	const policyIdentity = catchUp.catchUpPolicyIdentity;
+	assert.deepEqual( [ policyIdentity.graphId, policyIdentity.graphRevision, policyIdentity.debtClockId, policyIdentity.debtDisposition ], [ graph.graphId, graph.executionLedger.graphRevision, policy.debtClockId, policy.debtDisposition ], 'catch-up cost policy identity mismatch' );
+	assert.equal( policyIdentity.policyDigest, sha256Canonical( policy ), 'catch-up cost policy digest mismatch' );
+	assert.deepEqual( policyIdentity.maximumDebt, policy.maximumDebt, 'catch-up cost maximum debt mismatch' );
+	assert.deepEqual( policyIdentity.maximumCoordinationAdvancesPerPresentationOpportunity, policy.maximumCoordinationAdvancesPerPresentationOpportunity, 'catch-up cost maximum advances mismatch' );
+	assert.deepEqual( policyIdentity.maximumNativeExecutionsPerOpportunity, policy.maximumNativeExecutionsPerOpportunity, 'catch-up cost maximum native executions mismatch' );
+	assert.deepEqual( [ catchUp.harnessId, catchUp.gateSetId ], [ harness.harnessId, gateSet.gateSetId ], 'catch-up cost harness/gate identity mismatch' );
+	const requiredObjectives = [ 'cpu-critical-path', 'gpu-critical-path', 'external-tail', 'presented-interval', 'hot-traffic', 'peak-live-bytes', 'migration-overlap-bytes', 'numerical-error', 'visual-error' ];
+	assert.deepEqual( [ ...catchUp.admissibleScheduleModel.objectiveDimensions ].sort(), [ ...requiredObjectives ].sort(), 'catch-up schedule model objective closure mismatch' );
+	assert.deepEqual( [ ...catchUp.frontierCoverage.coveredObjectiveDimensions ].sort(), [ ...requiredObjectives ].sort(), 'catch-up frontier misses an objective dimension' );
+	assert.deepEqual( catchUp.frontierCoverage.uncoveredObjectiveDimensions, [], 'catch-up frontier reports uncovered objectives' );
+	assert.ok( catchUp.frontierWitnesses.length > 0, 'catch-up frontier has no executable witness' );
+	const witnessedObjectives = new Set();
+	let maximumWitnessAdvanceCount = 0;
+	for ( const [ index, witness ] of catchUp.frontierWitnesses.entries() ) {
+
+		requireAbiRecord( witness, 'PhysicsCatchUpCostWitness', `catchUp.frontierWitnesses[${ index }]` );
+		assert.equal( witness.witnessDigest, sha256CanonicalExcluding( witness, [ 'witnessDigest' ] ), `catch-up witness ${ witness.witnessId } digest mismatch` );
+		const row = requireAbiRecord( witness.opportunityRow, 'PhysicsCostOpportunityRow', `catchUp.frontierWitnesses[${ index }].opportunityRow` );
+		assert.equal( row.rowDigest, sha256CanonicalExcluding( row, [ 'rowDigest' ] ), `catch-up witness ${ witness.witnessId } row digest mismatch` );
+		assert.deepEqual( Object.keys( row.stageExecutionCounts ).sort(), graph.stages.map( ( stage ) => stage.stageId ).sort(), `catch-up witness ${ witness.witnessId } stage closure mismatch` );
+		maximumWitnessAdvanceCount = Math.max( maximumWitnessAdvanceCount, row.coordinationAdvanceIds.length );
+		assert.ok( row.coordinationAdvanceIds.length <= quantityValue( policy.maximumCoordinationAdvancesPerPresentationOpportunity, 'maximum catch-up advances' ), `catch-up witness ${ witness.witnessId } exceeds maximum advances` );
+		const nativeExecutionCount = Object.values( row.stageExecutionCounts ).reduce( ( sum, count ) => sum + quantityValue( count, 'catch-up witness stage count' ), 0 );
+		assert.ok( nativeExecutionCount <= quantityValue( policy.maximumNativeExecutionsPerOpportunity, 'maximum native executions' ), `catch-up witness ${ witness.witnessId } exceeds maximum native executions` );
+		for ( const objective of witness.maximizedObjectiveDimensions ) witnessedObjectives.add( objective );
+
+	}
+	const exactTraceAdvances = quantityValue( totals.coordinationAdvanceCount, 'exact trace coordination advances' );
+	const nativeExecutionsPerAdvance = Object.values( totals.stageExecutionCounts ).reduce( ( sum, count ) => sum + quantityValue( count, 'trace stage execution count' ), 0 ) / exactTraceAdvances;
+	const maximumFeasibleWholeAdvances = Math.min( quantityValue( policy.maximumCoordinationAdvancesPerPresentationOpportunity, 'maximum catch-up advances' ), Math.floor( quantityValue( policy.maximumNativeExecutionsPerOpportunity, 'maximum native executions' ) / nativeExecutionsPerAdvance ) );
+	assert.equal( maximumWitnessAdvanceCount, maximumFeasibleWholeAdvances, 'catch-up frontier never executes the maximum feasible whole-advance schedule under both policy caps' );
+	assert.deepEqual( [ ...witnessedObjectives ].sort(), [ ...requiredObjectives ].sort(), 'catch-up witness set does not cover every objective' );
+	assert.ok( Object.values( catchUp.gateResults ).every( ( result ) => result === 'pass' ) && catchUp.requiredDisposition === 'admit', 'catch-up frontier does not pass its gate set' );
+	const qualityRefs = ledger.qualityCostEvidence;
+	assert.deepEqual( qualityRefs.map( ( ref ) => ref.qualityStateAndEpoch.qualityStateId ).sort(), Object.keys( route.physicsQualityStates ).sort(), 'quality cost evidence state closure mismatch' );
+	for ( const [ index, ref ] of qualityRefs.entries() ) {
+
+		requireAbiRecord( ref, 'PhysicsQualityCostEvidenceRef', `physicsCostLedger.qualityCostEvidence[${ index }]` );
+		const state = route.physicsQualityStates[ ref.qualityStateAndEpoch.qualityStateId ];
+		assert.equal( ref.qualityStateAndEpoch.qualityEpoch, state.qualityEpoch, `quality cost evidence ${ state.qualityStateId } epoch mismatch` );
+		assert.equal( ref.status, 'accepted', `quality cost evidence ${ state.qualityStateId } is not accepted` );
+		if ( state.qualityStateId === ledger.qualityState ) assert.deepEqual( [ ref.harnessId, ref.gateSetId, ref.steadyCostLedgerId, ref.composedTraceId, ref.worstPermittedCatchUpCostId ], [ harness.harnessId, gateSet.gateSetId, ledger.ledgerId, trace.composedTraceId, catchUp.catchUpCostId ], 'active quality cost evidence does not close to active records' );
+
+	}
+	assert.deepEqual( ledger.qualityMigrationCostEvidence.map( ( evidenceRecord ) => evidenceRecord.transitionId ).sort(), route.physicsQualityTransitions.map( ( transition ) => transition.transitionId ).sort(), 'quality migration cost evidence transition closure mismatch' );
+	const evidenceById = new Map();
+	for ( const [ index, evidenceRecord ] of ledger.qualityMigrationCostEvidence.entries() ) {
+
+		requireAbiRecord( evidenceRecord, 'PhysicsQualityMigrationCostEvidence', `physicsCostLedger.qualityMigrationCostEvidence[${ index }]` );
+		assert.ok( ! evidenceById.has( evidenceRecord.migrationCostEvidenceId ), `duplicate migration cost evidence ${ evidenceRecord.migrationCostEvidenceId}` );
+		evidenceById.set( evidenceRecord.migrationCostEvidenceId, evidenceRecord );
+		const transition = route.physicsQualityTransitions.find( ( candidate ) => candidate.transitionId === evidenceRecord.transitionId );
+		const sourceCostRef = qualityRefs.find( ( ref ) => ref.qualityStateAndEpoch.qualityStateId === transition.fromState );
+		const destinationCostRef = qualityRefs.find( ( ref ) => ref.qualityStateAndEpoch.qualityStateId === transition.toState );
+		assert.ok( sourceCostRef.outgoingMigrationCostEvidenceIds.includes( evidenceRecord.migrationCostEvidenceId ), `source quality cost evidence omits outgoing migration ${ evidenceRecord.migrationCostEvidenceId}` );
+		assert.ok( destinationCostRef.incomingMigrationCostEvidenceIds.includes( evidenceRecord.migrationCostEvidenceId ), `destination quality cost evidence omits incoming migration ${ evidenceRecord.migrationCostEvidenceId}` );
+		assert.deepEqual( evidenceRecord.sourceAndDestinationQualityEpochs, { source: transition.fromQualityEpoch, destination: transition.toQualityEpoch }, `migration cost evidence ${ evidenceRecord.transitionId } quality epoch mismatch` );
+		assert.deepEqual( evidenceRecord.requestAndAllocationAdmissionIds, { requestAdmissionId: transition.requestAdmission.admissionId, allocationAdmissionId: transition.prepare.allocationAdmission.allocationAdmissionId }, `migration cost evidence ${ evidenceRecord.transitionId } admission mismatch` );
+		assert.equal( evidenceRecord.overlapMemoryLedgerId, ledger.migrationOverlap.memoryLedgerId, `migration cost evidence ${ evidenceRecord.transitionId } overlap ledger mismatch` );
+		assert.deepEqual( Object.keys( evidenceRecord.phaseOpportunityRows ).sort(), [ 'commit', 'populate', 'prepare', 'retire' ], `migration cost evidence ${ evidenceRecord.transitionId } phase closure mismatch` );
+		for ( const [ phase, rows ] of Object.entries( evidenceRecord.phaseOpportunityRows ) ) for ( const [ rowIndex, row ] of rows.entries() ) {
+
+			requireAbiRecord( row, 'PhysicsCostOpportunityRow', `migration ${ evidenceRecord.transitionId }.${ phase }[${ rowIndex }]` );
+			assert.equal( row.rowDigest, sha256CanonicalExcluding( row, [ 'rowDigest' ] ), `migration ${ evidenceRecord.transitionId }.${ phase } row digest mismatch` );
+
+		}
+		assert.ok( evidenceRecord.migrationTrafficRecordIds.every( ( id ) => ledger.uploadsCopiesMaps.some( ( record ) => record.trafficRecordId === id ) ), `migration cost evidence ${ evidenceRecord.transitionId } references unknown traffic` );
+		assert.equal( evidenceRecord.status, 'accepted', `migration cost evidence ${ evidenceRecord.transitionId } is not accepted` );
+		assert.ok( Object.values( evidenceRecord.composedGateResultsDuringTransition ).every( ( result ) => result === 'pass' ), `migration cost evidence ${ evidenceRecord.transitionId } contains failed gates` );
+
+	}
+	for ( const ref of qualityRefs ) for ( const id of [ ...ref.incomingMigrationCostEvidenceIds, ...ref.outgoingMigrationCostEvidenceIds ] ) assert.ok( evidenceById.has( id ), `quality cost evidence references missing migration ${ id}` );
+	const allReferencedMigrationIds = new Set( qualityRefs.flatMap( ( ref ) => [ ...ref.incomingMigrationCostEvidenceIds, ...ref.outgoingMigrationCostEvidenceIds ] ) );
+	assert.deepEqual( [ ...allReferencedMigrationIds ].sort(), [ ...evidenceById.keys() ].sort(), 'quality cost evidence omits or invents migration references' );
+	return true;
 
 }
 
@@ -4675,7 +4851,7 @@ function assertCanonicalCoupledFixtureCoverage( route ) {
 	assert.ok( route.physicsInteractions.some( ( exchange ) => exchange.mode !== 'one-way' && exchange.reactionGroups.some( ( group ) => group.sourceInteractionIds.length > 1 && group.reactionInteractionIds.length > 1 ) ), 'canonical coupled fixture does not exercise many-to-many source/reaction coverage' );
 	assert.ok( route.physicsCostLedger.presentationTargetsAndViews.length >= 2, 'canonical coupled fixture does not cover multiple presentation views' );
 	assert.ok( route.physicsCostLedger.measurementProtocolRefs.length >= 2, 'canonical coupled fixture does not cover protocol plus sustained trace identity' );
-	assert.match( route.physicsCostLedger.targetAndHarness, /mobile|low-end|tile/i, 'canonical coupled fixture does not cover the mobile/low-end harness' );
+	assert.match( JSON.stringify( route.physicsCostLedger.harness.target ), /mobile|low-end|tile/i, 'canonical coupled fixture does not cover the mobile/low-end harness' );
 	assert.ok( route.physicsCostLedger.graphStageCosts.every( ( cost ) => quantityValue( cost.sampleCount, `canonicalCoverage.${ cost.stageId}.sampleCount` ) >= 120 ), 'canonical coupled fixture does not cover sustained stage samples' );
 	assert.ok( Object.hasOwn( route.physicsCostLedger.cadenceTraceTotals.nativeSubcycleCounts, '$threejs-water-optics' ), 'canonical coupled fixture does not cover water native-subcycle totals' );
 	assert.ok( Object.keys( route.physicsExternalSolverAdaptersById ).length > 0, 'canonical coupled fixture does not cover an external solver adapter' );
@@ -4855,6 +5031,13 @@ function validateAlignedCostTraceAndNoCriticalReadback( fixture ) {
 
 	validateCanonicalCostLedger( fixture.route.physicsCostLedger, fixture.route.physicsGraph, fixture.route.physicsContext, fixture.route );
 	return true;
+
+}
+
+function validateComposedCostEnvelope( fixture ) {
+
+	validateCanonicalCostLedger( fixture.route.physicsCostLedger, fixture.route.physicsGraph, fixture.route.physicsContext, fixture.route );
+	return validateCanonicalComposedCostEvidence( fixture.route.physicsCostLedger, fixture.route.physicsGraph, fixture.route.physicsContext, fixture.route );
 
 }
 
@@ -5692,10 +5875,120 @@ function attachCanonicalCostLedger( route ) {
 	const cadenceDigestPayload = clone( cadenceTraceTotals );
 	delete cadenceDigestPayload.exactTotalsDigest;
 	cadenceTraceTotals.exactTotalsDigest = sha256Canonical( cadenceDigestPayload );
+	const qualityStateAndEpoch = { qualityStateId: 'mobile-quality-v3', qualityEpoch: 'quality-epoch-3' };
+	const graphAndResourceRevisionDigest = sha256Canonical( {
+		graphId: route.physicsGraph.graphId,
+		graphRevision: route.physicsGraph.executionLedger.graphRevision,
+		trafficRecordIds: trafficRecords.map( ( record ) => record.trafficRecordId ),
+		memoryLedgerIds: [ hotState.memoryLedgerId, peakTransient.memoryLedgerId, migrationOverlap.memoryLedgerId ]
+	} );
+	const harness = {
+		harnessId: 'mobile-cost-harness-42',
+		target: {
+			deviceId: 'fixture-low-end-mobile-tile-gpu', osAndBrowserBuild: 'fixture-mobile-os/chromium-webgpu-build-42', gpuAdapterAndDriver: 'fixture-integrated-tile-adapter-driver-42',
+			backendAndDeviceGeneration: { backend: 'WebGPU', backendGeneration: 'backend-generation-1', deviceLossGeneration: 'device-generation-1' },
+			displayModeAndMeasuredRefresh: { mode: 'foreground-vsync', refresh: evidence( 60, 'hertz', 'Measured', 'fixture-display-probe' ) },
+			powerSourceAndGovernor: { source: 'battery', governor: 'balanced-thermal-policy' }, thermalStartAndStabilizationPolicy: { start: 'conditioned-nominal', sustainedDuration: evidence( exactDurationSeconds, 'second', 'Authored', 'fixture-sustained-protocol' ) }
+		},
+		viewport: { cssExtent: evidence( [ 720, 1280 ], 'css-pixel-extent', 'Measured', 'fixture-canvas' ), dpr: evidence( 1.5, 'ratio', 'Measured', 'fixture-canvas' ), physicalExtent: evidence( [ 1080, 1920 ], 'physical-pixel-extent', 'Derived', 'css-extent-times-dpr' ) },
+		workload: {
+			routeAndSceneRevision: 'sha256:fixture-coupled-water-body-scene-42', contextGraphAndRegistryRevisions: { contextVersion: route.physicsContext.contextVersion, graphRevision: route.physicsGraph.executionLedger.graphRevision, frameRegistryRevision: route.physicsContext.physicsFrameRegistry.registryRevision },
+			resourceAndPipelineGraphDigest: graphAndResourceRevisionDigest, presentationTargetsAndViews: targetViewKeys, seedCameraInputAndEventTrace: 'sha256:fixture-seed-camera-input-event-trace-42', qualityStateAndEpoch
+		},
+		protocol: {
+			warmupAndCompilationState: { shaderPipelinesWarm: true, allocationPlateauReached: true }, coldTransitionAndSustainedSegments: { cold: 'excluded-and-recorded', sustained: evidence( exactDurationSeconds, 'second', 'Measured', 'mobile-sustained-trace' ) },
+			sampleAndQuantilePolicy: { estimator: 'nearest-rank', samples: evidence( exactFrames, 'opportunity', 'Measured', 'mobile-sustained-trace' ) }, cpuClockAndGpuQueryCoverage: { cpuClock: 'monotonic-performance-clock', gpuTimestamps: 'all-solver-and-render-critical-path-nodes' },
+			counterAvailabilityAndUncertainty: { tileTraffic: 'available', physicalAllocation: 'available', powerCounters: 'unavailable' }, visibilityPowerAndAutomationControls: { foreground: true, visible: true, automationThrottling: false }
+		},
+		harnessDigest: 'pending'
+	};
+	harness.harnessDigest = sha256CanonicalExcluding( harness, [ 'harnessDigest' ] );
+	const totalTraceLogicalBytes = Object.values( cadenceTraceTotals.trafficOccurrenceAndLogicalByteTotals ).reduce( ( total, record ) => total + quantityValue( record.logicalByteTotal, 'trace logical byte total' ), 0 );
+	const composedGateSet = {
+		gateSetId: 'mobile-composed-cost-gates-42', harnessId: harness.harnessId, qualityStateAndEpoch: clone( qualityStateAndEpoch ), frozenBeforeTraceDigest: 'sha256:fixture-mobile-gates-frozen-before-trace-42',
+		cpuCriticalPathP95: evidence( 0.004, 'second', 'Gated', 'derived-mobile-cpu-envelope' ), gpuCriticalPathP95: evidence( 0.006, 'second', 'Gated', 'derived-mobile-gpu-envelope' ), externalTailP95: typedAbsence( 'not-applicable', 'route-physics-coordinator' ),
+		presentedIntervalP95: evidence( 1 / 60, 'second', 'Gated', 'target-presentation-envelope' ), deadlineMissRatio: evidence( 0.01, 'ratio', 'Gated', 'product-deadline-contract' ),
+		updateLatencyByStateEquation: { 'water-state': evidence( 0.012, 'second', 'Gated', 'water-control-latency-contract' ), 'body-state': evidence( 0.012, 'second', 'Gated', 'body-control-latency-contract' ) },
+		hotStateBytes: evidence( 50331648, 'byte', 'Gated', 'named-target-memory-contract' ), peakTransientBytes: evidence( 83886080, 'byte', 'Gated', 'named-target-memory-contract' ), migrationOverlapBytes: evidence( 100663296, 'byte', 'Gated', 'named-target-memory-contract' ),
+		logicalTrafficPerOpportunity: evidence( totalTraceLogicalBytes / exactFrames, 'byte-per-opportunity', 'Gated', 'named-target-traffic-contract' ), uploadCopyMapBytesPerOpportunity: evidence( totalTraceLogicalBytes / exactFrames, 'byte-per-opportunity', 'Gated', 'named-target-transfer-contract' ),
+		allocationAndCompilationChurn: { steadyAllocationsPerOpportunity: evidence( 0, 'allocation-per-opportunity', 'Gated', 'steady-runtime-contract' ) }, sustainedDriftAndQualityResidence: { maximumP95Drift: evidence( 0.1, 'ratio', 'Gated', 'sustained-target-contract' ) },
+		numericalAndVisualErrorGateRefs: [ 'body-water-momentum-residual-gate', 'water-surface-error-gate', 'quality-visual-error-gate' ]
+	};
+	const opportunityPattern = {
+		coordinationAdvanceCount: exactIntervals / exactFrames,
+		stageExecutionCounts: Object.fromEntries( stages.map( ( stage ) => [ stage.stageId, executionCountPerInterval[ stage.stageId ] * exactIntervals / exactFrames ] ) ),
+		nativeSubcycleCounts: { '$threejs-water-optics': executionCountPerInterval[ 'solve-water' ] * exactIntervals / exactFrames },
+		couplingIterationCounts: { 'body-water-loop': 3 * exactIntervals / exactFrames },
+		interactionApplicationCounts: Object.fromEntries( Object.entries( cadenceTraceTotals.interactionApplicationCounts ).map( ( [ tag, count ] ) => [ tag, quantityValue( count, `cadenceTraceTotals.interactionApplicationCounts.${ tag }` ) / exactFrames ] ) ),
+		presentedFrameCounts: Object.fromEntries( targetViewKeys.map( ( key ) => [ key, 1 ] ) ),
+		workOccurrenceCounts: { [ sharedWorkKey ]: totalStageExecutions / exactFrames, 'render-main-work': 1, 'render-minimap-work': 1 },
+		trafficOccurrenceAndLogicalByteTotals: Object.fromEntries( trafficRecords.map( ( record ) => {
+			const occurrences = quantityValue( record.occurrenceCount, `${ record.trafficRecordId }.occurrences` ) / exactFrames;
+			return [ record.trafficRecordId, { occurrenceCount: occurrences, logicalByteTotal: occurrences * quantityValue( record.logicalBytesPerOccurrence, `${ record.trafficRecordId }.logicalBytes` ) } ];
+		} ) ),
+		queueDispatchPassAndBarrierCounts: { dispatches: Object.values( stageExecutionCounts ).reduce( ( total, count ) => total + quantityValue( count, 'dispatch count' ), 0 ) / exactFrames, submissions: 1, passBreaks: 2, barriers: route.physicsGraph.dependencies.length },
+		qualityStateAndEpoch: clone( qualityStateAndEpoch )
+	};
+	const opportunityResourcePayload = {
+		layout: 'physics-cost-opportunity-columnar-rle-v1', rowCount: exactFrames, presentationClockId: 'physics-fixed', firstOpportunitySequence: 0, ticksPerOpportunity: exactIntervals / exactFrames,
+		runs: [ { count: exactFrames, pattern: opportunityPattern, measuredColumns: { cpuCriticalPathSeconds: 0.0024, gpuCriticalPathSeconds: 0.0048, presentedIntervalSeconds: 1 / 60, deadlineMiss: false, hotStateBytes: 50331648, peakTransientBytes: 83886080, migrationOverlapBytes: 0 } } ]
+	};
+	const opportunityResourceDigest = sha256Canonical( opportunityResourcePayload );
+	costOpportunityTableResourceFixtures.set( opportunityResourceDigest, opportunityResourcePayload );
+	const opportunityTable = {
+		opportunityTableId: 'mobile-opportunity-table-42', harnessId: harness.harnessId, measurementInterval: clone( measurementInterval ), storage: 'immutable-resource', inlineRows: typedAbsence( 'not-applicable', 'route-physics-coordinator' ),
+		resource: { contentDigest: opportunityResourceDigest, canonicalByteLayout: opportunityResourcePayload.layout, rowCount: evidence( exactFrames, 'opportunity', 'Measured', 'mobile-sustained-trace' ), orderedRowDigestRoot: sha256Canonical( opportunityResourcePayload.runs ) },
+		exactRowCount: evidence( exactFrames, 'opportunity', 'Measured', 'mobile-sustained-trace' ), tableDigest: 'pending'
+	};
+	opportunityTable.tableDigest = sha256CanonicalExcluding( opportunityTable, [ 'tableDigest' ] );
+	const composedTrace = {
+		composedTraceId: 'mobile-composed-trace-42', harnessId: harness.harnessId, gateSetId: composedGateSet.gateSetId, opportunityTableId: opportunityTable.opportunityTableId, cadenceTraceTotalsId: cadenceTraceTotals.traceTotalsId,
+		cpuCriticalPathDistribution: { p50: evidence( 0.0022, 'second', 'Measured', 'mobile-sustained-opportunity-table' ), p95: evidence( 0.0024, 'second', 'Measured', 'mobile-sustained-opportunity-table' ) },
+		gpuCriticalPathDistribution: { p50: evidence( 0.0044, 'second', 'Measured', 'mobile-sustained-opportunity-table' ), p95: evidence( 0.0048, 'second', 'Measured', 'mobile-sustained-opportunity-table' ), queryCoverage: 'all dependency-path GPU nodes' }, externalTailDistribution: typedAbsence( 'not-applicable', 'route-physics-coordinator' ),
+		presentedIntervalAndDeadlineMissDistribution: { p95: evidence( 1 / 60, 'second', 'Measured', 'mobile-sustained-opportunity-table' ), missRatio: evidence( 0, 'ratio', 'Measured', 'mobile-sustained-opportunity-table' ) },
+		memoryTrafficAllocationAndThermalDistributions: { hotStatePeak: evidence( 50331648, 'byte', 'Measured', 'allocation-lifetime-sweep' ), transientPeak: evidence( 83886080, 'byte', 'Measured', 'allocation-lifetime-sweep' ), logicalTrafficPerOpportunity: evidence( totalTraceLogicalBytes / exactFrames, 'byte-per-opportunity', 'Derived', 'exact-trace-bytes-over-opportunities' ), thermalTrace: 'sha256:fixture-mobile-sustained-thermal-42' },
+		gateResults: { cpuCriticalPathP95: 'pass', gpuCriticalPathP95: 'pass', presentedIntervalP95: 'pass', deadlineMissRatio: 'pass', memory: 'pass', traffic: 'pass', numericalAndVisualError: 'pass' }, status: 'measured-valid'
+	};
+	const catchUpPolicyMaximumAdvances = quantityValue( route.physicsGraph.catchUpPolicy.maximumCoordinationAdvancesPerPresentationOpportunity, 'maximum catch-up advances' );
+	const catchUpMaximumNativeExecutions = quantityValue( route.physicsGraph.catchUpPolicy.maximumNativeExecutionsPerOpportunity, 'maximum catch-up native executions' );
+	const nativeExecutionsPerAdvance = Object.values( executionCountPerInterval ).reduce( ( total, count ) => total + count, 0 );
+	const catchUpMaxAdvances = Math.min( catchUpPolicyMaximumAdvances, Math.floor( catchUpMaximumNativeExecutions / nativeExecutionsPerAdvance ) );
+	assert.ok( catchUpMaxAdvances > 0, 'catch-up policy admits no complete coordination advance under its native-execution cap' );
+	const catchUpStageCounts = Object.fromEntries( stages.map( ( stage ) => [ stage.stageId, evidence( executionCountPerInterval[ stage.stageId ] * catchUpMaxAdvances, 'execution', 'Derived', 'graph-stage-activation-times-maximum-catch-up-advances' ) ] ) );
+	const catchUpStageTotal = Object.values( catchUpStageCounts ).reduce( ( total, count ) => total + quantityValue( count, 'catch-up stage count' ), 0 );
+	const catchUpTraffic = Object.fromEntries( trafficRecords.map( ( record ) => {
+		const occurrences = record.cadenceBasis === 'per-stage-execution' ? quantityValue( catchUpStageCounts[ record.producer ], `${ record.producer }.catchUpCount` ) : catchUpMaxAdvances;
+		return [ record.trafficRecordId, { occurrenceCount: evidence( occurrences, 'occurrence', 'Derived', 'worst-permitted-catch-up-schedule' ), logicalByteTotal: evidence( occurrences * quantityValue( record.logicalBytesPerOccurrence, `${ record.trafficRecordId }.logicalBytes` ), 'byte', 'Derived', 'worst-permitted-catch-up-schedule' ) } ];
+	} ) );
+	const catchUpOpportunityRow = {
+		opportunityKey: { presentationClockId: 'physics-fixed', presentationOpportunitySequence: 'worst-permitted-catch-up-witness-42' }, opportunityInterval: fixtureInterval( route.physicsContext.physicsClockRegistry.clocksById, 'physics-fixed', 0, catchUpMaxAdvances ), catchUpBatchId: 'synthetic-max-policy-batch-42',
+		coordinationAdvanceIds: Array.from( { length: catchUpMaxAdvances }, ( _, index ) => `synthetic-catch-up-advance-${ index }` ), stageExecutionCounts: catchUpStageCounts,
+		nativeSubcycleCounts: { '$threejs-water-optics': evidence( executionCountPerInterval[ 'solve-water' ] * catchUpMaxAdvances, 'subcycle', 'Derived', 'worst-permitted-catch-up-schedule' ) }, couplingIterationCounts: { 'body-water-loop': evidence( 3 * catchUpMaxAdvances, 'iteration', 'Derived', 'worst-permitted-catch-up-schedule' ) },
+		interactionApplicationCounts: Object.fromEntries( Object.entries( cadenceTraceTotals.interactionApplicationCounts ).map( ( [ tag, count ] ) => [ tag, evidence( quantityValue( count, `cadenceTraceTotals.interactionApplicationCounts.${ tag }` ) / exactIntervals * catchUpMaxAdvances, 'application', 'Derived', 'worst-permitted-catch-up-schedule' ) ] ) ), presentedFrameCounts: Object.fromEntries( targetViewKeys.map( ( key ) => [ key, evidence( 1, 'frame', 'Derived', 'one-catch-up-presentation-opportunity' ) ] ) ),
+		workOccurrenceCounts: { [ sharedWorkKey ]: evidence( catchUpStageTotal, 'occurrence', 'Derived', 'worst-permitted-catch-up-schedule' ), 'render-main-work': evidence( 1, 'occurrence', 'Derived', 'one-catch-up-presentation-opportunity' ), 'render-minimap-work': evidence( 1, 'occurrence', 'Derived', 'one-catch-up-presentation-opportunity' ) }, trafficOccurrenceAndLogicalByteTotals: catchUpTraffic,
+		queueDispatchPassAndBarrierCounts: { dispatches: evidence( catchUpStageTotal, 'dispatch', 'Derived', 'worst-permitted-catch-up-schedule' ), submissions: evidence( 1, 'submission', 'Measured', 'catch-up-frontier-trace' ), passBreaks: evidence( 2, 'pass-break', 'Measured', 'catch-up-frontier-trace' ), barriers: evidence( route.physicsGraph.dependencies.length * catchUpMaxAdvances, 'barrier', 'Derived', 'dependency-closure' ) },
+		cpuCriticalPath: { duration: evidence( 0.0036, 'second', 'Measured', 'catch-up-frontier-trace' ), nodePath: [ 'schedule', 'solve', 'commit' ] }, gpuCriticalPath: { duration: evidence( 0.0055, 'second', 'Measured', 'catch-up-frontier-trace' ), nodePath: [ 'solver-dispatches', 'render-critical-path' ], queryCoverage: 'complete' }, externalTail: typedAbsence( 'not-applicable', 'route-physics-coordinator' ),
+		presentedIntervalAndDeadlineMiss: { interval: evidence( 1 / 60, 'second', 'Measured', 'catch-up-frontier-trace' ), deadlineMiss: false }, hotStatePeakTransientAndMigrationBytes: { hotState: evidence( 50331648, 'byte', 'Measured', 'catch-up-frontier-trace' ), peakTransient: evidence( 83886080, 'byte', 'Measured', 'catch-up-frontier-trace' ), migrationOverlap: evidence( 100663296, 'byte', 'Measured', 'catch-up-frontier-trace' ) },
+		numericalAndVisualGateResults: [ { gateId: 'body-water-momentum-residual-gate', status: 'pass' }, { gateId: 'quality-visual-error-gate', status: 'pass' } ], qualityStateAndEpoch: clone( qualityStateAndEpoch ), rowDigest: 'pending'
+	};
+	catchUpOpportunityRow.rowDigest = sha256CanonicalExcluding( catchUpOpportunityRow, [ 'rowDigest' ] );
+	const catchUpWitness = {
+		witnessId: 'catch-up-frontier-witness-42', maximizedObjectiveDimensions: [ 'cpu-critical-path', 'gpu-critical-path', 'external-tail', 'presented-interval', 'hot-traffic', 'peak-live-bytes', 'migration-overlap-bytes', 'numerical-error', 'visual-error' ], opportunityRow: catchUpOpportunityRow,
+		repetitionAndSustainedProtocol: { repetitions: evidence( 900, 'opportunity', 'Measured', 'catch-up-frontier-trace' ), duration: evidence( 15, 'second', 'Measured', 'catch-up-frontier-trace' ) }, composedMeasuredDistributions: { cpuP95: clone( catchUpOpportunityRow.cpuCriticalPath.duration ), gpuP95: clone( catchUpOpportunityRow.gpuCriticalPath.duration ), presentedP95: clone( catchUpOpportunityRow.presentedIntervalAndDeadlineMiss.interval ), trafficBytes: evidence( Object.values( catchUpTraffic ).reduce( ( total, record ) => total + quantityValue( record.logicalByteTotal, 'catch-up traffic bytes' ), 0 ), 'byte', 'Derived', 'worst-permitted-catch-up-schedule' ) },
+		derivedUpperBoundsAndAssumptions: { scheduleModel: 'verified-integer-closure-over-graph-maxima', assumption: 'fixture stage activation is invariant over the admitted maximum debt envelope' }, witnessDigest: 'pending'
+	};
+	catchUpWitness.witnessDigest = sha256CanonicalExcluding( catchUpWitness, [ 'witnessDigest' ] );
+	const worstPermittedCatchUpCost = {
+		catchUpCostId: 'mobile-worst-permitted-catch-up-42', harnessId: harness.harnessId, gateSetId: composedGateSet.gateSetId,
+		catchUpPolicyIdentity: { graphId: route.physicsGraph.graphId, graphRevision: route.physicsGraph.executionLedger.graphRevision, policyDigest: sha256Canonical( route.physicsGraph.catchUpPolicy ), debtClockId: route.physicsGraph.catchUpPolicy.debtClockId, maximumDebt: clone( route.physicsGraph.catchUpPolicy.maximumDebt ), maximumCoordinationAdvancesPerPresentationOpportunity: clone( route.physicsGraph.catchUpPolicy.maximumCoordinationAdvancesPerPresentationOpportunity ), maximumNativeExecutionsPerOpportunity: clone( route.physicsGraph.catchUpPolicy.maximumNativeExecutionsPerOpportunity ), debtDisposition: route.physicsGraph.catchUpPolicy.debtDisposition },
+		admissibleScheduleModel: { integerVariables: [ 'coordination-advances', 'stage-executions', 'native-subcycles', 'loop-iterations', 'interaction-applications', 'work-occurrences' ], constraintsDigest: sha256Canonical( { catchUpPolicy: route.physicsGraph.catchUpPolicy, stageRules: stages.map( ( stage ) => stage.executionRule ), loopBounds: route.physicsGraph.loopMacros.map( ( loop ) => loop.iterationBound ) } ), objectiveDimensions: clone( catchUpWitness.maximizedObjectiveDimensions ) },
+		frontierWitnesses: [ catchUpWitness ], frontierCoverage: { method: 'verified-integer-optimization', proofRef: 'sha256:fixture-catch-up-frontier-proof-42', coveredObjectiveDimensions: clone( catchUpWitness.maximizedObjectiveDimensions ), uncoveredObjectiveDimensions: [], componentwiseDominationDigest: sha256Canonical( { witnessId: catchUpWitness.witnessId, dimensions: catchUpWitness.maximizedObjectiveDimensions, maximumAdvances: catchUpMaxAdvances } ) },
+		gateResults: { cpu: 'pass', gpu: 'pass', presentation: 'pass', traffic: 'pass', memory: 'pass', numericalError: 'pass', visualError: 'pass' }, requiredDisposition: 'admit'
+	};
 	route.physicsCostLedger = {
 		ledgerId: 'mobile-cost-ledger-42', contextId: route.physicsContext.contextId, graphId: route.physicsGraph.graphId, graphRevision: route.physicsGraph.executionLedger.graphRevision,
 		measurementInterval, measurementClockId: 'physics-fixed', qualityEpoch: 'quality-epoch-3', presentationTargetsAndViews: targetViewKeys, measurementProtocolRefs: [ 'sha256:fixture-mobile-sustained-protocol', 'sha256:fixture-mobile-sustained-trace' ], cadenceTraceTotals, status: 'active',
-		targetAndHarness: 'low-end mobile tile-GPU Chromium WebGPU, two views, 300 second sustained run', qualityState: 'mobile-quality-v3',
+		harness, composedGateSet, opportunityTable, composedTrace, qualityState: 'mobile-quality-v3',
 		graphStageCosts: stages.map( ( stage ) => ( { stageId: stage.stageId, cpuP95: evidence( 0.08, 'millisecond', 'Measured', 'mobile-sustained-trace' ), gpuP95: evidence( 0.12, 'millisecond', 'Measured', 'mobile-sustained-trace' ), sampleCount: evidence( quantityValue( stageExecutionCounts[ stage.stageId ], `${ stage.stageId }.exactExecutions` ), 'sample', 'Measured', 'mobile-sustained-trace' ) } ) ),
 		coordinationIntervalsPerSecond: { exactMean: evidence( 60, 'interval-per-second', 'Derived', 'exact-advance-count-over-duration' ), p50: evidence( 60, 'interval-per-second', 'Measured', 'mobile-sustained-trace' ) },
 		stageExecutionsPerCoordinationInterval: perStage( ( stageId ) => executionCountPerInterval[ stageId ], 'execution-per-interval' ),
@@ -5703,7 +5996,7 @@ function attachCanonicalCostLedger( route ) {
 		coordinationIntervalsPerPresentedFrame: { exactRatio: evidence( 2, 'interval-per-frame', 'Derived', 'exact-advance-count-over-frame-cohort-count' ), p95: evidence( 2, 'interval-per-frame', 'Measured', 'mobile-sustained-trace' ) },
 		subcyclesAndCouplingIterationsPerPresentedFrame: { water: evidence( executionCountPerInterval[ 'solve-water' ] * exactIntervals / exactFrames, 'subcycle-per-frame', 'Measured', 'mobile-sustained-trace' ), coupling: evidence( 3 * exactIntervals / exactFrames, 'iteration-per-frame', 'Measured', 'mobile-sustained-trace' ) },
 		executionsPerPresentedFrame: perStage( ( stageId ) => executionCountPerInterval[ stageId ] * exactIntervals / exactFrames, 'execution-per-frame' ),
-		worstPermittedCatchUpBurst: { triggerAndIntervalDebt: { debt: fixtureDurationSeconds( 0.05 ) }, executionsDispatchesAndTraffic: { executions: evidence( 30, 'execution', 'Derived', 'catch-up-policy' ), bytes: evidence( 8388608, 'byte', 'Derived', 'resource-ledger' ) }, latencyMemoryAndErrorGate: { latency: evidence( 12, 'millisecond', 'Gated', 'mobile-gate' ), memory: evidence( 100663296, 'byte', 'Gated', 'mobile-gate' ), error: evidence( 0.01, 'metre', 'Gated', 'mobile-gate' ) } },
+		worstPermittedCatchUpCost,
 		hotBytesReadWrittenPerExecution: Object.fromEntries( stages.map( ( stage ) => [ stage.stageId, { read: evidence( 262144, 'byte', 'Derived', 'resource-layout' ), written: evidence( 131072, 'byte', 'Derived', 'resource-layout' ) } ] ) ),
 		solverDispatches: stages.map( ( stage ) => ( { stageId: stage.stageId, owner: stage.owner, cadence: evidence( executionCountPerInterval[ stage.stageId ] * exactIntervals / exactDurationSeconds, 'dispatch-per-second', 'Measured', 'mobile-sustained-trace' ), occurrenceCount: clone( stageExecutionCounts[ stage.stageId ] ) } ) ),
 		queueSubmissionsAndPassBreaks: { submissions: evidence( 1, 'submission-per-frame', 'Measured', 'mobile-sustained-trace' ), breaks: evidence( 2, 'break-per-frame', 'Measured', 'mobile-sustained-trace' ) },
@@ -5713,9 +6006,108 @@ function attachCanonicalCostLedger( route ) {
 		cpuWork: [ { task: 'graph-schedule', p95: evidence( 0.5, 'millisecond', 'Measured', 'mobile-sustained-trace' ) } ], allocationGcAndCompilation: [ { category: 'steady-runtime', allocations: evidence( 0, 'allocation-per-frame', 'Measured', 'mobile-sustained-trace' ) } ],
 		uploadsCopiesMaps: trafficRecords,
 		hostCompletionsReadbacksPerPresentedFrame: evidence( 0, 'readback-per-frame', 'Measured', 'mobile-sustained-trace' ), synchronization: [ { kind: 'same-queue', p95: evidence( 0, 'millisecond', 'Measured', 'mobile-sustained-trace' ) } ],
-		workAttribution, sharedWorkKeys: [ sharedWorkKey ], perViewWorkKeys, hotState, peakTransient, migrationOverlap,
+		workAttribution, sharedWorkKeys: [ sharedWorkKey ], perViewWorkKeys, hotState, peakTransient, migrationOverlap, qualityCostEvidence: [], qualityMigrationCostEvidence: [],
 		multiviewAndFramesInFlightMultipliers: { viewCount: evidence( 2, 'view', 'Measured', 'fixture-route' ), framesInFlight: evidence( 2, 'frame', 'Measured', 'backend-trace' ), resourceMultiplier: evidence( 1.4, 'ratio', 'Derived', 'resource-ledger' ), workMultiplier: evidence( 1.25, 'ratio', 'Measured', 'mobile-sustained-trace' ) }, thermalPowerState: { state: 'sustained nominal', duration: evidence( 300, 'second', 'Measured', 'mobile-sustained-trace' ) }
 	};
+
+}
+
+function attachCanonicalQualityCostEvidence( route ) {
+
+	const ledger = route.physicsCostLedger;
+	const transitions = route.physicsQualityTransitions;
+	if ( transitions.length === 0 ) {
+
+		ledger.qualityCostEvidence = [];
+		ledger.qualityMigrationCostEvidence = [];
+		return;
+
+	}
+	const migrationEvidence = transitions.map( ( transition ) => {
+
+		const migrationCostEvidenceId = `cost-${ transition.transitionId }`;
+		const baseRow = ledger.worstPermittedCatchUpCost.frontierWitnesses[ 0 ].opportunityRow;
+		const phaseOpportunityRows = Object.fromEntries( [ 'prepare', 'populate', 'commit', 'retire' ].map( ( phase, index ) => {
+
+			const row = clone( baseRow );
+			row.opportunityKey = { presentationClockId: transition.commitAtStepBoundary.commitInstant.clockId, presentationOpportunitySequence: `${ transition.transitionId }-${ phase }` };
+			row.opportunityInterval = clone( transition.requestAdmission.safeCommitBoundary.kind === 'instant' ? route.physicsQualityRequests[ transition.requestId ].observedInterval : baseRow.opportunityInterval );
+			row.catchUpBatchId = typedAbsence( 'not-applicable', 'route-physics-coordinator' );
+			row.coordinationAdvanceIds = [];
+			row.cpuCriticalPath.duration = evidence( 0.0004 + index * 0.0001, 'second', 'Measured', `quality-${ phase }-cost-trace` );
+			row.gpuCriticalPath.duration = evidence( 0.0008 + index * 0.0002, 'second', 'Measured', `quality-${ phase }-cost-trace` );
+			row.presentedIntervalAndDeadlineMiss = { interval: evidence( 1 / 60, 'second', 'Measured', `quality-${ phase }-cost-trace` ), deadlineMiss: false };
+			row.qualityStateAndEpoch = { qualityStateId: phase === 'retire' ? transition.toState : transition.fromState, qualityEpoch: phase === 'retire' ? transition.toQualityEpoch : transition.fromQualityEpoch };
+			row.rowDigest = sha256CanonicalExcluding( row, [ 'rowDigest' ] );
+			return [ phase, [ row ] ];
+
+		} ) );
+		const migrationTrafficRecordIds = ledger.uploadsCopiesMaps.filter( ( record ) => /quality-migration/.test( record.trafficRecordId ) ).map( ( record ) => record.trafficRecordId );
+		assert.ok( migrationTrafficRecordIds.length > 0, `quality transition ${ transition.transitionId } has no migration traffic record` );
+		return {
+			migrationCostEvidenceId, transitionId: transition.transitionId, sourceAndDestinationQualityEpochs: { source: transition.fromQualityEpoch, destination: transition.toQualityEpoch }, requestAndAllocationAdmissionIds: { requestAdmissionId: transition.requestAdmission.admissionId, allocationAdmissionId: transition.prepare.allocationAdmission.allocationAdmissionId },
+			harnessId: ledger.harness.harnessId, gateSetId: ledger.composedGateSet.gateSetId, phaseOpportunityRows, overlapMemoryLedgerId: ledger.migrationOverlap.memoryLedgerId, migrationTrafficRecordIds,
+			allocationCompilationAndPipelineCreation: { allocationsAdmittedBeforePopulation: true, compileCost: evidence( 0.0012, 'second', 'Measured', 'quality-migration-cost-trace' ), allocationChurn: evidence( transition.prepare.predictedPeakResources.allocations.length, 'allocation', 'Measured', 'quality-migration-cost-trace' ) },
+			sourceRetirementTail: { duration: evidence( 2 / 60, 'second', 'Measured', 'quality-retirement-completion-trace' ), completionJoinId: transition.retireAfterCompletion.completionJoin.joinId, completionJoinDigest: transition.retireAfterCompletion.completionJoin.joinDigest },
+			conservationConstraintAndVisualErrorResults: [ { gateId: 'quality-conservation-residual', status: 'pass' }, { gateId: 'quality-visual-error-gate', status: 'pass' } ], composedGateResultsDuringTransition: { cpu: 'pass', gpu: 'pass', presentation: 'pass', memory: 'pass', traffic: 'pass', error: 'pass' }, status: 'accepted'
+		};
+
+	} );
+	const migrationByTransition = new Map( migrationEvidence.map( ( evidenceRecord ) => [ evidenceRecord.transitionId, evidenceRecord ] ) );
+	ledger.qualityMigrationCostEvidence = migrationEvidence;
+	ledger.qualityCostEvidence = Object.values( route.physicsQualityStates ).map( ( state ) => {
+
+		const incoming = transitions.filter( ( transition ) => transition.toState === state.qualityStateId ).map( ( transition ) => migrationByTransition.get( transition.transitionId ).migrationCostEvidenceId );
+		const outgoing = transitions.filter( ( transition ) => transition.fromState === state.qualityStateId ).map( ( transition ) => migrationByTransition.get( transition.transitionId ).migrationCostEvidenceId );
+		const isActiveLedgerState = state.qualityStateId === ledger.qualityState && state.qualityEpoch === ledger.qualityEpoch;
+		return {
+			qualityStateAndEpoch: { qualityStateId: state.qualityStateId, qualityEpoch: state.qualityEpoch }, graphAndResourceRevisionDigest: sha256Canonical( { graphRevision: ledger.graphRevision, stateResourceCosts: state.hotTransientTrafficAndSynchronizationCosts, qualityEpoch: state.qualityEpoch } ),
+			harnessId: isActiveLedgerState ? ledger.harness.harnessId : `harness-${ state.qualityStateId }`, gateSetId: isActiveLedgerState ? ledger.composedGateSet.gateSetId : `gate-set-${ state.qualityStateId }`, steadyCostLedgerId: isActiveLedgerState ? ledger.ledgerId : `steady-ledger-${ state.qualityStateId }`,
+			composedTraceId: isActiveLedgerState ? ledger.composedTrace.composedTraceId : `composed-trace-${ state.qualityStateId }`, worstPermittedCatchUpCostId: isActiveLedgerState ? ledger.worstPermittedCatchUpCost.catchUpCostId : `catch-up-cost-${ state.qualityStateId }`, incomingMigrationCostEvidenceIds: incoming, outgoingMigrationCostEvidenceIds: outgoing, status: 'accepted'
+		};
+
+	} );
+
+}
+
+function refreshCanonicalComposedCostEvidence( route ) {
+
+	const ledger = route.physicsCostLedger;
+	const table = ledger.opportunityTable;
+	assert.equal( table.storage, 'immutable-resource', 'canonical composed-cost refresh expects an immutable opportunity table' );
+	const rowCount = quantityValue( table.exactRowCount, 'canonical opportunity row count' );
+	const totals = ledger.cadenceTraceTotals;
+	const priorPayload = costOpportunityTableResourceFixtures.get( table.resource.contentDigest );
+	assert.ok( priorPayload, 'canonical opportunity resource is unavailable before refresh' );
+	const payload = clone( priorPayload );
+	const pattern = payload.runs[ 0 ].pattern;
+	const dividedCounts = ( records, label ) => Object.fromEntries( Object.entries( records ).map( ( [ key, value ] ) => [ key, quantityValue( value, `${ label }.${ key}` ) / rowCount ] ) );
+	pattern.coordinationAdvanceCount = quantityValue( totals.coordinationAdvanceCount, 'cadence coordination advances' ) / rowCount;
+	pattern.stageExecutionCounts = dividedCounts( totals.stageExecutionCounts, 'stageExecutionCounts' );
+	pattern.nativeSubcycleCounts = dividedCounts( totals.nativeSubcycleCounts, 'nativeSubcycleCounts' );
+	pattern.couplingIterationCounts = dividedCounts( totals.couplingIterationCounts, 'couplingIterationCounts' );
+	pattern.interactionApplicationCounts = dividedCounts( totals.interactionApplicationCounts, 'interactionApplicationCounts' );
+	pattern.presentedFrameCounts = dividedCounts( totals.presentedFrameCounts, 'presentedFrameCounts' );
+	pattern.workOccurrenceCounts = dividedCounts( totals.workOccurrenceCounts, 'workOccurrenceCounts' );
+	pattern.trafficOccurrenceAndLogicalByteTotals = Object.fromEntries( Object.entries( totals.trafficOccurrenceAndLogicalByteTotals ).map( ( [ trafficId, record ] ) => [ trafficId, { occurrenceCount: quantityValue( record.occurrenceCount, `${ trafficId }.occurrenceCount` ) / rowCount, logicalByteTotal: quantityValue( record.logicalByteTotal, `${ trafficId }.logicalByteTotal` ) / rowCount } ] ) );
+	const digest = sha256Canonical( payload );
+	costOpportunityTableResourceFixtures.set( digest, payload );
+	table.resource.contentDigest = digest;
+	table.resource.canonicalByteLayout = payload.layout;
+	table.resource.rowCount.value = payload.rowCount;
+	table.resource.orderedRowDigestRoot = sha256Canonical( payload.runs );
+	table.tableDigest = sha256CanonicalExcluding( table, [ 'tableDigest' ] );
+	const catchUp = ledger.worstPermittedCatchUpCost;
+	const exactAdvances = quantityValue( totals.coordinationAdvanceCount, 'exact coordination advances' );
+	for ( const witness of catchUp.frontierWitnesses ) {
+
+		const row = witness.opportunityRow;
+		const admittedAdvances = row.coordinationAdvanceIds.length;
+		row.interactionApplicationCounts = Object.fromEntries( Object.entries( totals.interactionApplicationCounts ).map( ( [ tag, count ] ) => [ tag, evidence( quantityValue( count, `${ tag }.applicationCount` ) / exactAdvances * admittedAdvances, 'application', 'Derived', 'worst-permitted-catch-up-schedule' ) ] ) );
+		row.rowDigest = sha256CanonicalExcluding( row, [ 'rowDigest' ] );
+		witness.witnessDigest = sha256CanonicalExcluding( witness, [ 'witnessDigest' ] );
+
+	}
 
 }
 
@@ -6072,7 +6464,7 @@ function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
 	ledger.graphRevision = graph.executionLedger.graphRevision;
 	ledger.presentationTargetsAndViews = [ keepView ];
 	ledger.measurementProtocolRefs = [ ledger.cadenceTraceTotals.traceRef ];
-	ledger.targetAndHarness = 'single-view generic WebGPU trace';
+	ledger.harness.target.deviceId = 'single-view-generic-WebGPU-trace';
 	ledger.qualityState = 'fixed-quality';
 	const exactIntervals = quantityValue( ledger.cadenceTraceTotals.coordinationAdvanceCount, 'singleView.exactIntervals' );
 	const keepStageId = stage.stageId;
@@ -6587,6 +6979,8 @@ const externalGpuBundle = buildExternalGpuFixtureBundle( fixtureModuleHelpers, c
 const activeExternalAdapter = clone( externalGpuBundle.externalAdapterVariants.sharedResource );
 coupledPhysicsFixture.physicsExternalSolverAdaptersById = { [ activeExternalAdapter.adapterId ]: activeExternalAdapter };
 const qualityTransitionBundle = buildQualityTransitionBundle( fixtureModuleHelpers, coupledPhysicsFixture );
+attachCanonicalQualityCostEvidence( coupledPhysicsFixture );
+refreshCanonicalComposedCostEvidence( coupledPhysicsFixture );
 markPhysicsSetup( 'coupledRouteAndModuleBuilds' );
 validateRouteManifest( coupledPhysicsFixture );
 markPhysicsSetup( 'canonicalCoupledRouteValidation' );
@@ -7044,6 +7438,7 @@ const semanticInvariantChecks = Object.freeze( {
 	validateAtomicPhysicsOriginRebase,
 	validateConservativeQualityMigration,
 	validateAlignedCostTraceAndNoCriticalReadback,
+	validateComposedCostEnvelope,
 	validateRegistryAuthorityAndDagClosure,
 	validateCoordinationAdvanceAndCatchUp,
 	validateDependencyCompletionInstances,
@@ -7080,6 +7475,7 @@ const semanticInvariantAcceptCases = Object.freeze( {
 	validateAtomicPhysicsOriginRebase: { 'complete-owner-rebase': semanticIdentityCase },
 	validateConservativeQualityMigration: { 'prepare-commit-retire': semanticIdentityCase },
 	validateAlignedCostTraceAndNoCriticalReadback: { 'aligned-sustained-trace': semanticIdentityCase },
+	validateComposedCostEnvelope: { 'digest-closed-opportunity-frontier-and-migration': semanticIdentityCase },
 	validateRegistryAuthorityAndDagClosure: { 'single-atomic-registry-revision': semanticIdentityCase },
 	validateCoordinationAdvanceAndCatchUp: { 'digest-linked-adjacent-advances': semanticIdentityCase },
 	validateDependencyCompletionInstances: { 'exact-producer-consumer-completion': semanticIdentityCase },
@@ -7214,6 +7610,24 @@ const semanticInvariantRejectCases = Object.freeze( {
 	validateAlignedCostTraceAndNoCriticalReadback: {
 		'mixed-interval-percentiles': semanticRouteCase( ( route ) => { route.physicsCostLedger.cadenceTraceTotals.measurementInterval = clone( route.physicsGraph.coordinationInterval ); refreshCadenceTotalsDigest( route ); } ),
 		'frame-critical-readback': semanticRouteCase( ( route ) => { route.physicsCostLedger.hostCompletionsReadbacksPerPresentedFrame.value = 1; } )
+	},
+	validateComposedCostEnvelope: {
+		'opaque-opportunity-resource': semanticRouteCase( ( route ) => {
+
+			route.physicsCostLedger.opportunityTable.resource.contentDigest = 'sha256:missing-opportunity-resource';
+			route.physicsCostLedger.opportunityTable.tableDigest = sha256CanonicalExcluding( route.physicsCostLedger.opportunityTable, [ 'tableDigest' ] );
+
+		} ),
+		'opportunity-count-mismatch': semanticRouteCase( ( route ) => {
+
+			route.physicsCostLedger.opportunityTable.resource.rowCount.value ++;
+			route.physicsCostLedger.opportunityTable.tableDigest = sha256CanonicalExcluding( route.physicsCostLedger.opportunityTable, [ 'tableDigest' ] );
+
+		} ),
+		'frontier-missing-objective': semanticRouteCase( ( route ) => { route.physicsCostLedger.worstPermittedCatchUpCost.frontierCoverage.coveredObjectiveDimensions.pop(); } ),
+		'catchup-policy-mismatch': semanticRouteCase( ( route ) => { route.physicsCostLedger.worstPermittedCatchUpCost.catchUpPolicyIdentity.maximumCoordinationAdvancesPerPresentationOpportunity.value ++; } ),
+		'stale-harness-digest': semanticRouteCase( ( route ) => { route.physicsCostLedger.harness.target.deviceId = 'different-device-with-stale-digest'; } ),
+		'migration-evidence-omitted': semanticRouteCase( ( route ) => { route.physicsCostLedger.qualityCostEvidence.find( ( ref ) => ref.outgoingMigrationCostEvidenceIds.length > 0 ).outgoingMigrationCostEvidenceIds.pop(); } )
 	},
 	validateRegistryAuthorityAndDagClosure: {
 		'cyclic-parent': semanticRouteCase( ( route ) => { route.physicsContext.physicsFrameRegistry.framesById[ 'body-frame-1' ].parentFrameId = 'body-frame-1'; } ),
@@ -7960,7 +8374,12 @@ expectPhysicsReject( 'cost ledger exceeds device binding limit', ( route ) => {
 {
 
 	const nonMobileCanonicalCoverage = clone( coupledPhysicsFixture );
-	nonMobileCanonicalCoverage.physicsCostLedger.targetAndHarness = 'desktop workstation';
+	nonMobileCanonicalCoverage.physicsCostLedger.harness.target = {
+		deviceId: 'desktop-workstation', osAndBrowserBuild: 'desktop-os/browser-build', gpuAdapterAndDriver: 'desktop-discrete-adapter-driver',
+		backendAndDeviceGeneration: { backend: 'WebGPU', backendGeneration: 'desktop-backend-generation', deviceLossGeneration: 'desktop-device-generation' },
+		displayModeAndMeasuredRefresh: { mode: 'foreground-vsync', refresh: evidence( 60, 'hertz', 'Measured', 'desktop-display-probe' ) },
+		powerSourceAndGovernor: { source: 'mains', governor: 'desktop-balanced-policy' }, thermalStartAndStabilizationPolicy: { start: 'conditioned-nominal', sustainedDuration: evidence( 300, 'second', 'Authored', 'desktop-sustained-protocol' ) }
+	};
 	assert.throws(
 		() => assertCanonicalCoupledFixtureCoverage( nonMobileCanonicalCoverage ),
 		/mobile\/low-end harness/,

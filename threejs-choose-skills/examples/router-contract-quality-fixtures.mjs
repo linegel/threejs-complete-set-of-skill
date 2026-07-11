@@ -1179,7 +1179,7 @@ function projectQualityMigrationIntoCostLedger( api, route, memoryLedger, traffi
 	sharedAttribution.memoryAllocationIds = [ ...cost.hotState.allocations, ...cost.peakTransient.allocations, ...cost.migrationOverlap.allocations ].map( ( allocation ) => allocation.allocationId );
 	sharedAttribution.attributionDigest = digestRecordWithout( api, sharedAttribution, 'attributionDigest' );
 	if ( ! cost.measurementProtocolRefs.includes( 'sha256:quality-allocation-admission-trace-43' ) ) cost.measurementProtocolRefs.push( 'sha256:quality-allocation-admission-trace-43' );
-	const memoryGate = cost.worstPermittedCatchUpBurst.latencyMemoryAndErrorGate.memory;
+	const memoryGate = cost.composedGateSet.migrationOverlapBytes;
 	memoryGate.value = DEVICE_CAPACITY_BYTES;
 	memoryGate.source = 'named-fixture-device-allocation-gate-not-a-portable-mobile-budget';
 	cost.cadenceTraceTotals.exactTotalsDigest = digestRecordWithout( api, cost.cadenceTraceTotals, 'exactTotalsDigest' );

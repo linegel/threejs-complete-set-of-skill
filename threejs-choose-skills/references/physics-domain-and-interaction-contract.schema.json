@@ -93,8 +93,14 @@
         "PhysicsCommitTransaction",
         "PhysicsContext",
         "PhysicsCoordinationAdvanceRecord",
+        "PhysicsCatchUpCostWitness",
+        "PhysicsComposedCostGateSet",
+        "PhysicsComposedCostTrace",
         "PhysicsCostAttribution",
+        "PhysicsCostHarness",
         "PhysicsCostLedger",
+        "PhysicsCostOpportunityRow",
+        "PhysicsCostOpportunityTable",
         "PhysicsDeadline",
         "PhysicsDependency",
         "PhysicsDependencyCompletion",
@@ -127,6 +133,8 @@
         "PhysicsPresentationCandidate",
         "PhysicsPresentationSnapshot",
         "PhysicsQualityStateDescriptor",
+        "PhysicsQualityCostEvidenceRef",
+        "PhysicsQualityMigrationCostEvidence",
         "PhysicsQuantitySystem",
         "PhysicsResidencyDescriptor",
         "PhysicsSampleRequest",
@@ -140,6 +148,7 @@
         "PhysicsTime",
         "PhysicsTimeInterval",
         "PhysicsValidityDescriptor",
+        "PhysicsWorstPermittedCatchUpCost",
         "PointImpulsePayload",
         "PrecipitationEmissionSnapshot",
         "PresentationClosureManifest",
@@ -1758,6 +1767,63 @@
       "if": {
         "properties": {
           "recordType": {
+            "const": "PhysicsCatchUpCostWitness"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsCatchUpCostWitness"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsComposedCostGateSet"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsComposedCostGateSet"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsComposedCostTrace"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsComposedCostTrace"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
             "const": "PhysicsCostAttribution"
           }
         },
@@ -1777,6 +1843,25 @@
       "if": {
         "properties": {
           "recordType": {
+            "const": "PhysicsCostHarness"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsCostHarness"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
             "const": "PhysicsCostLedger"
           }
         },
@@ -1788,6 +1873,44 @@
         "properties": {
           "value": {
             "$ref": "#/$defs/PhysicsCostLedger"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsCostOpportunityRow"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsCostOpportunityRow"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsCostOpportunityTable"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsCostOpportunityTable"
           }
         }
       }
@@ -2404,6 +2527,44 @@
       "if": {
         "properties": {
           "recordType": {
+            "const": "PhysicsQualityCostEvidenceRef"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsQualityCostEvidenceRef"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsQualityMigrationCostEvidence"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsQualityMigrationCostEvidence"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
             "const": "PhysicsQuantitySystem"
           }
         },
@@ -2643,6 +2804,25 @@
         "properties": {
           "value": {
             "$ref": "#/$defs/PhysicsValidityDescriptor"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "recordType": {
+            "const": "PhysicsWorstPermittedCatchUpCost"
+          }
+        },
+        "required": [
+          "recordType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value": {
+            "$ref": "#/$defs/PhysicsWorstPermittedCatchUpCost"
           }
         }
       }
@@ -12768,7 +12948,10 @@
         "measurementProtocolRefs",
         "cadenceTraceTotals",
         "status",
-        "targetAndHarness",
+        "harness",
+        "composedGateSet",
+        "opportunityTable",
+        "composedTrace",
         "qualityState",
         "graphStageCosts",
         "coordinationIntervalsPerSecond",
@@ -12777,7 +12960,7 @@
         "coordinationIntervalsPerPresentedFrame",
         "subcyclesAndCouplingIterationsPerPresentedFrame",
         "executionsPerPresentedFrame",
-        "worstPermittedCatchUpBurst",
+        "worstPermittedCatchUpCost",
         "hotBytesReadWrittenPerExecution",
         "solverDispatches",
         "queueSubmissionsAndPassBreaks",
@@ -12796,6 +12979,8 @@
         "hotState",
         "peakTransient",
         "migrationOverlap",
+        "qualityCostEvidence",
+        "qualityMigrationCostEvidence",
         "thermalPowerState"
       ],
       "properties": {
@@ -12829,8 +13014,17 @@
         "status": {
           "$ref": "#/$defs/AbiEnumCostLedgerStatuses"
         },
-        "targetAndHarness": {
-          "$ref": "#/$defs/AnyAbiValue"
+        "harness": {
+          "$ref": "#/$defs/PhysicsCostHarness"
+        },
+        "composedGateSet": {
+          "$ref": "#/$defs/PhysicsComposedCostGateSet"
+        },
+        "opportunityTable": {
+          "$ref": "#/$defs/PhysicsCostOpportunityTable"
+        },
+        "composedTrace": {
+          "$ref": "#/$defs/PhysicsComposedCostTrace"
         },
         "qualityState": {
           "$ref": "#/$defs/AnyAbiValue"
@@ -12856,8 +13050,8 @@
         "executionsPerPresentedFrame": {
           "$ref": "#/$defs/AnyAbiValue"
         },
-        "worstPermittedCatchUpBurst": {
-          "$ref": "#/$defs/AnyAbiValue"
+        "worstPermittedCatchUpCost": {
+          "$ref": "#/$defs/PhysicsWorstPermittedCatchUpCost"
         },
         "hotBytesReadWrittenPerExecution": {
           "$ref": "#/$defs/AnyAbiValue"
@@ -12906,6 +13100,18 @@
         },
         "migrationOverlap": {
           "$ref": "#/$defs/PhysicsMemoryLedger"
+        },
+        "qualityCostEvidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhysicsQualityCostEvidenceRef"
+          }
+        },
+        "qualityMigrationCostEvidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhysicsQualityMigrationCostEvidence"
+          }
         },
         "thermalPowerState": {
           "$ref": "#/$defs/AnyAbiValue"
@@ -16254,6 +16460,325 @@
         "receiptDigest": {
           "$ref": "#/$defs/AnyAbiValue"
         }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsCostHarness": {
+      "type": "object",
+      "required": [
+        "harnessId",
+        "target",
+        "viewport",
+        "workload",
+        "protocol",
+        "harnessDigest"
+      ],
+      "properties": {
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "target": { "$ref": "#/$defs/AnyAbiValue" },
+        "viewport": { "$ref": "#/$defs/AnyAbiValue" },
+        "workload": { "$ref": "#/$defs/AnyAbiValue" },
+        "protocol": { "$ref": "#/$defs/AnyAbiValue" },
+        "harnessDigest": { "$ref": "#/$defs/Id" }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsComposedCostGateSet": {
+      "type": "object",
+      "required": [
+        "gateSetId",
+        "harnessId",
+        "qualityStateAndEpoch",
+        "frozenBeforeTraceDigest",
+        "cpuCriticalPathP95",
+        "gpuCriticalPathP95",
+        "externalTailP95",
+        "presentedIntervalP95",
+        "deadlineMissRatio",
+        "updateLatencyByStateEquation",
+        "hotStateBytes",
+        "peakTransientBytes",
+        "migrationOverlapBytes",
+        "logicalTrafficPerOpportunity",
+        "uploadCopyMapBytesPerOpportunity",
+        "allocationAndCompilationChurn",
+        "sustainedDriftAndQualityResidence",
+        "numericalAndVisualErrorGateRefs"
+      ],
+      "properties": {
+        "gateSetId": { "$ref": "#/$defs/Id" },
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "qualityStateAndEpoch": { "$ref": "#/$defs/AnyAbiValue" },
+        "frozenBeforeTraceDigest": { "$ref": "#/$defs/Id" },
+        "cpuCriticalPathP95": { "$ref": "#/$defs/AnyAbiValue" },
+        "gpuCriticalPathP95": { "oneOf": [ { "$ref": "#/$defs/PresentAbiValue" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "externalTailP95": { "oneOf": [ { "$ref": "#/$defs/PresentAbiValue" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "presentedIntervalP95": { "$ref": "#/$defs/AnyAbiValue" },
+        "deadlineMissRatio": { "$ref": "#/$defs/AnyAbiValue" },
+        "updateLatencyByStateEquation": { "$ref": "#/$defs/AnyAbiValue" },
+        "hotStateBytes": { "$ref": "#/$defs/AnyAbiValue" },
+        "peakTransientBytes": { "$ref": "#/$defs/AnyAbiValue" },
+        "migrationOverlapBytes": { "$ref": "#/$defs/AnyAbiValue" },
+        "logicalTrafficPerOpportunity": { "$ref": "#/$defs/AnyAbiValue" },
+        "uploadCopyMapBytesPerOpportunity": { "$ref": "#/$defs/AnyAbiValue" },
+        "allocationAndCompilationChurn": { "$ref": "#/$defs/AnyAbiValue" },
+        "sustainedDriftAndQualityResidence": { "$ref": "#/$defs/AnyAbiValue" },
+        "numericalAndVisualErrorGateRefs": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "minItems": 1, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsCostOpportunityTable": {
+      "type": "object",
+      "required": [
+        "opportunityTableId",
+        "harnessId",
+        "measurementInterval",
+        "storage",
+        "inlineRows",
+        "resource",
+        "exactRowCount",
+        "tableDigest"
+      ],
+      "properties": {
+        "opportunityTableId": { "$ref": "#/$defs/Id" },
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "measurementInterval": { "$ref": "#/$defs/PhysicsTimeInterval" },
+        "storage": { "enum": [ "inline", "immutable-resource" ] },
+        "inlineRows": {
+          "oneOf": [
+            { "type": "array", "items": { "$ref": "#/$defs/PhysicsCostOpportunityRow" }, "minItems": 1 },
+            { "$ref": "#/$defs/TypedAbsence" }
+          ]
+        },
+        "resource": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [ "contentDigest", "canonicalByteLayout", "rowCount", "orderedRowDigestRoot" ],
+              "properties": {
+                "contentDigest": { "$ref": "#/$defs/Id" },
+                "canonicalByteLayout": { "$ref": "#/$defs/Id" },
+                "rowCount": { "$ref": "#/$defs/AnyAbiValue" },
+                "orderedRowDigestRoot": { "$ref": "#/$defs/Id" }
+              },
+              "additionalProperties": false
+            },
+            { "$ref": "#/$defs/TypedAbsence" }
+          ]
+        },
+        "exactRowCount": { "$ref": "#/$defs/AnyAbiValue" },
+        "tableDigest": { "$ref": "#/$defs/Id" }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "storage": { "const": "inline" },
+            "inlineRows": { "type": "array", "minItems": 1 },
+            "resource": { "$ref": "#/$defs/TypedAbsence" }
+          }
+        },
+        {
+          "properties": {
+            "storage": { "const": "immutable-resource" },
+            "inlineRows": { "$ref": "#/$defs/TypedAbsence" },
+            "resource": {
+              "type": "object",
+              "required": [ "contentDigest", "canonicalByteLayout", "rowCount", "orderedRowDigestRoot" ]
+            }
+          }
+        }
+      ]
+    },
+    "PhysicsCostOpportunityRow": {
+      "type": "object",
+      "required": [
+        "opportunityKey",
+        "opportunityInterval",
+        "catchUpBatchId",
+        "coordinationAdvanceIds",
+        "stageExecutionCounts",
+        "nativeSubcycleCounts",
+        "couplingIterationCounts",
+        "interactionApplicationCounts",
+        "presentedFrameCounts",
+        "workOccurrenceCounts",
+        "trafficOccurrenceAndLogicalByteTotals",
+        "queueDispatchPassAndBarrierCounts",
+        "cpuCriticalPath",
+        "gpuCriticalPath",
+        "externalTail",
+        "presentedIntervalAndDeadlineMiss",
+        "hotStatePeakTransientAndMigrationBytes",
+        "numericalAndVisualGateResults",
+        "qualityStateAndEpoch",
+        "rowDigest"
+      ],
+      "properties": {
+        "opportunityKey": { "$ref": "#/$defs/AnyAbiValue" },
+        "opportunityInterval": { "$ref": "#/$defs/PhysicsTimeInterval" },
+        "catchUpBatchId": { "oneOf": [ { "$ref": "#/$defs/Id" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "coordinationAdvanceIds": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "uniqueItems": true },
+        "stageExecutionCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "nativeSubcycleCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "couplingIterationCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "interactionApplicationCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "presentedFrameCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "workOccurrenceCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "trafficOccurrenceAndLogicalByteTotals": { "$ref": "#/$defs/AnyAbiValue" },
+        "queueDispatchPassAndBarrierCounts": { "$ref": "#/$defs/AnyAbiValue" },
+        "cpuCriticalPath": { "$ref": "#/$defs/AnyAbiValue" },
+        "gpuCriticalPath": { "oneOf": [ { "$ref": "#/$defs/PresentAbiValue" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "externalTail": { "oneOf": [ { "$ref": "#/$defs/PresentAbiValue" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "presentedIntervalAndDeadlineMiss": { "$ref": "#/$defs/AnyAbiValue" },
+        "hotStatePeakTransientAndMigrationBytes": { "$ref": "#/$defs/AnyAbiValue" },
+        "numericalAndVisualGateResults": { "type": "array", "items": { "$ref": "#/$defs/AnyAbiValue" }, "minItems": 1 },
+        "qualityStateAndEpoch": { "$ref": "#/$defs/AnyAbiValue" },
+        "rowDigest": { "$ref": "#/$defs/Id" }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsComposedCostTrace": {
+      "type": "object",
+      "required": [
+        "composedTraceId",
+        "harnessId",
+        "gateSetId",
+        "opportunityTableId",
+        "cadenceTraceTotalsId",
+        "cpuCriticalPathDistribution",
+        "gpuCriticalPathDistribution",
+        "externalTailDistribution",
+        "presentedIntervalAndDeadlineMissDistribution",
+        "memoryTrafficAllocationAndThermalDistributions",
+        "gateResults",
+        "status"
+      ],
+      "properties": {
+        "composedTraceId": { "$ref": "#/$defs/Id" },
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "gateSetId": { "$ref": "#/$defs/Id" },
+        "opportunityTableId": { "$ref": "#/$defs/Id" },
+        "cadenceTraceTotalsId": { "$ref": "#/$defs/Id" },
+        "cpuCriticalPathDistribution": { "$ref": "#/$defs/AnyAbiValue" },
+        "gpuCriticalPathDistribution": { "oneOf": [ { "$ref": "#/$defs/PresentAbiValue" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "externalTailDistribution": { "oneOf": [ { "$ref": "#/$defs/PresentAbiValue" }, { "$ref": "#/$defs/TypedAbsence" } ] },
+        "presentedIntervalAndDeadlineMissDistribution": { "$ref": "#/$defs/AnyAbiValue" },
+        "memoryTrafficAllocationAndThermalDistributions": { "$ref": "#/$defs/AnyAbiValue" },
+        "gateResults": { "$ref": "#/$defs/AnyAbiValue" },
+        "status": { "enum": [ "measured-valid", "measured-invalid", "insufficient-evidence" ] }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsWorstPermittedCatchUpCost": {
+      "type": "object",
+      "required": [
+        "catchUpCostId",
+        "harnessId",
+        "gateSetId",
+        "catchUpPolicyIdentity",
+        "admissibleScheduleModel",
+        "frontierWitnesses",
+        "frontierCoverage",
+        "gateResults",
+        "requiredDisposition"
+      ],
+      "properties": {
+        "catchUpCostId": { "$ref": "#/$defs/Id" },
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "gateSetId": { "$ref": "#/$defs/Id" },
+        "catchUpPolicyIdentity": { "$ref": "#/$defs/AnyAbiValue" },
+        "admissibleScheduleModel": { "$ref": "#/$defs/AnyAbiValue" },
+        "frontierWitnesses": { "type": "array", "items": { "$ref": "#/$defs/PhysicsCatchUpCostWitness" }, "minItems": 1 },
+        "frontierCoverage": { "$ref": "#/$defs/AnyAbiValue" },
+        "gateResults": { "$ref": "#/$defs/AnyAbiValue" },
+        "requiredDisposition": { "enum": [ "admit", "reduce-policy", "block-presentation", "drop-with-loss-and-discontinuity" ] }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsCatchUpCostWitness": {
+      "type": "object",
+      "required": [
+        "witnessId",
+        "maximizedObjectiveDimensions",
+        "opportunityRow",
+        "repetitionAndSustainedProtocol",
+        "composedMeasuredDistributions",
+        "derivedUpperBoundsAndAssumptions",
+        "witnessDigest"
+      ],
+      "properties": {
+        "witnessId": { "$ref": "#/$defs/Id" },
+        "maximizedObjectiveDimensions": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "minItems": 1, "uniqueItems": true },
+        "opportunityRow": { "$ref": "#/$defs/PhysicsCostOpportunityRow" },
+        "repetitionAndSustainedProtocol": { "$ref": "#/$defs/AnyAbiValue" },
+        "composedMeasuredDistributions": { "$ref": "#/$defs/AnyAbiValue" },
+        "derivedUpperBoundsAndAssumptions": { "$ref": "#/$defs/AnyAbiValue" },
+        "witnessDigest": { "$ref": "#/$defs/Id" }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsQualityCostEvidenceRef": {
+      "type": "object",
+      "required": [
+        "qualityStateAndEpoch",
+        "graphAndResourceRevisionDigest",
+        "harnessId",
+        "gateSetId",
+        "steadyCostLedgerId",
+        "composedTraceId",
+        "worstPermittedCatchUpCostId",
+        "incomingMigrationCostEvidenceIds",
+        "outgoingMigrationCostEvidenceIds",
+        "status"
+      ],
+      "properties": {
+        "qualityStateAndEpoch": { "$ref": "#/$defs/AnyAbiValue" },
+        "graphAndResourceRevisionDigest": { "$ref": "#/$defs/Id" },
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "gateSetId": { "$ref": "#/$defs/Id" },
+        "steadyCostLedgerId": { "$ref": "#/$defs/Id" },
+        "composedTraceId": { "$ref": "#/$defs/Id" },
+        "worstPermittedCatchUpCostId": { "$ref": "#/$defs/Id" },
+        "incomingMigrationCostEvidenceIds": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "uniqueItems": true },
+        "outgoingMigrationCostEvidenceIds": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "uniqueItems": true },
+        "status": { "enum": [ "accepted", "rejected", "insufficient-evidence" ] }
+      },
+      "additionalProperties": false
+    },
+    "PhysicsQualityMigrationCostEvidence": {
+      "type": "object",
+      "required": [
+        "migrationCostEvidenceId",
+        "transitionId",
+        "sourceAndDestinationQualityEpochs",
+        "requestAndAllocationAdmissionIds",
+        "harnessId",
+        "gateSetId",
+        "phaseOpportunityRows",
+        "overlapMemoryLedgerId",
+        "migrationTrafficRecordIds",
+        "allocationCompilationAndPipelineCreation",
+        "sourceRetirementTail",
+        "conservationConstraintAndVisualErrorResults",
+        "composedGateResultsDuringTransition",
+        "status"
+      ],
+      "properties": {
+        "migrationCostEvidenceId": { "$ref": "#/$defs/Id" },
+        "transitionId": { "$ref": "#/$defs/Id" },
+        "sourceAndDestinationQualityEpochs": { "$ref": "#/$defs/AnyAbiValue" },
+        "requestAndAllocationAdmissionIds": { "$ref": "#/$defs/AnyAbiValue" },
+        "harnessId": { "$ref": "#/$defs/Id" },
+        "gateSetId": { "$ref": "#/$defs/Id" },
+        "phaseOpportunityRows": { "$ref": "#/$defs/AnyAbiValue" },
+        "overlapMemoryLedgerId": { "$ref": "#/$defs/Id" },
+        "migrationTrafficRecordIds": { "type": "array", "items": { "$ref": "#/$defs/Id" }, "minItems": 1, "uniqueItems": true },
+        "allocationCompilationAndPipelineCreation": { "$ref": "#/$defs/AnyAbiValue" },
+        "sourceRetirementTail": { "$ref": "#/$defs/AnyAbiValue" },
+        "conservationConstraintAndVisualErrorResults": { "type": "array", "items": { "$ref": "#/$defs/AnyAbiValue" }, "minItems": 1 },
+        "composedGateResultsDuringTransition": { "$ref": "#/$defs/AnyAbiValue" },
+        "status": { "enum": [ "accepted", "rejected", "insufficient-evidence" ] }
       },
       "additionalProperties": false
     },
@@ -20985,7 +21510,10 @@
         "measurementProtocolRefs",
         "cadenceTraceTotals",
         "status",
-        "targetAndHarness",
+        "harness",
+        "composedGateSet",
+        "opportunityTable",
+        "composedTrace",
         "qualityState",
         "graphStageCosts",
         "coordinationIntervalsPerSecond",
@@ -20994,7 +21522,7 @@
         "coordinationIntervalsPerPresentedFrame",
         "subcyclesAndCouplingIterationsPerPresentedFrame",
         "executionsPerPresentedFrame",
-        "worstPermittedCatchUpBurst",
+        "worstPermittedCatchUpCost",
         "hotBytesReadWrittenPerExecution",
         "solverDispatches",
         "queueSubmissionsAndPassBreaks",
@@ -21013,7 +21541,149 @@
         "hotState",
         "peakTransient",
         "migrationOverlap",
+        "qualityCostEvidence",
+        "qualityMigrationCostEvidence",
         "thermalPowerState"
+      ]
+    },
+    "PhysicsCostHarness": {
+      "required": [
+        "harnessId",
+        "target",
+        "viewport",
+        "workload",
+        "protocol",
+        "harnessDigest"
+      ]
+    },
+    "PhysicsComposedCostGateSet": {
+      "required": [
+        "gateSetId",
+        "harnessId",
+        "qualityStateAndEpoch",
+        "frozenBeforeTraceDigest",
+        "cpuCriticalPathP95",
+        "gpuCriticalPathP95",
+        "externalTailP95",
+        "presentedIntervalP95",
+        "deadlineMissRatio",
+        "updateLatencyByStateEquation",
+        "hotStateBytes",
+        "peakTransientBytes",
+        "migrationOverlapBytes",
+        "logicalTrafficPerOpportunity",
+        "uploadCopyMapBytesPerOpportunity",
+        "allocationAndCompilationChurn",
+        "sustainedDriftAndQualityResidence",
+        "numericalAndVisualErrorGateRefs"
+      ]
+    },
+    "PhysicsCostOpportunityTable": {
+      "required": [
+        "opportunityTableId",
+        "harnessId",
+        "measurementInterval",
+        "storage",
+        "inlineRows",
+        "resource",
+        "exactRowCount",
+        "tableDigest"
+      ]
+    },
+    "PhysicsCostOpportunityRow": {
+      "required": [
+        "opportunityKey",
+        "opportunityInterval",
+        "catchUpBatchId",
+        "coordinationAdvanceIds",
+        "stageExecutionCounts",
+        "nativeSubcycleCounts",
+        "couplingIterationCounts",
+        "interactionApplicationCounts",
+        "presentedFrameCounts",
+        "workOccurrenceCounts",
+        "trafficOccurrenceAndLogicalByteTotals",
+        "queueDispatchPassAndBarrierCounts",
+        "cpuCriticalPath",
+        "gpuCriticalPath",
+        "externalTail",
+        "presentedIntervalAndDeadlineMiss",
+        "hotStatePeakTransientAndMigrationBytes",
+        "numericalAndVisualGateResults",
+        "qualityStateAndEpoch",
+        "rowDigest"
+      ]
+    },
+    "PhysicsComposedCostTrace": {
+      "required": [
+        "composedTraceId",
+        "harnessId",
+        "gateSetId",
+        "opportunityTableId",
+        "cadenceTraceTotalsId",
+        "cpuCriticalPathDistribution",
+        "gpuCriticalPathDistribution",
+        "externalTailDistribution",
+        "presentedIntervalAndDeadlineMissDistribution",
+        "memoryTrafficAllocationAndThermalDistributions",
+        "gateResults",
+        "status"
+      ]
+    },
+    "PhysicsWorstPermittedCatchUpCost": {
+      "required": [
+        "catchUpCostId",
+        "harnessId",
+        "gateSetId",
+        "catchUpPolicyIdentity",
+        "admissibleScheduleModel",
+        "frontierWitnesses",
+        "frontierCoverage",
+        "gateResults",
+        "requiredDisposition"
+      ]
+    },
+    "PhysicsCatchUpCostWitness": {
+      "required": [
+        "witnessId",
+        "maximizedObjectiveDimensions",
+        "opportunityRow",
+        "repetitionAndSustainedProtocol",
+        "composedMeasuredDistributions",
+        "derivedUpperBoundsAndAssumptions",
+        "witnessDigest"
+      ]
+    },
+    "PhysicsQualityCostEvidenceRef": {
+      "required": [
+        "qualityStateAndEpoch",
+        "graphAndResourceRevisionDigest",
+        "harnessId",
+        "gateSetId",
+        "steadyCostLedgerId",
+        "composedTraceId",
+        "worstPermittedCatchUpCostId",
+        "incomingMigrationCostEvidenceIds",
+        "outgoingMigrationCostEvidenceIds",
+        "status"
+      ]
+    },
+    "PhysicsQualityMigrationCostEvidence": {
+      "required": [
+        "migrationCostEvidenceId",
+        "transitionId",
+        "sourceAndDestinationQualityEpochs",
+        "requestAndAllocationAdmissionIds",
+        "harnessId",
+        "gateSetId",
+        "phaseOpportunityRows",
+        "overlapMemoryLedgerId",
+        "migrationTrafficRecordIds",
+        "allocationCompilationAndPipelineCreation",
+        "sourceRetirementTail",
+        "conservationConstraintAndVisualErrorResults",
+        "composedGateResultsDuringTransition",
+        "status"
       ]
     },
     "MassInventory": {
@@ -22628,6 +23298,35 @@
         ]
       },
       "contractLines": "2679-2766"
+    },
+    {
+      "id": "PHY-COMPOSED-COST-002",
+      "appliesTo": [
+        "PhysicsCostHarness",
+        "PhysicsComposedCostGateSet",
+        "PhysicsCostOpportunityTable",
+        "PhysicsCostOpportunityRow",
+        "PhysicsComposedCostTrace",
+        "PhysicsWorstPermittedCatchUpCost",
+        "PhysicsCatchUpCostWitness",
+        "PhysicsQualityCostEvidenceRef",
+        "PhysicsQualityMigrationCostEvidence"
+      ],
+      "validator": "validateComposedCostEnvelope",
+      "fixtures": {
+        "accept": [
+          "digest-closed-opportunity-frontier-and-migration"
+        ],
+        "reject": [
+          "opaque-opportunity-resource",
+          "opportunity-count-mismatch",
+          "frontier-missing-objective",
+          "catchup-policy-mismatch",
+          "stale-harness-digest",
+          "migration-evidence-omitted"
+        ]
+      },
+      "contractLines": "3565-3996"
     },
     {
       "id": "PHY-REGISTRY-AUTHORITY-001",
