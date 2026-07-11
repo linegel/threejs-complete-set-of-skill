@@ -704,6 +704,23 @@ interaction/causal identity and conservation group; it does not define a
 smaller swim/contact event. Exactly-once application, deterministic ordering/
 reduction, and authoritative batch-overflow accounting remain scheduler-owned.
 
+Record receipt alone never authorizes creature state. Each creature stage that
+applies a water/contact source or reduced reaction prepares the canonical
+`InteractionApplicationLedger` row addressed by the record's
+`applicationLedgerKey`. Require matching context/exchange/interaction identity,
+target creature owner/entity/equation and expected version, current
+`PhysicsStageExecution.stageExecutionId`, exact declared interval and execution
+overlap, `payloadTimeSemantics`, applied integral/fraction, cursor before/after,
+prepared version, commit transaction, disposition, replay lineage,
+`applicationContentDigest`, and `receiptDigest`. Rate payloads integrate only
+their overlap; interval-integrated payloads have one committed fraction-one
+row; disjoint and duplicate/replayed rows are no-ops. Pose, velocity,
+support/contact, and swimmer-state output becomes committed and
+presentation-eligible only with the receipt in the same atomic transaction.
+The ledger ID resolves from the batch and top-level keyed route inventory and
+appears in the stage execution, `StateAdvanceClaim`, accepted coupling-
+iteration result when applicable, and commit lineage.
+
 ## 7. Scale architecture
 
 - **Share by mesh identity, not label.** One geometry may serve bodies only
@@ -896,7 +913,7 @@ the shared projected-error contract linked in §0.
 | habitat query | Required-channel/unit/schema validation, field-version invalidation, deterministic placement under equal inputs, and placement/classification error including provider source resolution |
 | IK reconstruction | Relative upper/lower length residual plus reach-clamp classification, not decimal-string equality |
 | water-provider coupling | Canonical request/sample/envelope conformance with no raw-helper bypass; footprint/filter evidence; absent-channel rejection; gated `freeSurfacePoint`, `freeSurfaceNormal`, `surfacePointVelocityMps`, and when consumed `materialCurrentVelocityMps`, depth, and density residual; complete provider error/version/residency propagation; one-way authoritative-source and omitted-feedback bound/narrowed-claim evidence when applicable; zero frame-critical readback |
-| two-way creature interaction | Ordered both-owner-predict/sample/source-record/load-scatter/water-advance/reaction-reduce/correct/check/atomic-commit stages; declared explicit/semi-implicit/bounded-iterated/monolithic coupling; discrete-adjoint zeroth/first moments; force/torque/interface-work and added-mass stability; conservation-group mass, linear/angular momentum, energy/work and species closure; volume only for fixed-density incompressibility; deterministic replay; visual ripples do not count |
+| two-way creature interaction | Ordered both-owner-predict/sample/source-record/load-scatter/water-advance/reaction-reduce/correct/check/atomic-commit stages; declared explicit/semi-implicit/bounded-iterated/monolithic coupling; discrete-adjoint zeroth/first moments; force/torque/interface-work and added-mass stability; conservation-group mass, linear/angular momentum, energy/work and species closure; volume only for fixed-density incompressibility; deterministic replay; exact-overlap `InteractionApplicationLedger` receipts reject duplicate/replayed/disjoint applications and bind accepted state/iteration/commit lineage; visual ripples do not count |
 | physics presentation | One per-binding/provider `PresentedStatePair` in the immutable candidate, then one sealed per-target/view snapshot for visible pose, deformation storage, bounds, shadows, motion vectors, and temporal history; presented states are not assumed solver `n/n+1`; resource-generation leases; separate time/frame/transform/source epochs; explicit history-invalid reasons for spawn/death/teleport/reparent/slot/topology/LOD/provider/quality discontinuities |
 | shadow/depth parity | Gated silhouette distance in pixels for display, cast shadow, received-shadow lookup, and depth output |
 | geometry counts | Derived exactly from the selected compiler/topology/geometry signature; preview-shell counts are not shipping-mesh counts |

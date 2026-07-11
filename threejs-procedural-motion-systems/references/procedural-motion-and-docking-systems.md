@@ -881,6 +881,25 @@ it does not invent a smaller hull-source schema. Exactly-once application,
 deterministic total order/reduction, authoritative-overflow accounting, and
 source/reaction roles remain scheduler-owned.
 
+Record delivery is not state application. For every attempted body/water source
+or reduced-reaction application, the consuming motion stage prepares the
+canonical `InteractionApplicationLedger` row selected by the record's
+`applicationLedgerKey`. It must match the record/exchange/context identity,
+target owner/entity/equation and expected version, current
+`PhysicsStageExecution.stageExecutionId`, declared `applicationInterval`, and
+the exact execution-overlap interval. The row records `payloadTimeSemantics`,
+overlap seconds, applied integral and fraction, cursor before/after, prepared
+version, commit transaction, disposition, replay lineage,
+`applicationContentDigest`, and `receiptDigest`. A rate applies only its overlap
+integral; an interval-integrated value has one committed fraction-one row;
+disjoint executions apply zero; repeats restore or emit `duplicate-no-op`
+without changing state. A prepared body/water version becomes committed and
+presentation-eligible only when that ledger receipt commits in the same atomic
+transaction. Its ledger ID appears in the batch, top-level keyed route
+inventory, stage execution, `StateAdvanceClaim`, accepted coupling-iteration
+result when applicable, and commit lineage. A cursor, batch count, compute
+dispatch, or record lookup is insufficient authority.
+
 Wake ownership follows physics ownership. A foam ribbon or particle trail may
 visualize a one-way kinematic wake, but it cannot be cited as displaced water or
 two-way momentum exchange. When the water solver accepts canonical force,
@@ -902,6 +921,9 @@ discrete-adjoint moments, force/torque/interface-work residual, added-mass
 stability, conservation-group closure, wake causality, state-version ordering,
 coupling stability, and deterministic replay. A volume residual is required
 only for a fixed-density incompressible constraint.
+Tests also replay duplicates, partial overlaps, disjoint intervals, reordered
+delivery, restored cursors, and rejected/deferred rows; only previously
+unapplied keys may produce committed application receipts and state deltas.
 Record zero frame-critical GPU readbacks.
 
 ## Peeling and released debris

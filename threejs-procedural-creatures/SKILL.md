@@ -246,7 +246,22 @@ this order; every step ends in something renderable or assertable.
     Its gather/scatter pair preserves zeroth/first moments and gates force,
     torque, interface work, and added-mass stability. Source/reaction records
     form an all-or-none `InteractionReactionGroup`; many-to-many reduction is
-    legal and balance is tested in its declared frame/reference point. The accepted pose is contributed
+    legal and balance is tested in its declared frame/reference point. Each
+    creature stage that applies a water/contact source or reduced reaction
+    record resolves its `applicationLedgerKey` to a canonical
+    `InteractionApplicationLedger`. The row binds the current
+    `PhysicsStageExecution`, declared interval and exact execution overlap,
+    payload time semantics and applied integral/fraction, target creature
+    owner/entity/equation and expected state version, cursor before/after,
+    prepared version, commit transaction, disposition,
+    `applicationContentDigest`, and `receiptDigest`. Only a `committed` receipt authorizes the pose,
+    velocity, support/contact, or swimmer-state advance; rate payloads integrate
+    over their exact overlap and interval-integrated payloads commit once.
+    Duplicate/replayed, disjoint, deferred, or rejected rows are no-ops, not
+    informal deduplication. The ledger ID resolves from the batch and route
+    inventories and appears in the stage execution, `StateAdvanceClaim`,
+    accepted coupling iteration when present, and atomic commit lineage. The
+    accepted pose is contributed
     as a per-binding/provider `PresentedStatePair` to the view-independent
     `PhysicsPresentationCandidate`, which contains no camera or render
     transform. `previousPresented` and `currentPresented` each carry independent

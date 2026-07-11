@@ -822,7 +822,7 @@ const abiTokensByRole = {
   interaction: {
     coordinator: ['SurfaceExchange', 'InteractionApplicationLedger'],
     producer: ['InteractionRecord'],
-    consumer: ['InteractionRecord'],
+    consumer: ['InteractionRecord', 'InteractionApplicationLedger'],
     'exchange-owner': ['SurfaceExchange', 'InteractionBatchLedger', 'InteractionApplicationLedger'],
     adapter: ['InteractionRecord', 'ExternalSolverAdapter'],
     preserve: [],

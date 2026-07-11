@@ -220,7 +220,21 @@ sequence, partition, cursor, and overflow remain in InteractionBatchLedger
 
 Do not overload a dimensionless `weight` as impulse, force, pressure, depth,
 and decay. Convert a completed record once into the vegetation touch/load state
-using the declared footprint kernel. If a dense touch texture is selected, bin
+using the declared footprint kernel. That conversion prepares the canonical
+`InteractionApplicationLedger` row addressed by `applicationLedgerKey` and
+matching the record/exchange/context, target patch/entity/equation and expected
+version, current `PhysicsStageExecution.stageExecutionId`, exact declared
+interval and execution overlap, and payload time semantics. Record overlap
+seconds, applied integral/fraction, cursor before/after, prepared version,
+commit transaction, disposition, replay lineage, `applicationContentDigest`,
+and `receiptDigest`. Rate inputs integrate only their exact overlap;
+interval-integrated inputs have one committed fraction-one receipt; disjoint,
+duplicate/replayed, deferred, and rejected rows do not change touch/load state.
+The receipt commits atomically with the vegetation state version, and its
+ledger ID resolves from the batch/top-level keyed route inventory and appears
+in the stage execution, `StateAdvanceClaim`, accepted coupling-iteration result
+when applicable, and commit lineage. A consumer cursor or record lookup alone
+does not authorize state or presentation. If a dense touch texture is selected, bin
 records into dirty tiles and integrate only touched support plus decay regions;
 static candidate/placement buffers remain immutable.
 Decay time/constants belong to vegetation response state and are never
@@ -683,8 +697,11 @@ Acceptance includes:
   several presentation rates preserves structural state within the declared
   integrator/interpolation error;
 - permuting record delivery before canonical ordering yields identical touch
-  state, duplicate IDs are consumed once, and deterministic overflow reports
-  the same retained set and represented impulse/load;
+  state, duplicate IDs produce `duplicate-no-op` application receipts, partial
+  overlaps integrate only the overlap, disjoint intervals produce no state
+  delta, restored cursors apply only previously unapplied keys, and
+  deterministic overflow reports the same retained set and represented
+  impulse/load;
 - one-way trampling produces no actor reaction, while a two-way fixture closes
   equal-and-opposite impulse in the authoritative contact solver;
 - changing render LOD or material wetness cannot change the receiver-state

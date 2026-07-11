@@ -116,7 +116,21 @@ or load units, deterministic ordering keys, canonical source/target ownership,
 `SurfaceExchange.mode`, reaction-group identity, and batch/partition identity.
 Keep sequence ranges, consumer cursors, overflow, and lost/deferred commodities
 in the canonical immutable `InteractionBatchLedger`; coalescing is a producer
-transformation with provenance. Bin sparse records into affected
+transformation with provenance. Before a completed record changes trampling,
+sweep, support-load, impact, touch, or structural state, the vegetation stage
+resolves its `applicationLedgerKey` to a canonical
+`InteractionApplicationLedger`. The row binds the current
+`PhysicsStageExecution`, exact declared interval and execution overlap, payload
+time semantics and applied integral/fraction, target patch/entity/equation and
+expected state version, cursor before/after, prepared version, commit
+transaction, disposition, `applicationContentDigest`, and `receiptDigest`. Only
+a `committed` receipt authorizes the state advance; rate payloads integrate over
+their exact overlap and interval-integrated payloads commit once. Duplicate or
+replayed, disjoint, deferred, and rejected rows do not mutate touch/load state.
+The ledger ID resolves from the batch and route inventories and appears in the
+stage execution, `StateAdvanceClaim`, accepted coupling iteration when present,
+and atomic commit lineage; a record or cursor advance alone is not application
+authority. Bin sparse records into affected
 patches, update the contact/touch state after physics contact resolution, then
 evaluate structural wind/contact deformation and commit domain state over the
 declared `PhysicsGraphStage.executionInterval: PhysicsTimeInterval`. The
@@ -249,8 +263,9 @@ overdraw/over-submission and culling granularity.
 
 Vegetation and creatures consume the same `EnvironmentForcingSnapshot` air
 velocity but own different structural response models. Creature stance/contact
-resolution publishes typed `InteractionRecord`s; vegetation bins completed
-records into its dynamic touch texture or compact patch storage before blade
+resolution publishes typed `InteractionRecord`s; vegetation applies only
+records with matching committed `InteractionApplicationLedger` receipts into
+its dynamic touch texture or compact patch storage before blade
 deformation. The current WebGPU dense-grass example exposes only wind uniforms
 and static density storage, so it is not evidence that contact ingestion is
 implemented. A production route must instantiate the shared record adapter,

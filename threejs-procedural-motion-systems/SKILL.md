@@ -151,6 +151,22 @@ Two-way source/reaction records form an all-or-none
 `InteractionReactionGroup`; many-to-many reduction is legal, and balance is
 tested after transport to its declared frame/reference point.
 
+Every motion stage that applies a source or reduced reaction record resolves
+the record's `applicationLedgerKey` to a canonical
+`InteractionApplicationLedger`. The row names the current
+`PhysicsStageExecution`, exact declared interval and execution overlap, payload
+time semantics and applied integral/fraction, target owner/entity/equation and
+expected state version, cursor before/after, prepared version, commit
+transaction, disposition, `applicationContentDigest`, and `receiptDigest`. Rate payloads
+integrate only over the exact overlap; interval-integrated payloads commit once.
+Only a `committed` receipt may authorize the corresponding target-state
+advance. `duplicate-no-op`, replayed, disjoint, deferred, and rejected rows
+cannot mutate motion state or become presentation-eligible. The ledger ID must
+resolve from the batch and route inventories and appear in the stage execution,
+`StateAdvanceClaim`, accepted coupling iteration when present, and atomic commit
+lineage; reading an `InteractionRecord` or advancing a consumer cursor alone is
+not application authority.
+
 Presentation is not another physics query. Motion contributes a per-binding/provider
 `PresentedStatePair` to the view-independent `PhysicsPresentationCandidate`,
 which contains no camera or render transform. `previousPresented` and
