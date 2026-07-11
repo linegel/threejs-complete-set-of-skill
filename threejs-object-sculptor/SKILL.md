@@ -67,6 +67,12 @@ Prefer this loop for implementation tasks:
 8. After each visual pass, capture a browser screenshot, create one full reference/render comparison pair, inspect it once with AI vision, then update `reviewHistory` with overall, layer, and semantic feature scores.
 9. Run project typecheck/build and browser visual review; use the Codex in-app Browser screenshot tool first. Do not install or download Playwright/Chromium just for this skill unless the user explicitly requests that route.
 
+### Canonical WebGPU Demo
+
+Use `examples/webgpu-tower-ship-sculptor/` as the executable reference for this skill's complete contract. It includes the strict `ObjectSculptSpec`, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/colliders/destruction groups, `final`/`blockout`/`hierarchy`/`materials`/`interaction` modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.
+
+Run `npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick` before browser capture. Treat the lab's `incomplete` evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.
+
 ## 3D Terminology Discipline
 
 Descriptions must be clear, concrete, and compatible with real-time 3D graphics language. When describing the object, prefer terms from `references/3d-graphics-terminology.md`.

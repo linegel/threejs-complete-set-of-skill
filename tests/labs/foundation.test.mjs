@@ -66,9 +66,9 @@ import {
   plannedPublishedRoutes,
 } from '../../scripts/lib/page-routes.mjs';
 
-test('inventory freezes exactly 26 skills and all five integrations', () => {
+test('inventory freezes exactly 27 skills and all five integrations', () => {
   const registry = buildDemoRegistry();
-  assert.equal(registry.skillsExpected, 26);
+  assert.equal(registry.skillsExpected, 27);
   assert.equal(registry.counts.skills, registry.skillsExpected);
   assert.deepEqual(
     [...registry.integrationIds].sort(),

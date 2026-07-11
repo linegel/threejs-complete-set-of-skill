@@ -1,0 +1,732 @@
+{
+  "targetName": "Tower Ship",
+  "targetId": "tower-ship",
+  "schemaVersion": "2.0",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": ["station ring", "indexed hull surface", "taper", "roof rib", "semantic pivot", "socket"],
+    "materialTerms": ["albedo zone", "roughness variation", "normal response", "cavity mask", "edge wear"],
+    "lightingTerms": ["key light", "fill light", "rim light", "contact shadow", "ACES tone mapping"],
+    "descriptionRule": "State dimensions in world units, transforms in the declared coordinate frame, and confidence for image-inferred geometry."
+  },
+  "sourceImage": "reference/tower-ship-reference.png",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 2,
+    "occlusion_risk": 3,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "fortified river vessel",
+      "formLanguage": ["hard-surface", "architectural", "sculptural"],
+      "structureKind": ["compound object", "branching hierarchy", "repeated modules", "articulated assembly"],
+      "motionPotential": ["whole-object transform", "articulated", "detachable"],
+      "materialFamilies": ["wood", "cloth", "metal", "paper-like panels", "mixed"],
+      "notes": "Visible geometry is reconstructed from the primary three-quarter view; hidden forms are explicitly inferred."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 3,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 12,
+        "microFeatureGroups": 8,
+        "materialLayers": 5,
+        "repetitionSystems": 5
+      },
+      "reasoning": [
+        "Four identity-critical systems overlap in depth: hull/deck, tower cabin, sail/rigging, and articulated oar bank.",
+        "Repeated oars, shields, rails, roof ribs, and shoji grids require deterministic generators rather than hand-placed isolated meshes."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The asset must expose the same semantic hierarchy to interaction, diagnostics, and validation."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "sourceImage": "reference/tower-ship-reference.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "The design camera reads as the reference tower ship at thumbnail scale and preserves its four identity-critical systems.",
+      "The live demo exposes final, blockout, hierarchy, materials, and interaction modes from one procedural factory.",
+      "The runtime exposes stable maps for pivots, meshes, sockets, colliders, and destruction groups."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 8,
+      "microFeatureGroups": 6,
+      "materialLayers": 5,
+      "repetitionSystems": 5,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "curved-fortified-hull",
+        "name": "Curved fortified hull",
+        "required": true,
+        "qualityCriteria": ["Station-based 20-unit hull tapers in plan and rises at bow and stern while retaining a continuous gunwale."],
+        "evidenceRefs": ["ship-body"],
+        "failureModes": ["box barge", "flat ends", "broken deck contact"]
+      },
+      {
+        "id": "tower-cabin-roofs",
+        "name": "Tower cabin and pagoda roofs",
+        "required": true,
+        "qualityCriteria": ["Two shoji-panel tiers and two overhanging roofs form the dominant central vertical mass."],
+        "evidenceRefs": ["tower-cabin"],
+        "failureModes": ["single box cabin", "flat roofs", "missing grid rhythm"]
+      },
+      {
+        "id": "sail-rigging-system",
+        "name": "Sail and rigging",
+        "required": true,
+        "qualityCriteria": ["Tall segmented tan sail, mast, boom, and tension lines share continuous attachment points."],
+        "evidenceRefs": ["mast-sail"],
+        "failureModes": ["detached sail", "undersized mast", "floating lines"]
+      },
+      {
+        "id": "articulated-oar-bank",
+        "name": "Twenty-four articulated oars",
+        "required": true,
+        "qualityCriteria": ["Twelve root-pivoted oars per side follow the hull and maintain socket contact during animation."],
+        "evidenceRefs": ["oar-bank"],
+        "failureModes": ["wrong count", "center pivots", "air gaps"]
+      },
+      {
+        "id": "deck-detail-rhythm",
+        "name": "Deck defense and ornament rhythm",
+        "required": true,
+        "qualityCriteria": ["Rail posts, shields, lanterns, stairs, and prow ornament fill the deck without obscuring primary masses."],
+        "evidenceRefs": ["deck-details"],
+        "failureModes": ["empty deck", "random density", "floating ornaments"]
+      },
+      {
+        "id": "aged-material-zones",
+        "name": "Aged mixed-material response",
+        "required": true,
+        "qualityCriteria": ["Warm planks, dark frame wood, pale panels, tan cloth, and muted metal remain visually distinct under neutral and grazing light."],
+        "evidenceRefs": ["full-object"],
+        "failureModes": ["one brown plastic", "uniform roughness", "exact PBR claim from composite image"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "hull length-to-tower height",
+      "bow/stern rise and roof corner lift",
+      "mast/sail placement and negative space",
+      "oar count and socket continuity",
+      "wood/panel/cloth/metal material separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not merge oars, sail, cabin, roof, or lanterns into an opaque decorative mesh.",
+      "Do not substitute a box for the station-based hull.",
+      "Do not claim exact hidden geometry or PBR recovery from one composite screenshot.",
+      "Do not accept floating sockets or center-pivoted appendages."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": ["four identity-critical systems", "24 articulated oars", "mixed-material color zoning", "tower-ship silhouette"],
+    "niceToHave": ["small hardware", "painted shield marks", "subtle plank wear"],
+    "reviewViewpoints": ["design", "profile", "bow", "close-material"]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision reviews a side-by-side sheet; numeric image deltas are diagnostic only.",
+      "requiredLayerScores": ["silhouetteProportion", "componentStructure", "formDetail", "materialSurface", "lightingCamera"],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Review at most five identity-critical systems from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": ["blockout", "structural-pass", "form-refinement", "material-pass", "surface-pass", "lighting-pass", "interaction-pass"],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": ["missing identity-critical system", "wrong proportion", "unsupported attachment inference"],
+    "codeRefineTriggers": ["factory output differs from spec", "visible socket gap", "material zones collapse"],
+    "stopCriteria": ["accepted visual score", "remaining gap requires another reference view"],
+    "screenshotPolicy": {
+      "requiredForPasses": ["blockout", "structural-pass", "form-refinement", "material-pass", "surface-pass", "lighting-pass", "interaction-pass"],
+      "preferredCapture": "repository browser capture harness",
+      "fallbackCapture": "user-supplied screenshot path",
+      "minimumEvidence": "Named render, comparison sheet, AI vision score, layer scores, and subsystem notes.",
+      "reviewPairRule": "Compare design camera to the full reference and use secondary cameras for attachment diagnostics.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "hull-silhouette",
+      "name": "Curved fortified hull silhouette",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["hull"],
+      "evidenceRefs": ["ship-body"]
+    },
+    {
+      "id": "tower-architecture",
+      "name": "Tower cabin and roof architecture",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["cabin-lower", "cabin-upper", "roof-lower", "roof-upper"],
+      "evidenceRefs": ["tower-cabin"]
+    },
+    {
+      "id": "sail-rigging",
+      "name": "Mast, sail, and rigging attachment",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": ["mast", "sail", "rigging"],
+      "evidenceRefs": ["mast-sail"]
+    },
+    {
+      "id": "oar-bank",
+      "name": "Twenty-four articulated oar bank",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["oar-bank"],
+      "evidenceRefs": ["oar-bank"]
+    },
+    {
+      "id": "material-zoning",
+      "name": "Mixed-material zoning and surface response",
+      "tier": "critical",
+      "passIds": ["material-pass", "surface-pass", "lighting-pass"],
+      "minimumScore": 0.72,
+      "mustPass": true,
+      "componentRefs": ["hull", "cabin-lower", "sail"],
+      "evidenceRefs": ["full-object"]
+    },
+    {
+      "id": "deck-ornament",
+      "name": "Deck defense and ornament rhythm",
+      "tier": "important",
+      "passIds": ["form-refinement"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["deck-details"],
+      "evidenceRefs": ["deck-details"]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": ["blockout", "structural-pass", "form-refinement", "material-pass", "surface-pass", "lighting-pass", "interaction-pass", "optimization-pass"],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "Awaiting first design-camera capture and AI vision comparison.",
+    "nextRequiredEvidence": ["blockout render", "reference/render comparison", "AI vision score and layer scores"]
+  },
+  "lookDevTargets": {
+    "qualityPriority": "interactive-demo-fidelity",
+    "materialPass": {
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "acceptedLimitation": "Procedural response is image-informed; a single composite image cannot recover exact PBR channels."
+    },
+    "lightingPass": {
+      "requiredTerms": ["key light", "fill light", "rim light", "exposure", "ACES tone mapping", "background", "contact shadow"]
+    }
+  },
+  "actionReadiness": {
+    "contract": "Major and movable systems are stable pivot groups; runtime maps expose nodes, meshes, sockets, colliders, and destruction groups.",
+    "defaultRigType": "articulated-prop-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": ["id", "parent", "transform", "actionProfile", "attachment for appendages"],
+    "transformChannels": ["translate", "rotate", "scale", "detach", "visibility", "material-state"],
+    "authoringRules": ["Root appendages at sockets.", "Use simplified compound colliders.", "Keep detachable seams semantic."],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Semantic groups such as hull-shell, roof-tier, mast-rig, and oar-bank.",
+      "debrisStrategy": "Detach authored groups before generating fragments."
+    }
+  },
+  "assumptions": [
+    "Port-side systems mirror visible starboard structures unless the reference contradicts them.",
+    "The hull underside is a smooth continuation of visible station contours.",
+    "Panel inserts are paper-like but rendered opaque for stable real-time response."
+  ],
+  "coordinateFrame": {
+    "front": "+Z is starboard/reference-facing side",
+    "up": "+Y",
+    "longitudinal": "+X points toward the high stern; -X points toward the prow",
+    "scaleReference": "Hull overall length is 20 world units"
+  },
+  "silhouette": {
+    "boundingShape": "20 x 13 x 8 world-unit compound vessel including mast and oars",
+    "aspectRatios": ["hull length:beam = 4.3:1", "overall length:height = 1.55:1"],
+    "symmetry": "Bilateral across Z for hull and oars; cabin details mostly symmetric; sail offsets toward +X.",
+    "dominantCurves": ["shallow hull sheer", "raised bow/stern posts", "upturned roof corners", "convex segmented sail"],
+    "negativeSpaces": ["under roof eaves", "between oars", "between rigging and sail", "rail openings"],
+    "landmarks": ["prow ornament", "lower roof", "upper roof", "mast crown", "sail tip", "oar fan"]
+  },
+  "viewEvidence": [
+    {
+      "id": "full-object",
+      "view": "three-quarter starboard",
+      "imageRegion": {"x": 0.05, "y": 0.1, "width": 0.9, "height": 0.77, "units": "normalized"},
+      "observations": ["Full silhouette and color zones are legible."],
+      "confidence": 0.92
+    },
+    {
+      "id": "ship-body",
+      "view": "three-quarter starboard",
+      "imageRegion": {"x": 0.05, "y": 0.42, "width": 0.9, "height": 0.42, "units": "normalized"},
+      "observations": ["Hull taper, upward ends, deck, shields, stairs, and oar sockets are visible."],
+      "confidence": 0.86
+    },
+    {
+      "id": "tower-cabin",
+      "view": "three-quarter starboard",
+      "imageRegion": {"x": 0.3, "y": 0.22, "width": 0.35, "height": 0.43, "units": "normalized"},
+      "observations": ["Two wall tiers, shoji grids, roof overhangs, and supports are visible."],
+      "confidence": 0.9
+    },
+    {
+      "id": "mast-sail",
+      "view": "three-quarter starboard",
+      "imageRegion": {"x": 0.53, "y": 0.08, "width": 0.4, "height": 0.48, "units": "normalized"},
+      "observations": ["Mast, boom, segmented sail, and four main rig lines are visible."],
+      "confidence": 0.84
+    },
+    {
+      "id": "oar-bank",
+      "view": "three-quarter starboard",
+      "imageRegion": {"x": 0.25, "y": 0.58, "width": 0.62, "height": 0.28, "units": "normalized"},
+      "observations": ["Starboard oars are explicit; port count is inferred by symmetry and image annotation."],
+      "confidence": 0.82
+    },
+    {
+      "id": "deck-details",
+      "view": "three-quarter starboard",
+      "imageRegion": {"x": 0.08, "y": 0.34, "width": 0.78, "height": 0.38, "units": "normalized"},
+      "observations": ["Rail posts, shields, lanterns, stairs, roof ribs, and prow ornament establish scale."],
+      "confidence": 0.76
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Tower Ship root",
+      "level": "macro",
+      "role": "root",
+      "importance": 1.0,
+      "confidence": 1.0,
+      "primitive": "box",
+      "parent": null,
+      "attachment": null,
+      "dimensions": {"width": 20, "height": 13, "depth": 8, "units": "world", "confidence": 0.86},
+      "transform": {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "root", "pivot": {"mode": "waterline-center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 0.9}, "collider": {"type": "compound", "offset": [0, 2, 0], "scale": [10, 3, 2.3], "isTrigger": false}, "destruction": {"breakable": false, "fractureGroup": "vessel", "seamRefs": ["deck-seam"], "detachableFragments": ["tower", "mast-rig"], "breakImpulse": 0, "debrisMaterial": "warm-wood"}},
+      "material": "warm-wood",
+      "materialLayers": ["warm-wood", "dark-wood", "aged-metal"],
+      "localFeatures": ["overall sheer line"],
+      "evidenceRefs": ["full-object"]
+    },
+    {
+      "id": "hull",
+      "name": "Station-built curved hull",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.86,
+      "primitive": "curve-sweep",
+      "parent": "root",
+      "attachment": {"parentId": "root", "parentSocket": "waterline-center", "localStart": [-10, 0, 0], "localEnd": [10, 0, 0], "contactType": "embedded", "embedDepth": 0.2, "gapTolerance": 0.02, "evidenceRefs": ["ship-body"]},
+      "dimensions": {"width": 20, "height": 3.4, "depth": 4.7, "units": "world", "confidence": 0.86},
+      "transform": {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "structural-shell", "pivot": {"mode": "waterline-center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 0.9}, "collider": {"type": "compound-boxes", "offset": [0, 1, 0], "scale": [10, 2, 2.2], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "hull-shell", "seamRefs": ["deck-seam", "station-seams"], "detachableFragments": ["bow", "stern"], "breakImpulse": 18, "debrisMaterial": "warm-wood"}},
+      "material": "warm-wood",
+      "materialLayers": ["warm-wood", "dark-wood"],
+      "localFeatures": ["tapered station rings", "raised stern post", "raised prow post", "dark gunwale band"],
+      "evidenceRefs": ["ship-body"]
+    },
+    {
+      "id": "tower",
+      "name": "Central tower assembly",
+      "level": "macro",
+      "role": "architecture",
+      "importance": 0.96,
+      "confidence": 0.9,
+      "primitive": "box",
+      "parent": "root",
+      "dimensions": {"width": 6.1, "height": 6.6, "depth": 3.8, "units": "world", "confidence": 0.88},
+      "transform": {"position": [-0.5, 2.5, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "detachable-architecture", "pivot": {"mode": "base", "localPosition": [0, -3.3, 0], "axis": [0, 1, 0], "confidence": 0.9}, "collider": {"type": "box", "offset": [0, 3.3, 0], "scale": [3.1, 3.3, 1.9], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "tower", "seamRefs": ["tower-deck-seam"], "detachableFragments": ["roof-lower", "roof-upper"], "breakImpulse": 15, "debrisMaterial": "dark-wood"}},
+      "material": "dark-wood",
+      "materialLayers": ["dark-wood", "paper-panel"],
+      "localFeatures": ["exposed dark post frame"],
+      "evidenceRefs": ["tower-cabin"]
+    },
+    {
+      "id": "deck",
+      "name": "Raised deck and gunwales",
+      "level": "meso",
+      "role": "platform",
+      "importance": 0.82,
+      "confidence": 0.84,
+      "primitive": "box",
+      "parent": "hull",
+      "dimensions": {"width": 16.5, "height": 0.35, "depth": 3.8, "units": "world", "confidence": 0.84},
+      "transform": {"position": [0, 2.4, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "structural-platform", "pivot": {"mode": "center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 0.9}, "collider": {"type": "box", "offset": [0, 0, 0], "scale": [8.2, 0.2, 1.9], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "deck", "seamRefs": ["deck-seam"], "detachableFragments": ["deck-details"], "breakImpulse": 12, "debrisMaterial": "warm-wood"}},
+      "material": "warm-wood",
+      "materialLayers": ["warm-wood"],
+      "localFeatures": ["longitudinal plank seams"],
+      "evidenceRefs": ["ship-body"]
+    },
+    {
+      "id": "cabin-lower",
+      "name": "Lower shoji cabin",
+      "level": "meso",
+      "role": "architecture",
+      "importance": 0.9,
+      "confidence": 0.9,
+      "primitive": "box",
+      "parent": "tower",
+      "dimensions": {"width": 5.4, "height": 2.15, "depth": 3.2, "units": "world", "confidence": 0.9},
+      "transform": {"position": [0, 1.1, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "detachable-room", "pivot": {"mode": "base", "localPosition": [0, -1.08, 0], "axis": [0, 1, 0], "confidence": 0.9}, "collider": {"type": "box", "offset": [0, 0, 0], "scale": [2.7, 1.1, 1.6], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "lower-cabin", "seamRefs": ["lower-frame"], "detachableFragments": ["lower-panels"], "breakImpulse": 8, "debrisMaterial": "paper-panel"}},
+      "material": "paper-panel",
+      "materialLayers": ["paper-panel", "dark-wood"],
+      "localFeatures": ["shoji vertical grids", "shoji horizontal grids"],
+      "evidenceRefs": ["tower-cabin"]
+    },
+    {
+      "id": "roof-lower",
+      "name": "Lower pagoda roof",
+      "level": "meso",
+      "role": "roof",
+      "importance": 0.88,
+      "confidence": 0.88,
+      "primitive": "curve-sweep",
+      "parent": "tower",
+      "attachment": {"parentId": "tower", "parentSocket": "lower-cabin-top", "localStart": [-3.2, 2.25, 0], "localEnd": [3.2, 2.25, 0], "contactType": "overlap", "overlap": 0.18, "gapTolerance": 0.02, "evidenceRefs": ["tower-cabin"]},
+      "dimensions": {"width": 6.8, "height": 0.65, "depth": 4.3, "units": "world", "confidence": 0.88},
+      "transform": {"position": [0, 2.35, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "detachable-roof", "pivot": {"mode": "base", "localPosition": [0, -0.3, 0], "axis": [0, 1, 0], "confidence": 0.88}, "collider": {"type": "box", "offset": [0, 0, 0], "scale": [3.4, 0.35, 2.2], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "lower-roof", "seamRefs": ["lower-roof-ridge"], "detachableFragments": ["lower-eaves"], "breakImpulse": 10, "debrisMaterial": "dark-wood"}},
+      "material": "dark-wood",
+      "materialLayers": ["dark-wood"],
+      "localFeatures": ["segmented roof ribs", "upturned corners"],
+      "evidenceRefs": ["tower-cabin"]
+    },
+    {
+      "id": "cabin-upper",
+      "name": "Upper shoji cabin",
+      "level": "meso",
+      "role": "architecture",
+      "importance": 0.86,
+      "confidence": 0.88,
+      "primitive": "box",
+      "parent": "tower",
+      "dimensions": {"width": 4.3, "height": 1.8, "depth": 2.7, "units": "world", "confidence": 0.88},
+      "transform": {"position": [0, 3.42, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "detachable-room", "pivot": {"mode": "base", "localPosition": [0, -0.9, 0], "axis": [0, 1, 0], "confidence": 0.88}, "collider": {"type": "box", "offset": [0, 0, 0], "scale": [2.15, 0.9, 1.35], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "upper-cabin", "seamRefs": ["upper-frame"], "detachableFragments": ["upper-panels"], "breakImpulse": 7, "debrisMaterial": "paper-panel"}},
+      "material": "paper-panel",
+      "materialLayers": ["paper-panel", "dark-wood"],
+      "localFeatures": ["upper shoji grid"],
+      "evidenceRefs": ["tower-cabin"]
+    },
+    {
+      "id": "roof-upper",
+      "name": "Upper pagoda roof",
+      "level": "meso",
+      "role": "roof",
+      "importance": 0.86,
+      "confidence": 0.87,
+      "primitive": "curve-sweep",
+      "parent": "tower",
+      "attachment": {"parentId": "tower", "parentSocket": "upper-cabin-top", "localStart": [-2.7, 4.4, 0], "localEnd": [2.7, 4.4, 0], "contactType": "overlap", "overlap": 0.16, "gapTolerance": 0.02, "evidenceRefs": ["tower-cabin"]},
+      "dimensions": {"width": 5.7, "height": 0.6, "depth": 3.6, "units": "world", "confidence": 0.87},
+      "transform": {"position": [0, 4.45, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "detachable-roof", "pivot": {"mode": "base", "localPosition": [0, -0.3, 0], "axis": [0, 1, 0], "confidence": 0.87}, "collider": {"type": "box", "offset": [0, 0, 0], "scale": [2.85, 0.3, 1.8], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "upper-roof", "seamRefs": ["upper-roof-ridge"], "detachableFragments": ["upper-eaves"], "breakImpulse": 9, "debrisMaterial": "dark-wood"}},
+      "material": "dark-wood",
+      "materialLayers": ["dark-wood"],
+      "localFeatures": ["upper roof ribs"],
+      "evidenceRefs": ["tower-cabin"]
+    },
+    {
+      "id": "mast",
+      "name": "Main mast",
+      "level": "meso",
+      "role": "support",
+      "importance": 0.9,
+      "confidence": 0.9,
+      "primitive": "cylinder",
+      "parent": "root",
+      "attachment": {"parentId": "root", "parentSocket": "mast-step", "localStart": [1.5, 2.4, 0], "localEnd": [1.5, 12.1, 0], "baseRadius": 0.18, "endRadius": 0.12, "contactType": "embedded", "embedDepth": 0.35, "gapTolerance": 0.01, "evidenceRefs": ["mast-sail"]},
+      "dimensions": {"radius": 0.18, "length": 9.7, "units": "world", "confidence": 0.9},
+      "transform": {"position": [1.5, 2.4, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "mast-root", "pivot": {"mode": "base", "localPosition": [0, 0, 0], "axis": [0, 0, 1], "confidence": 0.92}, "collider": {"type": "capsule", "offset": [0, 4.85, 0], "scale": [0.18, 4.85, 0.18], "isTrigger": false}, "destruction": {"breakable": true, "fractureGroup": "mast-rig", "seamRefs": ["mast-step"], "detachableFragments": ["sail", "rigging"], "breakImpulse": 14, "debrisMaterial": "dark-wood"}},
+      "material": "dark-wood",
+      "materialLayers": ["dark-wood"],
+      "localFeatures": ["mast crown finial"],
+      "evidenceRefs": ["mast-sail"]
+    },
+    {
+      "id": "sail",
+      "name": "Segmented tan sail",
+      "level": "meso",
+      "role": "wing",
+      "importance": 0.94,
+      "confidence": 0.86,
+      "primitive": "plane-card",
+      "parent": "mast",
+      "attachment": {"parentId": "mast", "parentSocket": "sail-luff", "localStart": [0, 2.2, 0], "localEnd": [0, 8.6, 0], "contactType": "overlap", "overlap": 0.08, "gapTolerance": 0.02, "evidenceRefs": ["mast-sail"]},
+      "dimensions": {"width": 5.4, "height": 6.4, "depth": 0.08, "units": "world", "confidence": 0.86},
+      "transform": {"position": [0.1, 2.2, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "cloth-rig", "pivot": {"mode": "luff-edge", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 0.88}, "collider": {"type": "thin-box", "offset": [2.7, 3.2, 0], "scale": [2.7, 3.2, 0.05], "isTrigger": true}, "destruction": {"breakable": true, "fractureGroup": "sail", "seamRefs": ["sail-luff", "sail-battens"], "detachableFragments": ["sail-panels"], "breakImpulse": 6, "debrisMaterial": "sail-cloth"}},
+      "material": "sail-cloth",
+      "materialLayers": ["sail-cloth", "dark-wood"],
+      "localFeatures": ["horizontal battens", "alternating panel values"],
+      "evidenceRefs": ["mast-sail"]
+    },
+    {
+      "id": "rigging",
+      "name": "Rigging line system",
+      "level": "meso",
+      "role": "cable",
+      "importance": 0.72,
+      "confidence": 0.8,
+      "primitive": "tube",
+      "parent": "mast",
+      "attachment": {"parentId": "mast", "parentSocket": "mast-crown", "localStart": [0, 9.4, 0], "localEnd": [4.8, -0.2, 1.8], "baseRadius": 0.025, "endRadius": 0.025, "contactType": "socket", "overlap": 0.03, "gapTolerance": 0.01, "evidenceRefs": ["mast-sail"]},
+      "dimensions": {"radius": 0.025, "length": 12, "units": "world", "confidence": 0.8},
+      "transform": {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "tension-line", "pivot": {"mode": "socket", "localPosition": [0, 9.4, 0], "axis": [0, 1, 0], "confidence": 0.8}, "collider": {"type": "none", "offset": [0, 0, 0], "scale": [0, 0, 0], "isTrigger": true}, "destruction": {"breakable": true, "fractureGroup": "mast-rig", "seamRefs": ["rig-sockets"], "detachableFragments": ["rig-lines"], "breakImpulse": 2, "debrisMaterial": "rig-rope"}},
+      "material": "rig-rope",
+      "materialLayers": ["rig-rope"],
+      "localFeatures": ["four tension paths"],
+      "evidenceRefs": ["mast-sail"]
+    },
+    {
+      "id": "oar-bank",
+      "name": "Twenty-four articulated oars",
+      "level": "meso",
+      "role": "appendage",
+      "importance": 0.92,
+      "confidence": 0.84,
+      "primitive": "instanced-cluster",
+      "parent": "hull",
+      "attachment": {"parentId": "hull", "parentSocket": "gunwale-oar-sockets", "localStart": [-7.2, 2.1, -2.0], "localEnd": [7.2, 2.1, 2.0], "contactType": "hinge", "overlap": 0.08, "gapTolerance": 0.02, "evidenceRefs": ["oar-bank"]},
+      "dimensions": {"width": 15.2, "height": 4.4, "depth": 8.2, "units": "world", "confidence": 0.84},
+      "transform": {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "articulated-bank", "pivot": {"mode": "per-oar-hinge", "localPosition": [0, 0, 0], "axis": [1, 0, 0], "confidence": 0.9}, "collider": {"type": "per-oar-capsule", "offset": [0, -1.4, 0], "scale": [0.06, 2.2, 0.06], "isTrigger": true}, "destruction": {"breakable": true, "fractureGroup": "oar-bank", "seamRefs": ["oarlocks"], "detachableFragments": ["oar-00-through-23"], "breakImpulse": 4, "debrisMaterial": "warm-wood"}},
+      "material": "warm-wood",
+      "materialLayers": ["warm-wood", "aged-metal"],
+      "localFeatures": ["blade widening", "metal oarlock collars"],
+      "evidenceRefs": ["oar-bank"]
+    },
+    {
+      "id": "deck-details",
+      "name": "Deck detail assembly",
+      "level": "meso",
+      "role": "ornament",
+      "importance": 0.76,
+      "confidence": 0.76,
+      "primitive": "instanced-cluster",
+      "parent": "deck",
+      "dimensions": {"width": 16, "height": 2.2, "depth": 4.2, "units": "world", "confidence": 0.76},
+      "transform": {"position": [0, 0.2, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "detachable-props", "pivot": {"mode": "per-prop-base", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 0.8}, "collider": {"type": "compound", "offset": [0, 0.8, 0], "scale": [8, 1.1, 2.1], "isTrigger": true}, "destruction": {"breakable": true, "fractureGroup": "deck-props", "seamRefs": ["rail-sockets", "lantern-hooks"], "detachableFragments": ["shields", "lanterns", "rails"], "breakImpulse": 5, "debrisMaterial": "dark-wood"}},
+      "material": "dark-wood",
+      "materialLayers": ["dark-wood", "aged-metal", "paper-panel"],
+      "localFeatures": ["rail posts", "round shields", "hanging lanterns", "stern stairs", "prow fork ornament"],
+      "evidenceRefs": ["deck-details"]
+    }
+  ],
+  "materials": [
+    {
+      "id": "warm-wood",
+      "name": "Warm aged hull wood",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#9A552D",
+      "albedo": {"dominant": "#9A552D", "secondary": ["#64331F", "#C27B40"], "samplingNotes": "Warm hull and plank zones, image-informed rather than exact."},
+      "colorVariation": {"palette": ["#64331F", "#9A552D", "#C27B40"], "pattern": "object-space plank bands", "amplitude": 0.18, "heightCorrelation": 0.25},
+      "roughness": {"base": 0.72, "variation": 0.16, "map": "independent object-space grain field", "localResponse": "rough cavities and smoother handled rails"},
+      "metalness": {"base": 0, "variation": 0},
+      "normal": {"pattern": "independent longitudinal grain", "strength": 0.22, "scale": 18, "space": "object"},
+      "ambientOcclusion": {"cavityStrength": 0.28, "contactShadowBias": 0.3, "notes": "Darken plank seams and component contacts."},
+      "wear": {"edgeWear": 0.12, "scratches": ["longitudinal scuffs"], "chips": ["gunwale nicks"]},
+      "dirt": {"amount": 0.1, "cavityBias": 0.65, "color": "#281A14"},
+      "localOverrides": ["darker waterline", "polished rail contact zones"],
+      "surfaceFrequencyBands": [{"id": "macro", "frequency": 1.2, "amplitude": 0.18}, {"id": "meso", "frequency": 8, "amplitude": 0.08}, {"id": "micro", "frequency": 46, "amplitude": 0.025}],
+      "textureProjection": {"mode": "object-space procedural", "repeat": [3, 1], "anisotropy": 8, "texelDensityIntent": "grain follows hull length"},
+      "textureResolution": 1024,
+      "shaderNotes": ["Independent color and roughness fields; no albedo channel reuse."]
+    },
+    {
+      "id": "dark-wood",
+      "name": "Dark structural timber",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#2B1A18",
+      "albedo": {"dominant": "#2B1A18", "secondary": ["#44261F", "#171012"]},
+      "roughness": {"base": 0.66, "variation": 0.12, "map": "independent fine-grain field"},
+      "metalness": {"base": 0, "variation": 0},
+      "normal": {"pattern": "fine grain", "strength": 0.16, "scale": 26, "space": "object"},
+      "ambientOcclusion": {"cavityStrength": 0.25, "contactShadowBias": 0.4},
+      "localOverrides": ["lighter roof edge wear"],
+      "surfaceFrequencyBands": [{"id": "macro", "frequency": 1, "amplitude": 0.12}, {"id": "meso", "frequency": 9, "amplitude": 0.06}, {"id": "micro", "frequency": 52, "amplitude": 0.02}],
+      "textureProjection": {"mode": "object-space procedural", "repeat": [2, 2], "anisotropy": 8},
+      "textureResolution": 1024
+    },
+    {
+      "id": "paper-panel",
+      "name": "Pale shoji panel",
+      "type": "node-physical",
+      "shaderModel": "MeshPhysicalNodeMaterial",
+      "baseColor": "#E6D8B7",
+      "albedo": {"dominant": "#E6D8B7", "secondary": ["#CBB98E", "#F3E8CE"]},
+      "roughness": {"base": 0.88, "variation": 0.06, "map": "independent fiber field"},
+      "metalness": {"base": 0, "variation": 0},
+      "normal": {"pattern": "paper fiber", "strength": 0.06, "scale": 70, "space": "tangent"},
+      "ambientOcclusion": {"cavityStrength": 0.12, "contactShadowBias": 0.2},
+      "localOverrides": ["slightly darker panel edges"],
+      "surfaceFrequencyBands": [{"id": "macro", "frequency": 1.5, "amplitude": 0.06}, {"id": "meso", "frequency": 13, "amplitude": 0.025}, {"id": "micro", "frequency": 74, "amplitude": 0.01}],
+      "textureProjection": {"mode": "panel uv", "repeat": [1, 1], "anisotropy": 8},
+      "textureResolution": 1024
+    },
+    {
+      "id": "sail-cloth",
+      "name": "Segmented tan sail cloth",
+      "type": "node-physical",
+      "shaderModel": "MeshPhysicalNodeMaterial",
+      "baseColor": "#C5A461",
+      "albedo": {"dominant": "#C5A461", "secondary": ["#9F7F45", "#DFC684"]},
+      "roughness": {"base": 0.82, "variation": 0.1, "map": "independent woven field"},
+      "metalness": {"base": 0, "variation": 0},
+      "normal": {"pattern": "cross-woven fiber", "strength": 0.12, "scale": 38, "space": "tangent"},
+      "ambientOcclusion": {"cavityStrength": 0.14, "contactShadowBias": 0.18},
+      "localOverrides": ["darker seams and lower panels"],
+      "surfaceFrequencyBands": [{"id": "macro", "frequency": 0.8, "amplitude": 0.1}, {"id": "meso", "frequency": 7, "amplitude": 0.04}, {"id": "micro", "frequency": 48, "amplitude": 0.015}],
+      "textureProjection": {"mode": "sail uv", "repeat": [1, 2], "anisotropy": 8},
+      "textureResolution": 1024
+    },
+    {
+      "id": "aged-metal",
+      "name": "Muted aged metal",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "baseColor": "#5D5851",
+      "albedo": {"dominant": "#5D5851", "secondary": ["#35363A", "#83786A"]},
+      "roughness": {"base": 0.48, "variation": 0.2, "map": "independent patina field"},
+      "metalness": {"base": 0.76, "variation": 0.16},
+      "normal": {"pattern": "hammered speckle", "strength": 0.1, "scale": 44, "space": "object"},
+      "ambientOcclusion": {"cavityStrength": 0.2, "contactShadowBias": 0.25},
+      "localOverrides": ["dark patina in shield recesses", "brighter oarlock contact wear"],
+      "surfaceFrequencyBands": [{"id": "macro", "frequency": 1.4, "amplitude": 0.12}, {"id": "meso", "frequency": 11, "amplitude": 0.05}, {"id": "micro", "frequency": 58, "amplitude": 0.018}],
+      "textureProjection": {"mode": "object-space procedural", "repeat": [2, 2], "anisotropy": 8},
+      "textureResolution": 1024
+    },
+    {
+      "id": "rig-rope",
+      "name": "Dark rigging rope",
+      "type": "node-standard",
+      "shaderModel": "MeshStandardNodeMaterial",
+      "qualityTier": "utility",
+      "baseColor": "#1E1715",
+      "albedo": {"dominant": "#1E1715", "secondary": ["#30241E"]},
+      "roughness": {"base": 0.9, "variation": 0.04, "map": "independent rope twist field"},
+      "metalness": {"base": 0, "variation": 0},
+      "normal": {"pattern": "rope twist", "strength": 0.06, "scale": 72, "space": "tangent"},
+      "ambientOcclusion": {"cavityStrength": 0.1, "contactShadowBias": 0.1},
+      "localOverrides": ["slightly polished knot contacts"]
+    }
+  ],
+  "repetitionSystems": [
+    {"id": "oars-24", "count": 24, "distribution": "12 sockets per side along x=-7.2..7.2; blade angles follow side sign", "componentRef": "oar-bank", "stableIdRule": "oar-{port|starboard}-{00..11}"},
+    {"id": "shoji-grids", "count": 44, "distribution": "vertical and horizontal mullions across lower and upper cabin faces", "componentRef": "tower", "stableIdRule": "shoji-{tier}-{face}-{axis}-{index}"},
+    {"id": "roof-ribs", "count": 20, "distribution": "five curved ribs per roof face with lifted terminal points", "componentRef": "tower", "stableIdRule": "roof-rib-{tier}-{face}-{index}"},
+    {"id": "rail-and-shield-rhythm", "count": 32, "distribution": "regular deck rail posts with selected starboard shield mounts", "componentRef": "deck-details", "stableIdRule": "deck-detail-{type}-{index}"},
+    {"id": "lanterns", "count": 4, "distribution": "paired warm lanterns at cabin corners", "componentRef": "deck-details", "stableIdRule": "lantern-{corner}"}
+  ],
+  "buildPasses": [
+    {"id": "blockout", "goal": "Prove hull, tower, mast, sail, and oar-bank proportions.", "componentRefs": ["hull", "tower", "mast", "sail", "oar-bank"], "acceptance": ["Design-camera silhouette preserves all four critical systems.", "AI vision score meets threshold."]},
+    {"id": "structural-pass", "goal": "Build semantic hierarchy, sockets, and repetition systems.", "componentRefs": ["root", "tower", "mast", "oar-bank"], "acceptance": ["Runtime maps expose stable nodes and sockets.", "Oars pivot at gunwales without gaps."]},
+    {"id": "form-refinement", "goal": "Refine hull stations, roof lift, sail curvature, and deck detail rhythm.", "componentRefs": ["hull", "roof-lower", "roof-upper", "sail", "deck-details"], "acceptance": ["Profile and bow cameras preserve continuous attachments.", "AI vision score meets threshold."]},
+    {"id": "material-pass", "goal": "Separate five reference-observed material zones.", "componentRefs": ["hull", "tower", "sail", "deck-details"], "acceptance": ["Neutral light distinguishes wood, panel, cloth, and metal.", "No exact PBR recovery claim is made."]},
+    {"id": "surface-pass", "goal": "Add scale-aware procedural roughness and local response.", "componentRefs": ["hull", "tower", "sail"], "acceptance": ["Grazing light reveals nonuniform response without texture swimming."]},
+    {"id": "lighting-pass", "goal": "Establish readable studio and reference-like lighting.", "componentRefs": ["root"], "acceptance": ["Key, fill, rim, ACES exposure, and contact shadow are explicit."]},
+    {"id": "interaction-pass", "goal": "Prove articulated oars, sail flex, lantern sway, and stable sockets.", "componentRefs": ["oar-bank", "sail", "deck-details"], "acceptance": ["Animation originates at semantic pivots and remains deterministic at fixed time."]},
+    {"id": "optimization-pass", "goal": "Reduce secondary radial segments and detail density by tier.", "componentRefs": ["root"], "acceptance": ["Every tier preserves silhouette, 24 oars, and semantic IDs."]}
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {"tier": "full", "distance": 0, "strategy": "Full hull stations, roof ribs, grids, shields, lanterns, and curved oar blades."},
+    {"tier": "budgeted", "distance": 24, "strategy": "Preserve 24 oars and primary silhouette; reduce cylinder and curve segments."},
+    {"tier": "minimum", "distance": 48, "strategy": "Preserve named systems and counts; reduce secondary grids, ribs, and ornaments."}
+  ],
+  "performanceBudget": {
+    "qualityPriority": "interactive-demo-fidelity",
+    "targetTriangles": 120000,
+    "maxDrawCalls": 180,
+    "textureSize": 1024,
+    "fpsTarget": 60,
+    "optimizationPolicy": "No performance claim passes without measured sustained evidence; tiers preserve identity-critical invariants first."
+  },
+  "lightingFromPhoto": [
+    "Key light: warm-white directional light from camera-left and above, soft shadow footprint, intensity selected by neutral material readability.",
+    "Fill light: cool hemisphere response below the key to retain shoji and dark-frame detail.",
+    "Rim light: warm directional back-right cue separates the sail, mast, and roof corners.",
+    "Presentation: ACES tone mapping with explicit exposure 1.05; WebGPURenderer owns final output transform.",
+    "Ground/contact shadow: transparent receiving plane under the hull; no screen-space AO pass is required for the demo."
+  ],
+  "proceduralStrategy": [
+    "Compile a station-ring indexed hull with semantic material groups.",
+    "Build tower tiers and curved segmented roofs as named groups.",
+    "Generate all repeated systems from deterministic counts and stable IDs.",
+    "Create oar pivots at gunwale sockets and generate blades outward from local roots.",
+    "Use NodeMaterial-compatible procedural color/roughness response without postprocessing.",
+    "Expose final, blockout, hierarchy, materials, and interaction modes from the same object factory."
+  ],
+  "animationAnchors": ["root", "mast", "sail", "oar-port-00-through-11", "oar-starboard-00-through-11", "lantern-corners"],
+  "destructionAnchors": ["hull-shell", "tower", "lower-roof", "upper-roof", "mast-rig", "oar-bank", "deck-props"],
+  "risks": [
+    "Hidden port-side and lower-hull geometry remains inferred from one view.",
+    "Exact cloth weave, wood grain, and PBR values are not recoverable from the composite screenshot.",
+    "Visual fidelity threshold requires post-implementation AI vision review before acceptance."
+  ]
+}
