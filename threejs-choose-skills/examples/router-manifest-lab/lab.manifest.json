@@ -9,6 +9,8 @@
   "canonicalSource": [
     "threejs-choose-skills/examples/router-manifest-lab/router-core.mjs",
     "threejs-choose-skills/examples/router-manifest-lab/router-fixtures.json",
+    "threejs-choose-skills/examples/router-manifest-lab/route-urls.mjs",
+    "threejs-choose-skills/examples/router-manifest-lab/runnable-demos.mjs",
     "threejs-choose-skills/examples/router-manifest-lab/app.mjs"
   ],
   "browserEntry": "threejs-choose-skills/examples/router-manifest-lab/index.html",
