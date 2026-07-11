@@ -1,29 +1,30 @@
 export const SIDES = ["front", "back", "left", "right"];
-const EPSILON = 0.001;
 
-function overlap(a, b) {
-  return Math.max(a.start, b.start) < Math.min(a.end, b.end) - EPSILON;
+function overlap(a, b, tolerance) {
+  return Math.max(a.start, b.start) < Math.min(a.end, b.end) - tolerance;
 }
 
-function subtractInterval(segments, blocker) {
+function subtractInterval(segments, blocker, tolerance) {
   const result = [];
   for (const segment of segments) {
-    if (!overlap(segment, blocker)) {
+    if (!overlap(segment, blocker, tolerance)) {
       result.push(segment);
       continue;
     }
-    if (blocker.start > segment.start + EPSILON) {
+    if (blocker.start > segment.start + tolerance) {
       result.push({
         ...segment,
         end: Math.min(blocker.start, segment.end),
         clippedEnd: true,
+        blockers: [...(segment.blockers ?? []), blocker],
       });
     }
-    if (blocker.end < segment.end - EPSILON) {
+    if (blocker.end < segment.end - tolerance) {
       result.push({
         ...segment,
         start: Math.max(blocker.end, segment.start),
         clippedStart: true,
+        blockers: [...(segment.blockers ?? []), blocker],
       });
     }
   }
@@ -49,11 +50,11 @@ function sideInterval(rect, side) {
   };
 }
 
-function touches(rect, other, side) {
-  if (side === "front") return Math.abs(other.z0 - rect.z1) <= EPSILON;
-  if (side === "back") return Math.abs(other.z1 - rect.z0) <= EPSILON;
-  if (side === "right") return Math.abs(other.x0 - rect.x1) <= EPSILON;
-  return Math.abs(other.x1 - rect.x0) <= EPSILON;
+function touches(rect, other, side, tolerance) {
+  if (side === "front") return Math.abs(other.z0 - rect.z1) <= tolerance;
+  if (side === "back") return Math.abs(other.z1 - rect.z0) <= tolerance;
+  if (side === "right") return Math.abs(other.x0 - rect.x1) <= tolerance;
+  return Math.abs(other.x1 - rect.x0) <= tolerance;
 }
 
 function blockerInterval(other, side) {
@@ -61,23 +62,30 @@ function blockerInterval(other, side) {
   return { start: other.z0, end: other.z1 };
 }
 
-export function computeExposedEdges(footprintPieces) {
+export function computeExposedEdges(footprintPieces, {
+  tierId = "unassigned-tier",
+  tolerance = 0.001,
+  minimumLength = 0.25,
+} = {}) {
+  if (!(tolerance > 0) || !(minimumLength > 0)) throw new RangeError("edge tolerances must be positive");
   const exposedEdges = [];
   for (const rect of footprintPieces) {
     for (const side of SIDES) {
       const base = sideInterval(rect, side);
-      let segments = [{ start: base.start, end: base.end, clippedStart: false, clippedEnd: false }];
+      let segments = [{ start: base.start, end: base.end, clippedStart: false, clippedEnd: false, blockers: [] }];
       for (const other of footprintPieces) {
-        if (other.id === rect.id || !touches(rect, other, side)) continue;
-        segments = subtractInterval(segments, blockerInterval(other, side));
+        if (other.id === rect.id || !touches(rect, other, side, tolerance)) continue;
+        const blocker = blockerInterval(other, side);
+        segments = subtractInterval(segments, { ...blocker, pieceId: other.id }, tolerance);
       }
       segments
-        .filter((segment) => segment.end - segment.start >= 0.25)
+        .filter((segment) => segment.end - segment.start >= minimumLength)
         .forEach((segment, index) => {
           const center = (segment.start + segment.end) / 2;
           const length = segment.end - segment.start;
           exposedEdges.push({
-            id: `${rect.id}:${side}:${index}`,
+            id: `${tierId}:${rect.id}:${side}:${index}`,
+            tierId,
             pieceId: rect.id,
             side,
             center,
@@ -90,6 +98,8 @@ export function computeExposedEdges(footprintPieces) {
             isOuterCornerEnd: !segment.clippedEnd,
             isInnerCornerStart: segment.clippedStart,
             isInnerCornerEnd: segment.clippedEnd,
+            blockerIntervals: segment.blockers,
+            tolerance,
           });
         });
     }

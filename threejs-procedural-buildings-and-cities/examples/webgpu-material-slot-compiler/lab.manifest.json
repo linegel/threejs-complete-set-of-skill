@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-material-slot-compiler",
+  "skill": "threejs-procedural-buildings-and-cities",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
+  ],
+  "browserEntry": "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/index.html",
+  "publishPath": "/demos/webgpu-material-slot-compiler/",
+  "scenarios": [
+    { "id": "single-tower", "startup": { "scenario": "single-tower" } },
+    { "id": "compound-footprint", "startup": { "scenario": "compound-footprint" } },
+    { "id": "courtyard", "startup": { "scenario": "courtyard" } },
+    { "id": "twin-towers-bridge", "startup": { "scenario": "twin-towers-bridge" } },
+    { "id": "high-ornament", "startup": { "scenario": "high-ornament" } },
+    { "id": "distant-skyline", "startup": { "scenario": "distant-skyline" } }
+  ],
+  "mechanisms": [
+    { "id": "massing-grammar", "route": "mechanism/massing-grammar/", "startup": { "mode": "massing-grammar" } },
+    { "id": "exposed-edge-analysis", "route": "mechanism/exposed-edge-analysis/", "startup": { "mode": "exposed-edge-analysis" } },
+    { "id": "facade-ownership", "route": "mechanism/facade-ownership/", "startup": { "mode": "facade-ownership" } },
+    { "id": "module-geometry", "route": "mechanism/module-geometry/", "startup": { "mode": "module-geometry" } },
+    { "id": "material-slot-compilation", "route": "mechanism/material-slot-compilation/", "startup": { "mode": "material-slot-compilation" } },
+    { "id": "city-chunks-and-lod", "route": "mechanism/city-chunks-and-lod/", "startup": { "mode": "city-chunks-and-lod" } }
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetClass": "close-inspection-building",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 2 },
+      "mechanismLimits": { "facadeFloorStride": 1, "archRadialSegments": 10, "ornament": true, "representation": "merged-or-editable-batched" },
+      "resourceLimits": { "materialSlots": 8 },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["mass grammar", "exposed-edge ownership", "structural closure", "physical UV scale", "material slots"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "city",
+      "targetClass": "city-chunk",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 1.5 },
+      "mechanismLimits": { "facadeFloorStride": 2, "archRadialSegments": 6, "ornament": false, "representation": "chunked-material-slots" },
+      "resourceLimits": { "materialSlots": 8 },
+      "degradationFromPrevious": ["reduced facade sampling", "removed one-off ornament rewrites"],
+      "preservedInvariants": ["mass grammar", "exposed-edge ownership", "structural closure", "physical UV scale", "material slots"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "distant",
+      "targetClass": "skyline-sector",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": 1 },
+      "mechanismLimits": { "facadeFloorStride": 4, "archRadialSegments": 6, "ornament": false, "representation": "runtime-compiled-merged-material-slots" },
+      "resourceLimits": { "materialSlots": 8 },
+      "degradationFromPrevious": ["replaced sub-pixel window modules with facade panels", "coarsened roof detail"],
+      "preservedInvariants": ["primary silhouette", "mass grammar", "exposed-edge ownership", "structural closure", "material slots"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["massing-grammar", "exposed-edge-analysis", "facade-ownership", "module-geometry", "material-slot-compilation", "city-chunks-and-lod"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "The canonical controller blocks unless renderer.backend.isWebGPUBackend is true after initialization.",
+      "status": "incomplete"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "Await createBuildingLabController(), which awaits renderer.init() before constructing proof state.",
+      "status": "incomplete"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "Capture renderer.backend.isWebGPUBackend === true from the initialized controller.",
+      "status": "incomplete"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "Load every physical mechanism route and reconcile its locked startup mode with the compiled runtime representation.",
+      "status": "incomplete"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "Capture MRT pixels using the controller's integer 256-byte-aligned row-stride contract.",
+      "status": "incomplete"
+    },
+    {
+      "id": "compiled-resource-ledger",
+      "required": true,
+      "evidence": "Reconcile actual material-slot vertex/index allocation and r185 BatchedMesh backend draw entries from runtime resources.",
+      "status": "incomplete"
+    }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "node threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/validate-fixtures.mjs",
+  "sourceHash": null,
+  "proxyStatus": null,
+  "commands": {
+    "check": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run check",
+    "test": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run validate:unit",
+    "mutations": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run test:mutations",
+    "capture": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run capture",
+    "validateArtifacts": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run validate:quick",
+    "validateFull": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run validate:full"
+  }
+}
