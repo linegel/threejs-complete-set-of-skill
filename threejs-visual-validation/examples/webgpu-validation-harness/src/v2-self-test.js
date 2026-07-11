@@ -52,6 +52,35 @@ async function expectMutationRejects( id, expected, mutate ) {
 
 }
 
+async function validateIncompleteBrowserBundle() {
+
+	const dir = await mkdtemp( join( tmpdir(), 'threejs-v2-incomplete-browser-' ) );
+	await writeV2ContractFixture( dir );
+	await mutateJson( dir, 'evidence-manifest.json', ( manifest ) => {
+
+		manifest.bundleKind = 'browser-capture-incomplete';
+		manifest.publishable = false;
+		manifest.backend.isWebGPUBackend = true;
+		manifest.backend.initialized = true;
+		manifest.claimVerdicts = {
+			visualCorrectness: 'PASS',
+			mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
+			performanceCompliance: 'INSUFFICIENT_EVIDENCE',
+			gpuAttribution: 'INSUFFICIENT_EVIDENCE',
+			lifecycleStability: 'INSUFFICIENT_EVIDENCE'
+		};
+
+	} );
+	await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
+
+		rendererInfo.backend = 'WebGPU';
+
+	} );
+	const result = await validateV2ArtifactBundle( dir );
+	return { verdict: 'PASS', bundleKind: result.bundleKind, publishable: result.publishable, retainedFixture: dir };
+
+}
+
 function authored( value, unit = 'fixture unit' ) {
 
 	return numericDatum( value, unit, NumericLabel.AUTHORED, 'v2 mutation fixture' );
@@ -97,7 +126,7 @@ export async function runV2MutationSuite() {
 			} );
 
 		} ),
-		expectMutationRejects( 'missing-timestamp', /missing-timestamp/, async ( dir ) => {
+			expectMutationRejects( 'missing-timestamp', /missing-timestamp/, async ( dir ) => {
 
 			await mutateJson( dir, 'visual-contract.json', ( contract ) => {
 
@@ -115,7 +144,26 @@ export async function runV2MutationSuite() {
 				manifest.publishable = true;
 				manifest.backend.isWebGPUBackend = true;
 				manifest.backend.initialized = true;
-				manifest.claimVerdicts.gpuAttribution = 'PASS';
+				for ( const claim of Object.keys( manifest.claimVerdicts ) ) manifest.claimVerdicts[ claim ] = 'PASS';
+
+			} );
+			await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
+
+				rendererInfo.backend = 'WebGPU';
+
+			} );
+
+		} ),
+		expectMutationRejects( 'publishable-with-insufficient-claim', /requires lifecycleStability verdict PASS/, async ( dir ) => {
+
+			await mutateJson( dir, 'evidence-manifest.json', ( manifest ) => {
+
+				manifest.bundleKind = 'browser-capture';
+				manifest.publishable = true;
+				manifest.backend.isWebGPUBackend = true;
+				manifest.backend.initialized = true;
+				for ( const claim of Object.keys( manifest.claimVerdicts ) ) manifest.claimVerdicts[ claim ] = 'PASS';
+				manifest.claimVerdicts.lifecycleStability = 'INSUFFICIENT_EVIDENCE';
 
 			} );
 			await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
@@ -209,7 +257,7 @@ export async function runV2MutationSuite() {
 	];
 
 	const results = await Promise.all( mutations );
-	return { schemaVersion: 2, mutationCount: results.length, results };
+	return { schemaVersion: 2, mutationCount: results.length, incompleteBrowserBundle: await validateIncompleteBrowserBundle(), results };
 
 }
 

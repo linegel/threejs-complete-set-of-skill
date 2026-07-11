@@ -52,6 +52,11 @@ const CLAIM_CLASSES = Object.freeze( [
 	'lifecycleStability'
 ] );
 
+const BROWSER_CAPTURE_KINDS = new Set( [
+	'browser-capture',
+	'browser-capture-incomplete'
+] );
+
 const OWNERSHIP_SINGLETONS = new Set( [
 	'renderer',
 	'render-pipeline',
@@ -146,6 +151,22 @@ function validateClaimVerdicts( verdicts, bundleKind ) {
 
 	}
 
+	if ( bundleKind === 'browser-capture' ) {
+
+		for ( const claim of CLAIM_CLASSES ) {
+
+			if ( verdicts[ claim ] !== 'PASS' ) throw new Error( `Publishable browser capture requires ${ claim } verdict PASS.` );
+
+		}
+
+	}
+
+	if ( bundleKind === 'browser-capture-incomplete' && CLAIM_CLASSES.every( ( claim ) => verdicts[ claim ] === 'PASS' ) ) {
+
+		throw new Error( 'Incomplete browser capture cannot report every required claim as PASS.' );
+
+	}
+
 }
 
 function validateVisualContract( contract ) {
@@ -223,10 +244,11 @@ function validateEvidenceManifest( manifest ) {
 		'knownCompromises', 'pipelineGraphDigest', 'claimVerdicts'
 	], 'evidence-manifest.json' );
 
-	if ( [ 'browser-capture', 'contract-fixture' ].includes( manifest.bundleKind ) === false ) throw new Error( 'Unknown evidence bundleKind.' );
+	if ( [ ...BROWSER_CAPTURE_KINDS, 'contract-fixture' ].includes( manifest.bundleKind ) === false ) throw new Error( 'Unknown evidence bundleKind.' );
 	requireBoolean( manifest.publishable, 'evidence-manifest.json.publishable' );
 	if ( manifest.bundleKind === 'contract-fixture' && manifest.publishable !== false ) throw new Error( 'Fixture-only bundle cannot be publishable.' );
 	if ( manifest.bundleKind === 'browser-capture' && manifest.publishable !== true ) throw new Error( 'Browser capture bundle must explicitly mark publishable true.' );
+	if ( manifest.bundleKind === 'browser-capture-incomplete' && manifest.publishable !== false ) throw new Error( 'Incomplete browser capture must explicitly mark publishable false.' );
 	if ( manifest.skill !== 'threejs-visual-validation' ) throw new Error( 'evidence-manifest.json skill id is wrong.' );
 	if ( manifest.threeRevision !== '0.185.1' ) throw new Error( 'Canonical v2 evidence requires Three 0.185.1.' );
 	for ( const key of [ 'sceneId', 'evidenceBundleId', 'targetId', 'device', 'browser', 'os', 'renderer', 'qualityState', 'seed', 'pipelineGraphDigest' ] ) requireString( manifest[ key ], `evidence-manifest.json.${ key }` );
@@ -237,7 +259,7 @@ function validateEvidenceManifest( manifest ) {
 	requireBoolean( manifest.backend.initialized, 'evidence-manifest.json.backend.initialized' );
 	requireBoolean( manifest.backend.timestampAvailable, 'evidence-manifest.json.backend.timestampAvailable' );
 
-	if ( manifest.bundleKind === 'browser-capture' && ( manifest.backend.isWebGPUBackend !== true || manifest.backend.initialized !== true ) ) {
+	if ( BROWSER_CAPTURE_KINDS.has( manifest.bundleKind ) && ( manifest.backend.isWebGPUBackend !== true || manifest.backend.initialized !== true ) ) {
 
 		throw new Error( 'Canonical browser capture requires initialized native WebGPU.' );
 
@@ -269,7 +291,7 @@ function validateRendererInfo( rendererInfo, manifest ) {
 		'initializationState', 'deviceErrors', 'rendererInfoSnapshots'
 	], 'renderer-info.json' );
 	if ( rendererInfo.threeRevision !== manifest.threeRevision ) throw new Error( 'renderer-info.json Three revision disagrees with manifest.' );
-	if ( manifest.bundleKind === 'browser-capture' && rendererInfo.backend !== 'WebGPU' ) throw new Error( 'renderer-info.json does not record WebGPU backend.' );
+	if ( BROWSER_CAPTURE_KINDS.has( manifest.bundleKind ) && rendererInfo.backend !== 'WebGPU' ) throw new Error( 'renderer-info.json does not record WebGPU backend.' );
 
 }
 

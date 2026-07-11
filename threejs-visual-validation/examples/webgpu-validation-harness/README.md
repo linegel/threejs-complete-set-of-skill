@@ -14,6 +14,12 @@ This directory contains two deliberately separate surfaces:
 The fixture can never satisfy canonical acceptance. Only evidence captured
 from the browser subject's render targets can do that.
 
+A real browser run may be assembled as
+`bundleKind: "browser-capture-incomplete"` with `publishable: false` while one
+or more required claims remain `INSUFFICIENT_EVIDENCE`. This is an inspectable
+runtime bundle, not accepted evidence. `bundleKind: "browser-capture"` is
+reserved for a publishable bundle whose five required claims are all `PASS`.
+
 ## Commands
 
 ```bash
@@ -100,6 +106,7 @@ final-only-evidence
 false-diagnostic-route
 stale-pipeline-graph
 missing-timestamp
+publishable-with-insufficient-claim
 p95-overrun
 governor-oscillation
 visual-error-overrun
@@ -110,3 +117,6 @@ bad-padded-stride
 duplicate-output-owner
 baseline-equals-candidate
 ```
+
+Mutation fixtures remain in the operating-system temp directory for forensic
+inspection; the suite performs no recursive forced deletion.
