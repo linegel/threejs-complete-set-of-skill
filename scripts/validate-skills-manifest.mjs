@@ -697,6 +697,12 @@ const physicsBoundaryMatrix = {
     presentation: ['preparation-owner', 'snapshot-owner', 'execution-owner'], quality: ['presentation-only'], validation: ['contract-gate', 'mechanism-evidence'],
     requiredAbiTokens: ['LightingTransportSnapshot', 'PhysicsPresentationCandidate', 'CameraViewPublication', 'ViewPreparationPublication', 'PhysicsPresentationSnapshot', 'FrameExecutionRecord']
   },
+  'threejs-object-sculptor': {
+    applicability: { status: 'applicable', justification: 'Action-ready generated assets adapt stable collider, body, fracture, and presentation identities into the shared physical route.' },
+    coordinator: [], provider: ['collider-proxy', 'presentation-state'], consumer: [], interaction: ['adapter'], graph: [],
+    presentation: ['candidate-provider', 'snapshot-consumer'], quality: ['transition-participant'], validation: ['mechanism-evidence'],
+    requiredAbiTokens: ['PhysicsContext', 'ColliderProxy', 'RigidBodyProperties', 'ExternalSolverAdapter', 'InteractionRecord', 'PhysicsPresentationCandidate', 'PhysicsPresentationSnapshot', 'FrameExecutionRecord', 'QualityTransition']
+  },
   'threejs-particles-trails-and-effects': {
     applicability: { status: 'applicable', justification: 'Physical particles consume forcing/support and emit bounded exactly-once interactions.' },
     coordinator: [], provider: ['presentation-state'], consumer: ['environment-forcing', 'support-surface', 'collider-proxy'], interaction: ['producer', 'consumer'], graph: ['stage-owner'],

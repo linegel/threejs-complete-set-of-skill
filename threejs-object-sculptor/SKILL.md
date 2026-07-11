@@ -224,6 +224,47 @@ Build every generated model as if the user may later ask for animation, transfor
 
 Use `references/action-ready-models.md` for pivot, socket, collider, and destruction hierarchy rules.
 
+### Shared physics boundary
+
+For any physics-facing action-ready route, first read the shared
+[physics-domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md).
+The sculpt specification and `root.userData.sculptRuntime` maps are authoring
+inputs, not an independent solver ABI. Convert source dimensions once through
+the route's SI `PhysicsContext`, preserve stable component/entity generations,
+and keep visual geometry LOD separate from physical representation.
+
+The generated asset adapter publishes a canonical `ColliderProxy` for every
+physics-relevant solid or trigger and a canonical `RigidBodyProperties` record
+when mass, center of mass, inertia, and material evidence are sufficient. Each
+proxy names its owning entity generation, local frame, SI dimensions, shape
+approximation/error, physics-material identity, source revision, and validity.
+A decorative mesh or collider-shaped `userData` object is not collision
+authority. Missing scale, density, inertia, material, or approximation evidence
+blocks the corresponding dynamic claim instead of inventing defaults.
+
+When a selected engine or domain solver owns motion, contact, constraints, or
+fracture, the route binds it through the canonical `ExternalSolverAdapter`.
+That adapter maps exact context/frame/unit/clock/state versions and publishes
+complete canonical `InteractionRecord` contact, impulse, constraint, or
+breakage entries for the route coordinator and authoritative solver. The
+object-sculptor owns semantic pivots, sockets, collider construction inputs,
+fracture groups, and visual component identity; it does not become a contact or
+rigid-body solver merely because a model is action-ready.
+
+Solver-driven transforms and fracture visibility contribute stable bindings as
+`PresentedStatePair` entries in a view-independent
+`PhysicsPresentationCandidate`. Rendering consumes the sealed per-target/view
+`PhysicsPresentationSnapshot`; `FrameExecutionRecord` closes actual target
+execution and resource-lease disposition. Visual meshes, shadows, bounds,
+motion vectors, picking IDs, and detachable fragments resolve the same
+presented entity/component generation instead of sampling live solver state.
+
+A physics-facing collider/body/fracture/ID or presentation-representation tier
+change uses the canonical `QualityTransition` and commits at a safe route
+boundary. A render-only tessellation or material change stays local only when
+it preserves every collider, body property, interaction identity, committed
+state, presented binding, physical error bound, and stable component ID.
+
 The spec should include `actionReadiness`, and every macro/meso component should include `actionProfile`:
 
 - `animationRole`: root, static, articulated, deformable, detachable, breakable, effect-emitter, or socket-only.
