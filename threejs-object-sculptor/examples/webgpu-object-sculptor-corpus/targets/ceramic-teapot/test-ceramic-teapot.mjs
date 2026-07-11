@@ -747,7 +747,16 @@ try {
   revised.dispose();
 
   assert.throws(() => createCeramicTeapot({ tier: "unknown" }), /Unknown tier/);
-  assert.throws(() => createCeramicTeapot({ seed: 1.5 }), /integer/);
+  for (const invalidSeed of [-1, 0x100000000, 1.5, Number.NaN, Number.POSITIVE_INFINITY, "1", new Number(1)]) {
+    assert.throws(() => createCeramicTeapot({ seed: invalidSeed }), /uint32 integer/);
+    assert.throws(
+      () => buildCeramicTeapotContinuityToken({ baseContinuityToken, seed: invalidSeed }),
+      /uint32 integer/,
+    );
+  }
+  const maximumSeed = createCeramicTeapot({ tier: "minimum", seed: 0xffffffff });
+  assert.equal(maximumSeed.runtime.seed, 0xffffffff);
+  maximumSeed.dispose();
   assert.throws(() => buildCeramicTeapotContinuityToken({ baseContinuityToken: "", seed: 1 }), /non-empty/);
   assert.throws(() => createCeramicTeapot({ sourceRevision: "" }), /non-empty/);
 } finally {

@@ -226,6 +226,13 @@ function signedVariation(seed, salt, amplitude) {
   return (boundedUnit(seed, salt) * 2 - 1) * amplitude;
 }
 
+function requireUint32Seed(seed) {
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+    throw new TypeError("seed must be a uint32 integer");
+  }
+  return seed;
+}
+
 function requireText(value, label) {
   if (typeof value !== "string" || value.length === 0) throw new TypeError(`${label} must be a non-empty string`);
   return value;
@@ -237,7 +244,7 @@ export function buildCeramicTeapotContinuityToken({
   sourceRevision = TARGET_SOURCE_REVISION,
 } = {}) {
   requireText(baseContinuityToken, "baseContinuityToken");
-  if (!Number.isInteger(seed)) throw new TypeError("seed must be an integer");
+  requireUint32Seed(seed);
   requireText(sourceRevision, "sourceRevision");
   return JSON.stringify([
     CONTINUITY_SIGNATURE_REVISION,
@@ -858,7 +865,7 @@ export function createCeramicTeapot({
   sourceRevision = TARGET_SOURCE_REVISION,
 } = {}) {
   if (!SCULPT_TIERS.includes(tier)) throw new RangeError(`Unknown tier "${tier}"`);
-  if (!Number.isInteger(seed)) throw new TypeError("seed must be an integer");
+  requireUint32Seed(seed);
   requireText(sourceRevision, "sourceRevision");
   const effectiveContinuityToken = continuityToken === undefined
     ? undefined
