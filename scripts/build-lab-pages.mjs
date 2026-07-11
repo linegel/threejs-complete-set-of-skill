@@ -7,7 +7,6 @@ import {
   readFileSync,
   readdirSync,
   realpathSync,
-  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -544,25 +543,7 @@ const secondaryProviders = registry.demos.filter((lab) => (
 ));
 const plannedRoutesByLab = new Map(bundledPrimary.map((lab) => [lab.id, plannedPublishedRoutes(lab)]));
 
-const managedIds = new Set([
-  ...bundledPrimary,
-  ...placeholderPrimary,
-  ...secondaryProviders,
-].map((lab) => lab.id));
-const previousIndexPath = join(docsDemos, 'index.json');
-if (existsSync(previousIndexPath)) {
-  try {
-    const previous = JSON.parse(readFileSync(previousIndexPath, 'utf8'));
-    for (const route of [...(previous.routes ?? []), ...(previous.pendingRoutes ?? []), ...(previous.secondaryRoutes ?? [])]) {
-      if (/^[a-z0-9][a-z0-9-]*$/.test(route.id ?? '')) managedIds.add(route.id);
-    }
-  } catch {
-    // A malformed old index is not trusted to nominate deletion paths.
-  }
-}
 function installCompiledPages(compiledRoot) {
-  for (const id of managedIds) rmSync(join(docsDemos, id), { recursive: true, force: true });
-  rmSync(join(docsDemos, 'assets'), { recursive: true, force: true });
   if (compiledRoot) {
     for (const entry of readdirSync(compiledRoot, { withFileTypes: true })) {
       cpSync(join(compiledRoot, entry.name), join(docsDemos, entry.name), { recursive: true });
@@ -636,13 +617,13 @@ if (bundledPrimary.length + secondaryProviders.length > 0) {
       },
       build: {
         outDir: compiledRoot,
-        emptyOutDir: true,
+        emptyOutDir: false,
         rollupOptions: { input: inputs },
       },
     });
     installCompiledPages(compiledRoot);
   } finally {
-    rmSync(stagingRoot, { recursive: true, force: true });
+    console.log(`Retained non-destructive staging output at ${stagingRoot}.`);
   }
 } else {
   installCompiledPages(null);
