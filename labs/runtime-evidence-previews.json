@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "previews": [
+    {
+      "labId": "webgpu-node-gtao",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-node-gtao",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "capture-status.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "AO-applied lit render-target readback",
+      "limitations": [
+        "Mechanism and visual-correctness claims remain INSUFFICIENT_EVIDENCE.",
+        "No accepted named-adapter GPU timestamps or lifecycle loop are present."
+      ],
+      "images": [
+        { "source": "final-lit-display.raw", "readback": "final-lit-display", "output": "final.design.png", "encoding": "rgba8", "meaning": "Display-referred lit output with GTAO applied." },
+        { "source": "no-ao-baseline-display.raw", "readback": "no-ao-baseline-display", "output": "no-post.design.png", "encoding": "rgba8", "meaning": "Display-referred lit baseline with AO disabled." },
+        { "source": "raw-gtao.raw", "readback": "raw-gtao", "output": "raw-gtao.png", "encoding": "rgba8", "meaning": "Raw GTAO visibility diagnostic." },
+        { "source": "reconstructed-gtao.raw", "readback": "reconstructed-gtao", "output": "reconstructed-gtao.png", "encoding": "rgba8", "meaning": "Reconstructed and denoised GTAO visibility diagnostic." },
+        { "source": "gbuffer-normal.raw", "readback": "gbuffer-normal", "output": "normal.png", "encoding": "rgba8", "meaning": "Shared g-buffer normal diagnostic." },
+        { "source": "gbuffer-velocity.raw", "readback": "gbuffer-velocity", "output": "velocity.png", "encoding": "rgba8", "meaning": "Shared g-buffer velocity diagnostic." }
+      ]
+    },
+    {
+      "labId": "node-selective-bloom",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/node-selective-bloom",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "capture-status.json",
+      "primaryImage": "bloom-only.png",
+      "primaryImageLabel": "Bloom-only render-target readback visualization",
+      "limitations": [
+        "The promoted primary image is the bloom-only target, not a final scene composite.",
+        "Final-composite, GPU-timing, and lifecycle claims remain INSUFFICIENT_EVIDENCE."
+      ],
+      "images": [
+        { "source": "bloom-composite-target.raw", "readback": "bloom-composite-target", "output": "bloom-only.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "Bloom-only composite target, visualized with a documented Reinhard display transform." },
+        { "source": "scene-hdr-no-bloom.raw", "readback": "scene-hdr-no-bloom", "output": "scene-no-bloom.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "Scene-linear HDR target before bloom, visualized with a documented Reinhard display transform." },
+        { "source": "selective-emissive.raw", "readback": "selective-emissive", "output": "emissive.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "Selective emissive MRT attachment, visualized with a documented Reinhard display transform." },
+        { "source": "bright-pass.raw", "readback": "bright-pass", "output": "bright-pass.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "BloomNode bright-pass target, visualized with a documented Reinhard display transform." }
+      ]
+    },
+    {
+      "labId": "webgpu-exposure-color-pipeline",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-exposure-color-pipeline-v2",
+      "backendProof": "mechanism-metrics.json",
+      "claimVerdicts": "mechanism-metrics.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Exposure and grading render-target readback",
+      "limitations": [
+        "The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.",
+        "Lifecycle stability remains unaccepted."
+      ],
+      "images": [
+        { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final exposure, tone-map, LUT, and output-transform readback." },
+        { "source": "images/meter-source.png", "output": "meter-source.png", "encoding": "png-copy", "meaning": "Weighted log-luminance meter source diagnostic." },
+        { "source": "images/histogram-percentiles.png", "output": "histogram-percentiles.png", "encoding": "png-copy", "meaning": "Histogram and percentile diagnostic." },
+        { "source": "images/meter-mask.png", "output": "meter-mask.png", "encoding": "png-copy", "meaning": "Metering-mask diagnostic." },
+        { "source": "images/tone-map.png", "output": "tone-map.png", "encoding": "png-copy", "meaning": "Tone-map stage diagnostic before the creative LUT." },
+        { "source": "images/lut.png", "output": "lut.png", "encoding": "png-copy", "meaning": "Creative LUT stage diagnostic." }
+      ]
+    },
+    {
+      "labId": "webgpu-image-pipeline",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-image-pipeline-v2",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "mechanism-metrics.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Final image-pipeline render-target readback",
+      "limitations": [
+        "Signal, velocity, temporal-reset, and diagnostic readbacks passed the lab artifact validator.",
+        "Current-adapter GPU timestamp and lifecycle evidence remain INSUFFICIENT_EVIDENCE."
+      ],
+      "images": [
+        { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final composed output after the single tone map and output transform." },
+        { "source": "images/no-post.design.png", "output": "no-post.design.png", "encoding": "png-copy", "meaning": "Readable scene baseline without the post stack." },
+        { "source": "images/diagnostics.mosaic.png", "output": "diagnostics.mosaic.png", "encoding": "png-copy", "meaning": "Mosaic assembled from live diagnostic graph outputs." },
+        { "source": "images/normal.png", "output": "normal.png", "encoding": "png-copy", "meaning": "Shared normal signal readback." },
+        { "source": "images/emissive.png", "output": "emissive.png", "encoding": "png-copy", "meaning": "Shared emissive signal readback." },
+        { "source": "images/bloom.png", "output": "bloom.png", "encoding": "png-copy", "meaning": "BloomNode diagnostic readback." },
+        { "source": "images/velocity.moving-positive-x.png", "output": "velocity.moving-positive-x.png", "encoding": "png-copy", "meaning": "Moving-velocity fixture with expected positive NDC X sign." },
+        { "source": "images/temporal.history.png", "output": "temporal.history.png", "encoding": "png-copy", "meaning": "Temporal history target before camera-cut reset." }
+      ]
+    }
+  ]
+}
