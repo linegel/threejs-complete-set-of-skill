@@ -98,6 +98,7 @@ test('shared capture reads pixels through the space alias and typed-array width 
           width: 2,
           height: 1,
           bytesPerRow: 256,
+          sourceByteLength: 256,
           outputColorSpace: 'srgb',
           pixels,
         }),
@@ -107,6 +108,8 @@ test('shared capture reads pixels through the space alias and typed-array width 
     assert.equal(capture.bytesPerPixel, 4);
     assert.equal(capture.bytesPerRow, 8);
     assert.equal(capture.sourceBytesPerRow, 256);
+    assert.equal(capture.sourceByteLength, 256);
+    assert.equal(capture.transportByteLength, 8);
     assert.equal(capture.sourceLayout, 'compacted-from-padded');
     assert.deepEqual([...capture.data], [...pixels]);
   } finally {
@@ -129,6 +132,29 @@ test('compact RGBA8 payload wins over padded-copy metadata without re-unpacking'
   });
   assert.equal(capture.bytesPerRow, 12);
   assert.equal(capture.sourceBytesPerRow, 256);
+  assert.equal(capture.sourceByteLength, null);
+  assert.equal(capture.transportByteLength, 24);
+  assert.equal(capture.sourceLayout, 'compacted-from-padded');
+  assert.deepEqual([...capture.data], [...pixels]);
+});
+
+test('compact browser transport preserves the original padded GPU-copy length', () => {
+  const pixels = Uint8Array.from({ length: 24 }, (_, index) => index);
+  const capture = normalizePixelCapture({
+    target: 'final',
+    width: 3,
+    height: 2,
+    bytesPerPixel: 4,
+    sourceBytesPerRow: 256,
+    sourceByteLength: 268,
+    format: 'rgba8unorm',
+    colorSpace: 'srgb',
+    data: pixels,
+  });
+  assert.equal(capture.bytesPerRow, 12);
+  assert.equal(capture.sourceBytesPerRow, 256);
+  assert.equal(capture.sourceByteLength, 268);
+  assert.equal(capture.transportByteLength, 24);
   assert.equal(capture.sourceLayout, 'compacted-from-padded');
   assert.deepEqual([...capture.data], [...pixels]);
 });
@@ -151,6 +177,7 @@ test('real 256-byte padded rows are compacted with the integer source stride', (
   assert.equal(capture.bytesPerRow, 12);
   assert.equal(capture.sourceBytesPerRow, 256);
   assert.equal(capture.sourceByteLength, 268);
+  assert.equal(capture.transportByteLength, 268);
   assert.equal(capture.sourceLayout, 'padded');
   assert.deepEqual([...capture.data], [...expected]);
 });
@@ -209,6 +236,30 @@ test('shared capture rejects inconsistent lengths, strides, formats, and color m
       ...color,
     }),
     /conflicting padded source strides/,
+  );
+  assert.throws(
+    () => normalizePixelCapture({
+      width: 3,
+      height: 2,
+      bytesPerPixel: 4,
+      sourceBytesPerRow: 256,
+      sourceByteLength: 269,
+      data: new Uint8Array(24),
+      ...color,
+    }),
+    /sourceByteLength is 269 bytes; expected short-padded 268 or full-padded 512/,
+  );
+  assert.throws(
+    () => normalizePixelCapture({
+      width: 3,
+      height: 2,
+      bytesPerPixel: 4,
+      sourceBytesPerRow: 256,
+      sourceByteLength: 512,
+      data: new Uint8Array(268),
+      ...color,
+    }),
+    /sourceByteLength 512 does not match transported source data 268/,
   );
   assert.throws(
     () => normalizePixelCapture({
