@@ -64,13 +64,12 @@ function makeMaterials() {
   };
 }
 
-function register(runtime, object, { id, kind = "node", collider = null, destructionGroup = null } = {}) {
+function register(runtime, object, { id, kind = "node", destructionGroup = null } = {}) {
   object.name = id;
   object.userData.sculptId = id;
   runtime.nodes.set(id, object);
   if (object.isMesh) runtime.meshes.set(id, object);
   if (kind === "socket") runtime.sockets.set(id, object);
-  if (collider) runtime.colliders.set(id, collider);
   if (destructionGroup) {
     if (!runtime.destructionGroups.has(destructionGroup)) runtime.destructionGroups.set(destructionGroup, []);
     runtime.destructionGroups.get(destructionGroup).push(id);
@@ -102,6 +101,59 @@ function socket(runtime, id, parent, position) {
   register(runtime, value, { id, kind: "socket" });
   parent.add(value);
   return value;
+}
+
+function generatedId(namespace, localId) {
+  return Object.freeze({ namespace, localId, generation: 1 });
+}
+
+function physicsMaterialBinding(localId, visualMaterialId) {
+  return Object.freeze({
+    recordType: "PhysicsMaterialBinding",
+    physicsMaterialId: generatedId("tower-ship.physics-material", localId),
+    visualMaterialId,
+    claimStatus: "insufficient-evidence",
+    missingEvidence: Object.freeze(["density", "friction-law", "restitution-law", "compliance-damping-law"]),
+    sourceRevision: "tower-ship-object-sculpt-spec-v2",
+  });
+}
+
+function colliderProxy({ id, entityId, shape, physicsMaterialId, collisionRole = "solid", errorMeters }) {
+  return Object.freeze({
+    recordType: "ColliderProxy",
+    claimStatus: "authoring-input",
+    solverAuthority: false,
+    colliderId: generatedId("tower-ship.collider", id),
+    entityId: generatedId("tower-ship.entity", entityId),
+    shapeId: generatedId("tower-ship.collider-shape", id),
+    localFrame: Object.freeze({
+      frameId: `tower-ship.frame/${entityId}`,
+      parentFrameId: "tower-ship.frame/root",
+      positionMeters: Object.freeze([0, 0, 0]),
+      rotationQuaternion: Object.freeze([0, 0, 0, 1]),
+    }),
+    shape: Object.freeze(shape),
+    collisionRole,
+    physicsMaterialId,
+    topologyRevision: "tower-ship-collider-topology-v1",
+    sourceRevision: "tower-ship-object-sculpt-spec-v2",
+    validity: Object.freeze({
+      tiers: TOWER_SHIP_TIERS,
+      visualLodIndependent: true,
+      invalidation: "component topology, source scale, or attachment frame revision",
+    }),
+    approximationError: Object.freeze({
+      maxSurfaceDeviationMeters: errorMeters,
+      label: "Authored",
+      source: "single-reference conservative envelope; not measured contact evidence",
+    }),
+  });
+}
+
+function addCollider(runtime, fields) {
+  const proxy = colliderProxy(fields);
+  runtime.colliders.set(proxy.colliderId.localId, proxy);
+  return proxy;
 }
 
 function cylinderBetween(runtime, id, start, end, radius, material, segments, parent, group = "detail") {
@@ -241,14 +293,15 @@ function addShojiFace(runtime, id, parent, materials, width, height, z, y, limit
 }
 
 function addCabinTier(runtime, id, parent, materials, width, height, depth, y, limits) {
-  const tier = pivot(runtime, id, parent, { destructionGroup: id });
-  const floor = mesh(runtime, `${id}-floor`, new THREE.BoxGeometry(width + 0.25, 0.14, depth + 0.25), materials.darkWood, { parent: tier, group: "tower", destructionGroup: id });
+  const destructionGroup = id === "cabin-lower" ? "lower-cabin" : id === "cabin-upper" ? "upper-cabin" : id;
+  const tier = pivot(runtime, id, parent, { destructionGroup });
+  const floor = mesh(runtime, `${id}-floor`, new THREE.BoxGeometry(width + 0.25, 0.14, depth + 0.25), materials.darkWood, { parent: tier, group: "tower", destructionGroup });
   floor.position.y = y - height / 2;
   addShojiFace(runtime, `${id}-front`, tier, materials, width, height, depth / 2, y, limits);
   addShojiFace(runtime, `${id}-back`, tier, materials, width, height, -depth / 2, y, limits);
   for (const x of [-width / 2, width / 2]) {
     for (const z of [-depth / 2, depth / 2]) {
-      const post = mesh(runtime, `${id}-post-${x}-${z}`, new THREE.BoxGeometry(0.16, height + 0.35, 0.16), materials.darkWood, { parent: tier, group: "tower", destructionGroup: id });
+      const post = mesh(runtime, `${id}-post-${x}-${z}`, new THREE.BoxGeometry(0.16, height + 0.35, 0.16), materials.darkWood, { parent: tier, group: "tower", destructionGroup });
       post.position.set(x, y, z);
     }
   }
@@ -256,8 +309,9 @@ function addCabinTier(runtime, id, parent, materials, width, height, depth, y, l
 }
 
 function addRoof(runtime, id, parent, materials, width, depth, y, limits) {
-  const roofPivot = pivot(runtime, id, parent, { destructionGroup: id });
-  const roof = mesh(runtime, `${id}-surface`, buildRoofGeometry(width, depth, limits.roofX, limits.roofZ), materials.darkWood, { parent: roofPivot, group: "tower", destructionGroup: id });
+  const destructionGroup = id === "roof-lower" ? "lower-roof" : id === "roof-upper" ? "upper-roof" : id;
+  const roofPivot = pivot(runtime, id, parent, { destructionGroup });
+  const roof = mesh(runtime, `${id}-surface`, buildRoofGeometry(width, depth, limits.roofX, limits.roofZ), materials.darkWood, { parent: roofPivot, group: "tower", destructionGroup });
   roof.position.y = y;
   const ridge = mesh(runtime, `${id}-ridge`, new THREE.CylinderGeometry(0.12, 0.12, width * 0.78, limits.cylinder, 1), materials.darkWoodEdge, { parent: roofPivot, group: "tower" });
   ridge.rotation.z = Math.PI / 2;
@@ -351,6 +405,88 @@ function applySemanticMaterial(runtime, mode, materials) {
   }
 }
 
+function populateColliderProxies(runtime) {
+  const agedWood = runtime.physicsMaterials.get("aged-wood").physicsMaterialId;
+  const structuralWood = runtime.physicsMaterials.get("structural-wood").physicsMaterialId;
+  const sailCloth = runtime.physicsMaterials.get("sail-cloth").physicsMaterialId;
+  const deckProps = runtime.physicsMaterials.get("deck-props").physicsMaterialId;
+  addCollider(runtime, {
+    id: "root-envelope",
+    entityId: "root",
+    physicsMaterialId: agedWood,
+    errorMeters: 0.75,
+    shape: { kind: "box", units: "metre", centerMeters: [0, 2, 0], sizeMeters: [20, 6, 5] },
+  });
+  addCollider(runtime, {
+    id: "hull-compound",
+    entityId: "hull",
+    physicsMaterialId: agedWood,
+    errorMeters: 0.35,
+    shape: {
+      kind: "compound-boxes",
+      units: "metre",
+      boxes: [
+        { centerMeters: [0, 1.1, 0], sizeMeters: [15, 3, 4.5] },
+        { centerMeters: [-8.8, 2, 0], sizeMeters: [3, 3, 2.8] },
+        { centerMeters: [8.8, 2, 0], sizeMeters: [3, 3, 2.8] },
+      ],
+    },
+  });
+  const boxes = [
+    ["tower-box", "tower", [-0.6, 5.1, 0], [6.6, 6.4, 4.2], structuralWood, 0.32],
+    ["deck-box", "deck", [0, 2.54, 0], [16.8, 0.32, 3.55], agedWood, 0.06],
+    ["lower-cabin-box", "cabin-lower", [0, 3.72, 0], [5.5, 2.2, 3.4], structuralWood, 0.14],
+    ["lower-roof-box", "roof-lower", [0, 5.12, 0], [6.65, 0.9, 4.2], structuralWood, 0.28],
+    ["upper-cabin-box", "cabin-upper", [0, 6.12, 0], [4.3, 1.9, 2.8], structuralWood, 0.12],
+    ["upper-roof-box", "roof-upper", [0, 7.39, 0], [5.35, 0.85, 3.35], structuralWood, 0.24],
+    ["deck-details-trigger", "deck-details", [0, 3.75, 0], [16, 2.4, 4.4], deckProps, 0.5],
+  ];
+  for (const [id, entityId, centerMeters, sizeMeters, physicsMaterialId, errorMeters] of boxes) {
+    addCollider(runtime, {
+      id,
+      entityId,
+      physicsMaterialId,
+      errorMeters,
+      collisionRole: id.endsWith("trigger") ? "trigger" : "solid",
+      shape: { kind: "box", units: "metre", centerMeters, sizeMeters },
+    });
+  }
+  addCollider(runtime, {
+    id: "mast-capsule",
+    entityId: "mast",
+    physicsMaterialId: structuralWood,
+    errorMeters: 0.03,
+    shape: { kind: "capsule", units: "metre", startMeters: [0, 0, 0], endMeters: [0, 9.65, 0], radiusMeters: 0.2 },
+  });
+  addCollider(runtime, {
+    id: "sail-trigger",
+    entityId: "sail",
+    physicsMaterialId: sailCloth,
+    collisionRole: "trigger",
+    errorMeters: 0.18,
+    shape: { kind: "box", units: "metre", centerMeters: [2.7, 3.2, 0], sizeMeters: [5.4, 6.4, 0.1] },
+  });
+  addCollider(runtime, {
+    id: "oar-bank-trigger",
+    entityId: "oar-bank",
+    physicsMaterialId: agedWood,
+    collisionRole: "trigger",
+    errorMeters: 0.45,
+    shape: { kind: "box", units: "metre", centerMeters: [0, 0, 0], sizeMeters: [15.2, 4.4, 8.2] },
+  });
+  for (const oar of runtime.oars) {
+    const side = oar.name.includes("starboard") ? 1 : -1;
+    addCollider(runtime, {
+      id: `${oar.name}-capsule`,
+      entityId: oar.name,
+      physicsMaterialId: agedWood,
+      collisionRole: "trigger",
+      errorMeters: 0.08,
+      shape: { kind: "capsule", units: "metre", startMeters: [0, 0, 0], endMeters: [side * -0.12, -2.35, side * 3.1], radiusMeters: 0.09 },
+    });
+  }
+}
+
 export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   if (!TOWER_SHIP_TIERS.includes(tier)) throw new RangeError(`Unknown tier "${tier}"`);
   const limits = TIER_LIMITS[tier];
@@ -363,14 +499,21 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
     meshes: new Map(),
     sockets: new Map(),
     colliders: new Map(),
+    physicsMaterials: new Map([
+      ["aged-wood", physicsMaterialBinding("aged-wood", "warm-wood")],
+      ["structural-wood", physicsMaterialBinding("structural-wood", "dark-wood")],
+      ["sail-cloth", physicsMaterialBinding("sail-cloth", "sail-cloth")],
+      ["deck-props", physicsMaterialBinding("deck-props", "mixed-detail")],
+    ]),
     destructionGroups: new Map(),
     materials,
     oars: [],
     lanterns: [],
     sail: null,
   };
-  register(runtime, root, { id: "root", collider: { type: "compound", size: [20, 6, 5] }, destructionGroup: "vessel" });
+  register(runtime, root, { id: "root", destructionGroup: "vessel" });
   root.userData.sculptRuntime = runtime;
+  socket(runtime, "waterline-center", root, [0, 0, 0]);
 
   const hullPivot = pivot(runtime, "hull", root, { destructionGroup: "hull-shell" });
   const hull = mesh(runtime, "hull-surface", buildHullGeometry(limits.hullStations, limits.hullRadial), materials.warmWood, { parent: hullPivot, group: "hull", destructionGroup: "hull-shell" });
@@ -389,19 +532,22 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   const tower = pivot(runtime, "tower", root, { destructionGroup: "tower" });
   tower.position.x = -0.6;
   addCabinTier(runtime, "cabin-lower", tower, materials, 5.25, 2.05, 3.15, 3.72, limits);
+  socket(runtime, "lower-cabin-top", tower, [0, 4.78, 0]);
   addRoof(runtime, "roof-lower", tower, materials, 6.65, 4.2, 4.78, limits);
   addCabinTier(runtime, "cabin-upper", tower, materials, 4.05, 1.68, 2.55, 6.12, limits);
+  socket(runtime, "upper-cabin-top", tower, [0, 7.05, 0]);
   addRoof(runtime, "roof-upper", tower, materials, 5.35, 3.35, 7.05, limits);
 
+  socket(runtime, "mast-step", root, [1.65, 2.45, -0.35]);
   const mast = pivot(runtime, "mast", root, { destructionGroup: "mast-rig" });
   mast.position.set(1.65, 2.45, -0.35);
-  socket(runtime, "mast-step", mast, [0, 0, 0]);
   cylinderBetween(runtime, "mast-pole", [0, 0, 0], [0, 9.65, 0], 0.17, materials.darkWood, limits.cylinder, mast, "rig");
   const crown = socket(runtime, "mast-crown", mast, [0, 9.65, 0]);
   const mastFinial = mesh(runtime, "mast-finial", new THREE.SphereGeometry(0.25, limits.cylinder, Math.max(4, limits.cylinder / 2)), materials.metal, { parent: mast, group: "rig" });
   mastFinial.position.copy(crown.position);
   const sailPivot = pivot(runtime, "sail", mast, { destructionGroup: "sail" });
   sailPivot.position.set(0.1, 2.2, 0);
+  socket(runtime, "sail-luff", mast, [0.1, 2.2, 0]);
   const sailSurface = mesh(runtime, "sail-surface", buildSailGeometry(), materials.sail, { parent: sailPivot, group: "rig", destructionGroup: "sail" });
   sailSurface.rotation.y = -0.08;
   runtime.sail = sailPivot;
@@ -411,13 +557,15 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
     cylinderBetween(runtime, `sail-batten-${row}`, [0, v * 6.4, 0.02], [width, v * 6.4, 0.02], 0.035, row % 2 ? materials.sailDark : materials.darkWood, 6, sailPivot, "rig");
   }
   cylinderBetween(runtime, "sail-boom", [0, 2.2, 0], [5.2, 1.4, 0], 0.08, materials.darkWood, limits.cylinder, sailPivot, "rig");
+  const rigging = pivot(runtime, "rigging", root, { destructionGroup: "mast-rig" });
   const rigTargets = [[-9.2, 2.9, 0], [8.7, 3.1, 0], [5.15, 1.4, 0], [4.2, 6.3, 0]];
   rigTargets.forEach((target, index) => {
     const start = index < 2 ? [1.65, 12.1, -0.35] : [1.75, 11.85, -0.32];
-    cylinderBetween(runtime, `rig-line-${index}`, start, target, 0.022, materials.rope, 5, root, "rig");
+    cylinderBetween(runtime, `rig-line-${index}`, start, target, 0.022, materials.rope, 5, rigging, "rig");
   });
 
-  const oarBank = pivot(runtime, "oar-bank", root, { destructionGroup: "oar-bank" });
+  socket(runtime, "gunwale-oar-sockets", hullPivot, [0, 2.1, 0]);
+  const oarBank = pivot(runtime, "oar-bank", hullPivot, { destructionGroup: "oar-bank" });
   for (const side of [-1, 1]) {
     for (let index = 0; index < 12; index += 1) runtime.oars.push(addOar(runtime, oarBank, materials, limits, side, index));
   }
@@ -426,9 +574,7 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
 
   const worldSocket = socket(runtime, "camera-interest", root, [0, 4.2, 0]);
   worldSocket.visible = false;
-  runtime.colliders.set("hull-compound", { type: "compound-boxes", boxes: [[0, 1.1, 0, 15, 3, 4.5], [-8.8, 2, 0, 3, 3, 2.8], [8.8, 2, 0, 3, 3, 2.8]] });
-  runtime.colliders.set("tower-box", { type: "box", center: [-0.6, 5.1, 0], size: [6.6, 6.4, 4.2] });
-  runtime.colliders.set("mast-capsule", { type: "capsule", start: [1.65, 2.45, -0.35], end: [1.65, 12.1, -0.35], radius: 0.2 });
+  populateColliderProxies(runtime);
   runtime.nodes.set("deck-details", details);
   root.updateMatrixWorld(true);
 
@@ -484,6 +630,7 @@ export function summarizeTowerShip(root) {
     meshes: runtime.meshes.size,
     sockets: runtime.sockets.size,
     colliders: runtime.colliders.size,
+    physicsMaterials: runtime.physicsMaterials.size,
     destructionGroups: runtime.destructionGroups.size,
     oars: runtime.oars.length,
     vertices,

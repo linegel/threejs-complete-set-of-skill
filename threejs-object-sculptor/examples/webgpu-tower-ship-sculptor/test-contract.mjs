@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   createTowerShip,
@@ -17,14 +18,18 @@ import {
   TOWER_SHIP_SCENARIOS,
   TOWER_SHIP_SEEDS,
 } from "./lab-controller.js";
+import { validateTowerShipActionReady } from "./validate-action-ready.mjs";
+
+const sculptSpec = JSON.parse(readFileSync(new URL("./object-sculpt-spec.json", import.meta.url), "utf8"));
+const actionReadyContracts = [];
 
 for (const tier of TOWER_SHIP_TIERS) {
   const ship = createTowerShip({ tier, seed: TOWER_SHIP_SEEDS[0] });
   const summary = summarizeTowerShip(ship.root);
   assert.equal(summary.oars, 24, `${tier} must preserve 24 articulated oars`);
   assert(summary.nodes > 70, `${tier} must expose a deep semantic hierarchy`);
-  assert(summary.sockets >= 27, `${tier} must expose mast, camera, and per-oar sockets`);
-  assert(summary.colliders >= 3, `${tier} must expose simplified collider metadata`);
+  assert(summary.sockets >= 32, `${tier} must expose declared attachment, camera, and per-oar sockets`);
+  assert.equal(summary.colliders, 36, `${tier} must expose stable component and per-oar ColliderProxy inputs`);
   assert(ship.runtime.destructionGroups.has("hull-shell"), `${tier} needs hull destruction group`);
   assert(ship.runtime.destructionGroups.has("oar-bank"), `${tier} needs oar destruction group`);
   for (const mode of TOWER_SHIP_MODES) ship.setMode(mode);
@@ -34,8 +39,22 @@ for (const tier of TOWER_SHIP_TIERS) {
   const socket = ship.runtime.sockets.get(`${firstOar.name}-socket`);
   assert(socket, `${tier} first oar needs a root socket`);
   assert.equal(socket.parent, firstOar, `${tier} oar socket must stay parent-local`);
+  actionReadyContracts.push(validateTowerShipActionReady(sculptSpec, ship.root));
   ship.dispose();
 }
+
+for (const key of ["requiredComponentIds", "declaredSocketIds", "colliderIds", "physicsMaterialIds", "destructionGroupIds", "oarIds"]) {
+  for (const contract of actionReadyContracts.slice(1)) {
+    assert.deepEqual(contract[key], actionReadyContracts[0][key], `${key} must remain stable across visual tiers`);
+  }
+}
+
+const stressSeedShip = createTowerShip({ tier: "full", seed: TOWER_SHIP_SEEDS[1] });
+const stressSeedContract = validateTowerShipActionReady(sculptSpec, stressSeedShip.root);
+for (const key of ["requiredComponentIds", "declaredSocketIds", "colliderIds", "physicsMaterialIds", "destructionGroupIds", "oarIds"]) {
+  assert.deepEqual(stressSeedContract[key], actionReadyContracts[0][key], `${key} must remain stable across seeds`);
+}
+stressSeedShip.dispose();
 
 assert.deepEqual(TOWER_SHIP_CAMERAS, ["design", "profile", "bow", "close-material"]);
 assert.deepEqual(TOWER_SHIP_SCENARIOS, {

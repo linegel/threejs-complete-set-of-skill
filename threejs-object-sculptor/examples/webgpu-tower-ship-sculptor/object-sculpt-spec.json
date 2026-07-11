@@ -723,7 +723,7 @@
     "Expose final, blockout, hierarchy, materials, and interaction modes from the same object factory."
   ],
   "animationAnchors": ["root", "mast", "sail", "oar-port-00-through-11", "oar-starboard-00-through-11", "lantern-corners"],
-  "destructionAnchors": ["hull-shell", "tower", "lower-roof", "upper-roof", "mast-rig", "oar-bank", "deck-props"],
+  "destructionAnchors": ["vessel", "hull-shell", "tower", "deck", "lower-cabin", "lower-roof", "upper-cabin", "upper-roof", "mast-rig", "sail", "oar-bank", "deck-props"],
   "risks": [
     "Hidden port-side and lower-hull geometry remains inferred from one view.",
     "Exact cloth weave, wood grain, and PBR values are not recoverable from the composite screenshot.",

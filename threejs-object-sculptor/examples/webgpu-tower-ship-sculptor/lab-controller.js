@@ -351,6 +351,7 @@ export async function createTowerShipLabController({
           meshes: ship.runtime.meshes.size,
           sockets: ship.runtime.sockets.size,
           colliders: ship.runtime.colliders.size,
+          physicsMaterials: ship.runtime.physicsMaterials.size,
           destructionGroups: ship.runtime.destructionGroups.size,
         },
         preservedInvariants: ["24 articulated oars", "semantic IDs", "primary silhouette", "single scene render"],
@@ -362,6 +363,17 @@ export async function createTowerShipLabController({
         socketIds: [...ship.runtime.sockets.keys()].sort(),
         colliderIds: [...ship.runtime.colliders.keys()].sort(),
         destructionGroups: [...ship.runtime.destructionGroups.keys()].sort(),
+        socketBindings: [...ship.runtime.sockets.entries()].map(([id, value]) => ({
+          id,
+          parentId: value.parent?.userData?.sculptId ?? value.parent?.name ?? null,
+          localPositionMeters: value.position.toArray(),
+        })).sort((a, b) => a.id.localeCompare(b.id)),
+        colliderProxies: [...ship.runtime.colliders.values()],
+        physicsMaterialBindings: [...ship.runtime.physicsMaterials.values()],
+        destructionGroupRecords: [...ship.runtime.destructionGroups.entries()].map(([id, members]) => ({
+          id,
+          members: [...members].sort(),
+        })).sort((a, b) => a.id.localeCompare(b.id)),
       };
     },
     async dispose() {
