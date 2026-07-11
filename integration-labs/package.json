@@ -1,0 +1,14 @@
+{
+  "name": "threejs-integration-flagship-contracts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check shared/integration-contract-core.mjs && node --check shared/browser-controller.mjs && node --check shared/browser-bootstrap.mjs && node --check tests/integration-contracts.test.mjs && node tests/integration-contracts.test.mjs",
+    "validate:unit": "node tests/integration-contracts.test.mjs",
+    "test:mutations": "node tests/integration-contracts.test.mjs --mutations-only",
+    "capture": "node tests/evidence-status.mjs capture",
+    "validate:artifacts": "node tests/evidence-status.mjs validate-artifacts",
+    "validate:quick": "node tests/integration-contracts.test.mjs",
+    "validate:full": "node tests/integration-contracts.test.mjs && node tests/evidence-status.mjs validate-full"
+  }
+}
