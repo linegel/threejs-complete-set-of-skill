@@ -336,6 +336,17 @@ function measureNeckColliderBidirectional(
   return { visualToProxyMeters, proxyToVisualMeters, triangleCount: triangles.length };
 }
 
+function assertProtectedColliderInventory(runtime, label) {
+  for (const id of TARGET_CONTRACT.protectedColliderIds) {
+    const collider = runtime.colliders.get(id);
+    assert.ok(collider, `${label} lost protected collider ${id}`);
+    assert.equal(collider.recordType, "ColliderConstructionInput");
+    assert.equal(collider.solverAuthority, false);
+    assert.equal(collider.shape.units, "metre");
+    assert.ok(runtime.colliderIntents.has(id), `${label} lost protected collider intent ${id}`);
+  }
+}
+
 function lowerApertureClearance(shapes) {
   return Math.min(...shapes.map((shape) => {
     assert.ok(Math.abs(shape.endMeters[1] + 0.275) <= EPSILON, "shade rib endpoint left aperture plane");
@@ -428,13 +439,7 @@ for (const tier of TARGET_CONTRACT.tierIds) {
   for (const id of TARGET_CONTRACT.protectedSocketIds) {
     assert.ok(model.runtime.sockets.has(id), `${tier} lost protected socket ${id}`);
   }
-  for (const id of TARGET_CONTRACT.protectedColliderIds) {
-    const collider = model.runtime.colliders.get(id);
-    assert.ok(collider, `${tier} lost protected collider ${id}`);
-    assert.equal(collider.recordType, "ColliderConstructionInput");
-    assert.equal(collider.solverAuthority, false);
-    assert.equal(collider.shape.units, "metre");
-  }
+  assertProtectedColliderInventory(model.runtime, tier);
   for (const id of TARGET_CONTRACT.protectedDestructionGroupIds) {
     assert.ok(model.runtime.destructionGroups.has(id), `${tier} lost destruction group ${id}`);
   }
@@ -680,13 +685,6 @@ for (const tier of TARGET_CONTRACT.tierIds) {
       `minimum neck sample became suspiciously weak: ${neckFineError}`,
     );
   }
-  if (tier === "full") {
-    assert.throws(
-      () => measureNeckColliderBidirectional(neckMesh, shadeEntity, undefined),
-      /missing protected shade-neck-cylinder collider/,
-      "missing neck collider mutation must fail",
-    );
-  }
   const shadeErrorContract = TARGET_CONTRACT.colliderErrorContracts["shade-shell-ribs"];
   const shadeShapes = shadeErrorContract.colliderIds.map((id, index) => {
     const collider = model.runtime.colliders.get(id);
@@ -813,6 +811,14 @@ assert.ok(summaries[0].vertices > summaries[1].vertices);
 assert.ok(summaries[1].vertices > summaries[2].vertices);
 assert.deepEqual(semanticSnapshots[1], semanticSnapshots[0]);
 assert.deepEqual(semanticSnapshots[2], semanticSnapshots[0]);
+
+const missingNeckColliderMutation = createArticulatedDeskLamp({ tier: "minimum", seed: 17 });
+assert.equal(missingNeckColliderMutation.runtime.colliders.delete("shade-neck-cylinder"), true);
+assert.throws(
+  () => assertProtectedColliderInventory(missingNeckColliderMutation.runtime, "missing-neck-collider mutation"),
+  /missing-neck-collider mutation lost protected collider shade-neck-cylinder/,
+);
+missingNeckColliderMutation.dispose();
 
 const deterministicA = createArticulatedDeskLamp({ tier: "minimum", seed: 23 });
 const deterministicB = createArticulatedDeskLamp({ tier: "minimum", seed: 23 });
