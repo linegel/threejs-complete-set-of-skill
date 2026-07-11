@@ -46,9 +46,24 @@ function normalize(v, fallback = [0, 1, 0]) {
 
 function orderedCandidates(primitives, candidates) {
 	if (!Array.isArray(candidates)) return primitives.map((_, index) => index);
-	return candidates
+	return [...candidates]
 		.filter((index) => Number.isInteger(index) && index >= 0 && index < primitives.length)
 		.sort((a, b) => a - b);
+}
+
+export function selectSurfaceOwner(primitives, point, options = {}) {
+	let owner = -1;
+	let ownerDistance = Number.POSITIVE_INFINITY;
+	for (const index of orderedCandidates(primitives, options.candidates)) {
+		const distance = evaluateCapsulePrimitive(point, primitives[index]).d;
+		// Stable tie rule: lower slot wins. This is independent of draw order and
+		// removes coincident full-shell z-fighting from the diagnostic surface.
+		if (distance < ownerDistance || (Math.abs(distance - ownerDistance) <= 1e-12 && index < owner)) {
+			owner = index;
+			ownerDistance = distance;
+		}
+	}
+	return { owner, distance: ownerDistance };
 }
 
 export function evaluateCapsulePrimitive(arg0, arg1) {
@@ -97,27 +112,16 @@ export function hardMin(primitives, point, options = {}) {
 function evaluateNoAo(primitives, point, options = {}) {
 	const indices = orderedCandidates(primitives, options.candidates);
 	const perPrimitive = [];
-	let d = Number.POSITIVE_INFINITY;
-	let grad = [0, 1, 0];
 	let dMin = Number.POSITIVE_INFINITY;
+	const sampleBySlot = new Map();
 
 	for (const index of indices) {
 		const primitive = primitives[index];
 		const e = evaluateCapsulePrimitive(point, primitive);
 		const entry = { index, d: e.d, grad: e.grad, gradNormalized: e.gradNormalized, k: e.k, color: e.color, t: e.t, slope: e.slope };
 		perPrimitive.push(entry);
+		sampleBySlot.set(index, entry);
 		if (e.d < dMin) dMin = e.d;
-
-		if (d === Number.POSITIVE_INFINITY) {
-			d = e.d;
-			grad = e.grad.slice();
-			continue;
-		}
-
-		const k = Math.max(e.k, 1e-5);
-		const h = clamp(0.5 + 0.5 * (d - e.d) / k, 0, 1);
-		d = lerp(d, e.d, h) - k * h * (1 - h);
-		grad = mixVec(grad, e.grad, h);
 	}
 
 	if (perPrimitive.length === 0) {
@@ -126,8 +130,47 @@ function evaluateNoAo(primitives, point, options = {}) {
 			grad: [0, 1, 0],
 			gradNormalized: [0, 1, 0],
 			color: [0.85, 0.72, 0.5],
+			owner: -1,
 			perPrimitive,
 		};
+	}
+
+	let d = Number.POSITIVE_INFINITY;
+	let grad = [0, 1, 0];
+	if (options.blendDag) {
+		const values = new Array(options.blendDag.operations.length);
+		for (let operationIndex = 0; operationIndex < options.blendDag.operations.length; operationIndex++) {
+			const operation = options.blendDag.operations[operationIndex];
+			if (operation.kind === 'leaf') {
+				const sample = sampleBySlot.get(operation.slot);
+				if (!sample) throw new Error(`candidate program omitted blend-DAG leaf slot ${operation.slot}`);
+				values[operationIndex] = { d: sample.d, grad: sample.grad };
+				continue;
+			}
+			const left = values[operation.left];
+			const right = values[operation.right];
+			const k = Math.max(operation.k, 1e-5);
+			const h = clamp(0.5 + 0.5 * (left.d - right.d) / k, 0, 1);
+			values[operationIndex] = {
+				d: lerp(left.d, right.d, h) - k * h * (1 - h),
+				grad: mixVec(left.grad, right.grad, h),
+			};
+		}
+		const root = values[options.blendDag.root];
+		d = root.d;
+		grad = root.grad;
+	} else {
+		for (const entry of perPrimitive) {
+			if (d === Number.POSITIVE_INFINITY) {
+				d = entry.d;
+				grad = entry.grad.slice();
+				continue;
+			}
+			const k = Math.max(entry.k, 1e-5);
+			const h = clamp(0.5 + 0.5 * (d - entry.d) / k, 0, 1);
+			d = lerp(d, entry.d, h) - k * h * (1 - h);
+			grad = mixVec(grad, entry.grad, h);
+		}
 	}
 
 	const color = [0, 0, 0];
@@ -150,6 +193,11 @@ function evaluateNoAo(primitives, point, options = {}) {
 		grad,
 		gradNormalized: normalize(grad),
 		color,
+		owner: perPrimitive.reduce((best, entry) => (
+			entry.d < best.d || (Math.abs(entry.d - best.d) <= 1e-12 && entry.index < best.index)
+				? { index: entry.index, d: entry.d }
+				: best
+		), { index: -1, d: Number.POSITIVE_INFINITY }).index,
 		perPrimitive,
 	};
 }

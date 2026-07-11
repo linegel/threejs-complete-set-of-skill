@@ -24,7 +24,7 @@ function asIntNode(value) {
 	return value?.isNode ? int(value) : int(value ?? 0);
 }
 
-export function buildFieldNodes({ poseStorage, candidateStorage, maxParts, tierConfig = {} } = {}) {
+export function buildFieldNodes({ poseStorage, candidateStorage, blendDag = null, maxParts, tierConfig = {} } = {}) {
 	if (!poseStorage?.poseNode) throw new Error('buildFieldNodes requires poseStorage.poseNode');
 	if (!candidateStorage?.node) throw new Error('buildFieldNodes requires candidateStorage.node');
 	const partBudget = Math.max(1, Math.floor(maxParts ?? poseStorage.maxParts ?? candidateStorage.maxParts));
@@ -33,6 +33,9 @@ export function buildFieldNodes({ poseStorage, candidateStorage, maxParts, tierC
 	const maxPrimitiveRadius = float(Math.max(Number(tierConfig.maxRadius) || 0.25, 1e-4));
 	const poseNode = poseStorage.poseNode;
 	const candidatesNode = candidateStorage.node;
+	if (blendDag && blendDag.kernel !== 'polynomial-smooth-min') {
+		throw new Error(`unsupported creature blend DAG kernel '${blendDag.kernel}'`);
+	}
 
 	const primitiveBase = Fn(([creatureIndex, slotIndex]) => {
 		return creatureIndex.mul(int(partBudget)).add(slotIndex).mul(int(3));
@@ -74,8 +77,28 @@ export function buildFieldNodes({ poseStorage, candidateStorage, maxParts, tierC
 		return vec4(d, grad);
 	}
 
+	function evaluateBlendOperation(pLocal, creatureIndex, operationIndex) {
+		const operation = blendDag.operations[operationIndex];
+		if (operation.kind === 'leaf') {
+			return capsuleDistanceGradient(
+				pLocal,
+				readPrimitiveA(creatureIndex, int(operation.slot)),
+				readPrimitiveB(creatureIndex, int(operation.slot)),
+			);
+		}
+		const left = evaluateBlendOperation(pLocal, creatureIndex, operation.left);
+		const right = evaluateBlendOperation(pLocal, creatureIndex, operation.right);
+		const k = float(Math.max(operation.k, 1e-5));
+		const h = clamp(float(0.5).add(float(0.5).mul(left.x.sub(right.x).div(k))), 0, 1);
+		return vec4(
+			mix(left.x, right.x, h).sub(k.mul(h).mul(float(1).sub(h))),
+			mix(left.yzw, right.yzw, h),
+		);
+	}
+
 	const evaluateFieldVec4 = Fn(([pLocal, creatureIndexInput, ownerSlotInput]) => {
 		const creatureIndex = asIntNode(creatureIndexInput);
+		if (blendDag) return evaluateBlendOperation(pLocal, creatureIndex, blendDag.root);
 		const ownerSlot = asIntNode(ownerSlotInput);
 		const count = candidatesNode.element(ownerSlot.mul(int(entriesPerSlot))).toVar('candidateCount');
 		const d = float(1e20).toVar('fieldDistance');
@@ -110,7 +133,16 @@ export function buildFieldNodes({ poseStorage, candidateStorage, maxParts, tierC
 		const creatureIndex = asIntNode(creatureIndexInput);
 		const ownerSlot = asIntNode(ownerSlotInput);
 		const count = candidatesNode.element(ownerSlot.mul(int(entriesPerSlot))).toVar('candidateColorCount');
-		const dMin = float(dMinInput);
+		const primitiveMinimum = float(1e20).toVar('candidatePrimitiveMinimum');
+		Loop({ start: int(0), end: count, type: 'int', condition: '<', name: 'colorMinimumLoopIndex' }, ({ colorMinimumLoopIndex }) => {
+			const slot = candidatesNode.element(ownerSlot.mul(int(entriesPerSlot)).add(colorMinimumLoopIndex).add(int(1)));
+			const e = capsuleDistanceGradient(
+				pLocal,
+				readPrimitiveA(creatureIndex, slot),
+				readPrimitiveB(creatureIndex, slot),
+			);
+			primitiveMinimum.assign(minNode(primitiveMinimum, e.x));
+		});
 
 		const colorSum = vec3(0).toVar('fieldColorSum');
 		const weightSum = float(0).toVar('fieldWeightSum');
@@ -121,12 +153,35 @@ export function buildFieldNodes({ poseStorage, candidateStorage, maxParts, tierC
 			const meta = readPrimitiveMeta(creatureIndex, slot);
 			const e = capsuleDistanceGradient(pLocal, a4, b4);
 			const k = max(meta.x, float(1e-5));
-			const w = exp(max(e.x.sub(dMin), float(0)).negate().div(k));
+			const w = exp(max(e.x.sub(primitiveMinimum), float(0)).negate().div(k));
 			colorSum.assign(colorSum.add(meta.yzw.mul(w)));
 			weightSum.assign(weightSum.add(w));
 		});
 
 		return colorSum.div(max(weightSum, float(1e-12)));
+	});
+
+	const evaluateOwnerSlot = Fn(([pLocal, creatureIndexInput, ownerSlotInput]) => {
+		const creatureIndex = asIntNode(creatureIndexInput);
+		const ownerSlot = asIntNode(ownerSlotInput);
+		const count = candidatesNode.element(ownerSlot.mul(int(entriesPerSlot))).toVar('candidateOwnerCount');
+		const bestDistance = float(1e20).toVar('candidateOwnerDistance');
+		const bestSlot = int(0x7fffffff).toVar('candidateOwnerSlot');
+		Loop({ start: int(0), end: count, type: 'int', condition: '<', name: 'ownerLoopIndex' }, ({ ownerLoopIndex }) => {
+			const slot = candidatesNode.element(ownerSlot.mul(int(entriesPerSlot)).add(ownerLoopIndex).add(int(1)));
+			const primitiveDistance = capsuleDistanceGradient(
+				pLocal,
+				readPrimitiveA(creatureIndex, slot),
+				readPrimitiveB(creatureIndex, slot),
+			).x;
+			const wins = primitiveDistance.lessThan(bestDistance)
+				.or(primitiveDistance.equal(bestDistance).and(slot.lessThan(bestSlot)));
+			If(wins, () => {
+				bestDistance.assign(primitiveDistance);
+				bestSlot.assign(slot);
+			});
+		});
+		return bestSlot;
 	});
 
 	const snapPosition = Fn(([pStart, creatureIndexInput, ownerSlotInput, isoInput]) => {
@@ -172,6 +227,7 @@ export function buildFieldNodes({ poseStorage, candidateStorage, maxParts, tierC
 		snapAndShade,
 		evaluateFieldVec4,
 		evaluateColorVec3,
+		evaluateOwnerSlot,
 		snapPosition,
 		primitiveBase,
 		readPrimitiveA,

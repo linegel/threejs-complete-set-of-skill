@@ -1,4 +1,6 @@
-const LOCOMOTION_TYPES = new Set(['biped', 'quadruped', 'hexapod', 'hopper', 'flyer', 'swimmer']);
+import { validateBlendSchema } from './blend-dag.js';
+
+const LOCOMOTION_TYPES = new Set(['none', 'biped', 'quadruped', 'hexapod', 'hopper', 'flyer', 'swimmer']);
 const SHAPES = new Set(['capsule', 'sphere', 'cone', 'rope', 'leg']);
 const LEG_COUNTS = {
 	biped: 2,
@@ -6,6 +8,7 @@ const LEG_COUNTS = {
 	hexapod: 6,
 	hopper: 0,
 	swimmer: 0,
+	none: 0,
 };
 
 function fail(path, message) {
@@ -123,11 +126,13 @@ export function validateSpec(spec, options = {}) {
 	if (options.maxParts !== undefined && slotCount > options.maxParts) {
 		fail('spec.maxParts', `compiled slot count ${slotCount} exceeds maxParts ${options.maxParts}`);
 	}
+	const blend = validateBlendSchema(spec.blend, ids);
 
 	return {
 		...spec,
 		scale: spec.scale ?? 1,
 		parts: spec.parts.map((part) => ({ ...part })),
+		blend,
 		__slotCount: slotCount,
 	};
 }

@@ -1,12 +1,14 @@
 import { validateSpec } from './spec-schema.js';
+import { compileBlendDag, exactCandidateCertificate } from './blend-dag.js';
 
-export const SCHEMA_VERSION = 'creature-lab-schema-v1';
-export const COMPILER_VERSION = 'pure-core-sdf-rig-shell-v1';
+export const SCHEMA_VERSION = 'creature-lab-schema-v2';
+export const COMPILER_VERSION = 'pure-core-sdf-rig-shell-v2';
+export const SHADER_CONTRACT_VERSION = 'creature-field-tsl-v3-explicit-blend-dag-certificates';
 
 export const TIER_CONFIG = {
-	hero: { candidateK: 8, radial: 12, capRings: 3, vertsPerSlot: 98, trisPerSlot: 192 },
-	crowd: { candidateK: 6, radial: 10, capRings: 2, vertsPerSlot: 62, trisPerSlot: 120 },
-	background: { candidateK: 4, radial: 8, capRings: 2, vertsPerSlot: 50, trisPerSlot: 96 },
+	hero: { candidateK: 8, radial: 12, capRings: 3, vertsPerSlot: 98, trisPerSlot: 192, snapSteps: 2 },
+	crowd: { candidateK: 6, radial: 10, capRings: 2, vertsPerSlot: 62, trisPerSlot: 120, snapSteps: 1 },
+	background: { candidateK: 4, radial: 8, capRings: 2, vertsPerSlot: 50, trisPerSlot: 96, snapSteps: 1 },
 };
 
 function add(a, b) {
@@ -25,6 +27,14 @@ function dot(a, b) {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
+function cross(a, b) {
+	return [
+		a[1] * b[2] - a[2] * b[1],
+		a[2] * b[0] - a[0] * b[2],
+		a[0] * b[1] - a[1] * b[0],
+	];
+}
+
 function len(v) {
 	return Math.hypot(v[0], v[1], v[2]);
 }
@@ -33,10 +43,38 @@ function dist(a, b) {
 	return len(sub(a, b));
 }
 
+function normalize(v, fallback = [1, 0, 0]) {
+	const magnitude = len(v);
+	if (!(magnitude > 1e-12)) return fallback.slice();
+	return scale(v, 1 / magnitude);
+}
+
 function stableStringify(value) {
 	if (value === null || typeof value !== 'object') return JSON.stringify(value);
 	if (Array.isArray(value)) return `[${value.map((entry) => stableStringify(entry)).join(',')}]`;
 	return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`;
+}
+
+// Four independent 32-bit lanes make cache collisions materially less likely
+// than the rejected bare-32-bit spec hash while staying synchronous in both the
+// browser and Node validation runner. Cache correctness also keeps the full
+// canonical source string next to this digest (returned by compileSpec).
+export function digest128(value) {
+	const text = typeof value === 'string' ? value : stableStringify(value);
+	let h1 = 0x811c9dc5;
+	let h2 = 0x9e3779b9;
+	let h3 = 0x85ebca6b;
+	let h4 = 0xc2b2ae35;
+	for (let i = 0; i < text.length; i++) {
+		const c = text.charCodeAt(i);
+		h1 = Math.imul(h1 ^ c, 0x01000193);
+		h2 = Math.imul(h2 ^ c, 0x27d4eb2d);
+		h3 = Math.imul(h3 ^ c, 0x165667b1);
+		h4 = Math.imul(h4 ^ c, 0x9e3779b1);
+	}
+	return [h1, h2, h3, h4]
+		.map((lane) => (lane >>> 0).toString(16).padStart(8, '0'))
+		.join('');
 }
 
 function srgbChannelToLinear(c) {
@@ -49,10 +87,37 @@ export function srgbHexToLinear(hex) {
 	return [0, 2, 4].map((offset) => srgbChannelToLinear(parseInt(clean.slice(offset, offset + 2), 16) / 255));
 }
 
-function sortedParts(parts) {
-	// Codepoint comparison, NOT localeCompare: the canonical slot order feeds an
-	// order-dependent sequential smin, so it must be identical on every machine/locale.
-	return [...parts].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+function canonicalPartKey(part, origin) {
+	return stableStringify({
+		shape: part.shape,
+		origin,
+		a: part.a,
+		b: part.b,
+		offset: part.offset,
+		r: part.r,
+		r2: part.r2,
+		k: part.k,
+		kCap: part.kCap,
+		segments: part.segments,
+		length: part.length,
+		taper: part.taper,
+		hip: part.hip,
+		upper: part.upper,
+		lower: part.lower,
+		phase: part.phase,
+		flap: part.flap,
+	});
+}
+
+function canonicalParts(parts, origins) {
+	const keyed = parts.map((part) => ({ part, key: canonicalPartKey(part, origins.get(part.id)) }));
+	keyed.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+	for (let index = 1; index < keyed.length; index++) {
+		if (keyed[index - 1].key === keyed[index].key) {
+			throw new Error('part structural identities collide; add distinct authored geometry so rename-invariant slot order is defined');
+		}
+	}
+	return keyed.map((entry) => entry.part);
 }
 
 function partAnchor(part) {
@@ -87,6 +152,10 @@ function effectiveK(part, radius, scaleValue) {
 }
 
 function makePrimitive(part, a, b, ra, rb, color, k, slotClass, extra = {}) {
+	const axis = normalize(sub(b, a), [0, 1, 0]);
+	const helper = Math.abs(axis[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+	const radialX = normalize(cross(helper, axis), [1, 0, 0]);
+	const radialZ = normalize(cross(axis, radialX), [0, 0, 1]);
 	return {
 		a,
 		ra,
@@ -97,6 +166,9 @@ function makePrimitive(part, a, b, ra, rb, color, k, slotClass, extra = {}) {
 		partId: part.id,
 		shape: part.shape,
 		slotClass,
+		restAxis: axis,
+		radialX,
+		radialZ,
 		...extra,
 	};
 }
@@ -229,38 +301,13 @@ function buildCandidateSets(slots, adjacency, candidateK) {
 			})
 			.filter((entry) => entry.index !== owner)
 			.sort((a, b) => a.distance - b.distance || a.index - b.index)
-			.slice(0, candidateK)
+			// K is TOTAL contributor capacity, including the owning primitive.
+			// The old slice(K) + prepend(owner) built K+1 contributors and the
+			// storage writer silently truncated the last one.
+			.slice(0, Math.max(0, candidateK - 1))
 			.map((entry) => entry.index);
 		return [...new Set([owner, ...ranked])].sort((a, b) => a - b);
 	});
-}
-
-function geometryDigestInput(spec) {
-	return {
-		name: spec.name,
-		scale: spec.scale,
-		locomotion: spec.locomotion,
-		parts: sortedParts(spec.parts).map((part) => ({
-			id: part.id,
-			shape: part.shape,
-			parent: part.parent,
-			a: part.a,
-			b: part.b,
-			offset: part.offset,
-			r: part.r,
-			r2: part.r2,
-			k: part.k,
-			kCap: part.kCap,
-			color: part.color,
-			segments: part.segments,
-			length: part.length,
-			taper: part.taper,
-			hip: part.hip,
-			upper: part.upper,
-			lower: part.lower,
-			flap: part.flap,
-		})),
-	};
 }
 
 function computeBodyLift(spec) {
@@ -276,21 +323,54 @@ export function compileSpec(inputSpec, options = {}) {
 	const tier = options.tier ?? 'hero';
 	const config = TIER_CONFIG[tier] ?? TIER_CONFIG.hero;
 	const spec = validateSpec(inputSpec, { maxParts: options.maxParts });
-	const parts = sortedParts(spec.parts);
-	const origins = resolveOrigins(parts, spec.scale);
+	const origins = resolveOrigins(spec.parts, spec.scale);
+	const parts = canonicalParts(spec.parts, origins);
 	const slots = [];
-	for (const part of parts) slots.push(...compilePart(part, origins.get(part.id), spec.scale));
+	const partSlotIndices = new Map();
+	for (const part of parts) {
+		const first = slots.length;
+		slots.push(...compilePart(part, origins.get(part.id), spec.scale));
+		partSlotIndices.set(part.id, Array.from({ length: slots.length - first }, (_, index) => first + index));
+	}
 	if (options.maxParts !== undefined && slots.length > options.maxParts) {
 		throw new Error(`spec.maxParts compiled slot count ${slots.length} exceeds maxParts ${options.maxParts}`);
 	}
 
 	const excursion = locomotionExcursion(spec);
 	const adjacency = buildAdjacency(slots, excursion);
-	const candidateK = options.candidateK ?? config.candidateK;
+	const requestedCandidateK = options.candidateK ?? config.candidateK;
+	if (!Number.isFinite(requestedCandidateK) || requestedCandidateK < 1) {
+		throw new Error(`candidateK must be a positive total contributor capacity; got ${requestedCandidateK}`);
+	}
+	const candidateK = Math.min(slots.length, Math.floor(requestedCandidateK));
 	const candidateSets = buildCandidateSets(slots, adjacency, candidateK);
+	const blendDag = compileBlendDag({ spec, parts, slots, partSlotIndices });
+	const candidateCertificates = candidateSets.map((set) => exactCandidateCertificate(blendDag, set));
+	const candidateCertificateDigest = digest128(candidateCertificates.map((certificate) => ({
+		status: certificate.status,
+		omittedLeaves: certificate.omittedLeaves,
+		distanceTailBound: Number.isFinite(certificate.distanceTailBound) ? certificate.distanceTailBound : 'Infinity',
+		normalAngularBoundRadians: Number.isFinite(certificate.normalAngularBoundRadians) ? certificate.normalAngularBoundRadians : 'Infinity',
+		colorWeightBound: certificate.colorWeightBound,
+	})));
 	const maxRadius = Math.max(0, ...slots.map((slot) => Math.max(slot.ra, slot.rb)));
 	const slotClasses = slots.map((slot) => slot.slotClass).join(',');
-	const digest = `${SCHEMA_VERSION}|${COMPILER_VERSION}|${tier}|${slotClasses}|${stableStringify(geometryDigestInput(spec))}`;
+	const geometrySource = stableStringify(slots.map((slot) => ({
+		a: slot.a,
+		b: slot.b,
+		ra: slot.ra,
+		rb: slot.rb,
+		k: slot.k,
+		slotClass: slot.slotClass,
+		restAxis: slot.restAxis,
+		radialX: slot.radialX,
+	})));
+	const blendSource = blendDag.canonicalSource;
+	const compilerSignature = digest128({ schema: SCHEMA_VERSION, compiler: COMPILER_VERSION, shader: SHADER_CONTRACT_VERSION });
+	const topologySignature = digest128({ tier, slotClasses, blendSource, candidateK, candidateCertificateDigest });
+	const geometryDigest = digest128(geometrySource);
+	const shaderContractDigest = digest128({ shader: SHADER_CONTRACT_VERSION, maxParts: options.maxParts ?? slots.length, candidateK });
+	const digest = digest128({ compilerSignature, topologySignature, geometryDigest, shaderContractDigest });
 	const primitiveRecords = slots.map((slot, partSlot) => ({
 		...slot,
 		partSlot,
@@ -302,13 +382,22 @@ export function compileSpec(inputSpec, options = {}) {
 	return {
 		slots,
 		primitiveRecords,
+		blendDag,
 		candidateSets,
+		candidateCertificates,
+		candidateCertificateDigest,
 		adjacency,
 		bodyLift: computeBodyLift(spec),
 		maxRadius,
 		digest,
+		compilerSignature,
+		topologySignature,
+		geometryDigest,
+		geometrySource,
+		shaderContractDigest,
 		tier,
 		candidateK,
+		radialFrames: slots.map((slot) => ({ axis: slot.restAxis.slice(), x: slot.radialX.slice(), z: slot.radialZ.slice() })),
 		geometry: {
 			radial: config.radial,
 			capRings: config.capRings,
