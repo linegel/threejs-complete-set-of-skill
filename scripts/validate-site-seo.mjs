@@ -82,12 +82,27 @@ function hasType(node, type) {
   return types.includes(type);
 }
 
+function staticMarkup(html) {
+  return html.replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/gi, '');
+}
+
+function visibleText(html) {
+  return staticMarkup(html)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z#0-9]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function validateIndexablePage(path, expectedUrl, {
   requireH1 = false,
+  requireMain = false,
   validateImages = false,
   requireDiscovery = false,
   requireArticle = false,
   requireCatalog = false,
+  requireDemoShell = false,
+  requireAbout = false,
 } = {}) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
@@ -137,10 +152,30 @@ function validateIndexablePage(path, expectedUrl, {
     assert(headValue(html, 'property', 'article:published_time')[0] === article?.datePublished, `${label}: Open Graph publication time differs from JSON-LD`);
     assert(headValue(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${label}: Open Graph modification time differs from JSON-LD`);
   }
+  if (requireAbout) {
+    assert(nodes.some((node) => hasType(node, 'AboutPage')), `${label}: missing AboutPage structured-data node`);
+    assert(nodes.some((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`), `${label}: missing publisher identity`);
+    assert(nodes.some((node) => hasType(node, 'BreadcrumbList')), `${label}: missing breadcrumb structured data`);
+  }
 
   if (requireH1) {
-    const h1 = matches(html, /<h1\b[^>]*>/gi).length;
-    assert(h1 === 1, `${label}: expected one h1, found ${h1}`);
+    const headings = matches(staticMarkup(html), /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi);
+    assert(headings.length === 1, `${label}: expected one static h1, found ${headings.length}`);
+    assert(Boolean(visibleText(headings[0]?.[1] ?? '')), `${label}: static h1 has no text`);
+  }
+  if (requireMain) {
+    const main = matches(staticMarkup(html), /<main\b[^>]*>/gi).length;
+    assert(main === 1, `${label}: expected one static main landmark, found ${main}`);
+  }
+  if (requireDemoShell) {
+    const shell = staticMarkup(html).match(/<(aside|main)\b[^>]*data-demo-seo-shell[^>]*>([\s\S]*?)<\/\1>/i);
+    assert(Boolean(shell), `${label}: missing static demo SEO shell`);
+    const shellWords = visibleText(shell?.[2] ?? '').split(/\s+/).filter(Boolean).length;
+    assert(shellWords >= 80, `${label}: demo SEO shell is not substantial (${shellWords} words)`);
+    assert(/\bdata-owning-skill=["'][^"']+["']/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks owning-skill identity`);
+    assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks supported mechanisms`);
+    assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${label}: demo SEO shell lacks evidence status`);
+    assert(/<nav\b[^>]*aria-label=["']Demo documentation and provenance["']/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks provenance navigation`);
   }
   if (validateImages) {
     for (const [tag] of matches(html, /<img\b[^>]*>/gi)) {
@@ -188,13 +223,19 @@ for (const url of pageUrls) {
   assert(path && existsSync(path) && statSync(path).isFile(), `sitemap.xml: ${url} has no generated file`);
   if (!path || !existsSync(path)) continue;
   const isHome = url === SITE;
-  const isSkill = new URL(url).pathname.startsWith('/skills/');
+  const pathname = new URL(url).pathname;
+  const isSkill = pathname.startsWith('/skills/');
+  const isDemo = pathname.startsWith('/demos/');
+  const isAbout = pathname === '/about/';
   const record = validateIndexablePage(path, url, {
-    requireH1: isHome || isSkill,
-    validateImages: isHome || isSkill,
-    requireDiscovery: isHome || isSkill,
+    requireH1: true,
+    requireMain: true,
+    validateImages: true,
+    requireDiscovery: isHome || isSkill || isAbout,
     requireArticle: isSkill,
     requireCatalog: isHome,
+    requireDemoShell: isDemo,
+    requireAbout: isAbout,
   });
   pageRecords.push({ url, ...record });
 }
@@ -234,10 +275,19 @@ for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
     assert(canonicals.length === 1 && /^https:\/\/threejs-skills\.com\/demos\/[^/]+\/$/.test(canonicals[0]), `${relativePath}: wrapper canonical must point to its base demo`);
     const wrapperUrl = `${SITE}${relativePath.replace(/index\.html$/, '')}`;
     assert(!sitemapSet.has(wrapperUrl), `${relativePath}: state wrapper must not be in sitemap`);
+    continue;
+  }
+  if (/^demos\/[^/]+\/index\.html$/.test(relativePath) && /\bnoindex\b/i.test(headValue(html, 'name', 'robots')[0] ?? '')) {
+    const owningSkill = headValue(html, 'name', 'owning-skill')[0];
+    const canonical = canonicalValues(html);
+    assert(Boolean(owningSkill), `${relativePath}: noindex demo lacks owning-skill metadata`);
+    assert(canonical.length === 1 && canonical[0] === `${SITE}skills/${owningSkill}.html`, `${relativePath}: noindex demo must canonicalize to its owning skill`);
+    const pageUrl = `${SITE}${relativePath.replace(/index\.html$/, '')}`;
+    assert(!sitemapSet.has(pageUrl), `${relativePath}: noindex demo must not appear in sitemap`);
   }
 }
 
-for (const path of [join(DOCS, 'index.html'), ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html'))]) {
+for (const path of [join(DOCS, 'index.html'), join(DOCS, 'about', 'index.html'), ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html'))]) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
   assert(!/href=["'][^"']*index\.html(?:[#"'])/i.test(html), `${label}: internal navigation reinforces duplicate index.html URLs`);
@@ -263,6 +313,8 @@ for (const name of ['llm.txt', 'llms.txt', 'skills.json', 'site.webmanifest', 'r
   const text = readFileSync(join(DOCS, name), 'utf8');
   assert(!text.includes(OLD_SITE), `${name}: contains the retired GitHub Pages origin`);
 }
+assert(readFileSync(join(DOCS, 'llms.txt'), 'utf8').includes(`${SITE}about/`), 'llms.txt: missing methodology URL');
+assert(JSON.parse(readFileSync(join(DOCS, 'skills.json'), 'utf8')).methodology === `${SITE}about/`, 'skills.json: missing canonical methodology URL');
 
 if (errors.length) {
   console.error(`Site SEO validation failed (${errors.length} errors):`);
