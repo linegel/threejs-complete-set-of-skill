@@ -116,10 +116,14 @@ and the replaced techniques from the historical implementation.
 
 Canonical WebGPU lab: `examples/webgpu-pooled-effects/`. It contains prebound
 SoA A/B state, ordered mark/two-level exclusive-scan/scatter kernels,
-deterministic event expansion, indirect spark/debris render objects, and the
-hull-shell/wake stage. Its CPU oracles prove invariants only; canonical
+stable entity IDs backed by an atomic GPU free stack, deterministic event
+expansion, indirect spark/debris render objects, and the hull-shell/wake stage.
+Motion, appearance, and identity scatter are split so every kernel stays at or
+below seven storage-buffer bindings. Its CPU oracles prove invariants only; canonical
 acceptance still requires the native-browser readback/timing evidence named by
-`lab.manifest.json`.
+`lab.manifest.json`. Indirect meshes retain frustum culling through conservative
+event-envelope bounds, and evidence keeps pool, draw-consumption, hull,
+dissolve/shadow, depth, and emissive claims separate.
 
 Legacy WebGL implementation (deprecated, do not extend): `examples/reentry-plasma/reentry-plasma.js`
 

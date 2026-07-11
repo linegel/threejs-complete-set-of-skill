@@ -5,6 +5,8 @@ import {
   instancedArray,
   pass,
   mrt,
+  output,
+  emissive,
   renderOutput,
   workgroupBarrier,
   atomicAdd,
@@ -15,44 +17,39 @@ import {
 
 export const EFFECT_TIERS = {
   ultra: {
+    evidence: "Authored canonical workload; current-adapter performance unmeasured",
     poolCap: 65536,
     shellLayers: 5,
     wakeFamilies: 3,
     fieldOctaves: 3,
     bloomScale: 0.5,
-    gpuMs: [0.8, 1.5],
+    dprCap: 2,
   },
   high: {
+    evidence: "Authored canonical workload; current-adapter performance unmeasured",
     poolCap: 24576,
     shellLayers: 4,
     wakeFamilies: 2,
     fieldOctaves: 2,
     bloomScale: 0.5,
-    gpuMs: [1.5, 3.0],
+    dprCap: 1.5,
   },
   medium: {
+    evidence: "Authored canonical workload; current-adapter performance unmeasured",
     poolCap: 8192,
     shellLayers: 2,
     wakeFamilies: 1,
     fieldOctaves: 1,
     bloomScale: 0.25,
-    gpuMs: [3.0, 5.0],
-  },
-  compat: {
-    poolCap: 2048,
-    shellLayers: 1,
-    wakeFamilies: 1,
-    fieldOctaves: 0,
-    bloomScale: 0.25,
-    gpuMs: [0, 0],
+    dprCap: 1,
   },
 };
 
 export const HDR_HIERARCHY = {
   ordinarySurface: 1,
-  laser: 10,
-  projectile: 30,
-  sparkFlash: 80,
+  persistentEmitter: 10,
+  poweredCore: 30,
+  transientFlash: 80,
 };
 
 export const STORAGE_SLICES = ["startPosition", "velocity", "accelAge", "render0", "transform"];
@@ -170,7 +167,7 @@ export class EffectPool {
       const flow = packet.flowDirectionWorld;
       const flowBoost = 8 + random01(seed, 3) * 6;
       const radius = packet.radius * (0.7 + random01(seed, 4) * 0.6);
-      const brightness = HDR_HIERARCHY.sparkFlash * packet.emissionScale;
+      const brightness = HDR_HIERARCHY.transientFlash * packet.emissionScale;
 
       writeSlice(this.startPosition, index, [
         packet.position[0],
@@ -195,18 +192,18 @@ export class EffectPool {
         1,
         0,
         0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
         packet.position[0],
-        0,
-        1,
-        0,
         packet.position[1],
-        0,
-        0,
-        1,
         packet.position[2],
-        0,
-        0,
-        0,
         1,
       ]);
 
@@ -280,9 +277,11 @@ export class EffectPool {
         this.velocity.array[velocityOffset + 2] * dt;
       this.accelAge.array[accelOffset + 3] += dt / this.lifetimeSeconds;
 
-      this.transform.array[transformOffset + 3] = this.startPosition.array[positionOffset];
-      this.transform.array[transformOffset + 7] = this.startPosition.array[positionOffset + 1];
-      this.transform.array[transformOffset + 11] = this.startPosition.array[positionOffset + 2];
+      // Three.js matrices are column-major. Translation occupies elements
+      // 12/13/14, never the row-major-looking 3/7/11 slots.
+      this.transform.array[transformOffset + 12] = this.startPosition.array[positionOffset];
+      this.transform.array[transformOffset + 13] = this.startPosition.array[positionOffset + 1];
+      this.transform.array[transformOffset + 14] = this.startPosition.array[positionOffset + 2];
 
       if (this.accelAge.array[accelOffset + 3] >= 1) {
         this.removeAt(index);
@@ -333,16 +332,19 @@ export class EffectPool {
 
 export function validateHDRHierarchy(hierarchy = HDR_HIERARCHY) {
   return (
-    hierarchy.sparkFlash > hierarchy.projectile &&
-    hierarchy.projectile > hierarchy.laser &&
-    hierarchy.laser > hierarchy.ordinarySurface
+    hierarchy.transientFlash > hierarchy.poweredCore &&
+    hierarchy.poweredCore > hierarchy.persistentEmitter &&
+    hierarchy.persistentEmitter > hierarchy.ordinarySurface
   );
 }
 
 export async function createEffectRenderer(options = {}) {
   const renderer = new WebGPURenderer(options);
   await renderer.init();
-  const tier = renderer.backend?.isWebGPUBackend ? "ultra" : "compat";
+  if (renderer.backend?.isWebGPUBackend !== true) {
+    throw new Error("WebGPU backend unavailable for the canonical pooled-effects scaffold.");
+  }
+  const tier = "ultra";
   return { renderer, tier, budget: EFFECT_TIERS[tier] };
 }
 
@@ -360,23 +362,44 @@ export function createComputeDescriptors({ capacity = EFFECT_TIERS.medium.poolCa
     countersNode,
     spawnUpdateCompactKernel,
     atomics: [atomicAdd, atomicSub, atomicMax, atomicMin],
-    dispatch: "renderer.computeAsync(spawnUpdateCompactKernel)",
-    api: "renderer.computeAsync",
+    dispatch: "renderer.compute(spawnUpdateCompactKernel)",
+    api: "renderer.compute",
   };
 }
 
-export function createRenderPipelineContract({ scene, camera } = {}) {
+export const BLOOM_MODES = Object.freeze({
+  FULL_SCENE: "full-scene-hdr",
+  SELECTIVE_EMISSIVE: "selective-emissive",
+});
+
+export function createRenderPipelineContract({
+  scene,
+  camera,
+  bloomMode = BLOOM_MODES.FULL_SCENE,
+} = {}) {
+  if (!Object.values(BLOOM_MODES).includes(bloomMode)) {
+    throw new RangeError(`Unsupported bloom mode: ${bloomMode}`);
+  }
+
+  const selective = bloomMode === BLOOM_MODES.SELECTIVE_EMISSIVE;
+  const beautyPass = pass(scene ?? null, camera ?? null);
+  const contributionMRT = selective
+    ? mrt({
+        output,
+        emissive,
+      })
+    : null;
+
   return {
     renderer: "WebGPURenderer",
     RenderPipeline,
-    beautyPass: pass(scene ?? null, camera ?? null),
-    mrt: mrt({
-      output: "beauty",
-      emissive: "effect emissive MRT target",
-    }),
-    emissive: {
-      source: "MRT emissive",
-      bloomInput: "BloomNode(emissive)",
+    bloomMode,
+    beautyPass,
+    contributionMRT,
+    bloom: {
+      source: selective ? "MRT emissive" : "scene-linear HDR output",
+      input: selective ? "beautyPass.getTextureNode(emissive)" : "beautyPass",
+      requiresContributionAttachment: selective,
     },
     final: renderOutput,
     toneMapOwner: "RenderPipeline outputColorTransform",

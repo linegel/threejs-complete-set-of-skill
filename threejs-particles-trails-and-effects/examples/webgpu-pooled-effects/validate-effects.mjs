@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { BoxGeometry } from "three";
 
 import {
+  BLOOM_MODES,
   EFFECT_TIERS,
   EffectPool,
   createSpawnPacket,
@@ -78,9 +79,21 @@ const hull = demo.createFixtureHull();
 demo.spawnEvent();
 demo.attachReentryShell(hull);
 demo.update(1 / 60);
-demo.setDebugMode("MRT emissive");
+demo.setDebugMode("raw HDR");
+assert.equal(demo.pipelineContract.bloomMode, BLOOM_MODES.FULL_SCENE);
+assert.equal(demo.pipelineContract.contributionMRT, null, "default bloom adds no MRT");
 assert(demo.validateContracts());
 demo.dispose();
+
+const selectiveDemo = new PooledEffectsDemo({
+  tier: "medium",
+  seed: 42,
+  bloomMode: BLOOM_MODES.SELECTIVE_EMISSIVE,
+});
+assert(selectiveDemo.pipelineContract.contributionMRT, "selective bloom MRT descriptor");
+assert.equal(selectiveDemo.pipelineContract.bloom.source, "MRT emissive");
+assert(selectiveDemo.validateContracts());
+selectiveDemo.dispose();
 
 for (const [tier, config] of Object.entries(EFFECT_TIERS)) {
   assert(config.poolCap > 0, `${tier} pool cap`);
@@ -98,13 +111,14 @@ const source = [
 ]
   .map((file) => readFileSync(resolve(here, file), "utf8"))
   .join("\n");
+const readme = readFileSync(resolve(here, "README.md"), "utf8");
 
 for (const required of [
   "WebGPURenderer",
   "RenderPipeline",
   "StorageInstancedBufferAttribute",
   "Fn(",
-  "computeAsync",
+  "renderer.compute",
   "instancedArray",
   "supportPoint",
   "flowDirectionWorld",
@@ -117,17 +131,30 @@ for (const required of [
   "spark",
   "debris",
   "wake",
-  "renderer.info",
+  "rendererInfo",
   "softDepthFade",
   "occluder",
   "computeBounds",
   "point-size",
-  "Checkpoint",
-  "Expected",
-  "If you see",
 ]) {
   assert(source.includes(required), `missing ${required}`);
 }
+
+assert.match(
+  readme,
+  /These checks do not prove GPU execution\./,
+  "Node validation must not be presented as GPU-execution evidence",
+);
+assert.match(
+  readme,
+  /lab\.manifest\.json` therefore remains `incomplete` until the browser capture/,
+  "uncaptured native-WebGPU evidence must keep the artifact manifest incomplete",
+);
+assert.match(
+  readme,
+  /Missing timing is\s+`INSUFFICIENT_EVIDENCE`, never zero cost\./,
+  "missing measurements must not be encoded as zero-cost evidence",
+);
 
 const report = {
   pool: {

@@ -1,4 +1,13 @@
 {
   "type": "module",
-  "private": true
+  "private": true,
+  "scripts": {
+    "check": "node --check effect-pool.js && node --check gpu-compaction-pool.js && node --check effect-visuals.js && node --check reentry-shell.js && node --check depth-policy.js && node --check main.js && node --check lab.mjs && node --check browser.mjs && node --check route-wrappers.test.mjs && node --check capture.mjs && node --check validate-artifacts.mjs",
+    "validate:unit": "node dense-swap.test.mjs && node gpu-compaction.test.mjs && node route-wrappers.test.mjs && node validate-effects.mjs",
+    "test:mutations": "node gpu-compaction.mutations.test.mjs",
+    "capture": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts"
+  }
 }

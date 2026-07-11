@@ -1,9 +1,10 @@
 import { BoxGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene } from "three";
 import { WebGPURenderer, RenderPipeline } from "three/webgpu";
-import { pass, mrt, renderOutput } from "three/tsl";
+import { renderOutput } from "three/tsl";
 import { bloom } from "three/examples/jsm/tsl/display/BloomNode.js";
 
 import {
+  BLOOM_MODES,
   EFFECT_TIERS,
   EffectPool,
   createComputeDescriptors,
@@ -15,7 +16,11 @@ import { computeBounds, softDepthFade, validateDepthPolicy } from "./depth-polic
 import { createReentryShell, estimateShellBudget } from "./reentry-shell.js";
 
 export class PooledEffectsDemo {
-  constructor({ tier = "medium", seed = 20260704 } = {}) {
+  constructor({
+    tier = "medium",
+    seed = 20260704,
+    bloomMode = BLOOM_MODES.FULL_SCENE,
+  } = {}) {
     this.tier = tier;
     this.seed = seed;
     this.scene = new Scene();
@@ -32,11 +37,22 @@ export class PooledEffectsDemo {
       drag: 0.4,
     });
     this.debugMode = "final";
-    this.pipelineContract = createRenderPipelineContract({ scene: this.scene, camera: this.camera });
+    this.pipelineContract = createRenderPipelineContract({
+      scene: this.scene,
+      camera: this.camera,
+      bloomMode,
+    });
     this.computePlan = createComputeDescriptors({ capacity: EFFECT_TIERS[tier].poolCap });
     this.metrics = {
-      MRT: "beauty + emissive",
-      emissive: "spark/debris/wake contribution",
+      bloomMode,
+      MRT:
+        bloomMode === BLOOM_MODES.SELECTIVE_EMISSIVE
+          ? "beauty + emissive"
+          : "none; bloom consumes scene-linear HDR output",
+      emissive:
+        bloomMode === BLOOM_MODES.SELECTIVE_EMISSIVE
+          ? "spark/debris/wake contribution attachment"
+          : "scene-linear material emission",
       spark: 0,
       debris: 0,
       wake: 0,
@@ -45,16 +61,20 @@ export class PooledEffectsDemo {
   }
 
   async initialize({ canvas } = {}) {
-    this.renderer = new WebGPURenderer({ canvas, antialias: true });
+    this.renderer = new WebGPURenderer({ canvas, antialias: false });
     await this.renderer.init();
-    this.backendTier = this.renderer.backend?.isWebGPUBackend ? this.tier : "compat";
+    if (this.renderer.backend?.isWebGPUBackend !== true) {
+      throw new Error("WebGPU backend unavailable for the pooled-effects scaffold.");
+    }
+    this.backendTier = this.tier;
 
-    this.beautyPass = pass(this.scene, this.camera);
-    this.gbuffer = mrt({
-      output: "beauty",
-      emissive: "MRT emissive",
-    });
-    this.bloomNode = bloom("emissive");
+    this.beautyPass = this.pipelineContract.beautyPass;
+    this.gbuffer = this.pipelineContract.contributionMRT;
+    if (this.gbuffer) this.beautyPass.setMRT(this.gbuffer);
+    const bloomInput = this.gbuffer
+      ? this.beautyPass.getTextureNode("emissive")
+      : this.beautyPass;
+    this.bloomNode = bloom(bloomInput);
     this.finalOutput = renderOutput;
     this.renderPipeline = new RenderPipeline(this.renderer);
 
@@ -121,10 +141,16 @@ export class PooledEffectsDemo {
   }
 
   validateContracts() {
+    const selective = this.pipelineContract.bloomMode === BLOOM_MODES.SELECTIVE_EMISSIVE;
     return (
       validateHDRHierarchy() &&
       validateDepthPolicy() &&
-      this.pipelineContract.emissive.source === "MRT emissive"
+      this.pipelineContract.bloom.requiresContributionAttachment === selective &&
+      (selective
+        ? this.pipelineContract.contributionMRT !== null &&
+          this.pipelineContract.bloom.source === "MRT emissive"
+        : this.pipelineContract.contributionMRT === null &&
+          this.pipelineContract.bloom.source === "scene-linear HDR output")
     );
   }
 

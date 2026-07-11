@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-pooled-effects",
+  "skill": "threejs-particles-trails-and-effects",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/lab.mjs",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/gpu-compaction-pool.js",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/effect-visuals.js",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/effect-pool.js",
+    "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/reentry-shell.js"
+  ],
+  "browserEntry": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/index.html",
+  "publishPath": "/demos/webgpu-pooled-effects/",
+  "scenarios": [
+    { "id": "reentry-shell-and-wake", "route": "mechanism/reentry-shell-and-wake/", "acceptanceStatus": "incomplete" },
+    { "id": "impact-sparks", "route": "mechanism/impact-sparks/", "acceptanceStatus": "incomplete" },
+    { "id": "debris-dissolve", "route": "mechanism/debris-dissolve/", "acceptanceStatus": "incomplete" },
+    { "id": "gpu-pool-and-compaction", "route": "mechanism/gpu-pool-and-compaction/", "acceptanceStatus": "incomplete" },
+    { "id": "indirect-draws", "route": "mechanism/indirect-draws/", "acceptanceStatus": "incomplete" },
+    { "id": "hdr-emissive-and-depth", "route": "mechanism/hdr-emissive-and-depth/", "acceptanceStatus": "incomplete" },
+    { "id": "tier-benchmark", "route": "mechanism/tier-benchmark/", "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "reentry-shell-and-wake", "route": "mechanism/reentry-shell-and-wake", "startup": { "scenario": "reentry-shell-and-wake" }, "acceptanceStatus": "incomplete" },
+    { "id": "impact-sparks", "route": "mechanism/impact-sparks", "startup": { "scenario": "impact-sparks" }, "acceptanceStatus": "incomplete" },
+    { "id": "debris-dissolve", "route": "mechanism/debris-dissolve", "startup": { "scenario": "debris-dissolve" }, "acceptanceStatus": "incomplete" },
+    { "id": "gpu-pool-and-compaction", "route": "mechanism/gpu-pool-and-compaction", "startup": { "scenario": "gpu-pool-and-compaction" }, "acceptanceStatus": "incomplete" },
+    { "id": "indirect-draws", "route": "mechanism/indirect-draws", "startup": { "scenario": "indirect-draws" }, "acceptanceStatus": "incomplete" },
+    { "id": "hdr-emissive-and-depth", "route": "mechanism/hdr-emissive-and-depth", "startup": { "scenario": "hdr-emissive-and-depth" }, "acceptanceStatus": "incomplete" },
+    { "id": "tier-benchmark", "route": "mechanism/tier-benchmark", "startup": { "scenario": "tier-benchmark" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "ultra",
+      "targetClass": "current-adapter authored workload",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "sceneScale": 1, "bloomScale": 0.5, "dprCap": 2 },
+      "mechanismLimits": { "poolCap": 65536, "shellLayers": 5, "wakeFamilies": 3, "fieldOctaves": 3 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["event physics", "mark-scan-scatter", "indirect draw", "depth occlusion", "HDR hierarchy"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "high",
+      "targetClass": "current-adapter authored workload",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "sceneScale": 1, "bloomScale": 0.5, "dprCap": 1.5 },
+      "mechanismLimits": { "poolCap": 24576, "shellLayers": 4, "wakeFamilies": 2, "fieldOctaves": 2 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["lower active capacity", "merge one shell layer", "remove one field octave"],
+      "preservedInvariants": ["event physics", "mark-scan-scatter", "indirect draw", "depth occlusion", "HDR hierarchy"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "medium",
+      "targetClass": "current-adapter authored workload",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "sceneScale": 1, "bloomScale": 0.25, "dprCap": 1 },
+      "mechanismLimits": { "poolCap": 8192, "shellLayers": 2, "wakeFamilies": 1, "fieldOctaves": 1 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["lower active capacity", "primary wake only", "single field octave"],
+      "preservedInvariants": ["event physics", "mark-scan-scatter", "indirect draw", "depth occlusion", "HDR hierarchy"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "no-post", "raw-emissive", "bloom-only", "normal"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "webgpu-backend", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "storage-buffer", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "indirect-draw", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mrt", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "ordered-compute-dispatch", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "stable-identity-free-list-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "indirect-count-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "live-soft-depth-sampling", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "render-target-output", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "node threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/gpu-compaction.test.mjs",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}
