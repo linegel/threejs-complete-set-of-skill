@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 
 import { TOWER_SHIP_DPR_CAPS } from "./lab-controller.js";
+import { towerShipRouteFromLocation } from "./route-state.js";
 
 const manifest = JSON.parse(readFileSync(new URL("./lab.manifest.json", import.meta.url)));
 const routes = [
@@ -20,5 +21,24 @@ for (const tier of manifest.tiers) {
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert.match(app, /Unknown mechanism route/, "unknown mechanism routes must throw");
 assert.match(app, /Unknown tier route/, "unknown tier routes must throw");
+assert.deepEqual(
+  towerShipRouteFromLocation({ pathname: "/tier/minimum/", search: "" }),
+  { mechanism: null, tier: "minimum" },
+  "physical tier routes must resolve before boot",
+);
+assert.deepEqual(
+  towerShipRouteFromLocation({ pathname: "/demos/webgpu-tower-ship-sculptor/", search: "?mechanism=interaction" }),
+  { mechanism: "interaction", tier: null },
+  "generated mechanism queries must resolve before boot",
+);
+assert.deepEqual(
+  towerShipRouteFromLocation({ pathname: "/demos/webgpu-tower-ship-sculptor/", search: "?tier=minimum" }),
+  { mechanism: null, tier: "minimum" },
+  "generated tier queries must resolve before boot",
+);
+assert.throws(
+  () => towerShipRouteFromLocation({ pathname: "/tier/full/", search: "?tier=minimum" }),
+  /Conflicting tier route/,
+  "conflicting physical and generated routes must fail closed",
+);
 console.log(JSON.stringify({ ok: true, physicalRoutes: routes.length }, null, 2));
-

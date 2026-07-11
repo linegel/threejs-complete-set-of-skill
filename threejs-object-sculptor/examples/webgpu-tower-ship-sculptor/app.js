@@ -4,6 +4,7 @@ import {
   TOWER_SHIP_MODES,
   TOWER_SHIP_TIERS,
 } from "./lab-controller.js";
+import { towerShipRouteFromLocation } from "./route-state.js";
 
 const MODE_COPY = Object.freeze({
   final: ["Final reconstruction", "Reference-shaped geometry, mixed materials, and authored light."],
@@ -12,13 +13,6 @@ const MODE_COPY = Object.freeze({
   materials: ["Material study", "Neutral motion state for wood, paper, cloth, rope, and metal response."],
   interaction: ["Interaction proof", "Twenty-four oars row from named hinge sockets while the sail and lanterns react."],
 });
-
-function fixedRoute(pathname) {
-  return {
-    mechanism: pathname.match(/\/mechanism\/([^/]+)/)?.[1] ?? null,
-    tier: pathname.match(/\/tier\/([^/]+)/)?.[1] ?? null,
-  };
-}
 
 function addOptions(select, values) {
   for (const value of values) select.add(new Option(value.replaceAll("-", " "), value));
@@ -37,7 +31,7 @@ const metricOars = document.querySelector("#metric-oars");
 const referencePanel = document.querySelector("#reference-panel");
 const referenceImage = document.querySelector("#reference-image");
 const compareButton = document.querySelector("#compare");
-const route = fixedRoute(window.location.pathname);
+const route = towerShipRouteFromLocation(window.location);
 referenceImage.src = new URL("./reference/tower-ship-reference.png", import.meta.url).href;
 
 if (route.mechanism && !TOWER_SHIP_MODES.includes(route.mechanism)) throw new RangeError(`Unknown mechanism route "${route.mechanism}"`);
