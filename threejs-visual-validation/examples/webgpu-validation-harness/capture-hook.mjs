@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import { encodeRgbaPng } from '../../../scripts/lib/png-rgba.mjs';
-import { writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
+import { classifyPerformanceTrace, writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
 
@@ -84,68 +84,80 @@ export async function captureLab( session ) {
 	const captures = [];
 	await mkdir( resolve( session.outputDir, 'images' ), { recursive: true } );
 	await session.controllerCall( 'setScenario', 'browser-capture' );
-	await session.controllerCall( 'setTier', session.profile === 'performance' ? 'target-performance' : 'webgpu-correctness' );
+	await session.controllerCall( 'setTier', 'webgpu-correctness' );
+	await session.controllerCall( 'resize', 1200, 800, 1 );
 	await session.controllerCall( 'setCamera', 'design' );
 	await session.controllerCall( 'setSeed', 0x00000001 );
 	await session.controllerCall( 'setTime', 0 );
 
+	const final = await captureAndWrite( session, captures, 'images/final.design.png', 'final' );
+	const noPost = await captureAndWrite( session, captures, 'images/no-post.design.png', 'no-post' );
+	const normal = await captureAndWrite( session, captures, 'images/diagnostic.normal.png', 'normal' );
+	const emissive = await captureAndWrite( session, captures, 'images/diagnostic.emissive.png', 'emissive' );
+	const diagnosticDifference = Math.min(
+		meanRgbByteDifference( final, normal ),
+		meanRgbByteDifference( final, emissive )
+	);
+	if ( diagnosticDifference <= DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE ) throw new Error( 'Diagnostic outputs are not materially distinct from final output.' );
+	await writeFile(
+		resolve( session.outputDir, 'images/diagnostics.mosaic.png' ),
+		encodeRgbaPng( diagnosticMosaic( [ final, noPost, normal, emissive ] ) )
+	);
+	captures.push( { filename: 'images/diagnostics.mosaic.png', target: 'final/no-post/normal/emissive', width: final.width, height: final.height, source: 'four actual output-node captures' } );
+
+	for ( const camera of [ 'near', 'design', 'far' ] ) {
+
+		await session.controllerCall( 'setCamera', camera );
+		await captureAndWrite( session, captures, `images/camera.${ camera }.png`, 'final' );
+
+	}
+
+	await session.controllerCall( 'setCamera', 'design' );
+	for ( const seed of [ 0x00000001, 0x9e3779b9 ] ) {
+
+		await session.controllerCall( 'setSeed', seed );
+		await session.controllerCall( 'setTime', 0 );
+		const seedName = seed === 0x00000001 ? '0001' : seed.toString( 16 ).padStart( 8, '0' );
+		await captureAndWrite( session, captures, `images/seed-${ seedName }.final.png`, 'final' );
+
+	}
+
+	await session.controllerCall( 'setSeed', 0x00000001 );
+	await session.controllerCall( 'resetHistory', 'correctness-capture' );
+	await session.controllerCall( 'setTime', 0 );
+	await captureAndWrite( session, captures, 'images/temporal.t000.png', 'final' );
+	await session.controllerCall( 'step', 1 / 60 );
+	await captureAndWrite( session, captures, 'images/temporal.t001.png', 'final' );
+
+	await session.controllerCall( 'resize', 641, 359, 1 );
+	const odd = await captureAndWrite( session, captures, 'images/odd-size.final.png', 'final' );
+	if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
+
+	let performanceTrace = null;
 	if ( session.profile === 'performance' ) {
 
-		await captureAndWrite( session, captures, 'images/final.performance.png', 'final' );
-
-	} else {
-
-		const final = await captureAndWrite( session, captures, 'images/final.design.png', 'final' );
-		const noPost = await captureAndWrite( session, captures, 'images/no-post.design.png', 'no-post' );
-		const normal = await captureAndWrite( session, captures, 'images/diagnostic.normal.png', 'normal' );
-		const emissive = await captureAndWrite( session, captures, 'images/diagnostic.emissive.png', 'emissive' );
-		const diagnosticDifference = Math.min(
-			meanRgbByteDifference( final, normal ),
-			meanRgbByteDifference( final, emissive )
-		);
-		if ( diagnosticDifference <= DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE ) throw new Error( 'Diagnostic outputs are not materially distinct from final output.' );
-		await writeFile(
-			resolve( session.outputDir, 'images/diagnostics.mosaic.png' ),
-			encodeRgbaPng( diagnosticMosaic( [ final, noPost, normal, emissive ] ) )
-		);
-		captures.push( { filename: 'images/diagnostics.mosaic.png', target: 'final/no-post/normal/emissive', width: final.width, height: final.height, source: 'four actual output-node captures' } );
-
-		for ( const camera of [ 'near', 'design', 'far' ] ) {
-
-			await session.controllerCall( 'setCamera', camera );
-			await captureAndWrite( session, captures, `images/camera.${ camera }.png`, 'final' );
-
-		}
-
+		await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
+		await session.controllerCall( 'setTier', 'target-performance' );
 		await session.controllerCall( 'setCamera', 'design' );
-		for ( const seed of [ 0x00000001, 0x9e3779b9 ] ) {
-
-			await session.controllerCall( 'setSeed', seed );
-			await session.controllerCall( 'setTime', 0 );
-			const seedName = seed === 0x00000001 ? '0001' : seed.toString( 16 ).padStart( 8, '0' );
-			await captureAndWrite( session, captures, `images/seed-${ seedName }.final.png`, 'final' );
-
-		}
-
 		await session.controllerCall( 'setSeed', 0x00000001 );
-		await session.controllerCall( 'resetHistory', 'correctness-capture' );
 		await session.controllerCall( 'setTime', 0 );
-		await captureAndWrite( session, captures, 'images/temporal.t000.png', 'final' );
-		await session.controllerCall( 'step', 1 / 60 );
-		await captureAndWrite( session, captures, 'images/temporal.t001.png', 'final' );
+		await captureAndWrite( session, captures, 'images/final.performance.png', 'final' );
+		performanceTrace = await session.controllerCall( 'runPerformanceProfile', {
+			warmupFrames: 30,
+			sampleFrames: 120,
+			presentationFrames: 120
+		} );
 
-		await session.controllerCall( 'resize', 641, 359, 1 );
-		const odd = await captureAndWrite( session, captures, 'images/odd-size.final.png', 'final' );
-		if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
 	}
 
 	await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
+	await session.controllerCall( 'setTier', session.profile === 'performance' ? 'target-performance' : 'webgpu-correctness' );
 	await session.controllerCall( 'setCamera', 'design' );
 	await session.controllerCall( 'setSeed', 0x00000001 );
 	await session.controllerCall( 'setTime', 0 );
 	await session.controllerCall( 'setMode', 'final' );
 	await session.controllerCall( 'renderOnce' );
-	const lifecycle = session.profile === 'performance' ? null : await session.page.evaluate( async () => (
+	const lifecycle = await session.page.evaluate( async () => (
 		window.__THREEJS_LAB_LIFECYCLE__( 50 )
 	) );
 
@@ -154,8 +166,14 @@ export async function captureLab( session ) {
 		pipeline: await session.controllerCall( 'describePipeline' ),
 		resources: await session.controllerCall( 'describeResources' ),
 		gpuTiming: await session.controllerCall( 'resolveGpuTimings' ),
+		performanceTrace,
 		lifecycle
 	};
+	const performanceCompliance = classifyPerformanceTrace( performanceTrace, {
+		cpuP95: 1000 / 60 - 2,
+		gpuP95: 1000 / 60 - 2,
+		deadlineMissRatio: 0.01
+	} );
 	const boundary = {
 		schemaVersion: 2,
 		bundleKind: 'browser-capture-session',
@@ -164,21 +182,20 @@ export async function captureLab( session ) {
 		publishable: false,
 		sourceHash: session.lab.sourceHash,
 		evidenceContract: 'v2',
-		reason: 'Real render-target captures and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, sustained timing, GPU-stage attribution, and visual sign-off.',
+		reason: performanceTrace === null
+			? 'Real render-target captures and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, sustained timing, GPU-stage attribution, and visual sign-off.'
+			: 'Real render-target captures, a sustained CPU/GPU/cadence trace, and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, per-stage GPU attribution, governor stress, and visual sign-off.',
 		claimVerdicts: {
 			nativeWebGPUCorrectness: 'PASS',
 			renderTargetReadback: 'PASS',
 			mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
-			performanceCompliance: 'INSUFFICIENT_EVIDENCE',
+			performanceCompliance,
 			gpuTimestampAvailability: runtime.gpuTiming.verdict,
 			gpuAttribution: 'INSUFFICIENT_EVIDENCE',
 			lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 		},
 		diagnosticDifference: {
-			value: session.profile === 'performance' ? null : Math.min(
-				meanRgbByteDifference( await session.capturePixels( 'final' ), await session.capturePixels( 'normal' ) ),
-				meanRgbByteDifference( await session.capturePixels( 'final' ), await session.capturePixels( 'emissive' ) )
-			),
+			value: diagnosticDifference,
 			unit: 'mean-rgb-byte-difference',
 			label: 'Measured',
 			source: 'render-target output-node comparison'

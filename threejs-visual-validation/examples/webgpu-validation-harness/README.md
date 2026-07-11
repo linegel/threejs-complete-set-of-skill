@@ -29,6 +29,8 @@ npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run va
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run test:routes
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run test:mutations
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture -- --profile correctness
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture -- --profile performance
 ```
 
 `validate:v1` retains the migration reader for old bundles. A v1 result is
@@ -44,12 +46,23 @@ artifacts and standard images, then runs the blocking mutation suite.
 `INSUFFICIENT_EVIDENCE` while only fixtures exist. `validate:quick` remains
 browser-free.
 
-The correctness `capture` command writes the ten standard PNGs under
+The correctness `capture` profile writes the ten standard PNGs under
 `images/`, assembles all fourteen JSON artifacts from live controller and
 readback facts, validates the result as `browser-capture-incomplete`, and keeps
 it non-publishable. `validate:artifacts` continues to reject that bundle until
 mechanism, sustained performance, GPU attribution, and lifecycle verdicts all
 become `PASS` from their required runs.
+
+The performance profile first captures the same 1200x800 correctness set, then
+captures `final.performance.png` at 1920x1080 and measures 30 warm-up frames,
+120 individually resolved WebGPU render timestamps, 120 CPU submission
+samples, and 119 `requestAnimationFrame` cadence intervals. Timestamp mapping
+is disabled during the cadence window so the presentation samples describe
+rendering cadence rather than readback stalls. The profile remains
+non-publishable until per-stage attribution, governor stress, and mechanism
+proof are present; a sustained total-frame trace alone does not satisfy those
+claims. A measured total-frame budget overrun is still reported as `FAIL`
+immediately instead of being hidden behind `INSUFFICIENT_EVIDENCE`.
 
 ## Browser subject
 
@@ -115,6 +128,8 @@ stale-pipeline-graph
 missing-timestamp
 publishable-with-insufficient-claim
 p95-overrun
+gpu-p95-overrun
+deadline-overrun
 governor-oscillation
 visual-error-overrun
 target-leak

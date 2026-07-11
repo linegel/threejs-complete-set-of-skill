@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { bytesPerTexel, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
+import { buildTraceSegment, bytesPerTexel, classifyPerformanceTrace, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
 
 function lifecycleFixture( mutate = () => {} ) {
 
@@ -51,5 +51,33 @@ test( 'runtime bundle format widths include the canonical depth allocation', () 
 	assert.equal( bytesPerTexel( 'rgba8unorm' ), 4 );
 	assert.equal( bytesPerTexel( 'depth32float' ), 4 );
 	assert.throws( () => bytesPerTexel( 'depth24plus' ), /does not know the byte width/ );
+
+} );
+
+test( 'trace segments distinguish measured cadence from an authored target', () => {
+
+	const authored = buildTraceSegment( [ 2, 4, 6 ], 'unit trace', 16 );
+	assert.equal( authored.presentationSamples.label, 'Authored' );
+	assert.equal( authored.presentationP95.label, 'Authored' );
+	assert.equal( authored.deadlineMissRatio.label, 'Authored' );
+	assert.equal( authored.deadlineMissRatio.value, 1 );
+
+	const measured = buildTraceSegment( [ 2, 4, 6 ], 'unit trace', 16, [ 15, 16, 17, 18 ] );
+	assert.equal( measured.presentationSamples.label, 'Measured' );
+	assert.deepEqual( measured.presentationSamples.values, [ 15, 16, 17, 18 ] );
+	assert.equal( measured.presentationP95.label, 'Measured' );
+	assert.equal( measured.deadlineMissRatio.label, 'Measured' );
+	assert.equal( measured.deadlineMissRatio.value, 0.5 );
+
+} );
+
+test( 'performance classification exposes measured overruns without promoting incomplete passes', () => {
+
+	const gates = { cpuP95: 14, gpuP95: 14, deadlineMissRatio: 0.01 };
+	assert.equal( classifyPerformanceTrace( null, gates ), 'INSUFFICIENT_EVIDENCE' );
+	assert.equal( classifyPerformanceTrace( { cpuP95: 2, gpuP95: 12, deadlineMissRatio: 0 }, gates ), 'INSUFFICIENT_EVIDENCE' );
+	assert.equal( classifyPerformanceTrace( { cpuP95: 2, gpuP95: 15, deadlineMissRatio: 0 }, gates ), 'FAIL' );
+	assert.equal( classifyPerformanceTrace( { cpuP95: 2, gpuP95: 12, deadlineMissRatio: 0.02 }, gates ), 'FAIL' );
+	assert.throws( () => classifyPerformanceTrace( { cpuP95: 2, gpuP95: Number.NaN, deadlineMissRatio: 0 }, gates ), /GPU p95/ );
 
 } );

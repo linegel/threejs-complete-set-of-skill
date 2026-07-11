@@ -365,6 +365,9 @@ function validatePerformance( envelope, trace, manifest, contract ) {
 
 	const cpuP95 = numericValue( trace.sustained.cpuP95, 'frame-trace.json.sustained.cpuP95' );
 	const cpuGate = numericValue( envelope.cpuP95Gate, 'performance-envelope.json.cpuP95Gate' );
+	const gpuGate = numericValue( envelope.gpuP95Gate, 'performance-envelope.json.gpuP95Gate' );
+	const deadlineMissRatio = numericValue( trace.sustained.deadlineMissRatio, 'frame-trace.json.sustained.deadlineMissRatio' );
+	const deadlineMissRatioGate = numericValue( envelope.deadlineMissRatioGate, 'performance-envelope.json.deadlineMissRatioGate' );
 	if ( manifest.claimVerdicts.performanceCompliance === 'PASS' && cpuP95 > cpuGate ) {
 
 		throw new Error( `p95-overrun: CPU sustained p95 ${ cpuP95 } exceeds gate ${ cpuGate }.` );
@@ -385,11 +388,14 @@ function validatePerformance( envelope, trace, manifest, contract ) {
 
 			validateNumericDatum( trace.renderTimestamp, 'frame-trace.json.renderTimestamp' );
 			if ( trace.computeTimestamp !== null ) validateNumericDatum( trace.computeTimestamp, 'frame-trace.json.computeTimestamp' );
-			if ( manifest.claimVerdicts.gpuAttribution !== 'PASS' ) throw new Error( 'Timestamp-backed GPU attribution must use claim verdict PASS.' );
+			if ( manifest.claimVerdicts.gpuAttribution !== 'PASS' && manifest.claimVerdicts.gpuAttribution !== 'INSUFFICIENT_EVIDENCE' ) throw new Error( 'Timestamp-backed GPU attribution must be PASS or INSUFFICIENT_EVIDENCE.' );
+			const gpuP95 = numericValue( trace.renderTimestamp, 'frame-trace.json.renderTimestamp' );
+			if ( manifest.claimVerdicts.performanceCompliance === 'PASS' && gpuP95 > gpuGate ) throw new Error( `p95-overrun: GPU sustained p95 ${ gpuP95 } exceeds gate ${ gpuGate }.` );
 
 		}
 
 	}
+	if ( manifest.claimVerdicts.performanceCompliance === 'PASS' && deadlineMissRatio > deadlineMissRatioGate ) throw new Error( `deadline-overrun: miss ratio ${ deadlineMissRatio } exceeds gate ${ deadlineMissRatioGate }.` );
 
 }
 

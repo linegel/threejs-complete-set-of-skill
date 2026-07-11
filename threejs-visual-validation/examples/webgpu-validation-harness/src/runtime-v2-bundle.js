@@ -170,17 +170,46 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 
 }
 
-function traceSegment( samples, label, targetIntervalMs ) {
+export function buildTraceSegment( samples, label, targetIntervalMs, presentationSamples = null ) {
 
 	const source = `${ RUNTIME_SOURCE }; ${ label } CPU samples`;
+	const measuredPresentation = Array.isArray( presentationSamples ) && presentationSamples.length > 0;
+	const presentationSource = measuredPresentation
+		? `${ RUNTIME_SOURCE }; requestAnimationFrame cadence with rendering enabled`
+		: 'authored target interval; presentation cadence was not measured';
+	const cadenceSamples = measuredPresentation ? presentationSamples : [ targetIntervalMs ];
+	const presentationP95 = percentile( cadenceSamples, 0.95 );
+	const deadlineMissRatio = measuredPresentation
+		? cadenceSamples.filter( ( sample ) => sample > targetIntervalMs ).length / cadenceSamples.length
+		: 1;
 	return {
 		cpuSamples: MA( samples, 'ms', source ),
-		presentationSamples: AA( [ targetIntervalMs ], 'ms', 'authored target interval; presentation cadence was not measured' ),
+		presentationSamples: measuredPresentation ? MA( cadenceSamples, 'ms', presentationSource ) : AA( cadenceSamples, 'ms', presentationSource ),
 		cpuP50: M( percentile( samples, 0.5 ), 'ms', source ),
 		cpuP95: M( percentile( samples, 0.95 ), 'ms', source ),
-		presentationP95: A( targetIntervalMs, 'ms', 'authored target interval; not a measured presentation percentile' ),
-		deadlineMissRatio: A( 1, 'ratio', 'conservative unknown because presentation cadence was not measured' )
+		presentationP95: measuredPresentation ? M( presentationP95, 'ms', presentationSource ) : A( presentationP95, 'ms', presentationSource ),
+		deadlineMissRatio: measuredPresentation ? M( deadlineMissRatio, 'ratio', presentationSource ) : A( deadlineMissRatio, 'ratio', 'conservative unknown because presentation cadence was not measured' )
 	};
+
+}
+
+export function classifyPerformanceTrace( trace, gates ) {
+
+	if ( trace === null ) return 'INSUFFICIENT_EVIDENCE';
+	for ( const [ value, label ] of [
+		[ trace.cpuP95, 'CPU p95' ],
+		[ trace.gpuP95, 'GPU p95' ],
+		[ trace.deadlineMissRatio, 'deadline miss ratio' ],
+		[ gates.cpuP95, 'CPU p95 gate' ],
+		[ gates.gpuP95, 'GPU p95 gate' ],
+		[ gates.deadlineMissRatio, 'deadline miss ratio gate' ]
+	] ) {
+
+		if ( Number.isFinite( value ) === false || value < 0 ) throw new Error( `${ label } must be finite and nonnegative.` );
+
+	}
+	if ( trace.cpuP95 > gates.cpuP95 || trace.gpuP95 > gates.gpuP95 || trace.deadlineMissRatio > gates.deadlineMissRatio ) return 'FAIL';
+	return 'INSUFFICIENT_EVIDENCE';
 
 }
 
@@ -199,9 +228,14 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const pipeline = runtime.pipeline;
 	const resources = runtime.resources;
 	const gpuTiming = runtime.gpuTiming;
+	const performanceTrace = runtime.performanceTrace;
 	const lifecycle = summarizeLifecycleEvidence( runtime.lifecycle );
 	const finalCapture = captures.find( ( capture ) => capture.filename === 'images/final.design.png' );
+	const targetReadbackCapture = session.profile === 'performance'
+		? captures.find( ( capture ) => capture.filename === 'images/final.performance.png' )
+		: finalCapture;
 	if ( ! finalCapture ) throw new Error( 'Runtime v2 assembler requires images/final.design.png capture metadata.' );
+	if ( ! targetReadbackCapture ) throw new Error( 'Runtime v2 assembler requires capture metadata for the final resource state.' );
 	if ( metrics.backend?.isWebGPUBackend !== true ) throw new Error( 'Runtime v2 assembler requires initialized native WebGPU metrics.' );
 	if ( metrics.viewport.width !== session.profileConfig.width || metrics.viewport.height !== session.profileConfig.height || metrics.viewport.dpr !== session.profileConfig.dpr ) {
 
@@ -215,10 +249,16 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	} ) );
 	const targetRate = 60;
 	const targetIntervalMs = 1000 / targetRate;
+	const performanceGates = {
+		cpuP95: targetIntervalMs - 2,
+		gpuP95: targetIntervalMs - 2,
+		deadlineMissRatio: 0.01
+	};
+	const performanceVerdict = classifyPerformanceTrace( performanceTrace, performanceGates );
 	const claimVerdicts = {
 		visualCorrectness: 'PASS',
 		mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
-		performanceCompliance: 'INSUFFICIENT_EVIDENCE',
+		performanceCompliance: performanceVerdict,
 		gpuAttribution: 'INSUFFICIENT_EVIDENCE',
 		lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 	};
@@ -249,10 +289,14 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const pipelineGraphDigest = digest( graphWithoutDigest );
 	const pipelineGraph = schema( { graphDigest: pipelineGraphDigest, ...graphWithoutDigest } );
 	const knownCompromises = [
-		'Correctness capture only; no sustained performance window was run.',
+		...( performanceTrace === null
+			? [ 'Correctness capture only; no sustained performance window was run.' ]
+			: [ 'A sustained CPU/GPU/cadence trace was captured, but no performance verdict is promoted without per-stage attribution and governor stress.' ] ),
 		'One resolved render timestamp proves availability but not per-stage GPU attribution.',
 		...( lifecycle === null ? [ 'No lifecycle create/render/resize/mode/tier/dispose loop was run.' ] : [] ),
-		'Adapter identity, adapter features, adapter limits, display refresh, and presentation cadence were not exposed by this capture path.'
+		performanceTrace === null
+			? 'Adapter identity, adapter features, adapter limits, display refresh, and presentation cadence were not exposed by this capture path.'
+			: 'Adapter identity, adapter features, adapter limits, and physical display refresh were not exposed; presentation cadence was measured from requestAnimationFrame intervals.'
 	];
 	const visualContract = schema( {
 		contractRevision: 'webgpu-validation-runtime-v2-incomplete-1',
@@ -274,7 +318,10 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		requiredMetrics: [ 'native backend', 'readback layout', 'pipeline owners', 'resource inventory', 'claim-separated verdicts' ],
 		blockingFailures: [ 'non-WebGPU backend', 'unlabelled numeric', 'bad padded stride', 'false diagnostic route', 'publishable incomplete claims' ],
 		allowedDivergences: knownCompromises,
-		performanceClaims: { gpuTimingRequirement: 'not-claimed', claims: [] },
+		performanceClaims: {
+			gpuTimingRequirement: performanceTrace === null ? 'not-claimed' : 'required',
+			claims: performanceTrace === null ? [] : [ 'current-adapter total-frame performance at 1920x1080 DPR 1' ]
+		},
 		imageComparisons: [ {
 			id: 'diagnostic-runtime-transport',
 			baseline: 'images/final.design.png',
@@ -364,7 +411,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	} );
 	const refreshPeriod = D( targetIntervalMs, 'ms', '1000 / authored 60 Hz correctness target' );
 	const performanceEnvelope = schema( {
-		gpuTimingRequirement: 'not-claimed',
+		gpuTimingRequirement: performanceTrace === null ? 'not-claimed' : 'required',
 		refreshPeriod,
 		browserMainThreadReserve: A( 1, 'ms', 'authored target envelope' ),
 		compositorGpuReserve: A( 1, 'ms', 'authored target envelope' ),
@@ -372,25 +419,42 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		gpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
 		cpuSceneEnvelope: D( targetIntervalMs - 2, 'ms', 'refresh period - browser reserve - CPU reserve' ),
 		gpuSceneEnvelope: D( targetIntervalMs - 2, 'ms', 'refresh period - compositor reserve - GPU reserve' ),
-		cpuP95Gate: G( targetIntervalMs - 2, 'ms', 'frozen correctness target; performance remains insufficient' ),
-		gpuP95Gate: G( targetIntervalMs - 2, 'ms', 'frozen correctness target; performance remains insufficient' ),
-		deadlineMissRatioGate: G( 0.01, 'ratio', 'authored target; presentation cadence unmeasured' )
+		cpuP95Gate: G( performanceGates.cpuP95, 'ms', 'frozen 60 Hz scene budget' ),
+		gpuP95Gate: G( performanceGates.gpuP95, 'ms', 'frozen 60 Hz scene budget' ),
+		deadlineMissRatioGate: G( performanceGates.deadlineMissRatio, 'ratio', performanceTrace === null ? 'authored target; presentation cadence unmeasured' : 'authored target applied to measured presentation cadence' )
 	} );
-	const samples = metrics.cpuFrameMs.samples.filter( Number.isFinite );
+	const samples = ( performanceTrace?.cpuSamples ?? metrics.cpuFrameMs.samples ).filter( Number.isFinite );
 	if ( samples.length === 0 ) throw new Error( 'Runtime v2 assembler requires at least one measured CPU render sample.' );
-	const warmupSamples = samples.slice( 0, Math.min( 5, samples.length ) );
-	const sustainedSamples = samples.slice( Math.min( 5, samples.length ) );
+	const warmupSamples = ( performanceTrace?.warmupCpuSamples ?? samples.slice( 0, Math.min( 5, samples.length ) ) ).filter( Number.isFinite );
+	const sustainedSamples = performanceTrace === null ? samples.slice( Math.min( 5, samples.length ) ) : samples;
 	if ( sustainedSamples.length === 0 ) sustainedSamples.push( samples[ samples.length - 1 ] );
+	const gpuSamples = ( performanceTrace?.gpuSamples ?? [] ).filter( Number.isFinite );
+	const measuredPresentationSamples = ( performanceTrace?.presentationSamples ?? [] ).filter( Number.isFinite );
+	const measuredPresentationP50 = measuredPresentationSamples.length > 0 ? percentile( measuredPresentationSamples, 0.5 ) : null;
 	const frameTrace = schema( {
 		clockSource: 'performance.now around RenderPipeline.render calls',
-		warmup: traceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs ),
-		cold: traceSegment( [ samples[ 0 ] ], 'first post-initialization render', targetIntervalMs ),
-		sustained: traceSegment( sustainedSamples, 'remaining correctness capture sequence; not a sustained performance run', targetIntervalMs ),
+		warmup: buildTraceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs ),
+		cold: buildTraceSegment( [ samples[ 0 ] ], 'first post-initialization render', targetIntervalMs ),
+		sustained: buildTraceSegment(
+			sustainedSamples,
+			performanceTrace === null ? 'remaining correctness capture sequence; not a sustained performance run' : `${ performanceTrace.sampleFrames }-frame sustained target-performance trace`,
+			targetIntervalMs,
+			measuredPresentationSamples
+		),
 		gpuTimingAvailable: gpuTiming.verdict === 'PASS',
-		renderTimestamp: gpuTiming.renderMs === null ? null : M( gpuTiming.renderMs, 'ms', 'single resolved Three.js render timestamp after correctness capture' ),
+		renderTimestamp: gpuSamples.length > 0
+			? M( percentile( gpuSamples, 0.95 ), 'ms', 'sustained WebGPU render timestamp p95' )
+			: gpuTiming.renderMs === null ? null : M( gpuTiming.renderMs, 'ms', 'single resolved Three.js render timestamp after correctness capture' ),
 		computeTimestamp: gpuTiming.computeMs === null ? null : M( gpuTiming.computeMs, 'ms', 'single resolved Three.js compute timestamp after correctness capture' ),
-		presentationCadence: A( targetRate, 'frame/s', 'target only; presentation cadence was not measured' ),
-		excludedPhases: [ 'renderer initialization', 'pipeline compilation', 'readback mapping', 'PNG encoding', 'no sustained timing window' ]
+		presentationCadence: measuredPresentationP50 === null
+			? A( targetRate, 'frame/s', 'target only; presentation cadence was not measured' )
+			: M( 1000 / measuredPresentationP50, 'frame/s', 'inverse measured requestAnimationFrame interval p50' ),
+		gpuSamples: gpuSamples.length === 0 ? null : MA( gpuSamples, 'ms', 'one resolved WebGPU render timestamp per sustained frame' ),
+		gpuP50: gpuSamples.length === 0 ? null : M( percentile( gpuSamples, 0.5 ), 'ms', 'sustained WebGPU render timestamp samples' ),
+		gpuP95: gpuSamples.length === 0 ? null : M( percentile( gpuSamples, 0.95 ), 'ms', 'sustained WebGPU render timestamp samples' ),
+		excludedPhases: performanceTrace === null
+			? [ 'renderer initialization', 'pipeline compilation', 'readback mapping', 'PNG encoding', 'no sustained timing window' ]
+			: [ 'renderer initialization', 'pipeline compilation', 'PNG encoding', 'timestamp readback excluded from CPU render samples', 'timestamp mapping disabled during cadence sampling' ]
 	} );
 	const qualityGovernor = schema( {
 		enabled: false,
@@ -403,7 +467,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		settledState: metrics.tier,
 		oscillationDetected: false
 	} );
-	const targets = resources.renderTargets.map( ( target ) => targetArtifact( target, finalCapture ) );
+	const targets = resources.renderTargets.map( ( target ) => targetArtifact( target, targetReadbackCapture ) );
 	const totalTargetBytes = resources.renderTargets.reduce( ( sum, target ) => sum + target.bytes, 0 );
 	const renderTargets = schema( {
 		targets,
@@ -522,6 +586,14 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		metrics: [
 			{ id: 'diagnostic-mean-rgb-byte-difference', measured: M( diagnosticDifference, 'mean-rgb-byte-difference', 'minimum of final-vs-normal and final-vs-emissive' ), captures: [ 'images/diagnostic.normal.png', 'images/diagnostic.emissive.png' ] },
 			{ id: 'render-timestamp-availability', verdict: gpuTiming.verdict, measured: gpuTiming.renderMs === null ? null : M( gpuTiming.renderMs, 'ms', 'single resolved render timestamp' ) },
+			...( performanceTrace === null ? [] : [ {
+				id: 'sustained-performance-trace',
+				verdict: performanceVerdict,
+				cpuP95: M( performanceTrace.cpuP95, 'ms', `${ performanceTrace.sampleFrames } sustained RenderPipeline CPU submission samples` ),
+				gpuP95: M( performanceTrace.gpuP95, 'ms', `${ performanceTrace.sampleFrames } sustained WebGPU render timestamp samples` ),
+				presentationP95: M( performanceTrace.presentationP95, 'ms', `${ performanceTrace.presentationSamples.length } requestAnimationFrame cadence intervals with rendering enabled` ),
+				deadlineMissRatio: M( performanceTrace.deadlineMissRatio, 'ratio', 'measured cadence intervals above 16.6667 ms' )
+			} ] ),
 			{ id: 'readback-captures', records: captureMetrics }
 		],
 		verdicts: claimVerdicts

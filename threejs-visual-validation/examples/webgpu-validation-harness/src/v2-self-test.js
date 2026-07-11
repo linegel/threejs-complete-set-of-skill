@@ -201,6 +201,63 @@ export async function runV2MutationSuite() {
 			} );
 
 		} ),
+		expectMutationRejects( 'gpu-p95-overrun', /p95-overrun: GPU/, async ( dir ) => {
+
+			await mutateJson( dir, 'visual-contract.json', ( contract ) => {
+
+				contract.performanceClaims.gpuTimingRequirement = 'required';
+
+			} );
+			await mutateJson( dir, 'performance-envelope.json', ( envelope ) => {
+
+				envelope.gpuTimingRequirement = 'required';
+
+			} );
+			await mutateJson( dir, 'evidence-manifest.json', ( manifest ) => {
+
+				manifest.bundleKind = 'browser-capture';
+				manifest.publishable = true;
+				manifest.backend.isWebGPUBackend = true;
+				manifest.backend.initialized = true;
+				for ( const claim of Object.keys( manifest.claimVerdicts ) ) manifest.claimVerdicts[ claim ] = 'PASS';
+
+			} );
+			await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
+
+				rendererInfo.backend = 'WebGPU';
+
+			} );
+			await mutateJson( dir, 'frame-trace.json', ( trace ) => {
+
+				trace.gpuTimingAvailable = true;
+				trace.renderTimestamp = authored( 20, 'ms' );
+
+			} );
+
+		} ),
+		expectMutationRejects( 'deadline-overrun', /deadline-overrun/, async ( dir ) => {
+
+			await mutateJson( dir, 'evidence-manifest.json', ( manifest ) => {
+
+				manifest.bundleKind = 'browser-capture';
+				manifest.publishable = true;
+				manifest.backend.isWebGPUBackend = true;
+				manifest.backend.initialized = true;
+				for ( const claim of Object.keys( manifest.claimVerdicts ) ) manifest.claimVerdicts[ claim ] = 'PASS';
+
+			} );
+			await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
+
+				rendererInfo.backend = 'WebGPU';
+
+			} );
+			await mutateJson( dir, 'frame-trace.json', ( trace ) => {
+
+				trace.sustained.deadlineMissRatio = authored( 0.2, 'ratio' );
+
+			} );
+
+		} ),
 		expectMutationRejects( 'governor-oscillation', /governor-oscillation/, async ( dir ) => {
 
 			await mutateJson( dir, 'quality-governor.json', ( governor ) => {

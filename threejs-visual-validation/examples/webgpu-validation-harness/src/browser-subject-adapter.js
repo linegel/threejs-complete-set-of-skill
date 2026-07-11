@@ -86,6 +86,17 @@ function disposeObject( object ) {
 
 }
 
+function requireFrameCount( value, label, minimum, maximum ) {
+
+	if ( Number.isInteger( value ) === false || value < minimum || value > maximum ) {
+
+		throw new Error( `${ label } must be an integer in [${ minimum }, ${ maximum }].` );
+
+	}
+	return value;
+
+}
+
 export async function createNativeWebGPUValidationSubject( canvas, options = {} ) {
 
 	if ( canvas === null || typeof canvas !== 'object' ) throw new Error( 'A canvas is required.' );
@@ -223,8 +234,10 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		renderer.setRenderTarget( target );
 		const start = performance.now();
 		renderPipeline.render();
-		cpuFrameSamples.push( performance.now() - start );
+		const cpuMs = performance.now() - start;
+		cpuFrameSamples.push( cpuMs );
 		renderer.setRenderTarget( previousTarget );
+		return cpuMs;
 
 	}
 
@@ -460,6 +473,69 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				return { verdict: 'INSUFFICIENT_EVIDENCE', renderMs: null, computeMs: null, reason: error.message };
 
 			}
+
+		},
+
+		async runPerformanceProfile( configuration = {} ) {
+
+			requireLive();
+			if ( TIERS.get( tier ).performanceClaim !== true ) throw new Error( `Tier ${ tier } does not declare a performance profile.` );
+			if ( typeof requestAnimationFrame !== 'function' ) throw new Error( 'Presentation cadence sampling requires requestAnimationFrame.' );
+			const warmupFrames = requireFrameCount( configuration.warmupFrames ?? 30, 'warmupFrames', 30, 120 );
+			const sampleFrames = requireFrameCount( configuration.sampleFrames ?? 120, 'sampleFrames', 60, 240 );
+			const presentationFrames = requireFrameCount( configuration.presentationFrames ?? 120, 'presentationFrames', 60, 240 );
+			const warmupCpuSamples = [];
+			const cpuSamples = [];
+			const gpuSamples = [];
+			const presentationSamples = [];
+
+			for ( let frame = 0; frame < warmupFrames; frame ++ ) {
+
+				warmupCpuSamples.push( await renderTo( null ) );
+				const gpuMs = await renderer.resolveTimestampsAsync( 'render' );
+				if ( Number.isFinite( gpuMs ) === false ) throw new Error( `Warm-up frame ${ frame } has no GPU timestamp.` );
+
+			}
+
+			for ( let frame = 0; frame < sampleFrames; frame ++ ) {
+
+				cpuSamples.push( await renderTo( null ) );
+				const gpuMs = await renderer.resolveTimestampsAsync( 'render' );
+				if ( Number.isFinite( gpuMs ) === false ) throw new Error( `Sustained frame ${ frame } has no GPU timestamp.` );
+				gpuSamples.push( gpuMs );
+
+			}
+
+			let previousPresentationTime = null;
+			for ( let frame = 0; frame < presentationFrames; frame ++ ) {
+
+				const presentationTime = await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+				if ( previousPresentationTime !== null ) presentationSamples.push( presentationTime - previousPresentationTime );
+				previousPresentationTime = presentationTime;
+				await renderTo( null );
+
+			}
+			await renderer.resolveTimestampsAsync( 'render' );
+
+			const refreshPeriodMs = 1000 / 60;
+			return {
+				warmupFrames,
+				sampleFrames,
+				presentationFrames,
+				warmupCpuSamples,
+				cpuSamples,
+				gpuSamples,
+				presentationSamples,
+				cpuP50: percentile( cpuSamples, 0.5 ),
+				cpuP95: percentile( cpuSamples, 0.95 ),
+				gpuP50: percentile( gpuSamples, 0.5 ),
+				gpuP95: percentile( gpuSamples, 0.95 ),
+				presentationP50: percentile( presentationSamples, 0.5 ),
+				presentationP95: percentile( presentationSamples, 0.95 ),
+				deadlineMissRatio: presentationSamples.filter( ( value ) => value > refreshPeriodMs ).length / presentationSamples.length,
+				timestampScope: 'one resolved WebGPU render timestamp per sustained RenderPipeline frame',
+				presentationScope: 'requestAnimationFrame cadence with rendering enabled and timestamp mapping disabled'
+			};
 
 		},
 
