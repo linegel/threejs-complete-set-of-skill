@@ -406,6 +406,13 @@ and error. Do not
 redeclare a parallel lighting record. Each canonical channel
 declares its own basis/primaries or spectral basis, radiometric quantity, SI
 unit, frame/time, revision, validity, and error.
+
+The provenance `requestedPresentationInstant` and bundle `sampleInstant` are
+narrow `PhysicsInstant` values. Provider `requestedPhysicsTime` and channel
+`actualPhysicsTime` are `PhysicsTime` wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor's `timeSemantics`; a raw
+`PhysicsInstant` or `PhysicsTimeInterval` is invalid in either wrapper field.
+
 Materials, atmosphere, meter, bloom, and diagnostics must use a compatible
 channel or an explicit dimensionally valid conversion. If rendering uses a
 normalized scene-linear RGB basis, expose it as a separately named render-local

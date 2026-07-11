@@ -45,6 +45,12 @@ maximum staleness, validity, and error. Validate the exact central
 target/view and per-channel schemas; do not define a reduced bloom-local field
 list.
 
+The provenance `requestedPresentationInstant` and bundle `sampleInstant` are
+narrow `PhysicsInstant` values. Provider `requestedPhysicsTime` and channel
+`actualPhysicsTime` are `PhysicsTime` wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor's `timeSemantics`; a raw
+`PhysicsInstant` or `PhysicsTimeInterval` is invalid in either wrapper field.
+
 For each lighting channel, record basis/primaries or spectral basis,
 radiance/irradiance quantity, SI unit, bundle `sampleInstant`, channel
 `actualPhysicsTime`, revision, validity, and error.

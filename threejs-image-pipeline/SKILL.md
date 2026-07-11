@@ -239,6 +239,12 @@ source instant and clock-map revision/error, plus the bundle `sampleInstant`;
 validate channel `actualPhysicsTime`, filter/age, maximum staleness, validity,
 and error.
 
+The provenance `requestedPresentationInstant` and bundle `sampleInstant` are
+narrow `PhysicsInstant` values. Provider `requestedPhysicsTime` and channel
+`actualPhysicsTime` are `PhysicsTime` wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor's `timeSemantics`; a raw
+`PhysicsInstant` or `PhysicsTimeInterval` is invalid in either wrapper field.
+
 Canonical lighting-provider channels remain SI-valued. A normalized RGB working
 buffer is a separately named render-local signal derived through a versioned
 SI-to-render conversion with reference scale, provenance, and error; it is not a

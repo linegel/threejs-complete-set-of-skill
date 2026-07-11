@@ -57,6 +57,12 @@ Irradiance transport values
 must pass through the lighting/BRDF contract before bloom. Selective emission
 cannot use an unrelated arbitrary intensity scale.
 
+The provenance `requestedPresentationInstant` and bundle `sampleInstant` are
+narrow `PhysicsInstant` values. Provider `requestedPhysicsTime` and channel
+`actualPhysicsTime` are `PhysicsTime` wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor's `timeSemantics`; a raw
+`PhysicsInstant` or `PhysicsTimeInterval` is invalid in either wrapper field.
+
 Basis, quantity, SI unit, bundle `sampleInstant`, channel `actualPhysicsTime`,
 state/resource version, validity, and error are checked per canonical channel.
 Canonical lighting-provider channels

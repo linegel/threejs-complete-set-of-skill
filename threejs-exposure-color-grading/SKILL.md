@@ -72,6 +72,12 @@ declared `PresentationSampleProvenance` clock mapping; validate channel
 `actualPhysicsTime`, age, filter, maximum staleness, validity, and error against
 the target/view `currentRenderSampleInstant`.
 
+The provenance `requestedPresentationInstant` and bundle `sampleInstant` are
+narrow `PhysicsInstant` values. Provider `requestedPhysicsTime` and channel
+`actualPhysicsTime` are `PhysicsTime` wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor's `timeSemantics`; a raw
+`PhysicsInstant` or `PhysicsTimeInterval` is invalid in either wrapper field.
+
 Canonical lighting-provider channels remain SI-valued. The meter input is
 scene-linear radiance in the declared working basis. A physically calibrated
 render basis may retain those units. A normalized RGB render basis is a

@@ -522,9 +522,12 @@ is not a substitute for adjacent rendered poses.
 For a physically sourced directional light, bind
 `LightingTransportSnapshot.sourceDirection` through its provider-wide
 `PresentedStatePair`. Validate context/provider/signal IDs, directional basis
-and support, requested `PhysicsInstant`, channel `actualPhysicsTime`, declared
-clock mapping, maximum staleness, state/resource generations, lease, validity,
-and angular error.
+and support, `PresentationSampleProvenance.requestedPresentationInstant:
+PhysicsInstant`, bundle `sampleInstant: PhysicsInstant`, and channel
+`actualPhysicsTime: PhysicsTime`, whose discriminant selects exactly one arm
+consistent with the descriptor's `timeSemantics`. Validate the declared clock
+mapping, maximum staleness, state/resource generations, lease, validity, and
+angular error.
 Reject a single directional projection when a broad source
 distribution exceeds its declared approximation gate. A nonphysical route
 leaves this binding `not used` and declares an authored light basis.

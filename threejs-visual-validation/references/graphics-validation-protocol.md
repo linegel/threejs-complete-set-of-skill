@@ -786,6 +786,14 @@ Also require:
   validity, and error; plus every applied
   atmosphere/cloud/visibility factor in `attenuationFactorIds`.
 
+Validate the time shapes, not only their values. Provenance
+`requestedPresentationInstant` and bundle `sampleInstant` are narrow
+`PhysicsInstant` values. Provider `requestedPhysicsTime` and channel
+`actualPhysicsTime` are `PhysicsTime` wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor's `timeSemantics`; a raw
+`PhysicsInstant` or `PhysicsTimeInterval` in either wrapper field fails schema
+validation.
+
 The lighting snapshot must be bound by a provider-wide `PresentedStatePair`
 with `entityId: typed-absence` in the Candidate and referenced by the sealed
 Snapshot. Validate context/provider/signal IDs, descriptor and state/resource

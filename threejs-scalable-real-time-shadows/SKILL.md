@@ -202,8 +202,11 @@ and its dependent temporal region.
 For a physically sourced directional light, bind the canonical
 `LightingTransportSnapshot.sourceDirection` through its provider-wide
 `PresentedStatePair` and validate context/provider/signal IDs, basis, support,
-requested `PhysicsInstant`, channel `actualPhysicsTime`, declared clock mapping,
-maximum staleness,
+`PresentationSampleProvenance.requestedPresentationInstant: PhysicsInstant`,
+bundle `sampleInstant: PhysicsInstant`, and channel
+`actualPhysicsTime: PhysicsTime`, whose discriminant selects exactly one arm
+consistent with the descriptor's `timeSemantics`. Validate the declared clock
+mapping and maximum staleness,
 state/resource generations, lease, validity, and angular error.
 A broad directional distribution that exceeds the single-direction projection
 gate cannot be silently collapsed into one shadow camera. A nonphysical route
