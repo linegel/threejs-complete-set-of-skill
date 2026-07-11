@@ -6,6 +6,14 @@ import { canonicalUrlForRoute, createLockedController, MECHANISM_ROUTE_LOCKS, TI
 
 const LAB_ROOT = new URL( '../', import.meta.url );
 
+test( 'browser subject exposes the fresh-controller lifecycle runner', async () => {
+
+	const source = await readFile( new URL( './app.js', import.meta.url ), 'utf8' );
+	assert.match( source, /window\.__THREEJS_LAB_LIFECYCLE__/ );
+	assert.match( source, /createNativeWebGPUValidationSubject\( document\.createElement\( 'canvas' \) \)/ );
+
+} );
+
 for ( const [ kind, locks ] of [ [ 'mechanism', MECHANISM_ROUTE_LOCKS ], [ 'tier', TIER_ROUTE_LOCKS ] ] ) {
 
 	for ( const id of Object.keys( locks ) ) {

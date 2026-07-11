@@ -139,8 +139,10 @@ export async function runLifecycleProfile( createController, options = {} ) {
 		await controller.setMode( cycle % 3 === 0 ? 'normal' : 'final' );
 		await controller.resetHistory( `lifecycle-cycle-${ cycle }` );
 		await controller.renderOnce();
-		snapshots.push( { cycle, beforeDispose: controller.getMetrics(), resources: controller.describeResources() } );
+		const beforeDispose = controller.getMetrics();
+		const resources = controller.describeResources();
 		await controller.dispose();
+		snapshots.push( { cycle, beforeDispose, afterDispose: controller.getMetrics(), resources } );
 
 	}
 

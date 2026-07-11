@@ -1,5 +1,6 @@
 import { createNativeWebGPUValidationSubject, nativeSubjectContract } from './browser-subject-adapter.js';
 import { createLockedController, getRouteLock } from './route-locks.js';
+import { runLifecycleProfile } from './subject-adapter.js';
 
 const canvas = document.querySelector( '#validation-canvas' );
 const status = document.querySelector( '#status' );
@@ -24,6 +25,10 @@ async function start() {
 	window.__THREEJS_LAB__ = routeLock === null ? controller : createLockedController( controller, routeLock );
 	window.__THREEJS_LAB_CONTRACT__ = nativeSubjectContract;
 	window.__THREEJS_LAB_ROUTE_LOCK__ = routeLock;
+	window.__THREEJS_LAB_LIFECYCLE__ = ( cycles = 50 ) => runLifecycleProfile(
+		() => createNativeWebGPUValidationSubject( document.createElement( 'canvas' ) ),
+		{ cycles }
+	);
 	status.textContent = 'Native WebGPU validation subject ready';
 	document.documentElement.dataset.ready = 'true';
 
