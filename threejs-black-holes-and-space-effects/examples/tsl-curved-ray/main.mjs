@@ -58,7 +58,6 @@ export async function runCurvedRayAccretionDemo({
   seed = 7,
   quality = "standard",
   temporalHistory = false,
-  explicitFallbackWhenWebGPUUnavailable = false,
 } = {}) {
   if (!canvas) {
     throw new Error("runCurvedRayAccretionDemo requires a canvas element.");
@@ -76,7 +75,6 @@ export async function runCurvedRayAccretionDemo({
     scene: demo.scene,
     camera: demo.camera,
     effect: demo.effect,
-    explicitFallbackWhenWebGPUUnavailable,
   });
 
   let animationFrame = 0;

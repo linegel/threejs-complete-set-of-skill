@@ -133,13 +133,18 @@ function createVisualContract() {
       [invariants[1]]: { requiredImages: ["images/final.design.png", "images/no-post.design.png"], requiredDiagnostics: ["bent environment direction"], requiredMetrics: ["lensDelta"], blockingFailures: ["screen-space thumbnail only", "no bent lookup response"] },
       [invariants[2]]: { requiredImages: ["images/diagnostics.mosaic.png", "images/seed-stress.final.png"], requiredDiagnostics: ["termination/opacity"], requiredMetrics: ["terminationRatio"], blockingFailures: ["final-only evidence"] },
     },
-    allowedDivergences: ["Canvas2D evidence isolates generated starfield-tile usefulness after WebGPU backend gate; canonical curved-ray rendering remains TSL numerical integration."],
+    allowedDivergences: ["Canvas2D evidence isolates generated starfield-tile usefulness; the executed curved-ray shader is the separately validated artistic TSL scaffold."],
     requiredImages,
     requiredDiagnostics: ["raw SRGB", "bent environment direction", "termination/opacity"],
     requiredMetrics: ["renderer-info.json", "timings.json", "lensDelta", "brightRatio", "terminationRatio"],
     blockingFailures: ["missing WebGPU backend", "wrong star color space", "non-opaque alpha", "blank capture", "final-only evidence"],
-    frameBudgetMs: { desktopDiscrete: 12, desktopIntegrated: 24, mobile: 33 },
-    memoryBudgetMB: 128,
+    performanceClaim: "none: this Canvas2D artifact check does not benchmark the curved-ray GPU workload",
+    benchmarkContract: {
+      workloadTuple: ["viewportWidth", "viewportHeight", "dpr", "resolutionScale", "acceptedRaySteps", "diskSegments", "historyEnabled"],
+      requiredStatistics: ["whole-frame p50/p95", "paired same-frame marginal p50/p95 against an effect-disabled control"],
+      forbiddenInference: "do not route by device label or add/subtract independently sampled percentiles",
+    },
+    memoryAccounting: { required: true, authoredCeilingBytes: null },
   };
 }
 
@@ -211,7 +216,7 @@ function createEvidence({ assets, rendererInfo, metrics }) {
       required: true,
       loops: lifecycleLoops.map((name) => ({ name, iterations: 1, before: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, after: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, pass: true })),
       summary: { pass: true, uncapturedBackendErrors: [], knownInternalCacheDeltas: [] },
-      allowedCacheNotes: ["Browser page is closed after capture; canonical curved-ray resource disposal is covered by existing validators."],
+      allowedCacheNotes: ["Browser page is closed after capture; curved-ray scaffold resource disposal is covered by existing validators."],
     },
   };
 }

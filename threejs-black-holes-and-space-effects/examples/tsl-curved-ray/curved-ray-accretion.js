@@ -377,6 +377,11 @@ export class CurvedRayTemporalHistory {
     cameraDelta = 0,
     depthDelta = 0,
     velocityError = 0,
+    terminationChanged = false,
+    bentDirectionError = 0,
+    bentDirectionThreshold = 0.01,
+    diskStateChanged = false,
+    criticalReactive = false,
   } = {}) {
     const reasons = [];
 
@@ -396,6 +401,22 @@ export class CurvedRayTemporalHistory {
       reasons.push("velocity-mismatch");
     }
 
+    if (terminationChanged) {
+      reasons.push("termination-change");
+    }
+
+    if (Math.abs(bentDirectionError) > bentDirectionThreshold) {
+      reasons.push("bent-direction-mismatch");
+    }
+
+    if (diskStateChanged) {
+      reasons.push("disk-state-change");
+    }
+
+    if (criticalReactive) {
+      reasons.push("critical-reactive");
+    }
+
     return {
       rejected: reasons.length > 0,
       reasons,
@@ -412,6 +433,11 @@ export class CurvedRayTemporalHistory {
     cameraDelta = 0,
     depthDelta = 0,
     velocityError = 0,
+    terminationChanged = false,
+    bentDirectionError = 0,
+    bentDirectionThreshold = 0.01,
+    diskStateChanged = false,
+    criticalReactive = false,
   } = {}) {
     if (this.disposed) {
       throw new Error("CurvedRayTemporalHistory cannot accumulate after dispose().");
@@ -422,20 +448,21 @@ export class CurvedRayTemporalHistory {
       cameraDelta,
       depthDelta,
       velocityError,
+      terminationChanged,
+      bentDirectionError,
+      bentDirectionThreshold,
+      diskStateChanged,
+      criticalReactive,
     });
-    const initialHistoryOnly = rejection.reasons.length === 1 &&
-      rejection.reasons[0] === "initial-history";
     const readHistory = this.historyRead;
     const writeHistory = this.historyWrite;
 
-    this.historyRead = writeHistory;
-    this.historyWrite = readHistory;
-    this.historyValid = rejection.rejected === false || initialHistoryOnly;
     this.frameIndex += 1;
 
     return {
-      acceptedHistory: rejection.rejected === false,
-      rejectionReasons: rejection.reasons,
+      acceptedHistory: false,
+      wouldAcceptHistory: rejection.rejected === false,
+      rejectionReasons: [...rejection.reasons, "resolve-not-implemented"],
       renderer,
       source,
       velocity,
@@ -444,8 +471,10 @@ export class CurvedRayTemporalHistory {
       readHistory,
       writeHistory,
       storageTexture: StorageTexture.name,
-      textureStore: "textureStore(historyWrite, pixelCoord, blendedRadianceDepthVelocity)",
-      dispatches: 1,
+      textureStoreContract: "textureStore(historyWrite, pixelCoord, blendedRadianceDepthVelocity)",
+      executedDispatches: 0,
+      plannedDispatches: 1,
+      implementationStatus: "resource-and-rejection scaffold; no temporal resolve dispatch or history swap is executed",
     };
   }
 
@@ -469,8 +498,13 @@ export class CurvedRayTemporalHistory {
         "cameraDelta",
         "depthDelta",
         "velocityError",
+        "terminationChanged",
+        "bentDirectionError",
+        "diskStateChanged",
+        "criticalReactive",
       ],
       computeWrite: "textureStore(historyWrite, pixelCoord, blendedRadianceDepthVelocity)",
+      implementationStatus: "planned compute write; not dispatched by CurvedRayTemporalHistory",
     };
   }
 
@@ -810,9 +844,8 @@ const marchCurvedRayAccretion = Fn(
     const interval = intersectUnitSphere({ rayOrigin, rayDirection });
     const missed = interval.z.lessThan(0.0);
     const nearDistance = max(interval.x, 0.0);
-    const farDistance = max(interval.y, nearDistance);
     const jitter = hash12({
-      value: screenUV().mul(4096.0),
+      value: screenUV.mul(4096.0),
       seed,
     })
       .sub(0.5)
@@ -828,8 +861,7 @@ const marchCurvedRayAccretion = Fn(
     const stepCount = float(0.0).toVar("curvedRayStepCount");
     const steeringAccumulated = float(0.0).toVar("curvedRaySteering");
     const terminationId = float(0.0).toVar("curvedRayTermination");
-    const traveled = nearDistance.toVar("curvedRayTraveled");
-    const done = bool(false).toVar("curvedRayDone");
+    const done = bool(missed).toVar("curvedRayDone");
 
     Loop(
       {
@@ -872,8 +904,11 @@ const marchCurvedRayAccretion = Fn(
           .mul(bendingPower)
           .div(max(radius.mul(radius), 0.035))
           .mul(steeringRange);
+        const transverseRadial = radialDirection.sub(
+          direction.mul(dot(radialDirection, direction)),
+        );
         direction.assign(
-          normalize(direction.sub(radialDirection.mul(steeringMagnitude))),
+          normalize(direction.sub(transverseRadial.mul(steeringMagnitude))),
         );
         steeringAccumulated.assign(
           steeringAccumulated.add(steeringMagnitude),
@@ -937,18 +972,17 @@ const marchCurvedRayAccretion = Fn(
         const segmentAlpha = float(1.0).sub(
           exp(density.mul(extinction).mul(densityLength).negate()),
         );
-        const segmentEmission = select(insideCore, vec3(0.0), disk.rgb);
+        const segmentSourceRadiance = select(insideCore, vec3(0.0), disk.rgb);
 
         // Build-order step 6: exactly one ray-position advance is committed.
         // The legacy source advanced at both line 197 and line 276; this port
         // keeps the accepted-step state update singular.
         position.assign(candidatePosition);
-        traveled.assign(traveled.add(stepLength));
         stepCount.assign(stepCount.add(1.0));
 
         // Build-order step 7: linear front-to-back emission/transmittance.
         radiance.assign(
-          radiance.add(transmittance.mul(segmentEmission).mul(segmentAlpha)),
+          radiance.add(transmittance.mul(segmentSourceRadiance).mul(segmentAlpha)),
         );
         transmittance.assign(
           transmittance.mul(float(1.0).sub(segmentAlpha)),
@@ -964,11 +998,13 @@ const marchCurvedRayAccretion = Fn(
           terminationId.assign(3.0);
           done.assign(true);
         });
-        If(traveled.greaterThan(farDistance.add(maxStep.mul(2.0))), () => {
+        const outsideVolume = length(candidatePosition).greaterThanEqual(UNIT_SPHERE_RADIUS)
+          .and(dot(candidatePosition, direction).greaterThan(0.0));
+        If(outsideVolume, () => {
           terminationId.assign(1.0);
           done.assign(true);
         });
-        If(stepCount.greaterThanEqual(float(maxSteps).sub(1.0)), () => {
+        If(stepCount.greaterThanEqual(float(maxSteps)), () => {
           terminationId.assign(4.0);
           done.assign(true);
         });
@@ -991,7 +1027,12 @@ const marchCurvedRayAccretion = Fn(
         direction: direction.mul(vec3(1.0, -1.0, 1.0)),
       }),
     ).rgb;
-    const finalColor = radiance.add(environment.mul(transmittance));
+    const escapedBackgroundWeight = select(
+      terminationId.equal(1.0),
+      transmittance,
+      float(0.0),
+    );
+    const finalColor = radiance.add(environment.mul(escapedBackgroundWeight));
     const heat = clamp(stepCount.div(float(maxSteps)), 0.0, 1.0);
     const steeringHeat = clamp(steeringAccumulated.mul(3.0), 0.0, 1.0);
     const debugStepColor = vec3(heat, heat.mul(heat), float(1.0).sub(heat));
@@ -1067,7 +1108,7 @@ const marchCurvedRayAccretion = Fn(
   },
 );
 
-function qualityWithFallback(quality) {
+function resolveCurvedRayQuality(quality) {
   if (typeof quality === "string") {
     return CURVED_RAY_QUALITY_TIERS[quality] ?? CURVED_RAY_QUALITY_TIERS.standard;
   }
@@ -1091,7 +1132,7 @@ export function createCurvedRayAccretionMaterial({
   configureDataTexture(noiseTexture);
   configureColorTexture(starTexture);
 
-  const tier = qualityWithFallback(quality);
+  const tier = resolveCurvedRayQuality(quality);
   const uniforms = {
     time: uniform(time),
     seed: uniform(sanitizeSeed(seed)),
@@ -1171,6 +1212,9 @@ export function createCurvedRayRenderPipeline(renderer, scene, camera, {
     resolutionScale,
     outputTransformOwner: "renderOutput",
     outputColorTransform: false,
+    async compile() {
+      await scenePass.compileAsync(renderer);
+    },
     render() {
       if (effect?.mesh) {
         assertCurvedRayTransformContract(effect.mesh, { camera });
@@ -1188,8 +1232,9 @@ export function createCurvedRayRenderPipeline(renderer, scene, camera, {
     },
     diagnostics() {
       return {
-        pass: "scene",
+        pass: "effect-only-scene",
         resolutionScale: scenePass.getResolutionScale(),
+        hostCompositeImplemented: false,
         outputTransformOwner: "renderOutput",
         outputColorTransform: pipeline.outputColorTransform,
       };
@@ -1207,7 +1252,7 @@ export class TSLCurvedRayAccretionEffect {
     this.uniforms = this.material.userData.curvedRayUniforms;
     this.textures = this.material.userData.curvedRayTextures;
     this.resolutionScale =
-      qualityWithFallback(options.quality).resolutionScale;
+      resolveCurvedRayQuality(options.quality).resolutionScale;
     this.temporalHistory = options.temporalHistory === true
       ? new CurvedRayTemporalHistory({
         width: options.width ?? 1280,
@@ -1220,7 +1265,7 @@ export class TSLCurvedRayAccretionEffect {
   }
 
   setQuality(quality) {
-    const tier = qualityWithFallback(quality);
+    const tier = resolveCurvedRayQuality(quality);
     this.uniforms.maxSteps.value = tier.maxSteps;
     this.uniforms.baseStep.value = tier.baseStep;
     this.uniforms.minStep.value = tier.minStep;
@@ -1284,7 +1329,8 @@ export class TSLCurvedRayAccretionEffect {
     const quality = this.material.userData.curvedRayQuality;
     return {
       proxyDraws: 1,
-      dispatches: this.temporalAccumulator ? 1 : 0,
+      dispatches: 0,
+      plannedTemporalDispatches: this.temporalAccumulator ? 1 : 0,
       maxAcceptedSteps: this.uniforms.maxSteps.value,
       resolutionScale: this.resolutionScale,
       storage: this.temporalHistory?.createResourcePlan?.() ?? "none",
@@ -1310,7 +1356,6 @@ export async function prepareCurvedRayRenderer({
   scene,
   camera,
   effect,
-  explicitFallbackWhenWebGPUUnavailable = false,
 } = {}) {
   await renderer.init();
 
@@ -1320,12 +1365,7 @@ export async function prepareCurvedRayRenderer({
 
   const isWebGPUBackend = renderer.backend?.isWebGPUBackend === true;
   if (!isWebGPUBackend) {
-    if (!explicitFallbackWhenWebGPUUnavailable) {
-      throw new Error(
-        "WebGPU backend unavailable. This example teaches the canonical WebGPU/TSL path; only pass explicitFallbackWhenWebGPUUnavailable when the user explicitly asks how to apply fallback when WebGPU is unavailable.",
-      );
-    }
-    effect?.setQuality?.("background");
+    throw new Error("WebGPU backend unavailable for the curved-ray WebGPU/TSL example.");
   }
 
   const textures = effect?.textures ?? effect?.material?.userData?.curvedRayTextures ?? {};

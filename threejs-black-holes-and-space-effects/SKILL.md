@@ -297,8 +297,10 @@ caches, diagnostics, and validation requirements.
 Canonical WebGPU lab: `examples/tsl-curved-ray/`. It retains the artistic
 bounded accretion shader and adds GPU-sampled, critical-split Ellis and
 Schwarzschild direction-transfer stages, a compute direction cache, and
-termination-aware temporal ping-pong. Independent float64 Ellis quadrature and
-Schwarzschild Hamiltonian rays gate the generated tables. These CPU/source
+world-position-reprojected, termination-aware temporal ping-pong. A separate
+direct-GPU probe path executes Ellis/Schwarzschild ODEs, and the convergence
+route dispatches three Schwarzschild step caps. Independent float64 Ellis quadrature and
+Schwarzschild Hamiltonian rays gate tables and validation readback. These CPU/source
 checks do not replace the native-browser readback/timestamp evidence required
 by `lab.manifest.json`.
 

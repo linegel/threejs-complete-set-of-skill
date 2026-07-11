@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>TSL Curved-Ray Accretion</title>
+    <title>Native WebGPU Space Integrator Lab</title>
     <style>
       html,
       body {
@@ -46,7 +46,8 @@
         "imports": {
           "three": "../../../node_modules/three/build/three.webgpu.js",
           "three/webgpu": "../../../node_modules/three/build/three.webgpu.js",
-          "three/tsl": "../../../node_modules/three/build/three.tsl.js"
+          "three/tsl": "../../../node_modules/three/build/three.tsl.js",
+          "three/addons/": "../../../node_modules/three/examples/jsm/"
         }
       }
     </script>
@@ -55,7 +56,8 @@
     <main data-stage>
       <canvas></canvas>
     </main>
-    <div data-status>Starting</div>
-    <script type="module" src="./main.mjs"></script>
+    <div data-status>Starting native WebGPU Space Integrator Lab</div>
+    <pre data-metrics style="position:fixed;right:12px;top:12px;max-width:min(420px,40vw);max-height:35vh;overflow:auto;color:#cbd8ff;background:#02030acc;padding:8px;font:11px/1.3 ui-monospace,monospace"></pre>
+    <script type="module" src="./space-browser.mjs"></script>
   </body>
 </html>

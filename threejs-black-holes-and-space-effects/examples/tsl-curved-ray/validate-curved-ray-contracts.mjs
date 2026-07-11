@@ -74,6 +74,11 @@ assert(source.includes("candidatePosition.x.notEqual(candidatePosition.x)"), "In
 assert(source.includes("terminationId.equal(5.0)"), "Invalid-state debug output must be wired to termination ID 5.");
 assert(source.includes("direction.mul(0.5).add(0.5)"), "Bent-direction debug output must visualize the final direction.");
 assert(source.includes("float(1.0).sub(transmittance)"), "Opacity debug output must derive from accumulated transmittance.");
+assert(source.includes("transverseRadial.mul(steeringMagnitude)"), "Artistic steering must project attraction perpendicular to the unit ray.");
+assert(source.includes("segmentSourceRadiance"), "Disk RGB must be named as source radiance when multiplied by segment alpha.");
+assert(source.includes("escapedBackgroundWeight"), "Only escaped rays may contribute the bent exterior environment.");
+assert(source.includes("stepCount.greaterThanEqual(float(maxSteps))"), "Step-cap termination must allow the configured accepted-step budget.");
+assert(!source.includes("explicitFallbackWhenWebGPUUnavailable"), "Flagship example must not contain a non-WebGPU renderer branch.");
 assert(source.includes("loadAsync(url)"), "Generated star loading must expose an awaitable loadAsync path.");
 const initIndex = source.indexOf("await renderer.init()");
 const initTextureIndex = source.indexOf("renderer.initTexture(texture)");
@@ -82,30 +87,25 @@ assert(initIndex !== -1 && initTextureIndex !== -1 && compileIndex !== -1, "Rend
 assert(initIndex < initTextureIndex && initTextureIndex < compileIndex, "Renderer preparation order must be init(), initTexture(), then compileAsync().");
 assert(typeof createCurvedRayRenderPipeline === "function", "Curved-ray render pipeline factory must be exported.");
 assert(typeof RenderPipeline === "function" && typeof pass === "function" && typeof renderOutput === "function", "RenderPipeline/pass/renderOutput imports must resolve.");
-assert(source.includes("const scenePass = pass(scene, camera)"), "Reduced-resolution pipeline must create a real PassNode from pass(scene, camera).");
-assert(source.includes("scenePass.setResolutionScale(resolutionScale)"), "Reduced-resolution pipeline must apply PassNode.setResolutionScale().");
+assert(source.includes("const scenePass = pass(scene, camera)"), "Effect-only pipeline must create a real PassNode from pass(scene, camera).");
+assert(source.includes("scenePass.setResolutionScale(resolutionScale)"), "Effect-only reduced-resolution pipeline must apply PassNode.setResolutionScale().");
 assert(source.includes("const pipeline = new RenderPipeline(renderer)"), "Reduced-resolution pipeline must construct a RenderPipeline.");
 assert(source.includes("pipeline.outputColorTransform = false"), "renderOutput owner requires RenderPipeline.outputColorTransform = false.");
 assert(source.includes("pipeline.outputNode = renderOutput(scenePass"), "Reduced-resolution pipeline must composite through renderOutput(scenePass).");
+assert(source.includes("await scenePass.compileAsync(renderer)"), "Effect-only PassNode must expose compilation of its configured graph.");
 
-const fakeUnavailableRenderer = {
+const fakeNonWebGPURenderer = {
   backend: { isWebGPUBackend: false },
   async init() {},
 };
-let rejectedImplicitFallbackTeaching = false;
+let rejectedNonWebGPUBackend = false;
 try {
-  await prepareCurvedRayRenderer({ renderer: fakeUnavailableRenderer });
+  await prepareCurvedRayRenderer({ renderer: fakeNonWebGPURenderer });
 } catch (error) {
-  rejectedImplicitFallbackTeaching = error instanceof Error &&
-    error.message.includes("explicitly asks how to apply fallback when WebGPU is unavailable");
+  rejectedNonWebGPUBackend = error instanceof Error &&
+    error.message.includes("WebGPU backend unavailable");
 }
-assert(rejectedImplicitFallbackTeaching, "Fallback teaching for missing WebGPU must require an explicit user request.");
-
-const explicitFallbackResult = await prepareCurvedRayRenderer({
-  renderer: fakeUnavailableRenderer,
-  explicitFallbackWhenWebGPUUnavailable: true,
-});
-assert(explicitFallbackResult.isWebGPUBackend === false, "Explicit fallback teaching path must report the non-WebGPU backend.");
+assert(rejectedNonWebGPUBackend, "The flagship example must reject a non-WebGPU backend.");
 
 const effect = new TSLCurvedRayAccretionEffect({
   noiseTexture: createSeededNoiseTexture({ size: 1 }),
@@ -130,7 +130,7 @@ console.log(JSON.stringify({
     invalidStateTermination: true,
     disposeIdempotent: effect.disposed,
     textureWarmupOrder: "init -> initTexture -> compileAsync",
-    renderPipeline: "pass(scene,camera) -> setResolutionScale -> renderOutput",
-    fallbackTeachingRequiresExplicitRequest: rejectedImplicitFallbackTeaching,
+    renderPipeline: "effect-only pass(scene,camera) -> setResolutionScale -> renderOutput",
+    rejectsNonWebGPUBackend: rejectedNonWebGPUBackend,
   },
 }, null, 2));

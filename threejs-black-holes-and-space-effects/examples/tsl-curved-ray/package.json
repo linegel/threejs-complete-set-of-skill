@@ -1,14 +1,20 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check curved-ray-accretion.js && node --check main.mjs && node --check validate-curved-ray-contracts.mjs && node --check validate-transform-contracts.mjs && node --check validate-wormhole-reference-rays.mjs && node --check validate-temporal-history.mjs && node --check validate-generated-starfields.mjs && node --check generated-starfields-browser.mjs",
+    "check": "node --check curved-ray-accretion.js && node --check main.mjs && node --check space-integrators.js && node --check space-gpu-probes.js && node --check space-transfer-stage.js && node --check space-lab.mjs && node --check space-browser.mjs && node --check route-wrappers.test.mjs && node --check capture.mjs && node --check validate-artifacts.mjs && node --check validate-curved-ray-contracts.mjs && node --check validate-transform-contracts.mjs && node --check validate-wormhole-reference-rays.mjs && node --check validate-temporal-history.mjs && node --check validate-generated-starfields.mjs && node --check generated-starfields-browser.mjs",
     "smoke": "node main.mjs --smoke",
-    "validate": "node validate-curved-ray-contracts.mjs && node validate-transform-contracts.mjs && node validate-wormhole-reference-rays.mjs && node validate-temporal-history.mjs && node main.mjs --smoke && node validate-generated-starfields.mjs",
+    "validate": "node validate-curved-ray-contracts.mjs && node validate-transform-contracts.mjs && node validate-wormhole-reference-rays.mjs && node validate-temporal-history.mjs && node space-integrators.test.mjs && node main.mjs --smoke && node validate-generated-starfields.mjs",
+    "validate:unit": "node validate-curved-ray-contracts.mjs && node validate-transform-contracts.mjs && node validate-wormhole-reference-rays.mjs && node validate-temporal-history.mjs && node space-integrators.test.mjs && node route-wrappers.test.mjs && node main.mjs --smoke",
+    "test:mutations": "node space-integrators.mutations.test.mjs",
+    "capture": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts",
     "validate:generated-assets": "node validate-generated-starfields.mjs",
     "serve": "python3 -m http.server 4173 --bind 127.0.0.1 -d ../../.."
   },
   "dependencies": {
-    "playwright": "^1.45.0",
-    "three": "^0.185.1"
+    "playwright": "1.61.1",
+    "three": "0.185.1"
   }
 }

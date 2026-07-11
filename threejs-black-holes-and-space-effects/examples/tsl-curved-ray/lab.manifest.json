@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 2,
+  "id": "tsl-curved-ray",
+  "skill": "threejs-black-holes-and-space-effects",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-lab.mjs",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-gpu-probes.js",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.js",
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js"
+  ],
+  "browserEntry": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/index.html",
+  "publishPath": "/demos/tsl-curved-ray/",
+  "scenarios": [
+    { "id": "accretion-disk", "route": "mechanism/accretion-disk/", "acceptanceStatus": "incomplete" },
+    { "id": "ellis-wormhole", "route": "mechanism/ellis-wormhole/", "acceptanceStatus": "incomplete" },
+    { "id": "schwarzschild-lensing", "route": "mechanism/schwarzschild-lensing/", "acceptanceStatus": "incomplete" },
+    { "id": "integration-convergence", "route": "mechanism/integration-convergence/", "acceptanceStatus": "incomplete" },
+    { "id": "temporal-reconstruction", "route": "mechanism/temporal-reconstruction/", "acceptanceStatus": "incomplete" },
+    { "id": "lens-cache", "route": "mechanism/lens-cache/", "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "accretion-disk", "route": "mechanism/accretion-disk", "startup": { "scenario": "accretion-disk" }, "acceptanceStatus": "incomplete" },
+    { "id": "ellis-wormhole", "route": "mechanism/ellis-wormhole", "startup": { "scenario": "ellis-wormhole" }, "acceptanceStatus": "incomplete" },
+    { "id": "schwarzschild-lensing", "route": "mechanism/schwarzschild-lensing", "startup": { "scenario": "schwarzschild-lensing" }, "acceptanceStatus": "incomplete" },
+    { "id": "integration-convergence", "route": "mechanism/integration-convergence", "startup": { "scenario": "integration-convergence" }, "acceptanceStatus": "incomplete" },
+    { "id": "temporal-reconstruction", "route": "mechanism/temporal-reconstruction", "startup": { "scenario": "temporal-reconstruction" }, "acceptanceStatus": "incomplete" },
+    { "id": "lens-cache", "route": "mechanism/lens-cache", "startup": { "scenario": "lens-cache" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetClass": "current-adapter authored shot",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "effectScale": 0.5, "cacheExtent": [512, 512] },
+      "mechanismLimits": { "artisticMaxSteps": 160, "opacityCutoff": 0.01 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["bounded miss rejection", "exact step cap", "termination classes", "linear HDR transfer"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "standard",
+      "targetClass": "current-adapter authored shot",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "effectScale": 0.5, "cacheExtent": [256, 256] },
+      "mechanismLimits": { "artisticMaxSteps": 96, "opacityCutoff": 0.03 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["lower bounded integration cap", "smaller direction cache"],
+      "preservedInvariants": ["bounded miss rejection", "exact step cap", "termination classes", "linear HDR transfer"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "background",
+      "targetClass": "current-adapter authored shot",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "effectScale": 0.25, "cacheExtent": [128, 128] },
+      "mechanismLimits": { "artisticMaxSteps": 48, "opacityCutoff": 0.03 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["quarter-scale effect", "lower integration cap"],
+      "preservedInvariants": ["bounded miss rejection", "exact step cap", "termination classes", "linear HDR transfer"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "distant",
+      "targetClass": "current-adapter authored approximation",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "effectScale": 0.25, "cacheExtent": [128, 128] },
+      "mechanismLimits": { "artisticMaxSteps": 16, "opacityCutoff": 0.05 },
+      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "degradationFromPrevious": ["distant authored representation", "minimum optional numerical detail"],
+      "preservedInvariants": ["bounded miss rejection", "exact step cap", "termination classes", "single output owner"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "no-post", "step-count", "termination", "bent-direction"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "webgpu-backend", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "storage-texture", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "compute", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "transfer-lut-sampled", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "direct-metric-probe-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "cache-compute-dispatched", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "angular-cache-invalidation", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "world-position-temporal-reprojection", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "temporal-reset-matches-fresh", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "render-target-output", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "node threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.test.mjs",
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

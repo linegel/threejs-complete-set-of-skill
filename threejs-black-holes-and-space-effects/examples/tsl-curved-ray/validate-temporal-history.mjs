@@ -49,12 +49,20 @@ assert.equal(bytes.total, 960 * 540 * 8 * 2);
 const first = history.accumulate({ depthDelta: 0, velocityError: 0 });
 assert.equal(first.acceptedHistory, false);
 assert(first.rejectionReasons.includes("initial-history"));
+assert(first.rejectionReasons.includes("resolve-not-implemented"));
 assert.equal(first.storageTexture, "StorageTexture");
-assert(first.textureStore.includes("textureStore"));
+assert(first.textureStoreContract.includes("textureStore"));
+assert.equal(first.executedDispatches, 0);
+assert.equal(first.plannedDispatches, 1);
+assert(first.implementationStatus.includes("no temporal resolve dispatch"));
 
+history.historyValid = true;
 const second = history.accumulate({ depthDelta: 0.001, velocityError: 0.02 });
-assert.equal(second.acceptedHistory, true);
-assert.deepEqual(second.rejectionReasons, []);
+assert.equal(second.acceptedHistory, false);
+assert.equal(second.wouldAcceptHistory, true);
+assert.deepEqual(second.rejectionReasons, ["resolve-not-implemented"]);
+assert.equal(history.historyRead, second.readHistory);
+assert.equal(history.historyWrite, second.writeHistory);
 
 const cameraCut = history.accumulate({ cameraCut: true });
 assert.equal(cameraCut.acceptedHistory, false);
@@ -68,6 +76,22 @@ const velocityMismatch = history.accumulate({ velocityError: 0.5 });
 assert.equal(velocityMismatch.acceptedHistory, false);
 assert(velocityMismatch.rejectionReasons.includes("velocity-mismatch"));
 
+const lensDiscontinuity = history.accumulate({
+  terminationChanged: true,
+  bentDirectionError: 0.2,
+  diskStateChanged: true,
+  criticalReactive: true,
+});
+assert.equal(lensDiscontinuity.acceptedHistory, false);
+for (const reason of [
+  "termination-change",
+  "bent-direction-mismatch",
+  "disk-state-change",
+  "critical-reactive",
+]) {
+  assert(lensDiscontinuity.rejectionReasons.includes(reason));
+}
+
 const resized = history.setSize(1280, 720);
 assert.equal(resized, true);
 assert.equal(history.width, 640);
@@ -80,7 +104,10 @@ assert.equal(resourcePlan.history.className, "StorageTexture");
 assert.equal(resourcePlan.history.colorSpace, "NoColorSpace");
 assert(resourcePlan.rejectionInputs.includes("velocity"));
 assert(resourcePlan.rejectionInputs.includes("depth"));
+assert(resourcePlan.rejectionInputs.includes("terminationChanged"));
+assert(resourcePlan.rejectionInputs.includes("bentDirectionError"));
 assert(resourcePlan.computeWrite.includes("textureStore"));
+assert(resourcePlan.implementationStatus.includes("not dispatched"));
 
 const effect = new TSLCurvedRayAccretionEffect({
   noiseTexture: createSeededNoiseTexture({ size: 1 }),
@@ -91,7 +118,8 @@ const effect = new TSLCurvedRayAccretionEffect({
 });
 assert(effect.temporalHistory instanceof CurvedRayTemporalHistory);
 assert.equal(effect.temporalAccumulator, effect.temporalHistory);
-assert.equal(effect.metrics().dispatches, 1);
+assert.equal(effect.metrics().dispatches, 0);
+assert.equal(effect.metrics().plannedTemporalDispatches, 1);
 assert.equal(effect.metrics().storage.history.className, "StorageTexture");
 effect.dispose();
 effect.dispose();
@@ -122,7 +150,10 @@ for (const required of [
 }
 
 console.log(JSON.stringify({
-  pass: true,
+  classification: "contract-fixture",
+  canonicalAcceptance: false,
+  verdict: "NOT_CLAIMED",
+  limitation: "CurvedRayTemporalHistory is the retained undispatched scaffold; the canonical temporal route is SpaceTemporalDirectionHistory.",
   storage: {
     width: 960,
     height: 540,
@@ -133,6 +164,7 @@ console.log(JSON.stringify({
     cameraCut: cameraCut.rejectionReasons,
     depthDisocclusion: depthDisocclusion.rejectionReasons,
     velocityMismatch: velocityMismatch.rejectionReasons,
+    lensDiscontinuity: lensDiscontinuity.rejectionReasons,
   },
   resized: {
     width: history.width,
