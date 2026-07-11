@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import { encodeRgbaPng } from '../../../scripts/lib/png-rgba.mjs';
@@ -81,6 +81,7 @@ function diagnosticMosaic( entries ) {
 export async function captureLab( session ) {
 
 	const captures = [];
+	await mkdir( resolve( session.outputDir, 'images' ), { recursive: true } );
 	await session.controllerCall( 'setScenario', 'browser-capture' );
 	await session.controllerCall( 'setTier', session.profile === 'performance' ? 'target-performance' : 'webgpu-correctness' );
 	await session.controllerCall( 'setCamera', 'design' );
@@ -89,29 +90,29 @@ export async function captureLab( session ) {
 
 	if ( session.profile === 'performance' ) {
 
-		await captureAndWrite( session, captures, 'final.performance.png', 'final' );
+		await captureAndWrite( session, captures, 'images/final.performance.png', 'final' );
 
 	} else {
 
-		const final = await captureAndWrite( session, captures, 'final.design.png', 'final' );
-		const noPost = await captureAndWrite( session, captures, 'no-post.design.png', 'no-post' );
-		const normal = await captureAndWrite( session, captures, 'diagnostic.normal.png', 'normal' );
-		const emissive = await captureAndWrite( session, captures, 'diagnostic.emissive.png', 'emissive' );
+		const final = await captureAndWrite( session, captures, 'images/final.design.png', 'final' );
+		const noPost = await captureAndWrite( session, captures, 'images/no-post.design.png', 'no-post' );
+		const normal = await captureAndWrite( session, captures, 'images/diagnostic.normal.png', 'normal' );
+		const emissive = await captureAndWrite( session, captures, 'images/diagnostic.emissive.png', 'emissive' );
 		const diagnosticDifference = Math.min(
 			meanRgbByteDifference( final, normal ),
 			meanRgbByteDifference( final, emissive )
 		);
 		if ( diagnosticDifference <= DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE ) throw new Error( 'Diagnostic outputs are not materially distinct from final output.' );
 		await writeFile(
-			resolve( session.outputDir, 'diagnostics.mosaic.png' ),
+			resolve( session.outputDir, 'images/diagnostics.mosaic.png' ),
 			encodeRgbaPng( diagnosticMosaic( [ final, noPost, normal, emissive ] ) )
 		);
-		captures.push( { filename: 'diagnostics.mosaic.png', target: 'final/no-post/normal/emissive', width: final.width, height: final.height, source: 'four actual output-node captures' } );
+		captures.push( { filename: 'images/diagnostics.mosaic.png', target: 'final/no-post/normal/emissive', width: final.width, height: final.height, source: 'four actual output-node captures' } );
 
 		for ( const camera of [ 'near', 'design', 'far' ] ) {
 
 			await session.controllerCall( 'setCamera', camera );
-			await captureAndWrite( session, captures, `camera.${ camera }.png`, 'final' );
+			await captureAndWrite( session, captures, `images/camera.${ camera }.png`, 'final' );
 
 		}
 
@@ -121,19 +122,19 @@ export async function captureLab( session ) {
 			await session.controllerCall( 'setSeed', seed );
 			await session.controllerCall( 'setTime', 0 );
 			const seedName = seed === 0x00000001 ? '0001' : seed.toString( 16 ).padStart( 8, '0' );
-			await captureAndWrite( session, captures, `seed-${ seedName }.final.png`, 'final' );
+			await captureAndWrite( session, captures, `images/seed-${ seedName }.final.png`, 'final' );
 
 		}
 
 		await session.controllerCall( 'setSeed', 0x00000001 );
 		await session.controllerCall( 'resetHistory', 'correctness-capture' );
 		await session.controllerCall( 'setTime', 0 );
-		await captureAndWrite( session, captures, 'temporal.t000.png', 'final' );
+		await captureAndWrite( session, captures, 'images/temporal.t000.png', 'final' );
 		await session.controllerCall( 'step', 1 / 60 );
-		await captureAndWrite( session, captures, 'temporal.t001.png', 'final' );
+		await captureAndWrite( session, captures, 'images/temporal.t001.png', 'final' );
 
 		await session.controllerCall( 'resize', 641, 359, 1 );
-		const odd = await captureAndWrite( session, captures, 'odd-size.final.png', 'final' );
+		const odd = await captureAndWrite( session, captures, 'images/odd-size.final.png', 'final' );
 		if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
 	}
 
