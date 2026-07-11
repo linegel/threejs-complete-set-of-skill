@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildTraceSegment, bytesPerTexel, classifyGpuStageAttribution, classifyPerformanceTrace, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
+import { buildTraceSegment, bytesPerTexel, classifyGovernorTrace, classifyGpuStageAttribution, classifyPerformanceTrace, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
 
 function lifecycleFixture( mutate = () => {} ) {
 
@@ -93,5 +93,36 @@ test( 'GPU stage attribution requires complete reconciled scene and output sampl
 	assert.equal( classifyGpuStageAttribution( trace ), 'PASS' );
 	assert.equal( classifyGpuStageAttribution( { ...trace, gpuAttributionMaxErrorMs: 0.01 } ), 'FAIL' );
 	assert.throws( () => classifyGpuStageAttribution( { ...trace, gpuStageSamples: { ...trace.gpuStageSamples, 'scene-mrt': [ 8 ] } } ), /sample count/ );
+
+} );
+
+test( 'quality governor classification requires a settled non-oscillating trace', () => {
+
+	const trace = {
+		windowCount: 6,
+		cooldownWindows: 2,
+		targetMs: 14,
+		settledState: 'governor-stress',
+		visualErrorByTier: {
+			'target-performance': { meanRgbByteDifference: 0, edgeMaskPixels: 0, edgeMeanRgbByteDifference: 0, edgeP95RgbByteDifference: 0 },
+			'governor-stress': { meanRgbByteDifference: 3, edgeMaskPixels: 100, edgeMeanRgbByteDifference: 5, edgeP95RgbByteDifference: 12 }
+		},
+		visualErrorGates: { meanRgbByteDifference: 8, edgeP95RgbByteDifference: 32 },
+		windows: Array.from( { length: 6 }, ( _, window ) => ( { window, gpuP95: 12, measuredTier: window < 2 ? 'target-performance' : 'governor-stress', tier: window < 1 ? 'target-performance' : 'governor-stress' } ) ),
+		transitions: [ { window: 1, from: 'target-performance', to: 'governor-stress', rebuildCpuSubmissionMs: 0.2, rebuildGpuMs: 10, fromResourceBytes: 100, toResourceBytes: 60 } ],
+		oscillationDetected: false
+	};
+	assert.equal( classifyGovernorTrace( null ), 'INSUFFICIENT_EVIDENCE' );
+	assert.equal( classifyGovernorTrace( trace ), 'PASS' );
+	assert.equal( classifyGovernorTrace( {
+		...trace,
+		windows: trace.windows.map( ( window, index ) => index === 5 ? { ...window, measuredTier: 'target-performance', tier: 'governor-stress' } : window ),
+		transitions: [ { ...trace.transitions[ 0 ], window: 5 } ]
+	} ), 'INSUFFICIENT_EVIDENCE' );
+	assert.equal( classifyGovernorTrace( { ...trace, oscillationDetected: true } ), 'FAIL' );
+	assert.equal( classifyGovernorTrace( { ...trace, windows: trace.windows.map( ( window, index ) => index === 5 ? { ...window, gpuP95: 15 } : window ) } ), 'FAIL' );
+	assert.equal( classifyGovernorTrace( { ...trace, visualErrorByTier: { ...trace.visualErrorByTier, 'governor-stress': { ...trace.visualErrorByTier[ 'governor-stress' ], meanRgbByteDifference: 9 } } } ), 'FAIL' );
+	assert.equal( classifyGovernorTrace( { ...trace, visualErrorByTier: { ...trace.visualErrorByTier, 'governor-stress': { ...trace.visualErrorByTier[ 'governor-stress' ], edgeP95RgbByteDifference: 33 } } } ), 'FAIL' );
+	assert.throws( () => classifyGovernorTrace( { ...trace, windows: trace.windows.map( ( window, index ) => index === 1 ? { ...window, measuredTier: 'governor-stress' } : window ) } ), /tier lineage/ );
 
 } );

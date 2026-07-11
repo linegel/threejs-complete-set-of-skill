@@ -5,6 +5,8 @@ import { encodeRgbaPng } from '../../../scripts/lib/png-rgba.mjs';
 import { classifyGpuStageAttribution, classifyPerformanceTrace, writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
+const GOVERNOR_MEAN_VISUAL_ERROR_GATE = 8;
+const GOVERNOR_EDGE_P95_VISUAL_ERROR_GATE = 32;
 
 function captureRecord( filename, capture ) {
 
@@ -47,6 +49,45 @@ function meanRgbByteDifference( a, b ) {
 
 	}
 	return total / samples;
+
+}
+
+function percentile( values, quantile ) {
+
+	const sorted = [ ...values ].sort( ( a, b ) => a - b );
+	const position = ( sorted.length - 1 ) * quantile;
+	const lower = Math.floor( position );
+	const upper = Math.ceil( position );
+	return lower === upper ? sorted[ lower ] : sorted[ lower ] + ( sorted[ upper ] - sorted[ lower ] ) * ( position - lower );
+
+}
+
+function tierVisualErrorMetrics( reference, candidate ) {
+
+	if ( reference.width !== candidate.width || reference.height !== candidate.height ) throw new Error( 'Tier comparison dimensions differ.' );
+	const edgeDifferences = [];
+	for ( let y = 1; y < reference.height - 1; y ++ ) for ( let x = 1; x < reference.width - 1; x ++ ) {
+
+		const center = ( y * reference.width + x ) * 4;
+		const neighbors = [ center - 4, center + 4, center - reference.width * 4, center + reference.width * 4 ];
+		let gradient = 0;
+		for ( const neighbor of neighbors ) for ( let channel = 0; channel < 3; channel ++ ) gradient = Math.max( gradient, Math.abs( reference.data[ center + channel ] - reference.data[ neighbor + channel ] ) );
+		if ( gradient < 8 ) continue;
+		const difference = (
+			Math.abs( reference.data[ center ] - candidate.data[ center ] ) +
+			Math.abs( reference.data[ center + 1 ] - candidate.data[ center + 1 ] ) +
+			Math.abs( reference.data[ center + 2 ] - candidate.data[ center + 2 ] )
+		) / 3;
+		edgeDifferences.push( difference );
+
+	}
+	if ( edgeDifferences.length === 0 ) throw new Error( 'Tier comparison reference edge mask is empty.' );
+	return {
+		meanRgbByteDifference: meanRgbByteDifference( reference, candidate ),
+		edgeMaskPixels: edgeDifferences.length,
+		edgeMeanRgbByteDifference: edgeDifferences.reduce( ( sum, value ) => sum + value, 0 ) / edgeDifferences.length,
+		edgeP95RgbByteDifference: percentile( edgeDifferences, 0.95 )
+	};
 
 }
 
@@ -134,6 +175,7 @@ export async function captureLab( session ) {
 	if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
 
 	let performanceTrace = null;
+	let governorTrace = null;
 	if ( session.profile === 'performance' ) {
 
 		await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
@@ -147,6 +189,22 @@ export async function captureLab( session ) {
 			sampleFrames: 120,
 			presentationFrames: 120
 		} );
+		governorTrace = await session.controllerCall( 'runGovernorStressProfile', {
+			windowCount: 6,
+			framesPerWindow: 30
+		} );
+		await session.controllerCall( 'setTier', 'target-performance' );
+		const targetTier = await captureAndWrite( session, captures, 'images/tier.target-performance.png', 'final' );
+		await session.controllerCall( 'setTier', 'governor-stress' );
+		const governorTier = await captureAndWrite( session, captures, 'images/tier.governor-stress.png', 'final' );
+		governorTrace.visualErrorByTier = {
+			'target-performance': { meanRgbByteDifference: 0, edgeMaskPixels: 0, edgeMeanRgbByteDifference: 0, edgeP95RgbByteDifference: 0 },
+			'governor-stress': tierVisualErrorMetrics( targetTier, governorTier )
+		};
+		governorTrace.visualErrorGates = {
+			meanRgbByteDifference: GOVERNOR_MEAN_VISUAL_ERROR_GATE,
+			edgeP95RgbByteDifference: GOVERNOR_EDGE_P95_VISUAL_ERROR_GATE
+		};
 
 	}
 
@@ -167,6 +225,7 @@ export async function captureLab( session ) {
 		resources: await session.controllerCall( 'describeResources' ),
 		gpuTiming: await session.controllerCall( 'resolveGpuTimings' ),
 		performanceTrace,
+		governorTrace,
 		lifecycle
 	};
 	const performanceCompliance = classifyPerformanceTrace( performanceTrace, {
@@ -185,7 +244,7 @@ export async function captureLab( session ) {
 		evidenceContract: 'v2',
 		reason: performanceTrace === null
 			? 'Real render-target captures and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, sustained timing, GPU-stage attribution, and visual sign-off.'
-			: 'Real render-target captures, a sustained attributed CPU/GPU/cadence trace, and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, governor stress, and visual sign-off.',
+			: 'Real render-target captures, a sustained attributed CPU/GPU/cadence trace, a measured governor stress run, and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness and visual sign-off.',
 		claimVerdicts: {
 			nativeWebGPUCorrectness: 'PASS',
 			renderTargetReadback: 'PASS',

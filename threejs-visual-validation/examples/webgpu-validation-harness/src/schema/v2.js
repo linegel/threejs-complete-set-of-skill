@@ -425,6 +425,30 @@ function validateQualityGovernor( governor ) {
 	requireBoolean( governor.oscillationDetected, 'quality-governor.json.oscillationDetected' );
 	if ( governor.oscillationDetected ) throw new Error( 'governor-oscillation: quality governor did not settle.' );
 	if ( governor.states.includes( governor.settledState ) === false ) throw new Error( 'Quality governor settled outside declared states.' );
+	if ( governor.enabled ) {
+
+		requireKeys( governor, [ 'target', 'cooldown', 'windows', 'finalStableGpuP95', 'finalStableVisualError', 'visualErrorGate', 'finalStableEdgeP95VisualError', 'edgeP95VisualErrorGate', 'verdict' ], 'quality-governor.json' );
+		requireVerdict( governor.verdict, 'quality-governor.json.verdict' );
+		requireArray( governor.windows, 'quality-governor.json.windows', 6 );
+		for ( const [ index, window ] of governor.windows.entries() ) {
+
+			requireKeys( window, [ 'window', 'measuredTier', 'resultingTier', 'gpuSamples', 'gpuP95', 'visualError', 'visualErrorGate', 'edgeMaskPixels', 'edgeMeanVisualError', 'edgeP95VisualError', 'edgeP95VisualErrorGate', 'decision', 'residence', 'cooldown' ], `quality-governor.json.windows[${ index }]` );
+			validateNumericArray( window.gpuSamples, `quality-governor.json.windows[${ index }].gpuSamples` );
+			for ( const key of [ 'window', 'gpuP95', 'visualError', 'visualErrorGate', 'edgeMaskPixels', 'edgeMeanVisualError', 'edgeP95VisualError', 'edgeP95VisualErrorGate', 'residence', 'cooldown' ] ) validateNumericDatum( window[ key ], `quality-governor.json.windows[${ index }].${ key }` );
+
+		}
+		for ( const [ index, transition ] of governor.transitions.entries() ) {
+
+			requireKeys( transition, [ 'window', 'from', 'to', 'cause', 'gpuP95', 'rebuildCpuSubmission', 'rebuildGpu', 'fromResourceBytes', 'toResourceBytes' ], `quality-governor.json.transitions[${ index }]` );
+			for ( const key of [ 'window', 'gpuP95', 'rebuildCpuSubmission', 'rebuildGpu', 'fromResourceBytes', 'toResourceBytes' ] ) validateNumericDatum( transition[ key ], `quality-governor.json.transitions[${ index }].${ key }` );
+
+		}
+		for ( const key of [ 'target', 'cooldown', 'finalStableGpuP95', 'finalStableVisualError', 'visualErrorGate', 'finalStableEdgeP95VisualError', 'edgeP95VisualErrorGate' ] ) validateNumericDatum( governor[ key ], `quality-governor.json.${ key }` );
+		if ( governor.verdict === 'PASS' && numericValue( governor.finalStableGpuP95 ) > numericValue( governor.target ) ) throw new Error( 'governor-performance-overrun: settled tier exceeds its GPU p95 target.' );
+		if ( governor.verdict === 'PASS' && numericValue( governor.finalStableVisualError ) > numericValue( governor.visualErrorGate ) ) throw new Error( 'governor-visual-overrun: settled tier exceeds its visual-error gate.' );
+		if ( governor.verdict === 'PASS' && numericValue( governor.finalStableEdgeP95VisualError ) > numericValue( governor.edgeP95VisualErrorGate ) ) throw new Error( 'governor-edge-visual-overrun: settled tier exceeds its edge-domain visual-error gate.' );
+
+	}
 
 }
 

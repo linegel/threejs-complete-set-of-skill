@@ -229,6 +229,43 @@ export function classifyGpuStageAttribution( trace, reconciliationGateMs = 0.001
 
 }
 
+export function classifyGovernorTrace( trace ) {
+
+	if ( trace === null ) return 'INSUFFICIENT_EVIDENCE';
+	if ( Number.isInteger( trace.windowCount ) === false || trace.windowCount < 6 ) throw new Error( 'Governor trace requires at least six windows.' );
+	if ( Array.isArray( trace.windows ) === false || trace.windows.length !== trace.windowCount ) throw new Error( 'Governor window count drifted.' );
+	if ( trace.windows.some( ( window ) => Number.isFinite( window.gpuP95 ) === false || window.gpuP95 < 0 ) ) throw new Error( 'Governor windows require finite nonnegative GPU p95 values.' );
+	if ( Array.isArray( trace.transitions ) === false ) throw new Error( 'Governor transitions must be an array.' );
+	if ( Number.isInteger( trace.cooldownWindows ) === false || trace.cooldownWindows < 0 ) throw new Error( 'Governor cooldown must be a nonnegative integer.' );
+	if ( Number.isFinite( trace.targetMs ) === false || trace.targetMs <= 0 ) throw new Error( 'Governor target must be finite and positive.' );
+	for ( const key of [ 'meanRgbByteDifference', 'edgeP95RgbByteDifference' ] ) if ( Number.isFinite( trace.visualErrorGates?.[ key ] ) === false || trace.visualErrorGates[ key ] < 0 ) throw new Error( `Governor ${ key } gate must be finite and nonnegative.` );
+	const settledVisualError = trace.visualErrorByTier?.[ trace.settledState ];
+	for ( const key of [ 'meanRgbByteDifference', 'edgeMaskPixels', 'edgeMeanRgbByteDifference', 'edgeP95RgbByteDifference' ] ) if ( Number.isFinite( settledVisualError?.[ key ] ) === false || settledVisualError[ key ] < 0 ) throw new Error( `Governor settled tier requires a finite nonnegative ${ key }.` );
+	for ( const transition of trace.transitions ) for ( const key of [ 'rebuildCpuSubmissionMs', 'rebuildGpuMs', 'fromResourceBytes', 'toResourceBytes' ] ) {
+
+		if ( Number.isFinite( transition[ key ] ) === false || transition[ key ] < 0 ) throw new Error( `Governor transition ${ key } must be finite and nonnegative.` );
+
+	}
+	for ( const transition of trace.transitions ) {
+
+		const window = trace.windows[ transition.window ];
+		if ( window?.measuredTier !== transition.from || window?.tier !== transition.to ) throw new Error( 'Governor transition tier lineage does not match its measurement window.' );
+
+	}
+	if ( trace.oscillationDetected === true ) return 'FAIL';
+	const finalTransition = trace.transitions.at( - 1 );
+	if ( finalTransition && finalTransition.window > trace.windowCount - trace.cooldownWindows - 1 ) return 'INSUFFICIENT_EVIDENCE';
+	const finalWindow = trace.windows.at( - 1 );
+	if ( finalWindow.measuredTier !== trace.settledState ) return 'INSUFFICIENT_EVIDENCE';
+	if (
+		finalWindow.gpuP95 > trace.targetMs ||
+		settledVisualError.meanRgbByteDifference > trace.visualErrorGates.meanRgbByteDifference ||
+		settledVisualError.edgeP95RgbByteDifference > trace.visualErrorGates.edgeP95RgbByteDifference
+	) return 'FAIL';
+	return 'PASS';
+
+}
+
 function writeArtifacts( outputDir, artifacts ) {
 
 	return Promise.all( Object.entries( artifacts ).map( ( [ filename, artifact ] ) => (
@@ -245,6 +282,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const resources = runtime.resources;
 	const gpuTiming = runtime.gpuTiming;
 	const performanceTrace = runtime.performanceTrace;
+	const governorTrace = runtime.governorTrace;
 	const lifecycle = summarizeLifecycleEvidence( runtime.lifecycle );
 	const finalCapture = captures.find( ( capture ) => capture.filename === 'images/final.design.png' );
 	const targetReadbackCapture = session.profile === 'performance'
@@ -272,6 +310,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	};
 	const performanceVerdict = classifyPerformanceTrace( performanceTrace, performanceGates );
 	const gpuAttributionVerdict = classifyGpuStageAttribution( performanceTrace );
+	const governorVerdict = classifyGovernorTrace( governorTrace );
 	const claimVerdicts = {
 		visualCorrectness: 'PASS',
 		mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
@@ -308,7 +347,8 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const knownCompromises = [
 		...( performanceTrace === null
 			? [ 'Correctness capture only; no sustained performance window was run.' ]
-			: [ 'A sustained CPU/GPU/cadence trace with scene-MRT and final-output attribution was captured, but no passing performance verdict is promoted without governor stress.' ] ),
+			: [ 'A sustained CPU/GPU/cadence trace with scene-MRT and final-output attribution was captured.' ] ),
+		...( governorTrace === null ? [ 'The quality governor was not exercised.' ] : [] ),
 		...( performanceTrace === null ? [ 'One resolved render timestamp proves availability but not per-stage GPU attribution.' ] : [] ),
 		...( lifecycle === null ? [ 'No lifecycle create/render/resize/mode/tier/dispose loop was run.' ] : [] ),
 		performanceTrace === null
@@ -492,16 +532,63 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 			? [ 'renderer initialization', 'pipeline compilation', 'readback mapping', 'PNG encoding', 'no sustained timing window' ]
 			: [ 'renderer initialization', 'pipeline compilation', 'PNG encoding', 'timestamp readback excluded from CPU render samples', 'timestamp mapping disabled during cadence sampling' ]
 	} );
-	const qualityGovernor = schema( {
+	const qualityGovernor = governorTrace === null ? schema( {
 		enabled: false,
 		states: [ metrics.tier ],
 		inputMetric: 'none in correctness capture',
 		filter: 'none',
 		hysteresis: A( 0, 'ms', 'quality governor not exercised' ),
-		minimumResidence: A( 0, 'frame', 'quality governor not exercised' ),
+		minimumResidence: A( 0, 'window', 'quality governor not exercised' ),
+		cooldown: A( 0, 'window', 'quality governor not exercised' ),
+		windows: [],
 		transitions: [],
 		settledState: metrics.tier,
-		oscillationDetected: false
+		oscillationDetected: false,
+		verdict: 'INSUFFICIENT_EVIDENCE'
+	} ) : schema( {
+		enabled: true,
+		states: governorTrace.states,
+		inputMetric: 'resolved total-render GPU timestamp p95',
+		filter: `${ governorTrace.framesPerWindow }-frame percentile window`,
+		target: G( governorTrace.targetMs, 'ms', '60 Hz scene budget after reserves' ),
+		hysteresis: G( governorTrace.hysteresisMs, 'ms', 'frozen upgrade margin' ),
+		minimumResidence: G( governorTrace.minimumResidenceWindows, 'window', 'frozen transition residence' ),
+		cooldown: G( governorTrace.cooldownWindows, 'window', 'frozen post-transition cooldown' ),
+		windows: governorTrace.windows.map( ( window ) => ( {
+			window: M( window.window, 'window', 'measured governor sequence' ),
+			measuredTier: window.measuredTier,
+			resultingTier: window.tier,
+			gpuSamples: MA( window.gpuSamples, 'ms', 'resolved render timestamps in governor window' ),
+			gpuP95: M( window.gpuP95, 'ms', 'governor percentile window' ),
+			visualError: M( governorTrace.visualErrorByTier[ window.measuredTier ].meanRgbByteDifference, 'mean-rgb-byte-difference', 'fixed tier render-target comparison' ),
+			visualErrorGate: G( governorTrace.visualErrorGates.meanRgbByteDifference, 'mean-rgb-byte-difference', 'frozen whole-frame tier-degradation gate' ),
+			edgeMaskPixels: M( governorTrace.visualErrorByTier[ window.measuredTier ].edgeMaskPixels, 'pixel', 'reference-gradient edge mask' ),
+			edgeMeanVisualError: M( governorTrace.visualErrorByTier[ window.measuredTier ].edgeMeanRgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask tier comparison' ),
+			edgeP95VisualError: M( governorTrace.visualErrorByTier[ window.measuredTier ].edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask tier comparison' ),
+			edgeP95VisualErrorGate: G( governorTrace.visualErrorGates.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'frozen reference-edge p95 tier-degradation gate' ),
+			decision: window.decision,
+			residence: M( window.residence, 'window', 'governor state counter' ),
+			cooldown: M( window.cooldown, 'window', 'governor cooldown counter' )
+		} ) ),
+		transitions: governorTrace.transitions.map( ( transition ) => ( {
+			window: M( transition.window, 'window', 'governor transition record' ),
+			from: transition.from,
+			to: transition.to,
+			cause: transition.cause,
+			gpuP95: M( transition.gpuP95, 'ms', 'triggering governor window' ),
+			rebuildCpuSubmission: M( transition.rebuildCpuSubmissionMs, 'ms', 'first render after tier transition' ),
+			rebuildGpu: M( transition.rebuildGpuMs, 'ms', 'first attributed GPU frame after tier transition' ),
+			fromResourceBytes: M( transition.fromResourceBytes, 'byte', 'render-target ledger before transition' ),
+			toResourceBytes: M( transition.toResourceBytes, 'byte', 'render-target ledger after transition' )
+		} ) ),
+		finalStableGpuP95: M( governorTrace.windows.at( - 1 ).gpuP95, 'ms', 'final governor window' ),
+		finalStableVisualError: M( governorTrace.visualErrorByTier[ governorTrace.settledState ].meanRgbByteDifference, 'mean-rgb-byte-difference', 'fixed settled-tier render-target comparison' ),
+		visualErrorGate: G( governorTrace.visualErrorGates.meanRgbByteDifference, 'mean-rgb-byte-difference', 'frozen whole-frame tier-degradation gate' ),
+		finalStableEdgeP95VisualError: M( governorTrace.visualErrorByTier[ governorTrace.settledState ].edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask settled-tier comparison' ),
+		edgeP95VisualErrorGate: G( governorTrace.visualErrorGates.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'frozen reference-edge p95 tier-degradation gate' ),
+		settledState: governorTrace.settledState,
+		oscillationDetected: governorTrace.oscillationDetected,
+		verdict: governorVerdict
 	} );
 	const targets = resources.renderTargets.map( ( target ) => targetArtifact( target, targetReadbackCapture ) );
 	const totalTargetBytes = resources.renderTargets.reduce( ( sum, target ) => sum + target.bytes, 0 );
@@ -635,6 +722,16 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 				sceneMrtP95: M( performanceTrace.gpuStageP95[ 'scene-mrt' ], 'ms', '120 resolved scene MRT render-context timestamps' ),
 				finalOutputP95: M( performanceTrace.gpuStageP95[ 'final-output' ], 'ms', '120 resolved final-output render-context timestamps' ),
 				maxReconciliationError: M( performanceTrace.gpuAttributionMaxErrorMs, 'ms', 'frame total minus attributed stage sum' )
+			}, {
+				id: 'quality-governor-stress',
+				verdict: governorVerdict,
+				windowCount: M( governorTrace.windowCount, 'window', 'measured governor trace' ),
+				transitionCount: M( governorTrace.transitions.length, 'transition', 'measured governor trace' ),
+				settledState: governorTrace.settledState,
+				oscillationDetected: governorTrace.oscillationDetected,
+				finalStableGpuP95: M( governorTrace.windows.at( - 1 ).gpuP95, 'ms', 'final governor window' ),
+				finalStableVisualError: M( governorTrace.visualErrorByTier[ governorTrace.settledState ].meanRgbByteDifference, 'mean-rgb-byte-difference', 'settled-tier comparison' ),
+				finalStableEdgeP95VisualError: M( governorTrace.visualErrorByTier[ governorTrace.settledState ].edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask settled-tier comparison' )
 			} ] ),
 			{ id: 'readback-captures', records: captureMetrics }
 		],

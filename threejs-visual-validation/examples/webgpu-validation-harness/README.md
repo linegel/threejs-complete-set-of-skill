@@ -62,9 +62,18 @@ rendering cadence rather than readback stalls. The subject owns the exact
 adapter/device request, serializes its allowlisted identity, features, and
 limits, and attributes each sustained frame to the scene MRT and final-output
 render contexts. Their sum must reconcile with the frame total within 0.001
-ms. The profile remains non-publishable until governor stress and mechanism
-proof are present. A measured total-frame budget overrun is still reported as
+ms. The profile remains non-publishable until mechanism proof and visual
+sign-off are present. A measured total-frame budget overrun is still reported as
 `FAIL` immediately instead of being hidden behind `INSUFFICIENT_EVIDENCE`.
+
+The same performance capture runs six measured governor windows with 30 GPU
+timestamps each. The two-state controller uses a two-window minimum residence,
+a 2 ms upgrade hysteresis, and a two-window cooldown. It passes only after the
+trace settles without alternating transition directions; fast adapters may
+correctly remain at `target-performance`, while over-budget adapters degrade to
+`governor-stress` and must remain stable there. Acceptance checks both a
+whole-frame mean RGB error and a p95 RGB error over a reference-gradient edge
+mask, so unchanged background pixels cannot hide unacceptable tier blur.
 
 ## Browser subject
 
@@ -134,6 +143,9 @@ gpu-p95-overrun
 deadline-overrun
 missing-stage-attribution
 governor-oscillation
+governor-performance-overrun
+governor-visual-overrun
+governor-edge-visual-overrun
 visual-error-overrun
 target-leak
 storage-leak

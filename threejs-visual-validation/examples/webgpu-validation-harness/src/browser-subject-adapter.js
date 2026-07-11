@@ -282,6 +282,17 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 	}
 
+	function currentRenderTargetBytes() {
+
+		return buildValidationResourceLedger( {
+			sceneWidth: scenePass.renderTarget.width,
+			sceneHeight: scenePass.renderTarget.height,
+			captureWidth: captureTarget.width,
+			captureHeight: captureTarget.height
+		} ).renderTargets.reduce( ( sum, target ) => sum + target.bytes, 0 );
+
+	}
+
 	applyCamera();
 	applyTime();
 	applyTier();
@@ -585,6 +596,97 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				deadlineMissRatio: presentationSamples.filter( ( value ) => value > refreshPeriodMs ).length / presentationSamples.length,
 				timestampScope: 'one resolved WebGPU render timestamp per sustained RenderPipeline frame',
 				presentationScope: 'requestAnimationFrame cadence with rendering enabled and timestamp mapping disabled'
+			};
+
+		},
+
+		async runGovernorStressProfile( configuration = {} ) {
+
+			requireLive();
+			const windowCount = requireFrameCount( configuration.windowCount ?? 6, 'windowCount', 6, 12 );
+			const framesPerWindow = requireFrameCount( configuration.framesPerWindow ?? 30, 'framesPerWindow', 30, 60 );
+			const targetMs = 1000 / 60 - 2;
+			const hysteresisMs = 2;
+			const minimumResidenceWindows = 2;
+			const cooldownWindows = 2;
+			const states = [ 'target-performance', 'governor-stress' ];
+			let stateIndex = 0;
+			let residence = 0;
+			let cooldown = 0;
+			const windows = [];
+			const transitions = [];
+			await renderer.resolveTimestampsAsync( 'render' );
+
+			for ( let window = 0; window < windowCount; window ++ ) {
+
+				const measuredTier = states[ stateIndex ];
+				tier = measuredTier;
+				applyTier();
+				const gpuSamples = [];
+				for ( let frame = 0; frame < framesPerWindow; frame ++ ) {
+
+					await renderTo( null );
+					gpuSamples.push( ( await resolveAttributedRenderFrame( `Governor window ${ window } frame ${ frame }` ) ).totalMs );
+
+				}
+				const gpuP95 = percentile( gpuSamples, 0.95 );
+				residence ++;
+				if ( cooldown > 0 ) cooldown --;
+				let decision = 'hold';
+				if ( cooldown === 0 && residence >= minimumResidenceWindows ) {
+
+					if ( gpuP95 > targetMs && stateIndex < states.length - 1 ) {
+
+						const from = states[ stateIndex ];
+						const fromResourceBytes = currentRenderTargetBytes();
+						stateIndex ++;
+						tier = states[ stateIndex ];
+						applyTier();
+						const rebuildCpuSubmissionMs = await renderTo( null );
+						const rebuildGpuMs = ( await resolveAttributedRenderFrame( `Governor transition ${ window } degrade rebuild` ) ).totalMs;
+						const toResourceBytes = currentRenderTargetBytes();
+						decision = 'degrade';
+						transitions.push( { window, from, to: tier, cause: 'gpu-p95-over-budget', gpuP95, rebuildCpuSubmissionMs, rebuildGpuMs, fromResourceBytes, toResourceBytes } );
+						residence = 0;
+						cooldown = cooldownWindows;
+
+					} else if ( gpuP95 < targetMs - hysteresisMs && stateIndex > 0 ) {
+
+						const from = states[ stateIndex ];
+						const fromResourceBytes = currentRenderTargetBytes();
+						stateIndex --;
+						tier = states[ stateIndex ];
+						applyTier();
+						const rebuildCpuSubmissionMs = await renderTo( null );
+						const rebuildGpuMs = ( await resolveAttributedRenderFrame( `Governor transition ${ window } upgrade rebuild` ) ).totalMs;
+						const toResourceBytes = currentRenderTargetBytes();
+						decision = 'upgrade';
+						transitions.push( { window, from, to: tier, cause: 'gpu-p95-below-hysteresis', gpuP95, rebuildCpuSubmissionMs, rebuildGpuMs, fromResourceBytes, toResourceBytes } );
+						residence = 0;
+						cooldown = cooldownWindows;
+
+					}
+
+				}
+				windows.push( { window, tier: states[ stateIndex ], measuredTier, gpuSamples, gpuP95, decision, residence, cooldown } );
+
+			}
+			const transitionDirections = transitions.map( ( transition ) => transition.to === 'governor-stress' ? 1 : - 1 );
+			const oscillationDetected = transitionDirections.some( ( direction, index ) => index > 0 && direction !== transitionDirections[ index - 1 ] );
+			tier = states[ stateIndex ];
+			applyTier();
+			return {
+				windowCount,
+				framesPerWindow,
+				targetMs,
+				hysteresisMs,
+				minimumResidenceWindows,
+				cooldownWindows,
+				states,
+				windows,
+				transitions,
+				settledState: tier,
+				oscillationDetected
 			};
 
 		},

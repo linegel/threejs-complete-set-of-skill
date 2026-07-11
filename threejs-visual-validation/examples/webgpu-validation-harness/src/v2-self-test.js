@@ -92,6 +92,46 @@ function authored( value, unit = 'fixture unit' ) {
 
 }
 
+async function enableGovernorFixture( dir, { gpuP95 = 10, visualError = 1, edgeP95VisualError = 2 } = {} ) {
+
+	await mutateJson( dir, 'quality-governor.json', ( governor ) => {
+
+		governor.enabled = true;
+		governor.states = [ 'target-performance' ];
+		governor.inputMetric = 'fixture GPU p95';
+		governor.filter = 'six authored fixture windows';
+		governor.target = authored( 14, 'ms' );
+		governor.cooldown = authored( 2, 'window' );
+		governor.windows = Array.from( { length: 6 }, ( _, window ) => ( {
+			window: authored( window, 'window' ),
+			measuredTier: 'target-performance',
+			resultingTier: 'target-performance',
+			gpuSamples: { values: [ gpuP95 ], unit: 'ms', label: 'Authored', source: 'v2 mutation fixture' },
+			gpuP95: authored( gpuP95, 'ms' ),
+			visualError: authored( visualError, 'mean-rgb-byte-difference' ),
+			visualErrorGate: authored( 8, 'mean-rgb-byte-difference' ),
+			edgeMaskPixels: authored( 64, 'pixel' ),
+			edgeMeanVisualError: authored( 1, 'mean-rgb-byte-difference' ),
+			edgeP95VisualError: authored( edgeP95VisualError, 'mean-rgb-byte-difference' ),
+			edgeP95VisualErrorGate: authored( 32, 'mean-rgb-byte-difference' ),
+			decision: 'hold',
+			residence: authored( window + 1, 'window' ),
+			cooldown: authored( 0, 'window' )
+		} ) );
+		governor.transitions = [];
+		governor.settledState = 'target-performance';
+		governor.oscillationDetected = false;
+		governor.finalStableGpuP95 = authored( gpuP95, 'ms' );
+		governor.finalStableVisualError = authored( visualError, 'mean-rgb-byte-difference' );
+		governor.visualErrorGate = authored( 8, 'mean-rgb-byte-difference' );
+		governor.finalStableEdgeP95VisualError = authored( edgeP95VisualError, 'mean-rgb-byte-difference' );
+		governor.edgeP95VisualErrorGate = authored( 32, 'mean-rgb-byte-difference' );
+		governor.verdict = 'PASS';
+
+	} );
+
+}
+
 export async function runV2MutationSuite() {
 
 	const mutations = [
@@ -299,6 +339,21 @@ export async function runV2MutationSuite() {
 				governor.oscillationDetected = true;
 
 			} );
+
+		} ),
+		expectMutationRejects( 'governor-performance-overrun', /governor-performance-overrun/, async ( dir ) => {
+
+			await enableGovernorFixture( dir, { gpuP95: 20 } );
+
+		} ),
+		expectMutationRejects( 'governor-visual-overrun', /governor-visual-overrun/, async ( dir ) => {
+
+			await enableGovernorFixture( dir, { visualError: 9 } );
+
+		} ),
+		expectMutationRejects( 'governor-edge-visual-overrun', /governor-edge-visual-overrun/, async ( dir ) => {
+
+			await enableGovernorFixture( dir, { edgeP95VisualError: 33 } );
 
 		} ),
 		expectMutationRejects( 'visual-error-overrun', /visual-error-overrun/, async ( dir ) => {
