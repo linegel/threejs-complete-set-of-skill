@@ -2,22 +2,59 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import * as THREE from "three/webgpu";
 
 import { SCULPT_MODES, SCULPT_TIERS, summarizeSculptRuntime } from "../shared/sculpt-runtime.js";
 import { CORPUS_DPR_CAPS } from "./lab-controller.js";
 import { SCULPT_TARGETS } from "./object-catalog.js";
 import { CORPUS_CAMERAS } from "./route-state.js";
+import { validateCorpusArtifacts } from "./validate-artifacts.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = resolve(here, "../../..");
 const manifestPath = resolve(here, "lab.manifest.json");
 const corpusContractPath = resolve(here, "corpus.contract.json");
+const UINT32_MAX = 0xffffffff;
+const ACCEPTANCE_STATUSES = new Set(["accepted", "incomplete", "blocked"]);
 
 const EXPECTED_TARGET_IDS = Object.freeze([
   "articulated-desk-lamp",
   "potted-bonsai",
   "ceramic-teapot",
 ]);
+const EXPECTED_DEEP_COMMANDS = Object.freeze({
+  specs: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:specs",
+  targets: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:targets",
+  unit: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:unit",
+  generateRoutes: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run generate:routes",
+  routes: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:routes",
+});
 const ACCEPTED_STATUS_WORDS = new Set(["accepted", "complete", "completed", "pass", "passed"]);
+const BONSAI_BRANCH_IDS = Object.freeze([
+  "branch-left",
+  "branch-right",
+  "branch-back",
+  "branch-left-secondary",
+  "branch-right-secondary",
+  "branch-back-secondary",
+]);
+const BONSAI_COLLIDER_VISUALS = Object.freeze({
+  "pot-solid": Object.freeze(["pot-body", "pot-rim", "pot-foot"]),
+  "trunk-capsule": Object.freeze(["trunk-surface"]),
+  "branch-left-capsule": Object.freeze(["branch-left-surface"]),
+  "branch-right-capsule": Object.freeze(["branch-right-surface"]),
+  "branch-back-capsule": Object.freeze(["branch-back-surface"]),
+  "canopy-trigger": Object.freeze(BONSAI_BRANCH_IDS.map((id) => `${id}-foliage`)),
+});
+const VISUAL_SCULPT_PASS_IDS = new Set([
+  "blockout",
+  "structural-pass",
+  "form-refinement",
+  "material-pass",
+  "surface-pass",
+  "lighting-pass",
+  "interaction-pass",
+]);
 
 function readJson(path, label) {
   assert(existsSync(path), `missing ${label}: ${path}`);
@@ -44,6 +81,178 @@ function exact(actual, expected, label) {
   assert.deepEqual([...actual], [...expected], `${label} must preserve canonical order and membership`);
 }
 
+function requireObject(value, label) {
+  assert(value && typeof value === "object" && !Array.isArray(value), `${label} must be an object`);
+  return value;
+}
+
+function exactKeys(value, expected, label) {
+  requireObject(value, label);
+  exact(Object.keys(value), expected, `${label} keys`);
+}
+
+function requireText(value, label) {
+  assert.equal(typeof value, "string", `${label} must be a string`);
+  assert(value.trim().length > 0, `${label} must be nonempty`);
+  return value;
+}
+
+function requireBoolean(value, label) {
+  assert.equal(typeof value, "boolean", `${label} must be boolean`);
+  return value;
+}
+
+function requireInteger(value, label, { minimum = Number.MIN_SAFE_INTEGER, maximum = Number.MAX_SAFE_INTEGER } = {}) {
+  assert(Number.isInteger(value), `${label} must be an integer`);
+  assert(value >= minimum && value <= maximum, `${label} must be in [${minimum}, ${maximum}]`);
+  return value;
+}
+
+function requireFiniteNumber(value, label, { minimum = -Infinity, maximum = Infinity } = {}) {
+  assert(Number.isFinite(value), `${label} must be finite`);
+  assert(value >= minimum && value <= maximum, `${label} must be in [${minimum}, ${maximum}]`);
+  return value;
+}
+
+function requireStringArray(value, label, { nonempty = false, unique = false } = {}) {
+  assert(Array.isArray(value), `${label} must be an array`);
+  if (nonempty) assert(value.length > 0, `${label} must be nonempty`);
+  value.forEach((entry, index) => requireText(entry, `${label}[${index}]`));
+  if (unique) assert.equal(new Set(value).size, value.length, `${label} must contain unique values`);
+  return value;
+}
+
+function requireRepoPath(value, label) {
+  requireText(value, label);
+  assert(!value.startsWith("/"), `${label} must be repository-relative`);
+  assert(!value.split("/").includes(".."), `${label} must not traverse parent directories`);
+  return value;
+}
+
+function requireAcceptanceStatus(value, label) {
+  assert(ACCEPTANCE_STATUSES.has(value), `${label} must be accepted, incomplete, or blocked`);
+  return value;
+}
+
+function colliderSignedDistance(point, shape) {
+  if (shape.kind === "sphere") {
+    return point.distanceTo(new THREE.Vector3(...shape.centerMeters)) - shape.radiusMeters;
+  }
+  const start = new THREE.Vector3(...shape.startMeters);
+  const end = new THREE.Vector3(...shape.endMeters);
+  const axis = end.clone().sub(start);
+  const length = axis.length();
+  axis.multiplyScalar(1 / length);
+  if (shape.kind === "capsule") {
+    const along = THREE.MathUtils.clamp(point.clone().sub(start).dot(axis), 0, length);
+    return point.distanceTo(start.clone().addScaledVector(axis, along)) - shape.radiusMeters;
+  }
+  if (shape.kind === "cylinder") {
+    const center = start.clone().add(end).multiplyScalar(0.5);
+    const relative = point.clone().sub(center);
+    const axialCoordinate = relative.dot(axis);
+    const radialDistance = relative.addScaledVector(axis, -axialCoordinate).length();
+    const radial = radialDistance - shape.radiusMeters;
+    const axial = Math.abs(axialCoordinate) - length * 0.5;
+    return Math.hypot(Math.max(radial, 0), Math.max(axial, 0)) + Math.min(Math.max(radial, axial), 0);
+  }
+  throw new Error(`unsupported collider witness shape ${shape.kind}`);
+}
+
+function sampledVisualToProxyDeviation(asset, colliderId) {
+  const collider = asset.runtime.colliders.get(colliderId);
+  assert(collider, `missing collider ${colliderId} while measuring directed witness`);
+  const meshIds = BONSAI_COLLIDER_VISUALS[colliderId];
+  assert(meshIds, `missing directed witness visual scope for ${colliderId}`);
+  asset.root.updateMatrixWorld(true);
+  const entity = asset.runtime.nodes.get(collider.entityId.localId);
+  assert(entity, `missing collider entity ${collider.entityId.localId}`);
+  const worldToEntity = entity.matrixWorld.clone().invert();
+  const point = new THREE.Vector3();
+  let maximum = 0;
+  for (const meshId of meshIds) {
+    const mesh = asset.runtime.meshes.get(meshId);
+    assert(mesh, `missing directed witness mesh ${meshId}`);
+    const transform = worldToEntity.clone().multiply(mesh.matrixWorld);
+    const position = mesh.geometry.getAttribute("position");
+    for (let index = 0; index < position.count; index += 1) {
+      point.fromBufferAttribute(position, index).applyMatrix4(transform);
+      maximum = Math.max(maximum, Math.abs(colliderSignedDistance(point, collider.shape)));
+    }
+  }
+  return maximum;
+}
+
+function validateBonsaiColliderWitnessMeasurements(definition, witness) {
+  const measured = Object.fromEntries(Object.keys(witness.valuesMeters).map((id) => [id, 0]));
+  const cases = [
+    ...SCULPT_TIERS.map((tier) => ({ tier, seed: witness.tierSeed })),
+    ...witness.fullTierSeedCorpus.map((seed) => ({ tier: "full", seed })),
+  ];
+  for (const { tier, seed } of cases) {
+    const asset = definition.create({ tier, seed });
+    try {
+      for (const colliderId of Object.keys(measured)) {
+        measured[colliderId] = Math.max(measured[colliderId], sampledVisualToProxyDeviation(asset, colliderId));
+      }
+    } finally {
+      asset.dispose();
+    }
+  }
+  for (const [colliderId, declared] of Object.entries(witness.valuesMeters)) {
+    assert(
+      Math.abs(measured[colliderId] - declared) <= 1e-12,
+      `potted-bonsai/${colliderId} directed lower-bound witness drifted: declared ${declared}, measured ${measured[colliderId]}`,
+    );
+  }
+  return Object.freeze(measured);
+}
+
+function captureDigestMap(corpus) {
+  const bundle = corpus.acceptancePromotion.evidenceBundle;
+  const session = readJson(resolve(repositoryRoot, bundle, "capture-session.json"), "accepted capture session");
+  const captures = session.hookResult?.captures;
+  assert(Array.isArray(captures) && captures.length > 0, "accepted capture session needs digest-bound captures");
+  return new Map(captures.map((capture, index) => {
+    requireText(capture.filename, `accepted capture[${index}].filename`);
+    assert.equal(capture.file?.path, capture.filename, `accepted capture[${index}] file path drifted from filename`);
+    const digest = capture.file?.sha256;
+    assert.match(digest ?? "", /^[a-f0-9]{64}$/, `accepted capture[${index}] needs a sha256 digest`);
+    return [`${bundle}/${capture.file.path}`, digest];
+  }));
+}
+
+function makeSyntheticPromotedSpecFixture(spec, definition, evidenceBundle) {
+  const promoted = structuredClone(spec);
+  const digest = "a".repeat(64);
+  const imagePath = `${evidenceBundle}/${definition.id}.final.full.design.png`;
+  const visualEvidence = {
+    referenceScreenshot: "",
+    renderScreenshot: imagePath,
+    renderScreenshotSha256: digest,
+    comparisonImage: "",
+    cameraView: "design",
+    notes: "Synthetic positive control for acceptance wiring only.",
+    aiVisionNotes: "Synthetic positive control for acceptance wiring only.",
+  };
+  promoted.reviewHistory = promoted.buildPasses.map(({ id }) => ({
+    passId: id,
+    action: "continue",
+    aiVisionScore: 1,
+    visualAcceptanceThreshold: 0.8,
+    ...(VISUAL_SCULPT_PASS_IDS.has(id) ? { visualEvidence: { ...visualEvidence } } : {}),
+  }));
+  promoted.visualEvidence = promoted.buildPasses
+    .filter(({ id }) => VISUAL_SCULPT_PASS_IDS.has(id))
+    .map(({ id }) => ({ passId: id, ...visualEvidence }));
+  promoted.sculptPipeline.completedPasses = promoted.buildPasses.map(({ id }) => id);
+  promoted.sculptPipeline.currentPass = "complete";
+  promoted.sculptPipeline.lastCompletedPass = promoted.buildPasses.at(-1).id;
+  promoted.sculptPipeline.blockedReason = "All acceptance evidence passed.";
+  promoted.sculptPipeline.nextRequiredEvidence = [];
+  return Object.freeze({ spec: promoted, artifactDigests: new Map([[imagePath, digest]]) });
+}
+
 function requireIncomplete(value, label) {
   assert.equal(value, "incomplete", `${label} must remain incomplete until accepted evidence exists`);
 }
@@ -65,6 +274,434 @@ function rejectAcceptedStatus(value, path = "root") {
     }
     rejectAcceptedStatus(entry, childPath);
   }
+}
+
+function validateStartupShape(startup, label, keys) {
+  exactKeys(startup, keys, label);
+  for (const key of keys) {
+    if (key === "seed") requireInteger(startup[key], `${label}.seed`, { minimum: 0, maximum: UINT32_MAX });
+    else requireText(startup[key], `${label}.${key}`);
+  }
+}
+
+function validateCorpusDeepContractShape(corpus) {
+  exactKeys(corpus, [
+    "schemaVersion",
+    "id",
+    "manifestId",
+    "manifestPath",
+    "canonicalSchemaPath",
+    "status",
+    "acceptancePromotion",
+    "defaultStartup",
+    "scenarios",
+    "mechanisms",
+    "tiers",
+    "authoredPerformanceTargets",
+    "cameras",
+    "corpusDiversityContract",
+    "physicalRouteContract",
+    "renderArchitecture",
+    "physicsBoundary",
+    "identityContinuity",
+    "referencePolicy",
+    "visualAcceptance",
+    "commands",
+  ], "corpus deep contract");
+  requireInteger(corpus.schemaVersion, "corpus.schemaVersion", { minimum: 1, maximum: 1 });
+  for (const field of ["id", "manifestId"]) requireText(corpus[field], `corpus.${field}`);
+  for (const field of ["manifestPath", "canonicalSchemaPath"]) requireRepoPath(corpus[field], `corpus.${field}`);
+  requireAcceptanceStatus(corpus.status, "corpus.status");
+
+  const promotion = corpus.acceptancePromotion;
+  exactKeys(promotion, [
+    "validatorModule",
+    "validatorExport",
+    "evidenceBundle",
+    "evidenceReviewState",
+    "requiredClaimVerdict",
+    "promotedStatus",
+    "unpromotedStatus",
+    "failedStatus",
+    "promotedRenderClaimStatus",
+    "unpromotedRenderClaimStatus",
+    "failedRenderClaimStatus",
+    "scope",
+  ], "corpus.acceptancePromotion");
+  requireRepoPath(promotion.validatorModule, "corpus.acceptancePromotion.validatorModule");
+  requireText(promotion.validatorExport, "corpus.acceptancePromotion.validatorExport");
+  requireRepoPath(promotion.evidenceBundle, "corpus.acceptancePromotion.evidenceBundle");
+  assert.equal(
+    promotion.validatorModule,
+    "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/validate-artifacts.mjs",
+    "acceptance promotion validator module drifted",
+  );
+  assert.equal(promotion.validatorExport, "validateCorpusArtifacts", "acceptance promotion validator export drifted");
+  assert(["collecting", "candidate"].includes(promotion.evidenceReviewState), "acceptance evidence review state must be collecting or candidate");
+  assert.equal(promotion.requiredClaimVerdict, "PASS", "acceptance promotion must require the derived PASS verdict");
+  assert.equal(promotion.promotedStatus, "accepted", "accepted must be the promotion status");
+  assert.equal(promotion.unpromotedStatus, "incomplete", "incomplete must be the unpromoted status");
+  assert.equal(promotion.failedStatus, "blocked", "blocked must be the failed-evidence status");
+  requireText(promotion.promotedRenderClaimStatus, "corpus.acceptancePromotion.promotedRenderClaimStatus");
+  requireText(promotion.unpromotedRenderClaimStatus, "corpus.acceptancePromotion.unpromotedRenderClaimStatus");
+  requireText(promotion.failedRenderClaimStatus, "corpus.acceptancePromotion.failedRenderClaimStatus");
+  assert.equal(
+    new Set([
+      promotion.promotedRenderClaimStatus,
+      promotion.unpromotedRenderClaimStatus,
+      promotion.failedRenderClaimStatus,
+    ]).size,
+    3,
+    "accepted, incomplete, and failed render claim statuses must differ",
+  );
+  requireText(promotion.scope, "corpus.acceptancePromotion.scope");
+
+  validateStartupShape(corpus.defaultStartup, "corpus.defaultStartup", ["scenario", "mechanism", "tier", "camera", "seed"]);
+  assert(Array.isArray(corpus.scenarios) && corpus.scenarios.length > 0, "corpus.scenarios must be nonempty");
+  corpus.scenarios.forEach((scenario, index) => {
+    const label = `corpus.scenarios[${index}]`;
+    exactKeys(scenario, ["id", "route", "category", "formLanguage", "startup", "spec", "referenceManifest", "factory", "status"], label);
+    for (const field of ["id", "route", "category"]) requireText(scenario[field], `${label}.${field}`);
+    requireStringArray(scenario.formLanguage, `${label}.formLanguage`, { nonempty: true, unique: true });
+    validateStartupShape(scenario.startup, `${label}.startup`, ["scenario", "mechanism", "tier", "camera", "seed"]);
+    for (const field of ["spec", "referenceManifest", "factory"]) requireRepoPath(scenario[field], `${label}.${field}`);
+    requireAcceptanceStatus(scenario.status, `${label}.status`);
+  });
+
+  assert(Array.isArray(corpus.mechanisms) && corpus.mechanisms.length > 0, "corpus.mechanisms must be nonempty");
+  corpus.mechanisms.forEach((mechanism, index) => {
+    const label = `corpus.mechanisms[${index}]`;
+    exactKeys(mechanism, ["id", "route", "startup", "status"], label);
+    requireText(mechanism.id, `${label}.id`);
+    requireText(mechanism.route, `${label}.route`);
+    validateStartupShape(mechanism.startup, `${label}.startup`, ["mechanism"]);
+    requireAcceptanceStatus(mechanism.status, `${label}.status`);
+  });
+
+  assert(Array.isArray(corpus.tiers) && corpus.tiers.length > 0, "corpus.tiers must be nonempty");
+  corpus.tiers.forEach((tier, tierIndex) => {
+    const label = `corpus.tiers[${tierIndex}]`;
+    exactKeys(tier, ["id", "route", "sourceWorkloadEvidence", "status"], label);
+    requireText(tier.id, `${label}.id`);
+    requireText(tier.route, `${label}.route`);
+    exactKeys(tier.sourceWorkloadEvidence, EXPECTED_TARGET_IDS, `${label}.sourceWorkloadEvidence`);
+    for (const targetId of EXPECTED_TARGET_IDS) {
+      const evidence = tier.sourceWorkloadEvidence[targetId];
+      const evidenceLabel = `${label}.sourceWorkloadEvidence.${targetId}`;
+      exactKeys(evidence, ["seed", "storedVertices", "triangles", "renderItems", "shadowCasters"], evidenceLabel);
+      requireInteger(evidence.seed, `${evidenceLabel}.seed`, { minimum: 0, maximum: UINT32_MAX });
+      for (const field of ["storedVertices", "triangles", "renderItems", "shadowCasters"]) {
+        requireInteger(evidence[field], `${evidenceLabel}.${field}`, { minimum: 0 });
+      }
+    }
+    requireAcceptanceStatus(tier.status, `${label}.status`);
+  });
+
+  const performance = corpus.authoredPerformanceTargets;
+  exactKeys(performance, [
+    "label",
+    "claimStatus",
+    "currentReviewProfile",
+    "profilesByTier",
+    "legacySpecBindingTier",
+    "legacySpecFieldSemantics",
+    "targetsByTier",
+    "requiredPerformanceCases",
+    "evidenceBindingRequirement",
+    "evidenceBindingStatus",
+    "measurementPromotionRequirement",
+  ], "corpus.authoredPerformanceTargets");
+  assert.equal(performance.label, "Authored", "performance target label must be Authored");
+  assert.equal(performance.claimStatus, "unmeasured-target-only", "performance targets must remain explicitly unmeasured");
+  exactKeys(performance.currentReviewProfile, ["surface", "role", "canPromotePhysicalDevicePerformance"], "corpus.authoredPerformanceTargets.currentReviewProfile");
+  assert.equal(performance.currentReviewProfile.surface, "Codex in-app Browser", "current review must use the Codex in-app Browser");
+  requireText(performance.currentReviewProfile.role, "corpus.authoredPerformanceTargets.currentReviewProfile.role");
+  assert.equal(performance.currentReviewProfile.canPromotePhysicalDevicePerformance, false, "attached-host review cannot promote physical-device performance");
+  exactKeys(performance.profilesByTier, SCULPT_TIERS, "corpus.authoredPerformanceTargets.profilesByTier");
+  const profileIds = new Set();
+  for (const tier of SCULPT_TIERS) {
+    const profile = performance.profilesByTier[tier];
+    const label = `corpus.authoredPerformanceTargets.profilesByTier.${tier}`;
+    exactKeys(profile, ["id", "device", "soc", "operatingSystem", "browser", "backend", "refreshHz", "viewportCssPixels", "dprCap"], label);
+    for (const field of ["id", "device", "soc", "operatingSystem", "browser", "backend"]) requireText(profile[field], `${label}.${field}`);
+    assert(!profileIds.has(profile.id), `duplicate performance profile ${profile.id}`);
+    profileIds.add(profile.id);
+    requireInteger(profile.refreshHz, `${label}.refreshHz`, { minimum: 1 });
+    assert(Array.isArray(profile.viewportCssPixels) && profile.viewportCssPixels.length === 2, `${label}.viewportCssPixels must contain width and height`);
+    profile.viewportCssPixels.forEach((value, index) => requireInteger(value, `${label}.viewportCssPixels[${index}]`, { minimum: 1 }));
+    requireFiniteNumber(profile.dprCap, `${label}.dprCap`, { minimum: 0.25, maximum: 4 });
+    assert.equal(profile.dprCap, CORPUS_DPR_CAPS[tier], `${tier} performance profile DPR cap drifted from runtime policy`);
+  }
+  assert.equal(performance.legacySpecBindingTier, "full", "legacy spec performance fields must bind to the full authored tier");
+  exactKeys(performance.legacySpecFieldSemantics, ["fpsTarget", "maxDrawCalls"], "corpus.authoredPerformanceTargets.legacySpecFieldSemantics");
+  requireText(performance.legacySpecFieldSemantics.fpsTarget, "legacy fpsTarget semantics");
+  requireText(performance.legacySpecFieldSemantics.maxDrawCalls, "legacy maxDrawCalls semantics");
+  assert.match(performance.legacySpecFieldSemantics.fpsTarget, /Authored.*not a measured/i, "fpsTarget semantics must deny measured status");
+  assert.match(performance.legacySpecFieldSemantics.maxDrawCalls, /Authored.*render items.*not a measured/i, "maxDrawCalls semantics must define render-item scope and deny measured status");
+  exactKeys(performance.targetsByTier, SCULPT_TIERS, "corpus.authoredPerformanceTargets.targetsByTier");
+  for (const tier of SCULPT_TIERS) {
+    exactKeys(performance.targetsByTier[tier], EXPECTED_TARGET_IDS, `corpus.authoredPerformanceTargets.targetsByTier.${tier}`);
+    for (const targetId of EXPECTED_TARGET_IDS) {
+      const target = performance.targetsByTier[tier][targetId];
+      exactKeys(target, ["fpsTarget", "maxDrawCalls"], `corpus.authoredPerformanceTargets.targetsByTier.${tier}.${targetId}`);
+      requireInteger(target.fpsTarget, `${tier}/${targetId}.fpsTarget`, { minimum: 1 });
+      requireInteger(target.maxDrawCalls, `${tier}/${targetId}.maxDrawCalls`, { minimum: 1 });
+      assert.equal(target.fpsTarget, performance.profilesByTier[tier].refreshHz, `${tier}/${targetId} fps target must match the named profile refresh`);
+    }
+  }
+  assert(Array.isArray(performance.requiredPerformanceCases), "corpus authored performance cases must be an array");
+  assert.equal(performance.requiredPerformanceCases.length, SCULPT_TIERS.length * EXPECTED_TARGET_IDS.length, "authored performance cases must cover every subject/tier pair");
+  const casePairs = new Set();
+  const caseIds = new Set();
+  for (const [index, performanceCase] of performance.requiredPerformanceCases.entries()) {
+    const label = `corpus.authoredPerformanceTargets.requiredPerformanceCases[${index}]`;
+    exactKeys(performanceCase, ["id", "scenario", "tier", "mode", "camera", "seed", "profileId"], label);
+    for (const field of ["id", "scenario", "tier", "mode", "camera", "profileId"]) requireText(performanceCase[field], `${label}.${field}`);
+    requireInteger(performanceCase.seed, `${label}.seed`, { minimum: 0, maximum: UINT32_MAX });
+    assert(EXPECTED_TARGET_IDS.includes(performanceCase.scenario), `${label}.scenario is unknown`);
+    assert(SCULPT_TIERS.includes(performanceCase.tier), `${label}.tier is unknown`);
+    assert.equal(performanceCase.mode, "action-ready", `${label}.mode must exercise authored motion`);
+    assert.equal(performanceCase.camera, "design", `${label}.camera must use the frozen design framing`);
+    assert.equal(performanceCase.profileId, performance.profilesByTier[performanceCase.tier].id, `${label}.profileId drifted`);
+    const evidence = corpus.tiers.find(({ id }) => id === performanceCase.tier).sourceWorkloadEvidence[performanceCase.scenario];
+    assert.equal(performanceCase.seed, evidence.seed, `${label}.seed drifted from source workload provenance`);
+    assert(!caseIds.has(performanceCase.id), `duplicate performance case ID ${performanceCase.id}`);
+    caseIds.add(performanceCase.id);
+    casePairs.add(`${performanceCase.scenario}/${performanceCase.tier}`);
+  }
+  assert.equal(casePairs.size, SCULPT_TIERS.length * EXPECTED_TARGET_IDS.length, "performance cases must cover each subject/tier pair exactly once");
+  requireText(performance.evidenceBindingRequirement, "corpus.authoredPerformanceTargets.evidenceBindingRequirement");
+  assert.match(performance.evidenceBindingRequirement, /Every required case.*single easy workload cannot promote/i, "performance evidence binding must reject one-workload promotion");
+  assert(
+    ["ready", "blocked-pending-case-identified-timing-and-resource-schema"].includes(performance.evidenceBindingStatus),
+    "performance evidence binding status is invalid",
+  );
+  requireText(performance.measurementPromotionRequirement, "corpus.authoredPerformanceTargets.measurementPromotionRequirement");
+
+  assert(Array.isArray(corpus.cameras) && corpus.cameras.length > 0, "corpus.cameras must be nonempty");
+  corpus.cameras.forEach((camera, index) => {
+    const label = `corpus.cameras[${index}]`;
+    exactKeys(camera, ["id", "route", "purpose", "status"], label);
+    for (const field of ["id", "route", "purpose"]) requireText(camera[field], `${label}.${field}`);
+    requireAcceptanceStatus(camera.status, `${label}.status`);
+  });
+
+  const diversity = corpus.corpusDiversityContract;
+  exactKeys(diversity, [
+    "preexistingBoatBaseline",
+    "boatBaselineCountsTowardMinimum",
+    "minimumNonBoatTargets",
+    "actualNonBoatTargets",
+    "requiresOrganicTarget",
+    "organicTarget",
+    "requiresDistinctConstructionFamilies",
+    "constructionFamilies",
+    "status",
+  ], "corpus.corpusDiversityContract");
+  requireText(diversity.preexistingBoatBaseline, "corpus diversity boat baseline");
+  requireBoolean(diversity.boatBaselineCountsTowardMinimum, "corpus diversity boat-count policy");
+  requireInteger(diversity.minimumNonBoatTargets, "corpus diversity minimum non-boat targets", { minimum: 1 });
+  requireInteger(diversity.actualNonBoatTargets, "corpus diversity actual non-boat targets", { minimum: 0 });
+  requireBoolean(diversity.requiresOrganicTarget, "corpus diversity organic requirement");
+  requireText(diversity.organicTarget, "corpus diversity organic target");
+  requireBoolean(diversity.requiresDistinctConstructionFamilies, "corpus diversity construction-family requirement");
+  requireStringArray(diversity.constructionFamilies, "corpus diversity construction families", { nonempty: true, unique: true });
+  requireAcceptanceStatus(diversity.status, "corpus diversity status");
+
+  const routes = corpus.physicalRouteContract;
+  exactKeys(routes, ["required", "dimensions", "routeCount", "generationPolicy", "status"], "corpus.physicalRouteContract");
+  requireBoolean(routes.required, "corpus physical routes required");
+  exactKeys(routes.dimensions, ["scenario", "mechanism", "tier", "camera"], "corpus.physicalRouteContract.dimensions");
+  for (const field of ["scenario", "mechanism", "tier", "camera"]) requireInteger(routes.dimensions[field], `physical route dimension ${field}`, { minimum: 1 });
+  requireInteger(routes.routeCount, "corpus physical route count", { minimum: 1 });
+  requireText(routes.generationPolicy, "corpus physical route generation policy");
+  requireAcceptanceStatus(routes.status, "corpus physical route status");
+
+  const architecture = corpus.renderArchitecture;
+  exactKeys(architecture, [
+    "renderer",
+    "requiredBackend",
+    "fallback",
+    "sceneRendersPerFrame",
+    "postProcessingPasses",
+    "presentationOwner",
+    "toneMappingOwners",
+    "outputTransformOwners",
+    "claimStatus",
+  ], "corpus.renderArchitecture");
+  for (const field of ["renderer", "requiredBackend", "fallback", "presentationOwner", "claimStatus"]) requireText(architecture[field], `corpus.renderArchitecture.${field}`);
+  for (const field of ["sceneRendersPerFrame", "postProcessingPasses", "toneMappingOwners", "outputTransformOwners"]) {
+    requireInteger(architecture[field], `corpus.renderArchitecture.${field}`, { minimum: 0 });
+  }
+
+  const physics = corpus.physicsBoundary;
+  exactKeys(physics, [
+    "assetRecordType",
+    "constraintRecordType",
+    "units",
+    "solverAuthority",
+    "canonicalProxyStatus",
+    "rigidBodyPropertiesStatus",
+    "visualLodIndependent",
+    "requiredAdapterBeforePhysicalClaims",
+    "authoredColliderCeilingsMeters",
+    "directedColliderLowerBoundWitnesses",
+    "status",
+  ], "corpus.physicsBoundary");
+  for (const field of ["assetRecordType", "constraintRecordType", "units", "canonicalProxyStatus", "rigidBodyPropertiesStatus", "requiredAdapterBeforePhysicalClaims"]) {
+    requireText(physics[field], `corpus.physicsBoundary.${field}`);
+  }
+  requireBoolean(physics.solverAuthority, "corpus.physicsBoundary.solverAuthority");
+  requireBoolean(physics.visualLodIndependent, "corpus.physicsBoundary.visualLodIndependent");
+  exactKeys(physics.authoredColliderCeilingsMeters, EXPECTED_TARGET_IDS, "corpus.physicsBoundary.authoredColliderCeilingsMeters");
+  for (const targetId of EXPECTED_TARGET_IDS) {
+    const ceilings = physics.authoredColliderCeilingsMeters[targetId];
+    requireObject(ceilings, `corpus collider ceilings ${targetId}`);
+    assert(Object.keys(ceilings).length > 0, `${targetId} collider ceilings must be nonempty`);
+    for (const [colliderId, ceiling] of Object.entries(ceilings)) {
+      requireText(colliderId, `${targetId} collider ceiling id`);
+      requireFiniteNumber(ceiling, `${targetId}/${colliderId} collider ceiling`, { minimum: 0 });
+    }
+  }
+  exactKeys(physics.directedColliderLowerBoundWitnesses, ["potted-bonsai"], "corpus.physicsBoundary.directedColliderLowerBoundWitnesses");
+  const bonsaiWitness = physics.directedColliderLowerBoundWitnesses["potted-bonsai"];
+  exactKeys(bonsaiWitness, ["direction", "sourceTest", "tierSeed", "fullTierSeedCorpus", "valuesMeters", "samplingStatement"], "potted-bonsai directed collider witness");
+  assert.equal(bonsaiWitness.direction, "sampled-visual-vertices-to-authored-proxy-surface", "bonsai collider witness direction drifted");
+  requireRepoPath(bonsaiWitness.sourceTest, "bonsai collider witness sourceTest");
+  requireInteger(bonsaiWitness.tierSeed, "bonsai collider witness tierSeed", { minimum: 0, maximum: UINT32_MAX });
+  assert(Array.isArray(bonsaiWitness.fullTierSeedCorpus) && bonsaiWitness.fullTierSeedCorpus.length > 0, "bonsai collider witness seed corpus must be nonempty");
+  bonsaiWitness.fullTierSeedCorpus.forEach((seed, index) => requireInteger(seed, `bonsai collider witness seed[${index}]`, { minimum: 0, maximum: UINT32_MAX }));
+  assert.equal(new Set(bonsaiWitness.fullTierSeedCorpus).size, bonsaiWitness.fullTierSeedCorpus.length, "bonsai collider witness seed corpus must be unique");
+  const bonsaiCeilings = physics.authoredColliderCeilingsMeters["potted-bonsai"];
+  exactKeys(bonsaiWitness.valuesMeters, Object.keys(bonsaiCeilings), "potted-bonsai directed collider witness values");
+  for (const [colliderId, witness] of Object.entries(bonsaiWitness.valuesMeters)) {
+    requireFiniteNumber(witness, `potted-bonsai/${colliderId} directed lower-bound witness`, { minimum: Number.EPSILON });
+    assert(witness <= bonsaiCeilings[colliderId], `potted-bonsai/${colliderId} witness exceeds authored ceiling`);
+  }
+  requireText(bonsaiWitness.samplingStatement, "bonsai collider witness samplingStatement");
+  assert.match(bonsaiWitness.samplingStatement, /directed sampled lower-bound.*not bidirectional/i, "bonsai witness must deny a bidirectional proof");
+  requireAcceptanceStatus(physics.status, "corpus.physicsBoundary.status");
+
+  const identity = corpus.identityContinuity;
+  exactKeys(identity, ["semanticIdsStableAcrossVisualTiers", "continuityTokenRequiredForTierRebuild", "changedSeedOrSourceRequiresNewGeneration", "solverStateContinuityClaim", "status"], "corpus.identityContinuity");
+  for (const field of ["semanticIdsStableAcrossVisualTiers", "continuityTokenRequiredForTierRebuild", "changedSeedOrSourceRequiresNewGeneration"]) requireBoolean(identity[field], `corpus.identityContinuity.${field}`);
+  requireText(identity.solverStateContinuityClaim, "corpus.identityContinuity.solverStateContinuityClaim");
+  requireAcceptanceStatus(identity.status, "corpus.identityContinuity.status");
+
+  const reference = corpus.referencePolicy;
+  exactKeys(reference, ["sourceKind", "referenceImageAvailable", "referenceImageLicense", "referenceImageHash", "referenceSimilarityClaim", "authoredVisualAcceptanceStatus"], "corpus.referencePolicy");
+  requireText(reference.sourceKind, "corpus.referencePolicy.sourceKind");
+  requireBoolean(reference.referenceImageAvailable, "corpus.referencePolicy.referenceImageAvailable");
+  assert(reference.referenceImageLicense === null || typeof reference.referenceImageLicense === "string", "reference image license must be string or null");
+  assert(reference.referenceImageHash === null || typeof reference.referenceImageHash === "string", "reference image hash must be string or null");
+  if (reference.referenceImageLicense !== null) requireText(reference.referenceImageLicense, "corpus.referencePolicy.referenceImageLicense");
+  if (reference.referenceImageHash !== null) assert.match(reference.referenceImageHash, /^sha256:[a-f0-9]{64}$/, "reference image hash must be sha256-prefixed");
+  requireText(reference.referenceSimilarityClaim, "corpus.referencePolicy.referenceSimilarityClaim");
+  requireAcceptanceStatus(reference.authoredVisualAcceptanceStatus, "corpus.referencePolicy.authoredVisualAcceptanceStatus");
+
+  const visual = corpus.visualAcceptance;
+  exactKeys(visual, ["status", "acceptedScenarios", "reason"], "corpus.visualAcceptance");
+  requireAcceptanceStatus(visual.status, "corpus.visualAcceptance.status");
+  requireStringArray(visual.acceptedScenarios, "corpus.visualAcceptance.acceptedScenarios", { unique: true });
+  requireText(visual.reason, "corpus.visualAcceptance.reason");
+
+  exactKeys(corpus.commands, ["specs", "targets", "unit", "generateRoutes", "routes"], "corpus.commands");
+  for (const [id, command] of Object.entries(corpus.commands)) {
+    requireText(command, `corpus.commands.${id}`);
+    assert.equal(command, EXPECTED_DEEP_COMMANDS[id], `corpus.commands.${id} drifted from the package script entry point`);
+  }
+}
+
+function acceptanceStatusEntries(manifest, corpus) {
+  return [
+    ["manifest.status", manifest.status],
+    ...manifest.scenarios.map((entry) => [`manifest.scenarios.${entry.id}.acceptanceStatus`, entry.acceptanceStatus]),
+    ...manifest.mechanisms.map((entry) => [`manifest.mechanisms.${entry.id}.acceptanceStatus`, entry.acceptanceStatus]),
+    ...manifest.tiers.map((entry) => [`manifest.tiers.${entry.id}.acceptanceStatus`, entry.acceptanceStatus]),
+    ...manifest.capabilityRequirements.map((entry) => [`manifest.capabilityRequirements.${entry.id}.status`, entry.status]),
+    ...manifest.runtimeProof.map((entry) => [`manifest.runtimeProof.${entry.id}.status`, entry.status]),
+    ["corpus.status", corpus.status],
+    ...corpus.scenarios.map((entry) => [`corpus.scenarios.${entry.id}.status`, entry.status]),
+    ...corpus.mechanisms.map((entry) => [`corpus.mechanisms.${entry.id}.status`, entry.status]),
+    ...corpus.tiers.map((entry) => [`corpus.tiers.${entry.id}.status`, entry.status]),
+    ...corpus.cameras.map((entry) => [`corpus.cameras.${entry.id}.status`, entry.status]),
+    ["corpus.corpusDiversityContract.status", corpus.corpusDiversityContract.status],
+    ["corpus.physicalRouteContract.status", corpus.physicalRouteContract.status],
+    ["corpus.physicsBoundary.status", corpus.physicsBoundary.status],
+    ["corpus.identityContinuity.status", corpus.identityContinuity.status],
+    ["corpus.referencePolicy.authoredVisualAcceptanceStatus", corpus.referencePolicy.authoredVisualAcceptanceStatus],
+    ["corpus.visualAcceptance.status", corpus.visualAcceptance.status],
+  ];
+}
+
+function acceptanceVerdictFromArtifact(artifactValidation, corpus = null) {
+  requireObject(artifactValidation, "artifact validation result");
+  if (corpus?.acceptancePromotion?.evidenceReviewState !== "candidate") return "INSUFFICIENT_EVIDENCE";
+  if (artifactValidation.structuralVerdict === "FAIL") return "FAIL";
+  assert.equal(artifactValidation.structuralVerdict, "PASS", "artifact structural verdict must be PASS or FAIL");
+  if (
+    artifactValidation.claimVerdict === "PASS"
+    && corpus?.authoredPerformanceTargets?.evidenceBindingStatus !== "ready"
+  ) return "INSUFFICIENT_EVIDENCE";
+  return artifactValidation.claimVerdict;
+}
+
+function validateAcceptancePromotionState(manifest, corpus, claimVerdict) {
+  const promotion = corpus.acceptancePromotion;
+  const promoted = claimVerdict === promotion.requiredClaimVerdict;
+  const failed = claimVerdict === "FAIL";
+  assert(promoted || failed || claimVerdict === "INSUFFICIENT_EVIDENCE", `unknown artifact claimVerdict ${claimVerdict}`);
+  const expectedStatus = promoted
+    ? promotion.promotedStatus
+    : failed
+      ? promotion.failedStatus
+      : promotion.unpromotedStatus;
+  for (const [label, status] of acceptanceStatusEntries(manifest, corpus)) {
+    assert.equal(status, expectedStatus, `${label} must be ${expectedStatus} while artifact claimVerdict is ${claimVerdict}`);
+  }
+  assert.equal(
+    corpus.renderArchitecture.claimStatus,
+    promoted
+      ? promotion.promotedRenderClaimStatus
+      : failed
+        ? promotion.failedRenderClaimStatus
+        : promotion.unpromotedRenderClaimStatus,
+    `render architecture claim status must track artifact claimVerdict ${claimVerdict}`,
+  );
+  exact(
+    corpus.visualAcceptance.acceptedScenarios,
+    promoted ? EXPECTED_TARGET_IDS : [],
+    "visual acceptance scenario closure",
+  );
+  if (promoted) assert.match(corpus.visualAcceptance.reason, /accepted|passed/i, "promoted visual acceptance needs an acceptance reason");
+  else if (failed) assert.match(corpus.visualAcceptance.reason, /failed|invalid|malformed|blocked/i, "failed visual acceptance needs a failure reason");
+  else assert.match(corpus.visualAcceptance.reason, /No .*accepted|awaiting|missing|insufficient/i, "unpromoted visual acceptance needs an evidence blocker");
+  return promoted;
+}
+
+function makeSyntheticPromotedAcceptanceFixture(manifest, corpus) {
+  const promotedManifest = structuredClone(manifest);
+  const promotedCorpus = structuredClone(corpus);
+  promotedManifest.status = promotedCorpus.acceptancePromotion.promotedStatus;
+  for (const field of ["scenarios", "mechanisms", "tiers"]) {
+    for (const entry of promotedManifest[field]) entry.acceptanceStatus = promotedCorpus.acceptancePromotion.promotedStatus;
+  }
+  for (const field of ["capabilityRequirements", "runtimeProof"]) {
+    for (const entry of promotedManifest[field]) entry.status = promotedCorpus.acceptancePromotion.promotedStatus;
+  }
+  promotedCorpus.status = promotedCorpus.acceptancePromotion.promotedStatus;
+  for (const field of ["scenarios", "mechanisms", "tiers", "cameras"]) {
+    for (const entry of promotedCorpus[field]) entry.status = promotedCorpus.acceptancePromotion.promotedStatus;
+  }
+  for (const block of ["corpusDiversityContract", "physicalRouteContract", "physicsBoundary", "identityContinuity"]) {
+    promotedCorpus[block].status = promotedCorpus.acceptancePromotion.promotedStatus;
+  }
+  promotedCorpus.referencePolicy.authoredVisualAcceptanceStatus = promotedCorpus.acceptancePromotion.promotedStatus;
+  promotedCorpus.visualAcceptance.status = promotedCorpus.acceptancePromotion.promotedStatus;
+  promotedCorpus.visualAcceptance.acceptedScenarios = [...EXPECTED_TARGET_IDS];
+  promotedCorpus.visualAcceptance.reason = "All derived artifact gates passed and every authored scenario is accepted.";
+  promotedCorpus.renderArchitecture.claimStatus = promotedCorpus.acceptancePromotion.promotedRenderClaimStatus;
+  return Object.freeze({ manifest: promotedManifest, corpus: promotedCorpus });
 }
 
 function validateReferenceManifest(reference, definition, directory) {
@@ -120,7 +757,7 @@ function contractArray(contract, field, fallback = null) {
   return value;
 }
 
-function validateSpec(spec, definition) {
+function validateSpec(spec, definition, { acceptancePromoted = false, artifactDigests = null } = {}) {
   const { contract } = definition;
   assert.equal(spec.targetId, definition.id, `${definition.id} spec target ID drifted`);
   assert.equal(spec.targetName, definition.title, `${definition.id} spec target name drifted`);
@@ -301,20 +938,54 @@ function validateSpec(spec, definition) {
     assert.equal(evidence.evidenceStatus, "authoring-intent-only", `${definition.id} viewEvidence[${index}] must not claim visual proof`);
     assert.equal(evidence.imageRegion ?? null, null, `${definition.id} viewEvidence[${index}] must not invent image regions`);
   }
-  exact(spec.visualEvidence, [], `${definition.id} visualEvidence`);
-  exact(spec.reviewHistory, [], `${definition.id} reviewHistory`);
-  exact(spec.sculptPipeline?.completedPasses, [], `${definition.id} completed sculpt passes`);
-  assert.equal(spec.sculptPipeline?.currentPass, "blockout", `${definition.id} initial sculpt pass must remain blockout`);
-  assert.match(spec.sculptPipeline?.blockedReason ?? "", /awaiting|pending/i, `${definition.id} pipeline must state its evidence blocker`);
+  assert(Array.isArray(spec.visualEvidence), `${definition.id} visualEvidence must be an array`);
+  assert(Array.isArray(spec.reviewHistory), `${definition.id} reviewHistory must be an array`);
+  const passIds = spec.buildPasses.map(({ id }) => id);
+  if (acceptancePromoted) {
+    assert(artifactDigests instanceof Map && artifactDigests.size > 0, `${definition.id} accepted spec needs validated artifact digests`);
+    assert(spec.visualEvidence.length > 0, `${definition.id} accepted spec needs visual evidence`);
+    assert(spec.reviewHistory.length > 0, `${definition.id} accepted spec needs review history`);
+    for (const passId of passIds) {
+      const matchingReviews = spec.reviewHistory.filter((review) => review?.passId === passId && review?.action === "continue");
+      assert.equal(matchingReviews.length, 1, `${definition.id}/${passId} needs exactly one passing continue review`);
+      if (!VISUAL_SCULPT_PASS_IDS.has(passId)) continue;
+      const review = matchingReviews[0];
+      assert(Number.isFinite(review.aiVisionScore), `${definition.id}/${passId} needs an AI-vision score`);
+      assert(Number.isFinite(review.visualAcceptanceThreshold), `${definition.id}/${passId} needs a visual threshold`);
+      assert(review.aiVisionScore >= review.visualAcceptanceThreshold, `${definition.id}/${passId} visual review failed its threshold`);
+      const visual = review.visualEvidence;
+      requireObject(visual, `${definition.id}/${passId}.visualEvidence`);
+      const artifactPath = requireRepoPath(visual.renderScreenshot, `${definition.id}/${passId}.renderScreenshot`);
+      assert(artifactDigests.has(artifactPath), `${definition.id}/${passId}.renderScreenshot is not in the accepted digest-bound capture set`);
+      assert.equal(visual.renderScreenshotSha256, artifactDigests.get(artifactPath), `${definition.id}/${passId}.renderScreenshotSha256 drifted from accepted capture bytes`);
+      assert.equal(visual.comparisonImage ?? "", "", `${definition.id}/${passId} must not invent a reference comparison image for an authored brief`);
+      const historyRows = spec.visualEvidence.filter((entry) => entry?.passId === passId);
+      assert.equal(historyRows.length, 1, `${definition.id}/${passId} needs exactly one visualEvidence history row`);
+      assert.equal(historyRows[0].renderScreenshot, visual.renderScreenshot, `${definition.id}/${passId} render history path drifted`);
+      assert.equal(historyRows[0].renderScreenshotSha256, visual.renderScreenshotSha256, `${definition.id}/${passId} render history digest drifted`);
+      assert.equal(historyRows[0].comparisonImage ?? "", "", `${definition.id}/${passId} visual history must not invent a comparison image`);
+    }
+    exact(spec.sculptPipeline?.completedPasses, passIds, `${definition.id} accepted completed sculpt passes`);
+    assert.equal(spec.sculptPipeline?.currentPass, "complete", `${definition.id} accepted sculpt pipeline must be complete`);
+    assert.equal(spec.sculptPipeline?.lastCompletedPass, passIds.at(-1), `${definition.id} accepted last completed pass drifted`);
+    exact(spec.sculptPipeline?.nextRequiredEvidence, [], `${definition.id} accepted next required evidence`);
+    assert.doesNotMatch(spec.sculptPipeline?.blockedReason ?? "", /awaiting|pending/i, `${definition.id} accepted pipeline must not retain an evidence blocker`);
+  } else {
+    exact(spec.visualEvidence, [], `${definition.id} unpromoted visualEvidence`);
+    exact(spec.reviewHistory, [], `${definition.id} unpromoted reviewHistory`);
+    exact(spec.sculptPipeline?.completedPasses, [], `${definition.id} unpromoted completed sculpt passes`);
+    assert.equal(spec.sculptPipeline?.currentPass, "blockout", `${definition.id} unpromoted initial sculpt pass must remain blockout`);
+    assert.match(spec.sculptPipeline?.blockedReason ?? "", /awaiting|pending/i, `${definition.id} unpromoted pipeline must state its evidence blocker`);
+    rejectAcceptedStatus(spec, `${definition.id}.spec`);
+  }
   assert(
     spec.proceduralStrategy.some((rule) => /one scene render/i.test(rule))
       && spec.proceduralStrategy.some((rule) => /no post-processing/i.test(rule)),
     `${definition.id} spec must preserve one-render/no-post architecture`,
   );
-  rejectAcceptedStatus(spec, `${definition.id}.spec`);
 }
 
-function validateRuntimeContract(definition, spec) {
+function validateRuntimeContract(definition, spec, corpusTiers) {
   const contract = definition.contract;
   assert.equal(contract.id, definition.id, `${definition.id} factory contract ID drifted`);
   assert.equal(contract.title, definition.title, `${definition.id} factory title drifted`);
@@ -323,9 +994,12 @@ function validateRuntimeContract(definition, spec) {
   assert.equal(contract.physics?.solverAuthority, false, `${definition.id} factory must not claim solver authority`);
 
   for (const tier of SCULPT_TIERS) {
-    const asset = definition.create({ tier, seed: 1 });
+    const sourceEvidence = corpusTiers.find(({ id }) => id === tier)?.sourceWorkloadEvidence?.[definition.id];
+    assert(sourceEvidence, `${definition.id}/${tier} source workload evidence is required`);
+    const asset = definition.create({ tier, seed: sourceEvidence.seed });
     try {
       assert.equal(asset.runtime.subjectId, definition.id, `${definition.id}/${tier} runtime subject drifted`);
+      assert.equal(asset.runtime.seed, sourceEvidence.seed, `${definition.id}/${tier} workload provenance seed drifted`);
       for (const id of contractArray(contract, "protectedComponentIds", "semanticNodeIds")) {
         assert(asset.runtime.nodes.has(id), `${definition.id}/${tier} missing protected component ${id}`);
       }
@@ -487,6 +1161,11 @@ function validateRuntimeContract(definition, spec) {
         assert.equal(summary.renderItems, spec.workloadContract[tier].renderItems, `${definition.id}/${tier} render-item evidence drifted`);
         assert.equal(summary.storedVertices, spec.workloadContract[tier].storedVertices, `${definition.id}/${tier} stored-vertex evidence drifted`);
         assert.equal(summary.storedTriangles, spec.workloadContract[tier].triangles, `${definition.id}/${tier} triangle evidence drifted`);
+        assert.equal(summary.renderItems, sourceEvidence.renderItems, `${definition.id}/${tier} manifest render-item provenance drifted`);
+        assert.equal(summary.storedVertices, sourceEvidence.storedVertices, `${definition.id}/${tier} manifest stored-vertex provenance drifted`);
+        assert.equal(summary.storedTriangles, sourceEvidence.triangles, `${definition.id}/${tier} manifest triangle provenance drifted`);
+        const shadowCasters = [...asset.runtime.meshes.values()].filter((mesh) => mesh.castShadow).length;
+        assert.equal(shadowCasters, sourceEvidence.shadowCasters, `${definition.id}/${tier} manifest shadow-caster provenance drifted`);
       }
     } finally {
       asset.dispose();
@@ -497,19 +1176,24 @@ function validateRuntimeContract(definition, spec) {
 export function validateCorpusManifest() {
   const manifest = readJson(manifestPath, "corpus lab manifest");
   const corpus = readJson(corpusContractPath, "corpus deep contract");
+  validateCorpusDeepContractShape(corpus);
+  const artifactValidation = validateCorpusArtifacts({
+    bundleDirectory: resolve(repositoryRoot, corpus.acceptancePromotion.evidenceBundle),
+  });
+  const effectiveArtifactVerdict = acceptanceVerdictFromArtifact(artifactValidation, corpus);
+  const acceptancePromoted = validateAcceptancePromotionState(manifest, corpus, effectiveArtifactVerdict);
   assert.equal(manifest.schemaVersion, 2);
   assert.equal(manifest.id, "webgpu-object-sculptor-corpus");
   assert.equal(manifest.skill, "threejs-object-sculptor");
   assert.equal(manifest.kind, "canonical-lab");
-  requireIncomplete(manifest.status, "manifest status");
   assert.equal(manifest.browserEntry, "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html");
+  assert.equal(manifest.evidenceBundle, corpus.acceptancePromotion.evidenceBundle, "canonical/deep evidence bundle path drifted");
   assert(manifest.canonicalSource.includes("threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/corpus.contract.json"), "canonical manifest must link the deep corpus contract");
   assert.equal(corpus.schemaVersion, 1);
   assert.equal(corpus.id, "webgpu-object-sculptor-corpus-contract");
   assert.equal(corpus.manifestId, manifest.id);
   assert.equal(corpus.manifestPath, "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/lab.manifest.json");
   assert.equal(corpus.canonicalSchemaPath, "labs/schema/lab-manifest.schema.json");
-  requireIncomplete(corpus.status, "corpus deep-contract status");
 
   exact(ids(manifest.scenarios, "manifest scenarios"), EXPECTED_TARGET_IDS, "manifest scenarios");
   exact(ids(manifest.mechanisms, "manifest mechanisms"), SCULPT_MODES, "manifest mechanisms");
@@ -533,7 +1217,6 @@ export function validateCorpusManifest() {
     corpus.scenarios.find(({ id }) => id === "potted-bonsai")?.formLanguage?.includes("organic"),
     "corpus must retain one explicit organic target",
   );
-  requireIncomplete(corpus.corpusDiversityContract?.status, "corpus diversity acceptance status");
 
   for (const [field, kind] of [["scenarios", "scenario"], ["mechanisms", "mechanism"]]) {
     for (const entry of manifest[field]) {
@@ -541,8 +1224,6 @@ export function validateCorpusManifest() {
       assert(deepEntry, `deep contract missing ${kind}/${entry.id}`);
       assert.equal(entry.route, `${kind}/${entry.id}/`, `${kind}/${entry.id} canonical route drifted`);
       assert.equal(deepEntry.route, entry.route, `${kind}/${entry.id} canonical/deep route drifted`);
-      requireIncomplete(entry.acceptanceStatus, `${kind}/${entry.id} canonical acceptance status`);
-      requireIncomplete(deepEntry.status, `${kind}/${entry.id} deep acceptance status`);
       if (kind === "scenario") {
         const { mechanism, ...deepStartup } = deepEntry.startup;
         assert.deepEqual(
@@ -559,13 +1240,10 @@ export function validateCorpusManifest() {
     const deepTier = corpus.tiers.find(({ id }) => id === tier.id);
     assert(deepTier, `deep contract missing tier/${tier.id}`);
     assert.equal(deepTier.route, `tier/${tier.id}/`, `tier/${tier.id} deep route drifted`);
-    requireIncomplete(tier.acceptanceStatus, `tier/${tier.id} canonical acceptance status`);
-    requireIncomplete(deepTier.status, `tier/${tier.id} deep acceptance status`);
     assert.equal(tier.resolutionPolicy?.dprCap, CORPUS_DPR_CAPS[tier.id], `${tier.id} manifest/controller DPR cap drifted`);
   }
   for (const camera of corpus.cameras) {
     assert.equal(camera.route, `camera/${camera.id}/`, `camera/${camera.id} deep route drifted`);
-    requireIncomplete(camera.status, `camera/${camera.id} deep acceptance status`);
   }
   assert.equal(corpus.defaultStartup.scenario, "potted-bonsai");
   assert.equal(corpus.defaultStartup.mechanism, "action-ready");
@@ -586,37 +1264,74 @@ export function validateCorpusManifest() {
   assert.equal(corpus.physicsBoundary?.solverAuthority, false);
   assert.equal(corpus.physicsBoundary?.canonicalProxyStatus, "blocked");
   assert.match(corpus.physicsBoundary?.rigidBodyPropertiesStatus ?? "", /^blocked/);
-  requireIncomplete(corpus.physicsBoundary?.status, "deep physics boundary status");
   assert.equal(corpus.identityContinuity?.semanticIdsStableAcrossVisualTiers, true);
   assert.equal(corpus.identityContinuity?.continuityTokenRequiredForTierRebuild, true);
   assert.equal(corpus.identityContinuity?.changedSeedOrSourceRequiresNewGeneration, true);
   assert.match(corpus.identityContinuity?.solverStateContinuityClaim ?? "", /^blocked/);
-  requireIncomplete(corpus.identityContinuity?.status, "deep identity continuity status");
-  for (const requirement of manifest.capabilityRequirements) requireIncomplete(requirement.status, `capability ${requirement.id}`);
-  for (const proof of manifest.runtimeProof) requireIncomplete(proof.status, `runtime proof ${proof.id}`);
-  requireIncomplete(corpus.referencePolicy?.visualAcceptanceStatus, "deep reference visual acceptance");
   assert.equal(corpus.referencePolicy?.referenceImageAvailable, false);
   assert.equal(corpus.referencePolicy?.referenceImageLicense, null);
   assert.equal(corpus.referencePolicy?.referenceImageHash, null);
   assert.equal(corpus.referencePolicy?.referenceSimilarityClaim, "blocked");
-  requireIncomplete(corpus.visualAcceptance?.status, "deep visual acceptance");
-  exact(corpus.visualAcceptance?.acceptedScenarios, [], "deep accepted scenarios");
-  assert.equal(manifest.sourceHash, null, "manifest sourceHash must remain null until evidence generation");
+  const requiredRuntimeProofIds = new Set(manifest.runtimeProof.filter(({ required }) => required).map(({ id }) => id));
+  for (const id of ["renderer-init", "backend-is-webgpu", "mechanism-reachable", "aligned-readback"]) {
+    assert(requiredRuntimeProofIds.has(id), `canonical acceptance promotion requires runtime proof ${id}`);
+  }
+  if (acceptancePromoted) assert.match(manifest.sourceHash ?? "", /^sha256:[a-f0-9]{64}$/, "accepted manifest needs a source hash");
+  else assert.equal(manifest.sourceHash, null, "unpromoted manifest sourceHash must remain null until evidence generation");
   assert.equal(manifest.proxyStatus, null, "manifest proxyStatus must remain null until evidence generation");
-  rejectAcceptedStatus(manifest, "manifest");
-  rejectAcceptedStatus(corpus, "corpus");
 
   exact(SCULPT_TARGETS.map(({ id }) => id), EXPECTED_TARGET_IDS, "registered target catalog");
+  const acceptedArtifactDigests = acceptancePromoted ? captureDigestMap(corpus) : null;
   for (const definition of SCULPT_TARGETS) {
     const scenario = corpus.scenarios.find(({ id }) => id === definition.id);
     assert(scenario, `deep scenario missing ${definition.id}`);
+    assert.equal(scenario.spec, `targets/${definition.id}/object-sculpt-spec.json`, `${definition.id} spec path drifted`);
+    assert.equal(scenario.referenceManifest, `targets/${definition.id}/reference/reference.manifest.json`, `${definition.id} reference path drifted`);
+    assert.equal(scenario.factory, `targets/${definition.id}/${definition.id}-factory.js`, `${definition.id} factory path drifted`);
     const specPath = resolve(here, scenario.spec);
     const referencePath = resolve(here, scenario.referenceManifest);
+    const factoryPath = resolve(here, scenario.factory);
     const assessmentPath = resolve(dirname(specPath), "pre-spec-assessment.json");
+    assert(existsSync(specPath), `${definition.id} spec path is missing`);
+    assert(existsSync(referencePath), `${definition.id} reference path is missing`);
+    assert(existsSync(factoryPath), `${definition.id} factory path is missing`);
     validateReferenceManifest(readJson(referencePath, `${definition.id} reference manifest`), definition, dirname(referencePath));
     validateAssessment(readJson(assessmentPath, `${definition.id} pre-spec assessment`), definition);
     const spec = readJson(specPath, `${definition.id} object sculpt spec`);
-    validateSpec(spec, definition);
+    validateSpec(spec, definition, { acceptancePromoted, artifactDigests: acceptedArtifactDigests });
+    const promotedSpecFixture = makeSyntheticPromotedSpecFixture(spec, definition, corpus.acceptancePromotion.evidenceBundle);
+    validateSpec(promotedSpecFixture.spec, definition, {
+      acceptancePromoted: true,
+      artifactDigests: promotedSpecFixture.artifactDigests,
+    });
+    if (definition.id === EXPECTED_TARGET_IDS[0]) {
+      const missingPassReview = structuredClone(promotedSpecFixture.spec);
+      missingPassReview.reviewHistory = missingPassReview.reviewHistory.slice(0, -1);
+      assert.throws(
+        () => validateSpec(missingPassReview, definition, { acceptancePromoted: true, artifactDigests: promotedSpecFixture.artifactDigests }),
+        /needs exactly one passing continue review/,
+      );
+      const forgedRenderDigest = structuredClone(promotedSpecFixture.spec);
+      forgedRenderDigest.reviewHistory[0].visualEvidence.renderScreenshotSha256 = "b".repeat(64);
+      assert.throws(
+        () => validateSpec(forgedRenderDigest, definition, { acceptancePromoted: true, artifactDigests: promotedSpecFixture.artifactDigests }),
+        /renderScreenshotSha256 drifted/,
+      );
+    }
+    const legacyPerformanceTier = corpus.authoredPerformanceTargets.legacySpecBindingTier;
+    const authoredPerformance = corpus.authoredPerformanceTargets.targetsByTier[legacyPerformanceTier][definition.id];
+    assert.equal(authoredPerformance.fpsTarget, spec.performanceBudget?.fpsTarget, `${definition.id} Authored fpsTarget binding drifted`);
+    assert.equal(authoredPerformance.maxDrawCalls, spec.performanceBudget?.maxDrawCalls, `${definition.id} Authored maxDrawCalls binding drifted`);
+    assert.equal(
+      authoredPerformance.fpsTarget,
+      corpus.authoredPerformanceTargets.profilesByTier[legacyPerformanceTier].refreshHz,
+      `${definition.id} Authored fpsTarget must name the target refresh rate`,
+    );
+    assert.equal(
+      authoredPerformance.maxDrawCalls,
+      corpus.tiers.find(({ id }) => id === legacyPerformanceTier).sourceWorkloadEvidence[definition.id].renderItems,
+      `${definition.id} Authored maxDrawCalls must bind to the full-tier source render-item inventory`,
+    );
     assert.deepEqual(
       corpus.physicsBoundary.authoredColliderCeilingsMeters[definition.id],
       spec.physicsHandoff.colliderMaxSurfaceDeviationMeters,
@@ -629,17 +1344,77 @@ export function validateCorpusManifest() {
       assert.equal(evidence.renderItems, expected.renderItems, `${definition.id}/${tier.id} manifest render items drifted`);
       assert.equal(evidence.storedVertices, expected.storedVertices, `${definition.id}/${tier.id} manifest stored vertices drifted`);
       assert.equal(evidence.triangles, expected.triangles, `${definition.id}/${tier.id} manifest triangles drifted`);
+      assert.equal(
+        corpus.authoredPerformanceTargets.targetsByTier[tier.id][definition.id].maxDrawCalls,
+        evidence.renderItems,
+        `${definition.id}/${tier.id} Authored maxDrawCalls must bind to source render-item inventory`,
+      );
+      assert.equal(evidence.seed, spec.workloadContract.seed, `${definition.id}/${tier.id} manifest workload seed drifted`);
+      assert.equal(evidence.shadowCasters, expected.shadowCasters, `${definition.id}/${tier.id} manifest shadow-caster inventory drifted`);
     }
-    validateRuntimeContract(definition, spec);
+    validateRuntimeContract(definition, spec, corpus.tiers);
   }
 
-  const falseAcceptedMutation = structuredClone(corpus);
-  falseAcceptedMutation.visualAcceptance.status = "accepted";
-  falseAcceptedMutation.visualAcceptance.acceptedScenarios = [EXPECTED_TARGET_IDS[0]];
+  const bonsaiWitness = corpus.physicsBoundary.directedColliderLowerBoundWitnesses["potted-bonsai"];
+  assert(existsSync(resolve(repositoryRoot, bonsaiWitness.sourceTest)), "bonsai directed collider witness source test is missing");
+  const bonsaiSpec = readJson(
+    resolve(here, corpus.scenarios.find(({ id }) => id === "potted-bonsai").spec),
+    "potted-bonsai object sculpt spec for collider witness provenance",
+  );
+  assert.equal(bonsaiWitness.tierSeed, bonsaiSpec.workloadContract.seed, "bonsai collider witness tier seed drifted from source workload seed");
+  const bonsaiDefinition = SCULPT_TARGETS.find(({ id }) => id === "potted-bonsai");
+  assert(bonsaiDefinition, "potted-bonsai target definition is missing");
+  const measuredBonsaiColliderWitnesses = validateBonsaiColliderWitnessMeasurements(bonsaiDefinition, bonsaiWitness);
+
+  const falseAcceptedManifest = structuredClone(manifest);
+  falseAcceptedManifest.status = "accepted";
   assert.throws(
-    () => rejectAcceptedStatus(falseAcceptedMutation, "falseAcceptedMutation"),
-    /falsely claims accepted state/,
-    "manifest validator must reject a fabricated accepted state",
+    () => validateAcceptancePromotionState(falseAcceptedManifest, corpus, "INSUFFICIENT_EVIDENCE"),
+    /must be incomplete/,
+    "manifest validator must reject accepted metadata without a PASS verdict",
+  );
+  assert.throws(
+    () => validateAcceptancePromotionState(manifest, corpus, "FAIL"),
+    /must be blocked/,
+    "manifest validator must reject incomplete metadata after failed evidence",
+  );
+  assert.equal(
+    acceptanceVerdictFromArtifact(
+      { structuralVerdict: "FAIL", claimVerdict: "INSUFFICIENT_EVIDENCE" },
+      {
+        acceptancePromotion: { evidenceReviewState: "candidate" },
+        authoredPerformanceTargets: { evidenceBindingStatus: "ready" },
+      },
+    ),
+    "FAIL",
+    "structural artifact failure must outrank missing-evidence classification",
+  );
+  const promotedFixture = makeSyntheticPromotedAcceptanceFixture(manifest, corpus);
+  assert.equal(validateAcceptancePromotionState(promotedFixture.manifest, promotedFixture.corpus, "PASS"), true);
+
+  const unknownFieldMutation = structuredClone(corpus);
+  unknownFieldMutation.renderArchitecture.unownedField = true;
+  assert.throws(() => validateCorpusDeepContractShape(unknownFieldMutation), /keys must preserve canonical order and membership/);
+  const invalidSeedMutation = structuredClone(corpus);
+  invalidSeedMutation.tiers[0].sourceWorkloadEvidence[EXPECTED_TARGET_IDS[0]].seed = -1;
+  assert.throws(() => validateCorpusDeepContractShape(invalidSeedMutation), /must be in \[0, 4294967295\]/);
+  const missingShadowMutation = structuredClone(corpus);
+  missingShadowMutation.tiers[0].sourceWorkloadEvidence[EXPECTED_TARGET_IDS[0]].shadowCasters = null;
+  assert.throws(() => validateCorpusDeepContractShape(missingShadowMutation), /shadowCasters must be an integer/);
+  const measuredPerformanceMutation = structuredClone(corpus);
+  measuredPerformanceMutation.authoredPerformanceTargets.label = "Measured";
+  assert.throws(() => validateCorpusDeepContractShape(measuredPerformanceMutation), /performance target label must be Authored/);
+  const commandMutation = structuredClone(corpus);
+  commandMutation.commands.targets = "node arbitrary-target-check.mjs";
+  assert.throws(() => validateCorpusDeepContractShape(commandMutation), /commands.targets drifted/);
+  const colliderWitnessMutation = structuredClone(corpus);
+  colliderWitnessMutation.physicsBoundary.directedColliderLowerBoundWitnesses["potted-bonsai"].valuesMeters["pot-solid"] = 0.161;
+  assert.throws(() => validateCorpusDeepContractShape(colliderWitnessMutation), /witness exceeds authored ceiling/);
+  const fabricatedLowerWitnessMutation = structuredClone(bonsaiWitness);
+  fabricatedLowerWitnessMutation.valuesMeters["pot-solid"] = 0.01;
+  assert.throws(
+    () => validateBonsaiColliderWitnessMeasurements(bonsaiDefinition, fabricatedLowerWitnessMutation),
+    /directed lower-bound witness drifted/,
   );
 
   return Object.freeze({
@@ -652,8 +1427,27 @@ export function validateCorpusManifest() {
     cameras: CORPUS_CAMERAS.length,
     physicalRoutes: corpus.physicalRouteContract.routeCount,
     referenceImages: 0,
-    acceptedScenarios: 0,
-    negativeControls: Object.freeze(["false-accepted-manifest"]),
+    artifactClaimVerdict: artifactValidation.claimVerdict,
+    artifactStructuralVerdict: artifactValidation.structuralVerdict,
+    effectiveArtifactVerdict,
+    acceptancePromoted,
+    acceptedScenarios: corpus.visualAcceptance.acceptedScenarios.length,
+    directedColliderWitnesses: Object.keys(measuredBonsaiColliderWitnesses).length,
+    positiveControls: Object.freeze(["synthetic-pass-promotion-path", "accepted-spec-review-and-digest-closure"]),
+    negativeControls: Object.freeze([
+      "accepted-without-pass",
+      "incomplete-after-failed-evidence",
+      "structural-fail-priority",
+      "unknown-deep-contract-field",
+      "invalid-workload-seed",
+      "missing-shadow-caster-provenance",
+      "measured-label-on-authored-target",
+      "deep-command-drift",
+      "accepted-spec-missing-pass-review",
+      "accepted-spec-forged-render-digest",
+      "collider-witness-above-ceiling",
+      "fabricated-smaller-collider-witness",
+    ]),
   });
 }
 

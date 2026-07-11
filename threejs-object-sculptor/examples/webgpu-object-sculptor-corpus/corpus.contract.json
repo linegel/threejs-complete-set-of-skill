@@ -5,6 +5,20 @@
   "manifestPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/lab.manifest.json",
   "canonicalSchemaPath": "labs/schema/lab-manifest.schema.json",
   "status": "incomplete",
+  "acceptancePromotion": {
+    "validatorModule": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/validate-artifacts.mjs",
+    "validatorExport": "validateCorpusArtifacts",
+    "evidenceBundle": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
+    "evidenceReviewState": "collecting",
+    "requiredClaimVerdict": "PASS",
+    "promotedStatus": "accepted",
+    "unpromotedStatus": "incomplete",
+    "failedStatus": "blocked",
+    "promotedRenderClaimStatus": "runtime-evidence-accepted",
+    "unpromotedRenderClaimStatus": "source-contract-awaiting-runtime-evidence",
+    "failedRenderClaimStatus": "runtime-evidence-failed",
+    "scope": "all canonical/deep scenario, mechanism, tier, camera, capability, runtime, architecture, identity, physics-boundary, diversity, route, authored-visual acceptance, and target-spec review/pipeline closure fields"
+  },
   "defaultStartup": {
     "scenario": "potted-bonsai",
     "mechanism": "action-ready",
@@ -60,8 +74,8 @@
       "route": "tier/full/",
       "sourceWorkloadEvidence": {
         "articulated-desk-lamp": {"seed": 17, "storedVertices": 7519, "triangles": 8528, "renderItems": 46, "shadowCasters": 13},
-        "potted-bonsai": {"seed": 24301, "storedVertices": 2229, "triangles": 2952, "renderItems": 21},
-        "ceramic-teapot": {"seed": 24301, "storedVertices": 5464, "triangles": 9024, "renderItems": 16}
+        "potted-bonsai": {"seed": 24301, "storedVertices": 2229, "triangles": 2952, "renderItems": 21, "shadowCasters": 20},
+        "ceramic-teapot": {"seed": 24301, "storedVertices": 5464, "triangles": 9024, "renderItems": 16, "shadowCasters": 14}
       },
       "status": "incomplete"
     },
@@ -70,8 +84,8 @@
       "route": "tier/budgeted/",
       "sourceWorkloadEvidence": {
         "articulated-desk-lamp": {"seed": 17, "storedVertices": 4367, "triangles": 4408, "renderItems": 42, "shadowCasters": 13},
-        "potted-bonsai": {"seed": 24301, "storedVertices": 1377, "triangles": 1688, "renderItems": 21},
-        "ceramic-teapot": {"seed": 24301, "storedVertices": 3224, "triangles": 5120, "renderItems": 16}
+        "potted-bonsai": {"seed": 24301, "storedVertices": 1377, "triangles": 1688, "renderItems": 21, "shadowCasters": 20},
+        "ceramic-teapot": {"seed": 24301, "storedVertices": 3224, "triangles": 5120, "renderItems": 16, "shadowCasters": 14}
       },
       "status": "incomplete"
     },
@@ -80,12 +94,58 @@
       "route": "tier/minimum/",
       "sourceWorkloadEvidence": {
         "articulated-desk-lamp": {"seed": 17, "storedVertices": 2308, "triangles": 1964, "renderItems": 38, "shadowCasters": 13},
-        "potted-bonsai": {"seed": 24301, "storedVertices": 858, "triangles": 1042, "renderItems": 21},
-        "ceramic-teapot": {"seed": 24301, "storedVertices": 1838, "triangles": 2772, "renderItems": 16}
+        "potted-bonsai": {"seed": 24301, "storedVertices": 858, "triangles": 1042, "renderItems": 21, "shadowCasters": 20},
+        "ceramic-teapot": {"seed": 24301, "storedVertices": 1838, "triangles": 2772, "renderItems": 16, "shadowCasters": 14}
       },
       "status": "incomplete"
     }
   ],
+  "authoredPerformanceTargets": {
+    "label": "Authored",
+    "claimStatus": "unmeasured-target-only",
+    "currentReviewProfile": {"surface": "Codex in-app Browser", "role": "native-WebGPU correctness and visual review on the attached host only", "canPromotePhysicalDevicePerformance": false},
+    "profilesByTier": {
+      "full": {"id": "full-macbook-air-m2-60hz", "device": "Apple MacBook Air (M2)", "soc": "Apple M2", "operatingSystem": "macOS", "browser": "Codex in-app Browser", "backend": "native WebGPU", "refreshHz": 60, "viewportCssPixels": [1440, 900], "dprCap": 1.5},
+      "budgeted": {"id": "budgeted-ipad-10-60hz", "device": "Apple iPad (10th generation)", "soc": "Apple A14 Bionic", "operatingSystem": "iPadOS", "browser": "Safari", "backend": "native WebGPU", "refreshHz": 60, "viewportCssPixels": [820, 1180], "dprCap": 1.25},
+      "minimum": {"id": "minimum-pixel-6a-60hz", "device": "Google Pixel 6a", "soc": "Google Tensor", "operatingSystem": "Android", "browser": "Chrome", "backend": "native WebGPU", "refreshHz": 60, "viewportCssPixels": [360, 800], "dprCap": 1}
+    },
+    "legacySpecBindingTier": "full",
+    "legacySpecFieldSemantics": {
+      "fpsTarget": "Authored refresh-matched presentation target; not a measured frame-rate result.",
+      "maxDrawCalls": "Authored ceiling on potential per-frame render items before camera/frustum/occlusion culling; not a measured GPU draw-call count."
+    },
+    "targetsByTier": {
+      "full": {
+        "articulated-desk-lamp": {"fpsTarget": 60, "maxDrawCalls": 46},
+        "potted-bonsai": {"fpsTarget": 60, "maxDrawCalls": 21},
+        "ceramic-teapot": {"fpsTarget": 60, "maxDrawCalls": 16}
+      },
+      "budgeted": {
+        "articulated-desk-lamp": {"fpsTarget": 60, "maxDrawCalls": 42},
+        "potted-bonsai": {"fpsTarget": 60, "maxDrawCalls": 21},
+        "ceramic-teapot": {"fpsTarget": 60, "maxDrawCalls": 16}
+      },
+      "minimum": {
+        "articulated-desk-lamp": {"fpsTarget": 60, "maxDrawCalls": 38},
+        "potted-bonsai": {"fpsTarget": 60, "maxDrawCalls": 21},
+        "ceramic-teapot": {"fpsTarget": 60, "maxDrawCalls": 16}
+      }
+    },
+    "requiredPerformanceCases": [
+      {"id": "lamp-full-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "full-macbook-air-m2-60hz"},
+      {"id": "bonsai-full-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "full-macbook-air-m2-60hz"},
+      {"id": "teapot-full-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "full-macbook-air-m2-60hz"},
+      {"id": "lamp-budgeted-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "budgeted-ipad-10-60hz"},
+      {"id": "bonsai-budgeted-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "budgeted-ipad-10-60hz"},
+      {"id": "teapot-budgeted-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "budgeted-ipad-10-60hz"},
+      {"id": "lamp-minimum-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "minimum-pixel-6a-60hz"},
+      {"id": "bonsai-minimum-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "minimum-pixel-6a-60hz"},
+      {"id": "teapot-minimum-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "minimum-pixel-6a-60hz"}
+    ],
+    "evidenceBindingRequirement": "Every required case needs a case-identified sustained timing window and case-identified resource snapshot; a single easy workload cannot promote all scenarios or tiers.",
+    "evidenceBindingStatus": "blocked-pending-case-identified-timing-and-resource-schema",
+    "measurementPromotionRequirement": "Sustained named-device CPU, GPU timestamp, presentation, resource, and lifecycle evidence must pass the artifact validator before any measured performance claim."
+  },
   "cameras": [
     {"id": "design", "route": "camera/design/", "purpose": "overall authored silhouette and proportion", "status": "incomplete"},
     {"id": "profile", "route": "camera/profile/", "purpose": "depth, taper, linkage, and negative-space review", "status": "incomplete"},
@@ -135,6 +195,23 @@
       "potted-bonsai": {"pot-solid": 0.16, "trunk-capsule": 0.17, "branch-left-capsule": 0.1, "branch-right-capsule": 0.1, "branch-back-capsule": 0.1, "canopy-trigger": 0.92},
       "ceramic-teapot": {"body-envelope": 0.07, "lid-cylinder": 0.036, "spout-lower-capsule": 0.04, "spout-upper-capsule": 0.04, "handle-upper-capsule": 0.04, "handle-outer-capsule": 0.04, "handle-lower-capsule": 0.04}
     },
+    "directedColliderLowerBoundWitnesses": {
+      "potted-bonsai": {
+        "direction": "sampled-visual-vertices-to-authored-proxy-surface",
+        "sourceTest": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/targets/potted-bonsai/test-potted-bonsai.mjs",
+        "tierSeed": 24301,
+        "fullTierSeedCorpus": [0, 1, 2, 17, 91, 92, 255, 4095, 65535, 2147483647, 4294967295],
+        "valuesMeters": {
+          "pot-solid": 0.12999999642372134,
+          "trunk-capsule": 0.15999999962747097,
+          "branch-left-capsule": 0.09499999944286955,
+          "branch-right-capsule": 0.09499999950606569,
+          "branch-back-capsule": 0.09499999942828395,
+          "canopy-trigger": 0.6004621516381561
+        },
+        "samplingStatement": "The source test takes the maximum absolute signed distance from sampled visual vertices to each authored proxy surface across all tiers at tierSeed and across the declared full-tier seed corpus; values are directed sampled lower-bound witnesses, not bidirectional Hausdorff proofs."
+      }
+    },
     "status": "incomplete"
   },
   "identityContinuity": {
@@ -150,7 +227,7 @@
     "referenceImageLicense": null,
     "referenceImageHash": null,
     "referenceSimilarityClaim": "blocked",
-    "visualAcceptanceStatus": "incomplete"
+    "authoredVisualAcceptanceStatus": "incomplete"
   },
   "visualAcceptance": {
     "status": "incomplete",

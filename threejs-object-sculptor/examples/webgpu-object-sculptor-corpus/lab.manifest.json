@@ -100,12 +100,15 @@
     {"id": "renderer-init", "required": true, "evidence": "Await controller readiness after WebGPURenderer.init().", "status": "incomplete"},
     {"id": "backend-is-webgpu", "required": true, "evidence": "Capture controller metrics with nativeWebGPU true.", "status": "incomplete"},
     {"id": "physical-routes", "required": true, "evidence": "Load all 15 scenario/mechanism/tier/camera physical routes and prove each locks exactly one route dimension.", "status": "incomplete"},
+    {"id": "mechanism-reachable", "required": true, "evidence": "Load every final, blockout, hierarchy, materials, and action-ready mechanism route and bind the observed controller mode to the physical route record.", "status": "incomplete"},
     {"id": "target-contracts", "required": true, "evidence": "Capture protected node, socket, ColliderConstructionInput, destruction-group, mode, tier, and exact-reset inventories for all three targets.", "status": "incomplete"},
     {"id": "render-ownership", "required": true, "evidence": "Capture one renderer owner, one scene render, one tone-map owner, one output-transform owner, and zero post-processing passes.", "status": "incomplete"},
+    {"id": "aligned-readback", "required": true, "evidence": "Capture the actual integer WebGPU row stride, 256-byte alignment, compact width, height, and normalized render-target pixels for every required PNG.", "status": "incomplete"},
     {"id": "visual-contracts", "required": true, "evidence": "Inspect final and diagnostic PNGs for each target and record AI-vision authored-contract scores; no reference-image similarity claim is permitted.", "status": "incomplete"},
     {"id": "sustained-performance", "required": true, "evidence": "Record named-device sustained CPU/GPU/presentation evidence and mobile resource accounting without inventing a universal frame target.", "status": "incomplete"}
   ],
   "evidenceContract": "v2",
+  "evidenceBundle": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
   "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
   "sourceHash": null,
   "proxyStatus": null,
@@ -119,6 +122,7 @@
     "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:full"
   },
   "notes": [
-    "Deep multi-subject, route, physics, workload, provenance, and visual-acceptance metadata is owned by corpus.contract.json."
+    "Deep multi-subject, route, physics, workload, provenance, and visual-acceptance metadata is owned by corpus.contract.json.",
+    "Acceptance promotion is falsifiable: validate-manifest.mjs requires every canonical/deep status and target-spec pipeline closure to match validateCorpusArtifacts().claimVerdict (PASS -> accepted, INSUFFICIENT_EVIDENCE -> incomplete, FAIL -> blocked)."
   ]
 }

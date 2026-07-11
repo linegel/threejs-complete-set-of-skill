@@ -515,6 +515,7 @@
     "surfaceFrequencyTargetsBelow": "future material-pass authoring targets, not current implementation evidence"
   },
   "workloadContract": {
+    "seed": 17,
     "full": {"renderItems": 46, "storedVertices": 7519, "triangles": 8528, "shadowCasters": 13},
     "budgeted": {"renderItems": 42, "storedVertices": 4367, "triangles": 4408, "shadowCasters": 13},
     "minimum": {"renderItems": 38, "storedVertices": 2308, "triangles": 1964, "shadowCasters": 13},

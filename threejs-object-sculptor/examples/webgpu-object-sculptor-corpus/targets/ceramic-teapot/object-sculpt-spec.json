@@ -415,9 +415,9 @@
   },
   "workloadContract": {
     "seed": 24301,
-    "full": {"renderItems": 16, "storedVertices": 5464, "triangles": 9024},
-    "budgeted": {"renderItems": 16, "storedVertices": 3224, "triangles": 5120},
-    "minimum": {"renderItems": 16, "storedVertices": 1838, "triangles": 2772},
+    "full": {"renderItems": 16, "storedVertices": 5464, "triangles": 9024, "shadowCasters": 14},
+    "budgeted": {"renderItems": 16, "storedVertices": 3224, "triangles": 5120, "shadowCasters": 14},
+    "minimum": {"renderItems": 16, "storedVertices": 1838, "triangles": 2772, "shadowCasters": 14},
     "timingClaim": "none until sustained named-device evidence"
   },
   "actionReadiness": {
