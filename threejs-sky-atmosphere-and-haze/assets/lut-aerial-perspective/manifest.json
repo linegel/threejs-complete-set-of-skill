@@ -24,7 +24,17 @@
     "unpackAlignment": 1,
     "generateMipmaps": false
   },
-  "radianceUnits": "scene-linear atmosphere radiance in kilometer-scaled Bruneton LUT units",
+  "radianceUnits": "source-defined relative Bruneton radiance; not SI and not a live-kernel validation oracle",
+  "liveRadianceUnit": "relative-radiance-per-steradian",
+  "integrationLengthUnit": "kilometer",
+  "coefficientUnit": "km^-1",
+  "solarQuantity": "authored-relative-normal-irradiance",
+  "solarUnit": "relative-normal-irradiance",
+  "solarMagnitudeFactoredOutOfLiveLuts": true,
+  "spectralBasis": "three source bands; not display sRGB",
+  "phaseNormalization": "integrates-to-one-over-4pi",
+  "phaseDirectionConvention": "omega points from camera into scene; s points from sample to sun; mu=dot(omega,s)",
+  "evidenceStatus": "imported asset integrity/provenance only; does not validate the live Phase 1 compute kernels or the documentation-only sky/multiscatter/composite gates",
   "atmosphere": {
     "bottomRadiusMeters": 6360000,
     "topRadiusMeters": 6420000,
@@ -33,6 +43,7 @@
     "rayleighScatteringPerKm": [0.005802, 0.013558, 0.0331],
     "mieScatteringPerKm": [0.003996, 0.003996, 0.003996],
     "mieExtinctionPerKm": [0.00444, 0.00444, 0.00444],
+    "miePhaseFunction": "Henyey-Greenstein",
     "miePhaseG": 0.8,
     "absorptionExtinctionPerKm": [0.00065, 0.001881, 0.000085],
     "groundAlbedo": 0.1,
@@ -41,7 +52,7 @@
         "widthMeters": 60000,
         "expTerm": 1,
         "expScalePerKm": -0.125,
-        "linearTerm": 0,
+        "linearTermPerKm": 0,
         "constantTerm": 0
       }
     ],
@@ -50,7 +61,7 @@
         "widthMeters": 60000,
         "expTerm": 1,
         "expScalePerKm": -0.833333,
-        "linearTerm": 0,
+        "linearTermPerKm": 0,
         "constantTerm": 0
       }
     ],

@@ -1,4 +1,14 @@
 {
   "type": "module",
-  "private": true
+  "private": true,
+  "scripts": {
+    "check": "node check.mjs",
+    "validate:unit": "node validation.js",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-lut-atmosphere --target final",
+    "capture:evidence": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts"
+  }
 }

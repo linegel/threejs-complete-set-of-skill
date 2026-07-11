@@ -1,89 +1,112 @@
-# WebGPU LUT Atmosphere
+# Native WebGPU LUT Atmosphere Lab
 
-This is the canonical Phase 1 atmosphere contract. It teaches one shared
-WebGPU/TSL path for sky radiance, sun/moon transmittance, segment
-transmittance, segment inscattering, optional irradiance, and diagnostics.
-The old spherical shader remains only as historical comparison.
+`index.html` and `browser-app.js` are the canonical native-WebGPU entry. They
+initialize and gate `WebGPURenderer`, allocate all LUT/froxel resources,
+bind a real host scene/camera/body transform and `PassNode` depth, dispatch the
+selectively invalidated five-stage dependency chain, expose live controls and
+fixed diagnostic modes, and
+provide aligned render-target readback through `__LAB_CONTROLLER__`.
+`validation.js` is intentionally narrower: it proves source graphs and float64
+oracles without claiming that a GPU run occurred. Browser execution is blocked
+in the current validation environment, so `lab.manifest.json` remains
+`incomplete`.
 
-## Product Schedule
+## Claim Matrix
 
-| product | texture | format | workgroup | dispatch | invalidation | cadence |
-| --- | --- | --- | --- | --- | --- | --- |
-| transmittance | `StorageTexture` | RGBA16F | 8x8x1 | tier dimensions / 8 | atmosphere profile, unit conversion, solar inputs | update only when shared parameters change |
-| multiscatter | `StorageTexture` | RGBA16F | 8x8x1 | tier dimensions / 8 | profile, ground albedo, solar irradiance | update with profile and lighting changes |
-| irradiance | `StorageTexture` or manifest `DataTexture` | RGBA16F | 8x8x1 | tier dimensions / 8 | profile, ground albedo, sun direction | disabled for material relighting until the host lighting owner consumes it |
-| sky-view | `StorageTexture` | RGBA16F | 8x8x1 | tier dimensions / 8 | camera altitude, sun direction, planet transform | update on sun/camera-frame invalidation |
-| aerial froxel | `Storage3DTexture` | RGBA16F | 8x8x1 | width / 8, height / 8, slices | camera projection, view matrix, depth range | stagger under smooth motion |
+| product/owner | Phase 1 implementation | what the validator proves | what remains unproved |
+| --- | --- | --- | --- |
+| transmittance | real TSL `ComputeNode`; inverse Bruneton-style `(xMu,xR)` map; fixed-step RGB transmittance integration | graph construction, dispatch shape, CPU forward/inverse-map fixtures, homogeneous-medium units | GPU execution/readback, reference-integrator error, adaptive quadrature |
+| multiscatter | real TSL graph with a compact authored closure | graph construction and r185 dispatch accounting | GPU output, reference radiance, and energy closure; status is `reference-ungated` |
+| irradiance | imported manifest asset plus real TSL quadrature graph | asset bytes/hash/model metadata, graph construction, and dispatch accounting | imported reference-error evidence, GPU output, quadrature convergence, and material-lighting integration |
+| sky-view | real TSL line-integral response graph with live camera radius and local sun zenith | graph construction, dispatch accounting, homogeneous-radiometry units, and body-frame dependency metadata | GPU output, horizon/seam error, and reference radiance; status is `reference-ungated` |
+| aerial inscattering | one real live-camera TSL kernel per XY ray, cumulatively writing every Z slice with optical depth | graph/payload wiring, linear-in-depth CPU topology oracle, unjittered inverse-view-projection/body bindings | GPU output, multiple-scattering accuracy, and temporal amortization |
+| aerial optical depth | same cumulative XY-ray dispatch; RGB cumulative dimensionless `tau` | monotonic CPU oracle and shared-freshness structure | GPU output and depth-composite image accuracy |
+| scene/depth/pipeline | real sphere/PBR host scene, actual `PassNode` color/depth, metric off-axis reconstruction, ECEF/body diagnostics, and reusable `createAtmosphereCompositeNode()` | single-owner source wiring, control-to-invalidation mutations, and browser-safe controller surface | current-adapter readback, projection-specific depth images, and reference error |
 
-Tier budgets start as measurements targets, not claims:
+`createAtmosphereComputeKernels()` returns five real compute graphs in the
+declared dependency order, but only an
+application or browser harness that calls `computeAtmosphereLuts(renderer)` on
+an initialized native WebGPU backend executes them. Node graph construction is
+not GPU evidence. The method uses `renderer.compute()` after initialization;
+submission is queued and neither `compute()` nor r185 `computeAsync()` is a
+CPU-visible GPU-completion/readback fence. Later GPU submissions are
+queue-ordered; readback, timestamp resolution, reuse, or disposal based on
+completion needs an explicit completion/readback mechanism.
 
-| tier | target GPU time | LUT memory target | default per-frame work |
-| --- | ---: | ---: | --- |
-| Ultra desktop-discrete | 0.4-1.2 ms | 8-24 MB | sky-view plus aerial froxel updates as needed |
-| High desktop/integrated | 0.7-1.8 ms | 4-14 MB | staggered LUT refresh, 24-32 froxel slices |
-| Mobile/tiled | 0.8-2.5 ms | 2-8 MB | static/precomputed base LUTs, 16-24 froxel slices |
-| Fallback route | outside this flagship example | outside this flagship example | use `threejs-compatibility-fallbacks` when fallback behavior is explicitly requested |
+## Units And Transport
 
-## Executed Compute
+The live integrator uses kilometers internally and coefficients in
+`km^-1`; their product is dimensionless optical depth. The model declares this
+boundary explicitly. The three solar/coefficient channels are an authored
+linear transport basis, not display sRGB. The solar vector is explicitly an
+authored relative **normal irradiance**, never claimed as SI watts or as disc
+radiance. Compute products store transport response per unit normal irradiance;
+composition applies that vector once. The analytic disc conversion is
+`Ldisc = Enormal / (pi*sin(alpha)^2)`, so source quantity and output radiance
+units are not silently interchanged.
 
-The example builds real TSL `ComputeNode`s with `Fn().compute(count)` for:
+The executed single-scatter phase functions are normalized Rayleigh and
+Henyey-Greenstein. `omega` points from camera into the scene, `s` points from a
+sample to the sun, and `mu=dot(omega,s)`, so positive Mie `g` peaks toward the
+sun. The fixture gates `|g| <= 0.99`, evaluates the denominator with a
+cancellation-resistant sign branch, and tests normalization and peak direction
+at both allowed extremes.
 
-- transmittance LUT: fixed-step numerical extinction integration from radius
-  and view/sun cosine to the top atmosphere boundary;
-- aerial froxel volume: fixed-step segment extinction and single-scattering
-  accumulation, written to a `Storage3DTexture`.
+Imported assets are accepted only when their manifest radii, coefficients,
+density layers, units, phase convention, solar quantity, and spectral basis
+match the live config. This is metadata compatibility, not proof of the source
+transport error because the imported bundle contains no reference-error report.
 
-Multiscatter, irradiance, and sky-view compute remain out of scope here until
-their algorithms are implemented. The aerial froxel alpha channel stores scalar
-single-scattering luminance; full spectral inscattering needs an additional
-packing target.
+## Authored Workload Trials
 
-## Build Checkpoints
+`QUALITY_TIERS` exposes canonical `ultra`, `high`, and `mobile` trials. The old
+`full`, `budgeted`, and `minimum` keys remain aliases for compatibility. These
+are authored workloads, not device classes or timing claims. Derive work from
+the selected schedule:
 
-Render debug `altitude`: must show planet/ECEF coordinates and corrected
-altitude. If sea-level and orbit views share the same altitude, the transform
-is using a local flat axis.
+```text
+payloadBytes = sum(width*height*depth*bytesPerTexel*residentCopies)
+invocations = width*height*depth
+workgroupInvocations = wgX*wgY*wgZ
+r185FlattenedGroups = ceil(invocations/workgroupInvocations)
+integratorSamples = sum(updatedTexels*samplesPerTexel)
+```
 
-Render debug `intersections`: must show top and bottom intersections. If
-tangent rays blink, check the closest-point segment test and top-atmosphere
-miss guard.
+Numeric r185 `Fn().compute(invocations, workgroup)` dispatches
+`[r185FlattenedGroups,1,1]` for these trial sizes. Count the shared aerial
+kernel once even though it writes two storage volumes.
 
-Render debug `density`: must show Rayleigh, Mie, and absorption density. If
-Mie stays bright at high altitude, verify the density profile scale.
+Product acceptance requires named full-frame GPU/CPU/presentation p50/p95 and
+peak-live-byte budgets, then contemporaneous captures of the complete pass
+graph. The validator reports only derived payload bytes.
 
-Render debug `optical-depth`: must show view and sun optical depth. If sunset
-goes gray instead of warm, inspect ozone absorption and sun visibility.
+## Required Future Browser Evidence
 
-Render debug `sun-visibility`: must show ground occlusion and horizon
-softening. If terrain lights through the planet, check bottom-sphere
-intersections.
+Before calling the system production-ready, add fixed-view browser evidence for
+sea level, mountain altitude, horizon, terminator, night side, low/high orbit,
+and shell entry. Required diagnostics include:
 
-Render debug `segment-transmittance`: must darken long surface segments. If it
-acts like a fixed fog color, the aerial froxel lookup is not using depth.
+- body/ECEF altitude and top/bottom intersections;
+- density and view/sun optical depth;
+- sun visibility and ground occlusion;
+- RGB segment transmittance and RGB inscattering separately;
+- sky/surface coverage and projection-specific depth reconstruction;
+- LUT forward/inverse coordinates, seam, and froxel-depth distribution;
+- invalidation hash, update reason, history age, disocclusion, and resource
+  lifetime;
+- reference `tau`, radiance, phase-normalization, and energy residuals.
 
-Render debug `single-multiple-scattering`: must separate direct sky color from
-multiscatter. If the limb blooms uniformly, the multiscatter owner is wrong.
+The pipeline must clip ray segments geometrically against the shell. It must
+not use fixed-altitude shell/post blend constants.
 
-Render debug `depth-classification`: must distinguish sky pixel, surface
-pixel, clipped surface, reversed depth, logarithmic depth, orthographic depth,
-and MSAA resolved depth cases.
-
-Render debug `shell-post`: must blend across atmosphere entry. If the shell
-pops, validate the altitude-from-top blend range.
-
-Render debug `lut-coordinates`: must show LUT coordinates and texture slices.
-If slices jump under camera motion, verify radius/cosine packing.
-
-Render debug `froxel-depth`: must show logarithmic or cascade-like froxel
-depth distribution. If near haze smears, allocate more near slices.
-
-## Output Ownership
-
-The atmosphere outputs scene-linear HDR. When the final node is
-`renderOutput(...)`, `RenderPipeline.outputColorTransform` is `false`; otherwise
-the host image pipeline owns exactly one tone-map and output color conversion.
-LUTs, optical-depth fields, depth, normals, weather masks, and diagnostic
-textures use `NoColorSpace`.
+The aerial graph uses the host's unjittered inverse view-projection, world-to-
+body matrix, camera body position, body-space sun direction, viewport, and
+exponential far distance. `resize()` keeps authored tier dimensions fixed but
+invalidates aerial rays; camera altitude invalidates sky-view and aerial,
+camera yaw invalidates only aerial, and solar magnitude invalidates neither
+because it is factored into the final composite. All base-only
+`StorageTexture` and `Storage3DTexture` resources set
+`generateMipmaps=false`; 2D storage also disables `mipmapsAutoUpdate`.
 
 ## Validation
 
@@ -93,11 +116,24 @@ Run:
 node threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/validation.js
 ```
 
-The validator checks the LUT manifest hashes and byte counts, texture upload
-policy, atmosphere parameter object, meter/kilometer unit fixtures, CPU
-equivalent ray/segment math, depth-mode helpers, WebGPU/TSL import contract,
-resource resize/dispose ownership, and source sentinels for compute and
-pipeline ownership. It also runs pure-JS transmittance integrand fixtures,
-asserts real TSL compute nodes instead of descriptor strings, checks the
-non-WebGPU error route, and verifies renderOutput-owned output transform
-ownership.
+Passing means:
+
+- imported LUT integrity and upload policy pass;
+- model units and coefficient inequalities pass;
+- manifest/live-model physical metadata equality passes;
+- CPU spherical intersection, LUT map, phase-extreme, projection-depth, and
+  nearest-covered-sample MSAA resolve equations pass;
+- all five TSL compute graphs build as `ComputeNode`s, with the aerial graph
+  cumulatively writing both volumes from one invocation per XY ray;
+- live controls, actual scene depth/body transform source structure, and
+  dependency-specific invalidation mutations pass;
+- the homogeneous-medium float64 oracle reconciles `km^-1 * km`, cumulative
+  optical depth, and relative radiance response per steradian;
+- approximation kernels remain labeled `reference-ungated`;
+- native-WebGPU capability failure throws;
+- r185 flattened dispatch accounting, base-only mip policy, fixed-grid resize
+  non-applicability, resource disposal, and output-owner metadata pass.
+
+Passing does **not** mean GPU compute, reference-correct
+sky/multiscatter/irradiance transport, depth composition, image quality,
+performance, or energy conservation passed.

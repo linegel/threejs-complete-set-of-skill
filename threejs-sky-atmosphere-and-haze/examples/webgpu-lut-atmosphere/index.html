@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Native WebGPU LUT Atmosphere</title>
+    <style>html,body,canvas{width:100%;height:100%;margin:0;display:block;background:#02050b}#status{position:fixed;left:12px;top:12px;color:#d9ecff;background:#06101dcc;padding:8px 10px;font:12px/1.4 ui-monospace,monospace;white-space:pre}#live-controls{position:fixed;left:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;max-width:calc(100vw - 24px);color:#d9ecff;background:#06101ddd;padding:8px 10px;font:12px/1.4 ui-monospace,monospace}#live-controls label{display:flex;align-items:center;gap:4px}#live-controls select,#live-controls input{font:inherit}</style>
+    <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.webgpu.js","three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+  </head>
+  <body><canvas id="lab"></canvas><div id="status">initializing native WebGPU…</div><script type="module" src="./browser-app.js"></script></body>
+</html>

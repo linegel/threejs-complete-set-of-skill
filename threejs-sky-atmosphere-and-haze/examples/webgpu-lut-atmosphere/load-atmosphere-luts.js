@@ -8,7 +8,11 @@ import {
   RGBAFormat,
 } from "three/webgpu";
 
-import { LUT_MANIFEST_RELATIVE_PATH } from "./atmosphere-config.js";
+import {
+  LUT_MANIFEST_RELATIVE_PATH,
+  createAtmosphereConfig,
+  validateAtmosphereManifestCompatibility,
+} from "./atmosphere-config.js";
 
 export { LUT_MANIFEST_RELATIVE_PATH };
 
@@ -53,7 +57,7 @@ function configureDataTexture(texture, storage) {
   return texture;
 }
 
-export function validateAtmosphereLuts(manifest, buffers = {}) {
+export function validateAtmosphereLuts(manifest, buffers = {}, config = null) {
   const errors = [];
   if (!manifest?.textures || !manifest?.storage) {
     return { ok: false, errors: ["manifest must contain textures and storage"] };
@@ -99,6 +103,14 @@ export function validateAtmosphereLuts(manifest, buffers = {}) {
   if (manifest.storage.unpackAlignment !== 1) {
     errors.push("storage.unpackAlignment must be 1");
   }
+  if (manifest.storage.generateMipmaps !== false) {
+    errors.push("storage.generateMipmaps must be false for base-level-only LUT assets");
+  }
+
+  if (config) {
+    const compatibility = validateAtmosphereManifestCompatibility(manifest, config);
+    errors.push(...compatibility.errors.map((error) => `model compatibility: ${error}`));
+  }
 
   return {
     ok: errors.length === 0,
@@ -133,8 +145,12 @@ export function createAtmosphereLutTexture(name, buffer, manifest) {
   return configureDataTexture(texture, manifest.storage);
 }
 
-export function createAtmosphereLutTextures(buffers, manifest) {
-  const validation = validateAtmosphereLuts(manifest, buffers);
+export function createAtmosphereLutTextures(
+  buffers,
+  manifest,
+  config = createAtmosphereConfig(),
+) {
+  const validation = validateAtmosphereLuts(manifest, buffers, config);
   if (!validation.ok) {
     throw new Error(validation.errors.join("\n"));
   }
@@ -163,6 +179,7 @@ export async function loadAtmosphereLuts({
   baseUrl = new URL("../../assets/lut-aerial-perspective/", import.meta.url),
   manifestUrl = new URL("manifest.json", baseUrl),
   manifest,
+  config = createAtmosphereConfig(),
   fetchImpl = globalThis.fetch,
 } = {}) {
   if (typeof fetchImpl !== "function") {
@@ -177,6 +194,8 @@ export async function loadAtmosphereLuts({
 
   return {
     manifest: resolvedManifest,
-    textures: createAtmosphereLutTextures(buffers, resolvedManifest),
+    modelCompatibility:
+      validateAtmosphereManifestCompatibility(resolvedManifest, config),
+    textures: createAtmosphereLutTextures(buffers, resolvedManifest, config),
   };
 }
