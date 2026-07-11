@@ -351,8 +351,8 @@ a.chip:active{scale:.96}
     <div class="science">
 <p>Validation treats an image as a claim to be falsified. A fixed-view contract pins camera,
 seed, resolution, and time; comparison is perceptual error against a stored baseline:</p>
-$$E = \operatorname{quantile}_{0.99}\big(\Delta E_{pixel}\big) < \tau, \qquad
-\text{plus } \max_{region} \bar\Delta E < \tau_{region}$$
+$$E = \operatorname{quantile}_{0.99}\big(\Delta E_{pixel}\big) &lt; \tau, \qquad
+\text{plus } \max_{region} \bar\Delta E &lt; \tau_{region}$$
 <p>Determinism is tested by seed sweeps ($F(seed_1) \ne F(seed_2)$, but $F(seed_1)$ twice is
 byte-identical) and temporal pairs ($t_0, t_1$ frames must differ where motion exists, match
 where it doesn't). Performance claims bind to measurements:</p>

@@ -351,7 +351,7 @@ $$\mathbf n_{i+1} = R\big(\mathbf t_i \times \mathbf t_{i+1},\; \angle(\mathbf t
 <p>Smooth normals accumulate face normals weighted by corner angle, then normalize:
 $\mathbf n_v = \operatorname{normalize}\sum_f \theta_{v,f}\,\mathbf n_f$. Index sharing versus
 splitting is decided by crease angle: split when
-$\mathbf n_a \cdot \mathbf n_b < \cos\theta_{crease}$.</p>
+$\mathbf n_a \cdot \mathbf n_b &lt; \cos\theta_{crease}$.</p>
 <p>Draw-call strategy is a budget decision: $N$ unique shapes × $M$ instances favors
 BatchedMesh when shapes vary, InstancedMesh when only transforms do — one material slot
 per identity either way.</p></div>

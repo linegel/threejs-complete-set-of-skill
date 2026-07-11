@@ -14,7 +14,7 @@ $$\\omega^2 = \\left(gk + \\tfrac{\\sigma}{\\rho}k^3\\right)\\tanh(kh)$$
 <p>Choppy displacement is the horizontal gradient field
 $\\hat{\\mathbf D}(\\mathbf k) = i\\,(\\mathbf k/k)\\,\\hat h(\\mathbf k)$; whitecaps trigger where the
 deformation Jacobian folds the surface:</p>
-$$J = (1+\\lambda\\,\\partial_x D_x)(1+\\lambda\\,\\partial_z D_z) - (\\lambda\\,\\partial_x D_z)^2 \\;<\\; J_{\\min}$$
+$$J = (1+\\lambda\\,\\partial_x D_x)(1+\\lambda\\,\\partial_z D_z) - (\\lambda\\,\\partial_x D_z)^2 \\;&lt;\\; J_{\\min}$$
 <p>Because $\\mathbf D$ derives from one scalar spectrum, $\\partial_z D_x \\equiv \\partial_x D_z$ and the
 single cross term is exact. Multiple cascades cover wavelength bands with half-open masks
 $[k_{lo}, k_{hi})$ to avoid double-counting energy at handoffs.</p>`,
@@ -72,14 +72,14 @@ with amplitude-sorted dominance so overlaps read as impact history.</p>`,
 <p>A field is a pure function $F:\\mathbb R^3 \\to \\mathbb R^m$ from position to a bundle of
 channels (height, moisture, wear, mask…). Everything derives from shared causes, so channels
 correlate the way nature does. The workhorse is fractal Brownian motion over a noise basis:</p>
-$$F(\\mathbf p) = \\sum_{i=0}^{O-1} a^i\\, n\\big(f^i \\mathbf p + \\mathbf o_i\\big), \\qquad a < 1,\\; f \\approx 2$$
+$$F(\\mathbf p) = \\sum_{i=0}^{O-1} a^i\\, n\\big(f^i \\mathbf p + \\mathbf o_i\\big), \\qquad a &lt; 1,\\; f \\approx 2$$
 <p>Domain warping feeds a field through itself to break up isotropy:
 $F'(\\mathbf p) = F\\big(\\mathbf p + w\\,\\mathbf W(\\mathbf p)\\big)$. Derived surface data uses the
 gradient, e.g. slope masks $m = 1 - \\hat{\\mathbf n}\\cdot\\hat{\\mathbf u}$ from</p>
 $$\\nabla F \\approx \\frac{1}{2\\epsilon}\\big(F(\\mathbf p + \\epsilon\\mathbf e_i) - F(\\mathbf p - \\epsilon\\mathbf e_i)\\big)_{i=1..3}$$
 <p>The contract the skill enforces: the CPU and TSL implementations are the <em>same function</em>
 (same basis, same seeds, same remaps), validated by GPU readback diff
-$\\max|F_{CPU}-F_{GPU}| < \\varepsilon$ — placement and shading must agree on the world.</p>`,
+$\\max|F_{CPU}-F_{GPU}| &lt; \\varepsilon$ — placement and shading must agree on the world.</p>`,
 
   'threejs-procedural-materials': `
 <p>Materials are authored as PBR identity fields: albedo, roughness, and normal all derive
@@ -101,7 +101,7 @@ $$\\mathbf n_{i+1} = R\\big(\\mathbf t_i \\times \\mathbf t_{i+1},\\; \\angle(\\
 <p>Smooth normals accumulate face normals weighted by corner angle, then normalize:
 $\\mathbf n_v = \\operatorname{normalize}\\sum_f \\theta_{v,f}\\,\\mathbf n_f$. Index sharing versus
 splitting is decided by crease angle: split when
-$\\mathbf n_a \\cdot \\mathbf n_b < \\cos\\theta_{crease}$.</p>
+$\\mathbf n_a \\cdot \\mathbf n_b &lt; \\cos\\theta_{crease}$.</p>
 <p>Draw-call strategy is a budget decision: $N$ unique shapes × $M$ instances favors
 BatchedMesh when shapes vary, InstancedMesh when only transforms do — one material slot
 per identity either way.</p>`,
@@ -218,7 +218,7 @@ $q(t) = \\operatorname{slerp}(q_0, q_1, t)$ with hemisphere correction ($q \\equ
 body-relative up vectors keep orbits sane on planets: $\\hat{\\mathbf u} = \\widehat{\\mathbf p - \\mathbf c}$.
 At planetary scale, floating origin subtracts a world offset from every position via storage
 buffer so camera-local coordinates stay in float32-safe range
-($|\\mathbf p| < 10^4$ m keeps sub-millimeter precision).</p>`,
+($|\\mathbf p| &lt; 10^4$ m keeps sub-millimeter precision).</p>`,
 
   'threejs-procedural-motion-systems': `
 <p>Motion is simulated at a fixed timestep and rendered by interpolation — determinism and
@@ -290,8 +290,8 @@ scale $(s, 1/\\sqrt s, 1/\\sqrt s)$ has determinant exactly 1.</p>`,
   'threejs-visual-validation': `
 <p>Validation treats an image as a claim to be falsified. A fixed-view contract pins camera,
 seed, resolution, and time; comparison is perceptual error against a stored baseline:</p>
-$$E = \\operatorname{quantile}_{0.99}\\big(\\Delta E_{pixel}\\big) < \\tau, \\qquad
-\\text{plus } \\max_{region} \\bar\\Delta E < \\tau_{region}$$
+$$E = \\operatorname{quantile}_{0.99}\\big(\\Delta E_{pixel}\\big) &lt; \\tau, \\qquad
+\\text{plus } \\max_{region} \\bar\\Delta E &lt; \\tau_{region}$$
 <p>Determinism is tested by seed sweeps ($F(seed_1) \\ne F(seed_2)$, but $F(seed_1)$ twice is
 byte-identical) and temporal pairs ($t_0, t_1$ frames must differ where motion exists, match
 where it doesn't). Performance claims bind to measurements:</p>

@@ -347,14 +347,14 @@ a.chip:active{scale:.96}
 <p>A field is a pure function $F:\mathbb R^3 \to \mathbb R^m$ from position to a bundle of
 channels (height, moisture, wear, mask…). Everything derives from shared causes, so channels
 correlate the way nature does. The workhorse is fractal Brownian motion over a noise basis:</p>
-$$F(\mathbf p) = \sum_{i=0}^{O-1} a^i\, n\big(f^i \mathbf p + \mathbf o_i\big), \qquad a < 1,\; f \approx 2$$
+$$F(\mathbf p) = \sum_{i=0}^{O-1} a^i\, n\big(f^i \mathbf p + \mathbf o_i\big), \qquad a &lt; 1,\; f \approx 2$$
 <p>Domain warping feeds a field through itself to break up isotropy:
 $F'(\mathbf p) = F\big(\mathbf p + w\,\mathbf W(\mathbf p)\big)$. Derived surface data uses the
 gradient, e.g. slope masks $m = 1 - \hat{\mathbf n}\cdot\hat{\mathbf u}$ from</p>
 $$\nabla F \approx \frac{1}{2\epsilon}\big(F(\mathbf p + \epsilon\mathbf e_i) - F(\mathbf p - \epsilon\mathbf e_i)\big)_{i=1..3}$$
 <p>The contract the skill enforces: the CPU and TSL implementations are the <em>same function</em>
 (same basis, same seeds, same remaps), validated by GPU readback diff
-$\max|F_{CPU}-F_{GPU}| < \varepsilon$ — placement and shading must agree on the world.</p></div>
+$\max|F_{CPU}-F_{GPU}| &lt; \varepsilon$ — placement and shading must agree on the world.</p></div>
   </div></div>
 
 
