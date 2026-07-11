@@ -9,6 +9,7 @@ import {
 	evaluateScenario,
 	getScenario
 } from './router-core.mjs';
+import { scenarioHref } from './route-urls.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 import { listSkillDirs } from '../../../scripts/lib/lab-registry.mjs';
 
@@ -61,6 +62,15 @@ assert.equal( manifest.nonRenderingScenarioSuite, true );
 assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).errors, [] );
 assert.match( appSource, /fetch\( catalogUrl \)/, 'browser UI must consume the same fixture JSON as tests' );
 assert.match( appSource, /evaluateScenario/, 'browser UI must execute the tested router core' );
+assert.equal(
+	scenarioHref( 'ocean-planet', 'https://threejs-skills.com/demos/router-manifest-lab/' ),
+	'https://threejs-skills.com/demos/router-manifest-lab/scenario/ocean-planet/'
+);
+assert.equal(
+	scenarioHref( 'rainy-city', 'https://threejs-skills.com/demos/router-manifest-lab/?scenario=ocean-planet' ),
+	'https://threejs-skills.com/demos/router-manifest-lab/scenario/rainy-city/'
+);
+assert.throws( () => scenarioHref( '', 'https://threejs-skills.com/demos/router-manifest-lab/' ), TypeError );
 
 assert.deepEqual( manifest.mechanisms.map( ( mechanism ) => mechanism.id ), [ ...mechanismScenarios.keys() ] );
 for ( const mechanism of manifest.mechanisms ) {
