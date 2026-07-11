@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { Object3D, PerspectiveCamera, Sphere, Vector3, Vector4 } from "three/webgpu";
 
 import { CameraDirectionController } from "./CameraDirectionController.mjs";
+import { CAMERA_SCENARIOS, requireCameraState } from "./routeState.mjs";
 
 const routeMutation = spawnSync(process.execPath, ["cameraValidation.mjs", "--induce-violation"], {
   cwd: new URL(".", import.meta.url),
@@ -95,4 +96,31 @@ assert.notEqual(intentController.inspection.yaw, 0.75);
 const ignoredIntentMutant = new CameraDirectionController(new PerspectiveCamera());
 assert.throws(() => assert.notEqual(ignoredIntentMutant.inspection.yaw, 0.75), /AssertionError/, "unwired input mutant must fail");
 
-console.log("camera mutations detected: route drift, high/low recomposition, same-frame velocity, persistent collision, hot allocation, parent restore, and unwired input");
+const scaledSubject = new Object3D();
+scaledSubject.position.set(4, -2, 7);
+scaledSubject.scale.set(2, 3, 4);
+scaledSubject.updateMatrixWorld(true);
+const centeredBounds = new Sphere(new Vector3(0.5, 0.25, -1), 2);
+const scaledController = new CameraDirectionController(new PerspectiveCamera(), {
+  subject: scaledSubject,
+  subjectBounds: centeredBounds,
+});
+assert.equal(scaledController.subjectRadius(), 8, "world scale contributes to framing radius");
+const transformedCenter = centeredBounds.center.clone().applyMatrix4(scaledSubject.matrixWorld);
+assert(scaledController.subjectWorldPosition(new Vector3()).distanceTo(transformedCenter) < 1e-12);
+assert.throws(() => assert.equal(centeredBounds.radius, scaledController.subjectRadius()), /AssertionError/, "raw local-radius mutant must fail");
+assert.throws(() => assert(scaledSubject.position.distanceTo(transformedCenter) < 1e-12), /AssertionError/, "subject-origin framing mutant must fail");
+
+const transformedParent = new Object3D();
+transformedParent.position.x = 1;
+const wronglyParentedCamera = new PerspectiveCamera();
+transformedParent.add(wronglyParentedCamera);
+const ancestryController = new CameraDirectionController(wronglyParentedCamera);
+assert.throws(() => ancestryController.update(1 / 60), /identity parent ancestry/, "world-pose/local-parent mutant must fail closed");
+
+const coordinateOnlyVelocityMutant = -1024;
+assert.throws(() => assert(Math.abs(coordinateOnlyVelocityMutant) < 1e-6), /AssertionError/, "relative-coordinate-only rebase velocity mutant must fail");
+assert.equal(requireCameraState("default", CAMERA_SCENARIOS, "scenario"), "default");
+assert.throws(() => requireCameraState("floating-origin", CAMERA_SCENARIOS, "scenario"), /unknown camera scenario/);
+
+console.log("camera mutations detected: route drift, high/low recomposition, same-frame velocity, persistent collision, hot allocation, parent restore, unwired input, local-bounds framing, transformed camera ancestry, rebase compensation, and scenario drift");

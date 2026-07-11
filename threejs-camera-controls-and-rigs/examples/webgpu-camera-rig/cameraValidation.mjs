@@ -7,6 +7,7 @@ import {
   OrbitIntentAdapter,
   PointerLookIntentAdapter,
   ProjectionJitterOwner,
+  assertIdentityCameraAncestry,
   computeBodyTangentBasis,
   computeCameraPose,
   computeScreenOccupancy,
@@ -14,8 +15,15 @@ import {
   stepCriticalDampedScalar,
 } from "./CameraDirectionController.mjs";
 import { CAMERA_ORIGIN_RECORD, CameraRelativeOrigin } from "./CameraRelativeOrigin.mjs";
-import { CAMERA_MECHANISMS, assertCameraRouteLock, parseCameraRoute } from "./routeState.mjs";
-import { resolveReadbackStride } from "./main.mjs";
+import {
+  CAMERA_IDS,
+  CAMERA_MECHANISMS,
+  CAMERA_SCENARIOS,
+  assertCameraRouteLock,
+  parseCameraRoute,
+  requireCameraState,
+} from "./routeState.mjs";
+import { createCameraRigCore, resolveReadbackStride } from "./main.mjs";
 
 const induceViolation = process.argv.includes("--induce-violation");
 
@@ -54,6 +62,18 @@ function validateBasis() {
   assert(Math.abs(forward.dot(up)) < 1e-12);
   assert(Math.abs(right.dot(up)) < 1e-12);
   assert(new Vector3().crossVectors(forward, up).dot(right) > 0.999999, "body frame is right handed");
+  assert.throws(
+    () => computeBodyTangentBasis(forward, right, up, new Vector3(), new Vector3(0, 1, 0)),
+    /body forward must be finite and nonzero/,
+  );
+  assert.throws(
+    () => computeBodyTangentBasis(forward, right, up, new Vector3(0, 0, -1), new Vector3(NaN, 1, 0)),
+    /body up must be finite/,
+  );
+  assert.throws(
+    () => computeCameraPose(camera.position, camera.quaternion, new Vector3(NaN, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 1, 0), scratch),
+    /camera pose inputs must be finite/,
+  );
   return { ndc: ndc.toArray(), cameraSpaceZ: cameraSpace.z };
 }
 
@@ -97,17 +117,23 @@ function validateBodyRelativeProfile() {
   const subject = new Object3D();
   subject.position.set(7, -3, 11);
   subject.quaternion.setFromAxisAngle(new Vector3(0.3, 0.8, -0.2).normalize(), 1.1);
+  subject.scale.set(2, 3, 4);
   subject.updateMatrixWorld(true);
   const camera = createCamera();
-  const radius = 2;
+  const localCenter = new Vector3(0.5, -0.25, 1);
+  const localRadius = 2;
   const controller = new CameraDirectionController(camera, {
     subject,
-    subjectBounds: new Sphere(new Vector3(), radius),
+    subjectBounds: new Sphere(localCenter, localRadius),
   });
   const position = new Vector3();
   const quaternion = new Quaternion();
   controller.computeProfilePose(position, quaternion);
   const target = controller.subjectWorldPosition(new Vector3());
+  const expectedTarget = localCenter.clone().applyMatrix4(subject.matrixWorld);
+  const radius = controller.subjectRadius();
+  assert(target.distanceTo(expectedTarget) < 1e-12, "framing targets the transformed local bounds center");
+  assert(Math.abs(radius - localRadius * 4) < 1e-12, "framing radius includes the largest world scale");
   controller.computeBodyBasis();
   const offset = position.clone().sub(target);
   assert(Math.abs(offset.dot(controller.scratch.bodyUp) - radius) < 1e-10, "profile uses configured body-up component");
@@ -115,6 +141,8 @@ function validateBodyRelativeProfile() {
   assert(Math.abs(offset.dot(controller.scratch.bodyForward) - radius * 1.35) < 1e-10, "profile depth uses body forward");
   return {
     offset: offset.toArray(),
+    target: target.toArray(),
+    worldRadius: radius,
     bodyUpComponent: offset.dot(controller.scratch.bodyUp),
   };
 }
@@ -131,6 +159,17 @@ function replayHandoff(fps) {
   return { position: camera.position.clone(), quaternion: camera.quaternion.clone() };
 }
 
+function replayContinuousRig(fps) {
+  const camera = createCamera();
+  camera.position.set(5, 7, 20);
+  const controller = new CameraDirectionController(camera, {
+    subjectBounds: new Sphere(new Vector3(), 2),
+  });
+  controller.setThrust(1);
+  for (let frame = 0; frame < fps * 2; frame += 1) controller.update(1 / fps);
+  return { position: camera.position.clone(), quaternion: camera.quaternion.clone() };
+}
+
 function validateHandoffReplayAndAllocationStability() {
   const poses = [30, 60, 120, 144].map((fps) => replayHandoff(fps));
   const baseline = poses[0];
@@ -138,6 +177,30 @@ function validateHandoffReplayAndAllocationStability() {
     assert(pose.position.distanceTo(baseline.position) < 1e-9, "handoff endpoint replay equality");
     assert(1 - Math.abs(pose.quaternion.dot(baseline.quaternion)) < 1e-12, "handoff quaternion equality");
   }
+  const continuousPoses = [30, 60, 120, 144].map((fps) => replayContinuousRig(fps));
+  for (const pose of continuousPoses) {
+    assert(pose.position.distanceTo(continuousPoses[0].position) < 1e-6, "continuous rig replay agrees after equal real time");
+    assert(1 - Math.abs(pose.quaternion.dot(continuousPoses[0].quaternion)) < 1e-12, "continuous rig orientation is replay-rate independent");
+  }
+
+  const countedCamera = createCamera();
+  const countedController = new CameraDirectionController(countedCamera);
+  countedController.startHandoff("profile", 1);
+  const originalLerpVectors = countedCamera.position.lerpVectors;
+  const originalSlerp = countedCamera.quaternion.slerp;
+  let lerpCount = 0;
+  let slerpCount = 0;
+  countedCamera.position.lerpVectors = function countedLerp(...args) {
+    lerpCount += 1;
+    return originalLerpVectors.apply(this, args);
+  };
+  countedCamera.quaternion.slerp = function countedSlerp(...args) {
+    slerpCount += 1;
+    return originalSlerp.apply(this, args);
+  };
+  countedController.update(1 / 60);
+  assert.equal(lerpCount, 1, "handoff performs one position lerp");
+  assert.equal(slerpCount, 1, "handoff performs one quaternion slerp");
 
   const camera = createCamera();
   const controller = new CameraDirectionController(camera);
@@ -147,6 +210,8 @@ function validateHandoffReplayAndAllocationStability() {
     desired: controller.scratch.desiredPosition,
     target: controller.scratch.target,
     pose: controller.scratch.pose,
+    bodyScale: controller.scratch.bodyScale,
+    boundsCenter: controller.scratch.boundsCenter,
   };
   for (let i = 0; i < 8; i += 1) {
     controller.startHandoff(CAMERA_MODES[i % CAMERA_MODES.length], 0.1);
@@ -157,7 +222,9 @@ function validateHandoffReplayAndAllocationStability() {
   assert.equal(controller.scratch.desiredPosition, refs.desired, "desired pose scratch is stable");
   assert.equal(controller.scratch.target, refs.target, "target scratch is stable");
   assert.equal(controller.scratch.pose, refs.pose, "pose result record is preallocated");
-  return { rates: [30, 60, 120, 144] };
+  assert.equal(controller.scratch.bodyScale, refs.bodyScale, "world-scale scratch is preallocated");
+  assert.equal(controller.scratch.boundsCenter, refs.boundsCenter, "bounds-center scratch is preallocated");
+  return { rates: [30, 60, 120, 144], lerpCount, slerpCount };
 }
 
 function validateThrustLagReplay() {
@@ -172,6 +239,8 @@ function validateThrustLagReplay() {
     assert(Math.abs(state.value - results[0].value) < 1e-12, "critical spring position is frame-rate independent");
     assert(Math.abs(state.velocity - results[0].velocity) < 1e-12, "critical spring velocity is frame-rate independent");
   }
+  assert.throws(() => stepCriticalDampedScalar({ value: 0, velocity: 0 }, NaN, 8, 1 / 60), /target must be finite/);
+  assert.throws(() => stepCriticalDampedScalar({ value: 0, velocity: 0 }, 1, Infinity, 1 / 60), /angularFrequency must be finite/);
   return results;
 }
 
@@ -198,6 +267,9 @@ function validateCollisionEntryPersistenceRecovery() {
   assert(firstRecoveryDistance < 5.6, "outward recovery does not snap to desired distance");
   for (let i = 0; i < 120; i += 1) controller.update(1 / 60);
   assert(camera.position.length() > 5.4, "outward recovery converges");
+  controller.setObstructionDistance(0.1);
+  assert.throws(() => controller.update(1 / 60), /no feasible camera clearance/);
+  assert.equal(controller.obstruction.infeasible, true, "infeasible obstruction is reported instead of crossed");
   return { entryDistance, secondFrameDistance, persistentDistance, firstRecoveryDistance };
 }
 
@@ -214,16 +286,26 @@ function validateInputLifecycle() {
     count() { return [...this.listeners.values()].reduce((sum, set) => sum + set.size, 0); }
   }
   const target = new FakeTarget();
+  const externalListener = () => {};
+  target.addEventListener("pointermove", externalListener);
+  const baselineListeners = target.count();
   const pointer = new PointerLookIntentAdapter(target).connect();
   const orbit = new OrbitIntentAdapter(target).connect();
-  pointer.enabled = true;
-  orbit.enabled = true;
+  target.emit("pointerdown");
+  assert.equal(pointer.held, false, "disabled pointer input cannot arm a later owner");
+  pointer.setEnabled(true);
+  orbit.setEnabled(true);
   target.emit("pointerdown");
   target.emit("pointermove", { movementX: 4, movementY: -3 });
   target.emit("wheel", { deltaY: 10 });
   assert(pointer.yaw !== 0 && pointer.pitch !== 0, "pointer intent captured");
   const intent = orbit.consume({ yaw: 0, pitch: 0, zoomLog: 0 });
   assert(intent.yaw !== 0 && intent.pitch !== 0 && intent.zoomLog !== 0, "orbit intent captured");
+  target.emit("pointerdown");
+  target.emit("pointermove", { movementX: 2, movementY: 2 });
+  target.emit("blur");
+  assert.equal(pointer.held, false, "blur clears pointer ownership");
+  assert.deepEqual(orbit.consume({ yaw: 0, pitch: 0, zoomLog: 0 }), { yaw: 0, pitch: 0, zoomLog: 0 }, "blur clears latent orbit intent");
   const camera = createCamera();
   const controller = new CameraDirectionController(camera);
   controller.mode = "inspection";
@@ -235,8 +317,10 @@ function validateInputLifecycle() {
   assert(listenerCount > 0, "listeners installed");
   pointer.dispose();
   orbit.dispose();
-  assert.equal(target.count(), 0, "all listeners removed");
-  return { listenerCount };
+  assert.equal(target.count(), baselineListeners, "adapters remove only their listeners");
+  assert.equal(pointer.yaw, 0, "disposed pointer intent is cleared");
+  assert.equal(orbit.dragging, false, "disposed orbit ownership is cleared");
+  return { baselineListeners, listenerCount };
 }
 
 function validateFloatingOrigin() {
@@ -301,14 +385,40 @@ function validateFloatingOrigin() {
   state.commit();
   assert(state.velocityRelative.x > 0, "moving velocity has expected sign");
 
-  const beforeRelative = state.currentRelative.clone();
-  state.beginFrame();
-  state.currentObject.x += 1024;
-  const rebasedOrigin = state.currentOrigin.clone();
-  rebasedOrigin.x += 1024;
-  state.rebase(rebasedOrigin).commit();
-  assert(state.currentRelative.distanceTo(beforeRelative) < 1e-12, "rebase preserves visible relative position");
-  assert(state.velocityRelative.lengthSq() < 1e-24, "matched current/previous rebase produces zero false velocity");
+  const rebaseState = new CameraRelativeOrigin().setInitial(origin, object);
+  const rebaseCamera = createCamera();
+  const rebaseObject = new Object3D();
+  rebaseCamera.position.copy(rebaseState.currentRelative).add(new Vector3(0, 0, 10));
+  rebaseCamera.lookAt(rebaseState.currentRelative);
+  rebaseCamera.updateMatrixWorld(true);
+  rebaseObject.updateMatrixWorld(true);
+  rebaseState.setInitialMatrices(rebaseCamera, rebaseObject);
+  rebaseState.beginFrame();
+  const rebasedOrigin = rebaseState.currentOrigin.clone().add(new Vector3(1024, 0, 0));
+  rebaseState.rebase(rebasedOrigin).commit();
+  rebaseCamera.position.copy(rebaseState.currentRelative).add(new Vector3(0, 0, 10));
+  rebaseCamera.lookAt(rebaseState.currentRelative);
+  rebaseCamera.updateMatrixWorld(true);
+  rebaseState.setCurrentMatrices(rebaseCamera, rebaseObject);
+  const rebasePreviousClip = new Vector4(
+    rebaseState.previousRelative.x,
+    rebaseState.previousRelative.y,
+    rebaseState.previousRelative.z,
+    1,
+  ).applyMatrix4(rebaseState.previousModel).applyMatrix4(rebaseState.previousView).applyMatrix4(rebaseState.previousProjection);
+  const rebaseCurrentClip = new Vector4(
+    rebaseState.currentRelative.x,
+    rebaseState.currentRelative.y,
+    rebaseState.currentRelative.z,
+    1,
+  ).applyMatrix4(rebaseState.currentModel).applyMatrix4(rebaseState.currentView).applyMatrix4(rebaseState.currentProjection);
+  const rebaseVelocityNdc = new Vector2(
+    rebaseCurrentClip.x / rebaseCurrentClip.w - rebasePreviousClip.x / rebasePreviousClip.w,
+    rebaseCurrentClip.y / rebaseCurrentClip.w - rebasePreviousClip.y / rebasePreviousClip.w,
+  );
+  assert(rebaseState.velocityRelative.x < -1000, "a pure coordinate rebase changes relative coordinates");
+  assert(rebaseVelocityNdc.length() < 1e-12, "paired origin/view transforms remove false rebase velocity");
+  rebaseState.dispose();
   const rigSubject = new Object3D();
   rigSubject.position.copy(state.currentRelative);
   rigSubject.updateMatrixWorld(true);
@@ -320,6 +430,47 @@ function validateFloatingOrigin() {
   const description = state.describe();
   state.dispose();
   return description;
+}
+
+function validateCoreLifecycleAndCameraAncestry() {
+  const transformedParent = new Object3D();
+  transformedParent.position.set(1, 0, 0);
+  const parentedCamera = createCamera();
+  transformedParent.add(parentedCamera);
+  const parentedController = new CameraDirectionController(parentedCamera);
+  assert.throws(() => parentedController.update(1 / 60), /identity parent ancestry/);
+  transformedParent.position.set(0, 0, 0);
+  transformedParent.updateMatrixWorld(true);
+  assert.equal(assertIdentityCameraAncestry(parentedCamera), parentedCamera, "identity camera ancestry is accepted");
+
+  const hostCamera = createCamera();
+  hostCamera.fov = 41;
+  hostCamera.near = 0.4;
+  hostCamera.far = 900;
+  hostCamera.updateProjectionMatrix();
+  const initialPosition = hostCamera.position.clone();
+  const initialQuaternion = hostCamera.quaternion.clone();
+  const initialProjection = hostCamera.projectionMatrix.clone();
+  let storageDisposeCount = 0;
+  for (let cycle = 0; cycle < 50; cycle += 1) {
+    const core = createCameraRigCore({ camera: hostCamera });
+    const disposeStorage = core.originState.attribute.dispose.bind(core.originState.attribute);
+    core.originState.attribute.dispose = () => {
+      storageDisposeCount += 1;
+      disposeStorage();
+    };
+    core.controller.mode = "profile";
+    core.controller.update(1 / 60);
+    hostCamera.fov = 65;
+    hostCamera.updateProjectionMatrix();
+    core.dispose();
+    core.dispose();
+    assert(hostCamera.position.distanceTo(initialPosition) < 1e-12, "core disposal restores host camera position");
+    assert(1 - Math.abs(hostCamera.quaternion.dot(initialQuaternion)) < 1e-12, "core disposal restores host camera orientation");
+    assert(hostCamera.projectionMatrix.equals(initialProjection), "core disposal restores host camera projection");
+  }
+  assert.equal(storageDisposeCount, 50, "each lifecycle disposes its storage exactly once");
+  return { restored: true, transformedParentRejected: true, lifecycleCycles: 50, storageDisposeCount };
 }
 
 function validateProjectionSnapshotAndFraming() {
@@ -424,6 +575,10 @@ function validateRoutesAndStride() {
   }
   assert.throws(() => parseCameraRoute({ pathname: "/mechanism/fabricated/", search: "" }), /unknown camera mechanism/);
   assert.throws(() => parseCameraRoute({ pathname: "/tier/fabricated/", search: "" }), /unknown camera tier/);
+  assert.equal(requireCameraState("default", CAMERA_SCENARIOS, "scenario"), "default");
+  assert.equal(requireCameraState("design", CAMERA_IDS, "camera"), "design");
+  assert.throws(() => requireCameraState("fabricated", CAMERA_SCENARIOS, "scenario"), /unknown camera scenario/);
+  assert.throws(() => requireCameraState("fabricated", CAMERA_IDS, "camera"), /unknown camera camera/);
   const locked = parseCameraRoute({ pathname: "/mechanism/floating-origin/", search: "?tier=full" });
   assert.equal(assertCameraRouteLock(locked), locked);
   assert.throws(() => assertCameraRouteLock(locked, { mechanism: "scale-aware-framing" }), /locked to floating-origin/);
@@ -453,6 +608,7 @@ const gates = {
   collision: validateCollisionEntryPersistenceRecovery(),
   inputLifecycle: validateInputLifecycle(),
   floatingOrigin: validateFloatingOrigin(),
+  coreLifecycleAndCameraAncestry: validateCoreLifecycleAndCameraAncestry(),
   projectionSnapshotAndFraming: validateProjectionSnapshotAndFraming(),
   jitterOwnership: validateJitterOwnership(),
   routesAndStride: validateRoutesAndStride(),

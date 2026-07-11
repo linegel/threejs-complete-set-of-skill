@@ -9,6 +9,10 @@ import {
 
 const HALF_PI = Math.PI * 0.5;
 
+function isFiniteVector3(value) {
+  return Number.isFinite(value.x) && Number.isFinite(value.y) && Number.isFinite(value.z);
+}
+
 export const FIXTURE_BASIS_GATES = Object.freeze({
   aimLengthSq: 1e-12,
   rightLengthSq: 1e-12,
@@ -67,6 +71,8 @@ export function createCameraScratch() {
     bodyForward: new Vector3(),
     bodyRight: new Vector3(),
     bodyUp: new Vector3(),
+    bodyScale: new Vector3(1, 1, 1),
+    boundsCenter: new Vector3(),
     bodyQuaternion: new Quaternion(),
     obstructionDirection: new Vector3(),
     fallbackActive: false,
@@ -99,6 +105,17 @@ export function computeBodyTangentBasis(
   upHint,
   gates = FIXTURE_BASIS_GATES,
 ) {
+  if (
+    !isFiniteVector3(forwardHint) ||
+    forwardHint.lengthSq() <= gates.aimLengthSq
+  ) {
+    throw new Error("body forward must be finite and nonzero");
+  }
+  if (
+    !isFiniteVector3(upHint)
+  ) {
+    throw new Error("body up must be finite");
+  }
   outUp.copy(upHint);
   if (outUp.lengthSq() <= gates.upLengthSq) outUp.set(0, 1, 0);
   outUp.normalize();
@@ -116,6 +133,31 @@ export function computeBodyTangentBasis(
   return outForward;
 }
 
+/**
+ * This controller emits world poses. A transformed camera parent would turn
+ * those writes into a different local pose, so the supported ancestry is
+ * explicitly gated instead of silently producing the wrong view.
+ */
+export function assertIdentityCameraAncestry(camera, tolerance = 1e-12) {
+  if (
+    Math.abs(camera.scale.x - 1) > tolerance ||
+    Math.abs(camera.scale.y - 1) > tolerance ||
+    Math.abs(camera.scale.z - 1) > tolerance
+  ) {
+    throw new Error("camera rig requires unit camera scale");
+  }
+  if (!camera.parent) return camera;
+  camera.parent.updateWorldMatrix(true, false);
+  const elements = camera.parent.matrixWorld.elements;
+  for (let index = 0; index < 16; index += 1) {
+    const expected = index % 5 === 0 ? 1 : 0;
+    if (!Number.isFinite(elements[index]) || Math.abs(elements[index] - expected) > tolerance) {
+      throw new Error("camera rig requires identity parent ancestry");
+    }
+  }
+  return camera;
+}
+
 export function computeCameraPose(
   outPosition,
   outQuaternion,
@@ -125,6 +167,9 @@ export function computeCameraPose(
   scratch = createCameraScratch(),
   gates = FIXTURE_BASIS_GATES,
 ) {
+  if (!isFiniteVector3(target) || !isFiniteVector3(desiredPosition) || !isFiniteVector3(upHint)) {
+    throw new Error("camera pose inputs must be finite");
+  }
   outPosition.copy(desiredPosition);
   scratch.forward.subVectors(target, desiredPosition);
   if (scratch.forward.lengthSq() <= gates.aimLengthSq) {
@@ -194,7 +239,8 @@ export function expDecayAlpha(lambda, dt) {
 /** Exact critically damped response for a target that is constant over dt. */
 export function stepCriticalDampedScalar(state, target, angularFrequency, dt) {
   if (!Number.isFinite(dt) || dt < 0) throw new RangeError("dt must be finite and >= 0");
-  if (!(angularFrequency > 0)) throw new RangeError("angularFrequency must be > 0");
+  if (!Number.isFinite(target)) throw new RangeError("target must be finite");
+  if (!Number.isFinite(angularFrequency) || !(angularFrequency > 0)) throw new RangeError("angularFrequency must be finite and > 0");
   const y = state.value - target;
   const j = state.velocity + angularFrequency * y;
   const decay = Math.exp(-angularFrequency * dt);
@@ -217,7 +263,7 @@ export class PointerLookIntentAdapter {
       this.yaw -= (event.movementX ?? 0) * this.sensitivity;
       this.pitch = Math.max(-HALF_PI, Math.min(HALF_PI, this.pitch - (event.movementY ?? 0) * this.sensitivity));
     };
-    this._onPointerDown = () => { this.held = true; };
+    this._onPointerDown = () => { if (this.enabled) this.held = true; };
     this._onPointerUp = () => { this.held = false; };
     this._onBlur = () => { this.held = false; };
   }
@@ -229,6 +275,13 @@ export class PointerLookIntentAdapter {
     this.eventTarget.addEventListener("pointerup", this._onPointerUp);
     this.eventTarget.addEventListener("blur", this._onBlur);
     this.connected = true;
+    return this;
+  }
+
+  setEnabled(enabled) {
+    if (typeof enabled !== "boolean") throw new TypeError("pointer adapter enabled state must be boolean");
+    this.enabled = enabled;
+    if (!enabled) this.held = false;
     return this;
   }
 
@@ -249,6 +302,8 @@ export class PointerLookIntentAdapter {
     this.connected = false;
     this.enabled = false;
     this.held = false;
+    this.yaw = 0;
+    this.pitch = 0;
   }
 }
 
@@ -273,7 +328,7 @@ export class OrbitIntentAdapter {
     this._onWheel = (event) => {
       if (this.enabled) this.zoomLogDelta += (event.deltaY ?? 0) * this.zoomScale;
     };
-    this._onBlur = () => { this.dragging = false; };
+    this._onBlur = () => { this.clearPendingIntent(); };
   }
 
   connect() {
@@ -286,6 +341,21 @@ export class OrbitIntentAdapter {
       ["blur", this._onBlur],
     ]) this.eventTarget.addEventListener(type, handler);
     this.connected = true;
+    return this;
+  }
+
+  setEnabled(enabled) {
+    if (typeof enabled !== "boolean") throw new TypeError("orbit adapter enabled state must be boolean");
+    this.enabled = enabled;
+    if (!enabled) this.clearPendingIntent();
+    return this;
+  }
+
+  clearPendingIntent() {
+    this.dragging = false;
+    this.yawDelta = 0;
+    this.pitchDelta = 0;
+    this.zoomLogDelta = 0;
     return this;
   }
 
@@ -311,10 +381,7 @@ export class OrbitIntentAdapter {
     }
     this.connected = false;
     this.enabled = false;
-    this.dragging = false;
-    this.yawDelta = 0;
-    this.pitchDelta = 0;
-    this.zoomLogDelta = 0;
+    this.clearPendingIntent();
   }
 }
 
@@ -389,6 +456,13 @@ export class CameraDirectionController {
     this.camera = camera;
     this.subject = subject;
     this.subjectBounds = subjectBounds;
+    if (
+      !isFiniteVector3(bodyForwardLocal) ||
+      bodyForwardLocal.lengthSq() <= FIXTURE_BASIS_GATES.aimLengthSq
+    ) {
+      throw new Error("bodyForwardLocal must be finite and nonzero");
+    }
+    if (!isFiniteVector3(bodyUpLocal)) throw new Error("bodyUpLocal must be finite");
     this.bodyForwardLocal = bodyForwardLocal.clone().normalize();
     this.bodyUpLocal = bodyUpLocal.clone().normalize();
     this.scratch = createCameraScratch();
@@ -411,6 +485,7 @@ export class CameraDirectionController {
       clearance: 0.25,
       wasObstructed: false,
       inwardSnapThisFrame: false,
+      infeasible: false,
     };
     this.inspection = {
       yaw: 0.75,
@@ -433,7 +508,9 @@ export class CameraDirectionController {
   }
 
   setInspectionIntent(yaw, pitch, zoomLogDelta = 0) {
-    if (![yaw, pitch, zoomLogDelta].every(Number.isFinite)) throw new RangeError("inspection intent must be finite");
+    if (!Number.isFinite(yaw) || !Number.isFinite(pitch) || !Number.isFinite(zoomLogDelta)) {
+      throw new RangeError("inspection intent must be finite");
+    }
     this.inspection.yaw = yaw;
     this.inspection.pitch = Math.max(-HALF_PI + 1e-3, Math.min(HALF_PI - 1e-3, pitch));
     this.inspection.distanceScale = Math.max(0.25, Math.min(4, this.inspection.distanceScale * Math.exp(zoomLogDelta)));
@@ -448,24 +525,41 @@ export class CameraDirectionController {
   }
 
   subjectWorldPosition(out = this.scratch.target) {
-    if (this.subject) {
-      this.subject.updateWorldMatrix(true, false);
-      return this.subject.getWorldPosition(out);
-    }
-    return out.set(0, 0, 0);
+    if (this.subjectBounds instanceof Sphere) out.copy(this.subjectBounds.center);
+    else if (this.subjectBounds instanceof Box3) this.subjectBounds.getCenter(out);
+    else out.set(0, 0, 0);
+    if (!this.subject) return out;
+    this.subject.updateWorldMatrix(true, false);
+    return out.applyMatrix4(this.subject.matrixWorld);
   }
 
   subjectRadius() {
-    if (this.subjectBounds instanceof Sphere) return this.subjectBounds.radius;
+    let radius = 1;
+    if (this.subjectBounds instanceof Sphere) radius = this.subjectBounds.radius;
     if (this.subjectBounds instanceof Box3) {
       this.subjectBounds.getBoundingSphere(this.scratch.boundsSphere);
-      return this.scratch.boundsSphere.radius;
+      radius = this.scratch.boundsSphere.radius;
     }
-    return 1;
+    if (this.subject) {
+      this.subject.updateWorldMatrix(true, false);
+      this.subject.getWorldScale(this.scratch.bodyScale);
+      radius *= Math.max(
+        Math.abs(this.scratch.bodyScale.x),
+        Math.abs(this.scratch.bodyScale.y),
+        Math.abs(this.scratch.bodyScale.z),
+      );
+    }
+    if (!Number.isFinite(radius) || radius <= 0) {
+      throw new Error("subject bounds must produce a finite positive world radius");
+    }
+    return radius;
   }
 
   computeBodyBasis() {
-    if (this.subject) this.subject.getWorldQuaternion(this.scratch.bodyQuaternion);
+    if (this.subject) {
+      this.subject.updateWorldMatrix(true, false);
+      this.subject.getWorldQuaternion(this.scratch.bodyQuaternion);
+    }
     else this.scratch.bodyQuaternion.identity();
     this.scratch.bodyForward.copy(this.bodyForwardLocal).applyQuaternion(this.scratch.bodyQuaternion);
     this.scratch.bodyUp.copy(this.bodyUpLocal).applyQuaternion(this.scratch.bodyQuaternion);
@@ -490,10 +584,14 @@ export class CameraDirectionController {
     if (!tier.collision) return desiredPosition;
     const direction = this.scratch.obstructionDirection.subVectors(desiredPosition, target);
     const desiredDistance = direction.length();
-    if (desiredDistance <= FIXTURE_BASIS_GATES.aimLengthSq) return desiredPosition;
+    if (desiredDistance * desiredDistance <= FIXTURE_BASIS_GATES.aimLengthSq) return desiredPosition;
     direction.multiplyScalar(1 / desiredDistance);
     const hit = this.obstruction.hitDistance;
     const finiteHit = Number.isFinite(hit);
+    this.obstruction.infeasible = finiteHit && hit <= this.obstruction.clearance;
+    if (this.obstruction.infeasible) {
+      throw new Error("obstruction leaves no feasible camera clearance");
+    }
     const allowedDistance = finiteHit
       ? Math.max(this.obstruction.clearance, Math.min(desiredDistance, hit - this.obstruction.clearance))
       : desiredDistance;
@@ -513,7 +611,10 @@ export class CameraDirectionController {
       this.obstruction.inwardSnapThisFrame = true;
       this.obstruction.wasObstructed = true;
     }
-    if (!finiteHit && Math.abs(this.obstruction.currentDistance - desiredDistance) <= 1e-6) {
+    if (
+      !(finiteHit && allowedDistance < desiredDistance) &&
+      Math.abs(this.obstruction.currentDistance - desiredDistance) <= 1e-6
+    ) {
       this.obstruction.currentDistance = desiredDistance;
       this.obstruction.wasObstructed = false;
     }
@@ -587,6 +688,7 @@ export class CameraDirectionController {
     if (!Number.isFinite(duration) || duration <= 0) {
       throw new RangeError("handoff duration must be finite and > 0");
     }
+    assertIdentityCameraAncestry(this.camera);
     this.transition.active = true;
     this.transition.mode = mode;
     this.transition.duration = duration;
@@ -598,6 +700,7 @@ export class CameraDirectionController {
   update(dt) {
     if (!Number.isFinite(dt) || dt < 0) throw new RangeError("dt must be finite and >= 0");
     const clampedDt = Math.min(dt, 1 / 20);
+    assertIdentityCameraAncestry(this.camera);
     this._frameDt = clampedDt;
     this.obstruction.inwardSnapThisFrame = false;
     this.updateThrustLag(clampedDt);

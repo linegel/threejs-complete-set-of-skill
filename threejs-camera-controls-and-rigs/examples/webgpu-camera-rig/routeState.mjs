@@ -9,6 +9,9 @@ export const CAMERA_MECHANISMS = Object.freeze([
   "shared-jitter-and-velocity",
 ]);
 
+export const CAMERA_SCENARIOS = Object.freeze(["default"]);
+export const CAMERA_IDS = Object.freeze(["design", "near", "far"]);
+
 function routeSegment(pathname, label) {
   const pieces = pathname.split("/").filter(Boolean);
   const index = pieces.lastIndexOf(label);
@@ -18,6 +21,10 @@ function routeSegment(pathname, label) {
 function exact(value, allowed, label) {
   if (!allowed.includes(value)) throw new RangeError(`unknown camera ${label}: ${value}`);
   return value;
+}
+
+export function requireCameraState(value, allowed, label) {
+  return exact(value, allowed, label);
 }
 
 export function parseCameraRoute(locationLike = globalThis.location) {

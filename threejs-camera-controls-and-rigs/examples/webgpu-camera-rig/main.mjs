@@ -40,14 +40,19 @@ import {
   computeScreenOccupancy,
 } from "./CameraDirectionController.mjs";
 import { CameraRelativeOrigin } from "./CameraRelativeOrigin.mjs";
-import { CAMERA_MECHANISMS, assertCameraRouteLock, parseCameraRoute } from "./routeState.mjs";
+import {
+  CAMERA_IDS,
+  CAMERA_MECHANISMS,
+  CAMERA_SCENARIOS,
+  assertCameraRouteLock,
+  parseCameraRoute,
+  requireCameraState,
+} from "./routeState.mjs";
 
-const CAMERA_IDS = Object.freeze(["design", "near", "far"]);
 const FIXED_SEEDS = Object.freeze([0x00000001, 0x9e3779b9]);
 
 function requireChoice(value, allowed, label) {
-  if (!allowed.includes(value)) throw new RangeError(`unknown camera ${label}: ${value}`);
-  return value;
+  return requireCameraState(value, allowed, label);
 }
 
 function resolveReadbackStride(pixels, width, height) {
@@ -76,7 +81,9 @@ export function createCameraRigCore({
 } = {}) {
   if (!camera) throw new TypeError("createCameraRigCore requires a camera");
   const controller = new CameraDirectionController(camera, { subject, subjectBounds, tier });
+  const hostCameraSnapshot = controller.snapshot();
   const originState = new CameraRelativeOrigin().setInitial(origin, objectGlobal);
+  let disposed = false;
   return {
     controller,
     originState,
@@ -87,10 +94,20 @@ export function createCameraRigCore({
       semanticModes: CAMERA_MODES,
       qualityTiers: Object.keys(CAMERA_TIERS),
       mechanisms: CAMERA_MECHANISMS,
+      scenarios: CAMERA_SCENARIOS,
     }),
     dispose() {
-      controller.dispose();
-      originState.dispose();
+      if (disposed) return;
+      disposed = true;
+      try {
+        controller.restore(hostCameraSnapshot);
+      } finally {
+        try {
+          controller.dispose();
+        } finally {
+          originState.dispose();
+        }
+      }
     },
   };
 }
@@ -188,8 +205,8 @@ export async function createCameraRigDemo({
   };
   const pointerAdapter = new PointerLookIntentAdapter(canvas).connect();
   const orbitAdapter = new OrbitIntentAdapter(canvas).connect();
-  pointerAdapter.enabled = route.mechanism === "pointer-orbit-and-collision";
-  orbitAdapter.enabled = route.mechanism === "pointer-orbit-and-collision";
+  pointerAdapter.setEnabled(route.mechanism === "pointer-orbit-and-collision");
+  orbitAdapter.setEnabled(route.mechanism === "pointer-orbit-and-collision");
   if (route.mechanism === "pointer-orbit-and-collision") controller.mode = "inspection";
   const orbitIntent = { yaw: 0, pitch: 0, zoomLog: 0 };
   let orbitYaw = 0;
@@ -298,8 +315,7 @@ export async function createCameraRigDemo({
   const labController = {
     async ready() {},
     async setScenario(id) {
-      requireChoice(id, CAMERA_MECHANISMS, "scenario");
-      assertCameraRouteLock(route, { mechanism: id });
+      requireChoice(id, CAMERA_SCENARIOS, "scenario");
     },
     async setMode(id) {
       requireChoice(id, CAMERA_MODES, "mode");
