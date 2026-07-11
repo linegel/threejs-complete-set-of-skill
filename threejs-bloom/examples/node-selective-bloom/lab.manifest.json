@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "id": "node-selective-bloom",
+  "skill": "threejs-bloom",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": ["threejs-bloom/examples/node-selective-bloom"],
+  "browserEntry": "threejs-bloom/examples/node-selective-bloom/index.html",
+  "publishPath": "/demos/node-selective-bloom/",
+  "scenarios": [
+    { "id": "threshold-and-knee", "acceptanceStatus": "incomplete" },
+    { "id": "point-spread-function", "acceptanceStatus": "incomplete" },
+    { "id": "emissive-hierarchy", "acceptanceStatus": "incomplete" },
+    { "id": "transparent-emitters", "acceptanceStatus": "incomplete" },
+    { "id": "depth-and-occlusion", "acceptanceStatus": "incomplete" },
+    { "id": "shared-emissive-integration", "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "threshold-and-knee", "route": "mechanism/threshold-and-knee/", "acceptanceStatus": "incomplete" },
+    { "id": "point-spread-function", "route": "mechanism/point-spread-function/", "acceptanceStatus": "incomplete" },
+    { "id": "emissive-hierarchy", "route": "mechanism/emissive-hierarchy/", "acceptanceStatus": "incomplete" },
+    { "id": "transparent-emitters", "route": "mechanism/transparent-emitters/", "acceptanceStatus": "incomplete" },
+    { "id": "depth-and-occlusion", "route": "mechanism/depth-and-occlusion/", "acceptanceStatus": "incomplete" },
+    { "id": "shared-emissive-integration", "route": "mechanism/shared-emissive-integration/", "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    { "id": "full", "targetClass": "current-adapter", "frameTargetMs": null, "resolutionPolicy": { "bloomScale": 0.5, "dprCap": 2 }, "mechanismLimits": {}, "resourceLimits": {}, "degradationFromPrevious": [], "preservedInvariants": ["pre-tone-map", "selective-emissive"], "acceptanceStatus": "incomplete" },
+    { "id": "balanced", "targetClass": "current-adapter", "frameTargetMs": null, "resolutionPolicy": { "bloomScale": 0.33, "dprCap": 1.5 }, "mechanismLimits": {}, "resourceLimits": {}, "degradationFromPrevious": ["lower bloom resolution", "fewer animated contributors"], "preservedInvariants": ["pre-tone-map", "selective-emissive"], "acceptanceStatus": "incomplete" },
+    { "id": "mobile", "targetClass": "mobile-class-unmeasured", "frameTargetMs": null, "resolutionPolicy": { "bloomScale": 0.25, "dprCap": 1 }, "mechanismLimits": {}, "resourceLimits": {}, "degradationFromPrevious": ["lower bloom resolution", "cap DPR", "fewer animated contributors"], "preservedInvariants": ["pre-tone-map", "selective-emissive"], "acceptanceStatus": "incomplete" },
+    { "id": "reduced-readable-base", "targetClass": "readability-reference", "frameTargetMs": null, "resolutionPolicy": { "bloomScale": 0, "dprCap": 1 }, "mechanismLimits": { "bloom": "disabled" }, "resourceLimits": {}, "degradationFromPrevious": ["remove bloom and emissive MRT from active graph"], "preservedInvariants": ["base-scene-readability", "single-output-transform"], "acceptanceStatus": "incomplete" }
+  ],
+  "modes": ["combined", "emissive-only", "bloom-only", "no-post-baseline", "false-color-luminance", "resolution-scale-overlay", "transparent-emitter"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [{ "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" }],
+  "runtimeProof": [
+    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "actual-bloomnode-target-inventory", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "current-adapter-gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "node threejs-bloom/examples/node-selective-bloom/validate-node-selective-bloom.mjs",
+  "commands": {
+    "check": "npm --prefix threejs-bloom/examples/node-selective-bloom run check",
+    "test": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:unit",
+    "mutations": "npm --prefix threejs-bloom/examples/node-selective-bloom run test:mutations",
+    "capture": "npm --prefix threejs-bloom/examples/node-selective-bloom run capture --",
+    "validateArtifacts": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:quick",
+    "validateFull": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

@@ -1,152 +1,168 @@
-# Node selective bloom
+# Native WebGPU selective BloomNode lab
 
-Canonical WebGPU/TSL selective bloom example for `threejs-bloom`.
+This folder demonstrates the art-directed selective branch of
+`threejs-bloom`. Full-scene HDR bloom is the preferred optical/bandwidth path
+when one luminance rule can describe the desired response. Use this example
+only after the skill's false-positive/false-negative source gate requires
+selectivity.
 
-## Demonstrates
+The folder has an executable browser entry, fixed mechanism/tier routes, a
+`LabController`, aligned render-target readback, runtime inventory of
+BloomNode's internal targets, and a renderer-independent
+`createSelectiveBloomStage(...)` factory. Browser captures and current-adapter
+timing remain required before its manifest can move from `incomplete`.
 
-- `WebGPURenderer` with `RenderPipeline`.
-- One `pass( scene, camera )` configured with `mrt( { output, emissive } )`.
-- `BloomNode` from `bloom()` fed by `scenePass.getTextureNode( 'emissive' )`.
-- No material swapping, no second scene render, and no whole-scene override pass.
-- Scene-relative HDR emissive tiers authored with `MeshStandardNodeMaterial.emissiveNode`.
-- One explicit `renderOutput(...)` owner with `renderPipeline.outputColorTransform = false`.
-- Runtime controls for `strength`, `radius`, `threshold`, `smoothWidth`, and bloom `resolutionScale`.
-- Debug outputs: `combined`, `emissive-only`, `bloom-only`, `no-post-baseline`, `false-color-luminance`, `resolution-scale-overlay`, and `transparent-emitter`.
-
-## Pipeline graph
-
-```text
-WebGPURenderer { outputBufferType: HalfFloatType }
-  -> await renderer.init()
-  -> quality gate from renderer.backend.isWebGPUBackend
-  -> RenderPipeline { outputColorTransform: false }
-  -> scenePass = pass( scene, camera )
-  -> scenePass.setMRT( mrt( { output, emissive } ) )
-  -> sceneColor = scenePass.getTextureNode( 'output' )
-  -> emissiveContribution = scenePass.getTextureNode( 'emissive' )
-  -> bloomPass = bloom( emissiveContribution, strength, radius, threshold )
-  -> bloomPass.smoothWidth + bloomPass.setResolutionScale( tier.bloomScale )
-  -> combined = sceneColor + bloomPass.getTextureNode()
-  -> renderOutput( combined )
-```
-
-Debug graph switches only replace the final output node:
+## Graph
 
 ```text
-combined                 -> renderOutput( sceneColor + bloomOutput )
-emissive-only            -> renderOutput( emissiveContribution )
-bloom-only               -> renderOutput( bloomOutput )
-no-post-baseline         -> renderOutput( sceneColor )
-false-color-luminance    -> renderOutput( pre-tone-map luminance view )
-resolution-scale-overlay -> renderOutput( tier bloomScale overlay )
-transparent-emitter      -> renderOutput( transparent emitter contribution diagnostic )
+WebGPURenderer: WebGPU, HalfFloatType, no inherited MSAA
+  -> one scene PassNode
+  -> MRT output + emissive
+     emissive blend mode = BlendMode(MaterialBlending)
+  -> BloomNode(emissive), reduced resolution
+  -> vec4(scene.rgb + bloom.rgb, scene.a)
+  -> one renderOutput owner
 ```
 
-## Authored luminance hierarchy
+The selective path adds one RGBA16F contribution attachment but no second scene
+render. It is not automatically better than `bloom(sceneColor)`: reflected and
+transmitted highlights are absent unless explicitly authored.
+
+## Transparent emissive contract
+
+r185 assigns material blending only to MRT output named `output`; other outputs
+default to no blending. The example therefore calls:
+
+```js
+const materialBlend = new THREE.BlendMode( THREE.MaterialBlending );
+sceneMRT.setBlendMode( 'emissive', materialBlend );
+```
+
+The two overlapping transparent emitters use additive premultiplied emission:
 
 ```text
-short spark flash:        32
-projectile core:          16
-persistent laser:          8
-practical lamp filament:   4
-ordinary lit surface:      0
+visible base color = zero
+emissiveNode = radiance * opacity
+opacityNode = opacity
+premultipliedAlpha = true
+blending = AdditiveBlending
 ```
 
-The bright metal block intentionally has no emissive node, so threshold alone does not make it a bloom member.
+The same regular `emissiveNode` feeds the contribution MRT. Do not add a
+material-level `mrtNode` in this r185 path: installed `MRTNode.merge()` stores
+merged blend state under `blendings` instead of `blendModes`, so a material MRT
+override drops the scene's configured emissive blend mode. If visible and bloom
+emission must diverge, use a separately costed contribution pass or a source-
+verified custom MRT fix; do not assume stock merge preserves blending.
+
+The final composite adds bloom RGB and preserves scene alpha. A plain vec4 add
+inflates alpha because BloomNode's blur/composite carries nonzero alpha.
+
+## General luminance fixtures
+
+```text
+pulsed reference marker: 32       [Authored]
+calibration source:       16       [Authored]
+luminous instrument bar:  8       [Authored]
+practical lamp filament:  4       [Authored]
+ordinary lit surface:      0       [Authored]
+```
+
+The bright metal block deliberately has no emissive membership. The overlapping
+transparent pair proves that contribution blending accumulates instead of
+last-writer replacement.
 
 ## Quality tiers
 
 ```text
-full:
-  bloomScale 0.5, pixelRatioCap 2, dynamic MRT emissive contribution
-
-balanced:
-  bloomScale 0.33, pixelRatioCap 1.5, fewer transparent/effect contributors
-
-reduced:
-  bloomScale 0.25, pixelRatioCap 1, dynamicMrt false, disabled-in-reduced-tier contribution policy
+full:     bloom scale 0.5, DPR cap 2.0, selective MRT enabled       [Authored]
+balanced: bloom scale 0.33, DPR cap 1.5, fewer contributors         [Authored]
+mobile:   bloom scale 0.25, DPR cap 1.0, selective MRT enabled      [Authored]
+reduced-readable-base: bloom and MRT unreachable                    [Authored]
 ```
 
-The reduced tier is a quality reduction with `dynamicMrt:false`; it keeps the base scene readable without a live MRT-dependent bloom path.
+Reduced mode selects the readable base scene and makes the bloom graph
+unreachable; setting strength to zero would not be a bypass. The controller
+now rebuilds the owned stage when mode or tier changes: `no-post`, luminance,
+overlay, and reduced routes own only the base pass; emissive diagnostics own
+only the selective MRT; combined/bloom-only routes own the MRT plus BloomNode.
+The replaced stage is disposed before the new graph is published, so hidden
+BloomNode targets do not survive a base-only tier switch.
 
-## Checkpoints
+`describeResources()` follows the active stage kind. It lists scene output,
+emissive and validation-only attachments only when allocated, all eleven
+BloomNode targets only when BloomNode exists, and the scene depth attachment.
+Color payload bytes are derived; `depth24plus` physical bytes, alignment, and
+resident allocation remain `INSUFFICIENT_EVIDENCE` until adapter inspection.
 
-1. Checkpoint: MRT contribution.
-   must see only authored emissive members in `emissive-only`.
-   if you see bright metal, mistake: scene luminance is being used as bloom membership.
-2. Checkpoint: bloom-only.
-   must see soft high-pass glare around authored emitters.
-   if you see hard silhouettes, mistake: the high-pass/five-mip blur path is bypassed.
-3. Checkpoint: false-color luminance.
-   must see scene-linear HDR ordering before output conversion.
-   if you see display-clamped gray, mistake: threshold is being tuned after tone mapping.
-4. Checkpoint: resolution-scale overlay.
-   must see the selected tier's bloom scale reflected in diagnostics.
-   if you see unchanged overlay after tier change, mistake: `setResolutionScale()` was not applied.
-5. Checkpoint: transparent emitter.
-   must see the `transparent-emitter` sprite contribution in diagnostics.
-   if you see final glow but no emissive target signal, mistake: transparent depth/blend policy is wrong.
-6. Checkpoint: reduced mode.
-   must see `dynamicMrt:false` and no bloom-only signal.
-   if you see reduced mode reading `emissive`, mistake: reduced mode still depends on full MRT resources.
+## Derived cost floor
 
-## Budgets
+At `1920x1080`, bloom scale `0.5`, BloomNode's fixed internal targets occupy
+`14.49 MiB`; the selective full-resolution RGBA16F emissive attachment adds
+`15.82 MiB`, for `30.31 MiB` before scene output, depth, alignment, and tile
+scratch **[Derived]**. The node submits `12` fullscreen draws and approaches
+`42.3047 A` texture samples plus `4.6641 A` writes for
+`A = scale^2 * width * height` **[Derived]**.
 
-```text
-scene render count: 1
-MRT targets: output + emissive
-extra scene traversals for bloom: 0
-temporary whole-scene overrides per frame: 0
-HDR output target format: HalfFloatType / RGBA16F-equivalent
-bloom resolution: 0.25-0.5 of renderer size by tier
-draw-call multiplier from bloom selection: 1x
+Planning rejection ceilings are `0.8 ms` at `2560x1440`, scale `0.5` on
+discrete desktop; `1.5 ms` at `1920x1080`, scale `0.33-0.5` on integrated
+desktop; and `2.0 ms` at `1280x720`, scale `0.25-0.33` on mobile
+**[Authored]**. They are not measured claims.
+
+## Static checks
+
+```bash
+npm --prefix threejs-bloom/examples/node-selective-bloom run check
+npm --prefix threejs-bloom/examples/node-selective-bloom run validate
+npm --prefix threejs-bloom/examples/node-selective-bloom run test:mutations
+npm --prefix threejs-bloom/examples/node-selective-bloom run validate:quick
 ```
 
-At 1920x1080, two RGBA16F full-resolution MRT targets are about 31.6 MiB before depth and BloomNode internals. Keep bloom-related transient targets under about 64 MiB at 1080p by running bloom below full resolution.
+`capture` writes raw scene, emissive, bright-pass, bloom, and odd-size WebGPU
+render-target readbacks with aligned-stride metadata. It deliberately does not
+rename those targets as a final composite or use a page screenshot. The raw
+candidate remains `INSUFFICIENT_EVIDENCE` until a color-managed composite,
+standard PNG set, GPU timestamps, and lifecycle evidence exist.
+`validate:artifacts` rejects missing/incomplete v2 bundles; `validate:full`
+also requires every claim verdict to be `PASS`.
 
-Target bloom GPU time:
+The validator asserts:
 
-```text
-desktop-discrete: <= 0.8 ms at 1440p with bloomScale 0.5
-desktop-integrated: <= 1.5 ms at 1080p with bloomScale 0.33-0.5
-mobile: <= 2.0 ms at 720p-1080p with bloomScale 0.25-0.33
-```
+- WebGPU-only routing;
+- one scene render and no override selection pass;
+- explicit emissive `MaterialBlending`;
+- premultiplied regular `emissiveNode` authoring with no material `mrtNode`;
+- two overlapping transparent contributors;
+- bloom RGB addition with scene alpha preservation;
+- no inherited renderer MSAA;
+- disabled reduced tier and conditional resize handling.
 
-## Minimal usage
+Mechanism/tier Pages wrappers may select startup state through either fixed
+path segments or strict query parameters. Path locks take precedence. Unknown
+mechanisms, tiers, scenarios, modes, cameras, seeds, times, and diagnostic flags
+throw instead of silently selecting a default. Runtime metrics report the
+resolved mechanism and tier.
 
-```js
-import {
-	DEBUG_MODES,
-	createNodeSelectiveBloomExample
-} from './examples/node-selective-bloom/index.js';
+The PSF, non-emissive ROI, emissive hierarchy, transparent-occlusion, and
+no-post-readability gates are implemented as claim-specific metric evaluators.
+Without measured fixture probes each verdict remains
+`INSUFFICIENT_EVIDENCE`; the lab has no aggregate shortcut to acceptance.
 
-const canvas = document.querySelector( 'canvas' );
+## Runtime acceptance still required
 
-const bloomDemo = await createNodeSelectiveBloomExample( {
-	canvas,
-	seed: 0xB1004D,
-	width: window.innerWidth,
-	height: window.innerHeight,
-	pixelRatio: window.devicePixelRatio
-} );
+- Capture emissive-only output for the overlapping transparent pair in both
+  insertion orders; additive energy must be invariant.
+- Capture a bright mirror and transmissive surface to prove why selective input
+  was chosen over scene-color bloom.
+- Sweep threshold/soft knee only in pre-tone scene-linear space.
+- Sweep minimum/maximum DPR and aspect; reject halo-footprint drift outside the
+  authored tolerance.
+- Enforce the deepest-level gate
+  `floor(scale * min(drawingBufferWidth, drawingBufferHeight)) >= 16`
+  **[Derived/Gated]**.
+- Record scene MRT delta, BloomNode stages, transparent overdraw, attachment
+  bytes, and sustained mobile thermal behavior.
+- Disable bloom and prove both base readability and measured pass bypass.
 
-bloomDemo.setBloomControls( {
-	strength: 0.55,
-	radius: 0.35,
-	threshold: 0.9,
-	smoothWidth: 0.08,
-	resolutionScale: 0.5
-} );
-
-bloomDemo.setDebugMode( DEBUG_MODES.COMBINED );
-bloomDemo.start();
-
-window.addEventListener( 'resize', () => {
-
-	bloomDemo.resize( window.innerWidth, window.innerHeight, window.devicePixelRatio );
-
-} );
-
-// Later:
-// bloomDemo.dispose();
-```
+The browser implementation is present, but the missing evidence remains an
+explicit blocker rather than a fabricated pass.
