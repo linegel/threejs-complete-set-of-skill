@@ -915,7 +915,6 @@ function attachContactInteractionLineage( h, route, descriptor, interactionId, a
 	route.physicsGraph.executionLedger.interactionApplicationLedgers.push( clone( ledger ) );
 	execution.interactionApplicationLedgerIds.push( applicationLedgerId );
 	claim.interactionApplicationLedgerIds.push( applicationLedgerId );
-	for ( const loop of route.physicsGraph.loopMacros ) loop.perIterationLedger.find( ( row ) => row.accepted ).interactionApplicationLedgerIds.push( applicationLedgerId );
 	const totals = route.physicsCostLedger.cadenceTraceTotals;
 	totals.interactionApplicationCounts.pointImpulse = h.evidence( totals.coordinationAdvanceCount.value, 'application', 'Measured', totals.coordinationAdvanceCount.source );
 	const totalsPayload = clone( totals ); delete totalsPayload.exactTotalsDigest; totals.exactTotalsDigest = digest( totalsPayload );

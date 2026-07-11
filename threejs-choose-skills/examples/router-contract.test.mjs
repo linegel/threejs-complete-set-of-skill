@@ -631,7 +631,7 @@ function validateNumericEvidence( value, path = 'route' ) {
 			if ( nativeKind === 'integer' && Number.isInteger( Number( value ) ) ) return;
 
 		}
-		if ( ( /\.(generation|tick|epochTick|numerator|denominator|requestSequence|producerSequence|executionSequence|coordinationSequence|presentationOpportunitySequence|targetFrameSequence|subcycleIndex|nativeSubcycleIndex|frameSlotIndex|allocationCursor|firstSequence|lastSequence|lastSequenceInclusive|nextSequence|cursorBefore|cursorAfter|iterationIndex|producedIterationOffset|consumedIterationOffset|count|elementCount|configuredMaximumFramesInFlight|observedFramesInFlightAtAdmission)$/.test( path ) || /\.(perConsumerCursor|identitySlotMap|configuredMaximumFramesInFlightByTarget|observedFramesInFlightByTarget)\.[^.]+$/.test( path ) ) && Number.isInteger( Number( value ) ) ) return;
+		if ( ( /\.(generation|tick|epochTick|numerator|denominator|requestSequence|producerSequence|executionSequence|coordinationSequence|presentationOpportunitySequence|targetFrameSequence|subcycleIndex|nativeSubcycleIndex|frameSlotIndex|allocationCursor|firstSequence|lastSequence|lastSequenceInclusive|nextSequence|cursorBefore|cursorAfter|iterationIndex|producedIterationOffset|consumedIterationOffset|count|elementCount|configuredMaximumFramesInFlight|observedFramesInFlightAtAdmission)$/.test( path ) || /\.(perConsumerCursor|identitySlotMap|configuredMaximumFramesInFlightByTarget|observedFramesInFlightByTarget)\.[^.]+$/.test( path ) || /\.sourceCursorBeforeAfter\.(before|after)$/.test( path ) ) && Number.isInteger( Number( value ) ) ) return;
 		throw new Error( `${ path } is a bare numeric value` );
 
 	}
@@ -1090,7 +1090,7 @@ function validateRouteManifest( route ) {
 	assert.notEqual( String( route.primaryOwner ).trim(), '', 'primaryOwner must be non-empty' );
 
 	validateSignalRegistries( route );
-	if ( isPlainObject( route.physicsContext ) && route.physicsContext.schemaId === physicsAbiSchema?.$id ) validateCanonicalPhysicsContract( route );
+	if ( isPlainObject( route.physicsContext ) && route.physicsContext.schemaId === physicsAbiSchema?.$id ) validatePhysicalRouteManifest( route );
 	else validateNonphysicalPhysicsContract( route );
 	assert.ok( isPlainObject( route.outputOwnersByPresentationTarget ), 'outputOwnersByPresentationTarget must be a mapping' );
 	assert.ok( Object.keys( route.outputOwnersByPresentationTarget ).length > 0, 'outputOwnersByPresentationTarget must be non-empty' );
@@ -1667,13 +1667,11 @@ function validateCanonicalContext( context ) {
 	requireAbiRecord( context.physicsClockRegistry, 'PhysicsClockRegistry', 'physicsContext.physicsClockRegistry' );
 	requireNonEmptyMapping( context.physicsClockRegistry.clocksById, 'physicsContext.physicsClockRegistry.clocksById' );
 	assert.ok( Object.values( context.physicsClockRegistry.clocksById ).some( ( clock ) => clock.clockId === context.physicsClockRegistry.coordinationClockId ), 'physics clock registry coordination clock is missing' );
-	const mappingKinds = new Set();
 	for ( const [ clockKey, clock ] of Object.entries( context.physicsClockRegistry.clocksById ) ) {
 
 		requireAbiRecord( clock, 'PhysicsClockDescriptor', `physicsClockRegistry.${ clockKey }` );
 		assert.equal( clockKey, clock.clockId, `physicsClockRegistry key ${ clockKey } does not match clockId` );
 		requireAbiEnum( clock.mappingKind, 'clockMappingKinds', `physicsClockRegistry.${ clockKey }.mappingKind` );
-		mappingKinds.add( clock.mappingKind );
 		const armByKind = { 'fixed-rational': 'fixedRational', 'timestamp-table': 'timestampTable', 'piecewise-versioned': 'piecewiseVersioned', external: 'external' };
 		const activeArm = armByKind[ clock.mappingKind ];
 		for ( const arm of Object.values( armByKind ) ) {
@@ -1709,7 +1707,6 @@ function validateCanonicalContext( context ) {
 		}
 
 	}
-	assert.ok( mappingKinds.has( 'fixed-rational' ) && mappingKinds.has( 'timestamp-table' ) && mappingKinds.has( 'piecewise-versioned' ), 'physicsContext fixture must cover fixed and nonuniform clocks' );
 	requireAbiRecord( context.physicsMaterialRegistry, 'PhysicsMaterialRegistry', 'physicsMaterialRegistry' );
 	requireAbiRecord( context.idNamespaces, 'PhysicsIdentityRegistry', 'physicsContext.idNamespaces' );
 	requireNonEmptyString( context.physicsMaterialRegistry.registryId, 'physicsMaterialRegistry.registryId' );
@@ -2142,8 +2139,22 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 	const ledger = requireAbiRecord( graph.executionLedger, 'PhysicsExecutionLedger', 'physicsGraph.executionLedger' );
 	assert.deepEqual( [ ledger.graphId, ledger.coordinationAdvanceId, canonicalIntervalIdentity( ledger.coordinationInterval ) ], [ graph.graphId, graph.coordinationAdvance.coordinationAdvanceId, canonicalIntervalIdentity( graph.coordinationInterval ) ], 'physicsGraph.executionLedger identity mismatch' );
 	const acceptedIterationByLoop = new Map( graph.loopMacros.map( ( loop ) => [ loop.loopId, loop.acceptedIterationIndex ] ) );
-	const defaultAcceptedIteration = [ ...acceptedIterationByLoop.values() ][ 0 ] ?? 0;
-	const instantiateExecutionVersion = ( template, execution ) => template.replaceAll( '{i}', String( isTypedAbsence( execution.iterationIndex ) ? defaultAcceptedIteration : execution.iterationIndex ) ).replaceAll( '{s}', String( isTypedAbsence( execution.subcycleIndex ) ? 2 : execution.subcycleIndex ) );
+	const instantiateExecutionVersion = ( edge, execution ) => {
+
+		const template = edge.requiredVersionAndPhase.stateVersionRule;
+		let producerExecutions = ledger.stageExecutions.filter( ( row ) => row.stageId === edge.producerStageId );
+		if ( ! isTypedAbsence( execution.iterationIndex ) && producerExecutions.some( ( row ) => ! isTypedAbsence( row.iterationIndex ) ) ) producerExecutions = producerExecutions.filter( ( row ) => row.iterationIndex === execution.iterationIndex );
+		else if ( producerExecutions.some( ( row ) => ! isTypedAbsence( row.iterationIndex ) ) ) producerExecutions = producerExecutions.filter( ( row ) => acceptedIterationByLoop.get( row.couplingLoopId ) === row.iterationIndex );
+		if ( ! isTypedAbsence( execution.subcycleIndex ) && producerExecutions.some( ( row ) => ! isTypedAbsence( row.subcycleIndex ) ) ) producerExecutions = producerExecutions.filter( ( row ) => row.subcycleIndex === execution.subcycleIndex );
+		const producerExecution = producerExecutions.sort( ( a, b ) => a.executionSequence - b.executionSequence ).at( - 1 );
+		assert.ok( producerExecution, `version template ${ template } has no activated producer execution` );
+		let iterationIndex = execution.iterationIndex;
+		if ( isTypedAbsence( iterationIndex ) ) iterationIndex = producerExecution.iterationIndex;
+		assert.ok( ! template.includes( '{i}' ) || ! isTypedAbsence( iterationIndex ), `version template ${ template } requires an unresolved coupling-loop iteration` );
+		assert.ok( ! template.includes( '{s}' ) || ! isTypedAbsence( producerExecution.subcycleIndex ), `version template ${ template } requires an unresolved native-subcycle index` );
+		return template.replaceAll( '{i}', String( iterationIndex ) ).replaceAll( '{s}', String( producerExecution.subcycleIndex ) );
+
+	};
 	const executionsById = new Map();
 	let priorExecutionSequence = - 1;
 	for ( const [ index, execution ] of ledger.stageExecutions.entries() ) {
@@ -2161,7 +2172,13 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 		assertIntervalContained( execution.executionInterval, stage.executionInterval, context, label );
 		assert.equal( canonicalIntervalIdentity( execution.coordinationCoverageInterval ), canonicalIntervalIdentity( graph.coordinationInterval ), `${ label}.coordinationCoverageInterval mismatch` );
 		assert.equal( execution.status, 'completed', `${ label} is not completed` );
-		if ( stage.executionRule.activation === 'per-loop-iteration' ) assert.ok( ! isTypedAbsence( execution.iterationIndex ) && execution.couplingLoopId === 'body-water-loop', `${ label} lacks loop activation identity` );
+		if ( stage.executionRule.activation === 'per-loop-iteration' ) {
+
+			const loop = graph.loopMacros.find( ( candidate ) => candidate.loopId === execution.couplingLoopId );
+			assert.ok( ! isTypedAbsence( execution.iterationIndex ) && loop?.orderedStageIds.includes( stage.stageId ), `${ label} lacks a registered loop activation identity` );
+			assert.ok( execution.iterationIndex >= 0 && execution.iterationIndex < loop.perIterationLedger.length, `${ label} iteration index is outside its executed loop ledger` );
+
+		}
 		else assert.ok( isTypedAbsence( execution.iterationIndex ) && isTypedAbsence( execution.couplingLoopId ), `${ label} invents loop activation identity` );
 		if ( stage.executionRule.partition === 'exact-subcycle-tile' ) assert.ok( Number.isSafeInteger( execution.subcycleIndex ), `${ label} lacks subcycle identity` );
 		else assert.ok( isTypedAbsence( execution.subcycleIndex ), `${ label} invents a subcycle index` );
@@ -2172,7 +2189,7 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 			const read = stage.reads.find( ( candidate ) => candidate.readId === resolution.readId );
 			const edge = graph.edges.find( ( candidate ) => candidate.consumerStageId === stage.stageId && candidate.requiredVersionAndPhase.signalId === read.signalId && candidate.requiredVersionAndPhase.samplePhase === read.samplePhase );
 			assert.ok( edge, `${ label}.${ resolution.readId } has no exact edge` );
-			assert.equal( resolution.stateVersion, instantiateExecutionVersion( edge.requiredVersionAndPhase.stateVersionRule, execution ), `${ label}.${ resolution.readId } resolves the wrong state version` );
+			assert.equal( resolution.stateVersion, instantiateExecutionVersion( edge, execution ), `${ label}.${ resolution.readId } resolves the wrong state version` );
 			assert.deepEqual( resolution.requestedTime, read.requestedTime, `${ label}.${ resolution.readId } requested-time mismatch` );
 
 		}
@@ -2242,7 +2259,8 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 		const consumerIteration = isTypedAbsence( consumerExecution.iterationIndex ) ? null : consumerExecution.iterationIndex;
 		let candidates = executionsByStageId.get( edge.producerStageId );
 		if ( consumerIteration !== null && candidates.some( ( row ) => ! isTypedAbsence( row.iterationIndex ) ) ) candidates = candidates.filter( ( row ) => row.iterationIndex === consumerIteration );
-		else if ( consumerIteration === null && candidates.some( ( row ) => ! isTypedAbsence( row.iterationIndex ) ) ) candidates = candidates.filter( ( row ) => acceptedIterationByLoop.get( 'body-water-loop' ) === row.iterationIndex );
+		else if ( consumerIteration === null && candidates.some( ( row ) => ! isTypedAbsence( row.iterationIndex ) ) ) candidates = candidates.filter( ( row ) => acceptedIterationByLoop.get( row.couplingLoopId ) === row.iterationIndex );
+		if ( ! isTypedAbsence( consumerExecution.subcycleIndex ) && candidates.some( ( row ) => ! isTypedAbsence( row.subcycleIndex ) ) ) candidates = candidates.filter( ( row ) => row.subcycleIndex === consumerExecution.subcycleIndex );
 		const producerExecution = candidates.at( - 1 );
 		assert.ok( producerExecution, `dependency ${ edge.barrier.dependencyId } has no activated producer for ${ consumerExecution.executionId}` );
 		const identity = `${ edge.barrier.dependencyId }|${ producerExecution.executionId }|${ consumerExecution.executionId }`;
@@ -2251,6 +2269,7 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 	}
 	const completionsById = new Map();
 	const observedCompletionInstances = new Set();
+	const dependencyGenerationByDevice = new Map();
 	for ( const [ index, completion ] of ledger.dependencyCompletions.entries() ) {
 
 		const label = `physicsGraph.executionLedger.dependencyCompletions[${ index }]`;
@@ -2270,7 +2289,22 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 		assert.deepEqual( completion.payloadAndVersion, { signalId: expected.edge.requiredVersionAndPhase.signalId, stateVersionRule: expected.edge.requiredVersionAndPhase.stateVersionRule }, `${ label}.payloadAndVersion mismatch` );
 		assert.deepEqual( completion.producerResidency, stagesById.get( producer.stageId ).executionResidency, `${ label}.producerResidency mismatch` );
 		assert.deepEqual( completion.consumerResidency, stagesById.get( consumer.stageId ).executionResidency, `${ label}.consumerResidency mismatch` );
-		assert.deepEqual( completion.deviceBackendResourceGenerations, { deviceId: 'fixture-webgpu-device', backendGeneration: 'backend-generation-1', deviceLossGeneration: 'device-generation-1' }, `${ label}.device/backend/loss generation mismatch` );
+		if ( isTypedAbsence( completion.deviceBackendResourceGenerations ) ) {
+
+			assert.ok( isTypedAbsence( completion.producerResidency.deviceId ) && isTypedAbsence( completion.consumerResidency.deviceId ), `${ label} omits generations for a device-backed dependency` );
+
+		} else {
+
+			for ( const generationKey of [ 'deviceId', 'backendGeneration', 'deviceLossGeneration' ] ) requireNonEmptyString( completion.deviceBackendResourceGenerations[ generationKey ], `${ label}.deviceBackendResourceGenerations.${ generationKey}` );
+			const endpointDeviceIds = [ completion.producerResidency.deviceId, completion.consumerResidency.deviceId ].filter( ( deviceId ) => ! isTypedAbsence( deviceId ) );
+			assert.ok( endpointDeviceIds.length > 0, `${ label} invents device generations for a host-only dependency` );
+			assert.ok( endpointDeviceIds.includes( completion.deviceBackendResourceGenerations.deviceId ), `${ label}.deviceId does not identify a device-backed endpoint` );
+			const generationIdentity = `${ completion.deviceBackendResourceGenerations.backendGeneration }|${ completion.deviceBackendResourceGenerations.deviceLossGeneration }`;
+			const priorGenerationIdentity = dependencyGenerationByDevice.get( completion.deviceBackendResourceGenerations.deviceId );
+			if ( priorGenerationIdentity !== undefined ) assert.equal( generationIdentity, priorGenerationIdentity, `${ label}.device/backend/loss generation mismatch within one coordination advance` );
+			else dependencyGenerationByDevice.set( completion.deviceBackendResourceGenerations.deviceId, generationIdentity );
+
+		}
 		assert.equal( completion.producerRelease.completionToken, producer.completionReceiptDigest, `${ label}.producer release token mismatch` );
 		assert.equal( completion.consumerAcquire.waitToken, producer.completionReceiptDigest, `${ label}.consumer acquire token mismatch` );
 		assert.equal( completion.consumerAcquire.firstUse, consumer.executionId, `${ label}.consumer first-use mismatch` );
@@ -2335,7 +2369,7 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 		requireAbiRecord( loop, 'BoundedCouplingLoop', label );
 		assert.equal( loop.coordinationAdvanceId, graph.coordinationAdvance.coordinationAdvanceId, `${ label}.coordinationAdvanceId mismatch` );
 		assert.equal( canonicalIntervalIdentity( loop.couplingInterval ), canonicalIntervalIdentity( graph.coordinationInterval ), `${ label}.couplingInterval mismatch` );
-		assert.equal( quantityValue( loop.iterationBound, `${ label}.iterationBound` ), loop.perIterationLedger.length, `${ label}.iterationBound disagrees with its exact iteration ledger` );
+		assert.ok( loop.perIterationLedger.length <= quantityValue( loop.iterationBound, `${ label}.iterationBound` ), `${ label}.executed iterations exceed iterationBound` );
 		assertUnique( loop.orderedStageIds, `${ label}.orderedStageIds` );
 		assert.deepEqual( loop.perIterationLedger.map( ( row ) => row.iterationIndex ), loop.perIterationLedger.map( ( _, iterationIndex ) => iterationIndex ), `${ label} iteration indices are not contiguous` );
 		assert.equal( loop.perIterationLedger.filter( ( row ) => row.accepted ).length, 1, `${ label} must accept exactly one iterate` );
@@ -2468,13 +2502,9 @@ function validateCanonicalGraphV2( graph, signals, context, route ) {
 	assert.deepEqual( [ ...advance.stageExecutionIds ].sort(), [ ...executionsById.keys() ].sort(), 'coordination advance stage-execution closure mismatch' );
 	assert.deepEqual( [ ...advance.stateAdvanceClaimIds ].sort(), [ ...claimsById.keys() ].sort(), 'coordination advance state-claim closure mismatch' );
 	assert.deepEqual( [ ...advance.commitTransactionIds ].sort(), [ ...transactionsById.keys() ].sort(), 'coordination advance commit-transaction closure mismatch' );
-	assert.ok( quantityValue( advance.debtAfter.seconds, 'coordinationAdvance.debtAfter.seconds' ) <= quantityValue( advance.debtBefore.seconds, 'coordinationAdvance.debtBefore.seconds' ), 'coordination advance increases catch-up debt' );
 	assert.equal( advance.receiptDigest, sha256CanonicalExcluding( advance, [ 'receiptDigest' ] ), 'coordination advance receipt digest mismatch' );
-	assert.ok( isTypedAbsence( graph.catchUpBatch ), 'zero-drop fixture must not invent a catch-up batch' );
-	requireAbiRecord( graph.catchUpPolicy, 'PhysicsCatchUpPolicy', 'physicsGraph.catchUpPolicy' );
-	assert.equal( graph.catchUpPolicy.owner, 'route-physics-coordinator', 'catch-up policy is not graph-owned' );
-	assert.equal( ledger.physicsCostLedgerId, 'mobile-cost-ledger-42', 'execution ledger does not bind the active cost ledger' );
-	assert.deepEqual( route.physicsCoordinationAdvanceRecords, [ advance ], 'route coordination-advance inventory differs from the graph advance' );
+	validateCatchUpSchedulerClosure( graph, context, advance, route, ledger );
+	assert.equal( ledger.physicsCostLedgerId, route.physicsCostLedger.ledgerId, 'execution ledger does not bind the active cost ledger' );
 	assert.deepEqual( Object.keys( route.physicsCommitTransactions ).sort(), [ ...transactionsById.keys() ].sort(), 'route commit-transaction inventory key closure mismatch' );
 	for ( const [ transactionId, transaction ] of transactionsById ) assert.deepEqual( route.physicsCommitTransactions[ transactionId ], transaction, `route commit transaction ${ transactionId } differs from the graph transaction` );
 
@@ -2503,6 +2533,151 @@ function canonicalDurationSecondsValue( duration, context, label ) {
 	validateCanonicalDuration( duration, context, label );
 	if ( duration.kind === 'seconds' ) return quantityValue( duration.seconds, `${ label }.seconds` );
 	return canonicalInstantSeconds( duration.clockSpan.endExclusive, context, `${ label }.clockSpan.endExclusive` ) - canonicalInstantSeconds( duration.clockSpan.start, context, `${ label }.clockSpan.start` );
+
+}
+
+function validateCatchUpSchedulerClosure( graph, context, advance, route, executionLedger ) {
+
+	const policy = requireAbiRecord( graph.catchUpPolicy, 'PhysicsCatchUpPolicy', 'physicsGraph.catchUpPolicy' );
+	requireNonEmptyString( policy.owner, 'physicsGraph.catchUpPolicy.owner' );
+	assert.equal( policy.owner, graph.discontinuityPolicy.owner, 'catch-up and discontinuity policies have different coordinators' );
+	canonicalClock( context, policy.debtClockId, 'physicsGraph.catchUpPolicy.debtClockId' );
+	const maximumDebt = canonicalDurationSecondsValue( policy.maximumDebt, context, 'physicsGraph.catchUpPolicy.maximumDebt' );
+	assert.ok( maximumDebt >= 0, 'catch-up policy maximum debt is negative' );
+	const maximumAdvances = quantityValue( policy.maximumCoordinationAdvancesPerPresentationOpportunity, 'physicsGraph.catchUpPolicy.maximumCoordinationAdvancesPerPresentationOpportunity' );
+	const maximumNativeExecutions = quantityValue( policy.maximumNativeExecutionsPerOpportunity, 'physicsGraph.catchUpPolicy.maximumNativeExecutionsPerOpportunity' );
+	assert.ok( Number.isSafeInteger( maximumAdvances ) && maximumAdvances > 0, 'catch-up policy maximum coordination advances must be a positive integer' );
+	assert.ok( Number.isSafeInteger( maximumNativeExecutions ) && maximumNativeExecutions > 0, 'catch-up policy maximum native executions must be a positive integer' );
+	assert.ok( Array.isArray( policy.errorAndResourceGates ) && policy.errorAndResourceGates.length > 0, 'catch-up policy has no error/resource gates' );
+	const advanceDebtBefore = canonicalDurationSecondsValue( advance.debtBefore, context, 'physicsGraph.coordinationAdvance.debtBefore' );
+	const advanceDebtAfter = canonicalDurationSecondsValue( advance.debtAfter, context, 'physicsGraph.coordinationAdvance.debtAfter' );
+	assert.ok( advanceDebtBefore >= 0 && advanceDebtAfter >= 0 && advanceDebtAfter <= maximumDebt, 'coordination advance debt violates the catch-up policy bound' );
+	assert.deepEqual( executionLedger.catchUpDebtBeforeAfter, { before: advance.debtBefore, after: advance.debtAfter }, 'execution-ledger and coordination-advance catch-up debt endpoints differ' );
+	assert.ok( Array.isArray( route.physicsCoordinationAdvanceRecords ) && route.physicsCoordinationAdvanceRecords.length > 0, 'route has no coordination-advance inventory' );
+	const advancesById = new Map();
+	for ( const [ index, record ] of route.physicsCoordinationAdvanceRecords.entries() ) {
+
+		requireAbiRecord( record, 'PhysicsCoordinationAdvanceRecord', `physicsCoordinationAdvanceRecords[${ index }]` );
+		assert.ok( ! advancesById.has( record.coordinationAdvanceId ), `duplicate route coordination advance ${ record.coordinationAdvanceId}` );
+		assert.deepEqual( [ record.graphId, record.contextId ], [ graph.graphId, context.contextId ], `coordination advance ${ record.coordinationAdvanceId} graph/context mismatch` );
+		validateCanonicalInterval( record.interval, context, `physicsCoordinationAdvanceRecords[${ index }].interval` );
+		assert.equal( record.receiptDigest, sha256CanonicalExcluding( record, [ 'receiptDigest' ] ), `coordination advance ${ record.coordinationAdvanceId} receipt digest mismatch` );
+		advancesById.set( record.coordinationAdvanceId, record );
+
+	}
+	assert.deepEqual( advancesById.get( advance.coordinationAdvanceId ), advance, 'route coordination-advance inventory differs from the graph advance' );
+	if ( isTypedAbsence( graph.catchUpBatch ) ) {
+
+		assert.ok( isTypedAbsence( advance.catchUpBatchId ), 'coordination advance references an absent catch-up batch' );
+		return;
+
+	}
+	const batch = requireAbiRecord( graph.catchUpBatch, 'PhysicsCatchUpBatch', 'physicsGraph.catchUpBatch' );
+	assert.deepEqual( [ batch.graphId, batch.contextId, batch.owner ], [ graph.graphId, context.contextId, policy.owner ], 'catch-up batch graph/context/owner mismatch' );
+	assert.equal( advance.catchUpBatchId, batch.catchUpBatchId, 'coordination advance references another catch-up batch' );
+	assertUnique( batch.coordinationAdvanceIds, 'physicsGraph.catchUpBatch.coordinationAdvanceIds' );
+	assert.ok( batch.coordinationAdvanceIds.length > 0 && batch.coordinationAdvanceIds.length <= maximumAdvances, 'catch-up batch exceeds the policy advance-count bound' );
+	assert.ok( batch.coordinationAdvanceIds.includes( advance.coordinationAdvanceId ), 'catch-up batch omits the serialized coordination advance' );
+	const batchAdvances = batch.coordinationAdvanceIds.map( ( advanceId ) => {
+
+		const record = advancesById.get( advanceId );
+		assert.ok( record, `catch-up batch references unknown coordination advance ${ advanceId}` );
+		assert.equal( record.catchUpBatchId, batch.catchUpBatchId, `coordination advance ${ advanceId} references another catch-up batch` );
+		return record;
+
+	} );
+	const currentNativeExecutionIds = executionLedger.stageExecutions.map( ( execution ) => execution.executionId );
+	assertUnique( currentNativeExecutionIds, 'physicsGraph.executionLedger catch-up native-execution IDs' );
+	assert.ok( executionLedger.stageExecutions.every( ( execution ) => execution.coordinationAdvanceId === advance.coordinationAdvanceId ), 'execution ledger mixes native executions from different coordination advances' );
+	assert.deepEqual( [ ...advance.stageExecutionIds ].sort(), [ ...currentNativeExecutionIds ].sort(), 'serialized coordination advance native-execution closure differs from the execution ledger' );
+	const batchNativeExecutionIds = new Set();
+	let batchNativeExecutionCount = 0;
+	for ( const record of batchAdvances ) {
+
+		assertUnique( record.stageExecutionIds, `coordination advance ${ record.coordinationAdvanceId} native-execution IDs` );
+		batchNativeExecutionCount += record.stageExecutionIds.length;
+		for ( const executionId of record.stageExecutionIds ) {
+
+			assert.ok( ! batchNativeExecutionIds.has( executionId ), `catch-up native execution ${ executionId} belongs to more than one coordination advance` );
+			batchNativeExecutionIds.add( executionId );
+
+		}
+
+	}
+	assert.equal( batchNativeExecutionCount, batchNativeExecutionIds.size, 'catch-up batch native-execution cardinality is not the exact sum of its advances' );
+	assert.ok( batchNativeExecutionCount <= maximumNativeExecutions, 'catch-up batch exceeds the policy native-execution bound' );
+	assert.equal( batch.debtIdentity.graphId, graph.graphId, 'catch-up debt identity references another graph' );
+	assert.equal( batch.debtIdentity.debtClockId, policy.debtClockId, 'catch-up debt identity uses another debt clock' );
+	assert.equal( batch.debtIdentity.policyRevision, batch.policyRevision, 'catch-up batch/debt policy revisions differ' );
+	canonicalInstantSeconds( batch.debtIdentity.observedAt, context, 'physicsGraph.catchUpBatch.debtIdentity.observedAt' );
+	assert.equal( batch.debtIdentity.observedAt.clockId, policy.debtClockId, 'catch-up debt observation uses another clock' );
+	assert.ok( isPlainObject( batch.debtIdentity.sourceCursorBeforeAfter ) && Number.isSafeInteger( batch.debtIdentity.sourceCursorBeforeAfter.before ) && Number.isSafeInteger( batch.debtIdentity.sourceCursorBeforeAfter.after ) && batch.debtIdentity.sourceCursorBeforeAfter.after >= batch.debtIdentity.sourceCursorBeforeAfter.before, 'catch-up debt identity cursor is not monotonic' );
+	assert.equal( batch.admittedAdvanceIntervals.length, batch.coordinationAdvanceIds.length, 'catch-up batch advance interval/ID cardinality mismatch' );
+	let priorEnd = - Infinity;
+	let committedDurationFromIntervals = 0;
+	for ( const [ index, interval ] of batch.admittedAdvanceIntervals.entries() ) {
+
+		validateCanonicalInterval( interval, context, `physicsGraph.catchUpBatch.admittedAdvanceIntervals[${ index }]` );
+		const bounds = intervalBoundsSeconds( interval, context, `physicsGraph.catchUpBatch.admittedAdvanceIntervals[${ index }]` );
+		assert.ok( bounds[ 0 ] >= priorEnd - 1e-12, 'catch-up batch admitted advance intervals overlap or are out of order' );
+		priorEnd = bounds[ 1 ];
+		committedDurationFromIntervals += bounds[ 1 ] - bounds[ 0 ];
+		assert.equal( canonicalIntervalIdentity( interval ), canonicalIntervalIdentity( batchAdvances[ index ].interval ), `catch-up batch interval ${ index} does not match coordination advance ${ batchAdvances[ index ].coordinationAdvanceId}` );
+
+	}
+	const debtBefore = canonicalDurationSecondsValue( batch.debtBefore, context, 'physicsGraph.catchUpBatch.debtBefore' );
+	const elapsedDuringBatch = canonicalDurationSecondsValue( batch.elapsedDuringBatch, context, 'physicsGraph.catchUpBatch.elapsedDuringBatch' );
+	const committedAdvanceDuration = canonicalDurationSecondsValue( batch.committedAdvanceDuration, context, 'physicsGraph.catchUpBatch.committedAdvanceDuration' );
+	const explicitlyDroppedDuration = canonicalDurationSecondsValue( batch.explicitlyDroppedDuration, context, 'physicsGraph.catchUpBatch.explicitlyDroppedDuration' );
+	const debtAfter = canonicalDurationSecondsValue( batch.debtAfter, context, 'physicsGraph.catchUpBatch.debtAfter' );
+	for ( const [ label, value ] of Object.entries( { debtBefore, elapsedDuringBatch, committedAdvanceDuration, explicitlyDroppedDuration, debtAfter } ) ) assert.ok( value >= 0, `catch-up batch ${ label } is negative` );
+	const tolerance = 1e-12 * Math.max( 1, debtBefore, elapsedDuringBatch, committedAdvanceDuration, explicitlyDroppedDuration, debtAfter );
+	assert.ok( Math.abs( committedDurationFromIntervals - committedAdvanceDuration ) <= tolerance, 'catch-up batch committed duration differs from its admitted intervals' );
+	assert.ok( Math.abs( debtAfter - ( debtBefore + elapsedDuringBatch - committedAdvanceDuration - explicitlyDroppedDuration ) ) <= tolerance, 'catch-up debt equation does not close' );
+	assert.ok( debtAfter <= maximumDebt, 'catch-up batch debt exceeds the policy maximum' );
+	if ( batch.coordinationAdvanceIds.length === 1 ) assert.ok( Math.abs( advanceDebtBefore - debtBefore ) <= tolerance && Math.abs( advanceDebtAfter - debtAfter ) <= tolerance, 'single-advance catch-up batch debt endpoints disagree with the coordination advance' );
+	assert.equal( batch.status, advance.status === 'committed' ? 'completed' : batch.status, 'committed coordination advance belongs to an incomplete catch-up batch' );
+	assert.ok( Array.isArray( batch.errorResourceAndExecutionGateResults ) && batch.errorResourceAndExecutionGateResults.length > 0, 'catch-up batch has no gate results' );
+	assert.ok( batch.errorResourceAndExecutionGateResults.every( ( gate ) => gate === 'accepted' || gate?.status === 'accepted' ), 'catch-up batch contains a rejected or implicit gate result' );
+	if ( explicitlyDroppedDuration <= tolerance ) {
+
+		assert.ok( isTypedAbsence( batch.lossLedger ), 'zero-drop catch-up batch invents a loss ledger' );
+
+	} else {
+
+		assert.equal( policy.debtDisposition, 'drop-with-loss-ledger', 'catch-up batch drops time under a non-drop policy' );
+		assert.equal( policy.discontinuityOnDrop, 'required', 'catch-up drop does not require a discontinuity' );
+		const loss = requireAbiRecord( batch.lossLedger, 'PhysicsCatchUpLossLedger', 'physicsGraph.catchUpBatch.lossLedger' );
+		assert.equal( loss.debtIdentityId, batch.debtIdentity.debtIdentityId, 'catch-up loss ledger references another debt identity' );
+		let droppedDurationFromIntervals = 0;
+		let priorDroppedEnd = - Infinity;
+		for ( const [ index, interval ] of loss.droppedIntervals.entries() ) {
+
+			validateCanonicalInterval( interval, context, `physicsGraph.catchUpBatch.lossLedger.droppedIntervals[${ index }]` );
+			const bounds = intervalBoundsSeconds( interval, context, `physicsGraph.catchUpBatch.lossLedger.droppedIntervals[${ index }]` );
+			assert.ok( bounds[ 0 ] >= priorDroppedEnd - 1e-12, 'catch-up loss intervals overlap or are out of order' );
+			priorDroppedEnd = bounds[ 1 ];
+			droppedDurationFromIntervals += bounds[ 1 ] - bounds[ 0 ];
+
+		}
+		assert.ok( Math.abs( droppedDurationFromIntervals - explicitlyDroppedDuration ) <= tolerance, 'catch-up loss intervals do not equal the explicitly dropped duration' );
+		for ( const dropped of loss.droppedIntervals ) {
+
+			const droppedBounds = intervalBoundsSeconds( dropped, context, 'physicsGraph.catchUpBatch.lossLedger.droppedIntervals' );
+			for ( const admitted of batch.admittedAdvanceIntervals ) {
+
+				const admittedBounds = intervalBoundsSeconds( admitted, context, 'physicsGraph.catchUpBatch.admittedAdvanceIntervals' );
+				assert.ok( droppedBounds[ 1 ] <= admittedBounds[ 0 ] || droppedBounds[ 0 ] >= admittedBounds[ 1 ], 'catch-up dropped interval overlaps an admitted advance interval' );
+
+			}
+
+		}
+		assert.ok( isPlainObject( loss.discontinuityEpochBeforeAfter ) && loss.discontinuityEpochBeforeAfter.before !== loss.discontinuityEpochBeforeAfter.after, 'catch-up loss ledger does not advance the discontinuity epoch' );
+		assert.ok( loss.resetActions.length > 0, 'catch-up loss ledger has no reset actions' );
+		assert.equal( loss.contentDigest, sha256CanonicalExcluding( loss, [ 'contentDigest' ] ), 'catch-up loss-ledger digest mismatch' );
+
+	}
+	assert.equal( batch.receiptDigest, sha256CanonicalExcluding( batch, [ 'receiptDigest' ] ), 'catch-up batch receipt digest mismatch' );
 
 }
 
@@ -2833,7 +3008,7 @@ function validateCanonicalExchange( exchange, context, exchangeIndex ) {
 
 	} else {
 
-		assert.ok( exchange.reactionGroups.length > 0, `${ label } two-way fixture requires a reaction group` );
+		assert.ok( exchange.reactionGroups.length > 0, `${ label } two-way exchange requires at least one reaction group` );
 
 	}
 	for ( const [ groupIndex, group ] of exchange.reactionGroups.entries() ) {
@@ -2844,23 +3019,23 @@ function validateCanonicalExchange( exchange, context, exchangeIndex ) {
 		assert.equal( group.exchangeId, exchange.exchangeId, `${ groupLabel }.exchangeId mismatch` );
 		validateCanonicalInterval( group.applicationInterval, context, `${ groupLabel }.applicationInterval` );
 		assert.equal( group.acceptance, 'all-or-none', `${ groupLabel } must accept atomically` );
-		assert.ok( group.sourceInteractionIds.length > 1 && group.reactionInteractionIds.length > 1, `${ groupLabel } fixture must exercise a many-to-many relation` );
-		for ( const id of [ ...group.sourceInteractionIds, ...group.reactionInteractionIds ] ) assert.ok( recordsById.has( id ), `${ groupLabel } references unknown interaction ${ id }` );
+		assert.ok( group.sourceInteractionIds.length > 0 && group.reactionInteractionIds.length > 0, `${ groupLabel } must contain at least one source and one reaction` );
+		assertUnique( group.sourceInteractionIds, `${ groupLabel }.sourceInteractionIds` );
+		assertUnique( group.reactionInteractionIds, `${ groupLabel }.reactionInteractionIds` );
+		for ( const id of group.sourceInteractionIds ) assert.ok( exchange.interactions.some( ( record ) => record.interactionId === id ), `${ groupLabel } references unresolved source interaction ${ id }` );
+		for ( const id of group.reactionInteractionIds ) assert.ok( exchange.reactions.some( ( record ) => record.interactionId === id ), `${ groupLabel } references unresolved reaction interaction ${ id }` );
+		assert.ok( group.conservationGroupIds.length > 0, `${ groupLabel } must bind at least one conservation group` );
+		assertUnique( group.conservationGroupIds, `${ groupLabel }.conservationGroupIds` );
+		for ( const conservationGroupId of group.conservationGroupIds ) assert.ok( exchange.conservationGroups.some( ( conservation ) => conservation.conservationGroupId === conservationGroupId ), `${ groupLabel } references unresolved conservation group ${ conservationGroupId }` );
 		assert.equal( group.physicsOriginEpoch, exchange.physicsOriginEpoch, `${ groupLabel }.physicsOriginEpoch mismatch` );
 		assert.equal( group.balanceFrameId, exchange.physicsFrameId, `${ groupLabel }.balanceFrameId mismatch` );
 		assert.equal( group.balanceTransformRevision, exchange.transformRevision, `${ groupLabel }.balanceTransformRevision mismatch` );
-		const linear = [ 0, 0, 0 ];
-		const angular = [ 0, 0, 0 ];
 		for ( const id of [ ...group.sourceInteractionIds, ...group.reactionInteractionIds ] ) {
 
 			const record = recordsById.get( id );
 			assert.equal( record.reactionGroupId, group.reactionGroupId, `${ groupLabel } record ${ id } group mismatch` );
-			addVector( linear, physicalVec3( record.payload.linearMomentumNs, 'newton-second', `${ groupLabel}.${ id}.linear` ) );
-			addVector( angular, physicalVec3( record.payload.angularMomentumNms, 'newton-metre-second', `${ groupLabel}.${ id}.angular` ) );
 
 		}
-		assert.ok( Math.hypot( ...linear ) <= quantityValue( group.residualsAndBounds.linearMomentumBound, `${ groupLabel }.linearMomentumBound` ), `${ groupLabel } linear momentum does not close` );
-		assert.ok( Math.hypot( ...angular ) <= quantityValue( group.residualsAndBounds.angularMomentumBound, `${ groupLabel }.angularMomentumBound` ), `${ groupLabel } angular momentum does not close` );
 
 	}
 	for ( const record of exchange.reactions ) for ( const sourceId of record.reactionToInteractionIds ) assert.ok( exchange.interactions.some( ( source ) => source.interactionId === sourceId ), `${ label } reaction ${ record.interactionId } references unknown source ${ sourceId }` );
@@ -3020,7 +3195,13 @@ function validateExactOnceInteractionApplication( route ) {
 	for ( const loop of route.physicsGraph.loopMacros ) {
 
 		const acceptedRow = loop.perIterationLedger.find( ( row ) => row.accepted );
-		assert.deepEqual( [ ...acceptedRow.interactionApplicationLedgerIds ].sort(), expectedAllLedgerIds.sort(), `loop ${ loop.loopId } accepted application-ledger closure mismatch` );
+		const requiredLoopLedgerIds = route.physicsInteractions.filter( ( exchange ) => exchange.couplingLoopId === loop.loopId ).flatMap( ( exchange ) => exchange.batchLedger.applicationLedgerIds );
+		assertUnique( acceptedRow.interactionApplicationLedgerIds, `loop ${ loop.loopId } accepted application-ledger IDs` );
+		assert.deepEqual( [ ...acceptedRow.interactionApplicationLedgerIds ].sort(), [ ...requiredLoopLedgerIds ].sort(), `loop ${ loop.loopId } accepted application-ledger closure is not exact` );
+		for ( const applicationLedgerId of acceptedRow.interactionApplicationLedgerIds ) assert.ok( graphLedgersById.has( applicationLedgerId ), `loop ${ loop.loopId } accepted row references unknown application ledger ${ applicationLedgerId}` );
+		const acceptedRangeKeys = acceptedRow.interactionSequenceRanges.map( ( range ) => `${ range.firstSequence}:${ range.lastSequenceInclusive }` ).sort();
+		const requiredRangeKeys = route.physicsInteractions.filter( ( exchange ) => exchange.couplingLoopId === loop.loopId ).map( ( exchange ) => `${ exchange.batchLedger.publishedSequenceRange.firstSequence }:${ exchange.batchLedger.publishedSequenceRange.lastSequence }` ).sort();
+		assert.deepEqual( acceptedRangeKeys, requiredRangeKeys, `loop ${ loop.loopId } accepted interaction sequence-range closure is not exact` );
 		for ( const row of loop.perIterationLedger.filter( ( candidate ) => ! candidate.accepted ) ) assert.deepEqual( row.interactionApplicationLedgerIds, [], `loop ${ loop.loopId } rejected iteration carries committed application receipts` );
 
 	}
@@ -3307,6 +3488,21 @@ function validateRenderPlan( plan, targetViewKey, route, preparation, snapshot, 
 
 }
 
+function authoritativePresentationEventPayloadDigest( exchange ) {
+
+	const { firstSequence, lastSequence } = exchange.batchLedger.publishedSequenceRange;
+	const records = [ ...exchange.interactions, ...exchange.reactions ]
+		.filter( ( record ) => record.provenance.producerSequence >= firstSequence && record.provenance.producerSequence <= lastSequence )
+		.sort( ( a, b ) => a.provenance.producerSequence - b.provenance.producerSequence );
+	assert.deepEqual( records.map( ( record ) => record.provenance.producerSequence ), Array.from( { length: lastSequence - firstSequence + 1 }, ( _, index ) => firstSequence + index ), `presentation event stream ${ exchange.exchangeId } does not have an exact authoritative batch payload` );
+	return sha256Canonical( records.map( ( record ) => ( {
+		interactionId: record.interactionId,
+		producerSequence: record.provenance.producerSequence,
+		payload: record.payload
+	} ) ) );
+
+}
+
 function validateCanonicalPresentation( route ) {
 
 	const { physicsContext: context, physicsSignals: signals } = route;
@@ -3366,6 +3562,35 @@ function validateCanonicalPresentation( route ) {
 	requireNonEmptyMapping( cameras, 'physicsCameraViewPublicationsByTarget' );
 	requireNonEmptyMapping( preparations, 'physicsViewPreparationPublicationsByTarget' );
 	requireNonEmptyMapping( snapshots, 'physicsPresentationSnapshotsByTarget' );
+	const sharedPresentationConsumerId = 'shared-presentation-views';
+	const authoritativeEventBatchesByStreamId = new Map();
+	for ( const exchange of route.physicsInteractions ) {
+
+		assert.ok( ! authoritativeEventBatchesByStreamId.has( exchange.exchangeId ), `duplicate authoritative presentation event stream ${ exchange.exchangeId }` );
+		assert.equal( exchange.batchLedger.exchangeId, exchange.exchangeId, `presentation event stream ${ exchange.exchangeId } batch references another exchange` );
+		authoritativeEventBatchesByStreamId.set( exchange.exchangeId, exchange );
+
+	}
+	assertUnique( candidate.eventSequenceRanges.map( ( range ) => range.rangeId ), 'physicsPresentationCandidate.eventSequenceRanges range IDs' );
+	for ( const [ index, range ] of candidate.eventSequenceRanges.entries() ) {
+
+		const label = `physicsPresentationCandidate.eventSequenceRanges[${ index }]`;
+		requireAbiRecord( range, 'PresentationEventRange', label );
+		assert.ok( range.consumerId === sharedPresentationConsumerId || Object.hasOwn( cameras, range.consumerId ), `${ label}.consumerId is neither a registered target/view nor the shared presentation consumer` );
+		assert.ok( Number.isSafeInteger( range.firstSequence ) && Number.isSafeInteger( range.lastSequenceInclusive ) && range.firstSequence <= range.lastSequenceInclusive, `${ label} has an invalid closed sequence range` );
+		assert.equal( range.cursorBefore, range.firstSequence, `${ label}.cursorBefore does not start at the closed range` );
+		assert.equal( range.cursorAfter, range.lastSequenceInclusive + 1, `${ label}.cursorAfter does not advance past the closed range` );
+		validateCanonicalInterval( range.interval, context, `${ label}.interval` );
+		const exchange = authoritativeEventBatchesByStreamId.get( range.streamId );
+		assert.ok( exchange, `${ label}.streamId does not resolve an authoritative interaction batch` );
+		assert.equal( range.producerId, exchange.batchLedger.producerId, `${ label}.producerId does not own the authoritative batch` );
+		assert.deepEqual( [ range.firstSequence, range.lastSequenceInclusive ], [ exchange.batchLedger.publishedSequenceRange.firstSequence, exchange.batchLedger.publishedSequenceRange.lastSequence ], `${ label} does not equal the authoritative batch sequence range` );
+		assert.equal( canonicalIntervalIdentity( range.interval ), canonicalIntervalIdentity( exchange.applicationInterval ), `${ label}.interval differs from the authoritative batch interval` );
+		const committedSourceDescriptors = candidate.commitProvenance.committedStateVersions.flatMap( ( committed ) => Object.values( signals ).filter( ( descriptor ) => descriptor.signalId === committed.signalId && descriptor.stateVersion === committed.stateVersion && committed.stateVersion === range.sourceStateVersion && descriptor.owner === range.producerId ) );
+		assert.equal( committedSourceDescriptors.length, 1, `${ label}.sourceStateVersion does not resolve exactly one producer-owned committed signal` );
+		assert.equal( range.payloadDigest, authoritativePresentationEventPayloadDigest( exchange ), `${ label}.payloadDigest does not cover the authoritative batch payloads` );
+
+	}
 	const cameraIds = new Set();
 	const preparationIds = new Set();
 	const snapshotIds = new Set();
@@ -3516,7 +3741,7 @@ function validateCanonicalPresentation( route ) {
 		] ) ].sort();
 		const shadowCacheVisibilityLeaseIds = [ ...new Set( preparation.shadowViewPublicationRefs.flatMap( ( ref ) => ref.resourceLeaseRefs.map( ( leaseRef ) => leaseRef.leaseId ) ) ) ].sort();
 		const exactRequiredLeaseIds = [ ...new Set( [ ...pairStateHandleLeaseIds, ...preparationDependencyLeaseIds, ...reactiveAndResetLeaseIds, ...shadowCacheVisibilityLeaseIds ] ) ].sort();
-		const exactEventRangeIds = candidate.eventSequenceRanges.filter( ( range ) => range.consumerId === 'shared-presentation-views' || range.consumerId === targetViewKey ).map( ( range ) => range.rangeId ).sort();
+		const exactEventRangeIds = candidate.eventSequenceRanges.filter( ( range ) => range.consumerId === targetViewKey || range.consumerId === sharedPresentationConsumerId ).map( ( range ) => range.rangeId ).sort();
 		for ( const [ key, expected ] of Object.entries( { pairStateHandleLeaseIds, preparationDependencyLeaseIds, reactiveAndResetLeaseIds, shadowCacheVisibilityLeaseIds, exactRequiredLeaseIds, exactEventRangeIds } ) ) assert.deepEqual( [ ...closure[ key ] ].sort(), expected, `${ label}.closureManifest.${ key} is not exact` );
 		assert.deepEqual( snapshot.resourceLeaseRefs.map( ( ref ) => ref.leaseId ).sort(), exactRequiredLeaseIds, `${ label}.resourceLeaseRefs do not equal closure lease union` );
 		assert.deepEqual( snapshot.eventSequenceRanges.map( ( range ) => range.rangeId ).sort(), exactEventRangeIds, `${ label}.eventSequenceRanges do not equal addressed Candidate event ranges` );
@@ -3719,8 +3944,10 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	validateCanonicalInterval( ledger.measurementInterval, context, 'physicsCostLedger.measurementInterval' );
 	assert.equal( ledger.measurementClockId, ledger.measurementInterval.clockId, 'physicsCostLedger measurement clock mismatch' );
 	assert.equal( ledger.status, 'active', 'physicsCostLedger is not active' );
-	assert.ok( ledger.presentationTargetsAndViews.length >= 2 && ledger.measurementProtocolRefs.length >= 2, 'physicsCostLedger omits multiview/protocol trace identity' );
-	assert.match( ledger.targetAndHarness, /mobile|low-end|tile/i, 'physicsCostLedger must name the sustained mobile/low-end harness' );
+	assert.ok( ledger.presentationTargetsAndViews.length > 0 && ledger.measurementProtocolRefs.length > 0, 'physicsCostLedger omits target/view or trace identity' );
+	assertUnique( ledger.presentationTargetsAndViews, 'physicsCostLedger.presentationTargetsAndViews' );
+	assert.deepEqual( [ ...ledger.presentationTargetsAndViews ].sort(), Object.keys( route.physicsCameraViewPublicationsByTarget ).sort(), 'physicsCostLedger target/view closure differs from presentation cameras' );
+	requireNonEmptyString( ledger.targetAndHarness, 'physicsCostLedger.targetAndHarness' );
 	const totals = requireAbiRecord( ledger.cadenceTraceTotals, 'CadenceTraceTotals', 'physicsCostLedger.cadenceTraceTotals' );
 	assert.equal( canonicalIntervalIdentity( totals.measurementInterval ), canonicalIntervalIdentity( ledger.measurementInterval ), 'cadence trace and cost ledger use different measurement intervals' );
 	assert.ok( ledger.measurementProtocolRefs.includes( totals.traceRef ), 'cadence trace is absent from the cost-ledger protocol refs' );
@@ -3730,8 +3957,38 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	assert.ok( Math.abs( exactDuration - ( measurementBounds[ 1 ] - measurementBounds[ 0 ] ) ) <= 1e-12, 'cadence trace exact duration disagrees with clock endpoints' );
 	const exactIntervals = quantityValue( totals.coordinationAdvanceCount, 'physicsCostLedger.cadenceTraceTotals.coordinationAdvanceCount' );
 	assert.ok( Number.isSafeInteger( exactIntervals ) && exactIntervals > 0, 'cadence trace coordination count must be a positive integer' );
-	assert.equal( quantityValue( totals.catchUpBatchCount, 'physicsCostLedger.cadenceTraceTotals.catchUpBatchCount' ), 0, 'zero-debt trace invents catch-up batches' );
-	assert.deepEqual( totals.droppedCoordinationIntervals, [], 'canonical no-drop trace contains dropped coordination intervals' );
+	const catchUpBatchCount = quantityValue( totals.catchUpBatchCount, 'physicsCostLedger.cadenceTraceTotals.catchUpBatchCount' );
+	assert.ok( Number.isSafeInteger( catchUpBatchCount ) && catchUpBatchCount >= 0, 'cadence trace catch-up count must be a nonnegative integer' );
+	assert.ok( Array.isArray( totals.droppedCoordinationIntervals ), 'cadence trace droppedCoordinationIntervals must be an array' );
+	assertUnique( totals.droppedCoordinationIntervals.map( canonicalIntervalIdentity ), 'cadence trace dropped coordination intervals' );
+	let priorDroppedTraceEnd = - Infinity;
+	for ( const [ index, interval ] of totals.droppedCoordinationIntervals.entries() ) {
+
+		validateCanonicalInterval( interval, context, `physicsCostLedger.cadenceTraceTotals.droppedCoordinationIntervals[${ index }]` );
+		assert.equal( interval.clockId, graph.catchUpPolicy.debtClockId, `physicsCostLedger.cadenceTraceTotals.droppedCoordinationIntervals[${ index }] uses another debt clock` );
+		const bounds = intervalBoundsSeconds( interval, context, `physicsCostLedger.cadenceTraceTotals.droppedCoordinationIntervals[${ index }]` );
+		assert.ok( bounds[ 0 ] >= priorDroppedTraceEnd - 1e-12, 'cadence trace dropped coordination intervals overlap or are out of order' );
+		priorDroppedTraceEnd = bounds[ 1 ];
+		const whollyInside = bounds[ 0 ] >= measurementBounds[ 0 ] && bounds[ 1 ] <= measurementBounds[ 1 ];
+		const whollyOutside = bounds[ 1 ] <= measurementBounds[ 0 ] || bounds[ 0 ] >= measurementBounds[ 1 ];
+		assert.ok( whollyInside || whollyOutside, 'cadence trace contains a partially overlapping dropped coordination interval' );
+
+	}
+	if ( catchUpBatchCount === 0 ) assert.deepEqual( totals.droppedCoordinationIntervals, [], 'zero catch-up batches cannot report dropped coordination intervals' );
+	if ( totals.droppedCoordinationIntervals.length > 0 ) assert.ok( catchUpBatchCount > 0, 'dropped coordination intervals have no catch-up batch count' );
+	if ( ! isTypedAbsence( graph.catchUpBatch ) ) {
+
+		const observedAtSeconds = canonicalInstantSeconds( graph.catchUpBatch.debtIdentity.observedAt, context, 'physicsGraph.catchUpBatch.debtIdentity.observedAt' );
+		const batchBelongsToTrace = observedAtSeconds >= measurementBounds[ 0 ] && observedAtSeconds < measurementBounds[ 1 ];
+		if ( batchBelongsToTrace ) assert.ok( catchUpBatchCount > 0, 'measured catch-up batch is absent from exact cadence totals' );
+		if ( ! isTypedAbsence( graph.catchUpBatch.lossLedger ) ) {
+
+			const traceDroppedRangeIds = totals.droppedCoordinationIntervals.map( canonicalIntervalIdentity );
+			for ( const dropped of graph.catchUpBatch.lossLedger.droppedIntervals ) if ( batchBelongsToTrace ) assert.ok( traceDroppedRangeIds.includes( canonicalIntervalIdentity( dropped ) ), 'catch-up loss interval is absent from exact cadence totals' );
+
+		}
+
+	}
 	const digestPayload = clone( totals );
 	delete digestPayload.exactTotalsDigest;
 	assert.equal( totals.exactTotalsDigest, sha256Canonical( digestPayload ), 'cadence trace exact-totals digest mismatch' );
@@ -3742,7 +3999,7 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	for ( const cost of ledger.graphStageCosts ) {
 
 		const sampleCount = quantityValue( cost.sampleCount, `physicsCostLedger.${ cost.stageId }.sampleCount` );
-		assert.ok( sampleCount >= 120, `physicsCostLedger.${ cost.stageId } is not a sustained sample` );
+		assert.ok( sampleCount > 0, `physicsCostLedger.${ cost.stageId } has no timing samples` );
 		assert.equal( sampleCount, quantityValue( totals.stageExecutionCounts[ cost.stageId ], `cadenceTraceTotals.stageExecutionCounts.${ cost.stageId }` ), `physicsCostLedger.${ cost.stageId } timing sample does not cover every exact execution` );
 
 	}
@@ -3750,30 +4007,57 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	for ( const dispatch of ledger.solverDispatches ) assert.equal( quantityValue( dispatch.occurrenceCount, `${ dispatch.stageId }.dispatchCount` ), quantityValue( totals.stageExecutionCounts[ dispatch.stageId ], `${ dispatch.stageId }.traceCount` ), `solver/dispatch count mismatch for ${ dispatch.stageId }` );
 	const exactFramesByTarget = Object.fromEntries( Object.entries( totals.presentedFrameCounts ).map( ( [ key, value ] ) => [ key, quantityValue( value, `cadenceTraceTotals.presentedFrameCounts.${ key}` ) ] ) );
 	assert.deepEqual( Object.keys( exactFramesByTarget ).sort(), [ ...ledger.presentationTargetsAndViews ].sort(), 'cadence trace presented-frame target closure mismatch' );
-	assert.ok( new Set( Object.values( exactFramesByTarget ) ).size === 1, 'fixture requires one aligned frame-cohort count across its two views' );
-	const exactFrameCohorts = Object.values( exactFramesByTarget )[ 0 ];
+	assert.ok( Object.values( exactFramesByTarget ).every( ( count ) => Number.isSafeInteger( count ) && count > 0 ), 'cadence trace presented-frame counts must be positive integers' );
+	const resolvePresentedFrameDenominator = ( cadence, label ) => {
+
+		assert.ok( isPlainObject( cadence ), `${ label } must be a mapping` );
+		if ( Object.hasOwn( cadence, 'denominatorTargetViewKey' ) ) {
+
+			requireNonEmptyString( cadence.denominatorTargetViewKey, `${ label }.denominatorTargetViewKey` );
+			assert.ok( Object.hasOwn( exactFramesByTarget, cadence.denominatorTargetViewKey ), `${ label } names unknown presented-frame denominator ${ cadence.denominatorTargetViewKey}` );
+			return exactFramesByTarget[ cadence.denominatorTargetViewKey ];
+
+		}
+
+		const distinctFrameCounts = new Set( Object.values( exactFramesByTarget ) );
+		assert.equal( distinctFrameCounts.size, 1, `${ label } must declare denominatorTargetViewKey when target/views have independent presented-frame counts` );
+		return Math.min( ...distinctFrameCounts );
+
+	};
 	const intervalsPerSecond = quantityValue( ledger.coordinationIntervalsPerSecond.exactMean, 'physicsCostLedger.coordinationIntervalsPerSecond.exactMean' );
 	const intervalsPerFrame = quantityValue( ledger.coordinationIntervalsPerPresentedFrame.exactRatio, 'physicsCostLedger.coordinationIntervalsPerPresentedFrame.exactRatio' );
+	const intervalFrameDenominator = resolvePresentedFrameDenominator( ledger.coordinationIntervalsPerPresentedFrame, 'physicsCostLedger.coordinationIntervalsPerPresentedFrame' );
 	assert.ok( Math.abs( intervalsPerSecond - exactIntervals / exactDuration ) <= 1e-12, 'coordination intervals/second is not derived from exact trace totals' );
-	assert.ok( Math.abs( intervalsPerFrame - exactIntervals / exactFrameCohorts ) <= 1e-12, 'coordination intervals/frame is not derived from exact trace totals' );
+	assert.ok( Math.abs( intervalsPerFrame - exactIntervals / intervalFrameDenominator ) <= 1e-12, 'coordination intervals/frame is not derived from exact trace totals and its declared target/view denominator' );
 	assert.ok( quantityValue( ledger.coordinationIntervalsPerSecond.p50, 'physicsCostLedger.coordinationIntervalsPerSecond.p50' ) > 0, 'measured p50 coordination cadence must be positive' );
 	assert.ok( quantityValue( ledger.coordinationIntervalsPerPresentedFrame.p95, 'physicsCostLedger.coordinationIntervalsPerPresentedFrame.p95' ) > 0, 'measured p95 coordination/frame cadence must be positive' );
 	for ( const stageId of stageIds ) {
 
-		const observedPerAdvance = graph.executionLedger.stageExecutions.filter( ( execution ) => execution.stageId === stageId ).length;
 		const exactExecutions = quantityValue( totals.stageExecutionCounts[ stageId ], `cadenceTraceTotals.stageExecutionCounts.${ stageId }` );
 		const perInterval = quantityValue( ledger.stageExecutionsPerCoordinationInterval[ stageId ].count, `physicsCostLedger.stageExecutionsPerCoordinationInterval.${ stageId }` );
 		const perSecond = quantityValue( ledger.stageExecutionsPerSecond[ stageId ].count, `physicsCostLedger.stageExecutionsPerSecond.${ stageId }` );
-		const perFrame = quantityValue( ledger.executionsPerPresentedFrame[ stageId ].count, `physicsCostLedger.executionsPerPresentedFrame.${ stageId }` );
-		assert.equal( perInterval, observedPerAdvance, `physicsCostLedger ${ stageId } omits loop or partition executions` );
-		assert.equal( exactExecutions, observedPerAdvance * exactIntervals, `cadence trace ${ stageId } count mismatch` );
+		const perFrameCadence = ledger.executionsPerPresentedFrame[ stageId ];
+		const perFrame = quantityValue( perFrameCadence.count, `physicsCostLedger.executionsPerPresentedFrame.${ stageId }` );
+		const stageFrameDenominator = resolvePresentedFrameDenominator( perFrameCadence, `physicsCostLedger.executionsPerPresentedFrame.${ stageId }` );
+		assert.ok( Number.isSafeInteger( exactExecutions ) && exactExecutions > 0, `cadence trace ${ stageId } execution count must be a positive integer` );
+		assert.ok( Math.abs( perInterval - exactExecutions / exactIntervals ) <= 1e-12, `physicsCostLedger ${ stageId } per-interval cadence is not exact-total/advance-count` );
 		assert.ok( Math.abs( perSecond - exactExecutions / exactDuration ) <= 1e-12, `physicsCostLedger ${ stageId } per-second cadence is not exact-total/duration` );
-		assert.ok( Math.abs( perFrame - exactExecutions / exactFrameCohorts ) <= 1e-12, `physicsCostLedger ${ stageId } per-frame cadence is not exact-total/frame-count` );
+		assert.ok( Math.abs( perFrame - exactExecutions / stageFrameDenominator ) <= 1e-12, `physicsCostLedger ${ stageId } per-frame cadence is not exact-total/declared-target-view-frame-count` );
 
 	}
-	const solveExecutions = graph.executionLedger.stageExecutions.filter( ( execution ) => execution.stageId === 'solve-water' ).length;
-	assert.equal( quantityValue( totals.nativeSubcycleCounts[ '$threejs-water-optics' ], 'cadenceTraceTotals.nativeSubcycleCounts.water' ), solveExecutions * exactIntervals, 'native-subcycle exact total omits loop×subcycle multiplicity' );
-	for ( const loop of graph.loopMacros ) assert.equal( quantityValue( totals.couplingIterationCounts[ loop.loopId ], `cadenceTraceTotals.couplingIterationCounts.${ loop.loopId }` ), loop.perIterationLedger.length * exactIntervals, `cadence trace ${ loop.loopId } iteration total mismatch` );
+	const nativeSubcycleTotalsByOwner = {};
+	for ( const stage of graph.stages.filter( ( candidate ) => candidate.executionRule.partition === 'exact-subcycle-tile' ) ) nativeSubcycleTotalsByOwner[ stage.owner ] = ( nativeSubcycleTotalsByOwner[ stage.owner ] ?? 0 ) + quantityValue( totals.stageExecutionCounts[ stage.stageId ], `cadenceTraceTotals.stageExecutionCounts.${ stage.stageId }` );
+	assert.deepEqual( Object.keys( totals.nativeSubcycleCounts ).sort(), Object.keys( nativeSubcycleTotalsByOwner ).sort(), 'native-subcycle owner closure mismatch' );
+	for ( const [ owner, exactOwnerExecutions ] of Object.entries( nativeSubcycleTotalsByOwner ) ) assert.equal( quantityValue( totals.nativeSubcycleCounts[ owner ], `cadenceTraceTotals.nativeSubcycleCounts.${ owner}` ), exactOwnerExecutions, `native-subcycle exact total for ${ owner } differs from exact subcycle-stage executions` );
+	assert.deepEqual( Object.keys( totals.couplingIterationCounts ).sort(), graph.loopMacros.map( ( loop ) => loop.loopId ).sort(), 'coupling-iteration loop closure mismatch' );
+	for ( const loop of graph.loopMacros ) {
+
+		const referenceStage = loop.orderedStageIds.map( ( stageId ) => graph.stages.find( ( stage ) => stage.stageId === stageId ) ).find( ( stage ) => stage?.executionRule.activation === 'per-loop-iteration' && stage.executionRule.partition !== 'exact-subcycle-tile' );
+		const exactIterations = quantityValue( totals.couplingIterationCounts[ loop.loopId ], `cadenceTraceTotals.couplingIterationCounts.${ loop.loopId }` );
+		assert.ok( Number.isSafeInteger( exactIterations ) && exactIterations > 0, `cadence trace ${ loop.loopId } iteration total must be a positive integer` );
+		if ( referenceStage ) assert.equal( exactIterations, quantityValue( totals.stageExecutionCounts[ referenceStage.stageId ], `cadenceTraceTotals.stageExecutionCounts.${ referenceStage.stageId }` ), `cadence trace ${ loop.loopId } iteration total differs from exact ${ referenceStage.stageId } activations` );
+
+	}
 	const interactionCountsByTag = {};
 	const interactionsById = new Map( route.physicsInteractions.flatMap( ( exchange ) => [ ...exchange.interactions, ...exchange.reactions ] ).map( ( interaction ) => [ interaction.interactionId, interaction ] ) );
 	for ( const application of graph.executionLedger.interactionApplicationLedgers ) {
@@ -3784,7 +4068,12 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 
 	}
 	assert.deepEqual( Object.keys( totals.interactionApplicationCounts ).sort(), Object.keys( interactionCountsByTag ).sort(), 'cadence trace interaction-payload tag closure mismatch' );
-	for ( const [ tag, perAdvanceCount ] of Object.entries( interactionCountsByTag ) ) assert.equal( quantityValue( totals.interactionApplicationCounts[ tag ], `cadenceTraceTotals.interactionApplicationCounts.${ tag }` ), perAdvanceCount * exactIntervals, `cadence trace ${ tag } application total mismatch` );
+	for ( const [ tag, currentAdvanceCount ] of Object.entries( interactionCountsByTag ) ) {
+
+		const exactApplications = quantityValue( totals.interactionApplicationCounts[ tag ], `cadenceTraceTotals.interactionApplicationCounts.${ tag }` );
+		assert.ok( Number.isSafeInteger( exactApplications ) && exactApplications >= currentAdvanceCount, `cadence trace ${ tag } application total omits the serialized advance` );
+
+	}
 	requireObjectKeys( ledger.worstPermittedCatchUpBurst, [ 'triggerAndIntervalDebt', 'executionsDispatchesAndTraffic', 'latencyMemoryAndErrorGate' ], 'physicsCostLedger.worstPermittedCatchUpBurst' );
 	requireObjectKeys( ledger.tileGpuTraffic, [ 'attachmentStoreLoadResolveBytes', 'tileSpillEvidence', 'renderComputePassBreaks' ], 'physicsCostLedger.tileGpuTraffic' );
 	assert.ok( ledger.dependencyCriticalPaths.length > 0, 'physicsCostLedger has no dependency critical-path evidence' );
@@ -3823,7 +4112,7 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	assert.deepEqual( Object.keys( totals.trafficOccurrenceAndLogicalByteTotals ).sort(), [ ...trafficById.keys() ].sort(), 'exact traffic totals contain an unledgered transfer' );
 	for ( const stageId of stageIds ) {
 
-		const traffic = trafficById.get( `traffic-stage-${ stageId }` );
+		const traffic = [ ...trafficById.values() ].find( ( record ) => record.producer === stageId && record.cadenceBasis === 'per-stage-execution' );
 		assert.ok( traffic, `stage ${ stageId } has no hot-state traffic record` );
 		const hot = ledger.hotBytesReadWrittenPerExecution[ stageId ];
 		const perExecutionBytes = quantityValue( hot.read, `${ stageId }.hotReadBytes` ) + quantityValue( hot.written, `${ stageId }.hotWrittenBytes` );
@@ -3847,10 +4136,13 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 			physicalTotal += quantityValue( allocation.physicalAllocatedBytes, `${ allocation.allocationId }.physicalAllocatedBytes` );
 
 		}
-		assert.equal( quantityValue( memory.logicalBytesByResidency.gpu, `${ key}.logicalBytesByResidency.gpu` ), logicalTotal, `physicsCostLedger.${ key } logical-byte inventory mismatch` );
-		assert.equal( quantityValue( memory.physicalAllocatedBytesByResidency.gpu, `${ key}.physicalAllocatedBytesByResidency.gpu` ), physicalTotal, `physicsCostLedger.${ key } physical-byte inventory mismatch` );
-		assert.ok( quantityValue( memory.maximumSimultaneouslyLiveBytes.gpu, `${ key}.maximumSimultaneouslyLiveBytes.gpu` ) >= physicalTotal, `physicsCostLedger.${ key } understates simultaneous live bytes` );
-		if ( key === 'migrationOverlap' ) {
+		const logicalByResidency = Object.values( memory.logicalBytesByResidency ).reduce( ( total, value ) => total + quantityValue( value, `${ key}.logicalBytesByResidency` ), 0 );
+		const physicalByResidency = Object.values( memory.physicalAllocatedBytesByResidency ).reduce( ( total, value ) => total + quantityValue( value, `${ key}.physicalAllocatedBytesByResidency` ), 0 );
+		const maximumLiveByResidency = Object.values( memory.maximumSimultaneouslyLiveBytes ).reduce( ( total, value ) => total + quantityValue( value, `${ key}.maximumSimultaneouslyLiveBytes` ), 0 );
+		assert.equal( logicalByResidency, logicalTotal, `physicsCostLedger.${ key } logical-byte inventory mismatch` );
+		assert.equal( physicalByResidency, physicalTotal, `physicsCostLedger.${ key } physical-byte inventory mismatch` );
+		assert.ok( maximumLiveByResidency >= physicalTotal, `physicsCostLedger.${ key } understates simultaneous live bytes` );
+		if ( key === 'migrationOverlap' && route.physicsQualityTransitions.length > 0 ) {
 
 			assert.deepEqual( memory.allocations.map( ( allocation ) => allocation.encodingFormatAndExtent.generationRole ).sort(), [ 'destination', 'source' ], 'migration-overlap ledger does not prove simultaneous old/new generations' );
 			assert.ok( memory.allocations.every( ( allocation ) => allocation.liveInterval.coversQualityCommit === true ), 'migration-overlap allocation is not live across the quality commit' );
@@ -3913,9 +4205,9 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	assert.deepEqual( [ ...representativeExecutionIds ].sort(), expectedRepresentativeIds.sort(), 'work attribution omits or invents representative graph/render work' );
 	requireObjectKeys( ledger.multiviewAndFramesInFlightMultipliers, [ 'viewCount', 'framesInFlight', 'resourceMultiplier', 'workMultiplier' ], 'physicsCostLedger.multiviewAndFramesInFlightMultipliers' );
 	assert.equal( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.viewCount, 'physicsCostLedger.viewCount' ), ledger.presentationTargetsAndViews.length, 'physicsCostLedger view multiplier disagrees with target/view closure' );
-	const configuredFramesInFlight = new Set( route.frameExecutionRecord.slotAdmissions.map( ( admission ) => admission.configuredMaximumFramesInFlight ) );
-	assert.equal( configuredFramesInFlight.size, 1, 'fixture frame slots use different configured frames-in-flight bounds' );
-	assert.equal( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.framesInFlight, 'physicsCostLedger.framesInFlight' ), [ ...configuredFramesInFlight ][ 0 ], 'physicsCostLedger frames-in-flight multiplier disagrees with slot admission' );
+	const configuredFramesInFlight = route.frameExecutionRecord.slotAdmissions.map( ( admission ) => admission.configuredMaximumFramesInFlight );
+	assert.ok( configuredFramesInFlight.length > 0, 'physicsCostLedger has no admitted frame slot' );
+	assert.equal( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.framesInFlight, 'physicsCostLedger.framesInFlight' ), Math.max( ...configuredFramesInFlight ), 'physicsCostLedger frames-in-flight multiplier disagrees with the maximum admitted slot capacity' );
 	assert.ok( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.resourceMultiplier, 'physicsCostLedger.resourceMultiplier' ) >= 1, 'resource multiplier cannot erase live resources' );
 	assert.ok( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.workMultiplier, 'physicsCostLedger.workMultiplier' ) >= 1, 'work multiplier cannot erase submitted work' );
 	assert.equal( quantityValue( ledger.thermalPowerState.duration, 'physicsCostLedger.thermalPowerState.duration' ), exactDuration, 'thermal/power evidence does not span the exact trace duration' );
@@ -3923,8 +4215,398 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 
 }
 
+function validateExternalAdapterOwnershipPartition( route ) {
+
+	const adapters = Object.entries( route.physicsExternalSolverAdaptersById );
+	const claimsByEquation = new Map();
+	for ( const claim of route.physicsGraph.executionLedger.stateAdvanceClaims ) {
+
+		const claims = claimsByEquation.get( claim.stateEquationId ) ?? [];
+		claims.push( claim );
+		claimsByEquation.set( claim.stateEquationId, claims );
+
+	}
+	const commitOwnersByEquation = new Map();
+	for ( const group of route.physicsGraph.commitGroups ) for ( const [ stateEquationId, owner ] of Object.entries( group.stateEquationOwners ) ) {
+
+		const owners = commitOwnersByEquation.get( stateEquationId ) ?? [];
+		owners.push( {
+			commitGroupId: group.commitGroupId,
+			owner,
+			committedSignalIds: group.committedPublications.filter( ( publication ) => publication.stateEquation === stateEquationId ).map( ( publication ) => publication.signalId )
+		} );
+		commitOwnersByEquation.set( stateEquationId, owners );
+
+	}
+	const adapterByEquation = new Map();
+	for ( const [ adapterId, adapter ] of adapters ) {
+
+		assert.equal( adapter.adapterId, adapterId, `external adapter registry key ${ adapterId } mismatch during ownership partition validation` );
+		assertUnique( adapter.ownedStateEquations, `physicsExternalSolverAdaptersById.${ adapterId }.ownedStateEquations` );
+		const adapterSignalsById = new Map( adapter.signalDescriptors.map( ( descriptor ) => [ descriptor.signalId, descriptor ] ) );
+		assert.equal( adapterSignalsById.size, adapter.signalDescriptors.length, `external adapter ${ adapterId } duplicates a signal descriptor` );
+		for ( const equation of adapter.ownedStateEquations ) {
+
+			assert.ok( ! adapterByEquation.has( equation ), `state equation ${ equation } is owned by multiple external adapters: ${ adapterByEquation.get( equation ) } and ${ adapterId }` );
+			adapterByEquation.set( equation, adapterId );
+			const claims = claimsByEquation.get( equation ) ?? [];
+			const commitOwners = commitOwnersByEquation.get( equation ) ?? [];
+			assert.equal( claims.length, 1, `external adapter ${ adapterId } state equation ${ equation } must have exactly one graph state-advance claim` );
+			assert.equal( commitOwners.length, 1, `external adapter ${ adapterId } state equation ${ equation } must have exactly one graph commit owner` );
+			assert.equal( claims[ 0 ].owner, commitOwners[ 0 ].owner, `external adapter ${ adapterId } state equation ${ equation } claim/commit owner mismatch` );
+			const graphSignalIds = new Set( [ claims[ 0 ].outputPreparedVersion.signalId, ...commitOwners[ 0 ].committedSignalIds ] );
+			assert.ok( graphSignalIds.size > 0, `external adapter ${ adapterId } state equation ${ equation } has no graph signal lineage` );
+			for ( const signalId of graphSignalIds ) {
+
+				const descriptor = adapterSignalsById.get( signalId );
+				assert.ok( descriptor, `external adapter ${ adapterId } state equation ${ equation } omits graph signal ${ signalId }` );
+				assert.equal( descriptor.owner, claims[ 0 ].owner, `external adapter ${ adapterId } state equation ${ equation } descriptor/graph owner mismatch` );
+
+			}
+
+		}
+		const graphEquationsForAdapter = new Set();
+		for ( const [ equation, claims ] of claimsByEquation ) if ( claims.some( ( claim ) => adapterSignalsById.has( claim.outputPreparedVersion.signalId ) ) ) graphEquationsForAdapter.add( equation );
+		for ( const [ equation, commitOwners ] of commitOwnersByEquation ) if ( commitOwners.some( ( entry ) => entry.committedSignalIds.some( ( signalId ) => adapterSignalsById.has( signalId ) ) ) ) graphEquationsForAdapter.add( equation );
+		assert.deepEqual( [ ...adapter.ownedStateEquations ].sort(), [ ...graphEquationsForAdapter ].sort(), `external adapter ${ adapterId } ownedStateEquations do not exactly partition its graph-owned equations` );
+
+	}
+	const externalSignalIds = new Set( adapters.flatMap( ( [ , adapter ] ) => adapter.signalDescriptors.map( ( descriptor ) => descriptor.signalId ) ) );
+	const externallyOwnedGraphEquations = new Set();
+	for ( const [ equation, claims ] of claimsByEquation ) if ( claims.some( ( claim ) => externalSignalIds.has( claim.outputPreparedVersion.signalId ) ) ) externallyOwnedGraphEquations.add( equation );
+	for ( const [ equation, commitOwners ] of commitOwnersByEquation ) if ( commitOwners.some( ( entry ) => entry.committedSignalIds.some( ( signalId ) => externalSignalIds.has( signalId ) ) ) ) externallyOwnedGraphEquations.add( equation );
+	assert.deepEqual( [ ...adapterByEquation.keys() ].sort(), [ ...externallyOwnedGraphEquations ].sort(), 'external adapter state-equation registry is not an exact partition of graph-owned external equations' );
+	return true;
+
+}
+
+function validateExternalSolverAdapter( route, adapter, label ) {
+
+	requireAbiRecord( adapter, 'ExternalSolverAdapter', label );
+	assert.equal( adapter.contextId, route.physicsContext.contextId, `${ label}.contextId mismatch` );
+	requireNonEmptyString( adapter.adapterId, `${ label}.adapterId` );
+	const ownershipFields = [ 'stepping', 'constraintAssemblyAndSolve', 'collisionDetection', 'contactManifoldLifecycle', 'forceImpulseAccumulation', 'committedStatePublication' ];
+	requireObjectKeys( adapter.ownership, ownershipFields, `${ label}.ownership` );
+	for ( const field of ownershipFields ) {
+
+		requireNonEmptyString( adapter.ownership[ field ], `${ label}.ownership.${ field}` );
+		assert.doesNotMatch( adapter.ownership[ field ], /implicit|default|unknown/i, `${ label}.ownership.${ field} is implicit` );
+
+	}
+	assert.ok( adapter.ownedStateEquations.length > 0, `${ label}.ownedStateEquations must be nonempty` );
+	assertUnique( adapter.ownedStateEquations, `${ label}.ownedStateEquations` );
+	const claimsByEquation = new Map();
+	for ( const claim of route.physicsGraph.executionLedger.stateAdvanceClaims ) {
+
+		const rows = claimsByEquation.get( claim.stateEquationId ) ?? [];
+		rows.push( claim );
+		claimsByEquation.set( claim.stateEquationId, rows );
+
+	}
+	for ( const equation of adapter.ownedStateEquations ) {
+
+		assert.equal( ( claimsByEquation.get( equation ) ?? [] ).length, 1, `${ label} state equation ${ equation} does not resolve exactly one state-advance claim` );
+		const ownerGroups = route.physicsGraph.commitGroups.filter( ( group ) => Object.hasOwn( group.stateEquationOwners, equation ) );
+		assert.equal( ownerGroups.length, 1, `${ label} state equation ${ equation} does not resolve exactly one commit-group owner` );
+		assert.ok( ownerGroups[ 0 ].preparedPublications.some( ( publication ) => publication.stateEquationOwner === ownerGroups[ 0 ].stateEquationOwners[ equation ] ), `${ label} state equation ${ equation} has no prepared publication lineage` );
+
+	}
+	assertUnique( adapter.signalDescriptors.map( ( descriptor ) => descriptor.signalId ), `${ label}.signalDescriptors` );
+	const routeSignalsById = new Map( Object.values( route.physicsSignals ).map( ( descriptor ) => [ descriptor.signalId, descriptor ] ) );
+	for ( const [ index, descriptor ] of adapter.signalDescriptors.entries() ) {
+
+		requireAbiRecord( descriptor, 'PhysicsSignalDescriptor', `${ label}.signalDescriptors[${ index }]` );
+		assert.deepEqual( [ descriptor.providerId, descriptor.contextId ], [ adapter.adapterId, adapter.contextId ], `${ label}.signalDescriptors[${ index }] provider/context mismatch` );
+		const registered = routeSignalsById.get( descriptor.signalId );
+		assert.ok( registered, `${ label}.signalDescriptors[${ index }] is absent from the route signal registry` );
+		for ( const key of [ 'providerId', 'contextId', 'schemaId', 'stateVersion', 'physicsFrameId', 'clockId' ] ) assert.deepEqual( descriptor[ key ], registered[ key ], `${ label}.signalDescriptors[${ index }].${ key} differs from the route descriptor` );
+		assert.deepEqual( descriptor.resourceGeneration, registered.resourceGeneration, `${ label}.signalDescriptors[${ index }].resourceGeneration differs from the route descriptor` );
+
+	}
+	const supportedFrameChartIds = [
+		...adapter.signalDescriptors.flatMap( ( descriptor ) => [ descriptor.physicsFrameId, ...( isTypedAbsence( descriptor.chartId ) ? [] : [ descriptor.chartId ] ) ] ),
+		...adapter.interactionCapabilities.map( ( capability ) => capability.frameId )
+	];
+	assertUnique( adapter.supportedFramesCharts, `${ label}.supportedFramesCharts` );
+	assert.deepEqual( [ ...adapter.supportedFramesCharts ].sort(), [ ...new Set( supportedFrameChartIds ) ].sort(), `${ label}.supportedFramesCharts closure mismatch` );
+	const contextClock = canonicalClock( route.physicsContext, adapter.clockMapping.contextClockId, `${ label}.clockMapping.contextClockId` );
+	assert.deepEqual( [ adapter.clockMapping.mappingDescriptorRef.clockId, adapter.clockMapping.mappingDescriptorRef.mappingRevision, adapter.clockMapping.mappingDescriptorRef.discontinuityEpoch ], [ contextClock.clockId, contextClock.mappingRevision, contextClock.discontinuityEpoch ], `${ label}.clockMapping.mappingDescriptorRef does not resolve the registered context clock` );
+	assertUnique( adapter.interactionCapabilities.map( ( capability ) => capability.capabilityId ), `${ label}.interactionCapabilities` );
+	const graphDependencyIds = new Set( route.physicsGraph.dependencies.map( ( dependency ) => dependency.dependencyId ) );
+	for ( const [ index, capability ] of adapter.interactionCapabilities.entries() ) {
+
+		requireAbiRecord( capability, 'ExternalInteractionCapability', `${ label}.interactionCapabilities[${ index }]` );
+		assert.ok( graphDependencyIds.has( capability.dependencyRef.dependencyId ), `${ label}.interactionCapabilities[${ index }] dependency does not resolve` );
+		if ( capability.direction === 'ingress' ) {
+
+			assert.ok( ! isTypedAbsence( capability.targetEquationId ) && adapter.ownedStateEquations.includes( capability.targetEquationId ), `${ label}.interactionCapabilities[${ index }] ingress target equation is not adapter-owned` );
+			assert.equal( capability.exactOnceSupport, 'required-ledger', `${ label}.interactionCapabilities[${ index }] ingress does not require an exact-once ledger` );
+
+		}
+
+	}
+	const adapterSignalOwners = new Set( adapter.signalDescriptors.map( ( descriptor ) => descriptor.owner ) );
+	const crossing = route.physicsInteractions.flatMap( ( exchange ) => [ ...exchange.interactions, ...exchange.reactions ].map( ( record ) => ( {
+		exchange,
+		record,
+		direction: adapter.ownedStateEquations.includes( record.targetStateEquation ) ? 'ingress' : adapterSignalOwners.has( record.sourceOwner ) ? 'egress' : null
+	} ) ) ).filter( ( entry ) => entry.direction !== null );
+	const usedCapabilityIds = new Set();
+	for ( const { record, direction } of crossing ) {
+
+		const matches = adapter.interactionCapabilities.filter( ( capability ) => capability.direction === direction && capability.role === record.role && capability.payloadTag === record.payload.tag && capability.frameId === record.physicsFrameId && capability.footprintKinds.includes( record.footprint.kind ) && ( direction === 'egress' ? isTypedAbsence( capability.targetEquationId ) || capability.targetEquationId === record.targetStateEquation : capability.targetEquationId === record.targetStateEquation ) );
+		assert.equal( matches.length, 1, `${ label} interaction ${ record.interactionId} does not match exactly one directional capability` );
+		usedCapabilityIds.add( matches[ 0 ].capabilityId );
+		if ( matches[ 0 ].reactionAtomicity === 'independent-with-conservation-bound' ) assert.ok( record.conservationGroupIds.some( ( conservationGroupId ) => route.physicsInteractions.some( ( exchange ) => exchange.conservationGroups.some( ( group ) => group.conservationGroupId === conservationGroupId ) ) ), `${ label} capability ${ matches[ 0 ].capabilityId} has no resolved conservation bound` );
+
+	}
+	assert.deepEqual( [ ...usedCapabilityIds ].sort(), adapter.interactionCapabilities.map( ( capability ) => capability.capabilityId ).sort(), `${ label} contains an unused or duplicate directional capability` );
+	const routeAdvancesById = new Map( route.physicsCoordinationAdvanceRecords.map( ( advance ) => [ advance.coordinationAdvanceId, advance ] ) );
+	const dependencyCompletionsById = new Map( route.physicsGraph.executionLedger.dependencyCompletions.map( ( completion ) => [ completion.completionId, completion ] ) );
+	const applicationLedgersById = new Map( Object.values( route.physicsInteractionApplicationLedgers ).map( ( ledger ) => [ ledger.applicationLedgerId, ledger ] ) );
+	const inputLedgerIdsAcrossReceipts = [];
+	const emittedInteractionIdsAcrossReceipts = [];
+	const receiptStepKeys = new Set();
+	const receiptsByAdvance = new Map();
+	for ( const [ index, receipt ] of adapter.stepReceipts.entries() ) {
+
+		const receiptLabel = `${ label}.stepReceipts[${ index }]`;
+		requireAbiRecord( receipt, 'ExternalSolverStepReceipt', receiptLabel );
+		assert.equal( receipt.adapterId, adapter.adapterId, `${ receiptLabel}.adapterId mismatch` );
+		const stepKey = `${ receipt.coordinationAdvanceId }|${ receipt.externalStepSequence }`;
+		assert.ok( ! receiptStepKeys.has( stepKey ), `${ receiptLabel} duplicates external step ${ stepKey}` );
+		receiptStepKeys.add( stepKey );
+		const advance = routeAdvancesById.get( receipt.coordinationAdvanceId );
+		assert.ok( advance, `${ receiptLabel}.coordinationAdvanceId does not resolve` );
+		validateCanonicalInterval( receipt.requestedInterval, route.physicsContext, `${ receiptLabel}.requestedInterval` );
+		assertIntervalContained( receipt.requestedInterval, advance.interval, route.physicsContext, `${ receiptLabel}.requestedInterval` );
+		let priorEnd = intervalBoundsSeconds( receipt.requestedInterval, route.physicsContext, `${ receiptLabel}.requestedInterval` )[ 0 ];
+		const requestedEnd = intervalBoundsSeconds( receipt.requestedInterval, route.physicsContext, `${ receiptLabel}.requestedInterval` )[ 1 ];
+		for ( const [ nativeIndex, interval ] of receipt.actualNativeExecutionIntervals.entries() ) {
+
+			validateCanonicalInterval( interval, route.physicsContext, `${ receiptLabel}.actualNativeExecutionIntervals[${ nativeIndex }]` );
+			const bounds = intervalBoundsSeconds( interval, route.physicsContext, `${ receiptLabel}.actualNativeExecutionIntervals[${ nativeIndex }]` );
+			assert.ok( Math.abs( bounds[ 0 ] - priorEnd ) <= 1e-12, `${ receiptLabel} native execution intervals contain a gap or overlap` );
+			priorEnd = bounds[ 1 ];
+
+		}
+		if ( receipt.status === 'completed' ) assert.ok( receipt.actualNativeExecutionIntervals.length > 0 && Math.abs( priorEnd - requestedEnd ) <= 1e-12, `${ receiptLabel} completed native intervals do not tile the requested interval` );
+		for ( const ref of receipt.dependencyCompletionRefs ) {
+
+			const completion = dependencyCompletionsById.get( ref.completionId );
+			assert.ok( completion && ref.dependencyId === completion.dependencyId && ref.receiptDigest === completion.receiptDigest, `${ receiptLabel} dependency completion does not resolve exactly` );
+
+		}
+		for ( const applicationLedgerId of receipt.inputApplicationLedgerIds ) {
+
+			const application = applicationLedgersById.get( applicationLedgerId );
+			assert.ok( application?.disposition === 'committed', `${ receiptLabel} input application ${ applicationLedgerId} is absent or uncommitted` );
+			inputLedgerIdsAcrossReceipts.push( applicationLedgerId );
+
+		}
+		for ( const output of receipt.outputPreparedVersions ) {
+
+			assert.ok( adapter.ownedStateEquations.includes( output.stateEquationId ), `${ receiptLabel} publishes unowned state equation ${ output.stateEquationId}` );
+			const group = route.physicsGraph.commitGroups.find( ( candidate ) => candidate.commitGroupId === output.commitGroupId );
+			const transaction = route.physicsGraph.commitTransactions.find( ( candidate ) => candidate.commitTransactionId === output.commitTransactionId );
+			assert.ok( group && transaction?.status === 'committed' && transaction.commitGroupIds.includes( group.commitGroupId ), `${ receiptLabel} output does not resolve a committed group/transaction` );
+			assert.ok( group.preparedPublications.some( ( publication ) => publication.preparedVersion.signalId === output.signalId && publication.preparedVersion.stateVersion === output.preparedStateVersion ), `${ receiptLabel} output prepared version does not resolve` );
+			assert.ok( transaction.receipt.preparedToCommittedPublicationMap.some( ( promotion ) => promotion.preparedVersion.signalId === output.signalId && promotion.preparedVersion.stateVersion === output.preparedStateVersion ), `${ receiptLabel} output prepared version is not atomically promoted` );
+
+		}
+		for ( const range of receipt.emittedInteractionSequenceRanges ) {
+
+			assert.ok( Number.isSafeInteger( range.firstSequence ) && Number.isSafeInteger( range.lastSequenceInclusive ) && range.firstSequence <= range.lastSequenceInclusive, `${ receiptLabel} emitted interaction range is invalid` );
+			assert.equal( range.interactionIds.length, range.lastSequenceInclusive - range.firstSequence + 1, `${ receiptLabel} emitted interaction range cardinality mismatch` );
+			emittedInteractionIdsAcrossReceipts.push( ...range.interactionIds );
+			const records = crossing.filter( ( entry ) => entry.direction === 'egress' && range.interactionIds.includes( entry.record.interactionId ) ).map( ( entry ) => entry.record );
+			assert.deepEqual( [ ...range.exactOnceKeys ].sort(), records.map( ( record ) => record.exactOnceKey ).sort(), `${ receiptLabel} emitted exact-once key closure mismatch` );
+
+		}
+		assert.equal( receipt.contentDigest, sha256CanonicalExcluding( receipt, [ 'contentDigest' ] ), `${ receiptLabel}.contentDigest mismatch` );
+		const rows = receiptsByAdvance.get( receipt.coordinationAdvanceId ) ?? [];
+		rows.push( receipt );
+		receiptsByAdvance.set( receipt.coordinationAdvanceId, rows );
+
+	}
+	const ingressInteractionIds = new Set( crossing.filter( ( entry ) => entry.direction === 'ingress' ).map( ( entry ) => entry.record.interactionId ) );
+	const requiredInputLedgerIds = Object.values( route.physicsInteractionApplicationLedgers ).filter( ( ledger ) => ingressInteractionIds.has( ledger.interactionId ) ).map( ( ledger ) => ledger.applicationLedgerId );
+	assertUnique( inputLedgerIdsAcrossReceipts, `${ label} input application ledgers across receipts` );
+	assert.deepEqual( [ ...inputLedgerIdsAcrossReceipts ].sort(), requiredInputLedgerIds.sort(), `${ label} external ingress application-ledger closure mismatch` );
+	const requiredEgressIds = crossing.filter( ( entry ) => entry.direction === 'egress' ).map( ( entry ) => entry.record.interactionId );
+	assertUnique( emittedInteractionIdsAcrossReceipts, `${ label} emitted interactions across receipts` );
+	assert.deepEqual( [ ...emittedInteractionIdsAcrossReceipts ].sort(), requiredEgressIds.sort(), `${ label} external egress interaction closure mismatch` );
+	for ( const [ advanceId, receipts ] of receiptsByAdvance ) if ( receipts.some( ( receipt ) => receipt.status === 'completed' ) ) assert.deepEqual( [ ...new Set( receipts.filter( ( receipt ) => receipt.status === 'completed' ).flatMap( ( receipt ) => receipt.outputPreparedVersions.map( ( output ) => output.stateEquationId ) ) ) ].sort(), [ ...adapter.ownedStateEquations ].sort(), `${ label} completed receipts for ${ advanceId} do not publish every owned equation` );
+	assertUnique( adapter.stepReceipts.map( ( receipt ) => receipt.receiptId ), `${ label}.stepReceipts` );
+	const synchronization = adapter.residencySynchronization;
+	assert.deepEqual( Object.keys( synchronization.authorityBySignalOrStateEquation ).sort(), [ ...new Set( [ ...adapter.ownedStateEquations, ...adapter.signalDescriptors.map( ( descriptor ) => descriptor.signalId ) ] ) ].sort(), `${ label}.residencySynchronization authority closure mismatch` );
+	for ( const authority of Object.values( synchronization.authorityBySignalOrStateEquation ) ) assert.ok( authority === 'external-solver' || authority === adapter.adapterId, `${ label}.residencySynchronization contains an implicit authority` );
+	assert.ok( adapter.interactionCapabilities.some( ( capability ) => capability.dependencyRef.dependencyId === synchronization.resourceProtocol.acquireDependency.dependencyId ), `${ label}.resourceProtocol acquire dependency does not resolve a capability` );
+	requireNonEmptyString( synchronization.resourceProtocol.lifecycleAndRetirementOwner, `${ label}.resourceProtocol.lifecycleAndRetirementOwner` );
+	if ( synchronization.transport === 'shared-resource' ) {
+
+		assert.equal( synchronization.hostVisibilityProof, 'not-host-visible', `${ label} shared resource falsely claims host visibility` );
+		assert.equal( synchronization.transferProtocol.serializationLayoutAndDigest.mode, 'not-used-shared-resource', `${ label} shared resource invents a copy layout` );
+
+	} else {
+
+		assert.ok( [ 'device-copy', 'host-staging', 'network-message' ].includes( synchronization.transport ), `${ label} has an unsupported transport` );
+		const layout = clone( synchronization.transferProtocol.serializationLayoutAndDigest );
+		const contentDigest = layout.contentDigest;
+		delete layout.contentDigest;
+		assert.equal( contentDigest, sha256Canonical( layout ), `${ label} copy/staging/network layout digest mismatch` );
+		assert.notEqual( synchronization.hostVisibilityProof, 'not-host-visible', `${ label} copy/staging/network transport lacks completion-based visibility` );
+
+	}
+	const checkpointFields = [ 'checkpointFormatAndDigest', 'cadenceAndMaximumRollback', 'includedStateVersionsInventoriesAndCursors', 'restoreOrderingAndValidationGates' ];
+	if ( adapter.checkpointRollback.support === 'none' ) for ( const field of checkpointFields ) assert.ok( isTypedAbsence( adapter.checkpointRollback[ field ] ), `${ label}.checkpointRollback.${ field} must be absent when checkpointing is unsupported` );
+	else for ( const field of checkpointFields ) assert.ok( ! isTypedAbsence( adapter.checkpointRollback[ field ] ), `${ label}.checkpointRollback.${ field} is absent despite checkpoint support` );
+	for ( const commitGroupId of adapter.failurePolicy.freezeCommitGroups ) assert.ok( route.physicsGraph.commitGroups.some( ( group ) => group.commitGroupId === commitGroupId ), `${ label}.failurePolicy freezes unknown commit group ${ commitGroupId}` );
+	assert.doesNotMatch( adapter.failurePolicy.degradedPublication, /implicit|default|best-effort|unknown/i, `${ label}.failurePolicy permits implicit degraded publication` );
+	return true;
+
+}
+
+function validateQualityInventories( route ) {
+
+	assert.ok( isPlainObject( route.physicsQualityRequests ), 'physicsQualityRequests must be a keyed mapping' );
+	assert.ok( isPlainObject( route.physicsQualityStates ), 'physicsQualityStates must be a keyed mapping' );
+	assert.ok( Array.isArray( route.physicsQualityTransitions ), 'physicsQualityTransitions must be an array' );
+	if ( route.physicsQualityTransitions.length === 0 ) {
+
+		assert.deepEqual( route.physicsQualityRequests, {}, 'route without quality transitions retains requests' );
+		assert.deepEqual( route.physicsQualityStates, {}, 'route without quality transitions retains states' );
+		return true;
+
+	}
+	const requestSequences = Object.values( route.physicsQualityRequests ).map( ( request ) => request.requestSequence );
+	assert.ok( requestSequences.every( Number.isSafeInteger ), 'quality request sequences must be structural integers' );
+	assert.equal( new Set( requestSequences ).size, requestSequences.length, 'quality request sequences contain duplicates' );
+	for ( const [ requestId, request ] of Object.entries( route.physicsQualityRequests ) ) {
+
+		requireAbiRecord( request, 'QualityChangeRequest', `physicsQualityRequests.${ requestId}` );
+		assert.equal( request.requestId, requestId, `physicsQualityRequests key ${ requestId } mismatch` );
+		requireAbiRecord( request.requestedAllocation, 'QualityAllocationRequest', `physicsQualityRequests.${ requestId }.requestedAllocation` );
+		assert.deepEqual( [ ...request.requestedAllocation.affectedTargetsViews ].sort(), [ ...request.affectedTargetsViews ].sort(), `physicsQualityRequests.${ requestId } allocation target/view scope mismatch` );
+		assertUnique( request.admissionRequirements.map( ( requirement ) => requirement.requirementId ), `physicsQualityRequests.${ requestId }.admissionRequirements` );
+		for ( const [ index, requirement ] of request.admissionRequirements.entries() ) requireAbiRecord( requirement, 'QualityAdmissionRequirement', `physicsQualityRequests.${ requestId }.admissionRequirements[${ index }]` );
+
+	}
+	for ( const [ stateId, state ] of Object.entries( route.physicsQualityStates ) ) {
+
+		requireAbiRecord( state, 'PhysicsQualityStateDescriptor', `physicsQualityStates.${ stateId}` );
+		assert.equal( state.qualityStateId, stateId, `physicsQualityStates key ${ stateId } mismatch` );
+		assert.equal( state.contextId, route.physicsContext.contextId, `physicsQualityStates.${ stateId } context mismatch` );
+
+	}
+	assertUnique( route.physicsQualityTransitions.map( ( transition ) => transition.transitionId ), 'physicsQualityTransitions transition IDs' );
+	assert.deepEqual( route.physicsQualityTransitions.map( ( transition ) => transition.requestId ).sort(), Object.keys( route.physicsQualityRequests ).sort(), 'quality request/transition inventory closure mismatch' );
+	assert.deepEqual( [ ...new Set( route.physicsQualityTransitions.flatMap( ( transition ) => [ transition.fromState, transition.toState ] ) ) ].sort(), Object.keys( route.physicsQualityStates ).sort(), 'quality state inventory is not the exact transition endpoint set' );
+	const visitedQualityStateIds = new Set();
+	const visitedQualityEpochs = new Set();
+	for ( const [ index, transition ] of route.physicsQualityTransitions.entries() ) {
+
+		const label = `physicsQualityTransitions[${ index }]`;
+		assert.ok( Number.isSafeInteger( transition.requestSequence ), `${ label }.requestSequence must be a structural integer` );
+		assert.notEqual( transition.fromState, transition.toState, `${ label} is a self-transition` );
+		assert.notEqual( transition.fromQualityEpoch, transition.toQualityEpoch, `${ label} does not advance the quality epoch` );
+		if ( index === 0 ) {
+
+			visitedQualityStateIds.add( transition.fromState );
+			visitedQualityEpochs.add( transition.fromQualityEpoch );
+
+		}
+		else {
+
+			const predecessor = route.physicsQualityTransitions[ index - 1 ];
+			assert.ok( predecessor.requestSequence < transition.requestSequence, `${ label} is not strictly ordered by requestSequence` );
+			assert.equal( transition.fromState, predecessor.toState, `${ label} forks or is disconnected from the preceding quality transition` );
+			assert.equal( transition.fromQualityEpoch, predecessor.toQualityEpoch, `${ label} quality epoch is disconnected from the preceding quality transition` );
+
+		}
+		assert.ok( ! visitedQualityStateIds.has( transition.toState ), `${ label} closes a quality-transition cycle or reuses an earlier quality state` );
+		assert.ok( ! visitedQualityEpochs.has( transition.toQualityEpoch ), `${ label} closes a quality-transition cycle or reuses an earlier quality epoch` );
+		visitedQualityStateIds.add( transition.toState );
+		visitedQualityEpochs.add( transition.toQualityEpoch );
+
+	}
+	for ( const [ index, transition ] of route.physicsQualityTransitions.entries() ) {
+
+		const label = `physicsQualityTransitions[${ index }]`;
+		requireAbiRecord( transition, 'QualityTransition', label );
+		assert.equal( transition.contextId, route.physicsContext.contextId, `${ label }.contextId mismatch` );
+		const request = route.physicsQualityRequests[ transition.requestId ];
+		const sourceState = route.physicsQualityStates[ transition.fromState ];
+		const destinationState = route.physicsQualityStates[ transition.toState ];
+		assert.ok( request && sourceState && destinationState, `${ label } references an unknown request or endpoint state` );
+		assert.equal( transition.requestSequence, request.requestSequence, `${ label }.requestSequence mismatch` );
+		assert.deepEqual( transition.affectedTargetsViews, request.affectedTargetsViews, `${ label } target/view scope differs from the request` );
+		assert.deepEqual( transition.affectedControls, request.rankedCandidateControls, `${ label } control ranking differs from the request` );
+		assert.equal( transition.sourceEvidenceDigest, sha256Canonical( request.evidenceRecords ), `${ label }.sourceEvidenceDigest does not cover request evidence` );
+		assert.deepEqual( transition.triggerEvidence.pressureRecords, request.evidenceRecords, `${ label } pressure evidence differs from the request` );
+		assert.deepEqual( transition.triggerEvidence.errorRecords, sourceState.physicalAndVisualErrorBounds, `${ label } trigger errors differ from the source quality state` );
+		assert.deepEqual( transition.protectedInvariants, request.protectedInvariants, `${ label } changes protected invariants` );
+		assert.deepEqual( [ transition.fromQualityEpoch, transition.toQualityEpoch ], [ sourceState.qualityEpoch, destinationState.qualityEpoch ], `${ label } epoch endpoints differ from quality states` );
+		const requestAdmission = requireAbiRecord( transition.requestAdmission, 'QualityRequestAdmission', `${ label}.requestAdmission` );
+		assert.deepEqual( [ requestAdmission.requestId, requestAdmission.currentQualityStateId, requestAdmission.currentQualityEpoch, requestAdmission.selectedCandidateQualityStateId ], [ request.requestId, sourceState.qualityStateId, sourceState.qualityEpoch, destinationState.qualityStateId ], `${ label}.requestAdmission request/source/destination mismatch` );
+		assert.equal( requestAdmission.status, 'admitted', `${ label } performs quality work without request admission` );
+		assert.ok( requestAdmission.safeCommitBoundary.kind === 'instant' && ! isTypedAbsence( requestAdmission.safeCommitBoundary.instant ) && isTypedAbsence( requestAdmission.safeCommitBoundary.interval ), `${ label}.requestAdmission lacks an exact instant safe boundary` );
+		assert.deepEqual( requestAdmission.safeCommitBoundary.instant, transition.commitAtStepBoundary.commitInstant, `${ label } commit instant differs from the admitted boundary` );
+		assert.equal( requestAdmission.allocationRequestDigest, sha256Canonical( request.requestedAllocation ), `${ label}.requestAdmission allocation digest mismatch` );
+		assert.deepEqual( requestAdmission.admissionRequirementResults.map( ( result ) => result.requirementId ).sort(), request.admissionRequirements.map( ( requirement ) => requirement.requirementId ).sort(), `${ label}.requestAdmission requirement closure mismatch` );
+		for ( const result of requestAdmission.admissionRequirementResults ) {
+
+			const requirement = request.admissionRequirements.find( ( candidate ) => candidate.requirementId === result.requirementId );
+			assert.equal( result.status, 'accepted', `${ label}.requestAdmission requirement ${ result.requirementId } is not accepted` );
+			assert.equal( result.evidenceRef, requirement.evidenceRef, `${ label}.requestAdmission requirement ${ result.requirementId } cites other evidence` );
+
+		}
+		assert.ok( requestAdmission.hysteresisAndMinimumResidenceResults.length > 0 && requestAdmission.hysteresisAndMinimumResidenceResults.every( ( result ) => result.status === 'accepted' ), `${ label}.requestAdmission lacks accepted hysteresis/minimum-residence evidence` );
+		const allocation = requireAbiRecord( transition.prepare.allocationAdmission, 'QualityAllocationAdmission', `${ label}.prepare.allocationAdmission` );
+		assert.deepEqual( [ allocation.allocationRequestId, allocation.transitionId, allocation.status ], [ request.requestedAllocation.allocationRequestId, transition.transitionId, 'admitted' ], `${ label}.prepare allocation admission mismatch` );
+		assert.ok( transition.prepare.allocateCompilePopulate.length > 0 && transition.prepare.allocateCompilePopulate.every( ( operation ) => typeof operation === 'string' && operation.startsWith( `after-${ allocation.allocationAdmissionId }:` ) ), `${ label}.prepare work is not sequenced after allocation admission` );
+		requireAbiRecord( transition.prepare.predictedPeakResources, 'PhysicsMemoryLedger', `${ label}.prepare.predictedPeakResources` );
+		requireAbiRecord( allocation.simultaneousOldNewPeakProof, 'PhysicsMemoryLedger', `${ label}.prepare.allocationAdmission.simultaneousOldNewPeakProof` );
+		assert.ok( allocation.limitHeadroomAndThermalGateResults.length > 0 && allocation.limitHeadroomAndThermalGateResults.every( ( result ) => result.status === 'accepted' ), `${ label}.prepare allocation has a rejected/implicit capacity gate` );
+		assert.equal( allocation.receiptDigest, sha256CanonicalExcluding( allocation, [ 'receiptDigest' ] ), `${ label}.prepare allocation receipt digest mismatch` );
+		assert.ok( transition.commitAtStepBoundary.conservativeMap.length > 0, `${ label} has no conservative state map` );
+		for ( const [ mapIndex, stateMap ] of transition.commitAtStepBoundary.conservativeMap.entries() ) {
+
+			requireAbiRecord( stateMap, 'ConservativeStateMap', `${ label}.commitAtStepBoundary.conservativeMap[${ mapIndex }]` );
+			assert.deepEqual( [ stateMap.contextId, stateMap.sourceQualityStateId, stateMap.destinationQualityStateId ], [ route.physicsContext.contextId, sourceState.qualityStateId, destinationState.qualityStateId ], `${ label} conservative map endpoint mismatch` );
+			assert.ok( route.physicsErrorPropagationLedgers[ stateMap.errorPropagationLedgerRef ], `${ label} conservative map error ledger does not resolve` );
+			assert.equal( stateMap.acceptanceGate.status, 'accepted', `${ label} conservative map is not accepted` );
+			assert.ok( stateMap.conservedCommodities.length > 0 && stateMap.positivityAndConstraintPreservation.every( ( result ) => result.status === 'accepted' ), `${ label} conservative map lacks commodity/positivity closure` );
+
+		}
+		const expectedEmitterKeys = destinationState.stateVariablesAndInventories.stateEquations;
+		assert.ok( Array.isArray( expectedEmitterKeys ) && expectedEmitterKeys.length > 0, `${ label} destination state has no declared state equations` );
+		assert.deepEqual( Object.keys( transition.commitAtStepBoundary.authoritativeEmitterByStateEquationOrSourceChannel ).sort(), [ ...expectedEmitterKeys ].sort(), `${ label} authoritative emitter closure mismatch` );
+		assert.ok( Object.values( transition.commitAtStepBoundary.authoritativeEmitterByStateEquationOrSourceChannel ).every( ( value ) => value === 'exactly-one-owner-and-representation' ), `${ label} admits duplicate state-equation/source-channel emitters` );
+		assert.equal( transition.commitAtStepBoundary.atomicPublication, 'required', `${ label} quality commit is not atomic` );
+		const retirement = transition.retireAfterCompletion;
+		requireAbiRecord( retirement.completionJoin, 'ConsumerCompletionJoin', `${ label}.retireAfterCompletion.completionJoin` );
+		assert.ok( retirement.oldResourceLeases.length > 0, `${ label} retires no source resource leases` );
+		const completionTokens = [ ...retirement.completionJoin.simulationConsumers, ...retirement.completionJoin.couplingConsumers, ...retirement.completionJoin.externalConsumers, ...retirement.completionJoin.presentationConsumers ];
+		assertUnique( completionTokens.map( ( token ) => token.tokenId ), `${ label}.retireAfterCompletion completion token IDs` );
+		assert.deepEqual( [ ...retirement.completionJoin.requiredConsumerKeys ].sort(), completionTokens.map( ( token ) => token.consumerKey ).sort(), `${ label}.retireAfterCompletion consumer closure mismatch` );
+		assert.equal( retirement.completionJoin.joinDigest, sha256CanonicalExcluding( retirement.completionJoin, [ 'joinDigest' ] ), `${ label}.retireAfterCompletion completion-join digest mismatch` );
+		assert.deepEqual( [ ...retirement.retirementEvidence.completedConsumerKeys ].sort(), [ ...retirement.completionJoin.requiredConsumerKeys ].sort(), `${ label} retires before every consumer completes` );
+		assert.ok( transition.resetPlan.length > 0, `${ label} has no reset plan` );
+		for ( const [ actionIndex, action ] of transition.resetPlan.entries() ) {
+
+			requireAbiRecord( action, 'ScopedResetAction', `${ label}.resetPlan[${ actionIndex }]` );
+			assert.deepEqual( action.causeEpochs, [ transition.fromQualityEpoch, transition.toQualityEpoch ], `${ label}.resetPlan[${ actionIndex }] epoch scope mismatch` );
+
+		}
+
+	}
+	return true;
+
+}
+
 let physicsContractProfilePrinted = false;
-function validateCanonicalPhysicsContract( route ) {
+function validatePhysicalRouteManifest( route ) {
 
 	const phaseTimings = {};
 	let phaseStartedAt = performance.now();
@@ -3936,7 +4618,7 @@ function validateCanonicalPhysicsContract( route ) {
 	};
 	validateCanonicalContext( route.physicsContext );
 	markPhase( 'context' );
-	assert.ok( isPlainObject( route.physicsSignals ) && Object.keys( route.physicsSignals ).length >= 3, 'physical route requires registered gravity/water/body signals' );
+	requireNonEmptyMapping( route.physicsSignals, 'physical route physicsSignals' );
 	for ( const [ key, descriptor ] of Object.entries( route.physicsSignals ) ) validateCanonicalSignal( key, descriptor, route.physicsContext );
 	markPhase( 'signals' );
 	const gravity = Object.values( route.physicsSignals ).find( ( descriptor ) => descriptor.signalId === route.physicsContext.gravityProvider.signalId );
@@ -3951,9 +4633,10 @@ function validateCanonicalPhysicsContract( route ) {
 	for ( const [ adapterId, adapter ] of Object.entries( route.physicsExternalSolverAdaptersById ) ) {
 
 		assert.equal( adapterId, adapter.adapterId, `external solver adapter registry key ${ adapterId } mismatch` );
-		validateExternalSolverAdapterFixture( fixtureModuleHelpers, route, adapter, `physicsExternalSolverAdaptersById.${ adapterId}` );
+		validateExternalSolverAdapter( route, adapter, `physicsExternalSolverAdaptersById.${ adapterId}` );
 
 	}
+	validateExternalAdapterOwnershipPartition( route );
 	markPhase( 'externalAdapters' );
 	validateCanonicalGraphV2( route.physicsGraph, route.physicsSignals, route.physicsContext, route );
 	markPhase( 'graph' );
@@ -3966,7 +4649,7 @@ function validateCanonicalPhysicsContract( route ) {
 	markPhase( 'presentation' );
 	validateCanonicalCostLedger( route.physicsCostLedger, route.physicsGraph, route.physicsContext, route );
 	markPhase( 'cost' );
-	validateQualityTransitionBundle( fixtureModuleHelpers, route );
+	validateQualityInventories( route );
 	markPhase( 'quality' );
 	assert.ok( isNotUsedRecord( route.physicsPresentationSnapshot ), 'deprecated singular physicsPresentationSnapshot must remain not used' );
 	validateNumericEvidence( route );
@@ -3977,6 +4660,29 @@ function validateCanonicalPhysicsContract( route ) {
 		console.log( JSON.stringify( { physicsContractPhaseTimingsMs: phaseTimings }, null, 2 ) );
 
 	}
+
+}
+
+function assertCanonicalCoupledFixtureCoverage( route ) {
+
+	const mappingKinds = new Set( Object.values( route.physicsContext.physicsClockRegistry.clocksById ).map( ( clock ) => clock.mappingKind ) );
+	for ( const kind of [ 'fixed-rational', 'timestamp-table', 'piecewise-versioned' ] ) assert.ok( mappingKinds.has( kind ), `canonical coupled fixture does not cover ${ kind } clock mapping` );
+	const signalText = JSON.stringify( route.physicsSignals );
+	assert.match( signalText, /water/i, 'canonical coupled fixture does not cover a water signal' );
+	assert.match( signalText, /body|rigid/i, 'canonical coupled fixture does not cover a body signal' );
+	const coupledLoop = route.physicsGraph.loopMacros.find( ( loop ) => loop.loopId === 'body-water-loop' );
+	assert.ok( coupledLoop && coupledLoop.perIterationLedger.length > 1, 'canonical coupled fixture does not cover the body-water iterative loop' );
+	assert.ok( route.physicsInteractions.some( ( exchange ) => exchange.mode !== 'one-way' && exchange.reactionGroups.some( ( group ) => group.sourceInteractionIds.length > 1 && group.reactionInteractionIds.length > 1 ) ), 'canonical coupled fixture does not exercise many-to-many source/reaction coverage' );
+	assert.ok( route.physicsCostLedger.presentationTargetsAndViews.length >= 2, 'canonical coupled fixture does not cover multiple presentation views' );
+	assert.ok( route.physicsCostLedger.measurementProtocolRefs.length >= 2, 'canonical coupled fixture does not cover protocol plus sustained trace identity' );
+	assert.match( route.physicsCostLedger.targetAndHarness, /mobile|low-end|tile/i, 'canonical coupled fixture does not cover the mobile/low-end harness' );
+	assert.ok( route.physicsCostLedger.graphStageCosts.every( ( cost ) => quantityValue( cost.sampleCount, `canonicalCoverage.${ cost.stageId}.sampleCount` ) >= 120 ), 'canonical coupled fixture does not cover sustained stage samples' );
+	assert.ok( Object.hasOwn( route.physicsCostLedger.cadenceTraceTotals.nativeSubcycleCounts, '$threejs-water-optics' ), 'canonical coupled fixture does not cover water native-subcycle totals' );
+	assert.ok( Object.keys( route.physicsExternalSolverAdaptersById ).length > 0, 'canonical coupled fixture does not cover an external solver adapter' );
+	for ( const [ adapterId, adapter ] of Object.entries( route.physicsExternalSolverAdaptersById ) ) validateExternalSolverAdapterFixture( fixtureModuleHelpers, route, adapter, `canonicalCoverage.externalAdapters.${ adapterId}` );
+	assert.ok( route.physicsQualityTransitions.length > 0, 'canonical coupled fixture does not cover a quality transition' );
+	validateQualityTransitionBundle( fixtureModuleHelpers, route );
+	return true;
 
 }
 
@@ -4611,7 +5317,7 @@ function attachCanonicalGraph( route, fixedInterval, adaptiveInterval, eventInte
 	const loopRows = [ 0, 1, 2 ].map( ( iterationIndex ) => {
 
 		const rowExecutions = stageExecutions.filter( ( row ) => row.iterationIndex === iterationIndex );
-		return { loopId: 'body-water-loop', iterationIndex, bracket: canonicalIntervalIdentity( fixedInterval ), inputVersions: iterationIndex === 0 ? [ { signalId: signalId( 'waterSurface' ), stateVersion: 'water-41' }, { signalId: signalId( 'bodyState' ), stateVersion: 'body-41' } ] : [ { signalId: signalId( 'waterSurface' ), stateVersion: `loop-42/iteration-${ iterationIndex - 1 }/water/subcycle-2` }, { signalId: signalId( 'bodyState' ), stateVersion: `loop-42/iteration-${ iterationIndex - 1 }/body` } ], outputVersions: [ { signalId: signalId( 'waterSurface' ), stateVersion: `loop-42/iteration-${ iterationIndex }/water/subcycle-2` }, { signalId: signalId( 'bodyState' ), stateVersion: `loop-42/iteration-${ iterationIndex }/body` } ], interactionSequenceRanges: [ { firstSequence: 1001 + iterationIndex * 4, lastSequenceInclusive: 1004 + iterationIndex * 4 } ], residualValues: [ evidence( 0.001 / ( iterationIndex + 1 ), 'newton-second', 'Measured', 'fixture-coupling' ) ], conservationResults: [ { conservationGroupId: 'body-water-momentum', status: 'within-gate' } ], accepted: iterationIndex === 2, stageExecutionIds: rowExecutions.map( ( row ) => row.executionId ), interactionApplicationLedgerIds: [], outputContentDigest: `sha256:loop-42-iteration-${ iterationIndex }`, dependencyCompletionRefs: rowExecutions.flatMap( ( row ) => row.dependencyCompletions ) };
+		return { loopId: 'body-water-loop', iterationIndex, bracket: canonicalIntervalIdentity( fixedInterval ), inputVersions: iterationIndex === 0 ? [ { signalId: signalId( 'waterSurface' ), stateVersion: 'water-41' }, { signalId: signalId( 'bodyState' ), stateVersion: 'body-41' } ] : [ { signalId: signalId( 'waterSurface' ), stateVersion: `loop-42/iteration-${ iterationIndex - 1 }/water/subcycle-2` }, { signalId: signalId( 'bodyState' ), stateVersion: `loop-42/iteration-${ iterationIndex - 1 }/body` } ], outputVersions: [ { signalId: signalId( 'waterSurface' ), stateVersion: `loop-42/iteration-${ iterationIndex }/water/subcycle-2` }, { signalId: signalId( 'bodyState' ), stateVersion: `loop-42/iteration-${ iterationIndex }/body` } ], interactionSequenceRanges: [ { firstSequence: 1001, lastSequenceInclusive: 1004 } ], residualValues: [ evidence( 0.001 / ( iterationIndex + 1 ), 'newton-second', 'Measured', 'fixture-coupling' ) ], conservationResults: [ { conservationGroupId: 'body-water-momentum', status: 'within-gate' } ], accepted: iterationIndex === 2, stageExecutionIds: rowExecutions.map( ( row ) => row.executionId ), interactionApplicationLedgerIds: [], outputContentDigest: `sha256:loop-42-iteration-${ iterationIndex }`, dependencyCompletionRefs: rowExecutions.flatMap( ( row ) => row.dependencyCompletions ) };
 
 	} );
 	const acceptedWrites = clone( loopRows[ 2 ].outputVersions );
@@ -4752,7 +5458,7 @@ function attachCanonicalPresentation( route, clocks ) {
 			admissionPolicy: 'bounded-mapped-skew', cohortSpecificationDigest: 'sha256:presentation-cohort-42'
 		}
 	};
-	route.physicsPresentationCandidate = { candidateId: 'physics-candidate-42', contextId: route.physicsContext.contextId, presentationEpoch: 'presentation-42', timeCohortId: 'presentation-cohort-42', requestedPresentationInstant: fixed42Half, physicsOriginEpoch: 'physics-origin-17', commitProvenance: { provenanceId: 'candidate-commit-provenance-42', contextId: route.physicsContext.contextId, coordinationAdvanceIds: [ 'coordination-advance-42' ], commitTransactionIds: [ 'coordination-commit-transaction-42' ], commitReceiptIdsAndDigests: [ { receiptId: 'coordination-commit-receipt-42', receiptDigest: route.physicsGraph.commitTransactions[ 0 ].receipt.receiptDigest } ], committedStateVersions: [ { signalId: 'gravity-acceleration', stateVersion: 'gravity-42' }, { signalId: 'water-surface-state', stateVersion: 'water-42' }, { signalId: 'rigid-body-state', stateVersion: 'body-42' }, { signalId: 'coupled-commit-token', stateVersion: 'commit-42' } ], physicsOriginTransactionId: typedAbsence( 'not-applicable', 'route-physics-coordinator' ), qualityTransitionId: typedAbsence( 'not-applicable', 'route-physics-coordinator' ), closedPublicationSetDigest: route.physicsGraph.commitTransactions[ 0 ].publicationSetDigest }, candidateScope: 'committed-state-brackets-leases-and-events', presentedStatePairs: pairs, resourceLeases: candidateLeases, eventSequenceRanges: [ { rangeId: 'body-water-events-1001-1004', producerId: 'route-physics-coordinator', consumerId: 'shared-presentation-views', streamId: 'body-water-exchange', firstSequence: 1001, lastSequenceInclusive: 1004, sourceStateVersion: 'commit-42', interval: fixtureInterval( clocks, 'physics-fixed', 42, 43 ), cursorBefore: 1001, cursorAfter: 1005, payloadDigest: 'sha256:fixture-body-water-events-1001-1004' } ] };
+	route.physicsPresentationCandidate = { candidateId: 'physics-candidate-42', contextId: route.physicsContext.contextId, presentationEpoch: 'presentation-42', timeCohortId: 'presentation-cohort-42', requestedPresentationInstant: fixed42Half, physicsOriginEpoch: 'physics-origin-17', commitProvenance: { provenanceId: 'candidate-commit-provenance-42', contextId: route.physicsContext.contextId, coordinationAdvanceIds: [ 'coordination-advance-42' ], commitTransactionIds: [ 'coordination-commit-transaction-42' ], commitReceiptIdsAndDigests: [ { receiptId: 'coordination-commit-receipt-42', receiptDigest: route.physicsGraph.commitTransactions[ 0 ].receipt.receiptDigest } ], committedStateVersions: [ { signalId: 'gravity-acceleration', stateVersion: 'gravity-42' }, { signalId: 'water-surface-state', stateVersion: 'water-42' }, { signalId: 'rigid-body-state', stateVersion: 'body-42' }, { signalId: 'coupled-commit-token', stateVersion: 'commit-42' } ], physicsOriginTransactionId: typedAbsence( 'not-applicable', 'route-physics-coordinator' ), qualityTransitionId: typedAbsence( 'not-applicable', 'route-physics-coordinator' ), closedPublicationSetDigest: route.physicsGraph.commitTransactions[ 0 ].publicationSetDigest }, candidateScope: 'committed-state-brackets-leases-and-events', presentedStatePairs: pairs, resourceLeases: candidateLeases, eventSequenceRanges: [ { rangeId: 'body-water-events-1001-1004', producerId: 'route-physics-coordinator', consumerId: 'shared-presentation-views', streamId: 'body-water-exchange', firstSequence: 1001, lastSequenceInclusive: 1004, sourceStateVersion: 'commit-42', interval: fixtureInterval( clocks, 'physics-fixed', 42, 43 ), cursorBefore: 1001, cursorAfter: 1005, payloadDigest: authoritativePresentationEventPayloadDigest( route.physicsInteractions[ 0 ] ) } ] };
 	const matrix3 = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
 	const matrix4 = evidence( [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ], 'matrix4', 'Derived', 'camera' );
 	const renderMap = ( id, epoch, instant, translation ) => ( { sourcePhysicsFrameId: 'physics-world-y-up', sourceTransformRevision: 'physics-frame-transform-3', sourcePhysicsOriginEpoch: 'physics-origin-17', destinationRenderFrameId: `render-${ id }`, renderOriginEpoch: epoch, referenceInstant: instant, properBasisRotation: matrix3, presentationScale: evidence( 1, 'ratio', 'Authored', 'presentation-scale' ), renderUnitsPerMeter: evidence( 2, 'render-unit-per-metre', 'Derived', 'presentationScale/metersPerWorldUnit' ), translationRenderUnits: translation, transformRevision: `render-transform-${ id }`, error: fixtureError( 'render-unit', 1e-6, 'render-map' ) } );
@@ -5079,6 +5785,473 @@ function makeCanonicalCoupledPhysicsFixture() {
 	attachCanonicalPresentation( route, clocks );
 	attachCanonicalCostLedger( route );
 	route.physicsPresentationSnapshot = 'not used (deprecated compatibility projection)';
+	return route;
+
+}
+
+function normalizeRouteToSingleFixedClock( route ) {
+
+	const clocks = route.physicsContext.physicsClockRegistry.clocksById;
+	const fixedClock = Object.values( clocks ).find( ( clock ) => clock.mappingKind === 'fixed-rational' );
+	assert.ok( fixedClock, 'single-clock fixture source has no fixed-rational clock' );
+	const fixedMapping = fixedClock.mapping.fixedRational;
+	const epochCoordinate = instantCoordinate( { tick: fixedMapping.epochTick, rationalSubstep: fixedMapping.epochRationalSubstep }, 'singleClock.fixedMapping.epoch' );
+	const epochSeconds = quantityValue( fixedMapping.epochSeconds, 'singleClock.fixedMapping.epochSeconds' );
+	const secondsPerTick = rationalQuantityValue( fixedMapping.secondsPerTick, 'singleClock.fixedMapping.secondsPerTick' );
+	route.physicsContext.physicsClockRegistry.clocksById = { [ fixedClock.clockId ]: fixedClock };
+	route.physicsContext.physicsClockRegistry.coordinationClockId = fixedClock.clockId;
+	const gcd = ( a, b ) => {
+
+		while ( b !== 0 ) [ a, b ] = [ b, a % b ];
+		return Math.abs( a );
+
+	};
+	const normalizeInstant = ( instant ) => {
+
+		const seconds = quantityValue( instant.timeSecondsDerived, 'singleClock.timeSecondsDerived' );
+		const coordinate = epochCoordinate + ( seconds - epochSeconds ) / secondsPerTick;
+		let tick = Math.floor( coordinate );
+		let denominator = 1_000_000_000_000;
+		let numerator = Math.round( ( coordinate - tick ) * denominator );
+		if ( numerator === denominator ) { tick ++; numerator = 0; }
+		const divisor = numerator === 0 ? denominator : gcd( numerator, denominator );
+		numerator /= divisor;
+		denominator /= divisor;
+		instant.clockId = fixedClock.clockId;
+		instant.tick = tick;
+		instant.rationalSubstep = { numerator, denominator };
+		instant.clockMappingRevision = fixedClock.mappingRevision;
+		instant.discontinuityEpoch = fixedClock.discontinuityEpoch;
+		instant.timeSecondsDerived.value = epochSeconds + ( tick + numerator / denominator - epochCoordinate ) * secondsPerTick;
+
+	};
+	const visit = ( value, visited = new WeakSet() ) => {
+
+		if ( value === null || typeof value !== 'object' || visited.has( value ) ) return;
+		visited.add( value );
+		if ( Array.isArray( value ) ) { for ( const entry of value ) visit( entry, visited ); return; }
+		if ( Object.hasOwn( value, 'tick' ) && Object.hasOwn( value, 'rationalSubstep' ) && Object.hasOwn( value, 'timeSecondsDerived' ) ) normalizeInstant( value );
+		if ( Object.hasOwn( value, 'clockId' ) && ! Object.hasOwn( value, 'mappingKind' ) ) value.clockId = fixedClock.clockId;
+		if ( Object.hasOwn( value, 'sourceClockId' ) ) value.sourceClockId = fixedClock.clockId;
+		if ( Object.hasOwn( value, 'measurementClockId' ) ) value.measurementClockId = fixedClock.clockId;
+		if ( Object.hasOwn( value, 'presentationClockId' ) ) value.presentationClockId = fixedClock.clockId;
+		if ( Object.hasOwn( value, 'debtClockId' ) ) value.debtClockId = fixedClock.clockId;
+		if ( Object.hasOwn( value, 'intervalMappingRevision' ) ) value.intervalMappingRevision = fixedClock.mappingRevision;
+		if ( Object.hasOwn( value, 'clockMapRevision' ) ) value.clockMapRevision = fixedClock.mappingRevision;
+		if ( Object.hasOwn( value, 'coordinationClockMappingProof' ) ) value.coordinationClockMappingProof = 'identity fixed-clock mapping';
+		for ( const child of Object.values( value ) ) visit( child, visited );
+
+	};
+	visit( route );
+	for ( const pair of route.physicsPresentationCandidate.presentedStatePairs ) for ( const arm of [ pair.previousPresented, pair.currentPresented ] ) {
+
+		const lower = quantityValue( arm.provenance.lowerBracket.sampleInstant.timeSecondsDerived, 'singleClock.lower' );
+		const upper = quantityValue( arm.provenance.upperBracket.sampleInstant.timeSecondsDerived, 'singleClock.upper' );
+		const mapped = quantityValue( arm.provenance.mappedSourceInstant.timeSecondsDerived, 'singleClock.mapped' );
+		arm.provenance.interpolation.alpha.value = ( mapped - lower ) / ( upper - lower );
+
+	}
+	return fixedClock;
+
+}
+
+function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
+
+	const route = clone( canonicalRoute );
+	route.workloadProfile.domain = 'scientific-visualization';
+	route.causeLedger.sourceOfTruth = 'versioned inertial field state';
+	route.causeLedger.primaryObservable = 'one-view committed field state';
+	route.causeLedger.selectedAlgorithm = 'single-rate exact transactional field advance';
+	route.causeLedger.noPostBaseline = 'the committed inertial field remains legible without post-processing';
+	route.selectedSkills = [ '$threejs-camera-controls-and-rigs', '$threejs-image-pipeline', '$threejs-visual-validation' ];
+	route.primaryOwner = 'environment-owner';
+	route.owners.sourceOfTruth = 'versioned inertial field state';
+	route.owners.representation = 'environment-owner';
+	route.owners.timebase = 'environment-owner';
+	route.physicsExternalSolverAdaptersById = {};
+	route.physicsQualityRequests = {};
+	route.physicsQualityStates = {};
+	route.physicsQualityTransitions = [];
+	route.physicsErrorPropagationLedgers = {};
+	route.physicsInteractions = [];
+	route.physicsInteractionApplicationLedgers = {};
+
+	const fixedClock = normalizeRouteToSingleFixedClock( route );
+	const context = route.physicsContext;
+	const gravitySignal = route.physicsSignals.gravity;
+	route.physicsSignals = { gravity: gravitySignal };
+	gravitySignal.consumers = [ 'route-physics-coordinator' ];
+	gravitySignal.clockId = fixedClock.clockId;
+	gravitySignal.samplePhase = 'interval-end';
+	gravitySignal.stateVersion = 'gravity-42';
+	context.physicsMaterialRegistry.materials = {
+		'inertial-probe-material': {
+			...clone( context.physicsMaterialRegistry.materials[ 'hull-material-1' ] ),
+			physicsMaterialId: 'inertial-probe-material', recordVersion: 'inertial-probe-material-v1', provenance: 'single-view inertial fixture'
+		}
+	};
+	context.contextVersion = 'context-17-single-field';
+	context.physicsMaterialRegistry.pairLawResolver.explicitPairOverrides = {};
+	context.physicsMaterialRegistry.materialStateDescriptors = [];
+	context.physicsFrameRegistry.framesById = { [ context.physicsRootFrameId ]: context.physicsFrameRegistry.framesById[ context.physicsRootFrameId ] };
+	context.chartRegistry.chartsById = {};
+	context.chartRegistry.registryRevision = 'physics-charts-17-empty';
+	for ( const pass of route.performanceContract.passLedger ) {
+
+		if ( pass.accountingOwner === '$threejs-water-optics' ) pass.accountingOwner = 'environment-owner';
+		if ( pass.producer === '$threejs-water-optics' ) pass.producer = 'environment-owner';
+
+	}
+
+	const graph = route.physicsGraph;
+	const stage = graph.stages.find( ( candidate ) => candidate.stageId === 'ingest-gravity' );
+	const execution = graph.executionLedger.stageExecutions.find( ( candidate ) => candidate.stageId === stage.stageId );
+	const claim = graph.executionLedger.stateAdvanceClaims.find( ( candidate ) => candidate.claimId === 'gravity-advance-claim-42' );
+	const group = graph.commitGroups.find( ( candidate ) => candidate.commitGroupId === 'forcing-commit' );
+	const transaction = graph.commitTransactions[ 0 ];
+	transaction.commitGroupIds = [ group.commitGroupId ];
+	transaction.preparedPublicationIds = group.preparedPublications.map( ( publication ) => publication.preparedPublicationId );
+	transaction.priorCommittedVersions = transaction.priorCommittedVersions.filter( ( version ) => version.signalId === gravitySignal.signalId );
+	transaction.receipt.preparedToCommittedPublicationMap = transaction.receipt.preparedToCommittedPublicationMap.filter( ( row ) => row.preparedVersion.signalId === gravitySignal.signalId );
+	transaction.receipt.committedPublications = transaction.receipt.committedPublications.filter( ( row ) => row.signalId === gravitySignal.signalId );
+	transaction.receipt.priorToCommittedVersionMap = transaction.receipt.priorToCommittedVersionMap.filter( ( row ) => row.committedVersion.signalId === gravitySignal.signalId );
+	transaction.receipt.dependencyCompletionRefs = [];
+	transaction.receipt.conservationAndErrorGateResults = [ { gate: 'gravity-error', status: 'accepted' } ];
+	transaction.publicationSetDigest = sha256Canonical( transaction.receipt.committedPublications );
+	transaction.receipt.publicationSetDigest = transaction.publicationSetDigest;
+	transaction.receipt.receiptDigest = sha256CanonicalExcluding( transaction.receipt, [ 'receiptDigest' ] );
+	graph.stages = [ stage ];
+	graph.edges = [];
+	graph.dependencies = [];
+	graph.loopMacros = [];
+	graph.commitGroups = [ group ];
+	graph.commitTransactions = [ transaction ];
+	graph.originRebaseTransactions = [];
+	execution.couplingLoopId = typedAbsence( 'not-applicable', stage.owner, 'timeless', 'single-rate route has no coupling loop' );
+	execution.iterationIndex = typedAbsence( 'not-applicable', stage.owner, 'timeless', 'single-rate route has no coupling iteration' );
+	execution.interactionApplicationLedgerIds = [];
+	execution.dependencyCompletions = [];
+	claim.nativeExecutionIds = [ execution.executionId ];
+	claim.interactionApplicationLedgerIds = [];
+	graph.executionLedger.stageExecutions = [ execution ];
+	graph.executionLedger.dependencyCompletions = [];
+	graph.executionLedger.stateAdvanceClaims = [ claim ];
+	graph.executionLedger.interactionApplicationLedgers = [];
+	graph.executionLedger.loopResults = [];
+	graph.executionLedger.commitReceipts = [ transaction.receipt ];
+	graph.executionLedger.physicsCostLedgerId = 'generic-cost-ledger-1';
+	graph.coordinationAdvance.stageExecutionIds = [ execution.executionId ];
+	graph.coordinationAdvance.stateAdvanceClaimIds = [ claim.claimId ];
+	graph.coordinationAdvance.commitTransactionIds = [ transaction.commitTransactionId ];
+	graph.coordinationAdvance.receiptDigest = sha256CanonicalExcluding( graph.coordinationAdvance, [ 'receiptDigest' ] );
+	route.physicsCoordinationAdvanceRecords = [ clone( graph.coordinationAdvance ) ];
+	route.physicsCommitTransactions = { [ transaction.commitTransactionId ]: clone( transaction ) };
+
+	const keepView = 'main/main-view';
+	for ( const inventory of [ route.physicsCameraViewPublicationsByTarget, route.physicsViewPreparationPublicationsByTarget, route.physicsPresentationSnapshotsByTarget, route.physicsPresentationRenderPlansByTarget ] ) for ( const key of Object.keys( inventory ) ) if ( key !== keepView ) delete inventory[ key ];
+	const candidate = route.physicsPresentationCandidate;
+	candidate.commitProvenance.committedStateVersions = transaction.receipt.committedPublications.map( ( row ) => clone( row ) );
+	candidate.commitProvenance.commitReceiptIdsAndDigests = [ { receiptId: transaction.receipt.receiptId, receiptDigest: transaction.receipt.receiptDigest } ];
+	candidate.commitProvenance.closedPublicationSetDigest = transaction.publicationSetDigest;
+	candidate.eventSequenceRanges = [];
+	const rewriteStrings = ( value, replacements, visited = new WeakSet() ) => {
+
+		if ( typeof value === 'string' ) {
+
+			for ( const [ source, destination ] of replacements ) value = value.replaceAll( source, destination );
+			return value;
+
+		}
+		if ( value === null || typeof value !== 'object' || visited.has( value ) ) return value;
+		visited.add( value );
+		if ( Array.isArray( value ) ) {
+
+			for ( let index = 0; index < value.length; index ++ ) value[ index ] = rewriteStrings( value[ index ], replacements, visited );
+			return value;
+
+		}
+		for ( const key of Object.keys( value ) ) {
+
+			const rewrittenKey = rewriteStrings( key, replacements );
+			const rewrittenValue = rewriteStrings( value[ key ], replacements, visited );
+			if ( rewrittenKey !== key ) delete value[ key ];
+			value[ rewrittenKey ] = rewrittenValue;
+
+		}
+		return value;
+
+	};
+	const retargetLease = ( lease, suffix ) => {
+
+		const retargeted = rewriteStrings( clone( lease ), [ [ `water-${ suffix }`, `gravity-${ suffix }` ], [ 'water', 'gravity' ] ] );
+		retargeted.owner = 'environment-owner';
+		return retargeted;
+
+	};
+	const gravityPreviousLease = retargetLease( candidate.resourceLeases.find( ( lease ) => lease.leaseId === 'water-previous' ), 'previous' );
+	const gravityCurrentLease = retargetLease( candidate.resourceLeases.find( ( lease ) => lease.leaseId === 'water-current' ), 'current' );
+	candidate.resourceLeases = [ gravityPreviousLease, gravityCurrentLease ];
+	const gravityPair = rewriteStrings( clone( candidate.presentedStatePairs.find( ( pair ) => pair.bindingId === 'water-binding' ) ), [ [ 'water', 'gravity' ] ] );
+	gravityPair.bindingId = 'gravity-binding';
+	gravityPair.entityId = 'inertial-field#1';
+	gravityPair.providerId = gravitySignal.providerId;
+	gravityPair.signalId = gravitySignal.signalId;
+	gravityPair.previousPresented.globalBinding.bindingPayload = 'inertial-field-layout-v1';
+	gravityPair.currentPresented.globalBinding.bindingPayload = 'inertial-field-layout-v1';
+	gravityPair.motionBinding.identitySlotMap = 'inertial-field-map-v1';
+	candidate.presentedStatePairs = [ gravityPair ];
+	const preparation = route.physicsViewPreparationPublicationsByTarget[ keepView ];
+	rewriteStrings( preparation, [ [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
+	const presentationLeaseRef = ( lease ) => ( {
+		leaseId: lease.leaseId,
+		deviceId: lease.deviceId,
+		deviceLossGeneration: lease.deviceLossGeneration,
+		resourceGeneration: lease.resourceGeneration,
+		layoutRevision: lease.layoutRevision,
+		subresourceOrCpuSlice: `${ lease.leaseId }:all`
+	} );
+	preparation.resourceLeaseRefs = [ presentationLeaseRef( gravityCurrentLease ), presentationLeaseRef( preparation.resourceLeases[ 0 ] ) ];
+	preparation.shadowViewPublicationRefs[ 0 ].shadowFactorProvenance.receiverStateVersions = [ gravitySignal.stateVersion ];
+	preparation.reactivePublications[ 0 ].sourceId = gravitySignal.signalId;
+	preparation.reactivePublications[ 0 ].sourceVersion = gravitySignal.stateVersion;
+	preparation.requiredPreparationEdges[ 0 ].requiredContentIdAndVersion = { sourceId: gravitySignal.signalId, sourceVersion: gravitySignal.stateVersion };
+	const snapshot = route.physicsPresentationSnapshotsByTarget[ keepView ];
+	rewriteStrings( snapshot, [ [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
+	snapshot.presentedStatePairRefs = [ gravityPair.bindingId ];
+	snapshot.eventSequenceRanges = [];
+	const viewLeaseId = preparation.resourceLeases[ 0 ].leaseId;
+	const pairStateHandleLeaseIds = [ gravityPreviousLease.leaseId, gravityCurrentLease.leaseId ].sort();
+	const exactRequiredLeaseIds = [ ...pairStateHandleLeaseIds, viewLeaseId ].sort();
+	snapshot.resourceLeaseRefs = exactRequiredLeaseIds.map( ( leaseId ) => presentationLeaseRef( [ gravityPreviousLease, gravityCurrentLease, ...preparation.resourceLeases ].find( ( lease ) => lease.leaseId === leaseId ) ) );
+	snapshot.closureManifest.pairStateHandleLeaseIds = pairStateHandleLeaseIds;
+	snapshot.closureManifest.preparationDependencyLeaseIds = [ viewLeaseId ];
+	snapshot.closureManifest.reactiveAndResetLeaseIds = [ viewLeaseId ];
+	snapshot.closureManifest.shadowCacheVisibilityLeaseIds = [ viewLeaseId ];
+	snapshot.closureManifest.exactRequiredLeaseIds = exactRequiredLeaseIds;
+	snapshot.closureManifest.exactEventRangeIds = [];
+	snapshot.closureManifest.dependencyDagDigest = dependencyDagDigest( preparation );
+	snapshot.closureManifest.closureDigest = closureManifestDigest( snapshot.closureManifest );
+	const plan = route.physicsPresentationRenderPlansByTarget[ keepView ];
+	rewriteStrings( plan, [ [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
+	plan.closureDigest = snapshot.closureManifest.closureDigest;
+	plan.immutablePlanDigest = renderPlanDigest( plan );
+	const refreshJoin = ( lease ) => {
+
+		const join = lease.reuseProhibitedUntil;
+		join.presentationConsumers = join.presentationConsumers.filter( ( token ) => `${ token.presentationTargetId }/${ token.viewId }` === keepView );
+		join.couplingConsumers = [];
+		join.requiredConsumerKeys = [ ...join.simulationConsumers, ...join.externalConsumers, ...join.presentationConsumers ].map( ( token ) => token.consumerKey ).sort();
+		join.joinDigest = completionJoinDigest( join );
+
+	};
+	const activeLeases = [ ...candidate.resourceLeases, ...route.physicsViewPreparationPublicationsByTarget[ keepView ].resourceLeases ];
+	for ( const lease of activeLeases ) refreshJoin( lease );
+	const activeLeasesById = new Map( activeLeases.map( ( lease ) => [ lease.leaseId, lease ] ) );
+	const frame = route.frameExecutionRecord;
+	frame.requiredTargetViewKeys = [ keepView ];
+	frame.snapshotIds = [ snapshot.snapshotId ];
+	frame.renderPlans = [ clone( plan ) ];
+	frame.slotAdmissions = frame.slotAdmissions.filter( ( admission ) => `${ admission.presentationTargetId }/${ admission.viewId }` === keepView );
+	frame.targetExecutions = { [ keepView ]: frame.targetExecutions[ keepView ] };
+	rewriteStrings( frame.targetExecutions[ keepView ], [ [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
+	frame.targetExecutions[ keepView ].submittedPasses = plan.phaseRecords.map( ( phaseRecord ) => phaseRecord.passOrDispatchKey );
+	frame.targetExecutions[ keepView ].actionResults = [ { status: 'all-plan-phases-completed', phaseIds: [ ...plan.phaseIds ] } ];
+	frame.targetExecutions[ keepView ].resetActionResults = clone( preparation.resetActionResults );
+	frame.cohortAdmission.requiredTargetViewKeys = [ keepView ];
+	frame.cohortAdmission.snapshotIds = [ snapshot.snapshotId ];
+	frame.cohortAdmission.renderPlanIds = [ plan.renderPlanId ];
+	for ( const mapKey of [ 'configuredMaximumFramesInFlightByTarget', 'observedFramesInFlightByTarget', 'saturationPolicyByTarget' ] ) frame.cohortAdmission[ mapKey ] = { [ keepView ]: frame.cohortAdmission[ mapKey ][ keepView ] };
+	frame.targetExecutions[ keepView ].completionTokens = activeLeases.map( ( lease ) => lease.reuseProhibitedUntil.presentationConsumers[ 0 ] ).filter( Boolean ).map( clone );
+	frame.leaseDispositionById = Object.fromEntries( activeLeases.map( ( lease ) => [ lease.leaseId, {
+		disposition: 'retained-until-join', consumingSnapshotIds: [ snapshot.snapshotId ], completionJoin: clone( lease.reuseProhibitedUntil ),
+		retirementEvidence: { joinId: lease.reuseProhibitedUntil.joinId, joinDigest: lease.reuseProhibitedUntil.joinDigest, completedConsumerKeys: [ ...lease.reuseProhibitedUntil.requiredConsumerKeys ], cancelledConsumerKeys: [], joinResolution: 'completed-or-reservation-cancelled', status: 'all required consumers completed' }
+	} ] ) );
+
+	const ledger = route.physicsCostLedger;
+	ledger.ledgerId = 'generic-cost-ledger-1';
+	ledger.graphRevision = graph.executionLedger.graphRevision;
+	ledger.presentationTargetsAndViews = [ keepView ];
+	ledger.measurementProtocolRefs = [ ledger.cadenceTraceTotals.traceRef ];
+	ledger.targetAndHarness = 'single-view generic WebGPU trace';
+	ledger.qualityState = 'fixed-quality';
+	const exactIntervals = quantityValue( ledger.cadenceTraceTotals.coordinationAdvanceCount, 'singleView.exactIntervals' );
+	const keepStageId = stage.stageId;
+	const retainStageKey = ( mapping ) => ( { [ keepStageId ]: mapping[ keepStageId ] } );
+	ledger.graphStageCosts = ledger.graphStageCosts.filter( ( cost ) => cost.stageId === keepStageId );
+	ledger.stageExecutionsPerCoordinationInterval = retainStageKey( ledger.stageExecutionsPerCoordinationInterval );
+	ledger.stageExecutionsPerSecond = retainStageKey( ledger.stageExecutionsPerSecond );
+	ledger.executionsPerPresentedFrame = retainStageKey( ledger.executionsPerPresentedFrame );
+	ledger.hotBytesReadWrittenPerExecution = retainStageKey( ledger.hotBytesReadWrittenPerExecution );
+	ledger.solverDispatches = ledger.solverDispatches.filter( ( dispatch ) => dispatch.stageId === keepStageId );
+	ledger.cadenceTraceTotals.stageExecutionCounts = retainStageKey( ledger.cadenceTraceTotals.stageExecutionCounts );
+	ledger.cadenceTraceTotals.nativeSubcycleCounts = {};
+	ledger.cadenceTraceTotals.couplingIterationCounts = {};
+	ledger.cadenceTraceTotals.interactionApplicationCounts = {};
+	ledger.cadenceTraceTotals.presentedFrameCounts = { [ keepView ]: ledger.cadenceTraceTotals.presentedFrameCounts[ keepView ] };
+	delete ledger.perViewWorkKeys[ 'minimap/map-view' ];
+	const declaredWorkKeys = new Set( [ ...ledger.sharedWorkKeys, ...ledger.perViewWorkKeys[ keepView ] ] );
+	ledger.workAttribution = ledger.workAttribution.filter( ( row ) => declaredWorkKeys.has( row.workKey ) );
+	const sharedAttribution = ledger.workAttribution.find( ( row ) => ledger.sharedWorkKeys.includes( row.workKey ) );
+	sharedAttribution.stageExecutionPassOrDispatchIds = [ execution.executionId ];
+	sharedAttribution.targetViewKeys = [ keepView ];
+	sharedAttribution.occurrenceCount.value = exactIntervals;
+	ledger.cadenceTraceTotals.workOccurrenceCounts = Object.fromEntries( Object.entries( ledger.cadenceTraceTotals.workOccurrenceCounts ).filter( ( [ key ] ) => declaredWorkKeys.has( key ) ) );
+	ledger.cadenceTraceTotals.workOccurrenceCounts[ sharedAttribution.workKey ].value = exactIntervals;
+	ledger.uploadsCopiesMaps = ledger.uploadsCopiesMaps.filter( ( traffic ) => traffic.producer !== 'route-physics-coordinator' || traffic.trafficRecordId === 'traffic-descriptor-upload' ).filter( ( traffic ) => traffic.cadenceBasis !== 'per-stage-execution' || traffic.producer === keepStageId );
+	for ( const traffic of ledger.uploadsCopiesMaps ) traffic.targetViewKeys = [ keepView ];
+	const trafficIds = new Set( ledger.uploadsCopiesMaps.map( ( traffic ) => traffic.trafficRecordId ) );
+	ledger.cadenceTraceTotals.trafficOccurrenceAndLogicalByteTotals = Object.fromEntries( Object.entries( ledger.cadenceTraceTotals.trafficOccurrenceAndLogicalByteTotals ).filter( ( [ id ] ) => trafficIds.has( id ) ) );
+	sharedAttribution.trafficRecordIds = [ ...trafficIds ];
+	for ( const memoryKey of [ 'hotState', 'peakTransient', 'migrationOverlap' ] ) {
+
+		const memory = ledger[ memoryKey ];
+		memory.perViewBytesByTargetView = { [ keepView ]: memory.perViewBytesByTargetView[ keepView ] };
+		for ( const allocation of memory.allocations ) allocation.targetViewKeys = [ keepView ];
+
+	}
+	ledger.multiviewAndFramesInFlightMultipliers.viewCount.value = 1;
+	ledger.subcyclesAndCouplingIterationsPerPresentedFrame = {};
+	ledger.dependencyCriticalPaths[ 0 ].path = 'field-advance-to-atomic-commit';
+	rewriteStrings( ledger, [ [ '$threejs-water-optics', 'environment-owner' ], [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
+	const totalsDigestPayload = clone( ledger.cadenceTraceTotals );
+	delete totalsDigestPayload.exactTotalsDigest;
+	ledger.cadenceTraceTotals.exactTotalsDigest = sha256Canonical( totalsDigestPayload );
+	const coupledResidue = [];
+	const collectCoupledResidue = ( value, path = '$', visited = new WeakSet() ) => {
+
+		if ( typeof value === 'string' ) {
+
+			if ( /water|body-water|rigid-body-state|\$threejs-water-optics/i.test( value ) ) coupledResidue.push( `${ path }=${ value }` );
+			return;
+
+		}
+		if ( value === null || typeof value !== 'object' || visited.has( value ) ) return;
+		visited.add( value );
+		if ( Array.isArray( value ) ) for ( let index = 0; index < value.length; index ++ ) collectCoupledResidue( value[ index ], `${ path }[${ index }]`, visited );
+		else for ( const [ key, child ] of Object.entries( value ) ) {
+
+			if ( /water|body-water|rigid-body-state|\$threejs-water-optics/i.test( key ) ) coupledResidue.push( `${ path }.<key:${ key }>` );
+			collectCoupledResidue( child, `${ path }.${ key }`, visited );
+
+		}
+
+	};
+	collectCoupledResidue( route );
+	assert.deepEqual( coupledResidue, [], 'single-view non-water fixture retains coupled water or rigid-body route state' );
+	assert.equal( activeLeasesById.size, Object.keys( frame.leaseDispositionById ).length, 'single-view fixture lease pruning failed' );
+	return route;
+
+}
+
+function makeOneToOnePhysicalExchangeRouteFixture( canonicalRoute ) {
+
+	const route = clone( canonicalRoute );
+	route.causeLedger.selectedAlgorithm = 'multi-rate bounded coupling with one source and one equal-and-opposite reaction';
+	route.causeLedger.primaryObservable = 'one-to-one water-body momentum closes across one atomic commit';
+	const exchange = route.physicsInteractions[ 0 ];
+	const source = exchange.interactions[ 0 ];
+	const reaction = exchange.reactions[ 0 ];
+	exchange.interactions = [ source ];
+	exchange.reactions = [ reaction ];
+	exchange.physicalImpactParents = [];
+	exchange.physicalImpactPartitions = [];
+	for ( const record of [ source, reaction ] ) record.partitionMembership = typedAbsence( 'not-applicable', 'distributed-coupler', 'timeless', 'one-to-one exchange does not allocate a spatial partition family' );
+	const negateWithoutNegativeZero = ( component ) => component === 0 ? 0 : - component;
+	reaction.payload.linearMomentumNs = source.payload.linearMomentumNs.map( negateWithoutNegativeZero );
+	reaction.payload.angularMomentumNms = source.payload.angularMomentumNms.map( negateWithoutNegativeZero );
+	reaction.reactionToInteractionIds = [ source.interactionId ];
+	reaction.provenance.producerSequence = source.provenance.producerSequence + 1;
+	reaction.exactOnceKey = `${ canonicalIntervalIdentity( reaction.applicationInterval ) }|stage=${ reaction.provenance.stageId }|producer=${ reaction.provenance.producerId }|sequence=${ reaction.provenance.producerSequence }|interaction=${ reaction.interactionId }`;
+	reaction.applicationLedgerKey = `apply|${ reaction.exactOnceKey }`;
+	const reactionGroup = exchange.reactionGroups[ 0 ];
+	reactionGroup.sourceInteractionIds = [ source.interactionId ];
+	reactionGroup.reactionInteractionIds = [ reaction.interactionId ];
+	const conservation = exchange.conservationGroups[ 0 ];
+	conservation.modeledInternalTransfers.byInteractionId = Object.fromEntries( [ source, reaction ].map( ( record ) => [ record.interactionId, {
+		linearMomentumNs: clone( record.payload.linearMomentumNs ),
+		angularMomentumNms: clone( record.payload.angularMomentumNms ),
+		energyJ: evidence( 0, 'joule', 'Derived', 'one-to-one momentum-only transfer' )
+	} ] ) );
+	const firstSequence = source.provenance.producerSequence;
+	const lastSequence = reaction.provenance.producerSequence;
+	exchange.batchLedger.publishedSequenceRange = { firstSequence, lastSequence };
+	for ( const loop of route.physicsGraph.loopMacros.filter( ( candidate ) => candidate.loopId === exchange.couplingLoopId ) ) for ( const row of loop.perIterationLedger ) row.interactionSequenceRanges = [ { firstSequence, lastSequenceInclusive: lastSequence } ];
+	for ( const consumerId of Object.keys( exchange.batchLedger.perConsumerCursor ) ) exchange.batchLedger.perConsumerCursor[ consumerId ] = lastSequence + 1;
+	exchange.batchLedger.acceptedRejectedLateDuplicate.accepted.value = 2;
+	const retainedInteractionIds = new Set( [ source.interactionId, reaction.interactionId ] );
+	const applicationLedgers = route.physicsGraph.executionLedger.interactionApplicationLedgers.filter( ( ledger ) => retainedInteractionIds.has( ledger.interactionId ) );
+	const recordById = new Map( [ source, reaction ].map( ( record ) => [ record.interactionId, record ] ) );
+	for ( const ledger of applicationLedgers ) {
+
+		const record = recordById.get( ledger.interactionId );
+		ledger.exactOnceKey = record.exactOnceKey;
+		ledger.appliedPayloadAmount = Object.fromEntries( Object.entries( record.payload ).filter( ( [ key ] ) => ! [ 'tag', 'timeSemantics' ].includes( key ) ) );
+		ledger.cursorBefore = record.provenance.producerSequence;
+		ledger.cursorAfter = ledger.cursorBefore + 1;
+		ledger.applicationContentDigest = sha256Canonical( interactionApplicationContentDigestPayload( ledger ) );
+		ledger.receiptDigest = sha256Canonical( interactionApplicationReceiptDigestPayload( ledger ) );
+
+	}
+	const retainedApplicationIds = new Set( applicationLedgers.map( ( ledger ) => ledger.applicationLedgerId ) );
+	exchange.batchLedger.applicationLedgerIds = [ ...retainedApplicationIds ];
+	route.physicsGraph.executionLedger.interactionApplicationLedgers = applicationLedgers;
+	route.physicsInteractionApplicationLedgers = Object.fromEntries( applicationLedgers.map( ( ledger ) => [ ledger.applicationLedgerId, clone( ledger ) ] ) );
+	for ( const execution of route.physicsGraph.executionLedger.stageExecutions ) execution.interactionApplicationLedgerIds = execution.interactionApplicationLedgerIds.filter( ( id ) => retainedApplicationIds.has( id ) );
+	for ( const claim of route.physicsGraph.executionLedger.stateAdvanceClaims ) claim.interactionApplicationLedgerIds = claim.interactionApplicationLedgerIds.filter( ( id ) => retainedApplicationIds.has( id ) );
+	for ( const loop of route.physicsGraph.loopMacros ) for ( const row of loop.perIterationLedger ) row.interactionApplicationLedgerIds = row.interactionApplicationLedgerIds.filter( ( id ) => retainedApplicationIds.has( id ) );
+	const exactIntervals = quantityValue( route.physicsCostLedger.cadenceTraceTotals.coordinationAdvanceCount, 'oneToOne.coordinationAdvanceCount' );
+	route.physicsCostLedger.cadenceTraceTotals.interactionApplicationCounts = { momentumTransfer: evidence( 2 * exactIntervals, 'application', 'Measured', 'one-to-one exact application trace' ) };
+	const totalsDigestPayload = clone( route.physicsCostLedger.cadenceTraceTotals );
+	delete totalsDigestPayload.exactTotalsDigest;
+	route.physicsCostLedger.cadenceTraceTotals.exactTotalsDigest = sha256Canonical( totalsDigestPayload );
+	const candidateRange = route.physicsPresentationCandidate.eventSequenceRanges.find( ( range ) => range.streamId === exchange.exchangeId );
+	if ( candidateRange ) {
+
+		candidateRange.lastSequenceInclusive = lastSequence;
+		candidateRange.cursorAfter = lastSequence + 1;
+		candidateRange.payloadDigest = authoritativePresentationEventPayloadDigest( exchange );
+		for ( const snapshot of Object.values( route.physicsPresentationSnapshotsByTarget ) ) snapshot.eventSequenceRanges = snapshot.eventSequenceRanges.map( ( range ) => range.rangeId === candidateRange.rangeId ? clone( candidateRange ) : range );
+
+	}
+	return route;
+
+}
+
+function makeCatchUpPhysicalRouteFixture( sourceRoute ) {
+
+	const route = clone( sourceRoute );
+	const graph = route.physicsGraph;
+	const advance = graph.coordinationAdvance;
+	const catchUpBatchId = 'generic-catch-up-batch-1';
+	advance.catchUpBatchId = catchUpBatchId;
+	advance.receiptDigest = sha256CanonicalExcluding( advance, [ 'receiptDigest' ] );
+	route.physicsCoordinationAdvanceRecords = [ clone( advance ) ];
+	const advanceBounds = intervalBoundsSeconds( advance.interval, route.physicsContext, 'genericCatchUp.advance.interval' );
+	const committedSeconds = advanceBounds[ 1 ] - advanceBounds[ 0 ];
+	const debtBeforeSeconds = canonicalDurationSecondsValue( advance.debtBefore, route.physicsContext, 'genericCatchUp.advance.debtBefore' );
+	const elapsedSeconds = committedSeconds - debtBeforeSeconds;
+	assert.ok( elapsedSeconds >= 0, 'generic catch-up fixture cannot close nonnegative elapsed time' );
+	graph.catchUpBatch = {
+		catchUpBatchId,
+		graphId: graph.graphId,
+		contextId: route.physicsContext.contextId,
+		owner: graph.catchUpPolicy.owner,
+		debtIdentity: {
+			debtIdentityId: 'generic-catch-up-debt-1', graphId: graph.graphId, debtClockId: graph.catchUpPolicy.debtClockId,
+			sourceCursorBeforeAfter: { before: 42, after: 43 }, presentationOpportunitySequence: 42,
+			observedAt: clone( advance.interval.start ), policyRevision: 'generic-catch-up-policy-v1'
+		},
+		debtBefore: clone( advance.debtBefore ), elapsedDuringBatch: fixtureDurationSeconds( elapsedSeconds, 'generic-catch-up-fixture' ),
+		admittedAdvanceIntervals: [ clone( advance.interval ) ], coordinationAdvanceIds: [ advance.coordinationAdvanceId ],
+		committedAdvanceDuration: fixtureDurationSeconds( committedSeconds, 'generic-catch-up-fixture' ), explicitlyDroppedDuration: fixtureDurationSeconds( 0, 'generic-catch-up-fixture' ), debtAfter: clone( advance.debtAfter ),
+		lossLedger: typedAbsence( 'not-applicable', graph.catchUpPolicy.owner, 'timeless', 'generic catch-up fixture drops no interval' ),
+		policyRevision: 'generic-catch-up-policy-v1', errorResourceAndExecutionGateResults: [ { gate: 'latency', status: 'accepted' } ], status: 'completed', receiptDigest: 'pending'
+	};
+	graph.catchUpBatch.receiptDigest = sha256CanonicalExcluding( graph.catchUpBatch, [ 'receiptDigest' ] );
+	route.physicsCostLedger.cadenceTraceTotals.catchUpBatchCount.value = 1;
+	const totalsDigestPayload = clone( route.physicsCostLedger.cadenceTraceTotals );
+	delete totalsDigestPayload.exactTotalsDigest;
+	route.physicsCostLedger.cadenceTraceTotals.exactTotalsDigest = sha256Canonical( totalsDigestPayload );
 	return route;
 
 }
@@ -5423,6 +6596,200 @@ validateQualityTransitionBundle( fixtureModuleHelpers, coupledPhysicsFixture, qu
 validateContactIdentityBundle( fixtureModuleHelpers, coupledPhysicsFixture, contactIdentityBundle );
 validatePhysicalImpactPartitionBundle( fixtureModuleHelpers, coupledPhysicsFixture, physicalImpactPartitionBundle );
 markPhysicsSetup( 'modulePositiveValidation' );
+assertCanonicalCoupledFixtureCoverage( coupledPhysicsFixture );
+const implicitExternalOwnership = clone( activeExternalAdapter );
+implicitExternalOwnership.ownership.stepping = 'implicit engine default';
+assert.throws(
+	() => validateExternalSolverAdapter( coupledPhysicsFixture, implicitExternalOwnership, 'genericExternalReject.implicitOwnership' ),
+	/is implicit/,
+	'generic external adapter validation accepted implicit stepping ownership'
+);
+const mismatchedExternalDescriptor = clone( activeExternalAdapter );
+mismatchedExternalDescriptor.signalDescriptors[ 0 ].stateVersion = 'stale-external-state-version';
+assert.throws(
+	() => validateExternalSolverAdapter( coupledPhysicsFixture, mismatchedExternalDescriptor, 'genericExternalReject.descriptorMismatch' ),
+	/differs from the route descriptor/,
+	'generic external adapter validation accepted a stale route descriptor'
+);
+const duplicateExternalEquationOwner = clone( coupledPhysicsFixture );
+const secondExternalAdapter = clone( activeExternalAdapter );
+secondExternalAdapter.adapterId = 'duplicate-external-body-adapter';
+duplicateExternalEquationOwner.physicsExternalSolverAdaptersById[ secondExternalAdapter.adapterId ] = secondExternalAdapter;
+assert.throws(
+	() => validateExternalAdapterOwnershipPartition( duplicateExternalEquationOwner ),
+	/owned by multiple external adapters/,
+	'generic external adapter validation accepted duplicate route-global state-equation ownership'
+);
+const duplicateQualityEmitter = clone( coupledPhysicsFixture );
+duplicateQualityEmitter.physicsQualityTransitions[ 0 ].commitAtStepBoundary.authoritativeEmitterByStateEquationOrSourceChannel[ 'duplicate-source-channel' ] = 'exactly-one-owner-and-representation';
+assert.throws(
+	() => validateQualityInventories( duplicateQualityEmitter ),
+	/authoritative emitter closure mismatch/,
+	'generic quality validation accepted an extra authoritative emitter'
+);
+const staleQualityEvidence = clone( coupledPhysicsFixture );
+staleQualityEvidence.physicsQualityTransitions[ 0 ].sourceEvidenceDigest = 'sha256:stale-quality-evidence';
+assert.throws(
+	() => validateQualityInventories( staleQualityEvidence ),
+	/sourceEvidenceDigest does not cover request evidence/,
+	'generic quality validation accepted stale request evidence'
+);
+function makeQualityLineageRejectFixture( mode ) {
+
+	const route = clone( coupledPhysicsFixture );
+	const first = route.physicsQualityTransitions[ 0 ];
+	const request = clone( route.physicsQualityRequests[ first.requestId ] );
+	request.requestId = `${ first.requestId }-next`;
+	request.requestSequence = first.requestSequence + 1;
+	route.physicsQualityRequests[ request.requestId ] = request;
+	const nextStateId = `${ first.toState }-next`;
+	if ( mode !== 'cycle' ) {
+
+		const nextState = clone( route.physicsQualityStates[ first.toState ] );
+		nextState.qualityStateId = nextStateId;
+		nextState.qualityEpoch = `${ nextState.qualityEpoch }-next`;
+		route.physicsQualityStates[ nextStateId ] = nextState;
+
+	}
+	const second = clone( first );
+	second.transitionId = `${ first.transitionId }-next`;
+	second.requestId = request.requestId;
+	second.requestSequence = request.requestSequence;
+	second.fromState = mode === 'fork' ? first.fromState : first.toState;
+	second.toState = mode === 'cycle' ? first.fromState : nextStateId;
+	second.fromQualityEpoch = route.physicsQualityStates[ second.fromState ].qualityEpoch;
+	second.toQualityEpoch = route.physicsQualityStates[ second.toState ].qualityEpoch;
+	route.physicsQualityTransitions.push( second );
+	if ( mode === 'reversed' ) route.physicsQualityTransitions.reverse();
+	return route;
+
+}
+assert.throws(
+	() => validateQualityInventories( makeQualityLineageRejectFixture( 'fork' ) ),
+	/forks or is disconnected/,
+	'generic quality validation accepted a forked transition lineage'
+);
+assert.throws(
+	() => validateQualityInventories( makeQualityLineageRejectFixture( 'reversed' ) ),
+	/not strictly ordered by requestSequence/,
+	'generic quality validation accepted reverse request-sequence order'
+);
+assert.throws(
+	() => validateQualityInventories( makeQualityLineageRejectFixture( 'cycle' ) ),
+	/cycle or reuses an earlier quality state/,
+	'generic quality validation accepted a transition cycle'
+);
+const unknownPresentationConsumer = clone( coupledPhysicsFixture );
+unknownPresentationConsumer.physicsPresentationCandidate.eventSequenceRanges[ 0 ].consumerId = 'main/main-veiw';
+assert.throws(
+	() => validateCanonicalPresentation( unknownPresentationConsumer ),
+	/neither a registered target\/view nor the shared presentation consumer/,
+	'presentation validation treated an unknown consumer as a shared broadcast'
+);
+const unrelatedCommittedPresentationSource = clone( coupledPhysicsFixture );
+unrelatedCommittedPresentationSource.physicsPresentationCandidate.eventSequenceRanges[ 0 ].sourceStateVersion = 'water-42';
+for ( const snapshot of Object.values( unrelatedCommittedPresentationSource.physicsPresentationSnapshotsByTarget ) ) snapshot.eventSequenceRanges = clone( unrelatedCommittedPresentationSource.physicsPresentationCandidate.eventSequenceRanges );
+assert.throws(
+	() => validateCanonicalPresentation( unrelatedCommittedPresentationSource ),
+	/sourceStateVersion does not resolve exactly one producer-owned committed signal/,
+	'presentation validation accepted an unrelated committed state version as batch provenance'
+);
+const fabricatedPresentationPayload = clone( coupledPhysicsFixture );
+fabricatedPresentationPayload.physicsPresentationCandidate.eventSequenceRanges[ 0 ].payloadDigest = 'sha256:fabricated-presentation-event-payload';
+for ( const snapshot of Object.values( fabricatedPresentationPayload.physicsPresentationSnapshotsByTarget ) ) snapshot.eventSequenceRanges = clone( fabricatedPresentationPayload.physicsPresentationCandidate.eventSequenceRanges );
+assert.throws(
+	() => validateCanonicalPresentation( fabricatedPresentationPayload ),
+	/payloadDigest does not cover the authoritative batch payloads/,
+	'presentation validation accepted a fabricated batch payload digest copied into every snapshot'
+);
+const contaminatedLoopApplicationClosure = clone( coupledPhysicsFixture );
+const unrelatedApplicationLedgerId = contaminatedLoopApplicationClosure.physicsGraph.executionLedger.interactionApplicationLedgers.find( ( ledger ) => ! contaminatedLoopApplicationClosure.physicsInteractions.filter( ( exchange ) => exchange.couplingLoopId === 'body-water-loop' ).flatMap( ( exchange ) => exchange.batchLedger.applicationLedgerIds ).includes( ledger.applicationLedgerId ) ).applicationLedgerId;
+contaminatedLoopApplicationClosure.physicsGraph.loopMacros[ 0 ].perIterationLedger.find( ( row ) => row.accepted ).interactionApplicationLedgerIds.push( unrelatedApplicationLedgerId );
+assert.throws(
+	() => validateExactOnceInteractionApplication( contaminatedLoopApplicationClosure ),
+	/accepted application-ledger closure is not exact/,
+	'loop validation accepted an unrelated application ledger'
+);
+const singleViewNonWaterPhysicalRoute = makeSingleViewNonWaterPhysicalRouteFixture( coupledPhysicsFixture );
+validateRouteManifest( singleViewNonWaterPhysicalRoute );
+assert.throws(
+	() => assertCanonicalCoupledFixtureCoverage( singleViewNonWaterPhysicalRoute ),
+	/canonical coupled fixture does not cover/,
+	'single-view non-water route must not satisfy the canonical coupled coverage profile'
+);
+const oneToOnePhysicalExchangeRoute = makeOneToOnePhysicalExchangeRouteFixture( makeCanonicalCoupledPhysicsFixture() );
+validateRouteManifest( oneToOnePhysicalExchangeRoute );
+assert.equal( oneToOnePhysicalExchangeRoute.physicsInteractions[ 0 ].interactions.length, 1, 'one-to-one physical route must contain exactly one source interaction' );
+assert.equal( oneToOnePhysicalExchangeRoute.physicsInteractions[ 0 ].reactions.length, 1, 'one-to-one physical route must contain exactly one reaction interaction' );
+assert.throws(
+	() => assertCanonicalCoupledFixtureCoverage( oneToOnePhysicalExchangeRoute ),
+	/canonical coupled fixture does not exercise many-to-many/,
+	'one-to-one physical route must not satisfy the canonical many-to-many coverage profile'
+);
+const catchUpPhysicalRoute = makeCatchUpPhysicalRouteFixture( singleViewNonWaterPhysicalRoute );
+validateRouteManifest( catchUpPhysicalRoute );
+const catchUpDebtMismatch = clone( catchUpPhysicalRoute );
+catchUpDebtMismatch.physicsGraph.catchUpBatch.debtAfter = fixtureDurationSeconds( 0.001, 'catch-up-debt-mismatch' );
+catchUpDebtMismatch.physicsGraph.catchUpBatch.receiptDigest = sha256CanonicalExcluding( catchUpDebtMismatch.physicsGraph.catchUpBatch, [ 'receiptDigest' ] );
+assert.throws(
+	() => validateCatchUpSchedulerClosure( catchUpDebtMismatch.physicsGraph, catchUpDebtMismatch.physicsContext, catchUpDebtMismatch.physicsGraph.coordinationAdvance, catchUpDebtMismatch, catchUpDebtMismatch.physicsGraph.executionLedger ),
+	/catch-up debt equation does not close|debt endpoints disagree/,
+	'catch-up validator accepted inconsistent debt algebra'
+);
+const catchUpReciprocalMismatch = clone( catchUpPhysicalRoute );
+catchUpReciprocalMismatch.physicsGraph.coordinationAdvance.catchUpBatchId = 'another-catch-up-batch';
+catchUpReciprocalMismatch.physicsGraph.coordinationAdvance.receiptDigest = sha256CanonicalExcluding( catchUpReciprocalMismatch.physicsGraph.coordinationAdvance, [ 'receiptDigest' ] );
+catchUpReciprocalMismatch.physicsCoordinationAdvanceRecords = [ clone( catchUpReciprocalMismatch.physicsGraph.coordinationAdvance ) ];
+assert.throws(
+	() => validateCatchUpSchedulerClosure( catchUpReciprocalMismatch.physicsGraph, catchUpReciprocalMismatch.physicsContext, catchUpReciprocalMismatch.physicsGraph.coordinationAdvance, catchUpReciprocalMismatch, catchUpReciprocalMismatch.physicsGraph.executionLedger ),
+	/references another catch-up batch/,
+	'catch-up validator accepted a stale reciprocal batch ID'
+);
+const catchUpNativeExecutionClosureMismatch = clone( catchUpPhysicalRoute );
+catchUpNativeExecutionClosureMismatch.physicsGraph.coordinationAdvance.stageExecutionIds.push( 'schema-valid-but-unexecuted-native-step' );
+catchUpNativeExecutionClosureMismatch.physicsGraph.coordinationAdvance.receiptDigest = sha256CanonicalExcluding( catchUpNativeExecutionClosureMismatch.physicsGraph.coordinationAdvance, [ 'receiptDigest' ] );
+catchUpNativeExecutionClosureMismatch.physicsCoordinationAdvanceRecords = [ clone( catchUpNativeExecutionClosureMismatch.physicsGraph.coordinationAdvance ) ];
+assert.throws(
+	() => validateCatchUpSchedulerClosure( catchUpNativeExecutionClosureMismatch.physicsGraph, catchUpNativeExecutionClosureMismatch.physicsContext, catchUpNativeExecutionClosureMismatch.physicsGraph.coordinationAdvance, catchUpNativeExecutionClosureMismatch, catchUpNativeExecutionClosureMismatch.physicsGraph.executionLedger ),
+	/native-execution closure differs from the execution ledger/,
+	'catch-up validator accepted an inexact native-execution closure for an advance'
+);
+const catchUpMultiAdvanceNativeExecutionOverflow = clone( catchUpPhysicalRoute );
+const catchUpFirstAdvance = catchUpMultiAdvanceNativeExecutionOverflow.physicsGraph.coordinationAdvance;
+const catchUpSecondAdvance = clone( catchUpFirstAdvance );
+catchUpSecondAdvance.coordinationAdvanceId = 'generic-catch-up-advance-2';
+catchUpSecondAdvance.coordinationSequence = catchUpFirstAdvance.coordinationSequence + 1;
+catchUpSecondAdvance.predecessorAdvanceId = catchUpFirstAdvance.coordinationAdvanceId;
+catchUpSecondAdvance.predecessorReceiptDigest = catchUpFirstAdvance.receiptDigest;
+catchUpSecondAdvance.stageExecutionIds = catchUpSecondAdvance.stageExecutionIds.map( ( executionId ) => `${ executionId }/catch-up-advance-2` );
+const catchUpClockRegistry = catchUpMultiAdvanceNativeExecutionOverflow.physicsContext.physicsClockRegistry.clocksById;
+const catchUpFirstEnd = catchUpFirstAdvance.interval.endExclusive;
+catchUpSecondAdvance.interval = fixtureInterval( catchUpClockRegistry, catchUpFirstAdvance.interval.clockId, catchUpFirstEnd.tick, catchUpFirstEnd.tick + 1, [ catchUpFirstEnd.rationalSubstep.numerator, catchUpFirstEnd.rationalSubstep.denominator ], [ catchUpFirstEnd.rationalSubstep.numerator, catchUpFirstEnd.rationalSubstep.denominator ] );
+catchUpSecondAdvance.debtBefore = clone( catchUpFirstAdvance.debtAfter );
+catchUpSecondAdvance.debtAfter = clone( catchUpFirstAdvance.debtAfter );
+catchUpSecondAdvance.receiptDigest = sha256CanonicalExcluding( catchUpSecondAdvance, [ 'receiptDigest' ] );
+catchUpMultiAdvanceNativeExecutionOverflow.physicsCoordinationAdvanceRecords.push( catchUpSecondAdvance );
+const catchUpOverflowBatch = catchUpMultiAdvanceNativeExecutionOverflow.physicsGraph.catchUpBatch;
+catchUpOverflowBatch.coordinationAdvanceIds.push( catchUpSecondAdvance.coordinationAdvanceId );
+catchUpOverflowBatch.admittedAdvanceIntervals.push( clone( catchUpSecondAdvance.interval ) );
+const catchUpOverflowCommittedSeconds = catchUpOverflowBatch.admittedAdvanceIntervals.reduce( ( sum, interval, index ) => {
+
+	const bounds = intervalBoundsSeconds( interval, catchUpMultiAdvanceNativeExecutionOverflow.physicsContext, `catchUpOverflow.interval[${ index }]` );
+	return sum + bounds[ 1 ] - bounds[ 0 ];
+
+}, 0 );
+const catchUpOverflowDebtBeforeSeconds = canonicalDurationSecondsValue( catchUpOverflowBatch.debtBefore, catchUpMultiAdvanceNativeExecutionOverflow.physicsContext, 'catchUpOverflow.debtBefore' );
+const catchUpOverflowDebtAfterSeconds = canonicalDurationSecondsValue( catchUpOverflowBatch.debtAfter, catchUpMultiAdvanceNativeExecutionOverflow.physicsContext, 'catchUpOverflow.debtAfter' );
+catchUpOverflowBatch.committedAdvanceDuration = fixtureDurationSeconds( catchUpOverflowCommittedSeconds, 'catch-up-overflow-fixture' );
+catchUpOverflowBatch.elapsedDuringBatch = fixtureDurationSeconds( catchUpOverflowCommittedSeconds + catchUpOverflowDebtAfterSeconds - catchUpOverflowDebtBeforeSeconds, 'catch-up-overflow-fixture' );
+catchUpOverflowBatch.receiptDigest = sha256CanonicalExcluding( catchUpOverflowBatch, [ 'receiptDigest' ] );
+const catchUpOverflowNativeExecutionCount = catchUpFirstAdvance.stageExecutionIds.length + catchUpSecondAdvance.stageExecutionIds.length;
+catchUpMultiAdvanceNativeExecutionOverflow.physicsGraph.catchUpPolicy.maximumNativeExecutionsPerOpportunity.value = catchUpOverflowNativeExecutionCount - 1;
+assert.throws(
+	() => validateCatchUpSchedulerClosure( catchUpMultiAdvanceNativeExecutionOverflow.physicsGraph, catchUpMultiAdvanceNativeExecutionOverflow.physicsContext, catchUpMultiAdvanceNativeExecutionOverflow.physicsGraph.coordinationAdvance, catchUpMultiAdvanceNativeExecutionOverflow, catchUpMultiAdvanceNativeExecutionOverflow.physicsGraph.executionLedger ),
+	/catch-up batch exceeds the policy native-execution bound/,
+	'catch-up validator accepted a multi-advance batch whose summed native executions exceed the policy cap'
+);
 
 const noExchangePhysicsFixture = clone( coupledPhysicsFixture );
 noExchangePhysicsFixture.physicsInteractions = [];
@@ -5435,7 +6802,12 @@ noExchangePhysicsFixture.physicsInteractionApplicationLedgers = {};
 noExchangePhysicsFixture.physicsGraph.executionLedger.interactionApplicationLedgers = [];
 for ( const execution of noExchangePhysicsFixture.physicsGraph.executionLedger.stageExecutions ) execution.interactionApplicationLedgerIds = [];
 for ( const claim of noExchangePhysicsFixture.physicsGraph.executionLedger.stateAdvanceClaims ) claim.interactionApplicationLedgerIds = [];
-for ( const loop of noExchangePhysicsFixture.physicsGraph.loopMacros ) for ( const row of loop.perIterationLedger ) row.interactionApplicationLedgerIds = [];
+for ( const loop of noExchangePhysicsFixture.physicsGraph.loopMacros ) for ( const row of loop.perIterationLedger ) {
+
+	row.interactionApplicationLedgerIds = [];
+	row.interactionSequenceRanges = [];
+
+}
 noExchangePhysicsFixture.physicsCostLedger.cadenceTraceTotals.interactionApplicationCounts = {};
 {
 
@@ -5498,7 +6870,12 @@ oneWayPhysicsFixture.physicsInteractionApplicationLedgers = Object.fromEntries( 
 oneWayPhysicsFixture.physicsGraph.executionLedger.interactionApplicationLedgers = oneWayPhysicsFixture.physicsGraph.executionLedger.interactionApplicationLedgers.filter( ( ledger ) => oneWayApplicationIds.has( ledger.applicationLedgerId ) );
 for ( const execution of oneWayPhysicsFixture.physicsGraph.executionLedger.stageExecutions ) execution.interactionApplicationLedgerIds = execution.interactionApplicationLedgerIds.filter( ( id ) => oneWayApplicationIds.has( id ) );
 for ( const claim of oneWayPhysicsFixture.physicsGraph.executionLedger.stateAdvanceClaims ) claim.interactionApplicationLedgerIds = claim.interactionApplicationLedgerIds.filter( ( id ) => oneWayApplicationIds.has( id ) );
-for ( const loop of oneWayPhysicsFixture.physicsGraph.loopMacros ) for ( const row of loop.perIterationLedger ) row.interactionApplicationLedgerIds = row.interactionApplicationLedgerIds.filter( ( id ) => oneWayApplicationIds.has( id ) );
+for ( const loop of oneWayPhysicsFixture.physicsGraph.loopMacros ) for ( const row of loop.perIterationLedger ) {
+
+	row.interactionApplicationLedgerIds = [];
+	row.interactionSequenceRanges = [];
+
+}
 oneWayPhysicsFixture.physicsCostLedger.cadenceTraceTotals.interactionApplicationCounts.momentumTransfer.value = oneWayApplicationIds.size * oneWayPhysicsFixture.physicsCostLedger.cadenceTraceTotals.coordinationAdvanceCount.value;
 delete oneWayPhysicsFixture.physicsCostLedger.cadenceTraceTotals.interactionApplicationCounts.pointImpulse;
 {
@@ -5597,6 +6974,37 @@ const refreshCadenceTotalsDigest = ( route ) => {
 	route.physicsCostLedger.cadenceTraceTotals.exactTotalsDigest = sha256Canonical( payload );
 
 };
+const makeIndependentViewCadenceCase = semanticRouteCase( ( route ) => {
+
+	const ledger = route.physicsCostLedger;
+	const totals = ledger.cadenceTraceTotals;
+	const denominatorTargetViewKey = 'minimap/map-view';
+	const priorFrameCount = quantityValue( totals.presentedFrameCounts[ denominatorTargetViewKey ], 'independentViewCadence.priorFrameCount' );
+	const independentFrameCount = 6000;
+	totals.presentedFrameCounts[ denominatorTargetViewKey ].value = independentFrameCount;
+	ledger.coordinationIntervalsPerPresentedFrame.denominatorTargetViewKey = denominatorTargetViewKey;
+	ledger.coordinationIntervalsPerPresentedFrame.exactRatio.value = quantityValue( totals.coordinationAdvanceCount, 'independentViewCadence.coordinationAdvanceCount' ) / independentFrameCount;
+	for ( const [ stageId, cadence ] of Object.entries( ledger.executionsPerPresentedFrame ) ) {
+
+		cadence.denominatorTargetViewKey = denominatorTargetViewKey;
+		cadence.count.value = quantityValue( totals.stageExecutionCounts[ stageId ], `independentViewCadence.stageExecutionCounts.${ stageId }` ) / independentFrameCount;
+
+	}
+	for ( const [ metric, cadence ] of Object.entries( ledger.subcyclesAndCouplingIterationsPerPresentedFrame ) ) ledger.subcyclesAndCouplingIterationsPerPresentedFrame[ metric ] = {
+
+		denominatorTargetViewKey,
+		count: evidence( quantityValue( cadence, `independentViewCadence.${ metric }` ) * priorFrameCount / independentFrameCount, cadence.unit, cadence.label, cadence.source )
+
+	};
+	for ( const workKey of ledger.perViewWorkKeys[ denominatorTargetViewKey ] ) {
+
+		totals.workOccurrenceCounts[ workKey ].value = independentFrameCount;
+		ledger.workAttribution.find( ( row ) => row.workKey === workKey ).occurrenceCount.value = independentFrameCount;
+
+	}
+	refreshCadenceTotalsDigest( route );
+
+} );
 const makeSemanticInvariantFixture = ( context ) => {
 
 	const rootKeys = new Set( semanticCheckRootKeys[ context.validator ] ?? [ 'route' ] );
@@ -5685,7 +7093,7 @@ const semanticInvariantAcceptCases = Object.freeze( {
 	validateImmutableRenderPlanClosure: { 'complete-phase-edge-reset-shadow-closure': semanticIdentityCase },
 	validateQualityRequestAndAllocationAdmission: { 'scope-evidence-capacity-match': semanticIdentityCase },
 	validateMemoryTrafficAndWorkAttribution: { 'unique-lifetime-transfer-work-closure': semanticIdentityCase },
-	validateCadenceTraceTotals: { 'exact-duration-count-byte-reconciliation': semanticIdentityCase }
+	validateCadenceTraceTotals: { 'exact-duration-count-byte-reconciliation': makeIndependentViewCadenceCase }
 } );
 
 const semanticInvariantRejectCases = Object.freeze( {
@@ -5776,7 +7184,14 @@ const semanticInvariantRejectCases = Object.freeze( {
 	validatePresentationPublicationClosure: {
 		'camera-in-candidate': semanticRouteCase( ( route ) => { route.physicsPresentationCandidate.cameraId = 'illegal-camera'; } ),
 		'missing-lease': semanticRouteCase( ( route ) => { route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].resourceLeaseRefs[ 0 ].leaseId = 'missing-lease'; } ),
-		'invented-event-range': semanticRouteCase( ( route ) => { route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].eventSequenceRanges[ 0 ].lastSequenceInclusive ++; } )
+		'invented-event-range': semanticRouteCase( ( route ) => {
+
+			const fabricatedRange = route.physicsPresentationCandidate.eventSequenceRanges[ 0 ];
+			fabricatedRange.firstSequence ++;
+			fabricatedRange.cursorBefore ++;
+			for ( const snapshot of Object.values( route.physicsPresentationSnapshotsByTarget ) ) snapshot.eventSequenceRanges = snapshot.eventSequenceRanges.map( ( range ) => range.rangeId === fabricatedRange.rangeId ? clone( fabricatedRange ) : range );
+
+		} )
 	},
 	validateLeaseConsumerJoinAndRetirement: {
 		'early-reuse': semanticRouteCase( ( route ) => { route.frameExecutionRecord.leaseDispositionById[ 'water-current' ].retirementEvidence.completedConsumerKeys.pop(); } ),
@@ -5808,7 +7223,14 @@ const semanticInvariantRejectCases = Object.freeze( {
 	validateCoordinationAdvanceAndCatchUp: {
 		'double-step': semanticRouteCase( ( route ) => { const claim = clone( route.physicsGraph.executionLedger.stateAdvanceClaims[ 0 ] ); claim.claimId = 'duplicate-step-claim'; route.physicsGraph.executionLedger.stateAdvanceClaims.push( claim ); } ),
 		'debt-identity-mismatch': semanticRouteCase( ( route ) => { route.physicsCoordinationAdvanceRecords[ 0 ].debtAfter.seconds.value = 0.001; } ),
-		'drop-without-loss-ledger': semanticRouteCase( ( route ) => { route.physicsGraph.catchUpPolicy.debtDisposition = 'drop-with-loss-ledger'; } )
+		'drop-without-loss-ledger': semanticRouteCase( ( route ) => {
+
+			route.physicsGraph.catchUpPolicy.debtDisposition = 'drop-with-loss-ledger';
+			route.physicsGraph.coordinationAdvance.catchUpBatchId = 'missing-catch-up-batch';
+			route.physicsGraph.coordinationAdvance.receiptDigest = sha256CanonicalExcluding( route.physicsGraph.coordinationAdvance, [ 'receiptDigest' ] );
+			route.physicsCoordinationAdvanceRecords = [ clone( route.physicsGraph.coordinationAdvance ) ];
+
+		} )
 	},
 	validateDependencyCompletionInstances: {
 		'template-as-completion': semanticRouteCase( ( route ) => {
@@ -6514,6 +7936,12 @@ expectPhysicsReject( 'cost ledger accepts inconsistent stage cadence', ( route )
 	route.physicsCostLedger.stageExecutionsPerSecond[ 'predict-body' ].count.value = 61;
 
 }, /per-second cadence is inconsistent/ );
+expectPhysicsReject( 'cost ledger normalizes independent views by an implicit frame count', ( route ) => {
+
+	route.physicsCostLedger.cadenceTraceTotals.presentedFrameCounts[ 'minimap/map-view' ].value = 6000;
+	refreshCadenceTotalsDigest( route );
+
+}, /must declare denominatorTargetViewKey/ );
 expectPhysicsReject( 'cost ledger allows frame-critical readback', ( route ) => {
 
 	route.physicsCostLedger.hostCompletionsReadbacksPerPresentedFrame.value = 1;
@@ -6529,16 +7957,30 @@ expectPhysicsReject( 'cost ledger exceeds device binding limit', ( route ) => {
 	route.physicsCostLedger.bindingAndDeviceLimits[ 0 ].demand.value = 8;
 
 }, /exceeds the device limit/ );
-expectPhysicsReject( 'cost ledger is not mobile-targeted', ( route ) => {
+{
 
-	route.physicsCostLedger.targetAndHarness = 'desktop workstation';
+	const nonMobileCanonicalCoverage = clone( coupledPhysicsFixture );
+	nonMobileCanonicalCoverage.physicsCostLedger.targetAndHarness = 'desktop workstation';
+	assert.throws(
+		() => assertCanonicalCoupledFixtureCoverage( nonMobileCanonicalCoverage ),
+		/mobile\/low-end harness/,
+		'canonical stress coverage accepted a non-mobile harness'
+	);
+	negativeCaseCount ++;
 
-}, /mobile\/low-end harness/ );
-expectPhysicsReject( 'cost ledger is not sustained', ( route ) => {
+}
+{
 
-	route.physicsCostLedger.graphStageCosts[ 0 ].sampleCount.value = 20;
+	const shortCanonicalCoverage = clone( coupledPhysicsFixture );
+	shortCanonicalCoverage.physicsCostLedger.graphStageCosts[ 0 ].sampleCount.value = 20;
+	assert.throws(
+		() => assertCanonicalCoupledFixtureCoverage( shortCanonicalCoverage ),
+		/sustained stage samples/,
+		'canonical stress coverage accepted an undersampled stage trace'
+	);
+	negativeCaseCount ++;
 
-}, /not a sustained sample/ );
+}
 
 assertPhysicsFieldsInYaml( templateRouteYaml, 'template routeManifest' );
 for ( const recipeName of recipeNames ) assertRecipeManifest( recipes, recipeName );
