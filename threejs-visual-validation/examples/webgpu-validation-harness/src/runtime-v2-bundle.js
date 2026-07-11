@@ -89,6 +89,84 @@ function targetArtifact( target, finalCapture ) {
 
 }
 
+function finiteNonnegativeCounters( counters, label ) {
+
+	if ( counters === null || typeof counters !== 'object' || Array.isArray( counters ) ) throw new Error( `${ label } must be an object.` );
+	const entries = Object.entries( counters ).filter( ( [ , value ] ) => typeof value === 'number' );
+	if ( entries.length === 0 ) throw new Error( `${ label } has no numeric counters.` );
+	for ( const [ name, value ] of entries ) {
+
+		if ( Number.isFinite( value ) === false || value < 0 ) throw new Error( `${ label }.${ name } must be finite and nonnegative.` );
+
+	}
+	return entries;
+
+}
+
+function resourceBytes( resources, resourceName ) {
+
+	const records = resources?.[ resourceName ];
+	if ( Array.isArray( records ) === false ) throw new Error( `Lifecycle snapshot is missing resources.${ resourceName}.` );
+	return records.reduce( ( sum, resource, index ) => {
+
+		if ( Number.isFinite( resource?.bytes ) === false || resource.bytes < 0 ) throw new Error( `Lifecycle ${ resourceName }[${ index }].bytes must be finite and nonnegative.` );
+		return sum + resource.bytes;
+
+	}, 0 );
+
+}
+
+function rendererMemory( metrics, label ) {
+
+	const memory = metrics?.rendererInfo?.memory;
+	if ( memory === null || typeof memory !== 'object' || Array.isArray( memory ) ) throw new Error( `${ label}.rendererInfo.memory must be an object.` );
+	return memory;
+
+}
+
+export function summarizeLifecycleEvidence( lifecycle ) {
+
+	if ( lifecycle === null || typeof lifecycle !== 'object' ) return null;
+	const cycles = lifecycle.cycles;
+	if ( Number.isInteger( cycles ) === false || cycles < 50 || cycles > 100 ) throw new Error( 'Runtime lifecycle evidence must cover an integer 50-100 cycles.' );
+	if ( Array.isArray( lifecycle.snapshots ) === false || lifecycle.snapshots.length !== cycles ) throw new Error( 'Runtime lifecycle snapshot count must equal the declared cycle count.' );
+
+	const cycleSnapshots = lifecycle.snapshots.map( ( snapshot, index ) => {
+
+		if ( snapshot?.cycle !== index ) throw new Error( `Runtime lifecycle cycle ${ index } is missing or out of order.` );
+		if ( snapshot.beforeDispose?.backend?.isWebGPUBackend !== true ) throw new Error( `Runtime lifecycle cycle ${ index } did not initialize native WebGPU.` );
+		if ( snapshot.afterDispose?.backend?.isWebGPUBackend !== true ) throw new Error( `Runtime lifecycle cycle ${ index } lost its backend identity before post-disposal measurement.` );
+		const beforeMemory = rendererMemory( snapshot.beforeDispose, `lifecycle cycle ${ index } beforeDispose` );
+		const afterMemory = rendererMemory( snapshot.afterDispose, `lifecycle cycle ${ index } afterDispose` );
+		const beforeCounters = finiteNonnegativeCounters( beforeMemory, `lifecycle cycle ${ index } beforeDispose.rendererInfo.memory` );
+		const afterCounters = finiteNonnegativeCounters( afterMemory, `lifecycle cycle ${ index } afterDispose.rendererInfo.memory` );
+		const nonzeroAfter = afterCounters.filter( ( [ , value ] ) => value !== 0 );
+		if ( nonzeroAfter.length > 0 ) throw new Error( `Runtime lifecycle cycle ${ index } retained renderer memory after disposal: ${ nonzeroAfter.map( ( [ name ] ) => name ).join( ', ' ) }.` );
+		const beforeRendererBytes = beforeMemory.total;
+		const afterRendererBytes = afterMemory.total;
+		if ( Number.isFinite( beforeRendererBytes ) === false || Number.isFinite( afterRendererBytes ) === false ) throw new Error( `Runtime lifecycle cycle ${ index } is missing renderer-memory totals.` );
+		const targetBytes = resourceBytes( snapshot.resources, 'renderTargets' );
+		const storageBytes = resourceBytes( snapshot.resources, 'storageResources' );
+		return { cycle: index, beforeRendererBytes, afterRendererBytes, targetBytes, storageBytes, beforeCounterCount: beforeCounters.length };
+
+	} );
+
+	const beforeRendererBytes = cycleSnapshots.map( ( snapshot ) => snapshot.beforeRendererBytes );
+	const targetBytes = cycleSnapshots.map( ( snapshot ) => snapshot.targetBytes );
+	const storageBytes = cycleSnapshots.map( ( snapshot ) => snapshot.storageBytes );
+	return {
+		cycles,
+		cycleSnapshots,
+		beforeRendererBytesMin: Math.min( ...beforeRendererBytes ),
+		beforeRendererBytesMax: Math.max( ...beforeRendererBytes ),
+		afterRendererBytesMax: Math.max( ...cycleSnapshots.map( ( snapshot ) => snapshot.afterRendererBytes ) ),
+		targetBytesMin: Math.min( ...targetBytes ),
+		targetBytesMax: Math.max( ...targetBytes ),
+		storageBytesMax: Math.max( ...storageBytes )
+	};
+
+}
+
 function traceSegment( samples, label, targetIntervalMs ) {
 
 	const source = `${ RUNTIME_SOURCE }; ${ label } CPU samples`;
@@ -118,6 +196,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const pipeline = runtime.pipeline;
 	const resources = runtime.resources;
 	const gpuTiming = runtime.gpuTiming;
+	const lifecycle = summarizeLifecycleEvidence( runtime.lifecycle );
 	const finalCapture = captures.find( ( capture ) => capture.filename === 'images/final.design.png' );
 	if ( ! finalCapture ) throw new Error( 'Runtime v2 assembler requires images/final.design.png capture metadata.' );
 	if ( metrics.backend?.isWebGPUBackend !== true ) throw new Error( 'Runtime v2 assembler requires initialized native WebGPU metrics.' );
@@ -138,7 +217,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
 		performanceCompliance: 'INSUFFICIENT_EVIDENCE',
 		gpuAttribution: 'INSUFFICIENT_EVIDENCE',
-		lifecycleStability: 'INSUFFICIENT_EVIDENCE'
+		lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 	};
 	const graphWithoutDigest = {
 		owners: pipeline.owners,
@@ -169,7 +248,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const knownCompromises = [
 		'Correctness capture only; no sustained performance window was run.',
 		'One resolved render timestamp proves availability but not per-stage GPU attribution.',
-		'No lifecycle create/render/resize/mode/tier/dispose loop was run.',
+		...( lifecycle === null ? [ 'No lifecycle create/render/resize/mode/tier/dispose loop was run.' ] : [] ),
 		'Adapter identity, adapter features, adapter limits, display refresh, and presentation cadence were not exposed by this capture path.',
 		'Depth is reachable in the runtime graph but is not yet included in the explicit byte inventory.'
 	];
@@ -377,9 +456,9 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		spatialErrorMaps: [],
 		worstCaseArtifacts: [ 'images/diagnostics.mosaic.png' ]
 	} );
-	const leakLoop = schema( {
+	const leakLoop = lifecycle === null ? schema( {
 		operations: [],
-		cycles: M( 0, 'cycle', 'no lifecycle loop executed in correctness capture' ),
+		cycles: M( 0, 'cycle', 'no lifecycle loop executed in this capture profile' ),
 		before: { targetBytes: M( totalTargetBytes, 'byte', 'single resource snapshot; not a lifecycle baseline' ), storageBytes: M( 0, 'byte', 'single resource snapshot' ) },
 		after: { targetBytes: M( totalTargetBytes, 'byte', 'same single resource snapshot; no after-loop sample exists' ), storageBytes: M( 0, 'byte', 'same single resource snapshot' ) },
 		trend: { targetBytesPerCycle: A( 0, 'byte/cycle', 'undefined with zero cycles; no trend claim' ), storageBytesPerCycle: A( 0, 'byte/cycle', 'undefined with zero cycles; no trend claim' ) },
@@ -387,6 +466,45 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		allowedCachePlateaus: [],
 		deviceErrors: [],
 		verdict: 'INSUFFICIENT_EVIDENCE'
+	} ) : schema( {
+		operations: [ 'create', 'await ready', 'resize width/height/DPR', 'change tier', 'change mode', 'reset history', 'render once', 'dispose', 'measure post-disposal renderer state' ],
+		cycles: M( lifecycle.cycles, 'cycle', 'fresh-controller lifecycle runner result' ),
+		before: {
+			targetBytes: M( lifecycle.targetBytesMax, 'byte', 'maximum described render-target allocation across lifecycle cycles' ),
+			storageBytes: M( lifecycle.storageBytesMax, 'byte', 'maximum described storage allocation across lifecycle cycles' )
+		},
+		after: {
+			targetBytes: M( 0, 'byte', 'all post-disposal renderer-memory counters were measured at zero in every cycle' ),
+			storageBytes: M( 0, 'byte', 'all post-disposal renderer-memory counters were measured at zero in every cycle' )
+		},
+		trend: {
+			targetBytesPerCycle: M( 0, 'byte/cycle', 'post-disposal renderer-memory total is zero for every cycle' ),
+			storageBytesPerCycle: M( 0, 'byte/cycle', 'post-disposal renderer-memory total is zero for every cycle' )
+		},
+		gates: {
+			targetBytes: G( 0, 'byte', 'no retained target allocation is permitted after disposal' ),
+			storageBytes: G( 0, 'byte', 'no retained storage allocation is permitted after disposal' )
+		},
+		allowedCachePlateaus: [],
+		deviceErrors: [],
+		verdict: 'PASS',
+		rendererMemoryRange: {
+			beforeMin: M( lifecycle.beforeRendererBytesMin, 'byte', 'minimum renderer-info memory total before disposal' ),
+			beforeMax: M( lifecycle.beforeRendererBytesMax, 'byte', 'maximum renderer-info memory total before disposal' ),
+			afterMax: M( lifecycle.afterRendererBytesMax, 'byte', 'maximum renderer-info memory total after disposal' )
+		},
+		resourceRange: {
+			targetBytesMin: M( lifecycle.targetBytesMin, 'byte', 'minimum described render-target allocation across lifecycle resize states' ),
+			targetBytesMax: M( lifecycle.targetBytesMax, 'byte', 'maximum described render-target allocation across lifecycle resize states' ),
+			storageBytesMax: M( lifecycle.storageBytesMax, 'byte', 'maximum described storage allocation across lifecycle cycles' )
+		},
+		cycleSnapshots: lifecycle.cycleSnapshots.map( ( snapshot ) => ( {
+			cycle: M( snapshot.cycle, 'cycle', 'fresh-controller lifecycle runner result' ),
+			beforeRendererBytes: M( snapshot.beforeRendererBytes, 'byte', 'renderer-info memory total before disposal' ),
+			afterRendererBytes: M( snapshot.afterRendererBytes, 'byte', 'renderer-info memory total after disposal' ),
+			targetBytes: M( snapshot.targetBytes, 'byte', 'described render-target bytes before disposal' ),
+			storageBytes: M( snapshot.storageBytes, 'byte', 'described storage bytes before disposal' )
+		} ) )
 	} );
 	const captureMetrics = captures.filter( ( capture ) => Number.isFinite( capture.width ) && Number.isFinite( capture.height ) ).map( ( capture ) => ( {
 		id: capture.filename,

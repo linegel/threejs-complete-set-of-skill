@@ -145,12 +145,16 @@ export async function captureLab( session ) {
 	await session.controllerCall( 'setTime', 0 );
 	await session.controllerCall( 'setMode', 'final' );
 	await session.controllerCall( 'renderOnce' );
+	const lifecycle = session.profile === 'performance' ? null : await session.page.evaluate( async () => (
+		window.__THREEJS_LAB_LIFECYCLE__( 50 )
+	) );
 
 	const runtime = {
 		metrics: await session.controllerCall( 'getMetrics' ),
 		pipeline: await session.controllerCall( 'describePipeline' ),
 		resources: await session.controllerCall( 'describeResources' ),
-		gpuTiming: await session.controllerCall( 'resolveGpuTimings' )
+		gpuTiming: await session.controllerCall( 'resolveGpuTimings' ),
+		lifecycle
 	};
 	const boundary = {
 		schemaVersion: 2,
@@ -160,7 +164,7 @@ export async function captureLab( session ) {
 		publishable: false,
 		sourceHash: session.lab.sourceHash,
 		evidenceContract: 'v2',
-		reason: 'Real render-target captures exist; acceptance still requires fourteen assembled v2 artifacts, 50-100 lifecycle cycles, timestamp sufficiency, artifact validation, and visual sign-off.',
+		reason: 'Real render-target captures and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, sustained timing, GPU-stage attribution, and visual sign-off.',
 		claimVerdicts: {
 			nativeWebGPUCorrectness: 'PASS',
 			renderTargetReadback: 'PASS',
@@ -168,7 +172,7 @@ export async function captureLab( session ) {
 			performanceCompliance: 'INSUFFICIENT_EVIDENCE',
 			gpuTimestampAvailability: runtime.gpuTiming.verdict,
 			gpuAttribution: 'INSUFFICIENT_EVIDENCE',
-			lifecycleStability: 'INSUFFICIENT_EVIDENCE'
+			lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 		},
 		diagnosticDifference: {
 			value: session.profile === 'performance' ? null : Math.min(
