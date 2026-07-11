@@ -11298,7 +11298,6 @@
         "reactiveEpochs",
         "reactivePublications",
         "resetDependencies",
-        "resetActionResults",
         "requiredPreparationEdges",
         "resourceLeases",
         "resourceLeaseRefs",
@@ -11381,12 +11380,6 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/RenderResourceLease"
-          }
-        },
-        "resetActionResults": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/ScopedResetActionResult"
           }
         }
       },
@@ -12305,6 +12298,7 @@
         "resetActionResults",
         "completionTokens",
         "presentedTimestamp",
+        "loss",
         "failure"
       ],
       "properties": {
@@ -12346,6 +12340,37 @@
           "oneOf": [
             {
               "$ref": "#/$defs/PhysicsInstant"
+            },
+            {
+              "$ref": "#/$defs/TypedAbsence"
+            }
+          ]
+        },
+        "loss": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "deviceId",
+                "backendGeneration",
+                "deviceLossGeneration",
+                "lossTransactionId"
+              ],
+              "properties": {
+                "deviceId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "backendGeneration": {
+                  "$ref": "#/$defs/Version"
+                },
+                "deviceLossGeneration": {
+                  "$ref": "#/$defs/Version"
+                },
+                "lossTransactionId": {
+                  "$ref": "#/$defs/Id"
+                }
+              },
+              "additionalProperties": false
             },
             {
               "$ref": "#/$defs/TypedAbsence"
@@ -12408,6 +12433,9 @@
             "slotAdmissionId": {
               "$ref": "#/$defs/Id"
             },
+            "loss": {
+              "$ref": "#/$defs/TypedAbsence"
+            },
             "failure": {
               "$ref": "#/$defs/TypedAbsence"
             }
@@ -12437,6 +12465,9 @@
             "completionTokens": {
               "type": "array",
               "maxItems": 0
+            },
+            "loss": {
+              "$ref": "#/$defs/TypedAbsence"
             },
             "failure": {
               "$ref": "#/$defs/PresentAbiValue"
@@ -12476,6 +12507,15 @@
                 {
                   "$ref": "#/$defs/TypedAbsence"
                 }
+              ]
+            },
+            "loss": {
+              "type": "object",
+              "required": [
+                "deviceId",
+                "backendGeneration",
+                "deviceLossGeneration",
+                "lossTransactionId"
               ]
             },
             "failure": {
@@ -16037,6 +16077,7 @@
         "requiredPreparationEdgeIds",
         "renderResourceLeaseIds",
         "plannedResetActionIds",
+        "resetActionPhaseById",
         "expectedResetHistoryGenerations",
         "shadowFactorIds",
         "closureDigest",
@@ -16096,6 +16137,15 @@
         },
         "expectedResetHistoryGenerations": {
           "$ref": "#/$defs/AnyAbiValue"
+        },
+        "resetActionPhaseById": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyString"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Id"
+          }
         }
       },
       "additionalProperties": false
@@ -17356,6 +17406,8 @@
       "required": [
         "resultId",
         "actionId",
+        "renderPlanId",
+        "executionPhaseId",
         "presentationTargetId",
         "viewId",
         "historyKey",
@@ -17379,6 +17431,12 @@
         },
         "actionId": {
           "$ref": "#/$defs/AnyAbiValue"
+        },
+        "renderPlanId": {
+          "$ref": "#/$defs/Id"
+        },
+        "executionPhaseId": {
+          "$ref": "#/$defs/Id"
         },
         "presentationTargetId": {
           "$ref": "#/$defs/AnyAbiValue"
@@ -21309,7 +21367,6 @@
         "reactiveEpochs",
         "reactivePublications",
         "resetDependencies",
-        "resetActionResults",
         "requiredPreparationEdges",
         "resourceLeases",
         "resourceLeaseRefs",
@@ -21506,6 +21563,7 @@
         "resetActionResults",
         "completionTokens",
         "presentedTimestamp",
+        "loss",
         "failure"
       ]
     },
@@ -22512,6 +22570,7 @@
         "requiredPreparationEdgeIds",
         "renderResourceLeaseIds",
         "plannedResetActionIds",
+        "resetActionPhaseById",
         "expectedResetHistoryGenerations",
         "shadowFactorIds",
         "closureDigest",
@@ -22725,6 +22784,8 @@
       "required": [
         "resultId",
         "actionId",
+        "renderPlanId",
+        "executionPhaseId",
         "presentationTargetId",
         "viewId",
         "historyKey",
@@ -23722,7 +23783,9 @@
         "reject": [
           "prepared-version",
           "skew-over-gate",
-          "occupied-slot"
+          "occupied-slot",
+          "camera-cohort-instant-drift",
+          "jitter-sequence-drift"
         ]
       },
       "contractLines": "2615-3215"
@@ -23744,7 +23807,10 @@
         "reject": [
           "missing-edge",
           "history-generation-mismatch",
-          "duplicate-shadow-factor"
+          "duplicate-shadow-factor",
+          "wrong-reset-phase-map",
+          "reset-result-plan-mismatch",
+          "reset-result-queue-epoch-mismatch"
         ]
       },
       "contractLines": "2790-3245"

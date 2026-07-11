@@ -3399,10 +3399,11 @@ function validateAffectedRegion( region, allowedLeases, camera, label ) {
 
 }
 
-function validateResetActionResult( result, action, allowedLeases, camera, label ) {
+function validateResetActionResult( result, action, allowedLeases, camera, plan, target, label ) {
 
 	requireAbiRecord( result, 'ScopedResetActionResult', label );
 	assert.deepEqual( [ result.actionId, result.presentationTargetId, result.viewId, result.historyKey, result.policyApplied ], [ action.actionId, action.presentationTargetId, action.viewId, action.historyKey, action.policy ], `${ label} does not realize its planned reset action` );
+	assert.deepEqual( [ result.renderPlanId, result.executionPhaseId ], [ plan.renderPlanId, plan.resetActionPhaseById[ action.actionId ] ], `${ label} does not bind the reset action's immutable plan phase` );
 	assert.deepEqual( [ ...result.causeEpochs ].sort(), [ ...action.causeEpochs ].sort(), `${ label}.causeEpochs mismatch` );
 	validateAffectedRegion( result.appliedRegion, allowedLeases, camera, `${ label}.appliedRegion` );
 	for ( const [ refKey, generationKey ] of [ [ 'inputHistoryLeaseRef', 'inputHistoryGeneration' ], [ 'outputHistoryLeaseRef', 'outputHistoryGeneration' ] ] ) {
@@ -3412,9 +3413,13 @@ function validateResetActionResult( result, action, allowedLeases, camera, label
 
 	}
 	assert.deepEqual( [ result.inputHistoryGeneration, result.outputHistoryGeneration ], [ action.expectedInputHistoryGeneration, action.expectedOutputHistoryGeneration ], `${ label} history generations disagree with the immutable plan` );
-	assert.ok( Array.isArray( result.dependencyCompletionRefs ) && result.dependencyCompletionRefs.length > 0, `${ label} lacks dependency completion evidence` );
-	for ( const [ index, ref ] of result.dependencyCompletionRefs.entries() ) requireAbiRecord( ref, 'PhysicsDependencyCompletionRef', `${ label}.dependencyCompletionRefs[${ index }]` );
-	if ( result.status === 'completed' ) assert.ok( isTypedAbsence( result.failure ), `${ label} completed with a failure arm` );
+	const phase = plan.phaseRecords.find( ( candidate ) => candidate.phaseId === result.executionPhaseId );
+	assert.ok( phase && phase.historyWriteGenerationIds.includes( action.expectedOutputHistoryGeneration ), `${ label} execution phase does not write the planned history generation` );
+	const expectedCompletionRefs = plan.edges.filter( ( edge ) => edge.producerPhaseId === phase.phaseId ).map( ( edge ) => edge.completionRef );
+	assert.ok( expectedCompletionRefs.length > 0, `${ label} reset phase has no dependency-completion edge` );
+	assert.deepEqual( result.dependencyCompletionRefs, expectedCompletionRefs, `${ label}.dependencyCompletionRefs do not close the reset phase's outgoing edges` );
+	assert.ok( target.queueSubmissionEpochs.includes( result.queueSubmissionEpoch ), `${ label}.queueSubmissionEpoch is absent from the target execution` );
+	if ( [ 'completed', 'bypassed-with-proof' ].includes( result.status ) ) assert.ok( isTypedAbsence( result.failure ), `${ label} terminal success carries a failure arm` );
 	else assert.ok( ! isTypedAbsence( result.failure ), `${ label} failed without a typed failure record` );
 	requireNonEmptyString( result.resultDigest, `${ label}.resultDigest` );
 
@@ -3449,6 +3454,7 @@ function validateRenderPlan( plan, targetViewKey, route, preparation, snapshot, 
 	assert.deepEqual( [ ...plan.requiredPreparationEdgeIds ].sort(), preparation.requiredPreparationEdges.map( ( edge ) => edge.edgeId ).sort(), `${ label} preparation-edge closure mismatch` );
 	assert.deepEqual( [ ...plan.renderResourceLeaseIds ].sort(), preparation.renderResourceLeases.map( ( lease ) => lease.renderResourceLeaseId ).sort(), `${ label} render-resource lease closure mismatch` );
 	assert.deepEqual( [ ...plan.plannedResetActionIds ].sort(), preparation.resetDependencies.map( ( action ) => action.actionId ).sort(), `${ label} reset-action closure mismatch` );
+	assert.deepEqual( Object.keys( plan.resetActionPhaseById ).sort(), [ ...plan.plannedResetActionIds ].sort(), `${ label}.resetActionPhaseById keys must equal the planned reset actions` );
 	assertUnique( plan.shadowFactorIds, `${ label}.shadowFactorIds` );
 	assert.deepEqual( [ ...plan.shadowFactorIds ].sort(), preparation.shadowViewPublicationRefs.map( ( ref ) => ref.shadowFactorProvenance.shadowFactorId ).sort(), `${ label} shadow-factor closure mismatch` );
 	for ( const action of preparation.resetDependencies ) assert.deepEqual( plan.expectedResetHistoryGenerations[ action.actionId ], { inputHistoryGeneration: action.expectedInputHistoryGeneration, outputHistoryGeneration: action.expectedOutputHistoryGeneration }, `${ label} expected reset generations mismatch for ${ action.actionId }` );
@@ -3484,6 +3490,33 @@ function validateRenderPlan( plan, targetViewKey, route, preparation, snapshot, 
 		const ready = [ ...pending ].filter( ( phaseId ) => edgePredecessors.get( phaseId ).every( ( predecessor ) => visited.has( predecessor ) ) );
 		assert.ok( ready.length > 0, `${ label} phase edges contain a cycle` );
 		for ( const phaseId of ready ) { pending.delete( phaseId ); visited.add( phaseId ); }
+
+	}
+	const phaseSuccessors = new Map( plan.phaseIds.map( ( phaseId ) => [ phaseId, [] ] ) );
+	for ( const edge of plan.edges ) phaseSuccessors.get( edge.producerPhaseId ).push( edge.consumerPhaseId );
+	const phasePrecedes = ( predecessorId, successorId ) => {
+
+		const frontier = [ predecessorId ];
+		const reached = new Set();
+		while ( frontier.length > 0 ) {
+
+			const phaseId = frontier.pop();
+			if ( phaseId === successorId ) return true;
+			if ( reached.has( phaseId ) ) continue;
+			reached.add( phaseId );
+			frontier.push( ...phaseSuccessors.get( phaseId ) );
+
+		}
+		return false;
+
+	};
+	for ( const action of preparation.resetDependencies ) {
+
+		const phaseId = plan.resetActionPhaseById[ action.actionId ];
+		const resetPhase = phasesById.get( phaseId );
+		assert.ok( resetPhase, `${ label}.resetActionPhaseById.${ action.actionId } references an unknown phase` );
+		assert.ok( resetPhase.historyWriteGenerationIds.includes( action.expectedOutputHistoryGeneration ), `${ label}.${ phaseId} does not write the reset output history generation` );
+		for ( const reader of plan.phaseRecords.filter( ( phase ) => phase.historyReadGenerationIds.includes( action.expectedOutputHistoryGeneration ) ) ) assert.ok( phasePrecedes( phaseId, reader.phaseId ), `${ label}.${ phaseId} does not precede history reader ${ reader.phaseId }` );
 
 	}
 	assert.equal( plan.immutablePlanDigest, renderPlanDigest( plan ), `${ label}.immutablePlanDigest does not cover the immutable plan` );
@@ -3549,6 +3582,8 @@ function validateCanonicalPresentation( route ) {
 		assert.ok( ! pairIds.has( pair.bindingId ), `duplicate candidate binding ${ pair.bindingId }` );
 		pairIds.add( pair.bindingId );
 		validatePresentedPair( pair, context, signals, candidateLeasesById, rebaseTransactionsById, `physicsPresentationCandidate.presentedStatePairs[${ index }]` );
+		assert.equal( canonicalInstantIdentity( pair.previousPresented.provenance.requestedPresentationInstant ), canonicalInstantIdentity( timeCohort.previousRequestedPresentationInstant ), `physicsPresentationCandidate.presentedStatePairs[${ index }].previousPresented does not bind the cohort previous instant` );
+		assert.equal( canonicalInstantIdentity( pair.currentPresented.provenance.requestedPresentationInstant ), canonicalInstantIdentity( timeCohort.currentRequestedPresentationInstant ), `physicsPresentationCandidate.presentedStatePairs[${ index }].currentPresented does not bind the cohort current instant` );
 
 	}
 	const bindingSignature = ( binding ) => `${ binding.sourcePhysicsFrameId }|${ binding.transformRevision }|${ binding.physicsOriginEpoch }`;
@@ -3563,7 +3598,9 @@ function validateCanonicalPresentation( route ) {
 	const snapshots = route.physicsPresentationSnapshotsByTarget;
 	requireNonEmptyMapping( cameras, 'physicsCameraViewPublicationsByTarget' );
 	requireNonEmptyMapping( preparations, 'physicsViewPreparationPublicationsByTarget' );
-	requireNonEmptyMapping( snapshots, 'physicsPresentationSnapshotsByTarget' );
+	const allTargetPreSealAbort = route.frameExecutionRecord.overallStatus === 'aborted' && Object.values( route.frameExecutionRecord.targetExecutions ).every( ( target ) => [ 'failed', 'aborted' ].includes( target.status ) && isTypedAbsence( target.snapshotId ) );
+	if ( ! allTargetPreSealAbort ) requireNonEmptyMapping( snapshots, 'physicsPresentationSnapshotsByTarget' );
+	else assert.deepEqual( Object.keys( snapshots ), [], 'all-target pre-seal abort cannot publish snapshots' );
 	const sharedPresentationConsumerId = 'shared-presentation-views';
 	const authoritativeEventBatchesByStreamId = new Map();
 	for ( const exchange of route.physicsInteractions ) {
@@ -3608,6 +3645,12 @@ function validateCanonicalPresentation( route ) {
 		cameraIds.add( camera.cameraPublicationId );
 		canonicalInstantSeconds( camera.previousRenderSampleInstant, context, `${ label }.previousRenderSampleInstant` );
 		canonicalInstantSeconds( camera.currentRenderSampleInstant, context, `${ label }.currentRenderSampleInstant` );
+		assert.equal( canonicalInstantIdentity( camera.previousRenderSampleInstant ), canonicalInstantIdentity( timeCohort.previousRequestedPresentationInstant ), `${ label }.previousRenderSampleInstant does not bind the cohort previous instant` );
+		assert.equal( canonicalInstantIdentity( camera.currentRenderSampleInstant ), canonicalInstantIdentity( timeCohort.currentRequestedPresentationInstant ), `${ label }.currentRenderSampleInstant does not bind the cohort current instant` );
+		assert.deepEqual( [ camera.previousJitterSampleAndConvention.sample.source, camera.currentJitterSampleAndConvention.sample.source ], [ camera.jitterSequenceRevision, camera.jitterSequenceRevision ], `${ label } jitter samples do not bind the declared jitter sequence revision` );
+		assert.equal( camera.previousJitterSampleAndConvention.convention, camera.currentJitterSampleAndConvention.convention, `${ label } previous/current jitter conventions differ` );
+		assert.match( camera.currentJitterSampleAndConvention.convention, /unjittered/i, `${ label } motion convention does not identify unjittered matrices` );
+		assert.notDeepEqual( camera.previousJitterSampleAndConvention.sample.value, camera.currentJitterSampleAndConvention.sample.value, `${ label } previous/current jitter samples alias the same sample` );
 		validateRenderSimilarityTransform( camera.globalToRenderPrevious, context, `${ label }.globalToRenderPrevious`, camera.previousRenderSampleInstant, previousBinding );
 		validateRenderSimilarityTransform( camera.globalToRenderCurrent, context, `${ label }.globalToRenderCurrent`, camera.currentRenderSampleInstant, currentBinding );
 
@@ -3672,9 +3715,6 @@ function validateCanonicalPresentation( route ) {
 			if ( ! isTypedAbsence( action.inputHistoryLeaseRef ) ) validateLeaseRef( action.inputHistoryLeaseRef, allowedLeases, `${ actionLabel }.inputHistoryLeaseRef` );
 
 		}
-		assert.deepEqual( preparation.resetActionResults.map( ( result ) => result.actionId ).sort(), [ ...actionIds ].sort(), `${ label}.resetActionResults must realize every planned action exactly once` );
-		assertUnique( preparation.resetActionResults.map( ( result ) => result.resultId ), `${ label}.resetActionResults result IDs` );
-		for ( const [ index, result ] of preparation.resetActionResults.entries() ) validateResetActionResult( result, preparation.resetDependencies.find( ( action ) => action.actionId === result.actionId ), allowedLeases, camera, `${ label}.resetActionResults[${ index }]` );
 		assertUnique( preparation.requiredPreparationEdges.map( ( edge ) => edge.edgeId ), `${ label}.requiredPreparationEdges` );
 		for ( const [ index, edge ] of preparation.requiredPreparationEdges.entries() ) {
 
@@ -3716,7 +3756,9 @@ function validateCanonicalPresentation( route ) {
 		assert.equal( snapshot.cameraPublicationId, camera.cameraPublicationId, `${ label }.cameraPublicationId mismatch` );
 		assert.equal( snapshot.viewPreparationId, preparation.viewPreparationId, `${ label }.viewPreparationId mismatch` );
 		assert.deepEqual( [ snapshot.presentationTargetId, snapshot.viewId ], [ camera.presentationTargetId, camera.viewId ], `${ label } target/view mismatch` );
-		assert.deepEqual( [ ...snapshot.presentedStatePairRefs ].sort(), [ ...pairIds ].sort(), `${ label } must reference the exact Candidate pair set` );
+		assert.ok( snapshot.presentedStatePairRefs.length > 0, `${ label } must reference at least one Candidate pair` );
+		assertUnique( snapshot.presentedStatePairRefs, `${ label}.presentedStatePairRefs` );
+		assert.ok( snapshot.presentedStatePairRefs.every( ( bindingId ) => pairIds.has( bindingId ) ), `${ label } references a pair outside the Candidate` );
 		const allowedLeases = allowedLeasesByTargetView.get( targetViewKey );
 		for ( const [ index, ref ] of snapshot.resourceLeaseRefs.entries() ) {
 
@@ -3738,8 +3780,7 @@ function validateCanonicalPresentation( route ) {
 		const preparationDependencyLeaseIds = [ ...new Set( preparation.requiredPreparationEdges.flatMap( ( edge ) => isTypedAbsence( edge.resourceLeaseRef ) ? [] : [ edge.resourceLeaseRef.leaseId ] ) ) ].sort();
 		const reactiveAndResetLeaseIds = [ ...new Set( [
 			...preparation.reactivePublications.flatMap( ( publication ) => isTypedAbsence( publication.resourceLeaseId ) ? [] : [ publication.resourceLeaseId ] ),
-			...preparation.resetDependencies.flatMap( ( action ) => isTypedAbsence( action.resourceLeaseId ) ? [] : [ action.resourceLeaseId ] ),
-			...preparation.resetActionResults.flatMap( ( result ) => [ result.inputHistoryLeaseRef, result.outputHistoryLeaseRef ].flatMap( ( ref ) => isTypedAbsence( ref ) ? [] : [ ref.leaseId ] ) )
+			...preparation.resetDependencies.flatMap( ( action ) => isTypedAbsence( action.resourceLeaseId ) ? [] : [ action.resourceLeaseId ] )
 		] ) ].sort();
 		const shadowCacheVisibilityLeaseIds = [ ...new Set( preparation.shadowViewPublicationRefs.flatMap( ( ref ) => ref.resourceLeaseRefs.map( ( leaseRef ) => leaseRef.leaseId ) ) ) ].sort();
 		const exactRequiredLeaseIds = [ ...new Set( [ ...pairStateHandleLeaseIds, ...preparationDependencyLeaseIds, ...reactiveAndResetLeaseIds, ...shadowCacheVisibilityLeaseIds ] ) ].sort();
@@ -3773,16 +3814,18 @@ function validateCanonicalExecution( execution, route, presentation ) {
 	const exactTargetKeys = Object.keys( route.physicsCameraViewPublicationsByTarget ).sort();
 	assert.deepEqual( [ ...execution.requiredTargetViewKeys ].sort(), exactTargetKeys, 'frameExecutionRecord.requiredTargetViewKeys must equal the camera target/view set' );
 	assert.deepEqual( Object.keys( execution.targetExecutions ).sort(), exactTargetKeys, 'frameExecutionRecord must contain exactly one target execution per camera target/view' );
+	const allTargetPreSealAbort = execution.overallStatus === 'aborted' && Object.values( execution.targetExecutions ).every( ( target ) => [ 'failed', 'aborted' ].includes( target.status ) && isTypedAbsence( target.snapshotId ) );
 	assert.ok( execution.snapshotIds.every( ( id ) => presentation.snapshotIds.has( id ) ), 'frameExecutionRecord references unknown snapshot' );
 	assert.deepEqual( [ ...execution.snapshotIds ].sort(), Object.values( route.physicsPresentationSnapshotsByTarget ).map( ( snapshot ) => snapshot.snapshotId ).sort(), 'frameExecutionRecord.snapshotIds must equal every actually sealed route snapshot' );
 	const targetSnapshotIds = Object.values( execution.targetExecutions ).filter( ( target ) => ! isTypedAbsence( target.snapshotId ) ).map( ( target ) => target.snapshotId ).sort();
 	assert.deepEqual( [ ...execution.snapshotIds ].sort(), targetSnapshotIds, 'frameExecutionRecord.snapshotIds must equal successful target snapshot IDs exactly' );
 	const cohort = requireAbiRecord( execution.cohortAdmission, 'FrameCohortAdmission', 'frameExecutionRecord.cohortAdmission' );
-	assert.equal( cohort.status, 'admitted', 'frameExecutionRecord cannot submit a rejected cohort' );
+	assert.equal( cohort.status, allTargetPreSealAbort ? 'rejected' : 'admitted', 'frameExecutionRecord cohort admission status disagrees with its submission outcome' );
 	assert.equal( cohort.timeCohortId, execution.timeCohortId, 'frameExecutionRecord.cohortAdmission time-cohort mismatch' );
 	assert.deepEqual( [ ...cohort.requiredTargetViewKeys ].sort(), exactTargetKeys, 'frameExecutionRecord.cohortAdmission target closure mismatch' );
 	assert.deepEqual( [ ...cohort.candidateIds ].sort(), [ ...execution.candidateIds ].sort(), 'frameExecutionRecord.cohortAdmission Candidate closure mismatch' );
 	assert.deepEqual( [ ...cohort.snapshotIds ].sort(), [ ...execution.snapshotIds ].sort(), 'frameExecutionRecord.cohortAdmission snapshot closure mismatch' );
+	if ( allTargetPreSealAbort ) assert.deepEqual( [ execution.renderPlans, execution.slotAdmissions, cohort.renderPlanIds ], [ [], [], [] ], 'all-target pre-seal abort cannot seal plans or admit slots' );
 	assert.ok( canonicalDurationSecondsValue( cohort.observedMaximumSkew, route.physicsContext, 'frameExecutionRecord.cohortAdmission.observedMaximumSkew' ) <= canonicalDurationSecondsValue( presentation.timeCohort.maximumInterContextSkew, route.physicsContext, 'presentationTimeCohort.maximumInterContextSkew' ), 'frameExecutionRecord.cohortAdmission observed skew exceeds the cohort gate' );
 	const plansById = new Map();
 	for ( const [ index, plan ] of execution.renderPlans.entries() ) {
@@ -3845,6 +3888,7 @@ function validateCanonicalExecution( execution, route, presentation ) {
 			assert.deepEqual( target.completionTokens, [], `${ label } pre-seal failure cannot fabricate completion tokens` );
 			assert.ok( isTypedAbsence( target.renderPlanId ) && isTypedAbsence( target.slotAdmissionId ), `${ label } pre-seal failure cannot fabricate a plan or slot admission` );
 			assert.ok( isTypedAbsence( target.presentedTimestamp ), `${ label } pre-seal failure cannot have a presented timestamp` );
+			assert.ok( isTypedAbsence( target.loss ), `${ label } pre-seal failure cannot fabricate device-loss identity` );
 			assert.ok( ! isTypedAbsence( target.failure ), `${ label } pre-seal failure lacks a failure record` );
 
 		} else {
@@ -3857,16 +3901,37 @@ function validateCanonicalExecution( execution, route, presentation ) {
 			assert.ok( plan && `${ plan.presentationTargetId }/${ plan.viewId }` === key, `${ label} references the wrong render plan` );
 			assert.ok( slot && `${ slot.presentationTargetId }/${ slot.viewId }` === key, `${ label} references the wrong frame slot` );
 			assert.deepEqual( target.submittedPasses, plan.phaseRecords.map( ( phase ) => phase.passOrDispatchKey ), `${ label}.submittedPasses do not realize the immutable plan` );
-			assert.deepEqual( target.resetActionResults, route.physicsViewPreparationPublicationsByTarget[ key ].resetActionResults, `${ label}.resetActionResults mismatch` );
 			assert.ok( target.queueSubmissionEpochs.length > 0 && target.queueSubmissionEpochs.every( ( epoch ) => typeof epoch === 'string' && epoch.length > 0 ), `${ label } sealed target lacks queue-submission evidence` );
+			const preparation = route.physicsViewPreparationPublicationsByTarget[ key ];
+			const resetActionsById = new Map( preparation.resetDependencies.map( ( action ) => [ action.actionId, action ] ) );
+			assertUnique( target.resetActionResults.map( ( result ) => result.resultId ), `${ label}.resetActionResults result IDs` );
+			assertUnique( target.resetActionResults.map( ( result ) => result.actionId ), `${ label}.resetActionResults action IDs` );
+			for ( const [ index, result ] of target.resetActionResults.entries() ) {
+
+				const action = resetActionsById.get( result.actionId );
+				assert.ok( action, `${ label}.resetActionResults[${ index }] references an unplanned reset action` );
+				validateResetActionResult( result, action, presentation.leasesById, route.physicsCameraViewPublicationsByTarget[ key ], plan, target, `${ label}.resetActionResults[${ index }]` );
+
+			}
+			assert.ok( target.resetActionResults.every( ( result ) => [ 'completed', 'bypassed-with-proof' ].includes( result.status ) ), `${ label}.resetActionResults contain a non-terminal-success result` );
 			if ( target.status === 'device-lost' ) {
 
+				requireObjectKeys( target.loss, [ 'deviceId', 'backendGeneration', 'deviceLossGeneration', 'lossTransactionId' ], `${ label}.loss` );
+				assert.equal( target.loss.backendGeneration, execution.backendGeneration, `${ label}.loss backend generation mismatch` );
+				requireNonEmptyString( target.loss.lossTransactionId, `${ label}.loss.lossTransactionId` );
+				assert.ok( keyedSnapshot.resourceLeaseRefs.some( ( ref ) => {
+
+					const lease = presentation.leasesById.get( ref.leaseId );
+					return lease.deviceId === target.loss.deviceId && lease.deviceLossGeneration === target.loss.deviceLossGeneration;
+
+				} ), `${ label}.loss does not match a resource generation consumed by this target` );
 				assert.ok( ! isTypedAbsence( target.failure ), `${ label } device loss lacks a failure record` );
 				assert.deepEqual( target.completionTokens, [], `${ label } device loss cannot fabricate terminal completion tokens` );
 				assert.ok( isTypedAbsence( target.presentedTimestamp ), `${ label } loss-before-present cannot carry a presented timestamp` );
 
 			} else if ( target.status === 'submitted' ) {
 
+				assert.ok( isTypedAbsence( target.loss ), `${ label } submitted target carries device-loss identity` );
 				assert.ok( isTypedAbsence( target.failure ), `${ label } submitted target carries a failure` );
 				assert.deepEqual( target.completionTokens, [], `${ label } submitted target cannot carry completion tokens` );
 				assert.ok( isTypedAbsence( target.presentedTimestamp ), `${ label } submitted target cannot be marked presented` );
@@ -3874,6 +3939,8 @@ function validateCanonicalExecution( execution, route, presentation ) {
 			} else {
 
 				assert.equal( target.status, 'completed', `${ label } sealed target has unsupported status` );
+				assert.deepEqual( target.resetActionResults.map( ( result ) => result.actionId ).sort(), [ ...resetActionsById.keys() ].sort(), `${ label}.resetActionResults must close every planned reset action exactly once` );
+				assert.ok( isTypedAbsence( target.loss ), `${ label } completed target carries device-loss identity` );
 				assert.ok( isTypedAbsence( target.failure ), `${ label } completed target carries a failure` );
 				assert.ok( ! isTypedAbsence( target.presentedTimestamp ), `${ label } completed target lacks a presented timestamp` );
 				assert.ok( target.completionTokens.length > 0, `${ label } completed target lacks completion tokens` );
@@ -3900,6 +3967,7 @@ function validateCanonicalExecution( execution, route, presentation ) {
 	if ( execution.overallStatus === 'device-lost' ) assert.equal( targetStatuses.filter( ( status ) => status === 'device-lost' ).length, targetStatuses.length, 'device-lost status requires every target lost in the same execution' );
 	assert.deepEqual( Object.keys( execution.leaseDispositionById ).sort(), [ ...presentation.leasesById.keys() ].sort(), 'frameExecutionRecord must disposition every candidate lease by leaseId' );
 	const preSealFailedTargetKeys = new Set( Object.entries( execution.targetExecutions ).filter( ( [ , target ] ) => [ 'failed', 'aborted' ].includes( target.status ) && isTypedAbsence( target.snapshotId ) ).map( ( [ key ] ) => key ) );
+	const deviceLostTargets = new Map( Object.entries( execution.targetExecutions ).filter( ( [ , target ] ) => target.status === 'device-lost' ).map( ( [ key, target ] ) => [ key, target.loss ] ) );
 	for ( const [ leaseId, disposition ] of Object.entries( execution.leaseDispositionById ) ) {
 
 		const label = `frameExecutionRecord.leaseDispositionById.${ leaseId}`;
@@ -3911,17 +3979,17 @@ function validateCanonicalExecution( execution, route, presentation ) {
 		assert.deepEqual( disposition.completionJoin, lease.reuseProhibitedUntil, `${ label} completion join does not match the immutable lease join` );
 		assert.ok( disposition.consumingSnapshotIds.every( ( id ) => presentation.snapshotIds.has( id ) ), `${ label } references unknown consuming snapshot` );
 		assert.deepEqual( [ ...disposition.consumingSnapshotIds ].sort(), [ ...presentation.snapshotConsumersByLeaseId.get( leaseId ) ].sort(), `${ label } completion join omits or invents a snapshot consumer` );
-		if ( execution.overallStatus === 'device-lost' ) {
+		const matchingLosses = [ ...deviceLostTargets.values() ].filter( ( loss ) => loss.deviceId === lease.deviceId && loss.backendGeneration === execution.backendGeneration && loss.deviceLossGeneration === lease.deviceLossGeneration );
+		if ( matchingLosses.length > 0 ) {
 
 			assert.equal( disposition.disposition, 'invalidated-by-device-loss', `${ label } must invalidate on device loss` );
-			assert.equal( execution.deviceLossGeneration, lease.deviceLossGeneration, `${ label } does not identify the lost device generation` );
 			requireObjectKeys( disposition.retirementEvidence, [ 'lostDeviceLossGeneration', 'lostResourceGeneration' ], `${ label }.retirementEvidence` );
 			assert.equal( disposition.retirementEvidence.lostDeviceLossGeneration, lease.deviceLossGeneration, `${ label } loss-generation evidence mismatch` );
 			assert.equal( disposition.retirementEvidence.lostResourceGeneration, lease.resourceGeneration, `${ label } resource-generation evidence mismatch` );
 
 		} else {
 
-			const expectedCancelled = lease.reuseProhibitedUntil.presentationConsumers.filter( ( consumer ) => preSealFailedTargetKeys.has( `${ consumer.presentationTargetId }/${ consumer.viewId }` ) ).map( ( consumer ) => consumer.consumerKey ).sort();
+			const expectedCancelled = lease.reuseProhibitedUntil.presentationConsumers.filter( ( consumer ) => preSealFailedTargetKeys.has( `${ consumer.presentationTargetId }/${ consumer.viewId }` ) || deviceLostTargets.has( `${ consumer.presentationTargetId }/${ consumer.viewId }` ) ).map( ( consumer ) => consumer.consumerKey ).sort();
 			requireObjectKeys( disposition.retirementEvidence, [ 'completedConsumerKeys', 'cancelledConsumerKeys', 'joinResolution' ], `${ label }.retirementEvidence` );
 			assert.deepEqual( [ ...disposition.retirementEvidence.cancelledConsumerKeys ].sort(), expectedCancelled, `${ label } does not close aborted target reservations` );
 			const expectedCompleted = lease.reuseProhibitedUntil.requiredConsumerKeys.filter( ( key ) => ! expectedCancelled.includes( key ) ).sort();
@@ -3933,8 +4001,6 @@ function validateCanonicalExecution( execution, route, presentation ) {
 		}
 
 	}
-	if ( execution.overallStatus === 'device-lost' ) for ( const [ key, target ] of Object.entries( execution.targetExecutions ) ) assert.equal( target.status, 'device-lost', `frameExecutionRecord.targetExecutions.${ key} must identify the affected target as device-lost` );
-
 }
 
 function validateCanonicalCostLedger( ledger, graph, context, route ) {
@@ -4207,9 +4273,11 @@ function validateCanonicalCostLedger( ledger, graph, context, route ) {
 	assert.deepEqual( [ ...representativeExecutionIds ].sort(), expectedRepresentativeIds.sort(), 'work attribution omits or invents representative graph/render work' );
 	requireObjectKeys( ledger.multiviewAndFramesInFlightMultipliers, [ 'viewCount', 'framesInFlight', 'resourceMultiplier', 'workMultiplier' ], 'physicsCostLedger.multiviewAndFramesInFlightMultipliers' );
 	assert.equal( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.viewCount, 'physicsCostLedger.viewCount' ), ledger.presentationTargetsAndViews.length, 'physicsCostLedger view multiplier disagrees with target/view closure' );
-	const configuredFramesInFlight = route.frameExecutionRecord.slotAdmissions.map( ( admission ) => admission.configuredMaximumFramesInFlight );
-	assert.ok( configuredFramesInFlight.length > 0, 'physicsCostLedger has no admitted frame slot' );
-	assert.equal( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.framesInFlight, 'physicsCostLedger.framesInFlight' ), Math.max( ...configuredFramesInFlight ), 'physicsCostLedger frames-in-flight multiplier disagrees with the maximum admitted slot capacity' );
+	const configuredFramesInFlight = route.frameExecutionRecord.slotAdmissions.length > 0
+		? route.frameExecutionRecord.slotAdmissions.map( ( admission ) => admission.configuredMaximumFramesInFlight )
+		: Object.values( route.frameExecutionRecord.cohortAdmission.configuredMaximumFramesInFlightByTarget );
+	assert.ok( configuredFramesInFlight.length > 0, 'physicsCostLedger has no configured frame-slot capacity' );
+	assert.equal( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.framesInFlight, 'physicsCostLedger.framesInFlight' ), Math.max( ...configuredFramesInFlight ), 'physicsCostLedger frames-in-flight multiplier disagrees with the configured target capacity' );
 	assert.ok( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.resourceMultiplier, 'physicsCostLedger.resourceMultiplier' ) >= 1, 'resource multiplier cannot erase live resources' );
 	assert.ok( quantityValue( ledger.multiviewAndFramesInFlightMultipliers.workMultiplier, 'physicsCostLedger.workMultiplier' ) >= 1, 'work multiplier cannot erase submitted work' );
 	assert.equal( quantityValue( ledger.thermalPowerState.duration, 'physicsCostLedger.thermalPowerState.duration' ), exactDuration, 'thermal/power evidence does not span the exact trace duration' );
@@ -5761,15 +5829,6 @@ function attachCanonicalPresentation( route, clocks ) {
 		const inputHistoryGeneration = typedAbsence( 'unavailable', '$threejs-image-pipeline', 'timeless', 'history reset does not preserve an input generation' );
 		const outputHistoryGeneration = `${ viewLeases[ key ].resourceGeneration }/reset-42`;
 		const resetAction = { actionId, owner: '$threejs-image-pipeline', historyKey: `${ key}/water-history/r185`, presentationTargetId: c.presentationTargetId, viewId: c.viewId, causeEpochs: [ `water-${ key}-42` ], affectedRegion: clone( affectedRegion ), policy: 'reset', capabilityGate: 'mask-capable-or-full-frame-promoted', dependencies: [], executionStrategy: 'history-clear-before-temporal-consumer', resourceLeaseId: viewLease, inputHistoryLeaseRef: typedAbsence( 'unavailable', '$threejs-image-pipeline' ), expectedInputHistoryGeneration: inputHistoryGeneration, expectedOutputHistoryGeneration: outputHistoryGeneration, expectedPolicyResult: 'cleared-before-first-temporal-read' };
-		const resetActionResult = {
-			resultId: `reset-result-${ key}`, actionId, presentationTargetId: c.presentationTargetId, viewId: c.viewId,
-			historyKey: resetAction.historyKey, causeEpochs: [ ...resetAction.causeEpochs ], appliedRegion: clone( affectedRegion ), policyApplied: 'reset',
-			inputHistoryLeaseRef: typedAbsence( 'unavailable', '$threejs-image-pipeline' ), outputHistoryLeaseRef: leaseRef( viewLease ),
-			inputHistoryGeneration, outputHistoryGeneration,
-			dependencyCompletionRefs: [ { completionId: `reset-completion-${ key}`, dependencyId, receiptDigest: `sha256:reset-completion-${ key}` } ],
-			queueSubmissionEpoch: 'submit-42', status: 'completed', residualAndError: { residual: evidence( 0, 'ratio', 'Measured', 'fixture-history-clear' ), error: fixtureError( 'ratio', 0, 'fixture-history-clear' ) },
-			failure: typedAbsence( 'not-applicable', '$threejs-image-pipeline' ), resultDigest: `sha256:reset-result-${ key}`
-		};
 		const preparationEdge = {
 			edgeId: preparationEdgeId, producerPublicationId: `reactive-water-${ key}`, consumerPublicationId: `preparation-${ key}`,
 			requiredContentIdAndVersion: { sourceId: 'water-surface-state', sourceVersion: 'water-42' }, resourceLeaseRef: leaseRef( viewLease ),
@@ -5790,7 +5849,7 @@ function attachCanonicalPresentation( route, clocks ) {
 			shadowViewPublicationRefs: [ { shadowOwner: '$threejs-scalable-real-time-shadows', shadowViewId: `shadow-${ key}`, presentationTargetId: c.presentationTargetId, receiverViewId: c.viewId, cameraPublicationId: c.cameraPublicationId, cameraProjectionRevision: c.cameraProjectionRevision, shadowContentEpoch: `shadow-${ key}-42`, shadowFactorProvenance: { shadowFactorId, shadowViewId: `shadow-${ key}`, lightIdAndStateVersion: 'sun@42', receiverViewId: c.viewId, receiverStateVersions: [ 'water-42', 'body-42' ], occluderPublicationRefs: [ `visibility-${ key}` ], candidateId: 'physics-candidate-42', cameraPublicationId: c.cameraPublicationId, encodingAndFilterRevision: 'shadow-factor-r16f-pcf-v2', factorSemantics: 'direct-light-visibility', applicationOwner: 'lighting-owner', applicationMultiplicity: 'exactly-once', contentDigest: `sha256:shadow-factor-${ key}` }, resourceLeaseRefs: [ leaseRef( viewLease ) ], boundedDelay: typedAbsence( 'not-applicable', '$threejs-scalable-real-time-shadows' ) } ],
 			cachePublicationRefs: [ { publicationId: `cache-${ key}`, publicationVersion: 'cache-v42' } ], reactiveEpochs: [ `water-${ key}-42` ],
 			reactivePublications: [ { sourceId: 'water-surface-state', sourceVersion: 'water-42', reactiveEpoch: `water-${ key}-42`, kind: 'optical', presentationTargetId: c.presentationTargetId, viewId: c.viewId, affectedRegion: clone( affectedRegion ), resourceLeaseId: viewLease, validity: 'valid for sealed preparation', error: fixtureError( 'ratio', 0.01, 'reactive-publication' ), plannedConsumerActions: [ actionId ] } ],
-			resetDependencies: [ resetAction ], resetActionResults: [ resetActionResult ], requiredPreparationEdges: [ preparationEdge ],
+			resetDependencies: [ resetAction ], requiredPreparationEdges: [ preparationEdge ],
 			resourceLeases: [ viewLeases[ key ] ], resourceLeaseRefs: [ leaseRef( 'water-current' ), leaseRef( 'body-current' ), leaseRef( viewLease ) ],
 			renderResourceLeases: [ renderResourceLease ]
 		};
@@ -5853,6 +5912,7 @@ function attachCanonicalPresentation( route, clocks ) {
 			requiredPreparationEdgeIds: preparation.requiredPreparationEdges.map( ( preparationEdge ) => preparationEdge.edgeId ),
 			renderResourceLeaseIds: preparation.renderResourceLeases.map( ( lease ) => lease.renderResourceLeaseId ), plannedResetActionIds: [ resetAction.actionId ],
 			expectedResetHistoryGenerations: { [ resetAction.actionId ]: { inputHistoryGeneration: historyInput, outputHistoryGeneration: historyOutput } },
+			resetActionPhaseById: { [ resetAction.actionId ]: resetPhaseId },
 			shadowFactorIds: preparation.shadowViewPublicationRefs.map( ( ref ) => ref.shadowFactorProvenance.shadowFactorId ),
 			closureDigest: route.physicsPresentationSnapshotsByTarget[ key ].closureManifest.closureDigest
 		};
@@ -5894,7 +5954,18 @@ function attachCanonicalPresentation( route, clocks ) {
 		const consumedLeaseIds = [ 'water-previous', 'water-current', 'body-previous', 'body-current', viewLease ];
 		const completionTokens = consumedLeaseIds.map( ( leaseId ) => leasesById.get( leaseId ).reuseProhibitedUntil.presentationConsumers.find( ( ref ) => ref.presentationTargetId === presentationTargetId && ref.viewId === viewId ) );
 		const plan = route.physicsPresentationRenderPlansByTarget[ key ];
-		return { snapshotId: id, renderPlanId: plan.renderPlanId, slotAdmissionId: slotByKey.get( key ).slotAdmissionId, presentationTargetId, viewId, status: 'completed', submittedPasses: plan.phaseRecords.map( ( phaseRecord ) => phaseRecord.passOrDispatchKey ), queueSubmissionEpochs: [ 'submit-42' ], actionResults: [ { status: 'all-plan-phases-completed', phaseIds: plan.phaseIds } ], resetActionResults: clone( route.physicsViewPreparationPublicationsByTarget[ key ].resetActionResults ), completionTokens, presentedTimestamp: clone( fixed42Half ), failure: typedAbsence( 'not-applicable', '$threejs-image-pipeline' ) };
+		const resetAction = route.physicsViewPreparationPublicationsByTarget[ key ].resetDependencies[ 0 ];
+		const executionPhaseId = plan.resetActionPhaseById[ resetAction.actionId ];
+		const resetActionResult = {
+			resultId: `reset-result-${ key}`, actionId: resetAction.actionId, renderPlanId: plan.renderPlanId, executionPhaseId, presentationTargetId, viewId,
+			historyKey: resetAction.historyKey, causeEpochs: [ ...resetAction.causeEpochs ], appliedRegion: clone( resetAction.affectedRegion ), policyApplied: resetAction.policy,
+			inputHistoryLeaseRef: clone( resetAction.inputHistoryLeaseRef ), outputHistoryLeaseRef: leaseRef( viewLease ),
+			inputHistoryGeneration: clone( resetAction.expectedInputHistoryGeneration ), outputHistoryGeneration: resetAction.expectedOutputHistoryGeneration,
+			dependencyCompletionRefs: plan.edges.filter( ( edge ) => edge.producerPhaseId === executionPhaseId ).map( ( edge ) => clone( edge.completionRef ) ),
+			queueSubmissionEpoch: 'submit-42', status: 'completed', residualAndError: { residual: evidence( 0, 'ratio', 'Measured', 'fixture-history-clear' ), error: fixtureError( 'ratio', 0, 'fixture-history-clear' ) },
+			failure: typedAbsence( 'not-applicable', '$threejs-image-pipeline' ), resultDigest: `sha256:reset-result-${ key}`
+		};
+		return { snapshotId: id, renderPlanId: plan.renderPlanId, slotAdmissionId: slotByKey.get( key ).slotAdmissionId, presentationTargetId, viewId, status: 'completed', submittedPasses: plan.phaseRecords.map( ( phaseRecord ) => phaseRecord.passOrDispatchKey ), queueSubmissionEpochs: [ 'submit-42' ], actionResults: [ { status: 'all-plan-phases-completed', phaseIds: plan.phaseIds } ], resetActionResults: [ resetActionResult ], completionTokens, presentedTimestamp: clone( fixed42Half ), loss: typedAbsence( 'not-applicable', '$threejs-image-pipeline' ), failure: typedAbsence( 'not-applicable', '$threejs-image-pipeline' ) };
 
 	};
 	route.frameExecutionRecord = { executionId: 'execution-42', timeCohortId: 'presentation-cohort-42', candidateIds: [ 'physics-candidate-42' ], cohortAdmission, renderPlans: clone( renderPlans ), slotAdmissions, requiredTargetViewKeys, snapshotIds: [ mainId, mapId ], overallStatus: 'completed', backendGeneration: 'backend-generation-1', deviceLossGeneration: 'device-generation-1', targetExecutions: { 'main/main-view': targetExecution( 'main/main-view', mainId, 'main-view' ), 'minimap/map-view': targetExecution( 'minimap/map-view', mapId, 'map-view' ) }, leaseDispositionById: Object.fromEntries( allLeases.map( ( lease ) => [ lease.leaseId, { disposition: 'retained-until-join', consumingSnapshotIds: lease.leaseId === 'main-view' ? [ mainId ] : lease.leaseId === 'map-view' ? [ mapId ] : [ mainId, mapId ], completionJoin: clone( lease.reuseProhibitedUntil ), retirementEvidence: { joinId: lease.reuseProhibitedUntil.joinId, joinDigest: lease.reuseProhibitedUntil.joinDigest, completedConsumerKeys: [ ...lease.reuseProhibitedUntil.requiredConsumerKeys ], cancelledConsumerKeys: [], joinResolution: 'completed-or-reservation-cancelled', status: 'all required consumers completed' } } ] ) ) };
@@ -6724,7 +6795,6 @@ function makeSingleViewNonWaterPhysicalRouteFixture( canonicalRoute ) {
 	rewriteStrings( frame.targetExecutions[ keepView ], [ [ 'water', 'gravity' ], [ 'body', 'probe' ] ] );
 	frame.targetExecutions[ keepView ].submittedPasses = plan.phaseRecords.map( ( phaseRecord ) => phaseRecord.passOrDispatchKey );
 	frame.targetExecutions[ keepView ].actionResults = [ { status: 'all-plan-phases-completed', phaseIds: [ ...plan.phaseIds ] } ];
-	frame.targetExecutions[ keepView ].resetActionResults = clone( preparation.resetActionResults );
 	frame.cohortAdmission.requiredTargetViewKeys = [ keepView ];
 	frame.cohortAdmission.snapshotIds = [ snapshot.snapshotId ];
 	frame.cohortAdmission.renderPlanIds = [ plan.renderPlanId ];
@@ -8011,7 +8081,9 @@ const semanticInvariantRejectCases = Object.freeze( {
 	validatePresentationCohortAndSlotAdmission: {
 		'prepared-version': semanticRouteCase( ( route ) => { route.physicsPresentationCandidate.commitProvenance.committedStateVersions[ 0 ].stateVersion = 'gravity-42/prepared'; } ),
 		'skew-over-gate': semanticRouteCase( ( route ) => { route.frameExecutionRecord.cohortAdmission.observedMaximumSkew.seconds.value = 0.01; } ),
-		'occupied-slot': semanticRouteCase( ( route ) => { route.frameExecutionRecord.slotAdmissions[ 0 ].observedFramesInFlightAtAdmission = route.frameExecutionRecord.slotAdmissions[ 0 ].configuredMaximumFramesInFlight; } )
+		'occupied-slot': semanticRouteCase( ( route ) => { route.frameExecutionRecord.slotAdmissions[ 0 ].observedFramesInFlightAtAdmission = route.frameExecutionRecord.slotAdmissions[ 0 ].configuredMaximumFramesInFlight; } ),
+		'camera-cohort-instant-drift': semanticRouteCase( ( route ) => { route.physicsCameraViewPublicationsByTarget[ 'main/main-view' ].previousRenderSampleInstant = clone( route.physicsPresentationTimeCohortsById[ 'presentation-cohort-42' ].currentRequestedPresentationInstant ); } ),
+		'jitter-sequence-drift': semanticRouteCase( ( route ) => { route.physicsCameraViewPublicationsByTarget[ 'main/main-view' ].currentJitterSampleAndConvention.sample.source = 'unrelated-jitter-sequence'; } )
 	},
 	validateImmutableRenderPlanClosure: {
 		'missing-edge': semanticRouteCase( ( route ) => {
@@ -8030,7 +8102,10 @@ const semanticInvariantRejectCases = Object.freeze( {
 
 		} ),
 		'history-generation-mismatch': semanticRouteCase( ( route ) => { route.physicsPresentationRenderPlansByTarget[ 'main/main-view' ].expectedResetHistoryGenerations[ 'reset-water-history-main/main-view' ].outputHistoryGeneration = 'stale-history-generation'; } ),
-		'duplicate-shadow-factor': semanticRouteCase( ( route ) => { const plan = route.physicsPresentationRenderPlansByTarget[ 'main/main-view' ]; plan.shadowFactorIds.push( plan.shadowFactorIds[ 0 ] ); } )
+		'duplicate-shadow-factor': semanticRouteCase( ( route ) => { const plan = route.physicsPresentationRenderPlansByTarget[ 'main/main-view' ]; plan.shadowFactorIds.push( plan.shadowFactorIds[ 0 ] ); } ),
+		'wrong-reset-phase-map': semanticRouteCase( ( route ) => { const plan = route.physicsPresentationRenderPlansByTarget[ 'main/main-view' ]; plan.resetActionPhaseById[ plan.plannedResetActionIds[ 0 ] ] = plan.phaseIds[ 1 ]; } ),
+		'reset-result-plan-mismatch': semanticRouteCase( ( route ) => { route.frameExecutionRecord.targetExecutions[ 'main/main-view' ].resetActionResults[ 0 ].renderPlanId = 'unrelated-render-plan'; } ),
+		'reset-result-queue-epoch-mismatch': semanticRouteCase( ( route ) => { route.frameExecutionRecord.targetExecutions[ 'main/main-view' ].resetActionResults[ 0 ].queueSubmissionEpoch = 'unsubmitted-reset-epoch'; } )
 	},
 	validateQualityRequestAndAllocationAdmission: {
 		'work-before-admission': semanticRouteCase( qualityTransitionRejectMutations[ 'work-before-admission' ] ),
@@ -8194,7 +8269,7 @@ abortedExecutionFixture.frameExecutionRecord.renderPlans = abortedExecutionFixtu
 abortedExecutionFixture.frameExecutionRecord.slotAdmissions = abortedExecutionFixture.frameExecutionRecord.slotAdmissions.filter( ( slot ) => `${ slot.presentationTargetId }/${ slot.viewId }` !== 'minimap/map-view' );
 abortedExecutionFixture.frameExecutionRecord.cohortAdmission.snapshotIds = abortedExecutionFixture.frameExecutionRecord.cohortAdmission.snapshotIds.filter( ( id ) => id !== abortedMapSnapshotId );
 abortedExecutionFixture.frameExecutionRecord.cohortAdmission.renderPlanIds = abortedExecutionFixture.frameExecutionRecord.cohortAdmission.renderPlanIds.filter( ( id ) => id !== abortedMapRenderPlanId );
-abortedExecutionFixture.frameExecutionRecord.targetExecutions[ 'minimap/map-view' ] = { snapshotId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before seal' ), renderPlanId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before plan sealing' ), slotAdmissionId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before slot admission' ), presentationTargetId: 'minimap', viewId: 'map-view', status: 'aborted', submittedPasses: [], queueSubmissionEpochs: [], actionResults: [], resetActionResults: [], completionTokens: [], presentedTimestamp: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'target was not presented' ), failure: { code: 'validation-abort', cause: 'fixture pre-seal abort' } };
+abortedExecutionFixture.frameExecutionRecord.targetExecutions[ 'minimap/map-view' ] = { snapshotId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before seal' ), renderPlanId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before plan sealing' ), slotAdmissionId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before slot admission' ), presentationTargetId: 'minimap', viewId: 'map-view', status: 'aborted', submittedPasses: [], queueSubmissionEpochs: [], actionResults: [], resetActionResults: [], completionTokens: [], presentedTimestamp: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'target was not presented' ), loss: typedAbsence( 'not-applicable', 'frame-execution-owner' ), failure: { code: 'validation-abort', cause: 'fixture pre-seal abort' } };
 for ( const [ leaseId, disposition ] of Object.entries( abortedExecutionFixture.frameExecutionRecord.leaseDispositionById ) ) {
 
 	disposition.consumingSnapshotIds = disposition.consumingSnapshotIds.filter( ( id ) => id !== abortedMapSnapshotId );
@@ -8211,6 +8286,81 @@ abortedExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
 abortedExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( abortedExecutionFixture );
 
+const candidatePairSubsetFixture = clone( coupledPhysicsFixture );
+const subsetTargetKey = 'minimap/map-view';
+const subsetSnapshot = candidatePairSubsetFixture.physicsPresentationSnapshotsByTarget[ subsetTargetKey ];
+const omittedPair = candidatePairSubsetFixture.physicsPresentationCandidate.presentedStatePairs.find( ( pair ) => pair.bindingId === 'body-binding' );
+const omittedLeaseIds = [ omittedPair.previousPresented.stateHandle.leaseId, omittedPair.currentPresented.stateHandle.leaseId ];
+subsetSnapshot.presentedStatePairRefs = [ 'water-binding' ];
+subsetSnapshot.resourceLeaseRefs = subsetSnapshot.resourceLeaseRefs.filter( ( ref ) => ! omittedLeaseIds.includes( ref.leaseId ) );
+subsetSnapshot.closureManifest.pairStateHandleLeaseIds = subsetSnapshot.closureManifest.pairStateHandleLeaseIds.filter( ( leaseId ) => ! omittedLeaseIds.includes( leaseId ) );
+subsetSnapshot.closureManifest.exactRequiredLeaseIds = subsetSnapshot.closureManifest.exactRequiredLeaseIds.filter( ( leaseId ) => ! omittedLeaseIds.includes( leaseId ) );
+subsetSnapshot.closureManifest.closureDigest = closureManifestDigest( subsetSnapshot.closureManifest );
+candidatePairSubsetFixture.physicsViewPreparationPublicationsByTarget[ subsetTargetKey ].resourceLeaseRefs = candidatePairSubsetFixture.physicsViewPreparationPublicationsByTarget[ subsetTargetKey ].resourceLeaseRefs.filter( ( ref ) => ! omittedLeaseIds.includes( ref.leaseId ) );
+for ( const lease of candidatePairSubsetFixture.physicsPresentationCandidate.resourceLeases.filter( ( candidateLease ) => omittedLeaseIds.includes( candidateLease.leaseId ) ) ) {
+
+	lease.reuseProhibitedUntil.presentationConsumers = lease.reuseProhibitedUntil.presentationConsumers.filter( ( token ) => `${ token.presentationTargetId }/${ token.viewId }` !== subsetTargetKey );
+	lease.reuseProhibitedUntil.requiredConsumerKeys = [ ...lease.reuseProhibitedUntil.simulationConsumers, ...lease.reuseProhibitedUntil.couplingConsumers, ...lease.reuseProhibitedUntil.externalConsumers, ...lease.reuseProhibitedUntil.presentationConsumers ].map( ( token ) => token.consumerKey ).sort();
+	lease.reuseProhibitedUntil.joinDigest = completionJoinDigest( lease.reuseProhibitedUntil );
+	const disposition = candidatePairSubsetFixture.frameExecutionRecord.leaseDispositionById[ lease.leaseId ];
+	disposition.consumingSnapshotIds = disposition.consumingSnapshotIds.filter( ( snapshotId ) => snapshotId !== subsetSnapshot.snapshotId );
+	disposition.completionJoin = clone( lease.reuseProhibitedUntil );
+	disposition.retirementEvidence = { joinId: lease.reuseProhibitedUntil.joinId, joinDigest: lease.reuseProhibitedUntil.joinDigest, completedConsumerKeys: [ ...lease.reuseProhibitedUntil.requiredConsumerKeys ], cancelledConsumerKeys: [], joinResolution: 'completed-or-reservation-cancelled', status: 'all required consumers completed' };
+
+}
+candidatePairSubsetFixture.frameExecutionRecord.targetExecutions[ subsetTargetKey ].completionTokens = candidatePairSubsetFixture.frameExecutionRecord.targetExecutions[ subsetTargetKey ].completionTokens.filter( ( token ) => ! omittedLeaseIds.some( ( leaseId ) => token.consumerKey.endsWith( `/${ leaseId }` ) ) );
+const subsetPlan = candidatePairSubsetFixture.physicsPresentationRenderPlansByTarget[ subsetTargetKey ];
+subsetPlan.closureDigest = subsetSnapshot.closureManifest.closureDigest;
+subsetPlan.immutablePlanDigest = renderPlanDigest( subsetPlan );
+candidatePairSubsetFixture.frameExecutionRecord.renderPlans = candidatePairSubsetFixture.frameExecutionRecord.renderPlans.map( ( plan ) => plan.renderPlanId === subsetPlan.renderPlanId ? clone( subsetPlan ) : plan );
+candidatePairSubsetFixture.physicsQualityRequests = {};
+candidatePairSubsetFixture.physicsQualityStates = {};
+candidatePairSubsetFixture.physicsQualityTransitions = [];
+candidatePairSubsetFixture.physicsCostLedger.qualityCostEvidence = [];
+candidatePairSubsetFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
+validateRouteManifest( candidatePairSubsetFixture );
+
+const allTargetPreSealAbortFixture = clone( coupledPhysicsFixture );
+allTargetPreSealAbortFixture.physicsPresentationSnapshotsByTarget = {};
+allTargetPreSealAbortFixture.physicsPresentationRenderPlansByTarget = {};
+allTargetPreSealAbortFixture.frameExecutionRecord.overallStatus = 'aborted';
+allTargetPreSealAbortFixture.frameExecutionRecord.snapshotIds = [];
+allTargetPreSealAbortFixture.frameExecutionRecord.renderPlans = [];
+allTargetPreSealAbortFixture.frameExecutionRecord.slotAdmissions = [];
+allTargetPreSealAbortFixture.frameExecutionRecord.cohortAdmission.snapshotIds = [];
+allTargetPreSealAbortFixture.frameExecutionRecord.cohortAdmission.renderPlanIds = [];
+allTargetPreSealAbortFixture.frameExecutionRecord.cohortAdmission.status = 'rejected';
+for ( const [ key, priorTarget ] of Object.entries( allTargetPreSealAbortFixture.frameExecutionRecord.targetExecutions ) ) {
+
+	allTargetPreSealAbortFixture.frameExecutionRecord.targetExecutions[ key ] = {
+		snapshotId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'all-target abort before seal' ),
+		renderPlanId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'all-target abort before plan sealing' ),
+		slotAdmissionId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'all-target abort before slot admission' ),
+		presentationTargetId: priorTarget.presentationTargetId, viewId: priorTarget.viewId, status: 'aborted', submittedPasses: [], queueSubmissionEpochs: [], actionResults: [], resetActionResults: [], completionTokens: [],
+		presentedTimestamp: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'target was not presented' ), loss: typedAbsence( 'not-applicable', 'frame-execution-owner' ),
+		failure: { code: 'cohort-admission-abort', cause: 'fixture all-target pre-seal abort' }
+	};
+
+}
+for ( const disposition of Object.values( allTargetPreSealAbortFixture.frameExecutionRecord.leaseDispositionById ) ) {
+
+	disposition.consumingSnapshotIds = [];
+	const cancelledConsumerKeys = disposition.completionJoin.presentationConsumers.map( ( consumer ) => consumer.consumerKey ).sort();
+	const completedConsumerKeys = disposition.completionJoin.requiredConsumerKeys.filter( ( key ) => ! cancelledConsumerKeys.includes( key ) ).sort();
+	disposition.retirementEvidence = { joinId: disposition.completionJoin.joinId, joinDigest: disposition.completionJoin.joinDigest, completedConsumerKeys, cancelledConsumerKeys, joinResolution: 'completed-or-reservation-cancelled', status: 'all presentation reservations cancelled before seal' };
+
+}
+allTargetPreSealAbortFixture.physicsQualityRequests = {};
+allTargetPreSealAbortFixture.physicsQualityStates = {};
+allTargetPreSealAbortFixture.physicsQualityTransitions = [];
+allTargetPreSealAbortFixture.physicsCostLedger.qualityCostEvidence = [];
+allTargetPreSealAbortFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
+validateRouteManifest( allTargetPreSealAbortFixture );
+const fabricatedPreSealResetResult = clone( allTargetPreSealAbortFixture );
+fabricatedPreSealResetResult.frameExecutionRecord.targetExecutions[ 'main/main-view' ].resetActionResults = [ clone( coupledPhysicsFixture.frameExecutionRecord.targetExecutions[ 'main/main-view' ].resetActionResults[ 0 ] ) ];
+assert.throws( () => validateRouteManifest( fabricatedPreSealResetResult ), /pre-seal failure cannot execute reset actions/, 'all-target pre-seal abort accepted a fabricated reset result' );
+negativeCaseCount ++;
+
 const deviceLossExecutionFixture = clone( coupledPhysicsFixture );
 deviceLossExecutionFixture.frameExecutionRecord.overallStatus = 'device-lost';
 for ( const target of Object.values( deviceLossExecutionFixture.frameExecutionRecord.targetExecutions ) ) {
@@ -8219,6 +8369,7 @@ for ( const target of Object.values( deviceLossExecutionFixture.frameExecutionRe
 	target.completionTokens = [];
 	target.presentedTimestamp = typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'device lost before presentation completion' );
 	target.actionResults = [ { status: 'device-lost-after-submit', phaseIds: [] } ];
+	target.loss = { deviceId: 'fixture-webgpu-device', backendGeneration: 'backend-generation-1', deviceLossGeneration: 'device-generation-1', lossTransactionId: 'device-loss-transaction-42' };
 	target.failure = { code: 'device-lost', cause: 'fixture device-generation-1 loss' };
 
 }
@@ -8237,6 +8388,65 @@ deviceLossExecutionFixture.physicsQualityTransitions = [];
 deviceLossExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
 deviceLossExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
 validateRouteManifest( deviceLossExecutionFixture );
+const mismatchedDeviceLossGenerationFixture = clone( deviceLossExecutionFixture );
+mismatchedDeviceLossGenerationFixture.frameExecutionRecord.targetExecutions[ 'main/main-view' ].loss.deviceLossGeneration = 'unrelated-device-loss-generation';
+assert.throws( () => validateRouteManifest( mismatchedDeviceLossGenerationFixture ), /does not match a resource generation consumed by this target/, 'device-loss target accepted an unrelated lost generation' );
+negativeCaseCount ++;
+
+const mixedDeviceLossExecutionFixture = clone( coupledPhysicsFixture );
+const mixedLostKey = 'minimap/map-view';
+const mixedLostLeaseId = 'map-view';
+const mixedLostDeviceId = 'fixture-minimap-device';
+const mixedLostGeneration = 'minimap-device-generation-2';
+const mixedLostLease = mixedDeviceLossExecutionFixture.physicsViewPreparationPublicationsByTarget[ mixedLostKey ].resourceLeases.find( ( lease ) => lease.leaseId === mixedLostLeaseId );
+mixedLostLease.deviceId = mixedLostDeviceId;
+mixedLostLease.deviceLossGeneration = mixedLostGeneration;
+const rewriteMixedLostLeaseRef = ( value, visited = new WeakSet() ) => {
+
+	if ( value === null || typeof value !== 'object' || visited.has( value ) ) return;
+	visited.add( value );
+	if ( value.leaseId === mixedLostLeaseId ) {
+
+		if ( Object.hasOwn( value, 'deviceId' ) ) value.deviceId = mixedLostDeviceId;
+		if ( Object.hasOwn( value, 'deviceLossGeneration' ) ) value.deviceLossGeneration = mixedLostGeneration;
+		if ( Object.hasOwn( value, 'joinId' ) ) {
+
+			for ( const token of [ ...value.simulationConsumers, ...value.couplingConsumers, ...value.externalConsumers, ...value.presentationConsumers ] ) token.deviceLossGeneration = mixedLostGeneration;
+			value.joinDigest = completionJoinDigest( value );
+
+		}
+
+	}
+	for ( const child of Object.values( value ) ) rewriteMixedLostLeaseRef( child, visited );
+
+};
+rewriteMixedLostLeaseRef( mixedDeviceLossExecutionFixture );
+mixedDeviceLossExecutionFixture.frameExecutionRecord.overallStatus = 'partial-failure';
+mixedDeviceLossExecutionFixture.frameExecutionRecord.slotAdmissions.find( ( slot ) => `${ slot.presentationTargetId }/${ slot.viewId }` === mixedLostKey ).deviceLossGeneration = mixedLostGeneration;
+const mixedLostTarget = mixedDeviceLossExecutionFixture.frameExecutionRecord.targetExecutions[ mixedLostKey ];
+mixedLostTarget.status = 'device-lost';
+mixedLostTarget.completionTokens = [];
+mixedLostTarget.presentedTimestamp = typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'minimap device lost before presentation' );
+mixedLostTarget.actionResults = [ { status: 'device-lost-after-submit', phaseIds: [] } ];
+mixedLostTarget.loss = { deviceId: mixedLostDeviceId, backendGeneration: mixedDeviceLossExecutionFixture.frameExecutionRecord.backendGeneration, deviceLossGeneration: mixedLostGeneration, lossTransactionId: 'minimap-device-loss-transaction-42' };
+mixedLostTarget.failure = { code: 'device-lost', cause: 'fixture isolated minimap device loss' };
+const mixedLostDisposition = mixedDeviceLossExecutionFixture.frameExecutionRecord.leaseDispositionById[ mixedLostLeaseId ];
+mixedLostDisposition.disposition = 'invalidated-by-device-loss';
+mixedLostDisposition.retirementEvidence = { lostDeviceLossGeneration: mixedLostGeneration, lostResourceGeneration: mixedLostLease.resourceGeneration };
+for ( const [ leaseId, disposition ] of Object.entries( mixedDeviceLossExecutionFixture.frameExecutionRecord.leaseDispositionById ) ) {
+
+	if ( leaseId === mixedLostLeaseId ) continue;
+	const cancelledConsumerKeys = disposition.completionJoin.presentationConsumers.filter( ( consumer ) => `${ consumer.presentationTargetId }/${ consumer.viewId }` === mixedLostKey ).map( ( consumer ) => consumer.consumerKey ).sort();
+	const completedConsumerKeys = disposition.completionJoin.requiredConsumerKeys.filter( ( key ) => ! cancelledConsumerKeys.includes( key ) ).sort();
+	disposition.retirementEvidence = { joinId: disposition.completionJoin.joinId, joinDigest: disposition.completionJoin.joinDigest, completedConsumerKeys, cancelledConsumerKeys, joinResolution: 'completed-or-reservation-cancelled', status: cancelledConsumerKeys.length > 0 ? 'lost target reservations cancelled' : 'all required consumers completed' };
+
+}
+mixedDeviceLossExecutionFixture.physicsQualityRequests = {};
+mixedDeviceLossExecutionFixture.physicsQualityStates = {};
+mixedDeviceLossExecutionFixture.physicsQualityTransitions = [];
+mixedDeviceLossExecutionFixture.physicsCostLedger.qualityCostEvidence = [];
+mixedDeviceLossExecutionFixture.physicsCostLedger.qualityMigrationCostEvidence = [];
+validateRouteManifest( mixedDeviceLossExecutionFixture );
 
 expectPhysicsReject( 'physics schema required context key', ( route ) => {
 
@@ -8587,11 +8797,21 @@ expectPhysicsReject( 'reactive affected region activates two union arms', ( rout
 	route.physicsViewPreparationPublicationsByTarget[ 'main/main-view' ].reactivePublications[ 0 ].affectedRegion.fullFrame = { reason: 'illegal second arm' };
 
 }, /fullFrame must use typed absence/ );
+expectPhysicsReject( 'view preparation fabricates reset execution results', ( route ) => {
+
+	route.physicsViewPreparationPublicationsByTarget[ 'main/main-view' ].resetActionResults = [];
+
+}, /resetActionResults/ );
 expectPhysicsReject( 'sealed snapshot copies state pairs', ( route ) => {
 
 	route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].presentedStatePairs = [];
 
 }, /copies mutable presentedStatePairs/ );
+expectPhysicsReject( 'sealed snapshot selects no Candidate pair', ( route ) => {
+
+	route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].presentedStatePairRefs = [];
+
+}, /at least one Candidate pair/ );
 expectPhysicsReject( 'snapshot references unknown lease', ( route ) => {
 
 	route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].resourceLeaseRefs[ 0 ].leaseId = 'missing-lease';
@@ -8603,6 +8823,16 @@ expectPhysicsReject( 'target execution swaps multiview snapshots', ( route ) => 
 	route.frameExecutionRecord.targetExecutions[ 'minimap/map-view' ].snapshotId = route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].snapshotId;
 
 }, /swaps another target\/view snapshot/ );
+expectPhysicsReject( 'completed target omits a planned reset result', ( route ) => {
+
+	route.frameExecutionRecord.targetExecutions[ 'main/main-view' ].resetActionResults = [];
+
+}, /must close every planned reset action/ );
+expectPhysicsReject( 'reset result names an unrelated phase completion', ( route ) => {
+
+	route.frameExecutionRecord.targetExecutions[ 'main/main-view' ].resetActionResults[ 0 ].dependencyCompletionRefs[ 0 ].completionId = 'unrelated-render-completion';
+
+}, /outgoing edges/ );
 expectPhysicsReject( 'target execution uses overall-only partial-failure status', ( route ) => {
 
 	route.frameExecutionRecord.targetExecutions[ 'main/main-view' ].status = 'partial-failure';
@@ -8629,7 +8859,7 @@ expectPhysicsReject( 'aborted target fabricates completion token', ( route ) => 
 	delete route.physicsPresentationSnapshotsByTarget[ 'minimap/map-view' ];
 	route.frameExecutionRecord.overallStatus = 'partial-failure';
 	route.frameExecutionRecord.snapshotIds = [ route.physicsPresentationSnapshotsByTarget[ 'main/main-view' ].snapshotId ];
-	route.frameExecutionRecord.targetExecutions[ 'minimap/map-view' ] = { snapshotId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before seal' ), presentationTargetId: 'minimap', viewId: 'map-view', status: 'aborted', submittedPasses: [], queueSubmissionEpochs: [], actionResults: [], completionTokens: [ 'fake-complete' ], presentedTimestamp: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'target was not presented' ), failure: { code: 'validation-abort', cause: 'fixture pre-seal abort' } };
+	route.frameExecutionRecord.targetExecutions[ 'minimap/map-view' ] = { snapshotId: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'aborted before seal' ), renderPlanId: typedAbsence( 'unavailable', 'frame-execution-owner' ), slotAdmissionId: typedAbsence( 'unavailable', 'frame-execution-owner' ), presentationTargetId: 'minimap', viewId: 'map-view', status: 'aborted', submittedPasses: [], queueSubmissionEpochs: [], actionResults: [], resetActionResults: [], completionTokens: [ 'fake-complete' ], presentedTimestamp: typedAbsence( 'unavailable', 'frame-execution-owner', 'timeless', 'target was not presented' ), loss: typedAbsence( 'not-applicable', 'frame-execution-owner' ), failure: { code: 'validation-abort', cause: 'fixture pre-seal abort' } };
 	for ( const disposition of Object.values( route.frameExecutionRecord.leaseDispositionById ) ) disposition.consumingSnapshotIds = disposition.consumingSnapshotIds.filter( ( id ) => id !== abortedSnapshotId );
 	route.frameExecutionRecord.leaseDispositionById[ 'map-view' ].disposition = 'retired-after-abort';
 	route.frameExecutionRecord.leaseDispositionById[ 'map-view' ].completionJoin.presentationConsumers = [];
