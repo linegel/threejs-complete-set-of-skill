@@ -1,34 +1,9 @@
 import { makeSeededRngFromString } from '../../core/lcg.js';
+import { mutatePerceptualColor } from '../../core/locomotion/genome.js';
 import { validateSpec } from '../../core/spec-schema.js';
 
-function wrap01(v) {
-  return Math.max(0, Math.min(1, v));
-}
-
-function decodeHex(hex) {
-  const clean = hex.replace('#', '');
-  return {
-    r: parseInt(clean.slice(0, 2), 16) / 255,
-    g: parseInt(clean.slice(2, 4), 16) / 255,
-    b: parseInt(clean.slice(4, 6), 16) / 255,
-  };
-}
-
-function encodeHex(rgb) {
-  const clamp = (value) => Math.max(0, Math.min(1, value));
-  const channel = (value) => Math.max(0, Math.min(255, Math.round(clamp(value) * 255)));
-  return `#${channel(rgb.r).toString(16).padStart(2, '0')}${channel(rgb.g).toString(16).padStart(2, '0')}${channel(rgb.b).toString(16).padStart(2, '0')}`;
-}
-
 export function mutateLabColor(baseHex, amount, rng) {
-  const linear = decodeHex(baseHex);
-  const drift = (rng.nextFloat() - 0.5) * 2 * amount;
-  const rgb = {
-    r: wrap01(linear.r + drift * 0.45),
-    g: wrap01(linear.g + Math.sin(drift + 0.12) * amount * 0.3),
-    b: wrap01(linear.b + Math.cos(drift - 0.17) * amount * 0.3),
-  };
-  return encodeHex(rgb);
+	return mutatePerceptualColor(baseHex, amount, rng);
 }
 
 export function createGenomeSpec(baseSpec, options = {}) {
