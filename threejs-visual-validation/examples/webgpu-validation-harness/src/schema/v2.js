@@ -365,7 +365,11 @@ function validatePerformance( envelope, trace, manifest, contract ) {
 
 	const cpuP95 = numericValue( trace.sustained.cpuP95, 'frame-trace.json.sustained.cpuP95' );
 	const cpuGate = numericValue( envelope.cpuP95Gate, 'performance-envelope.json.cpuP95Gate' );
-	if ( cpuP95 > cpuGate ) throw new Error( `p95-overrun: CPU sustained p95 ${ cpuP95 } exceeds gate ${ cpuGate }.` );
+	if ( manifest.claimVerdicts.performanceCompliance === 'PASS' && cpuP95 > cpuGate ) {
+
+		throw new Error( `p95-overrun: CPU sustained p95 ${ cpuP95 } exceeds gate ${ cpuGate }.` );
+
+	}
 
 	if ( envelope.gpuTimingRequirement === 'required' ) {
 

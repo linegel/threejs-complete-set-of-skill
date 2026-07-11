@@ -76,6 +76,11 @@ async function validateIncompleteBrowserBundle() {
 		rendererInfo.backend = 'WebGPU';
 
 	} );
+	await mutateJson( dir, 'frame-trace.json', ( trace ) => {
+
+		trace.sustained.cpuP95 = authored( 20, 'ms' );
+
+	} );
 	const result = await validateV2ArtifactBundle( dir );
 	return { verdict: 'PASS', bundleKind: result.bundleKind, publishable: result.publishable, retainedFixture: dir };
 
@@ -175,6 +180,20 @@ export async function runV2MutationSuite() {
 		} ),
 		expectMutationRejects( 'p95-overrun', /p95-overrun/, async ( dir ) => {
 
+			await mutateJson( dir, 'evidence-manifest.json', ( manifest ) => {
+
+				manifest.bundleKind = 'browser-capture';
+				manifest.publishable = true;
+				manifest.backend.isWebGPUBackend = true;
+				manifest.backend.initialized = true;
+				for ( const claim of Object.keys( manifest.claimVerdicts ) ) manifest.claimVerdicts[ claim ] = 'PASS';
+
+			} );
+			await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
+
+				rendererInfo.backend = 'WebGPU';
+
+			} );
 			await mutateJson( dir, 'frame-trace.json', ( trace ) => {
 
 				trace.sustained.cpuP95 = authored( 20, 'ms' );
