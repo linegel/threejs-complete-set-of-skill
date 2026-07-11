@@ -17,3 +17,7 @@ export function towerShipRouteFromLocation({ pathname = '', search = '' } = {}) 
     tier: reconcileRoute('tier', params.get('tier'), pathnameRoute(pathname, 'tier')),
   });
 }
+
+export function towerShipInitialMode(route) {
+  return route?.mechanism ?? 'interaction';
+}

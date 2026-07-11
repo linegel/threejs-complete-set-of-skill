@@ -20,6 +20,7 @@ import {
   TOWER_SHIP_SCENARIOS,
   TOWER_SHIP_SEEDS,
 } from "./lab-controller.js";
+import { towerShipInitialMode } from "./route-state.js";
 import { validateTowerShipActionReady } from "./validate-action-ready.mjs";
 
 const sculptSpec = JSON.parse(readFileSync(new URL("./object-sculpt-spec.json", import.meta.url), "utf8"));
@@ -79,6 +80,8 @@ assert.deepEqual(TOWER_SHIP_SCENARIOS, {
   "staged-sculpt": "blockout",
   "action-ready": "interaction",
 });
+assert.equal(towerShipInitialMode({ mechanism: null }), "interaction", "general routes must expose animation without an extra mode selection");
+assert.equal(towerShipInitialMode({ mechanism: "final" }), "final", "fixed mechanism routes must remain deterministic");
 assert.equal(resolveTowerShipDpr("full", 3), TOWER_SHIP_DPR_CAPS.full);
 assert.equal(resolveTowerShipDpr("budgeted", 3), TOWER_SHIP_DPR_CAPS.budgeted);
 assert.equal(resolveTowerShipDpr("minimum", 3), TOWER_SHIP_DPR_CAPS.minimum);

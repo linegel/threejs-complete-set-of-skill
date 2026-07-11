@@ -71,7 +71,7 @@
       .mode-copy { margin: 14px 0; padding: 13px 0; border-block: 1px solid var(--line); }
       .mode-copy strong { display: block; margin-bottom: 5px; font-size: 13px; }
       .mode-copy span { display: block; color: var(--muted); font-size: 11px; line-height: 1.45; }
-      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .metric { padding: 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.035); }
       .metric b { display: block; font: 660 15px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace; }
       .metric span { color: var(--muted); font-size: 9px; text-transform: uppercase; }
@@ -127,6 +127,7 @@
         <div class="metric"><b id="metric-nodes">—</b><span>nodes</span></div>
         <div class="metric"><b id="metric-triangles">—</b><span>triangles</span></div>
         <div class="metric"><b id="metric-oars">—</b><span>oars</span></div>
+        <div class="metric"><b id="metric-motion">—</b><span>motion</span></div>
       </div>
       <button id="compare" type="button" aria-pressed="false">Compare reference</button>
     </aside>

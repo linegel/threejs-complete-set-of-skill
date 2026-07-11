@@ -5,7 +5,7 @@ import {
   TOWER_SHIP_TIERS,
 } from "./lab-controller.js";
 import { createTowerShipFrameDriver, towerShipFrameOwner } from "./frame-driver.js";
-import { towerShipRouteFromLocation } from "./route-state.js";
+import { towerShipInitialMode, towerShipRouteFromLocation } from "./route-state.js";
 
 const MODE_COPY = Object.freeze({
   final: ["Final reconstruction", "Reference-shaped geometry, mixed materials, and authored light."],
@@ -29,6 +29,7 @@ const modeDescription = document.querySelector("#mode-description");
 const metricNodes = document.querySelector("#metric-nodes");
 const metricTriangles = document.querySelector("#metric-triangles");
 const metricOars = document.querySelector("#metric-oars");
+const metricMotion = document.querySelector("#metric-motion");
 const referencePanel = document.querySelector("#reference-panel");
 const referenceImage = document.querySelector("#reference-image");
 const compareButton = document.querySelector("#compare");
@@ -41,7 +42,7 @@ if (route.tier && !TOWER_SHIP_TIERS.includes(route.tier)) throw new RangeError(`
 addOptions(modeSelect, TOWER_SHIP_MODES);
 addOptions(tierSelect, TOWER_SHIP_TIERS);
 addOptions(cameraSelect, TOWER_SHIP_CAMERAS);
-if (route.mechanism) modeSelect.value = route.mechanism;
+modeSelect.value = towerShipInitialMode(route);
 if (route.tier) tierSelect.value = route.tier;
 modeSelect.disabled = Boolean(route.mechanism);
 tierSelect.disabled = Boolean(route.tier);
@@ -70,6 +71,7 @@ function updateHud(metrics) {
   metricNodes.textContent = metrics.nodes.toLocaleString();
   metricTriangles.textContent = Math.round(metrics.triangles).toLocaleString();
   metricOars.textContent = metrics.oars;
+  metricMotion.textContent = metrics.mode === "interaction" ? `${metrics.time.toFixed(1)}s` : "frozen";
 }
 
 function reportRuntimeError(error) {
