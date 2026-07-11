@@ -30,14 +30,38 @@ test('shared capture profiles freeze the prescribed dimensions', () => {
   assert.equal(Object.isFrozen(CAPTURE_PROFILES.correctness), true);
 });
 
-test('shared capture recognizes canonical native-WebGPU metric spellings', () => {
-  assert.equal(backendProven({ backend: 'webgpu' }), true);
-  assert.equal(backendProven({ backendIsWebGPU: true }), true);
-  assert.equal(backendProven({ nativeWebGPU: true }), true);
-  assert.equal(backendProven({ renderer: { isWebGPUBackend: true } }), true);
-  assert.equal(backendProven({ rendererBackend: 'WebGPU' }), true);
-  assert.equal(backendProven({ rendererInfo: { backend: { isWebGPUBackend: true } } }), true);
-  assert.equal(backendProven({ backend: 'webgl', nativeWebGPU: false }), false);
+test('shared capture requires one consistent initialized native-WebGPU device identity', () => {
+  const proof = {
+    backend: 'webgpu',
+    backendKind: 'webgpu',
+    nativeWebGPU: true,
+    initialized: true,
+    rendererInfo: { rendererType: 'WebGPURenderer', backendType: 'WebGPUBackend' },
+    rendererBackendEvidence: {
+      backendKind: 'webgpu',
+      backendType: 'WebGPUBackend',
+      deviceType: 'GPUDevice',
+      deviceIdentitySource: 'renderer.backend.device-after-init',
+      deviceIdentityVerified: true,
+      lossPromiseObservedOnActualDevice: true,
+      rendererDeviceGeneration: 1,
+    },
+    rendererDeviceStatus: 'active',
+    rendererDeviceGeneration: 1,
+    deviceLossGeneration: 0,
+  };
+  assert.equal(backendProven(proof), true);
+  for (const forged of [
+    { backend: 'webgpu' },
+    { nativeWebGPU: true },
+    { initialized: true },
+    { rendererInfo: { rendererType: 'WebGPURenderer', backendType: 'WebGPUBackend' } },
+    { rendererBackendEvidence: proof.rendererBackendEvidence },
+  ]) assert.equal(backendProven(forged), false);
+  assert.equal(backendProven({ ...proof, backend: 'webgl' }), false);
+  assert.equal(backendProven({ ...proof, nativeWebGPU: false }), false);
+  assert.equal(backendProven({ ...proof, rendererBackendEvidence: { ...proof.rendererBackendEvidence, deviceIdentityVerified: false } }), false);
+  assert.equal(backendProven({ ...proof, rendererDeviceGeneration: 2 }), false);
 });
 
 test('shared capture rejects unknown profiles before starting a browser', async () => {

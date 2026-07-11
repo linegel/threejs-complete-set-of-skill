@@ -1,12 +1,17 @@
 #!/usr/bin/env node
+import { createHash } from 'node:crypto';
 import {
   existsSync,
+  lstatSync,
   mkdirSync,
+  readFileSync,
+  realpathSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { platform } from 'node:os';
 import {
+  dirname,
   isAbsolute,
   join,
   relative,
@@ -16,7 +21,11 @@ import {
 import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { createServer } from 'vite';
-import { unpackAlignedRows } from '../labs/runtime/aligned-readback.mjs';
+import {
+  WEBGPU_COPY_BYTES_PER_ROW_ALIGNMENT,
+  alignedBytesPerRow,
+  unpackAlignedRows,
+} from '../labs/runtime/aligned-readback.mjs';
 import {
   PRIMARY_DEMO_KINDS,
   REPO_ROOT,
@@ -38,6 +47,26 @@ export const LAB_CONTROLLER_GLOBALS = Object.freeze([
   '__THREEJS_LAB__',
   '__THREE_LAB__',
 ]);
+
+export const STANDARD_CAPTURE_OUTPUTS = Object.freeze([
+  'final.design.png',
+  'no-post.design.png',
+  'diagnostics.mosaic.png',
+  'camera.near.png',
+  'camera.design.png',
+  'camera.far.png',
+  'seed-0001.final.png',
+  'seed-9e3779b9.final.png',
+  'temporal.t000.png',
+  'temporal.t001.png',
+]);
+
+const CAPTURED_OUTPUT = 'CAPTURED';
+const NOT_APPLICABLE_OUTPUT = 'NOT_APPLICABLE';
+const CAPTURE_OUTPUT_STATUSES = new Set([CAPTURED_OUTPUT, NOT_APPLICABLE_OUTPUT]);
+const STANDARD_CAPTURE_OUTPUT_SET = new Set(STANDARD_CAPTURE_OUTPUTS);
+const EXPECTED_THREE_PACKAGE_REVISION = '0.185.1';
+const EXPECTED_THREE_RUNTIME_REVISION = '185';
 
 export function chromiumWebGpuLaunchArgs() {
   const args = ['--enable-unsafe-webgpu', '--disable-gpu-sandbox'];
@@ -66,17 +95,207 @@ function parseCli(argv) {
   };
 }
 
+export function buildCaptureUrl({ port, browserEntry, profile }) {
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) throw new RangeError('capture server port is invalid');
+  if (typeof browserEntry !== 'string' || browserEntry.length === 0) throw new TypeError('capture browserEntry is required');
+  if (!CAPTURE_PROFILES[profile]) throw new Error(`unknown capture profile: ${profile}`);
+  const browserPath = browserEntry.split('/').map(encodeURIComponent).join('/');
+  return `http://127.0.0.1:${port}/${browserPath}?capture=1&profile=${encodeURIComponent(profile)}`;
+}
+
 function isWithin(path, parent) {
   const result = relative(parent, path);
   return result === '' || (!result.startsWith(`..${sep}`) && result !== '..' && !isAbsolute(result));
 }
 
+export function assertSymlinkConfinedPath(candidatePath, rootPath, io = {
+  existsSync,
+  lstatSync,
+  realpathSync,
+}) {
+  const root = resolve(rootPath);
+  const candidate = resolve(candidatePath);
+  if (!isWithin(candidate, root)) throw new Error(`path escapes its confined root: ${candidate}`);
+  if (!io.existsSync(root)) throw new Error(`confined root does not exist: ${root}`);
+  if (io.lstatSync(root).isSymbolicLink()) throw new Error(`confined root is a symbolic link: ${root}`);
+  const realRoot = io.realpathSync(root);
+  let current = root;
+  const components = relative(root, candidate).split(sep).filter(Boolean);
+  for (const component of components) {
+    current = join(current, component);
+    if (!io.existsSync(current)) continue;
+    if (io.lstatSync(current).isSymbolicLink()) {
+      throw new Error(`symbolic-link path component is forbidden: ${current}`);
+    }
+    const realCurrent = io.realpathSync(current);
+    if (!isWithin(realCurrent, realRoot)) throw new Error(`real path escapes its confined root: ${current}`);
+  }
+  return candidate;
+}
+
 function confinedOutput(path) {
   const output = resolve(path);
-  if (!isWithin(output, REPO_ROOT) && !isWithin(output, resolve(tmpdir()))) {
+  const temporaryRoot = resolve(tmpdir());
+  const allowedRoot = isWithin(output, REPO_ROOT)
+    ? REPO_ROOT
+    : (isWithin(output, temporaryRoot) ? temporaryRoot : null);
+  if (!allowedRoot) {
     throw new Error(`capture output must remain inside the repository or temporary directory: ${output}`);
   }
+  assertSymlinkConfinedPath(output, allowedRoot);
   return output;
+}
+
+function sha256(bytes) {
+  return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+}
+
+function requireCaptureFilename(filename, label = 'capture filename') {
+  if (typeof filename !== 'string' || !/^[a-z0-9][a-z0-9._-]*\.png$/.test(filename)) {
+    throw new Error(`${label} must be a confined lowercase PNG filename`);
+  }
+  return filename;
+}
+
+function captureArtifactPath(outputDir, filename) {
+  if (typeof filename !== 'string' || filename.length === 0 || isAbsolute(filename)) {
+    throw new Error('capture artifact path must be a non-empty relative path');
+  }
+  const path = resolve(outputDir, filename);
+  if (!isWithin(path, outputDir)) throw new Error(`capture artifact escapes the output directory: ${filename}`);
+  assertSymlinkConfinedPath(path, outputDir);
+  return path;
+}
+
+function prepareArtifactWrite(outputDir, relativePath) {
+  const path = captureArtifactPath(outputDir, relativePath);
+  mkdirSync(dirname(path), { recursive: true });
+  assertSymlinkConfinedPath(path, outputDir);
+  return path;
+}
+
+function normalizedArtifactRelativePath(value) {
+  if (typeof value !== 'string' || value.length === 0 || isAbsolute(value)) {
+    throw new Error('artifact ledger paths must be non-empty and relative');
+  }
+  const normalized = value.split('\\').join('/');
+  if (normalized.split('/').includes('..')) throw new Error(`artifact ledger path escapes output: ${value}`);
+  return normalized.replace(/^\.\//, '');
+}
+
+export function createCaptureWriteLedger() {
+  const writes = new Map();
+  let sequence = 0;
+  return Object.freeze({
+    record(path, kind, { existedBefore = false } = {}) {
+      const normalized = normalizedArtifactRelativePath(path);
+      if (writes.has(normalized)) throw new Error(`capture session wrote ${normalized} more than once`);
+      const record = Object.freeze({
+        sequence: ++sequence,
+        path: normalized,
+        kind,
+        existedBefore: existedBefore === true,
+      });
+      writes.set(normalized, record);
+      return record;
+    },
+    has(path) {
+      return writes.has(normalizedArtifactRelativePath(path));
+    },
+    get(path) {
+      return writes.get(normalizedArtifactRelativePath(path)) ?? null;
+    },
+    snapshot() {
+      return Object.freeze([...writes.values()]);
+    },
+  });
+}
+
+function graphProofPresent(value) {
+  if (typeof value === 'string') return value.trim().length > 0;
+  return value !== null
+    && typeof value === 'object'
+    && !Array.isArray(value)
+    && Object.keys(value).length > 0;
+}
+
+function standardOutputId(filename) {
+  return filename.replace(/\.png$/, '');
+}
+
+/**
+ * Validate the hook's predeclared standard-output contract. Every normative
+ * output is either captured under its exact filename or structurally
+ * inapplicable with both a reason and graph proof. Aliases and copied evidence
+ * are deliberately not statuses in this contract.
+ */
+export function validateCaptureOutputPlan(plan) {
+  if (!Array.isArray(plan)) throw new TypeError('capture hook must export an outputPlan array');
+  const normalized = [];
+  const seen = new Set();
+  for (const raw of plan) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      throw new TypeError('capture output-plan entries must be objects');
+    }
+    const status = raw.status;
+    if (!CAPTURE_OUTPUT_STATUSES.has(status)) {
+      throw new Error(`capture output ${raw.id ?? raw.filename ?? '<unknown>'} has unsupported status ${status}`);
+    }
+    const filenameFromId = typeof raw.id === 'string' ? `${raw.id}.png` : null;
+    const standardFilename = status === CAPTURED_OUTPUT
+      ? requireCaptureFilename(raw.filename, `capture output ${raw.id ?? '<unknown>'} filename`)
+      : (raw.filename === null || raw.filename === undefined ? filenameFromId : raw.filename);
+    const identityFilename = standardFilename ?? filenameFromId;
+    if (!identityFilename || !STANDARD_CAPTURE_OUTPUT_SET.has(identityFilename)) {
+      throw new Error(`capture output ${raw.id ?? raw.filename ?? '<unknown>'} is not a normative standard output`);
+    }
+    const expectedId = standardOutputId(identityFilename);
+    if (raw.id !== undefined && raw.id !== expectedId) {
+      throw new Error(`capture output id ${raw.id} does not match ${identityFilename}`);
+    }
+    if (seen.has(identityFilename)) throw new Error(`capture output plan duplicates ${identityFilename}`);
+    seen.add(identityFilename);
+    if (status === NOT_APPLICABLE_OUTPUT) {
+      if (raw.filename !== null && raw.filename !== undefined) {
+        throw new Error(`NOT_APPLICABLE output ${identityFilename} must not name an image file`);
+      }
+      if (typeof raw.reason !== 'string' || raw.reason.trim().length === 0) {
+        throw new Error(`NOT_APPLICABLE output ${identityFilename} requires a reason`);
+      }
+      if (!graphProofPresent(raw.graphProof)) {
+        throw new Error(`NOT_APPLICABLE output ${identityFilename} requires graphProof`);
+      }
+    }
+    if (raw.sourceCaptures !== undefined && !Array.isArray(raw.sourceCaptures)) {
+      throw new TypeError(`${identityFilename} sourceCaptures must be an array`);
+    }
+    const sourceCaptures = raw.sourceCaptures === undefined
+      ? []
+      : raw.sourceCaptures.map((filename) => requireCaptureFilename(filename, `${identityFilename} source capture`));
+    normalized.push(Object.freeze({
+      id: expectedId,
+      status,
+      filename: status === CAPTURED_OUTPUT ? identityFilename : null,
+      ...(status === NOT_APPLICABLE_OUTPUT ? { reason: raw.reason, graphProof: raw.graphProof } : {}),
+      ...(sourceCaptures.length > 0 ? { sourceCaptures: Object.freeze(sourceCaptures) } : {}),
+    }));
+  }
+  const missing = STANDARD_CAPTURE_OUTPUTS.filter((filename) => !seen.has(filename));
+  if (missing.length > 0) throw new Error(`capture output plan omits standard outputs: ${missing.join(', ')}`);
+  for (const required of ['final.design.png', 'diagnostics.mosaic.png']) {
+    const entry = normalized.find((candidate) => candidate.filename === required || candidate.id === standardOutputId(required));
+    if (entry?.status !== CAPTURED_OUTPUT) throw new Error(`${required} is mandatory capture evidence`);
+  }
+  return Object.freeze(normalized);
+}
+
+function declaredHookOutputPlan(hook) {
+  const candidates = [hook.outputPlan, hook.CAPTURE_OUTPUT_PLAN];
+  for (const [name, value] of Object.entries(hook)) {
+    if (/_STANDARD_OUTPUT_PLAN$/.test(name)) candidates.push(value);
+  }
+  const plan = candidates.find((value) => value !== undefined);
+  return validateCaptureOutputPlan(plan);
 }
 
 function datumValue(value) {
@@ -180,6 +399,28 @@ function requireColorManagedRgba8(payload, bytesPerPixel, sourceElementBytes) {
   return encoding ?? 'explicit-color-managed-output';
 }
 
+function normalizeOrigin(value) {
+  if (value === undefined || value === null || value === '') return 'top-left';
+  const normalized = String(value).toLowerCase().replace(/[^a-z]/g, '');
+  if (normalized === 'topleft') return 'top-left';
+  if (normalized === 'bottomleft') return 'bottom-left';
+  throw new Error(`PixelCapture origin must be top-left or bottom-left; received ${value}`);
+}
+
+function orientRowsTopLeft(data, width, height, bytesPerPixel, sourceOrigin) {
+  if (sourceOrigin === 'top-left') return new Uint8Array(data);
+  const bytesPerRow = width * bytesPerPixel;
+  const oriented = new Uint8Array(data.byteLength);
+  for (let row = 0; row < height; row += 1) {
+    const sourceRow = height - row - 1;
+    oriented.set(
+      data.subarray(sourceRow * bytesPerRow, (sourceRow + 1) * bytesPerRow),
+      row * bytesPerRow,
+    );
+  }
+  return oriented;
+}
+
 /**
  * Normalize a controller PixelCapture into compact, color-managed RGBA8 rows.
  * `bytesPerRow` on the result is the compact data stride; the original copy
@@ -277,6 +518,15 @@ export function normalizePixelCapture(payload) {
   const sourceByteLength = reportedSourceByteLength
     ?? (sourceLayout === 'compacted-from-padded' ? null : source.byteLength);
 
+  const transportLayout = source.byteLength === compactByteLength ? 'compact' : 'padded';
+  const transportBytesPerRow = transportLayout === 'padded'
+    ? sourceBytesPerRow
+    : logicalBytesPerRow;
+
+  const sourceOrigin = normalizeOrigin(payload.origin ?? payload.rowOrigin);
+  const normalizedData = orientRowsTopLeft(data, width, height, bytesPerPixel, sourceOrigin);
+  const sourceFormat = payload.format ?? payload.pixelFormat ?? 'rgba8';
+
   return {
     target: payload.target ?? 'final',
     width,
@@ -286,11 +536,132 @@ export function normalizePixelCapture(payload) {
     sourceBytesPerRow,
     sourceByteLength,
     transportByteLength: source.byteLength,
+    transportBytesPerRow,
+    transportLayout,
+    transportData: new Uint8Array(source),
     sourceLayout,
+    sourceOrigin,
+    origin: 'top-left',
+    orientationTransform: sourceOrigin === 'bottom-left' ? 'vertical-row-flip' : 'none',
+    sourceFormat,
     format: 'rgba8',
     colorEncoding,
-    data,
+    data: normalizedData,
   };
+}
+
+function alignNormalizedRows(capture) {
+  const paddedBytesPerRow = alignedBytesPerRow(
+    capture.width,
+    capture.bytesPerPixel,
+    WEBGPU_COPY_BYTES_PER_ROW_ALIGNMENT,
+  );
+  const padded = new Uint8Array(paddedBytesPerRow * capture.height);
+  for (let row = 0; row < capture.height; row += 1) {
+    const sourceStart = row * capture.bytesPerRow;
+    const destinationStart = row * paddedBytesPerRow;
+    padded.set(
+      capture.data.subarray(sourceStart, sourceStart + capture.bytesPerRow),
+      destinationStart,
+    );
+  }
+  return {
+    alignmentBytes: WEBGPU_COPY_BYTES_PER_ROW_ALIGNMENT,
+    layout: 'cpu-normalized-padded-rgba8',
+    bytesPerRow: paddedBytesPerRow,
+    byteLength: padded.byteLength,
+    data: padded,
+  };
+}
+
+function rgba8Format(value) {
+  return new Set(['rgba8', 'rgba8unorm', 'rgba8srgb', 'rgba8unormsrgb'])
+    .has(String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, ''));
+}
+
+export function reconcileControllerNormalizedCapture(capture, controllerNormalized) {
+  if (!controllerNormalized || typeof controllerNormalized !== 'object') {
+    throw new TypeError('controller-normalized capture record is required');
+  }
+  const layout = controllerNormalized.layout;
+  const raw = controllerNormalized.data;
+  if (!layout || typeof layout !== 'object' || !ArrayBuffer.isView(raw)) {
+    throw new TypeError('controller-normalized layout and bytes are required');
+  }
+  const width = optionalPositiveInteger(layout.width, 'controller-normalized width');
+  const height = optionalPositiveInteger(layout.height, 'controller-normalized height');
+  if (width !== capture.width || height !== capture.height) {
+    throw new Error('controller-normalized dimensions do not match renderer transport');
+  }
+  if (!rgba8Format(layout.format ?? capture.sourceFormat)) {
+    throw new Error(`controller-normalized format ${layout.format ?? '<missing>'} is not RGBA8`);
+  }
+  if ((controllerNormalized.sourceElementBytes ?? 1) !== 1) {
+    throw new Error('controller-normalized bytes must be byte-addressed RGBA8');
+  }
+  const logicalBytesPerRow = width * 4;
+  const rowBytes = optionalPositiveInteger(layout.rowBytes, 'controller-normalized rowBytes');
+  const bytesPerRow = optionalPositiveInteger(layout.bytesPerRow, 'controller-normalized bytesPerRow');
+  const declaredByteLength = optionalPositiveInteger(layout.byteLength, 'controller-normalized byteLength');
+  if (rowBytes !== logicalBytesPerRow) {
+    throw new Error('controller-normalized rowBytes does not match the logical RGBA8 row');
+  }
+  if (bytesPerRow < logicalBytesPerRow) {
+    throw new Error('controller-normalized bytesPerRow is smaller than the logical row');
+  }
+  if (bytesPerRow !== logicalBytesPerRow && bytesPerRow % WEBGPU_COPY_BYTES_PER_ROW_ALIGNMENT !== 0) {
+    throw new Error('controller-normalized padded rows do not satisfy 256-byte alignment');
+  }
+  const expectedByteLength = bytesPerRow * height;
+  if (declaredByteLength !== expectedByteLength || raw.byteLength !== expectedByteLength) {
+    throw new Error(`controller-normalized byte length must be exactly ${expectedByteLength}`);
+  }
+  const compact = new Uint8Array(logicalBytesPerRow * height);
+  for (let row = 0; row < height; row += 1) {
+    const sourceStart = row * bytesPerRow;
+    compact.set(raw.subarray(sourceStart, sourceStart + logicalBytesPerRow), row * logicalBytesPerRow);
+    for (let index = sourceStart + logicalBytesPerRow; index < sourceStart + bytesPerRow; index += 1) {
+      if (raw[index] !== 0) throw new Error(`controller-normalized padding is nonzero at byte ${index}`);
+    }
+  }
+  const controllerOrigin = normalizeOrigin(layout.origin ?? capture.sourceOrigin);
+  const topLeftCompact = orientRowsTopLeft(compact, width, height, 4, controllerOrigin);
+  if (topLeftCompact.byteLength !== capture.data.byteLength) {
+    throw new Error('controller-normalized compact byte length differs from independent normalization');
+  }
+  for (let index = 0; index < topLeftCompact.byteLength; index += 1) {
+    if (topLeftCompact[index] !== capture.data[index]) {
+      throw new Error(`controller-normalized pixels differ from independent transport normalization at byte ${index}`);
+    }
+  }
+  const independentPadded = alignNormalizedRows(capture);
+  const record = {
+    layout: Object.freeze(structuredClone(layout)),
+    origin: controllerOrigin,
+    orientationTransform: controllerOrigin === 'bottom-left' ? 'vertical-row-flip' : 'none',
+    byteLength: raw.byteLength,
+    sha256: sha256(raw),
+    compactSha256: sha256(topLeftCompact),
+    independentPaddedSha256: sha256(independentPadded.data),
+    paddingBytesPerRow: bytesPerRow - logicalBytesPerRow,
+    paddingVerifiedZero: true,
+    reconciliationStatus: 'PASS',
+  };
+  Object.defineProperties(record, {
+    rawData: {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: raw,
+    },
+    data: {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: topLeftCompact,
+    },
+  });
+  return Object.freeze(record);
 }
 
 export async function controllerCall(page, method, args = []) {
@@ -332,51 +703,855 @@ export async function capturePixels(page, target) {
     const controller = await Promise.resolve(candidate);
     if (!controller || typeof controller.capturePixels !== 'function') throw new Error('LabController has no capturePixels() method');
     const capture = await controller.capturePixels(captureTarget);
-    const source = capture?.data ?? capture?.pixels;
-    let bytes;
-    if (source instanceof ArrayBuffer) bytes = new Uint8Array(source);
-    else if (ArrayBuffer.isView(source)) bytes = new Uint8Array(source.buffer, source.byteOffset, source.byteLength);
-    else if (Array.isArray(source)) bytes = Uint8Array.from(source);
-    else throw new Error('PixelCapture data must be an ArrayBuffer, ArrayBuffer view, or byte array');
-    let binary = '';
-    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-      binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
-    }
+    const bytesOf = (source, label) => {
+      if (source instanceof ArrayBuffer) return { bytes: new Uint8Array(source), elementBytes: 1 };
+      if (ArrayBuffer.isView(source)) {
+        return {
+          bytes: new Uint8Array(source.buffer, source.byteOffset, source.byteLength),
+          elementBytes: source.BYTES_PER_ELEMENT,
+        };
+      }
+      if (Array.isArray(source)) return { bytes: Uint8Array.from(source), elementBytes: 1 };
+      throw new Error(`${label} must be an ArrayBuffer, ArrayBuffer view, or byte array`);
+    };
+    const base64Of = (bytes) => {
+      let binary = '';
+      for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+      }
+      return btoa(binary);
+    };
+    const transportLayout = capture?.transport?.layout ?? null;
+    const transportSource = capture?.transport?.data
+      ?? capture?.transport?.pixels
+      ?? capture?.data
+      ?? capture?.pixels;
+    const transport = bytesOf(transportSource, 'PixelCapture transport data');
+    const controllerNormalizedLayout = capture?.normalized?.layout ?? null;
+    const controllerNormalizedSource = capture?.normalized?.data ?? capture?.normalized?.pixels ?? null;
+    const controllerNormalized = controllerNormalizedSource === null
+      ? null
+      : bytesOf(controllerNormalizedSource, 'PixelCapture controller-normalized data');
     return {
       target: capture.target ?? captureTarget,
-      width: capture.width,
-      height: capture.height,
+      width: transportLayout?.width ?? capture.width,
+      height: transportLayout?.height ?? capture.height,
       bytesPerPixel: capture.bytesPerPixel,
       bytesPerTexel: capture.bytesPerTexel,
-      bytesPerRow: capture.bytesPerRow,
-      sourceBytesPerRow: capture.sourceBytesPerRow,
-      sourceByteLength: capture.sourceByteLength,
-      rowBytes: capture.rowBytes,
+      bytesPerRow: transportLayout?.bytesPerRow
+        ?? capture.readbackSourceBytesPerRow
+        ?? capture.bytesPerRow,
+      sourceBytesPerRow: transportLayout?.bytesPerRow
+        ?? capture.readbackSourceBytesPerRow
+        ?? capture.sourceBytesPerRow,
+      sourceByteLength: transportLayout?.byteLength
+        ?? capture.readbackSourceByteLength
+        ?? capture.sourceByteLength,
+      rowBytes: transportLayout?.rowBytes ?? capture.rowBytes,
       packedRowBytes: capture.packedRowBytes,
-      sourceElementBytes: ArrayBuffer.isView(source) ? source.BYTES_PER_ELEMENT : 1,
-      format: capture.format,
+      sourceElementBytes: transport.elementBytes,
+      format: transportLayout?.format ?? capture.format,
       pixelFormat: capture.pixelFormat,
       colorManaged: capture.colorManaged,
       colorSpace: capture.colorSpace,
       outputColorSpace: capture.outputColorSpace,
       encoding: capture.encoding,
       transferFunction: capture.transferFunction,
-      dataBase64: btoa(binary),
+      origin: capture.origin,
+      rowOrigin: capture.rowOrigin,
+      transportPadding: transportLayout?.padding ?? null,
+      requestedLayout: {
+        width: capture.width,
+        height: capture.height,
+        rowBytes: capture.rowBytes,
+        bytesPerRow: capture.bytesPerRow,
+        byteLength: capture.sourceByteLength,
+        alignmentBytes: capture.alignmentBytes ?? 256,
+      },
+      dataBase64: base64Of(transport.bytes),
+      controllerNormalized: controllerNormalized === null ? null : {
+        layout: controllerNormalizedLayout,
+        sourceElementBytes: controllerNormalized.elementBytes,
+        dataBase64: base64Of(controllerNormalized.bytes),
+      },
     };
   }, { captureTarget: target, controllerGlobals: LAB_CONTROLLER_GLOBALS });
 
-  return normalizePixelCapture(serialized);
+  const capture = normalizePixelCapture(serialized);
+  if (serialized.controllerNormalized !== null) {
+    const controllerBytes = new Uint8Array(Buffer.from(serialized.controllerNormalized.dataBase64, 'base64'));
+    capture.controllerNormalized = reconcileControllerNormalizedCapture(capture, {
+      layout: structuredClone(serialized.controllerNormalized.layout),
+      sourceElementBytes: serialized.controllerNormalized.sourceElementBytes,
+      data: controllerBytes,
+    });
+  }
+  capture.transportPadding = serialized.transportPadding;
+  capture.requestedLayout = Object.freeze(structuredClone(serialized.requestedLayout));
+  return capture;
 }
 
 export function backendProven(metrics) {
-  return String(metrics?.backend ?? '').toLowerCase() === 'webgpu'
-    || String(metrics?.rendererBackend ?? '').toLowerCase() === 'webgpu'
-    || metrics?.backend?.isWebGPUBackend === true
-    || metrics?.isWebGPUBackend === true
-    || metrics?.backendIsWebGPU === true
-    || metrics?.nativeWebGPU === true
-    || metrics?.renderer?.isWebGPUBackend === true
-    || metrics?.rendererInfo?.backend?.isWebGPUBackend === true;
+  if (!metrics || typeof metrics !== 'object') return false;
+  const backendEvidence = metrics.rendererBackendEvidence
+    ?? metrics.backendEvidence
+    ?? metrics.rendererInfo?.backendEvidence
+    ?? null;
+  const backendSignals = [
+    metrics.backend,
+    metrics.backendKind,
+    metrics.rendererBackend,
+    metrics.rendererInfo?.backendType,
+    backendEvidence?.backendKind,
+    backendEvidence?.backendType,
+  ].filter((value) => value !== undefined && value !== null)
+    .map((value) => String(value).toLowerCase().replace(/[^a-z0-9]/g, ''));
+  if (backendSignals.length === 0 || backendSignals.some((value) => !new Set(['webgpu', 'webgpubackend']).has(value))) {
+    return false;
+  }
+  const rendererType = String(metrics.rendererInfo?.rendererType ?? metrics.rendererType ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+  return metrics.nativeWebGPU === true
+    && metrics.initialized === true
+    && rendererType === 'webgpurenderer'
+    && backendEvidence !== null
+    && backendEvidence.deviceIdentityVerified === true
+    && typeof backendEvidence.deviceIdentitySource === 'string'
+    && backendEvidence.deviceIdentitySource.length > 0
+    && typeof backendEvidence.deviceType === 'string'
+    && backendEvidence.deviceType.length > 0
+    && backendEvidence.lossPromiseObservedOnActualDevice === true
+    && Number.isInteger(backendEvidence.rendererDeviceGeneration)
+    && backendEvidence.rendererDeviceGeneration > 0
+    && metrics.rendererDeviceStatus === 'active'
+    && metrics.rendererDeviceGeneration === backendEvidence.rendererDeviceGeneration
+    && metrics.deviceLossGeneration === 0;
+}
+
+export function assertCaptureRuntimeProfile(runtime, profile) {
+  const metrics = runtime?.metrics;
+  const pipeline = runtime?.pipeline;
+  if (!metrics || !pipeline) throw new Error('capture runtime profile proof requires metrics and pipeline');
+  for (const [label, record] of [['metrics', metrics], ['pipeline', pipeline]]) {
+    if (record.runtimeProfile !== profile) {
+      throw new Error(`${label}.runtimeProfile ${record.runtimeProfile ?? '<missing>'} does not match capture profile ${profile}`);
+    }
+  }
+  if (profile === 'correctness') {
+    for (const [label, value] of [
+      ['metrics.timestampQueriesRequired', metrics.timestampQueriesRequired],
+      ['metrics.timestampQueriesRequested', metrics.timestampQueriesRequested],
+      ['metrics.timestampQueriesActive', metrics.timestampQueriesActive],
+      ['pipeline.timestampQueriesRequired', pipeline.timestampQueriesRequired],
+      ['pipeline.timestampQueriesRequested', pipeline.timestampQueriesRequested],
+      ['pipeline.timestampQueriesActive', pipeline.timestampQueriesActive],
+    ]) {
+      if (value !== false) throw new Error(`${label} must be false for correctness capture`);
+    }
+    return;
+  }
+  if (profile !== 'performance') throw new Error(`unsupported capture runtime profile ${profile}`);
+  for (const [label, value] of [
+    ['metrics.performanceTimestampMode', metrics.performanceTimestampMode],
+    ['pipeline.performanceTimestampMode', pipeline.performanceTimestampMode],
+  ]) {
+    if (value !== 'auto') throw new Error(`${label} must be auto for timestamp-attributed performance capture`);
+  }
+  for (const [label, value] of [
+    ['metrics.timestampQueriesRequested', metrics.timestampQueriesRequested],
+    ['metrics.timestampQueriesActive', metrics.timestampQueriesActive],
+    ['pipeline.timestampQueriesRequested', pipeline.timestampQueriesRequested],
+    ['pipeline.timestampQueriesActive', pipeline.timestampQueriesActive],
+  ]) {
+    if (value !== true) throw new Error(`${label} must be true for performance capture`);
+  }
+}
+
+function firstDefined(...values) {
+  return values.find((value) => value !== undefined && value !== null);
+}
+
+function scalarTime(value) {
+  if (Number.isFinite(value)) return value;
+  if (!value || typeof value !== 'object') return value;
+  return firstDefined(value.seconds, value.timeSeconds, value.value, value.current);
+}
+
+export function extractCaptureState(metrics) {
+  const route = metrics?.routeSelection ?? metrics?.routeState ?? metrics?.startup ?? {};
+  return Object.freeze({
+    scenario: firstDefined(metrics?.scenarioId, metrics?.scenario, metrics?.subjectId, route.scenario, route.subjectId),
+    mode: firstDefined(metrics?.modeId, metrics?.mode, metrics?.activeMode, route.mode),
+    tier: firstDefined(metrics?.tierId, metrics?.tier, metrics?.activeTier, route.tier, route.tierId),
+    camera: firstDefined(metrics?.cameraId, metrics?.camera, metrics?.activeCamera, route.camera, route.cameraId),
+    seed: firstDefined(metrics?.seed, route.seed),
+    timeSeconds: scalarTime(firstDefined(metrics?.timeSeconds, metrics?.time, route.timeSeconds, route.time)),
+  });
+}
+
+function defaultCaptureState(lab, target) {
+  const scenario = lab.scenarios[0]?.id ?? null;
+  const mode = lab.modes.includes(target)
+    ? target
+    : (lab.modes.includes('final') ? 'final' : (lab.modes[0] ?? null));
+  const tier = lab.tiers[0]?.id ?? null;
+  const camera = lab.cameras.includes('design') ? 'design' : (lab.cameras[0] ?? null);
+  const seed = lab.seeds.includes(1) ? 1 : (lab.seeds[0] ?? null);
+  return Object.freeze({ scenario, mode, tier, camera, seed, timeSeconds: 0 });
+}
+
+async function applyCaptureState(page, state) {
+  for (const [method, value] of [
+    ['setScenario', state.scenario],
+    ['setMode', state.mode],
+    ['setTier', state.tier],
+    ['setSeed', state.seed],
+    ['setCamera', state.camera],
+    ['setTime', state.timeSeconds],
+  ]) {
+    if (value !== null) await controllerCall(page, method, [value]);
+  }
+  await controllerCall(page, 'renderOnce');
+}
+
+function equalStateValue(actual, expected) {
+  if (typeof actual === 'number' && typeof expected === 'number') return Object.is(actual, expected);
+  return String(actual) === String(expected);
+}
+
+export function assertCaptureState(actual, expected) {
+  for (const [name, expectedValue] of Object.entries(expected)) {
+    if (expectedValue === null) continue;
+    const actualValue = actual[name];
+    if (actualValue === undefined || actualValue === null) {
+      throw new Error(`LabController metrics omitted locked capture state ${name}`);
+    }
+    if (!equalStateValue(actualValue, expectedValue)) {
+      throw new Error(`LabController capture state ${name}=${actualValue} does not match locked ${expectedValue}`);
+    }
+  }
+}
+
+function runtimeThreeRevision(metrics) {
+  return firstDefined(
+    metrics?.threeRevision,
+    metrics?.renderer?.threeRevision,
+    metrics?.rendererInfo?.threeRevision,
+    metrics?.rendererInfo?.renderer?.threeRevision,
+    metrics?.routeSelection?.threeRevision,
+  );
+}
+
+function explicitAdapterClass(metrics) {
+  return firstDefined(
+    metrics?.adapterClass,
+    metrics?.adapterIdentity?.adapterClass,
+    metrics?.rendererInfo?.adapterClass,
+    metrics?.rendererInfo?.adapterIdentity?.adapterClass,
+  );
+}
+
+function observedAdapterIdentity(metrics) {
+  const observed = firstDefined(
+    metrics?.adapterIdentity,
+    metrics?.adapterInfo,
+    metrics?.rendererInfo?.adapterIdentity,
+    metrics?.rendererInfo?.adapterInfo,
+    metrics?.renderer?.adapterIdentity,
+  );
+  if (observed && typeof observed === 'object' && !Array.isArray(observed)) {
+    return structuredClone(observed);
+  }
+  const backendType = firstDefined(
+    metrics?.backend,
+    metrics?.rendererBackend,
+    metrics?.rendererInfo?.backendType,
+    metrics?.rendererInfo?.backend?.type,
+    'WebGPU',
+  );
+  return {
+    source: 'LabController.getMetrics',
+    backendType: String(backendType),
+    deviceType: 'unknown',
+    deviceLabel: typeof observed === 'string' ? observed : '',
+    deviceIdentityVerified: false,
+  };
+}
+
+export function classifyAdapter(metrics) {
+  const explicit = String(explicitAdapterClass(metrics) ?? '').toLowerCase();
+  if (explicit === 'hardware' || explicit === 'software') return explicit;
+  const identity = JSON.stringify(observedAdapterIdentity(metrics)).toLowerCase();
+  if (/swiftshader|llvmpipe|software|lavapipe/.test(identity)) return 'software';
+  return 'unknown';
+}
+
+function errorValuePresent(value) {
+  if (value === null || value === undefined || value === false || value === 0 || value === '') return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === 'object') {
+    if (Array.isArray(value.events)) return value.events.length > 0;
+    if ('observed' in value) return value.observed === true;
+    if ('lost' in value) return value.lost === true;
+    if ('error' in value) return errorValuePresent(value.error);
+    if ('reason' in value) return errorValuePresent(value.reason);
+    if ('message' in value) return errorValuePresent(value.message);
+    if ('errors' in value) return errorValuePresent(value.errors);
+    if ('failure' in value) return errorValuePresent(value.failure);
+    return false;
+  }
+  return true;
+}
+
+const RUNTIME_ERROR_FIELDS = new Set([
+  'deviceErrors',
+  'deviceErrorCount',
+  'deviceErrorsRetained',
+  'deviceErrorsDropped',
+  'deviceLost',
+  'deviceLostObserved',
+  'deviceLoss',
+  'deviceLossGeneration',
+  'uncapturedErrors',
+  'uncapturedErrorCount',
+  'frameErrors',
+  'frameErrorCount',
+  'lastFrameError',
+  'lifecycleErrors',
+  'lifecycleErrorCount',
+  'lastLifecycleError',
+  'lastDeviceError',
+  'captureTargetRestoreFailures',
+  'lastCaptureTargetRestoreError',
+  'targetDisposeUncertain',
+  'untrackedCandidateDisposeUncertain',
+  'teardownUncertainCount',
+  'resourceUncertainDisposalCount',
+  'resourceOrphanDisposalCount',
+  'gpuTimestampResolveFailures',
+  'gpuTimestampFailureCount',
+  'lastGpuTimestampFailure',
+  'runtimeErrors',
+  'labError',
+]);
+
+export function runtimeFailureMessages(root) {
+  const failures = [];
+  const visited = new Set();
+  const inspect = (value, path) => {
+    if (!value || typeof value !== 'object' || visited.has(value)) return;
+    visited.add(value);
+    for (const [key, child] of Object.entries(value)) {
+      const childPath = path ? `${path}.${key}` : key;
+      const capacityMetadata = path.split('.').some((segment) => /(?:limits?|capacities|thresholds?)$/i.test(segment));
+      if (!capacityMetadata && RUNTIME_ERROR_FIELDS.has(key) && errorValuePresent(child)) {
+        failures.push(`${childPath}: ${JSON.stringify(child)}`);
+      }
+      inspect(child, childPath);
+    }
+  };
+  inspect(root, 'runtime');
+  return failures;
+}
+
+export function assertNoCaptureFailures({ pageErrors = [], consoleErrors = [], requestErrors = [], runtime = null } = {}) {
+  const failures = [
+    ...pageErrors.map((value) => `page: ${value}`),
+    ...consoleErrors.map((value) => `console: ${value}`),
+    ...requestErrors.map((value) => `request: ${value}`),
+    ...runtimeFailureMessages(runtime),
+  ];
+  if (failures.length > 0) {
+    throw new Error(`capture observed runtime failures:\n${failures.join('\n')}`);
+  }
+}
+
+async function collectBrowserRecord(browser, page, metrics) {
+  const navigatorRecord = await page.evaluate(() => ({
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+  }));
+  return Object.freeze({
+    name: 'Chromium',
+    version: browser.version(),
+    userAgent: navigatorRecord.userAgent,
+    platform: navigatorRecord.platform,
+    automationSurface: 'playwright-headless-chromium',
+    adapterClass: classifyAdapter(metrics),
+    adapterIdentity: observedAdapterIdentity(metrics),
+  });
+}
+
+export async function waitForPostDisposeObservations(page) {
+  return page.evaluate(async () => {
+    await new Promise((resolveFrame) => requestAnimationFrame(() => resolveFrame()));
+    await new Promise((resolveFrame) => requestAnimationFrame(() => resolveFrame()));
+    const safeClone = (value) => {
+      if (value === undefined) return null;
+      try { return JSON.parse(JSON.stringify(value)); } catch { return String(value); }
+    };
+    return {
+      labError: safeClone(window.__LAB_ERROR__),
+      gpuEvents: safeClone(window.__LAB_GPU_EVENTS__),
+      threeGpuEvents: safeClone(window.__THREEJS_GPU_EVENTS__),
+      imagePipelineGpuEvents: safeClone(window.__imagePipelineGpuEvents),
+      deviceErrors: safeClone(window.__LAB_DEVICE_ERRORS__),
+      visibilityState: document.visibilityState,
+    };
+  });
+}
+
+function artifactStem(filename) {
+  return requireCaptureFilename(filename).slice(0, -4);
+}
+
+export function buildCaptureArtifactPayload(capture, filename) {
+  const stem = artifactStem(filename);
+  const normalized = alignNormalizedRows(capture);
+  const pngBytes = encodeRgbaPng(capture);
+  const transportPath = `transport-readbacks/${stem}.rgba8.bin`;
+  const normalizedPath = `normalized-readbacks/${stem}.rgba8.padded.bin`;
+  const pngSha256 = sha256(pngBytes);
+  const transportSha256 = sha256(capture.transportData);
+  const normalizedSha256 = sha256(normalized.data);
+  const compactRgbaSha256 = sha256(capture.data);
+  const transport = {
+    artifact: Object.freeze({
+      path: transportPath,
+      sha256: transportSha256,
+      byteLength: capture.transportData.byteLength,
+    }),
+    layout: Object.freeze({
+      width: capture.width,
+      height: capture.height,
+      format: capture.sourceFormat,
+      layout: capture.transportLayout,
+      origin: capture.sourceOrigin,
+      bytesPerPixel: capture.bytesPerPixel,
+      rowBytes: capture.bytesPerRow,
+      bytesPerRow: capture.transportBytesPerRow,
+      byteLength: capture.transportByteLength,
+      paddingKind: typeof capture.transportPadding === 'string'
+        ? capture.transportPadding
+        : (capture.transportBytesPerRow === capture.bytesPerRow ? 'compact' : 'padded'),
+      paddingBytesPerRow: capture.transportBytesPerRow - capture.bytesPerRow,
+    }),
+    rendererCopy: Object.freeze({
+      layout: capture.sourceLayout,
+      bytesPerRow: capture.sourceBytesPerRow,
+      byteLength: capture.sourceByteLength,
+      rawBytesRetained: true,
+      requestedLayout: capture.requestedLayout ?? null,
+    }),
+  };
+  Object.defineProperty(transport, 'data', {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: capture.transportData,
+  });
+  const normalizedRecord = {
+    artifact: Object.freeze({
+      path: normalizedPath,
+      sha256: normalizedSha256,
+      byteLength: normalized.byteLength,
+    }),
+    layout: normalized.layout,
+    alignmentBytes: normalized.alignmentBytes,
+    bytesPerRow: normalized.bytesPerRow,
+    byteLength: normalized.byteLength,
+    origin: capture.origin,
+    orientationTransform: capture.orientationTransform,
+    compact: Object.freeze({
+      layout: 'compact-rgba8',
+      origin: capture.origin,
+      bytesPerRow: capture.bytesPerRow,
+      byteLength: capture.data.byteLength,
+      sha256: compactRgbaSha256,
+    }),
+    compactRgbaSha256,
+    compactByteLength: capture.data.byteLength,
+  };
+  Object.defineProperties(normalizedRecord, {
+    data: {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: capture.data,
+    },
+    paddedData: {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: normalized.data,
+    },
+  });
+  return Object.freeze({
+    target: capture.target,
+    width: capture.width,
+    height: capture.height,
+    bytesPerPixel: capture.bytesPerPixel,
+    bytesPerRow: capture.bytesPerRow,
+    sourceBytesPerRow: capture.sourceBytesPerRow,
+    sourceByteLength: capture.sourceByteLength,
+    transportByteLength: capture.transportByteLength,
+    sourceLayout: capture.sourceLayout,
+    sourceOrigin: capture.sourceOrigin,
+    origin: capture.origin,
+    orientationTransform: capture.orientationTransform,
+    sourceFormat: capture.sourceFormat,
+    format: capture.format,
+    colorEncoding: capture.colorEncoding,
+    transport: Object.freeze(transport),
+    normalized: Object.freeze(normalizedRecord),
+    ...(capture.controllerNormalized ? { controllerNormalized: capture.controllerNormalized } : {}),
+    png: Object.freeze({
+      path: filename,
+      sha256: pngSha256,
+      byteLength: pngBytes.byteLength,
+      encoding: 'png-rgba8-srgb',
+      derivedFromCompactRgbaSha256: compactRgbaSha256,
+      width: capture.width,
+      height: capture.height,
+    }),
+    bytes: Object.freeze({
+      transport: capture.transportData,
+      normalized: normalized.data,
+      png: pngBytes,
+    }),
+  });
+}
+
+function captureMetadataOnly(payload) {
+  const { bytes, ...metadata } = payload;
+  return metadata;
+}
+
+export function assertCaptureArtifactBinding(payload, {
+  pngBytes = payload?.bytes?.png,
+  transportBytes = payload?.bytes?.transport,
+  normalizedBytes = payload?.bytes?.normalized,
+} = {}) {
+  if (!payload || typeof payload !== 'object') throw new TypeError('capture payload is required');
+  for (const [label, bytes, expected] of [
+    ['PNG', pngBytes, payload.png],
+    ['transport readback', transportBytes, payload.transport?.artifact],
+    ['normalized padded readback', normalizedBytes, payload.normalized?.artifact],
+  ]) {
+    if (!ArrayBuffer.isView(bytes) && !Buffer.isBuffer(bytes)) throw new TypeError(`${label} bytes are required`);
+    if (bytes.byteLength !== expected.byteLength) {
+      throw new Error(`${label} byte length ${bytes.byteLength} does not match ${expected.byteLength}`);
+    }
+    if (sha256(bytes) !== expected.sha256) throw new Error(`${label} hash does not match capture metadata`);
+  }
+  const compact = payload.normalized?.data;
+  if (!ArrayBuffer.isView(compact)) throw new TypeError('normalized compact readback bytes are required');
+  if (sha256(compact) !== payload.normalized.compactRgbaSha256) {
+    throw new Error('normalized compact readback hash does not match capture metadata');
+  }
+  const expectedPng = encodeRgbaPng({
+    width: payload.width,
+    height: payload.height,
+    data: compact,
+  });
+  if (sha256(expectedPng) !== sha256(pngBytes)) {
+    throw new Error('PNG is not derived byte-for-byte from the normalized compact readback');
+  }
+}
+
+function writeCapturePayload(outputDir, payload, writeLedger) {
+  assertCaptureArtifactBinding(payload);
+  const paths = [
+    [payload.png.path, payload.bytes.png, 'writeCapture-png'],
+    [payload.transport.artifact.path, payload.bytes.transport, 'writeCapture-transport'],
+    [payload.normalized.artifact.path, payload.bytes.normalized, 'writeCapture-normalized'],
+  ];
+  for (const [relativePath, bytes, kind] of paths) {
+    if (writeLedger.has(relativePath)) throw new Error(`capture session wrote ${relativePath} more than once`);
+    const path = prepareArtifactWrite(outputDir, relativePath);
+    const existedBefore = existsSync(path);
+    writeFileSync(path, bytes);
+    writeLedger.record(relativePath, kind, { existedBefore });
+  }
+}
+
+
+function assertWrittenCaptureFiles(outputDir, capture) {
+  assertCaptureArtifactBinding(capture, {
+    pngBytes: readFileSync(captureArtifactPath(outputDir, capture.png.path)),
+    transportBytes: readFileSync(captureArtifactPath(outputDir, capture.transport.artifact.path)),
+    normalizedBytes: readFileSync(captureArtifactPath(outputDir, capture.normalized.artifact.path)),
+  });
+}
+
+function normalizedSha256(value) {
+  return String(value ?? '').replace(/^sha256:/, '').toLowerCase();
+}
+
+function validateHookFileReference(outputDir, writeLedger, reference, label) {
+  if (!reference || typeof reference.path !== 'string' || typeof reference.sha256 !== 'string') {
+    throw new Error(`${label} must contain a path and sha256`);
+  }
+  if (!writeLedger.has(reference.path)) throw new Error(`${label} was not written during this capture session`);
+  const bytes = readFileSync(captureArtifactPath(outputDir, reference.path));
+  if (normalizedSha256(sha256(bytes)) !== normalizedSha256(reference.sha256)) {
+    throw new Error(`${label} hash does not match its fresh artifact`);
+  }
+  return Object.freeze({ path: reference.path, sha256: sha256(bytes), byteLength: bytes.byteLength });
+}
+
+export function validateHookDerivedOutput(outputDir, writeLedger, hookResult, entry, sourceCaptures) {
+  const hookOutput = hookResult?.standardOutputs?.find?.((candidate) => (
+    candidate?.id === entry.id || candidate?.filename === entry.filename
+  ));
+  if (!hookOutput?.pixelEvidence) {
+    throw new Error(
+      `${entry.filename} is derived rather than a direct capture and requires hook pixelEvidence with normalized readback derivation`,
+    );
+  }
+  if (hookOutput.status !== CAPTURED_OUTPUT || hookOutput.filename !== entry.filename) {
+    throw new Error(`hook derivation record for ${entry.filename} has inconsistent identity`);
+  }
+  if (JSON.stringify(hookOutput.sourceCaptures ?? []) !== JSON.stringify(sourceCaptures)) {
+    throw new Error(`hook derivation record for ${entry.filename} changed sourceCaptures`);
+  }
+  const outputFile = validateHookFileReference(
+    outputDir,
+    writeLedger,
+    hookOutput.file ?? hookOutput.pixelEvidence.png,
+    `${entry.filename} hook PNG`,
+  );
+  const pngEvidence = hookOutput.pixelEvidence.png;
+  if (pngEvidence) validateHookFileReference(outputDir, writeLedger, pngEvidence, `${entry.filename} pixelEvidence.png`);
+  const normalizedEvidence = hookOutput.pixelEvidence.normalized ?? null;
+  if (!normalizedEvidence?.rawArtifact) {
+    throw new Error(`${entry.filename} hook derivation omits its normalized raw artifact`);
+  }
+  const normalizedRaw = validateHookFileReference(
+    outputDir,
+    writeLedger,
+    normalizedEvidence.rawArtifact,
+    `${entry.filename} normalized raw artifact`,
+  );
+  const normalizedRawBytes = readFileSync(captureArtifactPath(outputDir, normalizedRaw.path));
+  const width = optionalPositiveInteger(
+    hookOutput.width ?? hookOutput.derivation?.output?.width,
+    `${entry.filename} width`,
+  );
+  const height = optionalPositiveInteger(
+    hookOutput.height ?? hookOutput.derivation?.output?.height,
+    `${entry.filename} height`,
+  );
+  const paddedBytesPerRow = optionalPositiveInteger(
+    normalizedEvidence.paddedBytesPerRow,
+    `${entry.filename} normalized paddedBytesPerRow`,
+  );
+  const normalizedCompact = unpackAlignedRows({
+    source: normalizedRawBytes,
+    width,
+    height,
+    bytesPerPixel: 4,
+    bytesPerRow: paddedBytesPerRow,
+  });
+  if (
+    normalizedEvidence.packedByteLength !== normalizedCompact.byteLength
+    || normalizedSha256(normalizedEvidence.packedRgbaSha256) !== normalizedSha256(sha256(normalizedCompact))
+  ) {
+    throw new Error(`${entry.filename} normalized packed derivation does not match its retained padded bytes`);
+  }
+  const expectedPng = encodeRgbaPng({ width, height, data: normalizedCompact });
+  const actualPng = readFileSync(captureArtifactPath(outputDir, outputFile.path));
+  if (sha256(expectedPng) !== sha256(actualPng)) {
+    throw new Error(`${entry.filename} PNG is not byte-derived from its retained normalized pixels`);
+  }
+  const normalizedPacked = normalizedEvidence.packedArtifact
+    ? validateHookFileReference(
+      outputDir,
+      writeLedger,
+      normalizedEvidence.packedArtifact,
+      `${entry.filename} normalized packed artifact`,
+    )
+    : Object.freeze({
+      path: null,
+      sha256: sha256(normalizedCompact),
+      byteLength: normalizedCompact.byteLength,
+      retention: 'derived-on-validation-from-normalized-padded-artifact',
+    });
+  if (
+    pngEvidence?.derivedFromPackedRgbaSha256
+    && normalizedEvidence.packedRgbaSha256
+    && normalizedSha256(pngEvidence.derivedFromPackedRgbaSha256)
+      !== normalizedSha256(normalizedEvidence.packedRgbaSha256)
+  ) {
+    throw new Error(`${entry.filename} PNG derivation hash disagrees with normalized packed evidence`);
+  }
+  return Object.freeze({
+    kind: 'hook-validated-derived-output',
+    validationStatus: 'PASS',
+    sourceCaptures: Object.freeze([...sourceCaptures]),
+    outputFile,
+    normalizedRaw,
+    normalizedPacked,
+  });
+}
+
+function validateCapturedOutputs(outputDir, plan, writtenCaptures, writeLedger, hookResult) {
+  if (new Set(writtenCaptures.map((capture) => capture.png.path)).size !== writtenCaptures.length) {
+    throw new Error('capture hook overwrote a filename through multiple writeCapture() calls');
+  }
+  for (const capture of writtenCaptures) assertWrittenCaptureFiles(outputDir, capture);
+  const writtenByFilename = new Map(writtenCaptures.map((capture) => [capture.png.path, capture]));
+  const result = [];
+  for (const entry of plan) {
+    if (entry.status === NOT_APPLICABLE_OUTPUT) {
+      result.push(entry);
+      continue;
+    }
+    const path = captureArtifactPath(outputDir, entry.filename);
+    if (!existsSync(path)) throw new Error(`capture hook did not emit declared output ${entry.filename}`);
+    if (!writeLedger.has(entry.filename)) {
+      throw new Error(`declared output ${entry.filename} is stale or was not written during this capture session`);
+    }
+    const sourceCaptures = entry.sourceCaptures ?? [];
+    const direct = writtenByFilename.get(entry.filename) ?? null;
+    if (!direct && sourceCaptures.length === 0) {
+      throw new Error(`declared output ${entry.filename} has neither direct readback metadata nor sourceCaptures`);
+    }
+    for (const sourceFilename of sourceCaptures) {
+      if (!writtenByFilename.has(sourceFilename)) {
+        throw new Error(`${entry.filename} references unretained source capture ${sourceFilename}`);
+      }
+    }
+    const bytes = readFileSync(path);
+    const derivation = direct
+      ? Object.freeze({ kind: 'direct-render-target-readback', validationStatus: 'PASS', pixelEvidence: direct.png })
+      : validateHookDerivedOutput(outputDir, writeLedger, hookResult, entry, sourceCaptures);
+    result.push(Object.freeze({
+      ...entry,
+      artifact: Object.freeze({ path: entry.filename, sha256: sha256(bytes), byteLength: bytes.byteLength }),
+      derivation,
+    }));
+  }
+  const final = result.find((entry) => entry.filename === 'final.design.png');
+  const diagnostics = result.find((entry) => entry.filename === 'diagnostics.mosaic.png');
+  if (
+    final?.status === CAPTURED_OUTPUT
+    && diagnostics?.status === CAPTURED_OUTPUT
+    && final.artifact.sha256 === diagnostics.artifact.sha256
+  ) {
+    throw new Error('diagnostics.mosaic.png is byte-identical to final.design.png');
+  }
+  return Object.freeze(result);
+}
+
+const BUILTIN_OUTPUT_PLAN = validateCaptureOutputPlan(STANDARD_CAPTURE_OUTPUTS.map((filename) => ({
+  id: standardOutputId(filename),
+  status: CAPTURED_OUTPUT,
+  filename,
+})));
+
+async function runBuiltinCapture(session, target) {
+  const representativeSeed = session.lab.seeds.includes(1) ? 1 : session.lab.seeds[0];
+  const stressSeed = session.lab.seeds.includes(0x9e3779b9) ? 0x9e3779b9 : session.lab.seeds.at(-1);
+  const designCamera = session.lab.cameras.includes('design') ? 'design' : session.lab.cameras[0];
+  const captures = [];
+  const capture = async (filename, { mode = 'final', camera = designCamera, seed = representativeSeed, time = 0 } = {}) => {
+    if (mode !== null) await session.controllerCall('setMode', mode);
+    if (camera !== null) await session.controllerCall('setCamera', camera);
+    if (seed !== null && seed !== undefined) await session.controllerCall('setSeed', seed);
+    await session.controllerCall('setTime', time);
+    await session.controllerCall('renderOnce');
+    captures.push(await session.writeCapture(filename, target));
+  };
+  await capture('final.design.png');
+  await capture('no-post.design.png', { mode: 'no-post' });
+  await capture('diagnostics.mosaic.png', { mode: 'diagnostics' });
+  await capture('camera.near.png', { camera: session.lab.cameras.includes('near') ? 'near' : designCamera });
+  await capture('camera.design.png');
+  await capture('camera.far.png', { camera: session.lab.cameras.includes('far') ? 'far' : designCamera });
+  await capture('seed-0001.final.png', { seed: representativeSeed });
+  await capture('seed-9e3779b9.final.png', { seed: stressSeed });
+  await capture('temporal.t000.png', { time: 0 });
+  await capture('temporal.t001.png', { time: 1 / 60 });
+  return Object.freeze({ captures: Object.freeze(captures) });
+}
+
+function canonicalJsonValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalJsonValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalJsonValue(value[key])]));
+}
+
+function sourceClosureDigest(value) {
+  return sha256(Buffer.from(JSON.stringify(canonicalJsonValue(value))));
+}
+
+export function resolveCaptureSourceClosure(hookResult, registrySourceClosure, {
+  preCaptureSourceClosure = null,
+  recomputedSourceClosure = null,
+  sourceClosureValidation = null,
+} = {}) {
+  const hookSourceClosure = hookResult?.sourceClosure;
+  const sourceClosure = hookSourceClosure && typeof hookSourceClosure === 'object'
+    ? hookSourceClosure
+    : registrySourceClosure;
+  if (!sourceClosure || typeof sourceClosure !== 'object' || Array.isArray(sourceClosure)) {
+    throw new TypeError('capture source closure is required');
+  }
+  if (sourceClosure.threeRevision !== EXPECTED_THREE_PACKAGE_REVISION) {
+    throw new Error(`capture source closure Three revision ${sourceClosure.threeRevision ?? '<missing>'} is not ${EXPECTED_THREE_PACKAGE_REVISION}`);
+  }
+  if (typeof sourceClosure.sourceHash !== 'string' || sourceClosure.sourceHash.length === 0) {
+    throw new Error('capture source closure must expose sourceHash');
+  }
+  if (typeof sourceClosure.buildRevision !== 'string' || sourceClosure.buildRevision.length === 0) {
+    throw new Error('capture source closure must expose buildRevision');
+  }
+  const customClosure = sourceClosureDigest(sourceClosure) !== sourceClosureDigest(registrySourceClosure);
+  if (customClosure) {
+    if (
+      sourceClosureValidation?.recomputeProviderExported !== true
+      || sourceClosureValidation?.validatorExported !== true
+    ) {
+      throw new Error('custom capture source closure requires both recompute and validate providers');
+    }
+    if (
+      sourceClosureValidation.preCaptureValidated !== true
+      || sourceClosureValidation.postCaptureValidated !== true
+      || sourceClosureValidation.hookResultValidated !== true
+    ) {
+      throw new Error('custom capture source closure requires successful pre-capture, post-capture, and hook-result validation');
+    }
+    if (!preCaptureSourceClosure || !recomputedSourceClosure) {
+      throw new Error('custom capture source closure requires pre-capture and post-capture recomputation');
+    }
+    for (const [label, candidate] of [
+      ['pre-capture', preCaptureSourceClosure],
+      ['post-capture', recomputedSourceClosure],
+    ]) {
+      if (candidate?.threeRevision !== EXPECTED_THREE_PACKAGE_REVISION) {
+        throw new Error(`${label} source closure has the wrong Three revision`);
+      }
+      if (typeof candidate?.sourceHash !== 'string' || typeof candidate?.buildRevision !== 'string') {
+        throw new Error(`${label} source closure is incomplete`);
+      }
+    }
+    const declaredDigest = sourceClosureDigest(sourceClosure);
+    const preCaptureDigest = sourceClosureDigest(preCaptureSourceClosure);
+    const postCaptureDigest = sourceClosureDigest(recomputedSourceClosure);
+    if (declaredDigest !== preCaptureDigest || declaredDigest !== postCaptureDigest) {
+      throw new Error('custom capture source closure drifted or was forged during capture');
+    }
+  }
+  return sourceClosure;
+}
+
+async function validateCaptureSourceClosureCandidate(validator, candidate, label) {
+  if (typeof validator !== 'function') return false;
+  const verdict = await validator(candidate);
+  if (verdict === false) throw new Error(`${label} source-closure validator rejected the candidate`);
+  return true;
 }
 
 export async function captureLabBrowser({
@@ -393,25 +1568,78 @@ export async function captureLabBrowser({
   const lab = registry.demos.find((entry) => entry.id === labId);
   if (!lab || !PRIMARY_DEMO_KINDS.includes(lab.kind)) throw new Error(`unknown primary lab: ${labId}`);
   if (!lab.browserEntry || !existsSync(join(REPO_ROOT, lab.browserEntry))) throw new Error(`${labId} has no executable browserEntry`);
+  if (lab.threeRevision !== EXPECTED_THREE_PACKAGE_REVISION) {
+    throw new Error(`${labId} manifest requires Three ${lab.threeRevision}; expected ${EXPECTED_THREE_PACKAGE_REVISION}`);
+  }
+  const installedThree = JSON.parse(readFileSync(join(REPO_ROOT, 'node_modules', 'three', 'package.json'), 'utf8')).version;
+  if (installedThree !== EXPECTED_THREE_PACKAGE_REVISION) {
+    throw new Error(`installed Three revision ${installedThree} does not match ${EXPECTED_THREE_PACKAGE_REVISION}`);
+  }
   const output = confinedOutput(outputDir ?? join(REPO_ROOT, 'artifacts', 'visual-validation', labId, profile));
   mkdirSync(output, { recursive: true });
+  confinedOutput(output);
+  const writeLedger = createCaptureWriteLedger();
+  const registrySourceClosure = Object.freeze({
+    algorithm: 'demo-registry-transitive-source-closure-v2',
+    roots: Object.freeze([...(lab.sourceHashInputs ?? lab.canonicalSource)]),
+    files: null,
+    threeRevision: EXPECTED_THREE_PACKAGE_REVISION,
+    sourceHash: lab.sourceHash,
+    buildRevision: registry.buildRevision,
+  });
+
+  let captureHook = null;
+  let outputPlan = BUILTIN_OUTPUT_PLAN;
+  let sourceClosureProvider = null;
+  let sourceClosureValidator = null;
+  let preCaptureSourceClosure = null;
+  let preCaptureSourceClosureValidated = false;
+  if (hookPath) {
+    const hookAbsolute = resolve(hookPath);
+    if (!existsSync(hookAbsolute)) throw new Error(`capture hook does not exist: ${hookAbsolute}`);
+    const hook = await import(pathToFileURL(hookAbsolute));
+    captureHook = hook.captureLab ?? hook.default;
+    if (typeof captureHook !== 'function') throw new Error('capture hook must export captureLab() or default function');
+    outputPlan = declaredHookOutputPlan(hook);
+    sourceClosureProvider = hook.recomputeCaptureSourceClosure ?? hook.computeCaptureSourceClosure ?? null;
+    sourceClosureValidator = hook.validateCaptureSourceClosure ?? null;
+    if (sourceClosureProvider !== null && typeof sourceClosureProvider !== 'function') {
+      throw new TypeError('capture source-closure provider must be a function');
+    }
+    if (sourceClosureValidator !== null && typeof sourceClosureValidator !== 'function') {
+      throw new TypeError('capture source-closure validator must be a function');
+    }
+    if (sourceClosureProvider) {
+      preCaptureSourceClosure = await sourceClosureProvider();
+      preCaptureSourceClosureValidated = await validateCaptureSourceClosureCandidate(
+        sourceClosureValidator,
+        preCaptureSourceClosure,
+        'pre-capture',
+      );
+    }
+  }
 
   const vite = await createServer({
     root: REPO_ROOT,
     appType: 'mpa',
     logLevel: 'error',
     resolve: { alias: labViteAliases(REPO_ROOT) },
+    optimizeDeps: { noDiscovery: true },
     server: { host: '127.0.0.1', port: 0, strictPort: false },
   });
   let browser = null;
   let page = null;
+  let controllerDisposed = false;
   const pageErrors = [];
+  const consoleErrors = [];
+  const requestErrors = [];
+  const writtenCaptures = [];
+  const startedAt = new Date().toISOString();
   try {
     await vite.listen();
     const address = vite.httpServer.address();
     if (!address || typeof address === 'string') throw new Error('Vite did not expose a TCP capture address');
-    const browserPath = lab.browserEntry.split('/').map(encodeURIComponent).join('/');
-    const url = `http://127.0.0.1:${address.port}/${browserPath}?capture=1&profile=${encodeURIComponent(profile)}`;
+    const url = buildCaptureUrl({ port: address.port, browserEntry: lab.browserEntry, profile });
     browser = await chromium.launch({
       headless: true,
       args: chromiumWebGpuLaunchArgs(),
@@ -421,8 +1649,44 @@ export async function captureLabBrowser({
       deviceScaleFactor: profileConfig.dpr,
     });
     page = await context.newPage();
+    await page.addInitScript(({ captureProfile, expectedLabId }) => {
+      Object.defineProperty(window, '__LAB_CAPTURE_PROFILE__', {
+        configurable: false,
+        enumerable: true,
+        writable: false,
+        value: Object.freeze({ id: captureProfile, labId: expectedLabId }),
+      });
+    }, { captureProfile: profile, expectedLabId: labId });
     page.on('pageerror', (error) => pageErrors.push(String(error.stack ?? error)));
+    page.on('console', (message) => {
+      if (message.type() === 'error') {
+        const location = message.location();
+        consoleErrors.push(`${message.text()}${location.url ? ` (${location.url}:${location.lineNumber}:${location.columnNumber})` : ''}`);
+      }
+    });
+    page.on('requestfailed', (request) => {
+      requestErrors.push(`${request.method()} ${request.url()}: ${request.failure()?.errorText ?? 'request failed'}`);
+    });
+    page.on('response', (response) => {
+      if (response.status() >= 400) requestErrors.push(`${response.status()} ${response.request().method()} ${response.url()}`);
+    });
+    page.on('crash', () => pageErrors.push('page crashed'));
     await page.goto(url, { waitUntil: 'load', timeout: 60_000 });
+    const finalUrl = page.url();
+    const requested = new URL(url);
+    const navigated = new URL(finalUrl);
+    if (navigated.origin !== requested.origin || navigated.pathname !== requested.pathname) {
+      throw new Error(`capture route changed from ${url} to ${finalUrl}`);
+    }
+    if (
+      navigated.searchParams.getAll('capture').length !== 1
+      || navigated.searchParams.get('capture') !== '1'
+      || navigated.searchParams.getAll('profile').length !== 1
+      || navigated.searchParams.get('profile') !== profile
+      || [...navigated.searchParams.keys()].some((key) => !new Set(['capture', 'profile']).has(key))
+    ) {
+      throw new Error(`capture route did not preserve its exact profile query: ${finalUrl}`);
+    }
     await page.waitForFunction((controllerGlobals) => (
       controllerGlobals.some((name) => window[name] !== undefined && window[name] !== null)
       || window.__LAB_ERROR__
@@ -431,10 +1695,8 @@ export async function captureLabBrowser({
     if (blocker) throw new Error(`canonical lab blocker: ${blocker}`);
     await awaitCanonicalReady(page);
     await controllerCall(page, 'resize', [profileConfig.width, profileConfig.height, profileConfig.dpr]);
-    if (lab.cameras.some((camera) => camera === 'design')) await controllerCall(page, 'setCamera', ['design']);
-    if (lab.seeds.includes(1)) await controllerCall(page, 'setSeed', [1]);
-    await controllerCall(page, 'setTime', [0]);
-    await controllerCall(page, 'renderOnce');
+    const lockedState = defaultCaptureState(lab, target);
+    await applyCaptureState(page, lockedState);
 
     const runtime = {
       metrics: await controllerCall(page, 'getMetrics'),
@@ -442,9 +1704,25 @@ export async function captureLabBrowser({
       resources: await controllerCall(page, 'describeResources'),
     };
     if (!backendProven(runtime.metrics)) {
-      throw new Error('LabController metrics did not prove backend.isWebGPUBackend === true');
+      throw new Error('LabController metrics did not prove one initialized native-WebGPU renderer device identity');
     }
-
+    assertCaptureRuntimeProfile(runtime, profile);
+    const observedRevision = String(runtimeThreeRevision(runtime.metrics) ?? '');
+    if (![EXPECTED_THREE_RUNTIME_REVISION, EXPECTED_THREE_PACKAGE_REVISION].includes(observedRevision)) {
+      throw new Error(`LabController metrics reported Three ${observedRevision || '<missing>'}; expected r${EXPECTED_THREE_RUNTIME_REVISION}`);
+    }
+    const observedLabId = firstDefined(
+      runtime.metrics?.labId,
+      runtime.metrics?.sceneId,
+      runtime.metrics?.routeSelection?.labId,
+    );
+    if (observedLabId !== undefined && observedLabId !== labId) {
+      throw new Error(`LabController runtime lab ID ${observedLabId} does not match ${labId}`);
+    }
+    const observedState = extractCaptureState(runtime.metrics);
+    assertCaptureState(observedState, lockedState);
+    assertNoCaptureFailures({ pageErrors, consoleErrors, requestErrors, runtime });
+    const browserRecord = await collectBrowserRecord(browser, page, runtime.metrics);
     const session = {
       page,
       lab,
@@ -452,58 +1730,158 @@ export async function captureLabBrowser({
       profileConfig,
       outputDir: output,
       url,
+      finalUrl,
+      requestedUrl: url,
+      captureProfile: Object.freeze({ id: profile, ...profileConfig }),
+      automationSurface: 'playwright-headless-chromium',
+      sourceClosure: registrySourceClosure,
+      sourceClosureHash: registrySourceClosure.sourceHash,
+      buildRevision: registrySourceClosure.buildRevision,
+      threeRevision: EXPECTED_THREE_PACKAGE_REVISION,
+      lockedState,
+      observedState,
+      outputPlan,
       runtime,
       controllerCall: (method, ...args) => controllerCall(page, method, args),
       capturePixels: (captureTarget) => capturePixels(page, captureTarget),
+      async readArtifact(relativePath) {
+        return readFileSync(captureArtifactPath(output, relativePath));
+      },
+      async writeArtifact(relativePath, bytes) {
+        if (writeLedger.has(relativePath)) throw new Error(`capture session wrote ${relativePath} more than once`);
+        const path = prepareArtifactWrite(output, relativePath);
+        const existedBefore = existsSync(path);
+        writeFileSync(path, bytes);
+        writeLedger.record(relativePath, 'hook-artifact', { existedBefore });
+      },
       async writeCapture(filename, captureTarget) {
         const capture = await capturePixels(page, captureTarget);
-        writeFileSync(join(output, filename), encodeRgbaPng(capture));
-        return {
-          target: capture.target,
-          width: capture.width,
-          height: capture.height,
-          bytesPerPixel: capture.bytesPerPixel,
-          bytesPerRow: capture.bytesPerRow,
-          sourceBytesPerRow: capture.sourceBytesPerRow,
-          sourceByteLength: capture.sourceByteLength,
-          transportByteLength: capture.transportByteLength,
-          sourceLayout: capture.sourceLayout,
-          format: capture.format,
-          colorEncoding: capture.colorEncoding,
-        };
+        if (capture.target !== captureTarget) {
+          throw new Error(`LabController returned capture target ${capture.target} for requested ${captureTarget}`);
+        }
+        const payload = buildCaptureArtifactPayload(capture, filename);
+        writeCapturePayload(output, payload, writeLedger);
+        const metadata = captureMetadataOnly(payload);
+        writtenCaptures.push(metadata);
+        return metadata;
       },
     };
 
-    let hookResult;
-    if (hookPath) {
-      const hookAbsolute = resolve(hookPath);
-      if (!existsSync(hookAbsolute)) throw new Error(`capture hook does not exist: ${hookAbsolute}`);
-      const hook = await import(pathToFileURL(hookAbsolute));
-      const captureHook = hook.captureLab ?? hook.default;
-      if (typeof captureHook !== 'function') throw new Error('capture hook must export captureLab() or default function');
-      hookResult = await captureHook(session);
-    } else {
-      hookResult = { captures: [await session.writeCapture('final.design.png', target)] };
+    const hookResult = captureHook
+      ? await captureHook(session)
+      : await runBuiltinCapture(session, target);
+    const verifiedOutputs = validateCapturedOutputs(
+      output,
+      outputPlan,
+      writtenCaptures,
+      writeLedger,
+      hookResult,
+    );
+    const finalRuntime = {
+      metrics: await controllerCall(page, 'getMetrics'),
+      pipeline: await controllerCall(page, 'describePipeline'),
+      resources: await controllerCall(page, 'describeResources'),
+    };
+    const closingRegistry = buildDemoRegistry();
+    const closingLab = closingRegistry.demos.find((entry) => entry.id === labId);
+    if (
+      closingLab?.sourceHash !== lab.sourceHash
+      || closingRegistry.buildRevision !== registry.buildRevision
+    ) {
+      throw new Error('canonical source or build revision changed during capture');
     }
+    if (!backendProven(finalRuntime.metrics)) {
+      throw new Error('final LabController metrics lost native WebGPU backend proof');
+    }
+    assertCaptureRuntimeProfile(finalRuntime, profile);
+    assertNoCaptureFailures({ pageErrors, consoleErrors, requestErrors, runtime: finalRuntime });
+    await controllerCall(page, 'dispose');
+    controllerDisposed = true;
+    const postDisposeSnapshot = await waitForPostDisposeObservations(page);
+    assertNoCaptureFailures({
+      pageErrors,
+      consoleErrors,
+      requestErrors,
+      runtime: { finalRuntime, postDisposeSnapshot },
+    });
 
+    const recomputedSourceClosure = sourceClosureProvider
+      ? await sourceClosureProvider()
+      : null;
+    const postCaptureSourceClosureValidated = recomputedSourceClosure
+      ? await validateCaptureSourceClosureCandidate(
+        sourceClosureValidator,
+        recomputedSourceClosure,
+        'post-capture',
+      )
+      : false;
+    const hookResultSourceClosureValidated = hookResult?.sourceClosure
+      ? await validateCaptureSourceClosureCandidate(
+        sourceClosureValidator,
+        hookResult.sourceClosure,
+        'hook-result',
+      )
+      : false;
+    const sourceClosure = resolveCaptureSourceClosure(hookResult, registrySourceClosure, {
+      preCaptureSourceClosure,
+      recomputedSourceClosure,
+      sourceClosureValidation: Object.freeze({
+        recomputeProviderExported: typeof sourceClosureProvider === 'function',
+        validatorExported: typeof sourceClosureValidator === 'function',
+        preCaptureValidated: preCaptureSourceClosureValidated,
+        postCaptureValidated: postCaptureSourceClosureValidated,
+        hookResultValidated: hookResultSourceClosureValidated,
+      }),
+    });
+
+    const captureSessionPath = prepareArtifactWrite(output, 'capture-session.json');
+    const captureSessionExisted = existsSync(captureSessionPath);
+    writeLedger.record('capture-session.json', 'capture-session-record', { existedBefore: captureSessionExisted });
     const record = {
       schemaVersion: 2,
       labId,
-      sourceHash: lab.sourceHash,
-      buildRevision: registry.buildRevision,
+      sourceHash: sourceClosure.sourceHash,
+      sourceClosureHash: sourceClosure.sourceHash,
+      sourceClosure,
+      buildRevision: sourceClosure.buildRevision,
+      threeRevision: EXPECTED_THREE_PACKAGE_REVISION,
       profile,
       profileConfig,
+      automationSurface: 'playwright-headless-chromium',
+      adapterClass: browserRecord.adapterClass,
+      adapterIdentity: browserRecord.adapterIdentity,
+      browser: browserRecord,
       browserEntry: lab.browserEntry,
       url,
+      finalUrl,
+      route: Object.freeze({
+        requestedUrl: url,
+        finalUrl,
+        browserEntry: lab.browserEntry,
+        manifestLabId: labId,
+        observedRuntimeLabId: observedLabId ?? null,
+        lockedState,
+        observedState,
+        finalState: extractCaptureState(finalRuntime.metrics),
+      }),
+      startedAt,
+      finishedAt: new Date().toISOString(),
       runtime,
+      finalRuntime,
+      postDisposeSnapshot,
+      outputPlan: verifiedOutputs,
+      writtenCaptures: Object.freeze(writtenCaptures),
+      artifactWrites: writeLedger.snapshot(),
       hookResult: hookResult ?? null,
       pageErrors,
+      consoleErrors,
+      requestErrors,
       note: 'Capture-session record only; it is not a complete v2 evidence bundle.',
     };
-    writeFileSync(join(output, 'capture-session.json'), `${JSON.stringify(record, null, 2)}\n`);
+    writeFileSync(captureSessionPath, `${JSON.stringify(record, null, 2)}\n`);
     return record;
   } finally {
-    if (page) {
+    if (page && !controllerDisposed) {
       try { await controllerCall(page, 'dispose'); } catch { /* page may already be closed or blocked */ }
     }
     if (browser) await browser.close();
