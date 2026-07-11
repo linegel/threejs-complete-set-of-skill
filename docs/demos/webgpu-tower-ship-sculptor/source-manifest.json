@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-tower-ship-sculptor",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
+  ],
+  "sourceHashInputs": [
+    "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
+  ],
+  "browserEntry": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/index.html",
+  "sourceHash": "sha256:5c5f8a86ef59bf3b3d658b9392c667bc37f256c960e0af3fdbb3b3e678a96134",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-tower-ship-sculptor",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:f1e67e6e5b20af46bc1a498c90015bf3894f389042b2d6eba4a146aefce3640b",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
+  "evidenceBundleId": null
+}

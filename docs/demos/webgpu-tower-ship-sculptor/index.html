@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#091012" />
+    <title>WebGPU Tower Ship Sculptor | Three.js WebGPU Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --ink: #f2eadb;
+        --muted: #9ca9aa;
+        --panel: rgba(10, 17, 18, 0.82);
+        --line: rgba(231, 212, 175, 0.17);
+        --accent: #e7b66a;
+      }
+      * { box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #091012; color: var(--ink); }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at 72% 22%, rgba(225, 157, 78, 0.09), transparent 36%), linear-gradient(180deg, transparent 68%, rgba(0, 0, 0, 0.28));
+      }
+      canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+      .brand {
+        position: fixed;
+        top: 24px;
+        left: 28px;
+        z-index: 3;
+        display: grid;
+        gap: 4px;
+        pointer-events: none;
+      }
+      .eyebrow { color: var(--accent); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.18em; text-transform: uppercase; }
+      h1 { margin: 0; font: 560 clamp(25px, 3vw, 42px)/1.05 Georgia, "Times New Roman", serif; letter-spacing: -0.025em; }
+      .brand p { max-width: 450px; margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .controls {
+        position: fixed;
+        right: 24px;
+        top: 24px;
+        z-index: 4;
+        width: min(330px, calc(100vw - 48px));
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(18px) saturate(1.2);
+      }
+      .controls header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+      .controls h2 { margin: 0; font-size: 14px; font-weight: 650; }
+      #status { color: var(--muted); font: 600 9px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+      .selects { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+      label { display: grid; gap: 5px; color: var(--muted); font: 700 9px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+      label:first-child { grid-column: 1 / -1; }
+      select, button {
+        width: 100%;
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.045);
+        color: var(--ink);
+        padding: 0 10px;
+        font: 600 12px/1 ui-sans-serif, system-ui, sans-serif;
+      }
+      select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      select:disabled { opacity: 0.72; }
+      .mode-copy { margin: 14px 0; padding: 13px 0; border-block: 1px solid var(--line); }
+      .mode-copy strong { display: block; margin-bottom: 5px; font-size: 13px; }
+      .mode-copy span { display: block; color: var(--muted); font-size: 11px; line-height: 1.45; }
+      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .metric { padding: 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.035); }
+      .metric b { display: block; font: 660 15px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .metric span { color: var(--muted); font-size: 9px; text-transform: uppercase; }
+      button { margin-top: 12px; cursor: pointer; background: rgba(231, 182, 106, 0.1); color: #f4d39d; }
+      button:hover { background: rgba(231, 182, 106, 0.16); border-color: rgba(231, 182, 106, 0.42); }
+      .reference {
+        position: fixed;
+        z-index: 3;
+        left: 28px;
+        bottom: 26px;
+        width: min(450px, calc(100vw - 56px));
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.36);
+        backdrop-filter: blur(18px);
+        transform: translateY(calc(100% + 36px));
+        opacity: 0;
+        transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 180ms ease;
+      }
+      .reference[data-open] { transform: translateY(0); opacity: 1; }
+      .reference img { display: block; width: 100%; border-radius: 7px; }
+      .reference footer { display: flex; justify-content: space-between; gap: 16px; padding: 9px 3px 1px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+      .reference a { color: var(--accent); text-decoration: none; }
+      .interaction-hint { position: fixed; z-index: 2; left: 50%; bottom: 18px; transform: translateX(-50%); color: rgba(230, 235, 232, 0.58); font: 600 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; }
+      @media (max-width: 740px) {
+        .brand { top: 18px; left: 18px; }
+        .brand p { display: none; }
+        .controls { top: auto; right: 14px; bottom: 14px; width: calc(100vw - 28px); }
+        .mode-copy { display: none; }
+        .reference { left: 14px; bottom: 260px; width: calc(100vw - 28px); }
+        .interaction-hint { display: none; }
+      }
+    </style>
+    <meta name="lab-id" content="webgpu-tower-ship-sculptor">
+  <meta name="acceptance-status" content="incomplete">
+  <style>.lab-status-banner{position:fixed;z-index:2147483647;top:10px;left:50%;transform:translateX(-50%);max-width:min(800px,calc(100vw - 20px));padding:8px 12px;border:1px solid #ffb454;background:rgba(8,11,16,.95);color:#f7e7c5;font:600 12px/1.4 ui-monospace,monospace}.lab-status-banner a{color:#7fd4c1}</style>
+  <meta name="description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Tower Ship Sculptor, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="owning-skill" content="threejs-object-sculptor">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="WebGPU Tower Ship Sculptor | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Tower Ship Sculptor, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta property="og:url" content="https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/">
+  <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="760">
+  <meta property="og:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack; not evidence for WebGPU Tower Ship Sculptor">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WebGPU Tower Ship Sculptor | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Tower Ship Sculptor, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated validation.">
+  <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png">
+  <meta name="twitter:image:alt" content="Generated crater-field asset preview from the Three.js WebGPU Skill Pack; not evidence for WebGPU Tower Ship Sculptor">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/#demo","name":"WebGPU Tower Ship Sculptor","description":"Interactive Three.js WebGPU/TSL demo for WebGPU Tower Ship Sculptor, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated validation.","url":"https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","image":"https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png","about":["Three.js","WebGPU","TSL","Three.js Object Sculptor"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Three.js Object Sculptor","item":"https://threejs-skills.com/skills/threejs-object-sculptor.html"},{"@type":"ListItem","position":3,"name":"WebGPU Tower Ship Sculptor","item":"https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/"}]}]}</script>
+  <style data-demo-seo-shell-style>
+.demo-seo-shell{position:fixed;z-index:2147483000;left:12px;bottom:12px;display:block;box-sizing:border-box;width:min(460px,calc(100vw - 24px));max-height:min(58vh,560px);margin:0;color:#f3efe6;background:rgba(8,11,16,.94);border-radius:20px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 18px 60px rgba(0,0,0,.42);font:14px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;backdrop-filter:blur(18px) saturate(1.15);overflow:auto}.demo-seo-shell *{box-sizing:border-box}.demo-seo-shell details{margin:0}.demo-seo-shell summary{min-height:44px;display:flex;align-items:center;padding:10px 16px;cursor:pointer;color:#ffca80;font-weight:700;text-wrap:balance;list-style:none;transition-property:color,background-color,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell summary::-webkit-details-marker{display:none}.demo-seo-shell summary:after{content:"+";margin-left:auto;font:700 18px/1 ui-monospace,monospace}.demo-seo-shell details[open] summary:after{content:"−"}.demo-seo-shell summary:hover{color:#fff;background:rgba(255,255,255,.045)}.demo-seo-shell summary:active{scale:.96}.demo-seo-shell summary:focus-visible,.demo-seo-shell a:focus-visible{outline:2px solid #7fd4c1;outline-offset:-3px}.demo-seo-shell__body{padding:2px 16px 16px}.demo-seo-shell h1,.demo-seo-shell h2,.demo-seo-shell h3{margin:0 0 8px;color:#fff;line-height:1.14;text-wrap:balance}.demo-seo-shell h1,.demo-seo-shell h2{font-size:clamp(21px,4vw,29px)}.demo-seo-shell h3{margin-top:15px;font-size:15px;color:#ffca80}.demo-seo-shell p,.demo-seo-shell li,.demo-seo-shell dd{margin:0;text-wrap:pretty}.demo-seo-shell p+p{margin-top:9px}.demo-seo-shell strong{color:#ffca80;font:inherit;font-weight:750}.demo-seo-shell__kicker{margin-bottom:7px!important;color:#7fd4c1;font:600 10px/1.4 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}.demo-seo-shell__evidence{color:#d6d0c4}.demo-seo-shell dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 0}.demo-seo-shell dl div{min-width:0;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.045);box-shadow:0 0 0 1px rgba(255,255,255,.07)}.demo-seo-shell dt{color:#9a988f;font:600 9px/1.35 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase}.demo-seo-shell dd{margin-top:3px;color:#f3efe6;font-size:12px}.demo-seo-shell ul{display:grid;gap:4px;margin:0;padding-left:18px;color:#d6d0c4}.demo-seo-shell code{color:#7fd4c1;font:600 11px/1.4 ui-monospace,monospace}.demo-seo-shell nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.demo-seo-shell a{min-height:40px;display:inline-flex;align-items:center;padding:8px 11px;border-radius:10px;color:#f3efe6;background:rgba(127,212,193,.08);box-shadow:0 0 0 1px rgba(127,212,193,.2);text-decoration:none;font-weight:650;transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell a:hover{color:#fff;background:rgba(127,212,193,.16);box-shadow:0 0 0 1px rgba(127,212,193,.36)}.demo-seo-shell a:active{scale:.96}@media(max-width:560px){.demo-seo-shell{max-height:52vh}.demo-seo-shell dl{grid-template-columns:1fr}.demo-seo-shell__body{padding-inline:14px}}@media(prefers-reduced-motion:reduce){.demo-seo-shell summary,.demo-seo-shell a{transition-duration:0ms}}
+</style>
+  <script type="module" crossorigin src="../assets/index-Cjs2hCPl2.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-BfCkjjtt.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl-Bj6griTS.js">
+  <link rel="modulepreload" crossorigin href="../assets/OrbitControls-BSeBcSbS.js">
+</head>
+  <body>
+<main class="demo-seo-shell" data-demo-seo-shell data-demo-id="webgpu-tower-ship-sculptor" data-owning-skill="threejs-object-sculptor">
+  <details open>
+    <summary>About this WebGPU demo</summary>
+    <div class="demo-seo-shell__body">
+      <p class="demo-seo-shell__kicker">Canonical Lab · Three.js 0.185.1</p>
+      <h2>WebGPU Tower Ship Sculptor</h2>
+      <p>Interactive Three.js WebGPU/TSL demo for WebGPU Tower Ship Sculptor, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
+      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
+      <p>Use the linked skill, registry, and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
+      <dl>
+        <div><dt>Owning skill</dt><dd>Three.js Object Sculptor</dd></div>
+        <div><dt>Published routes</dt><dd>3 scenarios · 5 mechanisms · 3 quality tiers</dd></div>
+      </dl>
+      <h3>Supported mechanisms</h3>
+      <ul data-demo-mechanisms><li><code>final</code> — Final</li><li><code>blockout</code> — Blockout</li><li><code>hierarchy</code> — Hierarchy</li><li><code>materials</code> — Materials</li><li><code>interaction</code> — Interaction</li></ul>
+      <nav aria-label="Demo documentation and provenance"><a href="../../skills/threejs-object-sculptor.html">Owning skill</a><a href="../registry.json">Demo registry</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-object-sculptor">Source repository</a></nav>
+    </div>
+  </details>
+</main><aside class="lab-status-banner"><strong>Canonical lab incomplete.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../registry.json">Registry</a>.</aside>
+    <canvas id="scene" aria-label="Interactive procedural Tower Ship reconstruction"></canvas>
+    <section class="brand" aria-label="Demo title">
+      <span class="eyebrow">Object Sculptor / WebGPU</span>
+      <h1>Tower Ship</h1>
+      <p>A procedural, action-ready reconstruction. Every oar, roof, cabin tier, rigging socket, and lantern remains independently addressable.</p>
+    </section>
+    <aside class="controls" aria-label="Demo controls">
+      <header><h2>Sculpt inspection</h2><span id="status">initializing WebGPU</span></header>
+      <div class="selects">
+        <label>Mode<select id="mode" aria-label="Inspection mode"></select></label>
+        <label>Tier<select id="tier" aria-label="Geometry tier"></select></label>
+        <label>Camera<select id="camera" aria-label="Review camera"></select></label>
+      </div>
+      <div class="mode-copy"><strong id="mode-title"></strong><span id="mode-description"></span></div>
+      <div class="metrics" aria-label="Live geometry metrics">
+        <div class="metric"><b id="metric-nodes">—</b><span>nodes</span></div>
+        <div class="metric"><b id="metric-triangles">—</b><span>triangles</span></div>
+        <div class="metric"><b id="metric-oars">—</b><span>oars</span></div>
+      </div>
+      <button id="compare" type="button" aria-pressed="false">Compare reference</button>
+    </aside>
+    <figure class="reference" id="reference-panel">
+      <img id="reference-image" width="2880" height="1624" alt="Original Tower Ship procedural reconstruction reference" />
+      <footer>
+        <span>Reference and upstream Object Sculptor concept by Vinh Hiển.</span>
+        <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin" target="_blank" rel="noreferrer">Original project ↗</a>
+      </footer>
+    </figure>
+    <div class="interaction-hint">Drag to orbit · wheel to dolly · fixed cameras available above</div>
+  </body>
+</html>
