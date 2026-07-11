@@ -1,4 +1,17 @@
 {
   "type": "module",
-  "private": true
+  "name": "threejs-webgpu-procedural-timelines-lab",
+  "private": true,
+  "scripts": {
+    "check": "node --check timeline.js && node --check quaternion-helpers.js && node --check gpu-instance-motion.js && node --check route-state.js && node --check main.js && node --check browser.mjs && node --check validation.js && node --check mutation-test.js && node --check manifest-test.mjs && node --check local-lab-command.mjs",
+    "validate:unit": "node validation.js && node manifest-test.mjs",
+    "test:mutations": "node mutation-test.js",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-procedural-timelines --target presentation",
+    "validate:artifacts": "node manifest-test.mjs && node local-lab-command.mjs artifacts",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  }
 }

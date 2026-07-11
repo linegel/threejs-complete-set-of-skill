@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-procedural-timelines",
+  "skill": "threejs-procedural-motion-systems",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/gpu-instance-motion.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/browser.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/launch-and-staging/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/spin-docking/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/debris-release/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/quaternion-and-reparent/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/compute-storage/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/interpolation-and-velocity/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/full/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/balanced/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/test-minimum/index.html"
+  ],
+  "browserEntry": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
+  "publishPath": "/demos/webgpu-procedural-timelines/",
+  "scenarios": [
+    { "id": "launch-and-staging", "acceptanceStatus": "incomplete" },
+    { "id": "spin-docking", "acceptanceStatus": "incomplete" },
+    { "id": "debris-release", "acceptanceStatus": "incomplete" }
+  ],
+  "mechanisms": [
+    { "id": "launch-and-staging", "route": "mechanism/launch-and-staging/", "acceptanceStatus": "incomplete" },
+    { "id": "spin-docking", "route": "mechanism/spin-docking/", "acceptanceStatus": "incomplete" },
+    { "id": "debris-release", "route": "mechanism/debris-release/", "acceptanceStatus": "incomplete" },
+    { "id": "quaternion-and-reparent", "route": "mechanism/quaternion-and-reparent/", "acceptanceStatus": "incomplete" },
+    { "id": "compute-storage", "route": "mechanism/compute-storage/", "acceptanceStatus": "incomplete" },
+    { "id": "interpolation-and-velocity", "route": "mechanism/interpolation-and-velocity/", "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [
+    {
+      "id": "full",
+      "targetClass": "current native-WebGPU adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": { "value": 2, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
+      "mechanismLimits": { "instanceCapacity": { "value": 4096, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
+      "resourceLimits": { "motionStorageBytes": { "value": 589824, "unit": "bytes", "label": "Derived", "source": "4096 * 144" } },
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["fixed-step semantics", "exact terminal lock", "previous/current transforms"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balanced",
+      "targetClass": "current native-WebGPU adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": { "value": 1.5, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
+      "mechanismLimits": { "instanceCapacity": { "value": 2048, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
+      "resourceLimits": { "motionStorageBytes": { "value": 294912, "unit": "bytes", "label": "Derived", "source": "2048 * 144" } },
+      "degradationFromPrevious": ["halve recurrent instance capacity", "lower DPR cap"],
+      "preservedInvariants": ["fixed-step semantics", "exact terminal lock", "previous/current transforms"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "test-minimum",
+      "targetClass": "correctness fixture",
+      "frameTargetMs": null,
+      "resolutionPolicy": { "dprCap": { "value": 1, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
+      "mechanismLimits": { "instanceCapacity": { "value": 64, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
+      "resourceLimits": { "motionStorageBytes": { "value": 9216, "unit": "bytes", "label": "Derived", "source": "64 * 144" } },
+      "degradationFromPrevious": ["reduce recurrent instance capacity to fixture scale", "lower DPR cap"],
+      "preservedInvariants": ["native WebGPU", "fixed-step semantics", "exact terminal lock", "previous/current transforms"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "velocity", "emissive", "normal"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "storage-buffer", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "compute", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "runtimeProof": [
+    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "compute-storage-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "mrt-readback", "required": true, "evidence": null, "status": "incomplete" },
+    { "id": "current-adapter-gpu-timestamp", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:unit",
+  "commands": {
+    "check": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run check",
+    "test": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:unit",
+    "mutations": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run test:mutations",
+    "capture": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run capture",
+    "validateArtifacts": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:quick",
+    "validateFull": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null
+}

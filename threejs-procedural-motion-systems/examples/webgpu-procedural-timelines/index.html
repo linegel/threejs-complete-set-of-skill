@@ -3,15 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WebGPU Procedural Timelines</title>
+    <title>Native WebGPU Procedural Motion Lab</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #050812; color: #dce9ff; font: 13px/1.45 ui-monospace, monospace; }
+      canvas { display: block; width: 100vw; height: 100vh; }
+      aside { position: fixed; inset: 12px auto auto 12px; width: min(500px, calc(100vw - 48px)); padding: 12px; border: 1px solid #536a98; background: #07101ee8; }
+      pre { max-height: 64vh; overflow: auto; white-space: pre-wrap; }
+    </style>
   </head>
   <body>
     <canvas id="scene"></canvas>
+    <aside>
+      <strong>Native WebGPU procedural timelines</strong>
+      <pre data-motion-debug>Initializing WebGPU…</pre>
+    </aside>
     <script type="module">
       import { createProceduralTimelineDemo } from "./main.js";
 
       const demo = createProceduralTimelineDemo();
       await demo.initialize({ canvas: document.querySelector("#scene") });
+      globalThis.__LAB_CONTROLLER__ = demo.labController;
     </script>
   </body>
 </html>
