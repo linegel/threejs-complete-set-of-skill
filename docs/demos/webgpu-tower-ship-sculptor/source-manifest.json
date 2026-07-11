@@ -15,8 +15,8 @@
     "docs/demos/webgpu-tower-ship-sculptor",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:5de0b16ce44faf2b1aef788417ce582d482cedf89eb082c8b1316057882be44c",
+  "publishedBundleHash": "sha256:f7ea6a64cac37a83862793a489d2b98d0e001dec286c31dd47558667e4eb3fa0",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551",
+  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
   "evidenceBundleId": null
 }

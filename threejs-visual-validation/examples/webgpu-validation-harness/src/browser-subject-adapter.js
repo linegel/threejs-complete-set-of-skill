@@ -3,6 +3,7 @@ import {
 	BoxGeometry,
 	Color,
 	DirectionalLight,
+	FloatType,
 	HalfFloatType,
 	Mesh,
 	MeshStandardNodeMaterial,
@@ -20,6 +21,7 @@ import {
 import { color, emissive, float, mrt, normalView, output, pass, renderOutput, vec4 } from 'three/tsl';
 
 import { unpackAlignedReadback } from './readback.js';
+import { buildValidationResourceLedger } from './resource-ledger.js';
 import { snapshotRendererInfo } from './renderer-info-snapshot.js';
 
 const SCENARIO_IDS = [
@@ -150,6 +152,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	const normalNode = scenePass.getTextureNode( 'normal' );
 	const emissiveNode = scenePass.getTextureNode( 'emissive' );
 	const depthNode = scenePass.getTextureNode( 'depth' );
+	scenePass.renderTarget.depthTexture.type = FloatType;
 	const finalLinearNode = vec4( outputNode.rgb.add( emissiveNode.rgb.mul( float( 0.12 ) ) ), outputNode.a );
 	const modeNodes = {
 		final: renderOutput( finalLinearNode ),
@@ -393,18 +396,12 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 		describeResources() {
 
-			const pixelWidth = captureTarget.width;
-			const pixelHeight = captureTarget.height;
-			return {
-				renderTargets: [
-					{ name: 'output', owner: 'scene-pass', width: pixelWidth, height: pixelHeight, format: 'rgba16float', bytes: pixelWidth * pixelHeight * 8 },
-					{ name: 'normal', owner: 'scene-pass', width: pixelWidth, height: pixelHeight, format: 'rgba16float', bytes: pixelWidth * pixelHeight * 8 },
-					{ name: 'emissive', owner: 'scene-pass', width: pixelWidth, height: pixelHeight, format: 'rgba16float', bytes: pixelWidth * pixelHeight * 8 },
-					{ name: 'capture-target', owner: 'validation-capture', width: pixelWidth, height: pixelHeight, format: 'rgba8unorm', bytes: pixelWidth * pixelHeight * 4 }
-				],
-				storageResources: [],
-				readbackPolicy: 'render target copy with 256-byte aligned rows; unpacked after map completion'
-			};
+			return buildValidationResourceLedger( {
+				sceneWidth: scenePass.renderTarget.width,
+				sceneHeight: scenePass.renderTarget.height,
+				captureWidth: captureTarget.width,
+				captureHeight: captureTarget.height
+			} );
 
 		},
 

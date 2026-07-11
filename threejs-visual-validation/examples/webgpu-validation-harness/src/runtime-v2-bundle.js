@@ -37,10 +37,11 @@ function percentile( samples, quantile ) {
 
 }
 
-function bytesPerTexel( format ) {
+export function bytesPerTexel( format ) {
 
 	if ( format === 'rgba16float' ) return 8;
 	if ( format === 'rgba8unorm' || format === 'rgba8' ) return 4;
+	if ( format === 'depth32float' ) return 4;
 	throw new Error( `Runtime v2 assembler does not know the byte width of ${ format }.` );
 
 }
@@ -69,6 +70,8 @@ function readbackEvidence( width, height, byteWidth, observed = null ) {
 function targetArtifact( target, finalCapture ) {
 
 	const byteWidth = bytesPerTexel( target.format );
+	if ( target.bytesPerTexel !== byteWidth ) throw new Error( `${ target.name } bytesPerTexel does not match ${ target.format }.` );
+	if ( target.bytes !== target.width * target.height * byteWidth ) throw new Error( `${ target.name } byte total does not reconcile with its extent and format.` );
 	const isCaptureTarget = target.name === 'capture-target';
 	return {
 		name: target.name,
@@ -249,8 +252,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		'Correctness capture only; no sustained performance window was run.',
 		'One resolved render timestamp proves availability but not per-stage GPU attribution.',
 		...( lifecycle === null ? [ 'No lifecycle create/render/resize/mode/tier/dispose loop was run.' ] : [] ),
-		'Adapter identity, adapter features, adapter limits, display refresh, and presentation cadence were not exposed by this capture path.',
-		'Depth is reachable in the runtime graph but is not yet included in the explicit byte inventory.'
+		'Adapter identity, adapter features, adapter limits, display refresh, and presentation cadence were not exposed by this capture path.'
 	];
 	const visualContract = schema( {
 		contractRevision: 'webgpu-validation-runtime-v2-incomplete-1',
@@ -423,7 +425,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		staging: [ 'WebGPU readback staging is transient and its allocation bytes are not exposed' ],
 		readback: [ 'capture-target' ],
 		pipelineEstimate: 'unavailable from current renderer metrics',
-		residentBytes: D( totalTargetBytes, 'byte', 'sum of reported render-target bytes; depth is not yet inventoried' ),
+		residentBytes: D( totalTargetBytes, 'byte', 'sum of exact logical color, depth32float, and capture-target allocations' ),
 		peakLiveTransientBytes: D( totalTargetBytes, 'byte', 'reported targets only; staging allocation unavailable' ),
 		uploadChurnPerFrame: A( 0, 'byte/frame', 'not measured; no upload-churn claim' )
 	} );
@@ -436,7 +438,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		lowerBoundBytesPerFrame: D( totalTargetBytes, 'byte/frame', 'reported target store lower bound' ),
 		upperBoundBytesPerFrame: D( totalTargetBytes * 2, 'byte/frame', 'reported target load-plus-store upper bound' ),
 		bytesPerSecond: D( totalTargetBytes * targetRate, 'byte/s', 'lower bound * authored target rate' ),
-		assumptions: [ 'No compression, cache, tile residency, depth, or staging byte claim.' ],
+		assumptions: [ 'Logical uncompressed target bytes include depth32float; physical compression, cache, tile residency, and staging remain unclaimed.' ],
 		hardwareCountersAvailable: false,
 		verdict: 'INSUFFICIENT_EVIDENCE'
 	} );

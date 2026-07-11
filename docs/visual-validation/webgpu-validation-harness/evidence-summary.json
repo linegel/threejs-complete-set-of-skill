@@ -7,7 +7,7 @@
   "canonicalSource": [
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
-  "canonicalSourceHash": "sha256:bf4b476ae21967652149acd979e3c1550ae6d8c85867549d9d60f347cf320a48",
+  "canonicalSourceHash": "sha256:713826386f272e2643875961250313dc27043c11f8e721f48213e7eb41be2e17",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",

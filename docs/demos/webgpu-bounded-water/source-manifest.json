@@ -24,8 +24,8 @@
     "docs/demos/webgpu-bounded-water",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:6708c7aa3b69b0f253d00c36f7ff3486fd5364a5617083bb8a92a7e83d6bed0d",
+  "publishedBundleHash": "sha256:d19b921c799205986b37890ed66d8aaaf78b5256f80cc9ae7775ee5c3280a058",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551",
+  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
   "evidenceBundleId": null
 }

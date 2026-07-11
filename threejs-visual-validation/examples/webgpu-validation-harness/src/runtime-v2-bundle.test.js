@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
+import { bytesPerTexel, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
 
 function lifecycleFixture( mutate = () => {} ) {
 
@@ -42,5 +42,14 @@ test( 'lifecycle reducer rejects missing, non-WebGPU, and retained-resource cycl
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => fixture.snapshots.pop() ) ), /snapshot count/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 7 ].beforeDispose.backend.isWebGPUBackend = false; } ) ), /did not initialize native WebGPU/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 12 ].afterDispose.rendererInfo.memory.textures = 1; } ) ), /retained renderer memory/ );
+
+} );
+
+test( 'runtime bundle format widths include the canonical depth allocation', () => {
+
+	assert.equal( bytesPerTexel( 'rgba16float' ), 8 );
+	assert.equal( bytesPerTexel( 'rgba8unorm' ), 4 );
+	assert.equal( bytesPerTexel( 'depth32float' ), 4 );
+	assert.throws( () => bytesPerTexel( 'depth24plus' ), /does not know the byte width/ );
 
 } );
