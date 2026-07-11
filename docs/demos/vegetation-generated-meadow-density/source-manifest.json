@@ -23,8 +23,8 @@
     "docs/demos/vegetation-generated-meadow-density",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:68dc3c2ef1697af1a623d55d230403f356128622602b8296b9a8730dfca7c2e2",
+  "publishedBundleHash": "sha256:e9e9cb29a0435b6176a1f06859f8528c672fc161f83fc2c9b83198715d7238b9",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e9c56b395c1fc456976e3e8c318897ce15adb3060c35dc19616ef04c68c1cbc9",
   "evidenceBundleId": null
 }

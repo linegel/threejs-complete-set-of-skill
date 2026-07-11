@@ -24,7 +24,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+    "buildRevision": "sha256:e9c56b395c1fc456976e3e8c318897ce15adb3060c35dc19616ef04c68c1cbc9",
     "skills": 27,
     "primaryImplementations": 40,
     "loadablePrimaryImplementations": 40,
@@ -605,12 +605,14 @@
           "canonicalSource": [
             "threejs-choose-skills/examples/router-manifest-lab/router-core.mjs",
             "threejs-choose-skills/examples/router-manifest-lab/router-fixtures.json",
+            "threejs-choose-skills/examples/router-manifest-lab/route-urls.mjs",
+            "threejs-choose-skills/examples/router-manifest-lab/runnable-demos.mjs",
             "threejs-choose-skills/examples/router-manifest-lab/app.mjs"
           ],
           "sourceHashInputs": [
             "threejs-choose-skills/examples/router-manifest-lab"
           ],
-          "sourceHash": "sha256:dc8411db4bdc256d962223f4a3341baf00086af4be16a010a562ec415a62519d",
+          "sourceHash": "sha256:bd1faf3bb97980b022ae32e0491cc8fe3e41fb29994479b083422185fd846412",
           "proxyStatus": null
         },
         {
@@ -641,9 +643,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T12:37:30+03:00",
-        "commit": "72f468614be79628e732fc4cd0ff169bdae724fe",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/72f468614be79628e732fc4cd0ff169bdae724fe"
+        "datetime": "2026-07-11T16:03:48+03:00",
+        "commit": "69fee7d4077eac4ede631d40c4e41e806909eda3",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/69fee7d4077eac4ede631d40c4e41e806909eda3"
       },
       "page": "https://threejs-skills.com/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
@@ -3092,9 +3094,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T14:15:07+03:00",
-        "commit": "2c7e8b2d48cb58cf7059b1bc1307640488a97208",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2c7e8b2d48cb58cf7059b1bc1307640488a97208"
+        "datetime": "2026-07-11T15:04:27+03:00",
+        "commit": "b02b0c4587d339af17e6b1d7925e138281533e3f",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/b02b0c4587d339af17e6b1d7925e138281533e3f"
       },
       "page": "https://threejs-skills.com/skills/threejs-visual-validation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md",

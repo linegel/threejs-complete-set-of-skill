@@ -15,8 +15,8 @@
     "docs/demos/webgpu-node-gtao",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:1e7b6b8320a3411f74aff4bae0280e857f2e520d1a0b39443df484a2a6506bfa",
+  "publishedBundleHash": "sha256:29b7d84ac8118113732a5d2169672e65af1908f032829b0001bc9413e7514ada",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e9c56b395c1fc456976e3e8c318897ce15adb3060c35dc19616ef04c68c1cbc9",
   "evidenceBundleId": null
 }

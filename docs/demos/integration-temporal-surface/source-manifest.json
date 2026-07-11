@@ -24,8 +24,8 @@
     "docs/demos/integration-temporal-surface",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:5aba55da269c541f9b5da29018ab65bbe9b26facbb393e7e9442b9f3a3db4193",
+  "publishedBundleHash": "sha256:97de73b8567d9d38b4f3e8387d93d720d51db4850b3c37907b899402e287daa8",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e9c56b395c1fc456976e3e8c318897ce15adb3060c35dc19616ef04c68c1cbc9",
   "evidenceBundleId": null
 }

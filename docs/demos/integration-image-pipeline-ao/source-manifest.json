@@ -18,8 +18,8 @@
     "docs/demos/integration-image-pipeline-ao",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:f7ef3a142b13b0830db966aae07db267ce22e46e4e4d612c20c7f0085d5e9534",
+  "publishedBundleHash": "sha256:711e3b538af76cdb25b9fb381137dc5dd44302d0b59fd8b12717dfb197594a1f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e9c56b395c1fc456976e3e8c318897ce15adb3060c35dc19616ef04c68c1cbc9",
   "evidenceBundleId": null
 }

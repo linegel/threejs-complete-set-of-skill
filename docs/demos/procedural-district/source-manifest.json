@@ -35,8 +35,8 @@
     "docs/demos/procedural-district",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:46c373b23f48e73b7af9765f7b1d84e89152cdeae693ebb9173b9d5ec055be96",
+  "publishedBundleHash": "sha256:72d2e97cd770c0fb49571d0eea2aa93a16952126d7130a73bcd2230a70085fa8",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e9c56b395c1fc456976e3e8c318897ce15adb3060c35dc19616ef04c68c1cbc9",
   "evidenceBundleId": null
 }
