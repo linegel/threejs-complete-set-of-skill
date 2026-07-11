@@ -62,6 +62,7 @@ assert.equal( manifest.nonRenderingScenarioSuite, true );
 assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).errors, [] );
 assert.match( appSource, /fetch\( catalogUrl \)/, 'browser UI must consume the same fixture JSON as tests' );
 assert.match( appSource, /evaluateScenario/, 'browser UI must execute the tested router core' );
+assert.match( appSource, /window\.labController = controllerPromise/, 'route wrappers need an awaitable controller during top-level initialization' );
 assert.equal(
 	scenarioHref( 'ocean-planet', 'https://threejs-skills.com/demos/router-manifest-lab/' ),
 	'https://threejs-skills.com/demos/router-manifest-lab/scenario/ocean-planet/'
