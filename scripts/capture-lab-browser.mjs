@@ -176,7 +176,9 @@ function requireColorManagedRgba8(payload, bytesPerPixel, sourceElementBytes) {
 /**
  * Normalize a controller PixelCapture into compact, color-managed RGBA8 rows.
  * `bytesPerRow` on the result is the compact data stride; the original copy
- * stride remains available as `sourceBytesPerRow` for evidence.
+ * stride remains available as `sourceBytesPerRow` for evidence. The serialized
+ * payload length and the original GPU-copy length remain distinct because a
+ * controller may compact padded rows before crossing the browser boundary.
  */
 export function normalizePixelCapture(payload) {
   if (!payload || typeof payload !== 'object') throw new TypeError('PixelCapture must be an object');
@@ -190,6 +192,7 @@ export function normalizePixelCapture(payload) {
   const compactByteLength = logicalBytesPerRow * height;
   const reportedBytesPerRow = optionalPositiveInteger(payload.bytesPerRow, 'bytesPerRow');
   const reportedSourceBytesPerRow = optionalPositiveInteger(payload.sourceBytesPerRow, 'sourceBytesPerRow');
+  const reportedSourceByteLength = optionalPositiveInteger(payload.sourceByteLength, 'sourceByteLength');
   for (const [name, stride] of [
     ['bytesPerRow', reportedBytesPerRow],
     ['sourceBytesPerRow', reportedSourceBytesPerRow],
@@ -244,6 +247,29 @@ export function normalizePixelCapture(payload) {
     sourceLayout = 'padded';
   }
 
+  const shortSourceByteLength = sourceBytesPerRow * (height - 1) + logicalBytesPerRow;
+  const fullSourceByteLength = sourceBytesPerRow * height;
+  if (
+    reportedSourceByteLength !== null
+    && reportedSourceByteLength !== shortSourceByteLength
+    && reportedSourceByteLength !== fullSourceByteLength
+  ) {
+    throw new RangeError(
+      `sourceByteLength is ${reportedSourceByteLength} bytes; expected short-padded ${shortSourceByteLength} or full-padded ${fullSourceByteLength}`,
+    );
+  }
+  if (
+    sourceLayout === 'padded'
+    && reportedSourceByteLength !== null
+    && reportedSourceByteLength !== source.byteLength
+  ) {
+    throw new RangeError(
+      `padded PixelCapture sourceByteLength ${reportedSourceByteLength} does not match transported source data ${source.byteLength}`,
+    );
+  }
+  const sourceByteLength = reportedSourceByteLength
+    ?? (sourceLayout === 'compacted-from-padded' ? null : source.byteLength);
+
   return {
     target: payload.target ?? 'final',
     width,
@@ -251,7 +277,8 @@ export function normalizePixelCapture(payload) {
     bytesPerPixel,
     bytesPerRow: logicalBytesPerRow,
     sourceBytesPerRow,
-    sourceByteLength: source.byteLength,
+    sourceByteLength,
+    transportByteLength: source.byteLength,
     sourceLayout,
     format: 'rgba8',
     colorEncoding,
@@ -316,6 +343,7 @@ export async function capturePixels(page, target) {
       bytesPerTexel: capture.bytesPerTexel,
       bytesPerRow: capture.bytesPerRow,
       sourceBytesPerRow: capture.sourceBytesPerRow,
+      sourceByteLength: capture.sourceByteLength,
       rowBytes: capture.rowBytes,
       packedRowBytes: capture.packedRowBytes,
       sourceElementBytes: ArrayBuffer.isView(source) ? source.BYTES_PER_ELEMENT : 1,
@@ -435,6 +463,7 @@ export async function captureLabBrowser({
           bytesPerRow: capture.bytesPerRow,
           sourceBytesPerRow: capture.sourceBytesPerRow,
           sourceByteLength: capture.sourceByteLength,
+          transportByteLength: capture.transportByteLength,
           sourceLayout: capture.sourceLayout,
           format: capture.format,
           colorEncoding: capture.colorEncoding,
