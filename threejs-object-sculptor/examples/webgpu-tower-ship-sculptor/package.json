@@ -2,8 +2,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "check": "node --check app.js && node --check frame-driver.js && node --check route-state.js && node --check tower-ship-factory.js && node --check lab-controller.js && node --check validate-action-ready.mjs && node --check validate-routes.mjs && node --check test-contract.mjs && node --check test-frame-driver.mjs && node --check test-pixel-capture.mjs && node --check capture-hook.mjs && python3 ../../scripts/validate_sculpt_spec.py object-sculpt-spec.json --strict-quality",
-    "validate:unit": "node test-contract.mjs && node test-frame-driver.mjs && node test-pixel-capture.mjs && node validate-routes.mjs",
+    "check": "node --check app.js && node --check frame-driver.js && node --check route-state.js && node --check tower-ship-factory.js && node --check lab-controller.js && node --check validate-action-ready.mjs && node --check validate-routes.mjs && node --check test-contract.mjs && node --check test-frame-driver.mjs && node --check test-pixel-readback.mjs && node --check capture-hook.mjs && python3 ../../scripts/validate_sculpt_spec.py object-sculpt-spec.json --strict-quality",
+    "validate:unit": "node test-contract.mjs && node test-frame-driver.mjs && node test-pixel-readback.mjs && node validate-routes.mjs",
     "test:mutations": "node test-mutations.mjs",
     "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-tower-ship-sculptor --target presentation --hook capture-hook.mjs",
     "validate:artifacts": "node validate-artifacts.mjs",
