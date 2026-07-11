@@ -2,7 +2,46 @@ import * as THREE from 'three/webgpu';
 
 export const TAU = Math.PI * 2;
 export const CAPILLARY_SURFACE_TENSION_OVER_DENSITY = 7.28e-5;
-export const OCEAN_STORAGE_TEXTURES_PER_CASCADE = 17;
+export const OCEAN_BASE_STORAGE_TEXTURES_PER_CASCADE = 15;
+export const OCEAN_COMBINED_STORAGE_TEXTURES = 0;
+
+export const OCEAN_MECHANISM_ROUTES = Object.freeze( [
+	'spectrum-and-fft',
+	'dispersion-and-cascades',
+	'derivatives-and-jacobian',
+	'whitecaps-and-foam',
+	'above-and-below-surface',
+	'cpu-query-parity'
+] );
+
+export const OCEAN_COMPUTE_BINDING_REQUIREMENTS = Object.freeze( {
+	spectrumInitialization: 4,
+	evolution: 2,
+	fftStage: 2,
+	portableDisplacementAssembly: 3,
+	portableDerivativeAssembly: 3,
+	portableJacobianAssembly: 3,
+	foamReaction: 3,
+	fusedAssembly: 7
+} );
+
+export const OCEAN_EXAMPLE_CLAIM_BOUNDARY = Object.freeze( {
+	classification: 'numerical-integration-scaffold',
+	proves: Object.freeze( [
+		'explicit unnormalized inverse-DFT convention and CPU fixtures',
+		'dimensional spectrum-to-wavevector coefficient construction',
+		'r185 StorageTexture compute graph construction',
+		'exact resolved-band choppy-surface tangent formula in the material',
+		'native-resolution per-cascade displacement, derivative, and Lagrangian foam histories'
+	] ),
+	doesNotProve: Object.freeze( [
+		'GPU coefficients equal the CPU mirror within a measured tolerance',
+		'half-float FFT precision is acceptable',
+		'multicascade surface and foam GPU readback matches the CPU oracle',
+		'full scene-depth refraction, receiver caustics, or below-surface volumetric transport',
+		'sustained performance, mobile thermal behavior, or production resource lifetime'
+	] )
+} );
 
 export const OCEAN_QUALITY_TIERS = Object.freeze( {
 	ultra: Object.freeze( {
@@ -11,8 +50,7 @@ export const OCEAN_QUALITY_TIERS = Object.freeze( {
 		cascadeCount: 3,
 		packedFieldCount: 4,
 		textureType: THREE.HalfFloatType,
-		target: 'desktop-discrete',
-		targetSimulationMs: [ 2.5, 4.0 ],
+		target: 'unmeasured-current-adapter',
 		storageBudgetMiB: 104
 	} ),
 	high: Object.freeze( {
@@ -21,8 +59,7 @@ export const OCEAN_QUALITY_TIERS = Object.freeze( {
 		cascadeCount: 3,
 		packedFieldCount: 4,
 		textureType: THREE.HalfFloatType,
-		target: 'desktop-integrated',
-		targetSimulationMs: [ 1.5, 3.0 ],
+		target: 'unmeasured-current-adapter',
 		storageBudgetMiB: 28
 	} ),
 	medium: Object.freeze( {
@@ -31,8 +68,7 @@ export const OCEAN_QUALITY_TIERS = Object.freeze( {
 		cascadeCount: 2,
 		packedFieldCount: 4,
 		textureType: THREE.HalfFloatType,
-		target: 'balanced',
-		targetSimulationMs: [ 1.2, 2.4 ],
+		target: 'unmeasured-current-adapter',
 		storageBudgetMiB: 22
 	} ),
 	low: Object.freeze( {
@@ -41,8 +77,7 @@ export const OCEAN_QUALITY_TIERS = Object.freeze( {
 		cascadeCount: 1,
 		packedFieldCount: 4,
 		textureType: THREE.HalfFloatType,
-		target: 'mobile-or-budgeted-webgpu',
-		targetSimulationMs: [ 0.7, 2.0 ],
+		target: 'unmeasured-current-adapter',
 		storageBudgetMiB: 8
 	} )
 } );
@@ -54,7 +89,13 @@ export const OCEAN_DEBUG_MODES = Object.freeze( {
 	slopes: 3,
 	jacobian: 4,
 	foam: 5,
-	normal: 6
+	normal: 6,
+	'spectrum-fft': 7,
+	'cascade-bands': 8,
+	'underwater-optics': 9,
+	'cpu-query': 10,
+	'no-post': 11,
+	diagnostics: 12
 } );
 
 export const PACKED_FIELD_LAYOUT = Object.freeze( {
@@ -76,8 +117,8 @@ export const DEFAULT_OCEAN_CONFIG = Object.freeze( {
 	foamRecovery: 0.22,
 	foamThreshold: 0.4,
 	foamScale: 2.5,
+	enablePerCascadeFoamHistory: true,
 	seed: 0x1f2e3d4c,
-	surfaceSizeMeters: 400,
 	sunDirection: Object.freeze( [ -0.42, 0.62, 0.66 ] ),
 	local: Object.freeze( {
 		windSpeed: 11.5,
@@ -101,7 +142,7 @@ export const DEFAULT_OCEAN_CONFIG = Object.freeze( {
 	} )
 } );
 
-export const WEBGPU_REQUIRED_ROUTE_MESSAGE = 'WebGPU backend required for the canonical FFT ocean path. If the user explicitly asks how to apply fallback when WebGPU is unavailable, route that teaching to threejs-compatibility-fallbacks.';
+export const WEBGPU_REQUIRED_ROUTE_MESSAGE = 'WebGPU backend required for the FFT-ocean numerical integration scaffold.';
 
 export function chooseOceanTier( renderer, requested = 'high' ) {
 	const capabilities = validateOceanCapabilities( renderer, OCEAN_QUALITY_TIERS[ requested ] ?? OCEAN_QUALITY_TIERS.high );
@@ -130,12 +171,13 @@ export function mergeOceanConfig( options = {} ) {
 	const tier = OCEAN_QUALITY_TIERS[ quality ] ?? OCEAN_QUALITY_TIERS.high;
 	const patchLengthsMeters = options.patchLengthsMeters ?? options.patchLengths ?? DEFAULT_OCEAN_CONFIG.patchLengthsMeters;
 
+	const resolvedPatchLengths = [ ...patchLengthsMeters ].slice( 0, options.cascadeCount ?? tier.cascadeCount );
 	return {
 		...DEFAULT_OCEAN_CONFIG,
 		...tier,
 		...options,
 		quality,
-		patchLengthsMeters: [ ...patchLengthsMeters ].slice( 0, options.cascadeCount ?? tier.cascadeCount ),
+		patchLengthsMeters: resolvedPatchLengths,
 		sunDirection: new THREE.Vector3( ...( options.sunDirection ?? DEFAULT_OCEAN_CONFIG.sunDirection ) ).normalize(),
 		local: { ...DEFAULT_OCEAN_CONFIG.local, ...options.local },
 		swell: { ...DEFAULT_OCEAN_CONFIG.swell, ...options.swell }
@@ -146,11 +188,34 @@ export function isPowerOfTwo( value ) {
 	return Number.isInteger( value ) && value > 0 && ( value & ( value - 1 ) ) === 0;
 }
 
+export function hashOceanSeedUint32( x, y, seed, salt ) {
+	let state = (
+		Math.imul( x >>> 0, 0x9e3779b9 ) ^
+		Math.imul( y >>> 0, 0x85ebca6b ) ^
+		( seed >>> 0 ) ^
+		Math.imul( salt >>> 0, 0xc2b2ae35 )
+	) >>> 0;
+	state = ( state ^ ( state >>> 16 ) ) >>> 0;
+	state = Math.imul( state, 0x7feb352d ) >>> 0;
+	state = ( state ^ ( state >>> 15 ) ) >>> 0;
+	state = Math.imul( state, 0x846ca68b ) >>> 0;
+	state = ( state ^ ( state >>> 16 ) ) >>> 0;
+	return state;
+}
+
+export function hashOceanSeedUnit( x, y, seed, salt ) {
+	return ( ( hashOceanSeedUint32( x, y, seed, salt ) >>> 8 ) + 0.5 ) / 0x1000000;
+}
+
 export function validateOceanConfig( config ) {
 	const errors = [];
 	const resolution = config.resolution;
 	const patchLengths = config.patchLengthsMeters ?? config.patchLengths ?? [];
 	const cascadeCount = config.cascadeCount ?? patchLengths.length;
+
+	if ( ! OCEAN_QUALITY_TIERS[ config.quality ] ) {
+		errors.push( `unknown quality tier "${ config.quality }"` );
+	}
 
 	if ( ! isPowerOfTwo( resolution ) ) {
 		errors.push( `resolution must be a positive power of two, got ${ resolution }` );
@@ -192,6 +257,19 @@ export function validateOceanConfig( config ) {
 	if ( ! Number.isFinite( config.choppiness ) || config.choppiness < 0 ) {
 		errors.push( 'choppiness must be finite and non-negative' );
 	}
+	if ( ! Number.isFinite( config.foamRecovery ) || config.foamRecovery <= 0 ) {
+		errors.push( 'foamRecovery must be finite and positive' );
+	}
+	if ( ! Number.isFinite( config.foamThreshold ) || ! Number.isFinite( config.foamScale ) || config.foamScale < 0 ) {
+		errors.push( 'foamThreshold and non-negative foamScale must be finite' );
+	}
+	if ( ! Number.isInteger( config.seed ) || config.seed < 0 || config.seed > 0xffffffff ) {
+		errors.push( 'seed must be a uint32 integer' );
+	}
+
+	if ( typeof config.enablePerCascadeFoamHistory !== 'boolean' ) {
+		errors.push( 'enablePerCascadeFoamHistory must be boolean' );
+	}
 
 	if ( ! [ THREE.HalfFloatType, THREE.FloatType ].includes( config.textureType ) ) {
 		errors.push( 'textureType must be HalfFloatType or FloatType for storage writes' );
@@ -231,7 +309,10 @@ export function createCascadeDescriptors( config ) {
 		resolution: config.resolution,
 		patchLength,
 		cutoffLow: index === 0 ? 1e-4 : handoff( index ),
-		cutoffHigh: index === patchLengths.length - 1 ? 9999 : handoff( index + 1 ),
+		cutoffHigh: Math.min(
+			index === patchLengths.length - 1 ? Infinity : handoff( index + 1 ),
+			Math.PI * config.resolution / patchLength
+		),
 		seed: ( config.seed + index * 1013 ) >>> 0,
 		gravity: config.gravity,
 		capillarySurfaceTensionOverDensity: config.capillarySurfaceTensionOverDensity,
@@ -253,28 +334,42 @@ export function estimateOceanStorageMiB( config ) {
 }
 
 export function countOceanStorageTextures( config ) {
-	return OCEAN_STORAGE_TEXTURES_PER_CASCADE * config.cascadeCount;
+	const perCascade = OCEAN_BASE_STORAGE_TEXTURES_PER_CASCADE + ( config.enablePerCascadeFoamHistory ? 2 : 0 );
+	return perCascade * config.cascadeCount + OCEAN_COMBINED_STORAGE_TEXTURES;
 }
 
 export function validateOceanCapabilities( renderer, config = {} ) {
 	const backend = renderer?.backend ?? null;
 	const isWebGPUBackend = backend?.isWebGPUBackend === true;
-	const initialized = renderer?.initialized === true || typeof renderer?.init !== 'function';
+	const initialized = renderer?.initialized === true;
 	const hasFeature = typeof renderer?.hasFeature === 'function' && initialized;
 	const textureType = config.textureType ?? THREE.HalfFloatType;
 	const missingRequirementReason = [];
+	const maxStorageTexturesPerShaderStage = backend?.device?.limits?.maxStorageTexturesPerShaderStage ?? null;
+	const requiredPortableStorageTextures = Math.max( ...Object.entries( OCEAN_COMPUTE_BINDING_REQUIREMENTS )
+		.filter( ( [ name ] ) => name !== 'fusedAssembly' )
+		.map( ( [ , count ] ) => count ) );
 
 	if ( isWebGPUBackend === false ) missingRequirementReason.push( 'WebGPU backend required' );
 	if ( initialized === false ) missingRequirementReason.push( 'renderer not initialized' );
-	if ( typeof renderer?.computeAsync !== 'function' ) missingRequirementReason.push( 'renderer.computeAsync unavailable' );
+	if ( typeof renderer?.compute !== 'function' ) missingRequirementReason.push( 'renderer.compute submission unavailable' );
 	if ( typeof THREE.StorageTexture !== 'function' ) missingRequirementReason.push( 'StorageTexture constructor unavailable' );
 	if ( ! [ THREE.HalfFloatType, THREE.FloatType ].includes( textureType ) ) missingRequirementReason.push( 'unsupported storage texture type' );
+	if ( maxStorageTexturesPerShaderStage === null ) {
+		missingRequirementReason.push( 'maxStorageTexturesPerShaderStage unavailable after renderer initialization' );
+	} else if ( maxStorageTexturesPerShaderStage < requiredPortableStorageTextures ) {
+		missingRequirementReason.push( `portable ocean graph requires ${ requiredPortableStorageTextures } storage textures but device limit is ${ maxStorageTexturesPerShaderStage }` );
+	}
 
 	const float32Filterable = hasFeature ? renderer.hasFeature( 'float32-filterable' ) === true : null;
 	const timestampQuery = hasFeature ? renderer.hasFeature( 'timestamp-query' ) === true : null;
-	const filterableSamplingStrategy = textureType === THREE.FloatType && float32Filterable !== true
-		? 'sample nearest or resolve into HalfFloatType filterable texture'
-		: 'filter storage outputs directly after validation';
+	if ( textureType === THREE.FloatType && float32Filterable !== true ) {
+		missingRequirementReason.push( 'FloatType sampled outputs require the float32-filterable feature' );
+	}
+	const assemblyMode = maxStorageTexturesPerShaderStage !== null && maxStorageTexturesPerShaderStage >= 7
+		? 'fused-7-storage-textures'
+		: 'portable-split-3-storage-textures';
+	const filterableSamplingStrategy = 'filter storage outputs directly after capability validation';
 
 	return {
 		nativeStorage: missingRequirementReason.length === 0,
@@ -283,9 +378,30 @@ export function validateOceanCapabilities( renderer, config = {} ) {
 		textureType,
 		float32Filterable,
 		timestampQuery,
+		maxStorageTexturesPerShaderStage,
+		requiredPortableStorageTextures,
+		assemblyMode,
 		filterableSamplingStrategy,
 		missingRequirementReason
 	};
+}
+
+export function validateOceanComputeLayouts( capabilities ) {
+	const limit = capabilities?.maxStorageTexturesPerShaderStage;
+	if ( ! Number.isInteger( limit ) || limit < 1 ) throw new Error( 'Initialized adapter storage-texture limit is unavailable.' );
+	const selected = Object.fromEntries( Object.entries( OCEAN_COMPUTE_BINDING_REQUIREMENTS )
+		.filter( ( [ name ] ) => name !== 'fusedAssembly' || capabilities.assemblyMode === 'fused-7-storage-textures' ) );
+	const overLimit = Object.entries( selected ).filter( ( [ , count ] ) => count > limit );
+	if ( overLimit.length > 0 ) {
+		throw new Error( `Ocean compute layout exceeds adapter storage-texture limit ${ limit }: ${ overLimit.map( ( [ name, count ] ) => `${ name }=${ count }` ).join( ', ' ) }.` );
+	}
+	return Object.freeze( {
+		status: 'declared-layouts-gated-before-node-construction',
+		adapterLimit: limit,
+		assemblyMode: capabilities.assemblyMode,
+		selectedBindings: Object.freeze( selected ),
+		maximumSelectedBindings: Math.max( ...Object.values( selected ) )
+	} );
 }
 
 export function createStorageTexture( resolution, {

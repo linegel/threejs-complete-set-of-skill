@@ -7,13 +7,13 @@ import {
 	exp,
 	float,
 	floor,
-	fract,
 	instanceIndex,
 	int,
 	length,
 	max,
 	min,
 	mix,
+	normalize,
 	pow,
 	select,
 	sin,
@@ -23,6 +23,7 @@ import {
 	storageTexture,
 	texture,
 	textureStore,
+	uint,
 	uvec2,
 	vec2,
 	vec3,
@@ -35,10 +36,6 @@ function cellFromIndex( resolution ) {
 	const x = instanceIndex.mod( resolution );
 	const y = instanceIndex.div( resolution );
 	return uvec2( x, y );
-}
-
-function uvFromCell( cell, resolution ) {
-	return vec2( cell ).add( 0.5 ).div( resolution );
 }
 
 function complexMul( a, b ) {
@@ -66,7 +63,7 @@ function spectrumParameters( lobe, gravity ) {
 		...lobe,
 		angle: lobe.directionDegrees * Math.PI / 180,
 		alpha: 0.076 * Math.pow( gravity * lobe.fetchMeters / ( lobe.windSpeed * lobe.windSpeed ), - 0.22 ),
-		peakOmega: 22 * Math.pow( lobe.windSpeed * lobe.fetchMeters / ( gravity * gravity ), - 0.33 )
+		peakOmega: 22 * Math.pow( lobe.windSpeed * lobe.fetchMeters / ( gravity * gravity ), - 1 / 3 )
 	};
 }
 
@@ -106,9 +103,24 @@ function scalarUniformsFromCascade( cascade ) {
 	};
 }
 
+function hashUint( x, y, seed, salt ) {
+	const state = uint( x ).mul( uint( 0x9e3779b9 ) )
+		.bitXor( uint( y ).mul( uint( 0x85ebca6b ) ) )
+		.bitXor( uint( seed ) )
+		.bitXor( uint( salt ).mul( uint( 0xc2b2ae35 ) ) )
+		.toVar();
+	state.assign( state.bitXor( state.shiftRight( uint( 16 ) ) ) );
+	state.assign( state.mul( uint( 0x7feb352d ) ) );
+	state.assign( state.bitXor( state.shiftRight( uint( 15 ) ) ) );
+	state.assign( state.mul( uint( 0x846ca68b ) ) );
+	state.assign( state.bitXor( state.shiftRight( uint( 16 ) ) ) );
+	return state;
+}
+
 function hashUnit( x, y, seed, salt ) {
-	const p = vec3( float( x ), float( y ), float( seed + salt ) );
-	return fract( sin( p.dot( vec3( 12.9898, 78.233, 37.719 ) ) ).mul( 43758.5453123 ) );
+	// Keep the high 24 hash bits so u32->f32 conversion is exact, then sample
+	// the centre of each open unit-interval bin. CPU uses the identical map.
+	return float( hashUint( x, y, seed, salt ).shiftRight( uint( 8 ) ) ).add( 0.5 ).mul( 1 / 0x1000000 );
 }
 
 function gaussianPair( cell, seed ) {
@@ -158,7 +170,8 @@ function directionalSpread( theta, omega, peakOmega, directionAngle, directional
 	const below = float( 6.97 ).mul( pow( ratio, 5.0 ) );
 	const above = float( 9.77 ).mul( pow( ratio, - 2.5 ) );
 	const power = select( ratio.lessThanEqual( 1.0 ), below, above ).add( float( 16.0 ).mul( min( ratio, 20.0 ).tanh() ).mul( swell ).mul( swell ) );
-	const broad = float( 2 / Math.PI ).mul( cos( theta ).mul( cos( theta ) ) );
+	const forwardCosine = max( cos( theta.sub( directionAngle ) ), 0.0 );
+	const broad = float( 2 / Math.PI ).mul( forwardCosine.mul( forwardCosine ) );
 	const directed = normalizationFactor( power ).mul( pow( abs( cos( theta.sub( directionAngle ).mul( 0.5 ) ) ), power.mul( 2.0 ) ) );
 	return mix( broad, directed, directionality );
 }
@@ -212,7 +225,9 @@ export function createSpectrumInitNode( cascade, targets ) {
 		const swellEnergy = jonswapEnergy( omega, kSafe, theta, lobeParams( 'swell', uniforms ), uniforms );
 		const energy = localEnergy.add( swellEnergy );
 		const derivative = abs( dispersionDerivative( kSafe, uniforms.gravity, uniforms.depthMeters, uniforms.capillarySurfaceTensionOverDensity ) );
-		const amplitude = sqrt( max( energy.mul( 2.0 ).mul( derivative ).mul( deltaK ).mul( deltaK ).div( kSafe ), 0.0 ) ).mul( inBand );
+		// gaussianPair has E[|xi_r+i xi_i|^2]=2. For the unnormalized inverse
+		// transform, E|a_k|^2=P(k) DeltaK^2/2, hence amplitude^2=P DeltaK^2/4.
+		const amplitude = sqrt( max( energy.mul( 0.25 ).mul( derivative ).mul( deltaK ).mul( deltaK ).div( kSafe ), 0.0 ) ).mul( inBand );
 		const gaussian = gaussianPair( cell, constants.seed );
 		const h = gaussian.mul( amplitude );
 
@@ -232,7 +247,7 @@ export function createSpectrumInitNode( cascade, targets ) {
 		const mirroredSwellEnergy = jonswapEnergy( mirroredOmega, mirroredKSafe, mirroredTheta, lobeParams( 'swell', uniforms ), uniforms );
 		const mirroredEnergy = mirroredLocalEnergy.add( mirroredSwellEnergy );
 		const mirroredDerivative = abs( dispersionDerivative( mirroredKSafe, uniforms.gravity, uniforms.depthMeters, uniforms.capillarySurfaceTensionOverDensity ) );
-		const mirroredAmplitude = sqrt( max( mirroredEnergy.mul( 2.0 ).mul( mirroredDerivative ).mul( deltaK ).mul( deltaK ).div( mirroredKSafe ), 0.0 ) ).mul( mirroredInBand );
+		const mirroredAmplitude = sqrt( max( mirroredEnergy.mul( 0.25 ).mul( mirroredDerivative ).mul( deltaK ).mul( deltaK ).div( mirroredKSafe ), 0.0 ) ).mul( mirroredInBand );
 		const mirroredGaussian = gaussianPair( mirrored, constants.seed );
 		const mirroredH = mirroredGaussian.mul( mirroredAmplitude );
 
@@ -254,6 +269,41 @@ export function createClearTextureNode( textureTarget, resolution, value = [ 0, 
 	return kernel( { outputTex: textureTarget } ).compute( resolution * resolution, [ 64 ] ).setName( name );
 }
 
+export function createFftFixtureNode( textureTarget, resolution, fixture ) {
+	const fixtures = {
+		'dc-and-axis': [
+			{ x: 0, y: 0, value: [ 1, 0, 0, 0 ] },
+			{ x: 1, y: 0, value: [ 0, 0, 1, 0 ] }
+		],
+		'oblique-pair': [
+			{ x: 1, y: 2, value: [ 0.5, - 0.25, 0, 0 ] },
+			{ x: 2, y: 1, value: [ 0, 0, - 0.375, 0.625 ] }
+		],
+		'hermitian-cosines': [
+			{ x: 1, y: 0, value: [ 0.5, 0, 0, 0 ] },
+			{ x: resolution - 1, y: 0, value: [ 0.5, 0, 0, 0 ] },
+			{ x: 0, y: 1, value: [ 0, 0, 0.5, 0 ] },
+			{ x: 0, y: resolution - 1, value: [ 0, 0, 0.5, 0 ] }
+		]
+	};
+	const coefficients = fixtures[ fixture ];
+	if ( ! coefficients ) throw new Error( `Unknown FFT GPU fixture "${ fixture }".` );
+
+	const kernel = Fn( ( { outputTex } ) => {
+		const cell = cellFromIndex( resolution );
+		const packed = vec4( 0, 0, 0, 0 ).toVar();
+		for ( const coefficient of coefficients ) {
+			const matches = cell.x.equal( uint( coefficient.x ) ).and( cell.y.equal( uint( coefficient.y ) ) );
+			packed.assign( select( matches, vec4( ...coefficient.value ), packed ) );
+		}
+		textureStore( outputTex, cell, packed ).toWriteOnly();
+	} );
+
+	return kernel( { outputTex: textureTarget } )
+		.compute( resolution * resolution, [ 64 ] )
+		.setName( `ocean:fft-fixture:${ fixture }` );
+}
+
 export function createEvolutionNode( cascade, fieldIndex, targets ) {
 	const constants = scalarUniformsFromCascade( cascade );
 	const layoutName = Object.entries( PACKED_FIELD_LAYOUT ).find( ( [ , value ] ) => value === fieldIndex )?.[ 0 ] ?? `field-${ fieldIndex }`;
@@ -265,27 +315,21 @@ export function createEvolutionNode( cascade, fieldIndex, targets ) {
 		const kVec = centered.mul( TAU / constants.patchLength );
 		const kLength = max( length( kVec ), 1e-4 );
 		const omega = dispersion( kLength, float( constants.gravity ), float( constants.depthMeters ), float( constants.capillarySurfaceTensionOverDensity ) );
-		const phase = vec2( cos( omega.mul( time ) ), sin( omega.mul( time ) ) );
+		const phase = vec2( cos( omega.mul( time ) ), sin( omega.mul( time ) ).negate() );
 		const h = complexMul( initial.xy, phase ).add( complexMul( initial.zw, complexConjugate( phase ) ) );
 		const ih = complexI( h );
 		const kx = kVec.x;
 		const kz = kVec.y;
-		// Nyquist bins (cell 0 in either axis, centered k = -N/2*deltaK) have no +k
-		// partner on the grid, so k-multiplier fields are non-Hermitian there and would
-		// leak imaginary residue into the packed partner lane; zero derivative spectra
-		// on those bins. h itself is self-conjugate at Nyquist and stays.
-		const derivativeNyquistMask = select(
-			int( cell.x ).equal( 0 ).or( int( cell.y ).equal( 0 ) ),
-			float( 0.0 ),
-			float( 1.0 )
-		);
-		const dx = ih.mul( kx.div( kLength ) ).mul( derivativeNyquistMask );
-		const dz = ih.mul( kz.div( kLength ) ).mul( derivativeNyquistMask );
-		const slopeX = ih.mul( kx ).mul( derivativeNyquistMask );
-		const slopeZ = ih.mul( kz ).mul( derivativeNyquistMask );
-		const dxx = h.mul( kx.mul( kx ).div( kLength ).negate() ).mul( derivativeNyquistMask );
-		const dzz = h.mul( kz.mul( kz ).div( kLength ).negate() ).mul( derivativeNyquistMask );
-		const cross = h.mul( kx.mul( kz ).div( kLength ).negate() ).mul( derivativeNyquistMask );
+		const xOddMask = select( int( cell.x ).equal( 0 ), float( 0.0 ), float( 1.0 ) );
+		const zOddMask = select( int( cell.y ).equal( 0 ), float( 0.0 ), float( 1.0 ) );
+		const crossMask = xOddMask.mul( zOddMask );
+		const dx = ih.mul( kx.div( kLength ) ).mul( xOddMask );
+		const dz = ih.mul( kz.div( kLength ) ).mul( zOddMask );
+		const slopeX = ih.mul( kx ).mul( xOddMask );
+		const slopeZ = ih.mul( kz ).mul( zOddMask );
+		const dxx = h.mul( kx.mul( kx ).div( kLength ).negate() );
+		const dzz = h.mul( kz.mul( kz ).div( kLength ).negate() );
+		const cross = h.mul( kx.mul( kz ).div( kLength ).negate() ).mul( crossMask );
 		const packed = vec4().toVar();
 
 		If( int( fieldIndex ).equal( PACKED_FIELD_LAYOUT.horizontalDisplacement ), () => {
@@ -363,12 +407,9 @@ export function createCenterAndAssembleNode( cascade, targets ) {
 		field1,
 		field2,
 		field3,
-		previousFoam,
 		displacement,
 		derivatives,
-		crossJacobianFoam,
-		foamHistory,
-		dt
+		crossJacobianFoam
 	} ) => {
 		const cell = cellFromIndex( constants.resolution );
 		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
@@ -381,16 +422,76 @@ export function createCenterAndAssembleNode( cascade, targets ) {
 		const jxx = float( 1.0 ).add( lambda.mul( f3.x ) );
 		const jzz = float( 1.0 ).add( lambda.mul( f3.y ) );
 		const jacobian = jxx.mul( jzz ).sub( dDzDx.mul( dDzDx ) );
-		const previous = storageTexture( previousFoam, cell ).toReadOnly().r;
-		const recovered = previous.add( dt.mul( constants.foamRecovery ).div( max( jacobian, 0.5 ) ) );
-		const history = min( jacobian, recovered );
-		const coverage = smoothstep( 0.2, 0.9, max( float( constants.foamThreshold ).sub( history ).mul( constants.foamScale ), 0.0 ) );
-
-		textureStore( displacement, cell, vec4( lambda.mul( f0.x ), f1.x, lambda.mul( f0.y ), history ) ).toWriteOnly();
+		textureStore( displacement, cell, vec4( lambda.mul( f0.x ), f1.x, lambda.mul( f0.y ), 1.0 ) ).toWriteOnly();
 		textureStore( derivatives, cell, vec4( f2.x, f2.y, lambda.mul( f3.x ), lambda.mul( f3.y ) ) ).toWriteOnly();
-		textureStore( crossJacobianFoam, cell, vec4( dDzDx, jacobian, coverage, 0.0 ) ).toWriteOnly();
-		textureStore( foamHistory, cell, vec4( history, coverage, jacobian, 1.0 ) ).toWriteOnly();
+		textureStore( crossJacobianFoam, cell, vec4( dDzDx, jacobian, 0.0, 0.0 ) ).toWriteOnly();
 	} );
 
 	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble:cascade-${ cascade.index }` );
+}
+
+export function createDisplacementAssemblyNode( cascade, targets ) {
+	const constants = scalarUniformsFromCascade( cascade );
+	const kernel = Fn( ( { field0, field1, displacement } ) => {
+		const cell = cellFromIndex( constants.resolution );
+		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
+		const f0 = storageTexture( field0, cell ).toReadOnly().mul( sign );
+		const f1 = storageTexture( field1, cell ).toReadOnly().mul( sign );
+		const lambda = float( constants.choppiness );
+		textureStore( displacement, cell, vec4( lambda.mul( f0.x ), f1.x, lambda.mul( f0.y ), 1.0 ) ).toWriteOnly();
+	} );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble-displacement:cascade-${ cascade.index }` );
+}
+
+export function createDerivativesAssemblyNode( cascade, targets ) {
+	const constants = scalarUniformsFromCascade( cascade );
+	const kernel = Fn( ( { field2, field3, derivatives } ) => {
+		const cell = cellFromIndex( constants.resolution );
+		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
+		const f2 = storageTexture( field2, cell ).toReadOnly().mul( sign );
+		const f3 = storageTexture( field3, cell ).toReadOnly().mul( sign );
+		const lambda = float( constants.choppiness );
+		textureStore( derivatives, cell, vec4( f2.x, f2.y, lambda.mul( f3.x ), lambda.mul( f3.y ) ) ).toWriteOnly();
+	} );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble-derivatives:cascade-${ cascade.index }` );
+}
+
+export function createJacobianAssemblyNode( cascade, targets ) {
+	const constants = scalarUniformsFromCascade( cascade );
+	const kernel = Fn( ( { field1, field3, crossJacobianFoam } ) => {
+		const cell = cellFromIndex( constants.resolution );
+		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
+		const f1 = storageTexture( field1, cell ).toReadOnly().mul( sign );
+		const f3 = storageTexture( field3, cell ).toReadOnly().mul( sign );
+		const lambda = float( constants.choppiness );
+		const dDzDx = lambda.mul( f1.y );
+		const jxx = float( 1.0 ).add( lambda.mul( f3.x ) );
+		const jzz = float( 1.0 ).add( lambda.mul( f3.y ) );
+		const jacobian = jxx.mul( jzz ).sub( dDzDx.mul( dDzDx ) );
+		textureStore( crossJacobianFoam, cell, vec4( dDzDx, jacobian, 0.0, 0.0 ) ).toWriteOnly();
+	} );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble-jacobian:cascade-${ cascade.index }` );
+}
+
+export function createFoamHistoryNode( cascade, targets ) {
+	const constants = scalarUniformsFromCascade( cascade );
+
+	const kernel = Fn( ( {
+		crossJacobian,
+		previousFoam,
+		foamHistory,
+		dt
+	} ) => {
+		const cell = cellFromIndex( constants.resolution );
+		const jacobian = storageTexture( crossJacobian, cell ).toReadOnly().g;
+		const previous = storageTexture( previousFoam, cell ).toReadOnly().r.clamp( 0.0, 1.0 );
+		const sourceRate = max( float( constants.foamThreshold ).sub( jacobian ).mul( constants.foamScale ), 0.0 );
+		const decayRate = max( float( constants.foamRecovery ), 1e-6 );
+		const reactionRate = sourceRate.add( decayRate );
+		const equilibrium = sourceRate.div( reactionRate );
+		const coverage = equilibrium.add( previous.sub( equilibrium ).mul( exp( reactionRate.mul( dt ).negate() ) ) ).clamp( 0.0, 1.0 );
+		textureStore( foamHistory, cell, vec4( coverage, sourceRate, jacobian, 1.0 ) ).toWriteOnly();
+	} );
+
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:foam-history:cascade-${ cascade.index }` );
 }

@@ -17,6 +17,11 @@ const sceneId = "ocean-generated-wave-seeds";
 const artifactDir = resolve(repoRoot, `artifacts/visual-validation/${sceneId}/r185/native-budgeted/seed-180185`);
 const pagePath = "/threejs-spectral-ocean/examples/webgpu-fft-ocean/generated-wave-seeds.html";
 const assetFiles = ["directional-wave-seed-a.png", "directional-wave-seed-b.png", "directional-wave-seed-c.png"];
+const claimBoundary = {
+  classification: "asset-preview-only",
+  proves: ["PNG dimensions", "opaque alpha padding", "NoColorSpace declaration", "deterministic Canvas2D preview metrics"],
+  doesNotProve: ["FFT coefficients", "spectral ocean displacement", "combined-cascade foam", "GPU performance", "resource lifetime"],
+};
 const requiredImages = [
   "images/final.design.png",
   "images/no-post.design.png",
@@ -79,7 +84,7 @@ async function validateAssetInputs() {
       hash: createHash("sha256").update(buffer).digest("hex"),
       colorSpace: "NoColorSpace",
       alpha: "opaque padding",
-      reducedTierOnly: true,
+      assetPreviewOnly: true,
     });
   }
   return assets;
@@ -113,11 +118,12 @@ function createCameraRecord(bookmark) {
 function createVisualContract() {
   const invariants = [
     "directional wave seeds are RGBA NoColorSpace data with opaque alpha padding",
-    "height and slope channels drive different reduced-tier wave diagnostics",
-    "validator labels seed maps as debug/reduced-tier inputs, not production FFT spectra",
+    "height and slope channels drive different Canvas2D asset-preview diagnostics",
+    "validator labels seed maps as asset previews, not FFT spectra",
   ];
   return {
-    subject: "generated directional wave seeds in reduced-tier ocean diagnostics",
+    classification: claimBoundary.classification,
+    subject: "Canvas2D preview of generated directional wave-seed assets",
     identity: ["R drives preview height", "G/B drive slope and Jacobian diagnostics", "alpha is opaque padding"],
     silhouette: ["ocean strip remains visible in flat, displaced, near, and far views"],
     materialSeparation: ["flat baseline, height response, slope-lit response, slope/J diagnostic, and phase pair are separate captures"],
@@ -128,13 +134,13 @@ function createVisualContract() {
     invariantArtifacts: {
       [invariants[0]]: { requiredImages: ["images/diagnostics.mosaic.png"], requiredDiagnostics: ["opaque alpha", "source slope/J"], requiredMetrics: ["alphaMin", "alphaMax"], blockingFailures: ["RGB-only PNG", "sRGB-as-data"] },
       [invariants[1]]: { requiredImages: ["images/final.design.png", "images/no-post.design.png"], requiredDiagnostics: ["height seed", "slope/J"], requiredMetrics: ["displacementDelta", "slopeDelta"], blockingFailures: ["seed used as color thumbnail only"] },
-      [invariants[2]]: { requiredImages: ["images/final.design.png"], requiredDiagnostics: ["reduced-tier-only manifest flag"], requiredMetrics: ["reducedTierOnly"], blockingFailures: ["claims generated seed replaces FFT h0(k)"] },
+      [invariants[2]]: { requiredImages: ["images/final.design.png"], requiredDiagnostics: ["asset-preview-only manifest flag"], requiredMetrics: ["assetPreviewOnly"], blockingFailures: ["claims generated seed replaces FFT h0(k)"] },
     },
-    allowedDivergences: ["Generated wave seeds are reduced-tier preview/debug inputs; canonical ocean remains compute FFT spectra with frequency-space derivative fields."],
+    allowedDivergences: ["This preview does not execute the numerical FFT-ocean scaffold."],
     requiredImages,
     requiredDiagnostics: ["flat baseline", "height seed", "slope/J", "jacobian/foam", "tile stress", "temporal phase"],
     requiredMetrics: ["renderer-info.json", "timings.json", "displacementDelta", "slopeDelta", "seamError"],
-    blockingFailures: ["missing WebGPU backend", "wrong asset color space", "lost alpha padding", "blank capture", "production FFT overclaim"],
+    blockingFailures: ["wrong asset color space", "lost alpha padding", "blank capture", "FFT overclaim"],
     frameBudgetMs: { desktopDiscrete: 12, desktopIntegrated: 24, mobile: 33 },
     memoryBudgetMB: 128,
   };
@@ -161,7 +167,9 @@ function createEvidence({ assets, rendererInfo, metrics }) {
       gpuAdapter: null,
       renderer: "WebGPURenderer",
       backend,
-      qualityTier: "native-budgeted",
+      qualityTier: "asset-preview-only",
+      claimBoundary,
+      performanceClaimsAllowed: false,
       viewport: { width: 1200, height: 760, dpr: 1 },
       camera: createCameraRecord("design"),
       seed: "seed-180185",
@@ -177,9 +185,9 @@ function createEvidence({ assets, rendererInfo, metrics }) {
         hdrWorkingType: "browser validation LDR",
         colorTextures: [],
         dataTextures: assets.map((asset) => ({ name: asset.id, colorSpace: asset.colorSpace })),
-        screenshotEncoding: "Browser Canvas2D domain render after WebGPU backend gate",
+        screenshotEncoding: "Browser Canvas2D asset preview; WebGPU initialization is a capability probe only",
       },
-      postStack: { renderPipeline: "domain validation surface", outputColorTransform: true, renderOutputOwner: true, scenePasses: 1, mrtOutputs: [], diagnostics: ["height seed", "slope/J", "jacobian/foam", "tile stress"] },
+      postStack: { renderPipeline: null, outputColorTransform: false, renderOutputOwner: false, scenePasses: 0, mrtOutputs: [], diagnostics: ["wave-seed asset", "source channels", "tile stress"] },
       thresholds: {
         nonblank: { minRange: 8 },
         perViewPixelDiff: {
@@ -189,7 +197,7 @@ function createEvidence({ assets, rendererInfo, metrics }) {
         cameraMatrixRequired: true,
       },
       stochasticMasks: [{ name: "none", path: null, reason: "fixed generated assets and deterministic ocean seed sampling" }],
-      knownCompromises: ["Generated directional wave seeds are reduced-tier preview/debug inputs, not packed FFT spectra or persistent foam history."],
+      knownCompromises: ["Canvas2D asset preview only; no FFT coefficients, spectral displacement, combined-cascade foam, GPU timing, or resource-lifetime proof."],
       domainMetrics: metrics,
     },
     rendererInfo,
@@ -201,14 +209,14 @@ function createEvidence({ assets, rendererInfo, metrics }) {
     storageResources: {
       required: true,
       totalBytes: 0,
-      resources: [{ name: "none", kind: "not used by reduced-tier generated-wave-seed validation surface", dimensions: 0, format: null, bytes: 0, ownerDispatch: null, dispatchSize: null, workgroupAssumptions: null, synchronization: "none", readbackPolicy: "none", resetPolicy: "not applicable" }],
+      resources: [{ name: "none", kind: "not used by Canvas2D generated-wave-seed asset preview", dimensions: 0, format: null, bytes: 0, ownerDispatch: null, dispatchSize: null, workgroupAssumptions: null, synchronization: "none", readbackPolicy: "none", resetPolicy: "not applicable" }],
     },
-    timings: { required: true, warmupFrames: 1, sampleFrames: 1, cpuFrameMs: { median: 1, p95: 1, unit: "ms" }, gpuFrameMs: null, gpuTimingUnavailable: true, gpuTimingLabel: "CPU-only proxy", renderTimestampMs: null, computeTimestampMs: null, qualityTierChanges: [] },
+    timings: { required: true, syntheticPlaceholder: true, warmupFrames: 1, sampleFrames: 1, cpuFrameMs: { median: 1, p95: 1, unit: "ms" }, gpuFrameMs: null, gpuTimingUnavailable: true, gpuTimingLabel: "No performance claim: Canvas2D asset preview", renderTimestampMs: null, computeTimestampMs: null, qualityTierChanges: [] },
     leakLoop: {
       required: true,
       loops: lifecycleLoops.map((name) => ({ name, iterations: 1, before: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, after: { rendererInfoMemory: rendererInfo.info?.memory ?? {}, targetBytes: 1200 * 760 * 4, storageBytes: 0 }, deltas: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, thresholds: { geometries: 0, textures: 0, targetBytes: 0, storageBytes: 0 }, pass: true })),
       summary: { pass: true, uncapturedBackendErrors: [], knownInternalCacheDeltas: [] },
-      allowedCacheNotes: ["Browser page is closed after capture; canonical FFT storage resources are validated by validate-ocean-contracts.js."],
+      allowedCacheNotes: ["Schema bookkeeping only; this preview does not allocate or validate FFT-ocean storage resources."],
     },
   };
 }
@@ -232,11 +240,11 @@ async function main() {
       rendererInfo: window.__generatedWaveSeedValidation.rendererInfo ?? null,
     }));
     assert.equal(state.ready, true, state.error ?? "generated wave-seed browser validation did not become ready");
-    assert.equal(state.rendererInfo?.isPrimaryBackend, true, "primary WebGPU backend is required");
+    assert.equal(state.rendererInfo?.capabilityProbeOnly, true, "WebGPU renderer metadata must be labelled capability-probe-only");
     assert.equal(state.metrics.length, 3, "expected three wave-seed metrics");
     for (const metric of state.metrics) {
       assert.equal(metric.colorSpace, "NoColorSpace", `${metric.id} color space`);
-      assert.equal(metric.reducedTierOnly, true, `${metric.id} reduced-tier marker`);
+      assert.equal(metric.assetPreviewOnly, true, `${metric.id} asset-preview marker`);
       assert.equal(metric.alphaMin, 1, `${metric.id} alpha minimum`);
       assert.equal(metric.alphaMax, 1, `${metric.id} alpha maximum`);
       assert(metric.displacementDelta > 8, `${metric.id} displacement response is too weak`);
@@ -267,7 +275,8 @@ async function main() {
     await writeJson(resolve(artifactDir, "timings.json"), evidence.timings);
     await writeJson(resolve(artifactDir, "leak-loop.json"), evidence.leakLoop);
     const result = await validateArtifactBundle(artifactDir);
-    console.log(JSON.stringify({ pass: true, artifactDir, metrics: state.metrics, evidence: result }, null, 2));
+    assert.equal(claimBoundary.classification, "asset-preview-only");
+    console.log(JSON.stringify({ pass: true, acceptedAsFftOceanEvidence: false, claimBoundary, artifactDir, metrics: state.metrics, evidence: result }, null, 2));
   } finally {
     await browser.close().catch(() => {});
     await new Promise((resolveClose) => server.close(resolveClose));

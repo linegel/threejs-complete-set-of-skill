@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check *.js && node --check validate-generated-wave-seeds.mjs && node --check generated-wave-seeds-browser.mjs",
-    "validate": "node validate-ocean-contracts.js && node validate-generated-wave-seeds.mjs",
+    "check": "node --check *.js && node --check *.mjs && node -e \"JSON.parse(require('node:fs').readFileSync('lab.manifest.json','utf8'))\"",
+    "validate:unit": "node validate-ocean-contracts.js",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts",
+    "validate": "npm run validate:quick",
     "validate:generated-assets": "node validate-generated-wave-seeds.mjs"
-  },
-  "dependencies": {
-    "playwright": "^1.45.0",
-    "three": "^0.185.1"
   }
 }

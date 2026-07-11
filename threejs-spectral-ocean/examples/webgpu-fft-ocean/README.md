@@ -1,150 +1,182 @@
-# WebGPU FFT Ocean
+# Native WebGPU FFT-ocean lab — acceptance incomplete
 
-Canonical WebGPU/TSL implementation for `threejs-spectral-ocean`.
+This directory is the canonical browser implementation for
+`threejs-spectral-ocean`, but it remains classified as a
+`numerical-integration-scaffold`. It does not claim accepted skill coverage
+until native-browser evidence, current-adapter timestamps, lifecycle evidence,
+and visual review exist under the strict v2 protocol.
 
-This example demonstrates a deterministic multi-cascade FFT ocean with:
+The checked implementation proves only:
 
-- JONSWAP/TMA directional spectrum and coordinate-stable Gaussian seeds.
-- Hermitian-packed `h0(k), conj(h0(-k))` generation in a TSL compute kernel.
-- Per-frame frequency-domain evolution of four packed complex fields:
-  - horizontal displacement X/Z
-  - height and cross derivative
-  - height slopes X/Z
-  - horizontal derivatives XX/ZZ
-- Ordered Cooley-Tukey inverse FFT stages over `StorageTexture` ping-pongs with precomputed butterfly and bit-reversal textures.
-- Jacobian whitecap detection and persistent foam history in the compute chain.
-- `MeshStandardNodeMaterial` ocean shading with displacement, derivative normals, foam, absorption-colored body response, and shared TSL sky radiance.
+- [Derived] an explicit positive-exponent, unnormalized inverse-DFT convention
+  with CPU fixtures;
+- [Derived] dimensional conversion from directional frequency spectra to
+  discrete wavevector coefficients;
+- [Gated] Three.js r185 `StorageTexture` compute-graph construction;
+- [Derived] the exact resolved-band choppy-surface tangent and Jacobian formula;
+- [Derived] native-resolution per-cascade displacement, derivative, and
+  Lagrangian foam-history ownership.
 
-## Pipeline
+It explicitly does not prove:
+
+- GPU coefficients equal the CPU mirror within a measured tolerance
+- half-float FFT precision is acceptable
+- multicascade surface and foam GPU readback matches the CPU oracle
+- full scene-depth refraction, receiver caustics, or below-surface volumetric transport
+- sustained performance, mobile thermal behavior, or production resource lifetime
+
+CPU tests, source inspection, and capture hooks do not promote those claims.
+
+## Numerical convention
+
+For grid wavevector `k`, the evolution is
 
 ```text
-WebGPURenderer.init() + backend gate
-  -> validateOceanConfig()
-  -> choose quality tier
-  -> create disjoint cascade descriptors
-  -> compute h0 + debug seed/spectrum/mask textures
-  -> per frame:
-       submit one ordered compute-node array per cascade:
-         evolve four packed frequency fields
-         bit-reverse X for all fields
-         horizontal FFT stages 0..log2(N)-1
-         bit-reverse Y for all fields
-         vertical FFT stages 0..log2(N)-1
-         center spectrum, assemble displacement/derivatives/Jacobian/foam
-       render MeshStandardNodeMaterial through RenderPipeline
+H(k,t) = h0(k) exp(-i omega(k)t) + conj(h0(-k)) exp(+i omega(k)t)
 ```
 
-Independent packed fields are batched at the same stage only when they own disjoint source/scratch textures. The next stage is submitted after the previous whole-grid write boundary completes.
+and the spatial transform is
 
-## Quality Tiers
+```text
+h(x,t) = sum_k H(k,t) exp(+i k dot x).
+```
 
-| Tier | Resolution | Cascades | Storage Budget | Target |
-| --- | ---: | ---: | ---: | --- |
-| `ultra` | 512² | 3 | about 102 MiB, gated at 104 MiB | desktop discrete |
-| `high` | 256² | 3 | under 28 MiB | desktop integrated |
-| `medium` | 256² | 2 | under 22 MiB | balanced |
-| `low` | 128² | 1 | under 8 MiB | mobile or budgeted WebGPU preview |
+The inverse transform is intentionally unnormalized. One checkerboard
+centring correction is applied after both transform axes. The Box–Muller
+complex Gaussian has `E[|xi|^2] = 2`, so
+`amplitude^2 = P(k) DeltaK^2 / 4` gives the required half-pair variance under
+this convention.
 
-The canonical path requires WebGPU. On a non-WebGPU backend, throw with a
-routing message to `threejs-compatibility-fallbacks`; do not build or document a
-reduced fallback tier inside this skill.
+The spectrum uses finite-depth gravity-capillary dispersion, JONSWAP/TMA
+lobes, normalized directional spreading, disjoint half-open cascade bands, an
+isotropic Nyquist cap, and field-specific odd-derivative masks on self-mirror
+Nyquist axes. Seed mixing uses integer `u32` operations.
 
-## Contract Validation
+## Native per-cascade compute graph
 
-Run:
+Each cascade owns 17 RGBA storage textures:
+
+```text
+4 spectrum/debug textures
+4 frequency field textures A
+4 FFT ping-pong textures B
+3 physical outputs: displacement, derivatives, cross/Jacobian
+2 temporal foam-history ping-pong textures
+```
+
+No world-sized shared displacement or foam atlas exists. Each cascade keeps its
+declared period, resolution, and spectral band through rendering and foam
+history. Surface foam combines coverage as the union
+`1 - product_i(1 - coverage_i)` after sampling every history at its native
+period.
+
+Per frame, per cascade:
+
+```text
+4 frequency-evolution dispatches
+4 packed fields × (bit-reverse X + log2(N) X stages
+                 + bit-reverse Y + log2(N) Y stages)
+1 fused assembly, or 3 portable assembly dispatches
+1 temporal foam reaction dispatch
+```
+
+`describePipeline()` exposes every evolution, bit-reversal, FFT-stage,
+assembly, and foam node in submission order. `describeResources()` inventories
+all storage textures plus the butterfly and bit-reversal `DataTexture`s. The
+compiled-layout record changes from initialization-only to
+`all-selected-runtime-layouts-submitted-to-webgpu-compiler` only after every
+selected runtime node has reached `renderer.compute()`.
+
+Spectrum initialization requires four simultaneous storage textures. Portable
+execution therefore requires
+`maxStorageTexturesPerShaderStage >= 4`. The split assembly uses at most three;
+the optional fused assembly requires seven. Declared layouts are checked
+against the initialized adapter before graph construction.
+
+## Geometry and normal bandwidth
+
+`createOceanSurfaceMaterial()` partitions cascades against the actual mesh
+Nyquist limit:
+
+```text
+k_mesh = pi * segments / sizeMeters
+k_safe = geometryNyquistSafety * k_mesh.
+```
+
+Only complete cascades whose upper cutoff is at most `k_safe` may displace
+vertices. The exact geometric normal and Jacobian use those same resolved
+bands. Higher bands may affect only the fragment shading normal, sampled from
+their native cascade textures and faded by a derivative-based pixel-footprint
+filter before their frequency exceeds fragment support. This prevents an
+undersampled atlas or unresolved cascade from entering geometric derivatives.
+
+`createOceanMesh()` requires the same size and segment count used to construct
+the material’s band contract. Identity object rotation and scale remain
+required because periodic coordinates are authored in the world-aligned XZ
+frame.
+
+## Mechanism routes
+
+Every route imports the same canonical controller and selects a distinct fixed
+startup state:
+
+- `spectrum-and-fft`: source-spectrum and spatial FFT diagnostic;
+- `dispersion-and-cascades`: color-separated native cascade contributions;
+- `derivatives-and-jacobian`: exact derivative/Jacobian diagnostic;
+- `whitecaps-and-foam`: temporal per-cascade foam coverage and source;
+- `above-and-below-surface`: an underwater camera with side-aware dielectric
+  Fresnel, total-internal-reflection classification, and Beer attenuation;
+- `cpu-query-parity`: visible probes placed by the reduced CPU Eulerian-query
+  solver, with residual and truncation metadata.
+
+The optical route is a bounded diagnostic, not a full depth-aware water
+composer. It safely handles a zero refracted vector under total internal
+reflection and does not claim receiver caustics.
+
+## Deterministic time and CPU queries
+
+`setTime(t)` rebuilds history and replays from zero using fixed 1/60 s steps,
+plus one exact remainder. It never advances temporal foam with `dt = 0` at a
+nonzero target time. Equal fixed-time captures therefore do not depend on the
+presentation cadence that preceded them.
+
+The reduced CPU query sampler retains authored dominant bins and inverts the
+horizontal choppy map for Eulerian `(x,z)` queries. Its reported bounds separate
+parameter-height, parameter-slope, contraction, and conditional world-height
+errors. The browser route displays those probes, but GPU parity remains
+insufficient evidence until matching storage readback is captured.
+
+## Authored tiers and storage
+
+With half-float RGBA storage and two foam-history textures per cascade:
+
+| Tier | FFT | Cascades | Storage textures | Derived storage |
+|---|---:|---:|---:|---:|
+| ultra | 512² | 3 | 51 | 102 MiB |
+| high | 256² | 3 | 51 | 25.5 MiB |
+| medium | 256² | 2 | 34 | 17 MiB |
+| low | 128² | 1 | 17 | 2.125 MiB |
+
+These are derived allocation sizes, not measured residency or performance.
+They exclude lookup textures, scene/render targets, geometry, driver
+allocations, and pipeline caches. All tier target classes remain
+`unmeasured-current-adapter`.
+
+## Validation and capture
+
+Browser-free verification:
 
 ```bash
-npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate
+npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate:quick
 ```
 
-This validates FFT fixtures, spectrum physics checks, the `[5,17,250]` cascade
-counterexample, missing-requirement reasons, source-level contract rails, and
-storage accounting against the declared tier budget. It also validates the
-CPU water-height sampler against a full pure-JS spectral mirror at fixed probe
-points/times. In Node, GPU readback reports `pending-browser-webgpu`; in a
-WebGPU browser, small readback fixtures for `createBitReverseNode()`,
-`createFftStageNode()`, and assembly run before `initialized = true`.
+The capture adapter imports the repository’s shared self-serving Vite/WebGPU
+harness and supplies color-managed RGBA8 render-target readback with explicit
+256-byte row alignment. It defines the standard correctness image set, but it
+must not be treated as executed evidence until actually run.
 
-## CPU Coupling Query
-
-Use `createCpuWaterHeightSampler(config)` when another skill needs a water
-height, such as creature buoyancy. The sampler consumes the same authored
-cascade descriptors, seeded Gaussian `h0`, local/swell spectrum lobes, and
-capillary-gravity dispersion as the GPU kernels, then keeps the dominant
-frequency bins per cascade:
-
-```js
-import { createCpuWaterHeightSampler } from './examples/webgpu-fft-ocean/index.js';
-
-// dominantBinCount is an authored speed/accuracy default; whatever value is
-// chosen, estimateTruncationError() computes the exact omitted-coefficient
-// bound for it at construction, and validation.js gates the bound (it
-// validates at 255 bins so dispersion bugs cannot hide under truncation).
-const sampler = createCpuWaterHeightSampler({ quality: 'high', dominantBinCount: 32 });
-const surfaceY = sampler.getWaterHeight(worldX, worldZ, timeSeconds);
-const parity = sampler.estimateTruncationError();
-```
-
-The parity model is a coefficient truncation bound:
-
-```text
-|height_full - height_truncated| <= sum_{omitted bins} (|h0(k)| + |h0(-k)|)
-```
-
-This is the pack coupling-interface template: expose a CPU-evaluable query of
-the same authored cause, state the parity error, keep the data flow one-way,
-and never use hot-path GPU readback for cross-skill coupling.
-
-## Debug Modes
-
-`final`, `height`, `displacement`, `slopes`, `jacobian`, `foam`, `normal`
-
-`ocean.getDebugTextures()` also exposes capability tier data, butterfly/bit-reversal tables, Gaussian seed field, spectrum/mask textures, evolved packed fields, displacement, derivatives, Jacobian, and foam history.
-
-## Minimal Usage
-
-```js
-import {
-  createOceanMesh,
-  createOceanRenderer,
-  createOceanRenderPipeline,
-  createOceanSurfaceMaterial,
-  createWebGPUFftOcean,
-} from './examples/webgpu-fft-ocean/index.js';
-
-const { renderer, isWebGPUBackend } = await createOceanRenderer();
-if (!isWebGPUBackend) throw new Error('WebGPU backend required for the canonical FFT ocean path.');
-
-const ocean = await createWebGPUFftOcean(renderer, {
-  quality: 'high',
-  seed: 0xdecafbad,
-});
-const material = createOceanSurfaceMaterial(ocean.materialCascades);
-const mesh = createOceanMesh(material, { sizeMeters: 400, segments: 384 });
-scene.add(mesh);
-
-const pipeline = createOceanRenderPipeline(renderer, scene, camera);
-const validation = ocean.validate();
-if (!validation.pass) throw new Error(JSON.stringify(validation.selfTests.errors));
-
-function frame(timeMs) {
-  const time = timeMs / 1000;
-  ocean.update(time, 1 / 60).then(() => pipeline.render());
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
-```
-
-## Budgets
-
-Dispatch estimate per frame:
-
-```text
-cascades * (
-  4 evolve dispatches
-  + 4 packed fields * (2 bit-reversals + 2 * log2(N) FFT stages)
-  + 1 assembly/history dispatch
-)
-```
-
-The `high` tier at 256² and 3 cascades runs 3 * (4 + 4 * (2 + 16) + 1) = 231 compute nodes before the render pipeline. Each cascade submits those nodes as one ordered `renderer.computeAsync()` array; Three.js iterates the array in order, so ping-pong FFT dependencies are preserved without per-stage awaits.
+The artifact validator delegates to `scripts/lib/evidence-v2.mjs`, requires the
+complete v2 file/image set, and compares `evidence-manifest.json.sourceHash`
+against the registry hash. The manifest hashes the entire canonical directory,
+not a hand-picked source subset. The lab remains `incomplete` after browser-free
+checks.
