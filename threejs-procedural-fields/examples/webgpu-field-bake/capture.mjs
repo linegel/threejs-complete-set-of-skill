@@ -114,7 +114,11 @@ async function main() {
     });
 
     const readback = await page.evaluate(() => window.__fieldBakeValidation.captureFieldReadback());
+    const storedReadback = await page.evaluate(() => window.__fieldBakeValidation.captureStoredReadback());
+    const placementReadback = await page.evaluate(() => window.__fieldBakeValidation.capturePlacementReadback());
     await writeJson(resolve(options.artifacts, "field-readback.json"), readback);
+    await writeJson(resolve(options.artifacts, "field-storage-readback.json"), storedReadback);
+    await writeJson(resolve(options.artifacts, "field-placement-readback.json"), placementReadback);
     await validateArtifacts(options.artifacts);
     console.log(`WebGPU field readback written to ${options.artifacts}`);
   } finally {

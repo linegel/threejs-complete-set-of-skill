@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "description": "Golden CPU field values for the shared procedural field algorithm. Regenerate only when the contract intentionally changes.",
   "channels": [
     "macroHeight",
@@ -9,7 +9,10 @@
     "slope",
     "biome",
     "roughness",
-    "placementMask"
+    "placementMask",
+    "macroGradientX",
+    "macroGradientY",
+    "macroGradientZ"
   ],
   "probes": [
     {
@@ -27,10 +30,13 @@
         "ridge": 0.8756188446754691,
         "cavity": 0.11246552410200394,
         "moisture": 0.2072459674681899,
-        "slope": 0.5557353108952966,
+        "slope": 0.024545184111151398,
         "biome": 0.19030103601923248,
         "roughness": 0.5891910950647532,
-        "placementMask": 0
+        "placementMask": 0,
+        "macroGradientX": 0,
+        "macroGradientY": -0.11338910129409673,
+        "macroGradientZ": -0.17023757738195794
       },
       "sourceCoordinates": [
         1,
@@ -58,10 +64,13 @@
         "ridge": 0.9452612327265584,
         "cavity": 0.17357700127129938,
         "moisture": 0.46654471916409196,
-        "slope": 0.4814499294344304,
+        "slope": 0.13814663354259368,
         "biome": 0.36691116882196534,
         "roughness": 0.5962056135267131,
-        "placementMask": 0
+        "placementMask": 0.6653751632562204,
+        "macroGradientX": -0.2384146239243829,
+        "macroGradientY": 0.9066238694570239,
+        "macroGradientZ": -0.6682092455326407
       },
       "sourceCoordinates": [
         0.5773502691896258,
@@ -89,10 +98,13 @@
         "ridge": 0.8956600076416723,
         "cavity": 0.037123530761862075,
         "moisture": 0.4267543111681469,
-        "slope": 0.4488554065006501,
+        "slope": 0.011430493653783676,
         "biome": 0.3452095066779758,
         "roughness": 0.5562765477904632,
-        "placementMask": 0
+        "placementMask": 0.5325389623692269,
+        "macroGradientX": -0.081131901827463,
+        "macroGradientY": 0.04792659975412886,
+        "macroGradientZ": 0.013928450530164017
       },
       "sourceCoordinates": [
         1.5625,
@@ -120,10 +132,13 @@
         "ridge": 0.9339734593817239,
         "cavity": 0.07095876275861937,
         "moisture": 0.4569375473957906,
-        "slope": 0.2301141805248774,
+        "slope": 0.06550859000990822,
         "biome": 0.4249743109922414,
         "roughness": 0.5714297416941999,
-        "placementMask": 0
+        "placementMask": 0.9423208732413259,
+        "macroGradientX": -0.05075785690469392,
+        "macroGradientY": -0.5433924235504091,
+        "macroGradientZ": -0.012668548513733963
       },
       "sourceCoordinates": [
         0.125,
