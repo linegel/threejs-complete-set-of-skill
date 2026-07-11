@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  mkdtempSync,
-  rmSync,
+  mkdirSync,
   writeFileSync,
 } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -24,6 +23,12 @@ import {
   quickCommandStartsBrowser,
   rootBrowserToolchainDrift,
 } from '../../scripts/lib/lab-command-policy.mjs';
+
+function retainedFixtureDirectory(...segments) {
+  const directory = join(REPO_ROOT, 'artifacts', 'test-fixtures', 'foundation', ...segments);
+  mkdirSync(directory, { recursive: true });
+  return directory;
+}
 
 function rawManifestFixture() {
   return {
@@ -90,13 +95,10 @@ test('build revision is source-content based and independent of informational gi
   const primary = changed.find((demo) => ['canonical-lab', 'integration-demo'].includes(demo.kind));
   primary.sourceHash = `sha256:${'0'.repeat(64)}`;
   assert.notEqual(computeBuildRevision(changed), revision);
-  const generatedDocs = mkdtempSync(join(REPO_ROOT, 'docs', 'demos', '.revision-only-'));
-  try {
-    writeFileSync(join(generatedDocs, 'index.html'), '<p>generated-only change</p>\n');
-    assert.equal(buildDemoRegistry().buildRevision, revision);
-  } finally {
-    rmSync(generatedDocs, { recursive: true, force: true });
-  }
+  const generatedDocs = join(REPO_ROOT, 'docs', 'demos', '.test-fixtures', 'revision-only');
+  mkdirSync(generatedDocs, { recursive: true });
+  writeFileSync(join(generatedDocs, 'index.html'), '<p>generated-only change</p>\n');
+  assert.equal(buildDemoRegistry().buildRevision, revision);
 });
 
 test('every current example directory is explicitly classified', () => {
@@ -404,72 +406,59 @@ test('capture profiles pass through npm after the argument separator', () => {
 });
 
 test('frozen-target hashing includes unlisted transitive imports in the canonical directory', () => {
-  const fixtureDir = mkdtempSync(join(REPO_ROOT, '.source-hash-mutation-'));
+  const fixtureDir = retainedFixtureDirectory('source-hash-mutation');
   const canonicalDir = relative(REPO_ROOT, fixtureDir).split(sep).join('/');
   const browserEntry = `${canonicalDir}/index.html`;
   const app = `${canonicalDir}/app.mjs`;
   const unlistedImport = join(fixtureDir, 'kernel.mjs');
-  try {
-    writeFileSync(join(fixtureDir, 'index.html'), '<script type="module" src="./app.mjs"></script>\n');
-    writeFileSync(join(fixtureDir, 'app.mjs'), "import { value } from './kernel.mjs';\nwindow.value = value;\n");
-    writeFileSync(unlistedImport, 'export const value = 1;\n');
-    const manifest = {
-      canonicalSource: [browserEntry, app],
-      browserEntry,
-    };
-    manifest.sourceHashInputs = computeManifestSourceHashInputs(manifest, { canonicalDir });
-    assert.deepEqual(manifest.sourceHashInputs, [canonicalDir]);
-    assert.equal(manifest.canonicalSource.includes(`${canonicalDir}/kernel.mjs`), false);
-    const before = computeManifestSourceHash(manifest);
-    writeFileSync(unlistedImport, 'export const value = 2;\n');
-    const after = computeManifestSourceHash(manifest);
-    assert.notEqual(after, before);
-  } finally {
-    rmSync(fixtureDir, { recursive: true, force: true });
-  }
+  writeFileSync(join(fixtureDir, 'index.html'), '<script type="module" src="./app.mjs"></script>\n');
+  writeFileSync(join(fixtureDir, 'app.mjs'), "import { value } from './kernel.mjs';\nwindow.value = value;\n");
+  writeFileSync(unlistedImport, 'export const value = 1;\n');
+  const manifest = {
+    canonicalSource: [browserEntry, app],
+    browserEntry,
+  };
+  manifest.sourceHashInputs = computeManifestSourceHashInputs(manifest, { canonicalDir });
+  assert.deepEqual(manifest.sourceHashInputs, [canonicalDir]);
+  assert.equal(manifest.canonicalSource.includes(`${canonicalDir}/kernel.mjs`), false);
+  const before = computeManifestSourceHash(manifest);
+  writeFileSync(unlistedImport, 'export const value = 2;\n');
+  const after = computeManifestSourceHash(manifest);
+  assert.notEqual(after, before);
 });
 
 test('frozen-target hashing follows browser imports outside the canonical directory', () => {
-  const fixtureDir = mkdtempSync(join(REPO_ROOT, '.source-hash-browser-'));
-  const externalDir = mkdtempSync(join(REPO_ROOT, '.source-hash-external-'));
+  const fixtureDir = retainedFixtureDirectory('source-hash-browser');
+  const externalDir = retainedFixtureDirectory('source-hash-external');
   const canonicalDir = relative(REPO_ROOT, fixtureDir).split(sep).join('/');
   const browserEntry = `${canonicalDir}/index.html`;
   const externalFile = join(externalDir, 'shared-stage.mjs');
   let browserImport = relative(fixtureDir, externalFile).split(sep).join('/');
   if (!browserImport.startsWith('.')) browserImport = `./${browserImport}`;
-  try {
-    writeFileSync(join(fixtureDir, 'index.html'), '<script type="module" src="./app.mjs"></script>\n');
-    writeFileSync(join(fixtureDir, 'app.mjs'), `import { stage } from '${browserImport}';\nwindow.stage = stage;\n`);
-    writeFileSync(externalFile, 'export const stage = 1;\n');
-    const manifest = {
-      canonicalSource: [browserEntry],
-      browserEntry,
-    };
-    manifest.sourceHashInputs = computeManifestSourceHashInputs(manifest, { canonicalDir });
-    const externalRepoPath = relative(REPO_ROOT, externalFile).split(sep).join('/');
-    assert.ok(manifest.sourceHashInputs.includes(canonicalDir));
-    assert.ok(manifest.sourceHashInputs.includes(externalRepoPath));
-    const before = computeManifestSourceHash(manifest);
-    writeFileSync(externalFile, 'export const stage = 2;\n');
-    assert.notEqual(computeManifestSourceHash(manifest), before);
-  } finally {
-    rmSync(fixtureDir, { recursive: true, force: true });
-    rmSync(externalDir, { recursive: true, force: true });
-  }
+  writeFileSync(join(fixtureDir, 'index.html'), '<script type="module" src="./app.mjs"></script>\n');
+  writeFileSync(join(fixtureDir, 'app.mjs'), `import { stage } from '${browserImport}';\nwindow.stage = stage;\n`);
+  writeFileSync(externalFile, 'export const stage = 1;\n');
+  const manifest = {
+    canonicalSource: [browserEntry],
+    browserEntry,
+  };
+  manifest.sourceHashInputs = computeManifestSourceHashInputs(manifest, { canonicalDir });
+  const externalRepoPath = relative(REPO_ROOT, externalFile).split(sep).join('/');
+  assert.ok(manifest.sourceHashInputs.includes(canonicalDir));
+  assert.ok(manifest.sourceHashInputs.includes(externalRepoPath));
+  const before = computeManifestSourceHash(manifest);
+  writeFileSync(externalFile, 'export const stage = 2;\n');
+  assert.notEqual(computeManifestSourceHash(manifest), before);
 });
 
 test('published bundle hashing detects emitted output drift without hashing its own metadata', () => {
-  const fixtureDir = mkdtempSync(join(REPO_ROOT, '.published-hash-mutation-'));
+  const fixtureDir = retainedFixtureDirectory('published-hash-mutation');
   const input = relative(REPO_ROOT, fixtureDir).split(sep).join('/');
-  try {
-    writeFileSync(join(fixtureDir, 'index.html'), '<main>one</main>\n');
-    writeFileSync(join(fixtureDir, 'source-manifest.json'), '{"publishedBundleHash":"placeholder"}\n');
-    const before = computePublishedBundleHash(REPO_ROOT, [input]);
-    writeFileSync(join(fixtureDir, 'source-manifest.json'), '{"publishedBundleHash":"changed-metadata"}\n');
-    assert.equal(computePublishedBundleHash(REPO_ROOT, [input]), before);
-    writeFileSync(join(fixtureDir, 'index.html'), '<main>two</main>\n');
-    assert.notEqual(computePublishedBundleHash(REPO_ROOT, [input]), before);
-  } finally {
-    rmSync(fixtureDir, { recursive: true, force: true });
-  }
+  writeFileSync(join(fixtureDir, 'index.html'), '<main>one</main>\n');
+  writeFileSync(join(fixtureDir, 'source-manifest.json'), '{"publishedBundleHash":"placeholder"}\n');
+  const before = computePublishedBundleHash(REPO_ROOT, [input]);
+  writeFileSync(join(fixtureDir, 'source-manifest.json'), '{"publishedBundleHash":"changed-metadata"}\n');
+  assert.equal(computePublishedBundleHash(REPO_ROOT, [input]), before);
+  writeFileSync(join(fixtureDir, 'index.html'), '<main>two</main>\n');
+  assert.notEqual(computePublishedBundleHash(REPO_ROOT, [input]), before);
 });

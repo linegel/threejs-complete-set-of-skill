@@ -1,6 +1,7 @@
 node_modules/
 .DS_Store
 artifacts/
+docs/demos/.test-fixtures/
 !threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/
 threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/*
 !threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/artifacts/.gitignore

@@ -1,10 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  mkdtempSync,
   mkdirSync,
   readFileSync,
-  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -30,9 +28,9 @@ function minimalPng(marker) {
   return bytes;
 }
 
-function createBundle() {
-  const directory = mkdtempSync(join(tmpdir(), 'threejs-evidence-v2-'));
-  mkdirSync(join(directory, 'images'));
+function createBundle(id) {
+  const directory = join(tmpdir(), 'threejs-evidence-v2-fixtures', id);
+  mkdirSync(join(directory, 'images'), { recursive: true });
   for (const filename of REQUIRED_EVIDENCE_JSON) writeJson(join(directory, filename), { schemaVersion: 2 });
   writeJson(join(directory, 'evidence-manifest.json'), {
     schemaVersion: 2,
@@ -75,40 +73,28 @@ function updateJson(path, mutate) {
 }
 
 test('all-insufficient claims are structurally inspectable but cannot prove accepted coverage', () => {
-  const directory = createBundle();
-  try {
-    updateJson(join(directory, 'evidence-manifest.json'), (manifest) => {
-      for (const claim of Object.keys(manifest.claimVerdicts)) manifest.claimVerdicts[claim] = 'INSUFFICIENT_EVIDENCE';
-    });
-    assert.equal(validateEvidenceBundle(directory).valid, true);
-    const accepted = validateEvidenceBundle(directory, { requireRequiredClaimsPass: true });
-    assert.equal(accepted.valid, false);
-    assert.equal(accepted.errors.filter((error) => error.includes('must be PASS for accepted coverage')).length, 5);
-  } finally {
-    rmSync(directory, { recursive: true, force: true });
-  }
+  const directory = createBundle('all-insufficient');
+  updateJson(join(directory, 'evidence-manifest.json'), (manifest) => {
+    for (const claim of Object.keys(manifest.claimVerdicts)) manifest.claimVerdicts[claim] = 'INSUFFICIENT_EVIDENCE';
+  });
+  assert.equal(validateEvidenceBundle(directory).valid, true);
+  const accepted = validateEvidenceBundle(directory, { requireRequiredClaimsPass: true });
+  assert.equal(accepted.valid, false);
+  assert.equal(accepted.errors.filter((error) => error.includes('must be PASS for accepted coverage')).length, 5);
 });
 
 test('performance PASS without a positive GPU p95 timestamp is rejected', () => {
-  const directory = createBundle();
-  try {
-    writeJson(join(directory, 'frame-trace.json'), { schemaVersion: 2, summary: {} });
-    const result = validateEvidenceBundle(directory);
-    assert.equal(result.valid, false);
-    assert.ok(result.errors.includes('performance PASS requires a positive labelled GPU p95 timestamp value'));
-  } finally {
-    rmSync(directory, { recursive: true, force: true });
-  }
+  const directory = createBundle('missing-gpu-timestamp');
+  writeJson(join(directory, 'frame-trace.json'), { schemaVersion: 2, summary: {} });
+  const result = validateEvidenceBundle(directory);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.includes('performance PASS requires a positive labelled GPU p95 timestamp value'));
 });
 
 test('a 49-cycle lifecycle loop cannot satisfy the v2 evidence floor', () => {
-  const directory = createBundle();
-  try {
-    writeJson(join(directory, 'leak-loop.json'), { schemaVersion: 2, cycles: datum(49) });
-    const result = validateEvidenceBundle(directory);
-    assert.equal(result.valid, false);
-    assert.ok(result.errors.includes('leak-loop.json requires at least 50 measured lifecycle cycles'));
-  } finally {
-    rmSync(directory, { recursive: true, force: true });
-  }
+  const directory = createBundle('short-lifecycle');
+  writeJson(join(directory, 'leak-loop.json'), { schemaVersion: 2, cycles: datum(49) });
+  const result = validateEvidenceBundle(directory);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.includes('leak-loop.json requires at least 50 measured lifecycle cycles'));
 });
