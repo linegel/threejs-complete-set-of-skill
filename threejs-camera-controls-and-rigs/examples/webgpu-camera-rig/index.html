@@ -3,20 +3,32 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WebGPU Camera Rig</title>
+    <title>Native WebGPU Camera Rig Lab</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #070a12; color: #dbe5ff; font: 13px/1.45 ui-monospace, monospace; }
+      canvas { display: block; width: 100vw; height: 100vh; }
+      aside { position: fixed; inset: 12px auto auto 12px; max-width: min(520px, calc(100vw - 48px)); padding: 12px; border: 1px solid #52698f; background: #08101eea; }
+      nav { display: flex; flex-wrap: wrap; gap: 6px; }
+      button { color: inherit; background: #14233c; border: 1px solid #617aa7; padding: 6px 9px; cursor: pointer; }
+      pre { max-height: 48vh; overflow: auto; white-space: pre-wrap; }
+    </style>
   </head>
   <body>
     <canvas id="scene"></canvas>
-    <nav>
-      <button data-camera-mode="chase">Chase</button>
-      <button data-camera-mode="side">Side</button>
-      <button data-camera-mode="orbit">Orbit</button>
-    </nav>
-    <pre data-camera-debug></pre>
+    <aside>
+      <strong>Native WebGPU camera rig</strong>
+      <nav>
+        <button data-camera-mode="overview">Overview / chase</button>
+        <button data-camera-mode="profile">Body-relative profile</button>
+        <button data-camera-mode="inspection">Inspection orbit</button>
+      </nav>
+      <pre data-camera-debug>Initializing WebGPU…</pre>
+    </aside>
     <script type="module">
       import { createCameraRigDemo } from "./main.mjs";
 
-      await createCameraRigDemo({ canvas: document.querySelector("#scene") });
+      const demo = await createCameraRigDemo({ canvas: document.querySelector("#scene") });
+      globalThis.__LAB_CONTROLLER__ = demo.labController;
     </script>
   </body>
 </html>

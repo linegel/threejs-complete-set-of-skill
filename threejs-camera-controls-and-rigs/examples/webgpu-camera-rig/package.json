@@ -1,0 +1,17 @@
+{
+  "name": "threejs-webgpu-camera-rig-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check CameraDirectionController.mjs && node --check CameraRelativeOrigin.mjs && node --check routeState.mjs && node --check main.mjs && node --check browser.mjs && node --check cameraValidation.mjs && node --check mutation-test.mjs && node --check manifest-test.mjs && node --check local-lab-command.mjs",
+    "validate:unit": "node cameraValidation.mjs && node manifest-test.mjs",
+    "test:mutations": "node mutation-test.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-camera-rig --target presentation",
+    "validate:artifacts": "node manifest-test.mjs && node local-lab-command.mjs artifacts",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  }
+}
