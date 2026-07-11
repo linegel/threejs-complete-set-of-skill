@@ -8,6 +8,10 @@ import {
   TOWER_SHIP_MODES,
   TOWER_SHIP_TIERS,
 } from "./tower-ship-factory.js";
+import {
+  alignedBytesPerRow,
+  requiredPaddedByteLength,
+} from "../../../labs/runtime/aligned-readback.mjs";
 
 export { TOWER_SHIP_MODES, TOWER_SHIP_TIERS };
 export const TOWER_SHIP_SCENARIOS = Object.freeze({
@@ -42,10 +46,6 @@ function floorMaterial() {
   return material;
 }
 
-function align(value, alignment) {
-  return Math.ceil(value / alignment) * alignment;
-}
-
 export function describeTowerShipReadback(width, height, outputColorSpace) {
   if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
     throw new RangeError("capture dimensions must be positive integers");
@@ -54,13 +54,16 @@ export function describeTowerShipReadback(width, height, outputColorSpace) {
     throw new TypeError("capture output color space is required");
   }
   const rowBytes = width * 4;
+  const bytesPerRow = alignedBytesPerRow(width, 4);
   return Object.freeze({
     width,
     height,
     format: "rgba8unorm",
     bytesPerPixel: 4,
     rowBytes,
-    bytesPerRow: align(rowBytes, 256),
+    bytesPerRow,
+    minimumByteLength: requiredPaddedByteLength(width, height, 4, bytesPerRow),
+    fullyPaddedByteLength: bytesPerRow * height,
     colorManaged: true,
     outputColorSpace,
   });
@@ -287,7 +290,7 @@ export async function createTowerShipLabController({
         renderer.render(scene, perspectiveCamera);
         const tight = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, captureTarget.width, captureTarget.height);
         const layout = describeTowerShipReadback(captureTarget.width, captureTarget.height, renderer.outputColorSpace);
-        const pixels = new Uint8Array(layout.bytesPerRow * captureTarget.height);
+        const pixels = new Uint8Array(layout.fullyPaddedByteLength);
         for (let y = 0; y < captureTarget.height; y += 1) {
           const source = y * layout.rowBytes;
           pixels.set(tight.subarray(source, source + layout.rowBytes), y * layout.bytesPerRow);

@@ -62,6 +62,8 @@ assert.deepEqual(describeTowerShipReadback(641, 359, "srgb"), {
   bytesPerPixel: 4,
   rowBytes: 2564,
   bytesPerRow: 2816,
+  minimumByteLength: 1010692,
+  fullyPaddedByteLength: 1010944,
   colorManaged: true,
   outputColorSpace: "srgb",
 }, "odd-width capture metadata must preserve the aligned GPU stride and explicit sRGB output contract");
