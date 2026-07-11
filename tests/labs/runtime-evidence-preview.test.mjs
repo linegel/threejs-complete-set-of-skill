@@ -3,6 +3,7 @@ import { test } from 'node:test';
 
 import {
   halfFloatToNumber,
+  isThreeR185Revision,
   pngDimensions,
   resolveWithin,
   visualizeRgba16Float,
@@ -40,4 +41,11 @@ test('promoted PNG dimensions come from the encoded image header', () => {
   const png = encodeRgbaPng({ width: 2, height: 3, data: new Uint8Array(24) });
   assert.deepEqual(pngDimensions(png), { width: 2, height: 3 });
   assert.throws(() => pngDimensions(Buffer.from('not-png')), /not a PNG/);
+});
+
+test('runtime evidence accepts both Three revision spellings used by r185 artifacts', () => {
+  assert.equal(isThreeR185Revision('185'), true);
+  assert.equal(isThreeR185Revision('0.185.1'), true);
+  assert.equal(isThreeR185Revision('184'), false);
+  assert.equal(isThreeR185Revision('0.186.0'), false);
 });

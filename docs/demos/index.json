@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
+  "buildRevision": "sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551",
   "routes": [
     {
       "id": "browser-fallback-harness",
@@ -861,7 +861,7 @@
       "id": "webgpu-lut-atmosphere",
       "path": "/demos/webgpu-lut-atmosphere/",
       "status": "incomplete",
-      "sourceHash": "sha256:551de40c2730a4ca58fed3ba792ff39c57961b8db97761040519eaca1f2ebc61",
+      "sourceHash": "sha256:3fa15f99b8c751a662324fbb5d148f4ae7d426f54786e80e607881c0c7471797",
       "sourceHashInputs": [
         "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
       ],
@@ -988,7 +988,7 @@
       "id": "webgpu-procedural-creature-lab",
       "path": "/demos/webgpu-procedural-creature-lab/",
       "status": "incomplete",
-      "sourceHash": "sha256:57a64ea5b294dec8b22aecfee95241fe224f5646a872ea7289c4792e194679ff",
+      "sourceHash": "sha256:4566656ba16c784c8403fbe3a003580746ea2fe84caff859e88c66e76762d3c4",
       "sourceHashInputs": [
         "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
       ],
@@ -1242,11 +1242,11 @@
       "id": "webgpu-validation-harness",
       "path": "/demos/webgpu-validation-harness/",
       "status": "incomplete",
-      "sourceHash": "sha256:c1ab97a032f3d08d2cc54ac56f81dd102d07c890afd674f66bd6d6349c7f29ef",
+      "sourceHash": "sha256:bf4b476ae21967652149acd979e3c1550ae6d8c85867549d9d60f347cf320a48",
       "sourceHashInputs": [
         "threejs-visual-validation/examples/webgpu-validation-harness"
       ],
-      "publishedBundleHash": "sha256:288d2d9fc2636062663e71fedefe3ecabcfa7ab58cfc6f5c9d7de9a04e5095bc",
+      "publishedBundleHash": "sha256:12c8265ebc6253c6f64b4114505a1bc44eea7e8c70038f84d6e7fb89ba747cfd",
       "mechanisms": [
         "/demos/webgpu-validation-harness/mechanism/aligned-readback/",
         "/demos/webgpu-validation-harness/mechanism/claim-verdicts/",
@@ -1314,7 +1314,7 @@
       "id": "webgpu-weather-volume-clouds",
       "path": "/demos/webgpu-weather-volume-clouds/",
       "status": "incomplete",
-      "sourceHash": "sha256:7f234f0be198c3471e8600d5b9457438affaec1ead9a67bf7e7ba7faf0a2b912",
+      "sourceHash": "sha256:50a74f5d8cd0ddf23a08dfb672a684edfb6d5d7f421596124e677ddfd8395d31",
       "sourceHashInputs": [
         "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
       ],
@@ -1378,7 +1378,7 @@
       "path": "/demos/cloud-generated-weather-maps/",
       "kind": "generated-asset-demo",
       "canonicalLabId": "webgpu-weather-volume-clouds",
-      "sourceHash": "sha256:6515eccca7aec1ff9fbdbb3d8fcae9570e639564449ed1c2030cfea09369571e",
+      "sourceHash": "sha256:9b9060ec8295699ad0f9488075da8371ac727f46135d0dd78d4bbf4202c42e96",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1648,7 +1648,7 @@
       "path": "/demos/sky-atmosphere-haze-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "webgpu-lut-atmosphere",
-      "sourceHash": "sha256:9692474b579da00d1fdd1492a84dc239511de4afae85b7f93d2f0706189e1550",
+      "sourceHash": "sha256:ab1415b790f6df0867f02b2ec9e62d1f3dc32dcf5c65dd7e07f4fe09847047de",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1693,7 +1693,7 @@
       "path": "/demos/visual-validation-harness-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "webgpu-validation-harness",
-      "sourceHash": "sha256:a949ead8d435d53f0c13a81762d0dc863c79f6b08d420b1bc37354c05f2aa0fd",
+      "sourceHash": "sha256:77f29217319c21359e0868cfe7b995d501f85b189e46f930e32aef68b8bb1496",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",

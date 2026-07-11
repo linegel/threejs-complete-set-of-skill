@@ -24,6 +24,12 @@ const assert = (condition, message) => {
 };
 const relativePublishPath = (path) => path.replace(/^\/+/, '');
 const sha256 = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+const escapedHtmlText = (value) => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
 
 const primary = registry.demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
 const canonical = primary.filter((demo) => demo.kind === 'canonical-lab');
@@ -139,7 +145,15 @@ for (const configured of evidencePreviewConfig.previews ?? []) {
     assert(skillPage.includes(`visual-validation/${configured.labId}/${image.file}`), `${demo.skill} omits evidence image ${configured.labId}/${image.file}`);
   }
   if (demo.status !== 'accepted') {
-    assert(skillPage.includes('Native render-target readback preview; lab timing and lifecycle acceptance remain pending.'), `${demo.skill} does not disclose incomplete evidence limitations`);
+    assert(Array.isArray(evidence.limitations) && evidence.limitations.length > 0, `${configured.labId} has no explicit incomplete-evidence limitations`);
+    assert(skillPage.includes('Native WebGPU runtime evidence preview'), `${demo.skill} does not classify the incomplete runtime readback`);
+    for (const [claim, verdict] of Object.entries(evidence.claimVerdicts ?? {})) {
+      assert(skillPage.includes(escapedHtmlText(claim)), `${demo.skill} omits runtime evidence claim: ${claim}`);
+      assert(skillPage.includes(`data-verdict="${escapedHtmlText(verdict)}"`), `${demo.skill} omits runtime evidence verdict: ${claim}=${verdict}`);
+    }
+    for (const limitation of evidence.limitations ?? []) {
+      assert(skillPage.includes(escapedHtmlText(limitation)), `${demo.skill} omits runtime evidence limitation: ${limitation}`);
+    }
   }
 }
 

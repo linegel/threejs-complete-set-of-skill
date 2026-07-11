@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-validation-harness",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-visual-validation/examples/webgpu-validation-harness"
+  ],
+  "canonicalSourceHash": "sha256:bf4b476ae21967652149acd979e3c1550ae6d8c85867549d9d60f347cf320a48",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "PASS"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Native WebGPU MRT subject render-target readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Color-managed final output from the single RenderPipeline owner.",
+      "source": "images/final.design.png",
+      "sourceSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "outputSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post baseline from the same static MRT scene.",
+      "source": "images/no-post.design.png",
+      "sourceSha256": "sha256:97918f2bb0666edfe4f6f5513fda9e39dd6448f967cef0d526996c82cf434902",
+      "outputSha256": "sha256:97918f2bb0666edfe4f6f5513fda9e39dd6448f967cef0d526996c82cf434902",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Mosaic of the final, no-post, normal, and emissive output-node captures.",
+      "source": "images/diagnostics.mosaic.png",
+      "sourceSha256": "sha256:476502393a45f5d5cf9d812068896f30916d2b589e3c67c4ef382fa9a4fff2ea",
+      "outputSha256": "sha256:476502393a45f5d5cf9d812068896f30916d2b589e3c67c4ef382fa9a4fff2ea",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostic.normal.png",
+      "meaning": "Live shared normal attachment diagnostic.",
+      "source": "images/diagnostic.normal.png",
+      "sourceSha256": "sha256:6e485745dc1e946cb80664e02f41075b33252de86012d3a5b3de94b1fee8a419",
+      "outputSha256": "sha256:6e485745dc1e946cb80664e02f41075b33252de86012d3a5b3de94b1fee8a419",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostic.emissive.png",
+      "meaning": "Live shared emissive attachment diagnostic.",
+      "source": "images/diagnostic.emissive.png",
+      "sourceSha256": "sha256:55bcc7734c81b74bbf164aab67939d2194a9fcb22749a816d9c6912798823ebb",
+      "outputSha256": "sha256:55bcc7734c81b74bbf164aab67939d2194a9fcb22749a816d9c6912798823ebb",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near-camera correctness bookmark.",
+      "source": "images/camera.near.png",
+      "sourceSha256": "sha256:8d868c3881ca05283e7d800f48e5c3af2dd93489e83331079b51f8418c1b45e8",
+      "outputSha256": "sha256:8d868c3881ca05283e7d800f48e5c3af2dd93489e83331079b51f8418c1b45e8",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design-camera correctness bookmark.",
+      "source": "images/camera.design.png",
+      "sourceSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "outputSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far-camera correctness bookmark.",
+      "source": "images/camera.far.png",
+      "sourceSha256": "sha256:fd1142dae5c50892a24dcf333f69366b017e08e7873a9814cf9e6e8d4094c371",
+      "outputSha256": "sha256:fd1142dae5c50892a24dcf333f69366b017e08e7873a9814cf9e6e8d4094c371",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Baseline deterministic seed capture.",
+      "source": "images/seed-0001.final.png",
+      "sourceSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "outputSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress deterministic seed capture.",
+      "source": "images/seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:3c052e9fb8780589730376b7086122f64674cb51c8f15ecdf59479160cc4807e",
+      "outputSha256": "sha256:3c052e9fb8780589730376b7086122f64674cb51c8f15ecdf59479160cc4807e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Static-subject temporal baseline immediately after reset.",
+      "source": "images/temporal.t000.png",
+      "sourceSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "outputSha256": "sha256:703ffe0ca0cf8bfa4a5533496a00a8d7bbd9cdaa90c6190d76562c8b1f3f9dce",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Static-subject temporal capture one fixed 1/60-second step later.",
+      "source": "images/temporal.t001.png",
+      "sourceSha256": "sha256:4812c80ff49cc0f8f0c057bcdbf126637053d4694d6554350d6c70cfb2503f53",
+      "outputSha256": "sha256:4812c80ff49cc0f8f0c057bcdbf126637053d4694d6554350d6c70cfb2503f53",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "odd-size.final.png",
+      "meaning": "Odd 641 by 359 aligned-row readback result.",
+      "source": "images/odd-size.final.png",
+      "sourceSha256": "sha256:9eabb14d93ee756984b64dde2719f166194f734c1d67e8e4dac8428399b4f35c",
+      "outputSha256": "sha256:9eabb14d93ee756984b64dde2719f166194f734c1d67e8e4dac8428399b4f35c",
+      "width": 641,
+      "height": 359,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.",
+    "Mechanism completeness, sustained performance compliance, and per-stage GPU attribution remain INSUFFICIENT_EVIDENCE."
+  ]
+}

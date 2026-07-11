@@ -90,6 +90,10 @@ function backendProof(document) {
   };
 }
 
+export function isThreeR185Revision(revision) {
+  return revision === '185' || revision === '0.185.1';
+}
+
 function normalizedClaimVerdicts(document) {
   if (document.claimVerdicts && typeof document.claimVerdicts === 'object') return document.claimVerdicts;
   return {
@@ -179,7 +183,9 @@ export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG) {
     const proofDocument = readJson(resolveWithin(artifactDirectory, preview.backendProof, 'backend proof'));
     const runtime = backendProof(proofDocument);
     if (!runtime.isWebGPUBackend) throw new Error(`${preview.labId} does not serialize renderer.backend.isWebGPUBackend === true`);
-    if (runtime.threeRevision && runtime.threeRevision !== '185') throw new Error(`${preview.labId} capture used Three.js ${runtime.threeRevision}`);
+    if (runtime.threeRevision && !isThreeR185Revision(runtime.threeRevision)) {
+      throw new Error(`${preview.labId} capture used Three.js ${runtime.threeRevision}`);
+    }
 
     const claimDocument = readJson(resolveWithin(artifactDirectory, preview.claimVerdicts, 'claim verdicts'));
     const outputDirectory = join(DOCS_EVIDENCE_ROOT, preview.labId);

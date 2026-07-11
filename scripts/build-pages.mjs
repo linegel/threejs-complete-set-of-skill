@@ -556,6 +556,8 @@ const runtimeEvidenceSummary = (demo) => {
     || summary.canonicalSourceHash !== demo.sourceHash
     || summary.runtime?.isWebGPUBackend !== true
     || !Array.isArray(summary.images)
+    || !Array.isArray(summary.limitations)
+    || summary.limitations.length === 0
     || !summary.images.some((image) => image.file === summary.primaryImage);
   if (invalid) throw new Error(`Runtime evidence preview summary is invalid or stale for ${demo.id}`);
   for (const image of summary.images) {
@@ -573,9 +575,7 @@ const runtimeEvidenceEntries = (demo) => {
     path: `visual-validation/${demo.id}/${image.file}`,
     classification: summary.classification,
     label: image.file === summary.primaryImage ? summary.primaryImageLabel : image.meaning,
-    detail: demo.status === 'accepted'
-      ? 'Accepted runtime evidence image from the published bundle.'
-      : 'Native render-target readback preview; lab timing and lifecycle acceptance remain pending.',
+    detail: null,
     sourceId: demo.id,
   }));
 };
@@ -1159,6 +1159,15 @@ for (const slug of slugs) {
       .filter(([path]) => path !== resolvedSkillPreview?.path && docsImageExists(path))
       .map(([path, label]) => ({ path, label, classification: 'generated-asset-preview', detail: 'Presentation preview only; this image is not canonical runtime evidence.', sourceId: slug })),
   ];
+  const runtimeEvidenceDisclosures = ownedPrimaryDemos
+    .map((demo) => ({ demo, summary: runtimeEvidenceSummary(demo) }))
+    .filter(({ summary }) => summary !== null);
+  const evidenceDisclosureHtml = runtimeEvidenceDisclosures.length ? `<div class="runtime-evidence-disclosures">${runtimeEvidenceDisclosures.map(({ demo, summary }) => `
+      <article class="runtime-evidence-disclosure" data-acceptance-status="${esc(demo.status)}">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>${esc(primaryTitle(demo))}</h3></div><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Acceptance pending'}</span></div>
+        <dl>${Object.entries(summary.claimVerdicts).map(([claim, verdict]) => `<div><dt>${esc(claim)}</dt><dd data-verdict="${esc(verdict)}">${esc(verdict)}</dd></div>`).join('')}</dl>
+        <ul>${summary.limitations.map((limitation) => `<li>${esc(limitation)}</li>`).join('')}</ul>
+      </article>`).join('')}</div>` : '';
   const skillBodyHtml = rewriteSkillBodyLinks(marked.parse(s.body)
     .replace(/<h1([^>]*)>/g, '<h2$1>')
     .replace(/<\/h1>/g, '</h2>'), slug);
@@ -1239,10 +1248,11 @@ for (const slug of slugs) {
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--${hasAcceptedEvidence ? 'accepted' : 'pending'}">${hasAcceptedEvidence ? 'Accepted runtime evidence available' : 'Canonical runtime evidence pending'}</span><code>${previewGalleryEntries.length} published image${previewGalleryEntries.length === 1 ? '' : 's'}</code></div>
+${evidenceDisclosureHtml}
     ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification, detail }) => `
       <figure data-preview-classification="${esc(classification)}" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media">${previewPicture(`../${path}`, `${s.title} — ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
-        <figcaption itemprop="caption"><strong>${esc(label)}</strong><span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span></figcaption>
+        <figcaption itemprop="caption"><strong>${esc(label)}</strong>${detail === null ? '' : `<span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span>`}</figcaption>
       </figure>`).join('')}</div>` : `<div class="preview-missing"><span>Preview capture pending</span><code>npm run pages:capture-previews</code></div>`}
   </div></div>`;
 
@@ -1371,12 +1381,17 @@ a.chip:active{scale:.96}
 .card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.runtime-evidence-disclosures{display:grid;gap:14px;margin:0 0 28px}.runtime-evidence-disclosure{padding:20px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}
+.runtime-evidence-head{display:flex;align-items:start;justify-content:space-between;gap:18px}.runtime-evidence-head code{color:var(--cyan);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.runtime-evidence-head h3{margin-top:6px;font-size:21px}
+.runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
+.runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
   .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
   .evidence-ledger{align-items:flex-start;flex-direction:column}
+  .runtime-evidence-head{align-items:flex-start;flex-direction:column}
 }
 </style>
 </head>

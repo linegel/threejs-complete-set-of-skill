@@ -17,13 +17,13 @@
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
   ],
   "browserEntry": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/index.html",
-  "sourceHash": "sha256:551de40c2730a4ca58fed3ba792ff39c57961b8db97761040519eaca1f2ebc61",
+  "sourceHash": "sha256:3fa15f99b8c751a662324fbb5d148f4ae7d426f54786e80e607881c0c7471797",
   "publishedHashInputs": [
     "docs/demos/webgpu-lut-atmosphere",
     "docs/demos/assets"
   ],
   "publishedBundleHash": "sha256:55268cdc36db5acf3f59160b3254e63b2bc4b24b8bba304f000d6c554e3d4af2",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
+  "buildRevision": "sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551",
   "evidenceBundleId": null
 }

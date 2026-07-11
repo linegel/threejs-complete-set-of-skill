@@ -18,13 +18,13 @@
     "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:6515eccca7aec1ff9fbdbb3d8fcae9570e639564449ed1c2030cfea09369571e",
+  "sourceHash": "sha256:9b9060ec8295699ad0f9488075da8371ac727f46135d0dd78d4bbf4202c42e96",
   "publishedHashInputs": [
     "docs/demos/cloud-generated-weather-maps",
     "docs/demos/assets"
   ],
   "publishedBundleHash": "sha256:7f38bfdde2138916a0e9218a5a8c3095bb8c9d960081b623c718cc337afc1cdb",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
+  "buildRevision": "sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551",
   "evidenceBundleId": null
 }

@@ -10,13 +10,13 @@
     "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
   ],
   "browserEntry": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
-  "sourceHash": "sha256:57a64ea5b294dec8b22aecfee95241fe224f5646a872ea7289c4792e194679ff",
+  "sourceHash": "sha256:4566656ba16c784c8403fbe3a003580746ea2fe84caff859e88c66e76762d3c4",
   "publishedHashInputs": [
     "docs/demos/webgpu-procedural-creature-lab",
     "docs/demos/assets"
   ],
   "publishedBundleHash": "sha256:c844f2f30a11521e5f4f8ab586bc05e721efcc69145ea33946cf09fc691cb294",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
+  "buildRevision": "sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551",
   "evidenceBundleId": null
 }

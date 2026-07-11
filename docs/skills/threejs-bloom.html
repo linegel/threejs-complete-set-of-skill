@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-bloom.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420" />
+<meta name="skill-pack-build-revision" content="sha256:0f85d0f9dbb55c2eabbb3804f3f305ef56b023914339fe4e87eec23032303551" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -262,12 +262,17 @@ a.chip:active{scale:.96}
 .card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.runtime-evidence-disclosures{display:grid;gap:14px;margin:0 0 28px}.runtime-evidence-disclosure{padding:20px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}
+.runtime-evidence-head{display:flex;align-items:start;justify-content:space-between;gap:18px}.runtime-evidence-head code{color:var(--cyan);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.runtime-evidence-head h3{margin-top:6px;font-size:21px}
+.runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
+.runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
   .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
   .evidence-ledger{align-items:flex-start;flex-direction:column}
+  .runtime-evidence-head{align-items:flex-start;flex-direction:column}
 }
 </style>
 </head>
@@ -374,6 +379,12 @@ $$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relativ
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>4 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Node Selective Bloom</h3></div><span class="status status--pending">Acceptance pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>The promoted primary image is the bloom-only target, not a final scene composite.</li><li>Final-composite, GPU-timing, and lifecycle claims remain INSUFFICIENT_EVIDENCE.</li></ul>
+      </article></div>
     <div class="gallery">
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
@@ -381,7 +392,7 @@ $$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relativ
           <source type="image/webp" srcset="../visual-validation/node-selective-bloom/bloom-only.webp" />
           <img data-responsive-preview src="../visual-validation/node-selective-bloom/bloom-only.png" alt="Bloom — Bloom-only render-target readback visualization" itemprop="contentUrl" width="600" height="400" loading="lazy" decoding="async" />
         </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Bloom-only render-target readback visualization</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
+        <figcaption itemprop="caption"><strong>Bloom-only render-target readback visualization</strong></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
@@ -389,7 +400,7 @@ $$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relativ
           <source type="image/webp" srcset="../visual-validation/node-selective-bloom/scene-no-bloom.webp" />
           <img data-responsive-preview src="../visual-validation/node-selective-bloom/scene-no-bloom.png" alt="Bloom — Scene-linear HDR target before bloom, visualized with a documented Reinhard display transform." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Scene-linear HDR target before bloom, visualized with a documented Reinhard display transform.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
+        <figcaption itemprop="caption"><strong>Scene-linear HDR target before bloom, visualized with a documented Reinhard display transform.</strong></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
@@ -397,7 +408,7 @@ $$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relativ
           <source type="image/webp" srcset="../visual-validation/node-selective-bloom/emissive.webp" />
           <img data-responsive-preview src="../visual-validation/node-selective-bloom/emissive.png" alt="Bloom — Selective emissive MRT attachment, visualized with a documented Reinhard display transform." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Selective emissive MRT attachment, visualized with a documented Reinhard display transform.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
+        <figcaption itemprop="caption"><strong>Selective emissive MRT attachment, visualized with a documented Reinhard display transform.</strong></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
@@ -405,7 +416,7 @@ $$L_{bloom} = K * (E_{mrt}), \qquad E = \text{emissiveNode output, scene-relativ
           <source type="image/webp" srcset="../visual-validation/node-selective-bloom/bright-pass.webp" />
           <img data-responsive-preview src="../visual-validation/node-selective-bloom/bright-pass.png" alt="Bloom — BloomNode bright-pass target, visualized with a documented Reinhard display transform." itemprop="contentUrl" width="600" height="400" loading="lazy" decoding="async" />
         </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>BloomNode bright-pass target, visualized with a documented Reinhard display transform.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
+        <figcaption itemprop="caption"><strong>BloomNode bright-pass target, visualized with a documented Reinhard display transform.</strong></figcaption>
       </figure></div>
   </div></div>
 
@@ -771,7 +782,7 @@ conversion. Image-pipeline owns shared scene passes and global ordering.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>d61ce750a659</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>0f85d0f9dbb5</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
