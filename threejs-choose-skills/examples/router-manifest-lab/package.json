@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check router-core.mjs && node --check app.mjs && node --check router-manifest.test.mjs",
+    "check": "node --check router-core.mjs && node --check route-urls.mjs && node --check app.mjs && node --check router-manifest.test.mjs",
     "validate:unit": "node router-manifest.test.mjs",
     "test:mutations": "node router-manifest.test.mjs",
     "capture": "node router-manifest.test.mjs",

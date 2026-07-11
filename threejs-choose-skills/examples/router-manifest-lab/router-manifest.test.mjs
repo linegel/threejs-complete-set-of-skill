@@ -71,6 +71,10 @@ assert.equal(
 	scenarioHref( 'rainy-city', 'https://threejs-skills.com/demos/router-manifest-lab/?scenario=ocean-planet' ),
 	'https://threejs-skills.com/demos/router-manifest-lab/scenario/rainy-city/'
 );
+assert.equal(
+	scenarioHref( 'forest', 'https://threejs-skills.com/demos/router-manifest-lab/scenario/ocean-planet/' ),
+	'https://threejs-skills.com/demos/router-manifest-lab/scenario/forest/'
+);
 assert.throws( () => scenarioHref( '', 'https://threejs-skills.com/demos/router-manifest-lab/' ), TypeError );
 
 assert.deepEqual( manifest.mechanisms.map( ( mechanism ) => mechanism.id ), [ ...mechanismScenarios.keys() ] );

@@ -6,6 +6,23 @@ export function scenarioHref( scenarioId, pageHref ) {
 
 	}
 
-	return new URL( `./scenario/${ encodeURIComponent( scenarioId ) }/`, pageHref ).href;
+	const labUrl = new URL( pageHref );
+	const scenarioMarker = '/scenario/';
+	const scenarioIndex = labUrl.pathname.lastIndexOf( scenarioMarker );
+
+	if ( scenarioIndex >= 0 ) {
+
+		labUrl.pathname = labUrl.pathname.slice( 0, scenarioIndex + 1 );
+
+	} else if ( ! labUrl.pathname.endsWith( '/' ) ) {
+
+		labUrl.pathname += '/';
+
+	}
+
+	labUrl.search = '';
+	labUrl.hash = '';
+
+	return new URL( `scenario/${ encodeURIComponent( scenarioId ) }/`, labUrl ).href;
 
 }
