@@ -39,7 +39,7 @@ always returned as non-publishable fixture evidence by
 artifacts and standard images, then runs the blocking mutation suite.
 
 `validate:artifacts` and `validate:full` require a native browser bundle at
-`artifacts/visual-validation/webgpu-validation-harness/current` (or
+`artifacts/visual-validation/webgpu-validation-harness/correctness` (or
 `LAB_EVIDENCE_DIR`). They intentionally exit nonzero with
 `INSUFFICIENT_EVIDENCE` while only fixtures exist. `validate:quick` remains
 browser-free.

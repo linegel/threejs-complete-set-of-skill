@@ -10,7 +10,7 @@ function option( name, fallback ) {
 
 }
 
-const defaultDirectory = 'artifacts/visual-validation/webgpu-validation-harness/current';
+const defaultDirectory = 'artifacts/visual-validation/webgpu-validation-harness/correctness';
 const artifactDir = resolve( option( '--artifacts', process.env.LAB_EVIDENCE_DIR ?? defaultDirectory ) );
 
 try {
