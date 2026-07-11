@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "generated-asset-demo",
+  "status": "secondary",
+  "license": "ISC",
+  "provenance": {
+    "description": "Repository-owned generated texture variants used only by secondary provider previews.",
+    "generationMetadata": "unavailable-in-current-checkout",
+    "limitation": "These images are input previews, not native-WebGPU mechanism evidence, performance evidence, or canonical acceptance evidence."
+  },
+  "assets": [
+    { "file": "biome-field-a.png", "sha256": "90c3e906b8df1e4ef7642a48e226dee888cfb754b7fd85a8160e504042cc6bb6", "bytes": 493800, "width": 512, "height": 512 },
+    { "file": "biome-field-b.png", "sha256": "fcd64ed7dacfc80a0c0c9a8f4c08e73e0e5b7fb0b7a8069de136952712c185ea", "bytes": 464726, "width": 512, "height": 512 },
+    { "file": "biome-field-c.png", "sha256": "7fb727575f03eb45da910e4b752ecac433ac7d12cf3f17627e98127973a48010", "bytes": 505871, "width": 512, "height": 512 },
+    { "file": "caustic-field-a.png", "sha256": "b2ed53deb7b613bc37d722a1ee33ec2fcf8134df93a0f87f8b0aa55a84e5cba6", "bytes": 202126, "width": 512, "height": 512 },
+    { "file": "caustic-field-b.png", "sha256": "917d3cf9ce7c84d9d94c5b97453896f928640c7d7f672d24eebeb1af10446550", "bytes": 201927, "width": 512, "height": 512 },
+    { "file": "caustic-field-c.png", "sha256": "7c8066295bafc7cccbc387f82e17293a5ce2c163505e27e2314324abe35bfe8e", "bytes": 218190, "width": 512, "height": 512 },
+    { "file": "crater-mask-a.png", "sha256": "f989bd7da7e125cc4fc243a1490c93128b180a78d07f974f49c188ec33f72ce6", "bytes": 347364, "width": 512, "height": 512 },
+    { "file": "crater-mask-b.png", "sha256": "0f15b867ea82067b4d99bbc4ed152753c7d4c42df8e3abcc7cbdf933a8cd3214", "bytes": 363184, "width": 512, "height": 512 },
+    { "file": "crater-mask-c.png", "sha256": "f657f0c77bb212ddd8b93e0cc40d279ff48fad05b67469ee9a77207d05754c9b", "bytes": 363705, "width": 512, "height": 512 },
+    { "file": "directional-wave-seed-a.png", "sha256": "e4ef3e39d1bd14c927abd4f06b4a672224a5c74c7f2b159bc25b4dffbe37224b", "bytes": 243481, "width": 512, "height": 512 },
+    { "file": "directional-wave-seed-b.png", "sha256": "a122c0eb6c1c04bbca2742467fba64d2293489e5c6a0b9596d9e8a955aecfa97", "bytes": 135247, "width": 512, "height": 512 },
+    { "file": "directional-wave-seed-c.png", "sha256": "5e30ed6202f288f3c30a5db9336688859726f36914269f8f3ea1930852c06f56", "bytes": 264127, "width": 512, "height": 512 },
+    { "file": "frost-crystal-a.png", "sha256": "1fe6011c585a4354f9d141a4688aefa07619b1aedc756c2d8e5934f3cad7e372", "bytes": 216418, "width": 512, "height": 512 },
+    { "file": "frost-crystal-b.png", "sha256": "5d6b730890b3e74d72d681bc5c60056579527394a2fc9134330c8de4e2765cdf", "bytes": 218533, "width": 512, "height": 512 },
+    { "file": "frost-crystal-c.png", "sha256": "aedafe42aed1067d34b648a0db4b412792e73e119f66f7431de733a200a77314", "bytes": 219343, "width": 512, "height": 512 },
+    { "file": "lava-cause-a.png", "sha256": "697f8a449aa607238ab577d1b5114d0a5e609a37e5bbe183898304d707c72da9", "bytes": 320223, "width": 512, "height": 512 },
+    { "file": "lava-cause-b.png", "sha256": "3d5d42d29d2bf0d486ea953184821aa67a0eaff893af1fac4b08222a2a96efed", "bytes": 285777, "width": 512, "height": 512 },
+    { "file": "lava-cause-c.png", "sha256": "da4f763cc032f75f6f5dfe201112981bcb03b65eb4d172ff0f0f06e320dcc3ae", "bytes": 340955, "width": 512, "height": 512 },
+    { "file": "meadow-density-a.png", "sha256": "16be5e94f617e89e3c90c075314be15005eff35d6df2866da843d115f073987d", "bytes": 181987, "width": 512, "height": 512 },
+    { "file": "meadow-density-b.png", "sha256": "72684330ae273a356c9b61c3dc6fda04c782358a2a9b189ece1ae2db1aebb58f", "bytes": 177179, "width": 512, "height": 512 },
+    { "file": "meadow-density-c.png", "sha256": "9afd8b23bf8939bd820974376eda6ec47827f96f3eff86a43def86921e449676", "bytes": 192126, "width": 512, "height": 512 },
+    { "file": "ripple-normal-a.png", "sha256": "9713156d2cb1ce6025f064c63e9028c796c83f09a2feab9199c213df205e3e73", "bytes": 424631, "width": 512, "height": 512 },
+    { "file": "ripple-normal-b.png", "sha256": "6241c6994d94b2f53605acb8a2459f58bf140f7662ebfd31fd75e97bdeccdb9a", "bytes": 435820, "width": 512, "height": 512 },
+    { "file": "ripple-normal-c.png", "sha256": "a610d358f7f50644b48577999b5401b27370bf5232abfc097ade62e31c085b63", "bytes": 437027, "width": 512, "height": 512 },
+    { "file": "starfield-tile-a.png", "sha256": "9633d3b2586527fbdde1b7b0d59b95144043ca568a28eaff3baeb1bcad04b98b", "bytes": 96136, "width": 512, "height": 512 },
+    { "file": "starfield-tile-b.png", "sha256": "8b102dc5ec291da3520c74dd6282b015c71796cc04446795612c1b8a12f406c3", "bytes": 97929, "width": 512, "height": 512 },
+    { "file": "starfield-tile-c.png", "sha256": "8596e5315df1dc8c7feb5d839659292be152681895c6a3899a1eceb489710cdd", "bytes": 103467, "width": 512, "height": 512 },
+    { "file": "weather-map-a.png", "sha256": "a34942bd3188dbeda0bbd8c317c7222c26c6e6a58d8567eb5b92e616d4553cb0", "bytes": 264127, "width": 512, "height": 512 },
+    { "file": "weather-map-b.png", "sha256": "beac5a10f24d34a17ecd3349b340576beb944f1b393890de6c471437227feada", "bytes": 266616, "width": 512, "height": 512 },
+    { "file": "weather-map-c.png", "sha256": "59de4acc2d6bfc7932c26b3f7538e9695ce40e4098a1339a7aea4917008e4194", "bytes": 262908, "width": 512, "height": 512 }
+  ]
+}
