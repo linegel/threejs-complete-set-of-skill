@@ -67,11 +67,15 @@ Prefer this loop for implementation tasks:
 8. After each visual pass, capture a browser screenshot, create one full reference/render comparison pair, inspect it once with AI vision, then update `reviewHistory` with overall, layer, and semantic feature scores.
 9. Run project typecheck/build and browser visual review; use the Codex in-app Browser screenshot tool first. Do not install or download Playwright/Chromium just for this skill unless the user explicitly requests that route.
 
-### Canonical WebGPU Demo
+### Executable WebGPU References
 
-Use `examples/webgpu-tower-ship-sculptor/` as the executable reference for this skill's complete contract. It includes the strict `ObjectSculptSpec`, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/colliders/destruction groups, `final`/`blockout`/`hierarchy`/`materials`/`interaction` modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.
+Use `examples/webgpu-tower-ship-sculptor/` as the reference-reconstruction exemplar. It includes the strict `ObjectSculptSpec`, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/collider-construction inputs/destruction groups, `final`/`blockout`/`hierarchy`/`materials`/`interaction` modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.
 
-Run `npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick` before browser capture. Treat the lab's `incomplete` evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.
+Use `examples/webgpu-object-sculptor-corpus/` as the cross-subject representation and architecture benchmark. It deliberately spans an articulated hard-surface lamp, an organic potted bonsai, and a rotational ceramic teapot. Its shared runtime separates semantic and live-instance identity, visual LOD from collider construction, authored action preview from solver motion, and runtime-owned from registered external resources. Its gates target failure classes that a single ship cannot: hinge reset and constraint frames, shade apertures, botanical ring/crown winding, nondegenerate lathe poles, sweep boundaries, open vessel interiors, seed envelopes, directed collider-error lower-bound regressions, tier invariants, route locks, lifecycle, and aligned-readback layout/normalization. These self-authored benchmarks have no external reference image; they exercise transfer and runtime contracts, while native browser, visual, bidirectional collider-error, timing, and performance evidence remain separate gates.
+
+From the repository root, run `npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick` before browser capture. Treat the lab's `incomplete` evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.
+
+From the repository root, run `npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick` before corpus browser review. Its artifact validator must remain `INSUFFICIENT_EVIDENCE` until the declared visual, resource, lifecycle, GPU-timing, and target-performance evidence exists.
 
 ## 3D Terminology Discipline
 
@@ -200,7 +204,7 @@ For every major component, capture:
 - dimensions: width, height, depth, radius, length, taper ratios, and confidence
 - transforms: position, rotation, scale, taper, bend, twist, bevel, boolean cut, noise displacement
 - joints: parent component, overlap, seam, hinge, socket, embedded, glued, floating
-- action profile: animation role, pivot mode/local position/axis, transform channels, sockets, collider proxy, constraints, destruction behavior
+- action profile: animation role, pivot mode/local position/axis, transform channels, sockets, collider construction intent/input, constraints, destruction behavior
 - material layers: base color, palette variation, roughness, metalness, normal, bump, displacement, transparency, edge wear, dirt, moss, scratches, chips, wetness, grain
 - local features: per-region marks, dents, holes, seams, stains, ridges, raised details, carved lines, decals, chips, and wear patches
 - evidence refs: which image region supports this component or local feature
@@ -218,6 +222,8 @@ For complex objects, do not flatten everything into one `details` string. Use:
 
 Anti-shallow rule: a complex object with only one root component, no repetition systems, no material local overrides, and no micro feature groups is not implementation-ready even if the JSON schema validates.
 
+Before selecting geometry, repetition, hierarchy, motion, physics handoff, material, or mobile representations, read [multi-subject algorithm and architecture selection](references/multi-subject-algorithm-and-architecture.md). It contains the falsifiable selection matrices and exact topology, normal, frame, bounds, collider-error, seed, motion, diagnostic, and lifecycle tests. Do not choose an algorithm from object category alone; choose per semantic component from the frozen view, action, tier-invariant, and target contracts.
+
 ## Action-Ready Model Contract
 
 Build every generated model as if the user may later ask for animation, transformation, physics, or destruction. Do not generate a beautiful but inert lump of meshes.
@@ -233,23 +239,42 @@ inputs, not an independent solver ABI. Convert source dimensions once through
 the route's SI `PhysicsContext`, preserve stable component/entity generations,
 and keep visual geometry LOD separate from physical representation.
 
-The generated asset adapter publishes a canonical `ColliderProxy` for every
-physics-relevant solid or trigger and a canonical `RigidBodyProperties` record
-when mass, center of mass, inertia, and material evidence are sufficient. Each
-proxy names its owning entity generation, local frame, SI dimensions, shape
-approximation/error, physics-material identity, source revision, and validity.
-A decorative mesh or collider-shaped `userData` object is not collision
-authority. Missing scale, density, inertia, material, or approximation evidence
-blocks the corresponding dynamic claim instead of inventing defaults.
+The object factory publishes a `ColliderConstructionInput` for every
+physics-relevant solid, trigger, sensor, boundary, or query shape. It contains
+stable semantic and live-instance identity, explicit authoring units, a local
+authored frame, analytic or compound shape intent, physics-material binding
+request, source revision, and a conservative authored approximation envelope.
+It has no contact, rigid-body, frame-registration, or solver authority.
 
-When a selected engine or domain solver owns motion, contact, constraints, or
-fracture, the route binds it through the canonical `ExternalSolverAdapter`.
-That adapter maps exact context/frame/unit/clock/state versions and publishes
-complete canonical `InteractionRecord` contact, impulse, constraint, or
-breakage entries for the route coordinator and authoritative solver. The
-object-sculptor owns semantic pivots, sockets, collider construction inputs,
-fracture groups, and visual component identity; it does not become a contact or
-rigid-body solver merely because a model is action-ready.
+An articulated factory may also publish a `ConstraintConstructionInput` with
+stable parent/child identities, parent- and child-local anchor frames, authored
+axis/limits/compliance intent, source units, and revision. It is not an active
+constraint, state equation, or solve claim until the selected route owner
+adapts and commits it.
+
+Only the selected route adapter may publish a canonical `ColliderProxy`, after
+it supplies the versioned `PhysicsContext`, performs the one explicit unit
+conversion, registers frame/origin/transform revisions, binds committed pose,
+cadence, validity, filters, and residency, and validates the approximation
+error. It publishes a canonical `RigidBodyProperties` record only when mass,
+center of mass, inertia, and material evidence are sufficient. A decorative
+mesh or collider-shaped `userData` object is not collision authority. Missing
+scale, density, inertia, material, or approximation evidence blocks the
+corresponding dynamic claim instead of inventing defaults.
+
+When a route-native engine or domain solver owns motion, contact, constraints,
+or fracture, register it directly as the relevant `PhysicsGraph` state owner
+with the route's ordinary versioned cost, state, and commit records. When an
+external library, process, or device owns that work, bind it through the
+canonical `ExternalSolverAdapter`, which maps exact context/frame/unit/clock/
+state versions. Contact lifecycle publishes `ContactManifoldRecord`; closed
+dimensional payloads such as impulse or `constraintTarget` publish the matching
+`InteractionRecord`. Fracture remains a named state equation or transition owned
+by the selected solver; only its supported dimensional exchanges use an
+`InteractionRecord` arm. The object-sculptor owns semantic pivots, sockets,
+collider and constraint construction inputs, fracture groups, and visual
+component identity; it does not become a contact or rigid-body solver merely
+because a model is action-ready.
 
 The adapter owner publishes `PhysicsExternalAdapterCost` in the same route
 opportunity rows as solver-driven state and presentation. Evidence includes
@@ -279,17 +304,17 @@ The spec should include `actionReadiness`, and every macro/meso component should
 - `pivot`: mode, local position, axis, and confidence. Use a semantic pivot such as base, hinge, joint, center of mass, branch root, handle socket, or custom.
 - `transformChannels`: whether translate, rotate, scale, bend, twist, detach, visibility, or material-state changes are expected.
 - `sockets`: named attachment points for hands, tools, branches, wheels, lids, projectiles, effects, or later child objects.
-- `collider`: simplified runtime proxy such as box, sphere, capsule, cylinder, convex hull, compound, trigger, or none.
-- `constraints`: hinge limits, slide limits, bend limits, spring behavior, parent locks, or physics constraints.
+- `colliderConstructionInput`: authoring shape intent such as box, sphere, capsule, cylinder, convex hull, compound, trigger, query, boundary, or none; include source units, local authored frame, stable identities, material-binding request, source revision, and conservative authored error envelope.
+- `constraints`: a `ConstraintConstructionInput` for authored hinge, slide, bend, spring, or parent-lock intent with stable participants, local anchor frames, axis/limits, units, and revision; it is not a solver constraint until the selected route owner adapts and commits it.
 - `destruction`: breakable flag, fracture group, seam refs, detachable fragments, break impulse, debris material, and effect anchors.
 
 Generation rules:
 
 - Put each independently transformable part under a stable `THREE.Group` pivot node; put the visual mesh as its child.
-- Store runtime maps in `root.userData.sculptRuntime`: `nodes`, `meshes`, `sockets`, `colliders`, and `destructionGroups`.
+- Store runtime maps in `root.userData.sculptRuntime`: `nodes`, `meshes`, `sockets`, `colliders`, and `destructionGroups`. Values in the `colliders` map are `ColliderConstructionInput` records, not canonical `ColliderProxy` records.
 - Avoid merging parts that may move, detach, bend, break, swap materials, or receive independent collision later.
 - Use procedural seams and component boundaries as future break lines; do not rely on random explosions.
-- If the object truly has no moving parts, still include a root pivot, whole-object collider, and destruction policy so later whole-object actions remain easy.
+- If the object truly has no moving parts, still include a root pivot, whole-object collider construction input, and destruction policy so later whole-object actions remain easy.
 
 ## Self-Correction Loop
 
@@ -380,8 +405,8 @@ Minimum gates:
 3. `form-refinement`: screenshot proves bevel/chamfer/taper/bend/deformation, local geometry features, and no floating child joints.
 4. `material-pass`: screenshot proves albedo, roughness, metalness, normal/bump/displacement, AO, dirt, wear, local overrides.
 5. `lighting-pass`: screenshot proves reference-independent material readability plus optional reference lighting match.
-6. `interaction-pass`: screenshot or short render capture proves pivots, sockets, colliders, animation anchors, fracture seams, detachable fragments, and runtime metadata.
-7. `optimization-pass`: triangle budget, draw calls, instancing, LOD, and FPS target.
+6. `interaction-pass`: screenshot or short render capture demonstrates authored preview motion, pivots, sockets, construction-input overlays, fracture seams, and detachable fragments. Structural tests—not pixels—validate IDs, local frames, exact reset, records, and tier invariants; physical validity remains blocked until the canonical route gates pass.
+7. `optimization-pass`: visual-error-qualified geometry/material tiers plus sustained CPU, GPU, presentation, memory, traffic, binding, and lifecycle gates on each named device/browser/backend target.
 
 ### Locked Build Pass Gate
 
@@ -429,8 +454,8 @@ Use a layered sculpting workflow:
 4. `surface pass`: add generated normal maps, procedural noise, vertex colors, bark/stone/metal/plastic/cloth patterns, scratches, wetness, dirt, edge highlights, and small repeated geometry only where it matters.
 5. `material pass`: tune roughness/metalness/clearcoat/transmission/alpha so surfaces do not look like plastic unless they should.
 6. `lighting pass`: separate actual object material from photo lighting; create a neutral turntable light plus optional reference-matching light.
-7. `interaction pass`: add pivots, bones, colliders, animation handles, break points, and detachable fragments only when the user needs motion or destruction.
-8. `optimization pass`: instance repeated details, merge static pieces where safe, cap geometry density, and preserve FPS targets.
+7. `interaction pass`: add pivots, bones, collider construction inputs, animation handles, break points, and detachable fragments only when the user needs motion or destruction.
+8. `optimization pass`: instance repeated details, merge static pieces where safe, and derive candidates from projected visual error before measuring the complete sustained workload on each named target.
 
 ## Three.js Implementation Rules
 
