@@ -209,6 +209,37 @@ test('empty-startup mechanism wrappers select by query without calling setMode',
   }), /unsupported locked startup keys: mechanism/);
 });
 
+test('locked scenario and tier routes always apply their declared controller state', () => {
+  const tier = lockedRouteContract({
+    labId: 'fixture-lab',
+    kind: 'tier',
+    id: 'minimum',
+    startup: {},
+  });
+  assert.deepEqual(tier.startup, { tier: 'minimum' });
+  assert.deepEqual(tier.setterCalls, [{ setter: 'setTier', value: 'minimum' }]);
+
+  const scenario = lockedRouteContract({
+    labId: 'fixture-lab',
+    kind: 'scenario',
+    id: 'stress',
+    startup: { camera: 'far' },
+  });
+  assert.deepEqual(scenario.startup, { camera: 'far', scenario: 'stress' });
+  assert.deepEqual(scenario.setterCalls, [
+    { setter: 'setScenario', value: 'stress' },
+    { setter: 'setCamera', value: 'far' },
+  ]);
+  const aliasedTier = lockedRouteContract({
+    labId: 'fixture-lab',
+    kind: 'tier',
+    id: 'minimum-presentation',
+    startup: { tier: 'full' },
+  });
+  assert.deepEqual(aliasedTier.startup, { tier: 'full' });
+  assert.deepEqual(aliasedTier.setterCalls, [{ setter: 'setTier', value: 'full' }]);
+});
+
 test('locked route controller discovery accepts exposure after iframe load', async () => {
   const expected = { ready: async () => {} };
   const emittedWaiter = Function(`return (${awaitLockedRouteController.toString()})`)();

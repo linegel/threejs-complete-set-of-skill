@@ -13,6 +13,10 @@ const STARTUP_SETTERS = Object.freeze({
   camera: 'setCamera',
   time: 'setTime',
 });
+const ROUTE_STARTUP_KEYS = Object.freeze({
+  scenario: 'scenario',
+  tier: 'tier',
+});
 
 const ROUTE_ACKNOWLEDGEMENT_KEYS = Object.freeze({
   scenario: Object.freeze(['scenario', 'scenarioId', 'activeScenario']),
@@ -130,16 +134,19 @@ export function lockedRouteContract({ kind, id, startup = {}, labId = 'lab' }) {
   if (!['scenario', 'mechanism', 'tier'].includes(kind)) throw new Error(`${labId}: unsupported route kind ${kind}`);
   const unknown = Object.keys(startup).filter((key) => !(key in STARTUP_SETTERS));
   if (unknown.length > 0) throw new Error(`${labId}: unsupported locked startup keys: ${unknown.join(', ')}`);
+  const lockedStartup = structuredClone(startup);
+  const routeStartupKey = ROUTE_STARTUP_KEYS[kind];
+  if (routeStartupKey && lockedStartup[routeStartupKey] === undefined) lockedStartup[routeStartupKey] = id;
   return {
     query: `?${encodeURIComponent(kind)}=${encodeURIComponent(id)}`,
-    startup: structuredClone(startup),
+    startup: lockedStartup,
     acknowledgementKeys: [...ROUTE_ACKNOWLEDGEMENT_KEYS[kind]],
     startupAcknowledgementKeys: Object.fromEntries(
       Object.entries(STARTUP_ACKNOWLEDGEMENT_KEYS).map(([key, values]) => [key, [...values]]),
     ),
     setterCalls: Object.keys(STARTUP_SETTERS)
-      .filter((key) => startup[key] !== undefined)
-      .map((key) => ({ setter: STARTUP_SETTERS[key], value: startup[key] })),
+      .filter((key) => lockedStartup[key] !== undefined)
+      .map((key) => ({ setter: STARTUP_SETTERS[key], value: lockedStartup[key] })),
   };
 }
 
