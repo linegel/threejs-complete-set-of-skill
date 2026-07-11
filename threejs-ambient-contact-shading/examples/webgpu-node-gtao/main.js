@@ -682,14 +682,6 @@ async function captureTarget( renderer, renderTarget, textureIndex = 0 ) {
 
 }
 
-function textureIndex( renderTarget, name ) {
-
-	const index = renderTarget.textures.findIndex( ( texture ) => texture.name === name );
-	if ( index < 0 ) throw new Error( `Render target does not contain texture ${ name }.` );
-	return index;
-
-}
-
 export async function createWebGPUNodeGTAO( {
 	canvas,
 	width = 1200,
@@ -726,6 +718,12 @@ export async function createWebGPUNodeGTAO( {
 	} );
 	presentationTarget.texture.colorSpace = renderer.outputColorSpace;
 	presentationTarget.texture.name = 'webgpu-node-gtao-presentation-rgba8';
+	const diagnosticTarget = new THREE.RenderTarget( renderer.domElement.width, renderer.domElement.height, {
+		type: THREE.UnsignedByteType,
+		depthBuffer: false
+	} );
+	diagnosticTarget.texture.colorSpace = THREE.NoColorSpace;
+	diagnosticTarget.texture.name = 'webgpu-node-gtao-diagnostic-rgba8';
 	const stage = createGTAOStage( { scene, camera, tier: AO_TIERS[ initialTier ] ?? AO_TIERS.ultra } );
 
 	let tierId = 'ultra';
@@ -910,6 +908,7 @@ export async function createWebGPUNodeGTAO( {
 		renderer.setPixelRatio( dpr );
 		renderer.setSize( width, height, false );
 		presentationTarget.setSize( renderer.domElement.width, renderer.domElement.height );
+		diagnosticTarget.setSize( renderer.domElement.width, renderer.domElement.height );
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
 		await resetHistory( 'resize' );
@@ -922,39 +921,79 @@ export async function createWebGPUNodeGTAO( {
 
 	}
 
+	async function captureOutputNode( node, target, metadata ) {
+
+		const previousTarget = renderer.getRenderTarget();
+		const previousOutputNode = renderPipeline.outputNode;
+		try {
+
+			renderPipeline.outputNode = node;
+			renderPipeline.needsUpdate = true;
+			renderer.setRenderTarget( target );
+			renderPipeline.render();
+			return {
+				...await captureTarget( renderer, target, 0 ),
+				...metadata,
+				readbackRoute: 'explicit-single-attachment-staging-target'
+			};
+
+		} finally {
+
+			renderer.setRenderTarget( previousTarget );
+			renderPipeline.outputNode = previousOutputNode;
+			renderPipeline.needsUpdate = true;
+
+		}
+
+	}
+
 	async function capturePixels( target = 'lit-output' ) {
 
 		if ( target === 'presentation' ) {
 
-			const previousTarget = renderer.getRenderTarget();
-			try {
-
-				renderer.setRenderTarget( presentationTarget );
-				renderPipeline.render();
-
-			} finally {
-
-				renderer.setRenderTarget( previousTarget );
-
-			}
-			return {
-				...await captureTarget( renderer, presentationTarget, 0 ),
+			return captureOutputNode( renderPipeline.outputNode, presentationTarget, {
 				target,
 				format: 'rgba8unorm',
 				outputColorSpace: renderer.outputColorSpace,
+				colorEncoding: 'display-referred',
 				bytesPerPixel: 4
-			};
+			} );
 
 		}
-		await renderOnce();
-		if ( target === 'input-output' ) return captureTarget( renderer, stage.gbufferPass.renderTarget, textureIndex( stage.gbufferPass.renderTarget, 'output' ) );
-		if ( target === 'normal' ) return captureTarget( renderer, stage.gbufferPass.renderTarget, textureIndex( stage.gbufferPass.renderTarget, 'normal' ) );
-		if ( target === 'velocity' ) return captureTarget( renderer, stage.gbufferPass.renderTarget, textureIndex( stage.gbufferPass.renderTarget, 'velocity' ) );
-		if ( target === 'lit-output' ) return captureTarget( renderer, stage.litScenePass.renderTarget, textureIndex( stage.litScenePass.renderTarget, 'output' ) );
-		if ( target === 'baseline-output' ) return captureTarget( renderer, stage.baselineScenePass.renderTarget, textureIndex( stage.baselineScenePass.renderTarget, 'output' ) );
-		if ( target === 'raw-ao' ) return captureTarget( renderer, stage.gtaoNode._aoRenderTarget, 0 );
-		if ( target === 'denoised-ao' ) return captureTarget( renderer, stage.reconstructedAO.renderTarget, 0 );
-		if ( target === 'bent-normal' ) return captureTarget( renderer, stage.bentNormal.textureNode.renderTarget, 0 );
+		const displayNodes = {
+			'input-output': stage.gbufferPass.getTextureNode( 'output' ),
+			'lit-output': stage.materialContextOutput,
+			'baseline-output': stage.baselineOutput
+		};
+		if ( displayNodes[ target ] !== undefined ) {
+
+			return captureOutputNode( renderOutput( displayNodes[ target ] ), presentationTarget, {
+				target,
+				format: 'rgba8unorm',
+				outputColorSpace: renderer.outputColorSpace,
+				colorEncoding: 'display-referred',
+				bytesPerPixel: 4
+			} );
+
+		}
+		const diagnosticNodes = {
+			normal: vec4( stage.sceneNormal.sample( screenUV ).rgb.mul( 0.5 ).add( 0.5 ), 1 ),
+			velocity: vec4( stage.velocityNode.sample( screenUV ).rg.mul( 0.5 ).add( 0.5 ), 0, 1 ),
+			'raw-ao': vec4( vec3( stage.rawAO.sample( screenUV ).r ), 1 ),
+			'denoised-ao': vec4( vec3( stage.reconstructedAO.sample( screenUV ).r ), 1 ),
+			'bent-normal': stage.bentNormal.textureNode
+		};
+		if ( diagnosticNodes[ target ] !== undefined ) {
+
+			return captureOutputNode( diagnosticNodes[ target ], diagnosticTarget, {
+				target,
+				format: 'rgba8unorm',
+				outputColorSpace: THREE.NoColorSpace,
+				colorEncoding: 'linear-diagnostic',
+				bytesPerPixel: 4
+			} );
+
+		}
 		throw new Error( `Unknown AO capture target: ${ target }` );
 
 	}
@@ -995,7 +1034,15 @@ export async function createWebGPUNodeGTAO( {
 
 	function describeResources() {
 
-		return calculateAOResourceInventory( width, height, dpr, tierId, { mode, temporalEnabled } );
+		const inventory = calculateAOResourceInventory( width, height, dpr, tierId, { mode, temporalEnabled } );
+		const pixels = renderer.domElement.width * renderer.domElement.height;
+		return {
+			...inventory,
+			evidenceStagingResources: [
+				{ id: 'presentation-readback-rgba8', format: 'rgba8unorm', logicalBytes: 4 * pixels, provenance: 'Derived', reachableDuringNormalRender: false },
+				{ id: 'diagnostic-readback-rgba8', format: 'rgba8unorm', logicalBytes: 4 * pixels, provenance: 'Derived', reachableDuringNormalRender: false }
+			]
+		};
 
 	}
 
@@ -1027,6 +1074,7 @@ export async function createWebGPUNodeGTAO( {
 		stage.dispose();
 		renderPipeline.dispose();
 		presentationTarget.dispose();
+		diagnosticTarget.dispose();
 		const geometries = new Set();
 		const materials = new Set();
 		scene.traverse( ( object ) => {

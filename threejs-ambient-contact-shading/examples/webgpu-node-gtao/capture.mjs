@@ -94,6 +94,9 @@ try {
 			width: result.width,
 			height: result.height,
 			componentType: result.componentType,
+			format: result.format,
+			colorEncoding: result.colorEncoding,
+			readbackRoute: result.readbackRoute,
 			bytesPerTexel: { value: result.bytesPerTexel, unit: 'bytes/texel', label: 'Measured', source: 'WebGPU render-target readback metadata' },
 			bytesPerRow: { value: result.bytesPerRow, unit: 'bytes', label: 'Measured', source: 'integer 256-byte-aligned WebGPU copy stride' },
 			packedRowBytes: { value: result.packedRowBytes, unit: 'bytes', label: 'Measured', source: 'packed raw artifact row width' },
@@ -104,8 +107,8 @@ try {
 	}
 
 	for ( const [ id, target ] of [
-		[ 'final-lit-hdr', 'lit-output' ],
-		[ 'no-ao-baseline-hdr', 'baseline-output' ],
+		[ 'final-lit-display', 'lit-output' ],
+		[ 'no-ao-baseline-display', 'baseline-output' ],
 		[ 'raw-gtao', 'raw-ao' ],
 		[ 'reconstructed-gtao', 'denoised-ao' ],
 		[ 'gbuffer-normal', 'normal' ],

@@ -59,8 +59,12 @@ npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run valid
 ```
 
 `capture` launches the canonical route and writes native render-target `.raw`
-readbacks plus renderer, graph, stride, and resource metadata. It never uses a
-page screenshot as WebGPU proof and labels the candidate
+readbacks plus renderer, graph, stride, and resource metadata. Diagnostic nodes
+are copied through an explicit single-attachment RGBA8 staging target because
+r185 does not reliably expose backend format metadata for every internal
+PassNode attachment to `readRenderTargetPixelsAsync()`. The staging route is
+recorded in every readback entry and is separate from the normal render graph.
+It never uses a page screenshot as WebGPU proof and labels the candidate
 `INSUFFICIENT_EVIDENCE`; it does not manufacture the missing PNG, timestamp,
 or lifecycle evidence. `validate:artifacts` rejects a missing or structurally
 incomplete v2 bundle. `validate:full` additionally requires every claim verdict

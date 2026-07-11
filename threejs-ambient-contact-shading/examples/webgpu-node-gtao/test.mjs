@@ -48,6 +48,7 @@ assert.match( captureSource, /INSUFFICIENT_EVIDENCE/ );
 assert.match( captureSource, /mechanism-metrics\.json/ );
 assert.match( captureSource, /resident-resources\.json/ );
 assert.doesNotMatch( captureSource, /page\.screenshot/ );
+assert.doesNotMatch( captureSource, /final-lit-hdr/ );
 assert.ok( AO_SCENARIOS.includes( 'moving-occluder' ) );
 assert.ok( Object.values( AO_DEBUG_MODES ).includes( 'bent-normal' ) );
 
@@ -144,6 +145,11 @@ assert.ok( Object.values( passingMetrics.claims ).every( ( claim ) => claim.verd
 
 assert.equal( validateAOConfig().pass, true );
 assert.equal( validateExampleSourceContracts(), true );
+
+const mainSource = await readFile( join( here, 'main.js' ), 'utf8' );
+assert.match( mainSource, /diagnostic-readback-rgba8/ );
+assert.match( mainSource, /readbackRoute:\s*'explicit-single-attachment-staging-target'/ );
+assert.doesNotMatch( mainSource, /captureTarget\( renderer, stage\.[^)]+renderTarget/ );
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera();
