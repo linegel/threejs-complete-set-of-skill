@@ -535,6 +535,13 @@ For tile/mobile GPUs:
 - keep simulation resolution independent of viewport resolution;
 - restrict nearshore simulation to persistent causal-influence tiles, not
   merely currently visible tiles;
+- publish `PhysicsSparseActiveDomainCost` for every sparse water tier: eligible
+  and probed tiles/cells, active core, wet/dry halo and boundary cells,
+  allocated/high-water capacity, connected-component fragmentation,
+  detect/classify, scan/sort/compact, allocation/indirect-argument, neighbor/
+  halo, and solver phase timings/traffic, activation/deactivation hysteresis,
+  inactive-water model/error, and visible overflow disposition. A dense coast
+  probe followed by a sparse solve is not a wholly sparse algorithm;
 - use a separate halo/boundary pass before any whole-tile stencil and a later
   dispatch for each global producer/consumer dependency;
 - retain one canonical face flux when claiming shallow-water conservation;
@@ -592,6 +599,10 @@ applicable subset below and every algorithm-specific gate from those references:
   multiple times, with bathymetry/depth/phase/flow/foam/optics diagnostics;
 - final/no-optics/no-caustics/no-foam fixed views;
 - renderer info, allocation ledger, dispatch count, and sustained GPU timings.
+- sparse-domain stress traces for fragmented archipelagos, many isolated wet
+  components, rapidly advancing inundation fronts, maximum halo/core ratio,
+  capacity growth, deactivation/reactivation churn, catch-up, and quality
+  migration; each must close to the route opportunity table and frozen gates.
 
 Fail the build on an unstable stencil, stale derivative state, invalid values,
 double output conversion, source-space caustics presented as receiver-space

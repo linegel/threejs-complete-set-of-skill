@@ -644,6 +644,17 @@ Every quality state needs matching steady and catch-up evidence; every quality
 transition needs separate prepare/populate/commit/retire cost evidence through
 source-generation retirement.
 
+When present, bind three workload-shape ledgers into the same opportunity rows:
+`PhysicsSparseActiveDomainCost` covers detection, scan/sort, compaction,
+capacity/indirect arguments, halo/neighbors, solve, hysteresis, inactive-model
+error, and overflow; `PhysicsContactCost` covers broadphase pairs, narrowphase,
+manifolds, islands, constraint rows/iterations, warm starts/cache, deterministic
+reduction, and stress tails; `PhysicsExternalAdapterCost` covers batching,
+serialization/conversion, queue/transport/ownership/fence dependencies, remote
+solve attribution, retries/exact-once, in-flight memory, clock mapping, and
+failure recovery. Counting only active solver elements, average contacts, or
+remote compute time is incomplete.
+
 ### MRT And Tile-GPU Bandwidth Gate
 
 MRT saves work only when its consumers justify the attachments. For each
@@ -958,7 +969,9 @@ A routed implementation is incomplete without:
   `PhysicsWorstPermittedCatchUpCost` frontier, and per-state/per-transition
   quality-cost evidence; include coordination intervals, native owner steps,
   stage executions/hot bytes, critical queue paths, traffic/readbacks, multiview/
-  frames-in-flight multiplication, migration overlap, and sustained thermal state;
+  frames-in-flight multiplication, migration overlap, sparse active-domain
+  phases, contact-pipeline tails, external-adapter tails, and sustained thermal
+  state;
 - no-post baseline plus field, geometry, material, identity, depth, velocity,
   history, and output diagnostics actually used by the route;
 - color/data encoding, HDR format, tone-map owner, output-transform owner, and

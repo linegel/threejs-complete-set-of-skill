@@ -358,6 +358,16 @@ slots, bounded deterministic queues, and canonical batch-level
 per-creature query objects. Presented pose/resource generations use a
 frame-in-flight lease/reuse rule so compute or slot recycling cannot overwrite
 state still referenced by a sealed snapshot.
+Kinematic `SupportSurfaceSample` queries do not enter a contact ledger. When a
+route instead selects physical creature contact, publish `PhysicsContactCost`
+from the actual contact owner: body/shape/proxy counts, moved bounds,
+broadphase candidates, narrowphase shape-pair tests, contacts, manifolds and
+points, islands/largest island, scalar constraint rows, iterations/residuals,
+warm-start hits/misses/invalidations/cache bytes, deterministic sort/reduction,
+and contact/reaction lifecycle events. Measure frozen pileup, dense flock
+landing, high-speed crossing, sleeping/waking, topology/proxy change, cold
+warm-start cache, catch-up, and quality migration; ordinary gait over empty
+ground is not a contact-tail benchmark.
 Physical locomotion/interaction `QualityTransition` commits only at a scheduler
 tick with state projection, queue boundary, conserved-value/error ledger,
 atomic provider/identity generation, history action, rollback, and measured
@@ -428,6 +438,9 @@ snapped shell remains diagnostic even after that closure.
 - cross-owner recurrent locomotion advances from a creature-local/render-loop
   accumulator, so it diverges from `PhysicsGraph` catch-up and exact-once
   interaction application;
+- physical contact is budgeted from creature/body count while broadphase pairs,
+  shape-pair tests, manifolds, constraint rows/iterations, cache behavior, and
+  frozen pileup/topology-change tails are absent;
 - part-id sorting defines a repeated smooth-min fold, so a rename changes the
   field, or candidate leaves are folded outside their declared blend ancestry;
 - proximity skin weights leak across contacting limbs, influences are not

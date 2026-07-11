@@ -697,6 +697,9 @@ physics-presentation-snapshots.jsonl
 physics-frame-execution.jsonl
 physics-quality-migration.json
 physics-performance-and-traffic.json
+physics-sparse-active-domain-costs.json
+physics-contact-costs.json
+physics-external-adapter-costs.json
 images/physics.provider-validity.png
 images/physics.interactions-and-reactions.png
 images/physics.rebase-residual.png
@@ -1006,6 +1009,32 @@ readback, and in-flight frame rings. Derive lower/upper traffic per execution,
 multiply by measured executions per presented frame, then by measured
 presentation rate. Report queue/timestamp resolution latency separately; do not
 attribute a blocking query resolve to solver cost.
+
+For every sparse owner, `physics-sparse-active-domain-costs.json` records
+eligible/probed, active-core, halo/ghost/boundary, allocated/high-water, and
+component/extent distributions plus detection, scan/sort, compaction,
+allocation/indirect-argument, neighbor/halo, and solver phase time/traffic.
+Exercise fragmented components, advancing fronts, capacity growth,
+deactivation/reactivation, overflow, catch-up, and migration. Reject sparse
+claims that measure only the final active kernel or silently deactivate state
+without an inactive-model error gate.
+
+For the selected contact owner, `physics-contact-costs.json` records body/shape/
+proxy populations, moved bounds, broadphase candidates, narrowphase tests by
+shape pair, contacts, manifolds/points, islands/largest island, scalar
+constraint rows, iterations/residuals, warm-start/cache behavior, deterministic
+reduction, lifecycle events, and reactions. Freeze pileup, high-speed crossing,
+sleep/wake, proxy/topology change, cold cache, catch-up, and migration fixtures;
+average sparse-contact frames do not prove the tail.
+
+For every external adapter, `physics-external-adapter-costs.json` records batch/
+message counts, logical/physical bytes, serialization/conversion, queue and
+transport kind, ownership/fence/map/cache effects, remote wait/solve when
+observable, deserialization/commit tail, in-flight/staging/recovery memory,
+clock-map/staleness work, timeout/retry/duplicate/drop results, and exact-once
+outcomes. Dependency-aligned end-to-end adapter latency is mandatory even when
+remote attribution is unavailable. Test catch-up, migration, process failure,
+and device loss.
 
 Mobile acceptance requires sustained CPU, GPU, presentation, memory, traffic,
 allocation, migration-spike, deadline, and settled-quality evidence on the

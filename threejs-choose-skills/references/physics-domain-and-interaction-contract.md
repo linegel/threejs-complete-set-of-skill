@@ -3595,6 +3595,9 @@ PhysicsCostLedger:
   worstPermittedCatchUpCost: PhysicsWorstPermittedCatchUpCost
   hotBytesReadWrittenPerExecution: labelled-by-stage-and-resource
   solverDispatches: [extent-workgroup-cadence-and-timing]
+  sparseActiveDomainCosts: [PhysicsSparseActiveDomainCost]
+  contactCosts: [PhysicsContactCost]
+  externalAdapterCosts: [PhysicsExternalAdapterCost]
   queueSubmissionsAndPassBreaks: labelled-counts
   dependencyCriticalPaths: [cpu-gpu-external-overlap-and-tail-record]
   tileGpuTraffic:
@@ -3783,6 +3786,78 @@ PhysicsQualityMigrationCostEvidence:
   composedGateResultsDuringTransition: { gate-id: pass | fail | insufficient-evidence }
   status: accepted | rejected | insufficient-evidence
 
+PhysicsSparseActiveDomainCost:
+  sparseCostId: opaque-id
+  ownerAndStateEquationIds: typed-owner-equation-set
+  algorithmAndRevision: exact-active-set-compaction-solver-revision
+  measurementIntervalAndOpportunityTableId: typed-trace-ref
+  representedDomain:
+    totalEligibleElements: Quantity<count>
+    probeCandidates: labelled-distribution
+    activeCoreElements: labelled-distribution
+    haloGhostAndBoundaryElements: labelled-distribution
+    allocatedCapacityAndHighWater: labelled-counts
+    activeConnectedComponentsAndExtent: labelled-distributions
+  activationPipeline:
+    detectionClassification: labelled-work-traffic-and-time
+    prefixScanSortOrCompaction: labelled-work-traffic-and-time
+    allocationGrowthAndIndirectArguments: labelled-work-traffic-and-time
+    haloBoundaryAndNeighborRebuild: labelled-work-traffic-and-time
+    solverWorkOverActiveAndHaloSets: labelled-work-traffic-and-time
+  lifecycle:
+    activationAndDeactivationCounts: labelled-distributions
+    expansionVelocityAndResidence: labelled-distributions
+    deactivationHysteresis: typed-policy
+    inactiveRegionModelAndErrorGate: typed-model-gate
+    overflowDisposition: grow | backpressure | conservative-merge | fail-visible
+  catchUpAndMigrationWitnessRefs: [witness-or-migration-cost-id]
+  gateResults: { gate-id: pass | fail | insufficient-evidence }
+
+PhysicsContactCost:
+  contactCostId: opaque-id
+  contactOwnerSolverAndRevision: typed-owner-solver-revision
+  measurementIntervalAndOpportunityTableId: typed-trace-ref
+  bodyShapeAndProxyPopulation: labelled-counts-by-class
+  broadphase:
+    algorithmAndRevision: exact-algorithm
+    updatedBoundsAndMovedProxies: labelled-distributions
+    candidatePairsAndPairBytes: labelled-distributions
+    rebuildRefitSortAndTraversalWork: labelled-time-traffic-counts
+  narrowphase:
+    testedPairsByShapePair: labelled-distributions
+    generatedContactsAndRejectedPairs: labelled-distributions
+    manifoldCountPointCountAndFeatureRemaps: labelled-distributions
+  solve:
+    islandCountAndLargestIsland: labelled-distributions
+    scalarConstraintRowsByLaw: labelled-distributions
+    iterationsSubstepsAndResiduals: labelled-distributions
+    warmStartHitsMissesInvalidationsAndCacheBytes: labelled-record
+    deterministicSortReductionAndAtomicContention: labelled-record
+  lifecycleEventsAndReactionApplications: labelled-counts-and-exact-once-refs
+  stressFixtureRefs: [pileup-high-speed-topology-change-and-migration-trace]
+  gateResults: { gate-id: pass | fail | insufficient-evidence }
+
+PhysicsExternalAdapterCost:
+  externalCostId: opaque-id
+  adapterIdVersionProcessAndDevice: typed-external-identity
+  measurementIntervalAndOpportunityTableId: typed-trace-ref
+  requestResponseAndBatchCounts: labelled-distributions
+  ingressEgressLogicalAndPhysicalBytes: labelled-records
+  serializationDeserializationAndConversion: labelled-time-traffic-records
+  transport:
+    kind: shared-resource | same-process | IPC | device-copy | network | named
+    enqueueQueueWaitTransportAndRemoteWait: dependency-aligned-distributions
+    ownershipTransitionsFencesMapsAndCacheEffects: labelled-records
+  remoteSolveAndCommit:
+    remoteComputeDistribution: labelled-distribution | TypedAbsence
+    externalCompletionAndHostVisibility: typed-dependency-records
+    commitPublicationTail: labelled-distribution
+  retriesTimeoutsDuplicatesDropsAndExactOnceResults: labelled-record
+  inFlightStagingSharedAndRecoveryBytes: labelled-memory-record
+  clockMappingSamplingAndStalenessCost: labelled-record
+  catchUpMigrationProcessFailureAndDeviceLossWitnessRefs: [witness-id]
+  gateResults: { gate-id: pass | fail | insufficient-evidence }
+
 CadenceTraceTotals:
   traceTotalsId: CadenceTraceTotalsId
   traceRef: content-addressed-protocol-and-trace
@@ -3869,6 +3944,58 @@ own harness, frozen gate set, steady composed trace, catch-up frontier, and all
 incoming/outgoing transition evidence. Reusing a result after a graph,
 resource-layout, quality-epoch, target, browser, or harness digest change is
 invalid.
+
+Sparse work is not `activeElements * solverKernel` alone. The trace must expose
+the complete activation pipeline:
+
+```text
+T_sparse = criticalPath(detect/classify, scan-or-sort, compact,
+                        allocate-or-grow, build-neighbors-and-halo,
+                        solve, publish-indirect-arguments)                 [M]
+B_sparse >= compulsory bytes of every listed phase                        [D]
+```
+
+Record eligible/probed, active-core, halo/ghost/boundary, allocated, and
+high-water counts separately. A dense probe followed by a sparse solve remains
+dense in its probe phase. A sparse indirect dispatch still pays active-list,
+prefix-scan/sort, neighbor, counter-clear, and argument-buffer traffic. Freeze
+stress forcing that maximizes component fragmentation, active-front expansion,
+capacity growth, and halo-to-core ratio. Deactivation requires hysteresis plus
+a valid inactive-region model/error gate; silently dropping dry, sleeping, or
+out-of-view elements is not sparsity evidence. Active-list/capacity overflow is
+visible and participates in the catch-up frontier.
+
+Contact cost is state-distribution dependent. Do not infer it from body count
+or quote an asymptotic broadphase label. For each opportunity report moved
+proxies, candidate pairs, tested shape pairs, accepted contacts, manifolds,
+manifold points, scalar constraint rows, islands, largest island, solver
+iterations, warm-start outcomes, feature remaps, cache bytes, and exact-once
+contact/reaction events. Broadphase rebuild/refit/sort/traversal, narrowphase,
+manifold maintenance, island construction, constraint assembly/solve, and
+deterministic reduction are distinct work/traffic phases. Freeze pileup,
+high-speed crossing, sleeping/waking, topology/proxy change, cache-cold, and
+quality-migration fixtures before inspection. Average empty-space frames cannot
+authorize a contact-performance claim.
+
+For an external adapter, derive the end-to-end tail from its concrete dependency
+path:
+
+```text
+L_external = criticalPath(enqueue, serialization/conversion, queue wait,
+                          transport/ownership transfer, remote wait/solve,
+                          fence/completion, deserialization, atomic commit) [M]
+```
+
+Only serialized edges add; overlapped segments remain separate. “Zero copy”
+removes neither ownership transitions, cache effects, fences, queueing, nor
+in-flight residency. Record request/response/batch counts, logical and physical
+bytes, IPC/device/network transport, staging/shared allocations, process/device
+identity, remote-compute visibility, clock-map/staleness work, timeouts,
+retries, duplicate suppression, drops, recovery, and exact-once outcomes. If
+remote timing is unavailable, expose the measured adapter tail and mark remote
+attribution unavailable; do not assign the residual to the local solver. Test
+worst permitted catch-up, quality migration, process failure, and device loss
+with the same commit and loss semantics as native owners.
 
 PhysicsMemoryLedger:
   memoryLedgerId: PhysicsMemoryLedgerId
@@ -4061,6 +4188,9 @@ correctly.
 | composed opportunity closure | Every digest-checked `PhysicsCostOpportunityRow` resolves concrete advances/executions/dependencies and its stage/subcycle/loop/interaction/work/traffic/frame counts sum exactly to `CadenceTraceTotals`; composed CPU/GPU/external/presentation distributions derive from aligned rows rather than subsystem percentile sums |
 | worst permitted catch-up | The exact graph/policy feasible set has a componentwise dominating CPU/GPU/external/presentation/traffic/memory/migration/error frontier; each claimed dimension has an executable sustained witness or conservative bound, and every measured composed result passes its frozen gate |
 | quality cost coverage | Every eligible quality state binds a matching harness/gate/steady trace/catch-up frontier; every incoming/outgoing transition separately covers prepare/populate/commit/retire costs, simultaneous old/new resources, traffic, allocation/compilation, error, deadlines, and the retirement tail |
+| sparse active-domain cost | Eligible/probed/active/halo/allocated/high-water counts, activation/scan/compaction/allocation/neighbor/solver phases, overflow, hysteresis, inactive-model error, and fragmented expansion stress reconcile to opportunity work/traffic and the catch-up frontier |
+| contact cost | Broadphase moved proxies/candidate pairs, narrowphase tests/contacts, manifold points, islands, constraint rows, iterations, warm-start/cache behavior, deterministic reduction, reactions, and frozen pileup/high-speed/topology/migration stresses pass their composed gates |
+| external adapter cost | Batch/message/byte counts and dependency-aligned enqueue/serialization/queue/transport/remote/fence/deserialization/commit tails, in-flight memory, retries/exact-once, clock mapping, catch-up, migration, process failure, and device loss pass or narrow attribution explicitly |
 | mobile sustained run | Per-interval/per-second/presented-frame costs, worst-permitted catch-up frontier, dependency tails, tile traffic/spills, device limits, allocations, multiview/in-flight multiplication, memory, thermal/clock drift, quality trace, errors, and teardown stay within named physical-target gates |
 
 ### Hard failure gates
@@ -4137,6 +4267,11 @@ Reject the affected route or narrow its claim when any of the following occurs:
   totals, a catch-up objective lacks frontier coverage, a cost result is reused
   across a harness/graph/resource/quality digest change, or a transition relies
   on steady-state cost evidence instead of migration evidence;
+- a sparse claim omits activation/scan/compaction/halo work, hides capacity
+  overflow or inactive-region error, or measures only settled low occupancy; a
+  contact claim omits pair/manifold/constraint/cache tails or avoids its frozen
+  pileup/topology stresses; or an external adapter hides serialization,
+  transport, queue/fence, retry, in-flight-memory, or unavailable remote timing;
 - target acceptance uses isolated demo timings, desktop extrapolation, a cold
   burst, unlabelled budgets, or a final image without native-domain diagnostics.
 

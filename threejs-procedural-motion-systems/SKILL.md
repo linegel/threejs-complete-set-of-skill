@@ -222,6 +222,17 @@ Quality tiers:
   deterministic reductions, and canonical batch-level
   `InteractionBatchLedger` records; avoid per-sample
   JavaScript objects.
+- An `ExternalSolverAdapter` pose/dynamics route publishes
+  `PhysicsExternalAdapterCost`: request/response/batch counts, logical and
+  physical ingress/egress bytes, serialization and frame/unit conversion,
+  enqueue/queue/IPC/shared-resource/device/network transport, ownership
+  transitions, fences/maps/cache effects, remote wait/solve attribution,
+  deserialization and atomic-commit tail, retries/timeouts/duplicate
+  suppression, in-flight/staging/recovery bytes, and clock-map/staleness work.
+  Measure dependency-aligned p50/p95 under steady, worst catch-up, migration,
+  process-failure, and device-loss fixtures. “Zero copy” and unavailable remote
+  timers do not mean zero transport cost; unavailable remote attribution stays
+  unavailable while the observable adapter tail remains measured.
 - Presentation bindings reference immutable resource generations under a
   frame-in-flight lease/reuse rule; no solver overwrites a pose generation
   still used by a sealed snapshot.
