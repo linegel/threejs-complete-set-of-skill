@@ -62,6 +62,29 @@ export function validateCreatureFocus(value) {
 	return requiredChoice(value, CREATURE_FOCI, 'focus');
 }
 
-export function startupFromDataset(dataset = {}) {
-	return resolveCreatureStartup({ scenario: dataset.labScenario ?? null, tier: dataset.labTier ?? null });
+function reconcileLockedRouteValue(kind, queryValue, datasetValue) {
+	if (queryValue && datasetValue && queryValue !== datasetValue) {
+		throw new Error(`route input locks ${kind} '${datasetValue}', not '${queryValue}'`);
+	}
+	return queryValue ?? datasetValue ?? null;
+}
+
+export function startupFromRouteInput({ dataset = {}, search = '' } = {}) {
+	const params = new URLSearchParams(search);
+	const queryScenario = params.get('scenario');
+	const queryMechanism = params.get('mechanism');
+	if (queryScenario && queryMechanism && queryScenario !== queryMechanism) {
+		throw new Error(`route input locks scenario '${queryScenario}', not mechanism '${queryMechanism}'`);
+	}
+	const scenario = reconcileLockedRouteValue(
+		'scenario',
+		queryScenario ?? queryMechanism,
+		dataset.labScenario ?? null,
+	);
+	const tier = reconcileLockedRouteValue('tier', params.get('tier'), dataset.labTier ?? null);
+	return resolveCreatureStartup({ scenario, tier });
+}
+
+export function startupFromDataset(dataset = {}, search = globalThis.location?.search ?? '') {
+	return startupFromRouteInput({ dataset, search });
 }

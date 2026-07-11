@@ -6,6 +6,7 @@ import {
 	CREATURE_MECHANISM_ROUTES,
 	CREATURE_TIER_ROUTES,
 	resolveCreatureStartup,
+	startupFromRouteInput,
 	validateCreatureFocus,
 	validateCreatureMode,
 	validateCreatureTier,
@@ -40,6 +41,14 @@ async function runRoutesResolve() {
 		}
 		checked.push(`tier/${id}/`);
 	}
+	const queryMechanism = startupFromRouteInput({ search: '?mechanism=crowd-and-culling' });
+	if (queryMechanism.scenario !== 'crowd-and-culling' || queryMechanism.population !== 64) {
+		return { status: 'fail', details: { message: 'generated mechanism query did not select its complete startup preset', queryMechanism } };
+	}
+	const queryTier = startupFromRouteInput({ search: '?tier=background' });
+	if (queryTier.tier !== 'background' || queryTier.focus !== 'flyer' || queryTier.population !== 96) {
+		return { status: 'fail', details: { message: 'generated tier query did not select its complete startup preset', queryTier } };
+	}
 	return { status: 'pass', details: { routes: checked.length, checked } };
 }
 
@@ -60,6 +69,10 @@ async function runRoutesRejectUnknown() {
 		scenario: mustThrow('unknown scenario', () => resolveCreatureStartup({ scenario: 'not-a-creature-mechanism' })),
 		tierRoute: mustThrow('unknown tier route', () => resolveCreatureStartup({ tier: 'potato' })),
 		lockedTier: mustThrow('scenario tier mismatch', () => resolveCreatureStartup({ scenario: 'snap-and-ownership', tier: 'background' })),
+		queryConflict: mustThrow('query and dataset conflict', () => startupFromRouteInput({
+			dataset: { labTier: 'hero' },
+			search: '?tier=background',
+		})),
 		mode: mustThrow('unknown mode', () => validateCreatureMode('beauty-ish')),
 		tier: mustThrow('unknown tier', () => validateCreatureTier('auto')),
 		focus: mustThrow('unknown focus', () => validateCreatureFocus('generic-creature')),
