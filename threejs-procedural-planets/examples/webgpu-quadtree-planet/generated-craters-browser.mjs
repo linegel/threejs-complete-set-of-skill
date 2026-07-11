@@ -1,5 +1,3 @@
-import { WebGPURenderer } from "three/webgpu";
-
 const WIDTH = 1200;
 const HEIGHT = 760;
 const ASSETS = [
@@ -156,7 +154,7 @@ function drawFinal(ctx, records) {
 }
 
 function drawBaseline(ctx, records) {
-  drawPanel(ctx, { x: 80, y: 92, w: 310, h: 300 }, "flat reduced-tier sphere", (px, py) => {
+  drawPanel(ctx, { x: 80, y: 92, w: 310, h: 300 }, "flat minimum-resident trial", (px, py) => {
     const radius = 125;
     const nx = (px - 155) / radius;
     const ny = (150 - py) / radius;
@@ -222,7 +220,7 @@ function computeMetrics(records) {
       rimFloorDelta: rimFloorAbsDelta / denom,
       seamError: seamError / samples,
       colorSpace: record.asset.colorSpace,
-      reducedTierOnly: true,
+      minimumResidentDiagnosticOnly: true,
     };
   });
 }
@@ -240,46 +238,18 @@ function capture(state = {}) {
 }
 
 async function init() {
-  const renderer = new WebGPURenderer({ canvas: document.createElement("canvas") });
-  let rendererInfo;
-  try {
-    await renderer.init();
-    rendererInfo = {
-      threeRevision: "185",
-      renderer: "WebGPURenderer",
-      initialized: true,
-      isPrimaryBackend: renderer.backend?.isWebGPUBackend === true,
-      coordinateSystem: renderer.coordinateSystem,
-      outputBufferType: renderer.outputBufferType ?? "unknown",
-      compatibilityMode: false,
-      trackTimestamp: false,
-      features: Array.from(renderer.backend?.device?.features ?? []),
-      limits: Object.fromEntries(Object.entries(renderer.backend?.device?.limits ?? {}).map(([key, value]) => [key, Number(value)])),
-      info: renderer.info,
-      unavailableReason: null,
-    };
-  } catch (error) {
-    rendererInfo = {
-      threeRevision: "185",
-      renderer: "WebGPURenderer",
-      initialized: false,
-      isPrimaryBackend: false,
-      coordinateSystem: null,
-      outputBufferType: null,
-      compatibilityMode: false,
-      trackTimestamp: false,
-      unavailableReason: error.message,
-      features: [],
-      limits: {},
-      info: renderer.info ?? {},
-    };
-  }
   const records = await Promise.all(ASSETS.map(loadImage));
   window.__generatedCraterValidation = {
     ready: true,
     records,
     metrics: computeMetrics(records),
-    rendererInfo,
+    evidence: {
+      evidenceClass: "asset-preview-only",
+      canvas2DPreview: "manual-not-run-by-validator",
+      webgpuPipeline: "not-run",
+      lifecycleLoops: "not-run",
+      gpuTiming: "not-run",
+    },
     capture,
   };
 }

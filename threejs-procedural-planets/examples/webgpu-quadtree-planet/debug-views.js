@@ -10,7 +10,8 @@ export const REQUIRED_DEBUG_VIEWS = Object.freeze([
   "crater-channels",
   "biome-weights",
   "physical-water-classification",
-  "roughness-variance",
+  "roughness-cause",
+  "unresolved-normal-residual-variance",
   "atmosphere-masks",
 ]);
 
@@ -24,8 +25,9 @@ export function createPlanetDebugRegistry() {
           key === "crater-channels"
             ? "craterFloor/craterWall/craterRim/ejectaStrength"
             : key,
-        expected: `render debug ${key}; expected a stable, nonblank diagnostic`,
-        wrongIf: `wrong if ${key} flickers, aliases, or disagrees with the shared field schema`,
+        expected: `product obligation: render a stable, nonblank ${key} diagnostic`,
+        wrongIf: `reject if ${key} flickers, aliases, or disagrees with its declared owner`,
+        fixtureStatus: "not-rendered",
       },
     ]),
   );

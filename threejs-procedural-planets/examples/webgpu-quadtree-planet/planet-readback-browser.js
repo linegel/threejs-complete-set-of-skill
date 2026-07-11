@@ -22,7 +22,6 @@ import {
 import {
   samplePlanetParity0,
   samplePlanetParity1,
-  samplePlanetParity2,
 } from "./planet-fields.js";
 
 const canvas = document.getElementById("view");
@@ -76,13 +75,11 @@ async function createApp() {
   const materials = [
     new MeshBasicNodeMaterial(),
     new MeshBasicNodeMaterial(),
-    new MeshBasicNodeMaterial(),
   ];
   // Raw parity data must use fragmentNode. colorNode routes through material
   // alpha/output handling and is not a faithful float readback surface.
   materials[0].fragmentNode = samplePlanetParity0(shaderInputs);
   materials[1].fragmentNode = samplePlanetParity1(shaderInputs);
-  materials[2].fragmentNode = samplePlanetParity2(shaderInputs);
 
   const mesh = new Mesh(new PlaneGeometry(2, 2), materials[0]);
   const scene = new Scene();
@@ -118,7 +115,6 @@ async function createApp() {
     for (const probe of probes) {
       const pack0 = await readMaterial(materials[0], probe);
       const pack1 = await readMaterial(materials[1], probe);
-      const pack2 = await readMaterial(materials[2], probe);
       samples.push({
         preset: probe.preset,
         seed: probe.seed,
@@ -126,12 +122,12 @@ async function createApp() {
         values: {
           ...unpackVector(PLANET_PARITY_CHANNELS.slice(0, 4), pack0),
           ...unpackVector(PLANET_PARITY_CHANNELS.slice(4, 8), pack1),
-          ...unpackVector(PLANET_PARITY_CHANNELS.slice(8, 10), pack2),
         },
       });
     }
     return {
       version: 1,
+      algorithmVersion: PLANET_FIELD_ALGORITHM.version,
       renderer: {
         threeRevision: REVISION,
         isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,

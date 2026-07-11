@@ -1,9 +1,9 @@
 export const PLANET_FIELD_ALGORITHM = Object.freeze({
-  version: 3,
+  version: 5,
   hash: Object.freeze({
     family: "lowbias32-u32-lattice",
-    // Gated constants: same odd u32 lattice decorrelators and Chris Wellons
-    // lowbias32 finalizer used by the procedural-fields parity contract.
+    // Authored identity constants. CPU and TSL must share these exact u32
+    // values, but selecting this hash family is not a quality/performance proof.
     latticeMultipliers: Object.freeze([0x8da6b343, 0xd8163841, 0xcb1ab31f]),
     seedMultiplier: 0x9e3779b9,
     mixMultipliers: Object.freeze([0x21f0aaad, 0x735a2d97]),
@@ -36,8 +36,8 @@ export const PLANET_FIELD_ALGORITHM = Object.freeze({
     ejectaStrength: 0.08,
   }),
   parityTolerance: 0.005,
-  parityToleranceDerivation:
-    "Derived: scalar field path <= gamma_420 ~= 2.51e-5; tangent-gradient path <= gamma_960 * max observed |gradient| 32 ~= 0.00183; 0.005 gate gives 2.7x margin for f32 node codegen and driver libm on crater exp/acos/sqrt.",
+  parityToleranceProvenance:
+    "Gated acceptance thresholds, authored from the current fixed probes with margin for f32 node codegen and driver libm. They are regression gates, not an analytic global error bound or a production accuracy guarantee.",
   parityToleranceByChannel: Object.freeze({
     height: 1e-4,
     macroHeight: 1e-4,
@@ -45,10 +45,8 @@ export const PLANET_FIELD_ALGORITHM = Object.freeze({
     oceanDepth: 1e-4,
     humidity: 1e-4,
     temperature: 1e-4,
-    slope: 1e-4,
-    roughnessVariance: 1e-4,
-    heightGradientX: 0.005,
-    heightGradientY: 0.005,
+    ruggednessProxy: 1e-4,
+    roughnessCause: 1e-4,
   }),
   fixtureTolerance: 1e-12,
 });
@@ -60,10 +58,8 @@ export const PLANET_PARITY_CHANNELS = Object.freeze([
   "oceanDepth",
   "humidity",
   "temperature",
-  "slope",
-  "roughnessVariance",
-  "heightGradientX",
-  "heightGradientY",
+  "ruggednessProxy",
+  "roughnessCause",
 ]);
 
 export const PLANET_FIXED_DIRECTIONS = Object.freeze([
@@ -79,6 +75,9 @@ export const PLANET_PARITY_SEEDS = Object.freeze([31.731, 41.125, 59.75]);
 export const NORMAL_QUERY_EVALUATION_COUNTS = Object.freeze({
   previousFullFieldEvaluations: 4,
   previousDerivation: "2 tangent axes * 2 central-difference samples per axis",
-  fusedFullFieldEvaluations: 1,
-  fusedDerivation: "one planetFields() evaluation returns height and the two tangent gradient components",
+  fusedCandidateFullFieldEvaluations: 1,
+  fusedCandidateDerivation:
+    "one planetFields() evaluation returns height and two candidate tangent derivatives",
+  evidenceScope:
+    "Derived call count only. The candidate derivatives are not independently validated and must not drive production normals until a finite-difference or automatic-differentiation gate passes.",
 });

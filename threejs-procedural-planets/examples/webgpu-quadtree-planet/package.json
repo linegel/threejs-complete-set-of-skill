@@ -2,12 +2,22 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "capture": "node capture-planet-readback.mjs",
-    "validate": "node validate-planet.mjs && node validate-generated-craters.mjs",
+    "check": "node --check browser-lab.js && node --check capture.mjs && node --check planet-field-atlas.js && node --check planet-mesh.js && node --check planet-quadtree.js && node --check patch-compute.js && node --check integration-adapter.js && node --check planet-tiers.js && node validate-routes.mjs",
+    "validate:unit": "node validate-runtime-contracts.mjs && node validate-routes.mjs && node validate-planet.mjs --allow-missing-gpu",
+    "test:mutations": "node validate-routes.mjs --mutations && node mutation-test.mjs",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-quadtree-planet --target final",
+    "capture:evidence": "node capture.mjs",
+    "capture:parity": "node capture-planet-readback.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run validate:unit",
+    "validate:full": "npm run validate:unit && npm run validate:artifacts",
+    "validate": "node validate-planet.mjs --allow-missing-gpu && node validate-runtime-contracts.mjs && node validate-generated-craters.mjs",
+    "validate:strict": "node validate-planet.mjs --artifacts artifacts && node validate-runtime-contracts.mjs && node validate-generated-craters.mjs",
+    "validate:runtime-contracts": "node validate-runtime-contracts.mjs",
     "validate:generated-assets": "node validate-generated-craters.mjs"
   },
   "dependencies": {
-    "playwright": "^1.45.0",
-    "three": "^0.185.1"
+    "playwright": "1.61.1",
+    "three": "0.185.1"
   }
 }

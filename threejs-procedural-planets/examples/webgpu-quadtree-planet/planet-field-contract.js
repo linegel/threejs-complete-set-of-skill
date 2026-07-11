@@ -12,7 +12,8 @@ export function createPlanetFieldCpuBuilder() {
     target: "CPU",
     algorithm: CPU_PLANET_FIELD_ALGORITHM,
     channels: PLANET_PARITY_CHANNELS,
-    normalQueryCost: NORMAL_QUERY_EVALUATION_COUNTS,
+    derivativeCandidateCost: NORMAL_QUERY_EVALUATION_COUNTS,
+    derivativeCorrectness: "not-run-candidate-only",
   };
 }
 
@@ -22,6 +23,7 @@ export function createPlanetFieldTslBuilder() {
     algorithm: TSL_PLANET_FIELD_ALGORITHM,
     channels: PLANET_PARITY_CHANNELS,
     fn: "Fn(({ surfaceDirection, planetPreset }) => planetFields(surfaceDirection.normalize(), planetPreset))",
-    normalQueryCost: NORMAL_QUERY_EVALUATION_COUNTS,
+    derivativeCandidateCost: NORMAL_QUERY_EVALUATION_COUNTS,
+    derivativeCorrectness: "not-run-candidate-only",
   };
 }

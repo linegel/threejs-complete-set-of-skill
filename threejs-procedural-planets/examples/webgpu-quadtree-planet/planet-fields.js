@@ -1,7 +1,7 @@
 import {
   Fn,
   abs as absNode,
-  acos,
+  atan,
   bitcast,
   clamp as clampNode,
   cross as crossNode,
@@ -11,20 +11,23 @@ import {
   floor as floorNode,
   fract as fractNode,
   int,
+  length as lengthNode,
   max as maxNode,
   mix,
   normalize as normalizeNode,
   pow as powNode,
   sign as signNode,
   smoothstep as smoothstepNode,
-  sqrt,
   uint,
   vec3,
   vec4,
 } from "three/tsl";
 
 import { BODY_PRESETS } from "./planet-config.js";
-import { PLANET_FIELD_ALGORITHM } from "./planet-field-constants.js";
+import {
+  PLANET_FIELD_ALGORITHM,
+  PLANET_PARITY_CHANNELS,
+} from "./planet-field-constants.js";
 
 const fract = (value) => value - Math.floor(value);
 const smoothValue = (value) => value * value * (3 - 2 * value);
@@ -41,7 +44,10 @@ const smoothstepDerivative = (edge0, edge1, value) => {
   return (6 * t * (1 - t)) / (edge1 - edge0);
 };
 
-export const PLANET_FIELD_SCHEMA_KEYS = Object.freeze([
+// This is the CPU return schema. Only PLANET_PARITY_CHANNELS are packed by the
+// optional WebGPU readback harness. Presence here is not GPU implementation or
+// numeric-parity evidence.
+export const CPU_PLANET_FIELD_SCHEMA_KEYS = Object.freeze([
   "height",
   "macroHeight",
   "ridge",
@@ -54,17 +60,21 @@ export const PLANET_FIELD_SCHEMA_KEYS = Object.freeze([
   "oceanDepth",
   "humidity",
   "temperature",
-  "slope",
+  "ruggednessProxy",
   "snow",
   "ice",
   "wetness",
   "biomeWeights",
   "biomeId",
-  "roughnessVariance",
+  "roughnessCause",
   "atmosphereMask",
   "debugChannels",
-  "heightGradient",
+  "heightDerivativeCandidate",
 ]);
+
+// Compatibility name retained for callers. It still denotes CPU return-key
+// coverage only; PLANET_FIELD_EVIDENCE is the machine-readable claim boundary.
+export const PLANET_FIELD_SCHEMA_KEYS = CPU_PLANET_FIELD_SCHEMA_KEYS;
 
 export const DEBUG_FIELD_KEYS = Object.freeze([
   "height",
@@ -75,12 +85,25 @@ export const DEBUG_FIELD_KEYS = Object.freeze([
   "ejectaStrength",
   "humidity",
   "temperature",
-  "slope",
+  "ruggednessProxy",
   "oceanDepth",
   "biomeWeights",
-  "roughnessVariance",
+  "roughnessCause",
   "atmosphereMask",
 ]);
+
+export const PLANET_FIELD_EVIDENCE = Object.freeze({
+  hashConstants: "authored-identity-shared-by-cpu-and-tsl",
+  cpuSchema: "executed-key-presence-only",
+  cpuGoldenChannels: "executed-fixed-probe-regression",
+  gpuParityChannels: "conditional-on-native-webgpu-readback-artifact",
+  gpuParityExcludes: Object.freeze(
+    CPU_PLANET_FIELD_SCHEMA_KEYS.filter((channel) =>
+      !PLANET_PARITY_CHANNELS.includes(channel),
+    ),
+  ),
+  derivativeCorrectness: "not-run-candidate-only",
+});
 
 export const DEFAULT_CRATER_STAMPS = Object.freeze([
   {
@@ -297,7 +320,8 @@ function fbmNoise3WithGradient(x, y, z, seed, octaves, lacunarity, gain) {
 
 export function craterStamp(surfaceDirection, crater) {
   const cosine = clamp(dot(surfaceDirection, crater.centerDirection), -1, 1);
-  const angularDistance = Math.acos(cosine);
+  const sine = length(cross(surfaceDirection, crater.centerDirection));
+  const angularDistance = Math.atan2(sine, cosine);
   const d = angularDistance / crater.angularRadius;
   const floorEdge = 0.38;
   const rimInner = 0.72;
@@ -341,9 +365,10 @@ export function craterStamp(surfaceDirection, crater) {
 function craterStampWithGradient(surfaceDirection, crater, basis) {
   const sample = craterStamp(surfaceDirection, crater);
   const cosine = clamp(dot(surfaceDirection, crater.centerDirection), -1, 1);
-  const angularDistance = Math.acos(cosine);
+  const crossValue = cross(surfaceDirection, crater.centerDirection);
+  const sinTheta = length(crossValue);
+  const angularDistance = Math.atan2(sinTheta, cosine);
   const d = angularDistance / crater.angularRadius;
-  const sinTheta = Math.sqrt(Math.max(1 - cosine * cosine, 1e-12));
   const floorEdge = 0.38;
   const rimInner = 0.72;
   const rimOuter = 1.12;
@@ -364,7 +389,17 @@ function craterStampWithGradient(surfaceDirection, crater, basis) {
   const noiseTerm = 0.35 + rayNoise.value * 0.65;
   const ageTerm = 1 - crater.age * 0.55;
   const gradient = [basis.xTangent, basis.yTangent].map((tangent) => {
-    const angularDerivative = -dot(tangent, crater.centerDirection) / sinTheta;
+    const cosineDerivative = dot(tangent, crater.centerDirection);
+    const sineDerivative = sinTheta > 1e-7
+      ? dot(crossValue, cross(tangent, crater.centerDirection)) / sinTheta
+      : 0;
+    // atan2(s, c) remains well-conditioned near theta=0 and pi. The angular
+    // distance is nondifferentiable at exact coincidence/antipode, where this
+    // fixture deliberately selects the zero subgradient.
+    const angularDerivative = sinTheta > 1e-7
+      ? (cosine * sineDerivative - sinTheta * cosineDerivative) /
+        (cosine * cosine + sinTheta * sinTheta)
+      : 0;
     const dDerivative = angularDerivative / crater.angularRadius;
     const floorDerivative =
       -smoothstepDerivative(0, floorEdge, d) * (1 - crater.erosion) * crater.floorDepth;
@@ -609,7 +644,7 @@ export function planetFields(
         PLANET_FIELD_ALGORITHM.fbm.ridged.scale,
     ),
   );
-  const heightGradient = [basis.xTangent, basis.yTangent].map((tangent, axis) => {
+  const heightDerivativeCandidate = [basis.xTangent, basis.yTangent].map((tangent, axis) => {
     const terrainDerivative =
       macroRaw <= -1 || macroRaw >= 1
         ? 0
@@ -643,12 +678,12 @@ export function planetFields(
       height * 0.32 +
       preset.temperatureBias,
   );
-  const slope = clamp(ridge * 0.45 + crater.craterWall * 0.35 + Math.abs(height - macroHeight) * 0.2);
+  const ruggednessProxy = clamp(ridge * 0.45 + crater.craterWall * 0.35 + Math.abs(height - macroHeight) * 0.2);
   const snow = smoothstep(0.58, 0.88, Math.abs(surfaceDirection[1]) + height * 0.35 - temperature * 0.18);
   const ice = smoothstep(0.52, 0.9, snow + oceanDepth * (1 - temperature));
   const arid = smoothstep(0.46, 0.78, (1 - humidity) * temperature - height * 0.08);
-  const lush = smoothstep(0.36, 0.72, humidity * temperature - arid * 0.35 - slope * 0.8);
-  const rock = smoothstep(0.08, 0.3, slope + Math.max(height, 0) * 0.28);
+  const lush = smoothstep(0.36, 0.72, humidity * temperature - arid * 0.35 - ruggednessProxy * 0.8);
+  const rock = smoothstep(0.08, 0.3, ruggednessProxy + Math.max(height, 0) * 0.28);
   const wetness = clamp(oceanDepth + humidity * 0.35 + lush * 0.2);
   const biomeWeights = {
     ocean: oceanDepth,
@@ -663,7 +698,7 @@ export function planetFields(
     (best, [name, weight], index) => (weight > best.weight ? { id: index, name, weight } : best),
     { id: 0, name: "ocean", weight: -Infinity },
   ).id;
-  const roughnessVariance = clamp(slope * 0.4 + crater.ejectaStrength * 0.28 + rock * 0.22);
+  const roughnessCause = clamp(ruggednessProxy * 0.4 + crater.ejectaStrength * 0.28 + rock * 0.22);
   const atmosphereMask = clamp(1 - oceanDepth * 0.2 + wetness * 0.1);
   return {
     height,
@@ -678,15 +713,15 @@ export function planetFields(
     oceanDepth,
     humidity,
     temperature,
-    slope,
+    ruggednessProxy,
     snow,
     ice,
     wetness,
     biomeWeights,
     biomeId,
-    roughnessVariance,
+    roughnessCause,
     atmosphereMask,
-    heightGradient,
+    heightDerivativeCandidate,
     debugChannels: {
       tangentialWarpMagnitude: length(tangentWarp),
       craterAge: crater.age,
@@ -812,7 +847,8 @@ function fbmNoise3WithGradientNode(position, seed, config) {
 function craterStampNode(surfaceDirection, crater) {
   const center = vec3(...crater.centerDirection);
   const cosine = clampNode(dotNode(surfaceDirection, center), -1, 1);
-  const angularDistance = acos(cosine);
+  const sine = lengthNode(crossNode(surfaceDirection, center));
+  const angularDistance = atan(sine, cosine);
   const d = angularDistance.div(crater.angularRadius);
   const floorEdge = 0.38;
   const rimInner = 0.72;
@@ -848,9 +884,10 @@ function craterStampWithGradientNode(surfaceDirection, crater, basis) {
   const sample = craterStampNode(surfaceDirection, crater);
   const center = vec3(...crater.centerDirection);
   const cosine = clampNode(dotNode(surfaceDirection, center), -1, 1);
-  const angularDistance = acos(cosine);
+  const crossValue = crossNode(surfaceDirection, center);
+  const sinTheta = lengthNode(crossValue);
+  const angularDistance = atan(sinTheta, cosine);
   const d = angularDistance.div(crater.angularRadius);
-  const sinTheta = sqrt(maxNode(float(1).sub(cosine.mul(cosine)), 1e-12));
   const floorEdge = 0.38;
   const rimInner = 0.72;
   const rimOuter = 1.12;
@@ -869,7 +906,16 @@ function craterStampWithGradientNode(surfaceDirection, crater, basis) {
   const ageTerm = 1 - crater.age * 0.55;
 
   function gradientForTangent(tangent) {
-    const angularDerivative = dotNode(tangent, center).negate().div(sinTheta);
+    const cosineDerivative = dotNode(tangent, center);
+    const sineDerivative = dotNode(crossValue, crossNode(tangent, center))
+      .div(maxNode(sinTheta, 1e-7));
+    const angularDerivative = sinTheta.lessThanEqual(1e-7).select(
+      float(0),
+      cosine
+        .mul(sineDerivative)
+        .sub(sinTheta.mul(cosineDerivative))
+        .div(cosine.mul(cosine).add(sinTheta.mul(sinTheta))),
+    );
     const dDerivative = angularDerivative.div(crater.angularRadius);
     const floorDerivative = smoothstepDerivativeNode(0, floorEdge, d)
       .negate()
@@ -990,7 +1036,7 @@ function terrainDerivativeAlongTangentNode({
   return dotNode(qGradient, qDerivative);
 }
 
-function planetFieldNodes({
+export function planetFieldNodes({
   direction,
   seed,
   rocky,
@@ -1064,7 +1110,7 @@ function planetFieldNodes({
       ).mul(ridgeDerivativeFactor),
     );
   const signY = surfaceDirection.y.equal(0).select(float(1), signNode(surfaceDirection.y));
-  const heightGradient = [basis.xTangent, basis.yTangent].map((tangent, axis) => {
+  const heightDerivativeCandidate = [basis.xTangent, basis.yTangent].map((tangent, axis) => {
     const terrainDerivative = macroRaw
       .lessThanEqual(-1)
       .or(macroRaw.greaterThanEqual(1))
@@ -1111,7 +1157,7 @@ function planetFieldNodes({
     0,
     1,
   );
-  const slope = clampNode(
+  const ruggednessProxy = clampNode(
     ridge.mul(0.45).add(crater.craterWall.mul(0.35)).add(absNode(height.sub(macroHeight)).mul(0.2)),
     0,
     1,
@@ -1119,26 +1165,35 @@ function planetFieldNodes({
   const snow = smoothstepNode(0.58, 0.88, absNode(surfaceDirection.y).add(height.mul(0.35)).sub(temperature.mul(0.18)));
   const ice = smoothstepNode(0.52, 0.9, snow.add(oceanDepth.mul(float(1).sub(temperature))));
   const arid = smoothstepNode(0.46, 0.78, float(1).sub(humidity).mul(temperature).sub(height.mul(0.08)));
-  const rock = smoothstepNode(0.08, 0.3, slope.add(maxNode(height, 0).mul(0.28)));
-  const roughnessVariance = clampNode(
-    slope.mul(0.4).add(crater.ejectaStrength.mul(0.28)).add(rock.mul(0.22)),
+  const rock = smoothstepNode(0.08, 0.3, ruggednessProxy.add(maxNode(height, 0).mul(0.28)));
+  const roughnessCause = clampNode(
+    ruggednessProxy.mul(0.4).add(crater.ejectaStrength.mul(0.28)).add(rock.mul(0.22)),
     0,
     1,
   );
 
   return {
+    surfaceDirection,
+    xTangent: basis.xTangent,
+    yTangent: basis.yTangent,
     height,
     macroHeight,
     ridge,
     oceanDepth,
     humidity,
     temperature,
-    slope,
-    roughnessVariance,
-    heightGradientX: heightGradient[0],
-    heightGradientY: heightGradient[1],
+    ruggednessProxy,
+    roughnessCause,
+    heightDerivativeCandidateX: heightDerivativeCandidate[0],
+    heightDerivativeCandidateY: heightDerivativeCandidate[1],
+    craterFloor: crater.craterFloor,
+    craterWall: crater.craterWall,
+    craterRim: crater.craterRim,
+    ejectaStrength: crater.ejectaStrength,
+    snow,
     ice,
     arid,
+    rock,
   };
 }
 
@@ -1163,17 +1218,5 @@ export const samplePlanetParity1 = Fn(({
   temperatureBias,
 }) => {
   const fields = planetFieldNodes({ direction, seed, rocky, seaLevel, humidityBias, temperatureBias });
-  return vec4(fields.humidity, fields.temperature, fields.slope, fields.roughnessVariance);
-});
-
-export const samplePlanetParity2 = Fn(({
-  direction,
-  seed,
-  rocky,
-  seaLevel,
-  humidityBias,
-  temperatureBias,
-}) => {
-  const fields = planetFieldNodes({ direction, seed, rocky, seaLevel, humidityBias, temperatureBias });
-  return vec4(fields.heightGradientX, fields.heightGradientY, 0, 0);
+  return vec4(fields.humidity, fields.temperature, fields.ruggednessProxy, fields.roughnessCause);
 });

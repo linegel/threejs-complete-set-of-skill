@@ -8,14 +8,15 @@ import { fileURLToPath } from "node:url";
 import {
   BODY_PRESETS,
   GENERATED_VARIANT_MANIFEST_RELATIVE_PATH,
-  PLANET_UNITS,
-  VALIDITY_RANGE,
+  PLANET_UNIT_CONTRACT,
+  WORKLOAD_TRIALS,
   createPlanetConfig,
   validatePlanetConfig,
 } from "./planet-config.js";
 import {
+  CPU_PLANET_FIELD_SCHEMA_KEYS,
   DEFAULT_CRATER_STAMPS,
-  PLANET_FIELD_SCHEMA_KEYS,
+  PLANET_FIELD_EVIDENCE,
   craterStamp,
   planetFields,
 } from "./planet-fields.js";
@@ -34,20 +35,29 @@ import {
 } from "./planet-field-constants.js";
 import { PLANET_FIELD_ALGORITHM as SHARED_PLANET_FIELD_ALGORITHM } from "./planet-field-constants.js";
 import {
+  QUADTREE_EVIDENCE_SCOPE,
   annotateNeighborLevels,
   assertAdjacentLevelDelta,
   createPatch,
   createRootPatches,
+  edgeNeighbors,
   projectedScreenError,
   shouldSplitPatch,
   splitPatch,
+  transitionMask,
 } from "./planet-quadtree.js";
 import {
+  PATCH_COMPUTE_CONTRACT,
   createPatchComputeDescriptors,
   createPatchRecordBuffer,
+  deriveTileGutterTexels,
   estimateDirtyPatchBounds,
 } from "./patch-compute.js";
-import { altitudeDetailWeights, heightGradient } from "./altitude-detail.js";
+import {
+  detailRepresentationWeights,
+  heightDerivativeCandidate,
+  representedDetailWeight,
+} from "./altitude-detail.js";
 import { REQUIRED_DEBUG_VIEWS, createPlanetDebugRegistry } from "./debug-views.js";
 import { createPlanetMaterialContract, sampleMaterialInputs } from "./planet-material.js";
 import { NODE_POST_IMPORTS, WebGPUQuadtreePlanet } from "./webgpu-quadtree-planet.js";
@@ -58,6 +68,24 @@ const manifestDir = dirname(manifestPath);
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const fixturePath = resolve(here, "planet-golden-fixtures.json");
 let fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
+
+export const VALIDATION_SCOPE = Object.freeze({
+  proves: [
+    "CPU field schema and fixed-probe regression",
+    "CPU/TSL numeric parity only when a native-WebGPU readback artifact is supplied",
+    "stable spherical crater equation and selected zero subgradient convention",
+    "CPU cube-edge adjacency and 2:1 balance over the supplied leaf set",
+    "projected-error and footprint-filter equations for supplied inputs",
+    "generated asset integrity and color-space metadata",
+  ],
+  doesNotProve: [
+    "GPU patch-bound compute or conservative reductions",
+    "NodeMaterial compilation, planet geometry, storage or indirect draw submission",
+    "MRT, AO, bloom, temporal reconstruction, shadows, or final presentation",
+    "crack-free temporal LOD, image quality, full-frame timing, or peak live memory",
+    "correctness of the bundled height-derivative candidate or material normals",
+  ],
+});
 
 function parseArgs(argv) {
   const options = {
@@ -89,6 +117,9 @@ function pngDimensions(path) {
 
 function validateAssetLedger() {
   assert.equal(manifest.colorSpace, "NoColorSpace");
+  assert.equal(manifest.assetPreviewOnly, true);
+  assert.equal(manifest.pipelineEvidence, "not-run");
+  assert.equal(manifest.lifecycleEvidence, "not-run");
   for (const channel of ["r", "g", "b", "a"]) {
     assert(manifest.channelMeanings[channel], `missing channel ${channel}`);
   }
@@ -101,7 +132,7 @@ function validateAssetLedger() {
       height: asset.height,
     });
     assert.equal(asset.colorSpace, "NoColorSpace");
-    assert.equal(asset.reducedTierOnly, true);
+    assert.equal(asset.minimumResidentDiagnosticOnly, true);
   }
 }
 
@@ -114,11 +145,39 @@ function sampleParityChannels(direction, options) {
     oceanDepth: sample.oceanDepth,
     humidity: sample.humidity,
     temperature: sample.temperature,
-    slope: sample.slope,
-    roughnessVariance: sample.roughnessVariance,
-    heightGradientX: sample.heightGradient[0],
-    heightGradientY: sample.heightGradient[1],
+    ruggednessProxy: sample.ruggednessProxy,
+    roughnessCause: sample.roughnessCause,
   };
+}
+
+function probeKey(entry) {
+  return JSON.stringify([entry.preset, entry.seed, entry.direction]);
+}
+
+function expectedProbeKeys() {
+  const keys = new Set();
+  for (const preset of Object.keys(BODY_PRESETS)) {
+    for (const seed of PLANET_PARITY_SEEDS) {
+      for (const direction of PLANET_FIXED_DIRECTIONS) {
+        keys.add(probeKey({ preset, seed, direction }));
+      }
+    }
+  }
+  return keys;
+}
+
+function assertExactProbeCartesian(samples, label) {
+  assert(Array.isArray(samples) && samples.length > 0, `${label} probes must be nonempty`);
+  const expected = expectedProbeKeys();
+  assert.equal(samples.length, expected.size, `${label} must contain the exact probe Cartesian product`);
+  const observed = new Set();
+  for (const [index, sample] of samples.entries()) {
+    const key = probeKey(sample);
+    assert(expected.has(key), `${label} probe ${index} is outside the declared Cartesian product`);
+    assert(!observed.has(key), `${label} probe ${index} duplicates ${key}`);
+    observed.add(key);
+  }
+  assert.deepEqual([...observed].sort(), [...expected].sort(), `${label} probe product mismatch`);
 }
 
 function createGoldenFixtures() {
@@ -171,17 +230,19 @@ function validateSharedAlgorithm() {
     "old normal query cost must be derived as 2 tangent axes * 2 central samples",
   );
   assert.equal(
-    NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations,
+    NORMAL_QUERY_EVALUATION_COUNTS.fusedCandidateFullFieldEvaluations,
     1,
-    "new normal query cost must be one fused planetFields() call",
+    "candidate derivative query cost must be one fused planetFields() call",
   );
   assert(
-    NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations <
+    NORMAL_QUERY_EVALUATION_COUNTS.fusedCandidateFullFieldEvaluations <
       NORMAL_QUERY_EVALUATION_COUNTS.previousFullFieldEvaluations,
-    "fused gradient must reduce full field evaluations",
+    "candidate derivative path must reduce full field evaluations",
   );
   return {
     pass: true,
+    evidenceStatus:
+      "Executed structural identity and Derived call-count checks; derivative correctness and GPU timing not run",
     sharedConstantsObject: true,
     algorithmVersion: PLANET_FIELD_ALGORITHM.version,
     normalQueryEvaluationCounts: NORMAL_QUERY_EVALUATION_COUNTS,
@@ -192,6 +253,7 @@ function validateGoldenFixtures() {
   assert.equal(fixtures.version, 1);
   assert.equal(fixtures.algorithmVersion, PLANET_FIELD_ALGORITHM.version);
   assert.deepEqual(fixtures.channels, PLANET_PARITY_CHANNELS);
+  assertExactProbeCartesian(fixtures.probes, "CPU golden");
 
   let maxAbsError = 0;
   let meanAbsError = 0;
@@ -226,6 +288,7 @@ function validateGoldenFixtures() {
 
   return {
     pass: true,
+    evidenceStatus: "Executed CPU fixed-probe regression",
     fixtureTolerance: PLANET_FIELD_ALGORITHM.fixtureTolerance,
     maxAbsError,
     meanAbsError: count === 0 ? 0 : meanAbsError / count,
@@ -245,8 +308,15 @@ function readGpuReadback(artifactDir) {
 function validateGpuReadback(artifactDir) {
   const readback = readGpuReadback(artifactDir);
   assert.equal(readback.version, 1);
+  assert.equal(readback.algorithmVersion, PLANET_FIELD_ALGORITHM.version);
+  assert.equal(readback.renderer?.isWebGPUBackend, true);
+  assert.equal(readback.renderer?.threeRevision, "185");
   assert.deepEqual(readback.channels, PLANET_PARITY_CHANNELS);
+  assert.deepEqual(readback.constants?.hash, PLANET_FIELD_ALGORITHM.hash);
+  assert.deepEqual(readback.constants?.fbm, PLANET_FIELD_ALGORITHM.fbm);
+  assert.deepEqual(readback.constants?.heightWeights, PLANET_FIELD_ALGORITHM.heightWeights);
   assert(Array.isArray(readback.samples), "GPU readback samples must be an array");
+  assertExactProbeCartesian(readback.samples, "GPU readback");
 
   let maxAbsError = 0;
   let meanAbsError = 0;
@@ -256,6 +326,11 @@ function validateGpuReadback(artifactDir) {
     assert(BODY_PRESETS[entry.preset], `GPU sample ${index} unknown preset ${entry.preset}`);
     assert(entry.direction, `GPU sample ${index} missing direction`);
     assert(entry.values, `GPU sample ${index} missing values`);
+    assert.deepEqual(
+      Object.keys(entry.values).sort(),
+      [...PLANET_PARITY_CHANNELS].sort(),
+      `GPU sample ${index} must contain only the declared parity channels`,
+    );
     const cpu = sampleParityChannels(entry.direction, {
       preset: BODY_PRESETS[entry.preset],
       seed: entry.seed,
@@ -270,7 +345,7 @@ function validateGpuReadback(artifactDir) {
         PLANET_FIELD_ALGORITHM.parityTolerance;
       assert(
         error <= tolerance,
-        `GPU sample ${index} ${channel} error ${error} exceeds derived tolerance ${tolerance}`,
+        `GPU sample ${index} ${channel} error ${error} exceeds Gated tolerance ${tolerance}`,
       );
       channelErrors[channel] = error;
       meanAbsError += error;
@@ -300,7 +375,9 @@ function validateGpuReadback(artifactDir) {
     artifactDir,
     tolerance: PLANET_FIELD_ALGORITHM.parityTolerance,
     toleranceByChannel: PLANET_FIELD_ALGORITHM.parityToleranceByChannel,
-    toleranceDerivation: PLANET_FIELD_ALGORITHM.parityToleranceDerivation,
+    toleranceProvenance: PLANET_FIELD_ALGORITHM.parityToleranceProvenance,
+    evidenceStatus: "Measured native-WebGPU numeric field parity only",
+    proofExclusions: VALIDATION_SCOPE.doesNotProve,
     maxAbsError,
     meanAbsError,
     worstSample,
@@ -320,17 +397,31 @@ const structuralParity = validateSharedAlgorithm();
 
 const config = createPlanetConfig();
 assert.equal(validatePlanetConfig(config).ok, true);
-assert(PLANET_UNITS.radiusKm > 0);
-assert(VALIDITY_RANGE.angularRadius[0] < VALIDITY_RANGE.angularRadius[1]);
+assert.equal(PLANET_UNIT_CONTRACT.kilometresToMetres, 1000);
+assert.equal(config.workload.evidenceClass, "Authored");
+assert.equal(WORKLOAD_TRIALS[config.trial], config.workload);
+assert.equal(config.preset.radiusKm, config.radiusKm);
+assert.equal(config.preset.atmosphereInnerRadiusKm, config.radiusKm);
+assert(config.preset.atmosphereOuterRadiusKm > config.preset.atmosphereInnerRadiusKm);
+
+const resizedBody = createPlanetConfig({ radiusKm: 9000 });
+assert.equal(resizedBody.preset.radiusKm, 9000);
+assert.equal(resizedBody.preset.atmosphereInnerRadiusKm, 9000);
+assert.equal(
+  resizedBody.preset.atmosphereOuterRadiusKm - resizedBody.preset.atmosphereInnerRadiusKm,
+  BODY_PRESETS.pelagia.atmosphereOuterRadiusKm - BODY_PRESETS.pelagia.atmosphereInnerRadiusKm,
+);
 
 const invalid = createPlanetConfig();
-invalid.radiusKm = 100;
+invalid.radiusKm = 0;
 assert.equal(validatePlanetConfig(invalid).ok, false);
 
 const fields = planetFields([0.3, 0.7, 0.2], { preset: BODY_PRESETS.pelagia });
-for (const key of PLANET_FIELD_SCHEMA_KEYS) {
+for (const key of CPU_PLANET_FIELD_SCHEMA_KEYS) {
   assert(key in fields, `missing schema key ${key}`);
 }
+assert.equal(PLANET_FIELD_EVIDENCE.derivativeCorrectness, "not-run-candidate-only");
+assert(PLANET_FIELD_EVIDENCE.gpuParityExcludes.includes("heightDerivativeCandidate"));
 for (const key of ["craterFloor", "craterWall", "craterRim", "ejectaStrength", "erosion"]) {
   const crater = craterStamp(DEFAULT_CRATER_STAMPS[0].centerDirection, DEFAULT_CRATER_STAMPS[0]);
   assert(key in crater, `missing crater output ${key}`);
@@ -339,25 +430,78 @@ assert("biomeId" in fields);
 assert("biomeWeights" in fields);
 
 const root = createRootPatches();
+for (const patch of root) {
+  for (const edge of ["north", "south", "east", "west"]) {
+    const neighbors = edgeNeighbors(patch, root, edge);
+    assert.equal(neighbors.length, 1, `${patch.id} ${edge} must have one cube-face neighbor`);
+    assert.notEqual(neighbors[0].face, patch.face);
+  }
+}
+for (const splitFace of root.keys()) {
+  const splitLeaves = annotateNeighborLevels([
+    ...splitPatch(root[splitFace]),
+    ...root.filter((_, face) => face !== splitFace),
+  ]);
+  assert.equal(assertAdjacentLevelDelta(splitLeaves).ok, true);
+  assert(splitLeaves.filter((patch) => patch.face === splitFace).every((patch) => transitionMask(patch) !== 0));
+}
+const fovY = Math.PI / 3;
+const aspect = 16 / 9;
+const near = 1;
+const far = 100;
+const focal = 1 / Math.tan(fovY / 2);
 root[0].screenError = projectedScreenError({
-  patch: root[0],
-  cameraDistance: 2200,
-  radiusKm: config.radiusKm,
-  viewportHeight: 1080,
-  fovRadians: Math.PI / 3,
+  supportPairs: [
+    { referenceWorld: [0, 0, -10], approximateWorld: [1, 0, -10] },
+    // Off-axis depth error exercises the perspective denominator; an on-axis
+    // distance clamp cannot conservatively represent this pair.
+    { referenceWorld: [4, 1, -12], approximateWorld: [4, 1, -10] },
+  ],
+  views: [{
+    unjitteredProjection: true,
+    renderTargetWidthPx: 1920,
+    renderTargetHeightPx: 1080,
+    cameraNear: near,
+    viewMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    projectionMatrix: [
+      focal / aspect, 0, 0, 0,
+      0, focal, 0, 0,
+      0, 0, (far + near) / (near - far), -1,
+      0, 0, (2 * far * near) / (near - far), 0,
+    ],
+  }],
 });
+assert.throws(() => projectedScreenError({
+  supportPairs: [{ referenceWorld: [0, 0, -0.5], approximateWorld: [0, 0, -0.4] }],
+  views: [{
+    unjitteredProjection: true,
+    renderTargetWidthPx: 1920,
+    renderTargetHeightPx: 1080,
+    cameraNear: near,
+    viewMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    projectionMatrix: [
+      focal / aspect, 0, 0, 0,
+      0, focal, 0, 0,
+      0, 0, (far + near) / (near - far), -1,
+      0, 0, (2 * far * near) / (near - far), 0,
+    ],
+  }],
+}), /near plane/);
 assert.equal(
   shouldSplitPatch(root[0], {
-    splitThreshold: config.quality.splitThreshold,
-    maxLevel: config.quality.maxLevel,
+    splitThreshold: config.workload.splitPixelError,
+    maxLevel: config.workload.maxLevel,
   }),
   true,
 );
 const patches = annotateNeighborLevels([...splitPatch(root[0]), ...root.slice(1)]);
-assert.equal(assertAdjacentLevelDelta(patches).ok, true);
-assert(
-  patches.some((patch) => Object.values(patch.transitionEdges).some(Boolean) === false),
-);
+const balance = assertAdjacentLevelDelta(patches);
+assert.equal(balance.ok, true);
+assert.equal(balance.evidenceScope, QUADTREE_EVIDENCE_SCOPE);
+const crossFaceNeighbors = edgeNeighbors(patches[0], patches, "west");
+assert(crossFaceNeighbors.some((neighbor) => neighbor.face !== patches[0].face));
+assert(patches.some((patch) => transitionMask(patch) !== 0));
+assert(patches.every((patch) => transitionMask(patch) >= 0 && transitionMask(patch) < 16));
 
 const dirtyPatch = createPatch({ face: 0, level: 2, x: 1, y: 2 });
 const baseBounds = estimateDirtyPatchBounds(dirtyPatch, {
@@ -371,16 +515,43 @@ const amplifiedBounds = estimateDirtyPatchBounds(dirtyPatch, {
   amplitudeScale: 2,
 });
 assert.notEqual(baseBounds.maxHeight, amplifiedBounds.maxHeight);
-assert.equal(createPatchComputeDescriptors(patches).api, "renderer.computeAsync");
+const computeDescriptor = createPatchComputeDescriptors(patches);
+assert.equal(computeDescriptor.implementationStatus, "runtime-storage-compute");
+assert.equal(PATCH_COMPUTE_CONTRACT.implementationStatus, computeDescriptor.implementationStatus);
+assert.equal(computeDescriptor.reductions, "not-required-analytic-per-patch-bound");
 assert.equal(createPatchRecordBuffer(2).itemSize, 4);
+assert.equal(deriveTileGutterTexels({
+  maximumWarpDisplacementTexels: 0.75,
+  reconstructionFilterRadiusTexels: 1,
+  derivativeStencilRadiusTexels: 1.5,
+  maximumProjectedFootprintRadiusTexels: 2.4,
+}), 4);
 
-const weights = altitudeDetailWeights({ altitude: 20, radius: 1 });
-assert("nearWeight" in weights && "midWeight" in weights && "farWeight" in weights);
-const gradient = heightGradient([0.2, 0.8, 0.4], {
+const weights = detailRepresentationWeights({
+  wavelengths: { macro: 0.08, meso: 0.012, micro: 0.0025 },
+  vertexSpacing: 0.001,
+  pixelFootprint: 0.00075,
+});
+assert(weights.macroWeight >= weights.mesoWeight && weights.mesoWeight >= weights.microWeight);
+assert.equal(representedDetailWeight({
+  wavelength: 0.001,
+  vertexSpacing: 0.001,
+  pixelFootprint: 0.001,
+}), 0);
+assert.equal(representedDetailWeight({
+  wavelength: 0.004,
+  vertexSpacing: 0.001,
+  pixelFootprint: 0.001,
+}), 1);
+const derivative = heightDerivativeCandidate([0.2, 0.8, 0.4], {
   preset: BODY_PRESETS.pelagia,
 });
-assert.equal(gradient.analyticGradient.length, 2);
-assert.equal(gradient.evaluationCount, NORMAL_QUERY_EVALUATION_COUNTS.fusedFullFieldEvaluations);
+assert.equal(derivative.candidate.length, 2);
+assert.equal(derivative.derivativeCorrectness, "not-run-candidate-only");
+assert.equal(
+  derivative.evaluationCount,
+  NORMAL_QUERY_EVALUATION_COUNTS.fusedCandidateFullFieldEvaluations,
+);
 
 const registry = createPlanetDebugRegistry();
 assert.deepEqual(Object.keys(registry), REQUIRED_DEBUG_VIEWS);
@@ -388,86 +559,52 @@ assert(registry["crater-channels"].output.includes("craterFloor"));
 
 const material = createPlanetMaterialContract();
 assert.equal(material.positionNode, "shared planetFields(surfaceDirection).height");
+assert.equal(material.implementationStatus, "descriptor-only-not-rendered");
 const materialInputs = sampleMaterialInputs([0.1, 0.6, 0.8], {
   preset: BODY_PRESETS.pelagia,
-  altitude: 12,
-  radius: 1,
+  detailSampling: {
+    wavelengths: { macro: 0.08, meso: 0.012, micro: 0.0025 },
+    vertexSpacing: 0.001,
+    pixelFootprint: 0.00075,
+  },
 });
-assert("nearWeight" in materialInputs);
-assert("heightGradient" in materialInputs);
+assert("microWeight" in materialInputs);
+assert("heightDerivativeCandidate" in materialInputs);
+assert.equal(materialInputs.derivativeCorrectness, "not-run-candidate-only");
 
 const planet = new WebGPUQuadtreePlanet({ config });
-assert.equal(planet.createPassGraph().renderer, "WebGPURenderer");
+const passGraph = planet.createPassGraph();
+assert.equal(passGraph.implementationStatus, "descriptor-only-not-rendered");
+assert.equal(passGraph.mrtDefault, "mrt({ output })");
 assert.equal(planet.createComputePlan().buffers.dirtyPatchRecords, "StorageBufferAttribute");
+let patchInstanceDisposeEvents = 0;
+planet.patchInstances.addEventListener("dispose", () => {
+  patchInstanceDisposeEvents += 1;
+});
 planet.resize(1280, 720);
 planet.dispose();
 assert.equal(planet.disposeCounters.patchBuffers, 1);
+assert.equal(patchInstanceDisposeEvents, 1);
 
 for (const importPath of Object.values(NODE_POST_IMPORTS)) {
-  assert(importPath.includes("three/examples/jsm/"), importPath);
+  assert(importPath.startsWith("three/addons/"), importPath);
 }
 
-const source = [
-  "README.md",
-  "planet-field-constants.js",
-  "planet-field-contract.js",
-  "planet-config.js",
-  "planet-fields.js",
-  "planet-quadtree.js",
-  "patch-compute.js",
-  "altitude-detail.js",
-  "planet-material.js",
-  "debug-views.js",
-  "webgpu-quadtree-planet.js",
-  "validate-planet.mjs",
-  "capture-planet-readback.mjs",
-  "planet-readback-browser.js",
-]
-  .map((file) => readFileSync(resolve(here, file), "utf8"))
-  .join("\n");
+// Source inspection below is a structural guard only. Numeric or visual claims
+// come from executed fixtures/readback, never from finding documentation words.
+const fieldSource = readFileSync(resolve(here, "planet-fields.js"), "utf8");
+const runtimeSource = readFileSync(resolve(here, "webgpu-quadtree-planet.js"), "utf8");
+assert(fieldSource.includes("Math.atan2(sine, cosine)"));
+assert(fieldSource.includes("atan(sine, cosine)"));
+assert(!fieldSource.includes("Math.acos("));
+assert(!/\bacos\s*\(/u.test(fieldSource));
+assert(runtimeSource.includes("native WebGPU backend"));
+assert(runtimeSource.includes('from "three/addons/'));
 
-for (const required of [
-  "WebGPURenderer",
-  "MeshStandardNodeMaterial",
-  "MeshPhysicalNodeMaterial",
-  "positionNode",
-  "planetFields",
-  "StorageBufferAttribute",
-  "renderer.computeAsync",
-  "dirtyPatch",
-  "minHeight",
-  "maxHeight",
-  "splitThreshold",
-  "mergeThreshold",
-  "screenError",
-  "neighborLevels",
-  "transitionEdges",
-  "analyticGradient",
-  "heightGradient",
-  "NORMAL_QUERY_EVALUATION_COUNTS",
-  "nearWeight",
-  "midWeight",
-  "farWeight",
-  "Checkpoint",
-  "Expected",
-  "Wrong if",
-  "cube-face seam",
-  "LOD crack",
-  "CPU/GPU drift",
-  "planet-readback.json",
-  "--allow-missing-gpu",
-]) {
-  assert(source.includes(required), `missing ${required}`);
+for (const forbidden of [`Shader${"Material"}`, `gl_${"FragColor"}`, `tonemapping_${"fragment"}`]) {
+  assert(!fieldSource.includes(forbidden), `field source contains ${forbidden}`);
+  assert(!runtimeSource.includes(forbidden), `runtime descriptor contains ${forbidden}`);
 }
-
-for (const forbidden of [
-  `Shader${"Material"}`,
-  `gl_${"FragColor"}`,
-  `tonemapping_${"fragment"}`,
-]) {
-  assert(!source.includes(forbidden), `canonical source contains ${forbidden}`);
-}
-assert(!source.includes(`TSL_${"PLANET_FIELDS_CONTRACT"}`), "dead TSL contract string must stay deleted");
 
 const fixtureParity = validateGoldenFixtures();
 let gpuParity;
@@ -477,15 +614,25 @@ if (options.artifacts) {
   gpuParity = {
     pass: false,
     status: "not-run",
-    requiredForBrowserAcceptance: true,
+    requiredForNumericGpuParityClaim: true,
     reason:
-      "Pass --artifacts <dir> containing planet-readback.json, or pass --allow-missing-gpu for Layer 1 only.",
+      "Pass --artifacts <dir> containing planet-readback.json, or pass --allow-missing-gpu for structural/equation checks only.",
+    proofExclusions: VALIDATION_SCOPE.doesNotProve,
   };
   if (!options.allowMissingGpu) {
     process.exitCode = 1;
   }
 }
 const report = {
+  validationScope: VALIDATION_SCOPE,
+  fieldEvidence: PLANET_FIELD_EVIDENCE,
+  workloadEvidenceClass: config.workload.evidenceClass,
+  quadtreeEvidenceScope: QUADTREE_EVIDENCE_SCOPE,
+  descriptorStatuses: {
+    patchCompute: computeDescriptor.implementationStatus,
+    material: material.implementationStatus,
+    renderGraph: planet.createPassGraph().implementationStatus,
+  },
   structuralParity,
   fixtureParity,
   gpuParity,
