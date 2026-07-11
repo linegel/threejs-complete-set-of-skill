@@ -1,91 +1,183 @@
 import { existsSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { readFile, readdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const labRoot = resolve(here, '../..');
-const defaultArtifactDir = resolve(labRoot, 'artifacts');
+export const defaultArtifactDir = resolve(labRoot, 'artifacts');
 
-const requiredImages = [
-	'images/final.design.png',
-	'images/no-post.design.png',
-	'images/diagnostics.mosaic.png',
-	'images/final.debug.off.png',
-	'images/final.debug.unsnapped.png',
-	'images/final.debug.distance.png',
-	'images/final.debug.normals.png',
-	'images/final.debug.weights.png',
-	'images/tier-switcher.png',
-	'images/silhouette-shadow-composite.png',
-	'images/hop-apex.png',
-	'images/seed-grid.png',
-];
-
-function gate(name, passed, details = {}) {
-	return { name, status: passed ? 'pass' : 'fail', details };
+async function sourceFiles(path) {
+	const entries = await readdir(path, { withFileTypes: true });
+	const files = [];
+	for (const entry of entries) {
+		const child = resolve(path, entry.name);
+		if (entry.isDirectory()) files.push(...await sourceFiles(child));
+		else if (entry.isFile() && /\.(js|mjs|json|html)$/.test(entry.name)) files.push(child);
+	}
+	return files;
 }
 
-async function readJson(path, fallback = null) {
+export async function computeCanonicalSourceHashes() {
+	const files = [
+		resolve(labRoot, 'index.html'),
+		resolve(labRoot, 'package.json'),
+		resolve(labRoot, 'lab.manifest.json'),
+		resolve(labRoot, 'capture-creature-lab.mjs'),
+		...await sourceFiles(resolve(labRoot, 'src')),
+		...await sourceFiles(resolve(labRoot, 'mechanism')),
+		...await sourceFiles(resolve(labRoot, 'tier')),
+	].sort();
+	const hashes = {};
+	for (const file of files) {
+		const bytes = await readFile(file);
+		hashes[relative(labRoot, file)] = createHash('sha256').update(bytes).digest('hex');
+	}
+	return hashes;
+}
+
+const requiredImages = [
+	...['biped', 'quadruped', 'hexapod', 'hopper', 'flyer', 'swimmer'].map((name) => `images/final-${name}.png`),
+	...['off', 'unsnapped', 'distance', 'normals', 'weights', 'ownership'].map((mode) => `images/debug-${mode}-biped.png`),
+	...['hero', 'crowd', 'background'].map((tier) => `images/tier-${tier}-quadruped.png`),
+	'images/silhouette-light-quadruped.png',
+	'images/shadowmap-footprint-quadruped.png',
+	'images/silhouette-diff.png',
+	'images/hop-apex.png',
+	'images/seed-grid.png',
+	'images/determinism.initial.png',
+	'images/determinism.reload.png',
+];
+
+const requiredJson = [
+	'boot.json',
+	'determinism.json',
+	'drift.json',
+	'hop-apex.json',
+	'leak.json',
+	'parity.json',
+	'seed-grid.json',
+	'silhouette.json',
+	'lab-snapshot.json',
+	'manifest.json',
+];
+
+export async function readJson(base, relativePath, fallback = null) {
 	try {
-		return JSON.parse(await readFile(path, 'utf8'));
+		return JSON.parse(await readFile(resolve(base, relativePath), 'utf8'));
 	} catch {
 		return fallback;
 	}
 }
 
-function hasNumber(object, key) {
-	return typeof object?.[key] === 'number' && Number.isFinite(object[key]);
+function pass(name, details = {}) {
+	return { name, status: 'pass', details };
 }
 
-export async function validateManifestArtifacts(artifactDirArg = defaultArtifactDir) {
+function fail(name, details = {}) {
+	return { name, status: 'fail', details };
+}
+
+function hasFiniteNumber(value) {
+	return typeof value === 'number' && Number.isFinite(value);
+}
+
+function validateManifestShape(manifest) {
+	if (!manifest || typeof manifest !== 'object') return fail('manifest.shape', { message: 'manifest is not an object' });
+	if (manifest.kind !== 'creature-lab-webgpu-artifacts') return fail('manifest.kind', { kind: manifest.kind });
+	if (manifest.version !== 2) return fail('manifest.version', { version: manifest.version });
+	if (!Array.isArray(manifest.images)) return fail('manifest.images', { message: 'images must be an array' });
+	if (!manifest.sourceHashes || typeof manifest.sourceHashes !== 'object') {
+		return fail('manifest.sourceHashes', { message: 'capture predates canonical source-hash tracking and is stale' });
+	}
+	const imagePaths = new Set(manifest.images.map((image) => image.path));
+	const missingImages = requiredImages.filter((path) => !imagePaths.has(path));
+	if (missingImages.length > 0) return fail('manifest.requiredImages', { missingImages });
+	for (const image of manifest.images) {
+		if (typeof image.path !== 'string' || !hasFiniteNumber(image.bytes) || image.bytes <= 128 || typeof image.sha256 !== 'string') {
+			return fail('manifest.imageRecord', { image });
+		}
+	}
+	const artifactValues = new Set(Object.values(manifest.artifacts ?? {}));
+	const missingJson = requiredJson.filter((path) => path !== 'manifest.json' && !artifactValues.has(path));
+	if (missingJson.length > 0) return fail('manifest.requiredJson', { missingJson });
+	const shadowParity = manifest.labSnapshot?.shadowParity;
+	if (!Array.isArray(shadowParity) || shadowParity.some((entry) => entry.allEqual !== true)) {
+		return fail('manifest.shadowParity', { shadowParity });
+	}
+	return pass('manifest.shape', { images: manifest.images.length, json: requiredJson.length });
+}
+
+export async function validateManifestArtifacts(artifactDirArg = defaultArtifactDir, options = {}) {
+	const checkFiles = options.checkFiles !== false;
 	const base = resolve(artifactDirArg);
-	const manifestPath = resolve(base, 'manifest.json');
-	const metricsPath = resolve(base, 'metrics.json');
-	const snapshotPath = resolve(base, 'lab-snapshot.json');
 	const reports = [];
+	const manifest = await readJson(base, 'manifest.json');
+	reports.push(manifest ? pass('manifest.exists', { path: resolve(base, 'manifest.json') }) : fail('manifest.exists', { path: resolve(base, 'manifest.json') }));
+	if (!manifest) return summarize(reports, base, null);
 
-	const manifest = await readJson(manifestPath);
-	reports.push(gate('manifest.exists', manifest !== null, { path: manifestPath }));
-	if (!manifest) return summarize(reports, base);
+	reports.push(validateManifestShape(manifest));
+	const currentSourceHashes = await computeCanonicalSourceHashes();
+	const staleSources = Object.entries(currentSourceHashes)
+		.filter(([path, hash]) => manifest.sourceHashes?.[path] !== hash)
+		.map(([path, hash]) => ({ path, expected: hash, captured: manifest.sourceHashes?.[path] ?? null }));
+	reports.push(staleSources.length === 0
+		? pass('manifest.source-hashes', { files: Object.keys(currentSourceHashes).length })
+		: fail('manifest.source-hashes', { message: 'artifact bundle does not match current canonical sources', staleSources }));
 
-	reports.push(gate('manifest.kind', manifest.kind === 'creature-lab-artifacts', { kind: manifest.kind }));
-	reports.push(gate('manifest.images-listed', Array.isArray(manifest.images) && requiredImages.every((path) => manifest.images.includes(path)), { requiredImages }));
-
-	for (const image of requiredImages) {
-		reports.push(gate(`image:${image}`, existsSync(resolve(base, image)), { path: image }));
+	const schema = await readJson(base, 'manifest.schema.json');
+	reports.push(schema ? pass('manifest.schema-json-valid', { path: resolve(base, 'manifest.schema.json') }) : fail('manifest.schema-json-valid', { path: resolve(base, 'manifest.schema.json') }));
+	if (schema && schema.$schema !== 'https://json-schema.org/draft/2020-12/schema') {
+		reports.push(fail('manifest.schema-draft', { value: schema.$schema }));
+	} else if (schema) {
+		reports.push(pass('manifest.schema-draft', { value: schema.$schema }));
 	}
 
-	const metrics = await readJson(metricsPath, {});
-	reports.push(gate('metrics.exists', Object.keys(metrics).length > 0, { path: metricsPath }));
-	reports.push(gate('row13.shadow-silhouette', hasNumber(metrics, 'silhouetteDiffTexels') && metrics.silhouetteDiffTexels <= metrics.silhouetteDiffThresholdTexels, {
-		value: metrics.silhouetteDiffTexels,
-		threshold: metrics.silhouetteDiffThresholdTexels,
-		sharedPositionNode: metrics.sharedPositionNode,
-	}));
-	reports.push(gate('row15.browser-determinism', metrics.deterministicPair === true && metrics.pngHashEqual === true && metrics.poseHashEqual === true, {
-		deterministicPair: metrics.deterministicPair,
-		pngHashEqual: metrics.pngHashEqual,
-		poseHashEqual: metrics.poseHashEqual,
-	}));
-	reports.push(gate('row16.pipeline-compiles-after-reveal', metrics.pipelineCompilesAfterReveal === 0, { value: metrics.pipelineCompilesAfterReveal }));
-	reports.push(gate('row17.buffer-reallocs-after-init', metrics.bufferReallocsAfterInit === 0, { value: metrics.bufferReallocsAfterInit }));
-	reports.push(gate('row18.spawn-cost', hasNumber(metrics, 'spawnMedianMs') && metrics.spawnMedianMs <= 0.25, { value: metrics.spawnMedianMs, threshold: 0.25 }));
-	reports.push(gate('row19.first-frame-ratio', hasNumber(metrics, 'firstFrameRatio') && metrics.firstFrameRatio <= 1.5, { value: metrics.firstFrameRatio, threshold: 1.5 }));
-	reports.push(gate('cpu-tsl-field-parity-artifact', hasNumber(metrics, 'cpuTslMaxError') && metrics.cpuTslMaxError <= metrics.cpuTslTolerance, {
-		value: metrics.cpuTslMaxError,
-		threshold: metrics.cpuTslTolerance,
-	}));
-	reports.push(gate('world-drift-artifact', hasNumber(metrics, 'worldDriftMax') && metrics.worldDriftMax < 1e-4, { value: metrics.worldDriftMax, threshold: 1e-4 }));
-	reports.push(gate('leak-loop-flat', metrics.leakLoopFlat === true, { leakLoopFlat: metrics.leakLoopFlat }));
+	if (checkFiles) {
+		for (const image of requiredImages) {
+			const path = resolve(base, image);
+			reports.push(existsSync(path) ? pass(`image:${image}`, { path: image }) : fail(`image:${image}`, { path: image }));
+		}
+		for (const json of requiredJson) {
+			const path = resolve(base, json);
+			reports.push(existsSync(path) ? pass(`json:${json}`, { path: json }) : fail(`json:${json}`, { path: json }));
+		}
+	}
 
-	const snapshot = await readJson(snapshotPath, null);
-	reports.push(gate('window-lab-snapshot', snapshot !== null && snapshot.ready === true && Array.isArray(snapshot.specs), { path: snapshotPath }));
-
-	return summarize(reports, base, manifest, metrics);
+	return summarize(reports, base, manifest);
 }
 
-function summarize(reports, base, manifest = null, metrics = null) {
+export async function loadArtifacts(artifactDirArg = defaultArtifactDir) {
+	const base = resolve(artifactDirArg);
+	return {
+		base,
+		manifest: await readJson(base, 'manifest.json'),
+		boot: await readJson(base, 'boot.json'),
+		determinism: await readJson(base, 'determinism.json'),
+		drift: await readJson(base, 'drift.json'),
+		leak: await readJson(base, 'leak.json'),
+		parity: await readJson(base, 'parity.json'),
+		silhouette: await readJson(base, 'silhouette.json'),
+		snapshot: await readJson(base, 'lab-snapshot.json'),
+	};
+}
+
+export function parityDerivationIsValid(parity) {
+	const eps = 2 ** -24;
+	const candidateK = parity?.derivation?.K;
+	const expectedFlops = 30 + 6 * candidateK;
+	return Number.isInteger(candidateK)
+		&& candidateK > 0
+		&& parity.derivation.flopEstimate === expectedFlops
+		&& Math.abs(parity.derivation.f32RelativeEps - eps) < 1e-18
+		&& parity.derivation.bodyScaleMultiplier === 2e-4
+		&& typeof parity.derivation.formula === 'string'
+		&& parity.derivation.formula.includes('2e-4 * bodyScale')
+		&& typeof parity.derivedTolerance === 'number';
+}
+
+function summarize(reports, base, manifest = null) {
 	const failed = reports.filter((entry) => entry.status === 'fail');
 	return {
 		status: failed.length === 0 ? 'pass' : 'fail',
@@ -97,7 +189,6 @@ function summarize(reports, base, manifest = null, metrics = null) {
 		},
 		gates: reports,
 		manifest,
-		metrics,
 	};
 }
 

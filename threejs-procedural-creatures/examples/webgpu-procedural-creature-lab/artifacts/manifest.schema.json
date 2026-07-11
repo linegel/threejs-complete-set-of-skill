@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://threejs.local/schemas/webgpu-procedural-creature-lab-manifest.schema.json",
+  "title": "WebGPU Procedural Creature Lab Artifact Manifest",
+  "type": "object",
+  "required": [
+    "kind",
+    "version",
+    "url",
+    "schema",
+    "createdBy",
+    "sourceHashes",
+    "images",
+    "artifacts",
+    "labSnapshot"
+  ],
+  "properties": {
+    "kind": {
+      "const": "creature-lab-webgpu-artifacts"
+    },
+    "version": {
+      "const": 2
+    },
+    "url": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema": {
+      "const": "manifest.schema.json"
+    },
+    "createdBy": {
+      "const": "capture-creature-lab.mjs"
+    },
+    "sourceHashes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "images": {
+      "type": "array",
+      "minItems": 20
+    },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "determinism",
+        "parity",
+        "boot",
+        "leak",
+        "drift",
+        "silhouette",
+        "hopApex",
+        "seedGrid",
+        "labSnapshot"
+      ]
+    },
+    "labSnapshot": {
+      "type": "object",
+      "required": [
+        "shadowParity",
+        "renderer",
+        "timing"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
