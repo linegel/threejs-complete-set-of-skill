@@ -5,7 +5,7 @@
     "check": "node --check main.js && node --check validate-support-lab.mjs && node --check evidence-status.mjs",
     "validate:unit": "node validate-support-lab.mjs",
     "test:mutations": "node validate-support-lab.mjs --mutations",
-    "capture": "node evidence-status.mjs capture",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-shadow-pipeline-integration --target final",
     "validate:artifacts": "node evidence-status.mjs validate:artifacts",
     "validate:quick": "node --check main.js && node --check validate-support-lab.mjs && node --check evidence-status.mjs && node validate-support-lab.mjs && node validate-support-lab.mjs --mutations",
     "validate:full": "node --check main.js && node --check validate-support-lab.mjs && node --check evidence-status.mjs && node validate-support-lab.mjs && node validate-support-lab.mjs --mutations && node evidence-status.mjs validate:artifacts"

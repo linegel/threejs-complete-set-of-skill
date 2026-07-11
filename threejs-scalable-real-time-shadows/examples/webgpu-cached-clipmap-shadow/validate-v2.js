@@ -306,7 +306,12 @@ assert.match(canonicalHtml, /locked route rejects tier override/);
 assert.match(canonicalHtml, /mechanismIdForShadowScenario\(requestedScenario\)/);
 assert.match(canonicalHtml, /controller\.setCamera\(requestedCamera\)/);
 assert.match(canonicalHtml, /removeEventListener\("resize", onResize\)/);
-assert.equal(packageJson.scripts.capture, "node capture-canonical.mjs");
+assert.equal(
+  packageJson.scripts.capture,
+  "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-cached-clipmap-shadow --target final",
+  "canonical capture must use the root self-serving browser harness for this lab",
+);
+assert.equal(packageJson.scripts["capture:evidence"], "node capture-canonical.mjs");
 
 const oddWidth = 641;
 const oddHeight = 359;

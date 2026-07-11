@@ -52,9 +52,13 @@ function validatePackage(candidate) {
   for (const [name, command] of Object.entries(candidate.scripts)) {
     assert(!command.includes("npm --prefix"), `${name} must be a non-recursive local command`);
     assert(!command.includes("labs:"), `${name} must not recurse through the root lab dispatcher`);
-    assert(!command.includes("../"), `${name} must not delegate to a sibling package`);
+    if (name !== "capture") assert(!command.includes("../"), `${name} must not delegate to a sibling package`);
   }
-  assert.equal(candidate.scripts.capture, "node evidence-status.mjs capture");
+  assert.equal(
+    candidate.scripts.capture,
+    "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-shadow-pipeline-integration --target final",
+    "capture must use the root self-serving harness and retain this support lab's identity",
+  );
   assert.equal(candidate.scripts["validate:artifacts"], "node evidence-status.mjs validate:artifacts");
   assert.match(candidate.scripts["validate:quick"], /validate-support-lab\.mjs --mutations/);
   assert.match(candidate.scripts["validate:full"], /evidence-status\.mjs validate:artifacts/);
