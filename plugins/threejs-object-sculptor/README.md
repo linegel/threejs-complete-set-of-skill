@@ -18,6 +18,8 @@ Created by [Vinh Hiển](https://github.com/vinhhien112) in the original [Three.
 
 This tower ship study shows the intended output shape: a browser-rendered, code-sculpted Three.js object rebuilt from an attached reference image, with procedural geometry, articulated parts, material work, and interactive controls.
 
+This repository also ships a separate canonical [WebGPU Tower Ship Sculptor demo](https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/) with fixed blockout, hierarchy, materials, interaction, camera, and geometry-tier routes plus the executable lab/evidence contract. The reference and upstream concept remain credited to Vinh Hiển.
+
 ### Ancient Autumn Tree
 
 [Open the live ancient autumn tree demo](https://tree.harrysoftware.com/)

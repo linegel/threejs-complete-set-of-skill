@@ -1,9 +1,9 @@
 {
   "name": "threejs-object-sculptor",
-  "version": "0.1.1+codex.20260709134833",
+  "version": "0.1.1+codex.20260711015811",
   "description": "Turn object reference images into quality-gated, action-ready procedural Three.js reconstruction plans and code.",
   "author": {
-    "name": "Vinh Hiển",
+    "name": "Vinh Hi\u1ec3n",
     "url": "https://github.com/vinhhien112"
   },
   "homepage": "https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin",
@@ -21,7 +21,7 @@
     "displayName": "Three.js Object Sculptor",
     "shortDescription": "Validate object photos and rebuild them as procedural Three.js models.",
     "longDescription": "A Codex workflow for converting a single object reference image into a pre-assessed quality contract, structured sculpt spec, procedural geometry plan, material recipe, lighting notes, action-ready runtime hierarchy, and implementation strategy for Three.js or WebGPU scenes.",
-    "developerName": "Vinh Hiển",
+    "developerName": "Vinh Hi\u1ec3n",
     "category": "Developer Tools",
     "capabilities": [
       "Image Analysis",
