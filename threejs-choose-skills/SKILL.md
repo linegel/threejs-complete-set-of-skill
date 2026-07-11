@@ -270,6 +270,14 @@ performanceContract:
   qualityLadder: []
   skillTierCrosswalk: {} # selected skill local tier -> Full/Budgeted/Minimum viable
   qualityController: {}
+  physicsCostEvidence: # required when the route has a PhysicsGraph
+    harnessId: ""
+    gateSetId: ""
+    costLedgerId: ""
+    opportunityTableId: ""
+    composedTraceId: ""
+    worstPermittedCatchUpCostId: ""
+    qualityCostEvidenceRefs: []
   routeStatus: provisional | measured-valid | invalid | unmeasurable
 coverageStatus: complete | partial | blocked
 acceptanceEvidence:
@@ -619,7 +627,22 @@ producers. A consumer that needs another encoding or resolution must declare a
 conversion pass and its bytes; name reuse is not deduplication.
 Physics stages additionally declare state epochs, barriers, subcycling, hot
 traffic, and conservation side effects. Do not infer solver order from the
-render-pass list.
+render-pass list. For each presentation opportunity, serialize one exact
+`PhysicsCostOpportunityRow` whose stage/subcycle/loop/interaction/work/traffic
+counts close to `CadenceTraceTotals` and whose CPU, GPU, external, and
+presentation spans follow concrete dependency paths. A raw-trace reference or digest
+without loadable digest-checked rows cannot prove co-occurrence.
+
+The graph-wide catch-up contract is multi-objective. Build the integer feasible
+set from graph activation/partition/loop constraints and both catch-up maxima;
+then prove a componentwise dominating frontier for CPU critical path, GPU
+critical path, external tail, presentation interval, traffic, live memory,
+migration overlap, and numerical/visual error. Repeat executable frontier witnesses
+under the sustained target harness. One convenient zero-debt trace, one scalar
+"worst frame," stage-percentile addition, or domain-local clipping is invalid.
+Every quality state needs matching steady and catch-up evidence; every quality
+transition needs separate prepare/populate/commit/retire cost evidence through
+source-generation retirement.
 
 ### MRT And Tile-GPU Bandwidth Gate
 
@@ -676,6 +699,10 @@ does not justify emissive MRT unless selective emission is required.
 - Measure feature marginals with paired on/off runs over the same deterministic
   path. Report the sampling method and run-to-run dispersion; do not subtract
   unrelated percentile tables.
+- For physical routes, reconcile the ordered per-opportunity cost rows to exact
+  cadence totals, measure every objective on the worst-permitted catch-up
+  frontier, and capture migration spikes separately from steady state. Missing
+  frontier coverage or GPU-query coverage is `unmeasurable`, not passing.
 - Separate CPU-bound, vertex/primitive-bound, fragment/fill-bound,
   compute-bound, memory/bandwidth-bound, upload-bound, and synchronization-bound
   cases before changing quality.
@@ -926,8 +953,11 @@ A routed implementation is incomplete without:
   identities, the immutable
   presentation publication chain and `PresentationRenderPlan`, conservative
   `QualityTransition` records, and an active `PhysicsCostLedger`
-  covering coordination intervals, native owner steps, worst permitted catch-up,
-  stage executions/hot bytes, critical queue path, traffic/readbacks, multiview/
+  bound to an exact `PhysicsCostHarness`, frozen `PhysicsComposedCostGateSet`,
+  digest-closed opportunity table/composed trace, multi-objective
+  `PhysicsWorstPermittedCatchUpCost` frontier, and per-state/per-transition
+  quality-cost evidence; include coordination intervals, native owner steps,
+  stage executions/hot bytes, critical queue paths, traffic/readbacks, multiview/
   frames-in-flight multiplication, migration overlap, and sustained thermal state;
 - no-post baseline plus field, geometry, material, identity, depth, velocity,
   history, and output diagnostics actually used by the route;

@@ -3580,7 +3580,10 @@ PhysicsCostLedger:
   measurementProtocolRefs: [content-addressed-protocol-and-trace]
   cadenceTraceTotals: CadenceTraceTotals
   status: active | provisional
-  targetAndHarness: named-device-browser-view-workload
+  harness: PhysicsCostHarness
+  composedGateSet: PhysicsComposedCostGateSet
+  opportunityTable: PhysicsCostOpportunityTable
+  composedTrace: PhysicsComposedCostTrace
   qualityState: PhysicsQualityStateId
   graphStageCosts: [router-cost-record]
   coordinationIntervalsPerSecond: labelled-distribution
@@ -3589,10 +3592,7 @@ PhysicsCostLedger:
   coordinationIntervalsPerPresentedFrame: labelled-distribution
   subcyclesAndCouplingIterationsPerPresentedFrame: labelled-distribution-by-owner
   executionsPerPresentedFrame: labelled-count-by-stage
-  worstPermittedCatchUpBurst:
-    triggerAndIntervalDebt: typed-record
-    executionsDispatchesAndTraffic: labelled-records
-    latencyMemoryAndErrorGate: typed-gates
+  worstPermittedCatchUpCost: PhysicsWorstPermittedCatchUpCost
   hotBytesReadWrittenPerExecution: labelled-by-stage-and-resource
   solverDispatches: [extent-workgroup-cadence-and-timing]
   queueSubmissionsAndPassBreaks: labelled-counts
@@ -3614,7 +3614,174 @@ PhysicsCostLedger:
   hotState: PhysicsMemoryLedger
   peakTransient: PhysicsMemoryLedger
   migrationOverlap: PhysicsMemoryLedger
+  qualityCostEvidence: [PhysicsQualityCostEvidenceRef]
+  qualityMigrationCostEvidence: [PhysicsQualityMigrationCostEvidence]
   thermalPowerState: measured-or-unavailable
+
+PhysicsCostHarness:
+  harnessId: PhysicsCostHarnessId
+  target:
+    deviceId: stable-device-id
+    osAndBrowserBuild: exact-builds
+    gpuAdapterAndDriver: exact-identity-or-typed-unavailable
+    backendAndDeviceGeneration: exact-WebGPU-generations
+    displayModeAndMeasuredRefresh: typed-record
+    powerSourceAndGovernor: typed-record
+    thermalStartAndStabilizationPolicy: typed-record
+  viewport:
+    cssExtent: labelled-extent
+    dpr: labelled-scalar
+    physicalExtent: labelled-derived-extent
+  workload:
+    routeAndSceneRevision: content-addressed-identity
+    contextGraphAndRegistryRevisions: typed-revision-tuple
+    resourceAndPipelineGraphDigest: collision-resistant-digest
+    presentationTargetsAndViews: [target-view-key]
+    seedCameraInputAndEventTrace: content-addressed-record
+    qualityStateAndEpoch: typed-quality-identity
+  protocol:
+    warmupAndCompilationState: typed-record
+    coldTransitionAndSustainedSegments: typed-record
+    sampleAndQuantilePolicy: typed-record
+    cpuClockAndGpuQueryCoverage: typed-record
+    counterAvailabilityAndUncertainty: typed-record
+    visibilityPowerAndAutomationControls: typed-record
+  harnessDigest: collision-resistant-digest
+
+PhysicsComposedCostGateSet:
+  gateSetId: PhysicsComposedCostGateSetId
+  harnessId: PhysicsCostHarnessId
+  qualityStateAndEpoch: typed-quality-identity
+  frozenBeforeTraceDigest: collision-resistant-digest
+  cpuCriticalPathP95: Quantity<second> # [G]
+  gpuCriticalPathP95: Quantity<second> | TypedAbsence # [G], absence forbids GPU-performance acceptance
+  externalTailP95: Quantity<second> | TypedAbsence # [G]
+  presentedIntervalP95: Quantity<second> # [G]
+  deadlineMissRatio: Quantity<dimensionless> # [G]
+  updateLatencyByStateEquation: { state-equation-id: Quantity<second> } # [G]
+  hotStateBytes: Quantity<byte> # [G]
+  peakTransientBytes: Quantity<byte> # [G]
+  migrationOverlapBytes: Quantity<byte> # [G]
+  logicalTrafficPerOpportunity: Quantity<byte> # [G]
+  uploadCopyMapBytesPerOpportunity: Quantity<byte> # [G]
+  allocationAndCompilationChurn: typed-gates
+  sustainedDriftAndQualityResidence: typed-gates
+  numericalAndVisualErrorGateRefs: [gate-id]
+
+PhysicsCostOpportunityTable:
+  opportunityTableId: PhysicsCostOpportunityTableId
+  harnessId: PhysicsCostHarnessId
+  measurementInterval: PhysicsTimeInterval
+  storage: inline | immutable-resource
+  inlineRows: [PhysicsCostOpportunityRow] | TypedAbsence
+  resource:
+    { contentDigest, canonicalByteLayout, rowCount: Quantity<count>,
+      orderedRowDigestRoot }
+    | TypedAbsence
+  exactRowCount: Quantity<count>
+  tableDigest: collision-resistant-digest
+
+PhysicsCostOpportunityRow:
+  opportunityKey: { presentationClockId, presentationOpportunitySequence }
+  opportunityInterval: PhysicsTimeInterval
+  catchUpBatchId: PhysicsCatchUpBatchId | TypedAbsence
+  coordinationAdvanceIds: [PhysicsCoordinationAdvanceId]
+  stageExecutionCounts: { PhysicsGraphStageId: Quantity<count> }
+  nativeSubcycleCounts: { owner-id: Quantity<count> }
+  couplingIterationCounts: { BoundedCouplingLoopId: Quantity<count> }
+  interactionApplicationCounts: { payload-tag: Quantity<count> }
+  presentedFrameCounts: { target-view-key: Quantity<count> }
+  workOccurrenceCounts: { PhysicsWorkKey: Quantity<count> }
+  trafficOccurrenceAndLogicalByteTotals: { TrafficRecordId: typed-count-byte-pair }
+  queueDispatchPassAndBarrierCounts: typed-count-record
+  cpuCriticalPath: labelled-duration-and-node-path
+  gpuCriticalPath: labelled-duration-query-coverage-and-node-path | TypedAbsence
+  externalTail: labelled-duration-and-dependency-path | TypedAbsence
+  presentedIntervalAndDeadlineMiss: typed-measured-record
+  hotStatePeakTransientAndMigrationBytes: typed-measured-or-derived-record
+  numericalAndVisualGateResults: [gate-result]
+  qualityStateAndEpoch: typed-quality-identity
+  rowDigest: collision-resistant-digest
+
+PhysicsComposedCostTrace:
+  composedTraceId: PhysicsComposedCostTraceId
+  harnessId: PhysicsCostHarnessId
+  gateSetId: PhysicsComposedCostGateSetId
+  opportunityTableId: PhysicsCostOpportunityTableId
+  cadenceTraceTotalsId: CadenceTraceTotalsId
+  cpuCriticalPathDistribution: labelled-distribution
+  gpuCriticalPathDistribution: labelled-distribution | TypedAbsence
+  externalTailDistribution: labelled-distribution | TypedAbsence
+  presentedIntervalAndDeadlineMissDistribution: typed-distribution
+  memoryTrafficAllocationAndThermalDistributions: typed-distributions
+  gateResults: { gate-id: pass | fail | insufficient-evidence }
+  status: measured-valid | measured-invalid | insufficient-evidence
+
+PhysicsWorstPermittedCatchUpCost:
+  catchUpCostId: PhysicsWorstPermittedCatchUpCostId
+  harnessId: PhysicsCostHarnessId
+  gateSetId: PhysicsComposedCostGateSetId
+  catchUpPolicyIdentity:
+    { graphId, graphRevision, policyDigest, debtClockId,
+      maximumDebt, maximumCoordinationAdvancesPerPresentationOpportunity,
+      maximumNativeExecutionsPerOpportunity, debtDisposition }
+  admissibleScheduleModel:
+    integerVariables: stage-native-loop-interaction-and-work-counts
+    constraintsDigest: graph-policy-activation-partition-loop-and-resource-closure
+    objectiveDimensions:
+      [cpu-critical-path, gpu-critical-path, external-tail, presented-interval,
+       hot-traffic, peak-live-bytes, migration-overlap-bytes, numerical-error,
+       visual-error]
+  frontierWitnesses: [PhysicsCatchUpCostWitness]
+  frontierCoverage:
+    method: exhaustive-enumeration | verified-integer-optimization | conservative-dominating-bound
+    proofRef: content-addressed-proof
+    coveredObjectiveDimensions: [objective-dimension]
+    uncoveredObjectiveDimensions: [objective-dimension]
+    componentwiseDominationDigest: collision-resistant-digest
+  gateResults: { gate-id: pass | fail | insufficient-evidence }
+  requiredDisposition: admit | reduce-policy | block-presentation | drop-with-loss-and-discontinuity
+
+PhysicsCatchUpCostWitness:
+  witnessId: opaque-id
+  maximizedObjectiveDimensions: [objective-dimension]
+  opportunityRow: PhysicsCostOpportunityRow
+  repetitionAndSustainedProtocol: typed-record
+  composedMeasuredDistributions: typed-CPU-GPU-external-presentation-memory-traffic-error-distributions
+  derivedUpperBoundsAndAssumptions: typed-record
+  witnessDigest: collision-resistant-digest
+
+PhysicsQualityCostEvidenceRef:
+  qualityStateAndEpoch: typed-quality-identity
+  graphAndResourceRevisionDigest: collision-resistant-digest
+  harnessId: PhysicsCostHarnessId
+  gateSetId: PhysicsComposedCostGateSetId
+  steadyCostLedgerId: PhysicsCostLedgerId
+  composedTraceId: PhysicsComposedCostTraceId
+  worstPermittedCatchUpCostId: PhysicsWorstPermittedCatchUpCostId
+  incomingMigrationCostEvidenceIds: [PhysicsQualityMigrationCostEvidenceId]
+  outgoingMigrationCostEvidenceIds: [PhysicsQualityMigrationCostEvidenceId]
+  status: accepted | rejected | insufficient-evidence
+
+PhysicsQualityMigrationCostEvidence:
+  migrationCostEvidenceId: PhysicsQualityMigrationCostEvidenceId
+  transitionId: QualityTransitionId
+  sourceAndDestinationQualityEpochs: typed-quality-pair
+  requestAndAllocationAdmissionIds: typed-admission-pair
+  harnessId: PhysicsCostHarnessId
+  gateSetId: PhysicsComposedCostGateSetId
+  phaseOpportunityRows:
+    prepare: [PhysicsCostOpportunityRow]
+    populate: [PhysicsCostOpportunityRow]
+    commit: [PhysicsCostOpportunityRow]
+    retire: [PhysicsCostOpportunityRow]
+  overlapMemoryLedgerId: PhysicsMemoryLedgerId
+  migrationTrafficRecordIds: [TrafficRecordId]
+  allocationCompilationAndPipelineCreation: typed-cost-records
+  sourceRetirementTail: labelled-duration-and-completion-join
+  conservationConstraintAndVisualErrorResults: [gate-result]
+  composedGateResultsDuringTransition: { gate-id: pass | fail | insufficient-evidence }
+  status: accepted | rejected | insufficient-evidence
 
 CadenceTraceTotals:
   traceTotalsId: CadenceTraceTotalsId
@@ -3632,6 +3799,76 @@ CadenceTraceTotals:
   trafficOccurrenceAndLogicalByteTotals: { TrafficRecordId: typed-count-byte-pair }
   droppedCoordinationIntervals: [PhysicsTimeInterval]
   exactTotalsDigest: collision-resistant-digest
+
+`CadenceTraceTotals.traceRef` identifies raw evidence but is not itself count
+closure. The ordered opportunity table makes co-occurrence reviewable. For
+every stage, loop, owner, payload tag, work key, traffic record, and target/view,
+the corresponding row counts sum exactly to the matching cadence total:
+
+```text
+sum_o n_stage(o,s)       = CadenceTraceTotals.stageExecutionCounts[s]       [D]
+sum_o n_subcycle(o,a)    = CadenceTraceTotals.nativeSubcycleCounts[a]       [D]
+sum_o n_loop(o,l)        = CadenceTraceTotals.couplingIterationCounts[l]    [D]
+sum_o n_work(o,k)        = CadenceTraceTotals.workOccurrenceCounts[k]       [D]
+sum_o n_traffic(o,r)     = trace traffic occurrence count[r]                [D]
+sum_o bytes_traffic(o,r) = trace logical byte total[r]                      [D]
+```
+
+The same closure applies to interactions and target/view frame counts. Every
+row lists exact execution identities, not percentile-derived counts. Its
+critical paths resolve through the graph dependency DAG and concrete completion
+records. CPU, GPU, external, and presentation spans remain separate because
+they may overlap. A sum of stage `p95` values, a product of cadence percentiles,
+or a `traceRef` without loadable digest-checked rows fails composed evidence.
+
+For one presentation opportunity `o`, let `x_o` be the integer vector of
+coordination advances, stage executions, native subcycles, loop iterations,
+interaction applications, queue operations, and work occurrences. The exact
+graph activation/partition rules and `PhysicsCatchUpPolicy` define the feasible
+set `A`:
+
+```text
+x_o in A                                                                  [G]
+n_advance(o) <= maximumCoordinationAdvancesPerPresentationOpportunity     [G]
+n_native(o)  <= maximumNativeExecutionsPerOpportunity                     [G]
+```
+
+For cost/error dimension `j`, the permitted envelope is
+
+```text
+B_j = max over x in A of R_j(x)                                           [D]
+accept = AND_j( measuredComposedResult_j <= frozenGate_j )                 [G,M]
+```
+
+`R_j` is evaluated from the actual dependency/resource schedule, not a linear
+sum of subsystem percentiles. The maximum-CPU, maximum-GPU, maximum-traffic,
+maximum-live-memory, maximum-migration-overlap, maximum-numerical-error, and
+maximum-visual-error schedules may differ. Consequently
+`PhysicsWorstPermittedCatchUpCost` carries a componentwise
+dominating frontier, not one arbitrarily named worst frame. Its coverage proof
+must show that every feasible schedule is dominated in every claimed objective
+dimension by a measured witness or a conservative bound. An uncovered
+dimension is `insufficient-evidence`; a derived bound alone cannot become a
+measured target-performance verdict.
+
+Each frontier witness is an executable feasible schedule with exact row
+closure. Repeat it under the same sustained harness to measure the composed
+CPU/GPU/external/presentation distributions and resource peaks. If the frontier
+cannot pass, reduce the graph-wide policy, block presentation while debt is
+retained, or drop only through the declared loss ledger and discontinuity. A
+domain may not privately clip its executions to make the measured burst pass.
+
+Steady-state quality evidence does not cover a transition. Every admitted
+`QualityTransition` has one `PhysicsQualityMigrationCostEvidence` spanning
+prepare, population, atomic commit, and retirement. It includes simultaneous
+source/destination resources, frames in flight, copy/upload traffic,
+allocation/compilation or pipeline creation, reset/handoff cost, conservation
+and visual error, composed deadline behavior, and the completion-join tail
+until the source generation can retire. Every eligible quality state binds its
+own harness, frozen gate set, steady composed trace, catch-up frontier, and all
+incoming/outgoing transition evidence. Reusing a result after a graph,
+resource-layout, quality-epoch, target, browser, or harness digest change is
+invalid.
 
 PhysicsMemoryLedger:
   memoryLedgerId: PhysicsMemoryLedgerId
@@ -3733,9 +3970,10 @@ target evidence rather than assuming compute is cheaper.
 
 Per-presented-frame numbers never replace per-coordination-interval and
 per-second evidence: rendering may throttle, pause, or run at a cadence unrelated
-to simulation. Measure the worst catch-up policy that the route permits, not
-only the steady zero-debt case. Report dependency critical paths instead of
-adding overlapping CPU/GPU stage percentiles. On tile GPUs, count attachment
+to simulation. Bind every distribution to the exact opportunity rows, measure
+the `PhysicsWorstPermittedCatchUpCost` frontier rather than only the steady
+zero-debt case, and report dependency critical paths instead of adding
+overlapping CPU/GPU stage percentiles. On tile GPUs, count attachment
 store/load/resolve traffic, compute/render pass breaks, and spills; on all
 targets, gate binding/storage-buffer/texture limits and frames-in-flight or
 multiview resource multiplication.
@@ -3747,14 +3985,20 @@ their ratio are three separate statistics; multiplying percentile summaries is
 not an exact cadence identity. `CadenceTraceTotals` is the exact count/duration/
 byte authority for the cited trace. Every reported distribution derives from
 paired samples whose integer totals and interval equal that record; no
-percentile multiplication may reconstruct cadence.
+percentile multiplication may reconstruct cadence. The opportunity-table row
+sums must reproduce those totals and its row/digest closure must reproduce the
+`PhysicsComposedCostTrace`; otherwise co-occurrence and critical-path claims are
+unproven.
 
 Keep frequently sampled state in its consuming residency. Batch queries and
 interactions, compact active regions, update dirty ranges, and use analytic or
 precomputed inactive regions where the error gate permits. Do not evict hot
 state only to upload/reconstruct it at a higher cadence. Adaptive quality uses
 the router's single hysteretic controller; physics domains do not independently
-oscillate tiers.
+oscillate tiers. A controller may enter a state only when its
+`PhysicsQualityCostEvidenceRef` is accepted for the active harness and both the
+steady and worst-permitted catch-up gates pass. A transition is separately
+admissible only when its migration-cost evidence passes.
 
 ## Validation Scenarios And Failure Gates
 
@@ -3814,7 +4058,10 @@ correctly.
 | external directional capability | Every ingress/egress payload matches exactly one `ExternalInteractionCapability` frame/unit/footprint/cadence/batch/residency/dependency/error record; ingress exact-once and reaction atomicity survive retry and process failure |
 | memory/traffic attribution | Allocation lifetime totals match `PhysicsMemoryLedger`; every copy/map/transition matches one `TrafficRecord`; unique work keys count shared work once and per-view work only for actual views; logical/physical bytes remain distinct |
 | cadence trace totals | Exact duration/count/byte totals in `CadenceTraceTotals` reconcile all per-advance, per-second, per-frame, catch-up, work, and traffic distributions without percentile multiplication |
-| mobile sustained run | Per-interval/per-second/presented-frame costs, worst catch-up burst, dependency tails, tile traffic/spills, device limits, allocations, multiview/in-flight multiplication, memory, thermal/clock drift, quality trace, errors, and teardown stay within named target gates |
+| composed opportunity closure | Every digest-checked `PhysicsCostOpportunityRow` resolves concrete advances/executions/dependencies and its stage/subcycle/loop/interaction/work/traffic/frame counts sum exactly to `CadenceTraceTotals`; composed CPU/GPU/external/presentation distributions derive from aligned rows rather than subsystem percentile sums |
+| worst permitted catch-up | The exact graph/policy feasible set has a componentwise dominating CPU/GPU/external/presentation/traffic/memory/migration/error frontier; each claimed dimension has an executable sustained witness or conservative bound, and every measured composed result passes its frozen gate |
+| quality cost coverage | Every eligible quality state binds a matching harness/gate/steady trace/catch-up frontier; every incoming/outgoing transition separately covers prepare/populate/commit/retire costs, simultaneous old/new resources, traffic, allocation/compilation, error, deadlines, and the retirement tail |
+| mobile sustained run | Per-interval/per-second/presented-frame costs, worst-permitted catch-up frontier, dependency tails, tile traffic/spills, device limits, allocations, multiview/in-flight multiplication, memory, thermal/clock drift, quality trace, errors, and teardown stay within named physical-target gates |
 
 ### Hard failure gates
 
@@ -3886,7 +4133,10 @@ Reject the affected route or narrow its claim when any of the following occurs:
 - quality work starts before request/allocation admission, an allocation is
   absent from the memory lifetime ledger, a transfer is absent from traffic,
   shared/per-view work is double-counted, logical/physical bytes are conflated,
-  or cadence distributions do not reconcile to exact trace totals;
+  cadence distributions do not reconcile to exact opportunity rows and trace
+  totals, a catch-up objective lacks frontier coverage, a cost result is reused
+  across a harness/graph/resource/quality digest change, or a transition relies
+  on steady-state cost evidence instead of migration evidence;
 - target acceptance uses isolated demo timings, desktop extrapolation, a cold
   burst, unlabelled budgets, or a final image without native-domain diagnostics.
 
