@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 2,
+  "invariantDomains": [
+    "physical",
+    "color",
+    "temporal",
+    "spatial",
+    "ownership",
+    "lifecycle"
+  ],
+  "branchOrder": [
+    "canonical-budget-reduction",
+    "precomputed-static",
+    "cpu-offline",
+    "feature-removed",
+    "maintained-legacy"
+  ],
+  "scenarioDefaults": {
+    "canonicalOwner": "threejs-water-optics",
+    "canonicalFeature": "bounded-water",
+    "canonicalEvidence": {
+      "labId": "webgpu-bounded-water",
+      "requiredBundle": "docs/visual-validation/webgpu-bounded-water/evidence-manifest.json",
+      "status": "required-before-branch-acceptance"
+    },
+    "actualCapabilities": {
+      "webgpu": false,
+      "webgl2": true,
+      "runtimeCompute": false,
+      "storageTextures": false
+    },
+    "targetCapabilities": {
+      "webgpu": false,
+      "webgl2": true,
+      "staticTextures": true,
+      "cpuGeneration": true
+    },
+    "desiredBranch": null,
+    "decisionTrace": [],
+    "invariants": [],
+    "budgetEvidence": {
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "bounded-water compatibility target contract"
+      },
+      "browserReserveMs": {
+        "value": 2,
+        "unit": "ms",
+        "label": "Authored",
+        "source": "provisional harness reserve; not acceptance evidence"
+      },
+      "compositorReserveMs": {
+        "value": 1,
+        "unit": "ms",
+        "label": "Authored",
+        "source": "provisional harness reserve; not acceptance evidence"
+      },
+      "cpuEnvelopeMs": {
+        "value": 13.67,
+        "unit": "ms",
+        "label": "Derived",
+        "source": "targetFrameMs minus provisional browser and compositor reserves"
+      }
+    },
+    "screenshotTargets": [
+      "canonical-reference",
+      "selected-branch",
+      "error-map"
+    ],
+    "maintenance": null
+  },
+  "branchDefinitions": {
+    "canonical-budget-reduction": {
+      "renderKind": "canonical-owner-handoff",
+      "decisionTrace": [
+        {
+          "branch": "canonical-budget-reduction",
+          "changedAxes": ["native-webgpu-quality"],
+          "outcome": "selected",
+          "reason": "Native WebGPU exists, so quality remains owned by threejs-water-optics."
+        }
+      ],
+      "invariants": [
+        {"domain": "physical", "status": "preserved", "diagnostic": "height-and-normal-parity", "metric": "height-rmse", "gate": {"value": 0, "unit": "height-rmse", "label": "Gated", "source": "canonical owner invariant"}},
+        {"domain": "color", "status": "preserved", "diagnostic": "absorption-and-output-domain", "metric": "transmittance-rmse", "gate": {"value": 0, "unit": "transmittance-rmse", "label": "Gated", "source": "canonical owner invariant"}},
+        {"domain": "temporal", "status": "preserved", "diagnostic": "fixed-tick-replay", "metric": "temporal-response-rmse", "gate": {"value": 0, "unit": "response-rmse", "label": "Gated", "source": "canonical owner invariant"}},
+        {"domain": "spatial", "status": "preserved", "diagnostic": "bounded-domain-error-map", "metric": "maximum-height-error", "gate": {"value": 0, "unit": "height", "label": "Gated", "source": "canonical owner invariant"}},
+        {"domain": "ownership", "status": "preserved", "diagnostic": "owner-graph", "metric": "exclusive-owner-violations", "gate": {"value": 0, "unit": "violations", "label": "Gated", "source": "canonical owner invariant"}},
+        {"domain": "lifecycle", "status": "preserved", "diagnostic": "dispose-recreate-loop", "metric": "leaked-resources", "gate": {"value": 0, "unit": "resources", "label": "Gated", "source": "canonical owner invariant"}}
+      ]
+    },
+    "precomputed-static": {
+      "renderKind": "precomputed-static-webgl",
+      "decisionTrace": [
+        {"branch": "canonical-budget-reduction", "changedAxes": ["native-webgpu-quality"], "outcome": "rejected", "reason": "The tested target has no native WebGPU backend."},
+        {"branch": "precomputed-static", "changedAxes": ["temporal-dynamics"], "outcome": "selected", "reason": "The accepted branch freezes water dynamics at a versioned reference state."}
+      ],
+      "invariants": [
+        {"domain": "physical", "status": "weakened", "diagnostic": "height-residual-map", "metric": "height-rmse", "gate": {"value": 0.19, "unit": "height-rmse", "label": "Gated", "source": "static branch visual-loss contract"}},
+        {"domain": "color", "status": "weakened", "diagnostic": "transmittance-residual-map", "metric": "transmittance-rmse", "gate": {"value": 0.12, "unit": "transmittance-rmse", "label": "Gated", "source": "static branch color-loss contract"}},
+        {"domain": "temporal", "status": "removed", "diagnostic": "motion-disabled-banner", "metric": "dynamic-response-claim", "claimRemoved": true},
+        {"domain": "spatial", "status": "weakened", "diagnostic": "maximum-height-error-map", "metric": "maximum-height-error", "gate": {"value": 0.5, "unit": "height", "label": "Gated", "source": "static branch spatial-loss contract"}},
+        {"domain": "ownership", "status": "preserved", "diagnostic": "branch-owner-graph", "metric": "exclusive-owner-violations", "gate": {"value": 0, "unit": "violations", "label": "Gated", "source": "branch ownership contract"}},
+        {"domain": "lifecycle", "status": "preserved", "diagnostic": "static-resource-dispose-loop", "metric": "leaked-resources", "gate": {"value": 0, "unit": "resources", "label": "Gated", "source": "branch lifecycle contract"}}
+      ]
+    },
+    "cpu-offline": {
+      "renderKind": "cpu-generated-webgl",
+      "decisionTrace": [
+        {"branch": "canonical-budget-reduction", "changedAxes": ["native-webgpu-quality"], "outcome": "rejected", "reason": "The tested target has no native WebGPU backend."},
+        {"branch": "precomputed-static", "changedAxes": ["temporal-dynamics"], "outcome": "rejected", "reason": "The accepted product interaction still requires bounded time variation."},
+        {"branch": "cpu-offline", "changedAxes": ["simulation-execution-owner"], "outcome": "selected", "reason": "Quantized CPU generation preserves bounded motion with an explicit cadence loss."}
+      ],
+      "invariants": [
+        {"domain": "physical", "status": "weakened", "diagnostic": "height-residual-map", "metric": "height-rmse", "gate": {"value": 0.03, "unit": "height-rmse", "label": "Gated", "source": "CPU branch visual-loss contract"}},
+        {"domain": "color", "status": "weakened", "diagnostic": "transmittance-residual-map", "metric": "transmittance-rmse", "gate": {"value": 0.02, "unit": "transmittance-rmse", "label": "Gated", "source": "CPU branch color-loss contract"}},
+        {"domain": "temporal", "status": "weakened", "diagnostic": "cadence-residual-trace", "metric": "temporal-response-rmse", "gate": {"value": 0.04, "unit": "response-rmse", "label": "Gated", "source": "CPU branch cadence-loss contract"}},
+        {"domain": "spatial", "status": "weakened", "diagnostic": "maximum-height-error-map", "metric": "maximum-height-error", "gate": {"value": 0.07, "unit": "height", "label": "Gated", "source": "CPU branch spatial-loss contract"}},
+        {"domain": "ownership", "status": "preserved", "diagnostic": "branch-owner-graph", "metric": "exclusive-owner-violations", "gate": {"value": 0, "unit": "violations", "label": "Gated", "source": "branch ownership contract"}},
+        {"domain": "lifecycle", "status": "preserved", "diagnostic": "upload-resource-dispose-loop", "metric": "leaked-resources", "gate": {"value": 0, "unit": "resources", "label": "Gated", "source": "branch lifecycle contract"}}
+      ]
+    },
+    "feature-removed": {
+      "renderKind": "feature-removed-webgl",
+      "decisionTrace": [
+        {"branch": "canonical-budget-reduction", "changedAxes": ["native-webgpu-quality"], "outcome": "rejected", "reason": "The tested target has no native WebGPU backend."},
+        {"branch": "precomputed-static", "changedAxes": ["temporal-dynamics"], "outcome": "rejected", "reason": "A frozen water surface would misrepresent the required interaction."},
+        {"branch": "cpu-offline", "changedAxes": ["simulation-execution-owner"], "outcome": "rejected", "reason": "The target upload envelope cannot sustain the accepted interaction."},
+        {"branch": "feature-removed", "changedAxes": ["feature-presence"], "outcome": "selected", "reason": "Honest removal is preferable to a visually related but physically false surface."}
+      ],
+      "invariants": [
+        {"domain": "physical", "status": "removed", "diagnostic": "water-disabled-banner", "metric": "water-physics-claim", "claimRemoved": true},
+        {"domain": "color", "status": "removed", "diagnostic": "water-disabled-banner", "metric": "water-optics-claim", "claimRemoved": true},
+        {"domain": "temporal", "status": "removed", "diagnostic": "water-disabled-banner", "metric": "water-response-claim", "claimRemoved": true},
+        {"domain": "spatial", "status": "removed", "diagnostic": "water-disabled-banner", "metric": "water-domain-claim", "claimRemoved": true},
+        {"domain": "ownership", "status": "preserved", "diagnostic": "branch-owner-graph", "metric": "exclusive-owner-violations", "gate": {"value": 0, "unit": "violations", "label": "Gated", "source": "branch ownership contract"}},
+        {"domain": "lifecycle", "status": "preserved", "diagnostic": "removed-feature-resource-ledger", "metric": "leaked-resources", "gate": {"value": 0, "unit": "resources", "label": "Gated", "source": "branch lifecycle contract"}}
+      ]
+    },
+    "maintained-legacy": {
+      "renderKind": "maintained-force-webgl",
+      "decisionTrace": [
+        {"branch": "canonical-budget-reduction", "changedAxes": ["native-webgpu-quality"], "outcome": "rejected", "reason": "The tested target has no native WebGPU backend."},
+        {"branch": "precomputed-static", "changedAxes": ["temporal-dynamics"], "outcome": "rejected", "reason": "The accepted view envelope requires moving water."},
+        {"branch": "cpu-offline", "changedAxes": ["simulation-execution-owner"], "outcome": "rejected", "reason": "CPU update cadence misses the accepted interaction bound."},
+        {"branch": "feature-removed", "changedAxes": ["feature-presence"], "outcome": "rejected", "reason": "The product owner accepts legacy maintenance to retain a weakened water representation."},
+        {"branch": "maintained-legacy", "changedAxes": ["renderer-architecture"], "outcome": "selected", "reason": "The isolated forceWebGL branch has an explicit owner and acceptance contract."}
+      ],
+      "invariants": [
+        {"domain": "physical", "status": "weakened", "diagnostic": "height-residual-map", "metric": "height-rmse", "gate": {"value": 0.06, "unit": "height-rmse", "label": "Gated", "source": "legacy branch visual-loss contract"}},
+        {"domain": "color", "status": "weakened", "diagnostic": "transmittance-residual-map", "metric": "transmittance-rmse", "gate": {"value": 0.04, "unit": "transmittance-rmse", "label": "Gated", "source": "legacy branch color-loss contract"}},
+        {"domain": "temporal", "status": "weakened", "diagnostic": "motion-residual-trace", "metric": "temporal-response-rmse", "gate": {"value": 0.003, "unit": "response-rmse", "label": "Gated", "source": "legacy branch temporal-loss contract"}},
+        {"domain": "spatial", "status": "weakened", "diagnostic": "maximum-height-error-map", "metric": "maximum-height-error", "gate": {"value": 0.1, "unit": "height", "label": "Gated", "source": "legacy branch spatial-loss contract"}},
+        {"domain": "ownership", "status": "preserved", "diagnostic": "isolated-branch-owner-graph", "metric": "exclusive-owner-violations", "gate": {"value": 0, "unit": "violations", "label": "Gated", "source": "legacy maintenance contract"}},
+        {"domain": "lifecycle", "status": "preserved", "diagnostic": "legacy-dispose-recreate-loop", "metric": "leaked-resources", "gate": {"value": 0, "unit": "resources", "label": "Gated", "source": "legacy maintenance contract"}}
+      ],
+      "maintenance": {
+        "accepted": true,
+        "owner": "compatibility-water-maintainer",
+        "requiredTests": [
+          "force-webgl-smoke",
+          "bounded-water-invariant-delta",
+          "dispose-recreate-loop"
+        ],
+        "acceptanceContract": "legacy-water-v1"
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "id": "blocked-default",
+      "title": "Unavailable WebGPU, no explicit request",
+      "desiredBranch": null,
+      "expectedWithoutRequest": {"status": "BLOCKED", "code": "WEBGPU_UNAVAILABLE_BLOCKER"}
+    },
+    {
+      "id": "native-budget-reduction",
+      "title": "Canonical native-WebGPU budget reduction",
+      "desiredBranch": "canonical-budget-reduction",
+      "actualCapabilities": {"webgpu": true, "webgl2": true, "runtimeCompute": true, "storageTextures": true},
+      "expectedWithoutRequest": {"status": "PASS", "code": "CANONICAL_WEBGPU_OWNER_REQUIRED"}
+    },
+    {
+      "id": "precomputed-static",
+      "title": "Precomputed static representation",
+      "desiredBranch": "precomputed-static",
+      "expectedWithoutRequest": {"status": "BLOCKED", "code": "EXPLICIT_REQUEST_REQUIRED"},
+      "expectedWithRequest": {"status": "PASS", "code": "EXPLICIT_FALLBACK_BRANCH_SELECTED"}
+    },
+    {
+      "id": "cpu-offline",
+      "title": "CPU/offline representation",
+      "desiredBranch": "cpu-offline",
+      "expectedWithoutRequest": {"status": "BLOCKED", "code": "EXPLICIT_REQUEST_REQUIRED"},
+      "expectedWithRequest": {"status": "PASS", "code": "EXPLICIT_FALLBACK_BRANCH_SELECTED"}
+    },
+    {
+      "id": "feature-removed",
+      "title": "Feature removed",
+      "desiredBranch": "feature-removed",
+      "expectedWithoutRequest": {"status": "BLOCKED", "code": "EXPLICIT_REQUEST_REQUIRED"},
+      "expectedWithRequest": {"status": "PASS", "code": "EXPLICIT_FALLBACK_BRANCH_SELECTED"}
+    },
+    {
+      "id": "maintained-legacy",
+      "title": "Maintained legacy renderer",
+      "desiredBranch": "maintained-legacy",
+      "expectedWithoutRequest": {"status": "BLOCKED", "code": "EXPLICIT_REQUEST_REQUIRED"},
+      "expectedWithRequest": {"status": "PASS", "code": "EXPLICIT_FALLBACK_BRANCH_SELECTED"}
+    },
+    {
+      "id": "invariant-loss-comparison",
+      "title": "Invariant loss comparison",
+      "desiredBranch": "invariant-loss-comparison",
+      "expectedWithoutRequest": {"status": "BLOCKED", "code": "EXPLICIT_REQUEST_REQUIRED"},
+      "expectedWithRequest": {"status": "PASS", "code": "INVARIANT_LOSS_COMPARISON_READY"}
+    }
+  ]
+}

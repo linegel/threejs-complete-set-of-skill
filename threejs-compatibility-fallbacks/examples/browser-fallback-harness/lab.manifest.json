@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 2,
+  "id": "browser-fallback-harness",
+  "title": "Explicit WebGPU Fallback Teaching Harness",
+  "skill": "threejs-compatibility-fallbacks",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-core.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-fixtures.json",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/app.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/compatibility-renderer.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/capture.mjs",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/validate-artifacts.mjs"
+  ],
+  "browserEntry": "threejs-compatibility-fallbacks/examples/browser-fallback-harness/index.html",
+  "publishPath": "/demos/browser-fallback-harness/",
+  "scenarios": [
+    {
+      "id": "blocked-default",
+      "route": "/demos/browser-fallback-harness/scenario/blocked-default/",
+      "startup": { "scenario": "blocked-default" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "native-budget-reduction",
+      "route": "/demos/browser-fallback-harness/scenario/native-budget-reduction/",
+      "startup": { "scenario": "native-budget-reduction" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "precomputed-static",
+      "route": "/demos/browser-fallback-harness/scenario/precomputed-static/",
+      "startup": { "scenario": "precomputed-static" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "cpu-offline",
+      "route": "/demos/browser-fallback-harness/scenario/cpu-offline/",
+      "startup": { "scenario": "cpu-offline" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "feature-removed",
+      "route": "/demos/browser-fallback-harness/scenario/feature-removed/",
+      "startup": { "scenario": "feature-removed" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "maintained-legacy",
+      "route": "/demos/browser-fallback-harness/scenario/maintained-legacy/",
+      "startup": { "scenario": "maintained-legacy" },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "invariant-loss-comparison",
+      "route": "/demos/browser-fallback-harness/scenario/invariant-loss-comparison/",
+      "startup": { "scenario": "invariant-loss-comparison" },
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "mechanisms": [
+    { "id": "explicit-activation-gate", "route": "/demos/browser-fallback-harness/mechanism/explicit-activation-gate/", "startup": { "scenario": "blocked-default" }, "acceptanceStatus": "incomplete" },
+    { "id": "ordered-degradation-trace", "route": "/demos/browser-fallback-harness/mechanism/ordered-degradation-trace/", "startup": { "scenario": "maintained-legacy" }, "acceptanceStatus": "incomplete" },
+    { "id": "bounded-water-loss-oracle", "route": "/demos/browser-fallback-harness/mechanism/bounded-water-loss-oracle/", "startup": { "scenario": "invariant-loss-comparison" }, "acceptanceStatus": "incomplete" },
+    { "id": "invariant-ledger", "route": "/demos/browser-fallback-harness/mechanism/invariant-ledger/", "startup": { "scenario": "invariant-loss-comparison" }, "acceptanceStatus": "incomplete" },
+    { "id": "force-webgl-branch-isolation", "route": "/demos/browser-fallback-harness/mechanism/force-webgl-branch-isolation/", "startup": { "scenario": "maintained-legacy" }, "acceptanceStatus": "incomplete" },
+    { "id": "maintenance-acceptance", "route": "/demos/browser-fallback-harness/mechanism/maintenance-acceptance/", "startup": { "scenario": "maintained-legacy" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [],
+  "modes": ["plan"],
+  "cameras": ["comparison"],
+  "seeds": [0],
+  "capabilityRequirements": [
+    {
+      "id": "tested-webgpu-unavailable",
+      "required": true,
+      "evidence": "The source gate is implemented; a live no-WebGPU browser capture remains required before acceptance.",
+      "status": "incomplete"
+    },
+    {
+      "id": "explicit-user-request",
+      "required": true,
+      "evidence": "Compatibility branch construction is gated on explicit request authorization.",
+      "status": "incomplete"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "default-blocker",
+      "required": true,
+      "evidence": "Unit fixtures prove the default result blocks without an explicit request.",
+      "status": "accepted"
+    },
+    {
+      "id": "live-backend-probe",
+      "required": true,
+      "evidence": "A live browser probe must establish the unavailable-WebGPU condition before branch construction.",
+      "status": "incomplete"
+    },
+    {
+      "id": "one-degradation-axis",
+      "required": true,
+      "evidence": "Fixture validation enforces exactly one changed degradation axis per ordered decision step.",
+      "status": "accepted"
+    },
+    {
+      "id": "independent-loss-and-timing",
+      "required": true,
+      "evidence": "Visible loss and CPU-fixture timing have independent provenance; GPU timing remains insufficient without timestamps.",
+      "status": "accepted"
+    },
+    {
+      "id": "isolated-force-webgl-branch",
+      "required": true,
+      "evidence": "The forceWebGL module is lazily imported only after explicit authorization and unavailable-WebGPU proof.",
+      "status": "incomplete"
+    }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "node threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-harness.test.mjs",
+  "commands": {
+    "check": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run check",
+    "test": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run validate:unit",
+    "mutations": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run test:mutations",
+    "capture": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run capture",
+    "validateArtifacts": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run validate:quick",
+    "validateFull": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "Browser acceptance remains incomplete until a live no-WebGPU capture proves the backend gate and isolated compatibility branch."
+  ]
+}

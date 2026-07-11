@@ -1,0 +1,15 @@
+{
+  "name": "@threejs-skills/browser-fallback-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check fallback-core.mjs && node --check backend-probe.mjs && node --check compatibility-renderer.mjs && node --check app.mjs && node --check capture.mjs && node --check validate-artifacts.mjs && node --check fallback-harness.test.mjs",
+    "validate:unit": "node fallback-harness.test.mjs",
+    "test:mutations": "node fallback-harness.test.mjs",
+    "capture": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run check && npm run validate:unit && npm run test:mutations && npm run capture && npm run validate:artifacts"
+  }
+}
