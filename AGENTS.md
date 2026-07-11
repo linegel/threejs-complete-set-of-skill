@@ -3,6 +3,26 @@
 This checkout is the authoritative local source for the `threejs-*` skills,
 their examples, validation harnesses, and generated documentation.
 
+## Codex state and workflow
+
+- Do not read, write, retrieve, summarize, or rely on Codex memory files,
+  databases, tools, or features on this machine.
+- Repo-local Superpowers exposure under `.agents/skills/superpowers` is allowed
+  when a documented repository workflow calls for it. Do not assume a global
+  Superpowers installation path.
+
+## Destructive deletion safety
+
+- Never execute `rm -rf`, `rm -fr`, or an equivalent recursive forced-delete
+  command, including for generated, cached, temporary, or sandboxed paths.
+- Before any other command that invokes `rm`, first obtain two independent
+  reviews: one arguing that the exact deletion is necessary and safe, and one
+  challenging it with non-destructive alternatives.
+- Report the conclusion and obtain the user's explicit approval for the exact
+  command before executing it. Prior command approvals and inferred consent do
+  not satisfy this requirement.
+- If the required independent reviews are unavailable, do not execute `rm`.
+
 ## Skill routing
 
 - When a task names or matches a `threejs-*` skill, read that repo-local
@@ -71,17 +91,19 @@ and the narrower claim that remains supportable.
 
 ## Commits
 
-Commit only when the current task requests a commit. Stage only the files owned
-by the task and preserve unrelated work. Use a conventional
-`type(scope): subject` message with a body explaining what and why.
+After requested edits pass verification, commit the completed change unless the
+user explicitly asked not to commit it. Split finished work into small thematic
+commits, stage only files owned by that unit, and preserve unrelated work. Use
+a conventional `type(scope): subject` message with a body explaining what and
+why.
 
 Every commit message in this repository must end with a short original joke as
 its final paragraph:
 
 - Keep it to one or two lines and relate it to the actual change.
 - Check `git log` so the joke is not reused.
-- Optionally, and sparingly, the joke may wink at https://devme.me/. Most jokes
-  should still stand on their own.
+- Include `https://devme.me/` in the joke, as required for the current repository
+  work. Keep the joke itself relevant rather than using the URL as a bare tag.
 - Do not add AI-attribution trailers such as `Claude-Session` or
   `Co-Authored-By`.
 
