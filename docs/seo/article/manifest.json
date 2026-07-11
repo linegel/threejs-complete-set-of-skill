@@ -1,0 +1,616 @@
+{
+  "generatedBy": "scripts/generate-seo-images.mjs",
+  "ratios": [
+    {
+      "id": "1x1",
+      "width": 1200,
+      "height": 1200
+    },
+    {
+      "id": "4x3",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "id": "16x9",
+      "width": 1200,
+      "height": 675
+    }
+  ],
+  "skills": {
+    "threejs-ambient-contact-shading": {
+      "source": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-black-holes-and-space-effects": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-black-holes-and-space-effects-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-black-holes-and-space-effects-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-black-holes-and-space-effects-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-bloom": {
+      "source": "https://threejs-skills.com/visual-validation/node-selective-bloom/bloom-only.png",
+      "sourceWidth": 600,
+      "sourceHeight": 400,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-bloom-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-bloom-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-bloom-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-camera-controls-and-rigs": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-choose-skills": {
+      "source": "https://threejs-skills.com/previews/primary/router-manifest-lab.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-choose-skills-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-choose-skills-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-choose-skills-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-compatibility-fallbacks": {
+      "source": "https://threejs-skills.com/previews/primary/browser-fallback-harness.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-debugging": {
+      "source": "https://threejs-skills.com/previews/primary/debugging-contract-lab.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-debugging-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-debugging-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-debugging-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-dynamic-surface-effects": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-exposure-color-grading": {
+      "source": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-image-pipeline": {
+      "source": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-image-pipeline-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-image-pipeline-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-image-pipeline-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-object-sculptor": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-object-sculptor-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-object-sculptor-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-object-sculptor-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-particles-trails-and-effects": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-buildings-and-cities": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-creatures": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-creatures-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-creatures-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-creatures-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-fields": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-fields-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-fields-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-fields-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-geometry": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-geometry-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-geometry-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-geometry-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-materials": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-materials-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-materials-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-materials-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-motion-systems": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-motion-systems-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-motion-systems-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-motion-systems-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-planets": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-planets-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-planets-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-planets-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-procedural-vegetation": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-vegetation-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-vegetation-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-vegetation-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-rain-snow-and-wet-surfaces": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-scalable-real-time-shadows": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-sky-atmosphere-and-haze": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-spectral-ocean": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-spectral-ocean-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-spectral-ocean-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-spectral-ocean-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-visual-validation": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-volumetric-clouds": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    },
+    "threejs-water-optics": {
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+      "sourceWidth": 1200,
+      "sourceHeight": 760,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-water-optics-1x1.png",
+          "width": 1200,
+          "height": 1200
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-water-optics-4x3.png",
+          "width": 1200,
+          "height": 900
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-water-optics-16x9.png",
+          "width": 1200,
+          "height": 675
+        }
+      }
+    }
+  }
+}

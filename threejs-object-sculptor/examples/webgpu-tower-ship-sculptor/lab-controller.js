@@ -48,6 +48,12 @@ export function resolveTowerShipDpr(tier, requestedDpr) {
   return Math.min(requestedDpr, TOWER_SHIP_DPR_CAPS[tier]);
 }
 
+export function resolveFrameDeltaSeconds(nowMs, previousMs) {
+  if (!Number.isFinite(nowMs) || !Number.isFinite(previousMs)) {
+    throw new RangeError("frame timestamps must be finite");
+  }
+  return Math.min(Math.max((nowMs - previousMs) / 1000, 0), 0.1);
+}
 export async function createTowerShipLabController({
   canvas,
   width = 1280,

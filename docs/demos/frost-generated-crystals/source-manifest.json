@@ -23,8 +23,8 @@
     "docs/demos/frost-generated-crystals",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:9354716b371cdbf92c54e005b7bcd14a2675540219e3917714f90fbfdc2bd7b1",
+  "publishedBundleHash": "sha256:fb769383cda4b946f457756c13281256f03a40154b9907949acba040f1935f4c",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

@@ -3,8 +3,16 @@
 const SITE = new URL(process.env.SITE_URL ?? 'https://threejs-skills.com/');
 const RETIRED_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const CONCURRENCY = 8;
+const PUBLISHER_LOGO = new URL('icon-512.png', SITE).href;
+const ARTICLE_IMAGE_RATIOS = ['1x1', '4x3', '16x9'];
+const NOINDEX_DEMOS = [
+  ['demos/ambient-contact-shading-webgpu-node-gtao/', 'skills/threejs-ambient-contact-shading.html'],
+  ['demos/bloom-node-selective/', 'skills/threejs-bloom.html'],
+];
 const errors = [];
 const pageRecords = [];
+const structuredImageUrls = new Set([PUBLISHER_LOGO]);
+const responsiveImageTypes = new Map();
 
 function assert(condition, message) {
   if (!condition) errors.push(message);
@@ -25,6 +33,10 @@ function metaValues(html, attribute, value) {
   return tags
     .filter((tag) => get(tag, attribute)?.toLowerCase() === value.toLowerCase())
     .map((tag) => get(tag, 'content'));
+}
+
+function tagAttribute(tag, name) {
+  return tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'))?.[1] ?? null;
 }
 
 function canonicals(html) {
@@ -164,6 +176,18 @@ assert(urls.every((url) => url.startsWith(SITE.href)), 'sitemap.xml: URL outside
 assert(!sitemap.includes(RETIRED_SITE), 'sitemap.xml: contains the retired origin');
 assert(!urls.some((url) => /\/(?:scenario|mechanism|tier)\//.test(new URL(url).pathname)), 'sitemap.xml: contains state-only wrapper URLs');
 
+await mapConcurrent(NOINDEX_DEMOS, async ([demoPath, skillPath]) => {
+  const demoUrl = new URL(demoPath, SITE).href;
+  const response = await request(demoUrl, { redirect: 'manual' });
+  assert(response.status === 200, `${demoUrl}: expected reserved placeholder 200, received ${response.status}`);
+  if (response.status !== 200) return;
+  const html = await response.text();
+  const robots = metaValues(html, 'name', 'robots');
+  assert(robots.length === 1 && /\bnoindex\b/i.test(robots[0]) && /\bfollow\b/i.test(robots[0]), `${demoUrl}: reserved placeholder must be noindex, follow`);
+  assert(canonicals(html)[0] === new URL(skillPath, SITE).href, `${demoUrl}: reserved placeholder canonical does not point to its owning skill`);
+  assert(!urls.includes(demoUrl), `${demoUrl}: reserved placeholder appears in the sitemap`);
+});
+
 await mapConcurrent(urls, async (url) => {
   const response = await request(url, { redirect: 'manual' });
   assert(response.status === 200, `${url}: expected 200, received ${response.status}`);
@@ -183,6 +207,7 @@ await mapConcurrent(urls, async (url) => {
   assert(robotsMeta.length === 1 && /\bindex\b/i.test(robotsMeta[0]) && !/\bnoindex\b/i.test(robotsMeta[0]), `${url}: not explicitly indexable`);
   assert(canonical.length === 1 && canonical[0] === url, `${url}: canonical mismatch (${canonical.join(', ') || 'missing'})`);
   assert(metaValues(html, 'property', 'og:url')[0] === url, `${url}: og:url mismatch`);
+  assert(/\.png$/i.test(metaValues(html, 'property', 'og:image')[0] ?? ''), `${url}: social image is not preserved as PNG`);
   assert(metaValues(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${url}: missing large Twitter card`);
   assert(!html.includes(RETIRED_SITE), `${url}: contains the retired origin`);
 
@@ -201,12 +226,34 @@ await mapConcurrent(urls, async (url) => {
     assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks mechanism inventory`);
     assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${url}: demo shell lacks evidence status`);
   }
+  if (pathname === '/' || pathname.startsWith('/skills/')) {
+    const imageTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
+    const pictures = [...html.matchAll(/<picture\b[^>]*class=["'][^"']*\bresponsive-preview\b[^"']*["'][^>]*>([\s\S]*?)<\/picture>/gi)];
+    assert(pictures.length === imageTags.length, `${url}: expected ${imageTags.length} responsive picture wrappers, found ${pictures.length}`);
+    for (const [, body] of pictures) {
+      const sources = [...body.matchAll(/<source\b[^>]*>/gi)].map((match) => match[0]);
+      const fallback = body.match(/<img\b[^>]*>/i)?.[0];
+      assert(sources.length === 2, `${url}: responsive picture does not contain two sources`);
+      assert(tagAttribute(sources[0] ?? '', 'type') === 'image/avif', `${url}: AVIF is not the first responsive source`);
+      assert(tagAttribute(sources[1] ?? '', 'type') === 'image/webp', `${url}: WebP is not the second responsive source`);
+      assert(/\.png$/i.test(tagAttribute(fallback ?? '', 'src') ?? ''), `${url}: responsive fallback is not PNG`);
+      for (const source of sources) {
+        const srcset = tagAttribute(source, 'srcset');
+        const type = tagAttribute(source, 'type');
+        if (srcset && type) responsiveImageTypes.set(new URL(srcset, url).href, type);
+      }
+    }
+  }
   const expectedType = pathname === '/'
     ? 'WebSite'
     : (pathname === '/about/' ? 'AboutPage' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication'));
   assert(schema.has(expectedType), `${url}: missing ${expectedType} structured data`);
   assert(schema.has('BreadcrumbList') || pathname === '/', `${url}: missing breadcrumb structured data`);
   if (pathname === '/' || pathname === '/about/' || pathname.startsWith('/skills/')) {
+    const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE.href}#publisher`);
+    assert(publisher?.logo?.['@type'] === 'ImageObject', `${url}: publisher logo is not an ImageObject`);
+    assert(publisher?.logo?.url === PUBLISHER_LOGO && publisher?.logo?.contentUrl === PUBLISHER_LOGO, `${url}: publisher logo URL is not canonical`);
+    assert(publisher?.logo?.width === 512 && publisher?.logo?.height === 512, `${url}: publisher logo dimensions are not 512x512`);
     assert(alternateValues(html, 'text/plain')[0] === new URL('llms.txt', SITE).href, `${url}: missing llms.txt discovery link`);
     assert(alternateValues(html, 'application/json')[0] === new URL('skills.json', SITE).href, `${url}: missing skills.json discovery link`);
   }
@@ -215,6 +262,14 @@ await mapConcurrent(urls, async (url) => {
     const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE.href}#publisher`);
     assert(article && hasType(article, 'TechArticle'), `${url}: article lacks dual Article/TechArticle typing`);
     assert(publisher?.url === SITE.href && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${url}: incomplete publisher identity`);
+    const slug = pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
+    const expectedImages = ARTICLE_IMAGE_RATIOS.map((ratio) => new URL(`seo/article/${slug}-${ratio}.png`, SITE).href);
+    assert(Array.isArray(article?.image) && article.image.length === expectedImages.length, `${url}: Article image does not contain three ratios`);
+    for (const [index, imageUrl] of expectedImages.entries()) {
+      assert(article?.image?.[index] === imageUrl, `${url}: Article ${ARTICLE_IMAGE_RATIOS[index]} image URL is not canonical`);
+      structuredImageUrls.add(imageUrl);
+    }
+    assert(sitemap.includes(`<image:loc>${expectedImages[2]}</image:loc>`), `${url}: sitemap is missing the 16:9 Article image`);
     const published = Date.parse(article?.datePublished ?? '');
     const modified = Date.parse(article?.dateModified ?? '');
     assert(Number.isFinite(published), `${url}: missing or invalid datePublished`);
@@ -224,6 +279,17 @@ await mapConcurrent(urls, async (url) => {
     assert(metaValues(html, 'property', 'article:modified_time')[0] === article?.dateModified, `${url}: modification timestamps disagree`);
   }
   pageRecords.push({ url, title, description: description[0], links: internalLinks(html, url) });
+});
+
+await mapConcurrent([...structuredImageUrls], async (url) => {
+  const response = await request(url, { method: 'HEAD', redirect: 'manual' });
+  assert(response.status === 200, `${url}: structured image returned ${response.status}`);
+  assert(response.headers.get('content-type')?.startsWith('image/png'), `${url}: structured image is not served as PNG`);
+});
+await mapConcurrent([...responsiveImageTypes], async ([url, expectedType]) => {
+  const response = await request(url, { method: 'HEAD', redirect: 'manual' });
+  assert(response.status === 200, `${url}: responsive image returned ${response.status}`);
+  assert(response.headers.get('content-type')?.startsWith(expectedType), `${url}: responsive image is not served as ${expectedType}`);
 });
 
 for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
@@ -260,5 +326,5 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Live SEO audit passed: ${urls.length} sitemap pages, 3 permanent redirects, 2 LLM endpoints, and 1 crawl-safe 404.`);
+  console.log(`Live SEO audit passed: ${urls.length} sitemap pages, ${NOINDEX_DEMOS.length} noindex demo placeholders, ${structuredImageUrls.size} structured images, ${responsiveImageTypes.size} modern preview variants, 3 permanent redirects, 2 LLM endpoints, and 1 crawl-safe 404.`);
 }

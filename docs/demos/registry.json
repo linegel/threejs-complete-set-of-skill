@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -12482,7 +12482,7 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:full"
       },
-      "sourceHash": "sha256:9c2765b515f5c32d367ec11cb0170b5c16a5b20344518c1d8a441b6509b23002",
+      "sourceHash": "sha256:cbc0156079c5ab5310aa91251be4adaa1afbeddac35dc612ffa1740ef3b6be05",
       "proxyStatus": null,
       "sourceHashInputs": [
         "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"

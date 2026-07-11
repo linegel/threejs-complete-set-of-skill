@@ -15,8 +15,8 @@
     "docs/demos/webgpu-fft-ocean",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:b0a4ed6dfc26b7feaa5ddda1693b56a628f9e60fc427391fbeef06b8a8fa44b3",
+  "publishedBundleHash": "sha256:167b4df86190aaa8ba162a025038c116558740ffc09259ff311519d2074b8a54",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

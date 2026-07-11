@@ -28,12 +28,20 @@ const OG_IMAGE_HEIGHT = 760;
 const THEME_COLOR = '#0a0c10';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
 const PUBLISHER_ID = `${SITE}#publisher`;
+const PUBLISHER_LOGO = `${SITE}icon-512.png`;
 const PUBLISHER = {
   '@type': 'Organization',
   '@id': PUBLISHER_ID,
   name: `${SITE_NAME} contributors`,
   url: SITE,
   sameAs: REPO,
+  logo: {
+    '@type': 'ImageObject',
+    url: PUBLISHER_LOGO,
+    contentUrl: PUBLISHER_LOGO,
+    width: 512,
+    height: 512,
+  },
 };
 const PUBLISHER_REF = { '@id': PUBLISHER_ID };
 const DEMO_REGISTRY = buildDemoRegistry();
@@ -254,6 +262,17 @@ const imageSizeAttrs = (relativePath) => {
   }
   return '';
 };
+const articleImageUrls = (slug) => ['1x1', '4x3', '16x9']
+  .map((ratio) => `${SITE}seo/article/${slug}-${ratio}.png`);
+const responsiveVariant = (src, format) => src.replace(/\.png(?=(?:[?#].*)?$)/i, `.${format}`);
+const previewPicture = (src, alt, attributes = '') => {
+  if (!/\.png(?:[?#].*)?$/i.test(src)) throw new Error(`responsive preview must use a PNG fallback: ${src}`);
+  return `<picture class="responsive-preview">
+          <source type="image/avif" srcset="${responsiveVariant(src, 'avif')}" />
+          <source type="image/webp" srcset="${responsiveVariant(src, 'webp')}" />
+          <img data-responsive-preview src="${src}" alt="${esc(alt)}"${attributes ? ` ${attributes}` : ''} />
+        </picture>`;
+};
 const rewriteSkillBodyLinks = (html, slug) => html
   .replace(/href="((?:references|examples|assets|agents)\/[^"?#]*)([?#][^"]*)?"/g, (_match, path, suffix = '') => {
     const view = path.endsWith('/') ? 'tree' : 'blob';
@@ -356,6 +375,7 @@ const baseCss = `
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -496,7 +516,7 @@ const catalog = CATEGORIES.map((c) => `
 
 const galleryHtml = GALLERY.map((g) => `
       <a href="skills/${g.link}.html"><figure>
-        <img src="${g.img}" alt="${esc(g.title)}" ${imageSizeAttrs(g.img)} loading="lazy" decoding="async" />
+        ${previewPicture(g.img, g.title, `${imageSizeAttrs(g.img)} loading="lazy" decoding="async"`)}
         <figcaption><strong>${esc(g.title)}</strong><span>${esc(g.note)}</span></figcaption>
       </figure></a>`).join('');
 
@@ -620,7 +640,7 @@ const secondaryLimitation = (demo) => registryDemoById.get(demo.id)?.proxyStatus
 const liveDemoVisual = (demo, prefix = '') => {
   const poster = providerPosterPath(demo);
   return poster
-    ? `<span class="preview-media" data-preview-classification="${safeClass(classificationLabel(demo))}"><img src="${prefix}${poster}" alt="Live ${esc(classificationLabel(demo).toLowerCase())} screenshot for ${esc(demo.title)}; not canonical runtime evidence" ${imageSizeAttrs(poster)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(classificationLabel(demo))} preview</span></span>`
+    ? `<span class="preview-media" data-preview-classification="${safeClass(classificationLabel(demo))}">${previewPicture(`${prefix}${poster}`, `Live ${classificationLabel(demo).toLowerCase()} screenshot for ${demo.title}; not canonical runtime evidence`, `${imageSizeAttrs(poster)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classificationLabel(demo))} preview</span></span>`
     : `<div class="preview-missing" role="img" aria-label="Preview capture pending for ${esc(demo.title)}">
         <span>Preview capture pending</span><code>${esc(demo.id)}</code>
       </div>`;
@@ -636,7 +656,7 @@ const flagshipHtml = flagshipDemos.map(({ demo, tone, domain, copy }) => {
   const preview = previewForPrimary(demo);
   return `
       <a class="flagship-card flagship-card--${tone}" href="${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img src="${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo, 'flagship-preview-missing')}
+        ${preview ? `<span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo, 'flagship-preview-missing')}
         <div class="flagship-copy">
           <span class="flagship-kicker">${esc(domain)}</span>
           <h3>${esc(demo.title)}</h3>
@@ -659,7 +679,7 @@ const primaryLabHtml = primaryLabGroups.map((group) => `
         const preview = previewForPrimary(demo);
         return `
         <a class="lab-card" href="${demo.publishPath.replace(/^\/+/, '')}">
-          ${preview ? `<span class="lab-card-media" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img src="${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
+          ${preview ? `<span class="lab-card-media" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
           <span class="lab-card-top"><span>${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
           <h4>${esc(primaryTitle(demo))}</h4>
           <p>${esc(skills[demo.skill]?.title ?? demo.skill)}</p>
@@ -1128,6 +1148,7 @@ for (const slug of slugs) {
   const resolvedSkillPreview = canonicalSkillPreview(slug);
   const skillHeroImg = resolvedSkillPreview?.path ?? null;
   const ogImg = skillHeroImg ? `${SITE}${skillHeroImg}` : OG_IMAGE;
+  const articleImages = articleImageUrls(slug);
   const hasAcceptedEvidence = ownedPrimaryDemos.some((demo) => demo.status === 'accepted');
   const previewGalleryEntries = [
     ...(resolvedSkillPreview ? [resolvedSkillPreview] : []),
@@ -1162,7 +1183,7 @@ for (const slug of slugs) {
       const preview = previewForPrimary(demo);
       return `
       <a class="card" href="../${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img class="card-preview" src="../${preview.path}" alt="${esc(preview.label)} for ${esc(primaryTitle(demo))}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
+        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(`../${preview.path}`, `${preview.label} for ${primaryTitle(demo)}`, `class="card-preview" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
         <span class="card-head"><span class="card-index">${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
         <h3>${esc(primaryTitle(demo))}</h3>
         <p>${demo.scenarios.length} fixed scenarios, ${demo.mechanisms.length} mechanism routes, and ${demo.tiers.length} locked tiers.</p>
@@ -1180,7 +1201,7 @@ for (const slug of slugs) {
       const preview = previewForPrimary(demo);
       return `
       <a class="card" href="../${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}"><img class="card-preview" src="../${preview.path}" alt="${esc(preview.label)} for ${esc(demo.title)}" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
+        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(`../${preview.path}`, `${preview.label} for ${demo.title}`, `class="card-preview" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
         <span class="card-head"><span class="card-index">${esc(domain)}</span><span class="status status--pending">Evidence pending</span></span>
         <h3>${esc(demo.title)}</h3>
         <span class="card-meta">${demo.mechanisms.length} mechanisms · ${demo.tiers.length} locked tiers</span>
@@ -1220,7 +1241,7 @@ for (const slug of slugs) {
     <div class="evidence-ledger"><span class="status status--${hasAcceptedEvidence ? 'accepted' : 'pending'}">${hasAcceptedEvidence ? 'Accepted runtime evidence available' : 'Canonical runtime evidence pending'}</span><code>${previewGalleryEntries.length} published image${previewGalleryEntries.length === 1 ? '' : 's'}</code></div>
     ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification, detail }) => `
       <figure data-preview-classification="${esc(classification)}" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../${path}" alt="${esc(`${s.title} — ${label}`)}" itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async" /><span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
+        <span class="preview-media">${previewPicture(`../${path}`, `${s.title} — ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
         <figcaption itemprop="caption"><strong>${esc(label)}</strong><span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span></figcaption>
       </figure>`).join('')}</div>` : `<div class="preview-missing"><span>Preview capture pending</span><code>npm run pages:capture-previews</code></div>`}
   </div></div>`;
@@ -1245,7 +1266,7 @@ for (const slug of slugs) {
 <link rel="canonical" href="${pageUrl}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 ${assetHead('../')}
-${skillHeroImg ? `<link rel="preload" as="image" href="../${skillHeroImg}" fetchpriority="high" />` : ''}
+${skillHeroImg ? `<link rel="preload" as="image" href="${responsiveVariant(`../${skillHeroImg}`, 'avif')}" type="image/avif" fetchpriority="high" />` : ''}
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="${SITE_NAME}" />
@@ -1271,7 +1292,7 @@ ${JSON.stringify({
       description: s.desc,
       url: pageUrl,
       mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
-      image: ogImg,
+      image: articleImages,
       datePublished: s.published?.iso ?? s.attribution?.importedIso,
       dateModified: s.update?.iso ?? s.attribution?.importedIso,
       author: PUBLISHER_REF,
@@ -1364,7 +1385,7 @@ ${navHtml('../')}
 
 <main id="main-content" tabindex="-1">
 <header class="${skillHeroImg ? 'skill-hero' : ''}">
-${skillHeroImg ? `  <img class="skill-hero-bg" src="../${skillHeroImg}" alt="" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async" />\n` : ''}${resolvedSkillPreview ? `  <span class="hero-preview-badge">${esc(resolvedSkillPreview.label)}</span>\n` : ''}  <div class="wrap">
+${skillHeroImg ? `  ${previewPicture(`../${skillHeroImg}`, '', `class="skill-hero-bg" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async"`)}\n` : ''}${resolvedSkillPreview ? `  <span class="hero-preview-badge">${esc(resolvedSkillPreview.label)}</span>\n` : ''}  <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">${esc(cat ? cat.name : 'Skills')}</a></li><li aria-current="page">${esc(s.title)}</li></ol></nav>
     <h1 style="view-transition-name:skill-${safeClass(slug)}">${esc(s.title)}</h1>
     <p class="lede">${esc(s.desc)}</p>
@@ -1578,7 +1599,7 @@ writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="
   <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>About the ${SITE_NAME} methodology</image:title></image:image></url>
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
-  const image = VALIDATION[s] ? `${SITE}${VALIDATION[s][0][0]}` : OG_IMAGE;
+  const image = articleImageUrls(s)[2];
   return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}<image:image><image:loc>${image}</image:loc><image:title>${esc(skills[s].title)}</image:title></image:image></url>`;
 }).join('\n')}
 ${DEMO_REGISTRY.demos.filter((demo) => demo.publishPath && (

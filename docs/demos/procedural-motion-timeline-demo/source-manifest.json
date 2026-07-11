@@ -23,8 +23,8 @@
     "docs/demos/procedural-motion-timeline-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:db956514f99f3db458f4290ddf7fb79a50d64ff6c0d1c464c16a9b8176934689",
+  "publishedBundleHash": "sha256:e904cb24edd8f4d75569fb9d7a1fdb7e168da562e520872f38322e1a08af1c5e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

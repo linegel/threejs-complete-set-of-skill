@@ -1,5 +1,6 @@
 import {
   createTowerShipLabController,
+  resolveFrameDeltaSeconds,
   TOWER_SHIP_CAMERAS,
   TOWER_SHIP_MODES,
   TOWER_SHIP_TIERS,
@@ -79,7 +80,7 @@ updateModeCopy();
 let previous = performance.now();
 let lastHudUpdate = 0;
 async function frame(now) {
-  const delta = Math.min((now - previous) / 1000, 0.1);
+  const delta = resolveFrameDeltaSeconds(now, previous);
   previous = now;
   await controller.step(delta);
   await controller.renderOnce();

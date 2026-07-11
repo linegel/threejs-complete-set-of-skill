@@ -54,8 +54,8 @@
     "docs/demos/relativistic-space-shot",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:fbc91f61e0739e3c4bf282d7b31529c0af6e321aefc600c89c58486d7796698f",
+  "publishedBundleHash": "sha256:a8f97ccb9998268d03b548160c70785ffe89f4518a50bdad76b6be4a4bcf8d81",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

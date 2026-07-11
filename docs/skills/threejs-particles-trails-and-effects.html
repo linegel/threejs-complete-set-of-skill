@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
+<meta name="skill-pack-build-revision" content="sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -46,7 +46,14 @@
    "@id": "https://threejs-skills.com/#publisher",
    "name": "Three.js WebGPU Skill Pack contributors",
    "url": "https://threejs-skills.com/",
-   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill"
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
   },
   {
    "@type": [
@@ -61,7 +68,11 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html"
    },
-   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:20+03:00",
    "dateModified": "2026-07-11T12:53:24+03:00",
    "author": {
@@ -131,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -698,7 +710,11 @@ primary task.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/pooled-particles-effects-demo/"><figure>
-        <span class="preview-media" data-preview-classification="conceptproxy"><img src="../previews/provider/pooled-particles-effects-demo.png" alt="Live concept proxy screenshot for Pooled Particles And Trails; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media" data-preview-classification="conceptproxy"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/pooled-particles-effects-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/pooled-particles-effects-demo.webp" />
+          <img data-responsive-preview src="../previews/provider/pooled-particles-effects-demo.png" alt="Live concept proxy screenshot for Pooled Particles And Trails; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Pooled Particles And Trails</strong><span>Concept proxy · The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.</span></figcaption>
       </figure></a>
     </div>
@@ -708,7 +724,7 @@ primary task.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>d61ce750a659</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

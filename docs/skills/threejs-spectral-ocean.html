@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-spectral-ocean.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
+<meta name="skill-pack-build-revision" content="sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -46,7 +46,14 @@
    "@id": "https://threejs-skills.com/#publisher",
    "name": "Three.js WebGPU Skill Pack contributors",
    "url": "https://threejs-skills.com/",
-   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill"
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
   },
   {
    "@type": [
@@ -61,7 +68,11 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-spectral-ocean.html"
    },
-   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-spectral-ocean-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-spectral-ocean-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-spectral-ocean-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:21+03:00",
    "dateModified": "2026-07-11T12:53:59+03:00",
    "author": {
@@ -131,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -351,19 +363,35 @@ $[k_{lo}, k_{hi})$ to avoid double-counting energy at handoffs.</p></div>
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>4 published images</code></div>
     <div class="gallery">
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Spectral Ocean — Generated wave-seed asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Spectral Ocean — Generated wave-seed asset preview" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated wave-seed asset preview</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/ocean-generated-wave-seeds/no-post.design.png" alt="Spectral Ocean — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/no-post.design.png" alt="Spectral Ocean — Asset-preview baseline" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Asset-preview baseline</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Spectral Ocean — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Spectral Ocean — Generated-asset channel diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated-asset channel diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/ocean-generated-wave-seeds/seed-stress.final.png" alt="Spectral Ocean — Asset-preview seed stress" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/seed-stress.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/seed-stress.final.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/seed-stress.final.png" alt="Spectral Ocean — Asset-preview seed stress" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Asset-preview seed stress</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
@@ -838,7 +866,11 @@ two-way <code>InteractionRecord</code> loads rather than fabricating an offshore
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/ocean-generated-wave-seeds/"><figure>
-        <span class="preview-media" data-preview-classification="generatedassetpreview"><img src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Live generated asset preview screenshot for Directional Wave Seed Surface; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">Generated asset preview preview</span></span>
+        <span class="preview-media" data-preview-classification="generatedassetpreview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/final.design.png" alt="Live generated asset preview screenshot for Directional Wave Seed Surface; not canonical runtime evidence" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Generated asset preview preview</span></span>
         <figcaption><strong>Directional Wave Seed Surface</strong><span>Generated asset preview · Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.</span></figcaption>
       </figure></a>
     </div>
@@ -848,7 +880,7 @@ two-way <code>InteractionRecord</code> loads rather than fabricating an offshore
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>d61ce750a659</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

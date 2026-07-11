@@ -23,8 +23,8 @@
     "docs/demos/procedural-building-compiler-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:371977cf19bee00c8ea2f705b10f0519ed39bba73597b97cc57954f2c1b1dde6",
+  "publishedBundleHash": "sha256:16462cd068b2d53ae10a88abac7fe781d54b1b6be064961d59b2e939cc1119b0",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

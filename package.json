@@ -15,10 +15,12 @@
     "labs:validate": "node scripts/run-labs.mjs validate",
     "labs:validate:quick": "node scripts/validate-lab-manifests.mjs && node scripts/run-labs.mjs quick",
     "labs:validate:full": "node scripts/validate-lab-manifests.mjs --require-complete && node scripts/run-labs.mjs full",
-    "pages:build": "node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
+    "pages:build": "node scripts/build-pages.mjs && node scripts/generate-seo-images.mjs && node scripts/generate-responsive-images.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
+    "pages:generate-seo-images": "node scripts/generate-seo-images.mjs",
+    "pages:generate-responsive-images": "node scripts/generate-responsive-images.mjs",
     "pages:capture-previews": "node scripts/capture-site-previews.mjs --primary-only",
     "pages:promote-evidence": "node scripts/promote-runtime-evidence.mjs",
-    "pages:refresh-previews": "node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/capture-site-previews.mjs --primary-only && node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
+    "pages:refresh-previews": "node scripts/build-pages.mjs && node scripts/build-lab-pages.mjs && node scripts/capture-site-previews.mjs --primary-only && node scripts/build-pages.mjs && node scripts/generate-seo-images.mjs && node scripts/generate-responsive-images.mjs && node scripts/build-lab-pages.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
     "pages:smoke": "node scripts/pages-smoke.mjs",
     "pages:audit-live": "node scripts/audit-live-site-seo.mjs",
     "pages:audit-presentation": "node scripts/audit-live-presentation.mjs",
@@ -57,6 +59,7 @@
   "devDependencies": {
     "marked": "18.0.5",
     "playwright": "1.61.1",
+    "sharp": "^0.35.3",
     "vite": "8.1.3"
   }
 }

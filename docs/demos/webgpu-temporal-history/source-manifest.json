@@ -22,8 +22,8 @@
     "docs/demos/webgpu-temporal-history",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:e88ed5f846a9cfecd6ad1b14e075a8e1557bc00473970fbb38e64afd766f5ced",
+  "publishedBundleHash": "sha256:ca3efa4954033935c79e03458f433cd706456c7e6052866a5790ddfc5eed9143",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

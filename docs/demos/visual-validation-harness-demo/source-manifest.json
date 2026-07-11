@@ -23,8 +23,8 @@
     "docs/demos/visual-validation-harness-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:c142e0f4a3f6b261993047e2499012e40a4189f299587e6e0830e1afe2a41ad3",
+  "publishedBundleHash": "sha256:6e240ca4ae613eae5ef8efae54627418b579ab7d8bda913cb12ec296dd9402ca",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

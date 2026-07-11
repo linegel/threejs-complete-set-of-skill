@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-visual-validation.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
+<meta name="skill-pack-build-revision" content="sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -46,7 +46,14 @@
    "@id": "https://threejs-skills.com/#publisher",
    "name": "Three.js WebGPU Skill Pack contributors",
    "url": "https://threejs-skills.com/",
-   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill"
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
   },
   {
    "@type": [
@@ -61,7 +68,11 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-visual-validation.html"
    },
-   "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-visual-validation-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-visual-validation-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:21+03:00",
    "dateModified": "2026-07-11T04:41:20+03:00",
    "author": {
@@ -131,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -348,43 +360,83 @@ capability manifest, renderer.info counters, per-pass timings — so regressions
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>10 published images</code></div>
     <div class="gallery">
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Visual Validation — Generated crater-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/planet-generated-craters/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/planet-generated-craters/diagnostics.mosaic.png" alt="Visual Validation — Generated crater-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated crater-asset diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Visual Validation — Generated caustic-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/water-generated-caustics/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/water-generated-caustics/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/water-generated-caustics/diagnostics.mosaic.png" alt="Visual Validation — Generated caustic-asset diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated caustic-asset diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Visual Validation — Generated wave-seed diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png" alt="Visual Validation — Generated wave-seed diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated wave-seed diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Visual Validation — Generated ripple-normal diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/rain-generated-ripples/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/rain-generated-ripples/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/rain-generated-ripples/diagnostics.mosaic.png" alt="Visual Validation — Generated ripple-normal diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated ripple-normal diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated weather-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated weather-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated weather-map diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/frost-generated-crystals/diagnostics.mosaic.png" alt="Visual Validation — Generated frost-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/frost-generated-crystals/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/frost-generated-crystals/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/frost-generated-crystals/diagnostics.mosaic.png" alt="Visual Validation — Generated frost-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated frost-map diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png" alt="Visual Validation — Generated lava-cause diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png" alt="Visual Validation — Generated lava-cause diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated lava-cause diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png" alt="Visual Validation — Generated meadow-mask diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png" alt="Visual Validation — Generated meadow-mask diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated meadow-mask diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/space-generated-starfields/diagnostics.mosaic.png" alt="Visual Validation — Generated starfield-tile diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/space-generated-starfields/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/space-generated-starfields/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/space-generated-starfields/diagnostics.mosaic.png" alt="Visual Validation — Generated starfield-tile diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated starfield-tile diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated biome-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" /><span class="preview-badge">generated asset preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png" alt="Visual Validation — Generated biome-map diagnostics" itemprop="contentUrl" width="1200" height="760" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">generated asset preview</span></span>
         <figcaption itemprop="caption"><strong>Generated biome-map diagnostics</strong><span>Presentation preview only; this image is not canonical runtime evidence.</span></figcaption>
       </figure></div>
   </div></div>
@@ -835,7 +887,11 @@ is unavailable.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/visual-validation-harness-demo/"><figure>
-        <span class="preview-media" data-preview-classification="conceptproxy"><img src="../previews/provider/visual-validation-harness-demo.png" alt="Live concept proxy screenshot for Validation Evidence Harness; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media" data-preview-classification="conceptproxy"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/visual-validation-harness-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/visual-validation-harness-demo.webp" />
+          <img data-responsive-preview src="../previews/provider/visual-validation-harness-demo.png" alt="Live concept proxy screenshot for Validation Evidence Harness; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Validation Evidence Harness</strong><span>Concept proxy · The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.</span></figcaption>
       </figure></a>
     </div>
@@ -845,7 +901,7 @@ is unavailable.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>d61ce750a659</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

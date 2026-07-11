@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923" />
+<meta name="skill-pack-build-revision" content="sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,7 +17,7 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/webgpu-node-gtao/final.design.png" fetchpriority="high" />
+<link rel="preload" as="image" href="../visual-validation/webgpu-node-gtao/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
@@ -46,7 +46,14 @@
    "@id": "https://threejs-skills.com/#publisher",
    "name": "Three.js WebGPU Skill Pack contributors",
    "url": "https://threejs-skills.com/",
-   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill"
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
   },
   {
    "@type": [
@@ -61,7 +68,11 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html"
    },
-   "image": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.png",
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:19+03:00",
    "dateModified": "2026-07-11T13:00:02+03:00",
    "author": {
@@ -131,6 +142,7 @@
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
   background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
@@ -267,7 +279,11 @@ a.chip:active{scale:.96}
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
-  <img class="skill-hero-bg" src="../visual-validation/webgpu-node-gtao/final.design.png" alt="" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <span class="hero-preview-badge">AO-applied lit render-target readback</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Ambient Contact Shading</li></ol></nav>
@@ -306,7 +322,11 @@ a.chip:active{scale:.96}
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-node-gtao/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-node-gtao" data-preview-source="webgpu-node-gtao" data-preview-classification="inspected-runtime-evidence-preview"><img class="card-preview" src="../visual-validation/webgpu-node-gtao/final.design.png" alt="AO-applied lit render-target readback for WebGPU Node GTAO" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">AO-applied lit render-target readback</span></span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-node-gtao" data-preview-source="webgpu-node-gtao" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/final.design.png" alt="AO-applied lit render-target readback for WebGPU Node GTAO" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">AO-applied lit render-target readback</span></span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Node GTAO</h3>
         <p>7 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -367,27 +387,51 @@ indirect diffuse term of the lighting equation — the composition point is the 
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>6 published images</code></div>
     <div class="gallery">
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/webgpu-node-gtao/final.design.png" alt="Ambient Contact Shading — AO-applied lit render-target readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/final.design.png" alt="Ambient Contact Shading — AO-applied lit render-target readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>AO-applied lit render-target readback</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/webgpu-node-gtao/no-post.design.png" alt="Ambient Contact Shading — Display-referred lit baseline with AO disabled." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/no-post.design.png" alt="Ambient Contact Shading — Display-referred lit baseline with AO disabled." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>Display-referred lit baseline with AO disabled.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/webgpu-node-gtao/raw-gtao.png" alt="Ambient Contact Shading — Raw GTAO visibility diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/raw-gtao.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/raw-gtao.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/raw-gtao.png" alt="Ambient Contact Shading — Raw GTAO visibility diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>Raw GTAO visibility diagnostic.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/webgpu-node-gtao/reconstructed-gtao.png" alt="Ambient Contact Shading — Reconstructed and denoised GTAO visibility diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/reconstructed-gtao.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/reconstructed-gtao.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/reconstructed-gtao.png" alt="Ambient Contact Shading — Reconstructed and denoised GTAO visibility diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>Reconstructed and denoised GTAO visibility diagnostic.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/webgpu-node-gtao/normal.png" alt="Ambient Contact Shading — Shared g-buffer normal diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/normal.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/normal.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/normal.png" alt="Ambient Contact Shading — Shared g-buffer normal diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>Shared g-buffer normal diagnostic.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><img src="../visual-validation/webgpu-node-gtao/velocity.png" alt="Ambient Contact Shading — Shared g-buffer velocity diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" /><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-node-gtao/velocity.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-node-gtao/velocity.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-node-gtao/velocity.png" alt="Ambient Contact Shading — Shared g-buffer velocity diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>Shared g-buffer velocity diagnostic.</strong><span>Native render-target readback preview; lab timing and lifecycle acceptance remain pending.</span></figcaption>
       </figure></div>
   </div></div>
@@ -724,7 +768,11 @@ output conversion, and adaptive resolution.</p>
     <p class="sub">Preserved concept proxies and generated-asset previews. They are excluded from primary completion counts and link to the canonical lab through the schema-v2 registry.</p>
     <div class="gallery">
       <a href="../demos/ambient-contact-shading-demo/"><figure>
-        <span class="preview-media" data-preview-classification="conceptproxy"><img src="../previews/provider/ambient-contact-shading-demo.png" alt="Live concept proxy screenshot for Ambient Contact Shading Lab; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" /><span class="preview-badge">Concept proxy preview</span></span>
+        <span class="preview-media" data-preview-classification="conceptproxy"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../previews/provider/ambient-contact-shading-demo.avif" />
+          <source type="image/webp" srcset="../previews/provider/ambient-contact-shading-demo.webp" />
+          <img data-responsive-preview src="../previews/provider/ambient-contact-shading-demo.png" alt="Live concept proxy screenshot for Ambient Contact Shading Lab; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">Concept proxy preview</span></span>
         <figcaption><strong>Ambient Contact Shading Lab</strong><span>Concept proxy · The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.</span></figcaption>
       </figure></a>
     </div>
@@ -734,7 +782,7 @@ output conversion, and adaptive resolution.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>1a9de55e477d</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>d61ce750a659</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

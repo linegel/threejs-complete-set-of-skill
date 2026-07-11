@@ -23,8 +23,8 @@
     "docs/demos/procedural-geometry-writer-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:35cc473f7c7d0fd63eba2310dff9a1c1b196e1098305ba8c5293476606485915",
+  "publishedBundleHash": "sha256:77cba93e6594b791261a31eb6b2989bcf4d3d0ea7b4274782244c45b1eb39eb5",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }

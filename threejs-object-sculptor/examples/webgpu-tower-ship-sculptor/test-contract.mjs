@@ -7,6 +7,7 @@ import {
   TOWER_SHIP_TIERS,
 } from "./tower-ship-factory.js";
 import {
+  resolveFrameDeltaSeconds,
   resolveTowerShipDpr,
   TOWER_SHIP_CAMERAS,
   TOWER_SHIP_DPR_CAPS,
@@ -42,6 +43,10 @@ assert.deepEqual(TOWER_SHIP_SCENARIOS, {
 assert.equal(resolveTowerShipDpr("full", 3), TOWER_SHIP_DPR_CAPS.full);
 assert.equal(resolveTowerShipDpr("budgeted", 3), TOWER_SHIP_DPR_CAPS.budgeted);
 assert.equal(resolveTowerShipDpr("minimum", 3), TOWER_SHIP_DPR_CAPS.minimum);
+assert.equal(resolveFrameDeltaSeconds(99, 100), 0, "initial frame timestamps may precede performance.now() slightly");
+assert.equal(resolveFrameDeltaSeconds(116, 100), 0.016);
+assert.equal(resolveFrameDeltaSeconds(400, 100), 0.1, "long frame deltas must be capped");
+assert.throws(() => resolveFrameDeltaSeconds(Number.NaN, 100), /frame timestamps must be finite/);
 assert.throws(() => createTowerShip({ tier: "unknown" }), /Unknown tier/);
 
 console.log(JSON.stringify({ ok: true, tiers: TOWER_SHIP_TIERS, modes: TOWER_SHIP_MODES, cameras: TOWER_SHIP_CAMERAS }, null, 2));

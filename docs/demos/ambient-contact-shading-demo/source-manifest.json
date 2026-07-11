@@ -23,8 +23,8 @@
     "docs/demos/ambient-contact-shading-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8286a3eb9c3c25275c8ad93051c31391f9b2a2315c2f7ea06c1f0b13f2e53542",
+  "publishedBundleHash": "sha256:0030ed5fec505b7043cd96923cb6d8043ec04beac14787be67abb82546fa3672",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:1a9de55e477da741c2173e4713f89f54dd1a621c2ba9607f829a6e4e598a3923",
+  "buildRevision": "sha256:d61ce750a6590459625bcb104d8f718d74ca7ba3e709e5cf9cf753982cd55420",
   "evidenceBundleId": null
 }
