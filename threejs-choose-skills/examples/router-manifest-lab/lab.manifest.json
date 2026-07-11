@@ -149,7 +149,7 @@
     {
       "id": "exact-skill-inventory",
       "required": true,
-      "evidence": "The suite asserts the exact unique 26-skill inventory against the authoritative repository directories.",
+      "evidence": "The suite asserts the exact unique 27-skill inventory against the authoritative repository directories.",
       "status": "accepted"
     },
     {

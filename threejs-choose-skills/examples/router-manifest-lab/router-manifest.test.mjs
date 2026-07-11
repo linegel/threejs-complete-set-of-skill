@@ -49,11 +49,11 @@ const mechanismScenarios = new Map( [
 
 assert.equal( catalog.schemaVersion, 2 );
 const liveSkillDirs = listSkillDirs();
-assert.equal( liveSkillDirs.length, 26, 'the repository skill inventory changed without an explicit matrix migration' );
+assert.equal( liveSkillDirs.length, 27, 'the repository skill inventory changed without an explicit matrix migration' );
 assert.deepEqual( catalog.skillInventory, liveSkillDirs, 'fixture inventory differs from the authoritative repository inventory' );
 assert.deepEqual( catalog.skillInventory, CANONICAL_SKILL_INVENTORY );
-assert.equal( catalog.skillInventory.length, 26 );
-assert.equal( new Set( catalog.skillInventory ).size, 26 );
+assert.equal( catalog.skillInventory.length, 27 );
+assert.equal( new Set( catalog.skillInventory ).size, 27 );
 assert.deepEqual( catalog.routes.map( ( route ) => route.id ), expectedIds );
 assert.deepEqual( manifest.scenarios.map( ( scenario ) => scenario.id ), expectedIds );
 assert.deepEqual( manifest.tiers, [], 'planning skills must not invent GPU quality tiers' );
