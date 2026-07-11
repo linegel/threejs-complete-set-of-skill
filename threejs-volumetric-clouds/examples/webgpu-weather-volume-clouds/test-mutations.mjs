@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -87,34 +87,30 @@ for (const route of [...manifest.mechanisms, ...manifest.tiers]) {
 }
 
 const artifactFixture = await mkdtemp(join(tmpdir(), "cloud-insufficient-"));
-try {
-  await mkdir(resolve(artifactFixture, "images"));
-  await Promise.all([
-    writeFile(resolve(artifactFixture, "pipeline-graph.json"), "{}"),
-    writeFile(resolve(artifactFixture, "storage-resources.json"), JSON.stringify({ representativeDepthFormat: "R32F meters" })),
-    writeFile(resolve(artifactFixture, "renderer-info.json"), JSON.stringify({ backendIsWebGPU: true })),
-    writeFile(resolve(artifactFixture, "mechanism-metrics.json"), JSON.stringify({ rendererInfo: { compute: { calls: 3 } } })),
-    ...["final.design.png", "no-post.design.png", "diagnostics.mosaic.png"].map((name) =>
-      writeFile(resolve(artifactFixture, "images", name), new Uint8Array([1])),
-    ),
-    writeFile(resolve(artifactFixture, "evidence-manifest.json"), JSON.stringify({
-      schemaVersion: 2,
-      claims: [
-        { id: "native-webgpu-runtime", required: true, verdict: "PASS", evidence: "renderer-info.json" },
-        { id: "aligned-render-target-readback", required: true, verdict: "PASS", evidence: "images/final.design.png" },
-        { id: "bounded-compute-dispatch", required: true, verdict: "PASS", evidence: "mechanism-metrics.json" },
-        { id: "metric-r32f-depth-resource", required: true, verdict: "PASS", evidence: "storage-resources.json" },
-        { id: "current-adapter-gpu-timing", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
-        { id: "temporal-disocclusion-error", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
-        { id: "high-step-transport-reference", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
-        { id: "lifecycle-stability", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
-      ],
-    })),
-  ]);
-  const result = spawnSync(process.execPath, [resolve(here, "validate-artifacts.mjs"), "--output", artifactFixture], { encoding: "utf8" });
-  assert.notEqual(result.status, 0, "required INSUFFICIENT_EVIDENCE must fail artifact validation");
-  assert.match(`${result.stdout}${result.stderr}`, /current-adapter-gpu-timing: INSUFFICIENT_EVIDENCE/);
-} finally {
-  await rm(artifactFixture, { recursive: true, force: true });
-}
-console.log("webgpu-weather-volume-clouds mutation and route coverage tests passed");
+await mkdir(resolve(artifactFixture, "images"));
+await Promise.all([
+  writeFile(resolve(artifactFixture, "pipeline-graph.json"), "{}"),
+  writeFile(resolve(artifactFixture, "storage-resources.json"), JSON.stringify({ representativeDepthFormat: "R32F meters" })),
+  writeFile(resolve(artifactFixture, "renderer-info.json"), JSON.stringify({ backendIsWebGPU: true })),
+  writeFile(resolve(artifactFixture, "mechanism-metrics.json"), JSON.stringify({ rendererInfo: { compute: { calls: 3 } } })),
+  ...["final.design.png", "no-post.design.png", "diagnostics.mosaic.png"].map((name) =>
+    writeFile(resolve(artifactFixture, "images", name), new Uint8Array([1])),
+  ),
+  writeFile(resolve(artifactFixture, "evidence-manifest.json"), JSON.stringify({
+    schemaVersion: 2,
+    claims: [
+      { id: "native-webgpu-runtime", required: true, verdict: "PASS", evidence: "renderer-info.json" },
+      { id: "aligned-render-target-readback", required: true, verdict: "PASS", evidence: "images/final.design.png" },
+      { id: "bounded-compute-dispatch", required: true, verdict: "PASS", evidence: "mechanism-metrics.json" },
+      { id: "metric-r32f-depth-resource", required: true, verdict: "PASS", evidence: "storage-resources.json" },
+      { id: "current-adapter-gpu-timing", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
+      { id: "temporal-disocclusion-error", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
+      { id: "high-step-transport-reference", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
+      { id: "lifecycle-stability", required: true, verdict: "INSUFFICIENT_EVIDENCE", evidence: null },
+    ],
+  })),
+]);
+const result = spawnSync(process.execPath, [resolve(here, "validate-artifacts.mjs"), "--output", artifactFixture], { encoding: "utf8" });
+assert.notEqual(result.status, 0, "required INSUFFICIENT_EVIDENCE must fail artifact validation");
+assert.match(`${result.stdout}${result.stderr}`, /current-adapter-gpu-timing: INSUFFICIENT_EVIDENCE/);
+console.log(`webgpu-weather-volume-clouds mutation and route coverage tests passed; retained fixture: ${artifactFixture}`);
