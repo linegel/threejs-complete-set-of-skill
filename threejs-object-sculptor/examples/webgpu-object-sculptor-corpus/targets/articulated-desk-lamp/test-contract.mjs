@@ -183,14 +183,6 @@ function measureShadeBoundary(shapes, { angularSteps = 128, longitudinalSteps = 
       visitVisualPoint([Math.cos(angle) * radius, -0.055, Math.sin(angle) * radius]);
     }
   }
-  for (let yStep = 0; yStep <= longitudinalSteps; yStep += 1) {
-    const y = THREE.MathUtils.lerp(-0.015, -0.075, yStep / longitudinalSteps);
-    for (let angular = 0; angular < angularSteps; angular += 1) {
-      const angle = (angular / angularSteps) * Math.PI * 2;
-      visitVisualPoint([Math.cos(angle) * 0.032, y, Math.sin(angle) * 0.032]);
-    }
-  }
-
   const visitProxyPoint = (point) => {
     proxyToVisualMeters = Math.max(
       proxyToVisualMeters,
@@ -231,6 +223,117 @@ function measureShadeBoundary(shapes, { angularSteps = 128, longitudinalSteps = 
     }
   }
   return { visualToProxyMeters, proxyToVisualMeters };
+}
+
+function cappedCylinderSurfaceDistance(point, shape) {
+  const start = new THREE.Vector3(...shape.startMeters);
+  const end = new THREE.Vector3(...shape.endMeters);
+  const axis = end.clone().sub(start);
+  const length = axis.length();
+  axis.divideScalar(length);
+  const offset = new THREE.Vector3(...point).sub(start);
+  const axial = offset.dot(axis);
+  const radial = offset.addScaledVector(axis, -axial).length();
+  const radialDelta = Math.abs(radial - shape.radiusMeters);
+  const axialOutside = axial < 0 ? -axial : Math.max(0, axial - length);
+  const sideDistance = Math.hypot(radialDelta, axialOutside);
+  const capDistance = (capAxial) => {
+    const planeDistance = Math.abs(axial - capAxial);
+    return radial <= shape.radiusMeters
+      ? planeDistance
+      : Math.hypot(radial - shape.radiusMeters, planeDistance);
+  };
+  return Math.min(sideDistance, capDistance(0), capDistance(length));
+}
+
+function trianglesInEntityFrame(mesh, entity) {
+  mesh.updateWorldMatrix(true, false);
+  entity.updateWorldMatrix(true, false);
+  const toEntity = entity.matrixWorld.clone().invert().multiply(mesh.matrixWorld);
+  const position = mesh.geometry.getAttribute("position");
+  const indices = mesh.geometry.index
+    ? [...mesh.geometry.index.array]
+    : Array.from({ length: position.count }, (_, index) => index);
+  const vertex = (index) => new THREE.Vector3(
+    position.getX(index),
+    position.getY(index),
+    position.getZ(index),
+  ).applyMatrix4(toEntity);
+  const triangles = [];
+  for (let index = 0; index < indices.length; index += 3) {
+    triangles.push(new THREE.Triangle(
+      vertex(indices[index]),
+      vertex(indices[index + 1]),
+      vertex(indices[index + 2]),
+    ));
+  }
+  return triangles;
+}
+
+function measureNeckColliderBidirectional(
+  neckMesh,
+  neckEntity,
+  collider,
+  { triangleSubdivisions = 4, angularSteps = 128, axialSteps = 16, radialSteps = 8 } = {},
+) {
+  if (!collider) throw new Error("missing protected shade-neck-cylinder collider");
+  assert.equal(neckMesh.geometry.type, "CylinderGeometry");
+  const triangles = trianglesInEntityFrame(neckMesh, neckEntity);
+  let visualToProxyMeters = 0;
+  for (const triangle of triangles) {
+    for (let aStep = 0; aStep <= triangleSubdivisions; aStep += 1) {
+      for (let bStep = 0; bStep <= triangleSubdivisions - aStep; bStep += 1) {
+        const aWeight = aStep / triangleSubdivisions;
+        const bWeight = bStep / triangleSubdivisions;
+        const cWeight = 1 - aWeight - bWeight;
+        const point = triangle.a.clone().multiplyScalar(aWeight)
+          .addScaledVector(triangle.b, bWeight)
+          .addScaledVector(triangle.c, cWeight);
+        visualToProxyMeters = Math.max(
+          visualToProxyMeters,
+          cappedCylinderSurfaceDistance(point.toArray(), collider.shape),
+        );
+      }
+    }
+  }
+
+  const start = new THREE.Vector3(...collider.shape.startMeters);
+  const end = new THREE.Vector3(...collider.shape.endMeters);
+  const axis = end.clone().sub(start).normalize();
+  const reference = Math.abs(axis.y) < 0.9
+    ? new THREE.Vector3(0, 1, 0)
+    : new THREE.Vector3(1, 0, 0);
+  const side = new THREE.Vector3().crossVectors(axis, reference).normalize();
+  const binormal = new THREE.Vector3().crossVectors(axis, side).normalize();
+  let proxyToVisualMeters = 0;
+  const visitProxy = (point) => {
+    let nearest = Number.POSITIVE_INFINITY;
+    for (const triangle of triangles) {
+      nearest = Math.min(nearest, triangle.closestPointToPoint(point, new THREE.Vector3()).distanceTo(point));
+    }
+    proxyToVisualMeters = Math.max(proxyToVisualMeters, nearest);
+  };
+  for (let axialStep = 0; axialStep <= axialSteps; axialStep += 1) {
+    const center = start.clone().lerp(end, axialStep / axialSteps);
+    for (let angular = 0; angular < angularSteps; angular += 1) {
+      const phase = (angular / angularSteps) * Math.PI * 2;
+      visitProxy(center.clone()
+        .addScaledVector(side, Math.cos(phase) * collider.shape.radiusMeters)
+        .addScaledVector(binormal, Math.sin(phase) * collider.shape.radiusMeters));
+    }
+  }
+  for (const cap of [start, end]) {
+    for (let radialStep = 0; radialStep <= radialSteps; radialStep += 1) {
+      const radius = collider.shape.radiusMeters * radialStep / radialSteps;
+      for (let angular = 0; angular < angularSteps; angular += 1) {
+        const phase = (angular / angularSteps) * Math.PI * 2;
+        visitProxy(cap.clone()
+          .addScaledVector(side, Math.cos(phase) * radius)
+          .addScaledVector(binormal, Math.sin(phase) * radius));
+      }
+    }
+  }
+  return { visualToProxyMeters, proxyToVisualMeters, triangleCount: triangles.length };
 }
 
 function lowerApertureClearance(shapes) {
@@ -518,6 +621,7 @@ for (const tier of TARGET_CONTRACT.tierIds) {
     "lower-arm-right-capsule": 0.017,
     "upper-arm-left-capsule": 0.017,
     "upper-arm-right-capsule": 0.017,
+    "shade-neck-cylinder": 0.0017,
     "bulb-trigger": 0.023,
   };
   for (const [id, expectedError] of Object.entries(expectedColliderErrors)) {
@@ -530,6 +634,58 @@ for (const tier of TARGET_CONTRACT.tierIds) {
   for (const id of Object.keys(expectedColliderErrors).filter((value) => value.includes("arm"))) {
     assert.match(model.runtime.colliderIntents.get(id).capsuleEndpointSemantics, /hemispherical caps extend radius/);
     assert.ok(model.runtime.colliders.get(id).approximationError.maxSurfaceDeviationMeters >= 0.017);
+  }
+  const neckErrorContract = TARGET_CONTRACT.colliderErrorContracts["shade-neck-cylinder"];
+  const neckCollider = model.runtime.colliders.get("shade-neck-cylinder");
+  const neckIntent = model.runtime.colliderIntents.get("shade-neck-cylinder");
+  const neckMesh = model.runtime.meshes.get("shade-neck");
+  const shadeEntity = model.runtime.nodes.get("shade-hinge-pivot");
+  assert.equal(neckCollider.shape.kind, neckErrorContract.shapeKind);
+  assertVectorClose(neckCollider.shape.startMeters, neckErrorContract.startMeters);
+  assertVectorClose(neckCollider.shape.endMeters, neckErrorContract.endMeters);
+  assert.equal(neckCollider.shape.radiusMeters, neckErrorContract.radiusMeters);
+  assert.equal(neckCollider.collisionRole, neckErrorContract.collisionRole);
+  assert.equal(neckMesh.geometry.parameters.openEnded, false);
+  assert.deepEqual(neckIntent.comparisonMeshScope, ["shade-neck"]);
+  assert.match(neckIntent.proxyCapPolicy, /both endpoint disks/);
+  const neckCoarse = measureNeckColliderBidirectional(
+    neckMesh,
+    shadeEntity,
+    neckCollider,
+    { triangleSubdivisions: 2, angularSteps: 64, axialSteps: 8, radialSteps: 4 },
+  );
+  const neckFine = measureNeckColliderBidirectional(
+    neckMesh,
+    shadeEntity,
+    neckCollider,
+    { triangleSubdivisions: 4, angularSteps: 256, axialSteps: 16, radialSteps: 8 },
+  );
+  const neckFineError = Math.max(neckFine.visualToProxyMeters, neckFine.proxyToVisualMeters);
+  const neckConvergenceDelta = Math.max(
+    Math.abs(neckFine.visualToProxyMeters - neckCoarse.visualToProxyMeters),
+    Math.abs(neckFine.proxyToVisualMeters - neckCoarse.proxyToVisualMeters),
+  );
+  assert.equal(
+    neckFine.triangleCount,
+    neckMesh.geometry.parameters.radialSegments * 4,
+    `${tier} capped neck triangles`,
+  );
+  assert.ok(
+    neckFineError + neckConvergenceDelta <= neckErrorContract.declaredBidirectionalMeters,
+    `${tier} neck error ${neckFineError} + convergence ${neckConvergenceDelta}`,
+  );
+  if (tier === "minimum") {
+    assert.ok(
+      neckFineError >= neckErrorContract.minimumTierSampledLowerBoundMeters,
+      `minimum neck sample became suspiciously weak: ${neckFineError}`,
+    );
+  }
+  if (tier === "full") {
+    assert.throws(
+      () => measureNeckColliderBidirectional(neckMesh, shadeEntity, undefined),
+      /missing protected shade-neck-cylinder collider/,
+      "missing neck collider mutation must fail",
+    );
   }
   const shadeErrorContract = TARGET_CONTRACT.colliderErrorContracts["shade-shell-ribs"];
   const shadeShapes = shadeErrorContract.colliderIds.map((id, index) => {
@@ -546,6 +702,7 @@ for (const tier of TARGET_CONTRACT.tierIds) {
     assert.equal(intent.adapterCanonicalBodyCount, 1);
     assert.equal(intent.independentBroadphaseOwner, false);
     assert.equal(intent.hollowAperturePreserved, true);
+    assert.equal(intent.comparisonMeshScope.includes("shade-neck"), false);
     assert.deepEqual(intent.proxySetColliderIds, shadeErrorContract.colliderIds);
     return collider.shape;
   });
