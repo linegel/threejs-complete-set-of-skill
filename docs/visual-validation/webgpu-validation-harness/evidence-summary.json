@@ -7,7 +7,7 @@
   "canonicalSource": [
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
-  "canonicalSourceHash": "sha256:713826386f272e2643875961250313dc27043c11f8e721f48213e7eb41be2e17",
+  "canonicalSourceHash": "sha256:9e9b484608b7a0c8240bc7be0666d1bd2001808fc491e8178501ade6891c4dc6",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -158,6 +158,6 @@
   ],
   "limitations": [
     "Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.",
-    "Mechanism completeness, sustained performance compliance, and per-stage GPU attribution remain INSUFFICIENT_EVIDENCE."
+    "A separate 1920x1080 sustained trace now reports the measured current-adapter GPU budget overrun as FAIL; per-stage attribution, governor stress, and mechanism completeness remain INSUFFICIENT_EVIDENCE."
   ]
 }

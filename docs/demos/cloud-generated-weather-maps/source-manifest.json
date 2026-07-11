@@ -23,8 +23,8 @@
     "docs/demos/cloud-generated-weather-maps",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:814d8dd1d6d1e8dfa0d68055e537dcf9d8bbf668577e01b86e84b0b2753705d1",
+  "publishedBundleHash": "sha256:7567dcb017862a16215c62cec02d868f0bdde7ae9903cc75958d48c558340e81",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
   "evidenceBundleId": null
 }

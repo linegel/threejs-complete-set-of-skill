@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:568e7e17a39b8d17303be05f0324295e41ab47982d9fb92335546fe0e148d2fb",
+  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -6158,7 +6158,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:ac5fb13201e0c9a69ce041d592f9b72dbab0affadeddb48fc37c1f4a4a411953",
+      "sourceHash": "sha256:287c7cee80a45b7160782f2d3902480e2189be1af258d330bb4818dfa5bd4148",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -12789,7 +12789,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:713826386f272e2643875961250313dc27043c11f8e721f48213e7eb41be2e17",
+      "sourceHash": "sha256:9e9b484608b7a0c8240bc7be0666d1bd2001808fc491e8178501ade6891c4dc6",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
