@@ -118,7 +118,7 @@ function buildLocomotion(spec, compiled, options, rng) {
 		gait: ['biped', 'quadruped', 'hexapod'].includes(type) ? createGaitState(spec, compiled) : null,
 		hopper: type === 'hopper' ? createHopperState(spec, compiled, rng) : null,
 		flyer: type === 'flyer' ? createFlyerState(spec, compiled, rng) : null,
-		swim: type === 'swimmer' ? createSwimState(spec, compiled, options.waterHeightFn) : null,
+		swim: type === 'swimmer' ? createSwimState(spec, compiled, options.waterSurfaceProvider ?? options.waterHeightFn) : null,
 		ropes: createRopeState(spec, compiled),
 	};
 }
@@ -140,28 +140,26 @@ function resetDriver(driver) {
 }
 
 function updateRoot(driver, context) {
-	const previous = driver.root.position.slice();
+	const position = driver.root.position;
+	const velocityOut = driver.root.velocity;
+	const previousX = position[0];
+	const previousY = position[1];
+	const previousZ = position[2];
 	const providedVelocity = context.rootVelocity;
 	const hasVelocity = Array.isArray(providedVelocity);
-	const velocity = hasVelocity
-		? [finite(providedVelocity[0]), finite(providedVelocity[1]), finite(providedVelocity[2])]
-		: [0, 0, finite(driver.spec?.locomotion?.speed)];
-
-	driver.root.velocity = velocity;
-	driver.root.position = [
-		previous[0] + velocity[0] * FIXED_DT,
-		previous[1] + velocity[1] * FIXED_DT,
-		previous[2] + velocity[2] * FIXED_DT,
-	];
+	velocityOut[0] = hasVelocity ? finite(providedVelocity[0]) : 0;
+	velocityOut[1] = hasVelocity ? finite(providedVelocity[1]) : 0;
+	velocityOut[2] = hasVelocity ? finite(providedVelocity[2]) : finite(driver.spec?.locomotion?.speed);
+	position[0] = previousX + velocityOut[0] * FIXED_DT;
+	position[1] = previousY + velocityOut[1] * FIXED_DT;
+	position[2] = previousZ + velocityOut[2] * FIXED_DT;
 	if (Array.isArray(context.rootPosition)) {
-		driver.root.position = [
-			finite(context.rootPosition[0]),
-			finite(context.rootPosition[1]),
-			finite(context.rootPosition[2]),
-		];
+		position[0] = finite(context.rootPosition[0]);
+		position[1] = finite(context.rootPosition[1]);
+		position[2] = finite(context.rootPosition[2]);
 	}
 	if (Number.isFinite(context.rootYaw)) driver.root.yaw = context.rootYaw;
-	else if (Math.hypot(velocity[0], velocity[2]) > 1e-12) driver.root.yaw = Math.atan2(velocity[0], velocity[2]);
+	else if (Math.hypot(velocityOut[0], velocityOut[2]) > 1e-12) driver.root.yaw = Math.atan2(velocityOut[0], velocityOut[2]);
 }
 
 function applyLocomotion(driver, context) {
@@ -171,9 +169,11 @@ function applyLocomotion(driver, context) {
 		...context,
 		time: driver.time,
 		nextTime: driver.time + FIXED_DT,
+		tick: driver.ticks + 1,
 		fixedDt: FIXED_DT,
 		root: driver.root,
 		platform,
+		querySupport: context.querySupport ?? driver.options.querySupport ?? null,
 	};
 
 	driver.localPose = { squash: 1, roll: 0, yaw: 0, position: [0, 0, 0] };
@@ -250,7 +250,7 @@ export function createDriver(spec, compiled, options = {}) {
 	return driver;
 }
 
-export function advance(driver, dtSeconds, context = {}) {
+export function advanceInPlace(driver, dtSeconds, context = {}) {
 	if (!driver) throw new Error('advance requires a driver');
 	const dt = Math.min(Math.max(finite(dtSeconds), 0), MAX_ACCUMULATOR);
 	driver.accumulator = Math.min(driver.accumulator + dt, MAX_ACCUMULATOR);
@@ -263,7 +263,14 @@ export function advance(driver, dtSeconds, context = {}) {
 	const alpha = Math.max(0, Math.min(1, driver.accumulator / FIXED_DT));
 	if (substeps > 0 && alpha === 0) driver.presentPose.set(driver.currentPose);
 	else interpolatePose(driver.previousPose, driver.currentPose, alpha, driver.presentPose);
-	return getPose(driver, { alpha, substeps });
+	driver.lastAdvanceAlpha = alpha;
+	driver.lastAdvanceSubsteps = substeps;
+	return substeps;
+}
+
+export function advance(driver, dtSeconds, context = {}) {
+	const substeps = advanceInPlace(driver, dtSeconds, context);
+	return getPose(driver, { alpha: driver.lastAdvanceAlpha, substeps });
 }
 
 export function step(driver, nTicks, dtMs = 1000 / 60, maybeContext = {}) {

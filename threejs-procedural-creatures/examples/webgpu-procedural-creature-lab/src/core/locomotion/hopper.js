@@ -96,7 +96,9 @@ export function stepHopper(state, dt, root) {
 	state.elapsed = (state.elapsed ?? 0) + dt;
 	root.position[1] = sample.height;
 	root.position[2] = sample.z;
-	root.velocity = [0, 0, state.hopLength / Math.max(state.cycleTime, TICK)];
+	root.velocity[0] = 0;
+	root.velocity[1] = 0;
+	root.velocity[2] = state.hopLength / Math.max(state.cycleTime, TICK);
 	return {
 		squash: sample.squash,
 		telemetry: {

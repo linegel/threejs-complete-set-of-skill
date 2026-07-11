@@ -39,17 +39,13 @@ export function createFlyerState(spec, compiled, rng) {
 export function sampleFlyer(state, simTime, root) {
 	const a = state.phase + simTime * state.angularSpeed;
 	const bob = 0.15 * Math.sin(simTime * 1.7 + state.phase);
-	root.position = [
-		state.center[0] + Math.cos(a) * state.radius,
-		state.altitude + bob,
-		state.center[2] + Math.sin(a) * state.radius,
-	];
+	root.position[0] = state.center[0] + Math.cos(a) * state.radius;
+	root.position[1] = state.altitude + bob;
+	root.position[2] = state.center[2] + Math.sin(a) * state.radius;
 	root.yaw = a + Math.PI * 0.5;
-	root.velocity = [
-		-Math.sin(a) * state.speed,
-		0.15 * 1.7 * Math.cos(simTime * 1.7 + state.phase),
-		Math.cos(a) * state.speed,
-	];
+	root.velocity[0] = -Math.sin(a) * state.speed;
+	root.velocity[1] = 0.15 * 1.7 * Math.cos(simTime * 1.7 + state.phase);
+	root.velocity[2] = Math.cos(a) * state.speed;
 	const bank = Math.sign(state.angularSpeed) * Math.min(0.5, state.speed * 0.35);
 	const flapPhase = state.phase * 3 + simTime * (4.5 + 2 * Math.abs(state.angularSpeed)) * Math.PI;
 	return {
