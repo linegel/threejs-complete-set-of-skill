@@ -1,0 +1,19 @@
+{
+  "name": "threejs-procedural-district-integration",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check main.js && node --check browser.js && node --check routes.js && node --check district-contract.js && node --check shared-cause-field.js && node --check terrain-geometry.js && node --check district-materials.js && node --check validate.js && node --check test.mjs && node --check test-mutations.mjs && node --check capture-hook.mjs && node --check capture.mjs && node --check validate-artifacts.mjs",
+    "validate": "node validate.js",
+    "validate:unit": "node test.mjs",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node ../../scripts/capture-lab-browser.mjs --lab procedural-district --output ../../artifacts/visual-validation/procedural-district --hook capture-hook.mjs",
+    "capture:raw": "node capture.mjs",
+    "validate:artifacts": "node validate-artifacts.mjs",
+    "validate:quick": "npm run validate && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && node validate-artifacts.mjs --require-all-claims"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  }
+}

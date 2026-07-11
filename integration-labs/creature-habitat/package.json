@@ -1,0 +1,16 @@
+{
+  "name": "@threejs-skills/integration-creature-habitat",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/validate-controller.mjs",
+    "validate:unit": "node --test tests/contact-registry.test.mjs tests/ownership.test.mjs tests/readback.test.mjs tests/quality-governor.test.mjs tests/resource-ledger.test.mjs",
+    "test:mutations": "node --test tests/mutations.test.mjs",
+    "capture": "node capture.mjs",
+    "capture:correctness": "node capture.mjs --profile correctness",
+    "capture:performance": "node capture.mjs --profile performance",
+    "validate:artifacts": "node scripts/validate-artifacts.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick && npm run validate:artifacts"
+  }
+}

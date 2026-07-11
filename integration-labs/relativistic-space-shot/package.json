@@ -1,0 +1,14 @@
+{
+  "name": "relativistic-space-shot-native-webgpu-integration",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check main.mjs && node --check browser.mjs && node --check host-stages.mjs && node --check routes.mjs && node --check owner-graph.mjs && node --check quality-governor.mjs && node --check capture.mjs && node --check validate.mjs && node --check mutation-test.mjs && node --check evidence-status.mjs",
+    "validate:unit": "node validate.mjs",
+    "test:mutations": "node mutation-test.mjs",
+    "capture": "node ../../scripts/capture-lab-browser.mjs --lab relativistic-space-shot --hook capture.mjs",
+    "validate:artifacts": "node evidence-status.mjs validate-artifacts",
+    "validate:quick": "npm run check && npm run validate:unit",
+    "validate:full": "npm run validate:quick && npm run test:mutations && npm run validate:artifacts"
+  }
+}

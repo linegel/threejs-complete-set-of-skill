@@ -1,0 +1,16 @@
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background: #03050a; color: #e8eefc; }
+* { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+body { background: radial-gradient(circle at 20% 15%, #142044, #03050a 46%); }
+.shell { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, 29rem); }
+.viewport { min-height: 34rem; background: #010207; }
+canvas { display: block; width: 100%; height: 100%; min-height: 34rem; }
+.panel { padding: clamp(1.4rem, 3vw, 2.6rem); overflow: auto; border-left: 1px solid #27304d; background: rgb(4 7 15 / 92%); }
+.eyebrow { margin: 0 0 .7rem; color: #82b7ff; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
+h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: .98; }
+.status { color: #b7c4de; line-height: 1.55; }
+.controls { display: grid; gap: .75rem; margin: 1.4rem 0; }
+label { display: grid; gap: .35rem; color: #9fb0cf; font-size: .82rem; }
+select { width: 100%; padding: .62rem .75rem; border: 1px solid #354260; border-radius: .55rem; color: #eef4ff; background: #0d1424; }
+pre { max-height: 48vh; overflow: auto; padding: 1rem; border: 1px solid #26324e; border-radius: .7rem; background: #070b13; color: #aec8ff; font: .73rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+@media (max-width: 900px) { .shell { grid-template-columns: 1fr; } .panel { border-left: 0; border-top: 1px solid #27304d; } canvas, .viewport { min-height: 58vh; } }

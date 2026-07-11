@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 2,
+  "id": "weathered-world",
+  "title": "Weathered World",
+  "status": "incomplete",
+  "claimBoundary": "Executable native-WebGPU integration with corrected atmosphere/cloud source stages. Current-adapter timing, accepted image evidence, and lifecycle stability remain insufficient.",
+  "skills": [
+    "threejs-procedural-planets",
+    "threejs-sky-atmosphere-and-haze",
+    "threejs-volumetric-clouds",
+    "threejs-spectral-ocean",
+    "threejs-water-optics",
+    "threejs-rain-snow-and-wet-surfaces",
+    "threejs-procedural-vegetation",
+    "threejs-scalable-real-time-shadows",
+    "threejs-image-pipeline"
+  ],
+  "modes": [
+    "final",
+    "no-post",
+    "weather-envelope",
+    "atmosphere",
+    "cloud-optical-depth",
+    "ocean",
+    "bounded-water",
+    "precipitation",
+    "wetness",
+    "snow",
+    "vegetation-wind",
+    "shadow-contribution",
+    "owner-graph"
+  ],
+  "cameras": ["orbit", "horizon", "surface"],
+  "seeds": [1, 2654435769],
+  "owners": [
+    {"semantic": "renderer", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "final-render-pipeline", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "tone-map", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "output-transform", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "quality-governor", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "timebase", "owner": "threejs-rain-snow-and-wet-surfaces", "exclusive": true},
+    {"semantic": "camera-jitter", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "world-units", "owner": "threejs-procedural-planets", "exclusive": true},
+    {"semantic": "weather-envelope", "owner": "threejs-rain-snow-and-wet-surfaces", "exclusive": true},
+    {"semantic": "atmosphere-transport", "owner": "threejs-sky-atmosphere-and-haze", "exclusive": true},
+    {"semantic": "cloud-transport", "owner": "threejs-volumetric-clouds", "exclusive": true},
+    {"semantic": "cloud-optical-shadow", "owner": "threejs-volumetric-clouds", "exclusive": true},
+    {"semantic": "unbounded-water", "owner": "threejs-spectral-ocean", "exclusive": true},
+    {"semantic": "bounded-water", "owner": "threejs-water-optics", "exclusive": true},
+    {"semantic": "vegetation", "owner": "threejs-procedural-vegetation", "exclusive": true},
+    {"semantic": "opaque-shadow", "owner": "threejs-scalable-real-time-shadows", "exclusive": true}
+  ],
+  "signals": [
+    {"id": "world.units-per-meter", "producer": "threejs-procedural-planets", "consumers": ["threejs-sky-atmosphere-and-haze", "threejs-volumetric-clouds", "threejs-spectral-ocean", "threejs-water-optics", "threejs-rain-snow-and-wet-surfaces", "threejs-procedural-vegetation"], "domain": "one authored world-unit-to-metre conversion"},
+    {"id": "weather.envelope", "producer": "threejs-rain-snow-and-wet-surfaces", "consumers": ["threejs-volumetric-clouds", "threejs-spectral-ocean", "threejs-water-optics", "threejs-procedural-vegetation", "threejs-image-pipeline"], "domain": "one persistent object for time, wind, temperature, forcing, wetness, puddles, and snow"},
+    {"id": "atmosphere.scene-linear-hdr", "producer": "threejs-sky-atmosphere-and-haze", "consumers": ["threejs-volumetric-clouds", "threejs-image-pipeline"], "domain": "linear radiance and transmittance before output conversion"},
+    {"id": "cloud.radiance-transmittance", "producer": "threejs-volumetric-clouds", "consumers": ["threejs-image-pipeline"], "domain": "depth-aware temporally resolved low-grid linear HDR"},
+    {"id": "cloud.optical-depth-shadow", "producer": "threejs-volumetric-clouds", "consumers": ["threejs-image-pipeline", "threejs-procedural-planets", "threejs-spectral-ocean", "threejs-procedural-vegetation"], "domain": "sun optical depth; never an opaque comparison map"},
+    {"id": "opaque.shadow-visibility", "producer": "threejs-scalable-real-time-shadows", "consumers": ["threejs-image-pipeline"], "domain": "ordinary comparison depth; separate from cloud optical depth"},
+    {"id": "ocean.unbounded-surface", "producer": "threejs-spectral-ocean", "consumers": ["threejs-image-pipeline"], "domain": "periodic offshore surface"},
+    {"id": "water.bounded-heightfield", "producer": "threejs-water-optics", "consumers": ["threejs-image-pipeline"], "domain": "local finite interaction domain"},
+    {"id": "world.scene-linear-hdr", "producer": "threejs-image-pipeline", "consumers": ["threejs-image-pipeline"], "domain": "single final scene-linear signal before renderOutput"}
+  ],
+  "sceneSubmissions": [
+    {"id": "weathered-world.shared-scene-pass", "owner": "threejs-image-pipeline", "kind": "lit-output-and-depth", "outputs": ["world.scene-linear-hdr"]}
+  ],
+  "computeDispatches": [
+    {"id": "weathered-world.atmosphere-luts", "owner": "threejs-sky-atmosphere-and-haze", "kind": "ordered scattering LUT graph"},
+    {"id": "weathered-world.cloud-transport", "owner": "threejs-volumetric-clouds", "kind": "bounded Beer-HG transport and temporal resolve"},
+    {"id": "weathered-world.cloud-optical-depth", "owner": "threejs-volumetric-clouds", "kind": "sun-aligned optical-depth cascades"},
+    {"id": "weathered-world.ocean-fft", "owner": "threejs-spectral-ocean", "kind": "spectral cascade evolution"},
+    {"id": "weathered-world.bounded-water", "owner": "threejs-water-optics", "kind": "local fixed-step heightfield"}
+  ],
+  "resources": [
+    {"id": "atmosphere-luts", "owner": "threejs-sky-atmosphere-and-haze", "lifetime": "persistent until atmosphere invalidation"},
+    {"id": "cloud-history", "owner": "threejs-volumetric-clouds", "lifetime": "persistent ping-pong until tier/resize/dispose"},
+    {"id": "cloud-optical-depth", "owner": "threejs-volumetric-clouds", "lifetime": "persistent cascade textures"},
+    {"id": "ocean-spectrum", "owner": "threejs-spectral-ocean", "lifetime": "persistent FFT cascade state"},
+    {"id": "bounded-heightfield", "owner": "threejs-water-optics", "lifetime": "persistent local simulation"},
+    {"id": "opaque-shadow-map", "owner": "threejs-scalable-real-time-shadows", "lifetime": "persistent directional-light comparison target"}
+  ],
+  "compositionOrder": [
+    "shared weather-state update",
+    "atmosphere LUT invalidation and dispatch when dirty",
+    "host scene output/depth",
+    "cloud optical-depth and bounded transport",
+    "depth-aware cloud upsample and sceneHDR*T+L composition",
+    "ocean and bounded-water ownership-preserving composition",
+    "single renderOutput tone map and output transform"
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz target; current-adapter timing pending"},
+      "stageBudgets": [
+        {"id": "world", "budgetMs": {"value": 4.5, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "atmosphere", "budgetMs": {"value": 1.3, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "clouds", "budgetMs": {"value": 3, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "ocean", "budgetMs": {"value": 2.3, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "bounded-water", "budgetMs": {"value": 0.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "weather", "budgetMs": {"value": 0.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "presentation", "budgetMs": {"value": 1, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}}
+      ],
+      "resolutionPolicy": {"sceneScale": 1, "cloudScale": 0.5, "dprCap": 2},
+      "mechanismLimits": {"atmosphere": "ultra", "clouds": "ultra", "ocean": "ultra", "boundedWater": "ultra", "weather": "high", "vegetation": "ultra", "shadowMapSize": 2048},
+      "resourceLimits": {"status": "logical inventory implemented; physical inventory unmeasured"},
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["one unit system", "one weather object", "separate water domains", "separate shadow domains", "one final owner"]
+    },
+    {
+      "id": "balanced",
+      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz target; current-adapter timing pending"},
+      "stageBudgets": [
+        {"id": "world", "budgetMs": {"value": 3.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "atmosphere", "budgetMs": {"value": 1, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "clouds", "budgetMs": {"value": 2.4, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "ocean", "budgetMs": {"value": 1.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "bounded-water", "budgetMs": {"value": 0.6, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "weather", "budgetMs": {"value": 0.6, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "presentation", "budgetMs": {"value": 0.9, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}}
+      ],
+      "resolutionPolicy": {"sceneScale": 1, "cloudScale": 0.5, "dprCap": 1.5},
+      "mechanismLimits": {"atmosphere": "high", "clouds": "high", "ocean": "high", "boundedWater": "high", "weather": "medium", "vegetation": "high", "shadowMapSize": 1024},
+      "resourceLimits": {"status": "logical inventory implemented; physical inventory unmeasured"},
+      "degradationFromPrevious": ["reduce optional samples and texture dimensions", "reduce shadow and vegetation detail"],
+      "preservedInvariants": ["one unit system", "one weather object", "separate water domains", "separate shadow domains", "one final owner"]
+    },
+    {
+      "id": "budgeted",
+      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz target; current-adapter timing pending"},
+      "stageBudgets": [
+        {"id": "world", "budgetMs": {"value": 3.1, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "atmosphere", "budgetMs": {"value": 0.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "clouds", "budgetMs": {"value": 1.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "ocean", "budgetMs": {"value": 1.3, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "bounded-water", "budgetMs": {"value": 0.4, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "weather", "budgetMs": {"value": 0.4, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}},
+        {"id": "presentation", "budgetMs": {"value": 0.8, "unit": "ms", "label": "Gated", "source": "predeclared integration envelope"}}
+      ],
+      "resolutionPolicy": {"sceneScale": 0.85, "cloudScale": 0.25, "dprCap": 1},
+      "mechanismLimits": {"atmosphere": "mobile", "clouds": "default", "ocean": "medium", "boundedWater": "medium", "weather": "budgeted", "vegetation": "medium", "shadowMapSize": 512},
+      "resourceLimits": {"status": "logical inventory implemented; physical inventory unmeasured"},
+      "degradationFromPrevious": ["lower post resolution", "reduce optional samples", "reduce valid update cadence", "reduce counts and LOD", "disable decoration"],
+      "preservedInvariants": ["one unit system", "one weather object", "separate water domains", "separate shadow domains", "one final owner", "core physical contracts"]
+    }
+  ],
+  "adapterRequirements": [
+    {"id": "image-pipeline-host", "skill": "threejs-image-pipeline", "sourceStatus": "available", "module": "integration-labs/weathered-world/world-stages.js", "requiredExport": "createWeatheredWorldStages"},
+    {"id": "planet-stage", "skill": "threejs-procedural-planets", "sourceStatus": "available", "module": "threejs-procedural-planets/examples/webgpu-quadtree-planet/integration-adapter.js", "requiredExport": "createPlanetSceneAdapter"},
+    {"id": "atmosphere-stage", "skill": "threejs-sky-atmosphere-and-haze", "sourceStatus": "available", "module": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/webgpu-lut-atmosphere.js", "requiredExport": "createAtmosphereStage"},
+    {"id": "cloud-stage", "skill": "threejs-volumetric-clouds", "sourceStatus": "available", "module": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js", "requiredExport": "createWeatherCloudStage"},
+    {"id": "ocean-stage", "skill": "threejs-spectral-ocean", "sourceStatus": "available", "module": "threejs-spectral-ocean/examples/webgpu-fft-ocean/integration-stage.js", "requiredExport": "createSpectralOceanStage"},
+    {"id": "bounded-water-stage", "skill": "threejs-water-optics", "sourceStatus": "available", "module": "threejs-water-optics/examples/webgpu-bounded-water/integration-stage.js", "requiredExport": "createBoundedWaterStage"},
+    {"id": "weather-stage", "skill": "threejs-rain-snow-and-wet-surfaces", "sourceStatus": "available", "module": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js", "requiredExport": "createSharedWeatherStage"},
+    {"id": "vegetation-stage", "skill": "threejs-procedural-vegetation", "sourceStatus": "available", "module": "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js", "requiredExport": "createDenseVegetationSceneAdapter"},
+    {"id": "opaque-shadow-stage", "skill": "threejs-scalable-real-time-shadows", "sourceStatus": "available", "module": "integration-labs/weathered-world/world-stages.js", "requiredExport": "createOpaqueShadowStage"}
+  ],
+  "qualityGovernor": {
+    "performanceBasis": "sustained-measured-p95-with-hysteresis-and-cooldown",
+    "degradationOrder": ["lower post resolution", "reduce optional samples", "reduce valid update cadence", "reduce counts and LOD", "disable optional decoration"],
+    "forbidden": ["change renderer", "change physical invariant", "rename a failing tier"]
+  },
+  "runtimeEvidence": {
+    "nativeWebGPU": "INSUFFICIENT_EVIDENCE",
+    "renderTargetReadback": "INSUFFICIENT_EVIDENCE",
+    "atmosphereMechanism": "INSUFFICIENT_EVIDENCE",
+    "cloudMechanism": "INSUFFICIENT_EVIDENCE",
+    "currentAdapterTiming": "INSUFFICIENT_EVIDENCE",
+    "lifecycle": "INSUFFICIENT_EVIDENCE",
+    "visualError": "INSUFFICIENT_EVIDENCE"
+  }
+}

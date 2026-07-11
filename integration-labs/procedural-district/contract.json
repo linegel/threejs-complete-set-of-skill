@@ -1,0 +1,686 @@
+{
+  "schemaVersion": 2,
+  "id": "procedural-district",
+  "title": "Procedural District",
+  "status": "incomplete",
+  "skills": [
+    "threejs-procedural-fields",
+    "threejs-procedural-geometry",
+    "threejs-procedural-materials",
+    "threejs-procedural-buildings-and-cities",
+    "threejs-rain-snow-and-wet-surfaces",
+    "threejs-scalable-real-time-shadows",
+    "threejs-ambient-contact-shading",
+    "threejs-image-pipeline"
+  ],
+  "modes": [
+    "final",
+    "no-post",
+    "shared-field",
+    "facade-ownership",
+    "material-slots",
+    "weather-state",
+    "shadow-contribution",
+    "ao",
+    "owner-graph"
+  ],
+  "cameras": [
+    "street",
+    "district",
+    "aerial"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "owners": [
+    {
+      "semantic": "renderer",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "final-render-pipeline",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "tone-map",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "output-transform",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "quality-governor",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "timebase",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "exclusive": true
+    },
+    {
+      "semantic": "camera-jitter",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "shared-cause-field",
+      "owner": "threejs-procedural-fields",
+      "exclusive": true
+    },
+    {
+      "semantic": "structural-topology",
+      "owner": "threejs-procedural-geometry",
+      "exclusive": true
+    },
+    {
+      "semantic": "building-grammar",
+      "owner": "threejs-procedural-buildings-and-cities",
+      "exclusive": true
+    },
+    {
+      "semantic": "material-identity",
+      "owner": "threejs-procedural-materials",
+      "exclusive": true
+    },
+    {
+      "semantic": "weather-state",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "exclusive": true
+    },
+    {
+      "semantic": "shadow-maps",
+      "owner": "threejs-scalable-real-time-shadows",
+      "exclusive": true
+    },
+    {
+      "semantic": "ao-visibility",
+      "owner": "threejs-ambient-contact-shading",
+      "exclusive": true
+    }
+  ],
+  "signals": [
+    {
+      "id": "district.cause-field",
+      "producer": "threejs-procedural-fields",
+      "consumers": [
+        "threejs-procedural-geometry",
+        "threejs-procedural-buildings-and-cities",
+        "threejs-procedural-materials",
+        "threejs-rain-snow-and-wet-surfaces",
+        "threejs-image-pipeline"
+      ],
+      "domain": "computed packed/derived atlas shared by terrain, zoning, wear, wetness, and placement"
+    },
+    {
+      "id": "district.structural-topology",
+      "producer": "threejs-procedural-geometry",
+      "consumers": [
+        "threejs-procedural-buildings-and-cities",
+        "threejs-scalable-real-time-shadows",
+        "threejs-image-pipeline"
+      ],
+      "domain": "static semantic indexed geometry"
+    },
+    {
+      "id": "district.compiled-buildings",
+      "producer": "threejs-procedural-buildings-and-cities",
+      "consumers": [
+        "threejs-procedural-materials",
+        "threejs-scalable-real-time-shadows",
+        "threejs-image-pipeline"
+      ],
+      "domain": "validated facade-owned material-slot geometry"
+    },
+    {
+      "id": "district.material-slots",
+      "producer": "threejs-procedural-materials",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-scalable-real-time-shadows"
+      ],
+      "domain": "truthful integration-local minimal NodeMaterial slot response; canonical validator applied and advanced procedural-material mechanisms explicitly omitted"
+    },
+    {
+      "id": "district.weather-response",
+      "producer": "threejs-rain-snow-and-wet-surfaces",
+      "consumers": [
+        "threejs-procedural-materials",
+        "threejs-image-pipeline"
+      ],
+      "domain": "integrated uniforms; no static geometry regeneration"
+    },
+    {
+      "id": "district.depth",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-ambient-contact-shading"
+      ],
+      "domain": "pass depth"
+    },
+    {
+      "id": "district.normal",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-ambient-contact-shading"
+      ],
+      "domain": "view normal"
+    },
+    {
+      "id": "district.ao",
+      "producer": "threejs-ambient-contact-shading",
+      "consumers": [
+        "threejs-image-pipeline"
+      ],
+      "domain": "scalar indirect visibility"
+    },
+    {
+      "id": "district.shadow",
+      "producer": "threejs-scalable-real-time-shadows",
+      "consumers": [
+        "threejs-image-pipeline"
+      ],
+      "domain": "bounded comparison depth"
+    },
+    {
+      "id": "district.scene-hdr",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-image-pipeline"
+      ],
+      "domain": "single final scene-linear signal"
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "district.gbuffer-prepass",
+      "owner": "threejs-image-pipeline",
+      "kind": "depth-normal-prepass",
+      "outputs": [
+        "district.depth",
+        "district.normal"
+      ]
+    },
+    {
+      "id": "district.lit-scene-pass",
+      "owner": "threejs-image-pipeline",
+      "kind": "lit-output-with-material-context-ao",
+      "outputs": [
+        "district.scene-hdr"
+      ]
+    }
+  ],
+  "computeDispatches": [
+    {
+      "id": "district.field-atlas-bake",
+      "owner": "threejs-procedural-fields",
+      "kind": "base packed/derived/gradient atlas initialization"
+    },
+    {
+      "id": "district.field-mip-chain",
+      "owner": "threejs-procedural-fields",
+      "kind": "ordered packed-field mip construction"
+    }
+  ],
+  "submissionCounts": {
+    "gbufferPrepassCount": {
+      "value": 1,
+      "unit": "scene-submissions",
+      "label": "Derived",
+      "source": "one reachable AO input scene pass"
+    },
+    "litScenePassCount": {
+      "value": 1,
+      "unit": "scene-submissions",
+      "label": "Derived",
+      "source": "one reachable builtinAOContext lit scene pass"
+    },
+    "sceneSubmissionCount": {
+      "value": 2,
+      "unit": "scene-submissions",
+      "label": "Derived",
+      "source": "one prepass plus one lit scene pass"
+    },
+    "fullLitOutputCount": {
+      "value": 1,
+      "unit": "full-lit-outputs",
+      "label": "Derived",
+      "source": "only the material-context pass produces final lit HDR"
+    }
+  },
+  "resources": [
+    {
+      "id": "field-atlas",
+      "owner": "threejs-procedural-fields",
+      "lifetime": "persistent until tier or seed rebuild"
+    },
+    {
+      "id": "semantic-terrain",
+      "owner": "threejs-procedural-geometry",
+      "lifetime": "static until tier or seed rebuild"
+    },
+    {
+      "id": "compiled-city-slots",
+      "owner": "threejs-procedural-buildings-and-cities",
+      "lifetime": "static until tier or seed rebuild"
+    },
+    {
+      "id": "weather-state",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "lifetime": "persistent scalar response state"
+    },
+    {
+      "id": "bounded-shadow",
+      "owner": "threejs-scalable-real-time-shadows",
+      "lifetime": "persistent directional shadow target"
+    },
+    {
+      "id": "ao-targets",
+      "owner": "threejs-ambient-contact-shading",
+      "lifetime": "persistent while integration exists"
+    }
+  ],
+  "compositionOrder": [
+    "field atlas compute initialization",
+    "static semantic topology and building compilation",
+    "weather uniform response update",
+    "bounded shadow map",
+    "depth/normal prepass",
+    "lit scene with indirect-only AO",
+    "single renderOutput tone map and output transform"
+  ],
+  "integrationConstraints": {
+    "fieldIdentity": "one field stage identity drives terrain, zoning, wear, wetness, and placement",
+    "staticGeometry": "weather steps may update uniforms but cannot compile or replace geometry",
+    "facadeOwnership": "hidden, overlapping, and duplicate facade ownership is forbidden",
+    "outputOwnership": "one WebGPURenderer, one RenderPipeline, one renderOutput owner"
+  },
+  "tiers": [
+    {
+      "id": "hero",
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz target; current-adapter timing not yet captured"
+      },
+      "stageBudgets": [
+        {
+          "id": "field-initialization-amortized",
+          "budgetMs": {
+            "value": 1.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "city-submit",
+          "budgetMs": {
+            "value": 3.4,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "materials-weather",
+          "budgetMs": {
+            "value": 1.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "shadows",
+          "budgetMs": {
+            "value": 2.7,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "ao-prepass-lit",
+          "budgetMs": {
+            "value": 5.3,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 0.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        }
+      ],
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "aoScale": 0.5,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "fieldExtent": 256,
+        "terrainSegments": 64,
+        "buildingCount": 9,
+        "buildingTier": "hero",
+        "aoTier": "ultra",
+        "shadowMapSize": 2048
+      },
+      "resourceLimits": {
+        "status": "runtime logical inventory implemented; physical allocation unmeasured"
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "one shared cause field",
+        "no duplicate facades",
+        "weather does not rebuild geometry",
+        "one AO prepass plus one lit pass",
+        "one final owner"
+      ]
+    },
+    {
+      "id": "balanced",
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz target; current-adapter timing not yet captured"
+      },
+      "stageBudgets": [
+        {
+          "id": "field-initialization-amortized",
+          "budgetMs": {
+            "value": 0.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "city-submit",
+          "budgetMs": {
+            "value": 2.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "materials-weather",
+          "budgetMs": {
+            "value": 1.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "shadows",
+          "budgetMs": {
+            "value": 2.1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "ao-prepass-lit",
+          "budgetMs": {
+            "value": 4.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 0.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        }
+      ],
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "aoScale": 0.5,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "fieldExtent": 128,
+        "terrainSegments": 48,
+        "buildingCount": 7,
+        "buildingTier": "city",
+        "aoTier": "high",
+        "shadowMapSize": 1024
+      },
+      "resourceLimits": {
+        "status": "runtime logical inventory implemented; physical allocation unmeasured"
+      },
+      "degradationFromPrevious": [
+        "halve field extent",
+        "reduce terrain and building detail",
+        "reduce shadow map",
+        "cap DPR"
+      ],
+      "preservedInvariants": [
+        "one shared cause field",
+        "no duplicate facades",
+        "weather does not rebuild geometry",
+        "one AO prepass plus one lit pass",
+        "one final owner"
+      ]
+    },
+    {
+      "id": "budgeted",
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz target; current-adapter timing not yet captured"
+      },
+      "stageBudgets": [
+        {
+          "id": "field-initialization-amortized",
+          "budgetMs": {
+            "value": 0.6,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "city-submit",
+          "budgetMs": {
+            "value": 2.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "materials-weather",
+          "budgetMs": {
+            "value": 0.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "shadows",
+          "budgetMs": {
+            "value": 1.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "ao-prepass-lit",
+          "budgetMs": {
+            "value": 4.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 0.7,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "predeclared integration stage envelope"
+          }
+        }
+      ],
+      "resolutionPolicy": {
+        "sceneScale": 0.85,
+        "aoScale": 0.5,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "fieldExtent": 64,
+        "terrainSegments": 32,
+        "buildingCount": 5,
+        "buildingTier": "distant",
+        "aoTier": "medium",
+        "shadowMapSize": 512
+      },
+      "resourceLimits": {
+        "status": "runtime logical inventory implemented; physical allocation unmeasured"
+      },
+      "degradationFromPrevious": [
+        "halve field extent",
+        "reduce terrain and district counts",
+        "use distant building compiler tier",
+        "reduce shadow map",
+        "reduce display scale"
+      ],
+      "preservedInvariants": [
+        "one shared cause field",
+        "no duplicate facades",
+        "weather does not rebuild geometry",
+        "one AO prepass plus one lit pass",
+        "one final owner",
+        "structural topology"
+      ]
+    }
+  ],
+  "qualityGovernor": {
+    "owner": "threejs-image-pipeline",
+    "performanceBasis": "sustained-measured-p95-with-hysteresis-and-cooldown",
+    "downgradePersistence": {
+      "value": 2,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
+    "upgradePersistence": {
+      "value": 4,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
+    "cooldown": {
+      "value": 3,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
+    "degradationOrder": [
+      "lower post resolution",
+      "reduce optional samples/detail",
+      "reduce valid update cadence",
+      "reduce counts/LOD",
+      "disable optional decoration"
+    ]
+  },
+  "adapterRequirements": [
+    {
+      "id": "image-pipeline-host",
+      "skill": "threejs-image-pipeline",
+      "sourceStatus": "available",
+      "module": "integration-labs/procedural-district/main.js",
+      "requiredExport": "createProceduralDistrictLab",
+      "reason": "District-local host owns the only renderer, RenderPipeline, tone map, and output transform."
+    },
+    {
+      "id": "field-stage",
+      "skill": "threejs-procedural-fields",
+      "sourceStatus": "available",
+      "module": "integration-labs/procedural-district/shared-cause-field.js",
+      "requiredExport": "createDistrictCauseFieldStage",
+      "reason": "Host-owned real field compute and sampled storage textures."
+    },
+    {
+      "id": "geometry-stage",
+      "skill": "threejs-procedural-geometry",
+      "sourceStatus": "available",
+      "module": "integration-labs/procedural-district/terrain-geometry.js",
+      "requiredExport": "createDistrictStaticGeometry",
+      "reason": "Semantic writer emits exact static topology without renderer ownership."
+    },
+    {
+      "id": "material-stage",
+      "skill": "threejs-procedural-materials",
+      "sourceStatus": "available",
+      "module": "integration-labs/procedural-district/district-materials.js",
+      "requiredExport": "createDistrictMaterials",
+      "reason": "Truthful integration-local minimal NodeMaterial adapter consumes the canonical field/weather contracts and validateProceduralPbrConfig; it does not claim the full procedural-materials host feature set."
+    },
+    {
+      "id": "building-compiler",
+      "skill": "threejs-procedural-buildings-and-cities",
+      "sourceStatus": "available",
+      "module": "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/compiler.js",
+      "requiredExport": "createProceduralDistrictBuildingFactory",
+      "reason": "Pure plan compiler consumes host-owned materials."
+    },
+    {
+      "id": "weather-stage",
+      "skill": "threejs-rain-snow-and-wet-surfaces",
+      "sourceStatus": "available",
+      "module": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+      "requiredExport": "createSharedWeatherStage",
+      "reason": "Owns integrated weather state but no renderer or false compute dispatch."
+    },
+    {
+      "id": "shadow-stage",
+      "skill": "threejs-scalable-real-time-shadows",
+      "sourceStatus": "available",
+      "module": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
+      "requiredExport": "createShadowArchitectureOwner",
+      "reason": "Bounded directional shadow owner attaches to the host light."
+    },
+    {
+      "id": "ao-stage",
+      "skill": "threejs-ambient-contact-shading",
+      "sourceStatus": "available",
+      "module": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
+      "requiredExport": "createGTAOStage",
+      "reason": "Owns the honest prepass plus material-context lit pass but no renderer/final pipeline."
+    }
+  ],
+  "runtimeEvidence": {
+    "nativeWebGPU": "INSUFFICIENT_EVIDENCE",
+    "renderTargetReadback": "INSUFFICIENT_EVIDENCE",
+    "currentAdapterTiming": "INSUFFICIENT_EVIDENCE",
+    "lifecycle": "INSUFFICIENT_EVIDENCE"
+  }
+}

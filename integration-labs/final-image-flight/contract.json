@@ -1,0 +1,862 @@
+{
+  "schemaVersion": 2,
+  "id": "final-image-flight",
+  "title": "Final Image Flight",
+  "status": "incomplete",
+  "skills": [
+    "threejs-camera-controls-and-rigs",
+    "threejs-procedural-motion-systems",
+    "threejs-image-pipeline",
+    "threejs-ambient-contact-shading",
+    "threejs-bloom",
+    "threejs-exposure-color-grading",
+    "threejs-scalable-real-time-shadows",
+    "threejs-visual-validation"
+  ],
+  "modes": [
+    "final",
+    "no-post",
+    "velocity",
+    "ao",
+    "emissive",
+    "bloom",
+    "exposure",
+    "shadow-contribution",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "owners": [
+    {
+      "semantic": "renderer",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "final-render-pipeline",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "tone-map",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "output-transform",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "quality-governor",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "timebase",
+      "owner": "threejs-procedural-motion-systems",
+      "exclusive": true
+    },
+    {
+      "semantic": "camera-jitter",
+      "owner": "threejs-camera-controls-and-rigs",
+      "exclusive": true
+    },
+    {
+      "semantic": "camera-state",
+      "owner": "threejs-camera-controls-and-rigs",
+      "exclusive": true
+    },
+    {
+      "semantic": "object-transforms",
+      "owner": "threejs-procedural-motion-systems",
+      "exclusive": true
+    },
+    {
+      "semantic": "scene-signals",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "ao-visibility",
+      "owner": "threejs-ambient-contact-shading",
+      "exclusive": true
+    },
+    {
+      "semantic": "bloom-filter",
+      "owner": "threejs-bloom",
+      "exclusive": true
+    },
+    {
+      "semantic": "exposure-state",
+      "owner": "threejs-exposure-color-grading",
+      "exclusive": true
+    },
+    {
+      "semantic": "shadow-maps",
+      "owner": "threejs-scalable-real-time-shadows",
+      "exclusive": true
+    },
+    {
+      "semantic": "validation",
+      "owner": "threejs-visual-validation",
+      "exclusive": true
+    }
+  ],
+  "signals": [
+    {
+      "id": "camera.current",
+      "producer": "threejs-camera-controls-and-rigs",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-scalable-real-time-shadows",
+        "threejs-ambient-contact-shading"
+      ],
+      "domain": "world-to-view transform"
+    },
+    {
+      "id": "camera.previous",
+      "producer": "threejs-camera-controls-and-rigs",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-visual-validation"
+      ],
+      "domain": "previous unjittered view-projection"
+    },
+    {
+      "id": "motion.transforms",
+      "producer": "threejs-procedural-motion-systems",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-scalable-real-time-shadows"
+      ],
+      "domain": "versioned previous/current transforms"
+    },
+    {
+      "id": "scene.output",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-visual-validation"
+      ],
+      "domain": "scene-linear pre-AO gbuffer output"
+    },
+    {
+      "id": "scene.depth",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-ambient-contact-shading",
+        "threejs-visual-validation"
+      ],
+      "domain": "gbuffer depth texture"
+    },
+    {
+      "id": "scene.normal",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-ambient-contact-shading",
+        "threejs-visual-validation"
+      ],
+      "domain": "view-space normal texture"
+    },
+    {
+      "id": "scene.velocity",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-ambient-contact-shading",
+        "threejs-visual-validation"
+      ],
+      "domain": "current-minus-previous NDC velocity"
+    },
+    {
+      "id": "scene.emissive",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-bloom",
+        "threejs-visual-validation"
+      ],
+      "domain": "authored scene-linear HDR emission"
+    },
+    {
+      "id": "ao.visibility",
+      "producer": "threejs-ambient-contact-shading",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-visual-validation"
+      ],
+      "domain": "indirect-light visibility"
+    },
+    {
+      "id": "shadow.visibility",
+      "producer": "threejs-scalable-real-time-shadows",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-visual-validation"
+      ],
+      "domain": "direct-light visibility"
+    },
+    {
+      "id": "bloom.contribution",
+      "producer": "threejs-bloom",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-visual-validation"
+      ],
+      "domain": "scene-linear HDR"
+    },
+    {
+      "id": "scene.pre-grade-hdr",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-exposure-color-grading",
+        "threejs-visual-validation"
+      ],
+      "domain": "materialized scene-linear lit plus Bloom RGBA16F; one node identity for metering and presentation"
+    },
+    {
+      "id": "exposure.state",
+      "producer": "threejs-exposure-color-grading",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-visual-validation"
+      ],
+      "domain": "GPU-resident exposure state"
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "flight.gbuffer-prepass",
+      "owner": "threejs-image-pipeline",
+      "kind": "gbuffer-prepass",
+      "outputs": [
+        "scene.output",
+        "scene.depth",
+        "scene.normal",
+        "scene.emissive",
+        "scene.velocity"
+      ]
+    },
+    {
+      "id": "flight.material-context-lit",
+      "owner": "threejs-ambient-contact-shading",
+      "kind": "lit-scene-pass",
+      "outputs": [
+        "ao.visibility",
+        "lit.scene-hdr"
+      ]
+    }
+  ],
+  "computeDispatches": [
+    {
+      "id": "flight.motion-previous-current",
+      "owner": "threejs-procedural-motion-systems",
+      "kind": "storage-transform-update"
+    },
+    {
+      "id": "flight.exposure-meter-adapt",
+      "owner": "threejs-exposure-color-grading",
+      "kind": "meter-and-adapt"
+    }
+  ],
+  "submissionCounts": {
+    "gbufferPrepassCount": {
+      "value": 1,
+      "unit": "scene-submissions",
+      "label": "Authored",
+      "source": "material-context AO architecture"
+    },
+    "litScenePassCount": {
+      "value": 1,
+      "unit": "scene-submissions",
+      "label": "Authored",
+      "source": "material-context AO architecture"
+    },
+    "sceneSubmissionCount": {
+      "value": 2,
+      "unit": "scene-submissions",
+      "label": "Derived",
+      "source": "gbufferPrepassCount plus litScenePassCount"
+    },
+    "fullLitOutputCount": {
+      "value": 1,
+      "unit": "full-lit-outputs",
+      "label": "Authored",
+      "source": "single material-context lit pass"
+    }
+  },
+  "resources": [
+    {
+      "id": "gbuffer-output",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "gbuffer-depth",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "gbuffer-normal",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "gbuffer-emissive",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "gbuffer-velocity",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "ao-reconstruction",
+      "owner": "threejs-ambient-contact-shading",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "bloom-pyramid",
+      "owner": "threejs-bloom",
+      "lifetime": "frame",
+      "format": "runtime-derived"
+    },
+    {
+      "id": "pre-grade-hdr",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "frame",
+      "format": "RGBA16F",
+      "bindingInvariant": "the same RTT node is both exposure meterSourceTextureNode and hdrColorNode"
+    },
+    {
+      "id": "shadow-diagnostic-target",
+      "owner": "threejs-visual-validation",
+      "lifetime": "diagnostic-mode-only",
+      "format": "runtime-derived",
+      "submissionCost": "one declared ShadowNodeMaterial scene pass only when shadow-contribution is selected"
+    },
+    {
+      "id": "exposure-state",
+      "owner": "threejs-exposure-color-grading",
+      "lifetime": "persistent",
+      "format": "storage-buffer"
+    },
+    {
+      "id": "motion-state",
+      "owner": "threejs-procedural-motion-systems",
+      "lifetime": "persistent",
+      "format": "storage-buffer"
+    }
+  ],
+  "compositionOrder": [
+    "camera and authored motion update",
+    "bounded opaque shadow map",
+    "gbuffer prepass: output/depth/normal/emissive/velocity",
+    "material-context lit pass with indirect-only AO",
+    "BloomNode from shared emissive",
+    "materialize lit plus Bloom into one pre-grade RGBA16F RTT",
+    "exposure metering and HDR presentation sample that same pre-grade RTT",
+    "single tone map",
+    "single output conversion"
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration flagship 60 Hz target"
+      },
+      "stageBudgets": [
+        {
+          "id": "camera-motion",
+          "budgetMs": {
+            "value": 1.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "hero stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "shadows",
+          "budgetMs": {
+            "value": 2.6,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "hero stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "ao-prepass-and-lit",
+          "budgetMs": {
+            "value": 6.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "hero stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "bloom",
+          "budgetMs": {
+            "value": 1.4,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "hero stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "exposure",
+          "budgetMs": {
+            "value": 0.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "hero stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "hero stage budget; requires measured p95 before acceptance"
+          }
+        }
+      ],
+      "resolutionPolicy": {
+        "sceneScale": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "hero tier"
+        },
+        "aoScale": {
+          "value": 0.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "AO ultra"
+        },
+        "bloomScale": {
+          "value": 0.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "hero tier"
+        },
+        "dprCap": {
+          "value": 2,
+          "unit": "device-pixels-per-css-pixel",
+          "label": "Authored",
+          "source": "hero tier"
+        }
+      },
+      "mechanismLimits": {
+        "aoTier": "ultra",
+        "exposureTier": "full-histogram",
+        "shadowMapSize": {
+          "value": 1024,
+          "unit": "texels-per-axis",
+          "label": "Authored",
+          "source": "hero tier"
+        },
+        "effectInstances": {
+          "value": 256,
+          "unit": "instances",
+          "label": "Authored",
+          "source": "hero tier"
+        }
+      },
+      "resourceLimits": {
+        "status": "runtime inventory required before acceptance"
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "one renderer and RenderPipeline",
+        "one tone-map and output-transform owner",
+        "one gbuffer prepass plus one lit pass",
+        "shared depth, normal, emissive, and velocity",
+        "camera and motion physics"
+      ]
+    },
+    {
+      "id": "balanced",
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration flagship 60 Hz target"
+      },
+      "stageBudgets": [
+        {
+          "id": "camera-motion",
+          "budgetMs": {
+            "value": 0.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "balanced stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "shadows",
+          "budgetMs": {
+            "value": 2.1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "balanced stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "ao-prepass-and-lit",
+          "budgetMs": {
+            "value": 5.4,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "balanced stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "bloom",
+          "budgetMs": {
+            "value": 1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "balanced stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "exposure",
+          "budgetMs": {
+            "value": 0.6,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "balanced stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 0.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "balanced stage budget; requires measured p95 before acceptance"
+          }
+        }
+      ],
+      "resolutionPolicy": {
+        "sceneScale": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "balanced tier"
+        },
+        "aoScale": {
+          "value": 0.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "AO high"
+        },
+        "bloomScale": {
+          "value": 0.33,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "balanced tier"
+        },
+        "dprCap": {
+          "value": 1.5,
+          "unit": "device-pixels-per-css-pixel",
+          "label": "Authored",
+          "source": "balanced tier"
+        }
+      },
+      "mechanismLimits": {
+        "aoTier": "high",
+        "exposureTier": "balanced-log-reduction",
+        "shadowMapSize": {
+          "value": 512,
+          "unit": "texels-per-axis",
+          "label": "Authored",
+          "source": "balanced tier"
+        },
+        "effectInstances": {
+          "value": 128,
+          "unit": "instances",
+          "label": "Authored",
+          "source": "balanced tier"
+        }
+      },
+      "resourceLimits": {
+        "status": "runtime inventory required before acceptance"
+      },
+      "degradationFromPrevious": [
+        "reduce Bloom resolution",
+        "reduce AO samples and shadow resolution",
+        "reduce decorative effect instances"
+      ],
+      "preservedInvariants": [
+        "one renderer and RenderPipeline",
+        "one tone-map and output-transform owner",
+        "one gbuffer prepass plus one lit pass",
+        "shared depth, normal, emissive, and velocity",
+        "camera and motion physics"
+      ]
+    },
+    {
+      "id": "budgeted",
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration flagship 60 Hz target"
+      },
+      "stageBudgets": [
+        {
+          "id": "camera-motion",
+          "budgetMs": {
+            "value": 0.7,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "budgeted stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "shadows",
+          "budgetMs": {
+            "value": 1.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "budgeted stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "ao-prepass-and-lit",
+          "budgetMs": {
+            "value": 4.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "budgeted stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "bloom",
+          "budgetMs": {
+            "value": 0.6,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "budgeted stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "exposure",
+          "budgetMs": {
+            "value": 0.4,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "budgeted stage budget; requires measured p95 before acceptance"
+          }
+        },
+        {
+          "id": "presentation",
+          "budgetMs": {
+            "value": 0.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "budgeted stage budget; requires measured p95 before acceptance"
+          }
+        }
+      ],
+      "resolutionPolicy": {
+        "sceneScale": {
+          "value": 0.85,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "budgeted tier"
+        },
+        "aoScale": {
+          "value": 0.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "AO medium"
+        },
+        "bloomScale": {
+          "value": 0.25,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "budgeted tier"
+        },
+        "dprCap": {
+          "value": 1,
+          "unit": "device-pixels-per-css-pixel",
+          "label": "Authored",
+          "source": "budgeted tier"
+        }
+      },
+      "mechanismLimits": {
+        "aoTier": "medium",
+        "exposureTier": "minimum-fixed-shot",
+        "shadowMapSize": {
+          "value": 256,
+          "unit": "texels-per-axis",
+          "label": "Authored",
+          "source": "budgeted tier"
+        },
+        "effectInstances": {
+          "value": 64,
+          "unit": "instances",
+          "label": "Authored",
+          "source": "budgeted tier"
+        }
+      },
+      "resourceLimits": {
+        "status": "runtime inventory required before acceptance"
+      },
+      "degradationFromPrevious": [
+        "lower scene and Bloom resolution",
+        "reduce AO samples and shadow resolution",
+        "reduce decorative effect instances"
+      ],
+      "preservedInvariants": [
+        "one renderer and RenderPipeline",
+        "one tone-map and output-transform owner",
+        "one gbuffer prepass plus one lit pass",
+        "shared depth, normal, emissive, and velocity",
+        "camera and motion physics"
+      ]
+    }
+  ],
+  "qualityGovernor": {
+    "owner": "threejs-image-pipeline",
+    "performanceBasis": "sustained-measured-p95-with-hysteresis-and-cooldown",
+    "sampleSource": "renderer-timestamp-query",
+    "frameAggregationPolicy": "exactly-one-rendered-frame-per-resolve",
+    "composedFrameFormula": "renderMs + computeMs from a timestamp resolve covering exactly one host-rendered frame",
+    "missingTimestampPolicy": "INSUFFICIENT_EVIDENCE; do not advance sample windows, streaks, cooldown, or tier",
+    "windowSize": {
+      "value": 30,
+      "unit": "frames",
+      "label": "Authored",
+      "source": "FINAL_IMAGE_FLIGHT_GOVERNOR_POLICY.windowSize"
+    },
+    "downgradeP95Ms": {
+      "value": 16.67,
+      "unit": "ms",
+      "label": "Gated",
+      "source": "60 Hz flagship deadline"
+    },
+    "upgradeP95Ms": {
+      "value": 12.5,
+      "unit": "ms",
+      "label": "Authored",
+      "source": "hysteresis headroom threshold"
+    },
+    "downgradePersistence": {
+      "value": 2,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "flagship governor policy"
+    },
+    "upgradePersistence": {
+      "value": 4,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "flagship governor policy"
+    },
+    "cooldown": {
+      "value": 3,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "flagship governor policy"
+    },
+    "degradationOrder": [
+      "lower post resolution",
+      "reduce optional samples/detail",
+      "reduce valid update cadence",
+      "reduce counts/LOD",
+      "disable optional decoration"
+    ]
+  },
+  "adapterRequirements": [
+    {
+      "id": "image-pipeline-host",
+      "skill": "threejs-image-pipeline",
+      "sourceStatus": "available",
+      "module": "integration-labs/final-image-flight/main.mjs",
+      "requiredExport": "createFinalImageFlightLab",
+      "reason": "Host constructs the sole renderer, RenderPipeline, final tone map, and output transform."
+    },
+    {
+      "id": "camera-core",
+      "skill": "threejs-camera-controls-and-rigs",
+      "sourceStatus": "available",
+      "module": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/main.mjs",
+      "requiredExport": "createCameraRigCore",
+      "reason": "Host-safe core creates no renderer or RenderPipeline."
+    },
+    {
+      "id": "motion-core",
+      "skill": "threejs-procedural-motion-systems",
+      "sourceStatus": "available",
+      "module": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+      "requiredExport": "createProceduralMotionCore",
+      "reason": "Host-safe core supplies fixed-step state and storage motion."
+    },
+    {
+      "id": "ao-stage",
+      "skill": "threejs-ambient-contact-shading",
+      "sourceStatus": "available",
+      "module": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
+      "requiredExport": "createGTAOStage",
+      "reason": "Renderer-independent stage owns the honest prepass/lit pair."
+    },
+    {
+      "id": "bloom-stage",
+      "skill": "threejs-bloom",
+      "sourceStatus": "available",
+      "module": "integration-labs/final-image-flight/main.mjs",
+      "requiredExport": "createSharedEmissiveBloomStage",
+      "reason": "Host adapter consumes shared emissive without creating a private scene pass."
+    },
+    {
+      "id": "exposure-stage",
+      "skill": "threejs-exposure-color-grading",
+      "sourceStatus": "available",
+      "module": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+      "requiredExport": "createExposureColorStage",
+      "reason": "Consumes host HDR nodes and owns GPU exposure state."
+    },
+    {
+      "id": "shadow-owner",
+      "skill": "threejs-scalable-real-time-shadows",
+      "sourceStatus": "available",
+      "module": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
+      "requiredExport": "createShadowArchitectureOwner",
+      "reason": "Host selects one bounded shadow owner."
+    },
+    {
+      "id": "validation-readback",
+      "skill": "threejs-visual-validation",
+      "sourceStatus": "available",
+      "module": "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js",
+      "requiredExport": "unpackAlignedReadback",
+      "reason": "Unpacks integer 256-byte-aligned render-target readback."
+    }
+  ],
+  "runtimeEvidence": {
+    "nativeWebGPU": "INSUFFICIENT_EVIDENCE",
+    "renderTargetReadback": "INSUFFICIENT_EVIDENCE",
+    "currentAdapterTiming": "INSUFFICIENT_EVIDENCE",
+    "lifecycle": "INSUFFICIENT_EVIDENCE",
+    "evidenceBundle": "INSUFFICIENT_EVIDENCE"
+  }
+}

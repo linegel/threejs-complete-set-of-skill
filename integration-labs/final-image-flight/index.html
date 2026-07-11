@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="demo-kind" content="integration-demo">
+  <meta name="acceptance-status" content="incomplete">
+  <meta name="integration-contract" content="./contract.json">
+  <title>Final Image Flight — Native WebGPU Integration</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.webgpu.js","three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+  <main class="shell">
+    <section class="viewport" aria-label="Final Image Flight WebGPU viewport"><canvas data-flight-canvas width="1200" height="800"></canvas></section>
+    <aside class="panel">
+      <p class="eyebrow">Native WebGPU · integration evidence pending</p>
+      <h1>Final Image Flight</h1>
+      <p data-flight-status class="status">Initializing the sole WebGPU renderer and RenderPipeline…</p>
+      <div class="controls">
+        <label>Output mode<select data-flight-mode></select></label>
+        <label>Camera<select data-flight-camera></select></label>
+        <label>Seed<select data-flight-seed></select></label>
+      </div>
+      <pre data-flight-debug aria-live="polite">Awaiting first render…</pre>
+    </aside>
+  </main>
+  <script type="module" src="./browser.mjs"></script>
+</body>
+</html>

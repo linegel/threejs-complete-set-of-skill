@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 2,
+  "id": "weathered-world",
+  "title": "Weathered World",
+  "skill": "threejs-image-pipeline",
+  "threeRevision": "0.185.1",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": ["integration-labs/weathered-world"],
+  "browserEntry": "integration-labs/weathered-world/index.html",
+  "publishPath": "/demos/weathered-world/",
+  "scenarios": [
+    {"id": "world", "startup": {"tier": "balanced", "mode": "final", "camera": "horizon", "seed": 1, "time": 0}, "acceptanceStatus": "incomplete"}
+  ],
+  "mechanisms": [
+    {"id": "shared-world-units", "route": "mechanism/shared-world-units", "startup": {"mode": "owner-graph"}, "acceptanceStatus": "incomplete"},
+    {"id": "shared-weather-envelope", "route": "mechanism/shared-weather-envelope", "startup": {"mode": "weather-envelope"}, "acceptanceStatus": "incomplete"},
+    {"id": "atmosphere-cloud-hdr", "route": "mechanism/atmosphere-cloud-hdr", "startup": {"mode": "atmosphere"}, "acceptanceStatus": "incomplete"},
+    {"id": "ocean-bounded-water-ownership", "route": "mechanism/ocean-bounded-water-ownership", "startup": {"mode": "ocean"}, "acceptanceStatus": "incomplete"},
+    {"id": "cloud-opaque-shadow-separation", "route": "mechanism/cloud-opaque-shadow-separation", "startup": {"mode": "shadow-contribution"}, "acceptanceStatus": "incomplete"},
+    {"id": "owner-graph", "route": "mechanism/owner-graph", "startup": {"mode": "owner-graph"}, "acceptanceStatus": "incomplete"}
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetClass": "60-hz-flagship",
+      "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz target; current-adapter timing pending"},
+      "resolutionPolicy": {"sceneScale": 1, "cloudScale": 0.5, "dprCap": 2},
+      "mechanismLimits": {"atmosphere": "ultra", "clouds": "ultra", "ocean": "ultra", "boundedWater": "ultra", "weather": "high", "vegetation": "ultra", "shadowMapSize": 2048},
+      "resourceLimits": {"status": "logical inventory implemented; physical inventory unmeasured"},
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["one unit system", "one weather object", "separate water domains", "separate shadow domains", "one final owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balanced",
+      "targetClass": "60-hz-balanced",
+      "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz target; current-adapter timing pending"},
+      "resolutionPolicy": {"sceneScale": 1, "cloudScale": 0.5, "dprCap": 1.5},
+      "mechanismLimits": {"atmosphere": "high", "clouds": "high", "ocean": "high", "boundedWater": "high", "weather": "medium", "vegetation": "high", "shadowMapSize": 1024},
+      "resourceLimits": {"status": "logical inventory implemented; physical inventory unmeasured"},
+      "degradationFromPrevious": ["reduce optional samples and texture dimensions", "reduce shadow and vegetation detail"],
+      "preservedInvariants": ["one unit system", "one weather object", "separate water domains", "separate shadow domains", "one final owner"],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "budgeted",
+      "targetClass": "60-hz-budgeted",
+      "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz target; current-adapter timing pending"},
+      "resolutionPolicy": {"sceneScale": 0.85, "cloudScale": 0.25, "dprCap": 1},
+      "mechanismLimits": {"atmosphere": "mobile", "clouds": "default", "ocean": "medium", "boundedWater": "medium", "weather": "budgeted", "vegetation": "medium", "shadowMapSize": 512},
+      "resourceLimits": {"status": "logical inventory implemented; physical inventory unmeasured"},
+      "degradationFromPrevious": ["lower post resolution", "reduce optional samples", "reduce valid update cadence", "reduce counts and LOD", "disable optional decoration"],
+      "preservedInvariants": ["one unit system", "one weather object", "separate water domains", "separate shadow domains", "one final owner", "core physical contracts"],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": ["final", "no-post", "weather-envelope", "atmosphere", "cloud-optical-depth", "ocean", "bounded-water", "precipitation", "wetness", "snow", "vegetation-wind", "shadow-contribution", "owner-graph"],
+  "cameras": ["orbit", "horizon", "surface"],
+  "seeds": [1, 2654435769],
+  "capabilityRequirements": [
+    {"id": "native-webgpu", "required": true, "evidence": "renderer backend must prove isWebGPUBackend === true", "status": "incomplete"},
+    {"id": "gpu-timestamps", "required": true, "evidence": "required before any 60 Hz performance claim", "status": "incomplete"}
+  ],
+  "runtimeProof": [
+    {"id": "single-owner-graph", "required": true, "evidence": "runtime graph and mutation suite implemented; browser evidence pending", "status": "incomplete"},
+    {"id": "world-signal-readback", "required": true, "evidence": "aligned render-target readback hook implemented; accepted bundle absent", "status": "incomplete"},
+    {"id": "atmosphere-cloud-mechanism", "required": true, "evidence": "corrected source stages require native-WebGPU readback and oracle comparison", "status": "incomplete"},
+    {"id": "current-adapter-timing", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"},
+    {"id": "lifecycle-loop", "required": true, "evidence": "50-100 cycle evidence not captured", "status": "incomplete"}
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "npm --prefix integration-labs/weathered-world run validate:quick",
+  "commands": {
+    "check": "npm --prefix integration-labs/weathered-world run check",
+    "test": "npm --prefix integration-labs/weathered-world run validate:unit",
+    "mutations": "npm --prefix integration-labs/weathered-world run test:mutations",
+    "capture": "npm --prefix integration-labs/weathered-world run capture",
+    "validateArtifacts": "npm --prefix integration-labs/weathered-world run validate:artifacts",
+    "validateQuick": "npm --prefix integration-labs/weathered-world run validate:quick",
+    "validateFull": "npm --prefix integration-labs/weathered-world run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "The atmosphere and cloud stages now contain the corrected live-input, bounded-domain, persistent-history, sampled-depth, radiometric, and source-level composition paths.",
+    "The planet stage uses the canonical quadtree patch mesh and field-atlas integration adapter, translated into the shared local tangent frame.",
+    "Current-adapter timestamps, visual-error evidence, and 50-cycle lifecycle evidence remain insufficient."
+  ]
+}

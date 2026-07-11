@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "id": "relativistic-space-shot",
+  "title": "Relativistic Space Shot",
+  "status": "incomplete",
+  "skills": ["threejs-black-holes-and-space-effects", "threejs-particles-trails-and-effects", "threejs-camera-controls-and-rigs", "threejs-procedural-motion-systems", "threejs-bloom", "threejs-exposure-color-grading", "threejs-image-pipeline"],
+  "modes": ["final", "no-post", "curved-ray", "integration-pressure", "velocity", "particles", "emissive", "bloom", "exposure", "temporal-confidence", "owner-graph"],
+  "cameras": ["near", "design", "far"],
+  "seeds": [1, 2654435769],
+  "owners": [
+    {"semantic": "renderer", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "final-render-pipeline", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "tone-map", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "output-transform", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "quality-governor", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "timebase", "owner": "threejs-procedural-motion-systems", "exclusive": true},
+    {"semantic": "camera-jitter", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "camera-state", "owner": "threejs-camera-controls-and-rigs", "exclusive": true},
+    {"semantic": "ship-and-event-motion", "owner": "threejs-procedural-motion-systems", "exclusive": true},
+    {"semantic": "curved-ray-transport", "owner": "threejs-black-holes-and-space-effects", "exclusive": true},
+    {"semantic": "particle-pools", "owner": "threejs-particles-trails-and-effects", "exclusive": true},
+    {"semantic": "shared-emissive", "owner": "threejs-image-pipeline", "exclusive": true},
+    {"semantic": "bloom-filter", "owner": "threejs-bloom", "exclusive": true},
+    {"semantic": "exposure-state", "owner": "threejs-exposure-color-grading", "exclusive": true},
+    {"semantic": "temporal-history", "owner": "threejs-image-pipeline", "exclusive": true}
+  ],
+  "signals": [
+    {"id": "shot.camera-current-previous", "producer": "threejs-camera-controls-and-rigs", "consumers": ["threejs-black-holes-and-space-effects", "threejs-image-pipeline"], "domain": "current/previous jittered and unjittered camera"},
+    {"id": "shot.motion-transforms", "producer": "threejs-procedural-motion-systems", "consumers": ["threejs-camera-controls-and-rigs", "threejs-particles-trails-and-effects", "threejs-image-pipeline"], "domain": "ship and authored trajectories"},
+    {"id": "shot.motion-events", "producer": "threejs-procedural-motion-systems", "consumers": ["threejs-particles-trails-and-effects"], "domain": "deterministic event packets"},
+    {"id": "shot.curved-ray-hdr", "producer": "threejs-black-holes-and-space-effects", "consumers": ["threejs-image-pipeline", "threejs-exposure-color-grading"], "domain": "scene-linear HDR with finite termination"},
+    {"id": "shot.particle-emission", "producer": "threejs-particles-trails-and-effects", "consumers": ["threejs-image-pipeline"], "domain": "authored scene-linear emission"},
+    {"id": "shot.shared-emissive", "producer": "threejs-image-pipeline", "consumers": ["threejs-bloom"], "domain": "single MRT emissive producer"},
+    {"id": "shot.bloom-contribution", "producer": "threejs-bloom", "consumers": ["threejs-image-pipeline"], "domain": "scene-linear HDR contribution"},
+    {"id": "shot.exposure", "producer": "threejs-exposure-color-grading", "consumers": ["threejs-image-pipeline"], "domain": "pre-grade composed luminance state"},
+    {"id": "shot.temporal-history", "producer": "threejs-image-pipeline", "consumers": ["threejs-image-pipeline"], "domain": "single jitter/rejection/reset owner"},
+    {"id": "shot.scene-hdr", "producer": "threejs-image-pipeline", "consumers": ["threejs-exposure-color-grading", "threejs-image-pipeline"], "domain": "composed pre-grade scene signal"}
+  ],
+  "sceneSubmissions": [
+    {"id": "shot.primary-scene", "owner": "threejs-image-pipeline", "kind": "curved-ray-and-particles", "outputs": ["shot.shared-emissive", "shot.scene-hdr"]}
+  ],
+  "computeDispatches": [
+    {"id": "shot.particle-compaction", "owner": "threejs-particles-trails-and-effects", "kind": "ping-pong-dense-compaction"},
+    {"id": "shot.exposure-reduction", "owner": "threejs-exposure-color-grading", "kind": "meter-and-adapt"}
+  ],
+  "submissionCounts": {
+    "gbufferPrepassCount": {"value": 0, "unit": "scene-submissions", "label": "Authored", "source": "no material-context AO in this flagship"},
+    "litScenePassCount": {"value": 1, "unit": "scene-submissions", "label": "Authored", "source": "single curved-ray and particle scene"},
+    "sceneSubmissionCount": {"value": 1, "unit": "scene-submissions", "label": "Derived", "source": "zero prepass plus one lit pass"},
+    "fullLitOutputCount": {"value": 1, "unit": "full-lit-outputs", "label": "Authored", "source": "single shot beauty output"}
+  },
+  "resources": [
+    {"id": "scene-temporal-history", "owner": "threejs-image-pipeline", "lifetime": "persistent-ping-pong"},
+    {"id": "particle-pool-a-b", "owner": "threejs-particles-trails-and-effects", "lifetime": "persistent-ping-pong"},
+    {"id": "shared-emissive", "owner": "threejs-image-pipeline", "lifetime": "frame"},
+    {"id": "exposure-state", "owner": "threejs-exposure-color-grading", "lifetime": "persistent"}
+  ],
+  "compositionOrder": ["camera and motion update", "curved-ray scene-linear transport", "particle event expansion and compaction", "primary scene and shared emissive", "single temporal reconstruction", "bloom from shared emissive", "exposure from composed pre-grade signal", "single tone map", "single output transform"],
+  "integrationConstraints": {"curvedRayDomain": "bounded finite integration with explicit termination", "particleInput": "motion event packets only", "bloomInput": "shared emissive, never a second beauty render", "temporalOwner": "one camera jitter/history/rejection/reset owner", "resolutionConstraint": "Stock r185 TRAANode requires scene color, depth, and velocity at drawing-buffer extent. The one-shared-pass flagship therefore keeps sceneScale and rayScale at 1 in every tier; degradation uses integration steps, pool/count limits, DPR, bloom scale, and exposure meter complexity."},
+  "tiers": [
+    {
+      "id": "hero",
+      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"},
+      "stageBudgets": [
+        {"id": "camera-motion", "budgetMs": {"value": 1.1, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "curved-ray", "budgetMs": {"value": 7, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "particles", "budgetMs": {"value": 2.2, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "temporal-bloom", "budgetMs": {"value": 1.8, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "exposure-output", "budgetMs": {"value": 1.1, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}}
+      ],
+      "resolutionPolicy": {"sceneScale": 1, "rayScale": 1, "bloomScale": 0.5, "dprCap": 2},
+      "mechanismLimits": {"curvedRayTier": "hero", "curvedRayMaxSteps": 160, "particleTier": "ultra", "sparkPoolCapacity": 65536, "debrisPoolCapacity": 8192, "sparkEventCount": 4096, "debrisEventCount": 512, "exposureTier": "full-histogram", "temporal": true},
+      "resourceLimits": {"status": "requires runtime inventory"},
+      "degradationFromPrevious": [],
+      "preservedInvariants": ["bounded finite ray integration", "deterministic motion events", "GPU particle identity", "shared emissive", "single temporal/tone/output owner"]
+    },
+    {
+      "id": "balanced",
+      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"},
+      "stageBudgets": [
+        {"id": "camera-motion", "budgetMs": {"value": 0.9, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "curved-ray", "budgetMs": {"value": 5.8, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "particles", "budgetMs": {"value": 1.7, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "temporal-bloom", "budgetMs": {"value": 1.4, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "exposure-output", "budgetMs": {"value": 0.9, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}}
+      ],
+      "resolutionPolicy": {"sceneScale": 1, "rayScale": 1, "bloomScale": 0.33, "dprCap": 1.5},
+      "mechanismLimits": {"curvedRayTier": "standard", "curvedRayMaxSteps": 96, "particleTier": "high", "sparkPoolCapacity": 24576, "debrisPoolCapacity": 3072, "sparkEventCount": 2048, "debrisEventCount": 256, "exposureTier": "balanced-log-reduction", "temporal": true},
+      "resourceLimits": {"status": "requires runtime inventory"},
+      "degradationFromPrevious": ["lower ray/post resolution", "reduce optional integration detail", "reduce particle secondary detail"],
+      "preservedInvariants": ["bounded finite ray integration", "deterministic motion events", "GPU particle identity", "shared emissive", "single temporal/tone/output owner"]
+    },
+    {
+      "id": "budgeted",
+      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"},
+      "stageBudgets": [
+        {"id": "camera-motion", "budgetMs": {"value": 0.7, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "curved-ray", "budgetMs": {"value": 4.2, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "particles", "budgetMs": {"value": 1.2, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "temporal-bloom", "budgetMs": {"value": 1, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
+        {"id": "exposure-output", "budgetMs": {"value": 0.8, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}}
+      ],
+      "resolutionPolicy": {"sceneScale": 1, "rayScale": 1, "bloomScale": 0.25, "dprCap": 1},
+      "mechanismLimits": {"curvedRayTier": "background", "curvedRayMaxSteps": 48, "particleTier": "medium", "sparkPoolCapacity": 8192, "debrisPoolCapacity": 1024, "sparkEventCount": 1024, "debrisEventCount": 128, "exposureTier": "minimum-fixed-shot", "temporal": true},
+      "resourceLimits": {"status": "requires runtime inventory"},
+      "degradationFromPrevious": ["lower ray/post resolution", "reduce optional integration samples", "reduce valid cache/update cadence", "reduce particles/LOD", "disable secondary decoration"],
+      "preservedInvariants": ["bounded finite ray integration", "deterministic motion events", "GPU particle identity", "shared emissive", "single temporal/tone/output owner", "weak-field and termination physics"]
+    }
+  ],
+  "qualityGovernor": {
+    "owner": "threejs-image-pipeline",
+    "performanceBasis": "sustained-measured-p95-with-hysteresis-and-cooldown",
+    "downgradePersistence": {"value": 2, "unit": "windows", "label": "Authored", "source": "integration governor policy"},
+    "upgradePersistence": {"value": 5, "unit": "windows", "label": "Authored", "source": "integration governor policy"},
+    "cooldown": {"value": 4, "unit": "windows", "label": "Authored", "source": "integration governor policy"},
+    "degradationOrder": ["lower post resolution", "reduce optional samples/detail", "reduce valid update cadence", "reduce counts/LOD", "disable optional decoration"]
+  },
+  "adapterRequirements": [
+    {"id": "image-pipeline-stage", "skill": "threejs-image-pipeline", "sourceStatus": "available", "module": "threejs-image-pipeline/examples/webgpu-image-pipeline/stage.js", "requiredExport": "createImagePipelineStage", "reason": "Consumes host scene textures and owns only temporal/exposure composition state."},
+    {"id": "curved-ray-stage", "skill": "threejs-black-holes-and-space-effects", "sourceStatus": "available", "module": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js", "requiredExport": "createSpaceIntegratorStage", "reason": "Returns a host-mounted mesh and accepts the host renderer/camera for frame preparation."},
+    {"id": "particle-stage", "skill": "threejs-particles-trails-and-effects", "sourceStatus": "available", "module": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/lab.mjs", "requiredExport": "createPooledEffectsStage", "reason": "Accepts the host scene and renderer during step; owns no final pipeline."},
+    {"id": "camera-stage", "skill": "threejs-camera-controls-and-rigs", "sourceStatus": "available", "module": "integration-labs/relativistic-space-shot/host-stages.mjs", "requiredExport": "createRelativisticCameraStage", "reason": "Host-only current/previous camera-state adapter with no renderer ownership."},
+    {"id": "motion-stage", "skill": "threejs-procedural-motion-systems", "sourceStatus": "available", "module": "integration-labs/relativistic-space-shot/host-stages.mjs", "requiredExport": "createRelativisticMotionStage", "reason": "Deterministic fixed-step motion and event-packet adapter."},
+    {"id": "bloom-stage", "skill": "threejs-bloom", "sourceStatus": "available", "module": "integration-labs/relativistic-space-shot/host-stages.mjs", "requiredExport": "createSharedEmissiveBloomStage", "reason": "Consumes the host emissive MRT and creates no private scene pass."},
+    {"id": "exposure-stage", "skill": "threejs-exposure-color-grading", "sourceStatus": "available", "module": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js", "requiredExport": "createExposureColorStage", "reason": "Consumes composed host HDR nodes and initialized renderer."}
+  ],
+  "runtimeEvidence": {"nativeWebGPU": "INSUFFICIENT_EVIDENCE", "renderTargetReadback": "INSUFFICIENT_EVIDENCE", "currentAdapterTiming": "INSUFFICIENT_EVIDENCE", "lifecycle": "INSUFFICIENT_EVIDENCE"}
+}

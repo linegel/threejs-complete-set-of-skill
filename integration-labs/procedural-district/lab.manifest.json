@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 2,
+  "id": "procedural-district",
+  "title": "Procedural District",
+  "skill": "threejs-image-pipeline",
+  "threeRevision": "0.185.1",
+  "kind": "integration-demo",
+  "status": "incomplete",
+  "canonicalSource": [
+    "integration-labs/procedural-district"
+  ],
+  "browserEntry": "integration-labs/procedural-district/index.html",
+  "publishPath": "/demos/procedural-district/",
+  "scenarios": [
+    {
+      "id": "district",
+      "startup": {
+        "tier": "balanced",
+        "mode": "final",
+        "camera": "district",
+        "seed": 1,
+        "time": 0
+      },
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "shared-cause-field",
+      "route": "mechanism/shared-cause-field",
+      "startup": {
+        "mode": "shared-field"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "structural-topology",
+      "route": "mechanism/structural-topology",
+      "startup": {
+        "mode": "shared-field"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "facade-ownership",
+      "route": "mechanism/facade-ownership",
+      "startup": {
+        "mode": "facade-ownership"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "material-slot-weather",
+      "route": "mechanism/material-slot-weather",
+      "startup": {
+        "mode": "weather-state"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "ao-shadow-order",
+      "route": "mechanism/ao-shadow-order",
+      "startup": {
+        "mode": "shadow-contribution"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "owner-graph",
+      "route": "mechanism/owner-graph",
+      "startup": {
+        "mode": "owner-graph"
+      },
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "hero",
+      "targetClass": "60-hz-flagship",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz target; current-adapter timing pending"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "aoScale": 0.5,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "fieldExtent": 256,
+        "terrainSegments": 64,
+        "buildingCount": 9,
+        "buildingTier": "hero",
+        "aoTier": "ultra",
+        "shadowMapSize": 2048
+      },
+      "resourceLimits": {
+        "status": "logical runtime inventory implemented; physical allocation unmeasured"
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "one shared cause field",
+        "no duplicate facades",
+        "static geometry under weather",
+        "honest AO scene submissions",
+        "one final owner"
+      ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balanced",
+      "targetClass": "60-hz-balanced",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz target; current-adapter timing pending"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "aoScale": 0.5,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "fieldExtent": 128,
+        "terrainSegments": 48,
+        "buildingCount": 7,
+        "buildingTier": "city",
+        "aoTier": "high",
+        "shadowMapSize": 1024
+      },
+      "resourceLimits": {
+        "status": "logical runtime inventory implemented; physical allocation unmeasured"
+      },
+      "degradationFromPrevious": [
+        "halve field extent",
+        "reduce terrain/building detail",
+        "reduce shadow map and DPR cap"
+      ],
+      "preservedInvariants": [
+        "one shared cause field",
+        "no duplicate facades",
+        "static geometry under weather",
+        "honest AO scene submissions",
+        "one final owner"
+      ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "budgeted",
+      "targetClass": "60-hz-budgeted",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz target; current-adapter timing pending"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 0.85,
+        "aoScale": 0.5,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "fieldExtent": 64,
+        "terrainSegments": 32,
+        "buildingCount": 5,
+        "buildingTier": "distant",
+        "aoTier": "medium",
+        "shadowMapSize": 512
+      },
+      "resourceLimits": {
+        "status": "logical runtime inventory implemented; physical allocation unmeasured"
+      },
+      "degradationFromPrevious": [
+        "halve field extent",
+        "reduce terrain/district counts",
+        "use distant compiler tier",
+        "reduce shadow and display scale"
+      ],
+      "preservedInvariants": [
+        "one shared cause field",
+        "no duplicate facades",
+        "static geometry under weather",
+        "honest AO scene submissions",
+        "one final owner",
+        "structural topology"
+      ],
+      "acceptanceStatus": "incomplete"
+    }
+  ],
+  "modes": [
+    "final",
+    "no-post",
+    "shared-field",
+    "facade-ownership",
+    "material-slots",
+    "weather-state",
+    "shadow-contribution",
+    "ao",
+    "owner-graph"
+  ],
+  "cameras": [
+    "street",
+    "district",
+    "aerial"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "renderer backend must prove isWebGPUBackend === true",
+      "status": "incomplete"
+    },
+    {
+      "id": "gpu-timestamps",
+      "required": true,
+      "evidence": "required before any 60 Hz performance claim",
+      "status": "incomplete"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "single-owner-graph",
+      "required": true,
+      "evidence": "runtime graph and mutation suite implemented; browser evidence pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "field-storage-readback",
+      "required": true,
+      "evidence": "field atlas is sampled by render diagnostics; accepted readback bundle pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "incomplete"
+    },
+    {
+      "id": "lifecycle-loop",
+      "required": true,
+      "evidence": "50-100 cycle evidence not captured",
+      "status": "incomplete"
+    }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": null,
+  "validationCommand": "npm --prefix integration-labs/procedural-district run validate:quick",
+  "commands": {
+    "check": "npm --prefix integration-labs/procedural-district run check",
+    "test": "npm --prefix integration-labs/procedural-district run validate:unit",
+    "mutations": "npm --prefix integration-labs/procedural-district run test:mutations",
+    "capture": "npm --prefix integration-labs/procedural-district run capture",
+    "validateArtifacts": "npm --prefix integration-labs/procedural-district run validate:artifacts",
+    "validateQuick": "npm --prefix integration-labs/procedural-district run validate:quick",
+    "validateFull": "npm --prefix integration-labs/procedural-district run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "All host adapters are executable; acceptance remains incomplete until real native-WebGPU readbacks, current-adapter timestamps, image metrics, and lifecycle evidence pass."
+  ]
+}
+

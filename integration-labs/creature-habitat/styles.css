@@ -1,0 +1,88 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #090e14;
+  color: #e8f1f8;
+}
+
+* { box-sizing: border-box; }
+
+html, body { width: 100%; min-height: 100%; margin: 0; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 22% 5%, rgba(48, 104, 112, 0.25), transparent 40rem),
+    linear-gradient(145deg, #0b1219, #080c12 62%);
+}
+
+.lab-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.lab-header {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(151, 202, 211, 0.2);
+  background: rgba(7, 13, 19, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+.title-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.75rem; }
+.title-row h1 { margin: 0; font-size: clamp(1.15rem, 2.2vw, 1.65rem); font-weight: 650; }
+
+.classification {
+  padding: 0.28rem 0.55rem;
+  border: 1px solid #d7a84a;
+  border-radius: 999px;
+  color: #ffdb8b;
+  font: 600 0.72rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lab-header p { max-width: 90ch; margin: 0; color: #aebfca; font-size: 0.86rem; line-height: 1.45; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: end; }
+.controls label { display: grid; gap: 0.25rem; color: #aabdc8; font-size: 0.72rem; }
+.controls select, .controls button {
+  min-height: 2.2rem;
+  border: 1px solid rgba(148, 195, 205, 0.28);
+  border-radius: 0.45rem;
+  padding: 0.4rem 0.65rem;
+  background: #111d26;
+  color: #eff8fb;
+}
+.controls button { cursor: pointer; }
+.controls :disabled { cursor: not-allowed; opacity: 0.55; }
+
+.viewport { position: relative; min-height: 34rem; overflow: hidden; }
+[data-habitat-canvas] { display: block; width: 100%; height: 100%; min-height: 34rem; }
+
+[data-habitat-status] {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(31rem, calc(100% - 2rem));
+  max-height: 45%;
+  overflow: auto;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid rgba(129, 205, 219, 0.25);
+  border-radius: 0.55rem;
+  background: rgba(5, 12, 17, 0.86);
+  color: #bde7ef;
+  font: 0.7rem/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: none;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 680px) {
+  .lab-header { padding: 0.8rem; }
+  .viewport, [data-habitat-canvas] { min-height: 28rem; }
+  [data-habitat-status] { right: 0.6rem; bottom: 0.6rem; width: calc(100% - 1.2rem); }
+}
+
