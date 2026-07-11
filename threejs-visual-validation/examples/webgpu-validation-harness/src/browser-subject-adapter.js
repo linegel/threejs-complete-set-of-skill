@@ -419,6 +419,12 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				mode,
 				tier,
 				camera: cameraId,
+				cameraState: {
+					matrixWorld: camera.matrixWorld.toArray(),
+					projectionMatrix: camera.projectionMatrix.toArray(),
+					near: camera.near,
+					far: camera.far
+				},
 				seed: `0x${ seed.toString( 16 ).padStart( 8, '0' ) }`,
 				timeSeconds,
 				viewport: { width, height, dpr },
@@ -428,6 +434,16 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 					p95: percentile( cpuFrameSamples, 0.95 )
 				},
 				resetEvents: [ ...resetEvents ],
+				rendererState: {
+					renderer: 'WebGPURenderer',
+					outputColorSpace: renderer.outputColorSpace,
+					toneMapping: 'NeutralToneMapping',
+					toneMappingExposure: renderer.toneMappingExposure,
+					outputBufferType: 'HalfFloatType',
+					sampleCount: 1,
+					depthMode: 'standard',
+					compatibilityMode: null
+				},
 				rendererInfo: snapshotRendererInfo( renderer.info )
 			};
 
