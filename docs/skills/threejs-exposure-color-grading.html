@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
+<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
-<meta property="article:modified_time" content="2026-07-10T18:34:25+03:00" />
+<meta property="article:modified_time" content="2026-07-11T03:52:59+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-10T18:34:25+03:00",
+   "dateModified": "2026-07-11T03:52:59+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -276,9 +276,10 @@ a.chip:active{scale:.96}
       <span class="chip">1 primary implementation</span>
 <span class="chip">2 flagships</span>
 <span class="chip">1 secondary surface</span>
+      
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T18:34:25+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091">commit 9077075 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T03:52:59+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1">commit 1a25667 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-exposure-color-grading/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -351,6 +352,7 @@ transform is the classic double-transform bug.</p></div>
   </div></div>
 
 
+
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
@@ -419,6 +421,11 @@ instant. Channel clocks may differ from the presentation clock only through the
 declared <code>PresentationSampleProvenance</code> clock mapping; validate channel
 <code>actualPhysicsTime</code>, age, filter, maximum staleness, validity, and error against
 the target/view <code>currentRenderSampleInstant</code>.</p>
+<p>The provenance <code>requestedPresentationInstant</code> and bundle <code>sampleInstant</code> are
+narrow <code>PhysicsInstant</code> values. Provider <code>requestedPhysicsTime</code> and channel
+<code>actualPhysicsTime</code> are <code>PhysicsTime</code> wrappers whose discriminant selects
+exactly one arm consistent with the signal descriptor&#39;s <code>timeSemantics</code>; a raw
+<code>PhysicsInstant</code> or <code>PhysicsTimeInterval</code> is invalid in either wrapper field.</p>
 <p>Canonical lighting-provider channels remain SI-valued. The meter input is
 scene-linear radiance in the declared working basis. A physically calibrated
 render basis may retain those units. A normalized RGB render basis is a
@@ -543,7 +550,7 @@ transient-lifetime decisions; <code>$threejs-bloom</code> for the HDR glare sour
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

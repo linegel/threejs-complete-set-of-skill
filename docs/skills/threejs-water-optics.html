@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-water-optics.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
+<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Water Optics | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-water-optics.html" />
-<meta property="article:modified_time" content="2026-07-10T21:41:13+03:00" />
+<meta property="article:modified_time" content="2026-07-11T04:41:20+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Worlds and Environments" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-10T21:41:13+03:00",
+   "dateModified": "2026-07-11T04:41:20+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -276,9 +276,10 @@ a.chip:active{scale:.96}
       <span class="chip">1 primary implementation</span>
 <span class="chip">2 flagships</span>
 <span class="chip">2 secondary surfaces</span>
+      
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T21:41:13+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27">commit 3be3966 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T04:41:20+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323">commit 091f731 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-water-optics/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -294,7 +295,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-bounded-water">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>9995f2b2ec98</code> source hash</span>
+    <span><code>a49e6113d3fe</code> source hash</span>
     <span>11 fixed states · 6 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
@@ -349,6 +350,7 @@ Jacobian of the ray-footprint map, and Fresnel splits reflection/refraction by a
 $$I_c \propto \left|\det \frac{\partial \mathbf x_{floor}}{\partial \mathbf x_{surface}}\right|^{-1},
 \qquad F(\theta) = F_0 + (1-F_0)(1-\cos\theta)^5$$</div>
   </div></div>
+
 
 
   <div class="section" id="validation"><div class="wrap">
@@ -406,12 +408,12 @@ registry, and world/physics transform revision.</p>
 <h3>Canonical water-provider boundary</h3>
 <p>This skill publishes the canonical <code>WaterSurfaceProvider</code> interface and
 <code>WaterSurfaceSample</code>. A canonical <code>PhysicsSampleRequest</code> is batched and
-channel-requested. It carries context/provider/signal/schema IDs, the requested
-<code>PhysicsInstant</code>, physics-frame-metre points or oriented footprints, channel
-masks, filter/frequency response, per-channel tolerances, maximum staleness,
-acceptable residency/latency, and batch extent. Descriptor discovery supplies
-a stable descriptor-table reference; the request does not deep-copy a complete
-descriptor. The returned sample always exposes <code>freeSurfacePoint</code>,
+channel-requested. It carries context/provider/signal/schema IDs,
+<code>requestedPhysicsTime: PhysicsTime</code>, physics-frame-metre points or oriented
+footprints, channel masks, filter/frequency response, per-channel tolerances,
+maximum staleness, acceptable residency/latency, and batch extent. Descriptor
+discovery supplies a stable descriptor-table reference; the request does not
+deep-copy a complete descriptor. The returned sample always exposes <code>freeSurfacePoint</code>,
 <code>freeSurfaceNormal</code>, the gauge-invariant scalar
 <code>geometricNormalVelocityMps</code>, and the exact
 <code>WaterSurfaceParameterization</code>; only when represented it exposes
@@ -421,12 +423,20 @@ descriptor. The returned sample always exposes <code>freeSurfacePoint</code>,
 Each channel is a complete <code>SampledChannel</code> with actual time/support/filter,
 validity, error, and <code>stateVersion</code>. The result returns the complete canonical
 <code>PhysicsSignalDescriptor</code>, bundle <code>sampleInstant</code>, and each channel&#39;s
-<code>actualPhysicsTime</code> resolving to a <code>PhysicsInstant</code>; requested and actual
-instants may differ only within the
-declared latency/staleness gates. Consumers preserve that result envelope rather
-than copying a water-local subset. Packed GPU batches use stable descriptor-table
-handles plus SoA channels, not per-sample descriptor copies. Missing channels
-follow <code>missingChannelPolicy</code> and are never zero-filled. For a parameterized
+<code>actualPhysicsTime</code>. The generic request and response-envelope fields retain
+their canonical wrapper types: <code>PhysicsSampleRequest.requestedPhysicsTime</code>,
+<code>PhysicsSampleResponseEnvelope.requestedPhysicsTime</code>, and
+<code>PhysicsSampleResponseEnvelope.actualBundleTime</code> are each <code>PhysicsTime</code> with
+<code>kind: instant</code>, a present <code>instant: PhysicsInstant</code>, and an <code>interval</code> arm
+containing the complete canonical <code>TypedAbsence</code> record. Every
+<code>SampledChannel.actualPhysicsTime</code> has the same instant-arm shape. The narrower
+<code>WaterSurfaceSample.sampleInstant</code> alone remains a raw <code>PhysicsInstant</code> and is
+exactly equal to <code>actualBundleTime.instant</code>; requested and actual instant-arm
+values may differ only within the declared latency/staleness gates. Consumers
+preserve that result envelope rather than copying a water-local subset. Packed
+GPU batches use stable descriptor-table handles plus SoA channels, not
+per-sample descriptor copies. Missing channels follow <code>missingChannelPolicy</code>
+and are never zero-filled. For a parameterized
 surface <code>r(u,v,t)</code>, the exact projection identity is
 <code>geometricNormalVelocityMps = dot(surfacePointVelocityMps, freeSurfaceNormal)</code> whenever the optional full fixed-coordinate velocity is
 present at the same actual time, support/filter, and state version; its channel
@@ -611,7 +621,8 @@ diffraction or interference. Use a converged mild-slope solution when those
 linear phenomena are required over fixed bathymetry.</p>
 <p>At an offshore/nearshore handoff, choose one contract. A phase-resolved handoff
 transfers frequency, direction, complex surface-elevation amplitude, wavenumber,
-intrinsic frequency, energy, and phase-reference <code>PhysicsInstant</code>. A phase-averaged handoff transfers
+intrinsic frequency, energy, and a raw
+<code>phaseReferenceInstant: PhysicsInstant</code>. A phase-averaged handoff transfers
 action/energy quadrature and direction with no crest-phase claim; local phase is
 a separate owner. Match model validity before blending. Do not alpha-crossfade
 independently phased geometric surfaces; one owner supplies height and
@@ -627,8 +638,12 @@ uses the same canonical <code>WaterSurfaceProvider</code> ABI: mandatory
 fixed-parameterization <code>surfacePointVelocityMps</code>, material
 <code>materialCurrentVelocityMps</code>, depth, density, acceleration, pressure,
 bathymetry, and wet/dry channels. The handoff preserves the complete descriptor,
-requested/actual <code>PhysicsInstant</code>, footprint/filter, frame/origin/transform,
-state/resource version, validity, error, latency, and residency envelope. A
+the request and response-envelope <code>requestedPhysicsTime: PhysicsTime</code>, response
+<code>actualBundleTime: PhysicsTime</code>, raw bundle <code>sampleInstant: PhysicsInstant</code>,
+per-channel <code>actualPhysicsTime: PhysicsTime</code>, footprint/filter,
+frame/origin/transform, state/resource version, validity, error, latency, and
+residency envelope. Every generic time wrapper selects the <code>instant</code> arm and
+carries the complete canonical <code>TypedAbsence</code> record in its <code>interval</code> arm. A
 phase-averaged owner without a separately versioned display-phase synthesis
 cannot publish an instantaneous surface bundle and reports that provider query
 invalid instead of inventing phase.</p>
@@ -865,6 +880,13 @@ crossfade;</li>
 <li>keep simulation resolution independent of viewport resolution;</li>
 <li>restrict nearshore simulation to persistent causal-influence tiles, not
 merely currently visible tiles;</li>
+<li>publish <code>PhysicsSparseActiveDomainCost</code> for every sparse water tier: eligible
+and probed tiles/cells, active core, wet/dry halo and boundary cells,
+allocated/high-water capacity, connected-component fragmentation,
+detect/classify, scan/sort/compact, allocation/indirect-argument, neighbor/
+halo, and solver phase timings/traffic, activation/deactivation hysteresis,
+inactive-water model/error, and visible overflow disposition. A dense coast
+probe followed by a sparse solve is not a wholly sparse algorithm;</li>
 <li>use a separate halo/boundary pass before any whole-tile stencil and a later
 dispatch for each global producer/consumer dependency;</li>
 <li>retain one canonical face flux when claiming shallow-water conservation;</li>
@@ -921,6 +943,10 @@ are neither omitted nor double-applied;</li>
 multiple times, with bathymetry/depth/phase/flow/foam/optics diagnostics;</li>
 <li>final/no-optics/no-caustics/no-foam fixed views;</li>
 <li>renderer info, allocation ledger, dispatch count, and sustained GPU timings.</li>
+<li>sparse-domain stress traces for fragmented archipelagos, many isolated wet
+components, rapidly advancing inundation fronts, maximum halo/core ratio,
+capacity growth, deactivation/reactivation churn, catch-up, and quality
+migration; each must close to the route opportunity table and frozen gates.</li>
 </ul>
 <p>Fail the build on an unstable stencil, stale derivative state, invalid values,
 double output conversion, source-space caustics presented as receiver-space
@@ -972,7 +998,7 @@ solver and consume its versioned provider and presentation state here.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

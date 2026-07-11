@@ -52,8 +52,8 @@
     "docs/demos/weathered-world",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:7316822177d8c1b733bd2189b0ac430e38432ecf6c4b2b6db63b389e1149ce9b",
+  "publishedBundleHash": "sha256:0a5c4224b8dbd665580813ca66ab56e371bc4e95536b535404f5a9a3eb99ce99",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

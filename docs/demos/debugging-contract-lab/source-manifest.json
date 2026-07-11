@@ -19,13 +19,13 @@
     "threejs-debugging/SKILL.md"
   ],
   "browserEntry": "threejs-debugging/examples/debugging-contract-lab/index.html",
-  "sourceHash": "sha256:f2bdc1ae6bdef99e8072c87235bb5fbbd0d89c1aaff0eb4a095824635fa9e989",
+  "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
   "publishedHashInputs": [
     "docs/demos/debugging-contract-lab",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:072a8be985f51590fd36db0477019e8544992718afc02fc30bda41e78705a5c8",
+  "publishedBundleHash": "sha256:ef7e625ee7ecd9a23d008134dc4259c7c06f197553de95f3d01318a2f7554f9f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

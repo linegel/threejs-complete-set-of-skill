@@ -23,8 +23,8 @@
     "docs/demos/webgpu-shadow-pipeline-integration",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:721fa60c7473e28703e45728e515c2674ebe682a1e6410fb9b95b9c7f11041be",
+  "publishedBundleHash": "sha256:c0701199ad5e5a3c6e24e4e8f874ec3a255983ab31c0009a668d0ca2b4b95287",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

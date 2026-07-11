@@ -18,13 +18,13 @@
     "threejs-procedural-creatures/SKILL.md"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:03f6e4de4660774e3c9aa9545218e631ec152a132455c644e832b6576dec1969",
+  "sourceHash": "sha256:285acf7a53603dfcf13c06cfe3e7078fb30956a039805f90ca5b19917c52638d",
   "publishedHashInputs": [
     "docs/demos/procedural-creature-lab-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:b96b1846853162a4853cb3c1caa117cfb601b9061e30ed6c56ebcc0792be570c",
+  "publishedBundleHash": "sha256:39a9ec819b7d1d1134c561392550ce26f2216b81b53dfa3665beeb93c113e871",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

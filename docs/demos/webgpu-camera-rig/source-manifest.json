@@ -29,8 +29,8 @@
     "docs/demos/webgpu-camera-rig",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:876059775e09e5482e46d40b5db2bcea3029f59e78bb5163c8f2e18acd5ceba1",
+  "publishedBundleHash": "sha256:5e92747563cdf258b6bf143813c10394997fd2ad7a92faf70cc63fd8c124d2f1",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

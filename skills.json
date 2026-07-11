@@ -1,9 +1,10 @@
 {
   "name": "threejs-webgpu-skill-pack",
-  "description": "27 agent skills with 39 primary Three.js WebGPU/TSL implementations, 5 cross-skill flagships, and evidence-gated validation",
+  "description": "27 agent skills with 40 primary Three.js WebGPU/TSL implementations, 5 cross-skill flagships, and evidence-gated validation",
   "repository": "https://github.com/linegel/threejs-complete-set-of-skill",
   "source": "linegel/threejs-complete-set-of-skill",
   "homepage": "https://threejs-skills.com/",
+  "methodology": "https://threejs-skills.com/about/",
   "skillFormat": "SKILL.md with YAML frontmatter (name, description) per folder",
   "discovery": {
     "primary": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
@@ -23,24 +24,24 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+    "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
     "skills": 27,
-    "primaryImplementations": 39,
-    "loadablePrimaryImplementations": 39,
-    "canonicalLabs": 27,
+    "primaryImplementations": 40,
+    "loadablePrimaryImplementations": 40,
+    "canonicalLabs": 28,
     "crossSkillFlagships": 5,
     "focusedSupportPrimaries": 7,
     "acceptedPrimary": 2,
-    "pendingPrimary": 37,
+    "pendingPrimary": 38,
     "secondaryRecords": 47,
     "routes": {
-      "base": 39,
-      "scenarios": 167,
-      "mechanisms": 217,
-      "tiers": 110,
-      "fixedStartupContracts": 494,
-      "declaredContracts": 533,
-      "uniquePublishedPaths": 533
+      "base": 40,
+      "scenarios": 170,
+      "mechanisms": 222,
+      "tiers": 113,
+      "fixedStartupContracts": 505,
+      "declaredContracts": 545,
+      "uniquePublishedPaths": 545
     },
     "flagships": [
       {
@@ -185,6 +186,7 @@
       "title": "Ambient Contact Shading",
       "description": "Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "integration-image-pipeline-ao",
@@ -294,6 +296,7 @@
       "title": "Black Holes and Space Effects",
       "description": "Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "tsl-curved-ray",
@@ -391,6 +394,7 @@
       "title": "Bloom",
       "description": "Design workload-selected bloom in Three.js r185 WebGPU/TSL, choosing physical HDR scene bloom versus selective MRT contribution, with exact BloomNode pyramid costs, transparent blending rules, PSF limits, and mobile/tile-GPU gates.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "node-selective-bloom",
@@ -459,10 +463,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:52:59+03:00",
+        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
       },
       "page": "https://threejs-skills.com/skills/threejs-bloom.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-bloom/SKILL.md",
@@ -473,6 +477,7 @@
       "title": "Camera Controls And Rigs",
       "description": "Build general-purpose Three.js WebGPU/TSL camera systems for product inspection, architecture, scientific visualization, geospatial scenes, and authored cinematography. Use for bounds-derived framing, perspective and orthographic projection, controls/shot ownership, temporal jitter, camera-relative coordinates, large-world precision, constraints, and lifecycle restoration.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-camera-rig",
@@ -562,9 +567,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T19:39:52+03:00",
+        "commit": "6f8358fd64e839b6056fd01f546a140650d84a4f",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/6f8358fd64e839b6056fd01f546a140650d84a4f"
       },
       "page": "https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-camera-controls-and-rigs/SKILL.md",
@@ -577,6 +582,7 @@
       "examples": [
         "router-manifest-lab"
       ],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "router-manifest-lab",
@@ -604,7 +610,7 @@
           "sourceHashInputs": [
             "threejs-choose-skills/examples/router-manifest-lab"
           ],
-          "sourceHash": "sha256:96be1085980ca50ff873f19032b100df87005f0b6ffc7875c7acecb49b864eb7",
+          "sourceHash": "sha256:b91bed1079a3f90e84c33537e5ed50677b94a3215cb3b2a9dba6ea42e958720c",
           "proxyStatus": null
         },
         {
@@ -626,7 +632,7 @@
             "scripts/provider-demos.mjs",
             "threejs-choose-skills/examples/router-contract.test.mjs"
           ],
-          "sourceHash": "sha256:940983723b138f64d42f9400455f36bef4e6d5074fe8ebe7753d4f4fdbfa7860",
+          "sourceHash": "sha256:1974b0c2bfb65d33e7072a6c28efc893e30ee2d5083f635d09ab8326f7798cbc",
           "proxyStatus": {
             "limitation": "The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
             "canonicalLabId": "router-manifest-lab"
@@ -634,10 +640,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T19:26:02+03:00",
-        "commit": "f88c621afbf894b4e7ea94f204f527419377477d",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/f88c621afbf894b4e7ea94f204f527419377477d"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T04:41:20+03:00",
+        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
       },
       "page": "https://threejs-skills.com/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
@@ -648,6 +654,7 @@
       "title": "Three.js Compatibility Fallbacks",
       "description": "Use only for teaching how to apply fallback when WebGPU is unavailable after the user explicitly requests it. Never activate for canonical WebGPU/TSL work, low-end tuning, mobile optimization, capability preflight, or general target support.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "browser-fallback-harness",
@@ -743,6 +750,7 @@
         "debugging-contract.test.mjs",
         "debugging-contract-lab"
       ],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "debugging-contract-lab",
@@ -777,15 +785,15 @@
             "threejs-debugging/references/upstream-research.md",
             "threejs-debugging/SKILL.md"
           ],
-          "sourceHash": "sha256:f2bdc1ae6bdef99e8072c87235bb5fbbd0d89c1aaff0eb4a095824635fa9e989",
+          "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T19:00:16+03:00",
-        "commit": "ce20b8bd140942e57b579e2aadb77abf9a432926",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/ce20b8bd140942e57b579e2aadb77abf9a432926"
+        "datetime": "2026-07-10T20:48:56+03:00",
+        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
       },
       "page": "https://threejs-skills.com/skills/threejs-debugging.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-debugging/SKILL.md",
@@ -796,6 +804,7 @@
       "title": "Dynamic Surface Effects",
       "description": "Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "integration-temporal-surface",
@@ -882,7 +891,7 @@
             "threejs-dynamic-surface-effects/examples/integration-temporal-surface",
             "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js"
           ],
-          "sourceHash": "sha256:0964e514ce075881516482b6c4141498bcba40ff1a4823b9ceb473cfc1daba8e",
+          "sourceHash": "sha256:f3f47206aa6c750cc28690d364ad97847fb87523e2ed3477c71f310c44b2f26c",
           "proxyStatus": null
         },
         {
@@ -906,9 +915,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-dynamic-surface-effects/SKILL.md",
@@ -919,6 +928,7 @@
       "title": "Exposure And Color Grading",
       "description": "Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-exposure-color-pipeline",
@@ -987,10 +997,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:52:59+03:00",
+        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
       },
       "page": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/SKILL.md",
@@ -1001,6 +1011,7 @@
       "title": "Image Pipeline",
       "description": "Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "creature-habitat",
@@ -1444,10 +1455,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:52:59+03:00",
+        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
       },
       "page": "https://threejs-skills.com/skills/threejs-image-pipeline.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md",
@@ -1468,10 +1479,41 @@
         "importedDate": "2026-07-11",
         "importedIso": "2026-07-11T00:00:00+03:00"
       },
-      "primaryImplementations": [],
+      "primaryImplementations": [
+        {
+          "id": "webgpu-tower-ship-sculptor",
+          "title": "WebGPU Tower Ship Sculptor",
+          "kind": "canonical-lab",
+          "status": "incomplete",
+          "publishPath": "/demos/webgpu-tower-ship-sculptor/",
+          "scenarios": 3,
+          "mechanisms": 5,
+          "tiers": 3
+        }
+      ],
       "flagshipParticipation": [],
-      "demos": [],
-      "latestUpdate": null,
+      "demos": [
+        {
+          "id": "webgpu-tower-ship-sculptor",
+          "kind": "canonical-lab",
+          "status": "incomplete",
+          "publishPath": "/demos/webgpu-tower-ship-sculptor/",
+          "canonicalSource": [
+            "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
+          ],
+          "sourceHashInputs": [
+            "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
+          ],
+          "sourceHash": "sha256:5c5f8a86ef59bf3b3d658b9392c667bc37f256c960e0af3fdbb3b3e678a96134",
+          "proxyStatus": null
+        }
+      ],
+      "latestUpdate": {
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T04:29:27+03:00",
+        "commit": "76a206dc01700af4dacf01d0e1d98fdac6adb969",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/76a206dc01700af4dacf01d0e1d98fdac6adb969"
+      },
       "page": "https://threejs-skills.com/skills/threejs-object-sculptor.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/SKILL.md",
       "raw": "https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-object-sculptor/SKILL.md"
@@ -1481,6 +1523,7 @@
       "title": "Particles, Trails, and Effects",
       "description": "Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced sparks, timed dissolves, GPU particle pools, deterministic compaction, and conditional scene-relative HDR emission signals.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-pooled-effects",
@@ -1565,9 +1608,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-particles-trails-and-effects/SKILL.md",
@@ -1578,6 +1621,7 @@
       "title": "Procedural Buildings and Cities",
       "description": "Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-material-slot-compiler",
@@ -1658,9 +1702,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/SKILL.md",
@@ -1671,6 +1715,7 @@
       "title": "Procedural Creatures",
       "description": "Build workload-selected procedural and generated creatures in Three.js r185 WebGPU/TSL. Use for spec-driven bodies, semantic rigs, field-extracted skinned reference meshes, diagnostic SDF shells, procedural gait/hop/flight/swim locomotion, support-relative foot planting, 2-bone IK, verlet appendages, repeated populations, deterministic creature labs, and genetic variation. Not for imported glTF skinned-clip pipelines.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-procedural-creature-lab",
@@ -1711,7 +1756,7 @@
             "scripts/provider-demos.mjs",
             "threejs-procedural-creatures/SKILL.md"
           ],
-          "sourceHash": "sha256:03f6e4de4660774e3c9aa9545218e631ec152a132455c644e832b6576dec1969",
+          "sourceHash": "sha256:285acf7a53603dfcf13c06cfe3e7078fb30956a039805f90ca5b19917c52638d",
           "proxyStatus": {
             "limitation": "The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract. The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.",
             "canonicalLabId": "webgpu-procedural-creature-lab"
@@ -1733,10 +1778,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T04:41:20+03:00",
+        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-creatures.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md",
@@ -1747,6 +1792,7 @@
       "title": "Procedural Fields",
       "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-field-bake",
@@ -1812,10 +1858,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:16:43+03:00",
+        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-fields.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md",
@@ -1826,6 +1872,7 @@
       "title": "Procedural Geometry",
       "description": "Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "semantic-mesh-writer",
@@ -1919,6 +1966,7 @@
       "title": "Procedural Materials",
       "description": "Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for coupled terrain/coast/seabed response bundles, grass, rock, dry/wet sand and reef identities, NodeMaterial PBR fields, atlas and triplanar filtering, footprint filtering, specular AA, terrain wetness, stylized palette/facet policies, emissive or raymarched fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "tsl-procedural-pbr",
@@ -2003,9 +2051,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:38:36+03:00",
+        "commit": "916e3776038dbfeb67c094ff8645cea44cb13437",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/916e3776038dbfeb67c094ff8645cea44cb13437"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-materials.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-materials/SKILL.md",
@@ -2016,6 +2064,7 @@
       "title": "Procedural Motion Systems",
       "description": "Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-procedural-timelines",
@@ -2099,10 +2148,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T04:41:20+03:00",
+        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md",
@@ -2113,6 +2162,7 @@
       "title": "Procedural Planets",
       "description": "Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-quadtree-planet",
@@ -2200,10 +2250,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:16:43+03:00",
+        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-planets.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md",
@@ -2214,6 +2264,7 @@
       "title": "Procedural Vegetation",
       "description": "Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "structured-ash-growth",
@@ -2414,9 +2465,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T20:48:56+03:00",
+        "commit": "357dd582fc10aa01ec5fac04f05cb467b76d993d",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/357dd582fc10aa01ec5fac04f05cb467b76d993d"
       },
       "page": "https://threejs-skills.com/skills/threejs-procedural-vegetation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-vegetation/SKILL.md",
@@ -2427,6 +2478,7 @@
       "title": "Rain, Snow, and Wet Surfaces",
       "description": "Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "integration-precipitation-image-pipeline",
@@ -2491,7 +2543,7 @@
             "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
             "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js"
           ],
-          "sourceHash": "sha256:fd1c8e3d52557e281c4b2fb7c4ab4c4ecbc4729936a7021bdb3265a0065a3a1a",
+          "sourceHash": "sha256:5de5585573eafd9df333f25b0e7f13d31ae6254f4eb7bdadbc7c958040b58bdf",
           "proxyStatus": null
         },
         {
@@ -2575,9 +2627,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "datetime": "2026-07-10T21:41:13+03:00",
+        "commit": "3be3966f2d7fccc8cadd1e9fd8100e270a5ece27",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27"
       },
       "page": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md",
@@ -2588,6 +2640,7 @@
       "title": "Scalable Real-Time Shadows",
       "description": "Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached clipmaps, stable texel snapping, filter/bias footprints, cache invalidation, caster parity, binding pressure, and sustained mobile budgets.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-cached-clipmap-shadow",
@@ -2732,10 +2785,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:52:59+03:00",
+        "commit": "1a25667874229c222c13d0847be1295c625ba5a1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/1a25667874229c222c13d0847be1295c625ba5a1"
       },
       "page": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/SKILL.md",
@@ -2746,6 +2799,7 @@
       "title": "Sky, Atmosphere, and Haze",
       "description": "Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-lut-atmosphere",
@@ -2832,10 +2886,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:16:43+03:00",
+        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
       },
       "page": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-sky-atmosphere-and-haze/SKILL.md",
@@ -2846,6 +2900,7 @@
       "title": "Spectral Ocean",
       "description": "Build broad-band offshore procedural oceans in Three.js r185 WebGPU/TSL using dimensioned directional spectra, compute FFT cascades, StorageTexture ping-pongs, exact spectral derivatives, displaced-surface Jacobians, transported foam, water optics, CPU query bounds, falsifiable GPU evidence, and phase-resolved or phase-averaged handoff to a separate bathymetry-aware coastal owner.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-fft-ocean",
@@ -2886,7 +2941,7 @@
             "scripts/provider-demos.mjs",
             "threejs-spectral-ocean/examples/webgpu-fft-ocean"
           ],
-          "sourceHash": "sha256:76a2f44a942d79e4f83dd191037ca02850d101cf0f6afd8fff635c7052e6428e",
+          "sourceHash": "sha256:d0a0f069602883e7bb644a45c10a9dfd8201de4193d4ab32c9a203a66cb528bd",
           "proxyStatus": {
             "limitation": "Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.",
             "canonicalLabId": "webgpu-fft-ocean"
@@ -2954,15 +3009,15 @@
           "sourceHashInputs": [
             "threejs-spectral-ocean/examples/webgpu-fft-ocean"
           ],
-          "sourceHash": "sha256:747f813c18711c5f4a56a092af254831aef8ec4fed2a036bcee63e9a19029d2f",
+          "sourceHash": "sha256:17514de947361852f2dfbec7cd8f8aeae3a79676f4a2981328a2f12892b4befa",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:47:52+03:00",
+        "commit": "8440c7f60865771c62f55fb6e2e34f28bf535387",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/8440c7f60865771c62f55fb6e2e34f28bf535387"
       },
       "page": "https://threejs-skills.com/skills/threejs-spectral-ocean.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-spectral-ocean/SKILL.md",
@@ -2973,6 +3028,7 @@
       "title": "Visual Validation",
       "description": "Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-validation-harness",
@@ -3013,7 +3069,7 @@
             "scripts/provider-demos.mjs",
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:4163ff796a28cd7a092f78fe695a8272c5d8872f8fd24246b24212d9b8f1d5ce",
+          "sourceHash": "sha256:dc60f87e461c5b3844cb0aa0265eb50c06de9386058615bf3927fe9e02f24cf9",
           "proxyStatus": {
             "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
             "canonicalLabId": "webgpu-validation-harness"
@@ -3030,15 +3086,15 @@
           "sourceHashInputs": [
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:44bfcf58370e5d312508fc0e0e7e4ad94c596b6f12254783625de76e93e77aa6",
+          "sourceHash": "sha256:c1ab97a032f3d08d2cc54ac56f81dd102d07c890afd674f66bd6d6349c7f29ef",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T19:10:06+03:00",
-        "commit": "4c4e333d8f1c5fe38119d50c56fd32728ee9eb71",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4c4e333d8f1c5fe38119d50c56fd32728ee9eb71"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T04:41:20+03:00",
+        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
       },
       "page": "https://threejs-skills.com/skills/threejs-visual-validation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md",
@@ -3049,6 +3105,7 @@
       "title": "Volumetric Clouds",
       "description": "Implement workload-selected volumetric cloud systems in Three.js r185 with WebGPURenderer, TSL, NodeMaterial, node RenderPipeline passes, compute/storage textures, temporal reprojection, cloud shadows, and error-bounded quality tiers.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-weather-volume-clouds",
@@ -3137,10 +3194,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T03:16:43+03:00",
+        "commit": "4fc4131c14b60cba96553a0e4c3a98ceff80e5d1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/4fc4131c14b60cba96553a0e4c3a98ceff80e5d1"
       },
       "page": "https://threejs-skills.com/skills/threejs-volumetric-clouds.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-volumetric-clouds/SKILL.md",
@@ -3151,6 +3208,7 @@
       "title": "Water Optics",
       "description": "Build workload-selected analytic, bounded, and coastal water in Three.js r185 WebGPU/TSL. Use for generated archipelagos and shorelines, bathymetry-aware shoaling/refraction, mild-slope or shallow-water wet/dry solver selection, sparse active tiles, StorageTexture heightfields, exact displacement and normals, local disturbances, transported foam and wetness, receiver-space caustics, depth-aware refraction, absorption, Fresnel, and offshore/nearshore handoffs.",
       "examples": [],
+      "attribution": null,
       "primaryImplementations": [
         {
           "id": "webgpu-bounded-water",
@@ -3197,7 +3255,7 @@
             "scripts/provider-demos.mjs",
             "threejs-water-optics/examples/webgpu-bounded-water"
           ],
-          "sourceHash": "sha256:1935fb54daf784b1640d742223e329da03b9fdfd52dc904df3df7a3afe798192",
+          "sourceHash": "sha256:f60dee74d84cd37b8d1048a720c8788f0c4a66abe76ab070f57f05941ae0925b",
           "proxyStatus": {
             "limitation": "Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.",
             "canonicalLabId": "webgpu-bounded-water"
@@ -3282,15 +3340,15 @@
             "scripts/provider-demos.mjs",
             "threejs-water-optics/examples/webgpu-bounded-water"
           ],
-          "sourceHash": "sha256:9995f2b2ec9854d4653c2d23486bcaf2e441bb742f5121f7f5989b473ebb0265",
+          "sourceHash": "sha256:a49e6113d3fe009657c163da6061996d4d6e8eb5d3e88363b677904fdabb3f1b",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-10",
-        "datetime": "2026-07-10T18:34:25+03:00",
-        "commit": "907707582187af595bd1cfffc171168276bd5091",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/907707582187af595bd1cfffc171168276bd5091"
+        "date": "2026-07-11",
+        "datetime": "2026-07-11T04:41:20+03:00",
+        "commit": "091f7317c5470292faff994e3be8cf628d0d5323",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323"
       },
       "page": "https://threejs-skills.com/skills/threejs-water-optics.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/SKILL.md",

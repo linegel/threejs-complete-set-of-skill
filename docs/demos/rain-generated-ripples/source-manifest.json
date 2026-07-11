@@ -23,8 +23,8 @@
     "docs/demos/rain-generated-ripples",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:2d82ca11ea6ad95a21d44c0ef860733ed2b259c7212232b650cc8af200daf481",
+  "publishedBundleHash": "sha256:dbf6746d923b17ab11056ccf5f6a1e58e4d4c36eb8f476e51f591592435ecc11",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

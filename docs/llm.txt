@@ -1,6 +1,6 @@
 # Three.js WebGPU Skill Pack
 
-> 27 specialized agent skills backed by 39 loadable primary Three.js WebGPU/TSL implementations: 27 canonical labs, 5 cross-skill flagships, and 7 focused integration/mechanism surfaces. Runtime acceptance is evidence-gated: 2 suites are accepted and 37 native-WebGPU suites remain pending current-adapter evidence.
+> 27 specialized agent skills backed by 40 loadable primary Three.js WebGPU/TSL implementations: 28 canonical labs, 5 cross-skill flagships, and 7 focused integration/mechanism surfaces. Runtime acceptance is evidence-gated: 2 suites are accepted and 38 native-WebGPU suites remain pending current-adapter evidence.
 
 Repository: https://github.com/linegel/threejs-complete-set-of-skill
 Website: https://threejs-skills.com/ (each skill has a dedicated page at https://threejs-skills.com/skills/<name>.html with the approach, math, validation gallery, and full skill text)
@@ -15,12 +15,12 @@ Routing: after installing the whole pack, start broad requests with threejs-choo
 ## Implementation matrix
 
 - Skills: 27
-- Primary implementations: 39 (39 loadable)
-- Canonical labs: 27
+- Primary implementations: 40 (40 loadable)
+- Canonical labs: 28
 - Cross-skill flagships: Final Image Flight, Weathered World, Procedural District, Creature Habitat, Relativistic Space Shot
 - Focused integration and mechanism surfaces: 7
-- Fixed startup contracts: 494 (167 scenarios, 217 mechanisms, 110 tiers) across 533 unique published primary URLs
-- Runtime evidence status: 2 accepted, 37 pending
+- Fixed startup contracts: 505 (170 scenarios, 222 mechanisms, 113 tiers) across 545 unique published primary URLs
+- Runtime evidence status: 2 accepted, 38 pending
 - Secondary records: 47; none count toward primary acceptance
 
 ## Skills
@@ -54,7 +54,7 @@ Routing: after installing the whole pack, start broad requests with threejs-choo
 - [Procedural Fields](https://threejs-skills.com/skills/threejs-procedural-fields.html): Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.
 - [Procedural Materials](https://threejs-skills.com/skills/threejs-procedural-materials.html): Author workload-selected WebGPU/TSL procedural materials in Three.js. Use for coupled terrain/coast/seabed response bundles, grass, rock, dry/wet sand and reef identities, NodeMaterial PBR fields, atlas and triplanar filtering, footprint filtering, specular AA, terrain wetness, stylized palette/facet policies, emissive or raymarched fields, per-instance dissolve, derivative normals, and explicit physical-response bundles.
 - [Procedural Geometry](https://threejs-skills.com/skills/threejs-procedural-geometry.html): Build workload-selected procedural mesh systems in Three.js r185 WebGPU/TSL. Use for local terrain/coast contour compilation, terraced caps, cliffs, beaches, seabeds, sculpted profiles, oriented branch rings, semantic indexed BufferGeometry writers, explicit material slots, BatchedMesh versus InstancedMesh decisions, typed-array update paths, NodeMaterial surfaces, and projected-error geometry budgets.
-- [Three.js Object Sculptor](https://threejs-skills.com/skills/threejs-object-sculptor.html): Quality-gated reconstruction of reference objects as procedural, action-ready Three.js models. Adapted from [Vinh Hiển's original MIT-licensed project](https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin).
+- [Three.js Object Sculptor](https://threejs-skills.com/skills/threejs-object-sculptor.html): Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image suitability checks, ObjectSculptSpec extraction, geometry/material/lighting planning, code-native model implementation, staged visual comparison, animation-ready hierarchy, or destruction-ready component design. Adapted from Three.js Object Sculptor by Vinh Hiển.
 - [Procedural Buildings and Cities](https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html): Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.
 - [Procedural Planets](https://threejs-skills.com/skills/threejs-procedural-planets.html): Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.
 - [Procedural Vegetation](https://threejs-skills.com/skills/threejs-procedural-vegetation.html): Generate authored procedural trees, grass, and vegetation in Three.js r185 with WebGPURenderer, TSL, and NodeMaterial. Use for terrain/coastal ecology, windward/leeward and salt/moisture placement, deterministic chunk-safe populations, species presets, trunks, branches, roots, canopies, leaf cards, trellises, rooted wind, optional compute/storage, chunked LOD and impostors, and vegetation diagnostics.

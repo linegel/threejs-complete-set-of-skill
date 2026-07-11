@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -25,7 +25,7 @@
     "secondary",
     "not-applicable"
   ],
-  "skillsExpected": 26,
+  "skillsExpected": 27,
   "integrationIds": [
     "final-image-flight",
     "weathered-world",
@@ -122,6 +122,14 @@
         "weathered-world",
         "webgpu-image-pipeline",
         "webgpu-temporal-history"
+      ],
+      "acceptedPrimaryLabIds": [],
+      "status": "incomplete"
+    },
+    {
+      "skill": "threejs-object-sculptor",
+      "primaryLabIds": [
+        "webgpu-tower-ship-sculptor"
       ],
       "acceptedPrimaryLabIds": [],
       "status": "incomplete"
@@ -261,9 +269,9 @@
     }
   ],
   "counts": {
-    "skills": 26,
-    "demos": 86,
-    "primary": 39,
+    "skills": 27,
+    "demos": 87,
+    "primary": 40,
     "acceptedPrimary": 2,
     "secondary": 47
   },
@@ -1215,7 +1223,7 @@
         "validateQuick": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:quick",
         "validateFull": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:full"
       },
-      "sourceHash": "sha256:f2bdc1ae6bdef99e8072c87235bb5fbbd0d89c1aaff0eb4a095824635fa9e989",
+      "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
       "proxyStatus": null,
       "nonRenderingScenarioSuite": true,
       "sourceHashInputs": [
@@ -2420,7 +2428,7 @@
         "validateQuick": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:quick",
         "validateFull": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:full"
       },
-      "sourceHash": "sha256:fd1c8e3d52557e281c4b2fb7c4ab4c4ecbc4729936a7021bdb3265a0065a3a1a",
+      "sourceHash": "sha256:5de5585573eafd9df333f25b0e7f13d31ae6254f4eb7bdadbc7c958040b58bdf",
       "proxyStatus": null,
       "sourceHashInputs": [
         "README.md",
@@ -2656,7 +2664,7 @@
         "validateQuick": "npm --prefix threejs-dynamic-surface-effects/examples/integration-temporal-surface run validate:quick",
         "validateFull": "npm --prefix threejs-dynamic-surface-effects/examples/integration-temporal-surface run validate:full"
       },
-      "sourceHash": "sha256:0964e514ce075881516482b6c4141498bcba40ff1a4823b9ceb473cfc1daba8e",
+      "sourceHash": "sha256:f3f47206aa6c750cc28690d364ad97847fb87523e2ed3477c71f310c44b2f26c",
       "proxyStatus": null,
       "sourceHashInputs": [
         "README.md",
@@ -2974,7 +2982,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate:generated-assets",
-      "sourceHash": "sha256:76a2f44a942d79e4f83dd191037ca02850d101cf0f6afd8fff635c7052e6428e",
+      "sourceHash": "sha256:d0a0f069602883e7bb644a45c10a9dfd8201de4193d4ab32c9a203a66cb528bd",
       "proxyStatus": {
         "limitation": "Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.",
         "canonicalLabId": "webgpu-fft-ocean"
@@ -3218,7 +3226,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node --check docs/demos/shared/provider-demo.mjs",
-      "sourceHash": "sha256:03f6e4de4660774e3c9aa9545218e631ec152a132455c644e832b6576dec1969",
+      "sourceHash": "sha256:285acf7a53603dfcf13c06cfe3e7078fb30956a039805f90ca5b19917c52638d",
       "proxyStatus": {
         "limitation": "The full creature lab that exports SDF snap residuals, planted-foot drift, candidate-set parity, and silhouette/shadow masks is still pending in the skill contract. The docs page is a reduced live rig and field-shell demonstration; it does not claim accepted creature-lab evidence.",
         "canonicalLabId": "webgpu-procedural-creature-lab"
@@ -4487,7 +4495,7 @@
         "validateQuick": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:quick",
         "validateFull": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:full"
       },
-      "sourceHash": "sha256:96be1085980ca50ff873f19032b100df87005f0b6ffc7875c7acecb49b864eb7",
+      "sourceHash": "sha256:b91bed1079a3f90e84c33537e5ed50677b94a3215cb3b2a9dba6ea42e958720c",
       "proxyStatus": null,
       "nonRenderingScenarioSuite": true,
       "sourceHashInputs": [
@@ -4872,7 +4880,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-choose-skills/examples/router-contract.test.mjs",
-      "sourceHash": "sha256:940983723b138f64d42f9400455f36bef4e6d5074fe8ebe7753d4f4fdbfa7860",
+      "sourceHash": "sha256:1974b0c2bfb65d33e7072a6c28efc893e30ee2d5083f635d09ab8326f7798cbc",
       "proxyStatus": {
         "limitation": "The docs page visualizes routing contracts and budget ownership, not a generated application scene. The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
         "canonicalLabId": "router-manifest-lab"
@@ -6150,7 +6158,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:4163ff796a28cd7a092f78fe695a8272c5d8872f8fd24246b24212d9b8f1d5ce",
+      "sourceHash": "sha256:dc60f87e461c5b3844cb0aa0265eb50c06de9386058615bf3927fe9e02f24cf9",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -6227,7 +6235,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-water-optics/examples/webgpu-bounded-water run validate:generated-assets",
-      "sourceHash": "sha256:1935fb54daf784b1640d742223e329da03b9fdfd52dc904df3df7a3afe798192",
+      "sourceHash": "sha256:f60dee74d84cd37b8d1048a720c8788f0c4a66abe76ab070f57f05941ae0925b",
       "proxyStatus": {
         "limitation": "Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.",
         "canonicalLabId": "webgpu-bounded-water"
@@ -6940,7 +6948,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:9995f2b2ec9854d4653c2d23486bcaf2e441bb742f5121f7f5989b473ebb0265",
+      "sourceHash": "sha256:a49e6113d3fe009657c163da6061996d4d6e8eb5d3e88363b677904fdabb3f1b",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -8550,7 +8558,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:747f813c18711c5f4a56a092af254831aef8ec4fed2a036bcee63e9a19029d2f",
+      "sourceHash": "sha256:17514de947361852f2dfbec7cd8f8aeae3a79676f4a2981328a2f12892b4befa",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and readback are not captured",
@@ -12233,6 +12241,255 @@
     },
     {
       "schemaVersion": 2,
+      "id": "webgpu-tower-ship-sculptor",
+      "skill": "threejs-object-sculptor",
+      "threeRevision": "0.185.1",
+      "kind": "canonical-lab",
+      "status": "incomplete",
+      "canonicalSource": [
+        "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
+      ],
+      "browserEntry": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/index.html",
+      "publishPath": "/demos/webgpu-tower-ship-sculptor/",
+      "scenarios": [
+        {
+          "id": "reference-reconstruction",
+          "startup": {
+            "mode": "final",
+            "tier": "full",
+            "camera": "design",
+            "seed": 1
+          }
+        },
+        {
+          "id": "staged-sculpt",
+          "startup": {
+            "mode": "blockout",
+            "tier": "full",
+            "camera": "design",
+            "seed": 1
+          }
+        },
+        {
+          "id": "action-ready",
+          "startup": {
+            "mode": "interaction",
+            "tier": "full",
+            "camera": "design",
+            "seed": 1
+          }
+        }
+      ],
+      "mechanisms": [
+        {
+          "id": "final",
+          "route": "mechanism/final/",
+          "startup": {
+            "mode": "final"
+          }
+        },
+        {
+          "id": "blockout",
+          "route": "mechanism/blockout/",
+          "startup": {
+            "mode": "blockout"
+          }
+        },
+        {
+          "id": "hierarchy",
+          "route": "mechanism/hierarchy/",
+          "startup": {
+            "mode": "hierarchy"
+          }
+        },
+        {
+          "id": "materials",
+          "route": "mechanism/materials/",
+          "startup": {
+            "mode": "materials"
+          }
+        },
+        {
+          "id": "interaction",
+          "route": "mechanism/interaction/",
+          "startup": {
+            "mode": "interaction"
+          }
+        }
+      ],
+      "tiers": [
+        {
+          "id": "full",
+          "targetClass": "close-inspection desktop",
+          "frameTargetMs": null,
+          "resolutionPolicy": {
+            "dprCap": 2
+          },
+          "mechanismLimits": {
+            "hullStations": 17,
+            "hullRadialSegments": 12,
+            "cylinderSegments": 12,
+            "roofGrid": [
+              18,
+              8
+            ]
+          },
+          "resourceLimits": {
+            "maxVertices": 80000,
+            "maxTriangles": 150000
+          },
+          "degradationFromPrevious": [],
+          "preservedInvariants": [
+            "tower-ship silhouette",
+            "semantic IDs",
+            "24 articulated oars",
+            "five inspection modes",
+            "single scene render"
+          ],
+          "acceptanceStatus": "incomplete"
+        },
+        {
+          "id": "budgeted",
+          "targetClass": "ordinary desktop and tablet",
+          "frameTargetMs": null,
+          "resolutionPolicy": {
+            "dprCap": 1.5
+          },
+          "mechanismLimits": {
+            "hullStations": 13,
+            "hullRadialSegments": 10,
+            "cylinderSegments": 8,
+            "roofGrid": [
+              12,
+              6
+            ]
+          },
+          "resourceLimits": {
+            "maxVertices": 52000,
+            "maxTriangles": 98000
+          },
+          "degradationFromPrevious": [
+            "reduced hull, roof, cylinder, and ornament tessellation"
+          ],
+          "preservedInvariants": [
+            "tower-ship silhouette",
+            "semantic IDs",
+            "24 articulated oars",
+            "five inspection modes",
+            "single scene render"
+          ],
+          "acceptanceStatus": "incomplete"
+        },
+        {
+          "id": "minimum",
+          "targetClass": "low-end and distant inspection",
+          "frameTargetMs": null,
+          "resolutionPolicy": {
+            "dprCap": 1
+          },
+          "mechanismLimits": {
+            "hullStations": 9,
+            "hullRadialSegments": 8,
+            "cylinderSegments": 6,
+            "roofGrid": [
+              8,
+              4
+            ]
+          },
+          "resourceLimits": {
+            "maxVertices": 26000,
+            "maxTriangles": 50000
+          },
+          "degradationFromPrevious": [
+            "reduced secondary shoji grids, shields, stairs, roof finials, and curve segments"
+          ],
+          "preservedInvariants": [
+            "tower-ship silhouette",
+            "semantic IDs",
+            "24 articulated oars",
+            "five inspection modes",
+            "single scene render"
+          ],
+          "acceptanceStatus": "incomplete"
+        }
+      ],
+      "modes": [
+        "final",
+        "blockout",
+        "hierarchy",
+        "materials",
+        "interaction"
+      ],
+      "cameras": [
+        "design",
+        "profile",
+        "bow",
+        "close-material"
+      ],
+      "seeds": [
+        1,
+        2654435769
+      ],
+      "capabilityRequirements": [
+        {
+          "id": "native-webgpu",
+          "required": true,
+          "evidence": "The controller awaits WebGPURenderer.init() and rejects any backend where isWebGPUBackend is not true; no fallback is activated.",
+          "status": "incomplete"
+        }
+      ],
+      "runtimeProof": [
+        {
+          "id": "renderer-init",
+          "required": true,
+          "evidence": "Await createTowerShipLabController(), which awaits renderer.init() before exposing labController.",
+          "status": "incomplete"
+        },
+        {
+          "id": "backend-is-webgpu",
+          "required": true,
+          "evidence": "Capture getMetrics().nativeWebGPU === true from the initialized controller.",
+          "status": "incomplete"
+        },
+        {
+          "id": "mechanism-reachable",
+          "required": true,
+          "evidence": "Load every physical mechanism route and reconcile the locked path against the selected runtime mode.",
+          "status": "incomplete"
+        },
+        {
+          "id": "semantic-object-contract",
+          "required": true,
+          "evidence": "Capture node, socket, collider, destruction-group, and 24-oar inventories from root.userData.sculptRuntime.",
+          "status": "incomplete"
+        },
+        {
+          "id": "aligned-readback",
+          "required": true,
+          "evidence": "Capture RGBA8 render-target pixels with the controller-reported integer 256-byte row stride.",
+          "status": "incomplete"
+        }
+      ],
+      "evidenceContract": "v2",
+      "evidenceBundle": null,
+      "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:unit",
+      "commands": {
+        "check": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run check",
+        "test": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:unit",
+        "mutations": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run test:mutations",
+        "capture": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run capture",
+        "validateArtifacts": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:artifacts",
+        "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick",
+        "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:full"
+      },
+      "sourceHash": "sha256:5c5f8a86ef59bf3b3d658b9392c667bc37f256c960e0af3fdbb3b3e678a96134",
+      "proxyStatus": null,
+      "sourceHashInputs": [
+        "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
+      ]
+    },
+    {
+      "schemaVersion": 2,
       "id": "webgpu-validation-harness",
       "title": "Native WebGPU validation harness",
       "skill": "threejs-visual-validation",
@@ -12532,7 +12789,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:44bfcf58370e5d312508fc0e0e7e4ad94c596b6f12254783625de76e93e77aa6",
+      "sourceHash": "sha256:c1ab97a032f3d08d2cc54ac56f81dd102d07c890afd674f66bd6d6349c7f29ef",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
@@ -13199,6 +13456,11 @@
       "type": "source-manifest",
       "path": "threejs-visual-validation/examples/webgpu-validation-harness/lab.manifest.json",
       "canonicalDir": "threejs-visual-validation/examples/webgpu-validation-harness"
+    },
+    "webgpu-tower-ship-sculptor": {
+      "type": "source-manifest",
+      "path": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/lab.manifest.json",
+      "canonicalDir": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
     },
     "webgpu-camera-rig": {
       "type": "source-manifest",

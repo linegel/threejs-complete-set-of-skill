@@ -23,8 +23,8 @@
     "docs/demos/space-generated-starfields",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:9c428cb1c6afd99033adb2e80fb4b024b8dbab108e7394e9d9c130348f7d906e",
+  "publishedBundleHash": "sha256:de94f4077fa9ef6490351bc980e0c052f4932c160824b22b6618cba4e5a6e209",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

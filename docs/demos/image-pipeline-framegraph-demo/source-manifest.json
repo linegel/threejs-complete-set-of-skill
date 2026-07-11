@@ -23,8 +23,8 @@
     "docs/demos/image-pipeline-framegraph-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:f63129263f1f882761198e4725d4d5ec71a28f1ce539abcc8efe9d1d28db6113",
+  "publishedBundleHash": "sha256:8a7335888257bd24d27b2d7e4229b1959e8d758b4b1832aaaed0225f947833cd",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

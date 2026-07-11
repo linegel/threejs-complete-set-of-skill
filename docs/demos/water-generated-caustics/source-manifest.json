@@ -18,13 +18,13 @@
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:1935fb54daf784b1640d742223e329da03b9fdfd52dc904df3df7a3afe798192",
+  "sourceHash": "sha256:f60dee74d84cd37b8d1048a720c8788f0c4a66abe76ab070f57f05941ae0925b",
   "publishedHashInputs": [
     "docs/demos/water-generated-caustics",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:9082e25f06c287069319fd0b80e7138d51bc63ce9a10bd1c3972aa2db751bc15",
+  "publishedBundleHash": "sha256:d2ffb2068c87fc49bea67365efd920698147b9101f7bcd07cc9f1fd2b69e49ee",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

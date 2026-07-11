@@ -51,8 +51,8 @@
     "docs/demos/final-image-flight",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:512732faf723af9768f04b449cc8a315d834b5f83327bf88f3065437d2aef0b7",
+  "publishedBundleHash": "sha256:a24943248d9550dde39588045f6aab4630313886ed45ae8d6e90d4b3b66b5459",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

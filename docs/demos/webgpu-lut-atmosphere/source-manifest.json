@@ -22,8 +22,8 @@
     "docs/demos/webgpu-lut-atmosphere",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:3b93ee36f37f11eec46c77d06a243df6e3ad4be24c9ce9f80c80a49dae14d02f",
+  "publishedBundleHash": "sha256:dfa4a5e362ce5afcbb4308a684f374eba9baa5801d4a1f7cff7c57442061d90d",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

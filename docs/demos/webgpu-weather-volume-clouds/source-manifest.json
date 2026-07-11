@@ -24,8 +24,8 @@
     "docs/demos/webgpu-weather-volume-clouds",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:e3b6c57c30e8eecee578fcddf73bbdcd8a9c06a151cd225ce14beb32bf4ad0bc",
+  "publishedBundleHash": "sha256:b3fd45f01f128d970328a065afbea71d31cdafed738318d3e55487a4ab3d48ac",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

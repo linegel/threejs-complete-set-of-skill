@@ -18,13 +18,13 @@
     "threejs-spectral-ocean/examples/webgpu-fft-ocean"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:76a2f44a942d79e4f83dd191037ca02850d101cf0f6afd8fff635c7052e6428e",
+  "sourceHash": "sha256:d0a0f069602883e7bb644a45c10a9dfd8201de4193d4ab32c9a203a66cb528bd",
   "publishedHashInputs": [
     "docs/demos/ocean-generated-wave-seeds",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:56fded5ab8e0512ae4bcbc00f62e22bfa9aede0b8863613e7dbae6f5271ae2e0",
+  "publishedBundleHash": "sha256:f7789ea61d1e4634287fb7203936fad3661e08eb777bb854130d8bf09305f931",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

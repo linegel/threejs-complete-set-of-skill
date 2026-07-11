@@ -19,13 +19,13 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js"
   ],
   "browserEntry": "threejs-dynamic-surface-effects/examples/integration-temporal-surface/index.html",
-  "sourceHash": "sha256:0964e514ce075881516482b6c4141498bcba40ff1a4823b9ceb473cfc1daba8e",
+  "sourceHash": "sha256:f3f47206aa6c750cc28690d364ad97847fb87523e2ed3477c71f310c44b2f26c",
   "publishedHashInputs": [
     "docs/demos/integration-temporal-surface",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:f1daa8f0d558eda915f09d56bf0dfbcfe886b62d6dcb9146e7199ebdf120bf64",
+  "publishedBundleHash": "sha256:901a9b8eab973356e3cbf085693d2061c3ef726feeaedb8542c2b6def36cc4f9",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:a79f750d2469284dc4b5153a99a8ec8a2e320bb75eb07c815f61a9268ec5d128",
+  "buildRevision": "sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b",
   "evidenceBundleId": null
 }

@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-creatures.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:a9714a30cc7fdffebeb6284b601f9c997c57bf214f15eab32b29a2cac1dff425" />
+<meta name="skill-pack-build-revision" content="sha256:8cdb2b09875792632a3741a7d05b76a06e95fd35dd18efc57ec30ea5532ec83b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Creatures | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build workload-selected procedural and generated creatures in Three.js r185 WebGPU/TSL. Use for spec-driven bodies, semantic rigs, field-extracted skinned…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-creatures.html" />
-<meta property="article:modified_time" content="2026-07-10T21:41:13+03:00" />
+<meta property="article:modified_time" content="2026-07-11T04:41:20+03:00" />
 <meta property="article:published_time" content="2026-07-05T02:51:00+03:00" />
 <meta property="article:section" content="Procedural Content" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
@@ -63,7 +63,7 @@
    },
    "image": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
    "datePublished": "2026-07-05T02:51:00+03:00",
-   "dateModified": "2026-07-10T21:41:13+03:00",
+   "dateModified": "2026-07-11T04:41:20+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -276,9 +276,10 @@ a.chip:active{scale:.96}
       <span class="chip">1 primary implementation</span>
 <span class="chip">1 flagship</span>
 <span class="chip">1 secondary surface</span>
+      
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-10T21:41:13+03:00">2026-07-10</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/3be3966f2d7fccc8cadd1e9fd8100e270a5ece27">commit 3be3966 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T04:41:20+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/091f7317c5470292faff994e3be8cf628d0d5323">commit 091f731 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-creatures/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-creatures/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -342,6 +343,7 @@ scale $(s, 1/\sqrt s, 1/\sqrt s)$ has determinant exactly 1.</p></div>
   </div></div>
 
 
+
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
@@ -372,8 +374,9 @@ the immutable <code>EnvironmentForcingSnapshot</code>,
 <code>InteractionRecord</code>, conservation groups, residency/state versions, and
 the immutable presentation publication chain. This skill consumes those boundaries;
 it does not fork them inside creature locomotion.</p>
-<p>Reactive locomotion consumes the complete <code>SupportSurfaceSample</code> selected for
-its requested physics instant, including stable support/feature identity,
+<p>Reactive locomotion consumes the complete <code>SupportSurfaceSample</code> selected by
+the instant arm of its request&#39;s <code>requestedPhysicsTime: PhysicsTime</code>, including
+stable support/feature identity,
 point kinematics, sidedness, footprint, validity, and correlated channel
 error; it does not turn that kinematic query into a contact impulse. Swimming
 and buoyancy consume the complete <code>WaterSurfaceSample</code> returned under the
@@ -559,20 +562,25 @@ velocity and density from a versioned <code>EnvironmentForcingSnapshot</code> gr
 edge, preserving channel time/support/filter/error and never owning private
 wind state;
 fixed-step verlet ropes; buoyancy response against the shared batched,
-channel-requested <code>WaterSurfaceProvider</code>. The canonical request uses
-physics-frame metres and carries context/provider/signal/schema IDs,
-requested <code>PhysicsInstant</code>, channel masks, footprint/filter, tolerances,
-staleness, acceptable residency/latency, and batch extent; descriptor
+channel-requested <code>WaterSurfaceProvider</code>. Habitat, support, and water use
+canonical <code>PhysicsSampleRequest</code> records in physics-frame metres with
+context/provider/signal/schema IDs. <code>requestedPhysicsTime: PhysicsTime</code>
+selects <code>kind: instant</code>, carries a raw <code>PhysicsInstant</code> in <code>instant</code>, and a
+full canonical <code>TypedAbsence</code> record in <code>interval</code>; requests also carry
+channel masks, footprint/filter, tolerances, staleness, acceptable
+residency/latency, and batch extent. Descriptor
 discovery supplies a stable descriptor-table reference rather than a deep
 copy. Samples use
 <code>freeSurfacePoint</code>, <code>freeSurfaceNormal</code>, <code>geometricNormalVelocityMps</code>,
 <code>surfacePointVelocityMps</code>,
 <code>materialCurrentVelocityMps</code>, <code>waterColumnDepthMeters</code>, optional
-<code>densityKgPerM3</code>, and return the complete <code>PhysicsSignalDescriptor</code>, bundle
-<code>sampleInstant</code>, and per-channel <code>actualPhysicsTime</code> resolving to a
-<code>PhysicsInstant</code>. Requested and actual instants may differ only within
-declared latency/staleness gates. Each channel
-is the complete shared <code>SampledChannel</code>.
+<code>densityKgPerM3</code>. The response envelope retains <code>requestedPhysicsTime</code> and
+<code>actualBundleTime</code> as <code>PhysicsTime</code> wrappers using that instant arm and
+canonical <code>TypedAbsence</code> interval arm; every
+<code>SampledChannel.actualPhysicsTime</code> retains the same wrapper. The domain
+sample&#39;s <code>sampleInstant</code> remains a raw <code>PhysicsInstant</code>. Requested and
+actual instant-arm values may differ only within declared latency/staleness
+gates. Each channel is the complete shared <code>SampledChannel</code>.
 <code>geometricNormalVelocityMps</code> is mandatory even when the parameterization-
 dependent full <code>surfacePointVelocityMps</code> is absent. Surface-point velocity
 and material current are distinct;
@@ -745,6 +753,16 @@ slots, bounded deterministic queues, and canonical batch-level
 per-creature query objects. Presented pose/resource generations use a
 frame-in-flight lease/reuse rule so compute or slot recycling cannot overwrite
 state still referenced by a sealed snapshot.
+Kinematic <code>SupportSurfaceSample</code> queries do not enter a contact ledger. When a
+route instead selects physical creature contact, publish <code>PhysicsContactCost</code>
+from the actual contact owner: body/shape/proxy counts, moved bounds,
+broadphase candidates, narrowphase shape-pair tests, contacts, manifolds and
+points, islands/largest island, scalar constraint rows, iterations/residuals,
+warm-start hits/misses/invalidations/cache bytes, deterministic sort/reduction,
+and contact/reaction lifecycle events. Measure frozen pileup, dense flock
+landing, high-speed crossing, sleeping/waking, topology/proxy change, cold
+warm-start cache, catch-up, and quality migration; ordinary gait over empty
+ground is not a contact-tail benchmark.
 Physical locomotion/interaction <code>QualityTransition</code> commits only at a scheduler
 tick with state projection, queue boundary, conserved-value/error ledger,
 atomic provider/identity generation, history action, rollback, and measured
@@ -810,6 +828,9 @@ frame hitches;</li>
 <li>cross-owner recurrent locomotion advances from a creature-local/render-loop
 accumulator, so it diverges from <code>PhysicsGraph</code> catch-up and exact-once
 interaction application;</li>
+<li>physical contact is budgeted from creature/body count while broadphase pairs,
+shape-pair tests, manifolds, constraint rows/iterations, cache behavior, and
+frozen pileup/topology-change tails are absent;</li>
 <li>part-id sorting defines a repeated smooth-min fold, so a rename changes the
 field, or candidate leaves are folded outside their declared blend ancestry;</li>
 <li>proximity skin weights leak across contacting limbs, influences are not
@@ -887,7 +908,7 @@ pack — do not stretch this skill over them.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 39 primary implementations · registry <code>a9714a30cc7f</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>8cdb2b098757</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>
