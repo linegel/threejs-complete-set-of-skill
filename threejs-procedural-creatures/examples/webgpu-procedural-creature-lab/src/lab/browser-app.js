@@ -64,7 +64,14 @@ const specNames = [...CREATURE_FOCI];
 const debugModes = [...CREATURE_MODES];
 const tiers = [...CREATURE_TIERS];
 const startup = startupFromDataset(document.body?.dataset ?? {});
-const specUrlRoot = new URL('./specs/', import.meta.url);
+const specUrls = Object.freeze({
+	biped: new URL('./specs/biped.json', import.meta.url),
+	quadruped: new URL('./specs/quadruped.json', import.meta.url),
+	hexapod: new URL('./specs/hexapod.json', import.meta.url),
+	hopper: new URL('./specs/hopper.json', import.meta.url),
+	flyer: new URL('./specs/flyer.json', import.meta.url),
+	swimmer: new URL('./specs/swimmer.json', import.meta.url),
+});
 const MAX_PARTS = 64;
 const MAX_CREATURES = 96;
 const SPECIES_CAP = 16;
@@ -490,7 +497,7 @@ function renderOnce() {
 	resizeRenderer();
 	updatePoseStorage();
 	const start = instrumentationNow();
-	state.renderer.render(state.scene, state.camera);
+	state.renderPipeline.render();
 	const elapsed = instrumentationNow() - start;
 	state.frameCount += 1;
 	state.lastFrameMs = Number(Math.max(0, elapsed).toFixed(4));
@@ -1683,7 +1690,11 @@ async function init() {
 	state.bootCounters.mark('scene');
 
 	setStatus('Creature Lab Loading Specs');
-	state.specs = await Promise.all(specNames.map((name) => fetchJson(new URL(`${name}.json`, specUrlRoot))));
+	state.specs = await Promise.all(specNames.map((name) => {
+		const url = specUrls[name];
+		if (!url) throw new Error(`missing browser spec URL for '${name}'`);
+		return fetchJson(url);
+	}));
 	for (const tierName of tiers) buildShellGeometry(1, tierName);
 	buildSpeciesRecords(state.specs);
 	spawnGrid(startup.seed, startup.population, { render: false });
