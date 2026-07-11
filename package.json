@@ -1,9 +1,16 @@
 {
   "name": "threejs-webgpu-skill-pack",
   "version": "1.0.0",
+  "packageManager": "npm@10.9.4",
   "description": "Agent skill pack for Three.js WebGPU/TSL procedural graphics, image pipelines, and visual validation.",
   "main": "index.js",
+  "engines": {
+    "node": "22.22.0",
+    "npm": "10.9.4"
+  },
   "scripts": {
+    "toolchain:preflight": "node scripts/toolchain-preflight.mjs",
+    "browser:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
     "build:pages": "npm run pages:build",
     "labs:registry": "node scripts/validate-lab-manifests.mjs --write-registry",
     "labs:check": "node scripts/validate-lab-manifests.mjs && node scripts/check-lab-implementation-matrix.mjs && node scripts/check-lab-sources.mjs && node scripts/check-capture-wiring.mjs && node --test tests/labs/*.test.mjs && node scripts/run-labs.mjs check",
@@ -59,7 +66,7 @@
   "devDependencies": {
     "marked": "18.0.5",
     "playwright": "1.61.1",
-    "sharp": "^0.35.3",
+    "sharp": "0.35.3",
     "vite": "8.1.3"
   }
 }
