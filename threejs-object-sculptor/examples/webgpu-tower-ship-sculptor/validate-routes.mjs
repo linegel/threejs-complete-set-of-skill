@@ -12,7 +12,9 @@ const routes = [
 for (const [kind, id] of routes) {
   const url = new URL(`./${kind}/${id}/index.html`, import.meta.url);
   assert(existsSync(url), `missing physical ${kind} route ${id}`);
-  assert.match(readFileSync(url, "utf8"), /src="\.\.\/\.\.\/app\.js"/, `${kind}/${id} must import canonical app`);
+  const routeSource = readFileSync(url, "utf8");
+  assert.match(routeSource, /src="\.\.\/\.\.\/app\.js"/, `${kind}/${id} must import canonical app`);
+  assert.match(routeSource, /id="metric-motion"/, `${kind}/${id} must expose live or frozen motion state`);
 }
 for (const tier of manifest.tiers) {
   assert.equal(tier.resolutionPolicy.dprCap, TOWER_SHIP_DPR_CAPS[tier.id], `${tier.id} DPR cap drift`);
