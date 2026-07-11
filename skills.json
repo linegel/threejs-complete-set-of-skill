@@ -24,7 +24,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+    "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
     "skills": 27,
     "primaryImplementations": 40,
     "loadablePrimaryImplementations": 40,
@@ -3069,7 +3069,7 @@
             "scripts/provider-demos.mjs",
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:287c7cee80a45b7160782f2d3902480e2189be1af258d330bb4818dfa5bd4148",
+          "sourceHash": "sha256:b67792fb39e96bf27572c3354d893cdf58298f4ab6f0dacb72d497ea7fd1d0b2",
           "proxyStatus": {
             "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
             "canonicalLabId": "webgpu-validation-harness"
@@ -3086,15 +3086,15 @@
           "sourceHashInputs": [
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:9e9b484608b7a0c8240bc7be0666d1bd2001808fc491e8178501ade6891c4dc6",
+          "sourceHash": "sha256:1e8dd506e4ea5c8252bbb8cc12923fa8c54e5196cb69f8422de462d0c8a2e030",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T15:23:00+03:00",
-        "commit": "9053e87fb7af015d6a387c3fafe0151dbb24c8c6",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/9053e87fb7af015d6a387c3fafe0151dbb24c8c6"
+        "datetime": "2026-07-11T15:38:40+03:00",
+        "commit": "7c6d03bd2a74da7c20cb6f7e85f0fdead079297e",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/7c6d03bd2a74da7c20cb6f7e85f0fdead079297e"
       },
       "page": "https://threejs-skills.com/skills/threejs-visual-validation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md",

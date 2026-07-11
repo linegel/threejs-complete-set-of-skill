@@ -18,8 +18,8 @@
     "docs/demos/webgpu-field-bake",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:57a3d13a53c28cfdbb584c19bb0170b1abc237b14495aee5382e440f0c336bb8",
+  "publishedBundleHash": "sha256:eafced3b25651a9f6338b2c2f53ad4bfc4d1abe990fdf4c4e5590b7a73288ed0",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

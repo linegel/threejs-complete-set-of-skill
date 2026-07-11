@@ -23,8 +23,8 @@
     "docs/demos/materials-generated-lava-causes",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:d6a8642bed06bc448f68fb1b199ab5ac07a1008286b7ee7f0d45192af4c5a73e",
+  "publishedBundleHash": "sha256:8f0391af07ee71805f84d184912babd2633f5940000ec1aa9c1c41bbcb02af32",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

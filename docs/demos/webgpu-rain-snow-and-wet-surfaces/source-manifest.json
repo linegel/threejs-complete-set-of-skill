@@ -20,8 +20,8 @@
     "docs/demos/webgpu-rain-snow-and-wet-surfaces",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:3cbf67dcf2102c38fee4ad0e3007e4ec7c07fd26657ef2c5f499a82a623b8fb6",
+  "publishedBundleHash": "sha256:fa2046f87a6791edd93b938dba32ea0a5b9bff7743b8c5d473ab8ed224b176a6",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

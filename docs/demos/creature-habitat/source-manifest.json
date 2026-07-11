@@ -68,8 +68,8 @@
     "docs/demos/creature-habitat",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:1a9daf597754c4626a3ecd7187c440b2eb7571e96aeb3f75d8232186bf65146e",
+  "publishedBundleHash": "sha256:09b0ab019ba240c61a5dc319e079fe9da49b7f966fd5cfbb9c17d972953dd1db",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

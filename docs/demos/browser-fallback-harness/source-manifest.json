@@ -20,8 +20,8 @@
     "docs/demos/browser-fallback-harness",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:cdad27fe8c9cf56aba819d4e10f7944b313f6a7cba651228e852c9b80c5337a0",
+  "publishedBundleHash": "sha256:11940897998a9f8fa30e5edd70bdbfd731b13816e4ee02443f7fbe7c57579c82",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

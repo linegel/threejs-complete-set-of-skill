@@ -23,8 +23,8 @@
     "docs/demos/camera-rig-handoff-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:dd73ffda670e7e9b82c5fd214ea2420be226274163521925461c06bf99544e7d",
+  "publishedBundleHash": "sha256:2e0fc2c0ace3d7d0befdb19a55ee8d07be0e3b57089c28977eeb38b176f3255e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

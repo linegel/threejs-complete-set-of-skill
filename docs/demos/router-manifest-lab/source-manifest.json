@@ -17,8 +17,8 @@
     "docs/demos/router-manifest-lab",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8efe7bf55427ce11a5b9b8307d661495a1a780a0269930a192c6b78157d0edf0",
+  "publishedBundleHash": "sha256:8672faf84f1305ef68b37aa2789cd62bb352e80b18281966795a68e62f88f8be",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

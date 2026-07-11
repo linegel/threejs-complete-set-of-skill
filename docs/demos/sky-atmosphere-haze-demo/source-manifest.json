@@ -23,8 +23,8 @@
     "docs/demos/sky-atmosphere-haze-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:93fa80cee9e9dd4529eacafad645a2d43cfc8aa307ca1c125d4246a341653a5a",
+  "publishedBundleHash": "sha256:e9c49c3205f9b1a41739fba090a4a83521322607c8318029a5b7f2d5f8136de6",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

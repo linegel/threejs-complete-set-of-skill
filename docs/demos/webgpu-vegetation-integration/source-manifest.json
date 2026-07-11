@@ -32,8 +32,8 @@
     "docs/demos/webgpu-vegetation-integration",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8c87119fb73fbeb824669d4c9bd0ca1ca732466f79329c3feb5a889c7ba4718c",
+  "publishedBundleHash": "sha256:028f2e7d48b5d4527c3d8d4951126a649a818d7ca02ca6d0526810f01b23cee0",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }

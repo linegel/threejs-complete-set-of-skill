@@ -95,7 +95,7 @@
       "primaryImageLabel": "Native WebGPU MRT subject render-target readback",
       "limitations": [
         "Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.",
-        "A separate 1920x1080 sustained trace now reports the measured current-adapter GPU budget overrun as FAIL; per-stage attribution, governor stress, and mechanism completeness remain INSUFFICIENT_EVIDENCE."
+        "A separate 1920x1080 SwiftShader trace reports the measured GPU budget overrun as FAIL while scene-MRT/final-output attribution passes; governor stress and mechanism completeness remain INSUFFICIENT_EVIDENCE."
       ],
       "images": [
         { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Color-managed final output from the single RenderPipeline owner." },

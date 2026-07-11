@@ -18,13 +18,13 @@
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:287c7cee80a45b7160782f2d3902480e2189be1af258d330bb4818dfa5bd4148",
+  "sourceHash": "sha256:b67792fb39e96bf27572c3354d893cdf58298f4ab6f0dacb72d497ea7fd1d0b2",
   "publishedHashInputs": [
     "docs/demos/visual-validation-harness-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:99db4f83a481fbae8d264ae9ee7cac2211eaf8ae361e999dad251b511ce00c61",
+  "publishedBundleHash": "sha256:76d45bb8719865dfe2579df05ccd5ceb7c3450caecc69d916d766ba643903668",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:e1623221e6249521bfd1dfe3226fa6f1b31735a50fbe0f2c79d1494ebf348c5a",
+  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
   "evidenceBundleId": null
 }
