@@ -396,6 +396,24 @@ function validatePerformance( envelope, trace, manifest, contract ) {
 
 	}
 	if ( manifest.claimVerdicts.performanceCompliance === 'PASS' && deadlineMissRatio > deadlineMissRatioGate ) throw new Error( `deadline-overrun: miss ratio ${ deadlineMissRatio } exceeds gate ${ deadlineMissRatioGate }.` );
+	if ( manifest.claimVerdicts.gpuAttribution === 'PASS' ) {
+
+		const attribution = trace.gpuStageAttribution;
+		requireKeys( attribution, [ 'scene-mrt', 'final-output', 'maxReconciliationError', 'reconciliationGate', 'verdict' ], 'frame-trace.json.gpuStageAttribution' );
+		for ( const id of [ 'scene-mrt', 'final-output' ] ) {
+
+			requireKeys( attribution[ id ], [ 'samples', 'p50', 'p95' ], `frame-trace.json.gpuStageAttribution.${ id }` );
+			validateNumericArray( attribution[ id ].samples, `frame-trace.json.gpuStageAttribution.${ id }.samples` );
+			validateNumericDatum( attribution[ id ].p50, `frame-trace.json.gpuStageAttribution.${ id }.p50` );
+			validateNumericDatum( attribution[ id ].p95, `frame-trace.json.gpuStageAttribution.${ id }.p95` );
+
+		}
+		validateNumericDatum( attribution.maxReconciliationError, 'frame-trace.json.gpuStageAttribution.maxReconciliationError' );
+		validateNumericDatum( attribution.reconciliationGate, 'frame-trace.json.gpuStageAttribution.reconciliationGate' );
+		if ( attribution.verdict !== 'PASS' ) throw new Error( 'GPU attribution PASS requires a PASS stage-attribution verdict.' );
+		if ( numericValue( attribution.maxReconciliationError ) > numericValue( attribution.reconciliationGate ) ) throw new Error( 'gpu-attribution-mismatch: stage timestamps do not reconcile with the frame total.' );
+
+	}
 
 }
 

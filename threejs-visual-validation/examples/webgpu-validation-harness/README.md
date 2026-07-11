@@ -58,11 +58,13 @@ captures `final.performance.png` at 1920x1080 and measures 30 warm-up frames,
 120 individually resolved WebGPU render timestamps, 120 CPU submission
 samples, and 119 `requestAnimationFrame` cadence intervals. Timestamp mapping
 is disabled during the cadence window so the presentation samples describe
-rendering cadence rather than readback stalls. The profile remains
-non-publishable until per-stage attribution, governor stress, and mechanism
-proof are present; a sustained total-frame trace alone does not satisfy those
-claims. A measured total-frame budget overrun is still reported as `FAIL`
-immediately instead of being hidden behind `INSUFFICIENT_EVIDENCE`.
+rendering cadence rather than readback stalls. The subject owns the exact
+adapter/device request, serializes its allowlisted identity, features, and
+limits, and attributes each sustained frame to the scene MRT and final-output
+render contexts. Their sum must reconcile with the frame total within 0.001
+ms. The profile remains non-publishable until governor stress and mechanism
+proof are present. A measured total-frame budget overrun is still reported as
+`FAIL` immediately instead of being hidden behind `INSUFFICIENT_EVIDENCE`.
 
 ## Browser subject
 
@@ -130,6 +132,7 @@ publishable-with-insufficient-claim
 p95-overrun
 gpu-p95-overrun
 deadline-overrun
+missing-stage-attribution
 governor-oscillation
 visual-error-overrun
 target-leak

@@ -258,6 +258,40 @@ export async function runV2MutationSuite() {
 			} );
 
 		} ),
+		expectMutationRejects( 'missing-stage-attribution', /gpuStageAttribution/, async ( dir ) => {
+
+			await mutateJson( dir, 'visual-contract.json', ( contract ) => {
+
+				contract.performanceClaims.gpuTimingRequirement = 'required';
+
+			} );
+			await mutateJson( dir, 'performance-envelope.json', ( envelope ) => {
+
+				envelope.gpuTimingRequirement = 'required';
+
+			} );
+			await mutateJson( dir, 'evidence-manifest.json', ( manifest ) => {
+
+				manifest.bundleKind = 'browser-capture-incomplete';
+				manifest.publishable = false;
+				manifest.backend.isWebGPUBackend = true;
+				manifest.backend.initialized = true;
+				manifest.claimVerdicts.gpuAttribution = 'PASS';
+
+			} );
+			await mutateJson( dir, 'renderer-info.json', ( rendererInfo ) => {
+
+				rendererInfo.backend = 'WebGPU';
+
+			} );
+			await mutateJson( dir, 'frame-trace.json', ( trace ) => {
+
+				trace.gpuTimingAvailable = true;
+				trace.renderTimestamp = authored( 10, 'ms' );
+
+			} );
+
+		} ),
 		expectMutationRejects( 'governor-oscillation', /governor-oscillation/, async ( dir ) => {
 
 			await mutateJson( dir, 'quality-governor.json', ( governor ) => {

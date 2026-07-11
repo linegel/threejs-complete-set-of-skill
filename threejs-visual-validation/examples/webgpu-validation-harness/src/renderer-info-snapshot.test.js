@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { snapshotRendererInfo } from './renderer-info-snapshot.js';
+import { snapshotGpuAdapter, snapshotRendererInfo } from './renderer-info-snapshot.js';
 
 test( 'renderer info snapshot preserves counters and records unsafe values', () => {
 
@@ -62,5 +62,20 @@ test( 'renderer info snapshot rejects invalid roots and depth policies', () => {
 
 	assert.throws( () => snapshotRendererInfo( null ), /renderer\.info must be an object/ );
 	assert.throws( () => snapshotRendererInfo( {}, { maximumDepth: 0 } ), /positive integer/ );
+
+} );
+
+test( 'GPU adapter snapshot retains allowlisted identity, features, and limits', () => {
+
+	const snapshot = snapshotGpuAdapter( {
+		info: { vendor: 'test-vendor', architecture: 'test-arch', device: '', description: 'test adapter', ignored: 'nope' },
+		features: new Set( [ 'timestamp-query', 'texture-compression-bc' ] ),
+		limits: { maxTextureDimension2D: 8192, maxStorageTexturesPerShaderStage: 4, ignored: 99 }
+	} );
+	assert.deepEqual( snapshot.info, { vendor: 'test-vendor', architecture: 'test-arch', description: 'test adapter' } );
+	assert.deepEqual( snapshot.features, [ 'texture-compression-bc', 'timestamp-query' ] );
+	assert.deepEqual( snapshot.limits, { maxTextureDimension2D: 8192, maxStorageTexturesPerShaderStage: 4 } );
+	assert.match( snapshot.identitySource, /canonical renderer device request/ );
+	assert.throws( () => snapshotGpuAdapter( null ), /GPU adapter/ );
 
 } );

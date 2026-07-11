@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import { encodeRgbaPng } from '../../../scripts/lib/png-rgba.mjs';
-import { classifyPerformanceTrace, writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
+import { classifyGpuStageAttribution, classifyPerformanceTrace, writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
 
@@ -174,6 +174,7 @@ export async function captureLab( session ) {
 		gpuP95: 1000 / 60 - 2,
 		deadlineMissRatio: 0.01
 	} );
+	const gpuAttribution = classifyGpuStageAttribution( performanceTrace );
 	const boundary = {
 		schemaVersion: 2,
 		bundleKind: 'browser-capture-session',
@@ -184,14 +185,14 @@ export async function captureLab( session ) {
 		evidenceContract: 'v2',
 		reason: performanceTrace === null
 			? 'Real render-target captures and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, sustained timing, GPU-stage attribution, and visual sign-off.'
-			: 'Real render-target captures, a sustained CPU/GPU/cadence trace, and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, per-stage GPU attribution, governor stress, and visual sign-off.',
+			: 'Real render-target captures, a sustained attributed CPU/GPU/cadence trace, and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, governor stress, and visual sign-off.',
 		claimVerdicts: {
 			nativeWebGPUCorrectness: 'PASS',
 			renderTargetReadback: 'PASS',
 			mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
 			performanceCompliance,
 			gpuTimestampAvailability: runtime.gpuTiming.verdict,
-			gpuAttribution: 'INSUFFICIENT_EVIDENCE',
+			gpuAttribution,
 			lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 		},
 		diagnosticDifference: {

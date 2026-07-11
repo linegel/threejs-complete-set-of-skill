@@ -22,7 +22,7 @@ import { color, emissive, float, mrt, normalView, output, pass, renderOutput, ve
 
 import { unpackAlignedReadback } from './readback.js';
 import { buildValidationResourceLedger } from './resource-ledger.js';
-import { snapshotRendererInfo } from './renderer-info-snapshot.js';
+import { snapshotGpuAdapter, snapshotRendererInfo } from './renderer-info-snapshot.js';
 
 const SCENARIO_IDS = [
 	'browser-capture',
@@ -100,13 +100,32 @@ function requireFrameCount( value, label, minimum, maximum ) {
 export async function createNativeWebGPUValidationSubject( canvas, options = {} ) {
 
 	if ( canvas === null || typeof canvas !== 'object' ) throw new Error( 'A canvas is required.' );
+	if ( navigator.gpu === undefined ) throw new Error( 'WebGPU adapter required for canonical visual validation. No fallback is activated.' );
+	const rendererParameters = { ...options.rendererParameters };
+	let ownedDevice = null;
+	let adapterSnapshot = null;
+	if ( rendererParameters.device === undefined ) {
+
+		const adapter = await navigator.gpu.requestAdapter( {
+			powerPreference: rendererParameters.powerPreference,
+			featureLevel: 'compatibility',
+			xrCompatible: false
+		} );
+		if ( adapter === null ) throw new Error( 'Unable to create the canonical WebGPU adapter. No fallback is activated.' );
+		adapterSnapshot = snapshotGpuAdapter( adapter );
+		const deviceDescriptor = { requiredFeatures: [ ...adapter.features ] };
+		if ( rendererParameters.requiredLimits !== undefined ) deviceDescriptor.requiredLimits = rendererParameters.requiredLimits;
+		ownedDevice = await adapter.requestDevice( deviceDescriptor );
+		rendererParameters.device = ownedDevice;
+
+	}
 
 	const renderer = new WebGPURenderer( {
 		canvas,
 		antialias: false,
 		outputBufferType: HalfFloatType,
 		trackTimestamp: true,
-		...options.rendererParameters
+		...rendererParameters
 	} );
 	renderer.outputColorSpace = SRGBColorSpace;
 	renderer.toneMapping = NeutralToneMapping;
@@ -115,6 +134,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	if ( renderer.backend?.isWebGPUBackend !== true ) {
 
 		renderer.dispose();
+		ownedDevice?.destroy();
 		throw new Error( 'WebGPU backend required for canonical visual validation. No fallback is activated.' );
 
 	}
@@ -238,6 +258,27 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		cpuFrameSamples.push( cpuMs );
 		renderer.setRenderTarget( previousTarget );
 		return cpuMs;
+
+	}
+
+	async function resolveAttributedRenderFrame( label ) {
+
+		const queryPool = renderer.backend.timestampQueryPool.render;
+		const pendingUids = queryPool ? [ ...queryPool.queryOffsets.keys() ] : [];
+		const totalMs = await renderer.resolveTimestampsAsync( 'render' );
+		if ( Number.isFinite( totalMs ) === false ) throw new Error( `${ label } has no GPU timestamp.` );
+		if ( pendingUids.length !== 2 ) throw new Error( `${ label } expected two render contexts, received ${ pendingUids.length }.` );
+		const durations = pendingUids.map( ( uid ) => renderer.backend.getTimestamp( uid ) );
+		if ( durations.some( ( value ) => Number.isFinite( value ) === false || value < 0 ) ) throw new Error( `${ label } has an invalid per-context timestamp.` );
+		return {
+			totalMs,
+			stages: {
+				'scene-mrt': durations[ 0 ],
+				'final-output': durations[ 1 ]
+			},
+			reconciliationErrorMs: Math.abs( totalMs - durations[ 0 ] - durations[ 1 ] ),
+			contextUids: pendingUids
+		};
 
 	}
 
@@ -444,6 +485,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 					p95: percentile( cpuFrameSamples, 0.95 )
 				},
 				resetEvents: [ ...resetEvents ],
+				adapter: adapterSnapshot,
 				rendererState: {
 					renderer: 'WebGPURenderer',
 					outputColorSpace: renderer.outputColorSpace,
@@ -487,22 +529,26 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			const warmupCpuSamples = [];
 			const cpuSamples = [];
 			const gpuSamples = [];
+			const gpuStageSamples = { 'scene-mrt': [], 'final-output': [] };
+			const gpuAttributionErrors = [];
 			const presentationSamples = [];
+			await renderer.resolveTimestampsAsync( 'render' );
 
 			for ( let frame = 0; frame < warmupFrames; frame ++ ) {
 
 				warmupCpuSamples.push( await renderTo( null ) );
-				const gpuMs = await renderer.resolveTimestampsAsync( 'render' );
-				if ( Number.isFinite( gpuMs ) === false ) throw new Error( `Warm-up frame ${ frame } has no GPU timestamp.` );
+				await resolveAttributedRenderFrame( `Warm-up frame ${ frame }` );
 
 			}
 
 			for ( let frame = 0; frame < sampleFrames; frame ++ ) {
 
 				cpuSamples.push( await renderTo( null ) );
-				const gpuMs = await renderer.resolveTimestampsAsync( 'render' );
-				if ( Number.isFinite( gpuMs ) === false ) throw new Error( `Sustained frame ${ frame } has no GPU timestamp.` );
-				gpuSamples.push( gpuMs );
+				const gpuFrame = await resolveAttributedRenderFrame( `Sustained frame ${ frame }` );
+				gpuSamples.push( gpuFrame.totalMs );
+				gpuStageSamples[ 'scene-mrt' ].push( gpuFrame.stages[ 'scene-mrt' ] );
+				gpuStageSamples[ 'final-output' ].push( gpuFrame.stages[ 'final-output' ] );
+				gpuAttributionErrors.push( gpuFrame.reconciliationErrorMs );
 
 			}
 
@@ -525,6 +571,10 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				warmupCpuSamples,
 				cpuSamples,
 				gpuSamples,
+				gpuStageSamples,
+				gpuStageP50: Object.fromEntries( Object.entries( gpuStageSamples ).map( ( [ id, values ] ) => [ id, percentile( values, 0.5 ) ] ) ),
+				gpuStageP95: Object.fromEntries( Object.entries( gpuStageSamples ).map( ( [ id, values ] ) => [ id, percentile( values, 0.95 ) ] ) ),
+				gpuAttributionMaxErrorMs: Math.max( ...gpuAttributionErrors ),
 				presentationSamples,
 				cpuP50: percentile( cpuSamples, 0.5 ),
 				cpuP95: percentile( cpuSamples, 0.95 ),
@@ -547,6 +597,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			captureTarget.dispose();
 			renderPipeline.dispose();
 			renderer.dispose();
+			ownedDevice?.destroy();
 			captureTarget = null;
 
 		}

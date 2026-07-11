@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildTraceSegment, bytesPerTexel, classifyPerformanceTrace, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
+import { buildTraceSegment, bytesPerTexel, classifyGpuStageAttribution, classifyPerformanceTrace, summarizeLifecycleEvidence } from './runtime-v2-bundle.js';
 
 function lifecycleFixture( mutate = () => {} ) {
 
@@ -79,5 +79,19 @@ test( 'performance classification exposes measured overruns without promoting in
 	assert.equal( classifyPerformanceTrace( { cpuP95: 2, gpuP95: 15, deadlineMissRatio: 0 }, gates ), 'FAIL' );
 	assert.equal( classifyPerformanceTrace( { cpuP95: 2, gpuP95: 12, deadlineMissRatio: 0.02 }, gates ), 'FAIL' );
 	assert.throws( () => classifyPerformanceTrace( { cpuP95: 2, gpuP95: Number.NaN, deadlineMissRatio: 0 }, gates ), /GPU p95/ );
+
+} );
+
+test( 'GPU stage attribution requires complete reconciled scene and output samples', () => {
+
+	const trace = {
+		sampleFrames: 3,
+		gpuStageSamples: { 'scene-mrt': [ 8, 9, 10 ], 'final-output': [ 2, 2, 3 ] },
+		gpuAttributionMaxErrorMs: 0.0001
+	};
+	assert.equal( classifyGpuStageAttribution( null ), 'INSUFFICIENT_EVIDENCE' );
+	assert.equal( classifyGpuStageAttribution( trace ), 'PASS' );
+	assert.equal( classifyGpuStageAttribution( { ...trace, gpuAttributionMaxErrorMs: 0.01 } ), 'FAIL' );
+	assert.throws( () => classifyGpuStageAttribution( { ...trace, gpuStageSamples: { ...trace.gpuStageSamples, 'scene-mrt': [ 8 ] } } ), /sample count/ );
 
 } );

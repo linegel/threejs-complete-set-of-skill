@@ -213,6 +213,22 @@ export function classifyPerformanceTrace( trace, gates ) {
 
 }
 
+export function classifyGpuStageAttribution( trace, reconciliationGateMs = 0.001 ) {
+
+	if ( trace === null || trace.gpuStageSamples === undefined ) return 'INSUFFICIENT_EVIDENCE';
+	if ( Number.isInteger( trace.sampleFrames ) === false || trace.sampleFrames <= 0 ) throw new Error( 'GPU attribution requires a positive sampleFrames count.' );
+	for ( const id of [ 'scene-mrt', 'final-output' ] ) {
+
+		const samples = trace.gpuStageSamples[ id ];
+		if ( Array.isArray( samples ) === false || samples.length !== trace.sampleFrames ) throw new Error( `${ id } attribution sample count must equal sampleFrames.` );
+		if ( samples.some( ( value ) => Number.isFinite( value ) === false || value < 0 ) ) throw new Error( `${ id } attribution samples must be finite and nonnegative.` );
+
+	}
+	if ( Number.isFinite( trace.gpuAttributionMaxErrorMs ) === false || trace.gpuAttributionMaxErrorMs < 0 ) throw new Error( 'GPU attribution reconciliation error must be finite and nonnegative.' );
+	return trace.gpuAttributionMaxErrorMs <= reconciliationGateMs ? 'PASS' : 'FAIL';
+
+}
+
 function writeArtifacts( outputDir, artifacts ) {
 
 	return Promise.all( Object.entries( artifacts ).map( ( [ filename, artifact ] ) => (
@@ -255,11 +271,12 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		deadlineMissRatio: 0.01
 	};
 	const performanceVerdict = classifyPerformanceTrace( performanceTrace, performanceGates );
+	const gpuAttributionVerdict = classifyGpuStageAttribution( performanceTrace );
 	const claimVerdicts = {
 		visualCorrectness: 'PASS',
 		mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
 		performanceCompliance: performanceVerdict,
-		gpuAttribution: 'INSUFFICIENT_EVIDENCE',
+		gpuAttribution: gpuAttributionVerdict,
 		lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 	};
 	const graphWithoutDigest = {
@@ -291,8 +308,8 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const knownCompromises = [
 		...( performanceTrace === null
 			? [ 'Correctness capture only; no sustained performance window was run.' ]
-			: [ 'A sustained CPU/GPU/cadence trace was captured, but no performance verdict is promoted without per-stage attribution and governor stress.' ] ),
-		'One resolved render timestamp proves availability but not per-stage GPU attribution.',
+			: [ 'A sustained CPU/GPU/cadence trace with scene-MRT and final-output attribution was captured, but no passing performance verdict is promoted without governor stress.' ] ),
+		...( performanceTrace === null ? [ 'One resolved render timestamp proves availability but not per-stage GPU attribution.' ] : [] ),
 		...( lifecycle === null ? [ 'No lifecycle create/render/resize/mode/tier/dispose loop was run.' ] : [] ),
 		performanceTrace === null
 			? 'Adapter identity, adapter features, adapter limits, display refresh, and presentation cadence were not exposed by this capture path.'
@@ -329,6 +346,9 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 			maxDifferingRatio: G( 1, 'ratio', 'structural ceiling; minimum separation is validated independently' )
 		} ]
 	} );
+	const adapterInfo = Object.fromEntries( Object.entries( metrics.adapter?.info ?? {} ).map( ( [ key, value ] ) => [ key, typeof value === 'number' ? M( value, 'adapter property', metrics.adapter.identitySource ) : value ] ) );
+	const adapterLimits = Object.fromEntries( Object.entries( metrics.adapter?.limits ?? {} ).map( ( [ key, value ] ) => [ key, M( value, 'limit unit', metrics.adapter.identitySource ) ] ) );
+	const adapterDescription = metrics.adapter?.info?.description || metrics.adapter?.info?.device || metrics.adapter?.info?.architecture || 'identity fields unavailable';
 	const evidenceManifest = schema( {
 		bundleKind: 'browser-capture-incomplete',
 		publishable: false,
@@ -336,11 +356,11 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		sceneId: 'webgpu-validation-harness-browser-capture',
 		threeRevision: '0.185.1',
 		evidenceBundleId: `runtime-${ session.profile }-${ session.lab.sourceHash }`,
-		targetId: 'current-headless-chromium-webgpu-adapter',
-		device: 'current automated browser target; stable hardware identity unavailable',
+		targetId: `current-headless-chromium-webgpu-adapter:${ adapterDescription }`,
+		device: adapterDescription,
 		browser: environment.userAgent,
 		os: environment.platform,
-		gpuAdapter: 'unavailable from current LabController/backend metrics',
+		gpuAdapter: { ...adapterInfo, identitySource: metrics.adapter?.identitySource ?? 'unavailable' },
 		displayRefresh: A( targetRate, 'Hz', 'capture target assumption; display refresh was not measured' ),
 		targetPresentationRate: G( targetRate, 'Hz', 'correctness contract target' ),
 		renderer: metrics.rendererState.renderer,
@@ -349,8 +369,8 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 			initialized: true,
 			timestampAvailable: gpuTiming.verdict === 'PASS',
 			unavailableReason: gpuTiming.reason,
-			features: [],
-			limits: {},
+			features: metrics.adapter?.features ?? [],
+			limits: adapterLimits,
 			deviceLostObserved: false,
 			uncapturedErrors: []
 		},
@@ -399,8 +419,9 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		outputBufferType: metrics.rendererState.outputBufferType,
 		compatibilityMode: metrics.rendererState.compatibilityMode,
 		timestampSupport: gpuTiming.verdict === 'PASS',
-		adapterFeatures: [],
-		adapterLimits: {},
+		adapterInfo: { ...adapterInfo, identitySource: metrics.adapter?.identitySource ?? 'unavailable' },
+		adapterFeatures: metrics.adapter?.features ?? [],
+		adapterLimits,
 		initializationState: 'await renderer.init completed; backend.isWebGPUBackend true',
 		deviceErrors: [],
 		rendererInfoSnapshots: [ {
@@ -452,6 +473,21 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		gpuSamples: gpuSamples.length === 0 ? null : MA( gpuSamples, 'ms', 'one resolved WebGPU render timestamp per sustained frame' ),
 		gpuP50: gpuSamples.length === 0 ? null : M( percentile( gpuSamples, 0.5 ), 'ms', 'sustained WebGPU render timestamp samples' ),
 		gpuP95: gpuSamples.length === 0 ? null : M( percentile( gpuSamples, 0.95 ), 'ms', 'sustained WebGPU render timestamp samples' ),
+		gpuStageAttribution: performanceTrace === null ? null : {
+			'scene-mrt': {
+				samples: MA( performanceTrace.gpuStageSamples[ 'scene-mrt' ], 'ms', 'resolved r185 render-context timestamps' ),
+				p50: M( performanceTrace.gpuStageP50[ 'scene-mrt' ], 'ms', 'scene MRT timestamp samples' ),
+				p95: M( performanceTrace.gpuStageP95[ 'scene-mrt' ], 'ms', 'scene MRT timestamp samples' )
+			},
+			'final-output': {
+				samples: MA( performanceTrace.gpuStageSamples[ 'final-output' ], 'ms', 'resolved r185 render-context timestamps' ),
+				p50: M( performanceTrace.gpuStageP50[ 'final-output' ], 'ms', 'final output timestamp samples' ),
+				p95: M( performanceTrace.gpuStageP95[ 'final-output' ], 'ms', 'final output timestamp samples' )
+			},
+			maxReconciliationError: M( performanceTrace.gpuAttributionMaxErrorMs, 'ms', 'absolute frame total minus sum of stage timestamps' ),
+			reconciliationGate: G( 0.001, 'ms', 'frozen timestamp-sum tolerance' ),
+			verdict: gpuAttributionVerdict
+		},
 		excludedPhases: performanceTrace === null
 			? [ 'renderer initialization', 'pipeline compilation', 'readback mapping', 'PNG encoding', 'no sustained timing window' ]
 			: [ 'renderer initialization', 'pipeline compilation', 'PNG encoding', 'timestamp readback excluded from CPU render samples', 'timestamp mapping disabled during cadence sampling' ]
@@ -593,6 +629,12 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 				gpuP95: M( performanceTrace.gpuP95, 'ms', `${ performanceTrace.sampleFrames } sustained WebGPU render timestamp samples` ),
 				presentationP95: M( performanceTrace.presentationP95, 'ms', `${ performanceTrace.presentationSamples.length } requestAnimationFrame cadence intervals with rendering enabled` ),
 				deadlineMissRatio: M( performanceTrace.deadlineMissRatio, 'ratio', 'measured cadence intervals above 16.6667 ms' )
+			}, {
+				id: 'per-stage-gpu-attribution',
+				verdict: gpuAttributionVerdict,
+				sceneMrtP95: M( performanceTrace.gpuStageP95[ 'scene-mrt' ], 'ms', '120 resolved scene MRT render-context timestamps' ),
+				finalOutputP95: M( performanceTrace.gpuStageP95[ 'final-output' ], 'ms', '120 resolved final-output render-context timestamps' ),
+				maxReconciliationError: M( performanceTrace.gpuAttributionMaxErrorMs, 'ms', 'frame total minus attributed stage sum' )
 			} ] ),
 			{ id: 'readback-captures', records: captureMetrics }
 		],

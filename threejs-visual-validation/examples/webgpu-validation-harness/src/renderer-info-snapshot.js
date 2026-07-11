@@ -104,3 +104,47 @@ export function snapshotRendererInfo( info, options = {} ) {
 	};
 
 }
+
+const ADAPTER_INFO_FIELDS = [ 'vendor', 'architecture', 'device', 'description', 'subgroupMinSize', 'subgroupMaxSize' ];
+const ADAPTER_LIMIT_FIELDS = [
+	'maxTextureDimension1D', 'maxTextureDimension2D', 'maxTextureDimension3D', 'maxTextureArrayLayers',
+	'maxBindGroups', 'maxBindGroupsPlusVertexBuffers', 'maxBindingsPerBindGroup',
+	'maxDynamicUniformBuffersPerPipelineLayout', 'maxDynamicStorageBuffersPerPipelineLayout',
+	'maxSampledTexturesPerShaderStage', 'maxSamplersPerShaderStage', 'maxStorageBuffersPerShaderStage',
+	'maxStorageTexturesPerShaderStage', 'maxUniformBuffersPerShaderStage', 'maxUniformBufferBindingSize',
+	'maxStorageBufferBindingSize', 'minUniformBufferOffsetAlignment', 'minStorageBufferOffsetAlignment',
+	'maxVertexBuffers', 'maxBufferSize', 'maxVertexAttributes', 'maxVertexBufferArrayStride',
+	'maxInterStageShaderVariables', 'maxColorAttachments', 'maxColorAttachmentBytesPerSample',
+	'maxComputeWorkgroupStorageSize', 'maxComputeInvocationsPerWorkgroup', 'maxComputeWorkgroupSizeX',
+	'maxComputeWorkgroupSizeY', 'maxComputeWorkgroupSizeZ', 'maxComputeWorkgroupsPerDimension'
+];
+
+export function snapshotGpuAdapter( adapter ) {
+
+	if ( adapter === null || typeof adapter !== 'object' ) throw new TypeError( 'GPU adapter must be an object.' );
+	const info = {};
+	for ( const field of ADAPTER_INFO_FIELDS ) {
+
+		const value = adapter.info?.[ field ];
+		if ( typeof value === 'string' && value.length > 0 ) info[ field ] = value;
+		else if ( typeof value === 'number' && Number.isFinite( value ) ) info[ field ] = value;
+
+	}
+	const limits = {};
+	for ( const field of ADAPTER_LIMIT_FIELDS ) {
+
+		const value = adapter.limits?.[ field ];
+		if ( typeof value === 'number' && Number.isFinite( value ) ) limits[ field ] = value;
+
+	}
+	const features = adapter.features && typeof adapter.features[ Symbol.iterator ] === 'function'
+		? [ ...adapter.features ].filter( ( value ) => typeof value === 'string' ).sort()
+		: [];
+	return {
+		info,
+		features,
+		limits,
+		identitySource: 'GPUAdapter retained by the canonical renderer device request'
+	};
+
+}
