@@ -38,6 +38,21 @@ function waitForController( frame ) {
 
 }
 
+export function createLifecycleRunnerForwarder( frame ) {
+
+	if ( frame === null || typeof frame !== 'object' ) throw new Error( 'Locked route lifecycle forwarding requires an iframe.' );
+
+	return async ( ...args ) => {
+
+		const child = frame.contentWindow;
+		const runner = child?.__THREEJS_LAB_LIFECYCLE__;
+		if ( typeof runner !== 'function' ) throw new Error( 'Canonical validation lifecycle runner is unavailable.' );
+		return runner.apply( child, args );
+
+	};
+
+}
+
 export async function mountLockedRoute( { kind, id, root = document.body } ) {
 
 	const lock = getRouteLock( kind, id );
@@ -58,6 +73,7 @@ export async function mountLockedRoute( { kind, id, root = document.body } ) {
 
 	const controller = await waitForController( frame );
 	window.__THREEJS_LAB__ = controller;
+	window.__THREEJS_LAB_LIFECYCLE__ = createLifecycleRunnerForwarder( frame );
 	window.__THREEJS_LAB_ROUTE_LOCK__ = lock;
 	document.documentElement.dataset.ready = 'true';
 	document.documentElement.dataset.routeKind = kind;

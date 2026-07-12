@@ -10,6 +10,7 @@ import {
 	SCENARIO_ROUTE_LOCKS,
 	TIER_ROUTE_LOCKS
 } from './route-locks.js';
+import { createLifecycleRunnerForwarder } from './locked-route.js';
 
 const LAB_ROOT = new URL( '../', import.meta.url );
 
@@ -18,6 +19,32 @@ test( 'browser subject exposes the fresh-controller lifecycle runner', async () 
 	const source = await readFile( new URL( './app.js', import.meta.url ), 'utf8' );
 	assert.match( source, /window\.__THREEJS_LAB_LIFECYCLE__/ );
 	assert.match( source, /createNativeWebGPUValidationSubject\( document\.createElement\( 'canvas' \), \{ runtimeProfile \} \)/ );
+
+} );
+
+test( 'locked wrapper forwards the fresh-controller lifecycle runner', async () => {
+
+	const calls = [];
+	const child = {
+		async __THREEJS_LAB_LIFECYCLE__( cycles ) {
+
+			calls.push( { receiver: this, cycles } );
+			return { cycles, freshControllers: cycles };
+
+		}
+	};
+	const frame = { contentWindow: child };
+	const runLifecycle = createLifecycleRunnerForwarder( frame );
+
+	assert.deepEqual( await runLifecycle( 50 ), { cycles: 50, freshControllers: 50 } );
+	assert.equal( calls.length, 1 );
+	assert.equal( calls[ 0 ].receiver, child );
+	assert.equal( calls[ 0 ].cycles, 50 );
+
+	child.__THREEJS_LAB_LIFECYCLE__ = async ( cycles ) => ( { cycles, replacement: true } );
+	assert.deepEqual( await runLifecycle( 64 ), { cycles: 64, replacement: true } );
+	delete child.__THREEJS_LAB_LIFECYCLE__;
+	await assert.rejects( runLifecycle( 1 ), /lifecycle runner is unavailable/ );
 
 } );
 
