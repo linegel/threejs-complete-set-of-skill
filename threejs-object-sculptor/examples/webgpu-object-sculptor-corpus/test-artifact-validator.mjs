@@ -51,6 +51,8 @@ import {
 import {
   CORPUS_CORRECTNESS_CAPTURE_PROFILE,
   CORPUS_LIFECYCLE_MINIMUM_ITERATIONS,
+  CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN,
+  CORPUS_PERFORMANCE_TARGET_PLAN,
   CORPUS_RESOURCE_PEAK_GATE_BYTES,
   CORPUS_SCULPT_SPEC_EVIDENCE,
   CORPUS_TIMING_GATES,
@@ -1521,53 +1523,108 @@ async function makeFixtureBundle() {
   };
   writeJson(directory, "visual-error-results.json", visualErrors);
 
-  const timingTargetDevice = {
-    id: "fixture-device-01",
-    kind: "physical",
-    device: "Fixture physical device",
-    os: "Fixture OS",
-    browser: {
-      name: "Codex in-app Browser",
-      version: "fixture-1",
-      userAgent: "Fixture Codex in-app Browser user agent",
-      platform: "Fixture physical platform",
-      automationSurface: "codex-in-app-browser",
-    },
-    adapter: {
-      adapterClass: "hardware",
-      name: "Fixture hardware adapter",
-      identitySource: "initialized renderer device identity",
-      details: { vendor: "fixture-vendor", architecture: "fixture-architecture" },
-    },
-  };
-  const timingViewport = {
-    cssWidth: datum(390, "CSS px", "Measured", "performance viewport measurement"),
-    cssHeight: datum(844, "CSS px", "Measured", "performance viewport measurement"),
-    dpr: datum(1, "ratio", "Measured", "performance DPR measurement"),
-    physicalWidth: datum(390, "physical px", "Derived", "round(cssWidth * dpr)"),
-    physicalHeight: datum(844, "physical px", "Derived", "round(cssHeight * dpr)"),
-  };
-  const timingDeviceBinding = computeCorpusTimingDeviceBinding({
-    sourceHash: SOURCE_PROVENANCE.sourceHash,
-    buildRevision: SOURCE_PROVENANCE.buildRevision,
-    targetDevice: timingTargetDevice,
-    viewport: timingViewport,
-    backend: BACKEND,
-    rendererDeviceGeneration: null,
-    deviceLossGeneration: null,
+  const performanceBrowser = Object.freeze({
+    name: "Codex in-app Browser",
+    version: "fixture-1",
+    userAgent: "Fixture Codex in-app Browser user agent",
+    platform: "Fixture physical platform",
+    automationSurface: "codex-in-app-browser",
   });
-  const performanceCaptureSession = Object.freeze({
+  const makePerformanceTarget = (plan, { device, soc, adapterName, cssWidth, cssHeight }) => {
+    const adapter = {
+      adapterClass: "hardware",
+      name: adapterName,
+      identitySource: "initialized renderer device identity",
+      details: { vendor: "apple", architecture: soc },
+    };
+    const viewport = {
+      cssWidth: datum(cssWidth, "CSS px", "Measured", `${plan.id} performance viewport measurement`),
+      cssHeight: datum(cssHeight, "CSS px", "Measured", `${plan.id} performance viewport measurement`),
+      dpr: datum(1, "ratio", "Measured", `${plan.id} performance DPR measurement`),
+      physicalWidth: datum(cssWidth, "physical px", "Derived", "round(cssWidth * dpr)"),
+      physicalHeight: datum(cssHeight, "physical px", "Derived", "round(cssHeight * dpr)"),
+    };
+    const targetDevice = {
+      id: plan.id,
+      profileRole: plan.profileRole,
+      kind: "physical",
+      device,
+      soc,
+      os: "macOS",
+      browser: performanceBrowser,
+      adapter,
+    };
+    const refreshPeriod = 1000 / 60;
+    const cpuEnvelope = refreshPeriod - 2 - 2;
+    const gpuEnvelope = refreshPeriod - 2 - 2;
+    return {
+      ...targetDevice,
+      viewport,
+      deviceBinding: computeCorpusTimingDeviceBinding({
+        sourceHash: SOURCE_PROVENANCE.sourceHash,
+        buildRevision: SOURCE_PROVENANCE.buildRevision,
+        targetDevice,
+        viewport,
+        backend: BACKEND,
+        rendererDeviceGeneration: null,
+        deviceLossGeneration: null,
+      }),
+      displayRefreshHz: datum(60, "Hz", "Measured", `${plan.id} display measurement`),
+      targetPresentationRateHz: datum(60, "Hz", "Gated", `${plan.id} target cadence`),
+      refreshPeriodMs: datum(refreshPeriod, "ms", "Derived", "1000 / targetPresentationRateHz"),
+      browserMainThreadReserveMs: datum(2, "ms", "Measured", `${plan.id} pass-through host-shell p95`),
+      compositorGpuReserveMs: datum(2, "ms", "Authored", `${plan.id} provisional compositor reserve; no compositor timing API claimed`),
+      cpuSafetyReserveMs: datum(2, "ms", "Authored", `${plan.id} frozen CPU safety reserve`),
+      gpuSafetyReserveMs: datum(2, "ms", "Authored", `${plan.id} frozen GPU safety reserve`),
+      cpuSceneEnvelopeMs: datum(cpuEnvelope, "ms", "Derived", "refreshPeriodMs - browserMainThreadReserveMs - cpuSafetyReserveMs"),
+      gpuSceneEnvelopeMs: datum(gpuEnvelope, "ms", "Derived", "refreshPeriodMs - compositorGpuReserveMs - gpuSafetyReserveMs"),
+      cpuP95GateMs: datum(cpuEnvelope, "ms", "Gated", "cpuSceneEnvelopeMs"),
+      gpuP95GateMs: datum(gpuEnvelope, "ms", "Gated", "gpuSceneEnvelopeMs"),
+      rafIntervalP95GateMs: datum(refreshPeriod, "ms", "Gated", "refreshPeriodMs"),
+      deadlineMissGate: datum(CORPUS_TIMING_GATES.deadlineMisses, "count", "Gated", "CORPUS_TIMING_GATES.deadlineMisses"),
+      minimumSamplesPerWindow: datum(CORPUS_TIMING_GATES.minimumSamplesPerWindow, "sample", "Gated", "CORPUS_TIMING_GATES.minimumSamplesPerWindow"),
+      gpuTimingRequirement: "required",
+      timestampTrackingEnabled: true,
+      gpuTimestampSupport: true,
+      presentationTiming: {
+        verdict: "NOT_CLAIMED",
+        api: null,
+        reason: "No browser compositor timing API supplied independently attributable presentation timing.",
+      },
+    };
+  };
+  const timingPhysicalTargets = [
+    makePerformanceTarget(CORPUS_PERFORMANCE_TARGET_PLAN[0], {
+      device: "Apple MacBook Pro (M4 Max)",
+      soc: "Apple M4 Max",
+      adapterName: "Apple M4 Max",
+      cssWidth: 1728,
+      cssHeight: 1117,
+    }),
+    makePerformanceTarget(CORPUS_PERFORMANCE_TARGET_PLAN[1], {
+      device: "Apple MacBook Air (M2)",
+      soc: "Apple M2",
+      adapterName: "Apple M2",
+      cssWidth: 1440,
+      cssHeight: 900,
+    }),
+  ];
+  const timingTargetByTier = new Map(SCULPT_TIERS.map((tier) => [
+    tier,
+    timingPhysicalTargets.find((target) => CORPUS_PERFORMANCE_TARGET_PLAN.find((plan) => plan.id === target.id).tiers.includes(tier)),
+  ]));
+  const performanceCaptureSession = (target) => Object.freeze({
     schemaVersion: "object-sculptor-physical-performance-session-v1",
     profile: "performance",
     automationSurface: "codex-in-app-browser",
     sourceClosureHash: SOURCE_PROVENANCE.sourceHash,
     buildRevision: SOURCE_PROVENANCE.buildRevision,
     routeHref: "https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/",
-    sessionId: "fixture-physical-performance-session",
+    sessionId: `fixture-physical-performance-session-${target.id}`,
     startedAt: "2026-07-12T12:00:00.000Z",
     installedAtDocumentReadyState: "loading",
   });
-  const performanceMetrics = (subjectId, tier, lane) => ({
+  const performanceMetrics = (subjectId, tier, lane, target = timingTargetByTier.get(tier)) => ({
     subjectId,
     tier,
     mode: "action-ready",
@@ -1613,7 +1670,7 @@ async function makeFixtureBundle() {
     rendererDeviceStatus: "active",
     rendererDeviceIdentityStillCurrent: true,
     performanceAdapterIdentityStatus: "verified-exact-renderer-device-binding",
-    performanceAdapterIdentity: timingTargetDevice.adapter,
+    performanceAdapterIdentity: target.adapter,
     deviceErrorCount: 0,
     frameErrorCount: 0,
     lifecycleErrorCount: 0,
@@ -1625,7 +1682,7 @@ async function makeFixtureBundle() {
       deviceIdentityVerified: true,
       backendType: "WebGPUBackend",
       deviceType: "GPUDevice",
-      deviceLabel: "Fixture hardware adapter",
+      deviceLabel: target.adapter.name,
       deviceIdentitySource: "initialized renderer backend",
       timestampQueryFeatureOnActualDevice: true,
       backendTimestampTrackingActive: lane === "one-shot-gpu",
@@ -1690,13 +1747,14 @@ async function makeFixtureBundle() {
     async dispose() { return true; },
   });
   const identity = (subjectId, tier, lane) => {
-    const controller = performanceController(performanceMetrics(subjectId, tier, lane));
+    const target = timingTargetByTier.get(tier);
+    const controller = performanceController(performanceMetrics(subjectId, tier, lane, target));
     return createObjectSculptorCorpusPerformanceIdentity({
       lane,
       sourceClosureHash: SOURCE_PROVENANCE.sourceHash,
       buildRevision: SOURCE_PROVENANCE.buildRevision,
-      browser: timingTargetDevice.browser,
-      captureSession: performanceCaptureSession,
+      browser: target.browser,
+      captureSession: performanceCaptureSession(target),
       controller,
     });
   };
@@ -1788,9 +1846,10 @@ async function makeFixtureBundle() {
   };
   const timingWorkloadCases = SCULPT_TARGET_IDS.flatMap((subjectId) => SCULPT_TIERS.map((tier) => ({ subjectId, tier }))).map(({ subjectId, tier }, caseIndex) => {
     const id = `${subjectId}:${tier}`;
+    const target = timingTargetByTier.get(tier);
     const sustainedCadenceIdentity = identity(subjectId, tier, "sustained-cadence");
     const oneShotGpuIdentity = identity(subjectId, tier, "one-shot-gpu");
-    const workloadBinding = sha256(Buffer.from(JSON.stringify({ deviceBinding: timingDeviceBinding, commonIdentity: commonIdentity(sustainedCadenceIdentity) })));
+    const workloadBinding = sha256(Buffer.from(JSON.stringify({ deviceBinding: target.deviceBinding, commonIdentity: commonIdentity(sustainedCadenceIdentity) })));
     const cadenceIdentitySha256 = sha256(Buffer.from(JSON.stringify(sustainedCadenceIdentity)));
     const gpuIdentitySha256 = sha256(Buffer.from(JSON.stringify(oneShotGpuIdentity)));
     const base = caseIndex * 100_000;
@@ -1810,6 +1869,8 @@ async function makeFixtureBundle() {
       id,
       subjectId,
       tier,
+      targetId: target.id,
+      deviceBinding: target.deviceBinding,
       workloadBinding,
       sustainedCadenceIdentity,
       oneShotGpuIdentity,
@@ -1828,14 +1889,15 @@ async function makeFixtureBundle() {
     };
   });
   {
-    const metrics = performanceMetrics(SCULPT_TARGET_IDS[0], SCULPT_TIERS[0], "one-shot-gpu");
+    const target = timingTargetByTier.get(SCULPT_TIERS[0]);
+    const metrics = performanceMetrics(SCULPT_TARGET_IDS[0], SCULPT_TIERS[0], "one-shot-gpu", target);
     const controller = performanceController(metrics);
     const performanceIdentity = createObjectSculptorCorpusPerformanceIdentity({
       lane: "one-shot-gpu",
       sourceClosureHash: SOURCE_PROVENANCE.sourceHash,
       buildRevision: SOURCE_PROVENANCE.buildRevision,
-      browser: timingTargetDevice.browser,
-      captureSession: performanceCaptureSession,
+      browser: target.browser,
+      captureSession: performanceCaptureSession(target),
       controller,
     });
     const diagnosticDriver = createObjectSculptorCorpusFrameDriver({
@@ -1852,36 +1914,15 @@ async function makeFixtureBundle() {
     assert.deepEqual(authority.missingRequirements, ["canonicalBrowserTiming", "physicalCaptureSession"]);
     await diagnosticDriver.close();
   }
-  const refreshPeriod = 1000 / 60;
-  const cpuEnvelope = refreshPeriod - 2 - 2;
-  const gpuEnvelope = refreshPeriod - 2 - 2;
   writeJson(directory, "timing-trace.json", {
     ...commonDocument(RUN_BINDINGS.performance),
-    targetDevice: timingTargetDevice,
-    viewport: timingViewport,
-    deviceBinding: timingDeviceBinding,
-    displayRefreshHz: datum(60, "Hz", "Measured", "fixture display measurement"),
-    targetPresentationRateHz: datum(60, "Hz", "Gated", "fixture target cadence"),
-    refreshPeriodMs: datum(refreshPeriod, "ms", "Derived", "1000 / targetPresentationRateHz"),
-    browserMainThreadReserveMs: datum(2, "ms", "Measured", "pass-through host-shell p95"),
-    compositorGpuReserveMs: datum(2, "ms", "Authored", "provisional compositor reserve; no compositor timing API claimed"),
-    cpuSafetyReserveMs: datum(2, "ms", "Authored", "frozen CPU safety reserve"),
-    gpuSafetyReserveMs: datum(2, "ms", "Authored", "frozen GPU safety reserve"),
-    cpuSceneEnvelopeMs: datum(cpuEnvelope, "ms", "Derived", "refreshPeriodMs - browserMainThreadReserveMs - cpuSafetyReserveMs"),
-    gpuSceneEnvelopeMs: datum(gpuEnvelope, "ms", "Derived", "refreshPeriodMs - compositorGpuReserveMs - gpuSafetyReserveMs"),
-    cpuP95GateMs: datum(cpuEnvelope, "ms", "Gated", "cpuSceneEnvelopeMs"),
-    gpuP95GateMs: datum(gpuEnvelope, "ms", "Gated", "gpuSceneEnvelopeMs"),
-    rafIntervalP95GateMs: datum(refreshPeriod, "ms", "Gated", "refreshPeriodMs"),
-    deadlineMissGate: datum(CORPUS_TIMING_GATES.deadlineMisses, "count", "Gated", "CORPUS_TIMING_GATES.deadlineMisses"),
-    minimumSamplesPerWindow: datum(CORPUS_TIMING_GATES.minimumSamplesPerWindow, "sample", "Gated", "CORPUS_TIMING_GATES.minimumSamplesPerWindow"),
-    gpuTimingRequirement: "required",
-    timestampTrackingEnabled: true,
-    gpuTimestampSupport: true,
-    presentationTiming: {
-      verdict: "NOT_CLAIMED",
-      api: null,
-      reason: "No browser compositor timing API supplied independently attributable presentation timing.",
-    },
+    physicalTargets: timingPhysicalTargets,
+    mobileArchitectureModels: CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN.map((model) => ({
+      ...model,
+      status: "MODEL_ONLY_NOT_PERFORMANCE_ACCEPTANCE",
+      performanceClaim: "NOT_CLAIMED",
+      reason: "This profile constrains architecture and quality policy only; no mobile physical session is accepted by this bundle.",
+    })),
     workloadCases: timingWorkloadCases,
   });
 
@@ -2515,7 +2556,7 @@ mutateJson("route-runtime-evidence.json", (document) => {
   return document;
 }, /distinct Codex in-app Browser physical-route surface/);
 mutateJson("timing-trace.json", (document) => {
-  document.timestampTrackingEnabled = false;
+  document.physicalTargets[0].timestampTrackingEnabled = false;
   return document;
 }, /pre-init timestamp tracking/);
 mutateJson("timing-trace.json", (document) => {
@@ -2525,7 +2566,7 @@ mutateJson("timing-trace.json", (document) => {
 mutateJson("timing-trace.json", (document) => {
   document.workloadCases[0].subjectId = SCULPT_TARGET_IDS[1];
   return document;
-}, /identity\/order drifted/);
+}, /identity\/order\/target drifted/);
 mutateJson("timing-trace.json", (document) => {
   for (const sample of document.workloadCases[0].gpuTimestampPopulations[0].rawSamples.slice(0, 8)) sample.gpuMs.value = 20;
   return document;
@@ -2535,13 +2576,21 @@ mutateJson("timing-trace.json", (document) => {
   return document;
 }, /durationMs does not derive/);
 mutateJson("timing-trace.json", (document) => {
-  document.browserMainThreadReserveMs.value += 1;
+  document.physicalTargets[0].browserMainThreadReserveMs.value += 1;
   return document;
 }, /CPU envelope does not derive/);
 mutateJson("timing-trace.json", (document) => {
-  document.deviceBinding = "0".repeat(64);
+  document.physicalTargets[0].deviceBinding = "0".repeat(64);
   return document;
-}, /deviceBinding does not match/);
+}, /deviceBinding does not match the source\/device\/browser\/viewport\/backend closure/);
+mutateJson("timing-trace.json", (document) => {
+  document.workloadCases[0].targetId = "air-m1-or-m2-60hz";
+  return document;
+}, /identity\/order\/target drifted/);
+mutateJson("timing-trace.json", (document) => {
+  document.mobileArchitectureModels[0].performanceClaim = "PASS";
+  return document;
+}, /excluded from physical performance acceptance/);
 mutateJson("timing-trace.json", (document) => {
   document.workloadCases[0].sustainedCadenceIdentity.adapter.name = "Forged second adapter";
   return document;
@@ -2559,7 +2608,7 @@ mutateJson("timing-trace.json", (document) => {
   return document;
 }, /Three r185 native WebGPU performance profile/);
 mutateJson("timing-trace.json", (document) => {
-  document.presentationTiming = { verdict: "PASS", api: null, reason: "forged from rAF" };
+  document.physicalTargets[0].presentationTiming = { verdict: "PASS", api: null, reason: "forged from rAF" };
   return document;
 }, /presentation\/compositor timing must remain NOT_CLAIMED/);
 mutateJson("timing-trace.json", (document) => {
@@ -2755,7 +2804,7 @@ mutateJson("visual-reviews.json", (document) => {
   expectRouteRejection(aliasedRouteReadback, /normalized artifact path drifted|artifact paths alias/);
 }
 
-const EXPECTED_ADVERSARIAL_MUTATIONS = 90;
+const EXPECTED_ADVERSARIAL_MUTATIONS = 92;
 assert.equal(adversarialMutationCount, EXPECTED_ADVERSARIAL_MUTATIONS, "adversarial mutation inventory drifted; update the frozen count intentionally");
 
 console.log(JSON.stringify({

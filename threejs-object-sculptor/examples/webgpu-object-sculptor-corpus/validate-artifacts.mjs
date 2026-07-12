@@ -95,6 +95,28 @@ export const CORPUS_TIMING_GATES = Object.freeze({
   maximumGapRatio: 0.05,
 });
 
+export const CORPUS_PERFORMANCE_TARGET_PLAN = Object.freeze([
+  Object.freeze({
+    id: "full-m4-max-60hz",
+    profileRole: "full-reference",
+    tiers: Object.freeze(["full"]),
+    allowedDevices: Object.freeze(["Apple MacBook Pro (M4 Max)"]),
+    allowedSocs: Object.freeze(["Apple M4 Max"]),
+  }),
+  Object.freeze({
+    id: "air-m1-or-m2-60hz",
+    profileRole: "constrained-reference",
+    tiers: Object.freeze(["budgeted", "minimum"]),
+    allowedDevices: Object.freeze(["Apple MacBook Air (M1)", "Apple MacBook Air (M2)"]),
+    allowedSocs: Object.freeze(["Apple M1", "Apple M2"]),
+  }),
+]);
+
+export const CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN = Object.freeze([
+  Object.freeze({ id: "ipad-a14-budgeted-model", tier: "budgeted", deviceClass: "Apple iPad (10th generation)", socClass: "Apple A14 Bionic" }),
+  Object.freeze({ id: "android-tensor-minimum-model", tier: "minimum", deviceClass: "Google Pixel 6a", socClass: "Google Tensor" }),
+]);
+
 export const CORPUS_CORRECTNESS_CAPTURE_PROFILE = Object.freeze({
   profile: "correctness",
   width: 1200,
@@ -2111,6 +2133,97 @@ function validatePerformanceRetention(retention, workloadCase, label, errors) {
   }
 }
 
+function validatePerformanceTarget(target, expected, header, context, errors, label) {
+  if (!exactKeys(target, [
+    "id", "profileRole", "kind", "device", "soc", "os", "browser", "adapter", "viewport", "deviceBinding",
+    "displayRefreshHz", "targetPresentationRateHz", "refreshPeriodMs", "browserMainThreadReserveMs",
+    "compositorGpuReserveMs", "cpuSafetyReserveMs", "gpuSafetyReserveMs", "cpuSceneEnvelopeMs", "gpuSceneEnvelopeMs",
+    "cpuP95GateMs", "gpuP95GateMs", "rafIntervalP95GateMs", "deadlineMissGate", "minimumSamplesPerWindow",
+    "gpuTimingRequirement", "timestampTrackingEnabled", "gpuTimestampSupport", "presentationTiming",
+  ], label, errors)) return null;
+  if (target.id !== expected.id || target.profileRole !== expected.profileRole || target.kind !== "physical") errors.push(`${label} identity/role must match the frozen physical target plan`);
+  if (!expected.allowedDevices.includes(target.device) || !expected.allowedSocs.includes(target.soc)) errors.push(`${label} device/SoC must identify an allowed physical ${expected.profileRole} target`);
+  if (target.os !== "macOS") errors.push(`${label}.os must be macOS for the frozen physical target matrix`);
+  if (!target.browser || typeof target.browser !== "object" || target.browser.automationSurface !== IN_APP_BROWSER_SURFACE) errors.push(`${label}.browser must identify Codex in-app Browser`);
+  if (!target.adapter || typeof target.adapter !== "object" || target.adapter.adapterClass !== "hardware") errors.push(`${label}.adapter must identify a positively verified hardware adapter`);
+  if (!exactKeys(target.viewport, ["cssWidth", "cssHeight", "dpr", "physicalWidth", "physicalHeight"], `${label}.viewport`, errors)) return null;
+  const cssWidth = evidenceDatum(target.viewport.cssWidth, "Measured", `${label}.viewport.cssWidth`, errors, { unit: "CSS px", integer: true, minimum: 1 });
+  const cssHeight = evidenceDatum(target.viewport.cssHeight, "Measured", `${label}.viewport.cssHeight`, errors, { unit: "CSS px", integer: true, minimum: 1 });
+  const dpr = evidenceDatum(target.viewport.dpr, "Measured", `${label}.viewport.dpr`, errors, { unit: "ratio", minimum: Number.EPSILON, maximum: 4 });
+  const physicalWidth = evidenceDatum(target.viewport.physicalWidth, "Derived", `${label}.viewport.physicalWidth`, errors, { unit: "physical px", integer: true, minimum: 1 });
+  const physicalHeight = evidenceDatum(target.viewport.physicalHeight, "Derived", `${label}.viewport.physicalHeight`, errors, { unit: "physical px", integer: true, minimum: 1 });
+  if (physicalWidth !== Math.round(cssWidth * dpr) || physicalHeight !== Math.round(cssHeight * dpr)) errors.push(`${label} physical viewport does not derive from CSS pixels and DPR`);
+  const expectedBinding = computeCorpusTimingDeviceBinding({
+    sourceHash: header.sourceHash,
+    buildRevision: header.buildRevision,
+    targetDevice: {
+      id: target.id,
+      profileRole: target.profileRole,
+      kind: target.kind,
+      device: target.device,
+      soc: target.soc,
+      os: target.os,
+      browser: target.browser,
+      adapter: target.adapter,
+    },
+    viewport: target.viewport,
+    backend: context.backend,
+    rendererDeviceGeneration: null,
+    deviceLossGeneration: null,
+  });
+  if (target.deviceBinding !== expectedBinding) errors.push(`${label}.deviceBinding does not match the source/device/browser/viewport/backend closure`);
+  const refresh = evidenceDatum(target.displayRefreshHz, "Measured", `${label}.displayRefreshHz`, errors, { unit: "Hz", minimum: Number.EPSILON });
+  const targetRate = evidenceDatum(target.targetPresentationRateHz, "Gated", `${label}.targetPresentationRateHz`, errors, { unit: "Hz", minimum: Number.EPSILON });
+  const period = evidenceDatum(target.refreshPeriodMs, "Derived", `${label}.refreshPeriodMs`, errors, { unit: "ms", minimum: Number.EPSILON });
+  const browserReserve = evidenceDatum(target.browserMainThreadReserveMs, "Measured", `${label}.browserMainThreadReserveMs`, errors, { unit: "ms", minimum: 0 });
+  const compositorReserve = evidenceDatum(target.compositorGpuReserveMs, "Authored", `${label}.compositorGpuReserveMs`, errors, { unit: "ms", minimum: 0 });
+  const cpuSafetyReserve = evidenceDatum(target.cpuSafetyReserveMs, "Authored", `${label}.cpuSafetyReserveMs`, errors, { unit: "ms", minimum: 0 });
+  const gpuSafetyReserve = evidenceDatum(target.gpuSafetyReserveMs, "Authored", `${label}.gpuSafetyReserveMs`, errors, { unit: "ms", minimum: 0 });
+  const cpuEnvelope = evidenceDatum(target.cpuSceneEnvelopeMs, "Derived", `${label}.cpuSceneEnvelopeMs`, errors, { unit: "ms", minimum: Number.EPSILON });
+  const gpuEnvelope = evidenceDatum(target.gpuSceneEnvelopeMs, "Derived", `${label}.gpuSceneEnvelopeMs`, errors, { unit: "ms", minimum: Number.EPSILON });
+  const cpuP95 = evidenceDatum(target.cpuP95GateMs, "Gated", `${label}.cpuP95GateMs`, errors, { unit: "ms", minimum: 0 });
+  const gpuP95 = evidenceDatum(target.gpuP95GateMs, "Gated", `${label}.gpuP95GateMs`, errors, { unit: "ms", minimum: 0 });
+  const rafP95 = evidenceDatum(target.rafIntervalP95GateMs, "Gated", `${label}.rafIntervalP95GateMs`, errors, { unit: "ms", minimum: 0 });
+  const deadlineMisses = evidenceDatum(target.deadlineMissGate, "Gated", `${label}.deadlineMissGate`, errors, { unit: "count", integer: true, minimum: 0 });
+  const minimumSamples = evidenceDatum(target.minimumSamplesPerWindow, "Gated", `${label}.minimumSamplesPerWindow`, errors, { unit: "sample", integer: true, minimum: 2 });
+  if (targetRate > refresh) errors.push(`${label} target presentation rate exceeds measured display refresh`);
+  if (!almostEqual(period, 1000 / targetRate, 1e-6) || target.refreshPeriodMs?.source !== "1000 / targetPresentationRateHz") errors.push(`${label} refresh period does not derive from the gated target rate`);
+  if (!almostEqual(cpuEnvelope, period - browserReserve - cpuSafetyReserve) || target.cpuSceneEnvelopeMs?.source !== "refreshPeriodMs - browserMainThreadReserveMs - cpuSafetyReserveMs") errors.push(`${label} CPU envelope does not derive from the reserve model`);
+  if (!almostEqual(gpuEnvelope, period - compositorReserve - gpuSafetyReserve) || target.gpuSceneEnvelopeMs?.source !== "refreshPeriodMs - compositorGpuReserveMs - gpuSafetyReserveMs") errors.push(`${label} GPU envelope does not derive from the reserve model`);
+  if (!almostEqual(cpuP95, cpuEnvelope) || target.cpuP95GateMs?.source !== "cpuSceneEnvelopeMs") errors.push(`${label} CPU p95 gate must freeze the derived scene envelope`);
+  if (!almostEqual(gpuP95, gpuEnvelope) || target.gpuP95GateMs?.source !== "gpuSceneEnvelopeMs") errors.push(`${label} GPU p95 gate must freeze the derived scene envelope`);
+  if (!almostEqual(rafP95, period) || target.rafIntervalP95GateMs?.source !== "refreshPeriodMs") errors.push(`${label} rAF p95 gate must freeze the refresh period`);
+  if (deadlineMisses !== CORPUS_TIMING_GATES.deadlineMisses || target.deadlineMissGate?.source !== "CORPUS_TIMING_GATES.deadlineMisses") errors.push(`${label} deadline gate drifted`);
+  if (minimumSamples !== CORPUS_TIMING_GATES.minimumSamplesPerWindow || target.minimumSamplesPerWindow?.source !== "CORPUS_TIMING_GATES.minimumSamplesPerWindow") errors.push(`${label} sample gate drifted`);
+  if (target.gpuTimingRequirement !== "required" || target.timestampTrackingEnabled !== true || target.gpuTimestampSupport !== true) errors.push(`${label} requires pre-init timestamp tracking and actual timestamp support`);
+  if (!exactKeys(target.presentationTiming, ["verdict", "api", "reason"], `${label}.presentationTiming`, errors)) return null;
+  if (target.presentationTiming.verdict !== "NOT_CLAIMED" || target.presentationTiming.api !== null) errors.push(`${label} presentation/compositor timing must remain NOT_CLAIMED without an independent API`);
+  requireText(target.presentationTiming.reason, `${label}.presentationTiming.reason`, errors);
+  return Object.freeze({
+    id: target.id,
+    expected,
+    target,
+    deviceBinding: expectedBinding,
+    gates: Object.freeze({ minimumSamples, cpuP95, gpuP95, rafP95, deadlineMisses }),
+  });
+}
+
+function validateMobileArchitectureModels(models, errors) {
+  if (!Array.isArray(models) || models.length !== CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN.length) {
+    errors.push(`timing trace must declare exactly ${CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN.length} non-acceptance mobile architecture models`);
+    return;
+  }
+  for (let index = 0; index < CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN.length; index += 1) {
+    const expected = CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN[index];
+    const model = models[index];
+    const label = `timing.mobileArchitectureModels[${index}]`;
+    if (!exactKeys(model, ["id", "tier", "deviceClass", "socClass", "status", "performanceClaim", "reason"], label, errors)) continue;
+    for (const field of ["id", "tier", "deviceClass", "socClass"]) if (model[field] !== expected[field]) errors.push(`${label}.${field} drifted from the model-only plan`);
+    if (model.status !== "MODEL_ONLY_NOT_PERFORMANCE_ACCEPTANCE" || model.performanceClaim !== "NOT_CLAIMED") errors.push(`${label} must remain explicitly excluded from physical performance acceptance`);
+    requireText(model.reason, `${label}.reason`, errors);
+  }
+}
+
 function validateTiming(document, header, context, errors) {
   if (!document) return;
   exactKeys(document, [
@@ -2121,90 +2234,24 @@ function validateTiming(document, header, context, errors) {
     "sourceHash",
     "buildRevision",
     "backend",
-    "targetDevice",
-    "viewport",
-    "deviceBinding",
-    "displayRefreshHz",
-    "targetPresentationRateHz",
-    "refreshPeriodMs",
-    "browserMainThreadReserveMs",
-    "compositorGpuReserveMs",
-    "cpuSafetyReserveMs",
-    "gpuSafetyReserveMs",
-    "cpuSceneEnvelopeMs",
-    "gpuSceneEnvelopeMs",
-    "cpuP95GateMs",
-    "gpuP95GateMs",
-    "rafIntervalP95GateMs",
-    "deadlineMissGate",
-    "minimumSamplesPerWindow",
-    "gpuTimingRequirement",
-    "timestampTrackingEnabled",
-    "gpuTimestampSupport",
-    "presentationTiming",
+    "physicalTargets",
+    "mobileArchitectureModels",
     "workloadCases",
   ], "timing-trace.json", errors);
   validateDocumentHeader(document, "timing-trace.json", { ...header, runId: header.runBindings.performance, backend: context.backend }, errors);
-  if (!exactKeys(document.targetDevice, ["id", "kind", "device", "os", "browser", "adapter"], "timing.targetDevice", errors)) return;
-  requireText(document.targetDevice.id, "timing.targetDevice.id", errors, ID_PATTERN);
-  if (document.targetDevice.kind !== "physical") errors.push("timing target must be a named physical device");
-  for (const field of ["device", "os"]) requireText(document.targetDevice[field], `timing.targetDevice.${field}`, errors);
-  if (!document.targetDevice.browser || typeof document.targetDevice.browser !== "object") errors.push("timing target browser identity is required");
-  if (!document.targetDevice.adapter || typeof document.targetDevice.adapter !== "object") errors.push("timing target adapter identity is required");
-  if (!exactKeys(document.viewport, ["cssWidth", "cssHeight", "dpr", "physicalWidth", "physicalHeight"], "timing.viewport", errors)) return;
-  const cssWidth = evidenceDatum(document.viewport.cssWidth, "Measured", "timing.viewport.cssWidth", errors, { unit: "CSS px", integer: true, minimum: 1 });
-  const cssHeight = evidenceDatum(document.viewport.cssHeight, "Measured", "timing.viewport.cssHeight", errors, { unit: "CSS px", integer: true, minimum: 1 });
-  const dpr = evidenceDatum(document.viewport.dpr, "Measured", "timing.viewport.dpr", errors, { unit: "ratio", minimum: Number.EPSILON, maximum: 4 });
-  const physicalWidth = evidenceDatum(document.viewport.physicalWidth, "Derived", "timing.viewport.physicalWidth", errors, { unit: "physical px", integer: true, minimum: 1 });
-  const physicalHeight = evidenceDatum(document.viewport.physicalHeight, "Derived", "timing.viewport.physicalHeight", errors, { unit: "physical px", integer: true, minimum: 1 });
-  if (physicalWidth !== Math.round(cssWidth * dpr) || physicalHeight !== Math.round(cssHeight * dpr)) errors.push("timing physical viewport does not derive from CSS pixels and DPR");
-  const expectedBinding = computeCorpusTimingDeviceBinding({
-    sourceHash: document.sourceHash,
-    buildRevision: document.buildRevision,
-    targetDevice: document.targetDevice,
-    viewport: document.viewport,
-    backend: document.backend,
-    rendererDeviceGeneration: null,
-    deviceLossGeneration: null,
-  });
-  if (document.deviceBinding !== expectedBinding) errors.push("timing.deviceBinding does not match the source/device/browser/viewport/backend/generation closure");
-  const refresh = evidenceDatum(document.displayRefreshHz, "Measured", "timing.displayRefreshHz", errors, { unit: "Hz", minimum: Number.EPSILON });
-  const targetRate = evidenceDatum(document.targetPresentationRateHz, "Gated", "timing.targetPresentationRateHz", errors, { unit: "Hz", minimum: Number.EPSILON });
-  const period = evidenceDatum(document.refreshPeriodMs, "Derived", "timing.refreshPeriodMs", errors, { unit: "ms", minimum: Number.EPSILON });
-  const browserReserve = evidenceDatum(document.browserMainThreadReserveMs, "Measured", "timing.browserMainThreadReserveMs", errors, { unit: "ms", minimum: 0 });
-  const compositorReserve = evidenceDatum(document.compositorGpuReserveMs, "Authored", "timing.compositorGpuReserveMs", errors, { unit: "ms", minimum: 0 });
-  const cpuSafetyReserve = evidenceDatum(document.cpuSafetyReserveMs, "Authored", "timing.cpuSafetyReserveMs", errors, { unit: "ms", minimum: 0 });
-  const gpuSafetyReserve = evidenceDatum(document.gpuSafetyReserveMs, "Authored", "timing.gpuSafetyReserveMs", errors, { unit: "ms", minimum: 0 });
-  const cpuEnvelope = evidenceDatum(document.cpuSceneEnvelopeMs, "Derived", "timing.cpuSceneEnvelopeMs", errors, { unit: "ms", minimum: Number.EPSILON });
-  const gpuEnvelope = evidenceDatum(document.gpuSceneEnvelopeMs, "Derived", "timing.gpuSceneEnvelopeMs", errors, { unit: "ms", minimum: Number.EPSILON });
-  const cpuP95 = evidenceDatum(document.cpuP95GateMs, "Gated", "timing.cpuP95GateMs", errors, { unit: "ms", minimum: 0 });
-  const gpuP95 = evidenceDatum(document.gpuP95GateMs, "Gated", "timing.gpuP95GateMs", errors, { unit: "ms", minimum: 0 });
-  const rafP95 = evidenceDatum(document.rafIntervalP95GateMs, "Gated", "timing.rafIntervalP95GateMs", errors, { unit: "ms", minimum: 0 });
-  const deadlineMisses = evidenceDatum(document.deadlineMissGate, "Gated", "timing.deadlineMissGate", errors, { unit: "count", integer: true, minimum: 0 });
-  const minimumSamples = evidenceDatum(document.minimumSamplesPerWindow, "Gated", "timing.minimumSamplesPerWindow", errors, { unit: "sample", integer: true, minimum: 2 });
-  if (targetRate > refresh) errors.push("timing target presentation rate exceeds measured display refresh");
-  if (!almostEqual(period, 1000 / targetRate, 1e-6) || document.refreshPeriodMs?.source !== "1000 / targetPresentationRateHz") errors.push("timing refresh period does not derive from the gated target rate");
-  if (!almostEqual(cpuEnvelope, period - browserReserve - cpuSafetyReserve) || document.cpuSceneEnvelopeMs?.source !== "refreshPeriodMs - browserMainThreadReserveMs - cpuSafetyReserveMs") errors.push("timing CPU envelope does not derive from the frozen reserve model");
-  if (!almostEqual(gpuEnvelope, period - compositorReserve - gpuSafetyReserve) || document.gpuSceneEnvelopeMs?.source !== "refreshPeriodMs - compositorGpuReserveMs - gpuSafetyReserveMs") errors.push("timing GPU envelope does not derive from the frozen reserve model");
-  if (!almostEqual(cpuP95, cpuEnvelope) || document.cpuP95GateMs?.source !== "cpuSceneEnvelopeMs") errors.push("timing CPU p95 gate must freeze the derived CPU scene envelope");
-  if (!almostEqual(gpuP95, gpuEnvelope) || document.gpuP95GateMs?.source !== "gpuSceneEnvelopeMs") errors.push("timing GPU p95 gate must freeze the derived GPU scene envelope");
-  if (!almostEqual(rafP95, period) || document.rafIntervalP95GateMs?.source !== "refreshPeriodMs") errors.push("timing rAF interval p95 gate must freeze the refresh period");
-  if (deadlineMisses !== CORPUS_TIMING_GATES.deadlineMisses || document.deadlineMissGate?.source !== "CORPUS_TIMING_GATES.deadlineMisses") errors.push("timing deadline gate drifted from the checked-in gate");
-  if (minimumSamples !== CORPUS_TIMING_GATES.minimumSamplesPerWindow || document.minimumSamplesPerWindow?.source !== "CORPUS_TIMING_GATES.minimumSamplesPerWindow") errors.push("timing sample gate drifted from the checked-in gate");
-  if (cpuEnvelope > period || gpuEnvelope > period || cpuP95 > cpuEnvelope || gpuP95 > gpuEnvelope || rafP95 > period) {
-    errors.push("timing envelopes/gates do not close under the refresh period");
+  const targetContexts = new Map();
+  if (!Array.isArray(document.physicalTargets) || document.physicalTargets.length !== CORPUS_PERFORMANCE_TARGET_PLAN.length) {
+    errors.push(`timing trace must contain exactly ${CORPUS_PERFORMANCE_TARGET_PLAN.length} physical target records`);
+  } else for (let index = 0; index < CORPUS_PERFORMANCE_TARGET_PLAN.length; index += 1) {
+    const targetContext = validatePerformanceTarget(document.physicalTargets[index], CORPUS_PERFORMANCE_TARGET_PLAN[index], header, context, errors, `timing.physicalTargets[${index}]`);
+    if (targetContext) targetContexts.set(targetContext.id, targetContext);
   }
-  if (document.gpuTimingRequirement !== "required" || document.timestampTrackingEnabled !== true || document.gpuTimestampSupport !== true) {
-    errors.push("GPU timing acceptance requires pre-init timestamp tracking and available timestamp support");
-  }
-  if (!exactKeys(document.presentationTiming, ["verdict", "api", "reason"], "timing.presentationTiming", errors)) return;
-  if (document.presentationTiming.verdict !== "NOT_CLAIMED" || document.presentationTiming.api !== null) errors.push("presentation/compositor timing must remain NOT_CLAIMED unless a real timing API supplies it");
-  requireText(document.presentationTiming.reason, "timing.presentationTiming.reason", errors);
-  const gates = { minimumSamples, cpuP95, gpuP95, rafP95, deadlineMisses };
+  validateMobileArchitectureModels(document.mobileArchitectureModels, errors);
   const workloadPlan = SCULPT_TARGET_IDS.flatMap((subjectId) => SCULPT_TIERS.map((tier) => Object.freeze({
     id: `${subjectId}:${tier}`,
     subjectId,
     tier,
+    targetId: CORPUS_PERFORMANCE_TARGET_PLAN.find((target) => target.tiers.includes(tier))?.id ?? null,
   })));
   if (!Array.isArray(document.workloadCases) || document.workloadCases.length !== workloadPlan.length) {
     errors.push(`timing trace must contain exactly ${workloadPlan.length} subject/tier workload cases`);
@@ -2215,10 +2262,16 @@ function validateTiming(document, header, context, errors) {
     const workloadCase = document.workloadCases[caseIndex];
     const caseLabel = `timing.workloadCases[${caseIndex}]`;
     if (!exactKeys(workloadCase, [
-      "id", "subjectId", "tier", "workloadBinding", "sustainedCadenceIdentity", "oneShotGpuIdentity",
+      "id", "subjectId", "tier", "targetId", "deviceBinding", "workloadBinding", "sustainedCadenceIdentity", "oneShotGpuIdentity",
       "coldCadenceWindows", "sustainedCadenceWindows", "gpuTimestampPopulations", "retention", "finalStableWindowId",
     ], caseLabel, errors)) continue;
-    if (workloadCase.id !== expectedWorkload.id || workloadCase.subjectId !== expectedWorkload.subjectId || workloadCase.tier !== expectedWorkload.tier) errors.push(`${caseLabel} identity/order drifted`);
+    if (workloadCase.id !== expectedWorkload.id || workloadCase.subjectId !== expectedWorkload.subjectId || workloadCase.tier !== expectedWorkload.tier || workloadCase.targetId !== expectedWorkload.targetId) errors.push(`${caseLabel} identity/order/target drifted`);
+    const targetContext = targetContexts.get(expectedWorkload.targetId);
+    if (!targetContext) {
+      errors.push(`${caseLabel} has no validated physical target binding`);
+      continue;
+    }
+    if (workloadCase.deviceBinding !== targetContext.deviceBinding) errors.push(`${caseLabel}.deviceBinding does not match its tier-selected physical target`);
     const cadenceIdentity = validatePerformanceIdentity(workloadCase.sustainedCadenceIdentity, "sustained-cadence", expectedWorkload.subjectId, expectedWorkload.tier, header, errors, `${caseLabel}.sustainedCadenceIdentity`);
     const gpuIdentity = validatePerformanceIdentity(workloadCase.oneShotGpuIdentity, "one-shot-gpu", expectedWorkload.subjectId, expectedWorkload.tier, header, errors, `${caseLabel}.oneShotGpuIdentity`);
     if (!cadenceIdentity || !gpuIdentity) continue;
@@ -2228,12 +2281,12 @@ function validateTiming(document, header, context, errors) {
       errors.push(`${caseLabel} timing populations do not bind one immutable workload/device/source/generation definition`);
     }
     try {
-      assert.deepEqual(cadenceIdentity.browser, document.targetDevice.browser);
-      assert.deepEqual(cadenceIdentity.adapter, document.targetDevice.adapter);
+      assert.deepEqual(cadenceIdentity.browser, targetContext.target.browser);
+      assert.deepEqual(cadenceIdentity.adapter, targetContext.target.adapter);
     } catch {
       errors.push(`${caseLabel} performance identities do not match the named target browser/adapter`);
     }
-    const workloadBinding = stableSha256({ deviceBinding: expectedBinding, commonIdentity: commonPerformanceIdentity(cadenceIdentity) });
+    const workloadBinding = stableSha256({ deviceBinding: targetContext.deviceBinding, commonIdentity: commonPerformanceIdentity(cadenceIdentity) });
     if (workloadCase.workloadBinding !== workloadBinding) errors.push(`${caseLabel}.workloadBinding does not bind the exact device and subject/tier`);
     const workload = Object.freeze({
       ...expectedWorkload,
@@ -2244,10 +2297,10 @@ function validateTiming(document, header, context, errors) {
     });
     const orderedWindows = [];
     if (!Array.isArray(workloadCase.coldCadenceWindows) || workloadCase.coldCadenceWindows.length !== 1) errors.push(`${caseLabel} must contain exactly one cold cadence window`);
-    else workloadCase.coldCadenceWindows.forEach((window, index) => orderedWindows.push(validateCadenceWindow(window, index, "cold", gates, workload, cadenceIdentity, errors)));
+    else workloadCase.coldCadenceWindows.forEach((window, index) => orderedWindows.push(validateCadenceWindow(window, index, "cold", targetContext.gates, workload, cadenceIdentity, errors)));
     if (!Array.isArray(workloadCase.sustainedCadenceWindows) || workloadCase.sustainedCadenceWindows.length !== CORPUS_TIMING_GATES.sustainedWindowCount) errors.push(`${caseLabel} requires exactly ${CORPUS_TIMING_GATES.sustainedWindowCount} sustained cadence windows`);
     else {
-      workloadCase.sustainedCadenceWindows.forEach((window, index) => orderedWindows.push(validateCadenceWindow(window, index, "sustained", gates, workload, cadenceIdentity, errors)));
+      workloadCase.sustainedCadenceWindows.forEach((window, index) => orderedWindows.push(validateCadenceWindow(window, index, "sustained", targetContext.gates, workload, cadenceIdentity, errors)));
       if (workloadCase.finalStableWindowId !== workloadCase.sustainedCadenceWindows.at(-1)?.id) errors.push(`${caseLabel}.finalStableWindowId must name its final sustained cadence window`);
     }
     for (let windowIndex = 1; windowIndex < orderedWindows.length; windowIndex += 1) {
@@ -2256,7 +2309,7 @@ function validateTiming(document, header, context, errors) {
       if (previous && current && current.start <= previous.end) errors.push(`${caseLabel} cadence windows overlap or run out of order`);
     }
     if (!Array.isArray(workloadCase.gpuTimestampPopulations) || workloadCase.gpuTimestampPopulations.length !== 1) errors.push(`${caseLabel} must contain exactly one independent one-shot GPU timestamp population`);
-    else workloadCase.gpuTimestampPopulations.forEach((population, index) => validateGpuTimestampPopulation(population, index, gates, workload, gpuIdentity, errors));
+    else workloadCase.gpuTimestampPopulations.forEach((population, index) => validateGpuTimestampPopulation(population, index, targetContext.gates, workload, gpuIdentity, errors));
     validatePerformanceRetention(workloadCase.retention, workloadCase, caseLabel, errors);
   }
 }
