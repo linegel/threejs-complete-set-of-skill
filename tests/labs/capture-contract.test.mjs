@@ -10,11 +10,13 @@ import {
   assertCaptureArtifactBinding,
   assertCaptureRuntimeProfile,
   assertCaptureState,
+  assertFinalCaptureState,
   assertNoCaptureFailures,
   assertSymlinkConfinedPath,
   buildCaptureUrl,
   buildCaptureArtifactPayload,
   classifyAdapter,
+  captureMetadataOnly,
   capturePixels,
   createCaptureWriteLedger,
   extractCaptureState,
@@ -464,6 +466,11 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
     format: 'rgba8unorm',
     outputColorSpace: 'srgb',
     origin: 'bottom-left',
+    evidence: {
+      recipe: { id: 'final.design', schemaVersion: 1 },
+      effectiveState: { tier: 'webgpu-correctness' },
+      restoration: { status: 'PASS' },
+    },
     data: source,
   });
   assert.equal(capture.sourceOrigin, 'bottom-left');
@@ -499,6 +506,11 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
   assert.deepEqual([...payload.transport.data], [...source]);
   assert.deepEqual([...payload.normalized.data], [...topRow, ...bottomRow]);
   assert.equal(payload.normalized.paddedData.byteLength, 512);
+  assert.deepEqual(payload.evidence, capture.evidence);
+  assert.equal(Object.isFrozen(payload.evidence), true);
+  const writtenMetadata = captureMetadataOnly(payload);
+  assert.deepEqual(writtenMetadata.evidence, capture.evidence);
+  assert.equal(Object.hasOwn(writtenMetadata, 'bytes'), false);
   assert.doesNotThrow(() => assertCaptureArtifactBinding(payload));
 
   const serialized = JSON.stringify({
@@ -697,6 +709,40 @@ test('capture state extraction freezes canonical route fields and rejects silent
   assert.throws(
     () => assertCaptureState({ ...state, camera: null }, state),
     /omitted locked capture state camera/,
+  );
+});
+
+test('post-hook capture finalization requires the locked state and viewport', () => {
+  const lockedState = {
+    scenario: 'browser-capture',
+    mode: 'final',
+    tier: 'webgpu-correctness',
+    camera: 'design',
+    seed: 1,
+    timeSeconds: 0,
+  };
+  const profileConfig = { width: 1200, height: 800, dpr: 1 };
+  const finalRuntime = {
+    metrics: {
+      ...lockedState,
+      viewport: { ...profileConfig },
+    },
+  };
+  assert.deepEqual(assertFinalCaptureState(finalRuntime, lockedState, profileConfig), {
+    state: lockedState,
+    viewport: profileConfig,
+  });
+  assert.throws(
+    () => assertFinalCaptureState({ metrics: { ...finalRuntime.metrics, tier: 'mobile' } }, lockedState, profileConfig),
+    /tier=mobile does not match locked webgpu-correctness/,
+  );
+  assert.throws(
+    () => assertFinalCaptureState({ metrics: { ...finalRuntime.metrics, viewport: { ...profileConfig, dpr: 2 } } }, lockedState, profileConfig),
+    /viewport dpr=2 does not match locked 1/,
+  );
+  assert.throws(
+    () => assertFinalCaptureState({ metrics: { ...finalRuntime.metrics, viewport: null } }, lockedState, profileConfig),
+    /omitted locked capture viewport/,
   );
 });
 

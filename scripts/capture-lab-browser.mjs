@@ -159,6 +159,73 @@ function immutableBufferCopy(bytes, label = 'capture artifact bytes') {
   throw new TypeError(`${label} must be an exact string, ArrayBuffer, or ArrayBuffer view`);
 }
 
+const FORBIDDEN_EVIDENCE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
+function cloneJsonEvidenceValue(value, path, seen) {
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value) || Object.is(value, -0)) {
+      throw new TypeError(`${path} must contain only losslessly serializable JSON numbers`);
+    }
+    return value;
+  }
+  if (typeof value !== 'object') {
+    throw new TypeError(`${path} contains unsupported ${typeof value} data`);
+  }
+  if (ArrayBuffer.isView(value) || value instanceof ArrayBuffer) {
+    throw new TypeError(`${path} contains binary data; retain bytes as capture artifacts instead`);
+  }
+  if (seen.has(value)) throw new TypeError(`${path} contains a cyclic object reference`);
+  seen.add(value);
+  if (Array.isArray(value)) {
+    const keys = Reflect.ownKeys(value);
+    for (const key of keys) {
+      if (key === 'length') continue;
+      if (typeof key !== 'string' || !/^(?:0|[1-9][0-9]*)$/.test(key) || Number(key) >= value.length) {
+        throw new TypeError(`${path} contains a non-JSON array property`);
+      }
+      if (Object.getOwnPropertyDescriptor(value, key)?.enumerable !== true) {
+        throw new TypeError(`${path}[${key}] must be enumerable JSON data`);
+      }
+    }
+    const clone = [];
+    for (let index = 0; index < value.length; index += 1) {
+      if (!Object.hasOwn(value, index)) throw new TypeError(`${path} contains a sparse array entry at ${index}`);
+      clone.push(cloneJsonEvidenceValue(value[index], `${path}[${index}]`, seen));
+    }
+    seen.delete(value);
+    return Object.freeze(clone);
+  }
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) {
+    throw new TypeError(`${path} must contain only plain JSON objects`);
+  }
+  const clone = {};
+  for (const key of Reflect.ownKeys(value)) {
+    if (typeof key !== 'string') throw new TypeError(`${path} contains a symbol-keyed property`);
+    if (FORBIDDEN_EVIDENCE_KEYS.has(key)) throw new TypeError(`${path}.${key} is a forbidden evidence key`);
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (!descriptor || descriptor.enumerable !== true || !Object.hasOwn(descriptor, 'value')) {
+      throw new TypeError(`${path}.${key} must be enumerable plain JSON data`);
+    }
+    Object.defineProperty(clone, key, {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: cloneJsonEvidenceValue(descriptor.value, `${path}.${key}`, seen),
+    });
+  }
+  seen.delete(value);
+  return Object.freeze(clone);
+}
+
+export function normalizeCaptureEvidence(value) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new TypeError('PixelCapture.evidence must be a plain JSON object');
+  }
+  return cloneJsonEvidenceValue(value, 'PixelCapture.evidence', new WeakSet());
+}
+
 function requireCaptureFilename(filename, label = 'capture filename') {
   if (typeof filename !== 'string' || !/^[a-z0-9][a-z0-9._-]*\.png$/.test(filename)) {
     throw new Error(`${label} must be a confined lowercase PNG filename`);
@@ -652,6 +719,9 @@ export function normalizePixelCapture(payload) {
     format: 'rgba8',
     colorEncoding,
     data: normalizedData,
+    ...(Object.hasOwn(payload, 'evidence')
+      ? { evidence: normalizeCaptureEvidence(payload.evidence) }
+      : {}),
   };
 }
 
@@ -796,8 +866,8 @@ export async function awaitCanonicalReady(page) {
   await controllerCall(page, 'ready');
 }
 
-export async function capturePixels(page, target) {
-  const serialized = await page.evaluate(async ({ captureTarget, controllerGlobals }) => {
+async function capturePixelsThroughController(page, method, target) {
+  const serialized = await page.evaluate(async ({ captureTarget, captureMethod, controllerGlobals }) => {
     let candidate = null;
     for (const name of controllerGlobals) {
       if (window[name] !== undefined && window[name] !== null) {
@@ -806,8 +876,10 @@ export async function capturePixels(page, target) {
       }
     }
     const controller = await Promise.resolve(candidate);
-    if (!controller || typeof controller.capturePixels !== 'function') throw new Error('LabController has no capturePixels() method');
-    const capture = await controller.capturePixels(captureTarget);
+    if (!controller || typeof controller[captureMethod] !== 'function') {
+      throw new Error(`LabController has no ${captureMethod}() method`);
+    }
+    const capture = await controller[captureMethod](captureTarget);
     const bytesOf = (source, label) => {
       if (source instanceof ArrayBuffer) return { bytes: new Uint8Array(source), elementBytes: 1 };
       if (ArrayBuffer.isView(source)) {
@@ -826,6 +898,54 @@ export async function capturePixels(page, target) {
       }
       return btoa(binary);
     };
+    const assertJsonEvidence = (value, path, seen) => {
+      if (value === null || typeof value === 'string' || typeof value === 'boolean') return;
+      if (typeof value === 'number') {
+        if (!Number.isFinite(value) || Object.is(value, -0)) {
+          throw new TypeError(`${path} must contain only losslessly serializable JSON numbers`);
+        }
+        return;
+      }
+      if (typeof value !== 'object') throw new TypeError(`${path} contains unsupported ${typeof value} data`);
+      if (ArrayBuffer.isView(value) || value instanceof ArrayBuffer) {
+        throw new TypeError(`${path} contains binary data; retain bytes as capture artifacts instead`);
+      }
+      if (seen.has(value)) throw new TypeError(`${path} contains a cyclic object reference`);
+      seen.add(value);
+      if (Array.isArray(value)) {
+        for (const key of Reflect.ownKeys(value)) {
+          if (key === 'length') continue;
+          if (typeof key !== 'string' || !/^(?:0|[1-9][0-9]*)$/.test(key) || Number(key) >= value.length) {
+            throw new TypeError(`${path} contains a non-JSON array property`);
+          }
+          if (Object.getOwnPropertyDescriptor(value, key)?.enumerable !== true) {
+            throw new TypeError(`${path}[${key}] must be enumerable JSON data`);
+          }
+        }
+        for (let index = 0; index < value.length; index += 1) {
+          if (!Object.hasOwn(value, index)) throw new TypeError(`${path} contains a sparse array entry at ${index}`);
+          assertJsonEvidence(value[index], `${path}[${index}]`, seen);
+        }
+        seen.delete(value);
+        return;
+      }
+      const prototype = Object.getPrototypeOf(value);
+      if (prototype !== Object.prototype && prototype !== null) {
+        throw new TypeError(`${path} must contain only plain JSON objects`);
+      }
+      for (const key of Reflect.ownKeys(value)) {
+        if (typeof key !== 'string') throw new TypeError(`${path} contains a symbol-keyed property`);
+        if (new Set(['__proto__', 'constructor', 'prototype']).has(key)) {
+          throw new TypeError(`${path}.${key} is a forbidden evidence key`);
+        }
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (!descriptor || descriptor.enumerable !== true || !Object.hasOwn(descriptor, 'value')) {
+          throw new TypeError(`${path}.${key} must be enumerable plain JSON data`);
+        }
+        assertJsonEvidence(descriptor.value, `${path}.${key}`, seen);
+      }
+      seen.delete(value);
+    };
     const transportLayout = capture?.transport?.layout ?? null;
     const transportSource = capture?.transport?.data
       ?? capture?.transport?.pixels
@@ -837,6 +957,12 @@ export async function capturePixels(page, target) {
     const controllerNormalized = controllerNormalizedSource === null
       ? null
       : bytesOf(controllerNormalizedSource, 'PixelCapture controller-normalized data');
+    if (Object.hasOwn(capture, 'evidence')) {
+      if (capture.evidence === null || typeof capture.evidence !== 'object' || Array.isArray(capture.evidence)) {
+        throw new TypeError('PixelCapture.evidence must be a plain JSON object');
+      }
+      assertJsonEvidence(capture.evidence, 'PixelCapture.evidence', new WeakSet());
+    }
     return {
       target: capture.target ?? captureTarget,
       width: transportLayout?.width ?? capture.width,
@@ -879,8 +1005,9 @@ export async function capturePixels(page, target) {
         sourceElementBytes: controllerNormalized.elementBytes,
         dataBase64: base64Of(controllerNormalized.bytes),
       },
+      ...(Object.hasOwn(capture, 'evidence') ? { evidence: capture.evidence } : {}),
     };
-  }, { captureTarget: target, controllerGlobals: LAB_CONTROLLER_GLOBALS });
+  }, { captureTarget: target, captureMethod: method, controllerGlobals: LAB_CONTROLLER_GLOBALS });
 
   const capture = normalizePixelCapture(serialized);
   if (serialized.controllerNormalized !== null) {
@@ -893,6 +1020,18 @@ export async function capturePixels(page, target) {
   }
   capture.transportPadding = serialized.transportPadding;
   capture.requestedLayout = Object.freeze(structuredClone(serialized.requestedLayout));
+  return capture;
+}
+
+export async function capturePixels(page, target) {
+  return capturePixelsThroughController(page, 'capturePixels', target);
+}
+
+export async function captureRecipePixels(page, recipeId) {
+  const capture = await capturePixelsThroughController(page, 'captureRecipe', recipeId);
+  if (capture.target !== recipeId) {
+    throw new Error(`LabController returned capture target ${capture.target} for requested recipe ${recipeId}`);
+  }
   return capture;
 }
 
@@ -1069,6 +1208,35 @@ export function assertCaptureState(actual, expected) {
       throw new Error(`LabController capture state ${name}=${actualValue} does not match locked ${expectedValue}`);
     }
   }
+}
+
+export function assertFinalCaptureState(finalRuntime, lockedState, profileConfig) {
+  const metrics = finalRuntime?.metrics;
+  if (!metrics || typeof metrics !== 'object') {
+    throw new TypeError('final capture runtime metrics are required');
+  }
+  const state = extractCaptureState(metrics);
+  assertCaptureState(state, lockedState);
+  const viewport = metrics.viewport;
+  if (!viewport || typeof viewport !== 'object' || Array.isArray(viewport)) {
+    throw new Error('LabController final metrics omitted locked capture viewport');
+  }
+  const normalizedViewport = {};
+  for (const field of ['width', 'height', 'dpr']) {
+    const expectedValue = profileConfig?.[field];
+    const actualValue = datumValue(viewport[field]);
+    if (!Number.isFinite(expectedValue) || !Number.isFinite(actualValue)) {
+      throw new Error(`LabController final capture viewport ${field} must be finite`);
+    }
+    if (!Object.is(actualValue, expectedValue)) {
+      throw new Error(`LabController final capture viewport ${field}=${actualValue} does not match locked ${expectedValue}`);
+    }
+    normalizedViewport[field] = actualValue;
+  }
+  return Object.freeze({
+    state,
+    viewport: Object.freeze(normalizedViewport),
+  });
 }
 
 function runtimeThreeRevision(metrics) {
@@ -1341,6 +1509,7 @@ export function buildCaptureArtifactPayload(capture, filename) {
     sourceFormat: capture.sourceFormat,
     format: capture.format,
     colorEncoding: capture.colorEncoding,
+    ...(Object.hasOwn(capture, 'evidence') ? { evidence: capture.evidence } : {}),
     transport: Object.freeze(transport),
     normalized: Object.freeze(normalizedRecord),
     ...(capture.controllerNormalized ? { controllerNormalized: capture.controllerNormalized } : {}),
@@ -1361,7 +1530,7 @@ export function buildCaptureArtifactPayload(capture, filename) {
   });
 }
 
-function captureMetadataOnly(payload) {
+export function captureMetadataOnly(payload) {
   const { bytes, ...metadata } = payload;
   return metadata;
 }
@@ -1865,6 +2034,17 @@ export async function captureLabBrowser({
     assertCaptureState(observedState, lockedState);
     assertNoCaptureFailures({ pageErrors, consoleErrors, requestErrors, runtime });
     const browserRecord = await collectBrowserRecord(browser, page, runtime.metrics);
+    const persistCapture = async (filename, captureTarget, readCapture) => {
+      const capture = await readCapture();
+      if (capture.target !== captureTarget) {
+        throw new Error(`LabController returned capture target ${capture.target} for requested ${captureTarget}`);
+      }
+      const payload = buildCaptureArtifactPayload(capture, filename);
+      writeCapturePayload(output, payload, writeLedger);
+      const metadata = captureMetadataOnly(payload);
+      writtenCaptures.push(metadata);
+      return metadata;
+    };
     const session = {
       page,
       lab,
@@ -1886,6 +2066,7 @@ export async function captureLabBrowser({
       runtime,
       controllerCall: (method, ...args) => controllerCall(page, method, args),
       capturePixels: (captureTarget) => capturePixels(page, captureTarget),
+      captureRecipePixels: (recipeId) => captureRecipePixels(page, recipeId),
       async readArtifact(relativePath) {
         return readFileSync(captureArtifactPath(output, relativePath));
       },
@@ -1893,15 +2074,10 @@ export async function captureLabBrowser({
         writeLedgerBoundArtifact(output, writeLedger, relativePath, 'hook-artifact', bytes);
       },
       async writeCapture(filename, captureTarget) {
-        const capture = await capturePixels(page, captureTarget);
-        if (capture.target !== captureTarget) {
-          throw new Error(`LabController returned capture target ${capture.target} for requested ${captureTarget}`);
-        }
-        const payload = buildCaptureArtifactPayload(capture, filename);
-        writeCapturePayload(output, payload, writeLedger);
-        const metadata = captureMetadataOnly(payload);
-        writtenCaptures.push(metadata);
-        return metadata;
+        return persistCapture(filename, captureTarget, () => capturePixels(page, captureTarget));
+      },
+      async writeRecipeCapture(filename, recipeId) {
+        return persistCapture(filename, recipeId, () => captureRecipePixels(page, recipeId));
       },
     };
 
@@ -1920,6 +2096,7 @@ export async function captureLabBrowser({
       pipeline: await controllerCall(page, 'describePipeline'),
       resources: await controllerCall(page, 'describeResources'),
     };
+    const finalCaptureState = assertFinalCaptureState(finalRuntime, lockedState, profileConfig);
     const closingRegistry = buildDemoRegistry();
     const closingLab = closingRegistry.demos.find((entry) => entry.id === labId);
     if (
@@ -2003,7 +2180,7 @@ export async function captureLabBrowser({
         observedRuntimeLabId: observedLabId ?? null,
         lockedState,
         observedState,
-        finalState: extractCaptureState(finalRuntime.metrics),
+        finalState: finalCaptureState.state,
       }),
       startedAt,
       finishedAt: new Date().toISOString(),

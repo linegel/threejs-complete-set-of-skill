@@ -1,3 +1,6 @@
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
+
 export type PixelCapture = {
   target: string;
   width: number;
@@ -5,6 +8,7 @@ export type PixelCapture = {
   bytesPerPixel: number;
   bytesPerRow: number;
   data: Uint8Array;
+  evidence?: { [key: string]: JsonValue };
 };
 
 export type RuntimeGraphManifest = Record<string, unknown>;
@@ -23,6 +27,7 @@ export interface LabController {
   resize(width: number, height: number, dpr: number): Promise<void>;
   renderOnce(): Promise<void>;
   capturePixels(target: string): Promise<PixelCapture>;
+  captureRecipe?(recipeId: string): Promise<PixelCapture>;
   describePipeline(): RuntimeGraphManifest;
   describeResources(): RuntimeResourceManifest;
   getMetrics(): Record<string, unknown>;

@@ -8,7 +8,9 @@ import {
   backendProven,
   captureLabBrowser,
   capturePixels,
+  captureRecipePixels,
   controllerCall,
+  normalizeCaptureEvidence,
   normalizePixelCapture,
 } from '../../scripts/capture-lab-browser.mjs';
 import { encodeRgbaPng } from '../../scripts/lib/png-rgba.mjs';
@@ -140,6 +142,140 @@ test('shared capture reads pixels through the space alias and typed-array width 
     if (previousWindow === undefined) delete globalThis.window;
     else globalThis.window = previousWindow;
   }
+});
+
+test('shared capture preserves a deeply immutable JSON evidence envelope', async () => {
+  const previousWindow = globalThis.window;
+  const page = { evaluate: async (callback, argument) => callback(argument) };
+  const pixels = Uint8Array.from([12, 34, 56, 255]);
+  const evidence = {
+    recipe: {
+      id: 'final.design',
+      schemaVersion: 1,
+      digest: `sha256:${'a'.repeat(64)}`,
+    },
+    effectiveState: {
+      tier: 'webgpu-correctness',
+      viewport: { width: 1200, height: 800, dpr: 1 },
+      passScale: 1,
+    },
+    resources: { renderTargets: [{ id: 'capture-target', bytes: 3840000 }] },
+    restoration: {
+      status: 'PASS',
+      beforeStateDigest: `sha256:${'b'.repeat(64)}`,
+      afterStateDigest: `sha256:${'b'.repeat(64)}`,
+    },
+  };
+  try {
+    globalThis.window = {
+      __THREEJS_LAB__: {
+        capturePixels: async (target) => ({
+          target,
+          width: 1,
+          height: 1,
+          bytesPerPixel: 4,
+          format: 'rgba8unorm',
+          outputColorSpace: 'srgb',
+          pixels,
+          evidence,
+        }),
+      },
+    };
+    const capture = await capturePixels(page, 'final.design');
+    assert.deepEqual(capture.evidence, evidence);
+    assert.equal(Object.isFrozen(capture.evidence), true);
+    assert.equal(Object.isFrozen(capture.evidence.effectiveState.viewport), true);
+    assert.equal(Object.isFrozen(capture.evidence.resources.renderTargets), true);
+    evidence.effectiveState.tier = 'mutated-after-capture';
+    evidence.resources.renderTargets.push({ id: 'late-target', bytes: 4 });
+    evidence.restoration.status = 'FAIL';
+    assert.equal(capture.evidence.effectiveState.tier, 'webgpu-correctness');
+    assert.deepEqual(capture.evidence.resources.renderTargets, [{ id: 'capture-target', bytes: 3840000 }]);
+    assert.equal(capture.evidence.restoration.status, 'PASS');
+  } finally {
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+  }
+});
+
+test('recipe capture uses the explicit controller method and enforces recipe identity', async () => {
+  const previousWindow = globalThis.window;
+  const page = { evaluate: async (callback, argument) => callback(argument) };
+  const pixels = Uint8Array.from([21, 43, 65, 255]);
+  try {
+    globalThis.window = {
+      __THREEJS_LAB__: {
+        captureRecipe: async (recipeId) => ({
+          target: recipeId,
+          width: 1,
+          height: 1,
+          bytesPerPixel: 4,
+          format: 'rgba8unorm',
+          outputColorSpace: 'srgb',
+          pixels,
+          evidence: { recipe: { id: recipeId }, restoration: { status: 'PASS' } },
+        }),
+      },
+    };
+    const capture = await captureRecipePixels(page, 'camera.near');
+    assert.equal(capture.target, 'camera.near');
+    assert.equal(capture.evidence.recipe.id, 'camera.near');
+
+    globalThis.window.__THREEJS_LAB__.captureRecipe = async () => ({
+      target: 'final.design',
+      width: 1,
+      height: 1,
+      bytesPerPixel: 4,
+      format: 'rgba8unorm',
+      outputColorSpace: 'srgb',
+      pixels,
+    });
+    await assert.rejects(
+      captureRecipePixels(page, 'camera.near'),
+      /capture target final\.design for requested recipe camera\.near/,
+    );
+  } finally {
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+  }
+});
+
+test('capture evidence rejects non-JSON, lossy, and cyclic values', () => {
+  const cyclic = {};
+  cyclic.self = cyclic;
+  const accessor = {};
+  Object.defineProperty(accessor, 'value', { enumerable: true, get: () => 1 });
+  const nonEnumerable = {};
+  Object.defineProperty(nonEnumerable, 'value', { enumerable: false, value: 1 });
+  const symbolKey = { value: 1 };
+  symbolKey[Symbol('hidden')] = true;
+  const sparseArray = [];
+  sparseArray.length = 1;
+  const extraArrayProperty = [];
+  extraArrayProperty.extra = true;
+  const nonPlain = Object.create({ inherited: true });
+  nonPlain.value = 1;
+  const dangerousKey = {};
+  Object.defineProperty(dangerousKey, '__proto__', { enumerable: true, value: 'forbidden' });
+  for (const [evidence, message] of [
+    [{ value: Number.NaN }, /losslessly serializable JSON numbers/],
+    [{ value: -0 }, /losslessly serializable JSON numbers/],
+    [{ value: undefined }, /unsupported undefined data/],
+    [{ value: Symbol('value') }, /unsupported symbol data/],
+    [{ value: () => true }, /unsupported function data/],
+    [{ value: 1n }, /unsupported bigint data/],
+    [{ bytes: new Uint8Array(4) }, /contains binary data/],
+    [{ date: new Date(0) }, /plain JSON objects/],
+    [accessor, /must be enumerable plain JSON data/],
+    [nonEnumerable, /must be enumerable plain JSON data/],
+    [symbolKey, /symbol-keyed property/],
+    [{ value: sparseArray }, /sparse array entry at 0/],
+    [{ value: extraArrayProperty }, /non-JSON array property/],
+    [nonPlain, /plain JSON objects/],
+    [dangerousKey, /__proto__ is a forbidden evidence key/],
+    [cyclic, /cyclic object reference/],
+  ]) assert.throws(() => normalizeCaptureEvidence(evidence), message);
+  assert.throws(() => normalizeCaptureEvidence([]), /must be a plain JSON object/);
 });
 
 test('compact RGBA8 payload wins over padded-copy metadata without re-unpacking', () => {
