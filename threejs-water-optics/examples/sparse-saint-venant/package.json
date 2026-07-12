@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check swe-core.js && node --check test-swe-core.mjs",
+    "test": "node test-swe-core.mjs"
+  }
+}

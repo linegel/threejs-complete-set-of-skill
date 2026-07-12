@@ -619,6 +619,13 @@ semantics, or any unlabeled quantitative claim.
 
 ## Routing Boundary
 
+Executable wet/dry mechanism oracle:
+`examples/sparse-saint-venant/`. It selects HLL finite volumes with hydrostatic
+reconstruction after a six-family comparison and gates lake-at-rest,
+positivity, wet/dry advance, mass, and CFL behavior. Treat it as a float64
+oracle only until the sparse GPU state owner, transactional commit, and native
+Browser route are present.
+
 This skill consumes the versioned coast SDF, bathymetry, obstacle, and substrate
 contract from the terrain/data owner and the shared physics ABI from
 `../threejs-choose-skills/references/physics-domain-and-interaction-contract.md`.
