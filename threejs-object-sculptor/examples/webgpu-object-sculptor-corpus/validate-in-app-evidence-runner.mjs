@@ -130,6 +130,20 @@ function assertRunnerHtml(html) {
   assert.equal(iframe.attributes.get("height"), "512", "runner evidence viewport height drifted");
 }
 
+function assertCorrectnessHtml(html) {
+  const elements = parseActiveHtmlElements(html, "index.html");
+  assertNoInlineExecution(elements.filter(({ name }) => name !== "script"), "index.html");
+  const scripts = elements.filter(({ name }) => name === "script");
+  assert.equal(scripts.length, 3, "correctness entry must contain bootstrap, import map, and app scripts");
+  assert.equal(scripts[0].attributes.get("src"), "./route-evidence-bootstrap.js", "correctness bootstrap path drifted");
+  assert.equal(scripts[0].attributes.get("data-surface"), "correctness", "correctness bootstrap surface drifted");
+  assert.equal(scripts[0].parentName, "head", "correctness bootstrap must execute in head");
+  assert.equal(scripts[1].attributes.get("type"), "importmap", "correctness import map must follow its bootstrap");
+  assert.equal(scripts[2].attributes.get("src"), "./app.js", "correctness app module path drifted");
+  assert.equal(scripts[2].attributes.get("type"), "module", "correctness app must be a module");
+  assert(scripts[0].sourceIndex < scripts[1].sourceIndex && scripts[1].sourceIndex < scripts[2].sourceIndex, "correctness bootstrap/import-map/app order drifted");
+}
+
 export function validateInAppEvidenceRunner() {
   assert.equal(CORPUS_IN_APP_ROUTE_PLAN.length, 15, "in-app route plan must contain 15 physical routes");
   assert.equal(new Set(CORPUS_IN_APP_ROUTE_PLAN.map(({ routeId }) => routeId)).size, 15, "in-app route IDs must be unique");
@@ -137,11 +151,18 @@ export function validateInAppEvidenceRunner() {
 
   const runnerHtml = source("in-app-evidence.html");
   assertRunnerHtml(runnerHtml);
+  assertCorrectnessHtml(source("index.html"));
 
   const app = source("app.js");
   assert(app.includes("createCorpusRouteEvidenceProducer"), "corpus app must create the physical-route evidence producer");
   assert(app.includes("__CORPUS_ROUTE_EVIDENCE__"), "corpus app must expose its same-origin evidence producer");
   assert(app.includes('cameraInteractionEnabled: frameOwner === "live-page" && physicalRouteLockCount === 0'), "physical and capture routes must disable camera interaction");
+  assert(app.includes("createCorpusCorrectnessEvidenceProducer"), "corpus app must expose the Codex in-app Browser correctness producer");
+  const correctnessClient = source("correctness-evidence-client.js");
+  assert(correctnessClient.includes("CORPUS_NATIVE_READBACK_PLAN"), "correctness producer must consume the canonical 63-readback plan");
+  assert(correctnessClient.includes("correctness-readbacks/"), "correctness producer must retain exact renderer and independently normalized bytes");
+  assert(correctnessClient.includes("row-pack exact retained normalized artifact"), "correctness producer must bind compact pixels to the recorded integer row stride");
+  assert(correctnessClient.includes("describeResources"), "correctness producer must bind its resource inventory");
   const evidenceClient = source("route-evidence-client.js");
   assert(evidenceClient.includes("object-sculptor-route-camera-v1"), "route evidence must bind the stable camera pose");
   assert(evidenceClient.includes("object-sculptor-route-source-v4"), "route evidence must bind immutable served bytes and canonical closure");
@@ -153,7 +174,7 @@ export function validateInAppEvidenceRunner() {
   const runnerSource = source("in-app-evidence-runner.js");
   assert(runnerSource.includes("CORPUS_IN_APP_ROUTE_PLAN.length * 2"), "runner must require two retained readback artifacts per physical route");
   assert(runnerSource.includes("waitForChildAnimationFrames"), "runner must settle two child animation frames before post-disposal error closure");
-  const tarBuildIndex = runnerSource.indexOf("evidenceTar = buildRouteEvidenceTar");
+  const tarBuildIndex = runnerSource.indexOf("evidenceTar = await buildRouteEvidenceTar");
   const resultPublishIndex = runnerSource.indexOf("window.__CORPUS_ROUTE_EVIDENCE_RESULT__ = documentRecord");
   assert(tarBuildIndex >= 0 && resultPublishIndex > tarBuildIndex, "runner must build and validate its TAR before publishing completion");
   assert(runnerSource.includes("failClosedPhysicalRouteCollection"), "runner failure cleanup must reset the iframe even before producer acquisition");

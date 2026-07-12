@@ -39,6 +39,7 @@ const CORPUS_DERIVED_RUNTIME_OUTPUTS = Object.freeze([
 
 export const CORPUS_EXECUTABLE_SOURCE_ROOTS = Object.freeze([
   `${corpusBase}/in-app-evidence.html`,
+  `${corpusBase}/index.html`,
   `${corpusBase}/immutable-route-server.mjs`,
   ...CORPUS_PHYSICAL_ROUTE_PLAN.map(({ urlPath }) => `${corpusBase}/${urlPath}index.html`),
 ]);

@@ -19,6 +19,7 @@ assert.deepEqual(defaults, {
   performanceTimestampMode: "auto",
   performanceLane: null,
   performanceCaptureRequested: false,
+  correctnessCaptureRequested: false,
   automationSurface: null,
 });
 assert.equal(Object.isFrozen(defaults), true);
@@ -33,6 +34,7 @@ assert.deepEqual(
     performanceTimestampMode: "auto",
     performanceLane: "one-shot-gpu",
     performanceCaptureRequested: true,
+    correctnessCaptureRequested: false,
     automationSurface: "codex-in-app-browser",
   },
 );
@@ -54,6 +56,7 @@ assert.deepEqual(cadenceOptions, {
   performanceTimestampMode: "disabled-for-cadence",
   performanceLane: "sustained-cadence",
   performanceCaptureRequested: true,
+  correctnessCaptureRequested: false,
   automationSurface: "codex-in-app-browser",
 });
 
@@ -128,7 +131,21 @@ assert.throws(
   () => runtimeOptionsFromLocation({
     search: "?automationSurface=codex-in-app-browser",
   }),
-  /only valid with profile=performance/,
+  /requires capture=1 and codex-in-app-browser/,
+);
+
+assert.deepEqual(runtimeOptionsFromLocation({
+  search: "?capture=1&profile=correctness&automationSurface=codex-in-app-browser",
+}), {
+  ...defaults,
+  correctnessCaptureRequested: true,
+  automationSurface: "codex-in-app-browser",
+});
+assert.throws(
+  () => runtimeOptionsFromLocation({
+    search: "?capture=1&profile=correctness&automationSurface=playwright-headless-chromium",
+  }),
+  /requires capture=1 and codex-in-app-browser/,
 );
 
 assert.deepEqual(runtimeOptionsFromLocation({ search: "?capture=1" }), {

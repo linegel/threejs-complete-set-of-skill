@@ -19,6 +19,7 @@ const repositoryRoot = resolve(here, "../../..");
 const serverSourcePath = "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/immutable-route-server.mjs";
 const runnerPaths = Object.freeze([
   "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.html",
+  "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
   "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.css",
   "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence-runner.js",
 ]);

@@ -14,6 +14,13 @@ import {
 import { settleCorpusControlAction } from "./frame-driver.js";
 import { runtimeOptionsFromLocation } from "./app-runtime-options.js";
 import { createCorpusRouteEvidenceProducer } from "./route-evidence-client.js";
+import {
+  CORPUS_CORRECTNESS_ERROR_KEY,
+  CORPUS_CORRECTNESS_EVIDENCE_KEY,
+  CORPUS_CORRECTNESS_RESULT_KEY,
+  corpusCorrectnessEvidenceRequest,
+  createCorpusCorrectnessEvidenceProducer,
+} from "./correctness-evidence-client.js";
 
 const MODE_COPY = Object.freeze({
   final: ["Final reconstruction", "Complete procedural form, authored material zones, and neutral presentation lighting."],
@@ -72,6 +79,9 @@ const metricMotion = requireElement("#metric-motion");
 const metricDpr = requireElement("#metric-dpr");
 
 window.__LAB_ERROR__ = null;
+window[CORPUS_CORRECTNESS_EVIDENCE_KEY] = null;
+window[CORPUS_CORRECTNESS_RESULT_KEY] = null;
+window[CORPUS_CORRECTNESS_ERROR_KEY] = null;
 
 function addOptions(select, entries) {
   for (const [value, label] of entries) select.add(new Option(label, value));
@@ -377,6 +387,53 @@ async function boot() {
         return Object.freeze({ listenersDetached, controllerResult: controllerResult ?? null });
       },
     });
+  }
+
+  if (frameOwner === "capture-harness" && physicalRouteLockCount === 0 && runtimeOptions.correctnessCaptureRequested) {
+    const correctnessBootstrap = window.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__;
+    if (correctnessBootstrap?.enabled !== true || correctnessBootstrap?.surface !== "correctness") {
+      throw new Error("Correctness evidence requires the exact immutable Codex in-app Browser capture URL");
+    }
+    const correctnessProducer = createCorpusCorrectnessEvidenceProducer({
+      controller: labController,
+      disposeCorpus: async () => {
+        const listenersDetached = detachListeners();
+        const controllerResult = await labController.dispose();
+        return Object.freeze({ listenersDetached, controllerResult: controllerResult ?? null });
+      },
+    });
+    window[CORPUS_CORRECTNESS_EVIDENCE_KEY] = correctnessProducer;
+    const correctnessRequest = corpusCorrectnessEvidenceRequest(window.location.search);
+    if (correctnessRequest.autostart) {
+      status.dataset.state = "collecting";
+      status.textContent = `Collecting · ${correctnessRequest.subjectId} · 0 / 21`;
+      queueMicrotask(async () => {
+        try {
+          const documentRecord = await correctnessProducer.collectSubject(correctnessRequest.subjectId);
+          const retained = correctnessProducer.getState().retainedArtifactCount;
+          const summary = document.createElement("pre");
+          summary.id = "correctness-evidence-summary";
+          summary.textContent = JSON.stringify({
+            subjectId: documentRecord.subjectId,
+            profile: documentRecord.profile,
+            automationSurface: documentRecord.automationSurface,
+            nativeWebGPU: documentRecord.backend.nativeWebGPU,
+            captureCount: documentRecord.captures.length,
+            presentationCount: documentRecord.captures.filter(({ kind }) => kind === "presentation").length,
+            targetMaskCount: documentRecord.captures.filter(({ kind }) => kind === "target-mask").length,
+            retainedArtifactCount: retained,
+            sourceHash: documentRecord.sourceHash,
+            digest: documentRecord.digest,
+          }, null, 2);
+          summary.setAttribute("aria-label", "Correctness evidence summary");
+          document.body.append(summary);
+          status.dataset.state = "ready";
+          status.textContent = `Evidence ready · ${correctnessRequest.subjectId} · 21 / 21`;
+        } catch (error) {
+          reportRuntimeError(error);
+        }
+      });
+    }
   }
 
   if (frameOwner === "live-page") frameDriver.start();

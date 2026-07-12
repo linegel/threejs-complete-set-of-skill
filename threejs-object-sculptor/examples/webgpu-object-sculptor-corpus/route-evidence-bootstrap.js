@@ -6,6 +6,7 @@
   const ORIGIN = "http://127.0.0.1:4174";
   const BASE_PATH = "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/";
   const RUNNER_PATH = `${BASE_PATH}in-app-evidence.html`;
+  const CORRECTNESS_PATH = `${BASE_PATH}index.html`;
   const ROUTE_PATH = new RegExp(`^${BASE_PATH}(?:scenario|mechanism|tier|camera)/[a-z0-9]+(?:-[a-z0-9]+)*/$`);
   const currentScript = document.currentScript;
 
@@ -32,10 +33,28 @@
       && params.getAll("autostart").length <= 1;
   }
 
+  function hasExactCorrectnessQuery() {
+    const params = new URLSearchParams(location.search);
+    const allowed = new Set(["capture", "profile", "automationSurface", "subjectSegment", "autostart"]);
+    for (const key of params.keys()) if (!allowed.has(key)) return false;
+    const one = (key, value) => params.getAll(key).length === 1 && params.get(key) === value;
+    const subject = params.get("subjectSegment");
+    return one("capture", "1")
+      && one("profile", "correctness")
+      && one("automationSurface", "codex-in-app-browser")
+      && (subject === null || (
+        params.getAll("subjectSegment").length === 1
+        && new Set(["articulated-desk-lamp", "potted-bonsai", "ceramic-teapot"]).has(subject)
+        && one("autostart", "1")
+      ))
+      && (subject !== null || params.getAll("autostart").length === 0);
+  }
+
   const requestedSurface = currentScript?.dataset?.surface ?? null;
   const enabled = location.origin === ORIGIN && (
     (requestedSurface === "route" && ROUTE_PATH.test(location.pathname) && location.search === "?capture=1")
     || (requestedSurface === "runner" && location.pathname === RUNNER_PATH && hasExactRunnerQuery())
+    || (requestedSurface === "correctness" && location.pathname === CORRECTNESS_PATH && hasExactCorrectnessQuery())
   );
   const configuration = Object.freeze({
     enabled,
@@ -172,7 +191,7 @@
   }
 
   let gpuRequestHookInstalled = false;
-  if (requestedSurface === "route") {
+  if (requestedSurface === "route" || requestedSurface === "correctness") {
     try {
       const gpu = navigator.gpu;
       const originalRequestAdapter = gpu?.requestAdapter?.bind(gpu);
@@ -218,15 +237,15 @@
       requestFailures: eventChannel(requestFailures, "capturing window.error listener for document subresource failures"),
       gpuErrors: eventChannel(
         gpuErrors,
-        requestedSurface === "route"
+        requestedSurface === "route" || requestedSurface === "correctness"
           ? "GPU requestAdapter/requestDevice interception plus device uncapturederror listener"
           : "not applicable on the non-rendering runner surface",
-        requestedSurface === "route" && gpuRequestHookInstalled,
+        (requestedSurface === "route" || requestedSurface === "correctness") && gpuRequestHookInstalled,
       ),
       deviceLost: Object.freeze({
         monitorAttached: monitoredDeviceCount > 0,
         monitoredDeviceCount,
-        provenance: requestedSurface === "route"
+        provenance: requestedSurface === "route" || requestedSurface === "correctness"
           ? "GPUDevice.lost promise attached before the device is returned to WebGPURenderer"
           : "not applicable on the non-rendering runner surface",
         events: Object.freeze([...deviceLossEvents]),

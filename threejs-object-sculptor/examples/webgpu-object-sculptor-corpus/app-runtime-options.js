@@ -228,7 +228,9 @@ export function runtimeOptionsFromLocation({ search = "" } = {}) {
       );
     }
   } else if (automationSurface !== null) {
-    throw new Error("automationSurface is only valid with profile=performance");
+    if (captureValue !== "1" || automationSurface !== "codex-in-app-browser") {
+      throw new Error("correctness automationSurface requires capture=1 and codex-in-app-browser");
+    }
   }
 
   const performanceLane = profile !== "performance"
@@ -246,6 +248,9 @@ export function runtimeOptionsFromLocation({ search = "" } = {}) {
     performanceTimestampMode,
     performanceLane,
     performanceCaptureRequested: profile === "performance",
+    correctnessCaptureRequested: profile === "correctness"
+      && captureValue === "1"
+      && automationSurface === "codex-in-app-browser",
     automationSurface,
   });
 }

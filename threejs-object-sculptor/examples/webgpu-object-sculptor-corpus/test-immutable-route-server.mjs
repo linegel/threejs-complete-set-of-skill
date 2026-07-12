@@ -109,6 +109,24 @@ const ambiguousCaptureRoute = runBootstrap({
 assert.equal(ambiguousCaptureRoute.window.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__.enabled, false);
 assert.equal(ambiguousCaptureRoute.listeners.length, 0);
 
+const exactCorrectnessRoute = runBootstrap({
+  origin: "http://127.0.0.1:4174",
+  pathname: "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
+  search: "?capture=1&profile=correctness&automationSurface=codex-in-app-browser",
+  surface: "correctness",
+});
+assert.equal(exactCorrectnessRoute.window.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__.enabled, true);
+assert(exactCorrectnessRoute.listeners.length >= 2);
+assert.notEqual(exactCorrectnessRoute.navigator.gpu.requestAdapter, exactCorrectnessRoute.requestAdapter);
+
+const foreignCorrectnessSurface = runBootstrap({
+  origin: "http://127.0.0.1:4174",
+  pathname: "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
+  search: "?capture=1&profile=correctness&automationSurface=playwright-headless-chromium",
+  surface: "correctness",
+});
+assert.equal(foreignCorrectnessSurface.window.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__.enabled, false);
+
 const origin = "http://127.0.0.1:4174";
 const responder = createImmutableCorpusResponder({ origin });
 const manifestResponse = responder.respond({ url: CORPUS_ROUTE_IMMUTABLE_MANIFEST_PATH });
