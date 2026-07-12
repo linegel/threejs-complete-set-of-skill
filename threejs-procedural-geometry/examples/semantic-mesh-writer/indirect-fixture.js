@@ -54,6 +54,9 @@ export function reconcileIndirectReadback({
   if (readback?.provenance !== INDIRECT_READBACK_PROVENANCE) {
     errors.push("indirect validation requires fresh renderer.getArrayBufferAsync GPU readback");
   }
+  if (!Number.isInteger(readback?.sequence) || readback.sequence <= 0) {
+    errors.push("indirect validation requires a positive GPU readback sequence");
+  }
   const command = readback?.command;
   const visibleIds = readback?.visibleIds;
   const visibleOffsets = readback?.visibleOffsets;
@@ -112,6 +115,7 @@ export function reconcileIndirectReadback({
     visibleIds: actualIds,
     expectedVisibleIds: expected,
     submittedTriangles: visibleCount * indexCount / 3,
+    readbackSequence: readback.sequence,
   };
 }
 
@@ -201,7 +205,8 @@ export function createIndirectFixture({
     commandNode.element(uint(2)).assign(uint(0));
     commandNode.element(uint(3)).assign(uint(0));
     commandNode.element(uint(4)).assign(uint(0));
-  })().compute(1).setName("compact-visible-indexed-indirect-command");
+  })().compute(1).setName("semanticMeshWriterIndirectCompact");
+  let readbackSequence = 0;
 
   function setVisibilityMask(mask) {
     const next = validateVisibilityMask(mask, maxInstances);
@@ -220,6 +225,7 @@ export function createIndirectFixture({
     ]);
     return {
       provenance: INDIRECT_READBACK_PROVENANCE,
+      sequence: ++readbackSequence,
       command: new Uint32Array(commandBuffer.slice(0)),
       visibleIds: new Uint32Array(idBuffer.slice(0)),
       visibleOffsets: new Float32Array(offsetBuffer.slice(0)),
@@ -270,6 +276,11 @@ export function createIndirectFixture({
       compactedNode.dispose();
       idNode.dispose();
       commandNode.dispose();
+      sourceOffsets.dispose();
+      visibility.dispose();
+      compactedOffsets.dispose();
+      compactedIds.dispose();
+      indirect.dispose();
     },
   };
 }

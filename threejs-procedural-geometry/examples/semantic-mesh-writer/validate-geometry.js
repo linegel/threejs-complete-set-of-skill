@@ -1,20 +1,44 @@
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 
-import { buildFrameFixture, BOUNDARY_REASONS } from "./frame-profile.js";
-import { estimateTierBudget, LOD_PRESETS } from "./lod-presets.js";
-import { validateTangents } from "./tangents.js";
-import { chooseBatchingRoute, createBatchingDemoDescriptors } from "./batching-demo.js";
+import {
+  BOUNDARY_REASONS,
+  buildFrameFixture,
+  profileSampleAt,
+  profileZAt,
+} from "./frame-profile.js";
+import {
+  estimateTierBudget,
+  LOD_PRESETS,
+  projectTransverseErrorPixels,
+  resolvePhysicalProjectionEnvelope,
+} from "./lod-presets.js";
+import {
+  createTexturedMikkTangentFixture,
+  validateTangents,
+  validateTexturedMikkTangentFixture,
+} from "./tangents.js";
+import {
+  chooseBatchingRoute,
+  createBatchingDemoDescriptors,
+  createRealBatchingStrategies,
+  STRATEGY_IDS,
+  STRATEGY_ROSTER,
+} from "./batching-demo.js";
 import { createIndirectFixture } from "./indirect-fixture.js";
-import { buildBranchRingFixture, validateBranchFrames } from "./branch-rings.js";
+import {
+  buildBranchRingFixture,
+  measureBranchApproximation,
+  validateBranchFrames,
+} from "./branch-rings.js";
 import {
   beginDynamicUpdateFrame,
   configureDynamicGeometry,
   updateVertexRange,
   validateDynamicUpdateRecord,
 } from "./dynamic-updates.js";
-import { createRealBatchingStrategies } from "./batching-demo.js";
-import { selectIndexArrayType } from "./mesh-writer.js";
+import { buildDynamicComponentFixture } from "./dynamic-component-fixture.js";
+import { createWriter, selectIndexArrayType } from "./mesh-writer.js";
 
 function parseArgs(argv) {
   const args = { fixture: "frame-hero", json: false, sweep: null };
@@ -90,6 +114,126 @@ function weldedBoundaryProof(geometry, tolerance = 1e-6) {
   return { incompatibleWeldedGroups, claimedBoundaryVertices };
 }
 
+export function auditTopology(geometry, tolerance = 1e-6) {
+  const position = geometry.attributes.position;
+  const topologyVertex = geometry.attributes.topologyVertex;
+  const index = geometry.index;
+  const expected = geometry.userData.fixture?.topology ?? null;
+  const errors = [];
+  if (!topologyVertex || topologyVertex.count !== position.count) {
+    return {
+      ok: false,
+      errors: ["topologyVertex must exist for every render vertex"],
+      vertices: 0,
+      edges: 0,
+      faces: 0,
+      boundaryEdges: 0,
+      nonManifoldEdges: 0,
+      orientationMismatches: 0,
+      eulerCharacteristic: null,
+      signedVolume: null,
+    };
+  }
+
+  const authoredPositions = new Map();
+  const referencedVertices = new Set();
+  const edgeLedger = new Map();
+  const faceLedger = new Set();
+  let signedVolume6 = 0;
+  for (let vertex = 0; vertex < position.count; vertex += 1) {
+    const topologyId = topologyVertex.getX(vertex);
+    if (!Number.isInteger(topologyId) || topologyId < 0) {
+      errors.push(`render vertex ${vertex} has an invalid topology id`);
+      continue;
+    }
+    const point = attributeVector(position, vertex, 3);
+    const prior = authoredPositions.get(topologyId);
+    if (prior && Math.hypot(...subtract3(point, prior)) > tolerance) {
+      errors.push(`topology vertex ${topologyId} has divergent render positions`);
+    } else if (!prior) {
+      authoredPositions.set(topologyId, point);
+    }
+  }
+
+  for (let component = 0; component < index.count; component += 3) {
+    const renderVertices = [
+      index.getX(component),
+      index.getX(component + 1),
+      index.getX(component + 2),
+    ];
+    const topologyIds = renderVertices.map((vertex) => topologyVertex.getX(vertex));
+    topologyIds.forEach((id) => referencedVertices.add(id));
+    if (new Set(topologyIds).size !== 3) {
+      errors.push(`triangle ${component / 3} collapses after semantic-boundary welding`);
+      continue;
+    }
+    const faceKey = [...topologyIds].sort((a, b) => a - b).join(":");
+    if (faceLedger.has(faceKey)) errors.push(`duplicate topological face ${faceKey}`);
+    faceLedger.add(faceKey);
+    for (const [start, end] of [
+      [topologyIds[0], topologyIds[1]],
+      [topologyIds[1], topologyIds[2]],
+      [topologyIds[2], topologyIds[0]],
+    ]) {
+      const low = Math.min(start, end);
+      const high = Math.max(start, end);
+      const key = `${low}:${high}`;
+      const entry = edgeLedger.get(key) ?? { count: 0, orientation: 0 };
+      entry.count += 1;
+      entry.orientation += start === low ? 1 : -1;
+      edgeLedger.set(key, entry);
+    }
+    const [a, b, c] = renderVertices.map((vertex) => attributeVector(position, vertex, 3));
+    signedVolume6 += dot3(a, cross3(b, c));
+  }
+
+  let boundaryEdges = 0;
+  let nonManifoldEdges = 0;
+  let orientationMismatches = 0;
+  for (const edge of edgeLedger.values()) {
+    if (edge.count === 1) boundaryEdges += 1;
+    if (edge.count > 2) nonManifoldEdges += 1;
+    if (edge.count === 2 && edge.orientation !== 0) orientationMismatches += 1;
+  }
+  const faces = index.count / 3;
+  const eulerCharacteristic = referencedVertices.size - edgeLedger.size + faces;
+  if (nonManifoldEdges > 0) errors.push(`${nonManifoldEdges} topological edges have more than two incident faces`);
+  if (orientationMismatches > 0) errors.push(`${orientationMismatches} shared edges have equal rather than opposite winding`);
+  if (expected) {
+    if (referencedVertices.size !== expected.topologyVertexCount) {
+      errors.push(
+        `topology vertex count ${referencedVertices.size} does not match planned ${expected.topologyVertexCount}`,
+      );
+    }
+    if (boundaryEdges !== expected.expectedBoundaryEdgeCount) {
+      errors.push(
+        `topological boundary edge count ${boundaryEdges} does not match planned ${expected.expectedBoundaryEdgeCount}`,
+      );
+    }
+    if (eulerCharacteristic !== expected.expectedEulerCharacteristic) {
+      errors.push(
+        `Euler characteristic ${eulerCharacteristic} does not match planned ${expected.expectedEulerCharacteristic}`,
+      );
+    }
+    if (expected.declaredClosed && boundaryEdges !== 0) {
+      errors.push("declared closed fixture contains topological boundary edges");
+    }
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    vertices: referencedVertices.size,
+    edges: edgeLedger.size,
+    faces,
+    boundaryEdges,
+    nonManifoldEdges,
+    orientationMismatches,
+    eulerCharacteristic,
+    signedVolume: signedVolume6 / 6,
+  };
+}
+
 export function validateGeometry(geometry) {
   const position = geometry.attributes.position;
   const normal = geometry.attributes.normal;
@@ -105,7 +249,7 @@ export function validateGeometry(geometry) {
   const uvDensities = [];
   const expectedUvDensity = geometry.userData.fixture?.expectedUvDensity ?? geometry.userData.fixture?.texelsPerWorldUnit ?? null;
 
-  for (const attribute of [position, normal, uv, tangent]) {
+  for (const attribute of [position, normal, uv, tangent, geometry.attributes.debugUv]) {
     for (const value of attribute.array) {
       if (!Number.isFinite(value)) errors.push(`${attribute.name ?? "attribute"} non-finite`);
     }
@@ -190,9 +334,20 @@ export function validateGeometry(geometry) {
 
   const groupCoverage = new Array(index.count).fill(0);
   let groupAlignmentErrors = 0;
-  for (const group of geometry.groups) {
+  for (const [groupIndex, group] of geometry.groups.entries()) {
     if (group.start % 3 !== 0 || group.count % 3 !== 0) groupAlignmentErrors += 1;
-    if (!Number.isInteger(group.materialIndex) || group.materialIndex < 0) groupAlignmentErrors += 1;
+    if (
+      !Number.isInteger(group.materialIndex) ||
+      group.materialIndex < 0 ||
+      group.materialIndex >= geometry.userData.writer.materialSlots.length
+    ) groupAlignmentErrors += 1;
+    const semanticGroup = geometry.userData.writer.groups[groupIndex];
+    if (
+      !semanticGroup ||
+      semanticGroup.start !== group.start ||
+      semanticGroup.count !== group.count ||
+      semanticGroup.materialIndex !== group.materialIndex
+    ) groupAlignmentErrors += 1;
     for (let component = group.start; component < group.start + group.count; component += 1) {
       if (component >= 0 && component < groupCoverage.length) groupCoverage[component] += 1;
     }
@@ -213,6 +368,20 @@ export function validateGeometry(geometry) {
 
   const tangentValidation = validateTangents(geometry);
   errors.push(...tangentValidation.errors);
+
+  const topologyAudit = auditTopology(geometry);
+  errors.push(...topologyAudit.errors);
+
+  for (const name of ["semanticSurface", "boundaryReason", "smoothingGroup", "uvChart", "topologyVertex"]) {
+    const attribute = geometry.attributes[name];
+    if (!attribute || attribute.count !== position.count) {
+      errors.push(`${name} must exist for every render vertex`);
+      continue;
+    }
+    for (const value of attribute.array) {
+      if (!Number.isInteger(value) || value < 0) errors.push(`${name} contains an invalid integer lane`);
+    }
+  }
 
   const boundsContainment = storedBoundsContainAllVertices(geometry);
   if (!boundsContainment) errors.push("stored bounds are stale or do not contain all vertices");
@@ -245,6 +414,7 @@ export function validateGeometry(geometry) {
     hardEdgeVertices,
     hardEdgeProof,
     boundsContainment,
+    topologyAudit,
     drawCalls: geometry.groups.length,
     updateRanges: [],
   };
@@ -252,17 +422,124 @@ export function validateGeometry(geometry) {
 
 function validateLodSweep() {
   return Object.keys(LOD_PRESETS).map((tier) => {
+    const preset = LOD_PRESETS[tier];
     const geometry = buildFrameFixture({ tier });
-    const budget = estimateTierBudget(tier, geometry);
+    const dprSweep = [1, 1.5, 2].map((requestedDpr) => {
+      const appliedDpr = Math.min(requestedDpr, preset.dprCap);
+      const measured = estimateTierBudget(tier, geometry, {
+        cssHeight: preset.projectionEnvelope.referenceCssHeight,
+        dpr: appliedDpr,
+      });
+      assert.equal(
+        measured.projectedErrorOk,
+        true,
+        `${tier} physical-pixel positional error at requested DPR ${requestedDpr} (applied ${appliedDpr})`,
+      );
+      return {
+        requestedDpr,
+        appliedDpr,
+        physicalTargetHeight: measured.projectionEnvelope.physicalTargetHeight,
+        projectedPositionErrorPixels: measured.projectedPositionErrorPixels,
+        projectedErrorOk: measured.projectedErrorOk,
+      };
+    });
+    const budget = estimateTierBudget(tier, geometry, {
+      cssHeight: preset.projectionEnvelope.referenceCssHeight,
+      dpr: preset.dprCap,
+    });
     const validation = validateGeometry(geometry);
     assert.equal(validation.ok, true, validation.errors.join("\n"));
     assert.equal(budget.vertexBudgetOk, true, `${tier} vertex budget`);
     assert.equal(budget.triangleBudgetOk, true, `${tier} triangle budget`);
     assert.equal(budget.extremaPreservationOk, true, `${tier} measured stationary points preserved`);
     assert.equal(budget.profileErrorOk, true, `${tier} chord/normal approximation error gate`);
+    assert.equal(budget.projectedErrorOk, true, `${tier} physical-pixel positional error gate`);
     assert.equal(geometry.groups.length, 4);
-    return { ...budget, materialGroups: geometry.groups.length };
+    assert.deepEqual(
+      geometry.userData.writer.materialSlots,
+      ["top", "backing", "wall", "cap"],
+      `${tier} material slot order`,
+    );
+    assert.equal(validation.topologyAudit.ok, true, validation.topologyAudit.errors.join("\n"));
+    assert.equal(validation.topologyAudit.eulerCharacteristic, 2, `${tier} closed rail Euler characteristic`);
+    return {
+      ...budget,
+      dprSweep,
+      materialGroups: geometry.groups.length,
+      topology: validation.topologyAudit,
+    };
   });
+}
+
+function validateBranchLodSweep() {
+  return Object.keys(LOD_PRESETS).map((tier) => {
+    const preset = LOD_PRESETS[tier];
+    const geometry = buildBranchRingFixture({ radialSegments: preset.branchRadialSegments });
+    const approximation = measureBranchApproximation({
+      frames: geometry.userData.fixture.frames,
+      radii: geometry.userData.fixture.radii,
+      radialSegments: geometry.userData.fixture.radialSegments,
+    });
+    const dprSweep = [1, 1.5, 2].map((requestedDpr) => {
+      const appliedDpr = Math.min(requestedDpr, preset.dprCap);
+      const projectionEnvelope = resolvePhysicalProjectionEnvelope(preset.projectionEnvelope, {
+        cssHeight: preset.projectionEnvelope.referenceCssHeight,
+        dpr: appliedDpr,
+      });
+      const projectedPositionErrorPixels = projectTransverseErrorPixels(
+        approximation.maximumRadialChordError,
+        projectionEnvelope,
+      );
+      assert(
+        projectedPositionErrorPixels <= preset.branchErrorEnvelope.maximumPositionErrorPixels,
+        `${tier} branch radial error exceeds its physical-pixel gate at requested DPR ${requestedDpr}`,
+      );
+      return { requestedDpr, appliedDpr, projectedPositionErrorPixels };
+    });
+    assert(
+      approximation.maximumRadialNormalAngleError <=
+        preset.branchErrorEnvelope.maximumRadialNormalAngleError,
+      `${tier} branch radial normal error gate`,
+    );
+    assert(
+      approximation.maximumAdjacentFrameAngle <= preset.branchErrorEnvelope.maximumAdjacentFrameAngle,
+      `${tier} branch adjacent-frame angle gate`,
+    );
+    const validation = validateGeometry(geometry);
+    assert.equal(validation.ok, true, validation.errors.join("\n"));
+    const result = {
+      tier,
+      radialSegments: preset.branchRadialSegments,
+      approximation,
+      gates: { ...preset.branchErrorEnvelope },
+      dprSweep,
+    };
+    geometry.dispose();
+    return result;
+  });
+}
+
+function validateAnalyticProfileDerivative() {
+  const railWidth = 0.75;
+  const step = 1e-7;
+  let maximumAbsoluteError = 0;
+  for (let probe = 1; probe < 1000; probe += 1) {
+    const t = probe / 1000;
+    const centralDifference = (
+      profileZAt(t + step, railWidth) - profileZAt(t - step, railWidth)
+    ) / (2 * step);
+    maximumAbsoluteError = Math.max(
+      maximumAbsoluteError,
+      Math.abs(profileSampleAt(t, railWidth).derivative - centralDifference),
+    );
+  }
+  assert(maximumAbsoluteError <= 1e-5, "analytic profile derivative must match an f64 central-difference oracle");
+  return {
+    probeCount: 999,
+    maximumAbsoluteError,
+    gate: 1e-5,
+    normalSource: "analytic profile derivative",
+  };
 }
 
 function validateBranchFixture() {
@@ -278,10 +555,36 @@ function validateBranchFixture() {
 function validateStrategies() {
   const demo = createRealBatchingStrategies({ count: 4 });
   const strategies = demo.strategies;
+  assert.deepEqual(Object.keys(strategies), STRATEGY_IDS, "runtime must expose the exact ordered six-strategy roster");
+  assert.equal(STRATEGY_ROSTER.length, 6, "canonical batching comparison has exactly six strategies");
   assert.equal(strategies.grouped.object.isMesh, true);
   assert.equal(strategies.batched.object.isBatchedMesh, true);
   assert.equal(strategies.instanced.object.isInstancedMesh, true);
   assert.equal(strategies.storage.object.userData.storageOffsets.isStorageInstancedBufferAttribute, true);
+  assert.equal(demo.resources.baseOffsets.isStorageInstancedBufferAttribute, true);
+  assert.equal(demo.computeNodes[0].name, "semanticMeshWriterStorageUpdate");
+  assert.equal(demo.computeNodes[1].name, "semanticMeshWriterIndirectCompact");
+  assert(demo.computeNodes.every((node) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(node.name)), "compute names must be safe WGSL identifiers");
+  for (const [id, entry] of Object.entries(strategies)) {
+    assert(entry.geometryBytes > 0, `${id} must report live geometry bytes`);
+    const contract = STRATEGY_ROSTER.find((candidate) => candidate.id === id);
+    assert(contract, `${id} has no frozen strategy contract`);
+    for (const field of ["route", "topologyOwner", "transformOwner", "visibilityOwner", "commandOwner"]) {
+      assert.equal(entry[field], contract[field], `${id} ${field} contract drift`);
+    }
+    assert.deepEqual(entry.computeOwners, contract.computeOwners, `${id} compute ownership drift`);
+    assert.deepEqual(entry.computeNodes.map((node) => node.name), contract.computeOwners, `${id} compute graph isolation`);
+  }
+  assert.equal(
+    strategies.storage.bytes,
+    demo.resources.baseOffsets.array.byteLength + demo.resources.offsets.array.byteLength,
+    "storage instance bytes must reconcile with both transform buffers",
+  );
+  assert.equal(
+    strategies.indirect.storageBytes,
+    Object.values(strategies.indirect.fixture.resourceBytes).reduce((sum, bytes) => sum + bytes, 0),
+    "indirect storage bytes must reconcile with every live command/compaction buffer",
+  );
   assert.equal(strategies.indirect.object.geometry.indirect.isIndirectStorageBufferAttribute, true);
   assert.deepEqual(
     Array.from(strategies.indirect.object.geometry.indirect.array),
@@ -303,6 +606,48 @@ function validateStrategies() {
   }]));
   demo.dispose();
   return report;
+}
+
+function validateIndexBoundary() {
+  const build = (vertices) => {
+    const writer = createWriter({ vertices, indices: 3 }, ["boundary"]);
+    const smoothing = writer.startSmoothingGroup("boundary-proof");
+    const chart = writer.startUvChart("boundary-proof");
+    for (let vertex = 0; vertex < vertices; vertex += 1) {
+      writer.addVertex({
+        position: [vertex, vertex % 2, 0],
+        smoothing,
+        chart,
+        topology: vertex,
+      });
+    }
+    writer.addTriangle(0, 1, vertices - 1, "boundary");
+    writer.addGroup(0, 3, "boundary");
+    return writer.finishGeometry();
+  };
+  const uint16 = build(65536);
+  const uint32 = build(65537);
+  assert(uint16.index.array instanceof Uint16Array, "vertex index 65535 must fit Uint16");
+  assert.equal(uint16.index.getX(2), 65535);
+  assert(uint32.index.array instanceof Uint32Array, "vertex index 65536 must use Uint32");
+  assert.equal(uint32.index.getX(2), 65536);
+  const result = {
+    uint16: {
+      vertices: uint16.attributes.position.count,
+      maximumReferencedIndex: uint16.index.getX(2),
+      indexType: uint16.userData.writer.indexType,
+      exactCapacity: uint16.userData.writer.exactCapacity,
+    },
+    uint32: {
+      vertices: uint32.attributes.position.count,
+      maximumReferencedIndex: uint32.index.getX(2),
+      indexType: uint32.userData.writer.indexType,
+      exactCapacity: uint32.userData.writer.exactCapacity,
+    },
+  };
+  uint16.dispose();
+  uint32.dispose();
+  return result;
 }
 
 function validateDynamicRange() {
@@ -340,7 +685,78 @@ function validateDynamicRange() {
   return record;
 }
 
-function runCli() {
+function validateDynamicComponent() {
+  const geometry = buildDynamicComponentFixture({ tier: "crowd" });
+  const position = geometry.attributes.position;
+  const normal = geometry.attributes.normal;
+  const beforePosition = position.array.slice();
+  const beforeNormal = normal.array.slice();
+  const range = geometry.userData.dynamicComponentRange;
+  const initialTopology = auditTopology(geometry);
+  assert.equal(initialTopology.ok, true, initialTopology.errors.join("\n"));
+  assert.equal(initialTopology.eulerCharacteristic, 4, "two closed components must have Euler characteristic four");
+  beginDynamicUpdateFrame(geometry);
+  const displacement = 0.125;
+  const record = updateVertexRange(geometry, {
+    startVertex: range.startVertex,
+    vertexCount: range.vertexCount,
+    positionDelta: [0, 0, displacement],
+  });
+  for (let vertex = 0; vertex < position.count; vertex += 1) {
+    for (let lane = 0; lane < 3; lane += 1) {
+      const before = beforePosition[vertex * 3 + lane];
+      const expected = vertex < range.startVertex || lane !== 2
+        ? before
+        : Math.fround(before + displacement);
+      assert.equal(position.array[vertex * 3 + lane], expected, `dynamic component position ${vertex}:${lane}`);
+    }
+  }
+  assert.deepEqual(normal.array, beforeNormal, "rigid component translation must preserve its normal buffer exactly");
+  assert.equal(record.fullBufferUpload, false, "local component edit must not upload the static component range");
+  assert(
+    record.updatedVertexFraction <= range.maximumUpdatedVertexFraction,
+    "local edit must stay within the frozen three-percent vertex envelope",
+  );
+  assert.equal(range.steadyStateCpuRewrite, false, "rAF stepping must not rewrite CPU geometry");
+  assert.equal(validateDynamicUpdateRecord(geometry, record).ok, true);
+  assert.equal(storedBoundsContainAllVertices(geometry), true, "dynamic component bounds must contain translated vertices");
+  const translatedTopology = auditTopology(geometry);
+  assert.equal(translatedTopology.ok, true, translatedTopology.errors.join("\n"));
+  const result = {
+    range,
+    update: record,
+    initialTopology,
+    translatedTopology,
+    normalsBitIdentical: true,
+  };
+  geometry.dispose();
+  return result;
+}
+
+async function validateMikkFixture() {
+  const source = buildFrameFixture({ tier: "crowd" });
+  const fixture = await createTexturedMikkTangentFixture(source, { negateSign: false });
+  const validation = validateTexturedMikkTangentFixture(fixture);
+  assert.equal(validation.ok, true, validation.errors.join("\n"));
+  assert.equal(validation.deindexedVertices, source.index.count, "Mikk representation count must be explicit");
+  assert.equal(validation.groups, source.groups.length, "Mikk representation preserves semantic group ranges");
+  assert.equal(validation.materialSlots, source.userData.writer.materialSlots.length, "Mikk material slot count");
+  assert.equal(
+    validation.triangleMaterialSlots,
+    source.userData.writer.triangleMaterialSlots.length,
+    "Mikk per-triangle slot count",
+  );
+  assert.equal(
+    validation.representationBytes.totalBytes,
+    Object.values(validation.representationBytes.attributeBytes).reduce((sum, bytes) => sum + bytes, 0),
+    "Mikk deindexed full-byte ledger",
+  );
+  source.dispose();
+  fixture.dispose();
+  return validation;
+}
+
+async function runCli() {
   const args = parseArgs(process.argv.slice(2));
   let result;
   if (args.sweep === "lod") {
@@ -348,9 +764,14 @@ function runCli() {
   } else if (args.sweep === "all") {
     result = {
       lod: validateLodSweep(),
+      branchLod: validateBranchLodSweep(),
+      analyticProfileDerivative: validateAnalyticProfileDerivative(),
       branch: validateBranchFixture(),
+      texturedTangents: await validateMikkFixture(),
+      indexBoundary: validateIndexBoundary(),
       strategies: validateStrategies(),
       dynamicRange: validateDynamicRange(),
+      dynamicComponent: validateDynamicComponent(),
     };
   } else if (args.fixture === "branch-rings") {
     result = validateBranchFixture();
@@ -368,7 +789,8 @@ function runCli() {
     chooseBatchingRoute({ topology: "varied", materialCount: 1 }),
     "InstancedMesh",
   );
-  assert.equal(routes.hotGpuFields.route, "StorageInstancedBufferAttribute");
+  assert.deepEqual(Object.keys(routes), STRATEGY_IDS, "descriptor roster must exactly match runtime roster");
+  assert.equal(routes.storage.route, "StorageInstancedBufferAttribute");
   const indirectFixture = createIndirectFixture();
   assert.equal(indirectFixture.attribute, "IndirectStorageBufferAttribute");
   indirectFixture.dispose();
@@ -383,4 +805,6 @@ function runCli() {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) runCli();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await runCli();
+}

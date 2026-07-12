@@ -131,6 +131,15 @@ export function computeRotationMinimizingFrames(
   if (!Array.isArray(centers) || centers.length < 2) {
     throw new TypeError("at least two branch centers are required");
   }
+  if (centers.some((center) => !Array.isArray(center) || center.length !== 3 || center.some((value) => !Number.isFinite(value)))) {
+    throw new TypeError("branch centers must be finite vec3 tuples");
+  }
+  if (!Array.isArray(initialNormal) || initialNormal.length !== 3 || initialNormal.some((value) => !Number.isFinite(value))) {
+    throw new TypeError("initialNormal must be a finite vec3 tuple");
+  }
+  if (!Array.isArray(twists) || twists.some((value) => !Number.isFinite(value))) {
+    throw new TypeError("twists must contain only finite angles");
+  }
   const frames = [];
   let arcLength = 0;
   for (let index = 0; index < centers.length; index += 1) {
@@ -150,12 +159,46 @@ export function computeRotationMinimizingFrames(
 }
 
 export function branchRingCapacity(sectionCount, radialSegments, capEnds = true) {
+  if (!Number.isInteger(sectionCount) || sectionCount < 2) {
+    throw new RangeError("sectionCount must be an integer >= 2");
+  }
+  if (!Number.isInteger(radialSegments) || radialSegments < 3) {
+    throw new RangeError("radialSegments must be an integer >= 3");
+  }
+  if (typeof capEnds !== "boolean") throw new TypeError("capEnds must be boolean");
   const ringVertices = radialSegments + 1;
   return Object.freeze({
     vertices: sectionCount * ringVertices + (capEnds ? 2 * (ringVertices + 1) : 0),
     indices:
       (sectionCount - 1) * radialSegments * 6 +
       (capEnds ? 2 * radialSegments * 3 : 0),
+  });
+}
+
+export function measureBranchApproximation({ frames, radii, radialSegments }) {
+  if (!Array.isArray(frames) || frames.length < 2) {
+    throw new TypeError("branch approximation requires at least two authored frames");
+  }
+  if (!Array.isArray(radii) || radii.length !== frames.length || radii.some((radius) => !(radius > 0))) {
+    throw new TypeError("branch approximation requires one positive radius per frame");
+  }
+  if (!Number.isInteger(radialSegments) || radialSegments < 3) {
+    throw new RangeError("branch approximation radialSegments must be an integer >= 3");
+  }
+  const maximumRadius = Math.max(...radii);
+  const maximumRadialChordError = maximumRadius * (1 - Math.cos(Math.PI / radialSegments));
+  const maximumRadialNormalAngleError = Math.PI / radialSegments;
+  let maximumAdjacentFrameAngle = 0;
+  for (let index = 1; index < frames.length; index += 1) {
+    const cosine = Math.max(-1, Math.min(1, dot(frames[index - 1].tangent, frames[index].tangent)));
+    maximumAdjacentFrameAngle = Math.max(maximumAdjacentFrameAngle, Math.acos(cosine));
+  }
+  return Object.freeze({
+    maximumRadius,
+    radialSegments,
+    maximumRadialChordError,
+    maximumRadialNormalAngleError,
+    maximumAdjacentFrameAngle,
   });
 }
 
@@ -186,7 +229,15 @@ export function buildBranchRingFixture({
   const frames = computeRotationMinimizingFrames(centers, { twists });
   const capacity = branchRingCapacity(centers.length, radialSegments, capEnds);
   const writer = createWriter(capacity, ["bark", "cap"]);
+  const barkSmoothing = writer.startSmoothingGroup("branch-bark");
+  const barkChart = writer.startUvChart("bark-arc-and-circumference");
+  const capSmoothing = writer.startSmoothingGroup("branch-end-caps-hard");
+  const capStartChart = writer.startUvChart("branch-cap-start");
+  const capEndChart = writer.startUvChart("branch-cap-end");
   const rings = [];
+  const ringTopology = (section, radialIndex) =>
+    section * radialSegments + radialIndex % radialSegments;
+  const capCenterTopologyOffset = frames.length * radialSegments;
 
   for (let section = 0; section < frames.length; section += 1) {
     const frame = frames[section];
@@ -204,6 +255,9 @@ export function buildBranchRingFixture({
         debug: [section / (frames.length - 1), radialIndex / radialSegments],
         surface: 10,
         boundary: radialIndex === radialSegments ? BOUNDARY_REASONS.uvSeam : BOUNDARY_REASONS.smoothSkin,
+        smoothing: barkSmoothing,
+        chart: barkChart,
+        topology: ringTopology(section, radialIndex),
       });
     }
   }
@@ -216,6 +270,7 @@ export function buildBranchRingFixture({
         rings[section][radial + 1],
         rings[section + 1][radial],
         rings[section + 1][radial + 1],
+        "bark",
       );
     }
   }
@@ -234,6 +289,9 @@ export function buildBranchRingFixture({
         debug: [section === 0 ? 0 : 1, 0.5],
         surface: 11,
         boundary: BOUNDARY_REASONS.cap,
+        smoothing: capSmoothing,
+        chart: section === 0 ? capStartChart : capEndChart,
+        topology: capCenterTopologyOffset + (section === 0 ? 0 : 1),
       });
       const capRing = [];
       for (let radialIndex = 0; radialIndex <= radialSegments; radialIndex += 1) {
@@ -250,11 +308,14 @@ export function buildBranchRingFixture({
           debug: [section === 0 ? 0 : 1, radialIndex / radialSegments],
           surface: 11,
           boundary: BOUNDARY_REASONS.cap,
+          smoothing: capSmoothing,
+          chart: section === 0 ? capStartChart : capEndChart,
+          topology: ringTopology(section, radialIndex),
         }));
       }
       for (let radial = 0; radial < radialSegments; radial += 1) {
-        if (sign < 0) writer.addTriangle(capCenter, capRing[radial + 1], capRing[radial]);
-        else writer.addTriangle(capCenter, capRing[radial], capRing[radial + 1]);
+        if (sign < 0) writer.addTriangle(capCenter, capRing[radial + 1], capRing[radial], "cap");
+        else writer.addTriangle(capCenter, capRing[radial], capRing[radial + 1], "cap");
       }
     }
     writer.addGroup(capStart, writer.indexCount - capStart, "cap");
@@ -268,6 +329,14 @@ export function buildBranchRingFixture({
     metersPerRepeat,
     expectedUvDensity: 1 / metersPerRepeat,
     frames,
+    radii: [...resolvedRadii],
+    approximation: measureBranchApproximation({ frames, radii: resolvedRadii, radialSegments }),
+    topology: {
+      declaredClosed: capEnds,
+      topologyVertexCount: frames.length * radialSegments + (capEnds ? 2 : 0),
+      expectedEulerCharacteristic: capEnds ? 2 : 0,
+      expectedBoundaryEdgeCount: capEnds ? 0 : 2 * radialSegments,
+    },
   };
   return geometry;
 }

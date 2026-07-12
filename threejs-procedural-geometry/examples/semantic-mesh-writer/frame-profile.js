@@ -3,9 +3,12 @@ import { LOD_PRESETS } from "./lod-presets.js";
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const lerp = (start, end, amount) => start + (end - start) * amount;
-const smoothstep = (edge0, edge1, value) => {
+const smoothstepWithDerivative = (edge0, edge1, value) => {
   const t = clamp((value - edge0) / (edge1 - edge0), 0, 1);
-  return t * t * (3 - 2 * t);
+  return {
+    value: t * t * (3 - 2 * t),
+    derivative: t === 0 || t === 1 ? 0 : 6 * t * (1 - t) / (edge1 - edge0),
+  };
 };
 
 export const BOUNDARY_REASONS = Object.freeze({
@@ -17,26 +20,57 @@ export const BOUNDARY_REASONS = Object.freeze({
   mirroredTangent: 5,
 });
 
-export function profileZAt(t, railWidth) {
+function gaussianWithDerivative(t, amplitude, center, width) {
+  const normalized = (t - center) / width;
+  const value = amplitude * Math.exp(-(normalized ** 2));
+  return {
+    value,
+    derivative: value * -2 * (t - center) / (width ** 2),
+  };
+}
+
+export function profileSampleAt(t, railWidth) {
+  if (!(Number.isFinite(t) && t >= 0 && t <= 1)) {
+    throw new RangeError("profile t must be finite and within [0, 1]");
+  }
+  if (!(Number.isFinite(railWidth) && railWidth > 0)) {
+    throw new RangeError("railWidth must be finite and positive");
+  }
   const scale = railWidth / 0.75;
-  const crown = 0.355 * scale * Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.56);
-  const innerBead = 0.105 * scale * Math.exp(-Math.pow((t - 0.085) / 0.033, 2));
-  const outerBead = 0.092 * scale * Math.exp(-Math.pow((t - 0.905) / 0.038, 2));
-  const innerGroove = -0.115 * scale * Math.exp(-Math.pow((t - 0.205) / 0.043, 2));
-  const outerGroove = -0.102 * scale * Math.exp(-Math.pow((t - 0.735) / 0.052, 2));
-  const shoulder = 0.045 * scale * Math.exp(-Math.pow((t - 0.42) / 0.15, 2));
-  const cove = -0.035 * scale * Math.exp(-Math.pow((t - 0.61) / 0.095, 2));
-  let z = 0.07 * scale + crown + innerBead + outerBead + innerGroove + outerGroove + shoulder + cove;
-  z = lerp(0.105 * scale, z, smoothstep(0, 0.052, t));
-  z = lerp(z, 0.095 * scale, smoothstep(0.952, 1, t));
-  return z;
+  const sine = Math.max(0, Math.sin(Math.PI * t));
+  const crown = 0.355 * scale * sine ** 0.56;
+  const crownDerivative = sine > 1e-15
+    ? 0.355 * scale * 0.56 * sine ** -0.44 * Math.cos(Math.PI * t) * Math.PI
+    : 0;
+  const terms = [
+    gaussianWithDerivative(t, 0.105 * scale, 0.085, 0.033),
+    gaussianWithDerivative(t, 0.092 * scale, 0.905, 0.038),
+    gaussianWithDerivative(t, -0.115 * scale, 0.205, 0.043),
+    gaussianWithDerivative(t, -0.102 * scale, 0.735, 0.052),
+    gaussianWithDerivative(t, 0.045 * scale, 0.42, 0.15),
+    gaussianWithDerivative(t, -0.035 * scale, 0.61, 0.095),
+  ];
+  let value = 0.07 * scale + crown + terms.reduce((sum, term) => sum + term.value, 0);
+  let derivative = crownDerivative + terms.reduce((sum, term) => sum + term.derivative, 0);
+
+  const innerTerminal = 0.105 * scale;
+  const innerBlend = smoothstepWithDerivative(0, 0.052, t);
+  derivative = derivative * innerBlend.value + (value - innerTerminal) * innerBlend.derivative;
+  value = lerp(innerTerminal, value, innerBlend.value);
+
+  const outerTerminal = 0.095 * scale;
+  const outerBlend = smoothstepWithDerivative(0.952, 1, t);
+  derivative = derivative * (1 - outerBlend.value) + (outerTerminal - value) * outerBlend.derivative;
+  value = lerp(value, outerTerminal, outerBlend.value);
+  return { value, derivative };
+}
+
+export function profileZAt(t, railWidth) {
+  return profileSampleAt(t, railWidth).value;
 }
 
 function profileDerivativeAt(t, railWidth) {
-  const step = 1e-5;
-  const low = Math.max(0, t - step);
-  const high = Math.min(1, t + step);
-  return (profileZAt(high, railWidth) - profileZAt(low, railWidth)) / (high - low || 1);
+  return profileSampleAt(t, railWidth).derivative;
 }
 
 export function findProfileExtrema(railWidth) {
@@ -195,13 +229,37 @@ export function buildFrameFixture({
   texelsPerWorldUnit = 4,
 } = {}) {
   const preset = LOD_PRESETS[tier];
+  if (!preset) throw new RangeError(`unknown frame fixture tier "${tier}"`);
+  if (!(Number.isFinite(railLength) && railLength > 0)) {
+    throw new RangeError("railLength must be finite and positive");
+  }
+  if (!(Number.isFinite(railWidth) && railWidth > 0)) {
+    throw new RangeError("railWidth must be finite and positive");
+  }
+  if (!(Number.isFinite(texelsPerWorldUnit) && texelsPerWorldUnit > 0)) {
+    throw new RangeError("texelsPerWorldUnit must be finite and positive");
+  }
   const profile = buildProfileSamples(railWidth, preset);
   const lengthSegments = preset.railSegments;
   const capacity = frameFixtureCapacity(profile.length, lengthSegments);
   const writer = createWriter(capacity, ["top", "backing", "wall", "cap"]);
+  const topSmoothing = writer.startSmoothingGroup("profile-top");
+  const topChart = writer.startUvChart("profile-distance");
+  const backingSmoothing = writer.startSmoothingGroup("backing-hard");
+  const backingChart = writer.startUvChart("backing-distance");
+  const wallSmoothing = writer.startSmoothingGroup("rail-walls-hard");
+  const wallChart = writer.startUvChart("wall-distance");
+  const capSmoothing = writer.startSmoothingGroup("end-caps-hard");
+  const capStartChart = writer.startUvChart("cap-start-distance");
+  const capEndChart = writer.startUvChart("cap-end-distance");
   const top = [];
   const bottom = [];
   const bottomZ = -0.18 * (railWidth / 0.75);
+  const stations = lengthSegments + 1;
+  const topTopology = (profileIndex, segment) => profileIndex * stations + segment;
+  const bottomTopologyOffset = profile.length * stations;
+  const bottomTopology = (profileIndex, segment) =>
+    bottomTopologyOffset + profileIndex * stations + segment;
 
   for (let p = 0; p < profile.length; p += 1) {
     top[p] = [];
@@ -223,6 +281,9 @@ export function buildFrameFixture({
         debug: [s, sample.t],
         surface: 1,
         boundary: BOUNDARY_REASONS.smoothSkin,
+        smoothing: topSmoothing,
+        chart: topChart,
+        topology: topTopology(p, segment),
       });
       bottom[p][segment] = writer.addVertex({
         position: [x, y, bottomZ],
@@ -232,6 +293,9 @@ export function buildFrameFixture({
         debug: [s, sample.t],
         surface: 2,
         boundary: BOUNDARY_REASONS.hardEdge,
+        smoothing: backingSmoothing,
+        chart: backingChart,
+        topology: bottomTopology(p, segment),
       });
     }
   }
@@ -239,7 +303,13 @@ export function buildFrameFixture({
   const topStart = writer.indexCount;
   for (let p = 0; p < profile.length - 1; p += 1) {
     for (let segment = 0; segment < lengthSegments; segment += 1) {
-      writer.addQuad(top[p][segment], top[p][segment + 1], top[p + 1][segment], top[p + 1][segment + 1]);
+      writer.addQuad(
+        top[p][segment],
+        top[p][segment + 1],
+        top[p + 1][segment],
+        top[p + 1][segment + 1],
+        "top",
+      );
     }
   }
   writer.addGroup(topStart, writer.indexCount - topStart, "top");
@@ -247,7 +317,13 @@ export function buildFrameFixture({
   const backingStart = writer.indexCount;
   for (let p = 0; p < profile.length - 1; p += 1) {
     for (let segment = 0; segment < lengthSegments; segment += 1) {
-      writer.addQuad(bottom[p + 1][segment], bottom[p + 1][segment + 1], bottom[p][segment], bottom[p][segment + 1]);
+      writer.addQuad(
+        bottom[p + 1][segment],
+        bottom[p + 1][segment + 1],
+        bottom[p][segment],
+        bottom[p][segment + 1],
+        "backing",
+      );
     }
   }
   writer.addGroup(backingStart, writer.indexCount - backingStart, "backing");
@@ -271,6 +347,9 @@ export function buildFrameFixture({
         debug: [s, row],
         surface,
         boundary: BOUNDARY_REASONS.hardEdge,
+        smoothing: wallSmoothing,
+        chart: wallChart,
+        topology: row === 0 ? topTopology(0, segment) : bottomTopology(0, segment),
       });
     }
     for (const [row, z, normal, surface, handedness] of [
@@ -285,12 +364,29 @@ export function buildFrameFixture({
         debug: [s, row],
         surface,
         boundary: BOUNDARY_REASONS.hardEdge,
+        smoothing: wallSmoothing,
+        chart: wallChart,
+        topology: row === 0
+          ? topTopology(last, segment)
+          : bottomTopology(last, segment),
       });
     }
   }
   for (let segment = 0; segment < lengthSegments; segment += 1) {
-    writer.addQuad(innerWall[1][segment], innerWall[1][segment + 1], innerWall[0][segment], innerWall[0][segment + 1]);
-    writer.addQuad(outerWall[0][segment], outerWall[0][segment + 1], outerWall[1][segment], outerWall[1][segment + 1]);
+    writer.addQuad(
+      innerWall[1][segment],
+      innerWall[1][segment + 1],
+      innerWall[0][segment],
+      innerWall[0][segment + 1],
+      "wall",
+    );
+    writer.addQuad(
+      outerWall[0][segment],
+      outerWall[0][segment + 1],
+      outerWall[1][segment],
+      outerWall[1][segment + 1],
+      "wall",
+    );
   }
   writer.addGroup(wallStart, writer.indexCount - wallStart, "wall");
 
@@ -309,13 +405,30 @@ export function buildFrameFixture({
           debug: [sample.t, row],
           surface: 4,
           boundary: BOUNDARY_REASONS.cap,
+          smoothing: capSmoothing,
+          chart: capIndex === 0 ? capStartChart : capEndChart,
+          topology: row === 0
+            ? bottomTopology(p, segment)
+            : topTopology(p, segment),
         });
       }
     }
   }
   for (let p = 0; p < profile.length - 1; p += 1) {
-    writer.addQuad(caps[0][0][p + 1], caps[0][0][p], caps[0][1][p + 1], caps[0][1][p]);
-    writer.addQuad(caps[1][0][p], caps[1][0][p + 1], caps[1][1][p], caps[1][1][p + 1]);
+    writer.addQuad(
+      caps[0][0][p + 1],
+      caps[0][0][p],
+      caps[0][1][p + 1],
+      caps[0][1][p],
+      "cap",
+    );
+    writer.addQuad(
+      caps[1][0][p],
+      caps[1][0][p + 1],
+      caps[1][1][p],
+      caps[1][1][p + 1],
+      "cap",
+    );
   }
   writer.addGroup(capStart, writer.indexCount - capStart, "cap");
 
@@ -323,11 +436,19 @@ export function buildFrameFixture({
   const profileApproximation = measureProfileApproximation(profile, railWidth);
   geometry.userData.fixture = {
     tier,
+    railWidth,
+    railLength,
     texelsPerWorldUnit,
     profileSamples: profile.length,
     railSegments: lengthSegments,
     profileT: profile.map((sample) => sample.t),
     profileApproximation,
+    topology: {
+      declaredClosed: true,
+      topologyVertexCount: profile.length * stations * 2,
+      expectedEulerCharacteristic: 2,
+      expectedBoundaryEdgeCount: 0,
+    },
   };
   return geometry;
 }
