@@ -34,6 +34,50 @@ function stableHash( value ) {
 
 }
 
+function uniqueSignatures( values ) {
+
+	return [ ...new Set( values.map( ( value ) => stableStringify( value ) ) ) ].sort().map( ( value ) => JSON.parse( value ) );
+
+}
+
+export function physicalEnvironmentIdentities( record ) {
+
+	const routes = record.routes ?? [];
+	const refreshHz = record.refresh?.hz?.value;
+	if ( Number.isFinite( refreshHz ) === false || refreshHz <= 0 ) throw new Error( 'Physical environment identity requires a positive measured refresh rate.' );
+	return Object.freeze( {
+		adapter: stableHash( record.adapter?.identity ),
+		browser: stableHash( record.browser ),
+		device: stableHash( {
+			adapter: record.adapter?.identity,
+			backendContracts: uniqueSignatures( routes.map( ( route ) => ( {
+				isWebGPUBackend: route.backend?.isWebGPUBackend,
+				initialized: route.backend?.initialized,
+				deviceIdentityVerified: route.backend?.deviceIdentityVerified
+			} ) ) )
+		} ),
+		os: stableHash( {
+			platform: record.browser?.platform,
+			userAgentDataPlatform: record.browser?.userAgentDataPlatform
+		} ),
+		refresh: stableHash( {
+			method: 'foreground-idle-request-animation-frame',
+			nominalHz: Math.round( refreshHz )
+		} ),
+		color: stableHash( {
+			readbackContracts: uniqueSignatures( routes.map( ( route ) => ( {
+				resourceFormat: route.readback?.resourceFormat,
+				copyFormat: route.readback?.format,
+				colorManaged: route.readback?.colorManaged,
+				outputColorSpace: route.readback?.outputColorSpace,
+				encoding: route.readback?.encoding,
+				origin: route.readback?.origin
+			} ) ) )
+		} )
+	} );
+
+}
+
 export function laneIdentityBindingDigest( reference ) {
 
 	return stableHash( {
@@ -90,6 +134,7 @@ export function physicalLaneReference( record, sessionSha256 ) {
 
 	if ( ! [ PHYSICAL_ROUTE_PROFILE, HARDWARE_PERFORMANCE_PROFILE ].includes( record?.profile ) ) throw new Error( 'Physical lane reference requires a validated physical-route or performance record.' );
 	const lane = record.profile === PHYSICAL_ROUTE_PROFILE ? 'physicalRoute' : 'hardwarePerformance';
+	const environment = physicalEnvironmentIdentities( record );
 	const reference = {
 		lane,
 		profile: record.profile,
@@ -99,28 +144,16 @@ export function physicalLaneReference( record, sessionSha256 ) {
 		startedAt: record.startedAt,
 		finishedAt: record.finishedAt,
 		adapterClass: record.adapter?.adapterClass,
-		adapterIdentityDigest: stableHash( record.adapter?.identity ),
-		browserIdentityDigest: stableHash( record.browser ),
-		deviceIdentityType: 'gpu-adapter-backend-generation-v1',
-		deviceIdentityDigest: stableHash( {
-			adapter: record.adapter,
-			backend: record.routes?.map( ( route ) => ( { key: route.key, backend: route.backend } ) )
-		} ),
+		adapterIdentityDigest: environment.adapter,
+		browserIdentityDigest: environment.browser,
+		deviceIdentityType: 'gpu-adapter-backend-contract-v1',
+		deviceIdentityDigest: environment.device,
 		osIdentityType: 'browser-platform-v1',
-		osIdentityDigest: stableHash( {
-			platform: record.browser?.platform,
-			userAgentDataPlatform: record.browser?.userAgentDataPlatform
-		} ),
-		refreshIdentityType: 'foreground-idle-raf-v1',
-		refreshIdentityDigest: stableHash( record.refresh ),
-		colorIdentityType: 'capture-resource-copy-output-v1',
-		colorIdentityDigest: stableHash( record.routes?.map( ( route ) => ( {
-			key: route.key,
-			resourceFormat: route.readback?.resourceFormat,
-			copyFormat: route.readback?.format,
-			outputColorSpace: route.readback?.outputColorSpace,
-			encoding: route.readback?.encoding
-		} ) ) ),
+		osIdentityDigest: environment.os,
+		refreshIdentityType: 'nominal-foreground-idle-raf-v1',
+		refreshIdentityDigest: environment.refresh,
+		colorIdentityType: 'capture-resource-copy-output-contract-v1',
+		colorIdentityDigest: environment.color,
 		limitationsDigest: stableHash( record.limitations ?? [] ),
 		routeDigest: stableHash( record.routeOrder ),
 		stateDigest: stableHash( record.routes?.map( ( route ) => ( { key: route.key, startup: route.startup, state: route.state } ) ) ),

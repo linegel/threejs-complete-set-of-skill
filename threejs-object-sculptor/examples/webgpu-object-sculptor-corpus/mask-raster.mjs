@@ -1,40 +1,4 @@
-import { SCULPT_TARGET_IDS } from "./object-catalog.js";
-
-const FINAL_MASK_TIERS = Object.freeze(["full", "budgeted", "minimum"]);
-const ACTION_MASK_TIMES = Object.freeze([
-  Object.freeze({ suffix: "t000", time: 0 }),
-  Object.freeze({ suffix: "t200", time: 2 }),
-]);
-
-export const CORPUS_TARGET_MASK_PLAN = Object.freeze(SCULPT_TARGET_IDS.flatMap((subjectId) => [
-  ...FINAL_MASK_TIERS.map((tier) => Object.freeze({
-    id: `target-mask:${subjectId}:final:${tier}`,
-    filename: `${subjectId}.final.${tier}.target-mask.png`,
-    subjectId,
-    maskKind: "subject-silhouette",
-    mode: "final",
-    tier,
-    camera: "design",
-    seed: 1,
-    time: 0,
-    sourceCaptureFilename: `${subjectId}.final.${tier}.design.png`,
-  })),
-  ...ACTION_MASK_TIMES.map(({ suffix, time }) => Object.freeze({
-    id: `target-mask:${subjectId}:action-ready:${suffix}`,
-    filename: `${subjectId}.action-ready.full.design.${suffix}.target-mask.png`,
-    subjectId,
-    maskKind: "named-moving-semantic-regions",
-    mode: "action-ready",
-    tier: "full",
-    camera: "design",
-    seed: 1,
-    time,
-    sourceCaptureFilename: `${subjectId}.action-ready.full.design.${suffix}.png`,
-  })),
-]));
-
-if (CORPUS_TARGET_MASK_PLAN.length !== 15) throw new Error(`Object Sculptor target-mask plan must contain 15 records; received ${CORPUS_TARGET_MASK_PLAN.length}`);
-if (new Set(CORPUS_TARGET_MASK_PLAN.map(({ filename }) => filename)).size !== CORPUS_TARGET_MASK_PLAN.length) throw new Error("Object Sculptor target-mask filenames must be unique");
+export { CORPUS_TARGET_MASK_PLAN } from "./capture-plan.js";
 
 function requireRgbaRaster(raster, label) {
   if (

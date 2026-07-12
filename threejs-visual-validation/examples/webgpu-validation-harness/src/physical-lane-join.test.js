@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import {
 	correctnessLaneReference,
 	laneIdentityBindingDigest,
+	physicalEnvironmentIdentities,
 	physicalLaneReference,
 	validateEvidenceLaneJoin
 } from './physical-lane-join.js';
@@ -159,6 +160,48 @@ test( 'shared Playwright correctness sessions produce a separately typed lane re
 	assert.equal( reference.finalized, true );
 	assert.match( reference.captureSessionWriteLedgerHash, /^sha256:/ );
 	assert.throws( () => physicalLaneReference( correctnessCaptureRecord(), HASHES[ 0 ] ), /physical-route or performance/ );
+
+} );
+
+test( 'physical environment identities ignore route membership but retain adapter, refresh, and color contracts', () => {
+
+	function record( profile, routeKey ) {
+
+		return {
+			profile,
+			automationSurface: 'codex-in-app-browser',
+			startedAt: '2026-07-12T01:00:00.000Z',
+			finishedAt: '2026-07-12T01:01:00.000Z',
+			adapter: { adapterClass: 'hardware', identity: { vendor: 'Apple', device: 'M-series' } },
+			browser: { webdriver: false, headless: false, platform: 'macOS', userAgentDataPlatform: 'macOS', userAgent: 'Chromium' },
+			refresh: { hz: { value: 59.98 } },
+			immutableBuild: { sourceClosureHash: HASHES[ 3 ], buildRevision: HASHES[ 4 ], threeRevision: '0.185.1' },
+			routeOrder: [ routeKey ],
+			routes: [ {
+				key: routeKey,
+				backend: { isWebGPUBackend: true, initialized: true, deviceIdentityVerified: true },
+				readback: { resourceFormat: 'rgba8unorm-srgb', format: 'rgba8unorm', colorManaged: true, outputColorSpace: 'srgb', encoding: 'srgb', origin: 'top-left' }
+			} ],
+			limitations: [],
+			serving: { status: 'FINALIZED_EXACT_STATIC_BYTES', ledgerSha256: HASHES[ 9 ] }
+		};
+
+	}
+	const physical = record( 'physical-route', 'scenario/browser-capture' );
+	const performance = record( 'performance', 'tier/target-performance' );
+	assert.deepEqual( physicalEnvironmentIdentities( physical ), physicalEnvironmentIdentities( performance ) );
+	const physicalReference = physicalLaneReference( physical, HASHES[ 0 ] );
+	const performanceReference = physicalLaneReference( performance, HASHES[ 1 ] );
+	for ( const field of [ 'adapterIdentityDigest', 'browserIdentityDigest', 'deviceIdentityDigest', 'osIdentityDigest', 'refreshIdentityDigest', 'colorIdentityDigest' ] ) {
+
+		assert.equal( physicalReference[ field ], performanceReference[ field ], field );
+
+	}
+	performance.refresh.hz.value = 120;
+	assert.notEqual( physicalEnvironmentIdentities( physical ).refresh, physicalEnvironmentIdentities( performance ).refresh );
+	performance.refresh.hz.value = 59.98;
+	performance.routes[ 0 ].readback.outputColorSpace = 'display-p3';
+	assert.notEqual( physicalEnvironmentIdentities( physical ).color, physicalEnvironmentIdentities( performance ).color );
 
 } );
 
