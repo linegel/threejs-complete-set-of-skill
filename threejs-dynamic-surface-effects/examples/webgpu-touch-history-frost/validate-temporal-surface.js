@@ -23,6 +23,7 @@ import {
   depositScale,
   estimateHistoryStorageBytes,
   exactDielectricFresnel,
+  frostSeedPhase,
   laplacianDiffusion,
   resolveFrostGraphContract,
   screenPeriodPhase,
@@ -169,6 +170,10 @@ assert.equal(insideTir.totalInternalReflection, true, "inside-to-air rays above 
 assert.deepEqual(insideTir.uvOffset, { x: 0, y: 0 });
 assert.equal(screenPeriodPhase(600, 1200), Math.PI);
 assert(screenPeriodPhase(600, 1200) < screenPeriodPhase(600, 350), "larger screen periods must lower, not raise, spatial frequency");
+assert.deepEqual(frostSeedPhase(1), frostSeedPhase(1), "equal seeds must produce equal crystal phases");
+assert.notDeepEqual(frostSeedPhase(1), frostSeedPhase(0x9e3779b9), "stress seed must change crystal phase");
+assert.throws(() => frostSeedPhase(-1), /uint32/);
+assert.throws(() => frostSeedPhase(0x100000000), /uint32/);
 
 const oddBalancedExtent = computeFrostExtents({ drawingWidth: 641, drawingHeight: 359, historyScale: 0.5 });
 assert.deepEqual(
@@ -243,6 +248,14 @@ const initialResourcePlan = effect.createResourcePlan();
 assert.notEqual(initialResourcePlan.diagnostics.previousHistory.node, initialResourcePlan.diagnostics.currentHistory.node);
 assert.notEqual(initialResourcePlan.diagnostics.previousHistory.resource, initialResourcePlan.diagnostics.currentHistory.resource);
 await effect.initialize();
+const baselinePhase = effect.uniforms.crystalPhase.value.clone();
+assert.equal(effect.setSeed(0x9e3779b9), 0x9e3779b9);
+assert.equal(effect.getMetrics().seed, 0x9e3779b9);
+assert.notDeepEqual(
+  [effect.uniforms.crystalPhase.value.x, effect.uniforms.crystalPhase.value.y],
+  [baselinePhase.x, baselinePhase.y],
+  "setSeed must mutate the live crystal phase uniform",
+);
 const initialRead = effect.historyRead;
 effect.advanceFrame({
   deltaSeconds: 1 / 60,
@@ -318,7 +331,8 @@ for (const token of [
   "compute(",
   "mainScreenPeriod",
   "detailScreenPeriod",
-  "screenPixels.mul((2 * Math.PI) / settings.mainScreenPeriod)",
+  ".mul((2 * Math.PI) / settings.mainScreenPeriod)",
+  ".add(uniforms.crystalPhase)",
   "exactDielectricFresnelNode",
   "settings.thickness",
   "settings.ior",

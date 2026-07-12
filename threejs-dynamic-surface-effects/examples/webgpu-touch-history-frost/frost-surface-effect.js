@@ -245,6 +245,27 @@ export function screenPeriodPhase(pixelCoordinate, periodPixels) {
   return (2 * Math.PI * pixelCoordinate) / periodPixels;
 }
 
+function mixUint32(value) {
+  let mixed = value >>> 0;
+  mixed ^= mixed >>> 16;
+  mixed = Math.imul(mixed, 0x7feb352d) >>> 0;
+  mixed ^= mixed >>> 15;
+  mixed = Math.imul(mixed, 0x846ca68b) >>> 0;
+  mixed ^= mixed >>> 16;
+  return mixed >>> 0;
+}
+
+export function frostSeedPhase(seed) {
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+    throw new RangeError("frost seed must be a uint32 integer");
+  }
+  const scale = (2 * Math.PI) / 0x100000000;
+  return Object.freeze({
+    x: mixUint32(seed ^ 0xa511e9b3) * scale,
+    y: mixUint32(seed ^ 0x63d83595) * scale,
+  });
+}
+
 export function exactDielectricFresnel(cosIncident, incidentIor, transmittedIor) {
   if (![cosIncident, incidentIor, transmittedIor].every(Number.isFinite)
       || incidentIor <= 0 || transmittedIor <= 0) {
@@ -778,8 +799,14 @@ function buildFrostCompositeGraph({
   }
 
   const screenPixels = screenUv.mul(uniforms.displayResolution).toVar();
-  const mainPhase = screenPixels.mul((2 * Math.PI) / settings.mainScreenPeriod).toVar();
-  const detailPhase = screenPixels.mul((2 * Math.PI) / settings.detailScreenPeriod).toVar();
+  const mainPhase = screenPixels
+    .mul((2 * Math.PI) / settings.mainScreenPeriod)
+    .add(uniforms.crystalPhase)
+    .toVar();
+  const detailPhase = screenPixels
+    .mul((2 * Math.PI) / settings.detailScreenPeriod)
+    .add(uniforms.crystalPhase.yx)
+    .toVar();
   const frostNoise = sin(mainPhase.x.mul(0.73).add(sin(mainPhase.y.mul(0.59))))
     .mul(0.5).add(0.5).toVar();
   const frozenStructure = mix(
@@ -908,6 +935,7 @@ export function createTouchHistoryFrostCompositeNode({
   height,
   settings = DEFAULT_FROST_SETTINGS,
   tier = "full",
+  seed = 1,
 } = {}) {
   if (!sceneColorNode?.sample || !historyNode?.sample || !previousHistoryNode?.sample) {
     throw new TypeError("sceneColorNode and distinct previous/current history nodes must be sampleable");
@@ -919,6 +947,7 @@ export function createTouchHistoryFrostCompositeNode({
   const tierConfig = FROST_QUALITY_TIERS[tier];
   if (!tierConfig) throw new RangeError(`unknown frost tier "${tier}"`);
   const mechanismProfile = requireFrostMechanism("refraction-and-fresnel");
+  const seedPhase = frostSeedPhase(seed);
   const resolutionNode = uniform(new Vector2(width, height));
   const adapterUniforms = {
     displayResolution: resolutionNode,
@@ -928,6 +957,7 @@ export function createTouchHistoryFrostCompositeNode({
     pointerActive: uniform(0, "float"),
     pressure: uniform(0, "float"),
     brushRadius: uniform(settings.brushRadius, "float"),
+    crystalPhase: uniform(new Vector2(seedPhase.x, seedPhase.y)),
   };
   const graph = buildFrostCompositeGraph({
     sceneColorNode,
@@ -953,6 +983,10 @@ export function createTouchHistoryFrostCompositeNode({
       resolutionNode.value.set(nextWidth, nextHeight);
       adapterUniforms.aspect.value = nextWidth / nextHeight;
     },
+    setSeed(nextSeed) {
+      const phase = frostSeedPhase(nextSeed);
+      adapterUniforms.crystalPhase.value.set(phase.x, phase.y);
+    },
     dispose() {
       graph.blurNode?.dispose();
     },
@@ -970,6 +1004,7 @@ export class WebGPUTouchHistoryFrostEffect {
     camera,
     tier = "full",
     mechanism = "refraction-and-fresnel",
+    seed = 1,
   } = {}) {
     this.tier = this.#requireTier(tier);
     this.mechanismProfile = requireFrostMechanism(mechanism);
@@ -987,6 +1022,8 @@ export class WebGPUTouchHistoryFrostEffect {
       blurResolutionScale: this.tier.blurResolutionScale,
       diffusionEnabled: this.mechanismProfile.diffusion,
     };
+    const seedPhase = frostSeedPhase(seed);
+    this.seed = seed;
     if (!Number.isFinite(this.settings.ior) || this.settings.ior <= 1) {
       throw new RangeError("frost IOR must be finite and greater than one");
     }
@@ -1034,6 +1071,7 @@ export class WebGPUTouchHistoryFrostEffect {
       pressure: uniform(0, "float"),
       pointerActive: uniform(0, "float"),
       brushRadius: uniform(this.settings.brushRadius, "float"),
+      crystalPhase: uniform(new Vector2(seedPhase.x, seedPhase.y)),
       decayRate: uniform(-Math.log(this.settings.decaySurvivalPerSecond), "float"),
       fillRate: uniform(-Math.log(1 - this.settings.depositPerSecond), "float"),
       diffusionCoefficient: uniform(this.settings.diffusionCoefficient, "float"),
@@ -1287,6 +1325,13 @@ export class WebGPUTouchHistoryFrostEffect {
     return this.mechanismProfile;
   }
 
+  setSeed(seed) {
+    const phase = frostSeedPhase(seed);
+    this.seed = seed;
+    this.uniforms.crystalPhase.value.set(phase.x, phase.y);
+    return this.seed;
+  }
+
   setDebugView(view) {
     if (!this.debugNodes?.[view] || !this.availableDebugViews?.has(view)) {
       throw new RangeError(`unknown frost debug view "${view}"`);
@@ -1354,6 +1399,7 @@ export class WebGPUTouchHistoryFrostEffect {
       frame: this.frame,
       tier: this.tier.id,
       mechanism: this.mechanismProfile.id,
+      seed: this.seed,
       updatePolicy: this.mechanismProfile.updatePolicy,
       displaySize: [this.displayWidth, this.displayHeight],
       historySize: [this.width, this.height],

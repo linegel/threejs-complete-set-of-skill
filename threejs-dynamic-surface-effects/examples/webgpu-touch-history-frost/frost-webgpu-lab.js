@@ -189,6 +189,7 @@ export class WebGPUFrostLab {
       height,
       tier: this.tier.id,
       mechanism: this.mechanism,
+      seed: this.seed,
     });
     await this.effect.initialize();
     this.renderPipeline = this.effect.renderPipeline;
@@ -228,8 +229,10 @@ export class WebGPUFrostLab {
   }
 
   async setSeed(seed) {
-    if (!Number.isInteger(seed)) throw new TypeError("frost seed must be an integer");
-    this.seed = seed >>> 0;
+    if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+      throw new RangeError("frost seed must be a uint32 integer");
+    }
+    this.seed = this.effect.setSeed(seed);
   }
 
   async setCamera(id) {
