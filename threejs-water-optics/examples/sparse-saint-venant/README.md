@@ -29,6 +29,19 @@ flux plus two hydrostatic corrections per face, lookup/descriptor/display
 records, and the validation ledger. These are logical bytes **[D]**; backend
 alignment and residency remain Browser measurements **[M]**.
 
+`gpu-swe-owner.js` implements that graph with native TSL storage buffers. The
+committed buffer's interior cells are authoritative; its halo cells are derived
+in a separate pass. Candidate cells remain separate until GPU validation has
+checked finite values, nonnegative depth, and quantized closed-domain mass.
+Only the final GPU commit dispatch copies a valid candidate and advances the
+generation. Diagnostic readback is explicit and on-demand; the frame path has
+zero readbacks.
+
+Open `index.html?tier=budgeted&camera=hero` in Codex's in-app Browser for the
+native diagnostic. Keys `1`, `2`, and `3` select hero, top, and profile views.
+The button pauses solver admission before reading the eight-word GPU validation
+ledger; no render-frame code invokes readback.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,

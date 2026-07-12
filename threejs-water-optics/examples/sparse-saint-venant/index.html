@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Sparse Saint-Venant Water</title>
+	<style>
+		body{margin:0;overflow:hidden;background:#071d2a;color:#eafcff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}canvas{display:block;width:100vw;height:100vh}#hud{position:fixed;left:14px;top:14px;max-width:520px;padding:11px 13px;border:1px solid #a8efff42;border-radius:8px;background:#07151ee8;z-index:2;font-size:12px;line-height:1.45}#diagnostic{margin-top:8px;padding:6px 9px;border:1px solid #8adcf066;border-radius:5px;background:#123442;color:#effcff;font:inherit;cursor:pointer}#diagnostic:disabled{opacity:.55;cursor:wait}
+	</style>
+	<script type="importmap">{"imports":{"three":"../../../../node_modules/three/build/three.webgpu.js","three/webgpu":"../../../../node_modules/three/build/three.webgpu.js","three/tsl":"../../../../node_modules/three/build/three.tsl.js","three/addons/":"../../../../node_modules/three/examples/jsm/"}}</script>
+</head>
+<body><div id="hud"><div id="status">INITIALIZING WEBGPU…</div><button id="diagnostic" disabled>Capture committed-state diagnostic</button></div><canvas id="lab-canvas"></canvas><script type="module" src="./gpu-swe-app.js"></script></body>
+</html>
