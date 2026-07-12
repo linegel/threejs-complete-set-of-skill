@@ -118,6 +118,8 @@ async function runGateCoverage() {
 		'mutation-controller-pipeline-contract',
 		'performance-profile-contract',
 		'performance-negative-controls',
+		'stable-identity-pages',
+		'page-reuse-generation',
 	];
 	// Real assertion, not a vacuous pass: dynamically import every gate module and
 	// require the expected-id list to be a subset of what actually registered.
