@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clamp, color, float, instanceIndex, mix, positionLocal, select, vec3 } from 'three/tsl';
 import { deriveSweGpuContract } from './gpu-swe-contract.js';
 import { createGpuSparseSweOwner } from './gpu-swe-owner.js';
+import { finiteDepthAngularFrequency } from './offshore-boundary.js';
 import { commitSparseTiles, createSparseTileDomain, prepareSparseTileCommit } from './sparse-tile-domain.js';
 
 const params = new URLSearchParams( location.search );
@@ -50,10 +51,10 @@ const sparseDomain = createSparseTileDomain( {
 	deactivationTicks: 8
 } );
 const activationReasons = [
+	{ tileX: 0, tileZ: 2, wetCellCount: contract.tier.tileSize ** 2 },
+	{ tileX: 1, tileZ: 2, wetCellCount: contract.tier.tileSize ** 2 },
 	{ tileX: 2, tileZ: 2, wetCellCount: contract.tier.tileSize ** 2 },
-	{ tileX: 3, tileZ: 2, wetCellCount: contract.tier.tileSize ** 2 },
-	{ tileX: 4, tileZ: 2, wetCellCount: contract.tier.tileSize ** 2 },
-	{ tileX: 3, tileZ: 3, wetCellCount: Math.floor( contract.tier.tileSize ** 2 * 0.5 ) }
+	{ tileX: 1, tileZ: 3, wetCellCount: Math.floor( contract.tier.tileSize ** 2 * 0.5 ) }
 ];
 const sparseCommit = commitSparseTiles( sparseDomain, prepareSparseTileCommit( sparseDomain, activationReasons ) );
 const totalCellsX = contract.tier.logicalTilesX * contract.tier.tileSize;
@@ -61,13 +62,11 @@ const totalCellsZ = contract.tier.logicalTilesZ * contract.tier.tileSize;
 
 function initialCondition( { globalCellX, globalCellZ } ) {
 
-	const normalizedX = ( globalCellX + 0.5 ) / totalCellsX * 2 - 1;
-	const normalizedZ = ( globalCellZ + 0.5 ) / totalCellsZ * 2 - 1;
+	const normalizedX = ( globalCellX + 0.5 - contract.tier.tileSize * 1.6 ) / contract.tier.tileSize;
+	const normalizedZ = ( globalCellZ + 0.5 - contract.tier.tileSize * 2.6 ) / contract.tier.tileSize;
 	const island = 0.115 * Math.exp( -( normalizedX * normalizedX * 5 + normalizedZ * normalizedZ * 7 ) );
 	const bedElevationMeters = -0.105 + island + normalizedX * 0.012;
-	const leftReservoir = normalizedX < -0.08 ? 0.075 : -0.025;
-	const radialPulse = 0.018 * Math.exp( -( ( normalizedX + 0.34 ) ** 2 + normalizedZ ** 2 ) * 75 );
-	const freeSurface = leftReservoir + radialPulse;
+	const freeSurface = 0;
 	return { depthMeters: Math.max( 0, freeSurface - bedElevationMeters ), xDischargeM2ps: 0, zDischargeM2ps: 0, bedElevationMeters };
 
 }
@@ -153,7 +152,7 @@ async function captureDiagnostic() {
 	try {
 
 		const diagnostic = await owner.captureDiagnostics();
-		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits }`;
+		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
 		return diagnostic;
 
@@ -311,7 +310,22 @@ async function boot() {
 		status.textContent = `FAILED GPU: ${ message }`;
 
 	} );
-	owner = createGpuSparseSweOwner( renderer, { tierId, preparedCommit: sparseCommit, initialCondition } );
+	const boundaryDepthMeters = 0.105;
+	const boundaryWavenumber = 0.6;
+	const boundaryOmega = finiteDepthAngularFrequency( { wavenumberRadPerMeter: boundaryWavenumber, depthMeters: boundaryDepthMeters } );
+	owner = createGpuSparseSweOwner( renderer, {
+		tierId,
+		preparedCommit: sparseCommit,
+		initialCondition,
+		openBoundary: {
+			side: 'west',
+			mode: { modeId: 'minimum-tier-normal-swell', waveVectorRadPerMeter: [ boundaryWavenumber, 0 ], wavenumberRadPerMeter: boundaryWavenumber, amplitudeMeters: 0.015, phaseAtReferenceRadians: 0, intrinsicAngularFrequencyRadPerSecond: boundaryOmega },
+			meanCurrentMps: [ 0, 0 ], characteristicDepthMeters: boundaryDepthMeters, surfaceDatumMeters: 0,
+			phaseReferenceSeconds: 0,
+			gridOriginMeters: [ -totalCellsX * contract.tier.cellSizeMeters * 0.5, -totalCellsZ * contract.tier.cellSizeMeters * 0.5 ],
+			reflectionAmplitudeGate: 0.02
+		}
+	} );
 	residentFrame = measureResidentFrame();
 	setCamera( params.get( 'camera' ) ?? 'hero' );
 	display = buildDisplayMesh();

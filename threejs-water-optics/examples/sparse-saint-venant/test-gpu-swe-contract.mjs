@@ -11,6 +11,7 @@ for ( const tierId of Object.keys( SWE_GPU_TIERS ) ) {
 	assert.equal( validateSweGpuContract( contract ), true );
 	assert.ok( contract.tier.fixedTimeStepSeconds <= contract.stableTimeStepSeconds );
 	assert.equal( contract.dispatchOrder.length, 7 );
+	assert.equal( contract.resourceBytes.diagnostics, 48 );
 	summaries.push( { tierId, bytes: contract.totalLogicalBytes, cflRatio: contract.cflRatio } );
 
 }

@@ -63,6 +63,19 @@ gate, injects only `q_n-c eta`, and preserves the coastal solver's outgoing
 `q_n+c eta` plus tangential discharge. It does not claim that the one-way donor
 renders coastal reflection beyond the coupling curve.
 
+The native route wires the oracle's minimum-tier direct mode into west-edge
+GPU halo cells. The halo reconstructs ghost depth and normal discharge from the
+donor's incoming characteristic and the interior outgoing characteristic while
+retaining interior tangential discharge. The mode advances on solver time, not
+render time; there is no per-step CPU boundary upload or readback.
+Open-domain transaction validation integrates canonical face-flux divergence
+over every resident cell into separate net influx/outflux depth-sum quanta.
+Candidate depth must reconcile against prior depth plus that exact discrete
+exchange. A separate physical west-boundary ledger exposes exterior flux; its
+difference from net flux reports sparse-interface cancellation residual. The
+open boundary never disables mass validation or hides imbalance behind a larger
+tolerance.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,

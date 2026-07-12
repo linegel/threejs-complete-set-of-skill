@@ -6,6 +6,7 @@ import {
 	atomicAdd,
 	atomicLoad,
 	atomicSub,
+	cos,
 	float,
 	globalId,
 	int,
@@ -14,12 +15,14 @@ import {
 	select,
 	sqrt,
 	storage,
+	uniform,
 	uint,
 	vec2,
 	vec3,
 	vec4
 } from 'three/tsl';
 import { deriveSweGpuContract, validateSweGpuContract } from './gpu-swe-contract.js';
+import { assessCharacteristicCompatibility } from './offshore-boundary.js';
 
 const MASS_QUANTA_PER_METER = 100000;
 const DRY_TOLERANCE_METERS = 1e-5;
@@ -95,16 +98,46 @@ function createStorageBuffer( array, itemSize, name ) {
 
 }
 
+function validateOpenBoundary( openBoundary, contract, gravityMps2 ) {
+
+	if ( openBoundary === null || openBoundary === undefined ) return null;
+	if ( openBoundary.side !== 'west' ) throw new Error( 'GPU SWE currently supports only a west open boundary' );
+	const mode = openBoundary.mode;
+	const values = [
+		mode?.waveVectorRadPerMeter?.[ 0 ], mode?.waveVectorRadPerMeter?.[ 1 ], mode?.wavenumberRadPerMeter,
+		mode?.amplitudeMeters, mode?.phaseAtReferenceRadians, mode?.intrinsicAngularFrequencyRadPerSecond,
+		openBoundary.meanCurrentMps?.[ 0 ], openBoundary.meanCurrentMps?.[ 1 ], openBoundary.characteristicDepthMeters,
+		openBoundary.surfaceDatumMeters, openBoundary.phaseReferenceSeconds,
+		openBoundary.gridOriginMeters?.[ 0 ], openBoundary.gridOriginMeters?.[ 1 ], openBoundary.reflectionAmplitudeGate
+	];
+	if ( values.some( ( value ) => ! Number.isFinite( value ) ) ) throw new Error( 'GPU SWE open-boundary configuration must contain finite dimensioned values' );
+	if ( mode.wavenumberRadPerMeter <= 0 || mode.amplitudeMeters < 0 || mode.intrinsicAngularFrequencyRadPerSecond <= 0 || openBoundary.characteristicDepthMeters <= 0 ) throw new Error( 'GPU SWE open-boundary configuration lies outside its physical domain' );
+	if ( Math.abs( Math.hypot( ...mode.waveVectorRadPerMeter ) - mode.wavenumberRadPerMeter ) > 1e-9 ) throw new Error( 'GPU SWE open-boundary mode wavenumber does not match its vector' );
+	const compatibility = assessCharacteristicCompatibility( mode, [ -1, 0 ], openBoundary.characteristicDepthMeters, gravityMps2 );
+	if ( compatibility.reflectionAmplitudeEstimate > openBoundary.reflectionAmplitudeGate ) throw new Error( `GPU SWE open-boundary reflection estimate ${ compatibility.reflectionAmplitudeEstimate } exceeds gate ${ openBoundary.reflectionAmplitudeGate }` );
+	if ( compatibility.outwardDirectionCosine >= 0 ) throw new Error( 'GPU SWE west-boundary mode is not incoming' );
+	return Object.freeze( {
+		...openBoundary,
+		mode: Object.freeze( { ...mode, waveVectorRadPerMeter: Object.freeze( [ ...mode.waveVectorRadPerMeter ] ) } ),
+		meanCurrentMps: Object.freeze( [ ...openBoundary.meanCurrentMps ] ),
+		gridOriginMeters: Object.freeze( [ ...openBoundary.gridOriginMeters ] ),
+		compatibility
+	} );
+
+}
+
 export function createGpuSparseSweOwner( renderer, {
 	tierId = 'budgeted',
 	preparedCommit,
 	initialCondition,
-	gravityMps2 = 9.80665
+	gravityMps2 = 9.80665,
+	openBoundary = null
 } ) {
 
 	if ( renderer?.backend?.isWebGPUBackend !== true ) throw new Error( 'GPU sparse SWE requires an initialized native WebGPU renderer' );
 	const contract = deriveSweGpuContract( tierId, gravityMps2 );
 	validateSweGpuContract( contract );
+	const boundary = validateOpenBoundary( openBoundary, contract, gravityMps2 );
 	const initial = buildGpuSweInitialData( preparedCommit, contract, initialCondition );
 	const stateCommittedBuffer = createStorageBuffer( initial.stateArray.slice(), 4, 'sparse-swe:committed-state' );
 	const stateCandidateBuffer = createStorageBuffer( initial.stateArray.slice(), 4, 'sparse-swe:candidate-state' );
@@ -115,7 +148,7 @@ export function createGpuSparseSweOwner( renderer, {
 	const zFluxBuffer = createStorageBuffer( new Float32Array( contract.zFaceRecords * 4 ), 4, 'sparse-swe:z-face-flux' );
 	const xCorrectionBuffer = createStorageBuffer( new Float32Array( contract.xFaceRecords * 2 ), 2, 'sparse-swe:x-hydrostatic-correction' );
 	const zCorrectionBuffer = createStorageBuffer( new Float32Array( contract.zFaceRecords * 2 ), 2, 'sparse-swe:z-hydrostatic-correction' );
-	const diagnosticBuffer = new StorageBufferAttribute( 8, 1, Uint32Array );
+	const diagnosticBuffer = new StorageBufferAttribute( 12, 1, Uint32Array );
 	diagnosticBuffer.name = 'sparse-swe:transaction-diagnostics';
 	const resourceInventory = Object.freeze( {
 		statePingPong: stateCommittedBuffer.array.byteLength + stateCandidateBuffer.array.byteLength,
@@ -145,7 +178,7 @@ export function createGpuSparseSweOwner( renderer, {
 	const zFlux = storage( zFluxBuffer, 'vec4', contract.zFaceRecords );
 	const xCorrection = storage( xCorrectionBuffer, 'vec2', contract.xFaceRecords );
 	const zCorrection = storage( zCorrectionBuffer, 'vec2', contract.zFaceRecords );
-	const diagnostics = storage( diagnosticBuffer, 'uint', 8 ).toAtomic();
+	const diagnostics = storage( diagnosticBuffer, 'uint', 12 ).toAtomic();
 
 	const tileSize = contract.tier.tileSize;
 	const paddedSize = contract.paddedSize;
@@ -157,6 +190,7 @@ export function createGpuSparseSweOwner( renderer, {
 	const inverseDx = float( 1 / contract.tier.cellSizeMeters );
 	const gravity = float( gravityMps2 );
 	const dryTolerance = float( DRY_TOLERANCE_METERS );
+	const boundaryTimeSeconds = uniform( boundary?.phaseReferenceSeconds ?? 0 );
 
 	const paddedIndex = ( slot, localX, localZ ) => slot.mul( uint( paddedCells ) ).add( localZ.mul( uint( paddedSize ) ) ).add( localX );
 	const localCoordinates = ( linear, width ) => {
@@ -169,7 +203,7 @@ export function createGpuSparseSweOwner( renderer, {
 	const resetValidation = Fn( () => {
 
 		const index = globalId.x;
-		If( index.lessThan( uint( 5 ) ), () => {
+		If( index.lessThan( uint( 5 ) ).or( index.greaterThanEqual( uint( 8 ) ).and( index.lessThan( uint( 12 ) ) ) ), () => {
 
 			// Three r185 types atomicStore as uint although WGSL defines it as
 			// void, producing a false TSL generation error. One invocation owns
@@ -179,7 +213,7 @@ export function createGpuSparseSweOwner( renderer, {
 
 		} );
 
-	} )().compute( 8, [ 8 ] ).setName( 'sparse-swe:reset-validation' );
+	} )().compute( 16, [ 8 ] ).setName( 'sparse-swe:reset-validation' );
 
 	const haloAndBoundary = Fn( () => {
 
@@ -194,28 +228,61 @@ export function createGpuSparseSweOwner( renderer, {
 		const corner = xBoundary.and( zBoundary );
 		If( resident.and( xBoundary.or( zBoundary ) ).and( corner.not() ), () => {
 
-			const sourceSlot = slot.toVar();
-			const sourceX = coordinate.x.toVar();
-			const sourceZ = coordinate.z.toVar();
-			const reflectX = float( 1 ).toVar();
-			const reflectZ = float( 1 ).toVar();
-			const neighborTileX = descriptor.x.toVar();
-			const neighborTileZ = descriptor.y.toVar();
-			If( coordinate.x.equal( uint( 0 ) ), () => { sourceX.assign( uint( tileSize ) ); neighborTileX.subAssign( int( 1 ) ); reflectX.assign( -1 ); } );
-			If( coordinate.x.equal( uint( paddedSize - 1 ) ), () => { sourceX.assign( uint( 1 ) ); neighborTileX.addAssign( int( 1 ) ); reflectX.assign( -1 ); } );
-			If( coordinate.z.equal( uint( 0 ) ), () => { sourceZ.assign( uint( tileSize ) ); neighborTileZ.subAssign( int( 1 ) ); reflectZ.assign( -1 ); } );
-			If( coordinate.z.equal( uint( paddedSize - 1 ) ), () => { sourceZ.assign( uint( 1 ) ); neighborTileZ.addAssign( int( 1 ) ); reflectZ.assign( -1 ); } );
-			const neighborInDomain = neighborTileX.greaterThanEqual( int( 0 ) ).and( neighborTileX.lessThan( int( contract.tier.logicalTilesX ) ) )
-				.and( neighborTileZ.greaterThanEqual( int( 0 ) ) ).and( neighborTileZ.lessThan( int( contract.tier.logicalTilesZ ) ) );
-			If( neighborInDomain, () => {
+			const applyNeighborOrWall = () => {
 
-				const lookupIndex = neighborTileZ.mul( int( contract.tier.logicalTilesX ) ).add( neighborTileX ).toUint();
-				const neighborSlot = lookup.element( lookupIndex );
-				If( neighborSlot.greaterThanEqual( int( 0 ) ), () => { sourceSlot.assign( neighborSlot.toUint() ); reflectX.assign( 1 ); reflectZ.assign( 1 ); } );
+				const sourceSlot = slot.toVar();
+				const sourceX = coordinate.x.toVar();
+				const sourceZ = coordinate.z.toVar();
+				const reflectX = float( 1 ).toVar();
+				const reflectZ = float( 1 ).toVar();
+				const neighborTileX = descriptor.x.toVar();
+				const neighborTileZ = descriptor.y.toVar();
+				If( coordinate.x.equal( uint( 0 ) ), () => { sourceX.assign( uint( tileSize ) ); neighborTileX.subAssign( int( 1 ) ); reflectX.assign( -1 ); } );
+				If( coordinate.x.equal( uint( paddedSize - 1 ) ), () => { sourceX.assign( uint( 1 ) ); neighborTileX.addAssign( int( 1 ) ); reflectX.assign( -1 ); } );
+				If( coordinate.z.equal( uint( 0 ) ), () => { sourceZ.assign( uint( tileSize ) ); neighborTileZ.subAssign( int( 1 ) ); reflectZ.assign( -1 ); } );
+				If( coordinate.z.equal( uint( paddedSize - 1 ) ), () => { sourceZ.assign( uint( 1 ) ); neighborTileZ.addAssign( int( 1 ) ); reflectZ.assign( -1 ); } );
+				const neighborInDomain = neighborTileX.greaterThanEqual( int( 0 ) ).and( neighborTileX.lessThan( int( contract.tier.logicalTilesX ) ) )
+					.and( neighborTileZ.greaterThanEqual( int( 0 ) ) ).and( neighborTileZ.lessThan( int( contract.tier.logicalTilesZ ) ) );
+				If( neighborInDomain, () => {
 
-			} );
-			const source = committed.element( paddedIndex( sourceSlot, sourceX, sourceZ ) );
-			committed.element( linear ).assign( vec4( source.x, source.y.mul( reflectX ), source.z.mul( reflectZ ), source.w ) );
+					const lookupIndex = neighborTileZ.mul( int( contract.tier.logicalTilesX ) ).add( neighborTileX ).toUint();
+					const neighborSlot = lookup.element( lookupIndex );
+					If( neighborSlot.greaterThanEqual( int( 0 ) ), () => { sourceSlot.assign( neighborSlot.toUint() ); reflectX.assign( 1 ); reflectZ.assign( 1 ); } );
+
+				} );
+				const source = committed.element( paddedIndex( sourceSlot, sourceX, sourceZ ) );
+				committed.element( linear ).assign( vec4( source.x, source.y.mul( reflectX ), source.z.mul( reflectZ ), source.w ) );
+
+			};
+			if ( boundary !== null ) {
+
+				const openWest = coordinate.x.equal( uint( 0 ) ).and( descriptor.x.equal( int( 0 ) ) );
+				If( openWest, () => {
+
+					const interior = committed.element( paddedIndex( slot, uint( 1 ), coordinate.z ) );
+					const globalZ = descriptor.y.toFloat().mul( tileSize ).add( coordinate.z.toFloat().sub( 0.5 ) );
+					const worldZ = float( boundary.gridOriginMeters[ 1 ] ).add( globalZ.mul( contract.tier.cellSizeMeters ) );
+					const [ kx, kz ] = boundary.mode.waveVectorRadPerMeter;
+					const absoluteOmega = boundary.mode.intrinsicAngularFrequencyRadPerSecond + kx * boundary.meanCurrentMps[ 0 ] + kz * boundary.meanCurrentMps[ 1 ];
+					const phase = float( kx * boundary.gridOriginMeters[ 0 ] ).add( worldZ.mul( kz ) ).add( boundary.mode.phaseAtReferenceRadians )
+						.sub( boundaryTimeSeconds.sub( boundary.phaseReferenceSeconds ).mul( absoluteOmega ) );
+					const elevation = cos( phase ).mul( boundary.mode.amplitudeMeters );
+					const donorQx = elevation.mul( boundary.mode.intrinsicAngularFrequencyRadPerSecond / boundary.mode.wavenumberRadPerMeter ** 2 * kx );
+					const donorNormalDischarge = donorQx.negate();
+					const waveSpeed = float( Math.sqrt( gravityMps2 * boundary.characteristicDepthMeters ) );
+					const interiorElevation = interior.x.add( interior.w ).sub( boundary.surfaceDatumMeters );
+					const interiorNormalDischarge = interior.y.negate();
+					const incoming = donorNormalDischarge.sub( waveSpeed.mul( elevation ) );
+					const outgoing = interiorNormalDischarge.add( waveSpeed.mul( interiorElevation ) );
+					const boundaryElevation = outgoing.sub( incoming ).div( waveSpeed.mul( 2 ) );
+					const boundaryNormalDischarge = outgoing.add( incoming ).mul( 0.5 );
+					const boundaryDepth = max( float( 0 ), float( boundary.surfaceDatumMeters ).add( boundaryElevation ).sub( interior.w ) );
+					const boundaryWet = boundaryDepth.greaterThan( dryTolerance );
+					committed.element( linear ).assign( vec4( boundaryDepth, select( boundaryWet, boundaryNormalDischarge.negate(), float( 0 ) ), select( boundaryWet, interior.z, float( 0 ) ), interior.w ) );
+
+				} ).Else( applyNeighborOrWall );
+
+			} else applyNeighborOrWall();
 
 		} );
 
@@ -344,6 +411,40 @@ export function createGpuSparseSweOwner( renderer, {
 			If( next.x.greaterThan( dryTolerance ), () => { receipt.addAssign( atomicAdd( diagnostics.element( uint( 2 ) ), uint( 1 ) ) ); } );
 			receipt.addAssign( atomicAdd( diagnostics.element( uint( 3 ) ), max( prior.x, float( 0 ) ).mul( MASS_QUANTA_PER_METER ).add( 0.5 ).toUint() ) );
 			receipt.addAssign( atomicAdd( diagnostics.element( uint( 4 ) ), max( next.x, float( 0 ) ).mul( MASS_QUANTA_PER_METER ).add( 0.5 ).toUint() ) );
+			const westIndex = slot.mul( uint( xFacesPerTile ) ).add( coordinate.z.mul( uint( tileSize + 1 ) ) ).add( coordinate.x );
+			const eastIndex = westIndex.add( uint( 1 ) );
+			const southIndex = slot.mul( uint( zFacesPerTile ) ).add( coordinate.z.mul( uint( tileSize ) ) ).add( coordinate.x );
+			const northIndex = southIndex.add( uint( tileSize ) );
+			const netFluxDepthExchange = xFlux.element( westIndex ).x.sub( xFlux.element( eastIndex ).x )
+				.add( zFlux.element( southIndex ).x.sub( zFlux.element( northIndex ).x ) ).mul( dt.mul( inverseDx ) );
+			If( netFluxDepthExchange.greaterThanEqual( float( 0 ) ), () => {
+
+				receipt.addAssign( atomicAdd( diagnostics.element( uint( 8 ) ), netFluxDepthExchange.mul( MASS_QUANTA_PER_METER ).add( 0.5 ).toUint() ) );
+
+			} ).Else( () => {
+
+				receipt.addAssign( atomicAdd( diagnostics.element( uint( 9 ) ), netFluxDepthExchange.negate().mul( MASS_QUANTA_PER_METER ).add( 0.5 ).toUint() ) );
+
+			} );
+			if ( boundary !== null ) {
+
+				const onOpenWestCell = descriptors.element( slot ).x.equal( int( 0 ) ).and( coordinate.x.equal( uint( 0 ) ) );
+				If( onOpenWestCell, () => {
+
+					const boundaryDepthExchange = xFlux.element( westIndex ).x.mul( dt.mul( inverseDx ) );
+					If( boundaryDepthExchange.greaterThanEqual( float( 0 ) ), () => {
+
+						receipt.addAssign( atomicAdd( diagnostics.element( uint( 10 ) ), boundaryDepthExchange.mul( MASS_QUANTA_PER_METER ).add( 0.5 ).toUint() ) );
+
+					} ).Else( () => {
+
+						receipt.addAssign( atomicAdd( diagnostics.element( uint( 11 ) ), boundaryDepthExchange.negate().mul( MASS_QUANTA_PER_METER ).add( 0.5 ).toUint() ) );
+
+					} );
+
+				} );
+
+			}
 
 		} );
 
@@ -366,7 +467,9 @@ export function createGpuSparseSweOwner( renderer, {
 		const resident = descriptors.element( slot ).w.greaterThan( int( 0 ) );
 		const priorMass = atomicLoad( diagnostics.element( uint( 3 ) ) );
 		const candidateMass = atomicLoad( diagnostics.element( uint( 4 ) ) );
-		const massDifference = max( priorMass, candidateMass ).sub( min( priorMass, candidateMass ) );
+		const expectedPlusInflux = priorMass.add( atomicLoad( diagnostics.element( uint( 8 ) ) ) );
+		const candidatePlusOutflux = candidateMass.add( atomicLoad( diagnostics.element( uint( 9 ) ) ) );
+		const massDifference = max( expectedPlusInflux, candidatePlusOutflux ).sub( min( expectedPlusInflux, candidatePlusOutflux ) );
 		const valid = atomicLoad( diagnostics.element( uint( 0 ) ) ).equal( uint( 0 ) )
 			.and( atomicLoad( diagnostics.element( uint( 1 ) ) ).equal( uint( 0 ) ) )
 			.and( massDifference.lessThanEqual( uint( initial.residentCellCount * 2 ) ) );
@@ -402,18 +505,21 @@ export function createGpuSparseSweOwner( renderer, {
 	let droppedTimeSeconds = 0;
 	let diagnosticReadbackCount = 0;
 	let rollbackMutationProbeCount = 0;
+	let simulationTimeSeconds = boundary?.phaseReferenceSeconds ?? 0;
 	let disposed = false;
 
 	function requireLive() { if ( disposed ) throw new Error( 'GPU sparse SWE owner is disposed' ); }
 	function dispatchFixedStep() {
 
 		requireLive();
+		boundaryTimeSeconds.value = simulationTimeSeconds;
 		// Separate submissions are deliberate: every whole-grid pass must complete
 		// before a dependent pass reads its storage, and a validation failure must
 		// name the exact pipeline instead of poisoning an opaque grouped dispatch.
 		for ( const dispatch of stepGraph ) renderer.compute( dispatch );
 		submittedTicks += 1;
 		dispatchCount += stepGraph.length;
+		simulationTimeSeconds += contract.tier.fixedTimeStepSeconds;
 
 	}
 	function dispatchRollbackMutationProbe() {
@@ -437,6 +543,9 @@ export function createGpuSparseSweOwner( renderer, {
 			invalidCells: values[ 0 ], negativeDepthCells: values[ 1 ], wetCells: values[ 2 ],
 			priorDepthQuanta: values[ 3 ], candidateDepthQuanta: values[ 4 ], committedGeneration: values[ 5 ],
 			acceptedCommits: values[ 6 ], rejectedCommits: values[ 7 ],
+			netFluxInfluxDepthQuanta: values[ 8 ], netFluxOutfluxDepthQuanta: values[ 9 ],
+			boundaryInfluxDepthQuanta: values[ 10 ], boundaryOutfluxDepthQuanta: values[ 11 ],
+			internalFluxCancellationDepthQuanta: ( values[ 8 ] - values[ 9 ] ) - ( values[ 10 ] - values[ 11 ] ),
 			massQuantumMeters: 1 / MASS_QUANTA_PER_METER,
 			diagnosticReadbackOnly: true,
 			frameCriticalReadbackCount: 0
@@ -479,6 +588,7 @@ export function createGpuSparseSweOwner( renderer, {
 				backend: 'native-webgpu', model: 'nonlinear-Saint-Venant-HLL-hydrostatic', authority: 'gpu-float32',
 				tierId, submittedTicks, dispatchCount, droppedTimeSeconds, diagnosticReadbackCount, rollbackMutationProbeCount, frameCriticalReadbackCount: 0,
 				disposed,
+				simulationTimeSeconds, openBoundary: boundary === null ? null : Object.freeze( { side: boundary.side, modeId: boundary.mode.modeId, compatibility: boundary.compatibility } ),
 				residentTileCount: initial.residentTileCount, residentCellCount: initial.residentCellCount,
 				logicalResourceBytes: contract.totalLogicalBytes, resourceInventory,
 				backendAllocatedBytes: null, backendAllocationClaim: 'unmeasured-backend-alignment-and-residency', dispatchOrder: contract.dispatchOrder

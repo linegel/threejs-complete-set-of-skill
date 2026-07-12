@@ -23,7 +23,7 @@ export const SWE_GPU_LAYOUT = Object.freeze( {
 	faceFlux: Object.freeze( { type: 'vec4<f32>', channels: Object.freeze( [ 'massFluxM2ps', 'normalMomentumFluxM3ps2', 'tangentMomentumFluxM3ps2', 'reserved' ] ), orientations: 2 } ),
 	hydrostaticCorrection: Object.freeze( { type: 'vec2<f32>', channels: Object.freeze( [ 'leftOrSouthMomentumCorrectionM3ps2', 'rightOrNorthMomentumCorrectionM3ps2' ] ), orientations: 2 } ),
 	descriptor: Object.freeze( { type: 'vec4<i32>', channels: Object.freeze( [ 'logicalTileX', 'logicalTileZ', 'roleCode', 'resident' ] ) } ),
-	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits' ] ) } )
+	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta' ] ) } )
 } );
 
 export function resolveSweGpuTier( tierId ) {
