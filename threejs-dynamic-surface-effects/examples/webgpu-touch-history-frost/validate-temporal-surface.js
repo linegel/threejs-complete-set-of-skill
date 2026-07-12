@@ -35,6 +35,7 @@ import {
 import {
   FROST_LAB_ID,
   FROST_LAB_MODES,
+  FROST_MODE_TO_DEBUG_VIEW,
   FROST_SCENARIO_ID,
   WebGPUFrostLab,
   parseFrostLabRoute,
@@ -362,6 +363,8 @@ assert.equal(labManifest.threeRevision, "0.185.1");
 assert.deepEqual(labManifest.mechanisms.map(({ id }) => id), FROST_MECHANISMS);
 assert.deepEqual(labManifest.tiers.map(({ id }) => id), Object.keys(FROST_QUALITY_TIERS));
 assert.deepEqual(labManifest.modes, FROST_LAB_MODES);
+assert.equal(FROST_MODE_TO_DEBUG_VIEW["no-post"], "scene color");
+assert.equal(FROST_MODE_TO_DEBUG_VIEW.diagnostics, "next history R/A");
 assert.equal(labManifest.id, FROST_LAB_ID);
 assert.deepEqual(labManifest.scenarios.map(({ id }) => id), [FROST_SCENARIO_ID]);
 assert(existsSync(resolve(here, labManifest.browserEntry)), "canonical browser entry is missing");
@@ -386,6 +389,7 @@ await controllerContract.setScenario(FROST_SCENARIO_ID);
 assert.equal(controllerContract.scenario, FROST_SCENARIO_ID);
 assert.equal(controllerContract.mechanism, "diffusion", "scenario selection must not mutate the mechanism");
 await assert.rejects(controllerContract.setScenario("history-and-deposit"), /unknown frost scenario/);
+assert.throws(() => new WebGPUFrostLab({ runtimeProfile: "invented" }), /unknown frost runtime profile/);
 
 const browserSource = readFileSync(resolve(here, "frost-webgpu-lab.js"), "utf8");
 for (const token of [
@@ -393,6 +397,12 @@ for (const token of [
   "isWebGPUBackend !== true",
   "readRenderTargetPixelsAsync",
   "alignedBytesPerRow",
+  "exact retained renderer.backend.device reference after renderer.init()",
+  "lossPromiseObservedOnActualDevice",
+  "timestampQueriesActive",
+  "timeSeconds: this.time",
+  "this.renderer.getSize(new Vector2())",
+  "dpr: this.renderer.getPixelRatio()",
 ]) {
   assert(browserSource.includes(token), `canonical frost browser source is missing ${token}`);
 }
@@ -400,5 +410,8 @@ const entrySource = readFileSync(resolve(here, "main.js"), "utf8");
 assert(entrySource.includes("globalThis.labController = lab"), "canonical frost controller is not published through labController");
 assert(entrySource.includes("globalThis.__LAB_CONTROLLER__ = lab"), "canonical frost controller compatibility alias is missing");
 assert(entrySource.includes("lab.setMechanism(mechanismSelect.value)"), "mechanism UI still mutates the scenario channel");
+assert(entrySource.includes("globalThis.__LAB_CAPTURE_PROFILE__?.id"), "capture profile is not an explicit runtime input");
+assert(entrySource.includes('get("capture") === "1"'), "automated capture does not own a deterministic clock");
+assert(entrySource.includes("if (!automatedCapture)"), "presentation animation still runs during automated capture");
 
 console.log("webgpu-touch-history-frost validation passed");

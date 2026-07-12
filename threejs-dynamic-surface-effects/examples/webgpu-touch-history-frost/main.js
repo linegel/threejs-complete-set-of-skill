@@ -4,7 +4,9 @@ import { createFrostLab, FROST_LAB_MODES, parseFrostLabRoute } from "./frost-web
 const canvas = document.querySelector("canvas");
 const status = document.querySelector("[data-status]");
 const route = parseFrostLabRoute(location.pathname, location.search);
-const lab = await createFrostLab({ canvas, ...route, seed: 0x00000001 });
+const runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id ?? "correctness";
+const automatedCapture = new URLSearchParams(location.search).get("capture") === "1";
+const lab = await createFrostLab({ canvas, ...route, seed: 0x00000001, runtimeProfile });
 
 globalThis.labController = lab;
 globalThis.__LAB_CONTROLLER__ = lab;
@@ -85,17 +87,19 @@ addEventListener("resize", resize);
 resize();
 
 let previousTime = 0;
-lab.renderer.setAnimationLoop((timestamp) => {
-  if (previousTime === 0) previousTime = timestamp;
-  let elapsed = Math.max(0, (timestamp - previousTime) / 1000);
-  previousTime = timestamp;
-  while (elapsed > 0) {
-    const step = Math.min(elapsed, 1 / 30);
-    lab.step(step);
-    elapsed -= step;
-  }
-  lab.renderOnce();
-  status.textContent = JSON.stringify(lab.getMetrics(), null, 2);
-});
+if (!automatedCapture) {
+  lab.renderer.setAnimationLoop((timestamp) => {
+    if (previousTime === 0) previousTime = timestamp;
+    let elapsed = Math.max(0, (timestamp - previousTime) / 1000);
+    previousTime = timestamp;
+    while (elapsed > 0) {
+      const step = Math.min(elapsed, 1 / 30);
+      lab.step(step);
+      elapsed -= step;
+    }
+    lab.renderOnce();
+    status.textContent = JSON.stringify(lab.getMetrics(), null, 2);
+  });
+}
 
 addEventListener("pagehide", () => lab.dispose(), { once: true });

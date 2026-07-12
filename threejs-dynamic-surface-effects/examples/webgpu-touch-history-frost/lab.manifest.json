@@ -62,6 +62,8 @@
   ],
   "modes": [
     "final",
+    "no-post",
+    "diagnostics",
     "scene-color",
     "vertical-blur",
     "horizontal-blur",

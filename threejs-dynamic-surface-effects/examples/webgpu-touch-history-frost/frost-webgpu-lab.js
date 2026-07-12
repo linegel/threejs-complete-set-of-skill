@@ -6,6 +6,7 @@ import {
   Mesh,
   MeshStandardNodeMaterial,
   PerspectiveCamera,
+  REVISION,
   RendererUtils,
   RenderTarget,
   Scene,
@@ -24,6 +25,8 @@ import {
 
 export const FROST_MODE_TO_DEBUG_VIEW = Object.freeze({
   final: "final",
+  "no-post": "scene color",
+  diagnostics: "next history R/A",
   "scene-color": "scene color",
   "vertical-blur": "vertical blur",
   "horizontal-blur": "horizontal blur",
@@ -44,6 +47,7 @@ export const FROST_MODE_TO_DEBUG_VIEW = Object.freeze({
 export const FROST_LAB_MODES = Object.freeze(Object.keys(FROST_MODE_TO_DEBUG_VIEW));
 export const FROST_LAB_ID = "webgpu-touch-history-frost";
 export const FROST_SCENARIO_ID = "touch-history-frost";
+const FROST_RUNTIME_PROFILES = Object.freeze(["correctness", "performance"]);
 
 const FROST_DEBUG_VIEW_TO_MODE = Object.freeze(Object.fromEntries(
   Object.entries(FROST_MODE_TO_DEBUG_VIEW).map(([mode, debugView]) => [debugView, mode]),
@@ -114,8 +118,18 @@ function createBackdropScene() {
 }
 
 export class WebGPUFrostLab {
-  constructor({ canvas, tier = "balanced", mechanism = "history-and-deposit", seed = 1 } = {}) {
+  constructor({
+    canvas,
+    tier = "balanced",
+    mechanism = "history-and-deposit",
+    seed = 1,
+    runtimeProfile = "correctness",
+  } = {}) {
     this.canvas = canvas;
+    if (!FROST_RUNTIME_PROFILES.includes(runtimeProfile)) {
+      throw new RangeError(`unknown frost runtime profile "${runtimeProfile}"`);
+    }
+    this.runtimeProfile = runtimeProfile;
     this.scenario = FROST_SCENARIO_ID;
     this.tier = FROST_QUALITY_TIERS[tier];
     if (!this.tier) throw new RangeError(`unknown frost tier "${tier}"`);
@@ -134,10 +148,30 @@ export class WebGPUFrostLab {
   }
 
   async initialize() {
-    this.renderer = new WebGPURenderer({ canvas: this.canvas, antialias: false });
+    const timestampQueriesRequested = this.runtimeProfile === "performance";
+    this.renderer = new WebGPURenderer({
+      canvas: this.canvas,
+      antialias: false,
+      trackTimestamp: timestampQueriesRequested,
+    });
     await this.renderer.init();
     if (this.renderer.backend?.isWebGPUBackend !== true) {
       throw new Error("WebGPU is required for the canonical dynamic-surface path");
+    }
+    this.rendererDevice = this.renderer.backend.device ?? null;
+    if (!this.rendererDevice) throw new Error("Native WebGPU backend did not expose its initialized GPUDevice");
+    this.rendererDeviceGeneration = 1;
+    this.deviceLossGeneration = 0;
+    this.rendererDeviceStatus = "active";
+    this.deviceLostObserved = false;
+    this.lossPromiseObservedOnActualDevice = Boolean(this.rendererDevice.lost?.then);
+    if (this.lossPromiseObservedOnActualDevice) {
+      this.rendererDevice.lost.then(() => {
+        if (this.rendererDeviceStatus === "disposing" || this.rendererDeviceStatus === "disposed") return;
+        this.deviceLostObserved = true;
+        this.deviceLossGeneration += 1;
+        this.rendererDeviceStatus = "lost";
+      });
     }
     const width = Math.max(1, this.canvas?.clientWidth || this.canvas?.width || 1200);
     const height = Math.max(1, this.canvas?.clientHeight || this.canvas?.height || 800);
@@ -261,10 +295,10 @@ export class WebGPUFrostLab {
     this.renderPipeline.render();
   }
 
-  async capturePixels(target = this.mode) {
-    if (!FROST_LAB_MODES.includes(target)) throw new RangeError(`unknown frost capture target "${target}"`);
-    const previousMode = this.mode;
-    await this.setMode(target);
+  async capturePixels(target = "final") {
+    if (target !== "final" && target !== "presentation") {
+      throw new RangeError(`unknown frost capture target "${target}"`);
+    }
     const size = this.renderer.getDrawingBufferSize(new Vector2());
     const width = Math.trunc(size.x);
     const height = Math.trunc(size.y);
@@ -278,7 +312,6 @@ export class WebGPUFrostLab {
     } finally {
       RendererUtils.restoreRendererState(this.renderer, state);
       renderTarget.dispose();
-      await this.setMode(previousMode);
     }
     const rowBytes = width * 4;
     const alignedBytesPerRow = Math.ceil(rowBytes / 256) * 256;
@@ -316,6 +349,13 @@ export class WebGPUFrostLab {
       });
     }
     return {
+      runtimeProfile: this.runtimeProfile,
+      performanceTimestampMode: this.runtimeProfile === "performance" ? "auto" : "disabled",
+      timestampQueriesRequired: this.runtimeProfile === "performance",
+      timestampQueriesRequested: this.runtimeProfile === "performance",
+      timestampQueriesActive: this.runtimeProfile === "performance" &&
+        this.renderer.backend?.trackTimestamp === true &&
+        this.renderer.hasFeature?.("timestamp-query") === true,
       owners: {
         renderer: "threejs-dynamic-surface-effects",
         scenePass: "host-scene",
@@ -343,23 +383,68 @@ export class WebGPUFrostLab {
   }
 
   getMetrics() {
+    const timestampQueriesRequested = this.runtimeProfile === "performance";
+    const timestampQueriesActive = timestampQueriesRequested &&
+      this.renderer.backend?.trackTimestamp === true &&
+      this.renderer.hasFeature?.("timestamp-query") === true;
+    const deviceIdentityVerified = this.rendererDevice !== null &&
+      this.rendererDevice === this.renderer.backend?.device;
+    const viewportSize = this.renderer.getSize(new Vector2());
     return {
       ...this.effect.getMetrics(),
       labId: FROST_LAB_ID,
+      threeRevision: REVISION,
+      runtimeProfile: this.runtimeProfile,
+      performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
+      timestampQueriesRequired: timestampQueriesRequested,
+      timestampQueriesRequested,
+      timestampQueriesActive,
+      nativeWebGPU: this.renderer.backend?.isWebGPUBackend === true,
+      initialized: this.initialized === true,
+      backend: "WebGPU",
+      backendKind: "WebGPU",
+      rendererBackend: "WebGPUBackend",
+      rendererDeviceStatus: this.rendererDeviceStatus,
+      rendererDeviceGeneration: this.rendererDeviceGeneration,
+      deviceLossGeneration: this.deviceLossGeneration,
+      deviceLostObserved: this.deviceLostObserved,
+      rendererBackendEvidence: {
+        backendKind: "WebGPU",
+        backendType: "WebGPUBackend",
+        isWebGPUBackend: this.renderer.backend?.isWebGPUBackend === true,
+        deviceIdentityVerified,
+        deviceIdentitySource: "exact retained renderer.backend.device reference after renderer.init()",
+        deviceType: this.rendererDevice?.constructor?.name || "GPUDevice",
+        lossPromiseObservedOnActualDevice: this.lossPromiseObservedOnActualDevice,
+        rendererDeviceGeneration: this.rendererDeviceGeneration,
+      },
+      rendererInfo: {
+        rendererType: "WebGPURenderer",
+        backendType: "WebGPUBackend",
+        threeRevision: REVISION,
+      },
       backendIsWebGPU: this.renderer.backend?.isWebGPUBackend === true,
       scenario: this.scenario,
       mechanism: this.mechanism,
       mode: this.mode,
       camera: this.cameraId,
       seed: this.seed,
+      timeSeconds: this.time,
+      viewport: {
+        width: viewportSize.x,
+        height: viewportSize.y,
+        dpr: this.renderer.getPixelRatio(),
+      },
     };
   }
 
   async dispose() {
     this.renderer?.setAnimationLoop(null);
+    this.rendererDeviceStatus = "disposing";
     this.effect?.dispose();
     this.backdrop?.dispose();
     this.renderer?.dispose();
+    this.rendererDeviceStatus = "disposed";
     this.disposed = true;
   }
 
