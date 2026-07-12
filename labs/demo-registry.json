@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:7c7a8f4d4b82624ffd727373613d5fcd794eafaa43c86d879aeb193b36928754",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -4660,7 +4660,7 @@
         {
           "id": "exact-skill-inventory",
           "required": true,
-          "evidence": "The suite asserts the exact unique 27-skill inventory against the authoritative repository directories.",
+          "evidence": "The suite asserts the exact unique 27-skill inventory against the authoritative completion target roster.",
           "status": "accepted"
         },
         {
@@ -4682,7 +4682,7 @@
         "validateQuick": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:quick",
         "validateFull": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:full"
       },
-      "sourceHash": "sha256:174cbf305f43878c96d871ce02cc473525a4a59f0a5b5a22058579b373290d58",
+      "sourceHash": "sha256:3caec204577db9315960f65d6064c8148bb666e3be242bfda304207af617cf1d",
       "proxyStatus": null,
       "nonRenderingScenarioSuite": true,
       "executionClass": "non-rendering",
@@ -6368,7 +6368,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:0bb41ba2af3832391ea865a8e8340abe745973b4aa3528a1598ff45c5b40d70b",
+      "sourceHash": "sha256:657f5bb669166fc4014d470e3a93b7623ebd34c1439f845a05f2c6b1e65f38dd",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -6445,7 +6445,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-water-optics/examples/webgpu-bounded-water run validate:generated-assets",
-      "sourceHash": "sha256:b839742fd56ef63d6196c30c354357b27cc1805b46dbea9587a08df3d1c00495",
+      "sourceHash": "sha256:18fe35f71a46ac8218484b4911479ed020241a31eef0b587f05cf835f3149026",
       "proxyStatus": {
         "limitation": "Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.",
         "canonicalLabId": "webgpu-bounded-water"
@@ -6845,7 +6845,7 @@
         "validateQuick": "npm --prefix integration-labs/weathered-world run validate:quick",
         "validateFull": "npm --prefix integration-labs/weathered-world run validate:full"
       },
-      "sourceHash": "sha256:26e74c4ec93d91b4a6550fd5cd45a48036576ebebac3565dd94704eefd6c6044",
+      "sourceHash": "sha256:fae24d4abbc31231ef68b7e3f32e3cb638722dee89e8dab4ec603fba7b900bfd",
       "proxyStatus": null,
       "notes": [
         "The atmosphere and cloud stages now contain the corrected live-input, bounded-domain, persistent-history, sampled-depth, radiometric, and source-level composition paths.",
@@ -7177,7 +7177,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:fb027f0dee11f916fabf2fb8147509a5c9829ad57b41b514bfc0a7e63551690d",
+      "sourceHash": "sha256:d1725ac7a36db55bb8e4252ef996224586bdecbd81c958a208cd1a266b610050",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -7196,6 +7196,7 @@
         "labs/schema/lab-manifest.schema.json",
         "labs/schema/physics-integration.schema.json",
         "labs/schema/runtime-graph.schema.json",
+        "labs/schema/tier-visual-evidence.schema.json",
         "scripts/capture-lab-browser.mjs",
         "scripts/lib/checked-json-schema.mjs",
         "scripts/lib/evidence-manifest-contract.mjs",
@@ -10493,7 +10494,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
+      "evidenceBundle": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
       "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
       "commands": {
         "check": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run check",
@@ -10504,7 +10505,7 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:full"
       },
-      "sourceHash": "sha256:e6ea9dcc3067a2e1575d988cae68898bb1d84324d296f7db9336b1abc25b2cd0",
+      "sourceHash": "sha256:94fd7c78aab7c890b6a87f8160a259ee624317a2c657a07b083d8122b41c4aff",
       "proxyStatus": null,
       "notes": [
         "Deep multi-subject, route, physics, workload, provenance, and visual-acceptance metadata is owned by corpus.contract.json.",
@@ -13454,7 +13455,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:1e1a50d6f63a2ca0930c75ea9f7b89502ccc00c4c1823dfb625ddba09bc2f9b9",
+      "sourceHash": "sha256:80c4faee8e9e77412b80556a29bf7e9016751eb72487dc46c4bcb639da70c604",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
