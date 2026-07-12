@@ -1,61 +1,9 @@
-import { deflateSync, inflateSync } from 'node:zlib';
-
-const PNG_SIGNATURE = Buffer.from( [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ] );
-
-let crcTable = null;
-
-function getCrcTable() {
-
-	if ( crcTable !== null ) return crcTable;
-
-	crcTable = new Uint32Array( 256 );
-
-	for ( let n = 0; n < 256; n ++ ) {
-
-		let c = n;
-
-		for ( let k = 0; k < 8; k ++ ) {
-
-			c = ( c & 1 ) ? ( 0xedb88320 ^ ( c >>> 1 ) ) : ( c >>> 1 );
-
-		}
-
-		crcTable[ n ] = c >>> 0;
-
-	}
-
-	return crcTable;
-
-}
-
-function crc32( buffer ) {
-
-	const table = getCrcTable();
-	let crc = 0xffffffff;
-
-	for ( const byte of buffer ) {
-
-		crc = table[ ( crc ^ byte ) & 0xff ] ^ ( crc >>> 8 );
-
-	}
-
-	return ( crc ^ 0xffffffff ) >>> 0;
-
-}
-
-function chunk( type, data ) {
-
-	const typeBuffer = Buffer.from( type, 'ascii' );
-	const length = Buffer.alloc( 4 );
-	const crc = Buffer.alloc( 4 );
-	const body = Buffer.concat( [ typeBuffer, data ] );
-
-	length.writeUInt32BE( data.length, 0 );
-	crc.writeUInt32BE( crc32( body ), 0 );
-
-	return Buffer.concat( [ length, typeBuffer, data, crc ] );
-
-}
+import {
+	compareRgbaPngs,
+	decodeRgbaPng,
+	encodeRgbaPng,
+	inspectRgbaPng
+} from '../../../../scripts/lib/png-rgba.mjs';
 
 export function createRgbaPng( width, height, pixelAt ) {
 
@@ -64,57 +12,29 @@ export function createRgbaPng( width, height, pixelAt ) {
 		throw new Error( 'PNG dimensions must be positive integers.' );
 
 	}
+	if ( typeof pixelAt !== 'function' ) throw new TypeError( 'PNG pixel callback is required.' );
+	const data = new Uint8Array( width * height * 4 );
+	for ( let y = 0; y < height; y ++ ) for ( let x = 0; x < width; x ++ ) {
 
-	const scanlineLength = 1 + width * 4;
-	const raw = Buffer.alloc( scanlineLength * height );
-
-	for ( let y = 0; y < height; y ++ ) {
-
-		const rowOffset = y * scanlineLength;
-		raw[ rowOffset ] = 0;
-
-		for ( let x = 0; x < width; x ++ ) {
-
-			const [ r, g, b, a ] = pixelAt( x, y );
-			const pixelOffset = rowOffset + 1 + x * 4;
-			raw[ pixelOffset + 0 ] = r;
-			raw[ pixelOffset + 1 ] = g;
-			raw[ pixelOffset + 2 ] = b;
-			raw[ pixelOffset + 3 ] = a;
-
-		}
+		data.set( pixelAt( x, y ), ( y * width + x ) * 4 );
 
 	}
-
-	const header = Buffer.alloc( 13 );
-	header.writeUInt32BE( width, 0 );
-	header.writeUInt32BE( height, 4 );
-	header[ 8 ] = 8;
-	header[ 9 ] = 6;
-	header[ 10 ] = 0;
-	header[ 11 ] = 0;
-	header[ 12 ] = 0;
-
-	return Buffer.concat( [
-		PNG_SIGNATURE,
-		chunk( 'IHDR', header ),
-		chunk( 'IDAT', deflateSync( raw ) ),
-		chunk( 'IEND', Buffer.alloc( 0 ) )
-	] );
+	return encodeRgbaPng( { width, height, data } );
 
 }
 
 export function createDiagnosticPng( width = 96, height = 64, mode = 'final' ) {
 
 	const modeHash = [ ...mode ].reduce( ( sum, char ) => sum + char.charCodeAt( 0 ), 0 );
-
 	return createRgbaPng( width, height, ( x, y ) => {
 
 		const grid = ( ( Math.floor( x / 8 ) + Math.floor( y / 8 ) ) % 2 ) * 22;
-		const r = ( 48 + x * 3 + modeHash + grid ) % 256;
-		const g = ( 72 + y * 4 + modeHash * 2 ) % 256;
-		const b = ( 96 + x + y * 2 + modeHash * 3 ) % 256;
-		return [ r, g, b, 255 ];
+		return [
+			( 48 + x * 3 + modeHash + grid ) % 256,
+			( 72 + y * 4 + modeHash * 2 ) % 256,
+			( 96 + x + y * 2 + modeHash * 3 ) % 256,
+			255
+		];
 
 	} );
 
@@ -122,230 +42,27 @@ export function createDiagnosticPng( width = 96, height = 64, mode = 'final' ) {
 
 export function decodeGeneratedRgbaPng( buffer ) {
 
-	if ( Buffer.isBuffer( buffer ) === false || buffer.length < PNG_SIGNATURE.length + 12 || buffer.subarray( 0, PNG_SIGNATURE.length ).equals( PNG_SIGNATURE ) === false ) {
-
-		throw new Error( 'Expected PNG signature.' );
-
-	}
-
-	let offset = PNG_SIGNATURE.length;
-	let width = 0;
-	let height = 0;
-	const idatChunks = [];
-	let sawHeader = false;
-	let sawImageData = false;
-	let sawEnd = false;
-
-	while ( offset < buffer.length ) {
-
-		if ( offset + 12 > buffer.length ) throw new Error( 'PNG chunk header is truncated.' );
-		const length = buffer.readUInt32BE( offset );
-		const type = buffer.toString( 'ascii', offset + 4, offset + 8 );
-		const dataStart = offset + 8;
-		const dataEnd = dataStart + length;
-		const chunkEnd = dataEnd + 4;
-		if ( chunkEnd > buffer.length ) throw new Error( `PNG ${ type || '<unknown>' } chunk is truncated.` );
-		const data = buffer.subarray( dataStart, dataEnd );
-		const expectedCrc = buffer.readUInt32BE( dataEnd );
-		const actualCrc = crc32( Buffer.concat( [ Buffer.from( type, 'ascii' ), data ] ) );
-		if ( expectedCrc !== actualCrc ) throw new Error( `PNG ${ type } chunk CRC mismatch.` );
-
-		if ( type === 'IHDR' ) {
-
-			if ( sawHeader || offset !== PNG_SIGNATURE.length || length !== 13 ) throw new Error( 'PNG must contain exactly one leading 13-byte IHDR chunk.' );
-			width = data.readUInt32BE( 0 );
-			height = data.readUInt32BE( 4 );
-			if ( width <= 0 || height <= 0 || Number.isSafeInteger( width * height ) === false || width * height > 64 * 1024 * 1024 ) throw new Error( 'PNG dimensions are invalid or exceed the evidence decoder limit.' );
-
-			if ( data[ 8 ] !== 8 || data[ 9 ] !== 6 || data[ 10 ] !== 0 || data[ 11 ] !== 0 || data[ 12 ] !== 0 ) {
-
-				throw new Error( 'Only non-interlaced 8-bit RGBA PNGs are supported by this harness check.' );
-
-			}
-			sawHeader = true;
-
-		} else if ( type === 'IDAT' ) {
-
-			if ( sawHeader === false || sawEnd ) throw new Error( 'PNG IDAT chunk is out of order.' );
-			idatChunks.push( data );
-			sawImageData = true;
-
-		} else if ( type === 'IEND' ) {
-
-			if ( sawHeader === false || sawImageData === false || length !== 0 ) throw new Error( 'PNG IEND chunk is invalid or precedes image data.' );
-			sawEnd = true;
-			offset = chunkEnd;
-			break;
-
-		} else if ( type[ 0 ] === type[ 0 ].toUpperCase() ) {
-
-			throw new Error( `Unsupported critical PNG chunk ${ type }.` );
-
-		}
-
-		offset = chunkEnd;
-
-	}
-	if ( sawHeader === false || sawImageData === false || sawEnd === false ) throw new Error( 'PNG is missing IHDR, IDAT, or IEND.' );
-	if ( offset !== buffer.length ) throw new Error( 'PNG contains trailing bytes after IEND.' );
-
-	const raw = inflateSync( Buffer.concat( idatChunks ) );
-	const expectedLength = height * ( 1 + width * 4 );
-
-	if ( raw.length !== expectedLength ) {
-
-		throw new Error( `Unexpected PNG payload length: ${ raw.length } !== ${ expectedLength }.` );
-
-	}
-
+	const { width, height, raw } = decodeRgbaPng( buffer );
 	return { width, height, raw };
 
 }
 
 export function decodeGeneratedRgbaPixels( buffer ) {
 
-	const { width, height, raw } = decodeGeneratedRgbaPng( buffer );
-	const bytesPerPixel = 4;
-	const rowBytes = width * bytesPerPixel;
-	const scanlineLength = 1 + rowBytes;
-	const pixels = Buffer.alloc( rowBytes * height );
-
-	for ( let y = 0; y < height; y ++ ) {
-
-		const rowOffset = y * scanlineLength;
-		const filter = raw[ rowOffset ];
-		const sourceOffset = rowOffset + 1;
-		const targetOffset = y * rowBytes;
-		const previousOffset = targetOffset - rowBytes;
-
-		for ( let x = 0; x < rowBytes; x ++ ) {
-
-			const source = raw[ sourceOffset + x ];
-			const left = x >= bytesPerPixel ? pixels[ targetOffset + x - bytesPerPixel ] : 0;
-			const up = y > 0 ? pixels[ previousOffset + x ] : 0;
-			const upLeft = y > 0 && x >= bytesPerPixel ? pixels[ previousOffset + x - bytesPerPixel ] : 0;
-			let value;
-
-			if ( filter === 0 ) {
-
-				value = source;
-
-			} else if ( filter === 1 ) {
-
-				value = source + left;
-
-			} else if ( filter === 2 ) {
-
-				value = source + up;
-
-			} else if ( filter === 3 ) {
-
-				value = source + Math.floor( ( left + up ) / 2 );
-
-			} else if ( filter === 4 ) {
-
-				const p = left + up - upLeft;
-				const pa = Math.abs( p - left );
-				const pb = Math.abs( p - up );
-				const pc = Math.abs( p - upLeft );
-				const predictor = pa <= pb && pa <= pc ? left : pb <= pc ? up : upLeft;
-				value = source + predictor;
-
-			} else {
-
-				throw new Error( `Unsupported PNG row filter ${ filter }.` );
-
-			}
-
-			pixels[ targetOffset + x ] = value & 0xff;
-
-		}
-
-	}
-
+	const { width, height, pixels } = decodeRgbaPng( buffer );
 	return { width, height, pixels };
 
 }
 
 export function compareGeneratedRgbaPngs( baselineBuffer, candidateBuffer ) {
 
-	const baseline = decodeGeneratedRgbaPixels( baselineBuffer );
-	const candidate = decodeGeneratedRgbaPixels( candidateBuffer );
-
-	if ( baseline.width !== candidate.width || baseline.height !== candidate.height ) {
-
-		throw new Error( `PNG dimensions differ: ${ baseline.width }x${ baseline.height } !== ${ candidate.width }x${ candidate.height }.` );
-
-	}
-
-	let differingPixels = 0;
-	let maxChannelDelta = 0;
-
-	for ( let index = 0; index < baseline.pixels.length; index += 4 ) {
-
-		let pixelDiffers = false;
-
-		for ( let channel = 0; channel < 4; channel ++ ) {
-
-			const delta = Math.abs( baseline.pixels[ index + channel ] - candidate.pixels[ index + channel ] );
-			maxChannelDelta = Math.max( maxChannelDelta, delta );
-
-			if ( delta > 0 ) {
-
-				pixelDiffers = true;
-
-			}
-
-		}
-
-		if ( pixelDiffers ) differingPixels ++;
-
-	}
-
-	const totalPixels = baseline.width * baseline.height;
-
-	return {
-		width: baseline.width,
-		height: baseline.height,
-		totalPixels,
-		differingPixels,
-		ratio: differingPixels / totalPixels,
-		maxChannelDelta
-	};
+	return compareRgbaPngs( baselineBuffer, candidateBuffer );
 
 }
 
 export function assertNonBlankGeneratedPng( buffer, pathLabel = 'PNG' ) {
 
-	const { width, height, pixels } = decodeGeneratedRgbaPixels( buffer );
-	let min = 255;
-	let max = 0;
-	let opaquePixels = 0;
-
-	for ( let y = 0; y < height; y ++ ) {
-
-		for ( let x = 0; x < width; x ++ ) {
-
-			const pixelOffset = ( y * width + x ) * 4;
-			const r = pixels[ pixelOffset + 0 ];
-			const g = pixels[ pixelOffset + 1 ];
-			const b = pixels[ pixelOffset + 2 ];
-			const a = pixels[ pixelOffset + 3 ];
-
-			min = Math.min( min, r, g, b );
-			max = Math.max( max, r, g, b );
-			if ( a > 0 ) opaquePixels ++;
-
-		}
-
-	}
-
-	if ( opaquePixels === 0 || max - min < 8 ) {
-
-		throw new Error( `${ pathLabel } is blank or effectively flat.` );
-
-	}
-
+	const { width, height, min, max, opaquePixels } = inspectRgbaPng( buffer, pathLabel );
 	return { width, height, min, max, opaquePixels };
 
 }
