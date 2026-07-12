@@ -33,7 +33,7 @@
       "frameTargetMs": null,
       "resolutionPolicy": { "dprCap": 2, "bloomScale": 0.5 },
       "mechanismLimits": { "normalStrength": 1, "varianceScale": 1 },
-      "resourceLimits": { "validationMrtAttachments": 7, "gpuTimingRequiredForAcceptance": true },
+      "resourceLimits": { "productionMrtAttachments": 2, "identityDiagnosticMrtAttachments": 3, "surfaceDiagnosticMrtAttachments": 4, "diagnosticScenePassesWhenSelected": 2, "gpuTimingRequiredForAcceptance": true },
       "degradationFromPrevious": [],
       "preservedInvariants": ["PBR identity", "shared causes", "dissolve parity", "color-space ownership"],
       "acceptanceStatus": "incomplete"
@@ -44,7 +44,7 @@
       "frameTargetMs": null,
       "resolutionPolicy": { "dprCap": 1.5, "bloomScale": 0.33 },
       "mechanismLimits": { "normalStrength": 0.8, "varianceScale": 1 },
-      "resourceLimits": { "validationMrtAttachments": 7, "gpuTimingRequiredForAcceptance": true },
+      "resourceLimits": { "productionMrtAttachments": 2, "identityDiagnosticMrtAttachments": 3, "surfaceDiagnosticMrtAttachments": 4, "diagnosticScenePassesWhenSelected": 2, "gpuTimingRequiredForAcceptance": true },
       "degradationFromPrevious": ["reduce DPR cap", "reduce bloom resolution", "attenuate micro-normal amplitude"],
       "preservedInvariants": ["PBR identity", "shared causes", "dissolve parity", "color-space ownership"],
       "acceptanceStatus": "incomplete"
@@ -55,7 +55,7 @@
       "frameTargetMs": null,
       "resolutionPolicy": { "dprCap": 1, "bloomScale": 0.25 },
       "mechanismLimits": { "normalStrength": 0.55, "varianceScale": 1.15 },
-      "resourceLimits": { "validationMrtAttachments": 7, "gpuTimingRequiredForAcceptance": true },
+      "resourceLimits": { "productionMrtAttachments": 2, "identityDiagnosticMrtAttachments": 3, "surfaceDiagnosticMrtAttachments": 4, "diagnosticScenePassesWhenSelected": 2, "gpuTimingRequiredForAcceptance": true },
       "degradationFromPrevious": ["reduce DPR cap", "reduce bloom resolution", "further attenuate unresolved normal detail"],
       "preservedInvariants": ["PBR identity", "shared causes", "dissolve parity", "color-space ownership"],
       "acceptanceStatus": "incomplete"

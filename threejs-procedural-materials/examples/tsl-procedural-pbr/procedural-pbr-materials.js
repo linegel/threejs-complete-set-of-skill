@@ -45,6 +45,15 @@ import {
   vec4,
 } from "three/tsl";
 
+import {
+  evaluateDissolveVisibility,
+  hashMaterialSeed,
+  materialSeedPhase,
+  resolveAtlasTileTransform,
+} from "./pbr-oracles.mjs";
+
+export { evaluateDissolveVisibility } from "./pbr-oracles.mjs";
+
 export const TRIPLANAR_COST_NOTE =
   "Three.js r185 triplanar projection executes 3 filtered texture operations per input texture; reserve it for UV-less or seam-intolerant close inspection and account for every PBR texture.";
 
@@ -331,6 +340,11 @@ export function createAtlasArrayTriplanarMaterials({ atlas, textureArray, tripla
   if (!atlas?.isDataTexture || !textureArray?.isDataArrayTexture || !triplanarMap?.isDataTexture) {
     throw new Error("atlas, textureArray, and triplanarMap must be live texture resources");
   }
+  for (const [name, textureValue] of Object.entries({ atlas, textureArray, triplanarMap })) {
+    if (textureValue.colorSpace !== SRGBColorSpace) {
+      throw new Error(`${name} must declare SRGBColorSpace because it supplies material color`);
+    }
+  }
   const tile = createAtlasTileUvNode({
     atlasWidth: atlas.image.width,
     atlasHeight: atlas.image.height,
@@ -343,6 +357,7 @@ export function createAtlasArrayTriplanarMaterials({ atlas, textureArray, tripla
   atlasMaterial.name = "mip-safe atlas material";
   atlasMaterial.colorNode = texture(atlas, tile.node).rgb;
   atlasMaterial.userData.projectionLedger = describeProjectionLedger({ projection: "uv", colorTextures: 1, dataTextures: 0 });
+  atlasMaterial.userData.atlasTileTransform = tile.transform;
 
   const layerNode = int(attribute("instanceTextureLayer", "float"));
   const arrayMaterial = new MeshStandardNodeMaterial({ roughness: 0.52, metalness: 0 });
@@ -350,10 +365,12 @@ export function createAtlasArrayTriplanarMaterials({ atlas, textureArray, tripla
   arrayMaterial.colorNode = texture(textureArray).sample(uv()).depth(layerNode).rgb;
   arrayMaterial.userData.projectionLedger = describeProjectionLedger({ projection: "uv", colorTextures: 1, dataTextures: 0 });
 
+  const triplanarProjection = createTriplanarProjectionNode(triplanarMap, { scale: 0.72 });
   const triplanarMaterial = new MeshStandardNodeMaterial({ roughness: 0.6, metalness: 0 });
   triplanarMaterial.name = "three-axis triplanar material";
-  triplanarMaterial.colorNode = createTriplanarProjectionNode(triplanarMap, { scale: 0.72 }).node.rgb;
-  triplanarMaterial.userData.projectionLedger = describeProjectionLedger({ projection: "triplanar", colorTextures: 1, dataTextures: 0 });
+  triplanarMaterial.colorNode = triplanarProjection.node.rgb;
+  triplanarMaterial.userData.projectionLedger = triplanarProjection.ledger;
+  triplanarMaterial.userData.projectionContract = triplanarProjection.contract;
   return Object.freeze({ atlasMaterial, arrayMaterial, triplanarMaterial });
 }
 
@@ -375,14 +392,6 @@ export function evaluateFilteredBinaryMetalness(cause, footprint, threshold = 0.
   if (cause <= low) return 0;
   if (cause >= high) return 1;
   const t = (cause - low) / (high - low);
-  return t * t * (3 - 2 * t);
-}
-
-export function evaluateDissolveVisibility(cause, threshold, footprint) {
-  if (![cause, threshold, footprint].every(Number.isFinite) || footprint <= 0) {
-    throw new Error("dissolve inputs must be finite with positive footprint");
-  }
-  const t = Math.min(1, Math.max(0, (cause - threshold) / footprint));
   return t * t * (3 - 2 * t);
 }
 
@@ -449,6 +458,8 @@ export function describeProjectionLedger({
     projectionCount,
     sampledTextureBindings: colorTextures + dataTextures + normalTextures,
     executedSamples: projectionCount * (colorTextures + dataTextures + normalTextures) * manualTaps,
+    provenance: "Derived from the selected projection multiplicity and texture/tap counts",
+    compiledShaderEvidence: "INSUFFICIENT_EVIDENCE",
   });
 }
 
@@ -460,25 +471,17 @@ export function createAtlasTileUvNode({
   tileIndex,
   gutterTexels,
 }) {
-  if (!Number.isInteger(tileIndex) || tileIndex < 0 || tileIndex >= columns * rows) {
-    throw new Error("tileIndex is outside the atlas grid");
-  }
-  const tileWidth = atlasWidth / columns;
-  const tileHeight = atlasHeight / rows;
-  if (gutterTexels * 2 >= tileWidth || gutterTexels * 2 >= tileHeight) {
-    throw new Error("atlas gutter consumes the tile interior");
-  }
-  const tileX = tileIndex % columns;
-  const tileY = Math.floor(tileIndex / columns);
-  const origin = vec2(
-    (tileX * tileWidth + gutterTexels) / atlasWidth,
-    (tileY * tileHeight + gutterTexels) / atlasHeight,
-  );
-  const span = vec2(
-    (tileWidth - 2 * gutterTexels) / atlasWidth,
-    (tileHeight - 2 * gutterTexels) / atlasHeight,
-  );
-  return Object.freeze({ node: origin.add(uv().mul(span)), origin, span });
+  const transform = resolveAtlasTileTransform({
+    atlasWidth,
+    atlasHeight,
+    columns,
+    rows,
+    tileIndex,
+    gutterTexels,
+  });
+  const origin = vec2(...transform.origin);
+  const span = vec2(...transform.span);
+  return Object.freeze({ node: origin.add(uv().mul(span)), origin, span, transform });
 }
 
 export const authoredLavaIdentity = {
@@ -549,6 +552,8 @@ export function validateProceduralPbrConfig({
   coordinateScale = 1,
   coordinateMode = "object",
   seed = 1,
+  debugMode = "final",
+  normalStrength = 1,
   emissionIntensity = 0,
   sceneUnitsPerMeter = 1,
   specularVarianceScale = 1,
@@ -584,6 +589,12 @@ export function validateProceduralPbrConfig({
   }
   if (!Number.isFinite(seed)) {
     errors.push("seed must be finite");
+  }
+  if (!proceduralPbrDebugModes.has(debugMode)) {
+    errors.push(`debugMode must be one of ${[...proceduralPbrDebugModes.keys()].join(", ")}`);
+  }
+  if (!Number.isFinite(normalStrength) || normalStrength < 0) {
+    errors.push("normalStrength must be finite and non-negative");
   }
   if (!Number.isFinite(emissionIntensity) || emissionIntensity < 0) {
     errors.push("emissionIntensity must be finite and non-negative in scene-linear units");
@@ -625,7 +636,8 @@ function createMaterialUniforms({
   flowTime = 0,
 } = {}) {
   return {
-    seed: uniform(seed),
+    seed: uniform(materialSeedPhase(seed, 0)),
+    authoredSeed: seed >>> 0,
     coordinateScale: uniform(coordinateScale),
     debugMode: uniform(proceduralPbrDebugModes.get(debugMode) ?? 0, "int"),
     specularVarianceScale: uniform(specularVarianceScale),
@@ -936,8 +948,13 @@ function finalizePhysicalMaterial({
       dissolve.mask,
     ),
     materialNormal: vec4(normalNode.mul(0.5).add(0.5), 1),
-    materialFootprint: vec4(vec3(fields.footprint), 1),
-    materialNormalVariance: vec4(vec3(specular.normalVariance), 1),
+    materialFootprint: vec4(fields.footprint, fields.footprint, fields.footprint, 1),
+    materialNormalVariance: vec4(
+      specular.normalVariance.mul(96),
+      specular.normalVariance.mul(96),
+      specular.normalVariance.mul(96),
+      1,
+    ),
   });
   material.userData.proceduralPbr = {
     uniforms,
@@ -977,9 +994,15 @@ function createWoodLikeMaterial(identity, {
     identity,
     coordinateScale,
     coordinateMode,
+    seed,
+    debugMode,
+    normalStrength,
     sceneUnitsPerMeter,
     specularVarianceScale,
   });
+  if (triplanarMap && triplanarMap.colorSpace !== SRGBColorSpace) {
+    throw new Error("wood triplanarMap must declare SRGBColorSpace because it supplies material color");
+  }
   const uniforms = createMaterialUniforms({
     seed,
     coordinateScale,
@@ -1054,6 +1077,9 @@ export function createAntiqueGoldPbrMaterial({
     identity,
     coordinateScale,
     coordinateMode,
+    seed,
+    debugMode,
+    normalStrength,
     sceneUnitsPerMeter,
     specularVarianceScale,
   });
@@ -1128,10 +1154,14 @@ export function createWetRockPbrMaterial({
   waterlineWorldY = 0.45,
 } = {}) {
   const identity = authoredPbrIdentities.wetRock;
+  if (!Number.isFinite(waterlineWorldY)) throw new Error("waterlineWorldY must be finite");
   validateProceduralPbrConfig({
     identity,
     coordinateScale,
     coordinateMode: "world",
+    seed,
+    debugMode,
+    normalStrength,
     sceneUnitsPerMeter,
     specularVarianceScale,
   });
@@ -1238,9 +1268,14 @@ export function createLavaEmissivePbrMaterial({
   causeMap = null,
   emissionIntensity = authoredLavaIdentity.emissionIntensity,
 } = {}) {
+  if (!Number.isFinite(flowSpeed)) throw new Error("flowSpeed must be finite");
+  if (!Number.isFinite(flowTime)) throw new Error("flowTime must be finite");
   validateProceduralPbrConfig({
     coordinateScale,
     coordinateMode,
+    seed,
+    debugMode,
+    normalStrength,
     emissionIntensity,
     sceneUnitsPerMeter,
     specularVarianceScale,
@@ -1312,8 +1347,13 @@ export function createLavaEmissivePbrMaterial({
     materialAlbedo: vec4(colorNode, 1),
     materialParams: vec4(specular.filteredRoughness, 0, 0, dissolve.mask),
     materialNormal: vec4(normalNode.mul(0.5).add(0.5), 1),
-    materialFootprint: vec4(vec3(fields.footprint), 1),
-    materialNormalVariance: vec4(vec3(specular.normalVariance), 1),
+    materialFootprint: vec4(fields.footprint, fields.footprint, fields.footprint, 1),
+    materialNormalVariance: vec4(
+      specular.normalVariance.mul(96),
+      specular.normalVariance.mul(96),
+      specular.normalVariance.mul(96),
+      1,
+    ),
   });
   material.userData.proceduralPbr = {
     uniforms,
@@ -1343,10 +1383,28 @@ export function createTriplanarProjectionNode(textureSource, {
   positionNode = positionLocal,
   normalNode = normalLocal,
 } = {}) {
-  return {
-    node: triplanarTexture(texture(textureSource), null, null, float(scale), positionNode, normalNode),
+  if (!textureSource?.isTexture) throw new TypeError("triplanar projection requires a live texture");
+  if (!(Number.isFinite(scale) && scale > 0)) throw new RangeError("triplanar projection scale must be positive");
+  const node = triplanarTexture(texture(textureSource), null, null, float(scale), positionNode, normalNode);
+  const ledger = describeProjectionLedger({
+    projection: "triplanar",
+    colorTextures: 1,
+    dataTextures: 0,
+    normalTextures: 0,
+  });
+  return Object.freeze({
+    node,
+    ledger,
     costNote: TRIPLANAR_COST_NOTE,
-  };
+    contract: Object.freeze({
+      nodeOwner: "three/tsl triplanarTexture",
+      sourceTextureUuid: textureSource.uuid,
+      sourceTextureName: textureSource.name,
+      scale,
+      filteredOperations: ledger.executedSamples,
+      compiledShaderEvidence: "INSUFFICIENT_EVIDENCE",
+    }),
+  });
 }
 
 function createTriplanarWeights(normalNode) {
@@ -1359,17 +1417,34 @@ export function createInstancedDissolveAttributes(instanceCount, {
   initialDissolve = 0,
   variantSeed = 1,
 } = {}) {
+  if (!Number.isInteger(instanceCount) || instanceCount <= 0) {
+    throw new RangeError("instanceCount must be a positive integer");
+  }
+  if (!(Number.isFinite(initialDissolve) && initialDissolve >= 0 && initialDissolve <= 1)) {
+    throw new RangeError("initialDissolve must be inside [0,1]");
+  }
+  if (!Number.isInteger(variantSeed) || variantSeed < 0 || variantSeed > 0xffffffff) {
+    throw new RangeError("variantSeed must be a uint32 integer");
+  }
   const dissolve = new StorageInstancedBufferAttribute(instanceCount, 1);
   const variant = new StorageInstancedBufferAttribute(instanceCount, 1);
 
   for (let i = 0; i < instanceCount; i++) {
     dissolve.array[i] = initialDissolve;
-    variant.array[i] = (((i + 1) * 1103515245 + variantSeed * 12345) >>> 0) / 4294967295;
+    variant.array[i] = hashMaterialSeed(variantSeed, i) / 0xffffffff;
   }
 
   return {
     dissolve,
     variant,
+    resourceContract: Object.freeze({
+      count: instanceCount,
+      bytes: dissolve.array.byteLength + variant.array.byteLength,
+      storageCapable: true,
+      shaderReadPath: "instanced vertex attributes",
+      computeDispatches: 0,
+      provenance: "Derived from live StorageInstancedBufferAttribute arrays",
+    }),
     attachTo(geometry) {
       geometry.setAttribute("instanceDissolve", dissolve);
       geometry.setAttribute("instanceVariant", variant);
@@ -1404,7 +1479,6 @@ export function setProceduralPbrDebugMode(material, debugMode) {
     throw new Error(`Unknown procedural PBR debug mode "${debugMode}"`);
   }
   state.uniforms.debugMode.value = proceduralPbrDebugModes.get(debugMode);
-  material.needsUpdate = true;
   return true;
 }
 

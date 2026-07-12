@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { Color, DataTexture, NoColorSpace, SRGBColorSpace } from "three/webgpu";
+import { BufferGeometry, Color, DataTexture, NoColorSpace, SRGBColorSpace } from "three/webgpu";
 
 import { alignedBytesPerRow, requiredPaddedByteLength } from "../../../labs/runtime/aligned-readback.mjs";
 import {
@@ -14,12 +14,14 @@ import {
   authoredPbrIdentities,
   createAntiqueGoldPbrMaterial,
   createAtlasArrayTriplanarMaterials,
+  createAtlasTileUvNode,
   createEbonyFramePbrMaterial,
   createInstancedDissolveAttributes,
   createLavaEmissivePbrMaterial,
   createMaterialTextureArray,
   createMipSafeMaterialAtlas,
   createTriplanarMaterialTexture,
+  createTriplanarProjectionNode,
   createWalnutPbrMaterial,
   createWetRockPbrMaterial,
   describeProjectionLedger,
@@ -37,6 +39,19 @@ import {
   validateAtlasGutterContract,
   validateProceduralPbrConfig,
 } from "./procedural-pbr-materials.js";
+import {
+  computeRgbaReadbackLayout,
+  computeRgba8ReadbackLayout,
+  evaluateAtlasUv,
+  evaluateBandLimitSample,
+  evaluateColorAttachmentBudget,
+  evaluateDissolveMaskParity,
+  evaluateFilteredRoughness,
+  evaluateTriplanarWeights,
+  hashMaterialSeed,
+  materialSeedPhase,
+  resolveAtlasTileTransform,
+} from "./pbr-oracles.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const assetRoot = resolve(here, "../../assets/generated-variants");
@@ -111,6 +126,38 @@ function validateLiveProjectionResources() {
     assert.equal(materials.atlasMaterial.userData.projectionLedger.executedSamples, 1);
     assert.equal(materials.arrayMaterial.userData.projectionLedger.executedSamples, 1);
     assert.equal(materials.triplanarMaterial.userData.projectionLedger.executedSamples, 3);
+    assert.equal(materials.triplanarMaterial.userData.projectionLedger.compiledShaderEvidence, "INSUFFICIENT_EVIDENCE");
+    assert.equal(materials.triplanarMaterial.userData.projectionContract.sourceTextureUuid, triplanarMap.uuid);
+    assert.equal(materials.triplanarMaterial.userData.projectionContract.filteredOperations, 3);
+    const projection = createTriplanarProjectionNode(triplanarMap, { scale: 0.72 });
+    assert.equal(projection.node.isNode, true, "triplanar projection is not a live TSL node");
+    assert.equal(projection.node.node?.isShaderCallNodeInternal, true, "triplanar projection does not reach the r185 shader call");
+    assert.equal(projection.contract.compiledShaderEvidence, "INSUFFICIENT_EVIDENCE");
+
+    for (let tileIndex = 0; tileIndex < MATERIAL_ATLAS_CONTRACT.columns * MATERIAL_ATLAS_CONTRACT.rows; tileIndex++) {
+      const transform = resolveAtlasTileTransform({
+        atlasWidth: MATERIAL_ATLAS_CONTRACT.width,
+        atlasHeight: MATERIAL_ATLAS_CONTRACT.height,
+        columns: MATERIAL_ATLAS_CONTRACT.columns,
+        rows: MATERIAL_ATLAS_CONTRACT.rows,
+        tileIndex,
+        gutterTexels: MATERIAL_ATLAS_CONTRACT.baseGutterTexels,
+      });
+      const nodeTransform = createAtlasTileUvNode({
+        atlasWidth: MATERIAL_ATLAS_CONTRACT.width,
+        atlasHeight: MATERIAL_ATLAS_CONTRACT.height,
+        columns: MATERIAL_ATLAS_CONTRACT.columns,
+        rows: MATERIAL_ATLAS_CONTRACT.rows,
+        tileIndex,
+        gutterTexels: MATERIAL_ATLAS_CONTRACT.baseGutterTexels,
+      }).transform;
+      assert.deepEqual(nodeTransform, transform, "atlas node and CPU transform contracts diverged");
+      const minimum = evaluateAtlasUv(transform, [0, 0]);
+      const maximum = evaluateAtlasUv(transform, [1, 1]);
+      assert(minimum[0] >= tileIndex % 2 * 0.5 && minimum[1] >= Math.floor(tileIndex / 2) * 0.5);
+      assert(maximum[0] <= (tileIndex % 2 + 1) * 0.5 && maximum[1] <= (Math.floor(tileIndex / 2) + 1) * 0.5);
+      assert.deepEqual(transform.gradientScale, transform.span, "atlas gradients must inherit tile scale");
+    }
     Object.values(materials).forEach((material) => material.dispose());
     return {
       atlasMipCount: atlas.mipmaps.length,
@@ -169,7 +216,31 @@ function validateDissolveParity() {
     const attributes = createInstancedDissolveAttributes(32, { variantSeed: 41 });
     assert.equal(attributes.dissolve.count, 32);
     assert.equal(attributes.variant.count, 32);
+    assert.equal(attributes.dissolve.isStorageInstancedBufferAttribute, true);
+    assert.equal(attributes.variant.isStorageInstancedBufferAttribute, true);
+    assert.equal(attributes.resourceContract.storageCapable, true);
+    assert.equal(attributes.resourceContract.shaderReadPath, "instanced vertex attributes");
+    assert.equal(attributes.resourceContract.computeDispatches, 0);
+    const geometry = attributes.attachTo(new BufferGeometry());
+    assert.strictEqual(geometry.getAttribute("instanceDissolve"), attributes.dissolve);
+    assert.strictEqual(geometry.getAttribute("instanceVariant"), attributes.variant);
     assert(new Set(attributes.variant.array).size > 24, "instance variants collapsed to repeated values");
+    const causes = Array.from({ length: 1025 }, (_, index) => index / 1024);
+    const exactParity = evaluateDissolveMaskParity({
+      causeSamples: causes,
+      visibleThreshold: 0.42,
+      shadowThreshold: 0.42,
+      footprint: 0.035,
+    });
+    assert.equal(exactParity.iou, 1);
+    assert.equal(exactParity.mismatchCount, 0);
+    const biasedShadow = evaluateDissolveMaskParity({
+      causeSamples: causes,
+      visibleThreshold: 0.42,
+      shadowThreshold: 0.47,
+      footprint: 0.035,
+    });
+    assert(biasedShadow.iou < 0.98, "dissolve IoU oracle cannot detect a biased shadow threshold");
     for (let index = 0; index <= 512; index++) {
       const cause = index / 512;
       const threshold = 0.42;
@@ -179,10 +250,11 @@ function validateDissolveParity() {
       assert.equal(visible, shadow, `dissolve visible/shadow oracle diverged at ${cause}`);
       assert(visible >= 0 && visible <= 1);
     }
+    geometry.dispose();
   } finally {
     walnut.dispose();
   }
-  return "shared-node-and-f32-oracle-passed";
+  return "shared-node-storage-capable-attributes-and-iou-oracle-passed";
 }
 
 function integrateSchlickFurnace(f0, samples = 200_000) {
@@ -195,18 +267,117 @@ function integrateSchlickFurnace(f0, samples = 200_000) {
   return integral / samples;
 }
 
-function validateFurnaceApproximation() {
+function validateSchlickFresnelIntegral() {
   for (const f0 of [0.020373, 0.04, 0.36, 0.78]) {
     const numeric = integrateSchlickFurnace(f0);
     const analytic = f0 + (1 - f0) / 21;
-    assert(Math.abs(numeric - analytic) < 2e-10, `Schlick furnace quadrature failed for F0=${f0}`);
-    assert(numeric >= 0 && numeric <= 1, `Schlick furnace energy escaped [0,1] for F0=${f0}`);
+    assert(Math.abs(numeric - analytic) < 2e-10, `Schlick Fresnel quadrature failed for F0=${f0}`);
+    assert(numeric >= 0 && numeric <= 1, `Schlick Fresnel integral escaped [0,1] for F0=${f0}`);
   }
   for (const identity of Object.values(authoredPbrIdentities)) {
     const reflectance = new Color(identity.baseColor);
     assert([reflectance.r, reflectance.g, reflectance.b].every((channel) => channel >= 0 && channel <= 1));
   }
-  return "schlick-hemisphere-quadrature-passed";
+  return "schlick-fresnel-integral-only-not-node-material-furnace-acceptance";
+}
+
+function validateSpecularFilterOracle() {
+  const supportMultiplier = 2;
+  const surfacePixelSpan = 0.01;
+  const heightHalfAmplitude = 0.0004;
+  const slopeVarianceCalibration = 1.25;
+  let previousKeep = 1;
+  for (let index = 0; index <= 100; index++) {
+    const coordinateFootprint = index * 0.003;
+    const sample = evaluateBandLimitSample({
+      coordinateFootprint,
+      surfacePixelSpan,
+      heightHalfAmplitude,
+      supportMultiplier,
+      slopeVarianceCalibration,
+    });
+    assert(Number.isFinite(sample.removedSlopeVariance) && sample.removedSlopeVariance >= 0);
+    assert(sample.keep <= previousKeep + 1e-15, "band retention must be monotone with footprint");
+    previousKeep = sample.keep;
+  }
+  const retained = evaluateBandLimitSample({
+    coordinateFootprint: 0.05,
+    surfacePixelSpan,
+    heightHalfAmplitude,
+    supportMultiplier,
+    slopeVarianceCalibration,
+  });
+  assert.equal(retained.keep, 1);
+  assert.equal(retained.removedSlopeVariance, 0);
+  const removed = evaluateBandLimitSample({
+    coordinateFootprint: 0.25,
+    surfacePixelSpan,
+    heightHalfAmplitude,
+    supportMultiplier,
+    slopeVarianceCalibration,
+  });
+  assert.equal(removed.keep, 0);
+  assert(removed.removedSlopeVariance > 0);
+  const roughness = evaluateFilteredRoughness({
+    roughness: 0.28,
+    normalVariance: removed.removedSlopeVariance,
+    specularVarianceScale: 1,
+  });
+  assert(roughness >= 0.28 && roughness <= 1);
+  assert(Math.abs(roughness - Math.min(1, Math.sqrt(0.28 ** 2 + removed.removedSlopeVariance))) < 1e-15);
+  return { retained, removed, filteredRoughness: roughness };
+}
+
+function validateTriplanarWeightOracle() {
+  for (const normal of [[1, 0, 0], [-1, 0, 0], [1, 1, 1], [0.2, -0.6, 0.4]]) {
+    const weights = evaluateTriplanarWeights(normal);
+    assert(weights.every((weight) => weight >= 0 && weight <= 1));
+    assert(Math.abs(weights.reduce((sum, weight) => sum + weight, 0) - 1) < 1e-15);
+  }
+  assert.deepEqual(evaluateTriplanarWeights([1, 0, 0]), [1, 0, 0]);
+  assert.deepEqual(evaluateTriplanarWeights([-1, 0, 0]), [1, 0, 0]);
+  assert.throws(() => evaluateTriplanarWeights([0, 0, 0]), /non-zero/);
+  return "nonnegative-l1-normalized-axis-invariant-weights";
+}
+
+function validateAttachmentBudgetOracle() {
+  const production = evaluateColorAttachmentBudget({
+    formats: ["rgba16float", "rgba16float"],
+    limit: 32,
+  });
+  const diagnosticIdentity = evaluateColorAttachmentBudget({
+    formats: ["rgba16float", "rgba8unorm", "rgba8unorm"],
+    limit: 32,
+  });
+  const diagnosticSurface = evaluateColorAttachmentBudget({
+    formats: ["rgba16float", "rgba8unorm", "rgba8unorm", "rgba8unorm"],
+    limit: 32,
+  });
+  const invalidCombined = evaluateColorAttachmentBudget({
+    formats: [
+      "rgba16float", "rgba16float",
+      "rgba8unorm", "rgba8unorm", "rgba8unorm", "rgba8unorm",
+    ],
+    limit: 32,
+  });
+  assert.equal(production.total, 16);
+  assert.equal(production.passes, true);
+  assert.equal(diagnosticIdentity.total, 24);
+  assert.equal(diagnosticIdentity.passes, true);
+  assert.equal(diagnosticSurface.total, 32);
+  assert.equal(diagnosticSurface.passes, true);
+  assert.equal(invalidCombined.total, 48);
+  assert.equal(invalidCombined.passes, false);
+  assert.deepEqual(
+    diagnosticSurface.entries.map(({ pixelByteCost, componentAlignment }) => ({ pixelByteCost, componentAlignment })),
+    [
+      { pixelByteCost: 8, componentAlignment: 2 },
+      { pixelByteCost: 8, componentAlignment: 1 },
+      { pixelByteCost: 8, componentAlignment: 1 },
+      { pixelByteCost: 8, componentAlignment: 1 },
+    ],
+  );
+  return { production, diagnosticIdentity, diagnosticSurface, invalidCombined };
 }
 
 function validateWetnessCoherence() {
@@ -228,6 +399,10 @@ function validateWetnessCoherence() {
     );
     assert.equal(wetRock.userData.proceduralPbr.wetnessCause.ambientAndEmissionUnaffectedByProjectedOcclusion, true);
     assert.match(wetRock.userData.proceduralPbr.wetnessCause.directLightOcclusionOwner, /directional-light/);
+    assert.equal(wetRock.isMeshPhysicalNodeMaterial, true);
+    assert.equal(wetRock.lights, true);
+    assert.equal(wetRock.aoNode, null, "wetness must not inject ambient occlusion");
+    assert.equal(wetRock.emissiveNode, null, "wet rock must remain non-emissive");
   } finally {
     wetRock.dispose();
   }
@@ -249,7 +424,51 @@ function validateTierViewportPolicy() {
   const stride = alignedBytesPerRow(641, 4);
   assert.equal(stride, 2816);
   assert.equal(requiredPaddedByteLength(641, 359, 4, stride), stride * 358 + 641 * 4);
-  return { dprCaps: expected, oddReadbackStride: stride };
+  const compact = computeRgba8ReadbackLayout({
+    width: 641,
+    height: 359,
+    byteLength: 641 * 4 * 359,
+  });
+  assert.equal(compact.rowBytes, 641 * 4);
+  assert.equal(compact.sourceBytesPerRow, 641 * 4);
+  assert.equal(compact.requestedBytesPerRow, stride);
+  assert.equal(compact.sourceLayout, "compact");
+  const padded = computeRgba8ReadbackLayout({
+    width: 641,
+    height: 359,
+    byteLength: requiredPaddedByteLength(641, 359, 4, stride),
+  });
+  assert.equal(padded.sourceBytesPerRow, stride);
+  assert.equal(padded.sourceLayout, "aligned-padded");
+  assert.throws(() => computeRgba8ReadbackLayout({
+    width: 641,
+    height: 359,
+    byteLength: 641 * 4 * 359 + 3,
+  }), /unrecognized/);
+  const halfStride = alignedBytesPerRow(641, 8);
+  const half = computeRgbaReadbackLayout({
+    width: 641,
+    height: 359,
+    byteLength: halfStride * 358 + 641 * 8,
+    bytesPerComponent: 2,
+  });
+  assert.equal(half.sourceBytesPerRow, halfStride);
+  assert.equal(half.rowBytes, 641 * 8);
+  return { dprCaps: expected, oddReadbackStride: stride, compactReadbackStride: compact.sourceBytesPerRow };
+}
+
+function validateSeedMapping() {
+  const seeds = [1, 0x9e3779b9];
+  const phases = seeds.map((seed) => Array.from({ length: 8 }, (_, stream) => materialSeedPhase(seed, stream)));
+  assert(phases.flat().every((phase) => phase >= 0 && phase < 64));
+  assert.notDeepEqual(phases[0], phases[1], "fixed seeds collapsed to the same bounded phases");
+  for (const seed of seeds) {
+    const first = Array.from({ length: 16 }, (_, stream) => hashMaterialSeed(seed, stream));
+    const second = Array.from({ length: 16 }, (_, stream) => hashMaterialSeed(seed, stream));
+    assert.deepEqual(first, second, "uint32 seed hashing is nondeterministic");
+    assert.equal(new Set(first).size, first.length, "seed streams collided in the fixed fixture");
+  }
+  return { seeds, maximumPhase: Math.max(...phases.flat()) };
 }
 
 function validateMaterialGraphs() {
@@ -271,11 +490,25 @@ function validateMaterialGraphs() {
         ["materialAlbedo", "materialParams", "materialNormal", "materialFootprint", "materialNormalVariance"],
         `${name} diagnostic MRT schema drifted`,
       );
+      const diagnosticNodes = Object.values(material.mrtNode.outputNodes);
+      assert(diagnosticNodes.every((node) => node?.isNode === true), `${name} diagnostic MRT contains a non-node output`);
+      assert.equal(
+        new Set(diagnosticNodes.map((node) => node.getCacheKey())).size,
+        diagnosticNodes.length,
+        `${name} diagnostic MRT aliases semantic outputs`,
+      );
       assert.equal(material.userData.proceduralPbr.normalVarianceSource, "footprint-removed-material-slope-energy");
       assert.equal(material.userData.proceduralPbr.geometryRoughnessOwner, "three-r185-getRoughness");
-      for (const mode of proceduralPbrDebugModes.keys()) assert(setProceduralPbrDebugMode(material, mode));
+      for (const mode of proceduralPbrDebugModes.keys()) {
+        const version = material.version;
+        assert(setProceduralPbrDebugMode(material, mode));
+        assert.equal(material.version, version, `${name} uniform-only debug mode forced a pipeline recompile`);
+      }
     }
     assert(materials.lava.emissiveNode, "lava must publish authored scene-linear emission");
+    for (const [name, material] of Object.entries(materials)) {
+      if (name !== "lava") assert.equal(material.emissiveNode, null, `${name} has unauthored emission`);
+    }
     assert(materials.walnut.color.equals(new Color(0x5a2814)), "walnut base color was double converted");
   } finally {
     Object.values(materials).forEach((material) => material.dispose());
@@ -291,6 +524,8 @@ function validateConfigFailures() {
     { coordinateScale: 0 },
     { coordinateMode: "camera" },
     { seed: Number.NaN },
+    { debugMode: "invented" },
+    { normalStrength: -0.1 },
     { emissionIntensity: -1 },
     { sceneUnitsPerMeter: 0 },
     { specularVarianceScale: -1 },
@@ -310,6 +545,27 @@ function validateConfigFailures() {
     guttersByMip: [1, 1],
     filterRadiusByMip: [2.2, 1.1],
   }), /below required support/);
+  assert.throws(() => createInstancedDissolveAttributes(0), /positive integer/);
+  assert.throws(() => createInstancedDissolveAttributes(4, { initialDissolve: 1.1 }), /inside \[0,1\]/);
+  assert.throws(() => createInstancedDissolveAttributes(4, { variantSeed: -1 }), /uint32/);
+  assert.throws(() => createWalnutPbrMaterial({ debugMode: "invented" }), /Invalid procedural PBR config/);
+  assert.throws(() => createWetRockPbrMaterial({ waterlineWorldY: Number.NaN }), /waterlineWorldY/);
+  assert.throws(() => createLavaEmissivePbrMaterial({ flowTime: Number.NaN }), /flowTime/);
+
+  const atlas = createMipSafeMaterialAtlas();
+  const textureArray = createMaterialTextureArray();
+  const triplanarMap = createTriplanarMaterialTexture();
+  try {
+    triplanarMap.colorSpace = NoColorSpace;
+    assert.throws(
+      () => createAtlasArrayTriplanarMaterials({ atlas, textureArray, triplanarMap }),
+      /must declare SRGBColorSpace/,
+    );
+  } finally {
+    atlas.dispose();
+    textureArray.dispose();
+    triplanarMap.dispose();
+  }
   return "invalid-configs-rejected";
 }
 
@@ -386,9 +642,13 @@ const result = {
   projectionResources: validateLiveProjectionResources(),
   metalness: validateMetalnessDistribution(),
   dissolveParity: validateDissolveParity(),
-  furnace: validateFurnaceApproximation(),
+  fresnelIntegral: validateSchlickFresnelIntegral(),
+  specularFilterOracle: validateSpecularFilterOracle(),
+  triplanarWeightOracle: validateTriplanarWeightOracle(),
+  attachmentBudgetOracle: validateAttachmentBudgetOracle(),
   wetness: validateWetnessCoherence(),
   tierViewport: validateTierViewportPolicy(),
+  seedMapping: validateSeedMapping(),
   invalidConfigs: validateConfigFailures(),
   capabilityGate: await validateCapabilityGate(),
   assets: await validateAssets(),

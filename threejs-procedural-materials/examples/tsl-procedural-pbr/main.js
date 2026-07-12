@@ -7,11 +7,12 @@ import {
   output,
   pass,
   renderOutput,
+  screenUV,
+  select,
   vec4,
 } from "three/tsl";
 import { bloom } from "three/addons/tsl/display/BloomNode.js";
 
-import { alignedBytesPerRow } from "../../../labs/runtime/aligned-readback.mjs";
 import {
   createAntiqueGoldPbrMaterial,
   createAtlasArrayTriplanarMaterials,
@@ -31,6 +32,16 @@ import {
   setLavaFlowTime,
   setProceduralPbrDebugMode,
 } from "./procedural-pbr-materials.js";
+import {
+  computeRgbaReadbackLayout,
+  computeRgba8ReadbackLayout,
+  evaluateColorAttachmentBudget,
+  hashMaterialSeed,
+  materialSeedPhase,
+  visualizeHalfFloatEmissive,
+  WEBGPU_COLOR_ATTACHMENT_FORMAT_COST,
+} from "./pbr-oracles.mjs";
+import { assertLockedRouteMutation } from "./route-contract.mjs";
 
 export const MATERIAL_SCENARIOS = Object.freeze([
   "pbr-identity",
@@ -62,6 +73,49 @@ export const MATERIAL_MODES = Object.freeze([
   "dissolve",
   "triplanar-weights",
 ]);
+
+const DIAGNOSTIC_MOSAIC_CAPTURE_MODE = "diagnostics-mosaic";
+
+const RAW_MRT_CAPTURE_TARGETS = Object.freeze([
+  SCENE_DEBUG_MODES.materialAlbedo,
+  SCENE_DEBUG_MODES.materialParams,
+  SCENE_DEBUG_MODES.materialNormal,
+  SCENE_DEBUG_MODES.materialFootprint,
+  SCENE_DEBUG_MODES.materialNormalVariance,
+  SCENE_DEBUG_MODES.rawEmissive,
+]);
+
+export function createDisposableListenerScope() {
+  const records = [];
+  let disposed = false;
+  return Object.freeze({
+    listen(target, type, listener, options) {
+      if (disposed) throw new Error("listener scope is disposed");
+      if (!target?.addEventListener || !target?.removeEventListener) {
+        throw new TypeError("listener target must implement addEventListener/removeEventListener");
+      }
+      target.addEventListener(type, listener, options);
+      records.push({ target, type, listener, options });
+      return listener;
+    },
+    dispose() {
+      if (disposed) return 0;
+      disposed = true;
+      const count = records.length;
+      while (records.length > 0) {
+        const { target, type, listener, options } = records.pop();
+        target.removeEventListener(type, listener, options);
+      }
+      return count;
+    },
+    get size() {
+      return records.length;
+    },
+    get disposed() {
+      return disposed;
+    },
+  });
+}
 
 function requireKnown(values, id, kind) {
   if (!values.includes(id)) throw new RangeError(`Unknown material ${kind} "${id}"`);
@@ -107,10 +161,21 @@ function renderTargetTextures(target) {
   return target.texture ? [target.texture] : [];
 }
 
+function renderTargetTextureCost(texture) {
+  const isRgba8 = texture?.type === THREE.UnsignedByteType;
+  const format = isRgba8 ? "rgba8unorm" : "rgba16float";
+  return {
+    format,
+    storageBytesPerTexel: isRgba8 ? 4 : 8,
+    attachmentByteCostPerSample: WEBGPU_COLOR_ATTACHMENT_FORMAT_COST[format].pixelByteCost,
+  };
+}
+
 function textureResource(id, texture, overrides = {}) {
   const image = texture?.image ?? {};
   return {
     id,
+    runtimeIdentity: texture?.uuid ?? null,
     kind: texture?.isDepthTexture ? "depth-texture" : texture?.isDataArrayTexture ? "texture-array" : "texture",
     name: texture?.name ?? id,
     width: image.width ?? overrides.width ?? null,
@@ -120,8 +185,28 @@ function textureResource(id, texture, overrides = {}) {
     colorSpace: texture?.colorSpace ?? null,
     format: texture?.format ?? null,
     type: texture?.type ?? null,
+    attachmentFormat: overrides.attachmentFormat ?? null,
+    ownerPass: overrides.passId ?? null,
     byteCount: overrides.byteCount ?? null,
     byteCountProvenance: overrides.byteCount === null || overrides.byteCount === undefined ? "INSUFFICIENT_EVIDENCE" : "Derived",
+    attachmentByteCostPerSample: overrides.attachmentByteCostPerSample ?? null,
+  };
+}
+
+function instancedAttributeResource(id, attribute, semantic) {
+  return {
+    id,
+    runtimeIdentity: attribute.uuid ?? attribute.id ?? `${semantic}:${attribute.count}:${attribute.itemSize}`,
+    kind: "storage-capable-instanced-buffer",
+    semantic,
+    count: attribute.count,
+    itemSize: attribute.itemSize,
+    byteCount: attribute.array.byteLength,
+    byteCountProvenance: "Derived",
+    storageCapable: attribute.isStorageInstancedBufferAttribute === true,
+    shaderReadPath: "instanced vertex attribute",
+    storageBindingActive: false,
+    computeDispatches: 0,
   };
 }
 
@@ -134,14 +219,29 @@ export async function createProceduralPbrScene({
   materialScale = 1,
   tier = "ultra",
   validationAttachments = true,
+  runtimeProfile = "correctness",
+  lockedRouteKind = null,
+  lockedRouteId = null,
 } = {}) {
   requireKnown(Object.keys(proceduralPbrQualityTiers), tier, "tier");
   if (!proceduralPbrDebugModes.has(debugMode)) throw new RangeError(`Unknown material mode "${debugMode}"`);
+  requireKnown(["correctness", "performance"], runtimeProfile, "runtime profile");
+  const routeLock = lockedRouteKind === null
+    ? null
+    : Object.freeze({ kind: lockedRouteKind, id: lockedRouteId });
+  if (routeLock) {
+    if (routeLock.kind === "mechanism") requireKnown(MATERIAL_SCENARIOS, routeLock.id, "locked mechanism route");
+    else if (routeLock.kind === "tier") requireKnown(Object.keys(proceduralPbrQualityTiers), routeLock.id, "locked tier route");
+    else throw new RangeError(`Unknown material route kind "${routeLock.kind}"`);
+  }
+  const listenerScope = createDisposableListenerScope();
+  const timestampQueriesRequested = runtimeProfile === "performance";
 
   const renderer = new THREE.WebGPURenderer({
     canvas,
     antialias: true,
     outputBufferType: THREE.HalfFloatType,
+    trackTimestamp: timestampQueriesRequested,
   });
   renderer.toneMapping = THREE.AgXToneMapping;
   renderer.toneMappingExposure = 1;
@@ -150,6 +250,66 @@ export async function createProceduralPbrScene({
   await renderer.init();
   if (renderer.backend?.isWebGPUBackend !== true) {
     throw new Error("threejs-procedural-materials requires native WebGPU.");
+  }
+  const initializedRendererDevice = renderer.backend.device;
+  if (!initializedRendererDevice || typeof initializedRendererDevice.lost?.then !== "function") {
+    throw new Error("initialized WebGPU backend did not expose its actual GPUDevice loss promise");
+  }
+  const rendererDeviceGeneration = 1;
+  let rendererDeviceStatus = "active";
+  let deviceLossGeneration = 0;
+  let deviceLossDetails = null;
+  let disposingRenderer = false;
+  initializedRendererDevice.lost.then((info) => {
+    if (disposingRenderer) return;
+    rendererDeviceStatus = "lost";
+    deviceLossGeneration = rendererDeviceGeneration;
+    deviceLossDetails = {
+      reason: info?.reason ?? "unknown",
+      message: info?.message ?? "GPU device lost",
+    };
+  });
+  const rendererBackendEvidence = () => ({
+    backendKind: "WebGPU",
+    backendType: "WebGPUBackend",
+    deviceIdentityVerified: renderer.backend.device === initializedRendererDevice,
+    deviceIdentitySource: "renderer.backend.device captured immediately after await renderer.init()",
+    deviceType: initializedRendererDevice.constructor?.name || "GPUDevice",
+    deviceLabel: initializedRendererDevice.label || "",
+    lossPromiseObservedOnActualDevice: true,
+    rendererDeviceGeneration,
+  });
+  const adapterIdentity = Object.freeze({
+    source: "initialized renderer.backend.device",
+    adapterClass: "unknown",
+    deviceType: initializedRendererDevice.constructor?.name || "GPUDevice",
+    deviceLabel: initializedRendererDevice.label || "",
+    featureNames: Object.freeze(Array.from(initializedRendererDevice.features ?? [], String).sort()),
+  });
+  const timestampQueriesActive = timestampQueriesRequested
+    && renderer.hasFeature?.("timestamp-query") === true;
+  const colorAttachmentLimit = initializedRendererDevice.limits?.maxColorAttachmentBytesPerSample;
+  if (!Number.isInteger(colorAttachmentLimit) || colorAttachmentLimit <= 0) {
+    throw new Error("initialized GPUDevice did not expose maxColorAttachmentBytesPerSample");
+  }
+  const productionAttachmentBudget = evaluateColorAttachmentBudget({
+    formats: ["rgba16float", "rgba16float"],
+    limit: colorAttachmentLimit,
+  });
+  const diagnosticIdentityAttachmentBudget = evaluateColorAttachmentBudget({
+    formats: ["rgba16float", "rgba8unorm", "rgba8unorm"],
+    limit: colorAttachmentLimit,
+  });
+  const diagnosticSurfaceAttachmentBudget = evaluateColorAttachmentBudget({
+    formats: ["rgba16float", "rgba8unorm", "rgba8unorm", "rgba8unorm"],
+    limit: colorAttachmentLimit,
+  });
+  if (
+    !productionAttachmentBudget.passes
+    || !diagnosticIdentityAttachmentBudget.passes
+    || !diagnosticSurfaceAttachmentBudget.passes
+  ) {
+    throw new Error("material pass attachments exceed maxColorAttachmentBytesPerSample");
   }
 
   const scene = new THREE.Scene();
@@ -302,34 +462,85 @@ export async function createProceduralPbrScene({
   const renderPipeline = new THREE.RenderPipeline(renderer);
   renderPipeline.outputColorTransform = false;
   const scenePass = pass(scene, camera);
-  const validationMrt = {
+  scenePass.setMRT(mrt({ output, emissive }));
+  scenePass.setResolutionScale(1);
+  const diagnosticIdentityPass = validationAttachments ? pass(scene, camera) : null;
+  const diagnosticSurfacePass = validationAttachments ? pass(scene, camera) : null;
+  const diagnosticIdentityMrt = {
     output,
-    emissive,
     materialAlbedo: vec4(0),
     materialParams: vec4(0),
+  };
+  const diagnosticSurfaceMrt = {
+    output,
     materialNormal: vec4(0),
     materialFootprint: vec4(0),
     materialNormalVariance: vec4(0),
   };
-  scenePass.setMRT(mrt(validationAttachments ? validationMrt : { output, emissive }));
-  scenePass.setResolutionScale(1);
+  const configureDiagnosticPass = (diagnosticPass, diagnosticMrt, attachmentNames) => {
+    if (!diagnosticPass) return;
+    diagnosticPass.setMRT(mrt(diagnosticMrt));
+    diagnosticPass.setResolutionScale(1);
+    for (const name of attachmentNames) {
+      const diagnosticTexture = diagnosticPass.getTexture(name);
+      diagnosticTexture.type = THREE.UnsignedByteType;
+      diagnosticTexture.colorSpace = THREE.NoColorSpace;
+    }
+  };
+  configureDiagnosticPass(
+    diagnosticIdentityPass,
+    diagnosticIdentityMrt,
+    ["materialAlbedo", "materialParams"],
+  );
+  configureDiagnosticPass(
+    diagnosticSurfacePass,
+    diagnosticSurfaceMrt,
+    ["materialNormal", "materialFootprint", "materialNormalVariance"],
+  );
 
   const sceneColor = scenePass.getTextureNode("output");
   const emissiveNode = scenePass.getTextureNode("emissive");
+  const materialAlbedoNode = diagnosticIdentityPass
+    ? diagnosticIdentityPass.getTextureNode("materialAlbedo")
+    : null;
+  const materialParamsNode = diagnosticIdentityPass
+    ? diagnosticIdentityPass.getTextureNode("materialParams")
+    : null;
+  const materialNormalNode = diagnosticSurfacePass
+    ? diagnosticSurfacePass.getTextureNode("materialNormal")
+    : null;
+  const materialFootprintNode = diagnosticSurfacePass
+    ? diagnosticSurfacePass.getTextureNode("materialFootprint")
+    : null;
+  const materialNormalVarianceNode = diagnosticSurfacePass
+    ? diagnosticSurfacePass.getTextureNode("materialNormalVariance")
+    : null;
   const bloomPass = bloom(emissiveNode, 0.42, 0.32, 0.85);
   bloomPass.smoothWidth.value = 0.08;
   const bloomNode = bloomPass.getTextureNode();
+  const diagnosticMosaicNode = validationAttachments
+    ? select(
+      screenUV.y.lessThan(0.5),
+      select(screenUV.x.lessThan(0.5), materialAlbedoNode, materialParamsNode),
+      select(
+        screenUV.x.lessThan(0.5),
+        materialNormalNode,
+        select(screenUV.x.lessThan(0.75), materialFootprintNode, materialNormalVarianceNode),
+      ),
+    )
+    : null;
   const debugOutputs = {
     [SCENE_DEBUG_MODES.final]: renderOutput(sceneColor.add(bloomNode)),
     [SCENE_DEBUG_MODES.rawEmissive]: renderOutput(emissiveNode),
     [SCENE_DEBUG_MODES.bloomOnly]: renderOutput(bloomNode),
     [SCENE_DEBUG_MODES.noPost]: renderOutput(sceneColor),
     ...(validationAttachments ? {
-      [SCENE_DEBUG_MODES.materialAlbedo]: renderOutput(scenePass.getTextureNode("materialAlbedo")),
-      [SCENE_DEBUG_MODES.materialParams]: renderOutput(scenePass.getTextureNode("materialParams")),
-      [SCENE_DEBUG_MODES.materialNormal]: renderOutput(scenePass.getTextureNode("materialNormal")),
-      [SCENE_DEBUG_MODES.materialFootprint]: renderOutput(scenePass.getTextureNode("materialFootprint")),
-      [SCENE_DEBUG_MODES.materialNormalVariance]: renderOutput(scenePass.getTextureNode("materialNormalVariance")),
+      [SCENE_DEBUG_MODES.materialAlbedo]: renderOutput(materialAlbedoNode),
+      [SCENE_DEBUG_MODES.materialParams]: renderOutput(materialParamsNode),
+      [SCENE_DEBUG_MODES.materialNormal]: renderOutput(materialNormalNode),
+      [SCENE_DEBUG_MODES.materialFootprint]: renderOutput(materialFootprintNode),
+      [SCENE_DEBUG_MODES.materialNormalVariance]: renderOutput(materialNormalVarianceNode),
+      [DIAGNOSTIC_MOSAIC_CAPTURE_MODE]: renderOutput(diagnosticMosaicNode),
     } : {}),
   };
   renderPipeline.outputNode = debugOutputs[SCENE_DEBUG_MODES.final];
@@ -348,6 +559,8 @@ export async function createProceduralPbrScene({
   let lastHistoryResetCause = "initialization";
   let disposed = false;
   let renderedFrames = 0;
+  const rawCaptureCache = new Map();
+  const captureTransientRecords = [];
 
   function assertLive() {
     if (disposed) throw new Error("Procedural PBR LabController is disposed");
@@ -357,7 +570,8 @@ export async function createProceduralPbrScene({
     renderer.setPixelRatio(viewport.effectiveDpr);
     renderer.setSize(viewport.width, viewport.height, false);
     scenePass.setSize(viewport.physicalWidth, viewport.physicalHeight);
-    bloomPass.setSize(viewport.physicalWidth, viewport.physicalHeight);
+    diagnosticIdentityPass?.setSize(viewport.physicalWidth, viewport.physicalHeight);
+    diagnosticSurfacePass?.setSize(viewport.physicalWidth, viewport.physicalHeight);
     camera.aspect = viewport.width / viewport.height;
     camera.updateProjectionMatrix();
   }
@@ -384,8 +598,10 @@ export async function createProceduralPbrScene({
   function setSceneDebugMode(mode) {
     if (!Object.hasOwn(debugOutputs, mode)) throw new RangeError(`Unknown scene mode "${mode}"`);
     activeSceneMode = mode;
-    renderPipeline.outputNode = debugOutputs[mode];
-    renderPipeline.needsUpdate = true;
+    if (renderPipeline.outputNode !== debugOutputs[mode]) {
+      renderPipeline.outputNode = debugOutputs[mode];
+      renderPipeline.needsUpdate = true;
+    }
   }
 
   function setMode(mode) {
@@ -413,6 +629,7 @@ export async function createProceduralPbrScene({
   function setTier(nextTier) {
     assertLive();
     requireKnown(Object.keys(proceduralPbrQualityTiers), nextTier, "tier");
+    assertLockedRouteMutation(routeLock, "tier", nextTier);
     activeTier = nextTier;
     const quality = proceduralPbrQualityTiers[nextTier];
     viewport = resolveTierViewport({
@@ -451,6 +668,7 @@ export async function createProceduralPbrScene({
   function setScenario(id) {
     assertLive();
     requireKnown(MATERIAL_SCENARIOS, id, "scenario");
+    assertLockedRouteMutation(routeLock, "mechanism", id);
     const route = scenarioModes[id];
     activeScenario = id;
     for (const [name, group] of Object.entries(fixtureGroups)) group.visible = name === route.group;
@@ -480,10 +698,12 @@ export async function createProceduralPbrScene({
     if (seed !== 1 && seed !== 0x9e3779b9) throw new RangeError(`Unknown material seed "${seed}"`);
     activeSeed = seed;
     for (const [index, material] of pbrMaterials.entries()) {
-      material.userData.proceduralPbr.uniforms.seed.value = (seed + index * 101) >>> 0;
+      const state = material.userData.proceduralPbr;
+      state.uniforms.seed.value = materialSeedPhase(seed, index);
+      state.uniforms.authoredSeed = seed;
     }
     for (let index = 0; index < dissolveAttributes.variant.count; index++) {
-      dissolveAttributes.variant.array[index] = (((index + 1) * 1103515245 + seed * 12345) >>> 0) / 4294967295;
+      dissolveAttributes.variant.array[index] = hashMaterialSeed(seed, index + 0x1000) / 0xffffffff;
     }
     dissolveAttributes.variant.needsUpdate = true;
     return seed;
@@ -511,55 +731,237 @@ export async function createProceduralPbrScene({
     return { reset: true, cause, temporalResources: 0 };
   }
 
-  function renderOnce() {
+  async function renderOnce(waitForGpu = true) {
     assertLive();
     setLavaFlowTime(materials.lava, elapsedSeconds);
     for (const [index, mesh] of swatches.entries()) mesh.rotation.y = elapsedSeconds * 0.18 + index * 0.35;
     triplanarMesh.rotation.y = elapsedSeconds * 0.22;
     renderPipeline.render();
+    if (waitForGpu) await initializedRendererDevice.queue.onSubmittedWorkDone();
     renderedFrames += 1;
+  }
+
+  function rawAttachmentDescriptor(targetName) {
+    if (!validationAttachments && targetName !== SCENE_DEBUG_MODES.rawEmissive) return null;
+    const descriptors = {
+      [SCENE_DEBUG_MODES.materialAlbedo]: {
+        passId: "diagnostic-identity",
+        pass: diagnosticIdentityPass,
+        textureName: "materialAlbedo",
+        format: "rgba8unorm",
+        bytesPerComponent: 1,
+        visualization: "raw-unorm-byte-identity",
+      },
+      [SCENE_DEBUG_MODES.materialParams]: {
+        passId: "diagnostic-identity",
+        pass: diagnosticIdentityPass,
+        textureName: "materialParams",
+        format: "rgba8unorm",
+        bytesPerComponent: 1,
+        visualization: "raw-unorm-byte-identity",
+      },
+      [SCENE_DEBUG_MODES.materialNormal]: {
+        passId: "diagnostic-surface",
+        pass: diagnosticSurfacePass,
+        textureName: "materialNormal",
+        format: "rgba8unorm",
+        bytesPerComponent: 1,
+        visualization: "raw-unorm-byte-identity",
+      },
+      [SCENE_DEBUG_MODES.materialFootprint]: {
+        passId: "diagnostic-surface",
+        pass: diagnosticSurfacePass,
+        textureName: "materialFootprint",
+        format: "rgba8unorm",
+        bytesPerComponent: 1,
+        visualization: "raw-unorm-byte-identity",
+      },
+      [SCENE_DEBUG_MODES.materialNormalVariance]: {
+        passId: "diagnostic-surface",
+        pass: diagnosticSurfacePass,
+        textureName: "materialNormalVariance",
+        format: "rgba8unorm",
+        bytesPerComponent: 1,
+        visualization: "raw-unorm-byte-identity",
+      },
+      [SCENE_DEBUG_MODES.rawEmissive]: {
+        passId: "lit-scene-mrt",
+        pass: scenePass,
+        textureName: "emissive",
+        format: "rgba16float",
+        bytesPerComponent: 2,
+        visualization: "half-float-reinhard-linear-to-srgb-v1",
+      },
+    };
+    return descriptors[targetName] ?? null;
+  }
+
+  function rememberRawAttachment(targetName, descriptor, textureValue, textureIndex, pixels, layout) {
+    const rawBytes = new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength).slice();
+    rawCaptureCache.set(targetName, {
+      target: targetName,
+      passId: descriptor.passId,
+      textureName: descriptor.textureName,
+      textureUuid: textureValue.uuid,
+      textureIndex,
+      format: descriptor.format,
+      width: layout.width,
+      height: layout.height,
+      componentCount: 4,
+      bytesPerComponent: descriptor.bytesPerComponent,
+      bytesPerPixel: descriptor.bytesPerComponent * 4,
+      rowBytes: layout.rowBytes,
+      bytesPerRow: layout.sourceBytesPerRow,
+      byteLength: layout.sourceByteLength,
+      layout: layout.sourceLayout,
+      visualization: descriptor.visualization,
+      rawBytes,
+    });
+  }
+
+  function bytesToBase64(bytes) {
+    let binary = "";
+    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+    }
+    return btoa(binary);
+  }
+
+  function getRawCaptureArtifact(targetName) {
+    assertLive();
+    const capture = rawCaptureCache.get(targetName);
+    if (!capture) throw new Error(`No raw attachment capture exists for "${targetName}"`);
+    const { rawBytes, ...metadata } = capture;
+    return { ...metadata, dataBase64: bytesToBase64(rawBytes) };
+  }
+
+  function pixelCaptureRecord({ targetName, pixels, layout }) {
+    return {
+      target: targetName,
+      width: layout.width,
+      height: layout.height,
+      bytesPerPixel: 4,
+      rowBytes: layout.rowBytes,
+      sourceBytesPerRow: layout.sourceBytesPerRow,
+      sourceByteLength: layout.sourceByteLength,
+      bytesPerRow: layout.requestedBytesPerRow,
+      alignmentBytes: layout.requestedAlignment,
+      readbackLayout: layout.sourceLayout,
+      format: "rgba8unorm-srgb",
+      colorManaged: true,
+      outputColorSpace: "srgb",
+      origin: "top-left",
+      pixels,
+    };
   }
 
   async function capturePixels(targetName = "final") {
     assertLive();
-    requireKnown(MATERIAL_MODES, targetName, "capture target");
+    const captureModes = validationAttachments
+      ? [...MATERIAL_MODES, DIAGNOSTIC_MOSAIC_CAPTURE_MODE]
+      : MATERIAL_MODES;
+    requireKnown(captureModes, targetName, "capture target");
     const previousSceneMode = activeSceneMode;
     const previousMaterialMode = activeMaterialMode;
     const previousMode = activeMode;
-    setMode(targetName);
+    if (targetName === DIAGNOSTIC_MOSAIC_CAPTURE_MODE) {
+      setMaterialDebugMode("final");
+      setSceneDebugMode(DIAGNOSTIC_MOSAIC_CAPTURE_MODE);
+      activeMode = DIAGNOSTIC_MOSAIC_CAPTURE_MODE;
+    } else {
+      setMode(targetName);
+    }
     const captureWidth = viewport.physicalWidth;
     const captureHeight = viewport.physicalHeight;
-    const target = new THREE.RenderTarget(captureWidth, captureHeight, {
-      type: THREE.UnsignedByteType,
-      depthBuffer: false,
-    });
-    target.texture.name = `material-capture-${targetName}`;
     const previousTarget = renderer.getRenderTarget();
     try {
-      renderer.setRenderTarget(target);
-      renderOnce();
-      const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, captureWidth, captureHeight);
-      const bytesPerPixel = 4;
-      const bytesPerRow = alignedBytesPerRow(captureWidth, bytesPerPixel);
-      const logicalBytesPerRow = captureWidth * bytesPerPixel;
-      const validLengths = new Set([
-        bytesPerRow * captureHeight,
-        bytesPerRow * (captureHeight - 1) + logicalBytesPerRow,
-      ]);
-      if (!validLengths.has(pixels.byteLength)) {
-        throw new Error(`Unexpected WebGPU readback length ${pixels.byteLength}; expected padded 256-byte rows`);
+      renderer.setRenderTarget(null);
+      await renderOnce();
+      const rawDescriptor = rawAttachmentDescriptor(targetName);
+      if (rawDescriptor) {
+        const textures = renderTargetTextures(rawDescriptor.pass.renderTarget);
+        const textureIndex = textures.findIndex((textureValue) => textureValue.name === rawDescriptor.textureName);
+        if (textureIndex < 0) {
+          throw new Error(`Raw attachment ${rawDescriptor.textureName} is not allocated by ${rawDescriptor.passId}`);
+        }
+        const textureValue = textures[textureIndex];
+        const rawPixels = await renderer.readRenderTargetPixelsAsync(
+          rawDescriptor.pass.renderTarget,
+          0,
+          0,
+          captureWidth,
+          captureHeight,
+          textureIndex,
+        );
+        const rawLayout = computeRgbaReadbackLayout({
+          width: captureWidth,
+          height: captureHeight,
+          byteLength: rawPixels.byteLength,
+          bytesPerComponent: rawDescriptor.bytesPerComponent,
+        });
+        rememberRawAttachment(
+          targetName,
+          rawDescriptor,
+          textureValue,
+          textureIndex,
+          rawPixels,
+          rawLayout,
+        );
+        if (rawDescriptor.bytesPerComponent === 1) {
+          return pixelCaptureRecord({ targetName, pixels: rawPixels, layout: rawLayout });
+        }
+        const rawBytes = new Uint8Array(rawPixels.buffer, rawPixels.byteOffset, rawPixels.byteLength);
+        const visualization = visualizeHalfFloatEmissive({
+          bytes: rawBytes,
+          width: captureWidth,
+          height: captureHeight,
+          bytesPerRow: rawLayout.sourceBytesPerRow,
+        });
+        const visualizationLayout = computeRgba8ReadbackLayout({
+          width: captureWidth,
+          height: captureHeight,
+          byteLength: visualization.byteLength,
+        });
+        return pixelCaptureRecord({ targetName, pixels: visualization, layout: visualizationLayout });
       }
-      return {
+
+      const target = new THREE.RenderTarget(captureWidth, captureHeight, {
+        type: THREE.UnsignedByteType,
+        depthBuffer: false,
+      });
+      target.texture.name = `material-capture-${targetName}`;
+      const transientRecord = {
+        id: `capture-transient-${captureTransientRecords.length}`,
+        targetUuid: target.uuid,
+        textureUuid: target.texture.uuid,
         target: targetName,
         width: captureWidth,
         height: captureHeight,
-        bytesPerPixel,
-        bytesPerRow,
-        pixels,
+        format: "rgba8unorm-srgb",
+        byteCount: captureWidth * captureHeight * 4,
+        createdAtFrame: renderedFrames,
+        disposedAtFrame: null,
+        active: true,
       };
+      captureTransientRecords.push(transientRecord);
+      renderer.setRenderTarget(target);
+      try {
+        await renderOnce();
+        const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, captureWidth, captureHeight);
+        const layout = computeRgba8ReadbackLayout({
+          width: captureWidth,
+          height: captureHeight,
+          byteLength: pixels.byteLength,
+          bytesPerElement: pixels.BYTES_PER_ELEMENT,
+        });
+        return pixelCaptureRecord({ targetName, pixels, layout });
+      } finally {
+        target.dispose();
+        transientRecord.active = false;
+        transientRecord.disposedAtFrame = renderedFrames;
+      }
     } finally {
       renderer.setRenderTarget(previousTarget);
-      target.dispose();
       setMaterialDebugMode(previousMaterialMode);
       setSceneDebugMode(previousSceneMode);
       activeMode = previousMode;
@@ -568,11 +970,41 @@ export async function createProceduralPbrScene({
 
   function describeResources() {
     const sceneTargets = renderTargetTextures(scenePass.renderTarget);
+    const diagnosticPasses = [
+      {
+        id: "identity",
+        pass: diagnosticIdentityPass,
+        mrt: diagnosticIdentityMrt,
+        budget: diagnosticIdentityAttachmentBudget,
+      },
+      {
+        id: "surface",
+        pass: diagnosticSurfacePass,
+        mrt: diagnosticSurfaceMrt,
+        budget: diagnosticSurfaceAttachmentBudget,
+      },
+    ].filter((entry) => entry.pass);
+    const diagnosticTargetEntries = diagnosticPasses.flatMap((entry) => (
+      renderTargetTextures(entry.pass.renderTarget).map((textureValue, index) => ({
+        ...entry,
+        textureValue,
+        index,
+      }))
+    ));
     const bloomTargets = [
       bloomPass._renderTargetBright,
       ...(bloomPass._renderTargetsHorizontal ?? []),
       ...(bloomPass._renderTargetsVertical ?? []),
     ].filter(Boolean);
+    const passDepthEntries = [
+      { id: "scene-depth", passId: "lit-scene-mrt", pass: scenePass },
+      ...diagnosticPasses.map(({ id, pass: diagnosticPass }) => ({
+        id: `diagnostic-${id}-depth`,
+        passId: `diagnostic-${id}`,
+        pass: diagnosticPass,
+      })),
+    ].filter(({ pass: passValue }) => passValue.renderTarget?.depthTexture);
+    const shadowColor = key.shadow.map?.texture ?? null;
     const shadowDepth = key.shadow.map?.depthTexture ?? null;
     const resources = [
       textureResource("material-color-atlas", sampledTextures.atlas, {
@@ -584,37 +1016,115 @@ export async function createProceduralPbrScene({
       textureResource("material-triplanar-map", sampledTextures.triplanar, {
         byteCount: textureMipByteCount(sampledTextures.triplanar),
       }),
-      ...sceneTargets.map((textureValue, index) => textureResource(`scene-mrt-${index}`, textureValue, {
-        width: scenePass.renderTarget?.width ?? viewport.physicalWidth,
-        height: scenePass.renderTarget?.height ?? viewport.physicalHeight,
-        byteCount: (scenePass.renderTarget?.width ?? viewport.physicalWidth)
-          * (scenePass.renderTarget?.height ?? viewport.physicalHeight) * 8,
-      })),
+      ...sceneTargets.map((textureValue, index) => {
+        const cost = renderTargetTextureCost(textureValue);
+        const targetWidth = scenePass.renderTarget?.width ?? viewport.physicalWidth;
+        const targetHeight = scenePass.renderTarget?.height ?? viewport.physicalHeight;
+        return textureResource(`scene-mrt-${index}`, textureValue, {
+          width: targetWidth,
+          height: targetHeight,
+          byteCount: targetWidth * targetHeight * cost.storageBytesPerTexel,
+          attachmentFormat: cost.format,
+          attachmentByteCostPerSample: cost.attachmentByteCostPerSample,
+        });
+      }),
+      ...diagnosticTargetEntries.map(({ id, pass: diagnosticPass, textureValue, index }) => {
+        const cost = renderTargetTextureCost(textureValue);
+        const targetWidth = diagnosticPass.renderTarget?.width ?? viewport.physicalWidth;
+        const targetHeight = diagnosticPass.renderTarget?.height ?? viewport.physicalHeight;
+        return textureResource(`diagnostic-${id}-mrt-${index}`, textureValue, {
+          width: targetWidth,
+          height: targetHeight,
+          byteCount: targetWidth * targetHeight * cost.storageBytesPerTexel,
+          attachmentFormat: cost.format,
+          attachmentByteCostPerSample: cost.attachmentByteCostPerSample,
+        });
+      }),
       ...bloomTargets.map((target, index) => textureResource(`bloom-target-${index}`, target.texture, {
         width: target.width,
         height: target.height,
         byteCount: target.width * target.height * 8,
       })),
+      ...passDepthEntries.map(({ id, passId, pass: passValue }) => {
+        const targetWidth = passValue.renderTarget.width;
+        const targetHeight = passValue.renderTarget.height;
+        return textureResource(id, passValue.renderTarget.depthTexture, {
+          width: targetWidth,
+          height: targetHeight,
+          byteCount: targetWidth * targetHeight * 4,
+          attachmentFormat: "depth24plus-or-implementation-depth",
+          passId,
+        });
+      }),
+      instancedAttributeResource("instance-dissolve", dissolveAttributes.dissolve, "visible/shadow dissolve threshold"),
+      instancedAttributeResource("instance-variant", dissolveAttributes.variant, "deterministic material variant"),
     ];
+    if (shadowColor) {
+      const cost = renderTargetTextureCost(shadowColor);
+      resources.push(textureResource("directional-shadow-color", shadowColor, {
+        width: key.shadow.map.width,
+        height: key.shadow.map.height,
+        byteCount: key.shadow.map.width * key.shadow.map.height * cost.storageBytesPerTexel,
+        attachmentFormat: cost.format,
+        attachmentByteCostPerSample: cost.attachmentByteCostPerSample,
+      }));
+    }
     if (shadowDepth) {
       resources.push(textureResource("directional-shadow-depth", shadowDepth, {
         width: key.shadow.map.width,
         height: key.shadow.map.height,
         byteCount: key.shadow.map.width * key.shadow.map.height * 4,
+        attachmentFormat: "depth24plus-or-implementation-depth",
       }));
     }
     return {
       resources,
-      sampledTextureBindings: 3,
-      projectionSampleOperations: {
-        atlas: projectionMaterials.atlasMaterial.userData.projectionLedger.executedSamples,
-        textureArray: projectionMaterials.arrayMaterial.userData.projectionLedger.executedSamples,
-        triplanar: projectionMaterials.triplanarMaterial.userData.projectionLedger.executedSamples,
+      sampledTextureBindingModel: {
+        value: 3,
+        provenance: "Derived from the three live projection material resources; compiled per-stage layout remains unmeasured",
+        compiledLayoutVerdict: "INSUFFICIENT_EVIDENCE",
       },
-      sceneMrtAttachments: validationAttachments ? Object.keys(validationMrt) : ["output", "emissive"],
-      sceneMrtAttachmentCount: sceneTargets.length || (validationAttachments ? 7 : 2),
+      projectionOperationModel: {
+        provenance: "Derived from installed r185 projection multiplicity; generated WGSL inspection remains unmeasured",
+        compiledShaderVerdict: "INSUFFICIENT_EVIDENCE",
+        values: {
+          atlas: projectionMaterials.atlasMaterial.userData.projectionLedger.executedSamples,
+          textureArray: projectionMaterials.arrayMaterial.userData.projectionLedger.executedSamples,
+          triplanar: projectionMaterials.triplanarMaterial.userData.projectionLedger.executedSamples,
+        },
+      },
+      sceneMrtAttachments: ["output", "emissive"],
+      sceneMrtAttachmentCount: sceneTargets.length || 2,
       sceneMrtRuntimeAllocated: sceneTargets.length > 0,
+      sceneMrtAttachmentByteCostPerSample: productionAttachmentBudget.total,
+      diagnosticMrtPasses: diagnosticPasses.map((entry) => ({
+        id: entry.id,
+        attachments: Object.keys(entry.mrt),
+        attachmentCount: renderTargetTextures(entry.pass.renderTarget).length || 3,
+        runtimeAllocated: renderTargetTextures(entry.pass.renderTarget).length > 0,
+        attachmentByteCostPerSample: entry.budget.total,
+      })),
+      diagnosticMrtConfiguredAttachmentCount: diagnosticPasses.reduce(
+        (count, entry) => count + Object.keys(entry.mrt).length,
+        0,
+      ),
+      diagnosticMrtRuntimeAttachmentCount: diagnosticTargetEntries.length,
+      diagnosticMrtRuntimeAllocated: diagnosticTargetEntries.length > 0,
+      deviceMaxColorAttachmentBytesPerSample: colorAttachmentLimit,
+      attachmentBudgets: {
+        production: productionAttachmentBudget,
+        diagnosticIdentity: diagnosticIdentityPass ? diagnosticIdentityAttachmentBudget : null,
+        diagnosticSurface: diagnosticSurfacePass ? diagnosticSurfaceAttachmentBudget : null,
+      },
+      diagnosticPassPolicy: "each pass is reachable only from its material diagnostic outputs; the mosaic reaches both",
       bloomInternalTargetCount: bloomTargets.length,
+      passDepthTargets: passDepthEntries.map(({ id, passId, pass: passValue }) => ({
+        id,
+        passId,
+        runtimeIdentity: passValue.renderTarget.depthTexture.uuid,
+        width: passValue.renderTarget.width,
+        height: passValue.renderTarget.height,
+      })),
       shadow: {
         enabled: renderer.shadowMap.enabled === true,
         caster: dissolveMesh.name,
@@ -623,7 +1133,20 @@ export async function createProceduralPbrScene({
         mapAllocated: Boolean(shadowDepth),
         mapSize: [key.shadow.mapSize.x, key.shadow.mapSize.y],
       },
-      instanceStorageBytes: dissolveAttributes.dissolve.array.byteLength + dissolveAttributes.variant.array.byteLength,
+      instanceAttributeBytes: dissolveAttributes.resourceContract.bytes,
+      activeStorageBindingBytes: 0,
+      instanceStateAccess: dissolveAttributes.resourceContract.shaderReadPath,
+      storageAllocations: [
+        instancedAttributeResource("instance-dissolve", dissolveAttributes.dissolve, "visible/shadow dissolve threshold"),
+        instancedAttributeResource("instance-variant", dissolveAttributes.variant, "deterministic material variant"),
+      ],
+      captureTransients: captureTransientRecords.map((record) => ({ ...record })),
+      captureTransientSummary: {
+        createdCount: captureTransientRecords.length,
+        disposedCount: captureTransientRecords.filter((record) => record.active === false).length,
+        activeCount: captureTransientRecords.filter((record) => record.active === true).length,
+        peakByteCount: captureTransientRecords.reduce((peak, record) => Math.max(peak, record.byteCount), 0),
+      },
       viewport,
       physicalResidencyVerdict: "INSUFFICIENT_EVIDENCE",
     };
@@ -631,6 +1154,11 @@ export async function createProceduralPbrScene({
 
   function describePipeline() {
     return {
+      runtimeProfile,
+      timestampQueriesRequired: timestampQueriesRequested,
+      timestampQueriesRequested,
+      timestampQueriesActive,
+      performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
       owners: {
         renderer: "tsl-procedural-pbr",
         renderPipeline: "tsl-procedural-pbr",
@@ -647,8 +1175,33 @@ export async function createProceduralPbrScene({
         { id: "dissolve-mask", producer: "shared instance field graph", consumers: ["visible maskNode", "maskShadowNode"] },
       ],
       sceneSubmissions: [
-        { id: "directional-shadow-casters", count: key.castShadow ? 1 : 0, kind: "shadow" },
-        { id: "lit-scene-mrt", count: 1, kind: "full-lit-output" },
+        {
+          id: "directional-shadow-casters",
+          declaredPassCount: key.castShadow ? 1 : 0,
+          kind: "shadow",
+          provenance: "Authored pass topology",
+          actualSubmissionCountVerdict: "INSUFFICIENT_EVIDENCE",
+        },
+        {
+          id: "lit-scene-mrt",
+          declaredPassCount: 1,
+          kind: "full-lit-output",
+          provenance: "Authored pass topology",
+          actualSubmissionCountVerdict: "INSUFFICIENT_EVIDENCE",
+        },
+        {
+          id: "material-diagnostic-mrt-passes",
+          declaredPassCount: !validationAttachments
+            ? 0
+            : activeSceneMode === DIAGNOSTIC_MOSAIC_CAPTURE_MODE
+              ? 2
+              : activeSceneMode.startsWith("material-")
+                ? 1
+                : 0,
+          kind: "diagnostic-extra-scene-pass",
+          provenance: "Derived from selected output-node reachability",
+          actualSubmissionCountVerdict: "INSUFFICIENT_EVIDENCE",
+        },
       ],
       computeDispatches: [],
       resources: describeResources().resources,
@@ -667,10 +1220,22 @@ export async function createProceduralPbrScene({
 
   function getMetrics() {
     return {
-      backend: {
-        name: "WebGPU",
-        isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
-      },
+      labId: "tsl-procedural-pbr",
+      backendKind: "WebGPU",
+      nativeWebGPU: renderer.backend?.isWebGPUBackend === true,
+      initialized: true,
+      rendererType: "WebGPURenderer",
+      rendererBackendEvidence: rendererBackendEvidence(),
+      adapterIdentity,
+      rendererDeviceStatus,
+      rendererDeviceGeneration,
+      deviceLossGeneration,
+      deviceLossDetails,
+      runtimeProfile,
+      timestampQueriesRequired: timestampQueriesRequested,
+      timestampQueriesRequested,
+      timestampQueriesActive,
+      performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
       threeRevision: THREE.REVISION,
       status: "incomplete",
       acceptance: "INSUFFICIENT_EVIDENCE",
@@ -705,7 +1270,15 @@ export async function createProceduralPbrScene({
         viewport,
       },
       history: { resetCount: historyResetCount, lastCause: lastHistoryResetCause, temporalResources: 0 },
+      lifecycle: {
+        listenerCount: listenerScope.size,
+        listenerScopeDisposed: listenerScope.disposed,
+        captureTransientActiveCount: captureTransientRecords.filter((record) => record.active).length,
+      },
       rendererInfo: {
+        rendererType: "WebGPURenderer",
+        backendType: "WebGPUBackend",
+        backendEvidence: rendererBackendEvidence(),
         render: { ...renderer.info.render },
         memory: { ...renderer.info.memory },
       },
@@ -722,8 +1295,13 @@ export async function createProceduralPbrScene({
   async function dispose() {
     if (disposed) return;
     disposed = true;
+    disposingRenderer = true;
     renderer.setAnimationLoop(null);
+    listenerScope.dispose();
+    rawCaptureCache.clear();
     bloomPass.dispose();
+    diagnosticIdentityPass?.dispose();
+    diagnosticSurfacePass?.dispose();
     scenePass.dispose();
     renderPipeline.dispose();
     const geometries = new Set();
@@ -755,6 +1333,11 @@ export async function createProceduralPbrScene({
     resize,
     renderOnce,
     capturePixels,
+    getRawCaptureArtifact,
+    listen: (target, type, listener, options) => {
+      assertLive();
+      return listenerScope.listen(target, type, listener, options);
+    },
     describePipeline,
     describeResources,
     getMetrics,
@@ -763,6 +1346,10 @@ export async function createProceduralPbrScene({
     renderPipeline,
     scene,
     scenePass,
+    diagnosticPasses: Object.freeze({
+      identity: diagnosticIdentityPass,
+      surface: diagnosticSurfacePass,
+    }),
     bloomPass,
     camera,
     materials,
@@ -772,7 +1359,7 @@ export async function createProceduralPbrScene({
   setCamera("design");
   setTier(tier);
   setSeed(1);
-  setScenario("pbr-identity");
+  setScenario(routeLock?.kind === "mechanism" ? routeLock.id : "pbr-identity");
   return controller;
 }
 
@@ -794,12 +1381,16 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     }
     const routeKind = document.documentElement.dataset.routeKind;
     const routeId = document.documentElement.dataset.routeId;
+    const runtimeProfile = new URLSearchParams(window.location.search).get("profile") ?? "correctness";
     const controller = await createProceduralPbrScene({
       canvas,
       width: window.innerWidth,
       height: window.innerHeight,
       pixelRatio: window.devicePixelRatio,
       tier: routeKind === "tier" ? routeId : "ultra",
+      runtimeProfile,
+      lockedRouteKind: routeKind ?? null,
+      lockedRouteId: routeId ?? null,
     });
     if (routeKind === "mechanism") controller.setScenario(routeId);
     window.labController = controller;
@@ -814,12 +1405,12 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       controller.setMode(activeControl.checked ? mode : SCENE_DEBUG_MODES.final);
     }
 
-    debugSelect?.addEventListener("change", () => controller.setMode(debugSelect.value));
-    rawEmissive?.addEventListener("change", () => setExclusiveSceneDebugMode(rawEmissive, SCENE_DEBUG_MODES.rawEmissive));
-    bloomOnly?.addEventListener("change", () => setExclusiveSceneDebugMode(bloomOnly, SCENE_DEBUG_MODES.bloomOnly));
-    noPost?.addEventListener("change", () => setExclusiveSceneDebugMode(noPost, SCENE_DEBUG_MODES.noPost));
-    scale?.addEventListener("input", () => controller.setMaterialScale(Number(scale.value)));
-    window.addEventListener("resize", () => controller.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio));
+    if (debugSelect) controller.listen(debugSelect, "change", () => controller.setMode(debugSelect.value));
+    if (rawEmissive) controller.listen(rawEmissive, "change", () => setExclusiveSceneDebugMode(rawEmissive, SCENE_DEBUG_MODES.rawEmissive));
+    if (bloomOnly) controller.listen(bloomOnly, "change", () => setExclusiveSceneDebugMode(bloomOnly, SCENE_DEBUG_MODES.bloomOnly));
+    if (noPost) controller.listen(noPost, "change", () => setExclusiveSceneDebugMode(noPost, SCENE_DEBUG_MODES.noPost));
+    if (scale) controller.listen(scale, "input", () => controller.setMaterialScale(Number(scale.value)));
+    controller.listen(window, "resize", () => controller.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio));
     const captureMode = new URLSearchParams(window.location.search).has("capture");
     if (!captureMode) rendererLoop(controller);
   } catch (error) {
@@ -831,6 +1422,6 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 function rendererLoop(controller) {
   controller.renderer.setAnimationLoop((timeMs) => {
     controller.setTime(timeMs * 0.001);
-    controller.renderOnce();
+    void controller.renderOnce(false);
   });
 }

@@ -11,14 +11,31 @@ view distribution, and target hardware.
 
 The canonical browser scene includes walnut, antique gold, ebony lacquer,
 lava, wet rock, a mip-guttered atlas, a four-layer texture array, a true
-three-sample triplanar material, storage-backed instanced dissolve, and an
+three-sample triplanar material, storage-capable instanced dissolve attributes, and an
 enabled directional shadow caster/receiver fixture. Validation mode uses the
-shared scene output and emissive attachments plus real material albedo,
-parameter, normal, footprint, and normal-variance MRT attachments. Production
-callers can disable the five material diagnostic attachments.
+two-attachment HDR scene pass and two independently reachable diagnostic
+passes. Each diagnostic pass retains its required `RGBA16F` output anchor. The
+identity pass adds two `RGBA8` attachments for albedo and parameters; the
+surface pass adds three `RGBA8` attachments for normal, footprint, and scaled
+normal variance. Dissolve remains the alpha lane of the parameters attachment.
+Production callers can disable both
+diagnostic passes. Under the WebGPU format table, `RGBA16F` and `RGBA8` each
+have an 8-byte render-target pixel cost, distinct from their 8-byte and 4-byte
+storage footprints. The production pass therefore costs 16 bytes/sample, the
+identity diagnostic costs 24, and the surface diagnostic costs 32 against the
+initialized device's reported limit. An individual diagnostic performs one explicitly declared
+extra scene pass; the mosaic performs two. Final/no-post/bloom output reaches
+neither pass. The previous simultaneous seven-attachment and five-attachment
+layouts were invalid on a 32-byte-limit adapter.
 `lab.manifest.json` intentionally remains `incomplete` until the
 current adapter supplies render-target PNGs, shadow-atlas dissolve parity,
 supersampled specular-error measurements, GPU timestamps, and lifecycle proof.
+
+The dissolve fields use `StorageInstancedBufferAttribute`, but this fixture
+currently consumes them as instanced vertex attributes and performs zero
+compute dispatches. They are storage-capable resources, not evidence of an
+active storage binding or GPU simulation. Runtime resource reporting preserves
+that distinction.
 
 ## Physical Identity Contract
 
@@ -72,6 +89,14 @@ r185 `getRoughness()`. A texture-normal implementation must additionally retain
 the unnormalized mip normal mean and its variance, and filter clearcoat normals
 independently when present.
 
+`pbr-oracles.mjs` supplies executable CPU references for the fade equation,
+removed slope variance, alpha widening, atlas transforms, triplanar weights,
+dissolve IoU, and renderer-returned row layout. Those references catch source
+and mutation drift; they are not GPU parity, supersampled radiance, or temporal
+sparkle evidence. The Schlick hemispherical integral in unit validation proves
+only that isolated Fresnel equation. It is deliberately not called a
+NodeMaterial furnace or whole-BRDF energy test.
+
 This fixture leaves `clearcoatNormalNode` unset, so r185 uses `normalView` for
 the base and coat lobes; the same removed material slope variance widens both
 roughness values. A distinct clearcoat normal requires its own variance path.
@@ -103,6 +128,11 @@ The `atlas-array-and-triplanar` route executes three distinct live paths:
   selected per instance by `instanceTextureLayer`;
 - the triplanar fixture invokes r185 `triplanarTexture()` and records three
   filtered operations for its one color texture.
+
+The projection-operation ledger is **Derived** from the installed r185 helper
+contract and the selected texture multiplicity. Until generated WGSL and the
+compiled bind layout are captured, both remain `INSUFFICIENT_EVIDENCE`; the
+ledger is not presented as a measured shader count.
 
 The `instanced-dissolve` and `shadow-parity` routes use one material graph and
 one instance attribute pair. `maskNode` and `maskShadowNode` reference the same
@@ -159,6 +189,27 @@ on every resize. `capturePixels()` uses the shared 256-byte-aligned WebGPU
 readback contract. `npm run capture` delegates to the repository capture
 runner and writes only `evidence-manifest.incomplete.json`; it cannot promote
 the lab to accepted status.
+
+`capturePixels()` reports the byte stride actually returned by Three.js
+separately from the 256-byte-aligned row stride requested for retained WebGPU
+evidence. Compact renderer output is never relabelled as an already-padded GPU
+buffer; the shared capture runner performs and records any CPU padding.
+
+Material-channel capture reads each named MRT texture index directly. Albedo,
+parameters, normal, footprint, and normal variance retain their original
+`RGBA8` attachment bytes. Emissive retains the production `RGBA16F` bytes and
+derives its review PNG with the recorded
+`half-float-reinhard-linear-to-srgb-v1` transform. The artifact validator
+reconstructs each PNG from retained bytes, checks semantic subject coverage,
+and rejects stale source closures. These are correctness diagnostics only;
+shadow-atlas parity, supersampled specular error, timestamp attribution, and a
+50-cycle lifecycle verdict remain insufficient.
+
+Fixed uint seeds are hashed to bounded `[0,64)` float phases before reaching
+TSL noise. This preserves local float32 derivatives for `0x9e3779b9` instead
+of adding a multi-billion-unit coordinate offset. Fixed mechanism and tier
+routes reject conflicting public setter calls after startup. Browser listeners
+belong to the controller's disposable listener scope.
 
 ## Minimal Usage
 

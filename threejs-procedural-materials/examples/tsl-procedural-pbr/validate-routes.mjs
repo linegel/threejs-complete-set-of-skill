@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import { createStrictLabController } from "../../../labs/runtime/strict-lab-controller.mjs";
 import { lockedRouteSelectionMatches } from "../../../scripts/lib/page-routes.mjs";
 import { MATERIAL_CAMERAS, MATERIAL_MODES, MATERIAL_SCENARIOS } from "./main.js";
-import { resolveLockedRoute } from "./route-contract.mjs";
+import { outputPlan } from "./capture-hook.mjs";
+import { assertLockedRouteMutation, resolveLockedRoute } from "./route-contract.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../../..");
@@ -22,6 +23,8 @@ assert.deepEqual(manifest.tiers.map(({ id }) => id), target.tiers);
 assert.deepEqual(manifest.scenarios.map(({ id }) => id), MATERIAL_SCENARIOS);
 assert.deepEqual(manifest.modes, MATERIAL_MODES);
 assert.deepEqual(manifest.cameras, MATERIAL_CAMERAS);
+assert.equal(outputPlan.length, 10, "capture hook must classify every normative standard output");
+assert(outputPlan.every((entry) => entry.status === "CAPTURED" && entry.filename === `${entry.id}.png`));
 
 for (const [kind, ids] of [["mechanism", target.mechanisms], ["tier", target.tiers]]) {
   for (const id of ids) {
@@ -32,6 +35,15 @@ for (const [kind, ids] of [["mechanism", target.mechanisms], ["tier", target.tie
     assert(html.includes(`data-route-id="${id}"`), `${kind}/${id} does not lock route id`);
     assert(html.includes("route-entry.mjs"), `${kind}/${id} does not import the canonical route entry`);
     assert(Object.isFrozen(resolveLockedRoute(manifest, kind, id)));
+    assert.equal(assertLockedRouteMutation({ kind, id }, kind, id), id);
+    const conflictingId = ids.find((candidate) => candidate !== id);
+    if (conflictingId) {
+      assert.throws(
+        () => assertLockedRouteMutation({ kind, id }, kind, conflictingId),
+        /Locked/,
+        `${kind}/${id} did not reject a conflicting post-ready selection`,
+      );
+    }
     const metrics = kind === "mechanism"
       ? { scenario: id, mechanism: id, routeSelection: { scenario: id, mechanism: id } }
       : { tier: id, activeTier: id, routeSelection: { tier: id } };
