@@ -24,13 +24,13 @@
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
   ],
   "browserEntry": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
-  "sourceHash": "sha256:65da557ed0239e743e9d91115cf57a8dd06a29116d833538042104aa486c60e2",
+  "sourceHash": "sha256:de7d2f317cc0c5ff52f3ff521c019e3aaf2d22d29544c157b0ee08d22f7fdf18",
   "publishedHashInputs": [
     "docs/demos/webgpu-camera-rig",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:ede231485e4e5ea03ba0b4a1e1b4f9e98d2fb73f8879d84d12f5129b1da31abb",
+  "publishedBundleHash": "sha256:ed23f6ba7544b77e2d526b089885a636795ef42f8f0aa13fff7c4a5acde212ab",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

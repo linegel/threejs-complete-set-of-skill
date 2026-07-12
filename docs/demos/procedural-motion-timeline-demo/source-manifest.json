@@ -18,13 +18,13 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:e0d840c58ab70d36a9c2035457a7d48f3c998f420224c60d2ea1c83a4e2a54a9",
+  "sourceHash": "sha256:7f6c3bcf00e5ed3fc3ba9d07db9ab987e201369f83d33d2081781847040b9331",
   "publishedHashInputs": [
     "docs/demos/procedural-motion-timeline-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:2298893b5843fd1dd246555f2805f621ac0ef3d95a6a0d5e79c8cd11575be7e6",
+  "publishedBundleHash": "sha256:0566f1f02ad3e08181660b8d6ec001654de49b126d7862aad252cdb1f7ed9fa6",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

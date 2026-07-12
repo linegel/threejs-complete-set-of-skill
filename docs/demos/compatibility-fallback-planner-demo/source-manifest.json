@@ -23,8 +23,8 @@
     "docs/demos/compatibility-fallback-planner-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:95104fb5942f8d80e6a3d4ad0099f51ef2f4b5b0aa295fde4daf15590d45cdf1",
+  "publishedBundleHash": "sha256:0b6d2da032d5f050953deb6472169e7334556750b62e4d34ade1b2c9a52533b7",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

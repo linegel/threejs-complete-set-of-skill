@@ -49,13 +49,13 @@
     "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
   ],
   "browserEntry": "integration-labs/relativistic-space-shot/index.html",
-  "sourceHash": "sha256:cd1a484962b562728a67488ed71312fa4b68126e261a801024bfee9b2aa89f96",
+  "sourceHash": "sha256:f55c428986bb46f6b28374c5d4fb6e61b2868c6d7ec4923a9e379bfaf12b2ab1",
   "publishedHashInputs": [
     "docs/demos/relativistic-space-shot",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:3c08fdb4a3e97cd0c852a564bce9d04d36c3e1535d20329e686f19f658639151",
+  "publishedBundleHash": "sha256:011d7a8079a1f619971f8f5d92f33de7bbccddb0fa1857e4194a6d8a373d3121",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

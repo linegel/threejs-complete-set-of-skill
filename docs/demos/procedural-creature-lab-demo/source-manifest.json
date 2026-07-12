@@ -23,8 +23,8 @@
     "docs/demos/procedural-creature-lab-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:5a97b7c7cef441d4168268db6e4103b72d668246cb0af40f08eed72a19565c09",
+  "publishedBundleHash": "sha256:542cddc8d6b5faf040c3c99bc1b8e885b203cd0f58a57ef95e76f74da40ab4da",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

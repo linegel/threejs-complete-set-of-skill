@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-object-sculptor-corpus",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-object-sculptor/examples/shared/sculpt-runtime.js",
+    "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus",
+    "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/corpus.contract.json"
+  ],
+  "sourceHashInputs": [
+    "labs/runtime/aligned-readback.mjs",
+    "threejs-object-sculptor/examples/shared/sculpt-runtime.js",
+    "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
+  ],
+  "browserEntry": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
+  "sourceHash": "sha256:aae80ac61185f536e75d920cadd274ea39f5d4dc301ee7062b94df17bbf4d2a7",
+  "publishedHashInputs": [
+    "docs/demos/webgpu-object-sculptor-corpus",
+    "docs/demos/assets"
+  ],
+  "publishedBundleHash": "sha256:1e1c61aa6a8bd4c46654734a95bda39b1ae9b3037f8ad4423302d4b55756eb8f",
+  "threeRevision": "0.185.1",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
+  "evidenceBundleId": "correctness"
+}

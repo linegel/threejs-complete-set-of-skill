@@ -24,8 +24,8 @@
     "docs/demos/debugging-contract-lab",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:084b495dc0b64661d1e77a6ea34d9bef889df6316b0e617b26efbbaa1126a7ad",
+  "publishedBundleHash": "sha256:9a15841937660b1869953a44550d5b992ce56031ec080f66654dee4409c43c6a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

@@ -23,8 +23,8 @@
     "docs/demos/ocean-generated-wave-seeds",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:5983de78791a5e48441d762e009beb767d0c589fb6984dda0cf40855803350bf",
+  "publishedBundleHash": "sha256:a6ef1b88e6acff2fb76380e0523e9a12eb55929ac9c02d65183c79b99604e2e7",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

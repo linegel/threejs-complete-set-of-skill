@@ -23,8 +23,8 @@
     "docs/demos/webgpu-quadtree-planet",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:10b5e5b272454b551b54e3fb3464990f09cabba1c11ab614fb2233ebf51519cc",
+  "publishedBundleHash": "sha256:9f1d271aa585eff75fec7f4bf73c870ec7c482cdafcd4eb64f876da13ae6eb0e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

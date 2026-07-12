@@ -1,7 +1,7 @@
 {
   "name": "Three.js WebGPU Skill Pack",
   "short_name": "Three.js Skills",
-  "description": "27 expert agent skills with 40 primary Three.js WebGPU/TSL implementations and 5 cross-skill flagships.",
+  "description": "27 expert agent skills with 41 primary Three.js WebGPU/TSL implementations and 5 cross-skill flagships.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

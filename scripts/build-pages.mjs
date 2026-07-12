@@ -455,14 +455,14 @@ footer code{color:var(--cyan);font-size:11px}
 
 const navHtml = (depth) => `<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="${depth}">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="${depth}#matrix">How it works</a><a href="${depth}#flagships">Examples</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
 </nav></div></div>`;
 
 const footerHtml = `<div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary implementations · registry <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span><br/>
+  <span style="font-size:13px">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} working implementations · build <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="${SITE}about/">About &amp; methodology</a> · <a href="${REPO}">Repository</a> · <a href="${SITE}demos/registry.json">demo registry</a> · <a href="${SITE}llms.txt">llms.txt</a> · <a href="${SITE}skills.json">skills.json</a></span>
+  <span><a href="${SITE}about/">About &amp; methodology</a> · <a href="${REPO}">Repository</a> · <a href="${SITE}llms.txt">For coding agents</a></span>
 </footer></div>`;
 
 const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" />
@@ -541,6 +541,7 @@ const providerPosterPath = (demo) => {
   return previewImageExists(preview) ? preview : null;
 };
 const runtimeEvidenceSummaries = new Map();
+const staleRuntimeEvidenceIds = new Set();
 const runtimeEvidenceSummary = (demo) => {
   if (runtimeEvidenceSummaries.has(demo.id)) return runtimeEvidenceSummaries.get(demo.id);
   const summaryPath = join(root, 'docs', 'visual-validation', demo.id, 'evidence-summary.json');
@@ -549,11 +550,16 @@ const runtimeEvidenceSummary = (demo) => {
     return null;
   }
   const summary = JSON.parse(readFileSync(summaryPath, 'utf8'));
+  const stale = summary.acceptanceStatus !== demo.status
+    || summary.canonicalSourceHash !== demo.sourceHash;
+  if (stale) {
+    staleRuntimeEvidenceIds.add(demo.id);
+    runtimeEvidenceSummaries.set(demo.id, null);
+    return null;
+  }
   const invalid = summary.schemaVersion !== 1
     || summary.labId !== demo.id
     || summary.classification !== 'inspected-runtime-evidence-preview'
-    || summary.acceptanceStatus !== demo.status
-    || summary.canonicalSourceHash !== demo.sourceHash
     || summary.runtime?.isWebGPUBackend !== true
     || !Array.isArray(summary.images)
     || !Array.isArray(summary.limitations)
@@ -594,6 +600,7 @@ const directPrimaryPreview = (demo) => {
       sourceId: demo.id,
     };
   }
+  if (staleRuntimeEvidenceIds.has(demo.id)) return null;
   const evidence = `visual-validation/${demo.id}/final.design.png`;
   if (docsImageExists(evidence)) {
     return {
@@ -782,27 +789,26 @@ ${JSON.stringify({
 <link href="${esc(FONTS)}" rel="stylesheet" />
 <style>
 ${baseCss}
-header.hero{position:relative;overflow:hidden;min-height:calc(100svh - 76px);display:grid;align-items:center;padding:clamp(64px,8vw,112px) 0}
+header.hero{position:relative;overflow:hidden;min-height:calc(100svh - 76px);display:grid;align-items:center;padding:clamp(56px,7vw,96px) 0}
 .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 44%,rgba(127,212,193,.09),transparent 28%),radial-gradient(circle at 16% 22%,rgba(255,180,84,.1),transparent 28%),linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);background-size:auto,auto,52px 52px,52px 52px;mask-image:linear-gradient(to bottom,black 0%,rgba(0,0,0,.82) 72%,transparent 100%)}
 .hero .wrap{position:relative;z-index:2;width:100%}
-.hero-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);align-items:center;gap:clamp(38px,7vw,96px)}
+.hero-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(400px,.92fr);align-items:center;gap:clamp(38px,6vw,82px)}
 .hero .kicker{font-size:clamp(10px,1.25vw,13px);letter-spacing:clamp(.1em,1vw,.22em);margin-bottom:24px}
-h1{font-weight:700;font-size:clamp(46px,6.2vw,82px);line-height:1.01;letter-spacing:-.025em;max-width:13ch}
+h1{font-weight:700;font-size:clamp(46px,5.35vw,72px);line-height:1.01;letter-spacing:-.025em;max-width:16ch}
 h1 em{font-style:normal;color:var(--amber)}
-.lede{margin-top:28px;max-width:62ch;color:var(--dim);font-size:clamp(16px,1.45vw,19px)}
-.hero-proof{display:inline-flex;align-items:center;gap:9px;margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.06em;text-transform:uppercase}
-.hero-proof:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
-.hero-install{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;max-width:720px;margin-top:20px;border-radius:12px;background:rgba(8,11,16,.88);box-shadow:0 0 0 1px rgba(255,180,84,.34),0 14px 42px rgba(0,0,0,.28);overflow:hidden}
-.hero-install code{min-width:0;display:flex;align-items:center;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.45;color:var(--ink);white-space:nowrap;scrollbar-width:thin}
-.hero-install button{min-width:72px;min-height:44px;padding:10px 14px;border:0;border-left:1px solid rgba(255,255,255,.14);background:rgba(255,180,84,.12);font-family:var(--mono);font-size:12px;color:var(--amber);cursor:pointer;transition-property:background,color,scale;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
-.hero-install button:hover{background:rgba(255,180,84,.22);color:var(--ink)}.hero-install button:active{scale:.96}.hero-install button:focus-visible{outline:2px solid var(--cyan);outline-offset:-3px}
+.lede{margin-top:24px;max-width:54ch;color:var(--dim);font-size:clamp(16px,1.45vw,19px)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-.hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:44px;display:inline-flex;align-items:center;padding:10px 16px;background:rgba(15,18,24,.78);border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition-property:scale,color,box-shadow;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
-.hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}.hero-action:active{scale:.96}
-.hero-ledger{padding:clamp(24px,3.2vw,36px);border-radius:22px;background:rgba(9,12,17,.86);box-shadow:0 0 0 1px rgba(255,255,255,.1),0 28px 72px rgba(0,0,0,.28)}
-.hero-ledger-kicker{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase}.hero-ledger h2{max-width:18ch;margin-top:10px;font-size:clamp(24px,3vw,38px);line-height:1.08;text-wrap:balance}
-.hero-ledger dl{margin-top:24px;border-top:1px solid var(--line)}.hero-ledger-row{display:grid;grid-template-columns:minmax(118px,.38fr) minmax(0,1fr);gap:20px;align-items:start;padding:15px 0;border-bottom:1px solid var(--line)}.hero-ledger dt{padding-top:3px;color:var(--dim);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.hero-ledger dd{display:grid;gap:4px}.hero-ledger strong{font:600 clamp(20px,2vw,26px)/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}.hero-ledger dd[data-state="accepted"] strong{color:var(--cyan)}.hero-ledger dd[data-state="pending"] strong{color:var(--amber)}.hero-ledger dd span{color:var(--dim);font-size:12px;line-height:1.45;text-wrap:pretty}
-.hero-ledger-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.hero-ledger-link{display:inline-flex;min-height:40px;align-items:center;padding:8px 11px;border-radius:10px;background:rgba(255,180,84,.07);box-shadow:0 0 0 1px rgba(255,180,84,.18);font-family:var(--mono);font-size:10px;color:var(--amber);transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.hero-ledger-link:hover{color:var(--ink);background:rgba(255,180,84,.13);box-shadow:0 0 0 1px rgba(255,180,84,.34)}.hero-ledger-link:active{scale:.96}
+.hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:46px;display:inline-flex;align-items:center;padding:10px 17px;background:rgba(15,18,24,.78);border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition-property:scale,color,box-shadow,background-color;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.hero-action--primary{background:var(--amber);color:#171006;box-shadow:0 14px 42px rgba(255,180,84,.18)}
+.hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}.hero-action--primary:hover{background:#ffc272;color:#171006;box-shadow:0 18px 48px rgba(255,180,84,.24)}.hero-action:active{scale:.96}
+.hero-note{margin-top:22px;color:var(--dim);font:11px/1.5 var(--mono)}.hero-note strong{color:var(--cyan);font-weight:500}
+.hero-showcase{position:relative;min-height:520px;overflow:hidden;border-radius:24px;background:#080c12;box-shadow:0 0 0 1px rgba(255,255,255,.12),0 32px 82px rgba(0,0,0,.38)}
+.hero-showcase:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,9,14,.12),rgba(6,9,14,.96) 72%),url("demos/shared/generated-variants/caustic-field-a.png") center/cover;filter:saturate(.8) hue-rotate(154deg) brightness(.78);scale:1.04}
+.hero-showcase-inner{position:relative;z-index:1;min-height:520px;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(24px,3vw,34px)}
+.hero-showcase-kicker{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.11em;text-transform:uppercase}
+.hero-showcase h2{max-width:13ch;margin-top:10px;font-size:clamp(30px,3.2vw,44px);line-height:1.04;text-wrap:balance}
+.skill-route{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:22px}.skill-route a{padding:7px 9px;border-radius:8px;background:rgba(7,11,17,.78);box-shadow:0 0 0 1px rgba(255,255,255,.13);font:10px/1.35 var(--mono);color:var(--ink);backdrop-filter:blur(10px)}.skill-route span{color:var(--amber);font:12px var(--mono)}
+.hero-showcase p:last-of-type{max-width:45ch;margin-top:18px;color:rgba(237,232,221,.72);font-size:13px}.hero-showcase-link{display:inline-flex;align-self:flex-start;margin-top:20px;color:var(--amber);font:11px var(--mono)}.hero-showcase-link:hover{color:var(--ink)}
 .stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.64)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:0}
 .stat{padding:20px clamp(10px,2vw,24px);border-left:1px solid var(--line)}.stat:first-child{border-left:0}
@@ -810,7 +816,8 @@ h1 em{font-style:normal;color:var(--amber)}
 .matrix-shell{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);gap:clamp(32px,6vw,80px);align-items:start}
 .matrix-label{display:inline-flex;margin-bottom:18px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
 .matrix-copy p{color:var(--dim);max-width:56ch}.matrix-copy strong{color:var(--ink)}
-.matrix-rails{display:grid;gap:20px;padding:24px;border-radius:20px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));box-shadow:var(--shadow-card)}
+.matrix-rails{display:grid;gap:0;padding:10px 24px;border-radius:20px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));box-shadow:var(--shadow-card)}
+.route-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:16px;padding:20px 0;border-bottom:1px solid var(--line)}.route-step:last-of-type{border-bottom:0}.route-step b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(127,212,193,.09);box-shadow:0 0 0 1px rgba(127,212,193,.24);color:var(--cyan);font:11px var(--mono)}.route-step h3{font-size:18px}.route-step p{margin-top:5px;color:var(--dim);font-size:13px}.matrix-rails .hero-action{justify-self:start;margin:10px 0 14px}
 .coverage-rail{display:grid;gap:9px}.rail-head{display:flex;justify-content:space-between;gap:20px;font-family:var(--mono);font-size:11px}.rail-head b{color:var(--ink);font-weight:500}.rail-head span{color:var(--dim);font-variant-numeric:tabular-nums}.rail-track{height:9px;overflow:hidden;border-radius:6px;background:#06080b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.rail-fill{height:100%;width:var(--value);border-radius:inherit;background:linear-gradient(90deg,var(--cyan),#b9f5e7);box-shadow:0 0 20px rgba(127,212,193,.34)}.coverage-rail--acceptance .rail-fill{background:linear-gradient(90deg,var(--amber),#ffd392);box-shadow:0 0 20px rgba(255,180,84,.3)}.rail-note{color:var(--dim);font-size:13px}
 .achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
 .flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{--tone:var(--amber);position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--tone) 8%,var(--bg3)),rgba(11,14,19,.97) 60%);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--cyan{--tone:var(--cyan)}.flagship-card--lime{--tone:var(--lime)}.flagship-card--violet{--tone:var(--violet)}.flagship-card--rose{--tone:var(--rose)}
@@ -828,9 +835,9 @@ h1 em{font-style:normal;color:var(--amber)}
 @keyframes rise{from{opacity:0;translate:0 12px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}
 @media (prefers-reduced-motion:no-preference){.hero .kicker{animation:rise .55s ease-out both}h1{animation:rise .55s .07s ease-out both}.lede,.hero-proof{animation:rise .55s .14s ease-out both}.hero-actions{animation:rise .55s .2s ease-out both}@supports(animation-timeline:view()){.flagship-card{animation:rise linear both;animation-timeline:view();animation-range:entry 8% cover 28%}}}
 @media (hover:hover) and (pointer:fine){.flagship-card:hover,.lab-card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}.category:has(.card:hover) .category-head h3{color:var(--cyan)}}
-@media (max-width:980px){.hero-layout{grid-template-columns:1fr}.hero-ledger{max-width:620px;width:100%;justify-self:center}.matrix-shell{grid-template-columns:1fr}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-install{max-width:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview,.flagship-preview-missing{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
-@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.hero-ledger-row{grid-template-columns:1fr;gap:4px}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:18px}.rail-head{flex-direction:column;gap:2px}}
+@media (max-width:980px){.hero-layout{grid-template-columns:1fr}.hero-showcase{max-width:700px;width:100%;min-height:430px}.hero-showcase-inner{min-height:430px}.matrix-shell{grid-template-columns:1fr}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-showcase,.hero-showcase-inner{min-height:390px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview,.flagship-preview-missing{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
+@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.hero-showcase,.hero-showcase-inner{min-height:360px}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:10px 18px}}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}.card:hover,.flagship-card:hover,.lab-card:hover{translate:0 0}}
 </style>
 </head>
@@ -841,30 +848,28 @@ ${navHtml('')}
   <div class="wrap">
     <div class="hero-layout">
       <div class="hero-copy">
-        <p class="kicker">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · Native WebGPU/TSL · Evidence-gated</p>
-        <h1>${total} expert skills. One coherent <em>WebGPU research stack.</em></h1>
-        <p class="lede">A source-complete matrix for advanced Three.js graphics: ${canonicalDemos.length} canonical labs, ${flagshipDemos.length} cross-skill flagships, and ${supportPrimaryDemos.length} focused integration and mechanism surfaces. Every primary entry has a fixed browser route and source hash. Runtime acceptance stays deliberately harder.</p>
-        <p class="hero-proof">Acceptance state is explicit on every primary route</p>
-        <div class="hero-install" aria-label="Install the complete skill pack">
-          <code id="hero-install-command">${esc(SKILLS_INSTALL_PACK)}</code>
-          <button type="button" data-copy-install aria-label="Copy the full skill pack installation command">Copy</button>
-        </div>
+        <p class="kicker">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · Native WebGPU/TSL</p>
+        <h1>Build ambitious <em>Three.js scenes.</em></h1>
+        <p class="lede">Expert skills for WebGPU rendering, procedural worlds, and final-image pipelines, with working labs and explicit tradeoffs.</p>
         <div class="hero-actions">
-          <a class="hero-action" href="#matrix">Explore the matrix</a>
-          <a class="hero-action" href="#flagships">Inspect flagships</a>
-          <a class="hero-action" href="about/">Read the methodology</a>
+          <a class="hero-action hero-action--primary" href="skills/threejs-choose-skills.html">Find the right skill</a>
+          <a class="hero-action" href="#labs">Explore working labs</a>
         </div>
+        <p class="hero-note"><strong>${total} expert skills</strong> spanning scene architecture, simulation, materials, effects, and validation.</p>
       </div>
-      <aside class="hero-ledger" aria-labelledby="hero-ledger-title">
-        <p class="hero-ledger-kicker">Registry-derived repository state</p>
-        <h2 id="hero-ledger-title">Coverage you can inspect.</h2>
-        <dl>
-          <div class="hero-ledger-row"><dt>Primary routes</dt><dd><strong>${primaryDemos.length} / ${primaryDemos.length}</strong><span>Browser entry and canonical source hash published</span></dd></div>
-          <div class="hero-ledger-row"><dt>Accepted</dt><dd data-state="accepted"><strong>${acceptedPrimaryDemos.length} / ${primaryDemos.length}</strong><span>Claim-specific evidence bundle passed</span></dd></div>
-          <div class="hero-ledger-row"><dt>Pending</dt><dd data-state="pending"><strong>${primaryDemos.length - acceptedPrimaryDemos.length}</strong><span>Current-adapter capture or review still required</span></dd></div>
-          <div class="hero-ledger-row"><dt>Fixed states</dt><dd><strong>${fixedRouteCount}</strong><span>${scenarioRouteCount} scenarios · ${mechanismRouteCount} mechanisms · ${tierRouteCount} tiers</span></dd></div>
-        </dl>
-        <div class="hero-ledger-actions"><a class="hero-ledger-link" href="#labs">Inspect every lab&nbsp;→</a><a class="hero-ledger-link" href="demos/registry.json">Open registry JSON&nbsp;→</a></div>
+      <aside class="hero-showcase" aria-labelledby="hero-showcase-title">
+        <div class="hero-showcase-inner">
+          <p class="hero-showcase-kicker">Example architecture route</p>
+          <h2 id="hero-showcase-title">Building an ocean world?</h2>
+          <div class="skill-route" aria-label="Recommended ocean world skill sequence">
+            <a href="skills/threejs-procedural-fields.html">Fields</a><span>→</span>
+            <a href="skills/threejs-spectral-ocean.html">Ocean</a><span>→</span>
+            <a href="skills/threejs-water-optics.html">Optics</a><span>→</span>
+            <a href="skills/threejs-sky-atmosphere-and-haze.html">Atmosphere</a>
+          </div>
+          <p>One scene goal becomes the smallest coordinated skill set, with units, ownership, budgets, and failure conditions aligned.</p>
+          <a class="hero-showcase-link" href="skills/threejs-choose-skills.html">See how skill routing works&nbsp;→</a>
+        </div>
       </aside>
     </div>
   </div>
@@ -873,10 +878,10 @@ ${navHtml('')}
 <div class="stats-band"><div class="wrap">
   <dl class="stats">
     <div class="stat"><dd>${total}</dd><dt>expert skills</dt></div>
-    <div class="stat"><dd>${primaryDemos.length}</dd><dt>primary implementations</dt></div>
-    <div class="stat"><dd>${canonicalDemos.length}</dd><dt>canonical labs</dt></div>
-    <div class="stat"><dd>${flagshipDemos.length}</dd><dt>cross-skill flagships</dt></div>
-    <div class="stat"><dd>${uniquePrimaryRouteCount}</dd><dt>unique primary URLs</dt></div>
+    <div class="stat"><dd>${primaryDemos.length}</dd><dt>working implementations</dt></div>
+    <div class="stat"><dd>${canonicalDemos.length}</dd><dt>focused labs</dt></div>
+    <div class="stat"><dd>${flagshipDemos.length}</dd><dt>integrated scenes</dt></div>
+    <div class="stat"><dd>r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')}</dd><dt>Three.js target</dt></div>
   </dl>
 </div></div>
 
@@ -884,9 +889,9 @@ ${navHtml('')}
 <section class="section" id="matrix" aria-labelledby="matrix-title"><div class="wrap">
   <div class="matrix-shell">
     <div class="matrix-copy">
-      <span class="matrix-label">Implementation ≠ acceptance</span>
-      <h2 id="matrix-title">The matrix is built. Evidence still has veto power.</h2>
-      <p><strong>All ${primaryDemos.length} primary targets are loadable from canonical source.</strong> Acceptance is a separate runtime claim: only the non-rendering router suite is accepted today; ${primaryDemos.length - acceptedPrimaryDemos.length} native-WebGPU surfaces remain explicitly pending current-adapter capture, timing, lifecycle, and visual review.</p>
+      <span class="matrix-label">From scene goal to implementation</span>
+      <h2 id="matrix-title">Know what to build, which skills own it, and where the boundaries are.</h2>
+      <p><strong>Start with the visual system, not a directory of techniques.</strong> The routing skill selects the smallest expert set, names shared signals and final-output ownership, then points to working implementations you can inspect.</p>
       <div class="achievement-grid">
         <div class="achievement"><code>canonical</code><b>${canonicalDemos.length}</b><span>skill-owned labs built from native source</span></div>
         <div class="achievement"><code>support</code><b>${supportPrimaryDemos.length}</b><span>focused integrations and mechanism benches</span></div>
@@ -896,39 +901,30 @@ ${navHtml('')}
         <div class="achievement"><code>toolchain</code><b>${rootPackage.devDependencies.vite}</b><span>Vite · Playwright ${rootPackage.devDependencies.playwright}</span></div>
       </div>
     </div>
-    <div class="matrix-rails" aria-label="Implementation and evidence coverage">
-      <div class="coverage-rail">
-        <div class="rail-head"><b>Source implementation</b><span>${loadablePrimaryDemos.length} / ${primaryDemos.length}</span></div>
-        <div class="rail-track"><div class="rail-fill" style="--value:${(loadablePrimaryDemos.length / primaryDemos.length) * 100}%"></div></div>
-        <p class="rail-note">Browser entry, fixed route, local build, capture wiring, canonical source hash.</p>
-      </div>
-      <div class="coverage-rail coverage-rail--acceptance">
-        <div class="rail-head"><b>Accepted runtime evidence</b><span>${acceptedPrimaryDemos.length} / ${primaryDemos.length}</span></div>
-        <div class="rail-track"><div class="rail-fill" style="--value:${(acceptedPrimaryDemos.length / primaryDemos.length) * 100}%"></div></div>
-        <p class="rail-note">No GPU timing, lifecycle, or visual claim is promoted without current-adapter evidence.</p>
-      </div>
-      <span class="status status--accepted">${acceptedPrimaryDemos.length} accepted non-rendering suite</span>
-      <span class="status status--pending">${primaryDemos.length - acceptedPrimaryDemos.length} native evidence runs pending</span>
-      <a class="hero-action" href="demos/registry.json">Inspect the versioned registry</a>
+    <div class="matrix-rails" aria-label="Three-step skill workflow">
+      <div class="route-step"><b>01</b><div><h3>Describe the scene</h3><p>Name the visual target, platform, frame budget, and constraints.</p></div></div>
+      <div class="route-step"><b>02</b><div><h3>Get the smallest expert set</h3><p>Route across domains without duplicating renderers, passes, or temporal state.</p></div></div>
+      <div class="route-step"><b>03</b><div><h3>Build against working labs</h3><p>Reuse source, diagnostics, budgets, and explicit failure gates.</p></div></div>
+      <a class="hero-action" href="skills/threejs-choose-skills.html">Open the routing guide&nbsp;→</a>
     </div>
   </div>
 </div></section>
 
 <section class="section" id="flagships" aria-labelledby="flagships-title"><div class="wrap">
-  <h2 id="flagships-title">Five systems. Five ownership stress tests.</h2>
-  <p class="sub">The flagships are where individually correct algorithms must share world units, temporal state, signals, render submissions, and final-image ownership without quietly duplicating expensive work.</p>
+  <h2 id="flagships-title">See complete systems, not isolated effects.</h2>
+  <p class="sub">Five integrated scenes show how individually correct techniques share world units, temporal state, render submissions, and final-image ownership.</p>
   <div class="flagship-grid">${flagshipHtml}</div>
 </div></section>
 
 <section class="section" id="labs" aria-labelledby="labs-title"><div class="wrap">
-  <h2 id="labs-title">The complete primary lab matrix</h2>
-  <p class="sub">Every card is a distinct published base route generated from the canonical source revision. “Evidence pending” means the implementation exists and loads, but its v2 runtime bundle has not yet earned acceptance.</p>
+  <h2 id="labs-title">Working implementations, organized by outcome</h2>
+  <p class="sub">Open a lab to inspect the implementation, change its fixed scenarios, and see the diagnostics that explain how it works.</p>
 ${primaryLabHtml}
 </div></section>
 
 <section class="section" id="skills" aria-labelledby="skills-title"><div class="wrap">
-  <h2 id="skills-title">The ${total}-skill expert system</h2>
-  <p class="sub">Each skill owns a bounded technical domain. Cards report implementation surface and evidence separately, so substantial source work is visible without laundering it into a runtime claim.</p>
+  <h2 id="skills-title">Start with the scene you want to build</h2>
+  <p class="sub">Each skill owns a bounded technical domain and explains when to use it, what it costs, what it shares, and how it fails.</p>
 ${catalog}
 </div></section>
 
@@ -947,8 +943,8 @@ ${catalog}
 </div></section>
 
 <section class="section" id="install" aria-labelledby="install-title"><div class="wrap">
-  <h2 id="install-title">Install the whole research stack.</h2>
-  <p class="sub">The router selects the smallest relevant expert set after installation. Directory presence is never interpreted as runtime proof; the registry remains the public source of coverage truth.</p>
+  <h2 id="install-title">Add the skill pack to your coding agent</h2>
+  <p class="sub">Install once, then let the router select only the expert skills relevant to your scene.</p>
   <div class="install-console" id="quickstart">
     <div><p>List the pack, then install all top-level skills for your agent.</p><pre tabindex="0"><code>${SKILLS_ADD} --list
 ${SKILLS_INSTALL_PACK}</code></pre></div>
@@ -971,28 +967,6 @@ ${SKILLS_INSTALL_PACK}</code></pre></div>
 
 </main>
 
-<script>
-const copyInstallButton = document.querySelector('[data-copy-install]');
-const installCommand = document.getElementById('hero-install-command')?.textContent;
-copyInstallButton?.addEventListener('click', async () => {
-  if (!installCommand) return;
-  try {
-    await navigator.clipboard.writeText(installCommand);
-  } catch {
-    const textArea = document.createElement('textarea');
-    textArea.value = installCommand;
-    textArea.setAttribute('readonly', '');
-    textArea.style.position = 'fixed';
-    textArea.style.opacity = '0';
-    document.body.append(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    textArea.remove();
-  }
-  copyInstallButton.textContent = 'Copied';
-  window.setTimeout(() => { copyInstallButton.textContent = 'Copy'; }, 1800);
-});
-</script>
 ${footerHtml}
 </body>
 </html>
@@ -1117,7 +1091,7 @@ ${navHtml('../')}
       <article class="about-card"><code>corrections</code><h3>Fix source, then rebuild</h3><p>Technical corrections land in the owning skill or demo first. Generated HTML, sitemap metadata, and machine-readable indexes are rebuilt from that source.</p></article>
       <article class="about-card"><code>review</code><h3>Claims remain reversible</h3><p>Acceptance can be withdrawn when APIs, evidence, or hardware behavior change. The registry preserves the current status instead of promising permanent validity.</p></article>
     </div>
-    <div class="about-cta"><a href="${REPO}/issues">Report a technical issue ↗</a><a href="${REPO}/pulls">Review open contributions ↗</a><a href="../demos/registry.json">Inspect the demo registry</a><a href="../llms.txt">Read the LLM index</a></div>
+    <div class="about-cta"><a href="${REPO}/issues">Report a technical issue ↗</a><a href="${REPO}/pulls">Review open contributions ↗</a><a href="../#skills">Browse the skill catalog</a><a href="../llms.txt">For coding agents</a></div>
   </div></section>
 </main>
 ${footerHtml}

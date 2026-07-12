@@ -19,13 +19,13 @@
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
-  "sourceHash": "sha256:e8633e8c9f83c081d41f9ef7a5c589dae230915598f29d26e10ecf2b14f6cb92",
+  "sourceHash": "sha256:b75ba4007c9fef6d18ea08b8a00c2553f9e6b6af193fd9a704c6e6500b55fa2f",
   "publishedHashInputs": [
     "docs/demos/webgpu-bounded-water",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:89eb18970fbbd7e27e6b6f7c0816b3de886b11782b81b578e84b4e6409fb15bb",
+  "publishedBundleHash": "sha256:ab5470b91b062be25c00c95f1fe233abd9ec8b91fd0501915676f6e6158452e4",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

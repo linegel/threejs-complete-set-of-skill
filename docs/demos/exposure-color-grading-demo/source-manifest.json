@@ -23,8 +23,8 @@
     "docs/demos/exposure-color-grading-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:1441954563987da3c8975c1b4f2e11703d2816843e86b32c14a6fa0415e08fd7",
+  "publishedBundleHash": "sha256:dddafce687551fd5f3e7abc5e18b724506ee8b20df85dc4ca5a51cc7f7db87c8",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

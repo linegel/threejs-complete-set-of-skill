@@ -15,8 +15,8 @@
     "docs/demos/webgpu-exposure-color-pipeline",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:a12fc62a2229abe22662ae98e4859e1eb157f33e8ed371710d601fef5afe063c",
+  "publishedBundleHash": "sha256:93d3edbf83c27cf0d58d14c623487867524050ee4cb5ff38e2e5653e98f8a225",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

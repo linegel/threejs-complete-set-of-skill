@@ -23,8 +23,8 @@
     "docs/demos/water-generated-caustics",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:bf73bfe2b973fbc5a8b02f601be92b5aaa4e605988fe8d7f318ec614ef3d0c88",
+  "publishedBundleHash": "sha256:df92fbe0fef6337214cb6312a8f4557d31ce293881c68fa0df29b43a83afa6aa",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

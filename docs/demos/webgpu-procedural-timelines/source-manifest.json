@@ -10,6 +10,9 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/browser.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture-hook.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validate-artifacts.mjs",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/launch-and-staging/index.html",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/spin-docking/index.html",
@@ -25,13 +28,13 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
   ],
   "browserEntry": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
-  "sourceHash": "sha256:19124fd4449829f795f22a3b12d3309b52b2058db6968dd0c65f844ac73b5ecc",
+  "sourceHash": "sha256:b52c46dbabb83ffcbfd385b9c092fbf46e6d07f01aff5a3c9f516fe10e52cdc5",
   "publishedHashInputs": [
     "docs/demos/webgpu-procedural-timelines",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:99f6bb1ed11609be8689a300a66911d8a766ffe28b0a644a5b676648bd0bc573",
+  "publishedBundleHash": "sha256:37481b37afe5094dcc37529ee1771034b3c25c687f50f74ed9ebdf16efb1f9fa",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

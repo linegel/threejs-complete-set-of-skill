@@ -547,9 +547,9 @@
       }
     },
     "threejs-visual-validation": {
-      "source": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png",
+      "source": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
       "sourceWidth": 1200,
-      "sourceHeight": 800,
+      "sourceHeight": 760,
       "images": {
         "1x1": {
           "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-1x1.png",

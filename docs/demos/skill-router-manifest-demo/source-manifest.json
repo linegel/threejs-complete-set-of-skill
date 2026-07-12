@@ -23,8 +23,8 @@
     "docs/demos/skill-router-manifest-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:3258bdd83c51316680b4be8b9663a98974fcf523e066cdbb0e5a42ba81cfa741",
+  "publishedBundleHash": "sha256:02b7c0d1e4b5dc5b414d1123e97df44a5390e4eea3b1de9bcccaf6a6aa9ef6fc",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

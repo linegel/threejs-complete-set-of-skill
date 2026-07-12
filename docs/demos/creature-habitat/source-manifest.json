@@ -63,13 +63,13 @@
     "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
   ],
   "browserEntry": "integration-labs/creature-habitat/index.html",
-  "sourceHash": "sha256:2d9df5888e47d42dd29081948c6414797956d6a20bdbdb3d69fa263af207f0cb",
+  "sourceHash": "sha256:f4ce09cad9be7f3ccb456c272727227576ed5f3199606f38f4ac93148246be9f",
   "publishedHashInputs": [
     "docs/demos/creature-habitat",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:83b1ae3652cdc0f4e426c7a7730fc83f05a05f41f2970ea1888a85683a591ea7",
+  "publishedBundleHash": "sha256:7844213a4d1609853ef766f819145dcb780f10562efa6dcdf53e2e66c0b02c78",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

@@ -23,8 +23,8 @@
     "docs/demos/shadow-cascade-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:a17e9839799d124544fca898f60384edbbbca366f5e65e5c7420ceaf388e36c3",
+  "publishedBundleHash": "sha256:c920028a292e3f7c7808b5decb844eabc4048a6628f37ea6e371a1baf9cd8943",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

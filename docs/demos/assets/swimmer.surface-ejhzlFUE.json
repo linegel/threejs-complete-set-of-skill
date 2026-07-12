@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "creature-reference-asset-v2",
+  "identity": {
+    "compilerSignature": "b043e9a3a461a5e56376aebb6fe8c045",
+    "topologySignature": "a8c7facb0d4b7c2fad27f5fd836cf6a3",
+    "geometryDigest": "6f9441f5f0c51a792426640b02b91715",
+    "sourceRigIdentity": {
+      "compilerSignature": "244019baa6de9faa3ce6b1b8471be846",
+      "topologySignature": "c41958591cc350ef6dedfd012059f5ff",
+      "geometryDigest": "c894b598a54475be9ee27cf83ed36e46",
+      "motionEnvelopeDigest": "0cf6d2e21744f086205291fc649a8de2"
+    }
+  },
+  "tier": "hero",
+  "representation": "canonical-reference-surface-candidate",
+  "extraction": {
+    "algorithm": "marching-cubes-kuhn-ambiguity-v3",
+    "ambiguityPolicy": "globally-consistent-kuhn-tetrahedral-subdivision",
+    "cellSize": 0.013999999999999999,
+    "cellSizeDerivation": {
+      "cellSize": 0.013999999999999999,
+      "formula": "explicit test/fixture cellSize"
+    },
+    "bounds": {
+      "min": [
+        -1.1664,
+        -1.0664000000000002,
+        -1.2664
+      ],
+      "max": [
+        1.1664,
+        1.5464,
+        1.4064000000000003
+      ]
+    },
+    "grid": {
+      "cells": [
+        167,
+        187,
+        191
+      ],
+      "points": [
+        168,
+        188,
+        192
+      ],
+      "step": [
+        0.013968862275449103,
+        0.013972192513368984,
+        0.013993717277486913
+      ],
+      "requestedCellSize": 0.013999999999999999,
+      "sampleCount": 387435,
+      "activeCellCount": 370099,
+      "intersectedCells": 11764
+    }
+  },
+  "componentPolicy": {
+    "kind": "main-semantic-handle-single-component",
+    "mainSlot": 0,
+    "mainPartId": "main",
+    "handle": [
+      0,
+      0.24,
+      0.06999999999999999
+    ],
+    "componentCount": 1,
+    "selectedComponent": 0,
+    "selectedDistanceSquared": 0.048340837797412106
+  },
+  "certification": {
+    "status": "provisional",
+    "topology": {
+      "status": "accepted-topology-baseline",
+      "failures": [],
+      "vertexCount": 33345,
+      "triangleCount": 66686,
+      "finitePositions": true,
+      "finiteNormals": true,
+      "invalidIndices": 0,
+      "collapsedTriangles": 0,
+      "duplicateTriangles": 0,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "inwardTriangles": 0,
+      "duplicateCoincidentCoverage": 0,
+      "nonAdjacentSelfIntersections": {
+        "count": 0,
+        "coincidentCoveragePairs": 0,
+        "pairs": [],
+        "truncated": false,
+        "epsilon": 1.90399193372696e-9,
+        "broadPhase": "deterministic-median-bvh-v1"
+      },
+      "area": {
+        "min": 1.6450409084820286e-10,
+        "p05": 4.256767846295744e-7,
+        "median": 0.000018278661264654413
+      },
+      "minimumAngleRadians": {
+        "min": 0.0009524324319825038,
+        "p05": 0.0785427415045254
+      },
+      "signedOrientation": {
+        "min": 2.861452723112719e-10,
+        "p05": 8.075036252624601e-7,
+        "median": 0.00003467850575967071
+      },
+      "limitations": []
+    },
+    "meshToFieldVertexResidual": {
+      "samples": 33345,
+      "maximum": 0.003811377680883743,
+      "mean": 0.00009565442293791749
+    },
+    "meshToFieldHausdorff": {
+      "samples": 100031,
+      "maximum": 0.005303320620500317,
+      "p95": 0.0006004461276537532,
+      "mean": 0.00014992783833959892,
+      "sampling": "all vertices plus all triangle centroids; |field| / max(|gradient|, 1e-8)"
+    },
+    "fieldToMeshHausdorff": {
+      "samples": 110,
+      "maximum": 0.0012416504415557765,
+      "p95": 0.0003463881660308568,
+      "mean": 0.00012572712962916974,
+      "signChangeRoots": 110,
+      "rayResolution": 18,
+      "rayStep": 0.010499999999999999,
+      "rootIterations": 18,
+      "directions": [
+        "x",
+        "y",
+        "z"
+      ],
+      "broadPhase": "deterministic-median-bvh-v1",
+      "sampling": "stratified axis rays; every complete-field sign-change root to nearest reference triangle"
+    },
+    "normalAngleError": {
+      "samples": 33345,
+      "maximum": 0.000003909844353767574,
+      "p95": 2.346637211445519e-7,
+      "mean": 5.915606241884275e-8,
+      "unit": "radians",
+      "sampling": "every reference vertex against analytic complete-field gradient"
+    },
+    "thresholds": {
+      "maximumSurfaceDistance": 0.006999999999999999,
+      "maximumNormalAngleRadians": 0.2617993877991494
+    },
+    "limitations": [
+      "Projected silhouette and deformation gates are still required before acceptance."
+    ]
+  },
+  "arrays": {
+    "positions": {
+      "type": "Float32Array",
+      "byteOffset": 0,
+      "length": 100035,
+      "byteLength": 400140
+    },
+    "normals": {
+      "type": "Float32Array",
+      "byteOffset": 400144,
+      "length": 100035,
+      "byteLength": 400140
+    },
+    "indices": {
+      "type": "Uint32Array",
+      "byteOffset": 800288,
+      "length": 200058,
+      "byteLength": 800232
+    },
+    "skinIndices": {
+      "type": "Uint16Array",
+      "byteOffset": 1600528,
+      "length": 133380,
+      "byteLength": 266760
+    },
+    "skinWeights": {
+      "type": "Float32Array",
+      "byteOffset": 1867296,
+      "length": 133380,
+      "byteLength": 533520
+    },
+    "semanticIndices": {
+      "type": "Uint16Array",
+      "byteOffset": 2400816,
+      "length": 33345,
+      "byteLength": 66690
+    },
+    "colorIndices": {
+      "type": "Uint16Array",
+      "byteOffset": 2467520,
+      "length": 133380,
+      "byteLength": 266760
+    },
+    "colorWeights": {
+      "type": "Float32Array",
+      "byteOffset": 2734288,
+      "length": 133380,
+      "byteLength": 533520
+    },
+    "correctionWeights": {
+      "type": "Float32Array",
+      "byteOffset": 3267808,
+      "length": 33345,
+      "byteLength": 133380
+    },
+    "restRadialFrames": {
+      "type": "Float32Array",
+      "byteOffset": 3401200,
+      "length": 200070,
+      "byteLength": 800280
+    }
+  },
+  "binary": {
+    "byteLength": 4201488,
+    "alignment": 16,
+    "byteOrder": "little-endian",
+    "contentDigest128": "633fa20b2c99771d358e9d9b0d367ba5",
+    "sha256": "412863bc0a904771b3d0972298d62dfe74fed6b3b93c60901293065f43aa77fb",
+    "sha256Status": "verified-by-asset-writer"
+  },
+  "name": "swimmer",
+  "specName": "Swimmer Undulation Rope",
+  "skinning": {
+    "status": "accepted-weight-baseline",
+    "maximumInfluences": 4,
+    "maximumPartitionError": 4.470348358154297e-8,
+    "maximumBarrierLeakage": 0,
+    "fallbackVertices": 0,
+    "sigma": 0.33,
+    "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
+  },
+  "deformation": {
+    "status": "not-certified",
+    "selectedMethod": null,
+    "correctionLayout": null,
+    "limitation": "The full deterministic deformation selection sweep has not produced an accepted candidate for this species."
+  },
+  "acceptanceStatus": "provisional-reference-candidate",
+  "limitations": [
+    "Deformation selection and correction-region selection remain open.",
+    "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
+  ]
+}

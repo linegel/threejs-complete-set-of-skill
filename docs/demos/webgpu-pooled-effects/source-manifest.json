@@ -19,8 +19,8 @@
     "docs/demos/webgpu-pooled-effects",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:cba5a953ebe1cda047db70aaa1360e84fd58b4801a52072269a92b95e33b34ef",
+  "publishedBundleHash": "sha256:d2090cac85049916ee2701c7ef03b5be882e201068e79a82a6f19c885b4a1841",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

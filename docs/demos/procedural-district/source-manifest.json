@@ -19,10 +19,12 @@
     "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-f32-oracle.mjs",
     "threejs-procedural-geometry/examples/semantic-mesh-writer/mesh-writer.js",
     "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png",
     "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png",
     "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png",
+    "threejs-procedural-materials/examples/tsl-procedural-pbr/pbr-oracles.mjs",
     "threejs-procedural-materials/examples/tsl-procedural-pbr/procedural-pbr-materials.js",
     "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
@@ -30,13 +32,13 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
   ],
   "browserEntry": "integration-labs/procedural-district/index.html",
-  "sourceHash": "sha256:a1cda560058b7c6988bae1020fa4a18bb444204920cd3b7831ff2edfc92182fc",
+  "sourceHash": "sha256:1a2d0277c7c24e86ff4d01ad3ea141c03d4829ace34c1ecd6235d061ba186691",
   "publishedHashInputs": [
     "docs/demos/procedural-district",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:30b730c13f37084e1ffe673bd628a3b39c016857e6d20aae988176c33645bb0b",
+  "publishedBundleHash": "sha256:e2826e2a6f29821a63c8a268c0dc31b09752da4ba3310f723da436ab16c50dac",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

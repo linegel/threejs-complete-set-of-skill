@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "routes": [
     {
       "id": "browser-fallback-harness",
@@ -11,7 +11,7 @@
       "sourceHashInputs": [
         "threejs-compatibility-fallbacks/examples/browser-fallback-harness"
       ],
-      "publishedBundleHash": "sha256:aa9d2aab5036fa4d093d4a2fb4151bc18f10d3da7c0935ba0e900dd9ee0fc14a",
+      "publishedBundleHash": "sha256:060ead9221d2ad5ea87701a14b74f09b9b7acaa65a359fa90435f42bac96cc82",
       "mechanisms": [
         "/demos/browser-fallback-harness/mechanism/explicit-activation-gate/",
         "/demos/browser-fallback-harness/mechanism/ordered-degradation-trace/",
@@ -35,7 +35,7 @@
       "id": "creature-habitat",
       "path": "/demos/creature-habitat/",
       "status": "incomplete",
-      "sourceHash": "sha256:2d9df5888e47d42dd29081948c6414797956d6a20bdbdb3d69fa263af207f0cb",
+      "sourceHash": "sha256:f4ce09cad9be7f3ccb456c272727227576ed5f3199606f38f4ac93148246be9f",
       "sourceHashInputs": [
         "integration-labs/creature-habitat",
         "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
@@ -70,7 +70,7 @@
         "threejs-water-optics/examples/webgpu-bounded-water/cpu-water-height.js",
         "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
       ],
-      "publishedBundleHash": "sha256:83b1ae3652cdc0f4e426c7a7730fc83f05a05f41f2970ea1888a85683a591ea7",
+      "publishedBundleHash": "sha256:7844213a4d1609853ef766f819145dcb780f10562efa6dcdf53e2e66c0b02c78",
       "mechanisms": [
         "/demos/creature-habitat/mechanism/shared-world-wind/",
         "/demos/creature-habitat/mechanism/contact-ripple-trampling/",
@@ -99,7 +99,7 @@
         "threejs-debugging/references/upstream-research.md",
         "threejs-debugging/SKILL.md"
       ],
-      "publishedBundleHash": "sha256:084b495dc0b64661d1e77a6ea34d9bef889df6316b0e617b26efbbaa1126a7ad",
+      "publishedBundleHash": "sha256:9a15841937660b1869953a44550d5b992ce56031ec080f66654dee4409c43c6a",
       "mechanisms": [
         "/demos/debugging-contract-lab/mechanism/activation-gate/",
         "/demos/debugging-contract-lab/mechanism/version-matrix/",
@@ -122,7 +122,7 @@
       "id": "final-image-flight",
       "path": "/demos/final-image-flight/",
       "status": "incomplete",
-      "sourceHash": "sha256:f5f18643cb1d8aa1a40a9cd2dd978f1ac4fcc5bf5b1263b6ebad774d259032d2",
+      "sourceHash": "sha256:0a4b2549c82b0b795ead6312caec3322e73f19e8b8f100a5b814c955ac57d52d",
       "sourceHashInputs": [
         "integration-labs/final-image-flight",
         "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/host-adapter.js",
@@ -146,7 +146,7 @@
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
         "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
       ],
-      "publishedBundleHash": "sha256:a616534db6bc8226903c2ca1313097b322e4da4764ffbe1688849bd709057208",
+      "publishedBundleHash": "sha256:382b88ebdea0ce9b0141dd198b62e81c573be9c12f9272a6748e45824a173b86",
       "mechanisms": [
         "/demos/final-image-flight/mechanism/camera-motion-ownership/",
         "/demos/final-image-flight/mechanism/ao-prepass-lit-pair/",
@@ -173,7 +173,7 @@
         "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao",
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js"
       ],
-      "publishedBundleHash": "sha256:4ee81f4984f09e558c95dc88f0defa6cf9e7591291e11ead2ad96a0bb0b1cbd2",
+      "publishedBundleHash": "sha256:a875c7115f01c7a18ef9907dee19ca9655570e7a6b0a83dfec86872c1673e66d",
       "mechanisms": [
         "/demos/integration-image-pipeline-ao/mechanism/shared-gbuffer/",
         "/demos/integration-image-pipeline-ao/mechanism/indirect-only-application/",
@@ -200,7 +200,7 @@
         "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
         "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js"
       ],
-      "publishedBundleHash": "sha256:919958bf27da7b8a798585b613a03a75fff5543791102031e87e06f81de20510",
+      "publishedBundleHash": "sha256:2eb341c243c8c4396c893da2c47f094be522514e65043820319631c428a5d8db",
       "mechanisms": [
         "/demos/integration-precipitation-image-pipeline/mechanism/shared-signal-identity/",
         "/demos/integration-precipitation-image-pipeline/mechanism/host-output-ownership/",
@@ -227,7 +227,7 @@
         "threejs-dynamic-surface-effects/examples/integration-temporal-surface",
         "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js"
       ],
-      "publishedBundleHash": "sha256:2ecc06caa63bbc4a7b2a1292447a318e3ceb033c731bfc3d1ef7d731f87df162",
+      "publishedBundleHash": "sha256:8c1b005ad3c881f3eeb53aa5bd2478198adf3ad6008151c1c91fd6eed2df15b6",
       "mechanisms": [
         "/demos/integration-temporal-surface/mechanism/shared-scene-color/",
         "/demos/integration-temporal-surface/mechanism/shared-depth-velocity-camera/",
@@ -253,7 +253,7 @@
       "sourceHashInputs": [
         "threejs-bloom/examples/node-selective-bloom"
       ],
-      "publishedBundleHash": "sha256:ba711c2a44a62d70323b985c338f45fed58215e4f111a5ba96481c9eafd8880e",
+      "publishedBundleHash": "sha256:eb97ffbd5617f76700f55d183f29e68a7c01cddff88203087cdbd6a08313421d",
       "mechanisms": [
         "/demos/node-selective-bloom/mechanism/threshold-and-knee/",
         "/demos/node-selective-bloom/mechanism/point-spread-function/",
@@ -281,7 +281,7 @@
       "id": "procedural-district",
       "path": "/demos/procedural-district/",
       "status": "incomplete",
-      "sourceHash": "sha256:a1cda560058b7c6988bae1020fa4a18bb444204920cd3b7831ff2edfc92182fc",
+      "sourceHash": "sha256:1a2d0277c7c24e86ff4d01ad3ea141c03d4829ace34c1ecd6235d061ba186691",
       "sourceHashInputs": [
         "integration-labs/procedural-district",
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
@@ -295,17 +295,19 @@
         "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
         "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
         "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
+        "threejs-procedural-fields/examples/webgpu-field-bake/field-f32-oracle.mjs",
         "threejs-procedural-geometry/examples/semantic-mesh-writer/mesh-writer.js",
         "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png",
         "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png",
         "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png",
+        "threejs-procedural-materials/examples/tsl-procedural-pbr/pbr-oracles.mjs",
         "threejs-procedural-materials/examples/tsl-procedural-pbr/procedural-pbr-materials.js",
         "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
       ],
-      "publishedBundleHash": "sha256:30b730c13f37084e1ffe673bd628a3b39c016857e6d20aae988176c33645bb0b",
+      "publishedBundleHash": "sha256:e2826e2a6f29821a63c8a268c0dc31b09752da4ba3310f723da436ab16c50dac",
       "mechanisms": [
         "/demos/procedural-district/mechanism/shared-cause-field/",
         "/demos/procedural-district/mechanism/structural-topology/",
@@ -327,7 +329,7 @@
       "id": "relativistic-space-shot",
       "path": "/demos/relativistic-space-shot/",
       "status": "incomplete",
-      "sourceHash": "sha256:cd1a484962b562728a67488ed71312fa4b68126e261a801024bfee9b2aa89f96",
+      "sourceHash": "sha256:f55c428986bb46f6b28374c5d4fb6e61b2868c6d7ec4923a9e379bfaf12b2ab1",
       "sourceHashInputs": [
         "integration-labs/relativistic-space-shot",
         "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js",
@@ -356,7 +358,7 @@
         "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
         "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
       ],
-      "publishedBundleHash": "sha256:3c08fdb4a3e97cd0c852a564bce9d04d36c3e1535d20329e686f19f658639151",
+      "publishedBundleHash": "sha256:011d7a8079a1f619971f8f5d92f33de7bbccddb0fa1857e4194a6d8a373d3121",
       "mechanisms": [
         "/demos/relativistic-space-shot/mechanism/curved-ray-hdr/",
         "/demos/relativistic-space-shot/mechanism/motion-event-packets/",
@@ -378,11 +380,11 @@
       "id": "router-manifest-lab",
       "path": "/demos/router-manifest-lab/",
       "status": "accepted",
-      "sourceHash": "sha256:bd1faf3bb97980b022ae32e0491cc8fe3e41fb29994479b083422185fd846412",
+      "sourceHash": "sha256:bf5e14fa17d6549cb846e88dbc3fb8eb644c0dc29e10e6efcdb601fcadbca1d4",
       "sourceHashInputs": [
         "threejs-choose-skills/examples/router-manifest-lab"
       ],
-      "publishedBundleHash": "sha256:6a1b90d7a3de6ad94d248269ec9cb2c65d26ca7987ffd28abb1b002df24074d5",
+      "publishedBundleHash": "sha256:876a94c3a45542d8eaf2cf1be6d8516c44edf46419cc3f449ad0a314140b90d5",
       "mechanisms": [
         "/demos/router-manifest-lab/mechanism/inventory-intersection/",
         "/demos/router-manifest-lab/mechanism/capability-gate/",
@@ -417,11 +419,11 @@
       "id": "semantic-mesh-writer",
       "path": "/demos/semantic-mesh-writer/",
       "status": "incomplete",
-      "sourceHash": "sha256:9218a7322fe2c95e48d0640697f04334c0d71b870de7e27bcf4c4ab287d2d6a8",
+      "sourceHash": "sha256:c89d28b0f984e240d99c7d5c75324dd570bf6d9a66a570e89d9c5f8820b5835c",
       "sourceHashInputs": [
         "threejs-procedural-geometry/examples/semantic-mesh-writer"
       ],
-      "publishedBundleHash": "sha256:16e45821c7af995b37e586d9b02793350b915d9f3cdbb151e7525edf2ac538a4",
+      "publishedBundleHash": "sha256:6fbc82690214ec258df143b86abe12ee50a8edd14251f91b73a77a21421e3a3d",
       "mechanisms": [
         "/demos/semantic-mesh-writer/mechanism/frame-and-rail-profile/",
         "/demos/semantic-mesh-writer/mechanism/branch-rings/",
@@ -457,7 +459,7 @@
         "threejs-procedural-vegetation/assets/structured-ash-growth/bark-roughness.jpg",
         "threejs-procedural-vegetation/examples/structured-ash-growth"
       ],
-      "publishedBundleHash": "sha256:3fe9b93d813291b973d9579117078a72f6c47741b6c3b9b33fe579eee1e5c67b",
+      "publishedBundleHash": "sha256:876309c3e1212a4f67926ce478e6f77de331cd5e251cf35a4c55cb910c254c76",
       "mechanisms": [
         "/demos/structured-ash-growth/mechanism/structured-growth/",
         "/demos/structured-ash-growth/mechanism/leaf-origins-and-normals/",
@@ -486,7 +488,7 @@
       "sourceHashInputs": [
         "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
       ],
-      "publishedBundleHash": "sha256:5542b8ccdbc3a9f04e4d52909e2a822bd9bfc5ae88ef9756b69a37a5b3701f5a",
+      "publishedBundleHash": "sha256:d5c55864aa6b25c613f4ff6a4732aca830bcedff49f49381eb32a1bd64c67f06",
       "mechanisms": [
         "/demos/tsl-curved-ray/mechanism/accretion-disk/",
         "/demos/tsl-curved-ray/mechanism/ellis-wormhole/",
@@ -514,15 +516,14 @@
       "id": "tsl-procedural-pbr",
       "path": "/demos/tsl-procedural-pbr/",
       "status": "incomplete",
-      "sourceHash": "sha256:6b8c319820150ebd12ca802aa3e10575b13de28c8ce148712f3883bb3c77cf50",
+      "sourceHash": "sha256:0440d83b0ba396903a57f8a1a6e0835d3cdb005b26e12e1eee64cfa35e051044",
       "sourceHashInputs": [
-        "labs/runtime/aligned-readback.mjs",
         "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png",
         "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png",
         "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png",
         "threejs-procedural-materials/examples/tsl-procedural-pbr"
       ],
-      "publishedBundleHash": "sha256:9bdf68ec71c1f6a63319a7e8ec1e5450b7ef56bf1e409f34049c2e477e30d5f7",
+      "publishedBundleHash": "sha256:58a63438e58fbdfc7df99e6123835e1404a836c9b367e9474294832aaac58e0b",
       "mechanisms": [
         "/demos/tsl-procedural-pbr/mechanism/pbr-identity/",
         "/demos/tsl-procedural-pbr/mechanism/specular-aa-and-filtering/",
@@ -590,7 +591,7 @@
         "threejs-water-optics/examples/webgpu-bounded-water/integration-stage.js",
         "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
       ],
-      "publishedBundleHash": "sha256:5d928cd60baa803f2bab4588477aad8cf72967640cdc938bc74e3b54a1f6d483",
+      "publishedBundleHash": "sha256:ac7a2f92cdcd6f308b7a5b51d716afa102e45ec763b5ba5bc0b1396430e100e8",
       "mechanisms": [
         "/demos/weathered-world/mechanism/shared-world-units/",
         "/demos/weathered-world/mechanism/shared-weather-envelope/",
@@ -612,7 +613,7 @@
       "id": "webgpu-bounded-water",
       "path": "/demos/webgpu-bounded-water/",
       "status": "incomplete",
-      "sourceHash": "sha256:e8633e8c9f83c081d41f9ef7a5c589dae230915598f29d26e10ecf2b14f6cb92",
+      "sourceHash": "sha256:b75ba4007c9fef6d18ea08b8a00c2553f9e6b6af193fd9a704c6e6500b55fa2f",
       "sourceHashInputs": [
         "labs/runtime/aligned-readback.mjs",
         "scripts/capture-lab-browser.mjs",
@@ -623,7 +624,7 @@
         "scripts/provider-demos.mjs",
         "threejs-water-optics/examples/webgpu-bounded-water"
       ],
-      "publishedBundleHash": "sha256:89eb18970fbbd7e27e6b6f7c0816b3de886b11782b81b578e84b4e6409fb15bb",
+      "publishedBundleHash": "sha256:ab5470b91b062be25c00c95f1fe233abd9ec8b91fd0501915676f6e6158452e4",
       "mechanisms": [
         "/demos/webgpu-bounded-water/mechanism/heightfield-simulation/",
         "/demos/webgpu-bounded-water/mechanism/drops-and-object-ripples/",
@@ -650,7 +651,7 @@
       "sourceHashInputs": [
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
       ],
-      "publishedBundleHash": "sha256:e758292fbb989b22ff39c3966cd413399e603e628a5cd1574b1d64f1b868ca19",
+      "publishedBundleHash": "sha256:8dcec50d978ff87d5596061a03f30cad1c13ec1fe330c83aeb34c9bafcf93b0a",
       "mechanisms": [
         "/demos/webgpu-cached-clipmap-shadow/mechanism/bounded-shadow/",
         "/demos/webgpu-cached-clipmap-shadow/mechanism/csm/",
@@ -683,11 +684,11 @@
       "id": "webgpu-camera-rig",
       "path": "/demos/webgpu-camera-rig/",
       "status": "incomplete",
-      "sourceHash": "sha256:65da557ed0239e743e9d91115cf57a8dd06a29116d833538042104aa486c60e2",
+      "sourceHash": "sha256:de7d2f317cc0c5ff52f3ff521c019e3aaf2d22d29544c157b0ee08d22f7fdf18",
       "sourceHashInputs": [
         "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
       ],
-      "publishedBundleHash": "sha256:ede231485e4e5ea03ba0b4a1e1b4f9e98d2fb73f8879d84d12f5129b1da31abb",
+      "publishedBundleHash": "sha256:ed23f6ba7544b77e2d526b089885a636795ef42f8f0aa13fff7c4a5acde212ab",
       "mechanisms": [
         "/demos/webgpu-camera-rig/mechanism/scale-aware-framing/",
         "/demos/webgpu-camera-rig/mechanism/handoff-and-replay/",
@@ -717,7 +718,7 @@
         "threejs-procedural-vegetation/assets/generated-variants/meadow-density-c.png",
         "threejs-procedural-vegetation/examples/webgpu-dense-grass"
       ],
-      "publishedBundleHash": "sha256:98e4989b2fdad4c161d2616c559b5ca4f96f452276ed397c82b62d63512b28c1",
+      "publishedBundleHash": "sha256:eda93129d4bded189be840a88461a86281cc0493c5d3ee19913dfe81ec6339e9",
       "mechanisms": [
         "/demos/webgpu-dense-grass/mechanism/dense-grass-placement/",
         "/demos/webgpu-dense-grass/mechanism/dense-grass-wind-and-trampling/",
@@ -747,7 +748,7 @@
       "sourceHashInputs": [
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
       ],
-      "publishedBundleHash": "sha256:a12fc62a2229abe22662ae98e4859e1eb157f33e8ed371710d601fef5afe063c",
+      "publishedBundleHash": "sha256:93d3edbf83c27cf0d58d14c623487867524050ee4cb5ff38e2e5653e98f8a225",
       "mechanisms": [
         "/demos/webgpu-exposure-color-pipeline/mechanism/log-luminance-reduction/",
         "/demos/webgpu-exposure-color-pipeline/mechanism/histogram-and-percentiles/",
@@ -777,7 +778,7 @@
       "sourceHashInputs": [
         "threejs-spectral-ocean/examples/webgpu-fft-ocean"
       ],
-      "publishedBundleHash": "sha256:82cdfa79c54645291bd614f4a1d295488eadb7496d17190968ca2ca7093121c7",
+      "publishedBundleHash": "sha256:8fab3664a08020358d206ebfd9f9097b34773421a1cfa448010cb6c368b1411a",
       "mechanisms": [
         "/demos/webgpu-fft-ocean/mechanism/spectrum-and-fft/",
         "/demos/webgpu-fft-ocean/mechanism/dispersion-and-cascades/",
@@ -800,11 +801,12 @@
       "id": "webgpu-field-bake",
       "path": "/demos/webgpu-field-bake/",
       "status": "incomplete",
-      "sourceHash": "sha256:555355c7341ff6cefdaf0eb681bcd2440bdb30b957f79aebff935b6d0d9ce0e7",
+      "sourceHash": "sha256:f9c3f05e0541780d9e866511337d6758a2ce456da2982b9d64ebfd5688fce085",
       "sourceHashInputs": [
+        "threejs-procedural-fields/assets/generated-variants/manifest.json",
         "threejs-procedural-fields/examples/webgpu-field-bake"
       ],
-      "publishedBundleHash": "sha256:0a0db2b16d3932995543481a5854f56856912e616af77571086884220960e72a",
+      "publishedBundleHash": "sha256:7fe2f79e182a7df36c90697cd658d2e348e7d3ab03db92388b623a3325da7c9a",
       "mechanisms": [
         "/demos/webgpu-field-bake/mechanism/field-and-gradient-gallery/",
         "/demos/webgpu-field-bake/mechanism/domain-warp-jacobian/",
@@ -839,7 +841,7 @@
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
         "threejs-image-pipeline/examples/webgpu-image-pipeline"
       ],
-      "publishedBundleHash": "sha256:d60b9de99a978cccf7cfe0a53431505eee2a9bc684276be4774fc0e34ce951dd",
+      "publishedBundleHash": "sha256:0b76c66f2e205ab604afec913e9772bdfdea8ad80eee051bb42e538bdc24ee56",
       "mechanisms": [
         "/demos/webgpu-image-pipeline/mechanism/signal-inspector/",
         "/demos/webgpu-image-pipeline/mechanism/ao-bloom-exposure-order/",
@@ -865,7 +867,7 @@
       "sourceHashInputs": [
         "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
       ],
-      "publishedBundleHash": "sha256:c059aead384cb14bc2658b3b2e1c7a65425bb5233172c228b74c624758b15cf1",
+      "publishedBundleHash": "sha256:f183a1bcb405d00ef53ac268df8bd5ba34ac5e1a4e233eb06140e189446c0248",
       "mechanisms": [
         "/demos/webgpu-lut-atmosphere/mechanism/transmittance-and-multiscatter/",
         "/demos/webgpu-lut-atmosphere/mechanism/irradiance-and-sky-view/",
@@ -896,7 +898,7 @@
       "sourceHashInputs": [
         "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
       ],
-      "publishedBundleHash": "sha256:637704704e5fcbe0c606911c080592cfe332bfda44d90650b3594f81d3dc8e7b",
+      "publishedBundleHash": "sha256:1946f8d7b9a902789876d991e72fc17d894742c8614937ba4f3b87b6ac164881",
       "mechanisms": [
         "/demos/webgpu-material-slot-compiler/mechanism/massing-grammar/",
         "/demos/webgpu-material-slot-compiler/mechanism/exposed-edge-analysis/",
@@ -927,7 +929,7 @@
       "sourceHashInputs": [
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
       ],
-      "publishedBundleHash": "sha256:0b657d8fad5f41d1681515eb8b1e6b76251e5a8ccd06cee74884fc67d6767885",
+      "publishedBundleHash": "sha256:181b45c77fece7785e8620c14bc6269e293dc0079d989e4a10e225b9c1a80c3d",
       "mechanisms": [
         "/demos/webgpu-node-gtao/mechanism/scalar-gtao/",
         "/demos/webgpu-node-gtao/mechanism/bilateral-denoise-and-halo/",
@@ -952,6 +954,35 @@
       ]
     },
     {
+      "id": "webgpu-object-sculptor-corpus",
+      "path": "/demos/webgpu-object-sculptor-corpus/",
+      "status": "incomplete",
+      "sourceHash": "sha256:aae80ac61185f536e75d920cadd274ea39f5d4dc301ee7062b94df17bbf4d2a7",
+      "sourceHashInputs": [
+        "labs/runtime/aligned-readback.mjs",
+        "threejs-object-sculptor/examples/shared/sculpt-runtime.js",
+        "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
+      ],
+      "publishedBundleHash": "sha256:1e1c61aa6a8bd4c46654734a95bda39b1ae9b3037f8ad4423302d4b55756eb8f",
+      "mechanisms": [
+        "/demos/webgpu-object-sculptor-corpus/mechanism/final/",
+        "/demos/webgpu-object-sculptor-corpus/mechanism/blockout/",
+        "/demos/webgpu-object-sculptor-corpus/mechanism/hierarchy/",
+        "/demos/webgpu-object-sculptor-corpus/mechanism/materials/",
+        "/demos/webgpu-object-sculptor-corpus/mechanism/action-ready/"
+      ],
+      "tiers": [
+        "/demos/webgpu-object-sculptor-corpus/tier/full/",
+        "/demos/webgpu-object-sculptor-corpus/tier/budgeted/",
+        "/demos/webgpu-object-sculptor-corpus/tier/minimum/"
+      ],
+      "scenarios": [
+        "/demos/webgpu-object-sculptor-corpus/scenario/articulated-desk-lamp/",
+        "/demos/webgpu-object-sculptor-corpus/scenario/potted-bonsai/",
+        "/demos/webgpu-object-sculptor-corpus/scenario/ceramic-teapot/"
+      ]
+    },
+    {
       "id": "webgpu-pooled-effects",
       "path": "/demos/webgpu-pooled-effects/",
       "status": "incomplete",
@@ -959,7 +990,7 @@
       "sourceHashInputs": [
         "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
       ],
-      "publishedBundleHash": "sha256:cba5a953ebe1cda047db70aaa1360e84fd58b4801a52072269a92b95e33b34ef",
+      "publishedBundleHash": "sha256:d2090cac85049916ee2701c7ef03b5be882e201068e79a82a6f19c885b4a1841",
       "mechanisms": [
         "/demos/webgpu-pooled-effects/mechanism/reentry-shell-and-wake/",
         "/demos/webgpu-pooled-effects/mechanism/impact-sparks/",
@@ -988,11 +1019,11 @@
       "id": "webgpu-procedural-creature-lab",
       "path": "/demos/webgpu-procedural-creature-lab/",
       "status": "incomplete",
-      "sourceHash": "sha256:4566656ba16c784c8403fbe3a003580746ea2fe84caff859e88c66e76762d3c4",
+      "sourceHash": "sha256:a582a8a97afcf3023234bd7025d31054f6b008f3f93253affb6e5263c3b126fa",
       "sourceHashInputs": [
         "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
       ],
-      "publishedBundleHash": "sha256:3b9f8ed9f0d1d6d775964870e48b1b82cb59432a6772a0b306d43947e8e468a7",
+      "publishedBundleHash": "sha256:c92dceb0906cd6dcb4581215083f1caf1068eecc63940b2e9b6d3be9f1e9b9c4",
       "mechanisms": [
         "/demos/webgpu-procedural-creature-lab/mechanism/field-and-surface-certification/",
         "/demos/webgpu-procedural-creature-lab/mechanism/snap-and-ownership/",
@@ -1021,11 +1052,11 @@
       "id": "webgpu-procedural-timelines",
       "path": "/demos/webgpu-procedural-timelines/",
       "status": "incomplete",
-      "sourceHash": "sha256:19124fd4449829f795f22a3b12d3309b52b2058db6968dd0c65f844ac73b5ecc",
+      "sourceHash": "sha256:b52c46dbabb83ffcbfd385b9c092fbf46e6d07f01aff5a3c9f516fe10e52cdc5",
       "sourceHashInputs": [
         "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
       ],
-      "publishedBundleHash": "sha256:99f6bb1ed11609be8689a300a66911d8a766ffe28b0a644a5b676648bd0bc573",
+      "publishedBundleHash": "sha256:37481b37afe5094dcc37529ee1771034b3c25c687f50f74ed9ebdf16efb1f9fa",
       "mechanisms": [
         "/demos/webgpu-procedural-timelines/mechanism/launch-and-staging/",
         "/demos/webgpu-procedural-timelines/mechanism/spin-docking/",
@@ -1053,7 +1084,7 @@
       "sourceHashInputs": [
         "threejs-procedural-planets/examples/webgpu-quadtree-planet"
       ],
-      "publishedBundleHash": "sha256:10b5e5b272454b551b54e3fb3464990f09cabba1c11ab614fb2233ebf51519cc",
+      "publishedBundleHash": "sha256:9f1d271aa585eff75fec7f4bf73c870ec7c482cdafcd4eb64f876da13ae6eb0e",
       "mechanisms": [
         "/demos/webgpu-quadtree-planet/mechanism/field-crater-climate/",
         "/demos/webgpu-quadtree-planet/mechanism/cross-face-quadtree/",
@@ -1086,7 +1117,7 @@
       "sourceHashInputs": [
         "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
       ],
-      "publishedBundleHash": "sha256:11c1845b81ad6feb05c126f4261f77b0af6f409e593ca49ddf9785b48510c227",
+      "publishedBundleHash": "sha256:49c565940e150484591d351e00ab5286b8e00a83bd3f0014c3dd9bc404bdfd88",
       "mechanisms": [
         "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/precipitation-volume/",
         "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/analytic-vs-recurrent/",
@@ -1117,7 +1148,7 @@
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench"
       ],
-      "publishedBundleHash": "sha256:31dca3b71875e3e9d524b3bd0acd443635497b77f3a2f9567c3f44819406aff4",
+      "publishedBundleHash": "sha256:d68de3fb3cd8e4d752932bf8ffced134f2e606643d4f78ecc85e97efcde491f0",
       "mechanisms": [
         "/demos/webgpu-shadow-architecture-bench/mechanism/bounded-shadow/",
         "/demos/webgpu-shadow-architecture-bench/mechanism/csm/",
@@ -1147,7 +1178,7 @@
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration"
       ],
-      "publishedBundleHash": "sha256:4f2298078ecd8e7702ad274211fbf744dfde7e6f8c3557497017970a3b50e788",
+      "publishedBundleHash": "sha256:9a0ff40b2b0458108f397f10f030831451f245d176b4afe25d8418fbee55491b",
       "mechanisms": [
         "/demos/webgpu-shadow-pipeline-integration/mechanism/child-shadow-receiver-blend/",
         "/demos/webgpu-shadow-pipeline-integration/mechanism/sequential-shadow-updates/",
@@ -1174,7 +1205,7 @@
         "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
         "threejs-image-pipeline/examples/webgpu-temporal-history"
       ],
-      "publishedBundleHash": "sha256:6edb3c4c3628da3ce018ce27f717c67f4209ec9507fac1737a45a2a981ff110d",
+      "publishedBundleHash": "sha256:4e5114c73582298e93ce215c9c105f4d584677669eae440affd29c00ff2f81d5",
       "mechanisms": [
         "/demos/webgpu-temporal-history/mechanism/velocity-history-rejection-reset/"
       ],
@@ -1193,7 +1224,7 @@
       "sourceHashInputs": [
         "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
       ],
-      "publishedBundleHash": "sha256:b8610f928cf9dba320aaf8cda3391b40de97549ab16cd85d2055a3a77fd64446",
+      "publishedBundleHash": "sha256:ac1c391c9d11dd3458197131c4b190395895eeed0fc16689c145a45902741616",
       "mechanisms": [
         "/demos/webgpu-touch-history-frost/mechanism/history-and-deposit/",
         "/demos/webgpu-touch-history-frost/mechanism/diffusion/",
@@ -1215,12 +1246,12 @@
       "id": "webgpu-tower-ship-sculptor",
       "path": "/demos/webgpu-tower-ship-sculptor/",
       "status": "incomplete",
-      "sourceHash": "sha256:36250f53fbaa67b0fd410bd74ce1aa3dd6e7744af435bc8950119925a825abd1",
+      "sourceHash": "sha256:092f816d582ddd4ac6066b756e315f14efa98551ea619db1966e5a19319a314e",
       "sourceHashInputs": [
         "labs/runtime/aligned-readback.mjs",
         "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
       ],
-      "publishedBundleHash": "sha256:b6b1d8f11a5bfddc76bf2ea811b9cf9b23b8fa3b86eff9f59a04ea4767bd361e",
+      "publishedBundleHash": "sha256:ae2dea9db68bfb15de6af727e5c8ef4e6bfd4a670f006cc2400686dbd99ece01",
       "mechanisms": [
         "/demos/webgpu-tower-ship-sculptor/mechanism/final/",
         "/demos/webgpu-tower-ship-sculptor/mechanism/blockout/",
@@ -1243,11 +1274,11 @@
       "id": "webgpu-validation-harness",
       "path": "/demos/webgpu-validation-harness/",
       "status": "incomplete",
-      "sourceHash": "sha256:69f361995d8a99d1a34ba53e224b1baa26e616e8082599c6db7fcfa87a98c5dc",
+      "sourceHash": "sha256:184a0ef95681a3b256c96732852e0cef6c1ba02207fb0d58fe3118d11d28f10b",
       "sourceHashInputs": [
         "threejs-visual-validation/examples/webgpu-validation-harness"
       ],
-      "publishedBundleHash": "sha256:00cfed92f3cd314fc1e5d47c95a477a4db608c3203b0dc1f2db03db6852c35a6",
+      "publishedBundleHash": "sha256:568bc57cc6bed11fd779fd8b038bfe7998aabc5e8a3809eda1ca0ac39d51fd28",
       "mechanisms": [
         "/demos/webgpu-validation-harness/mechanism/aligned-readback/",
         "/demos/webgpu-validation-harness/mechanism/claim-verdicts/",
@@ -1295,7 +1326,7 @@
         "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
         "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
       ],
-      "publishedBundleHash": "sha256:985d99bcecdc4ea3451ed82d94915c593d684bdb3b140812b60b16777f96e7e3",
+      "publishedBundleHash": "sha256:be0f7350c993f62599b0682bcac06c3043de5069258da2d5121c1ff50c8aa1b0",
       "mechanisms": [
         "/demos/webgpu-vegetation-integration/mechanism/host-ownership/",
         "/demos/webgpu-vegetation-integration/mechanism/shared-weather/",
@@ -1319,7 +1350,7 @@
       "sourceHashInputs": [
         "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
       ],
-      "publishedBundleHash": "sha256:80d85d4fdfeb254963fff12f7519621faaa6c57a88e116720f952a220c22ac3d",
+      "publishedBundleHash": "sha256:aa36c627adb82144c1724e58a9ae70c4caaa5fb3b09b0ce81ef47a3e79c898ff",
       "mechanisms": [
         "/demos/webgpu-weather-volume-clouds/mechanism/flagship-transport/",
         "/demos/webgpu-weather-volume-clouds/mechanism/density-and-bounds/",
@@ -1357,14 +1388,14 @@
         "scripts/provider-demos.mjs",
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
       ],
-      "publishedBundleHash": "sha256:8058fe85fbe753b8039ff216f207960c023d5d91a4c2af4ab2e41766b22eb66a"
+      "publishedBundleHash": "sha256:3389ec2959886028a2922802e8e4b73494af8434652c3647898c678264258491"
     },
     {
       "id": "camera-rig-handoff-demo",
       "path": "/demos/camera-rig-handoff-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "webgpu-camera-rig",
-      "sourceHash": "sha256:4de7a3c2e31c69c2e416b1e51c554d66ef547d60a514060ab5e78ab9b1e4dc2b",
+      "sourceHash": "sha256:5ef9a616abcdb6961ac570d1ddde2566d402751faf779371e3ff03c29df89fb4",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1372,7 +1403,7 @@
         "scripts/provider-demos.mjs",
         "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
       ],
-      "publishedBundleHash": "sha256:75ba7ec77ca5e68ae5d4f23021fca15ab3bc38d72db36f91978fbfe737a01864"
+      "publishedBundleHash": "sha256:fefff6c6a4e88b5ab2a466ba82774412d271ffef8217ba0575944a2df7f66030"
     },
     {
       "id": "cloud-generated-weather-maps",
@@ -1387,7 +1418,7 @@
         "scripts/provider-demos.mjs",
         "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
       ],
-      "publishedBundleHash": "sha256:0da4997b6bd8f64b501d0e67f3bf528aa6609452bd309bd2f66d884a08f884a1"
+      "publishedBundleHash": "sha256:ce8c1c54621a91338d755925bdaeee5c8bce8074bc40a8827e05e201f8cb1a11"
     },
     {
       "id": "compatibility-fallback-planner-demo",
@@ -1402,7 +1433,7 @@
         "scripts/provider-demos.mjs",
         "threejs-compatibility-fallbacks/examples/tier-planner"
       ],
-      "publishedBundleHash": "sha256:95104fb5942f8d80e6a3d4ad0099f51ef2f4b5b0aa295fde4daf15590d45cdf1"
+      "publishedBundleHash": "sha256:0b6d2da032d5f050953deb6472169e7334556750b62e4d34ade1b2c9a52533b7"
     },
     {
       "id": "exposure-color-grading-demo",
@@ -1417,14 +1448,14 @@
         "scripts/provider-demos.mjs",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
       ],
-      "publishedBundleHash": "sha256:1441954563987da3c8975c1b4f2e11703d2816843e86b32c14a6fa0415e08fd7"
+      "publishedBundleHash": "sha256:dddafce687551fd5f3e7abc5e18b724506ee8b20df85dc4ca5a51cc7f7db87c8"
     },
     {
       "id": "fields-generated-biome-maps",
       "path": "/demos/fields-generated-biome-maps/",
       "kind": "generated-asset-demo",
       "canonicalLabId": "webgpu-field-bake",
-      "sourceHash": "sha256:83899d9151b53b4d484b1a941e33dc6da4beefe8ed1b0f5e30df95ab1a118e8f",
+      "sourceHash": "sha256:cc85d49bcd8d42b9334a954197349e50cd04ca69939e95a7c8f6f2575568e90d",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1432,7 +1463,7 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-fields/examples/webgpu-field-bake"
       ],
-      "publishedBundleHash": "sha256:a490fb027ded41cd055c7e04d6acdac5873fd94e930220b346eeab2b4fde562e"
+      "publishedBundleHash": "sha256:0bc9c708f18f9e43b15f8d5f148e109e3fe6b4f3d03ac1601591fffd2d767718"
     },
     {
       "id": "frost-generated-crystals",
@@ -1447,7 +1478,7 @@
         "scripts/provider-demos.mjs",
         "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
       ],
-      "publishedBundleHash": "sha256:e9ad7ebdcee021c9654c49fc7b33a42f3780cb832f0069d603ea09ba4e39c017"
+      "publishedBundleHash": "sha256:7f650ff0455fb045f90d1ab290fe0495bc34f135165205ed1c4d49ea9601dcc0"
     },
     {
       "id": "image-pipeline-framegraph-demo",
@@ -1462,14 +1493,14 @@
         "scripts/provider-demos.mjs",
         "threejs-image-pipeline/examples/webgpu-image-pipeline"
       ],
-      "publishedBundleHash": "sha256:a30d616410352d41addd0e6cc99fa9ef37d585a73ec2b05f46f6708bdd13d3ca"
+      "publishedBundleHash": "sha256:db2607affbe1912608f1b82bd3ca26575361141f18bcc73087a305fc3e9089fb"
     },
     {
       "id": "materials-generated-lava-causes",
       "path": "/demos/materials-generated-lava-causes/",
       "kind": "generated-asset-demo",
       "canonicalLabId": "tsl-procedural-pbr",
-      "sourceHash": "sha256:a54ffead3072431a91904f03970cdeef9761721c816d02a917106c70f0ebe157",
+      "sourceHash": "sha256:399f62a0febd55cea55cb1f5d14b481b949bbac37779da4629cd6e0c57457877",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1477,7 +1508,7 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-materials/examples/tsl-procedural-pbr"
       ],
-      "publishedBundleHash": "sha256:339566c4a9456ecc7e6236b4706d75e685dad313ff49d8362087888badb9f24e"
+      "publishedBundleHash": "sha256:f1133c7e91f6fd2213f0e218c2d38d3d134a65cefb091202017194b4771da262"
     },
     {
       "id": "ocean-generated-wave-seeds",
@@ -1492,7 +1523,7 @@
         "scripts/provider-demos.mjs",
         "threejs-spectral-ocean/examples/webgpu-fft-ocean"
       ],
-      "publishedBundleHash": "sha256:5983de78791a5e48441d762e009beb767d0c589fb6984dda0cf40855803350bf"
+      "publishedBundleHash": "sha256:a6ef1b88e6acff2fb76380e0523e9a12eb55929ac9c02d65183c79b99604e2e7"
     },
     {
       "id": "planet-generated-craters",
@@ -1507,7 +1538,7 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-planets/examples/webgpu-quadtree-planet"
       ],
-      "publishedBundleHash": "sha256:c63c374f6aa5183ee39e04d5a7af510b2c6bd7cf1ba6b2f9399542774f7dbc6d"
+      "publishedBundleHash": "sha256:3f4fc5905be1d43762955f1279956304fa968613fdde8ac6705d649bfc5e1657"
     },
     {
       "id": "pooled-particles-effects-demo",
@@ -1522,7 +1553,7 @@
         "scripts/provider-demos.mjs",
         "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
       ],
-      "publishedBundleHash": "sha256:fd23df00308f9cb3aa15b58d1a82883048d02389a7b6b14e64eec05e83938a4a"
+      "publishedBundleHash": "sha256:b9741bef3c6ede31116e98e0c78cac6ad7d32afeee9ad16752aab61842d8a123"
     },
     {
       "id": "procedural-building-compiler-demo",
@@ -1537,7 +1568,7 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
       ],
-      "publishedBundleHash": "sha256:e0d1f9322390911f81166952a7659d483c092d142eb3f8e9f09995150a4f8b2f"
+      "publishedBundleHash": "sha256:eb744e5045cba2eaffba98403ab2fb6dacb0257b9fb96ddc91eb1a5581db1c83"
     },
     {
       "id": "procedural-creature-lab-demo",
@@ -1552,14 +1583,14 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-creatures/SKILL.md"
       ],
-      "publishedBundleHash": "sha256:5a97b7c7cef441d4168268db6e4103b72d668246cb0af40f08eed72a19565c09"
+      "publishedBundleHash": "sha256:542cddc8d6b5faf040c3c99bc1b8e885b203cd0f58a57ef95e76f74da40ab4da"
     },
     {
       "id": "procedural-geometry-writer-demo",
       "path": "/demos/procedural-geometry-writer-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "semantic-mesh-writer",
-      "sourceHash": "sha256:064012816fd80d75880b795959db68580bef421f9c384b64ea2ccce63370dd00",
+      "sourceHash": "sha256:3191ec01f76f92a8e03d6100a4b7dac670439347755532a8d31b17c1d8ab0b26",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1567,14 +1598,14 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-geometry/examples/semantic-mesh-writer"
       ],
-      "publishedBundleHash": "sha256:92f4f44b7f764606cf08878c54f0591c5280e499744fbd4eeea40554e6c06e7b"
+      "publishedBundleHash": "sha256:231c48f17435a3fca73094ad1b077c2022362146b1ea460d4b33526624ad092d"
     },
     {
       "id": "procedural-motion-timeline-demo",
       "path": "/demos/procedural-motion-timeline-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "webgpu-procedural-timelines",
-      "sourceHash": "sha256:e0d840c58ab70d36a9c2035457a7d48f3c998f420224c60d2ea1c83a4e2a54a9",
+      "sourceHash": "sha256:7f6c3bcf00e5ed3fc3ba9d07db9ab987e201369f83d33d2081781847040b9331",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1582,7 +1613,7 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
       ],
-      "publishedBundleHash": "sha256:2298893b5843fd1dd246555f2805f621ac0ef3d95a6a0d5e79c8cd11575be7e6"
+      "publishedBundleHash": "sha256:0566f1f02ad3e08181660b8d6ec001654de49b126d7862aad252cdb1f7ed9fa6"
     },
     {
       "id": "rain-generated-ripples",
@@ -1597,7 +1628,7 @@
         "scripts/provider-demos.mjs",
         "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
       ],
-      "publishedBundleHash": "sha256:f7183b07a381d5b8f2c2a98e9ba755332d24ee4cc5aabfcc7d60c80c5cf9e4a0"
+      "publishedBundleHash": "sha256:0e1989bc1813ffa43a11ad417ca553e8c158d042e1238ecc7cdedbfbc35def49"
     },
     {
       "id": "selective-bloom-demo",
@@ -1612,7 +1643,7 @@
         "scripts/provider-demos.mjs",
         "threejs-bloom/examples/node-selective-bloom"
       ],
-      "publishedBundleHash": "sha256:5e40c5125f61a18c42571f7809c7a856cc2cd408ffe33a0cbbc9c461501b0302"
+      "publishedBundleHash": "sha256:5a40243333e55adb510bf9542a25744a6afe5c6aead4239ee17d067572c8314d"
     },
     {
       "id": "shadow-cascade-demo",
@@ -1627,7 +1658,7 @@
         "scripts/provider-demos.mjs",
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
       ],
-      "publishedBundleHash": "sha256:a17e9839799d124544fca898f60384edbbbca366f5e65e5c7420ceaf388e36c3"
+      "publishedBundleHash": "sha256:c920028a292e3f7c7808b5decb844eabc4048a6628f37ea6e371a1baf9cd8943"
     },
     {
       "id": "skill-router-manifest-demo",
@@ -1642,7 +1673,7 @@
         "scripts/provider-demos.mjs",
         "threejs-choose-skills/examples/router-contract.test.mjs"
       ],
-      "publishedBundleHash": "sha256:3258bdd83c51316680b4be8b9663a98974fcf523e066cdbb0e5a42ba81cfa741"
+      "publishedBundleHash": "sha256:02b7c0d1e4b5dc5b414d1123e97df44a5390e4eea3b1de9bcccaf6a6aa9ef6fc"
     },
     {
       "id": "sky-atmosphere-haze-demo",
@@ -1657,7 +1688,7 @@
         "scripts/provider-demos.mjs",
         "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
       ],
-      "publishedBundleHash": "sha256:c52931a32976952238f73c6a471935632977d8713ab6520276bfdea0855d0ae3"
+      "publishedBundleHash": "sha256:c1cb67eb17a561ba8f69ad9f93512f6705524cd0e36bebc1f06511a72671b3c8"
     },
     {
       "id": "space-generated-starfields",
@@ -1672,7 +1703,7 @@
         "scripts/provider-demos.mjs",
         "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
       ],
-      "publishedBundleHash": "sha256:9fa88c93a0d570567ffbfe90d9d82e681c2f361804de8fea218c398d97563dd0"
+      "publishedBundleHash": "sha256:436027cccc21feb856beba43cef8cd5f3005c751f85517077dd108c6880744ae"
     },
     {
       "id": "vegetation-generated-meadow-density",
@@ -1687,14 +1718,14 @@
         "scripts/provider-demos.mjs",
         "threejs-procedural-vegetation/examples/webgpu-dense-grass"
       ],
-      "publishedBundleHash": "sha256:35a70a6c935df3ae2c36cdf91457fa6a5310ad7d2531c70f8fe78c0d4338b8b9"
+      "publishedBundleHash": "sha256:7afe392a44e11c740f34c027702e6515e18619268ce13ec5bddbaf84b6cbccc9"
     },
     {
       "id": "visual-validation-harness-demo",
       "path": "/demos/visual-validation-harness-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "webgpu-validation-harness",
-      "sourceHash": "sha256:28d5789bb49f5b01261a102328da461d01c1f0bb8f860dc0d368bca736add4ba",
+      "sourceHash": "sha256:b1f8a8d59cfb592504d768c51c485af6334197d899db14eeee9bca331075ed05",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1702,7 +1733,7 @@
         "scripts/provider-demos.mjs",
         "threejs-visual-validation/examples/webgpu-validation-harness"
       ],
-      "publishedBundleHash": "sha256:79315062234af9271da8b41de66b978fcb7681f3acc0551a7a5303de3b957c70"
+      "publishedBundleHash": "sha256:5833f8529614d6e0d0764712ac7c65930b8f4015f29721cc8fe60d9b17fa6db7"
     },
     {
       "id": "water-generated-caustics",
@@ -1717,7 +1748,7 @@
         "scripts/provider-demos.mjs",
         "threejs-water-optics/examples/webgpu-bounded-water"
       ],
-      "publishedBundleHash": "sha256:bf73bfe2b973fbc5a8b02f601be92b5aaa4e605988fe8d7f318ec614ef3d0c88"
+      "publishedBundleHash": "sha256:df92fbe0fef6337214cb6312a8f4557d31ce293881c68fa0df29b43a83afa6aa"
     },
     {
       "id": "water-integration-surface",
@@ -1732,7 +1763,7 @@
         "scripts/provider-demos.mjs",
         "threejs-water-optics/EXPERIMENTAL/water-integration-surface"
       ],
-      "publishedBundleHash": "sha256:05084556ecfda621430fc1f1ff03edccd2f14e56c4df33e5eacf9815af95ff79"
+      "publishedBundleHash": "sha256:cb4d8a77a93bbeba459bc6d2605d4213cf3980bf6ea919b8353080782215035f"
     }
   ],
   "pendingRoutes": []

@@ -22,8 +22,8 @@
     "docs/demos/webgpu-dense-grass",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:98e4989b2fdad4c161d2616c559b5ca4f96f452276ed397c82b62d63512b28c1",
+  "publishedBundleHash": "sha256:eda93129d4bded189be840a88461a86281cc0493c5d3ee19913dfe81ec6339e9",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

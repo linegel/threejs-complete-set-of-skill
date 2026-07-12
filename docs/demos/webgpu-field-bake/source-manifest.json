@@ -10,16 +10,17 @@
     "threejs-procedural-fields/examples/webgpu-field-bake/browser-app.js"
   ],
   "sourceHashInputs": [
+    "threejs-procedural-fields/assets/generated-variants/manifest.json",
     "threejs-procedural-fields/examples/webgpu-field-bake"
   ],
   "browserEntry": "threejs-procedural-fields/examples/webgpu-field-bake/index.html",
-  "sourceHash": "sha256:555355c7341ff6cefdaf0eb681bcd2440bdb30b957f79aebff935b6d0d9ce0e7",
+  "sourceHash": "sha256:f9c3f05e0541780d9e866511337d6758a2ce456da2982b9d64ebfd5688fce085",
   "publishedHashInputs": [
     "docs/demos/webgpu-field-bake",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:0a0db2b16d3932995543481a5854f56856912e616af77571086884220960e72a",
+  "publishedBundleHash": "sha256:7fe2f79e182a7df36c90697cd658d2e348e7d3ab03db92388b623a3325da7c9a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

@@ -19,8 +19,8 @@
     "docs/demos/webgpu-image-pipeline",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:d60b9de99a978cccf7cfe0a53431505eee2a9bc684276be4774fc0e34ce951dd",
+  "publishedBundleHash": "sha256:0b76c66f2e205ab604afec913e9772bdfdea8ad80eee051bb42e538bdc24ee56",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

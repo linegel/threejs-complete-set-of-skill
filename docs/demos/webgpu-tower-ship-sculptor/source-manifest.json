@@ -11,13 +11,13 @@
     "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/index.html",
-  "sourceHash": "sha256:36250f53fbaa67b0fd410bd74ce1aa3dd6e7744af435bc8950119925a825abd1",
+  "sourceHash": "sha256:092f816d582ddd4ac6066b756e315f14efa98551ea619db1966e5a19319a314e",
   "publishedHashInputs": [
     "docs/demos/webgpu-tower-ship-sculptor",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:b6b1d8f11a5bfddc76bf2ea811b9cf9b23b8fa3b86eff9f59a04ea4767bd361e",
+  "publishedBundleHash": "sha256:ae2dea9db68bfb15de6af727e5c8ef4e6bfd4a670f006cc2400686dbd99ece01",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }

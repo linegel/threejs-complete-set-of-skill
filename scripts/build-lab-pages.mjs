@@ -168,7 +168,7 @@ function demoSeoShell(lab, { hasH1, hasMain }) {
   const mechanisms = lab.mechanisms.length
     ? [
       ...lab.mechanisms.slice(0, 6).map((entry) => `<li><code>${escapeHtml(entry.id)}</code> — ${escapeHtml(humanize(entry.id))}</li>`),
-      ...(lab.mechanisms.length > 6 ? [`<li>${lab.mechanisms.length - 6} additional mechanisms are listed in the registry.</li>`] : []),
+      ...(lab.mechanisms.length > 6 ? [`<li>${lab.mechanisms.length - 6} additional mechanisms are documented by the owning skill.</li>`] : []),
     ]
     : [`<li>${escapeHtml(lab.kind === 'generated-asset-demo' ? 'Generated asset presentation and provenance review.' : 'Interactive presentation linked to the owning production skill contract.')}</li>`];
   const canonicalLabLink = lab.proxyStatus?.canonicalLabId
@@ -177,7 +177,6 @@ function demoSeoShell(lab, { hasH1, hasMain }) {
   const links = [
     `<a href="../../skills/${escapeHtml(lab.skill)}.html">Owning skill</a>`,
     canonicalLabLink,
-    '<a href="../registry.json">Demo registry</a>',
     `<a href="${REPOSITORY}/tree/main/${escapeHtml(lab.skill)}">Source repository</a>`,
   ].filter(Boolean).join('');
   const roadmap = buildDemoRoadmap(lab);
@@ -203,7 +202,7 @@ function demoSeoShell(lab, { hasH1, hasMain }) {
           <ol>${roadmapItems}</ol>
         </div>
       </details>
-      <p>Use the linked skill, registry, and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
+      <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
       <dl>
         <div><dt>Owning skill</dt><dd>${escapeHtml(skill?.title ?? humanize(lab.skill))}</dd></div>
         <div><dt>Published routes</dt><dd>${lab.scenarios.length} scenarios · ${lab.mechanisms.length} mechanisms · ${lab.tiers.length} quality tiers</dd></div>
@@ -244,14 +243,15 @@ function runtimeEvidencePreview(lab) {
   const summaryPath = join(REPO_ROOT, 'docs', 'visual-validation', lab.id, 'evidence-summary.json');
   if (!existsSync(summaryPath)) return null;
   const summary = JSON.parse(readFileSync(summaryPath, 'utf8'));
+  if (summary.acceptanceStatus !== lab.status || summary.canonicalSourceHash !== lab.sourceHash) {
+    return { stale: true };
+  }
   if (
     summary.schemaVersion !== 1
     || summary.labId !== lab.id
     || summary.classification !== 'inspected-runtime-evidence-preview'
-    || summary.acceptanceStatus !== lab.status
-    || summary.canonicalSourceHash !== lab.sourceHash
     || summary.runtime?.isWebGPUBackend !== true
-  ) throw new Error(`Runtime evidence preview summary is invalid or stale for ${lab.id}`);
+  ) throw new Error(`Runtime evidence preview summary is invalid for ${lab.id}`);
   const image = summary.images?.find((entry) => entry.file === summary.primaryImage);
   if (!image) throw new Error(`Runtime evidence preview has no declared primary image for ${lab.id}`);
   return {
@@ -263,9 +263,9 @@ function runtimeEvidencePreview(lab) {
 function demoPreview(lab) {
   const runtimeEvidence = runtimeEvidencePreview(lab);
   const candidates = [
-    ...(runtimeEvidence ? [runtimeEvidence] : []),
+    ...(runtimeEvidence && !runtimeEvidence.stale ? [runtimeEvidence] : []),
     { path: `previews/primary/${lab.id}.png`, label: 'Canonical implementation screenshot; evidence status is reported separately' },
-    { path: `visual-validation/${lab.id}/final.design.png`, label: 'Published render-target evidence or explicitly classified evidence preview' },
+    ...(runtimeEvidence?.stale ? [] : [{ path: `visual-validation/${lab.id}/final.design.png`, label: 'Published render-target evidence or explicitly classified evidence preview' }]),
     { path: `previews/provider/${lab.id}.png`, label: 'Live concept-proxy screenshot; not canonical evidence' },
   ];
   const relatedProvider = registry.demos.find((entry) => (
@@ -408,7 +408,7 @@ function injectPrimaryClassification(html, lab) {
     const label = lab.status === 'blocked' ? 'blocked' : 'incomplete';
     output = output.replace(
       /<body([^>]*)>/i,
-      `<body$1><aside class="lab-status-banner"><strong>Canonical lab ${label}.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../registry.json">Registry</a>.</aside>`,
+      `<body$1><aside class="lab-status-banner"><strong>Canonical lab ${label}.</strong> This implementation is loadable for review, but it is excluded from accepted coverage until native-WebGPU runtime and v2 evidence gates pass. <a href="../../skills/${lab.skill}.html">Read the owning skill</a>.</aside>`,
     );
   }
   return output;
@@ -663,7 +663,7 @@ for (const lab of placeholderPrimary) {
   const statusLabel = lab.status === 'blocked' ? 'blocked' : 'incomplete';
   const sources = lab.canonicalSource.map((source) => `<li><code>${escapeHtml(source)}</code></li>`).join('');
   const placeholderHtml = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="demo-kind" content="${lab.kind}"><meta name="acceptance-status" content="${lab.status}"><title>${escapeHtml(lab.title ?? lab.id)} — ${statusLabel}</title><style>body{margin:0;background:#080b10;color:#ece8de;font:16px/1.6 system-ui,sans-serif}.wrap{max-width:760px;margin:10vh auto;padding:32px;border:1px solid #353a46;background:#0f131b}h1{font-size:clamp(28px,6vw,52px);line-height:1.05}strong{color:#ffb454}code{color:#7fd4c1}a{color:#7fd4c1}</style></head><body><main class="wrap"><p><strong>Canonical lab ${statusLabel}.</strong></p><h1>${escapeHtml(lab.title ?? lab.id)}</h1><p>This route is reserved by the schema-v2 completion matrix, but it is not accepted runtime evidence. It remains excluded from primary completion counts until native-WebGPU execution, aligned readback, v2 artifacts, lifecycle validation, and source-hash equivalence pass.</p><h2>Canonical source</h2><ul>${sources}</ul><p><a href="../../skills/${lab.skill}.html">Read the owning skill contract</a> · <a href="../registry.json">Inspect the demo registry</a></p></main></body></html>\n`;
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="demo-kind" content="${lab.kind}"><meta name="acceptance-status" content="${lab.status}"><title>${escapeHtml(lab.title ?? lab.id)} — ${statusLabel}</title><style>body{margin:0;background:#080b10;color:#ece8de;font:16px/1.6 system-ui,sans-serif}.wrap{max-width:760px;margin:10vh auto;padding:32px;border:1px solid #353a46;background:#0f131b}h1{font-size:clamp(28px,6vw,52px);line-height:1.05}strong{color:#ffb454}code{color:#7fd4c1}a{color:#7fd4c1}</style></head><body><main class="wrap"><p><strong>Canonical lab ${statusLabel}.</strong></p><h1>${escapeHtml(lab.title ?? lab.id)}</h1><p>This route is reserved by the schema-v2 completion matrix, but it is not accepted runtime evidence. It remains excluded from primary completion counts until native-WebGPU execution, aligned readback, v2 artifacts, lifecycle validation, and source-hash equivalence pass.</p><h2>Canonical source</h2><ul>${sources}</ul><p><a href="../../skills/${lab.skill}.html">Read the owning skill contract</a></p></main></body></html>\n`;
   writeFileSync(join(outputDir, 'index.html'), injectDemoSeoShell(injectDemoSeo(placeholderHtml, lab, { indexable: false }), lab));
 }
 

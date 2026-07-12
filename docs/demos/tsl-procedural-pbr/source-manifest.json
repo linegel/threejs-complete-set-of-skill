@@ -7,20 +7,19 @@
     "threejs-procedural-materials/examples/tsl-procedural-pbr"
   ],
   "sourceHashInputs": [
-    "labs/runtime/aligned-readback.mjs",
     "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png",
     "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png",
     "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png",
     "threejs-procedural-materials/examples/tsl-procedural-pbr"
   ],
   "browserEntry": "threejs-procedural-materials/examples/tsl-procedural-pbr/index.html",
-  "sourceHash": "sha256:6b8c319820150ebd12ca802aa3e10575b13de28c8ce148712f3883bb3c77cf50",
+  "sourceHash": "sha256:0440d83b0ba396903a57f8a1a6e0835d3cdb005b26e12e1eee64cfa35e051044",
   "publishedHashInputs": [
     "docs/demos/tsl-procedural-pbr",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:9bdf68ec71c1f6a63319a7e8ec1e5450b7ef56bf1e409f34049c2e477e30d5f7",
+  "publishedBundleHash": "sha256:58a63438e58fbdfc7df99e6123835e1404a836c9b367e9474294832aaac58e0b",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "evidenceBundleId": null
 }
