@@ -8,10 +8,16 @@ import {
   computeManifestSourceHash,
   registryJson,
 } from './lib/lab-registry.mjs';
-import { computePublishedBundleHash, publishedHashInputs } from './lib/published-pages.mjs';
+import {
+  allPublishedAssetFiles,
+  computePublishedBundleHash,
+  publishedAssetDependencies,
+  publishedHashInputs,
+} from './lib/published-pages.mjs';
 
 const registry = buildDemoRegistry();
 const errors = [];
+const registeredPublishedAssets = new Set();
 const publishedRegistryPath = join(REPO_ROOT, 'docs', 'demos', 'registry.json');
 if (!existsSync(publishedRegistryPath)) errors.push('missing docs/demos/registry.json');
 else if (readFileSync(publishedRegistryPath, 'utf8') !== registryJson(registry)) {
@@ -64,8 +70,13 @@ for (const lab of registry.demos) {
     errors.push(`${lab.id}: published source-hash input ledger drift`);
   }
   const currentPublishedInputs = publishedHashInputs(REPO_ROOT, lab.id);
+  const currentAssetDependencies = publishedAssetDependencies(REPO_ROOT, lab.id);
+  for (const asset of currentAssetDependencies) registeredPublishedAssets.add(asset);
   if (JSON.stringify(published.publishedHashInputs) !== JSON.stringify(currentPublishedInputs)) {
     errors.push(`${lab.id}: published-output input ledger drift`);
+  }
+  if (JSON.stringify(published.emittedAssetDependencies) !== JSON.stringify(currentAssetDependencies)) {
+    errors.push(`${lab.id}: emitted asset dependency ledger drift`);
   }
   const currentPublishedHash = computePublishedBundleHash(REPO_ROOT, currentPublishedInputs);
   if (published.publishedBundleHash !== currentPublishedHash) {
@@ -80,6 +91,13 @@ for (const lab of registry.demos) {
   }
   if (published.threeRevision !== '0.185.1') errors.push(`${lab.id}: published Three revision drift`);
   if (published.buildRevision !== registry.buildRevision) errors.push(`${lab.id}: published build revision drift`);
+}
+const allPublishedAssets = allPublishedAssetFiles(REPO_ROOT);
+if (allPublishedAssets.length !== registeredPublishedAssets.size) {
+  errors.push(`published assets: ${allPublishedAssets.length} files but ${registeredPublishedAssets.size} are registered by lab closures`);
+}
+for (const asset of allPublishedAssets) {
+  if (!registeredPublishedAssets.has(asset)) errors.push(`published assets: unregistered output ${asset}`);
 }
 
 if (errors.length > 0) {
