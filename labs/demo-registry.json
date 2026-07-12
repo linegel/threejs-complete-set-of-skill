@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:7c7a8f4d4b82624ffd727373613d5fcd794eafaa43c86d879aeb193b36928754",
+  "buildRevision": "sha256:182a997a71f2146bcd1ba3d763c279dc9813ae9c18f4344cca88bcef5e920d02",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -10505,7 +10505,7 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:full"
       },
-      "sourceHash": "sha256:94fd7c78aab7c890b6a87f8160a259ee624317a2c657a07b083d8122b41c4aff",
+      "sourceHash": "sha256:2582f4d5a92771dbacc95d2e027afab49e30a1ea0719974b6ea0330d22b6e5d1",
       "proxyStatus": null,
       "notes": [
         "Deep multi-subject, route, physics, workload, provenance, and visual-acceptance metadata is owned by corpus.contract.json.",
