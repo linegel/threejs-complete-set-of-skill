@@ -11,12 +11,13 @@
       "primaryImageLabel": "Exposure and grading render-target readback",
       "limitations": [
         "The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.",
+        "The promoted percentile frame is a selection mask, not proof that histogram bin totals, prefix scan, or f64 oracle parity pass.",
         "Lifecycle stability remains unaccepted."
       ],
       "images": [
         { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final exposure, tone-map, LUT, and output-transform readback." },
         { "source": "images/meter-source.png", "output": "meter-source.png", "encoding": "png-copy", "meaning": "Weighted log-luminance meter source diagnostic." },
-        { "source": "images/histogram-percentiles.png", "output": "histogram-percentiles.png", "encoding": "png-copy", "meaning": "Histogram and percentile diagnostic." },
+        { "source": "images/histogram-percentiles.png", "output": "histogram-percentiles.png", "encoding": "png-copy", "meaning": "Percentile-selection mask emitted by the histogram path; not a plotted histogram." },
         { "source": "images/meter-mask.png", "output": "meter-mask.png", "encoding": "png-copy", "meaning": "Metering-mask diagnostic." },
         { "source": "images/tone-map.png", "output": "tone-map.png", "encoding": "png-copy", "meaning": "Tone-map stage diagnostic before the creative LUT." },
         { "source": "images/lut.png", "output": "lut.png", "encoding": "png-copy", "meaning": "Creative LUT stage diagnostic." }
