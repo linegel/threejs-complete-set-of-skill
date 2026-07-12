@@ -6,6 +6,7 @@ const scratchFrom = new Vector3();
 const scratchTo = new Vector3();
 const scratchFallback = new Vector3(1, 0, 0);
 const scratchDelta = new Quaternion();
+const scratchSlerpTarget = new Quaternion();
 
 export function canonicalizeQuaternionSign(prev, next) {
   if (prev.dot(next) < 0) next.set(-next.x, -next.y, -next.z, -next.w);
@@ -32,11 +33,31 @@ export function fromUnitVectorsSafe(
   if (dot > 1 - 1e-6) return out.identity();
   if (dot < -1 + 1e-6) {
     scratchAxis.copy(fallbackAxis);
-    if (Math.abs(scratchAxis.dot(scratchFrom)) > 0.95) scratchAxis.set(0, 1, 0);
-    scratchAxis.cross(scratchFrom).normalize();
+    if (scratchAxis.lengthSq() < EPSILON || Math.abs(scratchAxis.normalize().dot(scratchFrom)) > 0.95) {
+      const absX = Math.abs(scratchFrom.x);
+      const absY = Math.abs(scratchFrom.y);
+      const absZ = Math.abs(scratchFrom.z);
+      if (absX <= absY && absX <= absZ) scratchAxis.set(1, 0, 0);
+      else if (absY <= absZ) scratchAxis.set(0, 1, 0);
+      else scratchAxis.set(0, 0, 1);
+    }
+    scratchAxis.cross(scratchFrom);
+    if (scratchAxis.lengthSq() < EPSILON) {
+      throw new Error("could not construct a stable antiparallel quaternion axis");
+    }
+    scratchAxis.normalize();
     return out.setFromAxisAngle(scratchAxis, Math.PI).normalize();
   }
   return out.setFromUnitVectors(scratchFrom, scratchTo).normalize();
+}
+
+/** Shortest-arc quaternion interpolation with explicit double-cover handling. */
+export function slerpQuaternionsShortest(previous, current, alpha, out = new Quaternion()) {
+  if (!Number.isFinite(alpha)) throw new RangeError("quaternion interpolation alpha must be finite");
+  const clampedAlpha = Math.min(Math.max(alpha, 0), 1);
+  scratchSlerpTarget.copy(current).normalize();
+  canonicalizeQuaternionSign(previous, scratchSlerpTarget);
+  return out.slerpQuaternions(previous, scratchSlerpTarget, clampedAlpha).normalize();
 }
 
 export function rotationAroundUnitAxis(axisWorld, radians, out = new Quaternion()) {
@@ -65,7 +86,9 @@ export function integrateAngularVelocityWorld(quaternion, angularVelocityWorld, 
 }
 
 export function quaternionAngle(a, b) {
-  const dot = Math.min(Math.abs(a.dot(b)), 1);
+  const denominator = Math.hypot(a.x, a.y, a.z, a.w) * Math.hypot(b.x, b.y, b.z, b.w);
+  if (!(denominator > EPSILON)) return Number.POSITIVE_INFINITY;
+  const dot = Math.min(Math.abs(a.dot(b) / denominator), 1);
   return 2 * Math.acos(dot);
 }
 
