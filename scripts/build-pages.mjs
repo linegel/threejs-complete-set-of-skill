@@ -238,35 +238,30 @@ const rootPackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 const FLAGSHIP_META = [
   {
     id: 'final-image-flight',
-    tone: 'amber',
     domain: 'Final image systems',
     copy: 'Camera and motion state feed one shared signal graph for shadows, honest material-context AO, emissive bloom, exposure, grading, and final output.',
     nodes: ['camera', 'motion', 'AO', 'bloom', 'exposure'],
   },
   {
     id: 'weathered-world',
-    tone: 'cyan',
     domain: 'Planetary environment',
     copy: 'Planet, atmosphere, clouds, oceans, bounded water, precipitation, vegetation, and shadows share units, weather, and one HDR composition.',
     nodes: ['planet', 'sky', 'clouds', 'water', 'weather'],
   },
   {
     id: 'procedural-district',
-    tone: 'lime',
     domain: 'Authored procedural world',
     copy: 'One causal field drives terrain, zoning, wear, wetness, and placement while geometry, buildings, materials, AO, and shadows keep strict ownership.',
     nodes: ['fields', 'geometry', 'city', 'materials', 'shadows'],
   },
   {
     id: 'creature-habitat',
-    tone: 'violet',
     domain: 'Actors and environment',
     copy: 'Creatures, vegetation, local water, weather, camera, shadows, and outline effects exchange contact signals without rewriting static spawn state.',
     nodes: ['creatures', 'plants', 'water', 'weather', 'outline'],
   },
   {
     id: 'relativistic-space-shot',
-    tone: 'rose',
     domain: 'Relativistic cinematic',
     copy: 'Curved-ray HDR, analytic motion, pooled effects, shared emissive bloom, exposure, camera jitter, and temporal history converge under one owner graph.',
     nodes: ['rays', 'motion', 'effects', 'bloom', 'history'],
@@ -307,9 +302,7 @@ const baseCss = `
 *{margin:0;padding:0;box-sizing:border-box}
 picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
-body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
-  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
-  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
@@ -338,13 +331,12 @@ code{font-family:var(--mono)}
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 .card:active{translate:0 -1px;scale:.99}
-.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .status--accepted{color:var(--lime)}
 .status--pending{color:var(--amber)}
 .status--secondary{color:var(--dim)}
@@ -354,15 +346,15 @@ a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
-.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
-.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
 .primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
-figcaption span{color:var(--dim)}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
@@ -421,7 +413,7 @@ const socialImageMeta = (relativePath, alt) => {
 
 /* ---------------------------- index page ---------------------------- */
 
-const card = (s, i) => {
+const card = (s) => {
   const ownedPrimary = s.demoRecords.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
   const accepted = ownedPrimary.filter((demo) => demo.status === 'accepted').length;
   const mechanisms = ownedPrimary.reduce((sum, demo) => sum + demo.mechanisms.length, 0);
@@ -432,21 +424,20 @@ const card = (s, i) => {
   const evidenceClass = accepted === ownedPrimary.length && ownedPrimary.length ? 'accepted' : 'pending';
   return `
       <a class="card" href="skills/${s.slug}.html">
-        <span class="card-head"><span class="card-index">${String(i + 1).padStart(2, '0')}</span><span class="status status--${evidenceClass}">${evidenceLabel}</span></span>
+        <span class="card-head"><span class="status status--${evidenceClass}">${evidenceLabel}</span></span>
         <h4 style="view-transition-name:skill-${esc(s.slug)}">${esc(s.title)}</h4>
         <p>${esc(s.desc)}</p>
         <span class="card-meta">${ownedPrimary.length} primary · ${mechanisms} mechanism${mechanisms === 1 ? '' : 's'} · ${tiers} tier${tiers === 1 ? '' : 's'}</span>
       </a>`;
 };
 
-let cardIndex = 0;
 const catalog = CATEGORIES.map((c) => `
     <section class="category">
       <div class="category-head">
         <h3>${esc(c.name)}</h3>
         <p>${esc(c.blurb)}</p>
       </div>
-      <div class="grid">${c.slugs.filter((s) => skills[s]).map((s) => card(skills[s], cardIndex++)).join('')}
+      <div class="grid">${c.slugs.filter((s) => skills[s]).map((s) => card(skills[s])).join('')}
       </div>
     </section>`).join('\n');
 
@@ -568,9 +559,9 @@ const secondaryLimitation = (demo) => registryDemoById.get(demo.id)?.proxyStatus
 const liveDemoVisual = (demo, prefix = '') => {
   const poster = providerPosterPath(demo);
   return poster
-    ? `<span class="preview-media" data-preview-classification="${safeClass(classificationLabel(demo))}">${previewPicture(`${prefix}${poster}`, `Live ${classificationLabel(demo).toLowerCase()} screenshot for ${demo.title}; not canonical runtime evidence`, `${imageSizeAttrs(poster)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classificationLabel(demo))} preview</span></span>`
-    : `<div class="preview-missing" role="img" aria-label="Preview capture pending for ${esc(demo.title)}">
-        <span>Preview capture pending</span><code>${esc(demo.id)}</code>
+    ? `<span class="preview-media" data-preview-classification="${safeClass(classificationLabel(demo))}">${previewPicture(`${prefix}${poster}`, `Live ${classificationLabel(demo).toLowerCase()} screenshot for ${demo.title}; not canonical runtime evidence`, `${imageSizeAttrs(poster)} loading="lazy" decoding="async"`)}</span>`
+    : `<div class="secondary-preview-status" aria-label="Preview capture pending for ${esc(demo.title)}">
+        <strong>Preview capture pending</strong><code>${esc(demo.id)}</code>
       </div>`;
 };
 
@@ -580,16 +571,17 @@ const liveDemoHtml = PROVIDER_DEMOS.map((demo) => `
         <figcaption><strong>${esc(demo.title)}</strong><span>${esc(classificationLabel(demo))} · ${esc(demo.skill)} · ${esc(secondaryLimitation(demo))}</span></figcaption>
       </figure></a>`).join('');
 
-const flagshipHtml = flagshipDemos.map(({ demo, tone, domain, copy }) => {
+const flagshipHtml = flagshipDemos.map(({ demo, domain, copy }) => {
   const preview = previewForPrimary(demo);
   return `
-      <a class="flagship-card flagship-card--${tone}" href="${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo, 'flagship-preview-missing')}
+      <a class="flagship-card${preview ? '' : ' flagship-card--no-media'}" href="${demo.publishPath.replace(/^\/+/, '')}">
+        ${preview ? `<span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : ''}
         <div class="flagship-copy">
           <span class="flagship-kicker">${esc(domain)}</span>
           <h3>${esc(demo.title)}</h3>
           <p>${esc(copy)}</p>
           <div class="flagship-meta"><span>${demo.mechanisms.length} mechanisms</span><span>${demo.tiers.length} locked tiers</span><span class="status status--pending">Evidence pending</span></div>
+          ${preview ? '' : primaryEvidencePanel(demo)}
         </div>
       </a>`;
 }).join('');
@@ -607,7 +599,7 @@ const primaryLabHtml = primaryLabGroups.map((group) => `
         const preview = previewForPrimary(demo);
         return `
         <a class="lab-card" href="${demo.publishPath.replace(/^\/+/, '')}">
-          ${preview ? `<span class="lab-card-media" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
+          ${preview ? `<span class="lab-card-media" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
           <span class="lab-card-top"><span>${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
           <h4>${esc(primaryTitle(demo))}</h4>
           <p>${esc(skills[demo.skill]?.title ?? demo.skill)}</p>
@@ -716,15 +708,13 @@ ${JSON.stringify({
 <style>
 ${baseCss}
 header.hero{position:relative;overflow:hidden;min-height:calc(100svh - 76px);display:grid;align-items:center;padding:clamp(64px,8vw,112px) 0}
-.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 44%,rgba(127,212,193,.09),transparent 28%),radial-gradient(circle at 16% 22%,rgba(255,180,84,.1),transparent 28%),linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);background-size:auto,auto,52px 52px,52px 52px;mask-image:linear-gradient(to bottom,black 0%,rgba(0,0,0,.82) 72%,transparent 100%)}
 .hero .wrap{position:relative;z-index:2;width:100%}
 .hero-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);align-items:center;gap:clamp(38px,7vw,96px)}
 .hero .kicker{font-size:clamp(10px,1.25vw,13px);letter-spacing:clamp(.1em,1vw,.22em);margin-bottom:24px}
 h1{font-weight:700;font-size:clamp(46px,6.2vw,82px);line-height:1.01;letter-spacing:-.025em;max-width:13ch}
 h1 em{font-style:normal;color:var(--amber)}
 .lede{margin-top:28px;max-width:62ch;color:var(--dim);font-size:clamp(16px,1.45vw,19px)}
-.hero-proof{display:inline-flex;align-items:center;gap:9px;margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.06em;text-transform:uppercase}
-.hero-proof:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+.hero-proof{display:inline-flex;align-items:center;margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.06em;text-transform:uppercase}
 .hero-install{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;max-width:720px;margin-top:20px;border-radius:12px;background:rgba(8,11,16,.88);box-shadow:0 0 0 1px rgba(255,180,84,.34),0 14px 42px rgba(0,0,0,.28);overflow:hidden}
 .hero-install code{min-width:0;display:flex;align-items:center;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.45;color:var(--ink);white-space:nowrap;scrollbar-width:thin}
 .hero-install button{min-width:72px;min-height:44px;padding:10px 14px;border:0;border-left:1px solid rgba(255,255,255,.14);background:rgba(255,180,84,.12);font-family:var(--mono);font-size:12px;color:var(--amber);cursor:pointer;transition-property:background,color,scale;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
@@ -743,13 +733,14 @@ h1 em{font-style:normal;color:var(--amber)}
 .matrix-shell{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);gap:clamp(32px,6vw,80px);align-items:start}
 .matrix-label{display:inline-flex;margin-bottom:18px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
 .matrix-copy p{color:var(--dim);max-width:56ch}.matrix-copy strong{color:var(--ink)}
-.matrix-rails{display:grid;gap:20px;padding:24px;border-radius:20px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));box-shadow:var(--shadow-card)}
-.coverage-rail{display:grid;gap:9px}.rail-head{display:flex;justify-content:space-between;gap:20px;font-family:var(--mono);font-size:11px}.rail-head b{color:var(--ink);font-weight:500}.rail-head span{color:var(--dim);font-variant-numeric:tabular-nums}.rail-track{height:9px;overflow:hidden;border-radius:6px;background:#06080b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.rail-fill{height:100%;width:var(--value);border-radius:inherit;background:linear-gradient(90deg,var(--cyan),#b9f5e7);box-shadow:0 0 20px rgba(127,212,193,.34)}.coverage-rail--acceptance .rail-fill{background:linear-gradient(90deg,var(--amber),#ffd392);box-shadow:0 0 20px rgba(255,180,84,.3)}.rail-note{color:var(--dim);font-size:13px}
+.matrix-rails{padding:0;border-top:1px solid var(--line)}
+.matrix-facts{display:grid}.matrix-fact{display:grid;grid-template-columns:minmax(150px,.42fr) minmax(0,1fr);gap:24px;padding:18px 0;border-bottom:1px solid var(--line)}.matrix-fact dt{font:10px/1.45 var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em}.matrix-fact dd{display:grid;gap:5px}.matrix-fact strong{font:600 clamp(22px,2.6vw,34px)/1 var(--disp);font-variant-numeric:tabular-nums}.matrix-fact span{color:var(--dim);font-size:13px}.matrix-fact[data-state="accepted"] strong{color:var(--lime)}.matrix-fact[data-state="pending"] strong{color:var(--amber)}
+.matrix-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
 .achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
-.flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{--tone:var(--amber);position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--tone) 8%,var(--bg3)),rgba(11,14,19,.97) 60%);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--cyan{--tone:var(--cyan)}.flagship-card--lime{--tone:var(--lime)}.flagship-card--violet{--tone:var(--violet)}.flagship-card--rose{--tone:var(--rose)}
-.flagship-preview{align-self:stretch;min-height:230px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}.flagship-preview-missing{min-height:230px;align-self:stretch;border-radius:14px}
-.flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--tone)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
-.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:330px;padding:14px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.88),rgba(12,15,21,.94));box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-media,.lab-card>.preview-missing,.lab-card>.primary-evidence-panel{margin:-4px -4px 14px;border-radius:11px}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:14px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px dashed var(--line)}
+.flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:var(--bg2);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--no-media{grid-template-columns:1fr;min-height:0}
+.flagship-preview{align-self:stretch;min-height:230px}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}
+.flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
+.lab-group{margin-top:48px;content-visibility:auto;contain-intrinsic-size:900px}.lab-group:first-child{margin-top:0}.lab-group-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.lab-group-head h3{font-size:24px}.lab-group-head p{margin-top:4px;color:var(--dim);font-size:14px;max-width:72ch}.lab-group-head>span{flex:0 0 auto;font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-card{display:flex;flex-direction:column;min-height:330px;padding:14px;border-radius:16px;background:var(--bg2);box-shadow:0 0 0 1px rgba(255,255,255,.07);transition-property:translate,box-shadow;transition-duration:180ms}.lab-card-media{margin:-4px -4px 14px}.lab-card-top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}.lab-card h4{margin-top:14px;font-size:18px}.lab-card p{margin-top:4px;color:var(--dim);font-size:13px}.lab-route-counts{margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:9px;color:var(--dim);border-top:1px solid var(--line)}
 .protocol-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.protocol-card{min-height:190px;padding:20px;border-radius:16px;background:var(--bg2);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.protocol-card code{font-size:10px;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.protocol-card h3{margin-top:14px;font-size:19px}.protocol-card p{margin-top:8px;color:var(--dim);font-size:14px}.protocol-flow{grid-column:span 2;background:linear-gradient(135deg,rgba(127,212,193,.08),rgba(15,18,24,.94))}.protocol-flow ol{list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:20px}.protocol-flow li{font-family:var(--mono);font-size:10px;color:var(--dim)}.protocol-flow li:not(:last-child):after{content:"→";margin-left:8px;color:var(--amber)}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}.step{background:var(--bg2);border-radius:18px;padding:26px 26px 22px;position:relative;box-shadow:var(--shadow-card)}.step .n{font-family:var(--mono);position:absolute;top:-12px;left:22px;background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.1);border-radius:7px;color:var(--amber);font-size:12px;padding:2px 10px;letter-spacing:.15em}.step h3{font-size:19px;margin-bottom:10px}.step p{color:var(--dim);font-size:15.5px;margin-bottom:14px}
 .install-console{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:24px;border-radius:20px;background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(15,18,24,.94));box-shadow:var(--shadow-card)}.install-console p{color:var(--dim);font-size:14px}.install-console pre{margin-top:14px}.install-console .hero-action{white-space:nowrap}
@@ -762,8 +753,8 @@ h1 em{font-style:normal;color:var(--amber)}
 @media (prefers-reduced-motion:no-preference){.hero .kicker{animation:rise .55s ease-out both}h1{animation:rise .55s .07s ease-out both}.lede,.hero-proof{animation:rise .55s .14s ease-out both}.hero-actions{animation:rise .55s .2s ease-out both}@supports(animation-timeline:view()){.flagship-card{animation:rise linear both;animation-timeline:view();animation-range:entry 8% cover 28%}}}
 @media (hover:hover) and (pointer:fine){.flagship-card:hover,.lab-card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}.category:has(.card:hover) .category-head h3{color:var(--cyan)}}
 @media (max-width:980px){.hero-layout{grid-template-columns:1fr}.hero-ledger{max-width:620px;width:100%;justify-self:center}.matrix-shell{grid-template-columns:1fr}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-install{max-width:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview,.flagship-preview-missing{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
-@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.hero-ledger-row{grid-template-columns:1fr;gap:4px}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:18px}.rail-head{flex-direction:column;gap:2px}}
+@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-install{max-width:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
+@media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.hero-ledger-row,.matrix-fact{grid-template-columns:1fr;gap:4px}.flagship-card{padding:18px;border-radius:18px}}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}.card:hover,.flagship-card:hover,.lab-card:hover{translate:0 0}}
 </style>
 </head>
@@ -830,19 +821,13 @@ ${navHtml('')}
       </div>
     </div>
     <div class="matrix-rails" aria-label="Implementation and evidence coverage">
-      <div class="coverage-rail">
-        <div class="rail-head"><b>Source implementation</b><span>${loadablePrimaryDemos.length} / ${primaryDemos.length}</span></div>
-        <div class="rail-track"><div class="rail-fill" style="--value:${(loadablePrimaryDemos.length / primaryDemos.length) * 100}%"></div></div>
-        <p class="rail-note">Browser entry, fixed route, local build, capture wiring, canonical source hash.</p>
-      </div>
-      <div class="coverage-rail coverage-rail--acceptance">
-        <div class="rail-head"><b>Accepted runtime evidence</b><span>${acceptedPrimaryDemos.length} / ${primaryDemos.length}</span></div>
-        <div class="rail-track"><div class="rail-fill" style="--value:${(acceptedPrimaryDemos.length / primaryDemos.length) * 100}%"></div></div>
-        <p class="rail-note">No GPU timing, lifecycle, or visual claim is promoted without current-adapter evidence.</p>
-      </div>
-      <span class="status status--accepted">${acceptedPrimaryDemos.length} accepted non-rendering suite</span>
-      <span class="status status--pending">${primaryDemos.length - acceptedPrimaryDemos.length} native evidence runs pending</span>
-      <a class="hero-action" href="demos/registry.json">Inspect the versioned registry</a>
+      <dl class="matrix-facts">
+        <div class="matrix-fact"><dt>Loadable primary routes</dt><dd><strong>${loadablePrimaryDemos.length} / ${primaryDemos.length}</strong><span>Browser entry, fixed route, capture wiring, and canonical source hash.</span></dd></div>
+        <div class="matrix-fact" data-state="accepted"><dt>Accepted evidence</dt><dd><strong>${acceptedPrimaryDemos.length} / ${primaryDemos.length}</strong><span>Every required claim passed the current evidence gate.</span></dd></div>
+        <div class="matrix-fact" data-state="pending"><dt>Still pending</dt><dd><strong>${primaryDemos.length - acceptedPrimaryDemos.length}</strong><span>Native capture, timing, lifecycle, or direct visual review remains open.</span></dd></div>
+        <div class="matrix-fact"><dt>Required proof records</dt><dd><strong>${DEMO_REGISTRY.counts.requiredRuntimeProofs}</strong><span>${DEMO_REGISTRY.counts.requiredCapabilities} capability records and ${fixedRouteCount} fixed startup contracts.</span></dd></div>
+      </dl>
+      <div class="matrix-actions"><a class="hero-action" href="demos/registry.json">Inspect the versioned registry</a></div>
     </div>
   </div>
 </div></section>
@@ -1119,8 +1104,8 @@ for (const slug of slugs) {
       const preview = previewForPrimary(demo);
       return `
       <a class="card" href="../${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(`../${preview.path}`, `${preview.label} for ${primaryTitle(demo)}`, `class="card-preview" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
-        <span class="card-head"><span class="card-index">${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
+        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(`../${preview.path}`, `${preview.label} for ${primaryTitle(demo)}`, `class="card-preview" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
+        <span class="card-head"><span class="card-kind">${esc(primaryKindLabel(demo.kind))}</span><span class="status status--${demo.status === 'accepted' ? 'accepted' : 'pending'}">${demo.status === 'accepted' ? 'Accepted' : 'Evidence pending'}</span></span>
         <h3>${esc(primaryTitle(demo))}</h3>
         <p>${demo.scenarios.length} fixed scenarios, ${demo.mechanisms.length} mechanism routes, and ${demo.tiers.length} locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -1137,8 +1122,8 @@ for (const slug of slugs) {
       const preview = previewForPrimary(demo);
       return `
       <a class="card" href="../${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(`../${preview.path}`, `${preview.label} for ${demo.title}`, `class="card-preview" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
-        <span class="card-head"><span class="card-index">${esc(domain)}</span><span class="status status--pending">Evidence pending</span></span>
+        ${preview ? `<span class="card-preview-wrap" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(`../${preview.path}`, `${preview.label} for ${demo.title}`, `class="card-preview" ${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : primaryEvidencePanel(demo)}
+        <span class="card-head"><span class="card-kind">${esc(domain)}</span><span class="status status--pending">Evidence pending</span></span>
         <h3>${esc(demo.title)}</h3>
         <span class="card-meta">${demo.mechanisms.length} mechanisms · ${demo.tiers.length} locked tiers</span>
       </a>`;
@@ -1178,8 +1163,8 @@ for (const slug of slugs) {
 ${evidenceDisclosureHtml}
     ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification, detail, sourceId }) => `
       <figure data-preview-classification="${esc(classification)}" data-preview-source="${esc(sourceId)}" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media">${previewPicture(`../${path}`, `${s.title}: ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
-        <figcaption itemprop="caption"><strong>${esc(label)}</strong>${detail === null ? '' : `<span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span>`}</figcaption>
+        <span class="preview-media">${previewPicture(`../${path}`, `${s.title}: ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}</span>
+        <figcaption itemprop="caption"><strong>${esc(label)}</strong><span>${esc(classification.replace(/-/g, ' '))}</span>${detail === null ? '' : `<span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span>`}</figcaption>
       </figure>`).join('')}</div>` : `<div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>`}
   </div></div>`;
 
@@ -1303,9 +1288,9 @@ a.chip:active{scale:.96}
 .pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
 .pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
-.hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.hero-evidence-caption{margin-top:14px;font:10px/1.45 var(--mono);color:var(--cyan)}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
-.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
+.card>.primary-evidence-panel{margin:0 0 14px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 .runtime-evidence-disclosures{display:grid;gap:14px;margin:0 0 28px}.runtime-evidence-disclosure{padding:20px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}
@@ -1316,7 +1301,6 @@ a.chip:active{scale:.96}
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
-  .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
   .evidence-ledger{align-items:flex-start;flex-direction:column}
   .runtime-evidence-head{align-items:flex-start;flex-direction:column}
 }
@@ -1327,10 +1311,11 @@ ${navHtml('../')}
 
 <main id="main-content" tabindex="-1">
 <header class="${skillHeroImg ? 'skill-hero' : ''}">
-${skillHeroImg ? `  ${previewPicture(`../${skillHeroImg}`, '', `class="skill-hero-bg" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async"`)}\n` : ''}${resolvedSkillPreview ? `  <span class="hero-preview-badge">${esc(resolvedSkillPreview.label)}</span>\n` : ''}  <div class="wrap">
+${skillHeroImg ? `  ${previewPicture(`../${skillHeroImg}`, '', `class="skill-hero-bg" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async"`)}\n` : ''}  <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">${esc(cat ? cat.name : 'Skills')}</a></li><li aria-current="page">${esc(s.title)}</li></ol></nav>
     <h1 style="view-transition-name:skill-${safeClass(slug)}">${esc(s.title)}</h1>
     <p class="lede">${esc(s.desc)}</p>
+    ${resolvedSkillPreview ? `<p class="hero-evidence-caption">Image: ${esc(resolvedSkillPreview.label)}. Source lab: ${esc(resolvedSkillPreview.sourceId)}.</p>` : ''}
     <div class="meta-row">
       <span class="chip a">$${slug}</span>
       ${primaryChipHtml}

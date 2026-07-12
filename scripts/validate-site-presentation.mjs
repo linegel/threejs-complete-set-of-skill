@@ -106,6 +106,11 @@ assert(homepage.includes(`<dd>${uniqueRoutes.size}</dd><dt>unique primary URLs</
 assert(!/>\s*Live WebGPU\s*</i.test(homepage), 'secondary visual still claims Live WebGPU');
 assert(!homepage.includes('class="live-visual'), 'homepage still uses CSS title slates instead of real preview media');
 assert(!homepage.includes('class="preview-missing'), 'homepage contains a missing-preview panel');
+assert(!homepage.includes('class="preview-badge'), 'homepage overlays classification badges on evidence media');
+assert(!homepage.includes('class="card-index'), 'homepage presents decorative card numbers as evidence');
+assert(!homepage.includes('class="rail-track'), 'homepage presents acceptance as a decorative progress track');
+assert(!homepage.includes('class="rail-fill'), 'homepage presents acceptance as a decorative progress fill');
+assert(!homepage.includes('.hero:before'), 'homepage uses a decorative hero pseudo-element');
 assert((homepage.match(/data-preview-for=/g) ?? []).length >= primary.length, 'homepage does not attach preview media to every primary lab card');
 assert(!homepage.includes('data-preview-classification="related-'), 'homepage reuses related-skill media as a primary preview');
 assert(!/\brunnable examples\b/i.test(homepage), 'homepage still uses directory-derived runnable-example language');
@@ -215,6 +220,9 @@ for (const skill of skillManifest.skills) {
     assert(allowedPreviewSources.has(match[1]), `${skill.name} publishes preview media from unrelated lab ${match[1]}`);
   }
   assert(page.includes('<main id="main-content"'), `${skill.name} page has no main landmark`);
+  assert(!page.includes('class="preview-badge'), `${skill.name} overlays classification badges on evidence media`);
+  assert(!page.includes('class="hero-preview-badge'), `${skill.name} overlays a decorative badge on hero evidence`);
+  assert(!page.includes('class="preview-missing'), `${skill.name} presents missing evidence as a visual placeholder`);
   assert(page.includes('Preview and evidence ledger'), `${skill.name} page has no preview/evidence ledger`);
   assert(
     page.includes('data-preview-classification=') || page.includes('data-evidence-state='),
