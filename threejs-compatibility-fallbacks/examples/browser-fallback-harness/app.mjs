@@ -8,6 +8,7 @@ import { probeCanonicalBackend } from './backend-probe.mjs';
 
 const fixtureUrl = new URL( './fallback-fixtures.json', import.meta.url );
 const scenarioBaseUrl = new URL( './scenario/', import.meta.url );
+const LAB_ID = 'browser-fallback-harness';
 
 function fixedScenarioId() {
 
@@ -200,6 +201,7 @@ export class FallbackLabController {
 	getMetrics() {
 
 		return {
+			labId: this.labId,
 			scenarioId: this.#scenarioId,
 			explicitRequest: this.#explicitRequest,
 			liveCapabilities: this.#liveCapabilities,
@@ -221,6 +223,7 @@ export class FallbackLabController {
 	}
 
 	get catalog() { return this.#catalog; }
+	get labId() { return LAB_ID; }
 	get liveCapabilities() { return this.#liveCapabilities; }
 	get explicitRequest() { return this.#explicitRequest; }
 

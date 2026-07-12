@@ -138,6 +138,9 @@ assert.ok( oracle.sampleCount > 0 && oracle.runs > 1 );
 
 assert.match( appSource, /authorizeExplicitRequest/ );
 assert.match( appSource, /probeCanonicalBackend/ );
+assert.match( appSource, /const LAB_ID = 'browser-fallback-harness'/ );
+assert.match( appSource, /get labId\(\) \{ return LAB_ID; \}/ );
+assert.match( appSource, /labId: this\.labId/ );
 assert.match( appSource, /INSUFFICIENT_EVIDENCE_GPU_TIMING/ );
 assert.match( appSource, /await import\( '\.\/compatibility-renderer\.mjs' \)/, 'compatibility renderer must be lazily imported after activation' );
 assert.match( runtimeSource, /authorization\?\.explicitRequest !== true/ );
