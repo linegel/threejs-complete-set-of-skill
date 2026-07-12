@@ -356,6 +356,9 @@ export async function createTowerShipLabController({
         finalOutputOwner: "renderer",
       };
     },
+    describeMotion() {
+      return ship.describeMotion();
+    },
     describeResources() {
       return {
         renderTargets: [{ id: "capture", format: "rgba8", width: captureTarget.width, height: captureTarget.height, transient: true }],

@@ -49,6 +49,66 @@ function runtimeNodeId(object) {
   return object?.userData?.sculptId ?? object?.name ?? null;
 }
 
+export const TOWER_SHIP_MOTION_GATES = Object.freeze({
+  oarAngularDeltaRadians: 0.12,
+  sailAngularDeltaRadians: 0.04,
+  sailScaleDelta: 0.05,
+  riggingEndpointDisplacementWorldUnits: 0.03,
+  lanternAngularDeltaRadians: 0.04,
+});
+
+function motionMetric(record, key, label, errors) {
+  const value = record?.[key];
+  if (!Number.isFinite(value) || value < 0) errors.push(`${label}.${key} must be finite and nonnegative`);
+  return value;
+}
+
+function semanticMotionIds(record, expectedCount, label, errors) {
+  const ids = record?.semanticNodeIds;
+  if (!Array.isArray(ids) || ids.length !== expectedCount || ids.some((id) => typeof id !== "string" || id.length === 0)) {
+    errors.push(`${label}.semanticNodeIds must contain ${expectedCount} named nodes`);
+    return [];
+  }
+  if (new Set(ids).size !== ids.length) errors.push(`${label}.semanticNodeIds must be unique`);
+  return ids;
+}
+
+export function validateTowerShipMotionEvidence(resetRecord, animatedRecord) {
+  const errors = [];
+  if (resetRecord?.timeSeconds !== 0 || resetRecord?.animationEnabled !== true) errors.push("reset record must be an animation-enabled exact t0 sample");
+  if (!(animatedRecord?.timeSeconds > 0) || animatedRecord?.animationEnabled !== true) errors.push("animated record must be sampled at a positive fixed time");
+  const reset = resetRecord?.systems ?? {};
+  const animated = animatedRecord?.systems ?? {};
+  semanticMotionIds(animated.oars, 24, "animated.oars", errors);
+  semanticMotionIds(animated.sail, 2, "animated.sail", errors);
+  semanticMotionIds(animated.rigging, 4, "animated.rigging", errors);
+  semanticMotionIds(animated.lanterns, 4, "animated.lanterns", errors);
+  for (const [system, keys] of Object.entries({
+    oars: ["maxAngularDeltaRadians"],
+    sail: ["maxAngularDeltaRadians", "maxScaleDelta"],
+    rigging: ["maxEndpointDisplacementWorldUnits"],
+    lanterns: ["maxAngularDeltaRadians"],
+  })) {
+    for (const key of keys) {
+      const value = motionMetric(reset[system], key, `reset.${system}`, errors);
+      if (value !== 0) errors.push(`reset.${system}.${key} must be exactly zero`);
+      motionMetric(animated[system], key, `animated.${system}`, errors);
+    }
+  }
+  if ((animated.oars?.maxAngularDeltaRadians ?? 0) < TOWER_SHIP_MOTION_GATES.oarAngularDeltaRadians) errors.push("animated oars do not clear the angular motion gate");
+  if ((animated.sail?.maxAngularDeltaRadians ?? 0) < TOWER_SHIP_MOTION_GATES.sailAngularDeltaRadians) errors.push("animated sail does not clear the angular motion gate");
+  if ((animated.sail?.maxScaleDelta ?? 0) < TOWER_SHIP_MOTION_GATES.sailScaleDelta) errors.push("animated sail does not clear the cloth-depth motion gate");
+  if ((animated.rigging?.maxEndpointDisplacementWorldUnits ?? 0) < TOWER_SHIP_MOTION_GATES.riggingEndpointDisplacementWorldUnits) errors.push("animated rigging does not clear the endpoint-displacement gate");
+  if ((animated.lanterns?.maxAngularDeltaRadians ?? 0) < TOWER_SHIP_MOTION_GATES.lanternAngularDeltaRadians) errors.push("animated lanterns do not clear the angular motion gate");
+  if (errors.length) throw new Error(`Tower Ship motion validation failed:\n- ${errors.join("\n- ")}`);
+  return Object.freeze({
+    resetTimeSeconds: resetRecord.timeSeconds,
+    animatedTimeSeconds: animatedRecord.timeSeconds,
+    semanticNodeCounts: Object.freeze({ oars: 24, sail: 2, rigging: 4, lanterns: 4 }),
+    gates: TOWER_SHIP_MOTION_GATES,
+  });
+}
+
 export function validateTowerShipActionReady(spec, root) {
   const errors = [];
   const runtime = root?.userData?.sculptRuntime;

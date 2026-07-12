@@ -7,7 +7,10 @@ import {
   createTowerShip,
   summarizeTowerShip,
 } from "./tower-ship-factory.js";
-import { validateTowerShipActionReady } from "./validate-action-ready.mjs";
+import {
+  validateTowerShipActionReady,
+  validateTowerShipMotionEvidence,
+} from "./validate-action-ready.mjs";
 
 const sculptSpec = JSON.parse(readFileSync(new URL("./object-sculpt-spec.json", import.meta.url), "utf8"));
 
@@ -35,6 +38,27 @@ const ship = createTowerShip({ tier: "full", seed: 1 });
 const baseline = summarizeTowerShip(ship.root);
 assert.equal(baseline.oars, 24);
 validateTowerShipActionReady(sculptSpec, ship.root);
+ship.setTime(0, true);
+const resetMotion = ship.describeMotion();
+ship.setTime(2, true);
+const animatedMotion = ship.describeMotion();
+validateTowerShipMotionEvidence(resetMotion, animatedMotion);
+assert.throws(
+  () => validateTowerShipMotionEvidence(resetMotion, {
+    ...animatedMotion,
+    systems: { ...animatedMotion.systems, rigging: { ...animatedMotion.systems.rigging, maxEndpointDisplacementWorldUnits: 0 } },
+  }),
+  /animated rigging does not clear/,
+  "the motion validator must reject a static rig hidden behind moving oars and shadows",
+);
+assert.throws(
+  () => validateTowerShipMotionEvidence({
+    ...resetMotion,
+    systems: { ...resetMotion.systems, oars: { ...resetMotion.systems.oars, maxAngularDeltaRadians: 0.01 } },
+  }, animatedMotion),
+  /must be exactly zero/,
+  "the motion validator must reject a phase-offset t0 reset",
+);
 
 const removed = ship.runtime.oars.pop();
 assert.throws(() => validateTowerShipActionReady(sculptSpec, ship.root), /oar runtime count is 23/, "the production validator must reject an incomplete oar bank");
@@ -77,4 +101,4 @@ ship.runtime.destructionGroups.set("lower-roof", lowerRoof);
 validateTowerShipActionReady(sculptSpec, ship.root);
 
 ship.dispose();
-console.log(JSON.stringify({ ok: true, negativeControls: ["punctured-hull", "reversed-hull-face", "oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));
+console.log(JSON.stringify({ ok: true, negativeControls: ["punctured-hull", "reversed-hull-face", "static-rigging", "phase-offset-reset", "oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));

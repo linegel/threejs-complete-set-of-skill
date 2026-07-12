@@ -164,14 +164,26 @@ function addCollider(runtime, fields) {
   return proxy;
 }
 
+function orientCylinderBetween(value, start, end) {
+  const a = new THREE.Vector3(...start);
+  const b = new THREE.Vector3(...end);
+  const delta = b.clone().sub(a);
+  const length = delta.length();
+  if (!(length > 0)) throw new RangeError("cylinder endpoints must be distinct");
+  const baseLength = value.userData.segmentBaseLength ?? length;
+  value.userData.segmentBaseLength = baseLength;
+  value.position.copy(a).addScaledVector(delta, 0.5);
+  value.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), delta.multiplyScalar(1 / length));
+  value.scale.y = length / baseLength;
+  return value;
+}
+
 function cylinderBetween(runtime, id, start, end, radius, material, segments, parent, group = "detail") {
   const a = new THREE.Vector3(...start);
   const b = new THREE.Vector3(...end);
   const delta = b.clone().sub(a);
   const value = mesh(runtime, id, new THREE.CylinderGeometry(radius, radius, delta.length(), segments, 1), material, { parent, group });
-  value.position.copy(a).addScaledVector(delta, 0.5);
-  value.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), delta.normalize());
-  return value;
+  return orientCylinderBetween(value, start, end);
 }
 
 export function analyzeIndexedSurfaceTopology(geometry) {
@@ -638,7 +650,9 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
     materials,
     oars: [],
     lanterns: [],
+    riggingLines: [],
     sail: null,
+    motion: null,
   };
   register(runtime, root, { id: "root", destructionGroup: "vessel" });
   root.userData.sculptRuntime = runtime;
@@ -686,11 +700,18 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
     cylinderBetween(runtime, `sail-batten-${row}`, [0, v * 6.4, 0.02], [width, v * 6.4, 0.02], 0.035, row % 2 ? materials.sailDark : materials.darkWood, 6, sailPivot, "rig");
   }
   cylinderBetween(runtime, "sail-boom", [0, 2.2, 0], [5.2, 1.4, 0], 0.08, materials.darkWood, limits.cylinder, sailPivot, "rig");
-  const rigging = pivot(runtime, "rigging", root, { destructionGroup: "mast-rig" });
-  const rigTargets = [[-9.2, 2.9, 0], [8.7, 3.1, 0], [5.15, 1.4, 0], [4.2, 6.3, 0]];
+  const rigging = pivot(runtime, "rigging", mast, { destructionGroup: "mast-rig" });
+  const rigTargets = [[-10.85, 0.45, 0.35], [7.05, 0.65, 0.35], [3.5, -1.05, 0.35], [2.55, 3.85, 0.35]];
   rigTargets.forEach((target, index) => {
-    const start = index < 2 ? [1.65, 12.1, -0.35] : [1.75, 11.85, -0.32];
-    cylinderBetween(runtime, `rig-line-${index}`, start, target, 0.022, materials.rope, 5, rigging, "rig");
+    const start = index < 2 ? [0, 9.65, 0] : [0.1, 9.4, 0.03];
+    const line = cylinderBetween(runtime, `rig-line-${index}`, start, target, 0.022, materials.rope, 5, rigging, "rig");
+    runtime.riggingLines.push(Object.freeze({
+      id: line.name,
+      line,
+      start: Object.freeze(start),
+      target: Object.freeze(target),
+      phase: index * 0.47,
+    }));
   });
 
   socket(runtime, "gunwale-oar-sockets", hullPivot, [0, 2.1, 0]);
@@ -718,17 +739,54 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
 
   function setTime(seconds, animate = false) {
     const active = animate ? seconds : 0;
+    let maxOarAngularDeltaRadians = 0;
     runtime.oars.forEach((oar, index) => {
       const side = oar.name.includes("starboard") ? 1 : -1;
-      oar.rotation.x = oar.userData.baseRotationX + Math.sin(active * 1.8 + index * 0.12) * 0.18 * side;
-      oar.rotation.z = Math.sin(active * 1.8 + index * 0.12) * 0.08;
+      const phase = index * 0.12;
+      const wave = Math.sin(active * 1.8 + phase) - Math.sin(phase);
+      const deltaX = wave * 0.32 * side;
+      const deltaZ = wave * 0.14;
+      oar.rotation.x = oar.userData.baseRotationX + deltaX;
+      oar.rotation.z = deltaZ;
+      maxOarAngularDeltaRadians = Math.max(maxOarAngularDeltaRadians, Math.hypot(deltaX, deltaZ));
     });
+    let maxLanternAngularDeltaRadians = 0;
     runtime.lanterns.forEach((lantern) => {
-      lantern.rotation.z = Math.sin(active * 1.25 + lantern.userData.swayPhase) * 0.09;
+      const phase = lantern.userData.swayPhase;
+      const delta = (Math.sin(active * 1.25 + phase) - Math.sin(phase)) * 0.16;
+      lantern.rotation.z = delta;
+      maxLanternAngularDeltaRadians = Math.max(maxLanternAngularDeltaRadians, Math.abs(delta));
     });
-    sailPivot.rotation.y = Math.sin(active * 0.72) * 0.045;
-    sailSurface.scale.z = 1 + Math.sin(active * 1.1) * 0.04;
+    const sailAngularDeltaRadians = Math.sin(active * 0.72) * 0.1;
+    const sailDepthScaleDelta = Math.sin(active * 1.1) * 0.12;
+    sailPivot.rotation.y = sailAngularDeltaRadians;
+    sailSurface.scale.z = 1 + sailDepthScaleDelta;
+    let maxRiggingEndpointDisplacementWorldUnits = 0;
+    runtime.riggingLines.forEach(({ line, start, target, phase }, index) => {
+      const wave = Math.sin(active * 0.72 + phase) - Math.sin(phase);
+      const endpointDelta = index < 2 ? wave * 0.08 : wave * 0.22;
+      const animatedTarget = [target[0], target[1] + Math.abs(endpointDelta) * 0.06, target[2] + endpointDelta];
+      orientCylinderBetween(line, start, animatedTarget);
+      maxRiggingEndpointDisplacementWorldUnits = Math.max(
+        maxRiggingEndpointDisplacementWorldUnits,
+        Math.hypot(animatedTarget[0] - target[0], animatedTarget[1] - target[1], animatedTarget[2] - target[2]),
+      );
+    });
+    runtime.motion = Object.freeze({
+      timeSeconds: seconds,
+      animationEnabled: animate,
+      systems: Object.freeze({
+        oars: Object.freeze({ semanticNodeIds: Object.freeze(runtime.oars.map(({ name }) => name)), maxAngularDeltaRadians: maxOarAngularDeltaRadians }),
+        sail: Object.freeze({ semanticNodeIds: Object.freeze([sailPivot.name, sailSurface.name]), maxAngularDeltaRadians: Math.abs(sailAngularDeltaRadians), maxScaleDelta: Math.abs(sailDepthScaleDelta) }),
+        rigging: Object.freeze({ semanticNodeIds: Object.freeze(runtime.riggingLines.map(({ id }) => id)), maxEndpointDisplacementWorldUnits: maxRiggingEndpointDisplacementWorldUnits }),
+        lanterns: Object.freeze({ semanticNodeIds: Object.freeze(runtime.lanterns.map(({ name }) => name)), maxAngularDeltaRadians: maxLanternAngularDeltaRadians }),
+      }),
+    });
     root.updateMatrixWorld(true);
+  }
+
+  function describeMotion() {
+    return runtime.motion;
   }
 
   function dispose() {
@@ -741,7 +799,7 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
     ownedMaterials.forEach((material) => material.dispose());
   }
 
-  return { root, runtime, setMode, setTime, dispose };
+  return { root, runtime, setMode, setTime, describeMotion, dispose };
 }
 
 export function summarizeTowerShip(root) {

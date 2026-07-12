@@ -21,7 +21,10 @@ import {
   TOWER_SHIP_SEEDS,
 } from "./lab-controller.js";
 import { towerShipInitialMode } from "./route-state.js";
-import { validateTowerShipActionReady } from "./validate-action-ready.mjs";
+import {
+  validateTowerShipActionReady,
+  validateTowerShipMotionEvidence,
+} from "./validate-action-ready.mjs";
 
 const sculptSpec = JSON.parse(readFileSync(new URL("./object-sculpt-spec.json", import.meta.url), "utf8"));
 const actionReadyContracts = [];
@@ -58,8 +61,15 @@ for (const tier of TOWER_SHIP_TIERS) {
   assert.equal(summary.colliders, 36, `${tier} must expose stable component and per-oar collider construction inputs`);
   assert(ship.runtime.destructionGroups.has("hull-shell"), `${tier} needs hull destruction group`);
   assert(ship.runtime.destructionGroups.has("oar-bank"), `${tier} needs oar destruction group`);
+  assert.equal(ship.runtime.nodes.get("rigging").parent, ship.runtime.nodes.get("mast"), `${tier} rigging must remain in the mast-local authored frame`);
   for (const mode of TOWER_SHIP_MODES) ship.setMode(mode);
-  ship.setTime(1, true);
+  ship.setTime(0, true);
+  const resetMotion = ship.describeMotion();
+  ship.setTime(2, true);
+  const animatedMotion = ship.describeMotion();
+  validateTowerShipMotionEvidence(resetMotion, animatedMotion);
+  ship.setTime(0, true);
+  assert.deepEqual(ship.describeMotion(), resetMotion, `${tier} t0 replay must exactly restore every semantic motion delta`);
   ship.root.updateMatrixWorld(true);
   const firstOar = ship.runtime.oars[0];
   const socket = ship.runtime.sockets.get(`${firstOar.name}-socket`);
