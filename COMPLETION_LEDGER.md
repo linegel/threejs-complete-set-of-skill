@@ -21,6 +21,8 @@ promote evidence, and an evidence commit does not replace source verification.
 | Observed `origin/main` | `7256d72a7aa331dcf87d71b1b26706d1cc9f6ca3` |
 | Merge base | `b02b0c4587d339af17e6b1d7925e138281533e3f` |
 | Initial divergence | local ahead 46, behind 6 |
+| Last recorded source HEAD | `2099aa9112bbf4fd8fb91be61f900593033f9ae1` |
+| Current divergence | local ahead 62, behind 6 |
 | Staged paths at freeze | none |
 | Browser policy | Codex in-app Browser only |
 | Commit policy | conventional subject/body; unique final joke containing `https://devme.me/`; no AI trailers |
@@ -29,23 +31,23 @@ promote evidence, and an evidence commit does not replace source verification.
 
 | ID | Unit | Dependencies | Status | Source owner / paths | Browser-free gate | Browser evidence | Source commit | Evidence commit / limitation |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| STAB-01 | Freeze writers and classify dirty work | none | in-progress | root + four read-only audits | clean ownership inventory | not applicable | pending | no staging until classification closes |
-| STAB-02 | Shared evidence contracts and source closures | STAB-01 | todo | `labs/runtime`, `labs/schema`, corpus/harness closure modules | focused schema/runtime tests | none | pending | pending |
-| STAB-03 | Object Sculptor runtime transactions and generations | STAB-02 | todo | corpus runtime/controller/frame driver | corpus unit/mutation suite | lifecycle runner | pending | pending |
-| STAB-04 | Object Sculptor in-app collection and importer | STAB-03 | todo | corpus runner/server/import/metrics | route/runner/import tests | 15 routes + 48 PNG + 15 masks | pending | pending |
+| STAB-01 | Freeze writers and classify dirty work | none | source-complete | root + four read-only audits | clean ownership inventory | not applicable | `15e69a7` | dirty work classified; generated derivatives remain quarantined |
+| STAB-02 | Shared evidence contracts and source closures | STAB-01 | source-complete | `labs/runtime`, `labs/schema`, corpus/harness closure modules | focused schema/runtime tests | none | `f3e1b05`, `d29d122`, `d3acbd2` | shared contract/source closure complete; physical evidence absent |
+| STAB-03 | Object Sculptor runtime transactions and generations | STAB-02 | source-complete | corpus runtime/controller/frame driver | corpus unit/mutation suite | lifecycle runner | prior source series ending `92b559a` | no accepted lifecycle evidence yet |
+| STAB-04 | Object Sculptor in-app collection and importer | STAB-03 | in-progress | corpus runner/server/import/metrics | route/runner/import tests | 15 routes + 48 PNG + 15 masks | `87de6ea`, `22c33b9`, `2099aa9` | 15 immutable routes and 48-image byte contract exist; 15 masks and Browser sessions remain |
 | STAB-05 | Commit coherent fields/materials/motion work | STAB-01 | todo | three existing canonical labs | package/unit/mutation suites | lab-specific | pending | pending |
 | GIT-01 | Integrate `origin/main` and regenerate derivatives | STAB-02..05 | todo | root manifests/generated docs | registry/foundation/build checks | none | pending | normal merge; no force |
 | ROUTE-01 | Generate complete skill roster and router schema | GIT-01 | todo | `threejs-choose-skills` | route fixtures/mutations | router lab | pending | current 27, then 32 after new owners |
-| PHYS-01 | Executable physics conformance profiles | GIT-01 | todo | `labs/runtime/physics`, schemas | closed-schema and graph tests | mechanism diagnostics | pending | render-only/query/one-way/two-way/external |
-| VALID-01 | Shared Codex in-app Browser evidence runtime | GIT-01, PHYS-01 | todo | visual-validation harness | runner/import/source-closure tests | same-origin physical runner | pending | Playwright/Chrome forbidden in canonical paths |
+| PHYS-01 | Executable physics conformance profiles | GIT-01 | in-progress | `labs/runtime/physics`, schemas | closed-schema and graph tests | mechanism diagnostics | `f3e1b05` | ownership shell only; canonical ABI/interactions/conservation/evidence still required |
+| VALID-01 | Shared Codex in-app Browser evidence runtime | GIT-01, PHYS-01 | source-complete | visual-validation harness | runner/import/source-closure tests | same-origin physical runner | `d29d122`, `e076180`, `d3acbd2`, `2b0b9ed` | real correctness/physical/performance sessions and inspected images remain absent |
 | SKILL-NEW-01 | Physics integration skill | ROUTE-01, PHYS-01 | todo | new skill + adapter lab | quick validation + conformance tests | adapter lab | pending | pending |
 | SKILL-NEW-02 | Lighting/environments/reflections skill | ROUTE-01 | todo | new skill + two lighting labs | quick validation + decision fixtures | product/coastal routes | pending | pending |
 | SKILL-NEW-03 | Asset pipeline and optimization skill | ROUTE-01 | todo | new skill + scripts/manifests | quick validation + asset fixtures | asset-budget lab | pending | pending |
 | SKILL-NEW-04 | Environment forcing skill | ROUTE-01, PHYS-01 | todo | new skill + forcing lab | quick validation + SI/provider tests | forcing diagnostics | pending | pending |
 | SKILL-NEW-05 | Volumes/point-clouds/large-data skill | ROUTE-01 | todo | new skill + large-data lab | quick validation + representation fixtures | large-data routes | pending | pending |
-| TOWER-01 | Tower hull/topology/pass-lock correctness | STAB-03 | todo | Tower Ship sculptor | topology/contract/mutation tests | bow/final diagnostics | pending | pending |
-| TOWER-02 | Tower visible animation and terminal HUD | TOWER-01 | todo | Tower Ship runtime | exact reset/motion-region tests | action-ready captures | pending | pending |
-| CORPUS-01 | Lamp, bonsai, teapot corpus acceptance | STAB-04 | todo | Object Sculptor corpus | metrics/review/resource/lifecycle gates | full corpus matrix | pending | pending |
+| TOWER-01 | Tower hull/topology/pass-lock correctness | STAB-03 | source-complete | Tower Ship sculptor | topology/contract/mutation tests | bow/final diagnostics | `0cd606d`, `fe083a2` | zero declared/open hull loops proven in source; evidence capture remains |
+| TOWER-02 | Tower visible animation and terminal HUD | TOWER-01 | source-complete | Tower Ship runtime | exact reset/motion-region tests | action-ready captures | `d0034b6`, `28597ab` | Browser inspection saw READY and visible oars; mask-bound evidence commit remains |
+| CORPUS-01 | Lamp, bonsai, teapot corpus acceptance | STAB-04 | in-progress | Object Sculptor corpus | metrics/review/resource/lifecycle gates | full corpus matrix | `2099aa9` (partial) | 48 correctness source contract complete; 15 target masks and pixel-derived gates remain |
 | PLANET-01 | Metric displacement and body-frame contract | GIT-01 | todo | procedural planets + Weathered World | deterministic frontier fixtures | orbit/horizon/surface | pending | pending |
 | PLANET-02 | Device-limit atlas paging | PLANET-01 | todo | planet atlas/runtime adapter | planner/boundary tests | forced page cap | pending | pending |
 | PLANET-03 | Transition-mask batching and transactions | PLANET-02 | todo | planet mesh/host lifecycle | ownership/fault/leak tests | 18 final/no-post + diagnostics | pending | pending |
