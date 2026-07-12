@@ -13,6 +13,12 @@ import {
   createCorpusCorrectnessEvidenceProducer,
 } from "./correctness-evidence-client.js";
 import { CORPUS_NATIVE_READBACK_PLAN } from "./capture-plan.js";
+import {
+  CORPUS_CORRECTNESS_DOCUMENT_PATH,
+  buildBoundedTarBlob,
+  parseCorpusCorrectnessTar,
+} from "./correctness-evidence-bundle.js";
+import { parseCorpusCorrectnessImportArguments } from "./import-correctness-evidence.mjs";
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
@@ -39,6 +45,43 @@ assert.deepEqual(
   ]), 2, 2, 256),
   Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
 );
+
+const tinyDocument = new TextEncoder().encode('{"schemaVersion":1,"labId":"fixture"}\n');
+const tinyArtifact = Uint8Array.of(1, 2, 3, 4);
+const longArtifactPath = "correctness-readbacks/articulated-desk-lamp/transport/articulated-desk-lamp.final.full.design.rgba8unorm.bin";
+const tinyTar = buildBoundedTarBlob([
+  [CORPUS_CORRECTNESS_DOCUMENT_PATH, tinyDocument],
+  [longArtifactPath, tinyArtifact],
+], 4096);
+assert.equal(tinyTar.byteLength, 3072);
+const parsedTinyTar = parseCorpusCorrectnessTar(new Uint8Array(await tinyTar.blob.arrayBuffer()));
+assert.deepEqual(parsedTinyTar.documentRecord, { schemaVersion: 1, labId: "fixture" });
+assert.deepEqual(parsedTinyTar.artifacts.get(longArtifactPath), tinyArtifact);
+assert.throws(() => buildBoundedTarBlob([
+  [CORPUS_CORRECTNESS_DOCUMENT_PATH, tinyDocument],
+  [CORPUS_CORRECTNESS_DOCUMENT_PATH, tinyDocument],
+]), /duplicate TAR path/);
+const corruptedTinyTar = new Uint8Array(await tinyTar.blob.arrayBuffer());
+corruptedTinyTar[0] ^= 1;
+assert.throws(() => parseCorpusCorrectnessTar(corruptedTinyTar), /checksum drifted/);
+assert.deepEqual(parseCorpusCorrectnessImportArguments(["--prepare"]), {
+  prepare: true,
+  checkOnly: false,
+  segments: [],
+  outputDir: new URL("../../../artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness-in-app-import", import.meta.url).pathname,
+});
+const importArgs = parseCorpusCorrectnessImportArguments([
+  "--segment", "lamp.tar",
+  "--segment", "bonsai.tar",
+  "--segment", "teapot.tar",
+  "--output", "evidence-output",
+  "--check",
+]);
+assert.equal(importArgs.prepare, false);
+assert.equal(importArgs.checkOnly, true);
+assert.equal(importArgs.segments.length, 3);
+assert.throws(() => parseCorpusCorrectnessImportArguments(["--segment", "one.tar"]), /exactly three/);
+assert.throws(() => parseCorpusCorrectnessImportArguments(["--prepare", "--check"]), /cannot be combined/);
 assert.throws(
   () => compactCorpusCorrectnessRows(new Uint8Array(8), 2, 1, 8),
   /preserve WebGPU alignment/,

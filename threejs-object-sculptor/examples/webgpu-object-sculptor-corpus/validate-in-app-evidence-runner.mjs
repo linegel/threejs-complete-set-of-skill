@@ -157,6 +157,7 @@ export function validateInAppEvidenceRunner() {
   assert(app.includes("createCorpusRouteEvidenceProducer"), "corpus app must create the physical-route evidence producer");
   assert(app.includes("__CORPUS_ROUTE_EVIDENCE__"), "corpus app must expose its same-origin evidence producer");
   assert(app.includes('cameraInteractionEnabled: frameOwner === "live-page" && physicalRouteLockCount === 0'), "physical and capture routes must disable camera interaction");
+  assert(app.includes('if (frameOwner === "live-page") window.addEventListener("resize", onResize)'), "capture-owned routes must reject ambient window resize ownership");
   assert(app.includes("createCorpusCorrectnessEvidenceProducer"), "corpus app must expose the Codex in-app Browser correctness producer");
   const correctnessClient = source("correctness-evidence-client.js");
   assert(correctnessClient.includes("CORPUS_NATIVE_READBACK_PLAN"), "correctness producer must consume the canonical 63-readback plan");
@@ -215,9 +216,11 @@ export function validateInAppEvidenceRunner() {
   const captureCommand = packageDocument.scripts?.capture ?? "";
   assert.equal(
     captureCommand,
-    "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-object-sculptor-corpus --target presentation --hook capture-hook.mjs",
-    "package capture must remain compatible with the root shared native-WebGPU capture harness",
+    "npm run generate:trusted-route-sources:check && node import-correctness-evidence.mjs --prepare",
+    "package capture must prepare only the immutable Codex in-app Browser correctness URLs",
   );
+  assert(!/playwright|chrome|headless|capture-lab-browser/i.test(captureCommand), "canonical correctness capture must not launch an external browser harness");
+  assert.equal(packageDocument.scripts?.["capture:import"], "node import-correctness-evidence.mjs", "package must expose offline in-app correctness segment import");
   const routePreparationCommand = packageDocument.scripts?.["prepare:physical-routes"] ?? "";
   assert(routePreparationCommand.includes("generate:routes") && routePreparationCommand.includes("generate:trusted-route-sources"), "physical route preparation must explicitly regenerate routes and source closure");
   assert(!/playwright|chrome|headless|capture-lab-browser/i.test(routePreparationCommand), "route evidence preparation must not launch an external browser harness");

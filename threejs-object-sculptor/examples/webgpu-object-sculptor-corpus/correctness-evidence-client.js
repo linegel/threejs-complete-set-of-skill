@@ -114,7 +114,7 @@ function identityEvidence(contract) {
 async function retainCapture({ capture, filename, kind, state, artifacts }) {
   assert(capture?.target === kind, `${filename} capture target drifted`);
   assert(capture.backendKind === "webgpu" && capture.nativeWebGPU === true, `${filename} readback was not native WebGPU`);
-  assert(capture.width === CORPUS_STANDARD_RASTER_CONTRACT.width && capture.height === CORPUS_STANDARD_RASTER_CONTRACT.height, `${filename} readback must be exactly 1200x800`);
+  assert(capture.width === CORPUS_STANDARD_RASTER_CONTRACT.width && capture.height === CORPUS_STANDARD_RASTER_CONTRACT.height, `${filename} readback must be exactly 1200x800; received ${capture.width}x${capture.height}`);
   assert(capture.format === "rgba8unorm" && capture.bytesPerPixel === 4 && capture.origin === "top-left", `${filename} readback format/origin drifted`);
   assert(capture.outputColorSpace === "srgb" && capture.colorEncoding === "srgb", `${filename} output encoding drifted`);
   const transport = Uint8Array.from(capture.transport?.pixels ?? []);

@@ -21,6 +21,7 @@ import {
   corpusCorrectnessEvidenceRequest,
   createCorpusCorrectnessEvidenceProducer,
 } from "./correctness-evidence-client.js";
+import { buildCorpusCorrectnessTarBlob } from "./correctness-evidence-bundle.js";
 
 const MODE_COPY = Object.freeze({
   final: ["Final reconstruction", "Complete procedural form, authored material zones, and neutral presentation lighting."],
@@ -360,7 +361,7 @@ async function boot() {
   modeSelect.addEventListener("change", onModeChange);
   tierSelect.addEventListener("change", onTierChange);
   cameraSelect.addEventListener("change", onCameraChange);
-  window.addEventListener("resize", onResize);
+  if (frameOwner === "live-page") window.addEventListener("resize", onResize);
   window.addEventListener("pagehide", onPageHide);
   window.addEventListener("pageshow", onPageShow);
 
@@ -411,6 +412,17 @@ async function boot() {
         try {
           const documentRecord = await correctnessProducer.collectSubject(correctnessRequest.subjectId);
           const retained = correctnessProducer.getState().retainedArtifactCount;
+          const bundle = await buildCorpusCorrectnessTarBlob({
+            documentRecord,
+            artifacts: correctnessProducer.takeArtifacts(),
+          });
+          const download = document.createElement("a");
+          download.id = "correctness-evidence-download";
+          download.href = URL.createObjectURL(bundle.blob);
+          download.download = bundle.filename;
+          download.textContent = `Save ${bundle.filename}`;
+          download.setAttribute("aria-label", "Save correctness evidence TAR");
+          document.body.append(download);
           const summary = document.createElement("pre");
           summary.id = "correctness-evidence-summary";
           summary.textContent = JSON.stringify({
@@ -422,6 +434,9 @@ async function boot() {
             presentationCount: documentRecord.captures.filter(({ kind }) => kind === "presentation").length,
             targetMaskCount: documentRecord.captures.filter(({ kind }) => kind === "target-mask").length,
             retainedArtifactCount: retained,
+            bundleFilename: bundle.filename,
+            bundleByteLength: bundle.byteLength,
+            artifactValidation: bundle.validation.ok,
             sourceHash: documentRecord.sourceHash,
             digest: documentRecord.digest,
           }, null, 2);
