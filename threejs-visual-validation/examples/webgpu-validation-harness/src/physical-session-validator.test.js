@@ -221,7 +221,7 @@ function timestampBatch() {
 		resolveCount: numericDatum( 1, 'resolve', 'Measured', 'timestamp batch' ),
 		gpuSamples: { values: timestampRows.map( ( row ) => row.totalMs ), unit: 'ms', label: 'Measured', source: 'WebGPU timestamp rows' },
 		timestampRows,
-		lastFrameResolveResidualMs: 0.01,
+		lastFrameResolveResidualMs: 0,
 		independentPerFrameTotalsAvailable: false,
 		reconciliationScope: 'Independent Three aggregate checked only for the final-frame resolve.'
 	};
@@ -556,6 +556,7 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 
 		}, /GPU p95/ ],
 		[ 'fabricated per-frame total', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].timestampRows[ 0 ].independentPerFrameTotalAvailable = true; }, /fabricates/ ],
+		[ 'unreconciled batch resolve', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].lastFrameResolveResidualMs = 0.002; }, /final-frame timestamp resolve/ ],
 		[ 'missing governor transition', ( value ) => { value.governor.trace.transitions = []; }, /did not exercise/ ],
 		[ 'forged governor p95', ( value ) => { value.governor.trace.windows[ 0 ].gpuP95 = 15; }, /does not reconcile/ ],
 		[ 'forged governor timestamp row', ( value ) => { value.governor.trace.windows[ 0 ].timestampRows[ 0 ].sceneMs += 1; }, /not derived/ ],

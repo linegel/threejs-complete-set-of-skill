@@ -418,7 +418,8 @@ function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 
 		}
 		if ( batch.independentPerFrameTotalsAvailable !== false ) fail( `${ batchLabel } falsely claims independent per-frame aggregate timestamps.` );
-		requireFinite( batch.lastFrameResolveResidualMs, `${ batchLabel }.lastFrameResolveResidualMs`, 0 );
+		const lastFrameResolveResidualMs = requireFinite( batch.lastFrameResolveResidualMs, `${ batchLabel }.lastFrameResolveResidualMs`, 0 );
+		if ( lastFrameResolveResidualMs > 0.001 ) fail( `${ batchLabel } final-frame timestamp resolve does not reconcile.` );
 		if ( typeof batch.reconciliationScope !== 'string' || /final-frame/i.test( batch.reconciliationScope ) === false ) fail( `${ batchLabel } does not confine the independent resolve residual to the final frame.` );
 
 	}
