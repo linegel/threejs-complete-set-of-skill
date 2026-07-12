@@ -4,6 +4,8 @@ import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { float, uint, vec3 } from "three/tsl";
+import sharp from "sharp";
 
 import {
   CPU_FIELD_ALGORITHM,
@@ -11,14 +13,22 @@ import {
   FIELD_CHANNELS,
   FIELD_DERIVED_CHANNELS,
   FIELD_GRADIENT_CHANNELS,
+  FIELD_F32_ORACLE_CONTRACT,
+  FIELD_INTERFACE_V2,
   FIELD_PARITY_ERROR_MANIFEST,
   FIELD_PARITY_CHANNELS,
   TSL_FIELD_ALGORITHM,
+  createFieldCauseBindings,
+  createFieldNodeBundle,
   coverage,
   fixedProbes,
   gpuParityProbes,
+  invalidFieldProbes,
   sampleFieldCPU,
+  sampleFieldF32CPU,
+  sampleFieldV2CPU,
   tangentWarp,
+  validateWarpFreeFieldNodeBundle,
 } from "./field-bundle.mjs";
 import {
   FIELD_ALGORITHM as SHARED_FIELD_ALGORITHM,
@@ -26,10 +36,14 @@ import {
 } from "./field-constants.mjs";
 import {
   buildDirtyDispatchTrace,
+  compareFieldStorageMutation,
   createDirtyTileTracker,
   createFieldBakeComputeNode,
   createFieldBakePlan,
   createFieldBakeResources,
+  createFieldProbeComputeNode,
+  createFieldProbeResources,
+  createFieldResourceLedger,
   createStructuredPlacementComputeNode,
   createStructuredPlacementResources,
   decideBakeStrategy,
@@ -37,7 +51,22 @@ import {
   fieldMipExtents,
   propagateDirtyRegion,
   STORAGE_FORMATS,
+  validateFieldDispatchTrace,
+  validateFieldResourceLedger,
 } from "./field-bake.mjs";
+import {
+  FIELD_PROBE_CORPUS,
+  FIELD_PROBE_CORPUS_COUNTS,
+  canonicalProbeCorpusPayload,
+  createStressProbeCorpus,
+  validateFieldProbeOracleIdentity,
+} from "./field-probe-corpus.mjs";
+import {
+  FIELD_MECHANISM_IDS,
+  analyzeFieldMechanismRgba,
+  validateReportedFieldMechanismStatistics,
+  validateFieldMechanismStatistics,
+} from "./mechanism-evidence.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const manifestPath = resolve(here, "../../assets/generated-variants/manifest.json");
@@ -51,6 +80,21 @@ const directF32Contract = FIELD_PARITY_ERROR_MANIFEST.directF32;
 const gpuParityTolerances = directF32Contract.absoluteChannelGates;
 const placementMaskContract = directF32Contract.thresholdConsumers.placementMask;
 const placementMaskThreshold = placementMaskContract.threshold;
+
+function validateToolchainAndF32Oracle() {
+  assert.equal(
+    process.versions.node,
+    FIELD_F32_ORACLE_CONTRACT.nodeRuntime,
+    "field f32 oracle must run under the pinned Node runtime",
+  );
+  assert.equal(FIELD_PROBE_CORPUS.oracleRuntime, `node-${process.versions.node}`);
+  assert.equal(FIELD_PROBE_CORPUS.oracleArithmetic, FIELD_F32_ORACLE_CONTRACT.id);
+  return {
+    pass: true,
+    node: process.versions.node,
+    oracle: FIELD_F32_ORACLE_CONTRACT,
+  };
+}
 
 function parseArgs(argv) {
   const options = {
@@ -89,6 +133,7 @@ function validateManifest() {
       `${channel} coverage min must be <= max`,
     );
   }
+  const contracts = [];
   for (const asset of manifest.assets) {
     const path = resolve(manifestDir, asset.path);
     assert.equal(statSync(path).size, asset.byteLength, asset.id);
@@ -98,7 +143,31 @@ function validateManifest() {
       height: asset.height,
     });
     assert.equal(asset.colorSpace, "NoColorSpace");
+    assert(Number.isInteger(asset.seed) && asset.seed >= 0 && asset.seed <= 0xffffffff);
+    assert.equal(asset.channels, 4);
+    const mipExtents = fieldMipExtents(asset.width, asset.height);
+    contracts.push({
+      id: asset.id,
+      seed: asset.seed,
+      sourceByteLength: asset.byteLength,
+      sourceSha256: asset.sha256,
+      decodedBaseBytes: asset.width * asset.height * asset.channels,
+      decodedMipChainBytes: mipExtents.reduce(
+        (sum, extent) => sum + extent.width * extent.height * asset.channels,
+        0,
+      ),
+      mipLevelCount: mipExtents.length,
+      mipExtents,
+    });
   }
+  assert.equal(new Set(contracts.map(({ seed }) => seed)).size, contracts.length);
+  return Object.freeze({
+    pass: true,
+    manifestId: manifest.id,
+    manifestVersion: manifest.version,
+    selection: "exact-seed-identity; modulo aliasing forbidden",
+    assets: Object.freeze(contracts),
+  });
 }
 
 function validateBakePlanning() {
@@ -303,6 +372,167 @@ function validateSharedAlgorithm() {
   }
   assert(accepted > 0, "structured placement fixture must contain accepted cells");
   assert(rejected > 0, "structured placement fixture must contain rejected cells");
+  for (const probe of invalidFieldProbes) {
+    assert.throws(() => sampleFieldCPU(probe), /f32 phase gate/);
+  }
+}
+
+function validateV2InterfaceAndProbeCorpus() {
+  assert.deepEqual(FIELD_INTERFACE_V2, {
+    schemaVersion: 2,
+    valueChannel: "macroHeight",
+    gradientChannel: "macroGradient",
+    gradientDomain: "declared input coordinate domain",
+    causeOwner: "createFieldNodeBundle",
+  });
+  const nodeBundle = createFieldNodeBundle({
+    coordinate: vec3(0.31, 0.47, 0.83),
+    seed: uint(17),
+    warpEnabled: false,
+    varPrefix: "v2ContractProbe",
+  });
+  assert.equal(validateWarpFreeFieldNodeBundle(nodeBundle), nodeBundle);
+  const causeBindings = createFieldCauseBindings(nodeBundle);
+  assert.equal(causeBindings.displacement.height, nodeBundle.macroHeight);
+  assert.equal(causeBindings.material.height, nodeBundle.macroHeight);
+  assert.equal(causeBindings.material.roughness, nodeBundle.roughness);
+  assert.equal(causeBindings.placement.mask, nodeBundle.placementMask);
+  assert.equal(causeBindings.diagnostics.gradient, nodeBundle.macroGradient);
+  const corpusHash = createHash("sha256")
+    .update(JSON.stringify(canonicalProbeCorpusPayload()))
+    .digest("hex");
+  assert.equal(corpusHash, FIELD_PROBE_CORPUS.expectedSha256, "fixed probe corpus input hash");
+  assert.equal(FIELD_PROBE_CORPUS.probes.length, FIELD_PROBE_CORPUS_COUNTS.total);
+  assert.deepEqual(FIELD_PROBE_CORPUS_COUNTS, {
+    object: 512,
+    world: 256,
+    sphere: 256,
+    total: 1024,
+  });
+  assert.equal(
+    new Set(FIELD_PROBE_CORPUS.probes.map(({ id }) => id)).size,
+    FIELD_PROBE_CORPUS_COUNTS.total,
+    "fixed probe IDs must be unique",
+  );
+  assert.equal(
+    new Set(FIELD_PROBE_CORPUS.probes
+      .filter(({ domain, storageCell }) => domain === "object" && storageCell)
+      .map(({ storageCell }) => `${storageCell.x}:${storageCell.y}`)).size,
+    FIELD_PROBE_CORPUS_COUNTS.object - 1,
+    "object probes must address unique storage texels",
+  );
+
+  const oracleRows = [];
+  const coverageByDomain = new Map();
+  for (const probe of FIELD_PROBE_CORPUS.probes) {
+    const v2 = sampleFieldV2CPU(probe);
+    const f32Sample = sampleFieldF32CPU(probe);
+    assert.equal(v2.schemaVersion, 2);
+    assert.equal(v2.value, v2.sample.macroHeight);
+    assert.deepEqual(v2.gradient, v2.sample.macroGradient);
+    assert.equal(v2.causes.slope, v2.sample.slope);
+    assert.equal(v2.causes.placementMask, v2.sample.placementMask);
+    for (const value of [v2.value, ...v2.gradient, ...Object.values(v2.causes)]) {
+      assert(Number.isFinite(value), `${probe.id} v2 field output must be finite`);
+    }
+    for (const value of FIELD_PARITY_CHANNELS.map((channel) => f32Sample[channel])) {
+      assert(Number.isFinite(value), `${probe.id} f32 field output must be finite`);
+    }
+    if (probe.id.endsWith("origin-warp-disabled-v1")) {
+      assert.equal(f32Sample.warpMode, "disabled");
+      assert.deepEqual(f32Sample.tangentWarp, [0, 0, 0]);
+      assert.deepEqual(f32Sample.warpJacobian, [[0, 0, 0], [0, 0, 0], [0, 0, 0]]);
+    }
+    const domainCoverage = coverageByDomain.get(probe.domain) ?? { accepted: 0, rejected: 0 };
+    if (v2.causes.placementMask >= placementMaskThreshold) domainCoverage.accepted += 1;
+    else domainCoverage.rejected += 1;
+    coverageByDomain.set(probe.domain, domainCoverage);
+    oracleRows.push([
+      probe.id,
+      ...FIELD_PARITY_CHANNELS.map((channel) => f32Sample[channel]),
+    ]);
+  }
+  const cpuOracleSha256 = createHash("sha256")
+    .update(JSON.stringify(oracleRows))
+    .digest("hex");
+  assert.equal(
+    cpuOracleSha256,
+    FIELD_PROBE_CORPUS.expectedCpuOracleSha256,
+    "1,024-probe CPU oracle hash drift",
+  );
+  const oracleIdentity = validateFieldProbeOracleIdentity({
+    nodeVersion: process.versions.node,
+    inputSha256: corpusHash,
+    cpuOracleSha256,
+  });
+  assert(coverageByDomain.get("object").accepted > 0);
+  assert(coverageByDomain.get("object").rejected > 0);
+
+  const stress = createStressProbeCorpus();
+  assert.equal(stress.length, FIELD_PROBE_CORPUS_COUNTS.total);
+  assert(stress.every((probe, index) => (
+    probe.seed !== FIELD_PROBE_CORPUS.probes[index].seed &&
+    probe.domain === FIELD_PROBE_CORPUS.probes[index].domain &&
+    JSON.stringify(probe.coordinate) === JSON.stringify(FIELD_PROBE_CORPUS.probes[index].coordinate)
+  )));
+
+  const probePartitions = [
+    FIELD_PROBE_CORPUS.probes.filter(({ domain }) => domain !== "sphere"),
+    FIELD_PROBE_CORPUS.probes.filter(({ domain }) => domain === "sphere"),
+  ].map((probes) => createFieldProbeResources(probes));
+  assert.deepEqual(probePartitions.map(({ warpMode }) => warpMode), ["disabled", "tangential"]);
+  for (const resources of probePartitions) {
+    assert.equal(resources.attributes.length, 8, "each probe kernel must fit the eight-storage-buffer gate");
+    assert(createFieldProbeComputeNode(resources).isComputeNode);
+  }
+  const probeResourceBytes = probePartitions.reduce((sum, resources) => sum + resources.bytes, 0);
+  assert.equal(
+    probePartitions.reduce((sum, resources) => sum + resources.inputBytes, 0),
+    FIELD_PROBE_CORPUS_COUNTS.total * 80,
+  );
+  assert.equal(
+    probePartitions.reduce((sum, resources) => sum + resources.outputBytes, 0),
+    FIELD_PROBE_CORPUS_COUNTS.total * 48,
+  );
+  assert.equal(probeResourceBytes, FIELD_PROBE_CORPUS_COUNTS.total * 128);
+  for (const resources of probePartitions) {
+    for (const attribute of resources.attributes) attribute.dispose?.();
+  }
+
+  const resources = createFieldBakeResources(641, 359);
+  const placement = createStructuredPlacementResources({ columns: 64, rows: 64 });
+  const resourceLedger = createFieldResourceLedger(resources, placement);
+  assert.equal(validateFieldResourceLedger(resourceLedger), resourceLedger);
+  assert.equal(
+    resourceLedger.totalBytes,
+    Object.values(resources.resourceBytes).reduce((sum, bytes) => sum + bytes, 0) + placement.bytes,
+  );
+  const region = { x: 71, y: 43, width: 257, height: 181 };
+  const dispatchTrace = buildDirtyDispatchTrace(region, resources.mipExtents);
+  assert.equal(validateFieldDispatchTrace(dispatchTrace, region, resources.mipExtents), dispatchTrace);
+  for (const entry of dispatchTrace) {
+    assert.deepEqual(entry.workgroupSize, [64, 1, 1]);
+    assert.deepEqual(entry.workgroupCount, [Math.ceil(entry.invocationCount / 64), 1, 1]);
+  }
+  for (const texture of resources.packedMipTextures) texture.dispose();
+  resources.derivedTexture.dispose();
+  resources.gradientTexture.dispose();
+  placement.records.dispose?.();
+  placement.acceptedIndices.dispose?.();
+
+  return {
+    pass: true,
+    corpusId: FIELD_PROBE_CORPUS.id,
+    corpusHash,
+    cpuOracleSha256,
+    oracleIdentity,
+    counts: FIELD_PROBE_CORPUS_COUNTS,
+    coverageByDomain: Object.fromEntries(coverageByDomain),
+    probeResourceBytes,
+    fieldResourceBytes: resourceLedger.totalBytes,
+    dirtyDispatchCount: dispatchTrace.length,
+    dirtyInvocationCount: dispatchTrace.reduce((sum, entry) => sum + entry.invocationCount, 0),
+  };
 }
 
 function validateAnalyticGradient() {
@@ -534,10 +764,15 @@ function validateGpuReadback(artifactDir) {
     "field-readback.json",
     "field-storage-readback.json",
     "field-placement-readback.json",
+    "field-mechanism-diagnostics.json",
+    "field-probe-corpus.json",
+    "field-dirty-region.json",
   ]);
-  assert.equal(readback.contract?.probeSet, "gpuParityProbes-v3-original-domain-gradients");
+  assert.equal(readback.contract?.probeSet, "gpuParityProbes-v4-f32-origin-and-threshold-gradients");
   assert.equal(readback.contract?.seedRepresentation, "u32-uniform");
   assert.equal(readback.renderer?.isWebGPUBackend, true);
+  assert.equal(readback.renderer?.threePackageVersion, "0.185.1");
+  assert.equal(readback.renderer?.threeRevision, "185");
   assert.deepEqual(readback.channels, FIELD_PARITY_CHANNELS);
   assert(Array.isArray(readback.samples), "GPU readback samples must be an array");
   assert.deepEqual(
@@ -554,7 +789,7 @@ function validateGpuReadback(artifactDir) {
   const samples = readback.samples.map((entry, index) => {
     assert(entry.probe, `GPU readback sample ${index} is missing probe`);
     assert(entry.values, `GPU readback sample ${index} is missing values`);
-    const cpu = sampleFieldCPU(entry.probe);
+    const cpu = sampleFieldF32CPU(entry.probe);
     const channelErrors = {};
     for (const channel of FIELD_PARITY_CHANNELS) {
       const actual = Number(entry.values[channel]);
@@ -669,6 +904,22 @@ function validateStorageReadback(artifactDir) {
     0.37,
     -4 + y / Math.max(height - 1, 1) * 8,
   ];
+  const f32GridCoordinate = (index, extent, minimum, range) => {
+    const fraction = Math.fround(
+      Math.fround(index) / Math.fround(Math.max(extent - 1, 1)),
+    );
+    return Math.fround(
+      Math.fround(minimum) + Math.fround(fraction * Math.fround(range)),
+    );
+  };
+  const coordinateForCellF32 = (x, y, width, height) => [
+    f32GridCoordinate(x, width, -4, 8),
+    Math.fround(0.37),
+    f32GridCoordinate(y, height, -4, 8),
+  ];
+  const gridCoordinateF32Bound = (value) => (
+    (Math.abs(-4) + Math.abs(8) + Math.abs(value)) * 2 ** -23
+  );
   const halfRoundingBound = (value) => {
     const magnitude = Math.abs(value);
     assert(magnitude <= 65504, `rgba16float oracle value ${value} is outside the finite range`);
@@ -683,7 +934,7 @@ function validateStorageReadback(artifactDir) {
   const validateBaseSamples = ({ label, readback, channelNames, vectorForCpu, normalized }) => {
     let maxAbsError = 0;
     for (const sample of readback.samples) {
-      const cpu = sampleFieldCPU({
+      const cpu = sampleFieldF32CPU({
         domain: "object",
         coordinate: coordinateForCell(sample.x, sample.y, storageWidth, storageHeight),
         seed: FIELD_ALGORITHM.defaultSeed,
@@ -712,7 +963,7 @@ function validateStorageReadback(artifactDir) {
       values: Array.from({ length: width * height }, (_, index) => {
         const x = index % width;
         const y = Math.floor(index / width);
-        const cpu = sampleFieldCPU({
+        const cpu = sampleFieldF32CPU({
           domain: "object",
           coordinate: coordinateForCell(x, y, width, height),
           seed: FIELD_ALGORITHM.defaultSeed,
@@ -751,6 +1002,8 @@ function validateStorageReadback(artifactDir) {
     productionReady: false,
   });
   assert.equal(storageReadback.renderer?.isWebGPUBackend, true);
+  assert.equal(storageReadback.renderer?.threePackageVersion, "0.185.1");
+  assert.equal(storageReadback.renderer?.threeRevision, "185");
   assert.deepEqual(storageReadback.extent, { width: storageWidth, height: storageHeight });
   validateTextureReadback(storageReadback.packed, storageWidth, storageHeight, "packed base");
   validateTextureReadback(storageReadback.derived, storageWidth, storageHeight, "derived base");
@@ -784,7 +1037,7 @@ function validateStorageReadback(artifactDir) {
       normalized: false,
     }),
   };
-  const centerCpu = sampleFieldCPU({
+  const centerCpu = sampleFieldF32CPU({
     domain: "object",
     coordinate: storageReadback.centerCpuReference.coordinate,
     seed: FIELD_ALGORITHM.defaultSeed,
@@ -831,6 +1084,24 @@ function validateStorageReadback(artifactDir) {
   assert.equal(storageReadback.resources.graph, "runtime-compute-storage-and-explicit-mips");
   assert.equal(storageReadback.resources.textures, expectedMipExtents.length + 2);
   assert.equal(storageReadback.resources.storageBuffers, 2);
+  const completeLedger = storageReadback.resources.common.completeResourceLedger;
+  validateFieldResourceLedger(completeLedger);
+  const completeResourceIds = new Set(completeLedger.resources.map(({ id }) => id));
+  for (const id of [
+    "display-evidence-target",
+    "raw-probe-target",
+    "display-readback-request",
+    "probe-readback-request",
+    "probe-corpus-coordinates",
+    "probe-corpus-gradient-output",
+    "storage-readback-request",
+  ]) assert(completeResourceIds.has(id), `complete resource ledger omitted ${id}`);
+  assert(completeLedger.residentBytes > storageReadback.resources.bytes);
+  assert(completeLedger.peakTransientBytes > 0);
+  assert.equal(
+    completeLedger.peakLabOwnedBytes,
+    completeLedger.residentBytes + completeLedger.peakTransientBytes,
+  );
   assert.deepEqual(storageReadback.resources.resourceBytes, {
     packedMipChain: packedMipChainBytes,
     derivedBase: baseTextureBytes,
@@ -844,20 +1115,26 @@ function validateStorageReadback(artifactDir) {
 
   assert.equal(placementReadback.schemaVersion, 2);
   assert.deepEqual(placementReadback.contract, {
-    path: "deterministic-index-list-plus-storage-buffer-write-readback",
-    artifactCoverage: "all-accepted-compacted-records-plus-index-list",
+    path: "raw-gpu-vec4-lane-plus-separate-deterministic-cpu-index-list",
+    artifactCoverage: "all-accepted-raw-gpu-records-plus-separate-index-identity",
+    rawGpuLaneWMeaning: "authored-live-record-sentinel-one",
+    cpuIndexIdentityStoredInGpuRecord: false,
     rejectedRecordsRetained: false,
     performanceMeasured: false,
     productionReady: false,
   });
   assert.equal(placementReadback.cellCount, 4096);
-  assert.equal(placementReadback.records.length, placementReadback.accepted);
+  assert.equal(placementReadback.rawGpuRecords.length, placementReadback.accepted);
+  assert.equal(placementReadback.decodedRecords.length, placementReadback.accepted);
   assert.equal(placementReadback.acceptedIndices.length, placementReadback.accepted);
   assert.deepEqual(
-    placementReadback.records.map((record) => record[3]),
+    placementReadback.decodedRecords.map((record) => record.cpuAcceptedCellIndex),
     placementReadback.acceptedIndices,
-    "record identity must come from the compacted integer index list",
+    "CPU cell identity must remain separate from the raw GPU vec4 lanes",
   );
+  assert(placementReadback.rawGpuRecords.every((record) => record[3] === 1));
+  assert.equal(placementReadback.minRawGpuW, 1);
+  assert.equal(placementReadback.maxRawGpuW, 1);
   const expectedAcceptedIndices = [];
   let expectedRejected = 0;
   let expectedMinAcceptedMask = 1;
@@ -868,7 +1145,7 @@ function validateStorageReadback(artifactDir) {
     const x = index % 64;
     const y = Math.floor(index / 64);
     const coordinate = coordinateForCell(x, y, 64, 64);
-    const expected = sampleFieldCPU({
+    const expected = sampleFieldF32CPU({
       domain: "object",
       coordinate,
       seed: FIELD_ALGORITHM.defaultSeed,
@@ -891,15 +1168,30 @@ function validateStorageReadback(artifactDir) {
     const x = cellIndex % 64;
     const y = Math.floor(cellIndex / 64);
     const coordinate = coordinateForCell(x, y, 64, 64);
-    const expected = sampleFieldCPU({
+    const coordinateF32 = coordinateForCellF32(x, y, 64, 64);
+    const expected = sampleFieldF32CPU({
       domain: "object",
       coordinate,
       seed: FIELD_ALGORITHM.defaultSeed,
     });
-    const actual = placementReadback.records[outputIndex];
+    const actual = placementReadback.rawGpuRecords[outputIndex];
+    const decoded = placementReadback.decodedRecords[outputIndex];
     assert.equal(actual.length, 4, `placement record ${outputIndex} width`);
-    assertClose(actual[0], coordinate[0], 2 ** -21, `placement record ${outputIndex} x`);
-    assertClose(actual[1], coordinate[2], 2 ** -21, `placement record ${outputIndex} z`);
+    // The coordinate path contains one division, multiply, and add. WGSL may
+    // fuse/reassociate them. Bound the propagated input/range/output f32
+    // rounding terms instead of using the much smaller ULP near a cancellation.
+    assertClose(
+      actual[0],
+      coordinateF32[0],
+      gridCoordinateF32Bound(coordinateF32[0]),
+      `placement record ${outputIndex} x`,
+    );
+    assertClose(
+      actual[1],
+      coordinateF32[2],
+      gridCoordinateF32Bound(coordinateF32[2]),
+      `placement record ${outputIndex} z`,
+    );
     const maskError = assertClose(
       actual[2],
       expected.placementMask,
@@ -907,7 +1199,10 @@ function validateStorageReadback(artifactDir) {
       `placement record ${outputIndex} mask`,
     );
     placementMaxAbsError = Math.max(placementMaxAbsError, maskError);
-    assert.equal(actual[3], cellIndex, `placement record ${outputIndex} cell index`);
+    assert.equal(actual[3], 1, `placement raw GPU record ${outputIndex} sentinel lane`);
+    assert.equal(decoded.outputIndex, outputIndex);
+    assert.equal(decoded.cpuAcceptedCellIndex, cellIndex);
+    assert.deepEqual(decoded.gpu, actual);
     expectedMinAcceptedMask = Math.min(expectedMinAcceptedMask, expected.placementMask);
     expectedMaxAcceptedMask = Math.max(expectedMaxAcceptedMask, expected.placementMask);
   }
@@ -966,14 +1261,326 @@ function validateStorageReadback(artifactDir) {
   };
 }
 
+function validateProbeCorpusReadback(artifactDir) {
+  const artifactPath = resolve(artifactDir, "field-probe-corpus.json");
+  assert(existsSync(artifactPath), `probe-corpus artifact missing: ${artifactPath}`);
+  const artifact = JSON.parse(readFileSync(artifactPath, "utf8"));
+  assert.equal(artifact.schemaVersion, 2);
+  assert.deepEqual(artifact.contract, {
+    path: "storage-buffer-tsl-corpus-plus-rgba16float-direct-comparison",
+    corpusId: FIELD_PROBE_CORPUS.id,
+    corpusSha256: FIELD_PROBE_CORPUS.expectedSha256,
+    sameSeedBitwiseStable: true,
+    stressSeedHashDistinct: true,
+    performanceMeasured: false,
+    productionReady: false,
+  });
+  assert.equal(artifact.renderer?.threeRevision, "185");
+  assert.equal(artifact.renderer?.threePackageVersion, "0.185.1");
+  assert.equal(artifact.renderer?.isWebGPUBackend, true);
+  assert(artifact.renderer.maxStorageBuffersPerShaderStage >= 8);
+  assert.deepEqual(artifact.counts, FIELD_PROBE_CORPUS_COUNTS);
+  assert.deepEqual(artifact.dispatches, [
+    {
+      warpMode: "disabled",
+      probeCount: FIELD_PROBE_CORPUS_COUNTS.object + FIELD_PROBE_CORPUS_COUNTS.world,
+      workgroupSize: [64, 1, 1],
+      workgroupCount: [12, 1, 1],
+      resourceBytes: (FIELD_PROBE_CORPUS_COUNTS.object + FIELD_PROBE_CORPUS_COUNTS.world) * 128,
+    },
+    {
+      warpMode: "tangential",
+      probeCount: FIELD_PROBE_CORPUS_COUNTS.sphere,
+      workgroupSize: [64, 1, 1],
+      workgroupCount: [4, 1, 1],
+      resourceBytes: FIELD_PROBE_CORPUS_COUNTS.sphere * 128,
+    },
+  ]);
+  assert.equal(artifact.inputBytes, FIELD_PROBE_CORPUS_COUNTS.total * 80);
+  assert.equal(artifact.outputBytes, FIELD_PROBE_CORPUS_COUNTS.total * 48);
+  assert.equal(artifact.resourceBytes, FIELD_PROBE_CORPUS_COUNTS.total * 128);
+  for (const [label, hash] of [
+    ["baseline", artifact.baselineSha256],
+    ["repeated", artifact.repeatedSha256],
+    ["stress", artifact.stressSha256],
+    ["packed storage", artifact.packedStorageSha256],
+  ]) {
+    assert.match(hash, /^[0-9a-f]{64}$/, `${label} hash`);
+  }
+  assert.equal(artifact.baselineSha256, artifact.repeatedSha256);
+  assert.notEqual(artifact.baselineSha256, artifact.stressSha256);
+  assert.equal(artifact.records.length, FIELD_PROBE_CORPUS_COUNTS.total);
+
+  let maxAbsError = 0;
+  let sumAbsError = 0;
+  let valueCount = 0;
+  for (let index = 0; index < FIELD_PROBE_CORPUS.probes.length; index += 1) {
+    const record = artifact.records[index];
+    assert.deepEqual(record.probe, FIELD_PROBE_CORPUS.probes[index], `probe record ${index} identity`);
+    const cpu = sampleFieldF32CPU(record.probe);
+    const vectors = [
+      [record.packed, Object.values(cpu.packedChannels), Object.values(FIELD_CHANNELS)],
+      [record.derived, Object.values(cpu.derivedChannels), Object.values(FIELD_DERIVED_CHANNELS)],
+      [record.gradient, Object.values(cpu.gradientChannels), Object.values(FIELD_GRADIENT_CHANNELS)],
+    ];
+    for (const [actual, expected, channels] of vectors) {
+      assert.equal(actual.length, 4);
+      for (let lane = 0; lane < 4; lane += 1) {
+        assert(Number.isFinite(actual[lane]), `${record.probe.id} ${channels[lane]} must be finite`);
+        const error = assertClose(
+          actual[lane],
+          expected[lane],
+          gpuParityTolerances[channels[lane]],
+          `${record.probe.id} ${channels[lane]}`,
+        );
+        maxAbsError = Math.max(maxAbsError, error);
+        sumAbsError += error;
+        valueCount += 1;
+      }
+    }
+  }
+  assert.deepEqual(artifact.directVsBaked.sampleCount, FIELD_PROBE_CORPUS_COUNTS.object - 1);
+  assert.equal(artifact.directVsBaked.valueCount, (FIELD_PROBE_CORPUS_COUNTS.object - 1) * 4);
+  assert(Number.isFinite(artifact.directVsBaked.maxAbsError));
+  assert(Number.isFinite(artifact.directVsBaked.meanAbsError));
+  const directVsBakedGate = Math.max(...Object.values(FIELD_CHANNELS).map(
+    (channel) => gpuParityTolerances[channel],
+  )) + FIELD_PARITY_ERROR_MANIFEST.rgba16floatStorage.nearestRoundingBoundBelowOne;
+  assert(
+    artifact.directVsBaked.maxAbsError <= directVsBakedGate,
+    `direct-vs-baked error ${artifact.directVsBaked.maxAbsError} exceeded ${directVsBakedGate}`,
+  );
+  return {
+    pass: true,
+    status: "passed",
+    probeCount: FIELD_PROBE_CORPUS_COUNTS.total,
+    valueCount,
+    maxAbsError,
+    meanAbsError: sumAbsError / valueCount,
+    directVsBakedGate,
+    directVsBaked: artifact.directVsBaked,
+    baselineSha256: artifact.baselineSha256,
+    stressSha256: artifact.stressSha256,
+  };
+}
+
+function validateDirtyRegionReadback(artifactDir) {
+  const artifactPath = resolve(artifactDir, "field-dirty-region.json");
+  assert(existsSync(artifactPath), `dirty-region artifact missing: ${artifactPath}`);
+  const artifact = JSON.parse(readFileSync(artifactPath, "utf8"));
+  assert.equal(artifact.schemaVersion, 2);
+  assert.deepEqual(artifact.contract, {
+    path: "bitwise-full-storage-before-after-dirty-update",
+    sameSeedBitwiseStable: true,
+    stressSeedHashDistinct: true,
+    dirtyRegionExecutionValidated: true,
+    dependentMipConfinementValidated: true,
+    canonicalRestoreBitwiseStable: true,
+    performanceMeasured: false,
+    productionReady: false,
+  });
+  assert.equal(artifact.renderer?.threeRevision, "185");
+  assert.equal(artifact.renderer?.threePackageVersion, "0.185.1");
+  assert.equal(artifact.renderer?.isWebGPUBackend, true);
+  assert.deepEqual(artifact.extent, { width: 641, height: 359 });
+  assert.deepEqual(artifact.dirtyRegion, { x: 71, y: 43, width: 257, height: 181 });
+  assert.equal(artifact.canonicalSeed, FIELD_ALGORITHM.defaultSeed);
+  assert.equal(artifact.stressSeed, (FIELD_ALGORITHM.defaultSeed ^ 0x9e3779b9) >>> 0);
+  assert.equal(artifact.baselineSha256, artifact.repeatedSha256);
+  assert.equal(artifact.baselineSha256, artifact.restoredSha256);
+  assert.notEqual(artifact.baselineSha256, artifact.mutatedSha256);
+  for (const hash of [
+    artifact.baselineSha256,
+    artifact.repeatedSha256,
+    artifact.mutatedSha256,
+    artifact.restoredSha256,
+  ]) assert.match(hash, /^[0-9a-f]{64}$/);
+
+  const extents = fieldMipExtents(641, 359);
+  const mipRegions = propagateDirtyRegion(artifact.dirtyRegion, extents);
+  assert.equal(artifact.comparisons.length, extents.length + 2);
+  for (const [index, comparison] of artifact.comparisons.entries()) {
+    const expectedId = index < extents.length
+      ? `packed-mip-${index}`
+      : index === extents.length ? "derived-base" : "gradient-base";
+    assert.equal(comparison.id, expectedId);
+    const expectedExtent = index < extents.length ? extents[index] : extents[0];
+    const expectedRegion = index < extents.length ? mipRegions[index] : artifact.dirtyRegion;
+    assert.deepEqual(comparison.extent, expectedExtent);
+    assert.deepEqual(comparison.allowedRegion, expectedRegion);
+    assert.equal(comparison.changedOutside, 0, `${comparison.id} outside-dirty mutation`);
+    assert(comparison.changedInside > 0, `${comparison.id} must change inside the dirty region`);
+    assert.equal(comparison.unchanged, false);
+    assert.notEqual(comparison.beforeSha256, comparison.afterSha256);
+  }
+  assert.equal(
+    validateFieldDispatchTrace(artifact.dirtyDispatchTrace, artifact.dirtyRegion, extents),
+    artifact.dirtyDispatchTrace,
+  );
+  const fullRegion = { x: 0, y: 0, width: 641, height: 359 };
+  validateFieldDispatchTrace(artifact.repeatedDispatchTrace, fullRegion, extents);
+  validateFieldDispatchTrace(artifact.restoreDispatchTrace, fullRegion, extents);
+  validateFieldResourceLedger(artifact.resourceLedger);
+  const placementEntry = artifact.resourceLedger.resources.find(({ id }) => id === "placement-records");
+  const fullInvocations = buildDirtyDispatchTrace(fullRegion, extents)
+    .reduce((sum, entry) => sum + entry.invocationCount, 0);
+  const dirtyInvocations = artifact.dirtyDispatchTrace
+    .reduce((sum, entry) => sum + entry.invocationCount, 0);
+  assert.deepEqual(artifact.dispatchTotals, {
+    computeSubmissions: extents.length * 4 + 1,
+    invocations: fullInvocations * 3 + dirtyInvocations + placementEntry.elementCount,
+    fieldRegionUpdates: 4,
+    placementUpdates: 1,
+  });
+  return {
+    pass: true,
+    status: "passed",
+    resourceCount: artifact.resourceLedger.resources.length,
+    resourceBytes: artifact.resourceLedger.totalBytes,
+    comparisonCount: artifact.comparisons.length,
+    dirtyInvocationCount: dirtyInvocations,
+    dispatchTotals: artifact.dispatchTotals,
+  };
+}
+
+async function validateMechanismDiagnostics(artifactDir) {
+  const artifactPath = resolve(artifactDir, "field-mechanism-diagnostics.json");
+  assert(existsSync(artifactPath), `mechanism diagnostic artifact missing: ${artifactPath}`);
+  const artifact = JSON.parse(readFileSync(artifactPath, "utf8"));
+  const expectedIds = FIELD_MECHANISM_IDS;
+  assert.equal(artifact.schemaVersion, 2);
+  assert.equal(artifact.statisticsSource, "recomputed-from-retained-compact-rgba8");
+  assert.deepEqual(artifact.diagnostics.map(({ id }) => id), expectedIds);
+  const rawHashes = new Set();
+  for (const diagnostic of artifact.diagnostics) {
+    assert.equal(diagnostic.source, "render-target-readback");
+    assert.match(diagnostic.compactRgbaSha256, /^[0-9a-f]{64}$/);
+    assert.match(diagnostic.pngSha256, /^[0-9a-f]{64}$/);
+    const pngPath = resolve(artifactDir, diagnostic.filename);
+    assert(existsSync(pngPath), `${diagnostic.id} PNG missing`);
+    assert.equal(sha256(pngPath), diagnostic.pngSha256);
+    const decoded = await sharp(pngPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    assert.equal(decoded.info.width, diagnostic.width);
+    assert.equal(decoded.info.height, diagnostic.height);
+    assert.equal(decoded.info.channels, 4);
+    assert.equal(
+      createHash("sha256").update(decoded.data).digest("hex"),
+      diagnostic.compactRgbaSha256,
+    );
+    const recomputedStatistics = analyzeFieldMechanismRgba(
+      new Uint8Array(decoded.data.buffer, decoded.data.byteOffset, decoded.data.byteLength),
+      decoded.info.width,
+      decoded.info.height,
+    );
+    assert.deepEqual(diagnostic.statistics, recomputedStatistics);
+    validateReportedFieldMechanismStatistics(
+      diagnostic.id,
+      diagnostic.statistics,
+      new Uint8Array(decoded.data.buffer, decoded.data.byteOffset, decoded.data.byteLength),
+      decoded.info.width,
+      decoded.info.height,
+    );
+    rawHashes.add(diagnostic.compactRgbaSha256);
+  }
+  assert.equal(rawHashes.size, expectedIds.length, "mechanism diagnostics must be hash-distinct");
+  return {
+    pass: true,
+    status: "passed",
+    diagnosticCount: expectedIds.length,
+    rawHashes: [...rawHashes],
+    statistics: Object.fromEntries(artifact.diagnostics.map(({ id, statistics }) => [id, statistics])),
+  };
+}
+
+async function validateSharedCaptureSession(artifactDir) {
+  const sessionPath = resolve(artifactDir, "capture-session.json");
+  assert(existsSync(sessionPath), `shared capture session missing: ${sessionPath}`);
+  const session = JSON.parse(readFileSync(sessionPath, "utf8"));
+  assert.equal(session.schemaVersion, 2);
+  assert.equal(session.labId, "webgpu-field-bake");
+  assert.equal(session.profile, "correctness");
+  assert.deepEqual(session.profileConfig, { width: 1200, height: 800, dpr: 1 });
+  assert.equal(session.automationSurface, "playwright-headless-chromium");
+  assert.equal(session.threeRevision, "0.185.1");
+  assert.match(session.sourceClosureHash, /^sha256:[0-9a-f]{64}$/);
+  assert.match(session.buildRevision, /^sha256:[0-9a-f]{64}$/);
+  assert.deepEqual(session.pageErrors, []);
+  assert.deepEqual(session.consoleErrors, []);
+  assert.deepEqual(session.requestErrors, []);
+  assert.equal(session.runtime?.metrics?.backend, "webgpu");
+  assert.equal(session.runtime?.metrics?.rendererType, "WebGPURenderer");
+  assert.equal(session.runtime?.metrics?.rendererBackendEvidence?.deviceIdentityVerified, true);
+  assert.equal(
+    session.runtime?.metrics?.rendererBackendEvidence?.lossPromiseObservedOnActualDevice,
+    true,
+  );
+  assert.equal(session.postDisposeSnapshot?.labError, null);
+  assert.equal(session.outputPlan.length, outputPlanExpectedCount());
+  const outputById = new Map(session.outputPlan.map((entry) => [entry.id, entry]));
+  assert.equal(outputById.get("no-post.design")?.status, "NOT_APPLICABLE");
+  for (const filename of [
+    "final.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png",
+  ]) assert(existsSync(resolve(artifactDir, filename)), `standard capture missing: ${filename}`);
+  assert.notEqual(
+    sha256(resolve(artifactDir, "final.design.png")),
+    sha256(resolve(artifactDir, "diagnostics.mosaic.png")),
+  );
+  assert.notEqual(
+    sha256(resolve(artifactDir, "seed-0001.final.png")),
+    sha256(resolve(artifactDir, "seed-9e3779b9.final.png")),
+  );
+  assert.notEqual(
+    sha256(resolve(artifactDir, "temporal.t000.png")),
+    sha256(resolve(artifactDir, "temporal.t001.png")),
+  );
+  const expectedWrites = new Set([
+    "capture-session.json",
+    "field-readback.json",
+    "field-storage-readback.json",
+    "field-placement-readback.json",
+    "field-probe-corpus.json",
+    "field-dirty-region.json",
+    "field-mechanism-diagnostics.json",
+  ]);
+  for (const path of expectedWrites) {
+    assert(session.artifactWrites.some((entry) => entry.path === path), `capture ledger omitted ${path}`);
+  }
+  return {
+    pass: true,
+    profile: session.profile,
+    sourceClosureHash: session.sourceClosureHash,
+    buildRevision: session.buildRevision,
+    standardOutputCount: session.outputPlan.length,
+    writtenCaptureCount: session.writtenCaptures.length,
+  };
+}
+
+function outputPlanExpectedCount() {
+  return 10;
+}
+
 function validateSourceContract() {
   const files = [
     "README.md",
     "field-constants.mjs",
+    "field-probe-corpus.mjs",
+    "field-f32-oracle.mjs",
+    "mechanism-evidence.mjs",
     "field-bundle.mjs",
     "field-bake.mjs",
     "browser-app.js",
     "capture.mjs",
+    "capture-hook.mjs",
+    "route-contract.mjs",
+    "package.json",
     "validate-field-contract.mjs",
   ];
   const sources = Object.fromEntries(
@@ -1026,6 +1633,12 @@ function validateSourceContract() {
     "createFieldBakeSystem",
     "createStructuredPlacementComputeNode",
     "fieldMipExtents",
+    "FIELD_INTERFACE_V2",
+    "createFieldCauseBindings",
+    "field-probe-corpus-v1",
+    "compareFieldStorageMutation",
+    "validateFieldResourceLedger",
+    "validateFieldMechanismStatistics",
   ]) {
     assert(source.includes(required), `missing ${required}`);
   }
@@ -1039,16 +1652,32 @@ function validateSourceContract() {
   assert(sources["browser-app.js"].includes("direct-wgsl-f32-plus-tier-specific-resources"));
   assert(sources["browser-app.js"].includes("resolveHalfReadbackLayout"));
   assert(sources["browser-app.js"].includes(
-    'artifactCoverage: "all-accepted-compacted-records-plus-index-list"',
+    'artifactCoverage: "all-accepted-raw-gpu-records-plus-separate-index-identity"',
   ));
   assert(sources["field-bundle.mjs"].includes("fieldInputTransform"));
   assert(sources["field-bundle.mjs"].includes("inputJacobianColumns"));
   assert(sources["field-bake.mjs"].includes("acceptedCellIndices"));
   assert(sources["field-bake.mjs"].includes("buildDirtyDispatchTrace"));
-  assert(sources["capture.mjs"].includes('"field-storage-readback.json"'));
-  assert(sources["capture.mjs"].includes('"field-placement-readback.json"'));
-  assert(sources["browser-app.js"].includes('uniform(FIELD_ALGORITHM.defaultSeed >>> 0, "uint")'));
+  assert(sources["capture-hook.mjs"].includes('"field-storage-readback.json"'));
+  assert(sources["capture-hook.mjs"].includes('"field-placement-readback.json"'));
+  assert(sources["capture-hook.mjs"].includes('"field-mechanism-diagnostics.json"'));
+  assert(sources["capture-hook.mjs"].includes('"field-probe-corpus.json"'));
+  assert(sources["capture-hook.mjs"].includes('"field-dirty-region.json"'));
+  assert(sources["capture.mjs"].includes("captureLabBrowser"));
+  assert(sources["capture.mjs"].includes(
+    "../../../artifacts/visual-validation/webgpu-field-bake/correctness",
+  ));
+  const packageJson = JSON.parse(sources["package.json"]);
+  assert.equal(packageJson.scripts.capture, "node capture.mjs --profile correctness");
+  assert(packageJson.scripts["validate:artifacts"].includes(
+    "../../../artifacts/visual-validation/webgpu-field-bake/correctness",
+  ));
+  assert(sources["browser-app.js"].includes('uniform(initialSeed >>> 0, "uint")'));
   assert(sources["field-bundle.mjs"].includes("return uint(seed)"));
+  assert(sources["field-bundle.mjs"].includes("if (warpEnabled)"));
+  assert(sources["field-bundle.mjs"].includes("WarpDisabledTangent"));
+  assert(sources["field-f32-oracle.mjs"].includes("Math.fround"));
+  assert(!sources["browser-app.js"].includes("seed % PRECOMPUTED_ASSETS.length"));
   for (const forbidden of [
     ["deepest", "RoundedOps"].join(""),
     ["gamma", "_384"].join(""),
@@ -1057,21 +1686,31 @@ function validateSourceContract() {
   }
 }
 
-function main() {
+async function main() {
   const options = parseArgs(process.argv.slice(2));
 
-  validateManifest();
+  const toolchainAndF32Oracle = validateToolchainAndF32Oracle();
+  const precomputedContract = validateManifest();
   validateBakePlanning();
   validateSharedAlgorithm();
+  const v2InterfaceAndProbeCorpus = validateV2InterfaceAndProbeCorpus();
   const analyticGradient = validateAnalyticGradient();
   const fixtureParity = validateGoldenFixtures();
   validateSourceContract();
 
   let gpuParity;
   let gpuStorage;
+  let gpuProbeCorpus;
+  let gpuDirtyRegion;
+  let mechanismDiagnostics;
+  let sharedCaptureSession;
   if (options.artifacts) {
     gpuParity = validateGpuReadback(options.artifacts);
     gpuStorage = validateStorageReadback(options.artifacts);
+    gpuProbeCorpus = validateProbeCorpusReadback(options.artifacts);
+    gpuDirtyRegion = validateDirtyRegionReadback(options.artifacts);
+    mechanismDiagnostics = await validateMechanismDiagnostics(options.artifacts);
+    sharedCaptureSession = await validateSharedCaptureSession(options.artifacts);
   } else {
     gpuParity = {
       pass: false,
@@ -1086,6 +1725,30 @@ function main() {
       requiredForBrowserAcceptance: true,
       reason: "Native-WebGPU storage, mip, and placement readback artifacts are required.",
     };
+    gpuProbeCorpus = {
+      pass: false,
+      status: "not-run",
+      requiredForBrowserAcceptance: true,
+      reason: "The 1,024-probe TSL compute corpus is required.",
+    };
+    gpuDirtyRegion = {
+      pass: false,
+      status: "not-run",
+      requiredForBrowserAcceptance: true,
+      reason: "Bitwise dirty-region and dependent-mip confinement evidence is required.",
+    };
+    mechanismDiagnostics = {
+      pass: false,
+      status: "not-run",
+      requiredForBrowserAcceptance: true,
+      reason: "All six mechanism render-target diagnostics are required.",
+    };
+    sharedCaptureSession = {
+      pass: false,
+      status: "not-run",
+      requiredForBrowserAcceptance: true,
+      reason: "The shared capture-runner session and standard outputs are required.",
+    };
     if (!options.allowMissingGpu) {
       process.exitCode = 1;
     }
@@ -1098,17 +1761,20 @@ function main() {
         "CPU golden fixtures",
         "analytic value and warp-Jacobian derivatives",
         "direct WGSL f32 readback",
+        "1,024-record TSL compute corpus with stable and stress-seed hashes",
         "declared rgba16float base texels and explicit box-filter mip texels",
+        "bitwise dirty-region confinement and dependent mip writes",
         "all structured-placement GPU records",
         "cost-model algebra",
       ],
       doesNotValidate: [
         "filtered texture consumption and interpolation error",
         "full-domain storage parity",
-        "dirty-region GPU execution",
         "target performance without GPU timestamps",
       ],
-      canonicalArtifactBundlePassed: gpuParity.pass && gpuStorage.pass,
+      canonicalArtifactBundlePassed:
+        gpuParity.pass && gpuStorage.pass && gpuProbeCorpus.pass && gpuDirtyRegion.pass &&
+        mechanismDiagnostics.pass && sharedCaptureSession.pass,
       productionReady: false,
     },
     structuralParity: {
@@ -1117,10 +1783,17 @@ function main() {
       channelPack: FIELD_CHANNELS,
       derivedChannelPack: FIELD_DERIVED_CHANNELS,
     },
+    toolchainAndF32Oracle,
+    precomputedContract,
+    v2InterfaceAndProbeCorpus,
     analyticGradient,
     fixtureParity,
     gpuParity,
     gpuStorage,
+    gpuProbeCorpus,
+    gpuDirtyRegion,
+    mechanismDiagnostics,
+    sharedCaptureSession,
   };
 
   const reportPath =
@@ -1137,4 +1810,4 @@ function main() {
   console.log(`webgpu-field-bake validation passed: ${reportPath}`);
 }
 
-main();
+await main();

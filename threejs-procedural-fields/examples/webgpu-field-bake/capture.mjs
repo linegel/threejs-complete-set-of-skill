@@ -1,133 +1,79 @@
-import { createServer } from "node:http";
-import { createReadStream, existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import { dirname, extname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+#!/usr/bin/env node
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(here, "../../..");
-const pagePath = "/threejs-procedural-fields/examples/webgpu-field-bake/index.html";
-const defaultArtifactDir = resolve(repoRoot, "threejs-procedural-fields/examples/webgpu-field-bake/artifacts");
+import { captureLabBrowser } from "../../../scripts/capture-lab-browser.mjs";
 
-const mimeTypes = new Map([
-  [".html", "text/html; charset=utf-8"],
-  [".js", "text/javascript; charset=utf-8"],
-  [".mjs", "text/javascript; charset=utf-8"],
-  [".json", "application/json; charset=utf-8"],
-  [".css", "text/css; charset=utf-8"],
-]);
+const LAB_DIR = dirname(fileURLToPath(import.meta.url));
+export const DEFAULT_ARTIFACT_DIR = resolve(
+  LAB_DIR,
+  "../../../artifacts/visual-validation/webgpu-field-bake/correctness",
+);
+export const CAPTURE_HOOK_PATH = resolve(LAB_DIR, "capture-hook.mjs");
+
+export function validateCaptureArtifactPathContract(captureOutputDir, validatorArtifactDir) {
+  const capturePath = resolve(captureOutputDir);
+  const validatorPath = resolve(validatorArtifactDir);
+  if (capturePath !== validatorPath) {
+    throw new Error(`field capture writes ${capturePath}, but artifact validation reads ${validatorPath}`);
+  }
+  return capturePath;
+}
+
+function optionValue(argv, name) {
+  const index = argv.indexOf(name);
+  return index >= 0 ? argv[index + 1] : null;
+}
 
 function parseArgs(argv) {
-  const options = {
-    headed: false,
-    port: 0,
-    artifacts: defaultArtifactDir,
-  };
-
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === "--headed") options.headed = true;
-    else if (arg === "--port") options.port = Number(argv[++index]);
-    else if (arg === "--artifacts") options.artifacts = resolve(argv[++index]);
-    else throw new Error(`Unknown argument: ${arg}`);
-  }
-
-  return options;
-}
-
-function serveStatic(root) {
-  const server = createServer((request, response) => {
-    const url = new URL(request.url ?? "/", "http://127.0.0.1");
-    const decoded = decodeURIComponent(url.pathname);
-    const normalized = decoded === "/" ? pagePath : decoded;
-    const path = resolve(root, `.${normalized}`);
-
-    if (!path.startsWith(root) || !existsSync(path)) {
-      response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-      response.end("not found");
-      return;
+  const allowed = new Set(["--profile", "--output", "--target"]);
+  for (let index = 0; index < argv.length; index += 2) {
+    const option = argv[index];
+    if (!allowed.has(option)) throw new Error(`unknown field capture option: ${option}`);
+    if (argv[index + 1] === undefined || argv[index + 1].startsWith("--")) {
+      throw new Error(`${option} requires a value`);
     }
-
-    response.writeHead(200, {
-      "content-type": mimeTypes.get(extname(path)) ?? "application/octet-stream",
-    });
-    createReadStream(path).pipe(response);
-  });
-
-  return server;
+  }
+  const profile = optionValue(argv, "--profile") ?? "correctness";
+  return {
+    profile,
+    outputDir: optionValue(argv, "--output") ?? (
+      profile === "correctness"
+        ? DEFAULT_ARTIFACT_DIR
+        : resolve(LAB_DIR, `../../../artifacts/visual-validation/webgpu-field-bake/${profile}`)
+    ),
+    target: optionValue(argv, "--target") ?? "display",
+  };
 }
 
-async function writeJson(path, value) {
-  await writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
-}
-
-async function validateArtifacts(artifactDir) {
-  const child = spawn(
-    process.execPath,
-    [resolve(here, "validate-field-contract.mjs"), "--artifacts", artifactDir],
-    { cwd: repoRoot, stdio: "inherit" },
+export async function captureFieldBake(options = {}) {
+  const outputDir = options.outputDir ?? DEFAULT_ARTIFACT_DIR;
+  validateCaptureArtifactPathContract(
+    outputDir,
+    options.validatorArtifactDir ?? outputDir,
   );
-
-  const [code] = await once(child, "exit");
-  if (code !== 0) throw new Error("field-bake artifact validation failed");
+  return captureLabBrowser({
+    labId: "webgpu-field-bake",
+    profile: options.profile ?? "correctness",
+    outputDir,
+    hookPath: CAPTURE_HOOK_PATH,
+    target: options.target ?? "display",
+  });
 }
 
 async function main() {
-  const options = parseArgs(process.argv.slice(2));
-  const { chromium } = await import("playwright");
-  const server = serveStatic(repoRoot);
-
-  server.listen(options.port, "127.0.0.1");
-  await once(server, "listening");
-
-  const address = server.address();
-  const baseUrl = `http://127.0.0.1:${address.port}`;
-  const browser = await chromium.launch({
-    headless: !options.headed,
-    args: [
-      "--enable-unsafe-webgpu",
-      "--enable-features=Vulkan,UseSkiaRenderer",
-      "--disable-gpu-sandbox",
-    ],
-  });
-
-  try {
-    await mkdir(options.artifacts, { recursive: true });
-    const context = await browser.newContext({
-      viewport: { width: 64, height: 64 },
-      deviceScaleFactor: 1,
-    });
-    const page = await context.newPage();
-
-    page.on("console", (message) => {
-      if (message.type() === "error") console.error(message.text());
-    });
-
-    await page.goto(`${baseUrl}${pagePath}`, { waitUntil: "networkidle" });
-    await page.waitForFunction(() => window.__fieldBakeValidation !== undefined, null, {
-      timeout: 30000,
-    });
-    await page.waitForFunction(() => window.__fieldBakeValidation.ready === true, null, {
-      timeout: 30000,
-    });
-
-    const readback = await page.evaluate(() => window.__fieldBakeValidation.captureFieldReadback());
-    const storedReadback = await page.evaluate(() => window.__fieldBakeValidation.captureStoredReadback());
-    const placementReadback = await page.evaluate(() => window.__fieldBakeValidation.capturePlacementReadback());
-    await writeJson(resolve(options.artifacts, "field-readback.json"), readback);
-    await writeJson(resolve(options.artifacts, "field-storage-readback.json"), storedReadback);
-    await writeJson(resolve(options.artifacts, "field-placement-readback.json"), placementReadback);
-    await validateArtifacts(options.artifacts);
-    console.log(`WebGPU field readback written to ${options.artifacts}`);
-  } finally {
-    await browser.close().catch(() => {});
-    await new Promise((resolveClose) => server.close(resolveClose));
-  }
+  const result = await captureFieldBake(parseArgs(process.argv.slice(2)));
+  console.log(JSON.stringify({
+    labId: result.labId,
+    profile: result.profile,
+    outputDir: result.outputDir,
+    outputPlan: result.outputPlan,
+  }, null, 2));
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  main().catch((error) => {
+    console.error(error.stack ?? error.message);
+    process.exitCode = 1;
+  });
+}

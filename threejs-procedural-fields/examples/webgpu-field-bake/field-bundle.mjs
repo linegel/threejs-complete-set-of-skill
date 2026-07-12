@@ -27,7 +27,13 @@ import {
   FIELD_SPECTRUM,
   fixedProbes,
   gpuParityProbes,
+  invalidFieldProbes,
+  warpFreeOriginProbes,
 } from "./field-constants.mjs";
+import {
+  FIELD_F32_ORACLE_CONTRACT,
+  sampleFieldF32CPU,
+} from "./field-f32-oracle.mjs";
 
 const fract = (value) => value - Math.floor(value);
 const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
@@ -47,10 +53,22 @@ export {
   FIELD_SPECTRUM,
   fixedProbes,
   gpuParityProbes,
+  invalidFieldProbes,
+  warpFreeOriginProbes,
+  FIELD_F32_ORACLE_CONTRACT,
+  sampleFieldF32CPU,
 };
 
 export const CPU_FIELD_ALGORITHM = FIELD_ALGORITHM;
 export const TSL_FIELD_ALGORITHM = FIELD_ALGORITHM;
+
+export const FIELD_INTERFACE_V2 = Object.freeze({
+  schemaVersion: 2,
+  valueChannel: "macroHeight",
+  gradientChannel: "macroGradient",
+  gradientDomain: "declared input coordinate domain",
+  causeOwner: "createFieldNodeBundle",
+});
 
 function latticeCoordToU32(value) {
   // CPU<->TSL convention: floor to i32, then reinterpret i32 bits as u32.
@@ -276,6 +294,11 @@ function warpBundleCPU(coordinate, seed) {
 }
 
 export function fieldInputTransform({ domain, coordinate }) {
+  if (!Array.isArray(coordinate) || coordinate.length !== 3 || coordinate.some(
+    (component) => !Number.isFinite(component),
+  )) {
+    throw new Error("field coordinate must contain three finite components");
+  }
   if (domain === "sphere") {
     return {
       coordinate: normalize3(coordinate),
@@ -285,13 +308,20 @@ export function fieldInputTransform({ domain, coordinate }) {
   }
   if (domain === "world") {
     const scale = FIELD_ALGORITHM.coordinates.world.scale;
+    const stable = scale3(coordinate, scale);
+    if (Math.max(...stable.map(Math.abs)) > FIELD_ALGORITHM.coordinates.stableMagnitudeGate) {
+      throw new Error("world field stable coordinate exceeds the f32 phase gate; rebase or split the coordinate");
+    }
     return {
-      coordinate: scale3(coordinate, scale),
+      coordinate: stable,
       jacobianColumns: [0, 1, 2].map((index) => scale3(identityColumn(index), scale)),
       gradientDomain: FIELD_ALGORITHM.coordinates.world.gradientDomain,
     };
   }
   if (domain === "object") {
+    if (Math.max(...coordinate.map(Math.abs)) > FIELD_ALGORITHM.coordinates.stableMagnitudeGate) {
+      throw new Error("object field coordinate exceeds the f32 phase gate; rebase or split the coordinate");
+    }
     return {
       coordinate: [...coordinate],
       jacobianColumns: [0, 1, 2].map(identityColumn),
@@ -447,6 +477,27 @@ export function sampleFieldCPU({ domain, coordinate, seed = FIELD_ALGORITHM.defa
   };
 }
 
+export function sampleFieldV2CPU(input) {
+  const sample = sampleFieldCPU(input);
+  return Object.freeze({
+    schemaVersion: FIELD_INTERFACE_V2.schemaVersion,
+    value: sample.macroHeight,
+    gradient: Object.freeze([...sample.macroGradient]),
+    gradientDomain: sample.gradientDomain,
+    causes: Object.freeze({
+      macroHeight: sample.macroHeight,
+      ridge: sample.ridge,
+      cavity: sample.cavity,
+      moisture: sample.moisture,
+      slope: sample.slope,
+      biome: sample.biome,
+      roughness: sample.roughness,
+      placementMask: sample.placementMask,
+    }),
+    sample,
+  });
+}
+
 function latticeCoordToU32Node(value) {
   // CPU<->TSL convention: floor to i32, then reinterpret i32 bits as u32.
   // This is the TSL form of `(Math.floor(value) | 0) >>> 0` for negatives.
@@ -549,43 +600,69 @@ function transposeMultiplyColumnsNode(columns, vector) {
   return vec3(dot(columns[0], vector), dot(columns[1], vector), dot(columns[2], vector));
 }
 
-function fieldNodes({ coordinate, seed, warpStrength, inputJacobianColumns, varPrefix }) {
+function fieldNodes({
+  coordinate,
+  seed,
+  warpEnabled,
+  warpStrength,
+  inputJacobianColumns,
+  varPrefix,
+}) {
   const fieldSeed = seed === undefined
     ? uint(FIELD_ALGORITHM.defaultSeed)
     : uint(seed);
-  const strength = warpStrength ?? float(FIELD_ALGORITHM.warp.amplitude);
-  const radial = normalize(coordinate).toVar(`${varPrefix}Radial`);
-  const radialLength = coordinate.length().max(1e-8).toVar(`${varPrefix}CoordinateLength`);
-  const radialJacobian = [0, 1, 2].map((index) => basisNode(index)
-    .sub(radial.mul(radial[index]))
-    .div(radialLength));
-  const { frequency, seedOffsets } = FIELD_ALGORITHM.warp;
-  const warpPosition = radial.mul(frequency);
-  const warpSamples = seedOffsets.map((offset) => valueNoise3NodeWithGradient(
-    warpPosition,
-    fieldSeed.add(uint(offset)),
-  ));
-  const warp = vec3(...warpSamples.map((sample) => sample.value.sub(0.5)));
-  const warpGradients = warpSamples.map((sample) => transposeMultiplyColumnsNode(
-    radialJacobian,
-    sample.gradient.mul(frequency),
-  ));
-  const tangent = warp.sub(radial.mul(dot(warp, radial))).toVar(`${varPrefix}TangentWarp`);
-  const tangentJacobian = [0, 1, 2].map((index) => {
-    const dr = radialJacobian[index];
-    const dw = vec3(
-      warpGradients[0][index],
-      warpGradients[1][index],
-      warpGradients[2][index],
-    );
-    const projectedDw = dw.sub(radial.mul(dot(radial, dw)));
-    return projectedDw
-      .sub(dr.mul(dot(radial, warp)))
-      .sub(radial.mul(dot(dr, warp)));
-  });
-  const coordinateJacobian = [0, 1, 2].map((index) => basisNode(index)
-    .add(tangentJacobian[index].mul(strength)));
-  const q = coordinate.add(tangent.mul(strength)).toVar(`${varPrefix}WarpedCoordinate`);
+  const strength = warpEnabled
+    ? (warpStrength ?? float(FIELD_ALGORITHM.warp.amplitude))
+    : float(0);
+  let radial;
+  let tangent;
+  let tangentJacobian;
+  let coordinateJacobian;
+  let q;
+
+  if (warpEnabled) {
+    radial = normalize(coordinate).toVar(`${varPrefix}Radial`);
+    const radialLength = coordinate.length().max(1e-8).toVar(`${varPrefix}CoordinateLength`);
+    const radialJacobian = [0, 1, 2].map((index) => basisNode(index)
+      .sub(radial.mul(radial[index]))
+      .div(radialLength));
+    const { frequency, seedOffsets } = FIELD_ALGORITHM.warp;
+    const warpPosition = radial.mul(frequency);
+    const warpSamples = seedOffsets.map((offset) => valueNoise3NodeWithGradient(
+      warpPosition,
+      fieldSeed.add(uint(offset)),
+    ));
+    const warp = vec3(...warpSamples.map((sample) => sample.value.sub(0.5)));
+    const warpGradients = warpSamples.map((sample) => transposeMultiplyColumnsNode(
+      radialJacobian,
+      sample.gradient.mul(frequency),
+    ));
+    tangent = warp.sub(radial.mul(dot(warp, radial))).toVar(`${varPrefix}TangentWarp`);
+    tangentJacobian = [0, 1, 2].map((index) => {
+      const dr = radialJacobian[index];
+      const dw = vec3(
+        warpGradients[0][index],
+        warpGradients[1][index],
+        warpGradients[2][index],
+      );
+      const projectedDw = dw.sub(radial.mul(dot(radial, dw)));
+      return projectedDw
+        .sub(dr.mul(dot(radial, warp)))
+        .sub(radial.mul(dot(dr, warp)));
+    });
+    coordinateJacobian = [0, 1, 2].map((index) => basisNode(index)
+      .add(tangentJacobian[index].mul(strength)));
+    q = coordinate.add(tangent.mul(strength)).toVar(`${varPrefix}WarpedCoordinate`);
+  } else {
+    // This is a graph-construction branch, not a numeric zero multiplied onto
+    // a warp graph. Object/world origin probes therefore never construct
+    // normalize(), radial Jacobians, or warp-noise work.
+    radial = vec3(0).toVar(`${varPrefix}WarpDisabledRadial`);
+    tangent = vec3(0).toVar(`${varPrefix}WarpDisabledTangent`);
+    tangentJacobian = [0, 1, 2].map(() => vec3(0));
+    coordinateJacobian = [0, 1, 2].map(basisNode);
+    q = coordinate.toVar(`${varPrefix}UnwarpedCoordinate`);
+  }
   const { bands, derived } = FIELD_ALGORITHM;
   const macroSample = fbmNodeWithGradient(
     q.mul(bands.macroHeight.scale),
@@ -660,6 +737,7 @@ function fieldNodes({ coordinate, seed, warpStrength, inputJacobianColumns, varP
 
   return {
     sourceRadial: radial,
+    warpMode: warpEnabled ? "tangential" : "disabled",
     tangentWarp: tangent,
     stableMacroGradient,
     macroHeight,
@@ -682,6 +760,7 @@ function fieldNodes({ coordinate, seed, warpStrength, inputJacobianColumns, varP
 export function createFieldNodeBundle({
   coordinate,
   seed,
+  warpEnabled = true,
   warpStrength,
   inputJacobianColumns,
   varPrefix = "field",
@@ -689,15 +768,22 @@ export function createFieldNodeBundle({
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(varPrefix)) {
     throw new Error("varPrefix must be a valid WGSL identifier prefix");
   }
+  if (typeof warpEnabled !== "boolean") {
+    throw new Error("warpEnabled must be a graph-construction boolean");
+  }
   const fields = fieldNodes({
     coordinate,
     seed,
+    warpEnabled,
     warpStrength,
     inputJacobianColumns,
     varPrefix,
   });
-  return {
+  const bundle = {
     ...fields,
+    schemaVersion: FIELD_INTERFACE_V2.schemaVersion,
+    value: fields.macroHeight,
+    gradient: fields.macroGradient,
     packedChannels: vec4(
       fields.macroHeight,
       fields.ridge,
@@ -715,12 +801,69 @@ export function createFieldNodeBundle({
       fields.slope,
     ).toVar(`${varPrefix}GradientChannels`),
   };
+  return bundle;
+}
+
+export function createFieldCauseBindings(bundle) {
+  if (!bundle || bundle.schemaVersion !== FIELD_INTERFACE_V2.schemaVersion) {
+    throw new Error("field cause bindings require a v2 field node bundle");
+  }
+  // These bindings deliberately retain node identity. Consumer stages may
+  // compile the shared owner independently, but they cannot substitute a
+  // second field equation or a heuristic copy of one cause.
+  return validateFieldCauseBindings(bundle, Object.freeze({
+    producerId: FIELD_INTERFACE_V2.causeOwner,
+    displacement: Object.freeze({ height: bundle.macroHeight }),
+    material: Object.freeze({
+      height: bundle.macroHeight,
+      moisture: bundle.moisture,
+      roughness: bundle.roughness,
+      slope: bundle.slope,
+    }),
+    placement: Object.freeze({ mask: bundle.placementMask }),
+    diagnostics: Object.freeze({
+      height: bundle.macroHeight,
+      moisture: bundle.moisture,
+      roughness: bundle.roughness,
+      slope: bundle.slope,
+      gradient: bundle.macroGradient,
+    }),
+  }));
+}
+
+export function validateWarpFreeFieldNodeBundle(bundle) {
+  if (!bundle || bundle.warpMode !== "disabled") {
+    throw new Error("warp-free field graph constructed tangential normalization or warp work");
+  }
+  if (!String(bundle.tangentWarp?.name ?? "").includes("WarpDisabledTangent")) {
+    throw new Error("warp-free field graph did not expose its constant tangent sentinel");
+  }
+  return bundle;
+}
+
+export function validateFieldCauseBindings(bundle, bindings) {
+  const requiredIdentity = [
+    [bindings?.displacement?.height, bundle?.macroHeight, "displacement.height"],
+    [bindings?.material?.height, bundle?.macroHeight, "material.height"],
+    [bindings?.material?.moisture, bundle?.moisture, "material.moisture"],
+    [bindings?.material?.roughness, bundle?.roughness, "material.roughness"],
+    [bindings?.material?.slope, bundle?.slope, "material.slope"],
+    [bindings?.placement?.mask, bundle?.placementMask, "placement.mask"],
+    [bindings?.diagnostics?.gradient, bundle?.macroGradient, "diagnostics.gradient"],
+  ];
+  for (const [actual, expected, label] of requiredIdentity) {
+    if (actual !== expected) {
+      throw new Error(`field cause consumer ${label} replaced the canonical producer node`);
+    }
+  }
+  return bindings;
 }
 
 export const sampleField = Fn(({ coordinate, seed, warpStrength, inputJacobianColumns }) => {
   return createFieldNodeBundle({
     coordinate,
     seed,
+    warpEnabled: true,
     warpStrength,
     inputJacobianColumns,
   }).packedChannels;
@@ -730,6 +873,7 @@ export const sampleFieldDerived = Fn(({ coordinate, seed, warpStrength, inputJac
   return createFieldNodeBundle({
     coordinate,
     seed,
+    warpEnabled: true,
     warpStrength,
     inputJacobianColumns,
   }).derivedChannels;
@@ -739,6 +883,7 @@ export const sampleFieldGradient = Fn(({ coordinate, seed, warpStrength, inputJa
   return createFieldNodeBundle({
     coordinate,
     seed,
+    warpEnabled: true,
     warpStrength,
     inputJacobianColumns,
   }).gradientChannels;
@@ -750,6 +895,7 @@ import { createFieldNodeBundle } from "./field-bundle.mjs";
 const bundle = createFieldNodeBundle({
   coordinate,
   seed,
+  warpEnabled,
   warpStrength,
 });
 material.colorNode = bundle.packedChannels;

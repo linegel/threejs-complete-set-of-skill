@@ -46,7 +46,7 @@ export const FIELD_PARITY_ERROR_MANIFEST = deepFreeze({
   directF32: {
     status: "gated",
     provenance: "Gated",
-    cpuOracle: "JavaScript binary64 with explicit f32 hash-corner conversion",
+    cpuOracle: "explicit-wgsl-f32-operation-mirror-v1 under pinned Node 22.22.0",
     gpuPath: "WGSL f32 field arithmetic with u32 seed uniform; no storage quantization or interpolation",
     roundingModel:
       "Use conservative WGSL u≈2^-23 for planning; builtins, FMA, reassociation, and subnormal behavior require separate empirical allowance.",
@@ -77,6 +77,9 @@ export const FIELD_PARITY_ERROR_MANIFEST = deepFreeze({
 export const FIELD_ALGORITHM = deepFreeze({
   defaultSeed: 17,
   coordinates: {
+    stableMagnitudeGate: 32,
+    stableMagnitudeProvenance:
+      "Gated for this f32 parity fixture; rebase or split coordinates outside the bound",
     object: {
       transform: "identity",
       gradientDomain: "original-object-coordinate",
@@ -193,6 +196,11 @@ export const FIELD_SPECTRUM = deepFreeze({
     "For every consumer require f_support*σmax(J_composed)<=0.5, or attenuate unresolved bands and transfer their slope variance to shading.",
 });
 
+export const warpFreeOriginProbes = deepFreeze([
+  { id: "object-origin-warp-disabled-v1", domain: "object", coordinate: [0, 0, 0], seed: 17 },
+  { id: "world-origin-warp-disabled-v1", domain: "world", coordinate: [0, 0, 0], seed: 17 },
+]);
+
 export const fixedProbes = deepFreeze([
   { domain: "sphere", coordinate: [1, 0, 0], seed: 17 },
   { domain: "sphere", coordinate: [0.577, 0.577, 0.577], seed: 17 },
@@ -236,9 +244,20 @@ export const placementThresholdProbes = deepFreeze([
 ]);
 
 export const gpuParityProbes = deepFreeze([
+  ...warpFreeOriginProbes,
   ...fixedProbes,
   { domain: "object", coordinate: [-1.000001, 2.99999, -4.5], seed: -13 },
-  { domain: "world", coordinate: [4095.875, -2048.125, 8191.5], seed: 2147483000 },
+  { domain: "world", coordinate: [31.875, -16.125, 63.5], seed: 2147483000 },
   { domain: "sphere", coordinate: [-0.2852127329, 0.9972098051, 5.372133451], seed: 16885 },
   ...placementThresholdProbes,
+]);
+
+export const invalidFieldProbes = deepFreeze([
+  {
+    id: "world-f32-phase-out-of-domain-v1",
+    domain: "world",
+    coordinate: [4095.875, -2048.125, 8191.5],
+    seed: 2147483000,
+    expectedFailure: "stable coordinate exceeds the f32 phase gate",
+  },
 ]);

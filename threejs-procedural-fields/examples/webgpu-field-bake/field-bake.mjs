@@ -27,8 +27,10 @@ import {
 
 import {
   FIELD_ALGORITHM,
+  createFieldCauseBindings,
   createFieldNodeBundle,
-  sampleFieldCPU,
+  fieldInputTransform,
+  sampleFieldF32CPU,
 } from "./field-bundle.mjs";
 
 export const STORAGE_FORMATS = Object.freeze({
@@ -273,6 +275,60 @@ export function alignedReadbackLayout({ width, height, bytesPerTexel, bytesPerEl
   return Object.freeze({ rowBytes, alignedRowBytes, elementsPerRow, minimumLength });
 }
 
+export function compareFieldStorageMutation({
+  before,
+  after,
+  width,
+  height,
+  allowedRegion,
+  lanes = 4,
+}) {
+  validateExtent(width, height, "storage comparison extent");
+  const region = validateRegionWithinExtent(allowedRegion, width, height, "allowed storage mutation region");
+  if (!ArrayBuffer.isView(before) || !ArrayBuffer.isView(after)) {
+    throw new Error("storage comparison requires typed-array snapshots");
+  }
+  const expectedLength = width * height * lanes;
+  if (before.length !== expectedLength || after.length !== expectedLength) {
+    throw new Error(`storage comparison length must equal ${expectedLength}`);
+  }
+  let changedInside = 0;
+  let changedOutside = 0;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = (y * width + x) * lanes;
+      let changed = false;
+      for (let lane = 0; lane < lanes; lane += 1) {
+        if (before[offset + lane] !== after[offset + lane]) {
+          changed = true;
+          break;
+        }
+      }
+      if (!changed) continue;
+      const inside = x >= region.x && x < region.x + region.width &&
+        y >= region.y && y < region.y + region.height;
+      if (inside) changedInside += 1;
+      else changedOutside += 1;
+    }
+  }
+  return Object.freeze({
+    allowedRegion: region,
+    changedInside,
+    changedOutside,
+    unchanged: changedInside === 0 && changedOutside === 0,
+  });
+}
+
+export function validateFieldStorageConfinement(comparison, { requireChange = true } = {}) {
+  if (!comparison || comparison.changedOutside !== 0) {
+    throw new Error(`storage mutation escaped its declared region by ${comparison?.changedOutside ?? "unknown"} texels`);
+  }
+  if (requireChange && comparison.changedInside <= 0) {
+    throw new Error("storage mutation did not change any texel inside its declared region");
+  }
+  return Object.freeze(comparison);
+}
+
 export function fieldMipExtents(width, height) {
   validateExtent(width, height);
   const extents = [];
@@ -316,15 +372,42 @@ export function dependentMipReadRegion(outputRegion, inputExtent) {
 
 export function buildDirtyDispatchTrace(region, extents) {
   const mipRegions = propagateDirtyRegion(region, extents);
-  return Object.freeze(mipRegions.map((outputRegion, level) => Object.freeze({
-    level,
-    kind: level === 0 ? "base-field-write" : "dependent-box-mip-write",
-    outputRegion,
-    inputReadRegion: level === 0
-      ? null
-      : dependentMipReadRegion(outputRegion, extents[level - 1]),
-    invocationCount: outputRegion.width * outputRegion.height,
-  })));
+  return Object.freeze(mipRegions.map((outputRegion, level) => {
+    const invocationCount = outputRegion.width * outputRegion.height;
+    return Object.freeze({
+      level,
+      kind: level === 0 ? "base-field-write" : "dependent-box-mip-write",
+      outputRegion,
+      inputReadRegion: level === 0
+        ? null
+        : dependentMipReadRegion(outputRegion, extents[level - 1]),
+      invocationCount,
+      workgroupSize: Object.freeze([64, 1, 1]),
+      workgroupCount: Object.freeze([Math.ceil(invocationCount / 64), 1, 1]),
+    });
+  }));
+}
+
+export function validateFieldDispatchTrace(trace, region, extents) {
+  const expected = buildDirtyDispatchTrace(region, extents);
+  if (!Array.isArray(trace) || trace.length !== expected.length) {
+    throw new Error(`field dispatch trace has ${trace?.length ?? "no"} entries; expected ${expected.length}`);
+  }
+  for (let index = 0; index < expected.length; index += 1) {
+    const actual = trace[index];
+    const reference = expected[index];
+    for (const key of ["level", "kind", "invocationCount"]) {
+      if (actual[key] !== reference[key]) {
+        throw new Error(`field dispatch ${index} ${key} drifted from the executed region`);
+      }
+    }
+    for (const key of ["outputRegion", "inputReadRegion", "workgroupSize", "workgroupCount"]) {
+      if (JSON.stringify(actual[key]) !== JSON.stringify(reference[key])) {
+        throw new Error(`field dispatch ${index} ${key} drifted from the executed region`);
+      }
+    }
+  }
+  return Object.freeze(trace);
 }
 
 function createBaseTexture(width, height, name) {
@@ -370,6 +453,205 @@ export function createFieldBakeResources(width, height) {
   };
 }
 
+export function validateFieldResourceLedger(ledger) {
+  if (!ledger || ledger.accountingScope !== "lab-owned-logical-bytes") {
+    throw new Error("field resource ledger must declare lab-owned logical-byte scope");
+  }
+  if (!Array.isArray(ledger.resources) || ledger.resources.length === 0) {
+    throw new Error("field resource ledger must contain resources");
+  }
+  const ids = new Set();
+  let totalBytes = 0;
+  let residentBytes = 0;
+  const transientBytesByScope = new Map();
+  for (const resource of ledger.resources) {
+    if (typeof resource.id !== "string" || resource.id.length === 0 || ids.has(resource.id)) {
+      throw new Error(`invalid or duplicate field resource id "${resource.id}"`);
+    }
+    ids.add(resource.id);
+    if (!Number.isInteger(resource.bytes) || resource.bytes <= 0) {
+      throw new Error(`field resource "${resource.id}" has invalid byte count`);
+    }
+    if (typeof resource.scope !== "string" || resource.scope.length === 0) {
+      throw new Error(`field resource "${resource.id}" has no accounting scope`);
+    }
+    if (!["resident", "transient"].includes(resource.residency)) {
+      throw new Error(`field resource "${resource.id}" has invalid residency`);
+    }
+    if (!["lab-owned", "capture-request"].includes(resource.ownership)) {
+      throw new Error(`field resource "${resource.id}" has invalid ownership`);
+    }
+    if (["storage-texture", "render-target", "sampled-texture"].includes(resource.kind)) {
+      const mipExtents = resource.mipExtents ?? [resource.extent];
+      if (!Array.isArray(mipExtents) || mipExtents.length === 0) {
+        throw new Error(`field texture "${resource.id}" has no extent`);
+      }
+      for (const extent of mipExtents) {
+        validateExtent(extent?.width, extent?.height, `${resource.id} extent`);
+      }
+      const expected = mipExtents.reduce(
+        (sum, extent) => sum + extent.width * extent.height * resource.bytesPerTexel,
+        0,
+      );
+      if (resource.bytes !== expected) {
+        throw new Error(`field texture "${resource.id}" reports ${resource.bytes} bytes; expected ${expected}`);
+      }
+    } else if (resource.kind === "storage-buffer") {
+      const expected = resource.elementCount * resource.itemSize * resource.bytesPerElement;
+      if (!Number.isInteger(expected) || expected <= 0 || resource.bytes !== expected) {
+        throw new Error(`field buffer "${resource.id}" reports ${resource.bytes} bytes; expected ${expected}`);
+      }
+    } else if (resource.kind === "cpu-buffer") {
+      const expected = resource.elementCount * resource.bytesPerElement;
+      if (!Number.isInteger(expected) || expected <= 0 || resource.bytes !== expected) {
+        throw new Error(`field CPU buffer "${resource.id}" reports ${resource.bytes} bytes; expected ${expected}`);
+      }
+    } else if (resource.kind === "readback-request") {
+      const expected = resource.alignedBytesPerRow * resource.rowCount;
+      if (
+        !Number.isInteger(resource.rowBytes) ||
+        !Number.isInteger(resource.alignedBytesPerRow) ||
+        resource.alignedBytesPerRow < resource.rowBytes ||
+        resource.alignedBytesPerRow % 256 !== 0 ||
+        !Number.isInteger(expected) ||
+        expected <= 0 ||
+        resource.bytes !== expected
+      ) {
+        throw new Error(`field readback request "${resource.id}" has an invalid aligned layout`);
+      }
+    } else {
+      throw new Error(`field resource "${resource.id}" has unknown kind "${resource.kind}"`);
+    }
+    totalBytes += resource.bytes;
+    if (resource.residency === "resident") {
+      residentBytes += resource.bytes;
+    } else {
+      transientBytesByScope.set(
+        resource.scope,
+        (transientBytesByScope.get(resource.scope) ?? 0) + resource.bytes,
+      );
+    }
+  }
+  if (ledger.totalBytes !== totalBytes) {
+    throw new Error(`field resource total ${ledger.totalBytes} does not reconcile with ${totalBytes}`);
+  }
+  const transientByteSum = [...transientBytesByScope.values()].reduce((sum, bytes) => sum + bytes, 0);
+  const peakTransientBytes = Math.max(0, ...transientBytesByScope.values());
+  if (
+    ledger.residentBytes !== residentBytes ||
+    ledger.transientByteSum !== transientByteSum ||
+    ledger.peakTransientBytes !== peakTransientBytes ||
+    ledger.peakLabOwnedBytes !== residentBytes + peakTransientBytes
+  ) {
+    throw new Error("field resource ledger resident/transient totals do not reconcile");
+  }
+  if (
+    !Array.isArray(ledger.unclaimed) ||
+    !ledger.unclaimed.includes("renderer-internal-readback-staging-residency")
+  ) {
+    throw new Error("field resource ledger must explicitly leave opaque renderer staging unclaimed");
+  }
+  return Object.freeze(ledger);
+}
+
+export function createScopedFieldResourceLedger(resourceEntries, {
+  unclaimed = ["renderer-internal-readback-staging-residency"],
+} = {}) {
+  const resources = Object.freeze(resourceEntries.map((entry) => Object.freeze({ ...entry })));
+  const residentBytes = resources
+    .filter((resource) => resource.residency === "resident")
+    .reduce((sum, resource) => sum + resource.bytes, 0);
+  const transientBytesByScope = Object.fromEntries(resources
+    .filter((resource) => resource.residency === "transient")
+    .reduce((scopes, resource) => {
+      scopes.set(resource.scope, (scopes.get(resource.scope) ?? 0) + resource.bytes);
+      return scopes;
+    }, new Map()));
+  const transientByteSum = Object.values(transientBytesByScope).reduce(
+    (sum, bytes) => sum + bytes,
+    0,
+  );
+  const peakTransientBytes = Math.max(0, ...Object.values(transientBytesByScope));
+  return validateFieldResourceLedger({
+    schemaVersion: 2,
+    accountingScope: "lab-owned-logical-bytes",
+    opaqueRendererResidency: "NOT_CLAIMED",
+    unclaimed: Object.freeze([...unclaimed]),
+    resources,
+    totalBytes: residentBytes + transientByteSum,
+    residentBytes,
+    transientByteSum,
+    transientBytesByScope: Object.freeze(transientBytesByScope),
+    peakTransientBytes,
+    peakLabOwnedBytes: residentBytes + peakTransientBytes,
+  });
+}
+
+export function createFieldResourceLedger(resources, placement) {
+  const textureResources = [
+    ...resources.packedMipTextures.map((texture, level) => ({
+      id: `packed-mip-${level}`,
+      kind: "storage-texture",
+      format: "rgba16float",
+      extent: { ...resources.mipExtents[level] },
+      bytesPerTexel: 8,
+      bytes: texture.image.width * texture.image.height * 8,
+      scope: "resident-tier",
+      residency: "resident",
+      ownership: "lab-owned",
+    })),
+    {
+      id: "derived-base",
+      kind: "storage-texture",
+      format: "rgba16float",
+      extent: { width: resources.width, height: resources.height },
+      bytesPerTexel: 8,
+      bytes: resources.width * resources.height * 8,
+      scope: "resident-tier",
+      residency: "resident",
+      ownership: "lab-owned",
+    },
+    {
+      id: "gradient-base",
+      kind: "storage-texture",
+      format: "rgba16float",
+      extent: { width: resources.width, height: resources.height },
+      bytesPerTexel: 8,
+      bytes: resources.width * resources.height * 8,
+      scope: "resident-tier",
+      residency: "resident",
+      ownership: "lab-owned",
+    },
+  ];
+  const bufferResources = [
+    {
+      id: "placement-records",
+      kind: "storage-buffer",
+      format: "vec4f32",
+      elementCount: placement.acceptedCount,
+      itemSize: 4,
+      bytesPerElement: Float32Array.BYTES_PER_ELEMENT,
+      bytes: placement.records.array.byteLength,
+      scope: "resident-tier",
+      residency: "resident",
+      ownership: "lab-owned",
+    },
+    {
+      id: "placement-accepted-indices",
+      kind: "storage-buffer",
+      format: "u32",
+      elementCount: placement.acceptedCount,
+      itemSize: 1,
+      bytesPerElement: Uint32Array.BYTES_PER_ELEMENT,
+      bytes: placement.acceptedIndices.array.byteLength,
+      scope: "resident-tier",
+      residency: "resident",
+      ownership: "lab-owned",
+    },
+  ];
+  return createScopedFieldResourceLedger([...textureResources, ...bufferResources]);
+}
+
 function fieldCoordinateFromCell(cell, width, height, domain) {
   const denominator = vec2(Math.max(width - 1, 1), Math.max(height - 1, 1));
   const uv = vec2(cell).div(denominator);
@@ -397,7 +679,7 @@ export function createFieldBakeComputeNode({
     const bundle = createFieldNodeBundle({
       coordinate,
       seed: uint(seed >>> 0),
-      warpStrength: float(0),
+      warpEnabled: false,
       varPrefix: "bakedField",
     });
     textureStore(packed, cell, bundle.packedChannels).toWriteOnly();
@@ -413,7 +695,9 @@ export function createFieldBakeComputeNode({
 
 export function createFieldMipComputeNode({ inputTexture, outputTexture, inputExtent, region, level }) {
   validateExtent(region.width, region.height, `mip ${level} region`);
-  const kernel = Fn(({ source, destination }) => {
+  const source = storageTexture(inputTexture).toReadOnly();
+  const destination = storageTexture(outputTexture).toWriteOnly();
+  const kernel = Fn(() => {
     const localX = instanceIndex.mod(uint(region.width));
     const localY = instanceIndex.div(uint(region.width));
     const cell = uvec2(localX.add(uint(region.x)), localY.add(uint(region.y)));
@@ -423,17 +707,120 @@ export function createFieldMipComputeNode({ inputTexture, outputTexture, inputEx
     const c10 = min(sourceCell.add(uvec2(1, 0)), maxCell);
     const c01 = min(sourceCell.add(uvec2(0, 1)), maxCell);
     const c11 = min(sourceCell.add(uvec2(1, 1)), maxCell);
-    const value = storageTexture(source, c00).toReadOnly()
-      .add(storageTexture(source, c10).toReadOnly())
-      .add(storageTexture(source, c01).toReadOnly())
-      .add(storageTexture(source, c11).toReadOnly())
+    const value = source.load(c00)
+      .add(source.load(c10))
+      .add(source.load(c01))
+      .add(source.load(c11))
       .mul(0.25);
     textureStore(destination, cell, value).toWriteOnly();
   });
-  return kernel({
-    source: inputTexture,
-    destination: storageTexture(outputTexture),
-  }).compute(region.width * region.height, [64]).setName(`field:mip-${level}`);
+  return kernel().compute(region.width * region.height, [64]).setName(`field:mip-${level}`);
+}
+
+export function createFieldProbeResources(probes) {
+  if (!Array.isArray(probes) || probes.length === 0) {
+    throw new Error("field probe corpus must be a nonempty array");
+  }
+  const count = probes.length;
+  const warpModes = new Set(probes.map((probe) => probe.domain === "sphere"));
+  if (warpModes.size !== 1) {
+    throw new Error("field probe dispatches must separate warp-free and tangential-warp corpora");
+  }
+  const warpEnabled = warpModes.has(true);
+  const coordinates = new StorageBufferAttribute(count, 4, Float32Array);
+  const seeds = new StorageBufferAttribute(count, 4, Uint32Array);
+  const jacobianColumns = [0, 1, 2].map(
+    () => new StorageBufferAttribute(count, 4, Float32Array),
+  );
+  const packed = new StorageBufferAttribute(count, 4, Float32Array);
+  const derived = new StorageBufferAttribute(count, 4, Float32Array);
+  const gradient = new StorageBufferAttribute(count, 4, Float32Array);
+  coordinates.name = "field-probe-coordinates-and-warp";
+  seeds.name = "field-probe-u32-seeds";
+  jacobianColumns.forEach((attribute, index) => {
+    attribute.name = `field-probe-input-jacobian-${index}`;
+  });
+  packed.name = "field-probe-packed-output";
+  derived.name = "field-probe-derived-output";
+  gradient.name = "field-probe-gradient-output";
+
+  for (let index = 0; index < count; index += 1) {
+    const probe = probes[index];
+    if (!Number.isInteger(probe.seed) || probe.seed < 0 || probe.seed > 0xffffffff) {
+      throw new Error(`field probe ${index} seed must be a u32 integer`);
+    }
+    const input = fieldInputTransform(probe);
+    coordinates.array.set([
+      ...input.coordinate,
+      warpEnabled ? FIELD_ALGORITHM.warp.amplitude : 0,
+    ], index * 4);
+    seeds.array[index * 4] = probe.seed >>> 0;
+    for (let column = 0; column < 3; column += 1) {
+      jacobianColumns[column].array.set([...input.jacobianColumns[column], 0], index * 4);
+    }
+  }
+
+  const attributes = [coordinates, seeds, ...jacobianColumns, packed, derived, gradient];
+  const inputBytes = coordinates.array.byteLength + seeds.array.byteLength +
+    jacobianColumns.reduce((sum, attribute) => sum + attribute.array.byteLength, 0);
+  const outputBytes = packed.array.byteLength + derived.array.byteLength + gradient.array.byteLength;
+  return {
+    count,
+    warpEnabled,
+    warpMode: warpEnabled ? "tangential" : "disabled",
+    probes: Object.freeze([...probes]),
+    coordinates,
+    seeds,
+    jacobianColumns,
+    packed,
+    derived,
+    gradient,
+    attributes,
+    inputBytes,
+    outputBytes,
+    bytes: inputBytes + outputBytes,
+  };
+}
+
+export function createFieldProbeComputeNode(resources) {
+  const coordinateInput = storage(resources.coordinates, "vec4", resources.count);
+  const seedInput = storage(resources.seeds, "uvec4", resources.count);
+  const jacobianInputs = resources.jacobianColumns.map(
+    (attribute) => storage(attribute, "vec4", resources.count),
+  );
+  const packedOutput = storage(resources.packed, "vec4", resources.count);
+  const derivedOutput = storage(resources.derived, "vec4", resources.count);
+  const gradientOutput = storage(resources.gradient, "vec4", resources.count);
+  const kernel = Fn(() => {
+    const coordinateRecord = coordinateInput.element(instanceIndex);
+    const bundle = createFieldNodeBundle({
+      coordinate: coordinateRecord.xyz,
+      seed: seedInput.element(instanceIndex).x,
+      warpEnabled: resources.warpEnabled,
+      warpStrength: resources.warpEnabled ? coordinateRecord.w : undefined,
+      inputJacobianColumns: jacobianInputs.map(
+        (input) => input.element(instanceIndex).xyz,
+      ),
+      varPrefix: "probeField",
+    });
+    const causes = createFieldCauseBindings(bundle);
+    packedOutput.element(instanceIndex).assign(bundle.packedChannels);
+    derivedOutput.element(instanceIndex).assign(vec4(
+      causes.material.slope,
+      bundle.biome,
+      causes.material.roughness,
+      causes.placement.mask,
+    ));
+    gradientOutput.element(instanceIndex).assign(vec4(
+      causes.diagnostics.gradient,
+      causes.material.slope,
+    ));
+  });
+  return kernel().compute(resources.count, [64]).setName("field:probe-corpus-v1");
+}
+
+export function disposeFieldProbeResources(resources) {
+  for (const attribute of resources.attributes) attribute.dispose?.();
 }
 
 function placementCoordinateForIndex(index, columns, rows, domain) {
@@ -454,17 +841,23 @@ export function createStructuredPlacementResources({
   threshold = 0.5,
 }) {
   validateExtent(columns, rows, "placement grid");
+  if (!Number.isFinite(threshold) || threshold < 0 || threshold > 1) {
+    throw new Error("structured placement threshold must be within [0,1]");
+  }
   const cellCount = columns * rows;
   const acceptedCellIndices = [];
   for (let index = 0; index < cellCount; index += 1) {
     const coordinate = placementCoordinateForIndex(index, columns, rows, domain);
-    const sample = sampleFieldCPU({ domain: "object", coordinate, seed });
+    const sample = sampleFieldF32CPU({ domain: "object", coordinate, seed });
     if (sample.placementMask >= threshold) acceptedCellIndices.push(index);
   }
   if (acceptedCellIndices.length === 0) {
     throw new Error("structured placement fixture produced no accepted cells");
   }
   const acceptedCount = acceptedCellIndices.length;
+  if (acceptedCount === cellCount) {
+    throw new Error("structured placement fixture produced no rejected cells");
+  }
   const records = new StorageBufferAttribute(acceptedCount, 4, Float32Array);
   records.name = "field-structured-placement-records";
   const acceptedIndices = new StorageBufferAttribute(acceptedCount, 1, Uint32Array);
@@ -505,28 +898,77 @@ export function createStructuredPlacementComputeNode({
     const bundle = createFieldNodeBundle({
       coordinate,
       seed: uint(seed >>> 0),
-      warpStrength: float(0),
+      warpEnabled: false,
       varPrefix: "placementField",
     });
+    const causes = createFieldCauseBindings(bundle);
     output.element(instanceIndex).assign(vec4(
       coordinate.x,
       coordinate.z,
-      bundle.placementMask,
+      causes.placement.mask,
       1,
     ));
   });
   return kernel().compute(placement.acceptedCount, [64]).setName("field:structured-placement");
 }
 
+export function validatePlacementReadbackSeparation(evidence) {
+  if (
+    !evidence ||
+    !Number.isInteger(evidence.accepted) ||
+    !Array.isArray(evidence.acceptedIndices) ||
+    !Array.isArray(evidence.rawGpuRecords) ||
+    !Array.isArray(evidence.decodedRecords) ||
+    evidence.acceptedIndices.length !== evidence.accepted ||
+    evidence.rawGpuRecords.length !== evidence.accepted ||
+    evidence.decodedRecords.length !== evidence.accepted
+  ) {
+    throw new Error("placement readback arrays do not reconcile with the accepted count");
+  }
+  for (let index = 0; index < evidence.accepted; index += 1) {
+    const raw = evidence.rawGpuRecords[index];
+    const decoded = evidence.decodedRecords[index];
+    if (!Array.isArray(raw) || raw.length !== 4 || raw.some((value) => !Number.isFinite(value))) {
+      throw new Error(`placement raw GPU record ${index} is invalid`);
+    }
+    if (raw[3] !== 1) {
+      throw new Error(`placement raw GPU record ${index} replaced its w sentinel`);
+    }
+    if (
+      decoded?.outputIndex !== index ||
+      decoded?.cpuAcceptedCellIndex !== evidence.acceptedIndices[index] ||
+      JSON.stringify(decoded?.gpu) !== JSON.stringify(raw)
+    ) {
+      throw new Error(`placement CPU index identity ${index} was folded into or detached from GPU data`);
+    }
+  }
+  if (evidence.minRawGpuW !== 1 || evidence.maxRawGpuW !== 1) {
+    throw new Error("placement raw GPU w summary does not preserve the sentinel lane");
+  }
+  return Object.freeze(evidence);
+}
+
 export function createFieldBakeSystem(renderer, options = {}) {
+  const canonicalSeed = options.seed ?? FIELD_ALGORITHM.defaultSeed;
+  if (!Number.isInteger(canonicalSeed) || canonicalSeed < 0 || canonicalSeed > 0xffffffff) {
+    throw new Error("field bake system seed must be a u32 integer");
+  }
   const resources = createFieldBakeResources(options.width ?? 256, options.height ?? 256);
   const placement = createStructuredPlacementResources({
     columns: options.placementColumns ?? 64,
     rows: options.placementRows ?? 64,
-    seed: options.seed ?? FIELD_ALGORITHM.defaultSeed,
+    seed: canonicalSeed,
   });
+  const resourceLedger = createFieldResourceLedger(resources, placement);
   const fullRegion = { x: 0, y: 0, width: resources.width, height: resources.height };
   let lastDispatchTrace = null;
+  let lastDispatchSeed = null;
+  const dispatchTotals = {
+    computeSubmissions: 0,
+    invocations: 0,
+    fieldRegionUpdates: 0,
+    placementUpdates: 0,
+  };
 
   async function requireNativeWebGpu() {
     await renderer.init();
@@ -535,7 +977,10 @@ export function createFieldBakeSystem(renderer, options = {}) {
     }
   }
 
-  async function dispatchRegion(region = fullRegion) {
+  async function dispatchRegion(region = fullRegion, { seed = canonicalSeed } = {}) {
+    if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+      throw new Error("field dispatch seed must be a u32 integer");
+    }
     const validatedRegion = validateRegionWithinExtent(
       region,
       resources.width,
@@ -544,8 +989,9 @@ export function createFieldBakeSystem(renderer, options = {}) {
     );
     await requireNativeWebGpu();
     const dispatchTrace = buildDirtyDispatchTrace(validatedRegion, resources.mipExtents);
+    validateFieldDispatchTrace(dispatchTrace, validatedRegion, resources.mipExtents);
     const mipRegions = dispatchTrace.map((entry) => entry.outputRegion);
-    renderer.compute(createFieldBakeComputeNode({ resources, region: validatedRegion, seed: options.seed }));
+    renderer.compute(createFieldBakeComputeNode({ resources, region: validatedRegion, seed }));
     for (let level = 1; level < resources.packedMipTextures.length; level += 1) {
       const mipRegion = mipRegions[level];
       if (mipRegion.width === 0 || mipRegion.height === 0) continue;
@@ -558,12 +1004,22 @@ export function createFieldBakeSystem(renderer, options = {}) {
       }));
     }
     lastDispatchTrace = dispatchTrace;
-    return { baseRegion: validatedRegion, mipRegions, dispatchTrace };
+    lastDispatchSeed = seed >>> 0;
+    dispatchTotals.computeSubmissions += dispatchTrace.length;
+    dispatchTotals.invocations += dispatchTrace.reduce(
+      (sum, entry) => sum + entry.invocationCount,
+      0,
+    );
+    dispatchTotals.fieldRegionUpdates += 1;
+    return { baseRegion: validatedRegion, mipRegions, dispatchTrace, seed: lastDispatchSeed };
   }
 
   async function dispatchPlacement() {
     await requireNativeWebGpu();
-    renderer.compute(createStructuredPlacementComputeNode({ placement, seed: options.seed }));
+    renderer.compute(createStructuredPlacementComputeNode({ placement, seed: canonicalSeed }));
+    dispatchTotals.computeSubmissions += 1;
+    dispatchTotals.invocations += placement.acceptedCount;
+    dispatchTotals.placementUpdates += 1;
     return renderer.getArrayBufferAsync(placement.records);
   }
 
@@ -578,20 +1034,23 @@ export function createFieldBakeSystem(renderer, options = {}) {
   return {
     resources,
     placement,
-    dispatchFull: () => dispatchRegion(fullRegion),
+    dispatchFull: (dispatchOptions) => dispatchRegion(fullRegion, dispatchOptions),
     dispatchRegion,
     dispatchPlacement,
     describeResources: () => ({
       textures: resources.packedMipTextures.length + 2,
       storageBuffers: 2,
-      bytes: Object.values(resources.resourceBytes).reduce((sum, value) => sum + value, 0) + placement.bytes,
+      bytes: resourceLedger.totalBytes,
       resourceBytes: resources.resourceBytes,
       placementBytes: placement.bytes,
       placementRecordBytes: placement.recordBytes,
       placementIndexBytes: placement.indexBytes,
       placementAcceptedCount: placement.acceptedCount,
       placementRejectedCount: placement.rejectedCount,
+      resourceLedger,
       lastDispatchTrace,
+      lastDispatchSeed,
+      dispatchTotals: { ...dispatchTotals },
     }),
     dispose,
   };

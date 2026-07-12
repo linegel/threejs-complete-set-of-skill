@@ -13,9 +13,27 @@ export function validateTierResourceDescription(tier, description) {
   if (!description || description.tier !== tier) {
     throw new Error(`resource description does not belong to tier "${tier}"`);
   }
+  const ledger = description.common?.completeResourceLedger;
+  const resourceIds = new Set(ledger?.resources?.map((resource) => resource.id));
+  if (
+    ledger?.schemaVersion !== 2 ||
+    !resourceIds.has("display-evidence-target") ||
+    !resourceIds.has("raw-probe-target") ||
+    !resourceIds.has("display-readback-request") ||
+    ledger.opaqueRendererResidency !== "NOT_CLAIMED"
+  ) {
+    throw new Error("tier resource description omitted common targets or scoped capture transients");
+  }
   if (tier === "gpu-storage") {
     if (!(description.textures >= 3) || !(description.storageBuffers >= 2) || !(description.bytes > 0)) {
       throw new Error("gpu-storage tier must own live textures, compacted indices, and placement records");
+    }
+    for (const id of [
+      "probe-corpus-coordinates",
+      "probe-corpus-gradient-output",
+      "storage-readback-request",
+    ]) {
+      if (!resourceIds.has(id)) throw new Error(`gpu-storage resource ledger omitted ${id}`);
     }
   } else if (tier === "gpu-direct-evaluate") {
     if (description.textures !== 0 || description.storageBuffers !== 0 || description.storageBytes !== 0) {
@@ -28,6 +46,33 @@ export function validateTierResourceDescription(tier, description) {
       description.storageBytes !== 0
     ) {
       throw new Error("precomputed-minimum tier must own exactly one sampled asset and no runtime storage");
+    }
+    const asset = description.precomputedAsset;
+    if (
+      !asset ||
+      asset.seed !== description.seed ||
+      !Number.isInteger(asset.sourceByteLength) || asset.sourceByteLength <= 0 ||
+      !/^[0-9a-f]{64}$/.test(asset.sha256 ?? "") ||
+      !Array.isArray(description.mipExtents) ||
+      description.mipExtents.length !== description.mipLevelCount ||
+      description.decodedTextureBytes !== description.decodedMipChainBytes ||
+      description.sourceAssetBytes !== asset.sourceByteLength ||
+      description.sourceAssetSha256 !== asset.sha256
+    ) {
+      throw new Error("precomputed-minimum seed, source hash, mip chain, or byte contract is incomplete");
+    }
+    const exactMipBytes = description.mipExtents.reduce(
+      (sum, extent) => sum + extent.width * extent.height * asset.channels,
+      0,
+    );
+    if (
+      description.decodedBaseBytes !== asset.width * asset.height * asset.channels ||
+      description.decodedMipChainBytes !== exactMipBytes
+    ) {
+      throw new Error("precomputed-minimum decoded byte count does not match its exact mip extents");
+    }
+    if (!resourceIds.has("precomputed-field-texture")) {
+      throw new Error("precomputed-minimum resource ledger omitted its sampled mip chain");
     }
   } else {
     throw new Error(`Unknown tier "${tier}"`);

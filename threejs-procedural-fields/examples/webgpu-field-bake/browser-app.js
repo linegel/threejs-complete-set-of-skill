@@ -15,12 +15,15 @@ import {
 } from "three/webgpu";
 import {
   float,
+  floor,
   normalize,
+  positionLocal,
   renderOutput,
   select,
   texture,
   uniform,
   uv,
+  vec2,
   vec3,
   vec4,
 } from "three/tsl";
@@ -29,15 +32,29 @@ import {
   FIELD_ALGORITHM,
   FIELD_GRADIENT_CHANNELS,
   FIELD_PARITY_CHANNELS,
+  createFieldCauseBindings,
   createFieldNodeBundle,
   fieldInputTransform,
   gpuParityProbes,
-  sampleField,
-  sampleFieldDerived,
-  sampleFieldGradient,
-  sampleFieldCPU,
+  sampleFieldF32CPU,
 } from "./field-bundle.mjs";
-import { createFieldBakeSystem } from "./field-bake.mjs";
+import {
+  compareFieldStorageMutation,
+  createFieldBakeSystem,
+  createFieldProbeComputeNode,
+  createFieldProbeResources,
+  createScopedFieldResourceLedger,
+  disposeFieldProbeResources,
+  fieldMipExtents,
+  propagateDirtyRegion,
+  validateFieldStorageConfinement,
+  validatePlacementReadbackSeparation,
+} from "./field-bake.mjs";
+import {
+  FIELD_PROBE_CORPUS,
+  FIELD_PROBE_CORPUS_COUNTS,
+  createStressProbeCorpus,
+} from "./field-probe-corpus.mjs";
 import {
   FIELD_MECHANISM_OUTPUTS,
   enforceLockedRouteSelection,
@@ -45,11 +62,13 @@ import {
   validateStorageEvidenceContract,
   validateTierResourceDescription,
 } from "./route-contract.mjs";
+import PRECOMPUTED_ASSET_MANIFEST from "../../assets/generated-variants/manifest.json" with { type: "json" };
 
 const canvas = document.getElementById("view");
 const status = document.getElementById("status");
 
 const FIELD_EXTENT = Object.freeze({ width: 641, height: 359 });
+const THREE_PACKAGE_VERSION = "0.185.1";
 const PLACEMENT_EXTENT = Object.freeze({ columns: 64, rows: 64 });
 const SCENARIOS = new Set([
   "field-and-gradient-gallery",
@@ -77,14 +96,24 @@ const CAMERAS = new Map([
   ["far", 2],
 ]);
 const PIXEL_TARGETS = new Set(["display", "final", "diagnostic"]);
-const PRECOMPUTED_ASSETS = Object.freeze([
-  { id: "biome-field-a", file: "biome-field-a.png", width: 512, height: 512, sourceSeed: 1103 },
-  { id: "biome-field-b", file: "biome-field-b.png", width: 512, height: 512, sourceSeed: 2207 },
-  { id: "biome-field-c", file: "biome-field-c.png", width: 512, height: 512, sourceSeed: 3301 },
-]);
+const PRECOMPUTED_ASSETS = Object.freeze(PRECOMPUTED_ASSET_MANIFEST.assets.map((asset) => {
+  const mipExtents = fieldMipExtents(asset.width, asset.height);
+  return Object.freeze({
+    ...asset,
+    sourceByteLength: asset.byteLength,
+    mipExtents,
+    mipLevelCount: mipExtents.length,
+    decodedBaseBytes: asset.width * asset.height * asset.channels,
+    decodedMipChainBytes: mipExtents.reduce(
+      (sum, extent) => sum + extent.width * extent.height * asset.channels,
+      0,
+    ),
+  });
+}));
 
 function setStatus(message) {
   status.textContent = message;
+  if (globalThis.__fieldBakeValidation) globalThis.__fieldBakeValidation.phase = message;
 }
 
 function requireKnown(value, values, label) {
@@ -147,23 +176,64 @@ function compactRgbaRows(raw, readWidth, readHeight, sourceBytesPerRow) {
 }
 
 async function createApp() {
+  const runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id ?? "correctness";
+  const timestampQueriesRequested = runtimeProfile === "performance";
   const routeKind = document.documentElement.dataset.routeKind ?? null;
   const routeId = document.documentElement.dataset.routeId ?? null;
   const lockedTier = routeKind === "tier" ? routeId : "gpu-storage";
   const lockedScenario = routeKind === "mechanism" ? routeId : "field-and-gradient-gallery";
   requireKnown(lockedTier, TIERS, "tier route");
   requireKnown(lockedScenario, SCENARIOS, "scenario route");
+  const initialSeed = lockedTier === "precomputed-minimum"
+    ? PRECOMPUTED_ASSETS[0].seed
+    : FIELD_ALGORITHM.defaultSeed;
 
-  const renderer = new WebGPURenderer({ canvas, antialias: false, outputBufferType: FloatType });
+  const renderer = new WebGPURenderer({
+    canvas,
+    antialias: false,
+    outputBufferType: FloatType,
+    trackTimestamp: timestampQueriesRequested,
+  });
   renderer.setPixelRatio(1);
   renderer.setSize(FIELD_EXTENT.width, FIELD_EXTENT.height, false);
   await renderer.init();
+  if (REVISION !== "185") throw new Error(`expected Three r185, received r${REVISION}`);
   if (renderer.backend?.isWebGPUBackend !== true) {
     throw new Error("threejs-procedural-fields requires a native WebGPU backend.");
   }
+  const initializedRendererDevice = renderer.backend.device;
+  if (!initializedRendererDevice || typeof initializedRendererDevice.lost?.then !== "function") {
+    throw new Error("initialized WebGPU backend did not expose its actual GPUDevice loss promise");
+  }
+  const rendererDeviceGeneration = 1;
+  let rendererDeviceStatus = "active";
+  let deviceLossGeneration = 0;
+  let deviceLossDetails = null;
+  let disposingRenderer = false;
+  initializedRendererDevice.lost.then((info) => {
+    if (disposingRenderer) return;
+    rendererDeviceStatus = "lost";
+    deviceLossGeneration = rendererDeviceGeneration;
+    deviceLossDetails = {
+      reason: info?.reason ?? "unknown",
+      message: info?.message ?? "GPU device lost",
+    };
+  });
+  const timestampQueriesActive = timestampQueriesRequested &&
+    renderer.hasFeature?.("timestamp-query") === true;
+  const rendererBackendEvidence = () => ({
+    backendKind: "WebGPU",
+    backendType: "WebGPUBackend",
+    deviceIdentityVerified: renderer.backend.device === initializedRendererDevice,
+    deviceIdentitySource: "renderer.backend.device captured immediately after await renderer.init()",
+    deviceType: initializedRendererDevice.constructor?.name || "GPUDevice",
+    deviceLabel: initializedRendererDevice.label || "",
+    lossPromiseObservedOnActualDevice: true,
+    rendererDeviceGeneration,
+  });
 
   const coordinateUniform = uniform(new Vector3(1, 0, 0));
-  const seedUniform = uniform(FIELD_ALGORITHM.defaultSeed >>> 0, "uint");
+  const seedUniform = uniform(initialSeed >>> 0, "uint");
   const warpStrengthUniform = uniform(FIELD_ALGORITHM.warp.amplitude);
   const viewScaleUniform = uniform(1);
   const timeUniform = uniform(0);
@@ -171,31 +241,38 @@ async function createApp() {
     new Vector3(index === 0 ? 1 : 0, index === 1 ? 1 : 0, index === 2 ? 1 : 0),
   ));
 
-  // Probe materials write raw data to the FloatType readback target. They are
-  // independent of the presentation graph and never own output conversion.
-  const packedMaterial = new MeshBasicNodeMaterial();
-  packedMaterial.fragmentNode = sampleField({
-    coordinate: coordinateUniform,
-    seed: seedUniform,
-    warpStrength: warpStrengthUniform,
-    inputJacobianColumns: inputJacobianColumnUniforms,
-  });
-  const derivedMaterial = new MeshBasicNodeMaterial();
-  derivedMaterial.fragmentNode = sampleFieldDerived({
-    coordinate: coordinateUniform,
-    seed: seedUniform,
-    warpStrength: warpStrengthUniform,
-    inputJacobianColumns: inputJacobianColumnUniforms,
-  });
-  const gradientMaterial = new MeshBasicNodeMaterial();
-  gradientMaterial.fragmentNode = sampleFieldGradient({
-    coordinate: coordinateUniform,
-    seed: seedUniform,
-    warpStrength: warpStrengthUniform,
-    inputJacobianColumns: inputJacobianColumnUniforms,
-  });
+  // Probe materials write raw data to the FloatType readback target. Object
+  // and world probes use a separately constructed warp-free graph, so origin
+  // probes cannot execute normalize(0) behind a numeric zero multiplier.
+  function createProbeMaterials(warpEnabled) {
+    const bundle = createFieldNodeBundle({
+      coordinate: coordinateUniform,
+      seed: seedUniform,
+      warpEnabled,
+      warpStrength: warpEnabled ? warpStrengthUniform : undefined,
+      inputJacobianColumns: inputJacobianColumnUniforms,
+      varPrefix: warpEnabled ? "probeWarpedField" : "probeWarpFreeField",
+    });
+    const packed = new MeshBasicNodeMaterial();
+    packed.fragmentNode = bundle.packedChannels;
+    const derived = new MeshBasicNodeMaterial();
+    derived.fragmentNode = bundle.derivedChannels;
+    const gradient = new MeshBasicNodeMaterial();
+    gradient.fragmentNode = bundle.gradientChannels;
+    return Object.freeze({ packed, derived, gradient, warpEnabled, warpMode: bundle.warpMode });
+  }
+  const warpFreeProbeMaterials = createProbeMaterials(false);
+  const warpedProbeMaterials = createProbeMaterials(true);
+  const allProbeMaterials = Object.freeze([
+    warpFreeProbeMaterials.packed,
+    warpFreeProbeMaterials.derived,
+    warpFreeProbeMaterials.gradient,
+    warpedProbeMaterials.packed,
+    warpedProbeMaterials.derived,
+    warpedProbeMaterials.gradient,
+  ]);
 
-  const mesh = new Mesh(new PlaneGeometry(2, 2), packedMaterial);
+  const mesh = new Mesh(new PlaneGeometry(2, 2), warpFreeProbeMaterials.packed);
   const scene = new Scene();
   scene.add(mesh);
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -209,7 +286,7 @@ async function createApp() {
   let tier = null;
   let mode = "final";
   let cameraId = "design";
-  let seed = FIELD_ALGORITHM.defaultSeed >>> 0;
+  let seed = initialSeed >>> 0;
   let timeSeconds = 0;
   let width = FIELD_EXTENT.width;
   let height = FIELD_EXTENT.height;
@@ -218,6 +295,7 @@ async function createApp() {
   let precomputedTexture = null;
   let precomputedAsset = null;
   let displayMaterial = null;
+  let causeGraph = null;
   let disposed = false;
   let initialized = false;
   const metrics = {
@@ -254,9 +332,10 @@ async function createApp() {
     const objectBundle = createFieldNodeBundle({
       coordinate: objectCoordinate,
       seed: seedUniform,
-      warpStrength: float(0),
+      warpEnabled: false,
       varPrefix: "displayObjectField",
     });
+    const objectCauses = createFieldCauseBindings(objectBundle);
     const sphereCoordinate = normalize(vec3(
       displayUv.x.sub(0.5).mul(2),
       displayUv.y.sub(0.5).mul(2),
@@ -265,6 +344,7 @@ async function createApp() {
     const sphereBundle = createFieldNodeBundle({
       coordinate: sphereCoordinate,
       seed: seedUniform,
+      warpEnabled: true,
       warpStrength: float(FIELD_ALGORITHM.warp.amplitude),
       varPrefix: "displaySphereField",
     });
@@ -278,30 +358,76 @@ async function createApp() {
     const tierPacked = tier === "gpu-storage"
       ? storagePacked
       : tier === "precomputed-minimum" ? precomputedPacked : directPacked;
-    const directVsBaked = select(displayUv.x.lessThan(0.5), directPacked, tierPacked);
+    const comparisonPixelWidth = Math.ceil(width * dpr);
+    const comparisonHalfWidth = Math.floor(comparisonPixelWidth / 2);
+    const comparisonRightStart = comparisonPixelWidth - comparisonHalfWidth;
+    const comparisonLeftBoundary = comparisonHalfWidth / comparisonPixelWidth;
+    const comparisonRightBoundary = comparisonRightStart / comparisonPixelWidth;
+    const comparisonScale = comparisonPixelWidth / comparisonHalfWidth;
+    const comparisonX = select(
+      displayUv.x.lessThan(comparisonLeftBoundary),
+      displayUv.x.mul(comparisonScale),
+      displayUv.x.sub(comparisonRightBoundary).mul(comparisonScale),
+    );
+    const comparisonUv = vec2(comparisonX, displayUv.y);
+    const storageExtentNode = vec2(FIELD_EXTENT.width, FIELD_EXTENT.height);
+    const comparisonCell = floor(comparisonUv.mul(storageExtentNode)).min(
+      storageExtentNode.sub(1),
+    );
+    const alignedStorageUv = comparisonCell.add(0.5).div(storageExtentNode);
+    const alignedFieldUv = comparisonCell.div(vec2(
+      FIELD_EXTENT.width - 1,
+      FIELD_EXTENT.height - 1,
+    ));
+    const comparisonCoordinate = vec3(
+      alignedFieldUv.x.sub(0.5).mul(8).mul(viewScaleUniform),
+      float(0.37).add(timeUniform.mul(0.01)),
+      alignedFieldUv.y.sub(0.5).mul(8).mul(viewScaleUniform),
+    );
+    const comparisonBundle = createFieldNodeBundle({
+      coordinate: comparisonCoordinate,
+      seed: seedUniform,
+      warpEnabled: false,
+      varPrefix: "comparisonObjectField",
+    });
+    const comparisonStored = fieldSystem
+      ? texture(fieldSystem.resources.packedTexture, alignedStorageUv)
+      : comparisonBundle.packedChannels;
+    const comparisonTier = tier === "gpu-storage"
+      ? comparisonStored
+      : tier === "precomputed-minimum" ? texture(precomputedTexture, comparisonUv) : comparisonBundle.packedChannels;
+    const directVsBaked = select(
+      displayUv.x.lessThan(comparisonLeftBoundary),
+      comparisonBundle.packedChannels,
+      select(
+        displayUv.x.greaterThanEqual(comparisonRightBoundary),
+        comparisonTier,
+        vec4(0.5, 0.5, 0.5, 1),
+      ),
+    );
     const acceptedColor = vec3(0.12, 0.92, 0.32);
     const rejectedColor = vec3(0.2, 0.035, 0.03);
     const placementColor = select(
-      objectBundle.placementMask.greaterThanEqual(0.5),
+      objectCauses.placement.mask.greaterThanEqual(0.5),
       acceptedColor,
       rejectedColor,
-    ).mul(objectBundle.placementMask.mul(0.65).add(0.35));
+    ).mul(objectCauses.placement.mask.mul(0.65).add(0.35));
 
     const named = {
       coordinates: vec4(displayUv.x, displayUv.y, 0, 1),
       warp: vec4(sphereBundle.tangentWarp.mul(0.5).add(0.5), 1),
-      "macro-height": vec4(vec3(objectBundle.macroHeight), 1),
-      gradient: vec4(objectBundle.macroGradient.mul(0.5).add(0.5), 1),
-      slope: vec4(vec3(objectBundle.slope), 1),
+      "macro-height": vec4(vec3(objectCauses.displacement.height), 1),
+      gradient: vec4(objectCauses.diagnostics.gradient.mul(0.5).add(0.5), 1),
+      slope: vec4(vec3(objectCauses.material.slope), 1),
       packed: tierPacked,
       "direct-vs-baked": directVsBaked,
       placement: vec4(placementColor, 1),
     };
     const scenarioNodes = {
       "macro-slope-roughness-gallery": vec4(
-        objectBundle.macroHeight,
-        objectBundle.slope,
-        objectBundle.roughness,
+        objectCauses.displacement.height,
+        objectCauses.material.slope,
+        objectCauses.material.roughness,
         1,
       ),
       "tangent-warp-vector": named.warp,
@@ -309,14 +435,31 @@ async function createApp() {
       "split-direct-storage-comparison": directVsBaked,
       "accepted-rejected-placement-mask": named.placement,
       "height-moisture-roughness-causes": vec4(
-        objectBundle.macroHeight,
-        objectBundle.moisture,
-        objectBundle.roughness,
+        objectCauses.material.height,
+        objectCauses.material.moisture,
+        objectCauses.material.roughness,
         1,
       ),
     };
     const scenarioNode = scenarioNodes[FIELD_MECHANISM_OUTPUTS[scenario].outputNodeId];
-    return { selected: mode === "final" ? scenarioNode : named[mode], named };
+    return {
+      selected: mode === "final" ? scenarioNode : named[mode],
+      displacedPosition: positionLocal.add(vec3(
+        0,
+        0,
+        objectCauses.displacement.height.mul(-0.05),
+      )),
+      causeGraph: Object.freeze({
+        producer: objectCauses.producerId,
+        consumers: Object.freeze({
+          displacement: "macroHeight",
+          material: Object.freeze(["macroHeight", "moisture", "roughness", "slope"]),
+          placement: "placementMask",
+          diagnostics: Object.freeze(["macroHeight", "moisture", "roughness", "slope", "macroGradient"]),
+        }),
+      }),
+      named,
+    };
   }
 
   function rebuildDisplayGraph() {
@@ -328,6 +471,8 @@ async function createApp() {
       renderer.toneMapping,
       renderer.outputColorSpace,
     );
+    displayMaterial.positionNode = nodes.displacedPosition;
+    causeGraph = nodes.causeGraph;
     displayMaterial.name = `field-display:${scenario}:${tier}:${mode}`;
     mesh.material = displayMaterial;
   }
@@ -338,6 +483,7 @@ async function createApp() {
     disposeDisplayMaterial();
     disposeTierResources();
     if (nextTier === "gpu-storage") {
+      setStatus("initializing gpu-storage field bake");
       fieldSystem = createFieldBakeSystem(renderer, {
         width: FIELD_EXTENT.width,
         height: FIELD_EXTENT.height,
@@ -347,10 +493,17 @@ async function createApp() {
       });
       const trace = await fieldSystem.dispatchFull();
       metrics.computeDispatchCount += trace.dispatchTrace.length;
+      setStatus("gpu-storage field bake submitted");
     } else if (nextTier === "precomputed-minimum") {
-      precomputedAsset = PRECOMPUTED_ASSETS[seed % PRECOMPUTED_ASSETS.length];
+      precomputedAsset = PRECOMPUTED_ASSETS.find((asset) => asset.seed === seed) ?? null;
+      if (!precomputedAsset) {
+        throw new Error(
+          `precomputed-minimum has no asset for seed ${seed}; supported seeds are ` +
+          PRECOMPUTED_ASSETS.map((asset) => asset.seed).join(", "),
+        );
+      }
       precomputedTexture = await new TextureLoader().loadAsync(new URL(
-        `../../assets/generated-variants/${precomputedAsset.file}`,
+        `../../assets/generated-variants/${precomputedAsset.path}`,
         import.meta.url,
       ).href);
       precomputedTexture.colorSpace = NoColorSpace;
@@ -394,9 +547,12 @@ async function createApp() {
     const samples = [];
     try {
       for (const probe of probes) {
-        const packed = await readMaterial(packedMaterial, probe);
-        const derived = await readMaterial(derivedMaterial, probe);
-        const gradient = await readMaterial(gradientMaterial, probe);
+        const materials = probe.domain === "sphere"
+          ? warpedProbeMaterials
+          : warpFreeProbeMaterials;
+        const packed = await readMaterial(materials.packed, probe);
+        const derived = await readMaterial(materials.derived, probe);
+        const gradient = await readMaterial(materials.gradient, probe);
         samples.push({
           probe,
           values: {
@@ -419,12 +575,16 @@ async function createApp() {
           "field-readback.json",
           "field-storage-readback.json",
           "field-placement-readback.json",
+          "field-mechanism-diagnostics.json",
+          "field-probe-corpus.json",
+          "field-dirty-region.json",
         ],
         productionReady: false,
-        probeSet: "gpuParityProbes-v3-original-domain-gradients",
+        probeSet: "gpuParityProbes-v4-f32-origin-and-threshold-gradients",
         seedRepresentation: "u32-uniform",
       },
       renderer: {
+        threePackageVersion: THREE_PACKAGE_VERSION,
         threeRevision: REVISION,
         isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
         outputBufferType: renderer.getOutputBufferType?.() ?? null,
@@ -489,7 +649,28 @@ async function createApp() {
     return [0, 1, 2, 3].map((lane) => halfToFloat(readback[offset + lane]));
   }
 
-  async function readStorage(storageTexture, readWidth, readHeight) {
+  function compactHalfRows(readback, readWidth, readHeight, layout) {
+    const tight = new Uint16Array(readWidth * readHeight * 4);
+    const elementsPerTightRow = readWidth * 4;
+    for (let y = 0; y < readHeight; y += 1) {
+      tight.set(
+        readback.subarray(
+          y * layout.elementsPerRow,
+          y * layout.elementsPerRow + elementsPerTightRow,
+        ),
+        y * elementsPerTightRow,
+      );
+    }
+    return tight;
+  }
+
+  async function sha256TypedArray(array) {
+    const bytes = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function readStorageRaw(storageTexture, readWidth, readHeight) {
     const readback = await renderer.backend.copyTextureToBuffer(
       storageTexture,
       0,
@@ -499,15 +680,36 @@ async function createApp() {
       0,
     );
     const layout = resolveHalfReadbackLayout(readback, readWidth, readHeight);
+    const tight = compactHalfRows(readback, readWidth, readHeight, layout);
     return {
       constructor: readback.constructor.name,
       length: readback.length,
       layout,
+      tight,
+      tightByteLength: tight.byteLength,
+      tightSha256: await sha256TypedArray(tight),
+    };
+  }
+
+  async function readStorage(storageTexture, readWidth, readHeight) {
+    const raw = await readStorageRaw(storageTexture, readWidth, readHeight);
+    return {
+      constructor: raw.constructor,
+      length: raw.length,
+      layout: raw.layout,
+      tightByteLength: raw.tightByteLength,
+      tightSha256: raw.tightSha256,
       samples: [
         [0, 0],
         [Math.floor(readWidth / 2), Math.floor(readHeight / 2)],
         [readWidth - 1, readHeight - 1],
-      ].map(([x, y]) => ({ x, y, value: readHalfPixel(readback, x, y, layout) })),
+      ].map(([x, y]) => ({
+        x,
+        y,
+        value: [0, 1, 2, 3].map(
+          (lane) => halfToFloat(raw.tight[(y * readWidth + x) * 4 + lane]),
+        ),
+      })),
     };
   }
 
@@ -538,7 +740,7 @@ async function createApp() {
       0.37,
       -4 + center.y / Math.max(resources.height - 1, 1) * 8,
     ];
-    const cpu = sampleFieldCPU({ domain: "object", coordinate, seed });
+    const cpu = sampleFieldF32CPU({ domain: "object", coordinate, seed });
     return {
       schemaVersion: 2,
       contract: validateStorageEvidenceContract({
@@ -550,7 +752,11 @@ async function createApp() {
         performanceMeasured: false,
         productionReady: false,
       }),
-      renderer: { threeRevision: REVISION, isWebGPUBackend: true },
+      renderer: {
+        threePackageVersion: THREE_PACKAGE_VERSION,
+        threeRevision: REVISION,
+        isWebGPUBackend: true,
+      },
       extent: { width: resources.width, height: resources.height },
       packed,
       derived,
@@ -573,18 +779,26 @@ async function createApp() {
     const indexBuffer = await renderer.getArrayBufferAsync(fieldSystem.placement.acceptedIndices);
     const values = new Float32Array(recordBuffer);
     const acceptedIndices = Array.from(new Uint32Array(indexBuffer));
-    const records = acceptedIndices.map((cellIndex, outputIndex) => [
+    const rawGpuRecords = acceptedIndices.map((_, outputIndex) => [
       values[outputIndex * 4],
       values[outputIndex * 4 + 1],
       values[outputIndex * 4 + 2],
-      cellIndex,
+      values[outputIndex * 4 + 3],
     ]);
-    const masks = records.map((record) => record[2]);
-    return {
+    const decodedRecords = acceptedIndices.map((cellIndex, outputIndex) => ({
+      outputIndex,
+      cpuAcceptedCellIndex: cellIndex,
+      gpu: rawGpuRecords[outputIndex],
+    }));
+    const masks = rawGpuRecords.map((record) => record[2]);
+    const rawGpuW = rawGpuRecords.map((record) => record[3]);
+    return validatePlacementReadbackSeparation({
       schemaVersion: 2,
       contract: {
-        path: "deterministic-index-list-plus-storage-buffer-write-readback",
-        artifactCoverage: "all-accepted-compacted-records-plus-index-list",
+        path: "raw-gpu-vec4-lane-plus-separate-deterministic-cpu-index-list",
+        artifactCoverage: "all-accepted-raw-gpu-records-plus-separate-index-identity",
+        rawGpuLaneWMeaning: "authored-live-record-sentinel-one",
+        cpuIndexIdentityStoredInGpuRecord: false,
         rejectedRecordsRetained: false,
         performanceMeasured: false,
         productionReady: false,
@@ -595,18 +809,468 @@ async function createApp() {
       acceptedIndices,
       minAcceptedMask: Math.min(...masks),
       maxAcceptedMask: Math.max(...masks),
+      minRawGpuW: Math.min(...rawGpuW),
+      maxRawGpuW: Math.max(...rawGpuW),
       storageBytes: fieldSystem.placement.bytes,
       recordBytes: fieldSystem.placement.recordBytes,
       indexBytes: fieldSystem.placement.indexBytes,
+      rawGpuRecords,
+      decodedRecords,
+    });
+  }
+
+  async function readProbeOutputs(resources) {
+    const [packedBuffer, derivedBuffer, gradientBuffer] = await Promise.all([
+      renderer.getArrayBufferAsync(resources.packed),
+      renderer.getArrayBufferAsync(resources.derived),
+      renderer.getArrayBufferAsync(resources.gradient),
+    ]);
+    const packed = new Float32Array(packedBuffer);
+    const derived = new Float32Array(derivedBuffer);
+    const gradient = new Float32Array(gradientBuffer);
+    const combined = new Uint8Array(packed.byteLength + derived.byteLength + gradient.byteLength);
+    let byteOffset = 0;
+    for (const array of [packed, derived, gradient]) {
+      combined.set(new Uint8Array(array.buffer, array.byteOffset, array.byteLength), byteOffset);
+      byteOffset += array.byteLength;
+    }
+    return {
+      packed,
+      derived,
+      gradient,
+      sha256: await sha256TypedArray(combined),
+    };
+  }
+
+  async function hashProbeOutputArrays(outputs) {
+    const combined = new Uint8Array(
+      outputs.packed.byteLength + outputs.derived.byteLength + outputs.gradient.byteLength,
+    );
+    let byteOffset = 0;
+    for (const array of [outputs.packed, outputs.derived, outputs.gradient]) {
+      combined.set(new Uint8Array(array.buffer, array.byteOffset, array.byteLength), byteOffset);
+      byteOffset += array.byteLength;
+    }
+    return sha256TypedArray(combined);
+  }
+
+  function createProbePartitions(probes) {
+    const groups = [
+      { warpMode: "disabled", entries: [] },
+      { warpMode: "tangential", entries: [] },
+    ];
+    probes.forEach((probe, index) => {
+      groups[probe.domain === "sphere" ? 1 : 0].entries.push({ probe, index });
+    });
+    return groups.filter((group) => group.entries.length > 0).map((group) => ({
+      ...group,
+      resources: createFieldProbeResources(group.entries.map((entry) => entry.probe)),
+    }));
+  }
+
+  async function dispatchProbePartitions(partitions, outputCount) {
+    const outputs = {
+      packed: new Float32Array(outputCount * 4),
+      derived: new Float32Array(outputCount * 4),
+      gradient: new Float32Array(outputCount * 4),
+    };
+    for (const partition of partitions) {
+      renderer.compute(createFieldProbeComputeNode(partition.resources));
+      metrics.computeDispatchCount += 1;
+      const partitionOutputs = await readProbeOutputs(partition.resources);
+      partition.entries.forEach(({ index }, partitionIndex) => {
+        for (const key of ["packed", "derived", "gradient"]) {
+          outputs[key].set(
+            partitionOutputs[key].subarray(partitionIndex * 4, partitionIndex * 4 + 4),
+            index * 4,
+          );
+        }
+      });
+    }
+    outputs.sha256 = await hashProbeOutputArrays(outputs);
+    return outputs;
+  }
+
+  function probeOutputRecords(probes, outputs) {
+    return probes.map((probe, index) => ({
+      probe,
+      packed: Array.from(outputs.packed.subarray(index * 4, index * 4 + 4)),
+      derived: Array.from(outputs.derived.subarray(index * 4, index * 4 + 4)),
+      gradient: Array.from(outputs.gradient.subarray(index * 4, index * 4 + 4)),
+    }));
+  }
+
+  async function captureProbeCorpusReadback() {
+    requireStorageTier("probe-corpus readback");
+    const deviceLimit = renderer.backend.device.limits.maxStorageBuffersPerShaderStage;
+    if (deviceLimit < 8) {
+      throw new Error(`field probe corpus requires 8 storage buffers; adapter exposes ${deviceLimit}`);
+    }
+    const partitions = createProbePartitions(FIELD_PROBE_CORPUS.probes);
+    let baseline;
+    let repeated;
+    try {
+      baseline = await dispatchProbePartitions(partitions, FIELD_PROBE_CORPUS.probes.length);
+      repeated = await dispatchProbePartitions(partitions, FIELD_PROBE_CORPUS.probes.length);
+    } finally {
+      for (const partition of partitions) disposeFieldProbeResources(partition.resources);
+    }
+    if (baseline.sha256 !== repeated.sha256) {
+      throw new Error("same-seed field probe dispatch was not bitwise deterministic");
+    }
+
+    const stressProbes = createStressProbeCorpus();
+    const stressPartitions = createProbePartitions(stressProbes);
+    let stress;
+    try {
+      stress = await dispatchProbePartitions(stressPartitions, stressProbes.length);
+    } finally {
+      for (const partition of stressPartitions) disposeFieldProbeResources(partition.resources);
+    }
+    if (stress.sha256 === baseline.sha256) {
+      throw new Error("stress-seed field probe corpus did not change its storage hash");
+    }
+
+    const records = probeOutputRecords(FIELD_PROBE_CORPUS.probes, baseline);
+    const packedStorage = await readStorageRaw(
+      fieldSystem.resources.packedTexture,
+      fieldSystem.resources.width,
+      fieldSystem.resources.height,
+    );
+    let directVsBakedMaxAbsError = 0;
+    let directVsBakedSumAbsError = 0;
+    let directVsBakedValueCount = 0;
+    let directVsBakedSampleCount = 0;
+    for (let index = 0; index < FIELD_PROBE_CORPUS_COUNTS.object; index += 1) {
+      if (!records[index].probe.storageCell) continue;
+      const { x, y } = records[index].probe.storageCell;
+      directVsBakedSampleCount += 1;
+      const offset = (y * fieldSystem.resources.width + x) * 4;
+      for (let lane = 0; lane < 4; lane += 1) {
+        const stored = halfToFloat(packedStorage.tight[offset + lane]);
+        const error = Math.abs(records[index].packed[lane] - stored);
+        directVsBakedMaxAbsError = Math.max(directVsBakedMaxAbsError, error);
+        directVsBakedSumAbsError += error;
+        directVsBakedValueCount += 1;
+      }
+    }
+
+    return {
+      schemaVersion: 2,
+      contract: {
+        path: "storage-buffer-tsl-corpus-plus-rgba16float-direct-comparison",
+        corpusId: FIELD_PROBE_CORPUS.id,
+        corpusSha256: FIELD_PROBE_CORPUS.expectedSha256,
+        sameSeedBitwiseStable: true,
+        stressSeedHashDistinct: true,
+        performanceMeasured: false,
+        productionReady: false,
+      },
+      renderer: {
+        threePackageVersion: THREE_PACKAGE_VERSION,
+        threeRevision: REVISION,
+        isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
+        maxStorageBuffersPerShaderStage: deviceLimit,
+      },
+      counts: FIELD_PROBE_CORPUS_COUNTS,
+      dispatches: partitions.map((partition) => ({
+        warpMode: partition.warpMode,
+        probeCount: partition.resources.count,
+        workgroupSize: [64, 1, 1],
+        workgroupCount: [Math.ceil(partition.resources.count / 64), 1, 1],
+        resourceBytes: partition.resources.bytes,
+      })),
+      resourceBytes: partitions.reduce((sum, partition) => sum + partition.resources.bytes, 0),
+      inputBytes: partitions.reduce((sum, partition) => sum + partition.resources.inputBytes, 0),
+      outputBytes: partitions.reduce((sum, partition) => sum + partition.resources.outputBytes, 0),
+      baselineSha256: baseline.sha256,
+      repeatedSha256: repeated.sha256,
+      stressSha256: stress.sha256,
+      packedStorageSha256: packedStorage.tightSha256,
+      directVsBaked: {
+        sampleCount: directVsBakedSampleCount,
+        valueCount: directVsBakedValueCount,
+        maxAbsError: directVsBakedMaxAbsError,
+        meanAbsError: directVsBakedSumAbsError / directVsBakedValueCount,
+      },
       records,
     };
   }
 
+  async function captureStorageSnapshot() {
+    const snapshotResources = [];
+    for (let level = 0; level < fieldSystem.resources.packedMipTextures.length; level += 1) {
+      const extent = fieldSystem.resources.mipExtents[level];
+      snapshotResources.push({
+        id: `packed-mip-${level}`,
+        extent,
+        raw: await readStorageRaw(
+          fieldSystem.resources.packedMipTextures[level],
+          extent.width,
+          extent.height,
+        ),
+      });
+    }
+    for (const [id, textureResource] of [
+      ["derived-base", fieldSystem.resources.derivedTexture],
+      ["gradient-base", fieldSystem.resources.gradientTexture],
+    ]) {
+      snapshotResources.push({
+        id,
+        extent: { width: fieldSystem.resources.width, height: fieldSystem.resources.height },
+        raw: await readStorageRaw(
+          textureResource,
+          fieldSystem.resources.width,
+          fieldSystem.resources.height,
+        ),
+      });
+    }
+    const hashPayload = new TextEncoder().encode(JSON.stringify(
+      snapshotResources.map(({ id, extent, raw }) => ({ id, extent, sha256: raw.tightSha256 })),
+    ));
+    return {
+      resources: snapshotResources,
+      sha256: await sha256TypedArray(hashPayload),
+    };
+  }
+
+  function requireSnapshotIdentity(reference, candidate, label) {
+    if (reference.sha256 !== candidate.sha256) {
+      throw new Error(`${label} storage snapshot hash drifted`);
+    }
+    for (let index = 0; index < reference.resources.length; index += 1) {
+      if (
+        reference.resources[index].id !== candidate.resources[index]?.id ||
+        reference.resources[index].raw.tightSha256 !== candidate.resources[index].raw.tightSha256
+      ) {
+        throw new Error(`${label} resource ${reference.resources[index].id} drifted`);
+      }
+    }
+  }
+
+  async function captureDirtyRegionReadback() {
+    requireStorageTier("dirty-region readback");
+    const dirtyRegion = Object.freeze({ x: 71, y: 43, width: 257, height: 181 });
+    const stressSeed = (seed ^ 0x9e3779b9) >>> 0;
+    const baseline = await captureStorageSnapshot();
+
+    const repeatedTrace = await fieldSystem.dispatchFull({ seed });
+    metrics.computeDispatchCount += repeatedTrace.dispatchTrace.length;
+    const repeated = await captureStorageSnapshot();
+    requireSnapshotIdentity(baseline, repeated, "same-seed repeat");
+
+    const dirtyTrace = await fieldSystem.dispatchRegion(dirtyRegion, { seed: stressSeed });
+    metrics.computeDispatchCount += dirtyTrace.dispatchTrace.length;
+    const mutated = await captureStorageSnapshot();
+    if (mutated.sha256 === baseline.sha256) {
+      throw new Error("dirty-region stress seed did not change storage");
+    }
+
+    const mipRegions = propagateDirtyRegion(dirtyRegion, fieldSystem.resources.mipExtents);
+    const comparisons = baseline.resources.map((beforeResource, index) => {
+      const afterResource = mutated.resources[index];
+      if (afterResource.id !== beforeResource.id) {
+        throw new Error("field storage snapshot resource order drifted");
+      }
+      const levelMatch = /^packed-mip-(\d+)$/.exec(beforeResource.id);
+      const allowedRegion = levelMatch ? mipRegions[Number(levelMatch[1])] : dirtyRegion;
+      const comparison = compareFieldStorageMutation({
+        before: beforeResource.raw.tight,
+        after: afterResource.raw.tight,
+        width: beforeResource.extent.width,
+        height: beforeResource.extent.height,
+        allowedRegion,
+      });
+      validateFieldStorageConfinement(comparison);
+      return {
+        id: beforeResource.id,
+        extent: beforeResource.extent,
+        beforeSha256: beforeResource.raw.tightSha256,
+        afterSha256: afterResource.raw.tightSha256,
+        ...comparison,
+      };
+    });
+
+    const restoreTrace = await fieldSystem.dispatchFull({ seed });
+    metrics.computeDispatchCount += restoreTrace.dispatchTrace.length;
+    const restored = await captureStorageSnapshot();
+    requireSnapshotIdentity(baseline, restored, "canonical restore");
+
+    const resources = fieldSystem.describeResources();
+    return {
+      schemaVersion: 2,
+      contract: {
+        path: "bitwise-full-storage-before-after-dirty-update",
+        sameSeedBitwiseStable: true,
+        stressSeedHashDistinct: true,
+        dirtyRegionExecutionValidated: true,
+        dependentMipConfinementValidated: true,
+        canonicalRestoreBitwiseStable: true,
+        performanceMeasured: false,
+        productionReady: false,
+      },
+      renderer: {
+        threePackageVersion: THREE_PACKAGE_VERSION,
+        threeRevision: REVISION,
+        isWebGPUBackend: true,
+      },
+      extent: { width: fieldSystem.resources.width, height: fieldSystem.resources.height },
+      canonicalSeed: seed,
+      stressSeed,
+      dirtyRegion,
+      baselineSha256: baseline.sha256,
+      repeatedSha256: repeated.sha256,
+      mutatedSha256: mutated.sha256,
+      restoredSha256: restored.sha256,
+      comparisons,
+      dirtyDispatchTrace: dirtyTrace.dispatchTrace,
+      repeatedDispatchTrace: repeatedTrace.dispatchTrace,
+      restoreDispatchTrace: restoreTrace.dispatchTrace,
+      resourceLedger: resources.resourceLedger,
+      dispatchTotals: resources.dispatchTotals,
+    };
+  }
+
   function describeResources() {
+    const physicalWidth = Math.ceil(width * dpr);
+    const physicalHeight = Math.ceil(height * dpr);
+    const commonEntries = [
+      {
+        id: "display-evidence-target",
+        kind: "render-target",
+        format: "rgba8unorm",
+        extent: { width: physicalWidth, height: physicalHeight },
+        bytesPerTexel: 4,
+        bytes: physicalWidth * physicalHeight * 4,
+        scope: "resident-common",
+        residency: "resident",
+        ownership: "lab-owned",
+      },
+      {
+        id: "raw-probe-target",
+        kind: "render-target",
+        format: "rgba32float",
+        extent: { width: 1, height: 1 },
+        bytesPerTexel: 16,
+        bytes: 16,
+        scope: "resident-common",
+        residency: "resident",
+        ownership: "lab-owned",
+      },
+      {
+        id: "display-readback-request",
+        kind: "readback-request",
+        rowBytes: physicalWidth * 4,
+        alignedBytesPerRow: Math.ceil(physicalWidth * 4 / 256) * 256,
+        rowCount: physicalHeight,
+        bytes: Math.ceil(physicalWidth * 4 / 256) * 256 * physicalHeight,
+        scope: "transient-display-readback",
+        residency: "transient",
+        ownership: "capture-request",
+      },
+      {
+        id: "display-normalized-rgba",
+        kind: "cpu-buffer",
+        elementCount: physicalWidth * physicalHeight * 4,
+        bytesPerElement: 1,
+        bytes: physicalWidth * physicalHeight * 4,
+        scope: "transient-display-readback",
+        residency: "transient",
+        ownership: "lab-owned",
+      },
+      {
+        id: "probe-readback-request",
+        kind: "readback-request",
+        rowBytes: 16,
+        alignedBytesPerRow: 256,
+        rowCount: 1,
+        bytes: 256,
+        scope: "transient-single-probe-readback",
+        residency: "transient",
+        ownership: "capture-request",
+      },
+      {
+        id: "probe-normalized-rgba32float",
+        kind: "cpu-buffer",
+        elementCount: 4,
+        bytesPerElement: 4,
+        bytes: 16,
+        scope: "transient-single-probe-readback",
+        residency: "transient",
+        ownership: "lab-owned",
+      },
+    ];
+    let tierEntries = [];
+    if (tier === "gpu-storage") {
+      const fieldLedger = fieldSystem.describeResources().resourceLedger;
+      tierEntries = [
+        ...fieldLedger.resources,
+        ...[
+          "coordinates",
+          "seeds",
+          "jacobian-0",
+          "jacobian-1",
+          "jacobian-2",
+          "packed-output",
+          "derived-output",
+          "gradient-output",
+        ].map((id) => ({
+          id: `probe-corpus-${id}`,
+          kind: "storage-buffer",
+          format: id === "seeds" ? "uvec4u32" : "vec4f32",
+          elementCount: FIELD_PROBE_CORPUS_COUNTS.total,
+          itemSize: 4,
+          bytesPerElement: 4,
+          bytes: FIELD_PROBE_CORPUS_COUNTS.total * 16,
+          scope: "transient-probe-corpus",
+          residency: "transient",
+          ownership: "lab-owned",
+        })),
+        {
+          id: "storage-readback-request",
+          kind: "readback-request",
+          rowBytes: FIELD_EXTENT.width * 8,
+          alignedBytesPerRow: Math.ceil(FIELD_EXTENT.width * 8 / 256) * 256,
+          rowCount: FIELD_EXTENT.height,
+          bytes: Math.ceil(FIELD_EXTENT.width * 8 / 256) * 256 * FIELD_EXTENT.height,
+          scope: "transient-storage-readback",
+          residency: "transient",
+          ownership: "capture-request",
+        },
+        {
+          id: "storage-normalized-rgba16float",
+          kind: "cpu-buffer",
+          elementCount: FIELD_EXTENT.width * FIELD_EXTENT.height * 4,
+          bytesPerElement: 2,
+          bytes: FIELD_EXTENT.width * FIELD_EXTENT.height * 8,
+          scope: "transient-storage-readback",
+          residency: "transient",
+          ownership: "lab-owned",
+        },
+      ];
+    } else if (tier === "precomputed-minimum") {
+      tierEntries = [{
+        id: "precomputed-field-texture",
+        kind: "sampled-texture",
+        format: "rgba8unorm",
+        mipExtents: precomputedAsset.mipExtents,
+        bytesPerTexel: precomputedAsset.channels,
+        bytes: precomputedAsset.decodedMipChainBytes,
+        scope: "resident-tier",
+        residency: "resident",
+        ownership: "lab-owned",
+      }];
+    }
+    const completeResourceLedger = createScopedFieldResourceLedger([
+      ...commonEntries,
+      ...tierEntries,
+    ]);
     const common = {
       probeTargets: 1,
       displayTargets: 1,
       outputExtent: { width, height, dpr },
+      physicalOutputExtent: { width: physicalWidth, height: physicalHeight },
+      completeResourceLedger,
     };
     if (tier === "gpu-storage") {
       return validateTierResourceDescription(tier, {
@@ -637,7 +1301,16 @@ async function createApp() {
       storageBytes: 0,
       precomputedTextures: 1,
       precomputedAsset,
-      decodedTextureBytes: precomputedAsset.width * precomputedAsset.height * 4,
+      precomputedManifestId: PRECOMPUTED_ASSET_MANIFEST.id,
+      precomputedManifestVersion: PRECOMPUTED_ASSET_MANIFEST.version,
+      decodedTextureBytes: precomputedAsset.decodedMipChainBytes,
+      decodedBaseBytes: precomputedAsset.decodedBaseBytes,
+      decodedMipChainBytes: precomputedAsset.decodedMipChainBytes,
+      mipLevelCount: precomputedAsset.mipLevelCount,
+      mipExtents: precomputedAsset.mipExtents,
+      sourceAssetBytes: precomputedAsset.sourceByteLength,
+      sourceAssetSha256: precomputedAsset.sha256,
+      seed,
     });
   }
 
@@ -649,6 +1322,7 @@ async function createApp() {
         finalOutput: "MeshBasicNodeMaterial.fragmentNode",
         fieldAlgorithm: "createFieldNodeBundle",
       },
+      causeGraph,
       routeSelection: { scenario, tier, mode, camera: cameraId, seed, timeSeconds },
       sceneSubmissionCount: 2,
       sceneSubmissions: [
@@ -662,6 +1336,11 @@ async function createApp() {
       mechanismNode: `${scenario}:${mode}`,
       nativeWebGPU: renderer.backend?.isWebGPUBackend === true,
       acceptanceStatus: "incomplete",
+      runtimeProfile,
+      performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
+      timestampQueriesRequired: timestampQueriesRequested,
+      timestampQueriesRequested,
+      timestampQueriesActive,
     });
   }
 
@@ -738,6 +1417,7 @@ async function createApp() {
       renderer.setSize(width, height, false);
       displayTarget.setSize(Math.ceil(width * dpr), Math.ceil(height * dpr));
       metrics.resizeCount += 1;
+      rebuildDisplayGraph();
       await renderOnce();
     },
     renderOnce,
@@ -785,6 +1465,9 @@ async function createApp() {
     describeResources,
     getMetrics() {
       return {
+        labId: "webgpu-field-bake",
+        threePackageVersion: THREE_PACKAGE_VERSION,
+        threeRevision: REVISION,
         ...metrics,
         scenario,
         tier,
@@ -793,6 +1476,20 @@ async function createApp() {
         seed,
         timeSeconds,
         nativeWebGPU: renderer.backend?.isWebGPUBackend === true,
+        backend: renderer.backend?.isWebGPUBackend === true ? "webgpu" : "unknown",
+        rendererBackend: "WebGPUBackend",
+        rendererType: "WebGPURenderer",
+        initialized: true,
+        runtimeProfile,
+        performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
+        timestampQueriesRequired: timestampQueriesRequested,
+        timestampQueriesRequested,
+        timestampQueriesActive,
+        rendererBackendEvidence: rendererBackendEvidence(),
+        rendererDeviceStatus,
+        rendererDeviceGeneration,
+        deviceLossGeneration,
+        deviceLossDetails,
       };
     },
     async dispose() {
@@ -803,29 +1500,31 @@ async function createApp() {
       probeTarget.dispose();
       displayTarget.dispose();
       mesh.geometry.dispose();
-      packedMaterial.dispose();
-      derivedMaterial.dispose();
-      gradientMaterial.dispose();
+      for (const material of allProbeMaterials) material.dispose();
+      disposingRenderer = true;
       renderer.dispose();
     },
     captureFieldReadback,
     captureStoredReadback,
     capturePlacementReadback,
+    captureProbeCorpusReadback,
+    captureDirtyRegionReadback,
   };
 
   await configureTierResources(lockedTier);
+  setStatus("compiling field presentation graph");
   await controller.ready();
   return controller;
 }
 
-globalThis.__fieldBakeValidation = { ready: false, error: null };
+globalThis.__fieldBakeValidation = { ready: false, error: null, phase: "initializing renderer" };
 
 createApp()
   .then((controller) => {
     const legacy = {
+      ...controller,
       ready: true,
       error: null,
-      ...controller,
       getState: () => controller.getMetrics(),
     };
     globalThis.labController = controller;
