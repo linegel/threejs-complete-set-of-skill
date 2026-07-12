@@ -3,6 +3,7 @@ import { access, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three/webgpu';
+import { buildDemoRegistry } from '../../../scripts/lib/lab-registry.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 import { AO_TIERS, createGTAOStage } from '../webgpu-node-gtao/main.js';
 import {
@@ -14,8 +15,10 @@ import { INTEGRATION_MODES, INTEGRATION_SCENARIOS } from './main.js';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const manifest = JSON.parse( await readFile( join( here, 'lab.manifest.json' ), 'utf8' ) );
+const registryManifest = buildDemoRegistry().demos.find( ( entry ) => entry.id === manifest.id );
 const integrationSource = await readFile( join( here, 'main.js' ), 'utf8' );
-const manifestVerdict = validateLabManifest( manifest, { validateEvidence: false } );
+assert.ok( registryManifest, `registry contains ${ manifest.id }` );
+const manifestVerdict = validateLabManifest( registryManifest, { validateEvidence: false } );
 assert.deepEqual( manifestVerdict.errors, [] );
 assert.equal( manifest.kind, 'integration-demo' );
 assert.equal( manifest.status, 'incomplete' );

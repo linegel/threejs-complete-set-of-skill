@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildDemoRegistry } from '../../scripts/lib/lab-registry.mjs';
 import { validateLabManifest } from '../../scripts/lib/lab-validation.mjs';
 import {
 	INTEGRATION_REASON,
@@ -29,6 +30,7 @@ const requested = requestedIndex >= 0 ? process.argv[ requestedIndex + 1 ] : nul
 if ( requested && ! integrationIds.includes( requested ) ) throw new RangeError( `Unknown integration lab: ${ requested }` );
 const selectedIds = requested ? [ requested ] : integrationIds;
 const mutationsOnly = process.argv.includes( '--mutations-only' );
+const registeredDemos = new Map( buildDemoRegistry().demos.map( ( demo ) => [ demo.id, demo ] ) );
 
 function exportPattern( name ) {
 
@@ -59,7 +61,9 @@ for ( const id of selectedIds ) {
 		assert.equal( manifest.kind, 'integration-demo' );
 		assert.equal( manifest.status, 'incomplete' );
 		assert.equal( manifest.evidenceContract, 'v2' );
-		assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).errors, [], `${ id } strict lab manifest` );
+		const registryManifest = registeredDemos.get( id );
+		assert.ok( registryManifest, `registry contains ${ id }` );
+		assert.deepEqual( validateLabManifest( registryManifest, { validateEvidence: false } ).errors, [], `${ id } strict lab manifest` );
 
 		const ownerSemantics = new Set( contract.owners.map( ( owner ) => owner.semantic ) );
 		for ( const semantic of REQUIRED_EXCLUSIVE_OWNERS ) assert.ok( ownerSemantics.has( semantic ), `${ id } missing ${ semantic } owner` );

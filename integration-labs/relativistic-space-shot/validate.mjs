@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildDemoRegistry } from "../../scripts/lib/lab-registry.mjs";
 import {
   INTEGRATION_REASON,
   loadAvailableAdapterFactories,
@@ -40,7 +41,9 @@ const target = targets.integrations.find((entry) => entry.id === "relativistic-s
 
 const raw = validateRawLabManifest(manifest);
 assert.deepEqual(raw.errors, [], raw.errors.join("\n"));
-const normalized = validateLabManifest(manifest, { root: repoRoot, validateEvidence: false });
+const registryManifest = buildDemoRegistry().demos.find((entry) => entry.id === manifest.id);
+assert(registryManifest, `registry contains ${manifest.id}`);
+const normalized = validateLabManifest(registryManifest, { root: repoRoot, validateEvidence: false });
 assert.deepEqual(normalized.errors, [], normalized.errors.join("\n"));
 assert.equal(manifest.status, "incomplete");
 assert.equal(manifest.evidenceBundle, null);

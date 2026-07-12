@@ -3,6 +3,7 @@ import { access, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three/webgpu';
+import { buildDemoRegistry } from '../../../scripts/lib/lab-registry.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 import {
 	AO_DEBUG_MODES,
@@ -20,6 +21,7 @@ import { resolveAORoute } from './routes.js';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const manifest = JSON.parse( await readFile( join( here, 'lab.manifest.json' ), 'utf8' ) );
+const registryManifest = buildDemoRegistry().demos.find( ( entry ) => entry.id === manifest.id );
 const canonicalTargets = JSON.parse( await readFile( join( here, '../../../labs/canonical-targets.json' ), 'utf8' ) );
 const canonicalTarget = canonicalTargets.targets.find( ( target ) => target.id === 'webgpu-node-gtao' );
 const packageJson = JSON.parse( await readFile( join( here, 'package.json' ), 'utf8' ) );
@@ -40,7 +42,8 @@ assert.deepEqual( manifest.canonicalSource, [ canonicalTarget.canonicalDir ] );
 assert.equal( manifest.browserEntry, `${ canonicalTarget.canonicalDir }/index.html` );
 assert.equal( manifest.publishPath, `/demos/${ canonicalTarget.id }/` );
 assert.equal( manifest.evidenceContract, 'v2' );
-assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).errors, [] );
+assert.ok( registryManifest, `registry contains ${ manifest.id }` );
+assert.deepEqual( validateLabManifest( registryManifest, { validateEvidence: false } ).errors, [] );
 assert.deepEqual( standardScripts.filter( ( script ) => typeof packageJson.scripts[ script ] !== 'string' ), [] );
 assert.match( captureSource, /__LAB_CONTROLLER__\.capturePixels/ );
 assert.match( captureSource, /odd-641x359/ );

@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildDemoRegistry } from "../../scripts/lib/lab-registry.mjs";
 import { validateLabManifest } from "../../scripts/lib/lab-validation.mjs";
 import { validateIntegrationContract } from "../shared/integration-contract-core.mjs";
 import {
@@ -100,7 +101,9 @@ export async function validateProceduralDistrict() {
     readFile(join(here, "capture.mjs"), "utf8"),
   ]);
   const target = canonicalTargets.integrations.find((entry) => entry.id === "procedural-district");
-  const manifestResult = validateLabManifest(manifest, { validateEvidence: false });
+  const registryManifest = buildDemoRegistry().demos.find((entry) => entry.id === manifest.id);
+  if (!registryManifest) throw new Error(`Registry does not contain ${manifest.id}.`);
+  const manifestResult = validateLabManifest(registryManifest, { validateEvidence: false });
   if (manifestResult.errors.length) throw new Error(`Manifest validation failed:\n- ${manifestResult.errors.join("\n- ")}`);
   if (manifest.status !== "incomplete") throw new Error("Procedural District must remain incomplete pending native-WebGPU evidence.");
   if (JSON.stringify(manifest.modes) !== JSON.stringify(target.modes)) throw new Error("Manifest modes drift from canonical target.");

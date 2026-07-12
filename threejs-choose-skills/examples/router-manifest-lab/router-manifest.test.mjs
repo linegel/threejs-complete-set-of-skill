@@ -12,11 +12,12 @@ import {
 import { scenarioHref } from './route-urls.mjs';
 import { RUNNABLE_DEMOS_BY_SKILL, runnableDemosForFixture } from './runnable-demos.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
-import { listSkillDirs } from '../../../scripts/lib/lab-registry.mjs';
+import { buildDemoRegistry, listSkillDirs } from '../../../scripts/lib/lab-registry.mjs';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const catalog = JSON.parse( await readFile( join( here, 'router-fixtures.json' ), 'utf8' ) );
 const manifest = JSON.parse( await readFile( join( here, 'lab.manifest.json' ), 'utf8' ) );
+const registryManifest = buildDemoRegistry().demos.find( ( entry ) => entry.id === manifest.id );
 const appSource = await readFile( join( here, 'app.mjs' ), 'utf8' );
 const registry = JSON.parse( await readFile( join( here, '../../../docs/demos/registry.json' ), 'utf8' ) );
 
@@ -61,7 +62,8 @@ assert.deepEqual( manifest.scenarios.map( ( scenario ) => scenario.id ), expecte
 assert.deepEqual( manifest.tiers, [], 'planning skills must not invent GPU quality tiers' );
 assert.equal( manifest.evidenceContract, 'v2' );
 assert.equal( manifest.nonRenderingScenarioSuite, true );
-assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).errors, [] );
+assert.ok( registryManifest, `registry contains ${ manifest.id }` );
+assert.deepEqual( validateLabManifest( registryManifest, { validateEvidence: false } ).errors, [] );
 assert.match( appSource, /fetch\( catalogUrl \)/, 'browser UI must consume the same fixture JSON as tests' );
 assert.match( appSource, /evaluateScenario/, 'browser UI must execute the tested router core' );
 assert.match( appSource, /window\.labController = controllerPromise/, 'route wrappers need an awaitable controller during top-level initialization' );

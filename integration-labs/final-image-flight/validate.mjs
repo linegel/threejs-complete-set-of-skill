@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildDemoRegistry } from "../../scripts/lib/lab-registry.mjs";
 import { validateIntegrationContract, INTEGRATION_REASON } from "../shared/integration-contract-core.mjs";
 import { validateLabManifest, validateRawLabManifest } from "../../scripts/lib/lab-validation.mjs";
 import { plannedPublishedRoutes } from "../../scripts/lib/page-routes.mjs";
@@ -31,7 +32,9 @@ const target = targets.integrations.find((entry) => entry.id === "final-image-fl
 
 const raw = validateRawLabManifest(manifest);
 assert.deepEqual(raw.errors, [], raw.errors.join("\n"));
-const normalized = validateLabManifest(manifest, { root: repoRoot, validateEvidence: false });
+const registryManifest = buildDemoRegistry().demos.find((entry) => entry.id === manifest.id);
+assert(registryManifest, `registry contains ${manifest.id}`);
+const normalized = validateLabManifest(registryManifest, { root: repoRoot, validateEvidence: false });
 assert.deepEqual(normalized.errors, [], normalized.errors.join("\n"));
 assert.equal(manifest.status, "incomplete");
 assert.equal(manifest.evidenceBundle, null);

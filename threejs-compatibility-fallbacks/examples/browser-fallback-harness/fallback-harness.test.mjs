@@ -10,11 +10,13 @@ import {
 	measureBoundedWaterBranch,
 	planFallback
 } from './fallback-core.mjs';
+import { buildDemoRegistry } from '../../../scripts/lib/lab-registry.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const catalog = JSON.parse( await readFile( join( here, 'fallback-fixtures.json' ), 'utf8' ) );
 const manifest = JSON.parse( await readFile( join( here, 'lab.manifest.json' ), 'utf8' ) );
+const registryManifest = buildDemoRegistry().demos.find( ( entry ) => entry.id === manifest.id );
 const appSource = await readFile( join( here, 'app.mjs' ), 'utf8' );
 const runtimeSource = await readFile( join( here, 'compatibility-renderer.mjs' ), 'utf8' );
 
@@ -44,7 +46,8 @@ assert.deepEqual( manifest.scenarios.map( ( scenario ) => scenario.id ), scenari
 assert.deepEqual( manifest.tiers, [], 'fallback branches must not masquerade as canonical GPU tiers' );
 assert.equal( manifest.status, 'incomplete', 'browser acceptance must remain incomplete until a live no-WebGPU capture is recorded' );
 assert.equal( manifest.evidenceContract, 'v2' );
-assert.deepEqual( validateLabManifest( manifest, { validateEvidence: false } ).errors, [] );
+assert.ok( registryManifest, `registry contains ${ manifest.id }` );
+assert.deepEqual( validateLabManifest( registryManifest, { validateEvidence: false } ).errors, [] );
 
 assert.deepEqual( manifest.mechanisms.map( ( mechanism ) => mechanism.id ), [ ...mechanismScenarios.keys() ] );
 for ( const mechanism of manifest.mechanisms ) {
