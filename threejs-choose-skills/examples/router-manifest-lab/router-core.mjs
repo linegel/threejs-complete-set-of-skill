@@ -13,7 +13,6 @@ export const CANONICAL_SKILL_INVENTORY = Object.freeze( [
 	'threejs-image-pipeline',
 	'threejs-object-sculptor',
 	'threejs-particles-trails-and-effects',
-	'threejs-physics-integration',
 	'threejs-procedural-buildings-and-cities',
 	'threejs-procedural-creatures',
 	'threejs-procedural-fields',

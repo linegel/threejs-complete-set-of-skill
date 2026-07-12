@@ -12,7 +12,11 @@ import {
 import { scenarioHref } from './route-urls.mjs';
 import { RUNNABLE_DEMOS_BY_SKILL, runnableDemosForFixture } from './runnable-demos.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
-import { buildDemoRegistry, listSkillDirs } from '../../../scripts/lib/lab-registry.mjs';
+import {
+	authoritativeSkillDirs,
+	buildDemoRegistry,
+	loadCanonicalTargets
+} from '../../../scripts/lib/lab-registry.mjs';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const catalog = JSON.parse( await readFile( join( here, 'router-fixtures.json' ), 'utf8' ) );
@@ -28,7 +32,6 @@ const expectedIds = [
 	'black-hole-shot',
 	'post-pipeline-dashboard',
 	'ocean-fauna',
-	'dynamic-skiff-coupling',
 	'route-away-unsupported',
 	'over-budget-17.5-to-16.5',
 	'missing-webgpu',
@@ -52,12 +55,12 @@ const mechanismScenarios = new Map( [
 ] );
 
 assert.equal( catalog.schemaVersion, 2 );
-const liveSkillDirs = listSkillDirs();
-assert.equal( liveSkillDirs.length, 28, 'the repository skill inventory changed without an explicit matrix migration' );
-assert.deepEqual( catalog.skillInventory, liveSkillDirs, 'fixture inventory differs from the authoritative repository inventory' );
+const liveSkillDirs = authoritativeSkillDirs( loadCanonicalTargets() );
+assert.equal( liveSkillDirs.length, 27, 'the authoritative completion target changed without an explicit matrix migration' );
+assert.deepEqual( catalog.skillInventory, liveSkillDirs, 'fixture inventory differs from the authoritative completion target' );
 assert.deepEqual( catalog.skillInventory, CANONICAL_SKILL_INVENTORY );
-assert.equal( catalog.skillInventory.length, 28 );
-assert.equal( new Set( catalog.skillInventory ).size, 28 );
+assert.equal( catalog.skillInventory.length, 27 );
+assert.equal( new Set( catalog.skillInventory ).size, 27 );
 assert.deepEqual( catalog.routes.map( ( route ) => route.id ), expectedIds );
 assert.deepEqual( manifest.scenarios.map( ( scenario ) => scenario.id ), expectedIds );
 assert.deepEqual( manifest.tiers, [], 'planning skills must not invent GPU quality tiers' );
@@ -140,7 +143,6 @@ assert.deepEqual( accepted, [
 	'black-hole-shot',
 	'post-pipeline-dashboard',
 	'ocean-fauna',
-	'dynamic-skiff-coupling',
 	'route-away-unsupported'
 ] );
 

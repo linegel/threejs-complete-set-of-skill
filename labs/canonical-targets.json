@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "skillsExpected": 28,
-  "primaryExpected": 42,
+  "skillsExpected": 27,
+  "primaryExpected": 41,
   "integrationsExpected": 10,
   "flagshipsExpected": 5,
-  "fixedRoutesExpected": 525,
+  "fixedRoutesExpected": 516,
   "requiredCapabilitiesExpected": 90,
-  "requiredRuntimeProofsExpected": 227,
+  "requiredRuntimeProofsExpected": 224,
   "primaryRoster": [
     {
       "id": "browser-fallback-harness",
@@ -41,14 +41,6 @@
       "id": "debugging-contract-lab",
       "kind": "canonical-lab",
       "canonicalDir": "threejs-debugging/examples/debugging-contract-lab",
-      "executionClass": "non-rendering",
-      "flagship": false,
-      "dependencyLabIds": []
-    },
-    {
-      "id": "external-physics-adapter-conformance",
-      "kind": "canonical-lab",
-      "canonicalDir": "threejs-physics-integration/examples/external-physics-adapter-conformance",
       "executionClass": "non-rendering",
       "flagship": false,
       "dependencyLabIds": []
@@ -457,7 +449,7 @@
       "skill": "threejs-choose-skills",
       "id": "router-manifest-lab",
       "canonicalDir": "threejs-choose-skills/examples/router-manifest-lab",
-      "scenarios": ["ocean-planet", "rainy-city", "forest", "black-hole-shot", "post-pipeline-dashboard", "ocean-fauna", "dynamic-skiff-coupling", "route-away-unsupported", "over-budget-17.5-to-16.5", "missing-webgpu", "duplicate-output-owner", "duplicate-velocity-owner", "fabricated-tier", "post-before-physical-cause", "inventory-drift", "unsupported-route-away", "automatic-fallback"],
+      "scenarios": ["ocean-planet", "rainy-city", "forest", "black-hole-shot", "post-pipeline-dashboard", "ocean-fauna", "route-away-unsupported", "over-budget-17.5-to-16.5", "missing-webgpu", "duplicate-output-owner", "duplicate-velocity-owner", "fabricated-tier", "post-before-physical-cause", "inventory-drift", "unsupported-route-away", "automatic-fallback"],
       "mechanisms": ["inventory-intersection", "capability-gate", "causal-ordering", "exclusive-ownership", "tier-provenance", "stage-budget-aggregation", "route-away", "fallback-quarantine"],
       "tiers": [],
       "nonRenderingScenarioSuite": true
@@ -468,15 +460,6 @@
       "canonicalDir": "threejs-debugging/examples/debugging-contract-lab",
       "scenarios": ["ordinary-scene-design", "older-release-suspicious-output", "merged-but-unreleased", "closed-but-unrelated", "installed-source-docs-disagree", "current-release-reproduces-without-match", "local-usage-error"],
       "mechanisms": ["activation-gate", "version-matrix", "release-containment", "candidate-classification", "decision-boundary"],
-      "tiers": [],
-      "nonRenderingScenarioSuite": true
-    },
-    {
-      "skill": "threejs-physics-integration",
-      "id": "external-physics-adapter-conformance",
-      "canonicalDir": "threejs-physics-integration/examples/external-physics-adapter-conformance",
-      "scenarios": ["static-product-query", "tower-authored-motion", "dynamic-skiff-coupling", "dense-rigid-assembly", "overturning-breaker-reference"],
-      "mechanisms": ["five-candidate-ranking", "external-adapter-boundary", "bounded-gpu-skiff-reference"],
       "tiers": [],
       "nonRenderingScenarioSuite": true
     },
