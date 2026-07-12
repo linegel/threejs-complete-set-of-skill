@@ -100,8 +100,8 @@ test("conflicting mechanism path/query and actual resolution policies are exact"
     HABITAT_TIERS.map((tier) => [tier, HABITAT_TIER_CONFIG[tier].sceneScale, HABITAT_TIER_CONFIG[tier].waterScale]),
     [
       ["hero", 1, 1],
-      ["balanced", 1, 0.75],
-      ["budgeted", 0.85, 0.5],
+      ["balanced", 1, 0.5],
+      ["budgeted", 0.85, 0.375],
     ],
   );
 });

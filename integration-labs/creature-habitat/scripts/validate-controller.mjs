@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { WATER_QUALITY_TIERS } from "../../../threejs-water-optics/examples/webgpu-bounded-water/constants.js";
+import { HABITAT_TIER_CONFIG } from "../route-state.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
@@ -10,6 +12,7 @@ const main = read("main.js");
 const capture = read("capture.mjs");
 const captureHook = read("capture-hook.mjs");
 const routeState = read("route-state.mjs");
+const scaledWaterStage = read("scaled-water-stage.js");
 const manifest = JSON.parse(read("lab.manifest.json"));
 const contract = JSON.parse(read("contract.json"));
 const packageJson = JSON.parse(read("package.json"));
@@ -62,6 +65,19 @@ assert.deepEqual(manifest.cameras, contract.cameras);
 assert.deepEqual(manifest.tiers.map((tier) => tier.id), ["hero", "balanced", "budgeted"]);
 assert.equal(contract.integrationConstraints.contactChannel.includes("one bounded registry"), true);
 assert.equal(contract.integrationConstraints.staticSpawnStorage.includes("never rewrites"), true);
+assert.equal(scaledWaterStage.includes("tierOverrides"), false, "habitat water must not forge a private canonical tier");
+assert.equal(scaledWaterStage.includes("new WebGPUBoundedWaterHeightfield(renderer, {\n    tier,\n    parameters,"), true);
+
+const ultraWaterResolution = WATER_QUALITY_TIERS.ultra.resolution;
+for (const tier of manifest.tiers) {
+  const config = HABITAT_TIER_CONFIG[tier.id];
+  const waterTier = WATER_QUALITY_TIERS[config.waterTier];
+  const expectedScale = waterTier.resolution / ultraWaterResolution;
+  const contractTier = contract.tiers.find((entry) => entry.id === tier.id);
+  assert.equal(config.waterScale, expectedScale, `${tier.id} runtime waterScale must derive from its canonical water tier`);
+  assert.equal(tier.resolutionPolicy.waterScale, expectedScale, `${tier.id} manifest waterScale drifted`);
+  assert.equal(contractTier.resolutionPolicy.waterScale, expectedScale, `${tier.id} contract waterScale drifted`);
+}
 
 for (const script of ["check", "validate:unit", "test:mutations", "capture", "validate:artifacts", "validate:quick", "validate:full"]) {
   assert.equal(typeof packageJson.scripts[script], "string", `missing local script ${script}`);

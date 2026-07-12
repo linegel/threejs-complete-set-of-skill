@@ -12,9 +12,9 @@ const FULL_RESOLUTION = WATER_QUALITY_TIERS.ultra.resolution;
 const FULL_MESH_SEGMENTS = WATER_QUALITY_TIERS.ultra.meshSegments;
 
 /**
- * Host-neutral bounded-water stage with an explicit integration resolution
- * policy. `waterScale` scales both simulation width/height and mesh segments;
- * no descriptor-only scale survives into the runtime.
+ * Host-neutral bounded-water stage that validates the integration's declared
+ * scale against the selected canonical water tier. Simulation and mesh
+ * resources remain owned by that exact tier; no private override survives.
  */
 export async function createScaledBoundedWaterStage({
   renderer,
@@ -36,12 +36,17 @@ export async function createScaledBoundedWaterStage({
     throw new Error("scaled bounded-water stage requires initialized native WebGPU");
   }
 
-  const resolution = Math.max(32, Math.round(FULL_RESOLUTION * waterScale));
-  const meshSegments = Math.max(24, Math.round(FULL_MESH_SEGMENTS * waterScale));
+  const selectedTier = WATER_QUALITY_TIERS[tier];
+  const resolution = selectedTier.resolution;
+  const meshSegments = selectedTier.meshSegments;
+  const canonicalWaterScale = resolution / FULL_RESOLUTION;
+  if (Math.abs(waterScale - canonicalWaterScale) > Number.EPSILON) {
+    throw new RangeError(
+      `waterScale ${waterScale} must equal canonical ${tier} tier ratio ${canonicalWaterScale}`,
+    );
+  }
   const heightfield = new WebGPUBoundedWaterHeightfield(renderer, {
     tier,
-    resolution,
-    tierOverrides: { meshSegments },
     parameters,
   });
   heightfield.initialize();
@@ -54,7 +59,7 @@ export async function createScaledBoundedWaterStage({
     sceneColorNode: opticalInputs?.sceneColorNode ?? null,
     sceneDepthNode: opticalInputs?.sceneDepthNode ?? null,
   });
-  const mesh = createBoundedWaterMesh({ heightfield, segments: meshSegments, material });
+  const mesh = createBoundedWaterMesh({ heightfield, material });
   const heightQuery = createBoundedWaterHeightQuery({
     analyticBandCount: heightfield.tier.analyticBands,
     parameters: heightfield.parameters,
@@ -110,4 +115,3 @@ export async function createScaledBoundedWaterStage({
     },
   };
 }
-

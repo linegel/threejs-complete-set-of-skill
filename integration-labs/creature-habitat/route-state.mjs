@@ -64,7 +64,7 @@ export const HABITAT_TIER_CONFIG = Object.freeze({
     cameraTier: "budgeted",
     shadowMapSize: 1024,
     sceneScale: 1,
-    waterScale: 0.75,
+    waterScale: 0.5,
     dprCap: 1.5,
   }),
   budgeted: Object.freeze({
@@ -77,7 +77,7 @@ export const HABITAT_TIER_CONFIG = Object.freeze({
     cameraTier: "minimum",
     shadowMapSize: 512,
     sceneScale: 0.85,
-    waterScale: 0.5,
+    waterScale: 0.375,
     dprCap: 1,
   }),
 });
