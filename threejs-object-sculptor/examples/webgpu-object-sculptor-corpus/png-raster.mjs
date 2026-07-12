@@ -171,3 +171,89 @@ export function comparePngRgb(left, right) {
     maxChannelDelta,
   });
 }
+
+export function analyzeRgbaRaster({ width, height, rgba } = {}) {
+  if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
+    throw new RangeError("RGBA raster dimensions must be positive integers");
+  }
+  if (!(rgba instanceof Uint8Array) || rgba.byteLength !== width * height * 4) {
+    throw new RangeError(`RGBA raster must contain exactly ${width * height * 4} bytes`);
+  }
+  const minimum = [255, 255, 255, 255];
+  const maximum = [0, 0, 0, 0];
+  const first = [rgba[0], rgba[1], rgba[2], rgba[3]];
+  let changedPixelsFromFirst = 0;
+  let opaquePixels = 0;
+  let nonzeroRgbPixels = 0;
+  for (let offset = 0; offset < rgba.length; offset += 4) {
+    let differs = false;
+    let nonzeroRgb = false;
+    for (let channel = 0; channel < 4; channel += 1) {
+      const value = rgba[offset + channel];
+      minimum[channel] = Math.min(minimum[channel], value);
+      maximum[channel] = Math.max(maximum[channel], value);
+      differs ||= value !== first[channel];
+      nonzeroRgb ||= channel < 3 && value !== 0;
+    }
+    changedPixelsFromFirst += differs ? 1 : 0;
+    opaquePixels += rgba[offset + 3] > 0 ? 1 : 0;
+    nonzeroRgbPixels += nonzeroRgb ? 1 : 0;
+  }
+  const pixelCount = width * height;
+  return Object.freeze({
+    width,
+    height,
+    pixelCount,
+    minimum: Object.freeze(minimum),
+    maximum: Object.freeze(maximum),
+    changedPixelRatioFromFirst: changedPixelsFromFirst / pixelCount,
+    opaquePixelRatio: opaquePixels / pixelCount,
+    nonzeroRgbPixelRatio: nonzeroRgbPixels / pixelCount,
+    rgbaSha256: createHash("sha256").update(rgba).digest("hex"),
+  });
+}
+
+export function assertMeaningfulRgbaRaster(raster, label = "RGBA raster") {
+  const analysis = analyzeRgbaRaster(raster);
+  const rgbRange = Math.max(
+    analysis.maximum[0] - analysis.minimum[0],
+    analysis.maximum[1] - analysis.minimum[1],
+    analysis.maximum[2] - analysis.minimum[2],
+  );
+  if (rgbRange === 0 || analysis.changedPixelRatioFromFirst === 0) {
+    throw new Error(`${label} is blank or constant`);
+  }
+  if (analysis.opaquePixelRatio === 0 || analysis.nonzeroRgbPixelRatio === 0) {
+    throw new Error(`${label} contains no visible RGB evidence`);
+  }
+  return analysis;
+}
+
+export function validatePngRgbaBinding(pngBytes, packedRgba, label = "PNG/raw binding") {
+  if (!(packedRgba instanceof Uint8Array)) throw new TypeError(`${label} packed RGBA must be Uint8Array`);
+  const decoded = decodePngRaster(pngBytes);
+  if (decoded.rgba.byteLength !== packedRgba.byteLength) {
+    throw new Error(`${label} byte length mismatch`);
+  }
+  const expectedSha256 = createHash("sha256").update(packedRgba).digest("hex");
+  if (decoded.rgbaSha256 !== expectedSha256) throw new Error(`${label} PNG pixels do not match retained raw RGBA`);
+  return Object.freeze({
+    width: decoded.width,
+    height: decoded.height,
+    packedByteLength: packedRgba.byteLength,
+    packedRgbaSha256: expectedSha256,
+    decodedRgbaSha256: decoded.rgbaSha256,
+  });
+}
+
+export function assertDistinctPngRasters(leftPng, rightPng, label = "PNG pair", {
+  minimumChangedPixelRatio = 0.001,
+} = {}) {
+  const left = decodePngRaster(leftPng);
+  const right = decodePngRaster(rightPng);
+  const comparison = comparePngRgb(left, right);
+  if (left.rgbaSha256 === right.rgbaSha256 || comparison.changedPixelRatio < minimumChangedPixelRatio) {
+    throw new Error(`${label} images are duplicated or materially indistinguishable`);
+  }
+  return comparison;
+}
