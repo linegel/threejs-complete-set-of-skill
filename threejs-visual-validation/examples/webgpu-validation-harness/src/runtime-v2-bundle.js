@@ -860,6 +860,8 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const samples = ( performanceTrace?.cpuSamples ?? metrics.cpuFrameMs.samples ).filter( Number.isFinite );
 	if ( samples.length === 0 ) throw new Error( 'Runtime v2 assembler requires at least one measured CPU render sample.' );
 	const warmupSamples = ( performanceTrace?.warmupCpuSamples ?? samples.slice( 0, Math.min( 5, samples.length ) ) ).filter( Number.isFinite );
+	const coldSamples = ( performanceTrace?.coldCpuSamples ?? [ samples[ 0 ] ] ).filter( Number.isFinite );
+	const coldPresentationSamples = ( performanceTrace?.coldPresentationSamples ?? [] ).filter( Number.isFinite );
 	const sustainedSamples = performanceTrace === null ? samples.slice( Math.min( 5, samples.length ) ) : samples;
 	if ( sustainedSamples.length === 0 ) sustainedSamples.push( samples[ samples.length - 1 ] );
 	const gpuSamples = ( performanceTrace?.gpuSamples ?? [] ).filter( Number.isFinite );
@@ -870,7 +872,13 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		adapterClass,
 		clockSource: 'performance.now around RenderPipeline.render calls',
 		warmup: buildTraceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs, null, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ),
-		cold: buildTraceSegment( [ samples[ 0 ] ], 'first post-initialization render', targetIntervalMs, null, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ),
+		cold: buildTraceSegment(
+			coldSamples,
+			performanceTrace === null ? 'first post-initialization render' : 'physical-browser cold segment',
+			targetIntervalMs,
+			coldPresentationSamples,
+			performanceTrace?.deadlineIntervalMs ?? HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value
+		),
 		sustained: buildTraceSegment(
 			sustainedSamples,
 			performanceTrace === null ? 'remaining correctness capture sequence; not a sustained performance run' : `${ performanceTrace.sampleFrames }-frame sustained target-performance trace`,

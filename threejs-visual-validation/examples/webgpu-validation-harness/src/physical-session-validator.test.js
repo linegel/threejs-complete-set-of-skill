@@ -6,6 +6,7 @@ import { test } from 'node:test';
 
 import { numericDatum } from './physical-evidence-common.js';
 import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
+import { createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -14,6 +15,7 @@ import {
 	validatePhysicalRouteSession
 } from './physical-session-validator.js';
 import { finalizeImportedPhysicalRecord, loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
+import { classifyGpuStageAttribution, classifyPerformanceTrace } from './runtime-v2-bundle.js';
 
 const HASH_A = `sha256:${ 'a'.repeat( 64 ) }`;
 const HASH_B = `sha256:${ 'b'.repeat( 64 ) }`;
@@ -198,19 +200,24 @@ async function importedWrapper( record, options = {} ) {
 
 }
 
-function timestampBatch() {
+function timestampBatch( { frameBase = 0, frameCallBase = 0 } = {} ) {
 
-	const timestampRows = Array.from( { length: 120 }, ( _, frameId ) => ( {
+	const timestampRows = Array.from( { length: 120 }, ( _, index ) => {
+
+		const frameId = frameBase + index;
+		return {
 		frameId,
-		sceneUid: `scene:${ frameId }`,
-		outputUid: `output:${ frameId }`,
+		sceneUid: `r:${ frameCallBase + index * 2 + 1 }:17:f${ frameId }`,
+		outputUid: `r:${ frameCallBase + index * 2 + 2 }:41:f${ frameId }`,
 		sceneMs: 1,
 		outputMs: 0.5,
 		totalMs: 1.5,
 		residualMs: null,
 		totalProvenance: 'Derived',
 		independentPerFrameTotalAvailable: false
-	} ) );
+		};
+
+	} );
 	return {
 		verdict: 'PASS',
 		mappingCadence: 'once-per-batch',
@@ -221,6 +228,7 @@ function timestampBatch() {
 		resolveCount: numericDatum( 1, 'resolve', 'Measured', 'timestamp batch' ),
 		gpuSamples: { values: timestampRows.map( ( row ) => row.totalMs ), unit: 'ms', label: 'Measured', source: 'WebGPU timestamp rows' },
 		timestampRows,
+		stageContextIds: { 'scene-mrt': 17, 'final-output': 41 },
 		lastFrameResolveResidualMs: 0,
 		independentPerFrameTotalsAvailable: false,
 		reconciliationScope: 'Independent Three aggregate checked only for the final-frame resolve.'
@@ -503,6 +511,43 @@ test( 'hardware performance session passes long-window and timestamp gates', () 
 		governorTransitionCount: 1,
 		governorSettledResidenceWindows: 4
 	} );
+
+} );
+
+test( 'verified hardware timing maps the final sustained window without relabelling cold samples', async () => {
+
+	const record = performanceSession();
+	record.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch( { frameBase: 120, frameCallBase: 240 } ) );
+	const imported = await importedWrapper( record );
+	const verified = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
+	const trace = createRuntimePerformanceTrace( verified );
+	assert.equal( trace.adapterClass, 'hardware' );
+	assert.equal( trace.sustainedWindowIndex, 1 );
+	assert.equal( trace.sustainedWindowCount, 2 );
+	assert.equal( trace.sampleFrames, 240 );
+	assert.equal( trace.timestampResolveCount, 2 );
+	assert.equal( trace.timestampRows[ 119 ].frameId, 119 );
+	assert.equal( trace.timestampRows[ 120 ].frameId, 120 );
+	assert.equal( trace.warmupCpuSamples.length, 30 );
+	assert.equal( trace.coldCpuSamples.length, 120 );
+	assert.equal( trace.coldGpuSamples.length, 120 );
+	assert.equal( trace.coldPresentationSamples.length, HARDWARE_PERFORMANCE_CONTRACT.coldMinimumSamples.value );
+	assert.equal( trace.deadlineIntervalMs, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value );
+	assert.equal( classifyPerformanceTrace( trace, {
+		cpuP95: HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value,
+		gpuP95: HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value,
+		deadlineMissRatio: HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value
+	} ), 'PASS' );
+	assert.equal( classifyGpuStageAttribution( trace ), 'PASS' );
+	verified.record.sustainedWindows.at( - 1 ).gpuTimestampBatches[ 0 ].cpuSamples.values[ 0 ] = 99;
+	assert.equal( trace.cpuSamples[ 0 ], 1.2 );
+	assert.throws( () => createRuntimePerformanceTrace( { record: performanceSession() } ), /exact wrapper bytes/ );
+
+	const duplicateRecord = performanceSession();
+	duplicateRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch() );
+	const duplicateImport = await importedWrapper( duplicateRecord );
+	const duplicateVerified = await loadVerifiedImportedPhysicalRecord( duplicateImport.path, { expectedProfile: 'performance' } );
+	assert.throws( () => createRuntimePerformanceTrace( duplicateVerified ), /duplicates a timestamp or frame identity/ );
 
 } );
 
