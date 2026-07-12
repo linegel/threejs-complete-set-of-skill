@@ -12,6 +12,11 @@ import {
 	reconstructDiagnosticMosaic as reconstructNamedDiagnosticMosaic
 } from './src/diagnostic-mosaic.js';
 import {
+	CORRECTNESS_CAPTURE_RECIPES,
+	correctnessCaptureRecipeDigest
+} from './src/correctness-capture-recipes.js';
+import { stableStringify } from './src/physical-evidence-common.js';
+import {
 	classifyGpuStageAttribution,
 	classifyMechanismProof,
 	classifyPerformanceTrace,
@@ -19,6 +24,14 @@ import {
 } from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
+const SHA256_PATTERN = /^sha256:[0-9a-f]{64}$/;
+export const TIER_VISUAL_EVIDENCE_FILENAME = 'tier-visual-evidence.json';
+export const TIER_VISUAL_ERROR_GATES = Object.freeze( {
+	meanRgbByteDifference: 8,
+	edgeP95RgbByteDifference: 32
+} );
+export const DIRECT_CAPTURE_RECIPE_ORDER = Object.freeze( CORRECTNESS_CAPTURE_RECIPES.map( ( recipe ) => recipe.id ) );
+if ( DIRECT_CAPTURE_RECIPE_ORDER.length !== 14 ) throw new Error( `Correctness capture requires exactly 14 direct recipes, observed ${ DIRECT_CAPTURE_RECIPE_ORDER.length }.` );
 export { DIAGNOSTIC_MOSAIC_RECIPE, DIAGNOSTIC_MOSAIC_SOURCES };
 
 export const outputPlan = Object.freeze( [
@@ -41,6 +54,29 @@ export const outputPlan = Object.freeze( [
 
 export const recomputeCaptureSourceClosure = computeCaptureSourceClosure;
 export { validateCaptureSourceClosure };
+
+function deepFreeze( value ) {
+
+	if ( value === null || typeof value !== 'object' || Object.isFrozen( value ) ) return value;
+	if ( ArrayBuffer.isView( value ) || value instanceof ArrayBuffer ) return value;
+	for ( const child of Object.values( value ) ) deepFreeze( child );
+	return Object.freeze( value );
+
+}
+
+function requireRecord( value, label ) {
+
+	if ( value === null || typeof value !== 'object' || Array.isArray( value ) ) throw new Error( `${ label } must be an object.` );
+	return value;
+
+}
+
+function requireSha256( value, label ) {
+
+	if ( SHA256_PATTERN.test( value ?? '' ) === false ) throw new Error( `${ label } must be a sha256: digest.` );
+	return value;
+
+}
 
 function sha256( bytes ) {
 
@@ -71,14 +107,45 @@ export function captureRecord( filename, capture ) {
 		colorEncoding: capture.colorEncoding,
 		pngSha256: capture.png.sha256,
 		transportSha256: capture.transport.artifact.sha256,
-		normalizedSha256: capture.normalized.artifact.sha256
+		normalizedSha256: capture.normalized.artifact.sha256,
+		evidence: capture.evidence
 	};
 
 }
 
-async function captureAndWrite( session, captures, filename, target ) {
+export async function assertRecipeCaptureMetadata( filename, recipe, capture ) {
 
-	const metadata = await session.writeCapture( filename, target );
+	requireRecord( recipe, 'Correctness capture recipe' );
+	if ( recipe.capture?.filename !== filename ) throw new Error( `Recipe ${ recipe.id } is locked to filename ${ recipe.capture?.filename }, not ${ filename }.` );
+	requireRecord( capture, `Capture metadata for ${ recipe.id }` );
+	if ( capture.target !== recipe.id ) throw new Error( `Capture metadata target ${ capture.target } does not match recipe ${ recipe.id }.` );
+	const evidence = requireRecord( capture.evidence, `Capture evidence for ${ recipe.id }` );
+	const recipeEvidence = requireRecord( evidence.recipe, `Capture recipe evidence for ${ recipe.id }` );
+	if ( recipeEvidence.id !== recipe.id ) throw new Error( `Capture recipe evidence ID ${ recipeEvidence.id } does not match ${ recipe.id }.` );
+	if ( recipeEvidence.captureFilename !== filename ) throw new Error( `Capture recipe evidence filename ${ recipeEvidence.captureFilename } does not match ${ filename }.` );
+	const expectedDigest = await correctnessCaptureRecipeDigest( recipe.id );
+	requireSha256( recipeEvidence.digest, `Capture recipe ${ recipe.id } digest` );
+	if ( recipeEvidence.digest !== expectedDigest ) throw new Error( `Capture recipe ${ recipe.id } digest does not match the frozen contract.` );
+	const transaction = requireRecord( evidence.transaction, `Capture transaction evidence for ${ recipe.id }` );
+	if ( transaction.status !== 'COMMITTED' ) throw new Error( `Capture recipe ${ recipe.id } transaction is not COMMITTED.` );
+	if ( transaction.recipeId !== recipe.id ) throw new Error( `Capture transaction recipe ID ${ transaction.recipeId } does not match ${ recipe.id }.` );
+	if ( transaction.restorationVerdict !== 'PASS' ) throw new Error( `Capture recipe ${ recipe.id } restoration did not PASS.` );
+	if ( typeof transaction.transactionId !== 'string' || transaction.transactionId.length === 0 ) throw new Error( `Capture recipe ${ recipe.id } transaction ID is required.` );
+	if ( Number.isInteger( transaction.sequence ) === false || transaction.sequence <= 0 ) throw new Error( `Capture recipe ${ recipe.id } transaction sequence must be a positive integer.` );
+	requireSha256( transaction.entryStateDigest, `Capture recipe ${ recipe.id } entry-state digest` );
+	requireSha256( transaction.restoredStateDigest, `Capture recipe ${ recipe.id } restored-state digest` );
+	if ( transaction.entryStateDigest !== transaction.restoredStateDigest ) throw new Error( `Capture recipe ${ recipe.id } did not restore its entry-state digest.` );
+	requireRecord( evidence.effectiveState, `Capture effective state for ${ recipe.id }` );
+	requireRecord( evidence.resources, `Capture resource evidence for ${ recipe.id }` );
+	return true;
+
+}
+
+async function captureRecipeAndWrite( session, captures, recipe ) {
+
+	const filename = recipe.capture.filename;
+	const metadata = await session.writeRecipeCapture( filename, recipe.id );
+	await assertRecipeCaptureMetadata( filename, recipe, metadata );
 	captures.push( captureRecord( filename, metadata ) );
 	const normalizedBytes = await session.readArtifact( metadata.normalized.artifact.path );
 	const compact = unpackAlignedRows( {
@@ -89,7 +156,7 @@ async function captureAndWrite( session, captures, filename, target ) {
 		bytesPerRow: metadata.normalized.bytesPerRow
 	} );
 	if ( sha256( compact ) !== metadata.normalized.compactRgbaSha256 ) throw new Error( `${ filename } normalized readback hash drifted before mosaic construction.` );
-	return { filename, width: metadata.width, height: metadata.height, data: compact, metadata };
+	return deepFreeze( { filename, recipeId: recipe.id, width: metadata.width, height: metadata.height, data: compact, metadata } );
 
 }
 
@@ -144,6 +211,160 @@ export function tierVisualErrorMetrics( reference, candidate ) {
 		edgeMeanRgbByteDifference: edgeDifferences.reduce( ( sum, value ) => sum + value, 0 ) / edgeDifferences.length,
 		edgeP95RgbByteDifference: percentile( edgeDifferences, 0.95 )
 	};
+
+}
+
+function numericEvidence( value, unit, label, source ) {
+
+	return { value, unit, label, source };
+
+}
+
+function requireResourceExtent( resources, semantic, width, height, recipeId ) {
+
+	if ( Array.isArray( resources.renderTargets ) === false ) throw new Error( `${ recipeId } effective resource evidence must list renderTargets.` );
+	const resource = resources.renderTargets.find( ( entry ) => entry?.semantic === semantic );
+	if ( resource === undefined ) throw new Error( `${ recipeId } effective resource evidence omits ${ semantic }.` );
+	if ( resource.width !== width || resource.height !== height ) throw new Error( `${ recipeId } ${ semantic } extent ${ resource.width }x${ resource.height } does not match ${ width }x${ height }.` );
+	return {
+		semantic,
+		owner: resource.owner ?? null,
+		targetName: resource.targetName ?? null,
+		textureUuid: resource.textureUuid ?? null,
+		width: resource.width,
+		height: resource.height,
+		format: resource.format ?? null,
+		bytes: resource.bytes ?? null,
+		logicalBytes: resource.logicalBytes ?? null,
+		liveBytes: resource.liveBytes ?? null,
+		liveness: resource.liveness ?? null
+	};
+
+}
+
+function tierCaptureBinding( capture, expectation ) {
+
+	const metadata = capture.metadata;
+	const normalized = requireRecord( metadata.normalized, `${ capture.recipeId } normalized evidence` );
+	const artifact = requireRecord( normalized.artifact, `${ capture.recipeId } normalized artifact` );
+	const evidence = requireRecord( metadata.evidence, `${ capture.recipeId } capture evidence` );
+	const recipe = requireRecord( evidence.recipe, `${ capture.recipeId } recipe evidence` );
+	const transaction = requireRecord( evidence.transaction, `${ capture.recipeId } transaction evidence` );
+	const effectiveState = requireRecord( evidence.effectiveState, `${ capture.recipeId } effective state` );
+	const resources = requireRecord( evidence.resources, `${ capture.recipeId } resource evidence` );
+	const effectiveResources = requireRecord( resources.effective, `${ capture.recipeId } effective resource ledger` );
+	if ( transaction.status !== 'COMMITTED' || transaction.recipeId !== capture.recipeId || transaction.restorationVerdict !== 'PASS' ) throw new Error( `${ capture.recipeId } tier binding requires committed restoration evidence.` );
+	if ( transaction.entryStateDigest !== transaction.restoredStateDigest ) throw new Error( `${ capture.recipeId } tier binding requires equal entry and restored state digests.` );
+	if ( capture.width !== 1920 || capture.height !== 1080 ) throw new Error( `${ capture.recipeId } must retain a 1920x1080 tier readback.` );
+	if ( effectiveState.tier !== expectation.tier ) throw new Error( `${ capture.recipeId } effective tier ${ effectiveState.tier } does not match ${ expectation.tier }.` );
+	if ( evidence.passScale !== expectation.passScale ) throw new Error( `${ capture.recipeId } pass scale ${ evidence.passScale } does not match ${ expectation.passScale }.` );
+	const captureTarget = requireResourceExtent( effectiveResources, 'capture-target', 1920, 1080, capture.recipeId );
+	const sceneMrt = [ 'output', 'normal', 'emissive' ].map( ( semantic ) => requireResourceExtent(
+		effectiveResources,
+		semantic,
+		expectation.sceneWidth,
+		expectation.sceneHeight,
+		capture.recipeId
+	) );
+	return {
+		recipeId: capture.recipeId,
+		recipeDigest: requireSha256( recipe.digest, `${ capture.recipeId } recipe digest` ),
+		filename: capture.filename,
+		pngSha256: requireSha256( metadata.png?.sha256, `${ capture.recipeId } PNG hash` ),
+		transaction: {
+			transactionId: transaction.transactionId,
+			sequence: transaction.sequence,
+			status: transaction.status,
+			entryStateDigest: transaction.entryStateDigest,
+			restoredStateDigest: transaction.restoredStateDigest,
+			restorationVerdict: transaction.restorationVerdict
+		},
+		normalized: {
+			artifact: {
+				path: artifact.path,
+				sha256: requireSha256( artifact.sha256, `${ capture.recipeId } normalized artifact hash` ),
+				byteLength: artifact.byteLength
+			},
+			compactRgbaSha256: requireSha256( normalized.compactRgbaSha256, `${ capture.recipeId } compact RGBA hash` ),
+			compactByteLength: normalized.compactByteLength,
+			width: capture.width,
+			height: capture.height
+		},
+		captureEvidenceSha256: sha256( Buffer.from( stableStringify( evidence ) ) ),
+		effectiveState,
+		passScale: evidence.passScale,
+		resources: { captureTarget, sceneMrt }
+	};
+
+}
+
+export function createTierVisualEvidence( reference, candidate ) {
+
+	if ( reference?.recipeId !== 'tier.target-performance.final' ) throw new Error( 'Tier visual reference must be tier.target-performance.final.' );
+	if ( candidate?.recipeId !== 'tier.governor-stress.final' ) throw new Error( 'Tier visual candidate must be tier.governor-stress.final.' );
+	const measured = tierVisualErrorMetrics( reference, candidate );
+	const binding = {
+		reference: tierCaptureBinding( reference, { tier: 'target-performance', passScale: 1, sceneWidth: 1920, sceneHeight: 1080 } ),
+		candidate: tierCaptureBinding( candidate, { tier: 'governor-stress', passScale: 0.5, sceneWidth: 960, sceneHeight: 540 } )
+	};
+	if ( typeof binding.reference.transaction.transactionId !== 'string' || binding.reference.transaction.transactionId.length === 0 ) throw new Error( 'Tier visual reference transaction ID is required.' );
+	if ( typeof binding.candidate.transaction.transactionId !== 'string' || binding.candidate.transaction.transactionId.length === 0 ) throw new Error( 'Tier visual candidate transaction ID is required.' );
+	if ( binding.reference.transaction.transactionId === binding.candidate.transaction.transactionId ) throw new Error( 'Tier visual captures must use distinct transactions.' );
+	if ( Number.isInteger( binding.reference.transaction.sequence ) === false || Number.isInteger( binding.candidate.transaction.sequence ) === false ) throw new Error( 'Tier visual capture transaction sequences must be integers.' );
+	if ( binding.reference.transaction.sequence === binding.candidate.transaction.sequence ) throw new Error( 'Tier visual captures must use distinct transaction sequences.' );
+	if ( binding.reference.normalized.artifact.path === binding.candidate.normalized.artifact.path ) throw new Error( 'Tier visual captures must retain separate normalized artifact paths.' );
+	const metrics = {
+		meanRgbByteDifference: numericEvidence(
+			measured.meanRgbByteDifference,
+			'mean-rgb-byte-difference',
+			'Measured',
+			`${ binding.reference.normalized.compactRgbaSha256 } versus ${ binding.candidate.normalized.compactRgbaSha256 }`
+		),
+		edgeMaskPixels: numericEvidence(
+			measured.edgeMaskPixels,
+			'pixels',
+			'Measured',
+			'reference-image RGB gradient mask with threshold 8 bytes'
+		),
+		edgeMeanRgbByteDifference: numericEvidence(
+			measured.edgeMeanRgbByteDifference,
+			'mean-rgb-byte-difference',
+			'Measured',
+			'reference-edge-mask comparison'
+		),
+		edgeP95RgbByteDifference: numericEvidence(
+			measured.edgeP95RgbByteDifference,
+			'mean-rgb-byte-difference',
+			'Measured',
+			'reference-edge-mask p95 comparison'
+		)
+	};
+	const gates = {
+		meanRgbByteDifference: numericEvidence(
+			TIER_VISUAL_ERROR_GATES.meanRgbByteDifference,
+			'mean-rgb-byte-difference',
+			'Gated',
+			'frozen correctness-capture tier degradation gate'
+		),
+		edgeP95RgbByteDifference: numericEvidence(
+			TIER_VISUAL_ERROR_GATES.edgeP95RgbByteDifference,
+			'mean-rgb-byte-difference',
+			'Gated',
+			'frozen correctness-capture reference-edge p95 gate'
+		)
+	};
+	const verdict = measured.meanRgbByteDifference <= TIER_VISUAL_ERROR_GATES.meanRgbByteDifference &&
+		measured.edgeP95RgbByteDifference <= TIER_VISUAL_ERROR_GATES.edgeP95RgbByteDifference ? 'PASS' : 'FAIL';
+	const bindingSha256 = sha256( Buffer.from( stableStringify( { binding, metrics, gates } ) ) );
+	return deepFreeze( {
+		schemaVersion: 1,
+		kind: 'validation-harness-tier-visual-evidence-v1',
+		binding,
+		metrics,
+		gates,
+		bindingSha256,
+		verdict
+	} );
 
 }
 
@@ -227,79 +448,113 @@ export function assertCanonicalCaptureLane( session ) {
 
 }
 
-export async function captureLab( session ) {
+export async function captureFrozenRecipeEvidence( session ) {
 
-	assertCanonicalCaptureLane( session );
-	const sourceClosure = computeCaptureSourceClosure();
+	if ( typeof session?.writeRecipeCapture !== 'function' ) throw new Error( 'Correctness capture session must expose writeRecipeCapture(filename, recipeId).' );
 	const captures = [];
-	await session.controllerCall( 'setScenario', 'browser-capture' );
-	await session.controllerCall( 'setTier', 'webgpu-correctness' );
-	await session.controllerCall( 'resize', 1200, 800, 1 );
-	await session.controllerCall( 'setCamera', 'design' );
-	await session.controllerCall( 'setSeed', 0x00000001 );
-	await session.controllerCall( 'setTime', 0 );
+	const retained = new Map();
+	for ( const recipe of CORRECTNESS_CAPTURE_RECIPES ) {
 
-	const final = await captureAndWrite( session, captures, 'final.design.png', 'final' );
-	const noPost = await captureAndWrite( session, captures, 'no-post.design.png', 'no-post' );
-	const normal = await captureAndWrite( session, captures, 'diagnostic.normal.png', 'normal' );
-	const emissive = await captureAndWrite( session, captures, 'diagnostic.emissive.png', 'emissive' );
+		const capture = await captureRecipeAndWrite( session, captures, recipe );
+		retained.set( capture.filename, capture );
+
+	}
+
+	const final = retained.get( 'final.design.png' );
+	const normal = retained.get( 'diagnostic.normal.png' );
+	const emissive = retained.get( 'diagnostic.emissive.png' );
 	const diagnosticDifferences = {
 		normal: meanRgbByteDifference( final, normal ),
 		emissive: meanRgbByteDifference( final, emissive )
 	};
 	const diagnosticDifference = Math.min( diagnosticDifferences.normal, diagnosticDifferences.emissive );
 	if ( diagnosticDifference <= DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE ) throw new Error( 'Diagnostic outputs are not materially distinct from final output.' );
-	const mosaicOutput = await writeDerivedMosaic( session, reconstructDiagnosticMosaic( new Map( [
-		[ final.filename, final ],
-		[ noPost.filename, noPost ],
-		[ normal.filename, normal ],
-		[ emissive.filename, emissive ]
-	] ) ) );
+	const mosaicOutput = await writeDerivedMosaic( session, reconstructDiagnosticMosaic( retained ) );
 	captures.push( derivedMosaicCaptureRecord( mosaicOutput ) );
 
-	for ( const camera of [ 'near', 'design', 'far' ] ) {
-
-		await session.controllerCall( 'setCamera', camera );
-		await captureAndWrite( session, captures, `camera.${ camera }.png`, 'final' );
-
-	}
-
-	await session.controllerCall( 'setCamera', 'design' );
-	for ( const seed of [ 0x00000001, 0x9e3779b9 ] ) {
-
-		await session.controllerCall( 'setSeed', seed );
-		await session.controllerCall( 'setTime', 0 );
-		const seedName = seed === 0x00000001 ? '0001' : seed.toString( 16 ).padStart( 8, '0' );
-		await captureAndWrite( session, captures, `seed-${ seedName }.final.png`, 'final' );
-
-	}
-
-	await session.controllerCall( 'setSeed', 0x00000001 );
-	await session.controllerCall( 'resetHistory', 'correctness-capture' );
-	await session.controllerCall( 'setTime', 0 );
-	await captureAndWrite( session, captures, 'temporal.t000.png', 'final' );
-	await session.controllerCall( 'step', 1 / 60 );
-	await captureAndWrite( session, captures, 'temporal.t001.png', 'final' );
-
-	await session.controllerCall( 'resize', 641, 359, 1 );
-	const odd = await captureAndWrite( session, captures, 'odd-size.final.png', 'final' );
+	const odd = retained.get( 'odd-size.final.png' );
 	if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
+	const tierVisualEvidence = createTierVisualEvidence(
+		retained.get( 'tier.target-performance.final.png' ),
+		retained.get( 'tier.governor-stress.final.png' )
+	);
+	await session.writeArtifact( TIER_VISUAL_EVIDENCE_FILENAME, `${ JSON.stringify( tierVisualEvidence, null, 2 ) }\n` );
+	if ( tierVisualEvidence.verdict !== 'PASS' ) throw new Error(
+		`Governor-stress tier exceeds frozen visual gates: mean ${ tierVisualEvidence.metrics.meanRgbByteDifference.value }/${ tierVisualEvidence.gates.meanRgbByteDifference.value }, edge p95 ${ tierVisualEvidence.metrics.edgeP95RgbByteDifference.value }/${ tierVisualEvidence.gates.edgeP95RgbByteDifference.value }.`
+	);
+
+	return {
+		captures,
+		retained,
+		mosaicOutput,
+		diagnosticDifference,
+		diagnosticDifferences,
+		tierVisualEvidence
+	};
+
+}
+
+function equalLockedValue( actual, expected ) {
+
+	return typeof actual === 'number' && typeof expected === 'number' ? Object.is( actual, expected ) : String( actual ) === String( expected );
+
+}
+
+export function assertControllerAtLockedState( session, metrics ) {
+
+	const lockedState = requireRecord( session?.lockedState, 'Correctness capture locked state' );
+	const current = requireRecord( metrics, 'Correctness capture controller metrics' );
+	for ( const field of [ 'scenario', 'mode', 'tier', 'camera', 'seed', 'timeSeconds' ] ) {
+
+		const expected = lockedState[ field ];
+		if ( expected === null || expected === undefined ) continue;
+		if ( current[ field ] === null || current[ field ] === undefined ) throw new Error( `Controller metrics omit locked ${ field }.` );
+		if ( equalLockedValue( current[ field ], expected ) === false ) throw new Error( `Controller ${ field }=${ current[ field ] } does not match locked ${ expected }.` );
+
+	}
+	const viewport = requireRecord( current.viewport, 'Correctness capture controller viewport' );
+	const profile = requireRecord( session?.profileConfig, 'Correctness capture profile' );
+	for ( const field of [ 'width', 'height', 'dpr' ] ) if ( equalLockedValue( viewport[ field ], profile[ field ] ) === false ) {
+
+		throw new Error( `Controller viewport ${ field }=${ viewport[ field ] } does not match locked ${ profile[ field ] }.` );
+
+	}
+	return true;
+
+}
+
+export async function runLockedMechanismAndLifecycleProfiles( session ) {
+
+	const beforeMechanism = await session.controllerCall( 'getMetrics' );
+	assertControllerAtLockedState( session, beforeMechanism );
+	const mechanismProof = await session.controllerCall( 'runMechanismReachabilityProfile' );
+	const beforeLifecycle = await session.controllerCall( 'getMetrics' );
+	assertControllerAtLockedState( session, beforeLifecycle );
+	const lifecycle = await session.page.evaluate( async ( cycles ) => window.__THREEJS_LAB_LIFECYCLE__( cycles ), 50 );
+	const metrics = await session.controllerCall( 'getMetrics' );
+	assertControllerAtLockedState( session, metrics );
+	return { mechanismProof, lifecycle, metrics };
+
+}
+
+export async function captureLab( session ) {
+
+	assertCanonicalCaptureLane( session );
+	const sourceClosure = computeCaptureSourceClosure();
+	const {
+		captures,
+		mosaicOutput,
+		diagnosticDifference,
+		diagnosticDifferences,
+		tierVisualEvidence
+	} = await captureFrozenRecipeEvidence( session );
 
 	const performanceTrace = null;
 	const governorTrace = null;
-
-	await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
-	await session.controllerCall( 'setTier', 'webgpu-correctness' );
-	await session.controllerCall( 'setCamera', 'design' );
-	await session.controllerCall( 'setSeed', 0x00000001 );
-	await session.controllerCall( 'setTime', 0 );
-	await session.controllerCall( 'setMode', 'final' );
-	await session.controllerCall( 'renderOnce' );
-	const mechanismProof = await session.controllerCall( 'runMechanismReachabilityProfile' );
-	const lifecycle = await session.page.evaluate( async () => window.__THREEJS_LAB_LIFECYCLE__( 50 ) );
+	const { mechanismProof, lifecycle, metrics } = await runLockedMechanismAndLifecycleProfiles( session );
 
 	const runtime = {
-		metrics: await session.controllerCall( 'getMetrics' ),
+		metrics,
 		pipeline: await session.controllerCall( 'describePipeline' ),
 		resources: await session.controllerCall( 'describeResources' ),
 		gpuTiming: await session.controllerCall( 'resolveGpuTimings' ),
@@ -362,7 +617,8 @@ export async function captureLab( session ) {
 		gpuTiming: runtime.gpuTiming,
 		bundle,
 		sourceClosure,
-		standardOutputs: [ mosaicOutput ]
+		standardOutputs: [ mosaicOutput ],
+		tierVisualEvidence
 	};
 
 }
