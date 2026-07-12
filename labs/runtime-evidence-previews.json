@@ -84,36 +84,6 @@
         { "source": "images/velocity.moving-positive-x.png", "output": "velocity.moving-positive-x.png", "encoding": "png-copy", "meaning": "Moving-velocity fixture with expected positive NDC X sign." },
         { "source": "images/temporal.history.png", "output": "temporal.history.png", "encoding": "png-copy", "meaning": "Temporal history target before camera-cut reset." }
       ]
-    },
-    {
-      "labId": "webgpu-validation-harness",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-validation-harness/performance",
-      "backendProof": "evidence-manifest.json",
-      "claimVerdicts": "evidence-manifest.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Native WebGPU MRT subject render-target readback",
-      "limitations": [
-        "Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.",
-        "The SwiftShader performance and governor traces report FAIL because the settled reduced tier misses both its GPU and edge-domain visual gates; scene-MRT/final-output attribution passes, while mechanism completeness remains INSUFFICIENT_EVIDENCE."
-      ],
-      "images": [
-        { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Color-managed final output from the single RenderPipeline owner." },
-        { "source": "images/no-post.design.png", "output": "no-post.design.png", "encoding": "png-copy", "meaning": "No-post baseline from the same static MRT scene." },
-        { "source": "images/diagnostics.mosaic.png", "output": "diagnostics.mosaic.png", "encoding": "png-copy", "meaning": "Mosaic of the final, no-post, normal, and emissive output-node captures." },
-        { "source": "images/diagnostic.normal.png", "output": "diagnostic.normal.png", "encoding": "png-copy", "meaning": "Live shared normal attachment diagnostic." },
-        { "source": "images/diagnostic.emissive.png", "output": "diagnostic.emissive.png", "encoding": "png-copy", "meaning": "Live shared emissive attachment diagnostic." },
-        { "source": "images/camera.near.png", "output": "camera.near.png", "encoding": "png-copy", "meaning": "Near-camera correctness bookmark." },
-        { "source": "images/camera.design.png", "output": "camera.design.png", "encoding": "png-copy", "meaning": "Design-camera correctness bookmark." },
-        { "source": "images/camera.far.png", "output": "camera.far.png", "encoding": "png-copy", "meaning": "Far-camera correctness bookmark." },
-        { "source": "images/seed-0001.final.png", "output": "seed-0001.final.png", "encoding": "png-copy", "meaning": "Baseline deterministic seed capture." },
-        { "source": "images/seed-9e3779b9.final.png", "output": "seed-9e3779b9.final.png", "encoding": "png-copy", "meaning": "Stress deterministic seed capture." },
-        { "source": "images/temporal.t000.png", "output": "temporal.t000.png", "encoding": "png-copy", "meaning": "Static-subject temporal baseline immediately after reset." },
-        { "source": "images/temporal.t001.png", "output": "temporal.t001.png", "encoding": "png-copy", "meaning": "Static-subject temporal capture one fixed 1/60-second step later." },
-        { "source": "images/odd-size.final.png", "output": "odd-size.final.png", "encoding": "png-copy", "meaning": "Odd 641 by 359 aligned-row readback result." },
-        { "source": "images/tier.target-performance.png", "output": "tier.target-performance.png", "encoding": "png-copy", "meaning": "Full-resolution target-performance tier used as the governor visual reference." },
-        { "source": "images/tier.governor-stress.png", "output": "tier.governor-stress.png", "encoding": "png-copy", "meaning": "Reduced governor-stress tier whose reference-edge p95 error exceeds the frozen gate." }
-      ]
     }
   ]
 }

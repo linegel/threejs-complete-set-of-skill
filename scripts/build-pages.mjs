@@ -17,6 +17,10 @@ import { PROVIDER_DEMOS } from './provider-demos.mjs';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const runtimeEvidencePreviewConfig = JSON.parse(readFileSync(join(root, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
+const configuredRuntimeEvidencePreviews = new Set(
+  (runtimeEvidencePreviewConfig.previews ?? []).map((preview) => preview.labId),
+);
 const REPO = 'https://github.com/linegel/threejs-complete-set-of-skill';
 const REPO_SLUG = 'linegel/threejs-complete-set-of-skill';
 const SITE = 'https://threejs-skills.com/';
@@ -543,6 +547,10 @@ const providerPosterPath = (demo) => {
 const runtimeEvidenceSummaries = new Map();
 const runtimeEvidenceSummary = (demo) => {
   if (runtimeEvidenceSummaries.has(demo.id)) return runtimeEvidenceSummaries.get(demo.id);
+  if (!configuredRuntimeEvidencePreviews.has(demo.id)) {
+    runtimeEvidenceSummaries.set(demo.id, null);
+    return null;
+  }
   const summaryPath = join(root, 'docs', 'visual-validation', demo.id, 'evidence-summary.json');
   if (!existsSync(summaryPath)) {
     runtimeEvidenceSummaries.set(demo.id, null);
@@ -583,7 +591,7 @@ const directPrimaryPreview = (demo) => {
   const runtimeEvidence = runtimeEvidenceEntries(demo);
   if (runtimeEvidence.length > 0) return runtimeEvidence.find((entry) => entry.path.endsWith(`/${runtimeEvidenceSummary(demo).primaryImage}`));
   const screenshot = primaryPreviewPath(demo);
-  if (previewImageExists(screenshot)) {
+  if (demo.nonRenderingScenarioSuite && previewImageExists(screenshot)) {
     return {
       path: screenshot,
       classification: demo.nonRenderingScenarioSuite ? 'non-rendering-lab-preview' : 'implementation-preview',
@@ -591,18 +599,6 @@ const directPrimaryPreview = (demo) => {
         ? 'Deterministic contract-lab screenshot'
         : 'Canonical implementation screenshot · runtime evidence pending',
       detail: 'Published implementation screenshot; runtime acceptance is reported separately.',
-      sourceId: demo.id,
-    };
-  }
-  const evidence = `visual-validation/${demo.id}/final.design.png`;
-  if (docsImageExists(evidence)) {
-    return {
-      path: evidence,
-      classification: demo.status === 'accepted' ? 'accepted-evidence' : 'evidence-preview',
-      label: demo.status === 'accepted' ? 'Accepted render-target evidence' : 'Evidence preview · acceptance pending',
-      detail: demo.status === 'accepted'
-        ? 'Accepted runtime evidence image from the published bundle.'
-        : 'Runtime evidence preview; lab acceptance remains pending.',
       sourceId: demo.id,
     };
   }

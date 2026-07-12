@@ -117,6 +117,7 @@ for (const demo of primary) {
 }
 
 assert(evidencePreviewConfig.schemaVersion === 1, 'runtime evidence preview config has an unsupported schema version');
+const configuredEvidencePreviewIds = new Set((evidencePreviewConfig.previews ?? []).map((preview) => preview.labId));
 for (const configured of evidencePreviewConfig.previews ?? []) {
   const demo = primary.find((entry) => entry.id === configured.labId);
   assert(Boolean(demo), `runtime evidence preview references a non-primary demo: ${configured.labId}`);
@@ -155,6 +156,18 @@ for (const configured of evidencePreviewConfig.previews ?? []) {
       assert(skillPage.includes(escapedHtmlText(limitation)), `${demo.skill} omits runtime evidence limitation: ${limitation}`);
     }
   }
+}
+
+for (const demo of primary.filter((entry) => !entry.nonRenderingScenarioSuite && !configuredEvidencePreviewIds.has(entry.id))) {
+  assert(
+    !homepage.includes(`visual-validation/${demo.id}/`),
+    `homepage publishes unconfigured or stale runtime evidence for ${demo.id}`,
+  );
+  const demoPage = readFileSync(join(docs, relativePublishPath(demo.publishPath), 'index.html'), 'utf8');
+  assert(
+    !demoPage.includes(`<meta property="og:image" content="${site}visual-validation/${demo.id}/`),
+    `demo social metadata publishes unconfigured or stale runtime evidence for ${demo.id}`,
+  );
 }
 
 for (const demo of flagships) {

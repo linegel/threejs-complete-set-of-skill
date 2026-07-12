@@ -144,8 +144,17 @@ function validateIndexablePage(path, expectedUrl, {
   assert(headValue(html, 'property', 'og:title').length === 1, `${label}: missing or duplicate og:title`);
   assert(headValue(html, 'property', 'og:description').length === 1, `${label}: missing or duplicate og:description`);
   assert(headValue(html, 'property', 'og:url')[0] === expectedUrl, `${label}: og:url is not self-referential`);
-  assert(headValue(html, 'property', 'og:image').length === 1, `${label}: missing or duplicate og:image`);
-  assert(headValue(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${label}: twitter card is not summary_large_image`);
+  const socialImages = headValue(html, 'property', 'og:image');
+  if (requireDemoShell) {
+    assert(socialImages.length <= 1, `${label}: duplicate og:image`);
+    assert(
+      headValue(html, 'name', 'twitter:card')[0] === (socialImages.length === 1 ? 'summary_large_image' : 'summary'),
+      `${label}: twitter card does not match same-demo image availability`,
+    );
+  } else {
+    assert(socialImages.length === 1, `${label}: missing or duplicate og:image`);
+    assert(headValue(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${label}: twitter card is not summary_large_image`);
+  }
   assert(!html.includes(OLD_SITE), `${label}: contains the retired GitHub Pages origin`);
   const structuredData = validateJsonLd(html, label);
   const nodes = graphNodes(structuredData);

@@ -39,7 +39,10 @@ import { buildDemoRoadmap } from './lib/demo-roadmap.mjs';
 const SITE = 'https://threejs-skills.com/';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
 const REPOSITORY = 'https://github.com/linegel/threejs-complete-set-of-skill';
-const SOCIAL_IMAGE = `${SITE}visual-validation/planet-generated-craters/final.design.png`;
+const runtimeEvidencePreviewConfig = JSON.parse(readFileSync(join(REPO_ROOT, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
+const configuredRuntimeEvidencePreviews = new Set(
+  (runtimeEvidencePreviewConfig.previews ?? []).map((preview) => preview.labId),
+);
 const skillManifest = JSON.parse(readFileSync(join(REPO_ROOT, 'skills.json'), 'utf8'));
 const skillsByName = new Map(skillManifest.skills.map((skill) => [skill.name, skill]));
 const registry = buildDemoRegistry();
@@ -241,6 +244,7 @@ function pngDimensions(path) {
 }
 
 function runtimeEvidencePreview(lab) {
+  if (!configuredRuntimeEvidencePreviews.has(lab.id)) return null;
   const summaryPath = join(REPO_ROOT, 'docs', 'visual-validation', lab.id, 'evidence-summary.json');
   if (!existsSync(summaryPath)) return null;
   const summary = JSON.parse(readFileSync(summaryPath, 'utf8'));
@@ -264,31 +268,18 @@ function demoPreview(lab) {
   const runtimeEvidence = runtimeEvidencePreview(lab);
   const candidates = [
     ...(runtimeEvidence ? [runtimeEvidence] : []),
-    { path: `previews/primary/${lab.id}.png`, label: 'Canonical implementation screenshot; evidence status is reported separately' },
-    { path: `visual-validation/${lab.id}/final.design.png`, label: 'Published render-target evidence or explicitly classified evidence preview' },
-    { path: `previews/provider/${lab.id}.png`, label: 'Live concept-proxy screenshot; not canonical evidence' },
+    ...(lab.nonRenderingScenarioSuite
+      ? [{ path: `previews/primary/${lab.id}.png`, label: 'Deterministic contract-lab screenshot; runtime evidence status is reported separately' }]
+      : []),
+    ...(lab.status === 'secondary'
+      ? [{ path: `previews/provider/${lab.id}.png`, label: 'Same-demo secondary presentation screenshot; not canonical evidence' }]
+      : []),
   ];
-  const relatedProvider = registry.demos.find((entry) => (
-    entry.skill === lab.skill
-    && entry.status === 'secondary'
-    && existsSync(join(REPO_ROOT, 'docs', 'previews', 'provider', `${entry.id}.png`))
-  ));
-  if (relatedProvider) {
-    candidates.push({
-      path: `previews/provider/${relatedProvider.id}.png`,
-      label: 'Related skill concept-proxy screenshot; not evidence for this canonical lab',
-    });
-  }
   const selected = candidates.find((candidate) => (
     existsSync(join(REPO_ROOT, 'docs', candidate.path))
     && (!candidate.path.startsWith('previews/') || usablePreviewPaths.has(candidate.path))
   ));
-  if (!selected) return {
-    url: SOCIAL_IMAGE,
-    width: 1200,
-    height: 760,
-    alt: `Generated crater-field asset preview from the ${SITE_NAME}; not evidence for ${demoTitle(lab)}`,
-  };
+  if (!selected) return null;
   const dimensions = pngDimensions(join(REPO_ROOT, 'docs', selected.path)) ?? { width: 1200, height: 760 };
   return {
     url: `${SITE}${selected.path}`,
@@ -321,7 +312,7 @@ function demoSeoHead(lab, { indexable = true } = {}) {
         softwareVersion: `Three.js ${lab.threeRevision}`,
         isAccessibleForFree: true,
         inLanguage: 'en',
-        image: preview.url,
+        ...(preview ? { image: preview.url } : {}),
         about: ['Three.js', 'WebGPU', 'TSL', skill?.title ?? humanize(lab.skill)],
         isPartOf: {
           '@type': 'SoftwareSourceCode',
@@ -354,16 +345,16 @@ function demoSeoHead(lab, { indexable = true } = {}) {
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${canonicalUrl}">
-  <meta property="og:image" content="${preview.url}">
+  ${preview ? `<meta property="og:image" content="${preview.url}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="${preview.width}">
   <meta property="og:image:height" content="${preview.height}">
-  <meta property="og:image:alt" content="${escapeHtml(preview.alt)}">
-  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:image:alt" content="${escapeHtml(preview.alt)}">` : ''}
+  <meta name="twitter:card" content="${preview ? 'summary_large_image' : 'summary'}">
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
-  <meta name="twitter:image" content="${preview.url}">
-  <meta name="twitter:image:alt" content="${escapeHtml(preview.alt)}">
+  ${preview ? `<meta name="twitter:image" content="${preview.url}">
+  <meta name="twitter:image:alt" content="${escapeHtml(preview.alt)}">` : ''}
   <script type="application/ld+json">${JSON.stringify(schema)}</script>`;
 }
 
