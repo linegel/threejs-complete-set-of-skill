@@ -171,7 +171,8 @@ export function buildDeformationPoseCorpus(spec, compiled, options = {}) {
 	};
 }
 
-function evaluateCandidate(method, surface, skinning, compiled, corpus, options) {
+export function evaluateDeformationCandidate(method, surface, skinning, compiled, corpus, options) {
+	if (method !== 'lbs' && method !== 'dqs-log-scale') throw new Error(`unsupported deformation candidate method '${method}'`);
 	const worldUnitsPerPixel = finitePositive(options.worldUnitsPerPixel, 'worldUnitsPerPixel');
 	const maximumSilhouetteErrorPx = finitePositive(options.maximumSilhouetteErrorPx, 'maximumSilhouetteErrorPx');
 	const maximumSurfaceErrorWorld = options.maximumSurfaceErrorWorld ?? worldUnitsPerPixel * maximumSilhouetteErrorPx;
@@ -237,6 +238,13 @@ function evaluateCandidate(method, surface, skinning, compiled, corpus, options)
 				collapsedTriangles: topology.collapsedTriangles,
 				inwardTriangles: faceInversions,
 				nonAdjacentSelfIntersections: topology.nonAdjacentSelfIntersections.count,
+				selfIntersectionPairs: topology.nonAdjacentSelfIntersections.pairs.map((pair) => ({
+					...pair,
+					leftVertices: [...deformed.indices.subarray(pair.left * 3, pair.left * 3 + 3)],
+					rightVertices: [...deformed.indices.subarray(pair.right * 3, pair.right * 3 + 3)],
+					leftOwnerParts: [...new Set([...deformed.indices.subarray(pair.left * 3, pair.left * 3 + 3)].map((vertex) => skinning.ownerParts?.[vertex] ?? null))],
+					rightOwnerParts: [...new Set([...deformed.indices.subarray(pair.right * 3, pair.right * 3 + 3)].map((vertex) => skinning.ownerParts?.[vertex] ?? null))],
+				})),
 				minimumArea: topology.area.min,
 				minimumAngleRadians: topology.minimumAngleRadians.min,
 			},
@@ -263,7 +271,7 @@ function evaluateCandidate(method, surface, skinning, compiled, corpus, options)
 	};
 }
 
-function evaluateCorrectedCandidate(method, rawCandidate, surface, skinning, compiled, corpus, options) {
+export function evaluateCorrectedDeformationCandidate(method, rawCandidate, surface, skinning, compiled, corpus, options) {
 	const thresholds = rawCandidate.thresholds;
 	const maximumTrials = Math.max(0, Math.floor(options.maximumCorrectionTrials ?? 2));
 	if (maximumTrials === 0) return { method, status: 'disabled', failures: ['live correction is disabled for this tier'], region: null, poseRecords: [] };
@@ -363,10 +371,10 @@ function evaluateCorrectedCandidate(method, rawCandidate, surface, skinning, com
 
 export function certifyDeformationSelection(spec, compiled, surface, skinning, options = {}) {
 	const corpus = options.corpus ?? buildDeformationPoseCorpus(spec, compiled, options);
-	const lbs = evaluateCandidate('lbs', surface, skinning, compiled, corpus, options);
-	const dqs = evaluateCandidate('dqs-log-scale', surface, skinning, compiled, corpus, options);
-	const lbsCorrected = lbs.status === 'accepted-candidate' ? null : evaluateCorrectedCandidate('lbs', lbs, surface, skinning, compiled, corpus, options);
-	const dqsCorrected = dqs.status === 'accepted-candidate' ? null : evaluateCorrectedCandidate('dqs-log-scale', dqs, surface, skinning, compiled, corpus, options);
+	const lbs = evaluateDeformationCandidate('lbs', surface, skinning, compiled, corpus, options);
+	const dqs = evaluateDeformationCandidate('dqs-log-scale', surface, skinning, compiled, corpus, options);
+	const lbsCorrected = lbs.status === 'accepted-candidate' ? null : evaluateCorrectedDeformationCandidate('lbs', lbs, surface, skinning, compiled, corpus, options);
+	const dqsCorrected = dqs.status === 'accepted-candidate' ? null : evaluateCorrectedDeformationCandidate('dqs-log-scale', dqs, surface, skinning, compiled, corpus, options);
 	const selection = lbs.status === 'accepted-candidate'
 		? { method: 'lbs', correction: 'none' }
 		: dqs.status === 'accepted-candidate'

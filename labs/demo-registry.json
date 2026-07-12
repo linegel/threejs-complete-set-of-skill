@@ -10876,7 +10876,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:a69074d98ad05d37bb32fdf7d549c1ec84dfea52e4350137ad4433d86ce23b96",
+      "sourceHash": "sha256:a9d618424840930b96388e19c3517b79a14ddd6fc28c5bb568ad9cb851f1ef3b",
       "proxyStatus": null,
       "sourceHashInputs": [
         "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
