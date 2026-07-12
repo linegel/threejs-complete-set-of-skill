@@ -28,6 +28,7 @@ const expectedIds = [
 	'black-hole-shot',
 	'post-pipeline-dashboard',
 	'ocean-fauna',
+	'dynamic-skiff-coupling',
 	'route-away-unsupported',
 	'over-budget-17.5-to-16.5',
 	'missing-webgpu',
@@ -52,11 +53,11 @@ const mechanismScenarios = new Map( [
 
 assert.equal( catalog.schemaVersion, 2 );
 const liveSkillDirs = listSkillDirs();
-assert.equal( liveSkillDirs.length, 27, 'the repository skill inventory changed without an explicit matrix migration' );
+assert.equal( liveSkillDirs.length, 28, 'the repository skill inventory changed without an explicit matrix migration' );
 assert.deepEqual( catalog.skillInventory, liveSkillDirs, 'fixture inventory differs from the authoritative repository inventory' );
 assert.deepEqual( catalog.skillInventory, CANONICAL_SKILL_INVENTORY );
-assert.equal( catalog.skillInventory.length, 27 );
-assert.equal( new Set( catalog.skillInventory ).size, 27 );
+assert.equal( catalog.skillInventory.length, 28 );
+assert.equal( new Set( catalog.skillInventory ).size, 28 );
 assert.deepEqual( catalog.routes.map( ( route ) => route.id ), expectedIds );
 assert.deepEqual( manifest.scenarios.map( ( scenario ) => scenario.id ), expectedIds );
 assert.deepEqual( manifest.tiers, [], 'planning skills must not invent GPU quality tiers' );
@@ -139,6 +140,7 @@ assert.deepEqual( accepted, [
 	'black-hole-shot',
 	'post-pipeline-dashboard',
 	'ocean-fauna',
+	'dynamic-skiff-coupling',
 	'route-away-unsupported'
 ] );
 

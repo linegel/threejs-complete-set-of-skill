@@ -724,6 +724,12 @@ const physicsBoundaryMatrix = {
     presentation: ['candidate-provider', 'snapshot-consumer'], quality: ['transition-participant'], validation: ['mechanism-evidence'],
     requiredAbiTokens: ['PhysicsContext', 'ColliderProxy', 'RigidBodyProperties', 'ExternalSolverAdapter', 'InteractionRecord', 'PhysicsPresentationCandidate', 'PhysicsPresentationSnapshot', 'FrameExecutionRecord', 'QualityTransition']
   },
+  'threejs-physics-integration': {
+    applicability: { status: 'applicable', justification: 'The physics integration owner selects collision and solver architecture and validates external boundaries against the shared route ABI.' },
+    coordinator: [], provider: ['presentation-state'], consumer: ['support-surface', 'collider-proxy'], interaction: ['adapter', 'consumer'], graph: ['stage-owner'],
+    presentation: ['candidate-provider', 'snapshot-consumer'], quality: ['transition-participant'], validation: ['contract-gate', 'mechanism-evidence'],
+    requiredAbiTokens: ['PhysicsContext', 'PhysicsGraph', 'PhysicsSignalDescriptor', 'SupportSurfaceSample', 'ColliderProxy', 'RigidBodyProperties', 'RigidBodyState', 'ContactManifoldRecord', 'PhysicsMaterialRegistry', 'SurfaceExchange', 'InteractionRecord', 'InteractionApplicationLedger', 'ConservationGroup', 'ExternalSolverAdapter', 'AuthoritativeGpuStateRecovery', 'PhysicsPresentationCandidate', 'PhysicsPresentationSnapshot', 'FrameExecutionRecord', 'QualityTransition', 'PhysicsCostLedger', 'PhysicsContactCost', 'PhysicsExternalAdapterCost']
+  },
   'threejs-particles-trails-and-effects': {
     applicability: { status: 'applicable', justification: 'Physical particles consume forcing/support and emit bounded exactly-once interactions.' },
     coordinator: [], provider: ['presentation-state'], consumer: ['environment-forcing', 'support-surface', 'collider-proxy'], interaction: ['producer', 'consumer'], graph: ['stage-owner'],
@@ -833,6 +839,7 @@ const physicsWorkloadShapeCostRoles = {
   'threejs-choose-skills': ['coordinator'],
   'threejs-object-sculptor': ['external-adapter'],
   'threejs-particles-trails-and-effects': ['sparse-active-domain', 'contact'],
+  'threejs-physics-integration': ['contact', 'external-adapter'],
   'threejs-procedural-buildings-and-cities': ['external-adapter'],
   'threejs-procedural-creatures': ['contact'],
   'threejs-procedural-motion-systems': ['contact', 'external-adapter'],

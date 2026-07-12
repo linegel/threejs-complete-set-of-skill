@@ -142,6 +142,8 @@ Broadphase output is a candidate set, not contact truth. Measure moved proxies,
 candidate pairs, narrowphase tests, accepted contacts, manifolds, constraint
 rows, islands, iterations, warm-start hits, and cache bytes. Freeze pileup,
 high-speed, topology-change, sleep/wake, and cache-cold stresses.
+Serialize this workload tail as `PhysicsContactCost`; body count alone is not
+contact-performance evidence.
 
 Contact ownership includes manifold begin/persist/end, stable point IDs,
 material-pair selection, warm starts, friction state, and emitted impulses.

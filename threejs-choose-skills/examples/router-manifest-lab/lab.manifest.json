@@ -53,6 +53,12 @@
       "acceptanceStatus": "accepted"
     },
     {
+      "id": "dynamic-skiff-coupling",
+      "route": "/demos/router-manifest-lab/scenario/dynamic-skiff-coupling/",
+      "startup": { "scenario": "dynamic-skiff-coupling" },
+      "acceptanceStatus": "accepted"
+    },
+    {
       "id": "route-away-unsupported",
       "route": "/demos/router-manifest-lab/scenario/route-away-unsupported/",
       "startup": { "scenario": "route-away-unsupported" },
@@ -151,7 +157,7 @@
     {
       "id": "exact-skill-inventory",
       "required": true,
-      "evidence": "The suite asserts the exact unique 27-skill inventory against the authoritative repository directories.",
+      "evidence": "The suite asserts the exact unique 28-skill inventory against the authoritative repository directories.",
       "status": "accepted"
     },
     {

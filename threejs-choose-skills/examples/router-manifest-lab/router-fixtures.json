@@ -13,6 +13,7 @@
     "threejs-image-pipeline",
     "threejs-object-sculptor",
     "threejs-particles-trails-and-effects",
+    "threejs-physics-integration",
     "threejs-procedural-buildings-and-cities",
     "threejs-procedural-creatures",
     "threejs-procedural-fields",
@@ -218,6 +219,40 @@
         "id": "medium",
         "provenance": "owner-manifest"
       }
+    },
+    {
+      "id": "dynamic-skiff-coupling",
+      "title": "Dynamic skiff and persistent coastal water",
+      "route": {
+        "selectedSkills": [
+          "threejs-physics-integration",
+          "threejs-procedural-buildings-and-cities",
+          "threejs-water-optics",
+          "threejs-image-pipeline",
+          "threejs-visual-validation"
+        ],
+        "primaryOwner": "threejs-physics-integration"
+      },
+      "requiredSignals": [
+        {
+          "id": "skiff.rigid-body-state",
+          "producer": "external-rigid-body-adapter",
+          "consumers": ["skiff-water-coupling", "skiff-presentation"]
+        },
+        {
+          "id": "coast.water-surface-state",
+          "producer": "threejs-water-optics",
+          "consumers": ["skiff-water-coupling", "water-presentation"]
+        }
+      ],
+      "ownershipClaims": [
+        {"semantic": "rigid-body-state", "owner": "threejs-physics-integration"},
+        {"semantic": "water-state", "owner": "threejs-water-optics"},
+        {"semantic": "coupling-transaction", "owner": "threejs-physics-integration"},
+        {"semantic": "final-pipeline", "owner": "threejs-image-pipeline"},
+        {"semantic": "tone-map", "owner": "threejs-image-pipeline"},
+        {"semantic": "output-transform", "owner": "threejs-image-pipeline"}
+      ]
     },
     {
       "id": "route-away-unsupported",

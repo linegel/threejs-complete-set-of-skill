@@ -781,6 +781,7 @@ with this repository roster:
 - `threejs-exposure-color-grading`
 - `threejs-image-pipeline`
 - `threejs-particles-trails-and-effects`
+- `threejs-physics-integration`
 - `threejs-procedural-buildings-and-cities`
 - `threejs-procedural-creatures`
 - `threejs-procedural-fields`
@@ -829,6 +830,7 @@ owner is absent, block that part or reduce scope; never invent a renamed owner.
 | HDR bloom/selective emission | `$threejs-bloom` | Prove HDR emission and exposure policy first. |
 | Exposure adaptation, tone map, LUT grading, output color | `$threejs-exposure-color-grading` | Scientific/data displays may require a fixed transfer function instead of eye adaptation. |
 | Shared depth/normal/velocity/ID, MRT, history, pass ordering, final presentation | `$threejs-image-pipeline` | Plan early only when sharing exists; load for final assembly after the no-post baseline. For physical routes, bind the sealed snapshot, exact resources, leases, pass dependencies, histories, and output owner through `PresentationRenderPlan`. |
+| Static queries, collision architecture, rigid bodies, constraints, CCD, sleeping, external solver boundaries, or cross-domain physics execution | `$threejs-physics-integration` | Load after the router freezes the route contract. It selects and validates solver/adaptor architecture but does not replace water, creature, terrain, weather, or other domain equations. |
 | Fixed-view/trajectory evidence, seed/data sweeps, temporal stability, budgets, regression artifacts | `$threejs-visual-validation` | Required for ambitious compute, temporal, adaptive, quantitative, or sustained-performance work. |
 
 See `references/router-recipes.md` for general-purpose domain routes.
@@ -920,7 +922,7 @@ state version, and residency.
 | Picking, selection, annotation, DOM UI, accessibility | Keep application/UI ownership outside the flagship pack; image pipeline owns only graphics-safe compositing/output. |
 | WebXR | Use official WebXR/Three.js guidance unless a dedicated skill exists. |
 | Deployment/editor/tooling | Use platform and project conventions. |
-| Physics engines | Keep the selected engine/domain solver authoritative internally, but require its adapter to publish the shared `PhysicsContext`, typed provider/state epochs, interactions, and `PhysicsPresentationSnapshot`; unsupported channels remain explicit blockers. |
+| Physics engines | Use `$threejs-physics-integration` to select local versus external architecture. Keep the selected engine/domain solver authoritative internally, but require its adapter to publish the shared `PhysicsContext`, typed provider/state epochs, interactions, and `PhysicsPresentationSnapshot`; unsupported channels remain explicit blockers. |
 | Meteorological-state synthesis and `EnvironmentForcingSnapshot` production | No current skill synthesizes meteorological state. Require a supplied project/environment coordinator or a dedicated environment-forcing capability; block dependent weather coupling when neither exists. Clouds, rain, water, vegetation, and particles are consumers, not substitute owners. |
 | General authored prop libraries, mesh repair, UV unwrapping, texture baking, compression, and source-asset LOD production | Treat these as an explicit asset-pipeline input. Procedural skills may define anchors, variants, and runtime compilation, but they do not make an unvalidated source asset production-ready. |
 | Generic app architecture | Keep framework/state/router decisions outside visual skills. |

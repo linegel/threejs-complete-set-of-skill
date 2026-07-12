@@ -11,6 +11,7 @@ export const RUNNABLE_DEMOS_BY_SKILL = Object.freeze( {
 	'threejs-image-pipeline': { id: 'webgpu-image-pipeline', title: 'Image pipeline lab', href: '/demos/webgpu-image-pipeline/' },
 	'threejs-object-sculptor': { id: 'webgpu-tower-ship-sculptor', title: 'Tower and ship sculptor', href: '/demos/webgpu-tower-ship-sculptor/' },
 	'threejs-particles-trails-and-effects': { id: 'webgpu-pooled-effects', title: 'Pooled effects lab', href: '/demos/webgpu-pooled-effects/' },
+	'threejs-physics-integration': { id: 'external-physics-adapter-conformance', title: 'Physics adapter conformance', href: '/demos/external-physics-adapter-conformance/' },
 	'threejs-procedural-buildings-and-cities': { id: 'webgpu-material-slot-compiler', title: 'Material-slot city compiler', href: '/demos/webgpu-material-slot-compiler/' },
 	'threejs-procedural-creatures': { id: 'webgpu-procedural-creature-lab', title: 'Procedural creature lab', href: '/demos/webgpu-procedural-creature-lab/' },
 	'threejs-procedural-fields': { id: 'webgpu-field-bake', title: 'Procedural field bake', href: '/demos/webgpu-field-bake/' },
