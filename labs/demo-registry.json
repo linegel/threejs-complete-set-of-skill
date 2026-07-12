@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:ff48a1d2adb7e2e56bf754192bbe3c484a2a203c81ec377b42a96ae2f1bc3f9e",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -6368,7 +6368,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:fc09153aca1d345a98ca0c09ece635151884fcae8e8768b2be75b230d51ba548",
+      "sourceHash": "sha256:5dad4ec2548fb247c4e4b5c11101c2a0b24812557e4c08106dab09d742237b14",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -7177,7 +7177,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:006b1a7e58051c901d2567f8542389db2a602e3234ff50d42f4c1d51bf6afbc1",
+      "sourceHash": "sha256:24e18b51759411a4fa013bc7f15dd48af3701cc57cc5064a8158df70415094e3",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -13424,7 +13424,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:58740fc8537b61d87176f51477bfeab1ae545d88f3e7f95e9ce4d71a22f103e9",
+      "sourceHash": "sha256:d5359278276b47f6de0d52f768dcc31a06baec9a50143494cdd8dd5b7a435074",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
