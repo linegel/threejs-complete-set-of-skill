@@ -22,7 +22,7 @@ adds cardinal halo tiles for face fluxes, and delays dry deactivation by an
 explicit tick count. Byte counts include three float32 conservative channels,
 two ping-pong copies, core cells, and resident halo cells separately.
 
-`gpu-swe-contract.js` selects the seven-dispatch reference graph after six GPU
+`gpu-swe-contract.js` selects the eight-dispatch reference graph after six GPU
 execution architectures. It derives the unsplit CFL bound from each tier's
 maximum represented depth and velocity, counts padded state, one canonical
 flux plus two hydrostatic corrections per face, lookup/descriptor/display
@@ -89,6 +89,19 @@ pass transports it with depth-averaged carrier velocity and applies exact
 source/decay reaction, validation gates coverage and carrier velocity, and the
 water transaction commits or rejects both states together. The display samples
 that coverage; unrelated texture noise cannot create whitewater.
+
+`interaction-source-core.js` owns the moving-body-to-SWE momentum adapter
+oracle. It compares six materially different representations and selects a
+cell-in-cloud discrete-adjoint scatter for each hull quadrature point. A
+complete four-cell receiving stencil gives nonnegative weights, exact total
+horizontal impulse, and exact first moment about an arbitrary balance point.
+The adapter converts N s into the conservative discharge increment with the
+declared water density and cell area, validates the full batch before mutation,
+advances exact-once keys only with the candidate, and emits the equal-opposite
+reaction summary. Missing halo/receiver cells fail instead of renormalizing and
+moving the force centroid. This source oracle does not claim a resolved solid
+boundary; moving cut cells and Brinkman penalization remain separate obstacle
+candidates.
 
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
