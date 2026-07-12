@@ -7,7 +7,7 @@ import { test } from 'node:test';
 
 import {
   STANDARD_CAPTURE_OUTPUTS,
-  applyControllerCaptureState,
+  applyPublicCaptureState,
   assertCaptureArtifactBinding,
   assertCaptureRuntimeProfile,
   assertCaptureState,
@@ -51,7 +51,7 @@ function completeOutputPlan(overrides = {}) {
   });
 }
 
-test('capture-state transactions restore every locked field before rendering', async () => {
+test('public capture-state application requires and applies every locked field before rendering', async () => {
   const calls = [];
   const lockedState = {
     scenario: 'history-and-deposit',
@@ -61,7 +61,7 @@ test('capture-state transactions restore every locked field before rendering', a
     camera: 'design',
     timeSeconds: 0,
   };
-  await applyControllerCaptureState(async (method, ...args) => {
+  await applyPublicCaptureState(async (method, ...args) => {
     calls.push([method, ...args]);
   }, lockedState);
   assert.deepEqual(calls, [
@@ -75,12 +75,22 @@ test('capture-state transactions restore every locked field before rendering', a
   ]);
 
   await assert.rejects(
-    () => applyControllerCaptureState(null, lockedState),
+    () => applyPublicCaptureState(null, lockedState),
     /controller invoker must be a function/,
   );
   await assert.rejects(
-    () => applyControllerCaptureState(async () => {}, null),
+    () => applyPublicCaptureState(async () => {}, null),
     /capture state must be an object/,
+  );
+  const { camera, ...missingCamera } = lockedState;
+  assert.equal(camera, 'design');
+  await assert.rejects(
+    () => applyPublicCaptureState(async () => {}, missingCamera),
+    /capture state omits fields: camera/,
+  );
+  await assert.rejects(
+    () => applyPublicCaptureState(async () => {}, { ...lockedState, hiddenHistory: 2 }),
+    /capture state has unknown fields: hiddenHistory/,
   );
 });
 
