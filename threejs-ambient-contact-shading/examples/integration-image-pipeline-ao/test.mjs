@@ -17,6 +17,7 @@ const here = dirname( fileURLToPath( import.meta.url ) );
 const manifest = JSON.parse( await readFile( join( here, 'lab.manifest.json' ), 'utf8' ) );
 const registryManifest = buildDemoRegistry().demos.find( ( entry ) => entry.id === manifest.id );
 const integrationSource = await readFile( join( here, 'main.js' ), 'utf8' );
+const browserSource = await readFile( join( here, 'browser.js' ), 'utf8' );
 assert.ok( registryManifest, `registry contains ${ manifest.id }` );
 const manifestVerdict = validateLabManifest( registryManifest, { validateEvidence: false } );
 assert.deepEqual( manifestVerdict.errors, [] );
@@ -30,6 +31,7 @@ assert.doesNotMatch( integrationSource, /stage\.baselineOutput/, 'integration di
 assert.match( integrationSource, /const LAB_ID = 'integration-image-pipeline-ao'/ );
 assert.match( integrationSource, /get labId\(\) \{ return LAB_ID; \}/ );
 assert.match( integrationSource, /labId: LAB_ID/ );
+assert.match( browserSource, /window\.labController = controller/ );
 
 await access( join( here, 'index.html' ) );
 for ( const mechanism of manifest.mechanisms ) await access( join( here, mechanism.route, 'index.html' ) );

@@ -58,6 +58,7 @@ try {
 	if ( navigator.gpu === undefined ) throw new Error( 'WebGPU unavailable. Integration remains blocked; no fallback is activated.' );
 	controller = await createImagePipelineAOIntegration( { canvas, ...extent(), tier, mode: mechanism === null ? 'final' : mechanismModes[ mechanism ] } );
 	window.__LAB_CONTROLLER__ = controller;
+	window.labController = controller;
 	window.__LAB_READY__ = controller.ready();
 	updateStatus();
 	if ( automatedCapture !== true ) animationId = requestAnimationFrame( animate );
