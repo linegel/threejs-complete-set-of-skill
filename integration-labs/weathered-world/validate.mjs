@@ -70,6 +70,10 @@ export async function validateWeatheredWorldStatic() {
 
   assert((browserSource.match(/new WebGPURenderer\s*\(/g) ?? []).length === 1, "Weathered World requires exactly one renderer construction");
   assert((browserSource.match(/new RenderPipeline\s*\(/g) ?? []).length === 1, "Weathered World requires exactly one RenderPipeline construction");
+  assert(browserSource.includes('const LAB_ID = "weathered-world"'), "Weathered World must define one canonical lab identity");
+  assert(browserSource.includes("get labId() { return LAB_ID; }"), "Weathered World controller must expose its canonical identity");
+  assert(browserSource.includes("labId: LAB_ID"), "Weathered World metrics must mirror controller identity");
+  assert(browserSource.includes("globalThis.labController = controller"), "Weathered World must publish the canonical controller contract");
   assert(!stageSource.includes("new WebGPURenderer"), "Imported stages cannot construct a renderer");
   assert(!stageSource.includes("new RenderPipeline"), "Imported stages cannot construct a RenderPipeline");
   assert(!browserSource.includes("WebGLRenderer") && !stageSource.includes("WebGLRenderer"), "Canonical integration cannot contain a WebGL fallback");

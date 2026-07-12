@@ -46,6 +46,8 @@ import {
 } from "./world-contract.js";
 import { createWeatheredWorldStages } from "./world-stages.js";
 
+const LAB_ID = "weathered-world";
+
 const canvas = document.querySelector("#lab");
 const status = document.querySelector("#status");
 const query = new URLSearchParams(location.search);
@@ -366,6 +368,7 @@ function updateStatus() {
 }
 
 const controller = {
+  get labId() { return LAB_ID; },
   async ready() {},
   async setScenario(id) { if (id !== "world") throw new Error(`Unknown Weathered World scenario "${id}"`); },
   async setMode(id) { setMode(id); await renderOnce(); },
@@ -445,6 +448,7 @@ const controller = {
   },
   getMetrics() {
     return {
+      labId: LAB_ID,
       ...state,
       backendIsWebGPU: renderer.backend.isWebGPUBackend,
       rendererInfo: structuredClone(renderer.info),
@@ -468,4 +472,5 @@ const controller = {
 };
 
 globalThis.__LAB_CONTROLLER__ = controller;
+globalThis.labController = controller;
 updateStatus();
