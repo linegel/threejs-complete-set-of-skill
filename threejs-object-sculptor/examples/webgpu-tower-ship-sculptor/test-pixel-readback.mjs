@@ -4,13 +4,16 @@ import { normalizePixelCapture } from "../../../scripts/capture-lab-browser.mjs"
 import { describeTowerShipReadback, preserveTowerShipReadbackRows } from "./lab-controller.js";
 
 const layout = describeTowerShipReadback(3, 2, "srgb");
-const expected = Uint8Array.from({ length: 24 }, (_, index) => index + 1);
-const pixels = preserveTowerShipReadbackRows(expected, layout);
+const bottomRow = Uint8Array.from([255, 0, 0, 255, 0, 255, 0, 255, 255, 255, 0, 255]);
+const topRow = Uint8Array.from([0, 0, 255, 255, 255, 255, 255, 255, 0, 255, 255, 255]);
+const sourceBottomLeft = Uint8Array.from([...bottomRow, ...topRow]);
+const expectedTopLeft = Uint8Array.from([...topRow, ...bottomRow]);
+const pixels = preserveTowerShipReadbackRows(sourceBottomLeft, layout);
 assert.equal(pixels.byteLength, layout.fullyPaddedByteLength, "compact readback must be padded exactly once");
 
 const alreadyPadded = new Uint8Array(layout.fullyPaddedByteLength);
-alreadyPadded.set(expected.subarray(0, layout.rowBytes), 0);
-alreadyPadded.set(expected.subarray(layout.rowBytes), layout.bytesPerRow);
+alreadyPadded.set(sourceBottomLeft.subarray(0, layout.rowBytes), 0);
+alreadyPadded.set(sourceBottomLeft.subarray(layout.rowBytes), layout.bytesPerRow);
 assert.equal(
   preserveTowerShipReadbackRows(alreadyPadded, layout),
   alreadyPadded,
@@ -34,7 +37,11 @@ assert.equal(normalized.sourceLayout, "padded");
 assert.equal(normalized.bytesPerRow, layout.rowBytes, "normalized transport rows must be compact");
 assert.equal(normalized.sourceBytesPerRow, layout.bytesPerRow, "GPU-copy stride must remain explicit");
 assert.equal(normalized.sourceByteLength, layout.fullyPaddedByteLength);
-assert.deepEqual([...normalized.data], [...expected]);
+assert.equal(normalized.sourceOrigin, "bottom-left");
+assert.equal(normalized.origin, "top-left");
+assert.equal(normalized.orientationTransform, "vertical-row-flip");
+assert.deepEqual([...normalized.transportData], [...pixels], "transport evidence must retain native row order and padding");
+assert.deepEqual([...normalized.data], [...expectedTopLeft], "normalized rows must present the asymmetric calibration image top-left first");
 
 const aliasOnly = { ...capture, rowStride: layout.bytesPerRow };
 delete aliasOnly.bytesPerRow;
