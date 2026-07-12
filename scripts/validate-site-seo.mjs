@@ -2,6 +2,12 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  manifestOwnedOutputPaths,
+  ownerIdForResponsiveSource,
+  responsiveDependencyHash,
+  sha256,
+} from './lib/generated-asset-ledger.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
@@ -367,10 +373,32 @@ for (const url of pageUrls.filter((value) => new URL(value).pathname.startsWith(
   );
 }
 const responsiveManifestSources = Object.keys(responsiveManifest.sources ?? {});
+assert(responsiveManifest.schemaVersion === 2, 'responsive image manifest: schemaVersion must equal 2');
 assert(responsiveManifest.generatedBy === 'scripts/generate-responsive-images.mjs', 'responsive image manifest: unexpected generator identity');
 assert(responsiveManifestSources.length > 0, 'responsive image manifest: no source images');
 assert(responsiveManifestSources.length === responsiveSourcesSeen.size, `responsive image manifest: ${responsiveManifestSources.length} entries but ${responsiveSourcesSeen.size} are referenced`);
-for (const source of responsiveManifestSources) assert(responsiveSourcesSeen.has(source), `responsive image manifest: stale source ${source}`);
+for (const source of responsiveManifestSources) {
+  assert(responsiveSourcesSeen.has(source), `responsive image manifest: stale source ${source}`);
+  const record = responsiveManifest.sources[source];
+  const sourcePath = join(DOCS, source);
+  assert(record.ownerId === ownerIdForResponsiveSource(source), `responsive image manifest: owner drift for ${source}`);
+  if (existsSync(sourcePath)) {
+    assert(record.sourceSha256 === sha256(readFileSync(sourcePath)), `responsive image manifest: source hash drift for ${source}`);
+  }
+  assert(record.dependencyClosureHash === responsiveDependencyHash(source, record), `responsive image manifest: dependency closure drift for ${source}`);
+  for (const [format, output] of Object.entries(record.formats ?? {})) {
+    const outputPath = localPathForUrl(output.url);
+    if (outputPath && existsSync(outputPath)) {
+      assert(output.sha256 === sha256(readFileSync(outputPath)), `responsive image manifest: ${format} hash drift for ${source}`);
+    }
+  }
+}
+const registeredResponsiveOutputs = manifestOwnedOutputPaths(responsiveManifest, DOCS, SITE);
+const publishedResponsiveOutputs = new Set(walk(DOCS, (file) => /\.(?:avif|webp)$/i.test(file)));
+assert(registeredResponsiveOutputs.size === publishedResponsiveOutputs.size, `responsive image manifest: ${registeredResponsiveOutputs.size} registered outputs but ${publishedResponsiveOutputs.size} are published`);
+for (const output of publishedResponsiveOutputs) {
+  assert(registeredResponsiveOutputs.has(output), `responsive image manifest: unregistered output ${relative(DOCS, output)}`);
+}
 
 for (const [key, label] of [['title', 'title'], ['description', 'meta description']]) {
   for (const urls of duplicateValues(pageRecords, key)) {
