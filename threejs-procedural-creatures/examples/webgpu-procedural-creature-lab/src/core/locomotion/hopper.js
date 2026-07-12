@@ -38,6 +38,7 @@ export function createHopperState(spec, compiled, rng) {
 	return {
 		hopHeight,
 		hopLength,
+		squashAmplitude: spec.locomotion?.squashAmplitude ?? 1,
 		idleTime,
 		crouchTime,
 		airDuration,
@@ -93,6 +94,7 @@ export function sampleHopper(state, timeSeconds) {
 
 export function stepHopper(state, dt, root) {
 	const sample = sampleHopper(state, state.elapsed === undefined ? dt : state.elapsed + dt);
+	sample.squash = 1 + (sample.squash - 1) * state.squashAmplitude;
 	state.elapsed = (state.elapsed ?? 0) + dt;
 	root.position[1] = sample.height;
 	root.position[2] = sample.z;
@@ -103,6 +105,7 @@ export function stepHopper(state, dt, root) {
 		squash: sample.squash,
 		telemetry: {
 			...sample,
+			squashAmplitude: state.squashAmplitude,
 			hopHeight: state.hopHeight,
 			hopLength: state.hopLength,
 			apexTime: hopperApexTime(state),

@@ -1,13 +1,14 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "58294a60a3b4972a11a3af34c1685a2a",
+    "compilerSignature": "27fa37219a665cf59bc9e97fd0a45901",
     "topologySignature": "421114df66d0c0d7e4f8a1ed4d671fb3",
     "geometryDigest": "5b61780353527537f3541b9dd656d803",
     "sourceRigIdentity": {
-      "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
+      "compilerSignature": "244019baa6de9faa3ce6b1b8471be846",
       "topologySignature": "cb15a52eae8083b663be0474d0fa068a",
-      "geometryDigest": "35374706df8b4c0628b5b79c8c58c402"
+      "geometryDigest": "35374706df8b4c0628b5b79c8c58c402",
+      "motionEnvelopeDigest": "d486cbc6c5eb89ec3f6920da48649e24"
     }
   },
   "tier": "hero",
@@ -218,8 +219,8 @@
     "byteLength": 2820528,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "f4aa0e47ddebb9f56b8d84bb69c97b85",
-    "sha256": "d66336de05360ce1d8f595ed789ae67fe38478dca273bd06b28c9c3c5c55d6fe",
+    "contentDigest128": "69316443e26beb15b87e5b5b2c2511e5",
+    "sha256": "bb8c34ddbcc4f8ca9f5284c6fbd6b54bc4d96b571e3d355be38465973b931e44",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "hopper",
@@ -227,21 +228,75 @@
   "skinning": {
     "status": "accepted-weight-baseline",
     "maximumInfluences": 4,
-    "maximumPartitionError": 4.470348358154297e-8,
+    "maximumPartitionError": 4.400499165058136e-8,
     "maximumBarrierLeakage": 0,
     "fallbackVertices": 0,
-    "sigma": 0.36,
+    "sigma": 0.04,
     "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
   },
   "deformation": {
-    "status": "not-certified",
-    "selectedMethod": null,
-    "correctionLayout": null,
-    "limitation": "The full deterministic deformation selection sweep has not produced an accepted candidate for this species."
+    "version": "creature-deformation-sweep-v2",
+    "motionEnvelopeDigest": "d486cbc6c5eb89ec3f6920da48649e24",
+    "status": "accepted-deformation-selection",
+    "selectedMethod": "lbs",
+    "correctionLayout": "none",
+    "selectionRule": "Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded binary or geodesically feathered correction region only when it covers at most 25% and the corrected full sweep passes; otherwise reject.",
+    "corpus": {
+      "version": "creature-deformation-sweep-v2",
+      "locomotionType": "hopper",
+      "durationSeconds": 4,
+      "sampleCount": 25,
+      "deterministicSampling": "integer 60 Hz ticks addressed by seek()"
+    },
+    "thresholds": {
+      "worldUnitsPerPixel": 0.020000000000000004,
+      "maximumSurfaceErrorWorld": 0.020000000000000004,
+      "maximumSilhouetteErrorPx": 1,
+      "maximumNormalAngleRadians": 0.3665191429188092
+    },
+    "worst": {
+      "surfaceDistance": 0.024816014740605345,
+      "normalAngleRadians": 0.09641224654812024,
+      "projectedSilhouetteErrorBoundPx": 1.240800737030267,
+      "directSilhouetteErrorPx": 2,
+      "directSilhouetteP95ErrorPx": 1,
+      "silhouetteDisagreementFraction": 0.03515625
+    },
+    "totals": {
+      "collapsedTriangles": 0,
+      "invertedTriangles": 0,
+      "nonAdjacentSelfIntersections": 0
+    },
+    "correctionRegion": null,
+    "alternatives": {
+      "lbs": {
+        "status": "accepted-candidate",
+        "failures": [],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 0
+        }
+      },
+      "dqs": {
+        "status": "accepted-candidate",
+        "failures": [],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 0
+        }
+      },
+      "lbsCorrected": null
+    },
+    "limitations": [
+      "Deterministic CPU silhouettes certify three orthographic design directions; browser near/design/far perspective captures remain required evidence.",
+      "Morphology-envelope endpoint poses are not included unless supplied through options.corpus."
+    ]
   },
   "acceptanceStatus": "provisional-reference-candidate",
   "limitations": [
-    "Deformation selection and correction-region selection remain open.",
+    "Deterministic orthographic deformation selection passes; direct browser near/design/far perspective evidence remains open.",
     "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
   ]
 }

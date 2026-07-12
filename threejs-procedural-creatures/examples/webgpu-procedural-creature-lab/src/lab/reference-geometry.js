@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry } from 'three';
 
-const SOURCE_IDENTITY_KEYS = Object.freeze(['compilerSignature', 'topologySignature', 'geometryDigest']);
+const SOURCE_IDENTITY_KEYS = Object.freeze(['compilerSignature', 'topologySignature', 'geometryDigest', 'motionEnvelopeDigest']);
 
 export function assertReferenceAssetIdentity(asset, compiled) {
 	const manifest = asset?.manifest;

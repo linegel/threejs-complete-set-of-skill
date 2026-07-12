@@ -1,13 +1,14 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "844ee2a35bd645f511f47ffbb9062825",
+    "compilerSignature": "23261c2261ded6c236bb66b0bab6a4ce",
     "topologySignature": "ca34b14980c6d44d920c7c07957e0719",
     "geometryDigest": "36a0029da36d5b0bce46c3ddb2a0d3a3",
     "sourceRigIdentity": {
-      "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
+      "compilerSignature": "244019baa6de9faa3ce6b1b8471be846",
       "topologySignature": "59454470a41d9cf690ee173064bd382e",
-      "geometryDigest": "19d1dd78cc3a1c301141a97ac3f3c664"
+      "geometryDigest": "19d1dd78cc3a1c301141a97ac3f3c664",
+      "motionEnvelopeDigest": "e35a618be8909ab9e35ae3bf993fa921"
     }
   },
   "tier": "hero",

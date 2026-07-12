@@ -309,6 +309,7 @@ export function extractReferenceSurface(compiled, options = {}) {
 				compilerSignature: compiled.compilerSignature,
 				topologySignature: compiled.topologySignature,
 				geometryDigest: compiled.geometryDigest,
+				motionEnvelopeDigest: compiled.motionEnvelopeDigest,
 			},
 		},
 		extraction: {

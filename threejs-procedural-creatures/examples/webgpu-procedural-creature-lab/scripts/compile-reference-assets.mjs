@@ -19,6 +19,10 @@ const skinWeightOptions = Object.freeze({
 	// Frozen 25-pose topology sweep: sigma 0.13 yields zero LBS
 	// self-intersections; 0.12 and 0.14 reintroduce 3 and 6 respectively.
 	biped: Object.freeze({ sigma: 0.13 }),
+	// Frozen 25-pose topology/silhouette sweep: sigma 0.04 is the tightest
+	// tested geodesic field that preserves the authored 0.40 squash envelope
+	// and the follow-constrained counter-tail without live correction.
+	hopper: Object.freeze({ sigma: 0.04 }),
 	// Frozen 25-pose method/correction sweep: raw LBS and DQ retain 14 and 10
 	// intersections; corrected LBS worsens to 52, while DQ with the frozen
 	// feathered region clears every topology, silhouette, and normal gate.
@@ -26,7 +30,13 @@ const skinWeightOptions = Object.freeze({
 });
 const deformationOptions = Object.freeze({
 	biped: Object.freeze({ maximumCorrectionTrials: 0 }),
+	hopper: Object.freeze({ maximumCorrectionTrials: 0 }),
 	flyer: Object.freeze({ maximumCorrectionTrials: 2, correctionTrustRadius: 0.024, correctionFeatherRings: 2 }),
+});
+const deformationExpectations = Object.freeze({
+	biped: Object.freeze({ method: 'lbs', correction: 'none' }),
+	hopper: Object.freeze({ method: 'lbs', correction: 'none' }),
+	flyer: Object.freeze({ method: 'dqs-log-scale', correction: 'bounded-static-feather' }),
 });
 
 function parseArgs(argv) {
@@ -76,8 +86,8 @@ function deformationSelection(name, spec, compiled, surface, skinning, cellSize)
 		...deformationOptions[name],
 		checkSelfIntersections: true,
 	});
-	const expectedMethod = name === 'biped' ? 'lbs' : 'dqs-log-scale';
-	const expectedCorrection = name === 'biped' ? 'none' : 'bounded-static-feather';
+	const expectedMethod = deformationExpectations[name].method;
+	const expectedCorrection = deformationExpectations[name].correction;
 	if (result.status !== 'accepted-deformation-selection' || result.selectedMethod !== expectedMethod || result.correctionLayout !== expectedCorrection) {
 		throw new Error(`${name} frozen deformation selection rejected: ${JSON.stringify({ status: result.status, method: result.selectedMethod, correction: result.correctionLayout, lbs: result.candidates.lbs.failures, dqs: result.candidates.dqs.failures, lbsCorrected: result.candidates.lbsCorrected?.failures, dqsCorrected: result.candidates.dqsCorrected?.failures })}`);
 	}
@@ -87,6 +97,7 @@ function deformationSelection(name, spec, compiled, surface, skinning, cellSize)
 	const correctionWeights = selected.region?.weights?.slice() ?? new Float32Array(surface.positions.length / 3);
 	return { summary: {
 		version: result.version,
+		motionEnvelopeDigest: compiled.motionEnvelopeDigest,
 		status: result.status,
 		selectedMethod: result.selectedMethod,
 		correctionLayout: result.correctionLayout,

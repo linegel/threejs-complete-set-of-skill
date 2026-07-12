@@ -170,6 +170,7 @@ async function runReferenceIdentityMutation() {
 		['compilerSignature', { ...compiled, compilerSignature: `${compiled.compilerSignature}-mutated` }],
 		['topologySignature', { ...compiled, topologySignature: `${compiled.topologySignature}-mutated` }],
 		['geometryDigest', { ...compiled, geometryDigest: `${compiled.geometryDigest}-mutated` }],
+		['motionEnvelopeDigest', { ...compiled, motionEnvelopeDigest: `${compiled.motionEnvelopeDigest}-mutated` }],
 		['tier', { ...compiled, tier: 'crowd' }],
 	];
 	const rejected = [];

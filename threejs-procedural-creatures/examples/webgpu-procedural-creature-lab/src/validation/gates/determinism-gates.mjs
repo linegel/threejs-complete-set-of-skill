@@ -86,6 +86,7 @@ async function runGateCoverage() {
 		'projected-silhouette-fixture',
 		'deformation-selection-fixture',
 		'biped-deformation-sweep',
+		'hopper-deformation-sweep',
 		'bounded-correction',
 		'correction-failure-preserves-skin',
 		'correction-region-policy',

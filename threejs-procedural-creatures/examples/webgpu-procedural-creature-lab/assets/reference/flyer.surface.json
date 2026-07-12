@@ -1,13 +1,14 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "41448edcfcbc75a22bec35fc7b658fa2",
+    "compilerSignature": "1cc47a794b37759dfb5b64776e51e889",
     "topologySignature": "c9eb0310dd4f5d1e6122e1280fd4d216",
     "geometryDigest": "c192f1253f02a7bb9bca1275c7f5330b",
     "sourceRigIdentity": {
-      "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
+      "compilerSignature": "244019baa6de9faa3ce6b1b8471be846",
       "topologySignature": "e2eaca7481dc3c5ac799ed14ada9060a",
-      "geometryDigest": "f94a8442aba9879052c818e6afaf28f8"
+      "geometryDigest": "f94a8442aba9879052c818e6afaf28f8",
+      "motionEnvelopeDigest": "93bf1c5df3027fa788d90e290fe0ae17"
     }
   },
   "tier": "hero",
@@ -235,6 +236,7 @@
   },
   "deformation": {
     "version": "creature-deformation-sweep-v2",
+    "motionEnvelopeDigest": "93bf1c5df3027fa788d90e290fe0ae17",
     "status": "accepted-deformation-selection",
     "selectedMethod": "dqs-log-scale",
     "correctionLayout": "bounded-static-feather",

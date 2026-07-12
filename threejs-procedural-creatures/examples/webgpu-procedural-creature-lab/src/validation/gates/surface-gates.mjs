@@ -212,9 +212,9 @@ async function runBundledReferenceAssets() {
 		if (manifest.acceptanceStatus !== 'provisional-reference-candidate' || manifest.representation !== 'canonical-reference-surface-candidate') {
 			return { status: 'fail', details: { message: `bundled asset '${name}' overstates acceptance`, acceptanceStatus: manifest.acceptanceStatus, representation: manifest.representation } };
 		}
-		const expectedDeformationStatus = name === 'biped' || name === 'flyer' ? 'accepted-deformation-selection' : 'not-certified';
-		const expectedMethod = name === 'biped' ? 'lbs' : name === 'flyer' ? 'dqs-log-scale' : null;
-		const expectedCorrection = name === 'biped' ? 'none' : name === 'flyer' ? 'bounded-static-feather' : null;
+		const expectedDeformationStatus = name === 'biped' || name === 'hopper' || name === 'flyer' ? 'accepted-deformation-selection' : 'not-certified';
+		const expectedMethod = name === 'biped' || name === 'hopper' ? 'lbs' : name === 'flyer' ? 'dqs-log-scale' : null;
+		const expectedCorrection = name === 'biped' || name === 'hopper' ? 'none' : name === 'flyer' ? 'bounded-static-feather' : null;
 		if (manifest.deformation?.status !== expectedDeformationStatus || manifest.deformation?.selectedMethod !== expectedMethod
 			|| manifest.deformation?.correctionLayout !== expectedCorrection) {
 			return { status: 'fail', details: { message: `bundled asset '${name}' deformation status drifted`, expectedDeformationStatus, deformation: manifest.deformation } };
@@ -430,6 +430,46 @@ async function runFlyerDeformationSweep() {
 	return { status: 'pass', details: { sigma: manifest.skinning.sigma, selectedMethod: result.selectedMethod, correctionLayout: result.correctionLayout, corpus: result.corpus, worst: winner.worst, totals: winner.totals, region: { fraction: winner.region.fraction, grownCount: winner.region.grownCount, featherRings: winner.region.featherRings } } };
 }
 
+async function runHopperDeformationSweep() {
+	const [specText, manifestText, binary] = await Promise.all([
+		readFile(resolve(specsDir, 'hopper.json'), 'utf8'),
+		readFile(resolve(referenceAssetsDir, 'hopper.surface.json'), 'utf8'),
+		readFile(resolve(referenceAssetsDir, 'hopper.surface.bin')),
+	]);
+	const spec = JSON.parse(specText);
+	const manifest = JSON.parse(manifestText);
+	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileFixture(spec);
+	const motionMutation = compileFixture({ ...spec, locomotion: { ...spec.locomotion, squashAmplitude: 0.41 } });
+	const result = certifyDeformationSelection(
+		spec,
+		compiled,
+		{ positions: arrays.positions, normals: arrays.normals, indices: arrays.indices },
+		{ skinIndices: arrays.skinIndices, skinWeights: arrays.skinWeights },
+		{
+			durationSeconds: 4,
+			sampleCount: 25,
+			worldUnitsPerPixel: manifest.extraction.cellSize,
+			maximumSilhouetteErrorPx: 1,
+			silhouetteResolution: 32,
+			silhouetteRayStep: manifest.extraction.cellSize,
+			maximumCorrectionTrials: 0,
+			checkSelfIntersections: true,
+		},
+	);
+	const winner = result.candidates.lbs;
+	if (manifest.skinning?.sigma !== 0.04 || spec.locomotion.squashAmplitude !== 0.4
+		|| spec.parts.find((part) => part.id === 'counter-tail')?.followStrength !== 0.45
+		|| manifest.identity?.sourceRigIdentity?.motionEnvelopeDigest !== compiled.motionEnvelopeDigest
+		|| motionMutation.motionEnvelopeDigest === compiled.motionEnvelopeDigest
+		|| result.status !== 'accepted-deformation-selection' || result.selectedMethod !== 'lbs'
+		|| result.correctionLayout !== 'none' || winner.totals.collapsedTriangles !== 0
+		|| winner.totals.nonAdjacentSelfIntersections !== 0 || winner.worst.directSilhouetteP95ErrorPx > 1) {
+		return { status: 'fail', details: { message: 'frozen hopper motion/weight sweep rejected', sigma: manifest.skinning?.sigma, squashAmplitude: spec.locomotion.squashAmplitude, followStrength: spec.parts.find((part) => part.id === 'counter-tail')?.followStrength, status: result.status, selectedMethod: result.selectedMethod, correctionLayout: result.correctionLayout, failures: winner.failures, totals: winner.totals, worst: winner.worst } };
+	}
+	return { status: 'pass', details: { sigma: manifest.skinning.sigma, squashAmplitude: spec.locomotion.squashAmplitude, followStrength: spec.parts.find((part) => part.id === 'counter-tail').followStrength, motionEnvelopeDigest: compiled.motionEnvelopeDigest, motionMutationDigest: motionMutation.motionEnvelopeDigest, selectedMethod: result.selectedMethod, corpus: result.corpus, worst: winner.worst, totals: winner.totals, dqsFailures: result.candidates.dqs.failures } };
+}
+
 export const gates = [
 	{ id: 'reference-surface-sphere', run: runReferenceSphere },
 	{ id: 'reference-surface-determinism', run: runReferenceDeterminism },
@@ -444,5 +484,6 @@ export const gates = [
 	{ id: 'projected-silhouette-fixture', run: runProjectedSilhouetteFixture },
 	{ id: 'deformation-selection-fixture', run: runDeformationSelectionFixture },
 	{ id: 'biped-deformation-sweep', run: runBipedDeformationSweep },
+	{ id: 'hopper-deformation-sweep', run: runHopperDeformationSweep },
 	{ id: 'flyer-deformation-sweep', run: runFlyerDeformationSweep },
 ];

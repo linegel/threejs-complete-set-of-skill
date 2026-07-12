@@ -144,8 +144,16 @@ async function runSpecSchemaGate() {
 		...base,
 		parts: [{ id: 'rope', shape: 'rope', segments: 65, length: 1, r: 0.02 }],
 	}, 'spec.maxParts');
+	assertThrowsMessage({
+		...base,
+		locomotion: { ...base.locomotion, squashAmplitude: 1.01 },
+	}, 'locomotion.squashAmplitude');
+	assertThrowsMessage({
+		...base,
+		parts: [{ id: 'rope', shape: 'rope', segments: 4, length: 1, r: 0.02, followStrength: -0.01 }],
+	}, 'rope.followStrength');
 
-	return { status: 'pass', details: { specs: specNames.length, fixtures: 8 } };
+	return { status: 'pass', details: { specs: specNames.length, fixtures: 10 } };
 }
 
 async function runSminVsHardMin() {

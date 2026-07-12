@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:2d08ad2eec151c8deeaac4a40cb45fa8cb7bd9cdb83ed5f93a93a228b8735afe",
+  "buildRevision": "sha256:17156082a24b9a603c03a5682ef6d7d813acea17e134be4952efd569108ca16c",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -1084,7 +1084,7 @@
         "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
         "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
       },
-      "sourceHash": "sha256:593236c5255d83e1ee914876796c5c0b103b543e0e709b0ea0b1ebf58424ff63",
+      "sourceHash": "sha256:f4ce09cad9be7f3ccb456c272727227576ed5f3199606f38f4ac93148246be9f",
       "proxyStatus": null,
       "notes": [
         "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
@@ -11110,7 +11110,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:b0a7001a395ce6eeaf05fe3f7d48ac8a28844943c2e5efb06e605ffa233f06a3",
+      "sourceHash": "sha256:a582a8a97afcf3023234bd7025d31054f6b008f3f93253affb6e5263c3b126fa",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,

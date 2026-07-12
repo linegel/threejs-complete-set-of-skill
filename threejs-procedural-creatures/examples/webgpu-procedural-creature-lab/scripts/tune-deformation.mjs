@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { buildDeformationPoseCorpus, evaluateCorrectedDeformationCandidate, evaluateDeformationCandidate } from '../src/core/deformation-sweep.js';
 import { unpackReferenceAsset } from '../src/core/reference-asset-format.js';
+import { extractReferenceSurface } from '../src/core/reference-surface.js';
 import { compileSpec } from '../src/core/rig-compiler.js';
 import { generateGeodesicSkinWeights } from '../src/core/skin-weights.js';
 
@@ -35,6 +36,10 @@ function parseArgs(argv) {
 		correctionTrials: 0,
 		correctionTrustRadius: null,
 		correctionFeatherRings: 0,
+		details: 'full',
+		ropeFollowStrength: null,
+		cellSize: null,
+		hopperSquashAmplitude: null,
 	};
 	for (let index = 0; index < argv.length; index += 2) {
 		const flag = argv[index];
@@ -51,32 +56,62 @@ function parseArgs(argv) {
 		else if (flag === '--correction-trials') values.correctionTrials = parsePositiveInteger(value, 'correction trials');
 		else if (flag === '--correction-trust-radius') values.correctionTrustRadius = parsePositiveNumber(value, 'correction trust radius');
 		else if (flag === '--correction-feather-rings') values.correctionFeatherRings = parsePositiveInteger(value, 'correction feather rings');
+		else if (flag === '--details') values.details = value;
+		else if (flag === '--rope-follow-strength') {
+			values.ropeFollowStrength = Number(value);
+			if (!(Number.isFinite(values.ropeFollowStrength) && values.ropeFollowStrength >= 0 && values.ropeFollowStrength <= 1)) {
+				throw new Error('--rope-follow-strength must be in [0,1]');
+			}
+		}
+		else if (flag === '--cell-size') values.cellSize = parsePositiveNumber(value, 'cell size');
+		else if (flag === '--hopper-squash-amplitude') {
+			values.hopperSquashAmplitude = Number(value);
+			if (!(Number.isFinite(values.hopperSquashAmplitude) && values.hopperSquashAmplitude >= 0 && values.hopperSquashAmplitude <= 1)) {
+				throw new Error('--hopper-squash-amplitude must be in [0,1]');
+			}
+		}
 		else throw new Error(`unknown tuning option '${flag}'`);
 	}
 	if (!validSpecies.has(values.species)) throw new Error(`--species must be one of ${[...validSpecies].join(', ')}`);
 	if (!values.sigmas?.length) throw new Error('--sigmas requires a comma-separated list');
 	if (values.method !== 'lbs' && values.method !== 'dqs-log-scale') throw new Error("--method must be 'lbs' or 'dqs-log-scale'");
+	if (values.details !== 'full' && values.details !== 'summary') throw new Error("--details must be 'full' or 'summary'");
 	return values;
 }
 
-async function loadInputs(species) {
+async function loadInputs(species, ropeFollowStrength, cellSize, hopperSquashAmplitude) {
 	const [specText, manifestText, binary] = await Promise.all([
 		readFile(resolve(root, 'src/lab/specs', `${species}.json`), 'utf8'),
 		readFile(resolve(root, 'assets/reference', `${species}.surface.json`), 'utf8'),
 		readFile(resolve(root, 'assets/reference', `${species}.surface.bin`)),
 	]);
 	const spec = JSON.parse(specText);
+	if (ropeFollowStrength !== null) {
+		for (const part of spec.parts) if (part.shape === 'rope') part.followStrength = ropeFollowStrength;
+	}
+	if (hopperSquashAmplitude !== null) spec.locomotion.squashAmplitude = hopperSquashAmplitude;
 	const manifest = JSON.parse(manifestText);
-	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileSpec(spec, { tier: 'hero', maxParts: 64, candidateK: 64 });
+	const arrays = cellSize === null
+		? unpackReferenceAsset(manifest, new Uint8Array(binary))
+		: extractReferenceSurface(compiled, {
+			cellSize,
+			maxSamples: 10_000_000,
+			checkSelfIntersections: true,
+			checkBidirectionalDistance: true,
+			fieldRayResolution: 18,
+			maximumSurfaceDistance: cellSize * 0.5,
+		});
 	return {
 		spec,
 		manifest,
-		compiled: compileSpec(spec, { tier: 'hero', maxParts: 64, candidateK: 64 }),
+		compiled,
 		surface: { positions: arrays.positions, normals: arrays.normals, indices: arrays.indices },
+		cellSize: cellSize ?? manifest.extraction.cellSize,
 	};
 }
 
-function summarize(candidate, sigma, skinning) {
+function summarize(candidate, sigma, skinning, details = 'full') {
 	return {
 		sigma,
 		weightStatus: skinning.certification.status,
@@ -84,7 +119,7 @@ function summarize(candidate, sigma, skinning) {
 		failures: candidate.failures,
 		totals: candidate.totals,
 		worst: candidate.worst,
-		worstPoses: candidate.poseRecords
+		...(details === 'summary' ? {} : { worstPoses: candidate.poseRecords
 			.filter((record) => record.topology.nonAdjacentSelfIntersections > 0
 				|| record.surface.normalContinuity.p95AngleRadians > candidate.thresholds.maximumNormalAngleRadians
 				|| record.silhouette.maximumP95ErrorPx > candidate.thresholds.maximumSilhouetteErrorPx)
@@ -95,12 +130,15 @@ function summarize(candidate, sigma, skinning) {
 				selfIntersectionPairs: record.topology.selfIntersectionPairs?.slice(0, 8) ?? [],
 				normalP95Radians: record.surface.normalContinuity.p95AngleRadians,
 				silhouetteP95Px: record.silhouette.maximumP95ErrorPx,
-			})),
+				silhouetteViews: record.silhouette.views
+					.filter((view) => view.p95ErrorPx > candidate.thresholds.maximumSilhouetteErrorPx)
+					.map((view) => ({ direction: view.direction, p95ErrorPx: view.p95ErrorPx, maximumErrorPx: view.maximumErrorPx, disagreementFraction: view.disagreementFraction })),
+			})) }),
 	};
 }
 
 const options = parseArgs(process.argv.slice(2));
-const inputs = await loadInputs(options.species);
+const inputs = await loadInputs(options.species, options.ropeFollowStrength, options.cellSize, options.hopperSquashAmplitude);
 const corpus = buildDeformationPoseCorpus(inputs.spec, inputs.compiled, {
 	durationSeconds: options.duration,
 	sampleCount: options.samples,
@@ -109,10 +147,10 @@ const results = [];
 for (const sigma of options.sigmas) {
 	const skinning = generateGeodesicSkinWeights(inputs.surface, inputs.compiled, { sigma });
 	const evaluationOptions = {
-		worldUnitsPerPixel: inputs.manifest.extraction.cellSize,
+		worldUnitsPerPixel: inputs.cellSize,
 		maximumSilhouetteErrorPx: options.maximumSilhouetteErrorPx,
 		silhouetteResolution: options.resolution,
-		silhouetteRayStep: inputs.manifest.extraction.cellSize,
+		silhouetteRayStep: inputs.cellSize,
 		checkSelfIntersections: true,
 		stopAfterSelfIntersections: options.stopAfter,
 		maximumCorrectionTrials: options.correctionTrials,
@@ -124,8 +162,8 @@ for (const sigma of options.sigmas) {
 		? evaluateCorrectedDeformationCandidate(options.method, rawCandidate, inputs.surface, skinning, inputs.compiled, corpus, evaluationOptions)
 		: rawCandidate;
 	results.push({
-		...summarize(candidate, sigma, skinning),
-		raw: options.correctionTrials > 0 ? summarize(rawCandidate, sigma, skinning) : null,
+		...summarize(candidate, sigma, skinning, options.details),
+		raw: options.correctionTrials > 0 ? summarize(rawCandidate, sigma, skinning, options.details) : null,
 		correction: candidate.region ? {
 			status: candidate.region.status,
 			selectedVertices: candidate.region.selectedVertices,
@@ -139,6 +177,6 @@ console.log(JSON.stringify({
 	version: 'creature-deformation-tuner-v1',
 	species: options.species,
 	method: options.method,
-	corpus: { sampleCount: corpus.sampleCount, durationSeconds: corpus.durationSeconds, resolution: options.resolution, correctionTrials: options.correctionTrials, correctionTrustRadius: options.correctionTrustRadius, correctionFeatherRings: options.correctionFeatherRings },
+	corpus: { sampleCount: corpus.sampleCount, durationSeconds: corpus.durationSeconds, resolution: options.resolution, correctionTrials: options.correctionTrials, correctionTrustRadius: options.correctionTrustRadius, correctionFeatherRings: options.correctionFeatherRings, ropeFollowStrength: options.ropeFollowStrength, cellSize: inputs.cellSize, hopperSquashAmplitude: options.hopperSquashAmplitude },
 	results,
 }, null, 2));

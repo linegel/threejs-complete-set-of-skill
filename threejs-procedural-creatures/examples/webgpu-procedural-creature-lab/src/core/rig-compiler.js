@@ -1,7 +1,7 @@
 import { validateSpec } from './spec-schema.js';
 import { compileBlendDag, exactCandidateCertificate } from './blend-dag.js';
 
-export const SCHEMA_VERSION = 'creature-lab-schema-v2';
+export const SCHEMA_VERSION = 'creature-lab-schema-v3-motion-envelopes';
 export const COMPILER_VERSION = 'pure-core-sdf-rig-shell-v2';
 export const SHADER_CONTRACT_VERSION = 'creature-field-tsl-v3-explicit-blend-dag-certificates';
 
@@ -106,6 +106,7 @@ function canonicalPartKey(part, origin) {
 		lower: part.lower,
 		phase: part.phase,
 		flap: part.flap,
+		followStrength: part.followStrength,
 	});
 }
 
@@ -210,7 +211,10 @@ function compilePart(part, origin, scaleValue) {
 			const b = add(root, [0, 0, -lengthValue * t1]);
 			const ra = Math.max(part.r * (1 - taper * t0), part.r * 0.15) * scaleValue;
 			const rb = Math.max(part.r * (1 - taper * t1), part.r * 0.15) * scaleValue;
-			records.push(makePrimitive(part, a, b, ra, rb, color, effectiveK(part, Math.max(ra, rb) / scaleValue, scaleValue), 'rope', { ropeSegment: i }));
+			records.push(makePrimitive(part, a, b, ra, rb, color, effectiveK(part, Math.max(ra, rb) / scaleValue, scaleValue), 'rope', {
+				ropeSegment: i,
+				ropeFollowStrength: part.followStrength ?? 0,
+			}));
 		}
 	}
 
@@ -387,6 +391,15 @@ export function compileSpec(inputSpec, options = {}) {
 		semanticStructure: semanticParts.map((part) => ({ index: part.index, parentIndex: part.parentIndex })),
 	});
 	const geometryDigest = digest128(geometrySource);
+	const motionEnvelopeDigest = digest128({
+		locomotion: spec.locomotion,
+		parts: parts.map((part) => ({
+			shape: part.shape,
+			phase: part.phase ?? null,
+			flap: part.flap ?? null,
+			followStrength: part.followStrength ?? null,
+		})),
+	});
 	const shaderContractDigest = digest128({ shader: SHADER_CONTRACT_VERSION, maxParts: options.maxParts ?? slots.length, candidateK });
 	const digest = digest128({ compilerSignature, topologySignature, geometryDigest, shaderContractDigest });
 	const primitiveRecords = slots.map((slot, partSlot) => ({
@@ -412,6 +425,7 @@ export function compileSpec(inputSpec, options = {}) {
 		compilerSignature,
 		topologySignature,
 		geometryDigest,
+		motionEnvelopeDigest,
 		geometrySource,
 		shaderContractDigest,
 		tier,

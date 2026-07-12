@@ -1,13 +1,14 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "7404ac1d18f348c9038afebb3dffbb65",
+    "compilerSignature": "83ebc12a4d44f84a0cc32260c9ff8efe",
     "topologySignature": "7aa5fa7a9921fe08d491000e43919af0",
     "geometryDigest": "30e42f354e05defd3a565a27ade22139",
     "sourceRigIdentity": {
-      "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
+      "compilerSignature": "244019baa6de9faa3ce6b1b8471be846",
       "topologySignature": "9e82f77bd5e4471dd9980bf3c3836e6d",
-      "geometryDigest": "9f81839e77e3cd18ce3f22de51458980"
+      "geometryDigest": "9f81839e77e3cd18ce3f22de51458980",
+      "motionEnvelopeDigest": "18c8dea0a36e943c80ba6d2eec8d87f0"
     }
   },
   "tier": "hero",
@@ -235,6 +236,7 @@
   },
   "deformation": {
     "version": "creature-deformation-sweep-v2",
+    "motionEnvelopeDigest": "18c8dea0a36e943c80ba6d2eec8d87f0",
     "status": "accepted-deformation-selection",
     "selectedMethod": "lbs",
     "correctionLayout": "none",
