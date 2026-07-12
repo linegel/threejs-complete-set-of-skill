@@ -14,14 +14,14 @@ The unrestricted route starts on `potted-bonsai`, `action-ready`, and `budgeted`
 
 The page frame driver is the only live presentation owner. It serializes time steps, scene renders, control changes, target rebuilds, and resize mutations through one promise tail. A `?capture=1` route transfers frame ownership to the evidence harness, so the live page does not race a deterministic capture.
 
-The presentation path is intentionally small: one active subject, one forward scene render, no MRT, no post stack, and no CSS animation or backdrop filter. Changing subject disposes the previous factory-owned geometry and materials before replacing it. Logical component identity remains independent of visual tessellation tier.
+The presentation path is intentionally small: one active subject, one forward scene render, no MRT, no post stack, and no CSS animation or backdrop filter. Changing subjects first prepares and validates the candidate while the prior target remains active; after presentation plans apply, the controller retires the prior target and commits the candidate, reconstructing the prior state if a later transaction step fails. Logical component identity remains independent of visual tessellation tier.
 
 The HUD distinguishes quantities with different evidence:
 
 - nodes and triangles come from the active procedural hierarchy;
 - draw calls are shown only when the renderer exposes a numeric call count, otherwise `—`;
 - submissions are controller-counted scene render submissions, not GPU completion or timing;
-- motion time is the procedural display clock and is not solver time;
+- motion is a measured procedural pose-delta witness, reporting active channels and maximum translation, rotation, or scale change; it is kinematic evidence, not solver time or physics proof;
 - DPR is the applied tier cap, not the device-requested DPR.
 
 The authored DPR ceilings are `1.5` for `full`, `1.25` for `budgeted`, and `1.0` for `minimum`. These are starting policies, not measured acceptance proof. Triangle counts and representation density decrease by target and tier; no universal frame-time, draw-count, or thermal claim is inferred from those reductions. Sustained CPU/GPU/presentation timing still requires a named device, refresh rate, timestamp-query protocol, and an accepted evidence bundle.
@@ -41,6 +41,20 @@ Review cameras are `design`, `profile`, `attachment`, and `close-material`. The 
 The page accepts generated pathname routes such as `/scenario/potted-bonsai/`, `/mechanism/action-ready/`, `/tier/minimum/`, and `/camera/attachment/`. The equivalent query keys are `scenario`, `mechanism`, `tier`, and `camera`. A value supplied by either surface disables that selector. Repeated conflicting values or path/query conflicts fail closed and publish `window.__LAB_ERROR__`.
 
 `window.labController` exposes the deterministic controller after successful native-WebGPU initialization. `window.__LAB_ERROR__` is `null` on successful startup and becomes a frozen `{ name, message }` record when routing, initialization, frame execution, or a serialized mutation fails. Readiness is claimed only after the first completed native-WebGPU scene render.
+
+## Codex in-app Browser route evidence
+
+`npm run capture:routes:prepare` is a browser-free preparation check. It regenerates a content-addressed manifest from the complete trusted runtime source list, validates the runner against those current local bytes, and prints the one canonical URL to open manually in Codex's in-app Browser. It does not launch Playwright, Chrome, or any other browser process. Open exactly:
+
+`http://127.0.0.1:4174/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.html`
+
+The runner rejects every other origin or base path. It automatically visits all 15 physical routes in one same-origin iframe, in canonical order, with the exact `?capture=1` ownership query. Before assigning each iframe URL, the parent installs `load` and `error` observers and records strictly ordered monotonic timestamps plus a SHA-256 attestation. It also verifies an HTTP `200` response without redirects. Each physical route installs page, console, unhandled-rejection, resource, uncaptured-GPU-error, and device-loss observers in `<head>` before `app.js`; initialization fails closed if those observers are late or inactive.
+
+For every route, the runner proves zero initial submissions, disables camera interaction, performs one explicit native-WebGPU frame, requires the HUD to read the exact `Ready · <subject> · correctness WebGPU` state, exercises the locked UI and public-controller methods, proves every unlocked dimension changes and restores both controller and selector state, then uses `capturePixels("presentation")` as the second render. The camera pose must remain byte-for-byte stable before the first frame, after it, after all probes, and after readback. The record binds the trusted local route/runtime source closure, camera pose, normalized pipeline descriptor, and padded native readback with SHA-256 digests. The outer document separately binds the canonical correctness-capture source revision and exact native-WebGPU backend fingerprint. A route is disposed before the next one starts.
+
+No export is enabled until all 15 records pass. Each JSON readback reference points to retained raw padded bytes under `route-readbacks/*.rgba8unorm.bin`; binary data is never expanded as base64 or dumped into the page. On success the exact document is shown and exposed as `window.__CORPUS_ROUTE_EVIDENCE_RESULT__`. `window.__CORPUS_ROUTE_EVIDENCE_ARTIFACTS__` provides bounded `list()`, `getArtifact(path)`, and `buildTar()` methods. The page can save JSON alone or a deterministic, at-most-256-MiB TAR containing the JSON and all 15 readbacks. `bundleId` and `runId` remain visible inputs because a later evidence manifest must bind the same identities. A failure leaves the result and artifact API `null` and publishes a short diagnostic as `window.__CORPUS_ROUTE_EVIDENCE_ERROR__`.
+
+`npm run capture` remains the root-compatible shared browser capture command and uses `capture-hook.mjs` for the 48-image native-readback plan. The in-app runner is a separate route-evidence surface, not a replacement for canonical correctness/performance capture. Route evidence establishes physical-route, WebGPU initialization, HUD, lock, pipeline, readback, and observer facts only. It does not replace authored visual review, sustained named-device timing, resource/leak evidence, or the full artifact validator.
 
 ## Physics claim boundary
 
