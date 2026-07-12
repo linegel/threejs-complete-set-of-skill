@@ -33,6 +33,8 @@ import { ao } from 'three/addons/tsl/display/GTAONode.js';
 import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
+const LAB_ID = 'webgpu-node-gtao';
+
 export const AO_SCENARIOS = Object.freeze( [
 	'wall-receiver',
 	'thin-silhouette',
@@ -1049,6 +1051,7 @@ export async function createWebGPUNodeGTAO( {
 	function getMetrics() {
 
 		return {
+			labId: LAB_ID,
 			backend: renderer.backend.isWebGPUBackend === true ? 'webgpu' : 'unsupported',
 			threeRevision: THREE.REVISION,
 			tier: tierId,
@@ -1094,6 +1097,11 @@ export async function createWebGPUNodeGTAO( {
 	await setMode( initialMode );
 
 	return {
+		get labId() {
+
+			return LAB_ID;
+
+		},
 		ready: async () => {},
 		setScenario,
 		setMode,

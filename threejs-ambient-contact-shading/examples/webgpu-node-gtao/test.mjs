@@ -152,7 +152,13 @@ assert.equal( validateExampleSourceContracts(), true );
 const mainSource = await readFile( join( here, 'main.js' ), 'utf8' );
 assert.match( mainSource, /diagnostic-readback-rgba8/ );
 assert.match( mainSource, /readbackRoute:\s*'explicit-single-attachment-staging-target'/ );
+assert.match( mainSource, /const LAB_ID = 'webgpu-node-gtao';/ );
+assert.match( mainSource, /get labId\(\)/ );
+assert.match( mainSource, /labId: LAB_ID/ );
 assert.doesNotMatch( mainSource, /captureTarget\( renderer, stage\.[^)]+renderTarget/ );
+const browserSource = await readFile( join( here, 'browser.js' ), 'utf8' );
+assert.match( browserSource, /window\.labController = controller/ );
+assert.match( browserSource, /window\.__LAB_CONTROLLER__ = controller/ );
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera();

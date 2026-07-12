@@ -62,6 +62,7 @@ try {
 	} );
 	await controller.setCamera( route.camera );
 	await controller.setTime( route.time );
+	window.labController = controller;
 	window.__LAB_CONTROLLER__ = controller;
 	window.__LAB_READY__ = controller.ready();
 	updateStatus();
