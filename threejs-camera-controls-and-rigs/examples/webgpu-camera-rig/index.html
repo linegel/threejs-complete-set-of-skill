@@ -28,6 +28,7 @@
       import { createCameraRigDemo } from "./main.mjs";
 
       const demo = await createCameraRigDemo({ canvas: document.querySelector("#scene") });
+      globalThis.labController = demo.labController;
       globalThis.__LAB_CONTROLLER__ = demo.labController;
     </script>
   </body>

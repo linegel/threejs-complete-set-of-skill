@@ -13,6 +13,16 @@ const registryManifest = buildDemoRegistry().demos.find((entry) => entry.id === 
 assert(registryManifest, `registry contains ${manifest.id}`);
 const result = validateLabManifest(registryManifest);
 assert.deepEqual(result.errors, [], result.errors.join("\n"));
+const mainSource = readFileSync(join(root, "main.mjs"), "utf8");
+assert.match(mainSource, /const LAB_ID = ["']webgpu-camera-rig["'];/);
+assert.match(mainSource, /get labId\(\)/);
+assert.match(mainSource, /labId: LAB_ID/);
+const browserSource = readFileSync(join(root, "browser.mjs"), "utf8");
+assert.match(browserSource, /globalThis\.labController = demo\.labController/);
+assert.match(browserSource, /globalThis\.__LAB_CONTROLLER__ = demo\.labController/);
+const indexSource = readFileSync(join(root, "index.html"), "utf8");
+assert.match(indexSource, /globalThis\.labController = demo\.labController/);
+assert.match(indexSource, /globalThis\.__LAB_CONTROLLER__ = demo\.labController/);
 for (const route of manifest.mechanisms) {
   assert(route.route, `mechanism ${route.id} declares a route`);
   assert(existsSync(join(root, route.route, "index.html")), `mechanism ${route.id} has a physical wrapper`);

@@ -50,6 +50,7 @@ import {
 } from "./routeState.mjs";
 
 const FIXED_SEEDS = Object.freeze([0x00000001, 0x9e3779b9]);
+const LAB_ID = "webgpu-camera-rig";
 
 function requireChoice(value, allowed, label) {
   return requireCameraState(value, allowed, label);
@@ -313,6 +314,9 @@ export async function createCameraRigDemo({
   }
 
   const labController = {
+    get labId() {
+      return LAB_ID;
+    },
     async ready() {},
     async setScenario(id) {
       requireChoice(id, CAMERA_SCENARIOS, "scenario");
@@ -448,6 +452,7 @@ export async function createCameraRigDemo({
     },
     getMetrics() {
       return {
+        labId: LAB_ID,
         rendererBackend: renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
         threeRevision: REVISION,
         mechanism: route.mechanism,
