@@ -37,9 +37,9 @@ function referencedValues(file, source) {
     }
   }
   if (extension === '.js' || extension === '.mjs') {
-    collect(/\bfrom\s*(['"])([^'"]+)\1/g);
-    collect(/\bimport\s*(?:\(\s*)?(['"])([^'"]+)\1/g);
-    collect(/\bnew\s+URL\(\s*(['"])([^'"]+)\1\s*,\s*import\.meta\.url\s*\)/g);
+    collect(/\bfrom\s*(['"`])([^'"`]+)\1/g);
+    collect(/\bimport\s*(?:\(\s*)?(['"`])([^'"`]+)\1/g);
+    collect(/\bnew\s+URL\(\s*(['"`])([^'"`]+)\1\s*,\s*import\.meta\.url\s*\)/g);
   }
   if (extension === '.css') {
     collect(/\burl\(\s*(['"]?)([^'"\)]+)\1\s*\)/gi);
