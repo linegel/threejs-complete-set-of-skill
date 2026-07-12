@@ -44,6 +44,11 @@ ledger; no render-frame code invokes readback. `Run rollback mutation` inserts
 one diagnostic-only pass between candidate update and validation. It must report
 at least one negative candidate, hold committed generation and accepted count,
 and advance only the rejection count. Normal stepping remains seven passes.
+`Run 120-frame sustain` samples real presentation cadence and requires committed
+generations to advance with zero invalid, negative, rejected, GPU-error, or
+frame-readback events. It reports elapsed wall time but explicitly makes no GPU
+timing claim. The HUD's resource byte count is the exact logical typed-array
+inventory; backend alignment and physical residency remain unmeasured.
 
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL

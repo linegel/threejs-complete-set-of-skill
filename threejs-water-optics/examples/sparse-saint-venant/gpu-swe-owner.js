@@ -117,6 +117,24 @@ export function createGpuSparseSweOwner( renderer, {
 	const zCorrectionBuffer = createStorageBuffer( new Float32Array( contract.zFaceRecords * 2 ), 2, 'sparse-swe:z-hydrostatic-correction' );
 	const diagnosticBuffer = new StorageBufferAttribute( 8, 1, Uint32Array );
 	diagnosticBuffer.name = 'sparse-swe:transaction-diagnostics';
+	const resourceInventory = Object.freeze( {
+		statePingPong: stateCommittedBuffer.array.byteLength + stateCandidateBuffer.array.byteLength,
+		xFaceFlux: xFluxBuffer.array.byteLength,
+		zFaceFlux: zFluxBuffer.array.byteLength,
+		xHydrostaticCorrection: xCorrectionBuffer.array.byteLength,
+		zHydrostaticCorrection: zCorrectionBuffer.array.byteLength,
+		descriptors: descriptorBuffer.array.byteLength,
+		logicalLookup: lookupBuffer.array.byteLength,
+		displayIndices: displayIndexBuffer.array.byteLength,
+		diagnostics: diagnosticBuffer.array.byteLength
+	} );
+	for ( const [ resourceId, logicalBytes ] of Object.entries( contract.resourceBytes ) ) {
+
+		if ( resourceInventory[ resourceId ] !== logicalBytes ) throw new Error( `GPU SWE resource '${ resourceId }' allocated ${ resourceInventory[ resourceId ] } logical bytes; contract requires ${ logicalBytes }` );
+
+	}
+	const inventoriedLogicalBytes = Object.values( resourceInventory ).reduce( ( total, bytes ) => total + bytes, 0 );
+	if ( inventoriedLogicalBytes !== contract.totalLogicalBytes ) throw new Error( 'GPU SWE runtime resource inventory does not match contract total' );
 
 	const committed = storage( stateCommittedBuffer, 'vec4', contract.stateRecords );
 	const candidate = storage( stateCandidateBuffer, 'vec4', contract.stateRecords );
@@ -429,6 +447,7 @@ export function createGpuSparseSweOwner( renderer, {
 	return Object.freeze( {
 		contract,
 		initial,
+		resourceInventory,
 		stateCommittedBuffer,
 		stateCandidateBuffer,
 		descriptorBuffer,
@@ -460,7 +479,8 @@ export function createGpuSparseSweOwner( renderer, {
 				backend: 'native-webgpu', model: 'nonlinear-Saint-Venant-HLL-hydrostatic', authority: 'gpu-float32',
 				tierId, submittedTicks, dispatchCount, droppedTimeSeconds, diagnosticReadbackCount, rollbackMutationProbeCount, frameCriticalReadbackCount: 0,
 				residentTileCount: initial.residentTileCount, residentCellCount: initial.residentCellCount,
-				logicalResourceBytes: contract.totalLogicalBytes, dispatchOrder: contract.dispatchOrder
+				logicalResourceBytes: contract.totalLogicalBytes, resourceInventory,
+				backendAllocatedBytes: null, backendAllocationClaim: 'unmeasured-backend-alignment-and-residency', dispatchOrder: contract.dispatchOrder
 			} );
 
 		},

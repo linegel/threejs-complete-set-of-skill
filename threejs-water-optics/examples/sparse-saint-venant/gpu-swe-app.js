@@ -13,6 +13,7 @@ const canvas = document.getElementById( 'lab-canvas' );
 const status = document.getElementById( 'status' );
 const diagnosticButton = document.getElementById( 'diagnostic' );
 const rollbackButton = document.getElementById( 'rollback' );
+const sustainedButton = document.getElementById( 'sustained' );
 const renderer = new WebGPURenderer( { canvas, antialias: false, trackTimestamp: false } );
 renderer.setPixelRatio( Math.min( devicePixelRatio, tierId === 'full' ? 1.5 : 1 ) );
 const scene = new Scene();
@@ -195,6 +196,43 @@ async function runRollbackMutation() {
 
 }
 
+async function runSustainedDiagnostic( presentationFrames = 120 ) {
+
+	if ( ! Number.isInteger( presentationFrames ) || presentationFrames < 60 || presentationFrames > 240 ) throw new Error( 'sustained presentation frames must be an integer in [60, 240]' );
+	for ( const button of [ diagnosticButton, rollbackButton, sustainedButton ] ) button.disabled = true;
+	sustainedButton.textContent = `Running ${ presentationFrames } frames…`;
+	pausedForDiagnostic = true;
+	try {
+
+		const before = await owner.captureDiagnostics();
+		const descriptionBefore = owner.describe();
+		pausedForDiagnostic = false;
+		const startMilliseconds = performance.now();
+		for ( let frame = 0; frame < presentationFrames; frame += 1 ) await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+		const elapsedMilliseconds = performance.now() - startMilliseconds;
+		pausedForDiagnostic = true;
+		const after = await owner.captureDiagnostics();
+		const descriptionAfter = owner.describe();
+		const passed = after.invalidCells === 0 && after.negativeDepthCells === 0
+			&& after.rejectedCommits === before.rejectedCommits
+			&& after.committedGeneration > before.committedGeneration
+			&& descriptionAfter.frameCriticalReadbackCount === 0
+			&& gpuErrors.length === 0;
+		if ( ! passed ) throw new Error( `sustained diagnostic failed: before=${ JSON.stringify( before ) } after=${ JSON.stringify( after ) } errors=${ JSON.stringify( gpuErrors ) }` );
+		lastDiagnosticSummary = `SUSTAIN PASS · ${ presentationFrames } presentation frames / ${ ( elapsedMilliseconds / 1000 ).toFixed( 2 ) } s · generations +${ after.committedGeneration - before.committedGeneration } · dispatches +${ descriptionAfter.dispatchCount - descriptionBefore.dispatchCount } · invalid 0 · negative 0 · rejected +0 · 0 frame readbacks · GPU time NOT CLAIMED`;
+		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
+		return Object.freeze( { passed: true, presentationFrames, elapsedMilliseconds, before, after, descriptionBefore, descriptionAfter, gpuTimingClaim: null } );
+
+	} finally {
+
+		pausedForDiagnostic = false;
+		for ( const button of [ diagnosticButton, rollbackButton, sustainedButton ] ) button.disabled = false;
+		sustainedButton.textContent = 'Run 120-frame sustain';
+
+	}
+
+}
+
 function formatGpuError( event ) {
 
 	return `${ event.error?.constructor?.name ?? 'GPUError' }: ${ event.error?.message ?? 'unknown uncaptured GPU error' }`;
@@ -248,9 +286,11 @@ async function boot() {
 	const bootstrapDiagnostic = await verifyNativeBootstrap( device );
 	diagnosticButton.disabled = false;
 	rollbackButton.disabled = false;
+	sustainedButton.disabled = false;
 	diagnosticButton.addEventListener( 'click', captureDiagnostic );
 	rollbackButton.addEventListener( 'click', runRollbackMutation );
-	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, bootstrapDiagnostic, gpuErrors } );
+	sustainedButton.addEventListener( 'click', () => runSustainedDiagnostic() );
+	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, runSustainedDiagnostic, bootstrapDiagnostic, gpuErrors } );
 	status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · verified gen ${ bootstrapDiagnostic.committedGeneration } · ${ owner.initial.residentTileCount }/${ contract.tier.logicalTilesX * contract.tier.logicalTilesZ } tiles · ${ owner.initial.residentCellCount } cells · ${ contract.totalLogicalBytes } logical bytes`;
 	renderer.setAnimationLoop( ( time ) => {
 
