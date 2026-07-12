@@ -2,11 +2,16 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  CODEX_IN_APP_CAPTURE_POLICY,
   FALLBACK_CAPTURE_POLICY_MARKER,
   NON_RENDERING_CAPTURE_POLICY,
   auditCaptureWiring,
   checkCaptureImplementation,
 } from '../../scripts/check-capture-wiring.mjs';
+import {
+  PRIMARY_DEMO_KINDS,
+  buildDemoRegistry,
+} from '../../scripts/lib/lab-registry.mjs';
 
 const SHARED_SOURCE = `
   import { captureLabBrowser } from '../../../scripts/capture-lab-browser.mjs';
@@ -94,6 +99,24 @@ test('bespoke capture policy requires server, profiles, readback stride, and PNG
   assert.match(message, /render-target readback/);
 });
 
+test('Codex in-app Browser policy requires immutable exact-byte self-serving without launching a browser', () => {
+  const source = `
+    export const CAPTURE_POLICY = '${CODEX_IN_APP_CAPTURE_POLICY}';
+    const kind = 'immutable-physical-build';
+    const runner = 'in-app-evidence.html';
+    const ledgerPath = '/tmp/served-byte-ledger.ndjson';
+    const server = createServer();
+    server.listen();
+  `;
+  assert.deepEqual(checkCaptureImplementation({
+    id: 'fixture', packageCapture: 'node capture.mjs', captureSource: source, captureProgramPath: '/repo/capture.mjs',
+  }), []);
+  const external = checkCaptureImplementation({
+    id: 'fixture', packageCapture: 'node capture.mjs', captureSource: `${source}\nchromium.launch();`, captureProgramPath: '/repo/capture.mjs',
+  });
+  assert.match(external.join('\n'), /must not launch an external browser/);
+});
+
 test('fixture-driven non-rendering suites and fallback harness use explicit exceptional policies', () => {
   assert.deepEqual(checkCaptureImplementation({
     id: 'router-manifest-lab',
@@ -129,8 +152,13 @@ test('fixture-driven non-rendering suites and fallback harness use explicit exce
 });
 
 test('the live registry has one statically auditable capture policy per primary demo', () => {
-  const result = auditCaptureWiring();
-  assert.equal(result.primaryCount, 40);
+  const registry = buildDemoRegistry();
+  const expectedPrimaryCount = registry.demos
+    .filter(({ kind }) => PRIMARY_DEMO_KINDS.includes(kind))
+    .length;
+  const result = auditCaptureWiring({ registry });
+  assert.equal(result.primaryCount, expectedPrimaryCount);
+  assert.equal(result.primaryCount, registry.counts.primary);
   assert.deepEqual(result.records.map(({ id }) => id).sort(), [...new Set(result.records.map(({ id }) => id))].sort());
   assert.deepEqual(result.errors, []);
   assert.equal(result.records.filter(({ policy }) => policy === NON_RENDERING_CAPTURE_POLICY).length, 2);

@@ -21,6 +21,7 @@ export const ROUTER_CAPTURE_POLICY_ID = 'router-manifest-lab';
 export const FALLBACK_CAPTURE_POLICY_ID = 'browser-fallback-harness';
 export const FALLBACK_CAPTURE_POLICY_MARKER = 'explicit-fallback-harness';
 export const NON_RENDERING_CAPTURE_POLICY = 'non-rendering-fixture-suite';
+export const CODEX_IN_APP_CAPTURE_POLICY = 'codex-in-app-browser-immutable-evidence';
 
 const EXTERNAL_CAPTURE_PATTERNS = Object.freeze([
   { pattern: /requires\s+--(?:url|base-url)/i, reason: 'requires an externally served URL' },
@@ -133,6 +134,15 @@ export function checkCaptureImplementation({
     return errors;
   }
 
+  if (captureSource.includes(CODEX_IN_APP_CAPTURE_POLICY)) {
+    if (!hasSelfServingServer(captureSource)) errors.push(`${id}: Codex Browser capture must self-serve immutable bytes`);
+    if (!/immutable-physical-build/.test(captureSource)) errors.push(`${id}: Codex Browser capture does not bind an immutable physical build`);
+    if (!/in-app-evidence\.html/.test(captureSource)) errors.push(`${id}: Codex Browser capture does not expose the in-app evidence runner`);
+    if (!/(?:served-byte|ledgerPath)/.test(captureSource)) errors.push(`${id}: Codex Browser capture does not retain a served-byte ledger`);
+    if (/(?:from\s+['"]playwright|chromium\.launch|chrome-launcher)/i.test(captureSource)) errors.push(`${id}: Codex Browser capture must not launch an external browser`);
+    return errors;
+  }
+
   const sharedKind = sharedCaptureKind(packageCapture, captureSource, captureProgramPath);
   if (sharedKind) {
     if (sharedKind === 'shared-direct' && /--profile\s+(?:correctness|performance)/.test(packageCapture)) {
@@ -203,7 +213,9 @@ export function auditCaptureWiring({ registry = buildDemoRegistry() } = {}) {
         ? NON_RENDERING_CAPTURE_POLICY
         : demo.id === FALLBACK_CAPTURE_POLICY_ID
           ? FALLBACK_CAPTURE_POLICY_MARKER
-          : sharedCaptureKind(packageCapture, captureSource, captureProgramPath) ?? 'bespoke-self-serving',
+          : captureSource.includes(CODEX_IN_APP_CAPTURE_POLICY)
+            ? CODEX_IN_APP_CAPTURE_POLICY
+            : sharedCaptureKind(packageCapture, captureSource, captureProgramPath) ?? 'bespoke-self-serving',
       captureProgram: captureProgramPath,
       hookPrograms: hookSourceRecords.map(({ path }) => path),
     });
