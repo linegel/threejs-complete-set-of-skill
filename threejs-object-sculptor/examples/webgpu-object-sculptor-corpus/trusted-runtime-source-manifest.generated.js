@@ -68,8 +68,8 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/package.json",
-    "sha256": "85b2eab882b6dd53aba35416634ac3cadc49bd1b987c0df0daa9123311c1d441",
-    "byteLength": 4797
+    "sha256": "b8de51141a0ed87a42d2f04b423bdf93062e0d8fe2979c17c46d9b4609676368",
+    "byteLength": 4809
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-bootstrap.js",
@@ -117,7 +117,7 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
     "byteLength": 40108
   }
 ].map((entry) => Object.freeze(entry)));
-export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "a1d54234548fbbc8585f3561742cc876549916caa552b9dc0d1f123714901baa";
+export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "52c23ff3abada5f76e3718892d988c44840937d9e493b18eb3e38e0865275075";
 export const CORPUS_TRUSTED_ROUTE_HTML_SHA256_BY_ROUTE_ID = Object.freeze({
   "scenario:articulated-desk-lamp": "a648f2c0b779c9978051e957a02fd1cf0b699f58eade01235b65f338a5f8609a",
   "scenario:potted-bonsai": "ba6b7d70751b740c5fe60b84cc540c3060297a3074f0fc8ec175b3b34b70a1f4",
