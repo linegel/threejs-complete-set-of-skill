@@ -221,6 +221,42 @@ function requireFrameCount( value, label, minimum, maximum ) {
 
 }
 
+export function createValidationResourceLedgerObserver( { renderer, scenePass, captureTarget, geometries } ) {
+
+	let currentLedger = null;
+	let state = 'live';
+	return Object.freeze( {
+		describeLive() {
+
+			if ( state !== 'live' ) throw new Error( 'Cannot observe live validation resources after disposal.' );
+			currentLedger = buildValidationResourceLedger( {
+				renderer,
+				scenePass,
+				captureTarget,
+				geometries,
+				previousLedger: currentLedger
+			} );
+			return currentLedger;
+
+		},
+		describeDisposed() {
+
+			if ( state === 'disposed' ) return currentLedger;
+			if ( currentLedger?.state !== 'live' ) throw new Error( 'Validation resource disposal requires an exact live predecessor observation.' );
+			currentLedger = emptyValidationResourceLedger( { renderer, previousLedger: currentLedger } );
+			state = 'disposed';
+			return currentLedger;
+
+		},
+		current() {
+
+			return currentLedger;
+
+		}
+	} );
+
+}
+
 export async function createNativeWebGPUValidationSubject( canvas, options = {} ) {
 
 	if ( canvas === null || typeof canvas !== 'object' ) throw new Error( 'A canvas is required.' );
@@ -350,6 +386,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	scene.add( marker );
 	const ownedControls = new Set();
 	const ownedMaterials = new Set( [ subjectMaterial, groundMaterial, markerMaterial ] );
+	const ownedGeometries = [ subject.geometry, ground.geometry, marker.geometry ];
 
 	const renderPipeline = new RenderPipeline( renderer );
 	const scenePass = pass( scene, camera );
@@ -402,6 +439,12 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	let captureTarget = new RenderTarget( width, height, { type: UnsignedByteType, depthBuffer: false } );
 	captureTarget.texture.colorSpace = SRGBColorSpace;
 	captureTarget.texture.name = 'validation-capture-rgba8';
+	const resourceLedgerObserver = createValidationResourceLedgerObserver( {
+		renderer,
+		scenePass,
+		captureTarget,
+		geometries: ownedGeometries
+	} );
 	const cpuFrameSamples = [];
 	const resetEvents = [];
 	let renderSubmissionCount = 0;
@@ -485,12 +528,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 	function currentRenderTargetBytes() {
 
-		return buildValidationResourceLedger( {
-			sceneWidth: scenePass.renderTarget.width,
-			sceneHeight: scenePass.renderTarget.height,
-			captureWidth: captureTarget.width,
-			captureHeight: captureTarget.height
-		} ).trackedRenderTargetBytes;
+		return resourceLedgerObserver.describeLive().trackedRenderTargetBytes;
 
 	}
 
@@ -762,13 +800,8 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 		describeResources() {
 
-			if ( disposed ) return emptyValidationResourceLedger();
-			return buildValidationResourceLedger( {
-				sceneWidth: scenePass.renderTarget.width,
-				sceneHeight: scenePass.renderTarget.height,
-				captureWidth: captureTarget.width,
-				captureHeight: captureTarget.height
-			} );
+			if ( disposed ) return resourceLedgerObserver.current();
+			return resourceLedgerObserver.describeLive();
 
 		},
 
@@ -1081,6 +1114,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		async dispose() {
 
 			if ( disposed ) return disposeEvidence;
+			resourceLedgerObserver.describeLive();
 			disposed = true;
 			rendererDeviceStatus = 'disposing';
 			const queueSettlement = { status: 'PENDING', durationMs: null, error: null };
@@ -1111,6 +1145,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			captureTarget.dispose();
 			renderPipeline.dispose();
 			renderer.dispose();
+			resourceLedgerObserver.describeDisposed();
 			let deviceDestroy = { status: 'NOT_APPLICABLE', reason: 'renderer uses a caller-owned GPUDevice', intentionalDestroyObserved: false };
 			if ( ownedDevice ) {
 

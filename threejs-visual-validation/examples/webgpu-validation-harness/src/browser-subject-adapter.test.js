@@ -2,11 +2,61 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+	BoxGeometry,
+	FloatType,
+	HalfFloatType,
+	PerspectiveCamera,
+	PlaneGeometry,
+	RenderTarget,
+	Scene,
+	SRGBColorSpace,
+	UnsignedByteType,
+	WebGPURenderer
+} from 'three/webgpu';
+import { emissive, mrt, normalView, output, pass } from 'three/tsl';
+
+import {
 	assertRendererBackendDeviceIdentity,
+	createValidationResourceLedgerObserver,
 	parseRenderTimestampUid,
 	summarizeTimestampBatch,
 	timestampResolutionPolicy
 } from './browser-subject-adapter.js';
+
+function testCanvas() {
+
+	return {
+		width: 1,
+		height: 1,
+		style: {},
+		addEventListener() {},
+		removeEventListener() {},
+		getContext() { return null; }
+	};
+
+}
+
+function createResourceObserverFixture() {
+
+	const renderer = new WebGPURenderer( { canvas: testCanvas(), outputBufferType: HalfFloatType } );
+	const scenePass = pass( new Scene(), new PerspectiveCamera() );
+	scenePass.setMRT( mrt( { output, normal: normalView, emissive } ) );
+	scenePass.setSize( 1200, 800 );
+	scenePass.getTexture( 'normal' );
+	scenePass.getTexture( 'emissive' );
+	scenePass.renderTarget.depthTexture.type = FloatType;
+	scenePass.renderTarget.depthTexture.image.width = 1200;
+	scenePass.renderTarget.depthTexture.image.height = 800;
+	const captureTarget = new RenderTarget( 1200, 800, { type: UnsignedByteType, depthBuffer: false } );
+	captureTarget.texture.colorSpace = SRGBColorSpace;
+	captureTarget.texture.name = 'validation-capture-rgba8';
+	const geometries = [ new BoxGeometry( 1, 1, 1 ), new PlaneGeometry( 2, 2 ) ];
+	return {
+		renderer,
+		observer: createValidationResourceLedgerObserver( { renderer, scenePass, captureTarget, geometries } )
+	};
+
+}
 
 test( 'renderer identity requires the exact device retained by the initialized backend', () => {
 
@@ -68,5 +118,32 @@ test( 'timestamp attribution rejects ordering, stage, frame, and context forgeri
 		entries: base.map( ( entry ) => entry.stage === 'final-output' ? { ...entry, uid: entry.uid.replace( ':41:', ':17:' ) } : entry ),
 		resolvedLastFrameTotalMs: 6
 	} ), /two distinct stable render contexts/ );
+
+} );
+
+test( 'resource observer retains the exact live predecessor and reports zero live bytes after disposal', () => {
+
+	const { renderer, observer } = createResourceObserverFixture();
+	const firstLive = observer.describeLive();
+	const latestLive = observer.describeLive();
+	assert.equal( latestLive.identityClosureDigest, firstLive.identityClosureDigest );
+	assert.equal( latestLive.trackedRenderTargetBytes, 30_720_000 );
+	assert.equal( observer.current(), latestLive );
+
+	renderer.info.dispose();
+	const disposed = observer.describeDisposed();
+	assert.equal( disposed.state, 'disposed' );
+	assert.equal( disposed.predecessorIdentityClosureDigest, latestLive.identityClosureDigest );
+	assert.equal( disposed.identityClosureDigest, latestLive.identityClosureDigest );
+	assert.deepEqual( disposed.renderTargets.map( ( target ) => target.textureUuid ), latestLive.renderTargets.map( ( target ) => target.textureUuid ) );
+	assert.deepEqual( disposed.geometries.map( ( geometry ) => geometry.uuid ), latestLive.geometries.map( ( geometry ) => geometry.uuid ) );
+	assert.equal( disposed.trackedRenderTargetBytes, 0 );
+	assert.equal( disposed.trackedGeometryBytes, 0 );
+	assert.equal( disposed.trackedTransientBytes, 0 );
+	assert.equal( disposed.trackedLiveBytes, 0 );
+	assert.equal( disposed.disposalObservation.memoryMapSize, 0 );
+	assert.equal( disposed.disposalObservation.memoryTotalBytes, 0 );
+	assert.equal( observer.describeDisposed(), disposed );
+	assert.throws( () => observer.describeLive(), /after disposal/ );
 
 } );
