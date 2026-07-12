@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 import { IMAGE_PIPELINE_MECHANISM_ROUTES, IMAGE_PIPELINE_TIERS, resolveImagePipelineRoute, resolveImagePipelineTier } from './canonical-main.js';
+import { IMAGE_PIPELINE_LAB_IDS, resolveImagePipelineLabId } from './lab-identity.js';
 
 function assert( value, message ) { if ( ! value ) throw new Error( message ); }
 function rejectMessage( callback ) { try { callback(); } catch ( error ) { return error.message; } throw new Error( 'Expected route rejection.' ); }
@@ -44,8 +45,12 @@ const browserSource = await readFile( new URL( './canonical-browser-app.js', imp
 assert( browserSource.includes( 'Locked image-pipeline route rejects' ), 'Browser app does not reject locked-route overrides.' );
 assert( browserSource.includes( 'Object.freeze( { ...locked } )' ), 'Locked image-pipeline startup is mutable.' );
 assert( browserSource.includes( 'window.labController = controller' ) && browserSource.includes( 'routeSelection:' ), 'Published routes cannot acknowledge their locked startup through getMetrics().' );
-assert( browserSource.includes( "const LAB_ID = 'webgpu-image-pipeline'" ), 'Published controller lacks a canonical lab identity.' );
+assert( browserSource.includes( 'resolveImagePipelineLabId( globalThis.__IMAGE_PIPELINE_LAB_ID__ )' ), 'Published controller lacks an explicit allowlisted lab identity.' );
 assert( browserSource.includes( 'get labId() { return LAB_ID; }' ) && browserSource.includes( 'labId: LAB_ID' ), 'Controller and metrics identity can drift.' );
+assert( JSON.stringify( IMAGE_PIPELINE_LAB_IDS ) === JSON.stringify( [ 'webgpu-image-pipeline', 'webgpu-temporal-history' ] ), 'Image-pipeline host identity allowlist drifted.' );
+assert( resolveImagePipelineLabId() === 'webgpu-image-pipeline', 'Canonical image-pipeline identity is not the default.' );
+assert( resolveImagePipelineLabId( 'webgpu-temporal-history' ) === 'webgpu-temporal-history', 'Temporal mechanism identity is not allowed.' );
+assert( rejectMessage( () => resolveImagePipelineLabId( 'forged-pipeline-route' ) ).includes( 'Unknown image-pipeline lab identity' ), 'Unknown host identity did not fail closed.' );
 const captureSource = await readFile( new URL( './canonical-capture.mjs', import.meta.url ), 'utf8' );
 assert( captureSource.includes( "import { createServer } from 'vite'" ) && captureSource.includes( 'if ( ! url )' ), 'Root capture lacks a deterministic self-serving URL.' );
 assert( captureSource.includes( "--profile" ) && captureSource.includes( "'correctness', 'performance'" ), 'Root capture does not enforce the standard profile contract.' );
@@ -53,6 +58,8 @@ const unknownMechanism = rejectMessage( () => resolveImagePipelineRoute( '__unkn
 const unknownTier = rejectMessage( () => resolveImagePipelineTier( '__unknown__' ) );
 const packageJson = JSON.parse( await readFile( new URL( './package.json', import.meta.url ), 'utf8' ) );
 const temporalPackageJson = JSON.parse( await readFile( new URL( '../webgpu-temporal-history/package.json', import.meta.url ), 'utf8' ) );
+const temporalEntry = await readFile( new URL( '../webgpu-temporal-history/index.html', import.meta.url ), 'utf8' );
+assert( temporalEntry.includes( "globalThis.__IMAGE_PIPELINE_LAB_ID__='webgpu-temporal-history'" ), 'Temporal mechanism route does not select its registered controller identity.' );
 for ( const [ label, value ] of [ [ 'image pipeline', packageJson ], [ 'temporal history', temporalPackageJson ] ] ) {
 
 	assert( value.scripts[ 'validate:full' ].includes( 'validate:artifacts' ), `${ label } full validation does not require browser artifacts.` );

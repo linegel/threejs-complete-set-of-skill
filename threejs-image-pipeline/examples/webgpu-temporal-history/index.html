@@ -11,6 +11,6 @@
 	</head>
 	<body>
 		<canvas id="view"></canvas><div id="status">initializing temporal history</div>
-		<script type="module">history.replaceState(null,'',`${location.pathname}?tier=full&mode=temporal-history&mechanism=temporal-velocity-and-history`); await import('../webgpu-image-pipeline/canonical-browser-app.js');</script>
+		<script type="module">globalThis.__IMAGE_PIPELINE_LAB_ID__='webgpu-temporal-history'; history.replaceState(null,'',`${location.pathname}?tier=full&mode=temporal-history&mechanism=temporal-velocity-and-history`); await import('../webgpu-image-pipeline/canonical-browser-app.js');</script>
 	</body>
 </html>

@@ -5,7 +5,7 @@
   "threeRevision": "0.185.1",
   "kind": "mechanism-demo",
   "status": "incomplete",
-  "canonicalSource": ["threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js", "threejs-image-pipeline/examples/webgpu-temporal-history"],
+  "canonicalSource": ["threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js", "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js", "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js", "threejs-image-pipeline/examples/webgpu-temporal-history"],
   "browserEntry": "index.html",
   "publishPath": "/demos/webgpu-temporal-history/",
   "scenarios": [{"id":"moving-rigid-subject","acceptanceStatus":"incomplete"}],

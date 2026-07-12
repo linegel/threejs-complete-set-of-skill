@@ -6,8 +6,9 @@ import {
 	createCanonicalImagePipeline,
 	resolveImagePipelineRoute
 } from './canonical-main.js';
+import { resolveImagePipelineLabId } from './lab-identity.js';
 
-const LAB_ID = 'webgpu-image-pipeline';
+const LAB_ID = resolveImagePipelineLabId( globalThis.__IMAGE_PIPELINE_LAB_ID__ );
 
 const canvas = document.querySelector( '#view' );
 const status = document.querySelector( '#status' );
