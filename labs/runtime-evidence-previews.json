@@ -2,46 +2,6 @@
   "schemaVersion": 1,
   "previews": [
     {
-      "labId": "webgpu-node-gtao",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-node-gtao",
-      "backendProof": "renderer-info.json",
-      "claimVerdicts": "capture-status.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "AO-applied lit render-target readback",
-      "limitations": [
-        "Mechanism and visual-correctness claims remain INSUFFICIENT_EVIDENCE.",
-        "No accepted named-adapter GPU timestamps or lifecycle loop are present."
-      ],
-      "images": [
-        { "source": "final-lit-display.raw", "readback": "final-lit-display", "output": "final.design.png", "encoding": "rgba8", "meaning": "Display-referred lit output with GTAO applied." },
-        { "source": "no-ao-baseline-display.raw", "readback": "no-ao-baseline-display", "output": "no-post.design.png", "encoding": "rgba8", "meaning": "Display-referred lit baseline with AO disabled." },
-        { "source": "raw-gtao.raw", "readback": "raw-gtao", "output": "raw-gtao.png", "encoding": "rgba8", "meaning": "Raw GTAO visibility diagnostic." },
-        { "source": "reconstructed-gtao.raw", "readback": "reconstructed-gtao", "output": "reconstructed-gtao.png", "encoding": "rgba8", "meaning": "Reconstructed and denoised GTAO visibility diagnostic." },
-        { "source": "gbuffer-normal.raw", "readback": "gbuffer-normal", "output": "normal.png", "encoding": "rgba8", "meaning": "Shared g-buffer normal diagnostic." },
-        { "source": "gbuffer-velocity.raw", "readback": "gbuffer-velocity", "output": "velocity.png", "encoding": "rgba8", "meaning": "Shared g-buffer velocity diagnostic." }
-      ]
-    },
-    {
-      "labId": "node-selective-bloom",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/node-selective-bloom",
-      "backendProof": "renderer-info.json",
-      "claimVerdicts": "capture-status.json",
-      "primaryImage": "bloom-only.png",
-      "primaryImageLabel": "Bloom-only render-target readback visualization",
-      "limitations": [
-        "The promoted primary image is the bloom-only target, not a final scene composite.",
-        "Final-composite, GPU-timing, and lifecycle claims remain INSUFFICIENT_EVIDENCE."
-      ],
-      "images": [
-        { "source": "bloom-composite-target.raw", "readback": "bloom-composite-target", "output": "bloom-only.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "Bloom-only composite target, visualized with a documented Reinhard display transform." },
-        { "source": "scene-hdr-no-bloom.raw", "readback": "scene-hdr-no-bloom", "output": "scene-no-bloom.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "Scene-linear HDR target before bloom, visualized with a documented Reinhard display transform." },
-        { "source": "selective-emissive.raw", "readback": "selective-emissive", "output": "emissive.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "Selective emissive MRT attachment, visualized with a documented Reinhard display transform." },
-        { "source": "bright-pass.raw", "readback": "bright-pass", "output": "bright-pass.png", "encoding": "rgba16float-reinhard-srgb", "meaning": "BloomNode bright-pass target, visualized with a documented Reinhard display transform." }
-      ]
-    },
-    {
       "labId": "webgpu-exposure-color-pipeline",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/webgpu-exposure-color-pipeline-v2",

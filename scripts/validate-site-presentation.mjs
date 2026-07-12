@@ -30,6 +30,18 @@ const escapedHtmlText = (value) => String(value)
   .replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
+const metaContent = (html, key, value) => [...html.matchAll(/<meta\b[^>]*>/gi)]
+  .map((match) => match[0])
+  .filter((tag) => tag.match(new RegExp(`\\b${key}=["']([^"']+)["']`, 'i'))?.[1] === value)
+  .map((tag) => tag.match(/\bcontent=["']([^"']+)["']/i)?.[1])
+  .filter(Boolean);
+const sameLabImageSourceId = (urlString) => {
+  if (!urlString) return null;
+  const pathname = new URL(urlString, site).pathname;
+  return pathname.match(/^\/visual-validation\/([^/]+)\//)?.[1]
+    ?? pathname.match(/^\/previews\/primary\/([^/.]+)\.png$/)?.[1]
+    ?? null;
+};
 
 const primary = registry.demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
 const canonical = primary.filter((demo) => demo.kind === 'canonical-lab');
@@ -47,6 +59,7 @@ const routes = primary.flatMap((demo) => [
   ...demo.tiers.map((route) => `${demo.publishPath}tier/${route.id}/`),
 ]);
 const uniqueRoutes = new Set(routes);
+const acceptedFlagshipIds = new Set(flagships.filter((demo) => demo.status === 'accepted').map((demo) => demo.id));
 
 assert(registry.counts.skills === skillManifest.skills.length, 'registry skill count does not match the published skill manifest');
 assert(primary.length === registry.counts.primary, 'primary demo count does not match registry counts');
@@ -102,6 +115,12 @@ assert(homepage.includes(`<meta name="skill-pack-build-revision" content="${regi
 assert(homepage.includes('class="skip-link"'), 'homepage has no skip link');
 assert(homepage.includes(':focus-visible'), 'homepage has no authored focus-visible treatment');
 assert(homepage.includes('prefers-reduced-motion:reduce'), 'homepage has no reduced-motion treatment');
+const homepageSocialImages = metaContent(homepage, 'property', 'og:image');
+assert(homepageSocialImages.length <= 1, 'homepage publishes duplicate social images');
+if (homepageSocialImages.length === 1) {
+  const sourceId = sameLabImageSourceId(homepageSocialImages[0]);
+  assert(sourceId !== null && acceptedFlagshipIds.has(sourceId), 'homepage social image is not accepted flagship evidence');
+}
 
 for (const demo of primary) {
   const relative = relativePublishPath(demo.publishPath);
@@ -181,6 +200,20 @@ for (const skill of skillManifest.skills) {
   assert(existsSync(pagePath), `missing generated skill page ${skill.name}`);
   if (!existsSync(pagePath)) continue;
   const page = readFileSync(pagePath, 'utf8');
+  const ownedPrimaryIds = new Set(primary.filter((demo) => demo.skill === skill.name).map((demo) => demo.id));
+  const participatingFlagshipIds = new Set(flagships
+    .filter((demo) => registry.origins[demo.id]?.ownerSkills?.includes(skill.name))
+    .map((demo) => demo.id));
+  const allowedPreviewSources = new Set([...ownedPrimaryIds, ...participatingFlagshipIds]);
+  const socialImages = metaContent(page, 'property', 'og:image');
+  assert(socialImages.length <= 1, `${skill.name} publishes duplicate social images`);
+  if (socialImages.length === 1) {
+    const sourceId = sameLabImageSourceId(socialImages[0]);
+    assert(sourceId !== null && ownedPrimaryIds.has(sourceId), `${skill.name} social image is not same-skill primary evidence`);
+  }
+  for (const match of page.matchAll(/\bdata-preview-source=["']([^"']+)["']/g)) {
+    assert(allowedPreviewSources.has(match[1]), `${skill.name} publishes preview media from unrelated lab ${match[1]}`);
+  }
   assert(page.includes('<main id="main-content"'), `${skill.name} page has no main landmark`);
   assert(page.includes('Preview and evidence ledger'), `${skill.name} page has no preview/evidence ledger`);
   assert(

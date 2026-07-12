@@ -43,7 +43,7 @@ for (const file of readdirSync(SKILLS).filter((name) => name.endsWith('.html')).
   const slug = file.replace(/\.html$/, '');
   const html = readFileSync(join(SKILLS, file), 'utf8');
   const sourceUrl = metaContent(html, 'og:image');
-  if (!sourceUrl) throw new Error(`${file}: missing og:image source`);
+  if (!sourceUrl) continue;
   const sourcePath = localImagePath(sourceUrl);
   const sourceMetadata = await sharp(sourcePath).metadata();
   manifest[slug] = {

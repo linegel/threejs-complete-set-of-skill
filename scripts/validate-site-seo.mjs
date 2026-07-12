@@ -145,15 +145,22 @@ function validateIndexablePage(path, expectedUrl, {
   assert(headValue(html, 'property', 'og:description').length === 1, `${label}: missing or duplicate og:description`);
   assert(headValue(html, 'property', 'og:url')[0] === expectedUrl, `${label}: og:url is not self-referential`);
   const socialImages = headValue(html, 'property', 'og:image');
-  if (requireDemoShell) {
-    assert(socialImages.length <= 1, `${label}: duplicate og:image`);
-    assert(
-      headValue(html, 'name', 'twitter:card')[0] === (socialImages.length === 1 ? 'summary_large_image' : 'summary'),
-      `${label}: twitter card does not match same-demo image availability`,
-    );
-  } else {
-    assert(socialImages.length === 1, `${label}: missing or duplicate og:image`);
-    assert(headValue(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${label}: twitter card is not summary_large_image`);
+  assert(socialImages.length <= 1, `${label}: duplicate og:image`);
+  assert(
+    headValue(html, 'name', 'twitter:card')[0] === (socialImages.length === 1 ? 'summary_large_image' : 'summary'),
+    `${label}: twitter card does not match provenance-bound image availability`,
+  );
+  if (socialImages.length === 1) {
+    const imageUrl = socialImages[0];
+    const imagePath = localPathForUrl(imageUrl);
+    const dimensions = pngDimensions(imagePath);
+    assert(Boolean(imagePath && dimensions), `${label}: social image is missing, external, or not PNG`);
+    assert(headValue(html, 'property', 'og:image:type')[0] === 'image/png', `${label}: social image type is not image/png`);
+    assert(Number(headValue(html, 'property', 'og:image:width')[0]) === dimensions?.width, `${label}: social image width metadata drift`);
+    assert(Number(headValue(html, 'property', 'og:image:height')[0]) === dimensions?.height, `${label}: social image height metadata drift`);
+    assert(Boolean(headValue(html, 'property', 'og:image:alt')[0]?.trim()), `${label}: social image lacks alt text`);
+    assert(headValue(html, 'name', 'twitter:image')[0] === imageUrl, `${label}: Twitter image differs from Open Graph image`);
+    assert(headValue(html, 'name', 'twitter:image:alt')[0] === headValue(html, 'property', 'og:image:alt')[0], `${label}: Twitter image alt differs from Open Graph alt`);
   }
   assert(!html.includes(OLD_SITE), `${label}: contains the retired GitHub Pages origin`);
   const structuredData = validateJsonLd(html, label);
@@ -184,13 +191,17 @@ function validateIndexablePage(path, expectedUrl, {
     assert(publisher?.url === SITE && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${label}: publisher identity is incomplete`);
     assert(article?.author?.['@id'] === `${SITE}#publisher` && article?.publisher?.['@id'] === `${SITE}#publisher`, `${label}: article author/publisher references are inconsistent`);
     const slug = new URL(expectedUrl).pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
-    const expectedImages = ARTICLE_IMAGE_SPECS.map(({ id }) => `${SITE}seo/article/${slug}-${id}.png`);
-    assert(Array.isArray(article?.image) && article.image.length === ARTICLE_IMAGE_SPECS.length, `${label}: Article image must contain 1:1, 4:3, and 16:9 variants`);
-    for (const [index, spec] of ARTICLE_IMAGE_SPECS.entries()) {
-      const imageUrl = article?.image?.[index];
-      assert(imageUrl === expectedImages[index], `${label}: Article ${spec.id} image URL is not canonical`);
-      const dimensions = pngDimensions(imageUrl ? localPathForUrl(imageUrl) : null);
-      assert(dimensions?.width === spec.width && dimensions?.height === spec.height, `${label}: Article ${spec.id} image is not ${spec.width}x${spec.height}`);
+    if (socialImages.length === 1) {
+      const expectedImages = ARTICLE_IMAGE_SPECS.map(({ id }) => `${SITE}seo/article/${slug}-${id}.png`);
+      assert(Array.isArray(article?.image) && article.image.length === ARTICLE_IMAGE_SPECS.length, `${label}: Article image must contain 1:1, 4:3, and 16:9 variants when same-lab evidence exists`);
+      for (const [index, spec] of ARTICLE_IMAGE_SPECS.entries()) {
+        const imageUrl = article?.image?.[index];
+        assert(imageUrl === expectedImages[index], `${label}: Article ${spec.id} image URL is not canonical`);
+        const dimensions = pngDimensions(imageUrl ? localPathForUrl(imageUrl) : null);
+        assert(dimensions?.width === spec.width && dimensions?.height === spec.height, `${label}: Article ${spec.id} image is not ${spec.width}x${spec.height}`);
+      }
+    } else {
+      assert(article?.image === undefined, `${label}: Article publishes image variants without a same-lab social source`);
     }
     const published = Date.parse(article?.datePublished ?? '');
     const modified = Date.parse(article?.dateModified ?? '');
@@ -347,7 +358,13 @@ for (const url of pageUrls) {
 
 for (const url of pageUrls.filter((value) => new URL(value).pathname.startsWith('/skills/'))) {
   const slug = new URL(url).pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
-  assert(sitemap.includes(`<image:loc>${SITE}seo/article/${slug}-16x9.png</image:loc>`), `sitemap.xml: ${slug} is missing its 16:9 Article image`);
+  const skillHtml = readFileSync(localPathForUrl(url), 'utf8');
+  const hasSocialImage = headValue(skillHtml, 'property', 'og:image').length === 1;
+  const sitemapImage = `<image:loc>${SITE}seo/article/${slug}-16x9.png</image:loc>`;
+  assert(
+    sitemap.includes(sitemapImage) === hasSocialImage,
+    `sitemap.xml: ${slug} image entry does not match same-lab evidence availability`,
+  );
 }
 const responsiveManifestSources = Object.keys(responsiveManifest.sources ?? {});
 assert(responsiveManifest.generatedBy === 'scripts/generate-responsive-images.mjs', 'responsive image manifest: unexpected generator identity');

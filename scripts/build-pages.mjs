@@ -26,9 +26,6 @@ const REPO_SLUG = 'linegel/threejs-complete-set-of-skill';
 const SITE = 'https://threejs-skills.com/';
 const SKILLS_ADD = `npx skills@latest add ${REPO_SLUG}`;
 const SKILLS_INSTALL_PACK = `${SKILLS_ADD} --skill '*'`;
-const OG_IMAGE = `${SITE}visual-validation/planet-generated-craters/final.design.png`;
-const OG_IMAGE_WIDTH = 1200;
-const OG_IMAGE_HEIGHT = 760;
 const THEME_COLOR = '#0a0c10';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
 const PUBLISHER_ID = `${SITE}#publisher`;
@@ -69,81 +66,6 @@ const CATEGORIES = [
   { name: 'Procedural Content', blurb: 'Fields, materials, geometry, object reconstruction, buildings, planets, vegetation, creatures — authored systems, not noise soup.', slugs: ['threejs-procedural-fields', 'threejs-procedural-materials', 'threejs-procedural-geometry', 'threejs-object-sculptor', 'threejs-procedural-buildings-and-cities', 'threejs-procedural-planets', 'threejs-procedural-vegetation', 'threejs-procedural-creatures'] },
   { name: 'Motion and Effects', blurb: 'Kinematics, particles, surface history, and spacetime — motion with frame-rate-independent discipline.', slugs: ['threejs-procedural-motion-systems', 'threejs-particles-trails-and-effects', 'threejs-dynamic-surface-effects', 'threejs-black-holes-and-space-effects'] },
 ];
-
-// Validation artifacts (paths relative to docs/) shown on skill pages.
-const VALIDATION = {
-  'threejs-procedural-planets': [
-    ['visual-validation/planet-generated-craters/final.design.png', 'Generated crater-asset preview fixture'],
-    ['visual-validation/planet-generated-craters/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/planet-generated-craters/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/planet-generated-craters/camera.near.png', 'Asset-preview near framing'],
-  ],
-  'threejs-water-optics': [
-    ['visual-validation/water-generated-caustics/final.design.png', 'Generated caustic-texture preview fixture'],
-    ['visual-validation/water-generated-caustics/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/water-generated-caustics/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/water-generated-caustics/camera.near.png', 'Asset-preview near framing'],
-  ],
-  'threejs-spectral-ocean': [
-    ['visual-validation/ocean-generated-wave-seeds/final.design.png', 'Generated wave-seed asset preview'],
-    ['visual-validation/ocean-generated-wave-seeds/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/ocean-generated-wave-seeds/seed-stress.final.png', 'Asset-preview seed stress'],
-  ],
-  'threejs-rain-snow-and-wet-surfaces': [
-    ['visual-validation/rain-generated-ripples/final.design.png', 'Generated ripple-normal asset preview'],
-    ['visual-validation/rain-generated-ripples/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/rain-generated-ripples/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-  ],
-  'threejs-volumetric-clouds': [
-    ['visual-validation/cloud-generated-weather-maps/final.design.png', 'Generated weather-map asset preview'],
-    ['visual-validation/cloud-generated-weather-maps/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/cloud-generated-weather-maps/temporal.t001.png', 'Asset-preview parameter variation'],
-  ],
-  'threejs-dynamic-surface-effects': [
-    ['visual-validation/frost-generated-crystals/final.design.png', 'Generated frost-map asset preview'],
-    ['visual-validation/frost-generated-crystals/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/frost-generated-crystals/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/frost-generated-crystals/temporal.t001.png', 'Asset-preview parameter variation'],
-  ],
-  'threejs-visual-validation': [
-    ['visual-validation/planet-generated-craters/diagnostics.mosaic.png', 'Generated crater-asset diagnostics'],
-    ['visual-validation/water-generated-caustics/diagnostics.mosaic.png', 'Generated caustic-asset diagnostics'],
-    ['visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png', 'Generated wave-seed diagnostics'],
-    ['visual-validation/rain-generated-ripples/diagnostics.mosaic.png', 'Generated ripple-normal diagnostics'],
-    ['visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png', 'Generated weather-map diagnostics'],
-    ['visual-validation/frost-generated-crystals/diagnostics.mosaic.png', 'Generated frost-map diagnostics'],
-    ['visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png', 'Generated lava-cause diagnostics'],
-    ['visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png', 'Generated meadow-mask diagnostics'],
-    ['visual-validation/space-generated-starfields/diagnostics.mosaic.png', 'Generated starfield-tile diagnostics'],
-    ['visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png', 'Generated biome-map diagnostics'],
-  ],
-  'threejs-procedural-materials': [
-    ['visual-validation/materials-generated-lava-causes/final.design.png', 'Generated lava-cause asset preview'],
-    ['visual-validation/materials-generated-lava-causes/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/materials-generated-lava-causes/temporal.t001.png', 'Asset-preview parameter variation'],
-  ],
-  'threejs-procedural-vegetation': [
-    ['visual-validation/vegetation-generated-meadow-density/final.design.png', 'Generated meadow-mask asset preview'],
-    ['visual-validation/vegetation-generated-meadow-density/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/vegetation-generated-meadow-density/seed-stress.final.png', 'Asset-preview seed stress'],
-  ],
-  'threejs-black-holes-and-space-effects': [
-    ['visual-validation/space-generated-starfields/final.design.png', 'Artistic starfield-tile asset preview'],
-    ['visual-validation/space-generated-starfields/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/space-generated-starfields/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/space-generated-starfields/seed-stress.final.png', 'Asset-preview seed stress'],
-  ],
-  'threejs-procedural-fields': [
-    ['visual-validation/fields-generated-biome-maps/final.design.png', 'Generated biome-map asset preview'],
-    ['visual-validation/fields-generated-biome-maps/no-post.design.png', 'Asset-preview baseline'],
-    ['visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png', 'Generated-asset channel diagnostics'],
-    ['visual-validation/fields-generated-biome-maps/seed-stress.final.png', 'Asset-preview seed stress'],
-  ],
-};
 
 const GALLERY = [
   { img: 'visual-validation/ocean-generated-wave-seeds/final.design.png', title: 'Ocean input — generated wave seeds', note: 'threejs-spectral-ocean · generated-asset preview; not FFT renderer evidence', link: 'threejs-spectral-ocean' },
@@ -255,16 +177,20 @@ const metaDescription = (value, maxLength = 160) => {
   const lastSpace = clipped.lastIndexOf(' ');
   return `${clipped.slice(0, Math.max(lastSpace, maxLength - 24)).replace(/[,:;.!?\s-]+$/, '')}…`;
 };
-const imageSizeAttrs = (relativePath) => {
+const pngSize = (relativePath) => {
   try {
     const data = readFileSync(join(root, 'docs', relativePath));
     if (data.length >= 24 && data.toString('ascii', 1, 4) === 'PNG') {
-      return `width="${data.readUInt32BE(16)}" height="${data.readUInt32BE(20)}"`;
+      return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
     }
   } catch {
     // Missing dimensions are handled by the site SEO validator.
   }
-  return '';
+  return null;
+};
+const imageSizeAttrs = (relativePath) => {
+  const size = pngSize(relativePath);
+  return size ? `width="${size.width}" height="${size.height}"` : '';
 };
 const articleImageUrls = (slug) => ['1x1', '4x3', '16x9']
   .map((ratio) => `${SITE}seo/article/${slug}-${ratio}.png`);
@@ -479,13 +405,19 @@ const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" 
 <link rel="alternate" type="text/plain" href="${SITE}llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="${SITE}skills.json" title="Machine-readable skill catalog" />`;
 
-const socialImageMeta = (image, alt) => `<meta property="og:image" content="${image}" />
+const socialImageMeta = (relativePath, alt) => {
+  if (!relativePath) return '';
+  const size = pngSize(relativePath);
+  if (!size) throw new Error(`social image is missing or not PNG: ${relativePath}`);
+  const image = new URL(relativePath, SITE).href;
+  return `<meta property="og:image" content="${image}" />
 <meta property="og:image:type" content="image/png" />
-<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />
-<meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />
+<meta property="og:image:width" content="${size.width}" />
+<meta property="og:image:height" content="${size.height}" />
 <meta property="og:image:alt" content="${esc(alt)}" />
 <meta name="twitter:image" content="${image}" />
 <meta name="twitter:image:alt" content="${esc(alt)}" />`;
+};
 
 /* ---------------------------- index page ---------------------------- */
 
@@ -685,6 +617,11 @@ const primaryLabHtml = primaryLabGroups.map((group) => `
       </div>
     </section>`).join('');
 
+const homepageEvidencePreview = flagshipDemos
+  .map(({ demo }) => demo.status === 'accepted' ? previewForPrimary(demo) : null)
+  .find(Boolean) ?? null;
+const homepageSocialImage = homepageEvidencePreview?.path ?? null;
+
 const HARNESSES = [
   { name: 'skills CLI', how: 'Use the open skills installer to list the pack, then install every top-level threejs-* skill folder as one coherent graphics skill pack for your selected agent.', code: `${SKILLS_ADD} --list\n${SKILLS_INSTALL_PACK}` },
   { name: 'Claude Code', how: 'Install through skills CLI, or symlink/copy the skill folders into a personal or project skills directory.', code: `${SKILLS_ADD} --skill '*' -a claude-code -g -y\n# manual fallback:\ngit clone ${REPO}.git\nln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/` },
@@ -715,8 +652,8 @@ ${assetHead('')}
 <meta property="og:title" content="${homeTitle}" />
 <meta property="og:description" content="${esc(homeDescription)}" />
 <meta property="og:url" content="${SITE}" />
-${socialImageMeta(OG_IMAGE, 'Generated crater-field asset preview from the Three.js WebGPU Skill Pack; not canonical planet-renderer evidence')}
-<meta name="twitter:card" content="summary_large_image" />
+${socialImageMeta(homepageSocialImage, homepageEvidencePreview ? `${homepageEvidencePreview.label} from an accepted integration flagship` : '')}
+<meta name="twitter:card" content="${homepageSocialImage ? 'summary_large_image' : 'summary'}" />
 <meta name="twitter:title" content="${homeTitle}" />
 <meta name="twitter:description" content="${esc(homeDescription)}" />
 <script type="application/ld+json">
@@ -757,7 +694,7 @@ ${JSON.stringify({
       runtimePlatform: 'Three.js WebGPURenderer',
       keywords: 'three.js, webgpu, TSL, agent skills, procedural graphics, visual validation',
       license: 'https://spdx.org/licenses/ISC.html',
-      image: OG_IMAGE,
+      image: homepageSocialImage ? new URL(homepageSocialImage, SITE).href : undefined,
     },
     {
       '@type': 'ItemList',
@@ -1018,8 +955,7 @@ ${assetHead('../')}
 <meta property="og:title" content="${aboutTitle}" />
 <meta property="og:description" content="${esc(aboutDescription)}" />
 <meta property="og:url" content="${aboutUrl}" />
-${socialImageMeta(OG_IMAGE, 'Generated crater-field asset preview representing the evidence-led Three.js WebGPU Skill Pack methodology')}
-<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="${aboutTitle}" />
 <meta name="twitter:description" content="${esc(aboutDescription)}" />
 <script type="application/ld+json">
@@ -1135,7 +1071,6 @@ for (const slug of slugs) {
   const prev = skills[slugs[(idx + slugs.length - 1) % slugs.length]];
   const next = skills[slugs[(idx + 1) % slugs.length]];
   const science = SCIENCE[slug];
-  const validation = VALIDATION[slug];
   const skillDemos = PROVIDER_DEMOS.filter((demo) => demo.skill === slug);
   const ownedPrimaryDemos = s.demoRecords.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
   const participatingFlagships = flagshipDemos.filter(({ demo }) => DEMO_REGISTRY.origins[demo.id]?.ownerSkills?.includes(slug));
@@ -1143,17 +1078,13 @@ for (const slug of slugs) {
   const pageUrl = `${SITE}skills/${slug}.html`;
   const resolvedSkillPreview = canonicalSkillPreview(slug);
   const skillHeroImg = resolvedSkillPreview?.path ?? null;
-  const ogImg = skillHeroImg ? `${SITE}${skillHeroImg}` : OG_IMAGE;
-  const articleImages = articleImageUrls(slug);
+  const articleImages = skillHeroImg ? articleImageUrls(slug) : undefined;
   const hasAcceptedEvidence = ownedPrimaryDemos.some((demo) => demo.status === 'accepted');
   const previewGalleryEntries = [
     ...(resolvedSkillPreview ? [resolvedSkillPreview] : []),
     ...ownedPrimaryDemos
       .flatMap((demo) => runtimeEvidenceEntries(demo).length > 0 ? runtimeEvidenceEntries(demo) : [directPrimaryPreview(demo)])
       .filter((entry) => entry && entry.path !== resolvedSkillPreview?.path),
-    ...(validation ?? [])
-      .filter(([path]) => path !== resolvedSkillPreview?.path && docsImageExists(path))
-      .map(([path, label]) => ({ path, label, classification: 'generated-asset-preview', detail: 'Presentation preview only; this image is not canonical runtime evidence.', sourceId: slug })),
   ];
   const runtimeEvidenceDisclosures = ownedPrimaryDemos
     .map((demo) => ({ demo, summary: runtimeEvidenceSummary(demo) }))
@@ -1245,11 +1176,11 @@ for (const slug of slugs) {
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--${hasAcceptedEvidence ? 'accepted' : 'pending'}">${hasAcceptedEvidence ? 'Accepted runtime evidence available' : 'Canonical runtime evidence pending'}</span><code>${previewGalleryEntries.length} published image${previewGalleryEntries.length === 1 ? '' : 's'}</code></div>
 ${evidenceDisclosureHtml}
-    ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification, detail }) => `
-      <figure data-preview-classification="${esc(classification)}" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media">${previewPicture(`../${path}`, `${s.title} — ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
+    ${previewGalleryEntries.length ? `<div class="gallery">${previewGalleryEntries.map(({ path, label, classification, detail, sourceId }) => `
+      <figure data-preview-classification="${esc(classification)}" data-preview-source="${esc(sourceId)}" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media">${previewPicture(`../${path}`, `${s.title}: ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}<span class="preview-badge">${esc(classification.replace(/-/g, ' '))}</span></span>
         <figcaption itemprop="caption"><strong>${esc(label)}</strong>${detail === null ? '' : `<span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span>`}</figcaption>
-      </figure>`).join('')}</div>` : `<div class="preview-missing"><span>Preview capture pending</span><code>npm run pages:capture-previews</code></div>`}
+      </figure>`).join('')}</div>` : `<div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>`}
   </div></div>`;
 
   const scienceHtml = science ? `
@@ -1282,8 +1213,8 @@ ${skillHeroImg ? `<link rel="preload" as="image" href="${responsiveVariant(`../$
 ${s.update || s.attribution ? `<meta property="article:modified_time" content="${esc(s.update?.iso ?? s.attribution.importedIso)}" />` : ''}
 ${s.published || s.attribution ? `<meta property="article:published_time" content="${esc(s.published?.iso ?? s.attribution.importedIso)}" />` : ''}
 ${cat ? `<meta property="article:section" content="${esc(cat.name)}" />` : ''}
-${socialImageMeta(ogImg, `${s.title} evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status`)}
-<meta name="twitter:card" content="summary_large_image" />
+${socialImageMeta(skillHeroImg, resolvedSkillPreview ? `${resolvedSkillPreview.label} for ${s.title}` : '')}
+<meta name="twitter:card" content="${skillHeroImg ? 'summary_large_image' : 'summary'}" />
 <meta name="twitter:title" content="${esc(skillTitle)}" />
 <meta name="twitter:description" content="${esc(skillDescription)}" />
 <script type="application/ld+json">
@@ -1606,12 +1537,13 @@ writeFileSync(join(root, 'docs', 'site.webmanifest'), JSON.stringify({
 const sitemapHomeLastmod = latestPathDate(['scripts/build-pages.mjs', ...slugs]);
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>${SITE_NAME}</image:title></image:image></url>
-  <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}<image:image><image:loc>${OG_IMAGE}</image:loc><image:title>About the ${SITE_NAME} methodology</image:title></image:image></url>
+  <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}${homepageSocialImage ? `<image:image><image:loc>${new URL(homepageSocialImage, SITE).href}</image:loc><image:title>${SITE_NAME}</image:title></image:image>` : ''}</url>
+  <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}</url>
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
-  const image = articleImageUrls(s)[2];
-  return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}<image:image><image:loc>${image}</image:loc><image:title>${esc(skills[s].title)}</image:title></image:image></url>`;
+  const preview = canonicalSkillPreview(s);
+  const image = preview ? articleImageUrls(s)[2] : null;
+  return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}${image ? `<image:image><image:loc>${image}</image:loc><image:title>${esc(skills[s].title)}</image:title></image:image>` : ''}</url>`;
 }).join('\n')}
 ${DEMO_REGISTRY.demos.filter((demo) => demo.publishPath && (
   demo.status === 'secondary'
