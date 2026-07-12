@@ -369,6 +369,9 @@ try {
         consoleErrors,
         requestErrors,
       });
+    } catch (cause) {
+      const detail = cause instanceof Error ? cause.message : String(cause);
+      throw new Error(`Pages smoke failed for ${route.path}: ${detail}`, { cause });
     } finally {
       await page.close();
     }

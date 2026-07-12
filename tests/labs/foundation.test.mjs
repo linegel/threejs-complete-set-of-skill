@@ -284,6 +284,7 @@ test('Pages smoke plan enumerates every primary base and fixed route from the re
 test('Pages smoke uses the authoritative skill roster rather than filesystem discovery', () => {
   const source = readFileSync(new URL('../../scripts/pages-smoke.mjs', import.meta.url), 'utf8');
   assert.match(source, /authoritativeSkillDirs\(loadCanonicalTargets\(\)\)/);
+  assert.match(source, /Pages smoke failed for \$\{route\.path\}/);
   assert.doesNotMatch(source, /readdirSync|startsWith\(['"]threejs-/);
 });
 
