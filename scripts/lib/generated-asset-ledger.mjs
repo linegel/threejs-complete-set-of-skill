@@ -29,6 +29,37 @@ export function responsiveDependencyHash(relativeSource, record) {
   }));
 }
 
+export function ownerIdForSiteImageUrl(urlString, siteOrigin) {
+  const url = new URL(urlString, siteOrigin);
+  if (url.origin !== new URL(siteOrigin).origin) throw new Error(`site image has foreign origin: ${urlString}`);
+  const relativeSource = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+  const ownerId = ownerIdForResponsiveSource(relativeSource);
+  if (ownerId === 'site' || ownerId === 'generated-asset-archive') {
+    throw new Error(`site image has no primary lab owner: ${urlString}`);
+  }
+  return ownerId;
+}
+
+export function articleDependencyHash(slug, record) {
+  const images = Object.entries(record.images ?? {})
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([ratio, output]) => ({
+      ratio,
+      url: output.url,
+      sha256: output.sha256,
+      bytes: output.bytes,
+    }));
+  return sha256(JSON.stringify({
+    slug,
+    ownerId: record.ownerId,
+    source: record.source,
+    sourceSha256: record.sourceSha256,
+    sourceWidth: record.sourceWidth,
+    sourceHeight: record.sourceHeight,
+    images,
+  }));
+}
+
 export function manifestOwnedOutputPaths(manifest, docsRoot, siteOrigin) {
   const docs = resolve(docsRoot);
   const expectedOrigin = new URL(siteOrigin).origin;

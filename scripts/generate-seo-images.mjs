@@ -4,6 +4,11 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFile
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import {
+  articleDependencyHash,
+  ownerIdForSiteImageUrl,
+  sha256,
+} from './lib/generated-asset-ledger.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
@@ -46,8 +51,11 @@ for (const file of readdirSync(SKILLS).filter((name) => name.endsWith('.html')).
   if (!sourceUrl) continue;
   const sourcePath = localImagePath(sourceUrl);
   const sourceMetadata = await sharp(sourcePath).metadata();
+  const sourceBytes = readFileSync(sourcePath);
   manifest[slug] = {
+    ownerId: ownerIdForSiteImageUrl(sourceUrl, SITE),
     source: sourceUrl,
+    sourceSha256: sha256(sourceBytes),
     sourceWidth: sourceMetadata.width,
     sourceHeight: sourceMetadata.height,
     images: {},
@@ -73,17 +81,21 @@ for (const file of readdirSync(SKILLS).filter((name) => name.endsWith('.html')).
         effort: 10,
       })
       .toFile(outputPath);
+    const outputBytes = readFileSync(outputPath);
     manifest[slug].images[ratio.id] = {
       url: new URL(`seo/article/${filename}`, SITE).href,
       width: ratio.width,
       height: ratio.height,
+      bytes: outputBytes.byteLength,
+      sha256: sha256(outputBytes),
     };
   }
+  manifest[slug].dependencyClosureHash = articleDependencyHash(slug, manifest[slug]);
 }
 
 for (const file of readdirSync(OUTPUT)) {
   if (!expectedFiles.has(file)) unlinkSync(join(OUTPUT, file));
 }
 
-writeFileSync(join(OUTPUT, 'manifest.json'), `${JSON.stringify({ generatedBy: 'scripts/generate-seo-images.mjs', ratios: RATIOS, skills: manifest }, null, 2)}\n`);
+writeFileSync(join(OUTPUT, 'manifest.json'), `${JSON.stringify({ schemaVersion: 2, generatedBy: 'scripts/generate-seo-images.mjs', ratios: RATIOS, skills: manifest }, null, 2)}\n`);
 console.log(`Generated ${Object.keys(manifest).length * RATIOS.length} Article images for ${Object.keys(manifest).length} skills.`);
