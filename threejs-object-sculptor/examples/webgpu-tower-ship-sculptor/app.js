@@ -5,7 +5,11 @@ import {
   TOWER_SHIP_TIERS,
 } from "./lab-controller.js";
 import { createTowerShipFrameDriver, towerShipFrameOwner } from "./frame-driver.js";
-import { towerShipHudStatus } from "./hud-status.js";
+import {
+  resolveTowerShipHudState,
+  towerShipHudStatus,
+  TOWER_SHIP_TERMINAL_HUD_STATES,
+} from "./hud-status.js";
 import { towerShipInitialMode, towerShipRouteFromLocation } from "./route-state.js";
 
 const MODE_COPY = Object.freeze({
@@ -57,6 +61,7 @@ tierSelect.disabled = Boolean(route?.tier);
 
 let controller = null;
 let frameDriver = null;
+let hudState = "initializing";
 
 function updateModeCopy() {
   const [title, description] = MODE_COPY[modeSelect.value];
@@ -65,8 +70,12 @@ function updateModeCopy() {
 }
 
 function updateHud(metrics) {
-  status.dataset.state = metrics.firstFrameCompleted ? "ready" : "starting";
-  status.textContent = towerShipHudStatus(metrics.firstFrameCompleted ? "ready" : "initializing");
+  const requestedState = metrics.firstFrameCompleted ? "ready" : "initializing";
+  hudState = resolveTowerShipHudState(hudState, requestedState);
+  if (!TOWER_SHIP_TERMINAL_HUD_STATES.includes(hudState)) {
+    status.dataset.state = hudState === "ready" ? "ready" : "starting";
+    status.textContent = towerShipHudStatus(hudState);
+  }
   metricNodes.textContent = metrics.nodes.toLocaleString();
   metricTriangles.textContent = Math.round(metrics.triangles).toLocaleString();
   metricOars.textContent = metrics.oars;
@@ -74,13 +83,20 @@ function updateHud(metrics) {
 }
 
 function reportRuntimeError(error, state = "failed") {
+  frameDriver?.stop();
+  const nextState = resolveTowerShipHudState(hudState, state);
+  if (nextState === hudState && TOWER_SHIP_TERMINAL_HUD_STATES.includes(hudState)) {
+    console.error(error);
+    return;
+  }
+  hudState = nextState;
   const message = error instanceof Error ? error.message : error?.message ?? error?.reason ?? String(error);
   window.__LAB_ERROR__ = Object.freeze({
     name: error instanceof Error ? error.name : "Error",
     message,
   });
   status.dataset.state = "error";
-  status.textContent = towerShipHudStatus(state, error);
+  status.textContent = towerShipHudStatus(hudState, error);
   modeSelect.disabled = true;
   tierSelect.disabled = true;
   cameraSelect.disabled = true;
@@ -101,7 +117,7 @@ compareButton.addEventListener("click", () => {
   compareButton.textContent = open ? "Hide reference" : "Compare reference";
 });
 updateModeCopy();
-status.textContent = towerShipHudStatus("initializing");
+status.textContent = towerShipHudStatus(hudState);
 
 if (bootstrapError) {
   reportRuntimeError(bootstrapError);
