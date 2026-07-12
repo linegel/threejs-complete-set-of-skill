@@ -86,7 +86,7 @@ export function createDistrictTerrainGeometry({ causeField, segments }) {
       const b = ids[(zIndex + 1) * side + xIndex];
       const c = ids[zIndex * side + xIndex + 1];
       const d = ids[(zIndex + 1) * side + xIndex + 1];
-      writer.addQuad(a, b, c, d);
+      writer.addQuad(a, b, c, d, "terrain");
     }
   }
   writer.addGroup(0, capacity.indices, "terrain");

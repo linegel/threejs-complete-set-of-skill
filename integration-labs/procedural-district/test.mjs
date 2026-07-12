@@ -120,6 +120,7 @@ assert.equal(terrain.userData.writer.exactCapacity, true);
 assert.equal(terrain.userData.writer.vertexCount, 81);
 assert.equal(terrain.userData.writer.indexCount, 384);
 assert.equal(terrain.groups.length, 1);
+assert.deepEqual([...new Set(terrain.userData.writer.triangleMaterialSlots)], ["terrain"]);
 assert.equal(terrain.userData.causeFieldId, DISTRICT_CAUSE_FIELD_ID);
 terrain.dispose();
 
