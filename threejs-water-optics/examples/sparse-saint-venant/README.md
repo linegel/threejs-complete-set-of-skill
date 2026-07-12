@@ -22,6 +22,13 @@ adds cardinal halo tiles for face fluxes, and delays dry deactivation by an
 explicit tick count. Byte counts include three float32 conservative channels,
 two ping-pong copies, core cells, and resident halo cells separately.
 
+`gpu-swe-contract.js` selects the seven-dispatch reference graph after six GPU
+execution architectures. It derives the unsplit CFL bound from each tier's
+maximum represented depth and velocity, counts padded state, one canonical
+flux plus two hydrostatic corrections per face, lookup/descriptor/display
+records, and the validation ledger. These are logical bytes **[D]**; backend
+alignment and residency remain Browser measurements **[M]**.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,
