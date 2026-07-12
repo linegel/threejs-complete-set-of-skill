@@ -40,6 +40,13 @@ import {
   CORPUS_PHYSICAL_ROUTE_PLAN,
   validatePhysicalRouteRuntimeRecords,
 } from "./validate-routes.mjs";
+import {
+  CORPUS_TARGET_MASK_PLAN,
+  computeMaskedTierError,
+  computeNamedMotionOverlap,
+  computeNormalizedSymmetricBoundaryDistance,
+  decodeBinaryTargetMask,
+} from "./mask-raster.mjs";
 
 const LAB_ID = "webgpu-object-sculptor-corpus";
 const VISUAL_CONTRACT_ID = "object-sculptor-corpus-visual-v1";
@@ -118,6 +125,10 @@ export function validateCorpusCorrectnessCaptureProfile(profile, profileConfig) 
 
 export const CORPUS_RESOURCE_PEAK_GATE_BYTES = 256 * 1024 * 1024;
 export const CORPUS_LIFECYCLE_MINIMUM_ITERATIONS = 50;
+export const CORPUS_TARGET_MASK_GATES = Object.freeze({
+  motionNamedRegionChangedRatioMinimum: 0.1,
+  motionChangedPixelOverlapRatioMinimum: 0.25,
+});
 const CORPUS_CRITICAL_FEATURE_SCORE_GATE = 0.8;
 
 export const REQUIRED_SUPPLEMENTAL_EVIDENCE = Object.freeze([
@@ -886,7 +897,7 @@ function validateArtifactWriteLedger(bundleDir, records, errors) {
   return byPath;
 }
 
-function validateWrittenCaptureRecord(written, capture, label, errors) {
+function validateWrittenCaptureRecord(written, capture, label, errors, expectedTarget = "presentation") {
   if (!exactKeys(written, [
     "target",
     "width",
@@ -908,7 +919,7 @@ function validateWrittenCaptureRecord(written, capture, label, errors) {
     "controllerNormalized",
     "png",
   ], label, errors)) return;
-  if (written.target !== "presentation") errors.push(`${label}.target must identify the presentation readback`);
+  if (written.target !== expectedTarget) errors.push(`${label}.target must identify the ${expectedTarget} readback`);
   if (
     written.width !== capture.width
     || written.height !== capture.height
@@ -1029,6 +1040,12 @@ function validateArtifactWriteClosure(ledgerByPath, hook, errors) {
     addExpected(capture?.pixelEvidence?.normalized?.rawArtifact?.path, "writeCapture-normalized", `${capture?.filename ?? "capture"}.normalized`);
     addExpected(capture?.pixelEvidence?.normalized?.packedArtifact?.path, "hook-artifact", `${capture?.filename ?? "capture"}.packed`);
   }
+  for (const mask of hook?.targetMasks ?? []) {
+    addExpected(mask?.pixelEvidence?.png?.path, "writeCapture-png", `${mask?.filename ?? "target-mask"}.png`);
+    addExpected(mask?.pixelEvidence?.transport?.rawArtifact?.path, "writeCapture-transport", `${mask?.filename ?? "target-mask"}.transport`);
+    addExpected(mask?.pixelEvidence?.normalized?.rawArtifact?.path, "writeCapture-normalized", `${mask?.filename ?? "target-mask"}.normalized`);
+    addExpected(mask?.pixelEvidence?.normalized?.packedArtifact?.path, "hook-artifact", `${mask?.filename ?? "target-mask"}.packed`);
+  }
   for (const output of hook?.standardOutputs ?? []) {
     if (output?.status !== "CAPTURED") continue;
     addExpected(output?.pixelEvidence?.png?.path, "hook-artifact", `${output?.id ?? "standard"}.png`);
@@ -1092,7 +1109,7 @@ function validateSharedOutputPlan(outputPlan, hook, errors) {
 }
 
 function validateCaptureSession(bundleDir, session, errors) {
-  const emptyContext = Object.freeze({ runId: null, backend: null, captureFiles: new Map(), standardOutputFiles: new Map(), rasterComparisons: new Map(), sourceHash: null, buildRevision: null, captureProvenance: null });
+  const emptyContext = Object.freeze({ runId: null, backend: null, captureFiles: new Map(), targetMaskFiles: new Map(), targetMaskMetrics: new Map(), standardOutputFiles: new Map(), rasterComparisons: new Map(), sourceHash: null, buildRevision: null, captureProvenance: null });
   if (!session || typeof session !== "object") return emptyContext;
   exactKeys(session, [
     "schemaVersion",
@@ -1205,7 +1222,8 @@ function validateCaptureSession(bundleDir, session, errors) {
   }
   if (session.finalRuntime?.metrics?.nativeWebGPU !== true || session.finalRuntime?.metrics?.lastFrameError !== null) errors.push("capture session finalRuntime lost native WebGPU/error-free state");
   validateSharedOutputPlan(session.outputPlan, hook, errors);
-  if (!Array.isArray(session.writtenCaptures) || session.writtenCaptures.length !== CORPUS_CAPTURE_PLAN.length) errors.push("capture session writtenCaptures must retain exactly every declared native source readback");
+  const nativeReadbackCount = CORPUS_CAPTURE_PLAN.length + CORPUS_TARGET_MASK_PLAN.length;
+  if (!Array.isArray(session.writtenCaptures) || session.writtenCaptures.length !== nativeReadbackCount) errors.push(`capture session writtenCaptures must retain exactly all ${nativeReadbackCount} presentation and target-mask readbacks`);
   if (
     pipeline?.owner !== "WebGPURenderer"
     || pipeline?.sceneRendersPerFrame !== 1
@@ -1241,6 +1259,7 @@ function validateCaptureSession(bundleDir, session, errors) {
 
   const captures = hook?.captures;
   const captureFiles = new Map();
+  const targetMaskFiles = new Map();
   const captureRecords = new Map();
   const writtenCaptureByFilename = new Map((session.writtenCaptures ?? []).map((capture) => [capture?.png?.path, capture]));
   let rasterComparisons = new Map();
@@ -1411,6 +1430,92 @@ function validateCaptureSession(bundleDir, session, errors) {
     }
     rasterComparisons = validateRasterComparisons(hook, captureFiles, errors);
   }
+  try {
+    assert.deepEqual(hook?.targetMaskPlan, CORPUS_TARGET_MASK_PLAN);
+  } catch {
+    errors.push("capture hook target-mask plan drifted");
+  }
+  const targetMasks = hook?.targetMasks;
+  const targetMaskRecords = new Map();
+  if (!Array.isArray(targetMasks)) errors.push("capture hook did not publish target masks");
+  else {
+    if (targetMasks.length !== CORPUS_TARGET_MASK_PLAN.length) errors.push(`expected ${CORPUS_TARGET_MASK_PLAN.length} target masks, received ${targetMasks.length}`);
+    for (const mask of targetMasks) {
+      if (targetMaskRecords.has(mask?.filename)) errors.push(`duplicate target-mask filename ${mask?.filename}`);
+      targetMaskRecords.set(mask?.filename, mask);
+    }
+    for (const plan of CORPUS_TARGET_MASK_PLAN) {
+      const mask = targetMaskRecords.get(plan.filename);
+      if (!mask) {
+        errors.push(`missing target-mask metadata ${plan.filename}`);
+        continue;
+      }
+      exactObjectSubset(mask, plan, plan.filename, errors);
+      if (mask.target !== "target-mask" || mask.captureSource !== "native-webgpu-render-target-readback") {
+        errors.push(`${plan.filename} is not a native target-mask render-target readback`);
+      }
+      if (mask.maskKind !== plan.maskKind) errors.push(`${plan.filename}.maskKind drifted`);
+      if (!Array.isArray(mask.semanticNodeIds)) errors.push(`${plan.filename}.semanticNodeIds must be an array`);
+      else if (plan.maskKind === "subject-silhouette") {
+        if (mask.semanticNodeIds.length !== 0) errors.push(`${plan.filename} subject silhouette must not claim moving semantic nodes`);
+      } else requireUniqueSortedIds(mask.semanticNodeIds, `${plan.filename}.semanticNodeIds`, errors);
+      exactObjectSubset(mask.runtimeState, {
+        subjectId: plan.subjectId,
+        mode: plan.mode,
+        tier: plan.tier,
+        camera: plan.camera,
+        seed: plan.seed,
+        time: plan.time,
+        backend: "webgpu",
+        nativeWebGPU: true,
+        initialized: true,
+        firstFrameCompleted: true,
+        lastFrameError: null,
+      }, `${plan.filename}.runtimeState`, errors);
+      exactKeys(mask.file, ["path", "sha256", "producerOwner", "decodedRgbaSha256", "derivedFromPackedRgbaSha256"], `${plan.filename}.file`, errors);
+      const file = confinedExtendedFileReference(bundleDir, mask.file, `${plan.filename}.file`, errors, { extensions: [".png"] });
+      const decodedPng = validatePngCaptureFile(file, mask.width, mask.height, `${plan.filename}.file`, errors);
+      let binary = null;
+      if (decodedPng) {
+        try {
+          binary = decodeBinaryTargetMask(decodedPng, plan.filename);
+        } catch (error) {
+          errors.push(`${plan.filename} is not a valid binary target mask: ${error.message}`);
+        }
+      }
+      if (mask.width !== Math.round(profileWidth * profileDpr) || mask.height !== Math.round(profileHeight * profileDpr)) {
+        errors.push(`${plan.filename} dimensions do not derive from the captured CSS viewport and DPR`);
+      }
+      if (mask.file?.path !== plan.filename) errors.push(`${plan.filename}.file.path must equal its canonical filename`);
+      if (binary && mask.selectedPixels !== binary.selectedPixels) errors.push(`${plan.filename}.selectedPixels does not equal the decoded binary population`);
+      validateCapturePixelEvidence(bundleDir, mask, file, decodedPng, plan.filename, errors);
+      const writtenCapture = writtenCaptureByFilename.get(plan.filename);
+      if (!writtenCapture) errors.push(`${plan.filename} is absent from the shared runner writtenCaptures ledger`);
+      else validateWrittenCaptureRecord(writtenCapture, mask, `${plan.filename}.writtenCapture`, errors, "target-mask");
+      if (!captureFiles.has(plan.sourceCaptureFilename)) errors.push(`${plan.filename}.sourceCaptureFilename does not identify a validated presentation capture`);
+      if (file && decodedPng && binary) targetMaskFiles.set(plan.filename, Object.freeze({
+        path: file.path,
+        sha256: file.sha256,
+        bytes: file.bytes,
+        decoded: decodedPng,
+        binary,
+        metadata: mask,
+      }));
+    }
+    const orderedReadbacks = [...(captures ?? []), ...targetMasks];
+    for (let index = 1; index < orderedReadbacks.length; index += 1) {
+      const previous = orderedReadbacks[index - 1]?.runtimeState;
+      const current = orderedReadbacks[index]?.runtimeState;
+      if (
+        !Number.isInteger(previous?.completedFrames)
+        || !Number.isInteger(current?.completedFrames)
+        || current.completedFrames !== previous.completedFrames + 1
+        || !Number.isInteger(previous?.renderSubmissions)
+        || !Number.isInteger(current?.renderSubmissions)
+        || current.renderSubmissions !== previous.renderSubmissions + 1
+      ) errors.push(`native readback ${index} did not advance completed-frame and render-submission counters exactly once`);
+    }
+  }
   const observedSeeds = new Set(CORPUS_CAPTURE_PLAN.map(({ state }) => state.seed));
   if (!observedSeeds.has(CORPUS_REPRESENTATIVE_SEED) || !observedSeeds.has(CORPUS_STRESS_SEED)) {
     errors.push("capture plan must include representative and stress seeds");
@@ -1418,6 +1523,7 @@ function validateCaptureSession(bundleDir, session, errors) {
   validateTierContracts(hook?.tierContracts, errors);
   const standardOutputFiles = validateStandardOutputs(bundleDir, hook, captureFiles, captureRecords, pipeline, errors);
   validateArtifactWriteClosure(artifactWriteByPath, hook, errors);
+  const targetMaskMetrics = computeTargetMaskVisualMetrics(captureFiles, targetMaskFiles, errors);
   const captureProvenance = Object.freeze({
     sourceHash: session.sourceHash,
     sourceClosureHash: session.sourceClosureHash,
@@ -1437,7 +1543,7 @@ function validateCaptureSession(bundleDir, session, errors) {
     startedAt: session.startedAt,
     finishedAt: session.finishedAt,
   });
-  return Object.freeze({ runId, backend, captureFiles, standardOutputFiles, rasterComparisons, sourceHash: session.sourceHash, buildRevision: session.buildRevision, captureProvenance });
+  return Object.freeze({ runId, backend, captureFiles, targetMaskFiles, targetMaskMetrics, standardOutputFiles, rasterComparisons, sourceHash: session.sourceHash, buildRevision: session.buildRevision, captureProvenance });
 }
 
 function plannedCapture(subjectId, mode, tier, camera, seed, time, label) {
@@ -1474,7 +1580,7 @@ function buildVisualInvariantPlan() {
     const stressAction2 = captureByFilenameFragment(subjectId, "action-ready.full.design.stress-seed.t200");
     records.push(
       { id: `final-authored-contract:${subjectId}`, metricId: "ai-vision-score", domain: "authored-contract-review", statistic: "global-score", comparison: "gte", unit: "score", thresholdValue: 0.8, captureFilenames: [finalFull] },
-      { id: `action-motion-delta:${subjectId}`, metricId: "rgb-mae-code-values", domain: "decoded-output-rgb8", statistic: "channel-mae", comparison: "gte", unit: "code-value", thresholdValue: 0.05, captureFilenames: [action0, action2] },
+      { id: `action-motion-delta:${subjectId}`, metricId: "named-moving-region-rgb-overlap", domain: "decoded-output-rgb8-plus-binary-semantic-masks", statistic: "channel-mae-with-bidirectional-overlap-gates", comparison: "gte", unit: "code-value", thresholdValue: 0.05, captureFilenames: [action0, action2] },
       { id: `tier-visual-error:${subjectId}:budgeted`, metricId: "normalized-visual-error", domain: "decoded-output-rgba8", statistic: "masked-p95", comparison: "lte", unit: "ratio", thresholdValue: 0.25, captureFilenames: [finalFull, finalBudgeted] },
       { id: `tier-visual-error:${subjectId}:minimum`, metricId: "normalized-visual-error", domain: "decoded-output-rgba8", statistic: "masked-p95", comparison: "lte", unit: "ratio", thresholdValue: 0.4, captureFilenames: [finalFull, finalMinimum] },
       { id: `stress-seed-distinctness:${subjectId}`, metricId: "rgb-mae-code-values", domain: "decoded-output-rgb8", statistic: "channel-mae", comparison: "gte", unit: "code-value", thresholdValue: 0.02, captureFilenames: [finalFull, stressFinal] },
@@ -1505,7 +1611,6 @@ export const CORPUS_VISUAL_INVARIANT_PLAN = Object.freeze(buildVisualInvariantPl
 
 export function corpusRasterComparisonIdForInvariant(invariantId) {
   const [kind, subjectId, detail] = String(invariantId).split(":");
-  if (kind === "action-motion-delta") return `raster-motion:${subjectId}:A0`;
   if (kind === "stress-action-motion") return `raster-motion:${subjectId}:B`;
   if (kind === "stress-seed-distinctness") return `raster-stress:${subjectId}:final-full-design`;
   if (kind === "representative-replay") {
@@ -1513,6 +1618,88 @@ export function corpusRasterComparisonIdForInvariant(invariantId) {
     return suffix ? `raster-replay:${subjectId}:${suffix}` : null;
   }
   return null;
+}
+
+export function computeCorpusTargetMaskMetricSource(metric, field, files) {
+  const inputs = files.map(({ path, sha256 }) => ({ path, sha256 }));
+  return `validator-recomputed:${metric}:${field}:sha256:${stableSha256({ metric, field, inputs })}`;
+}
+
+function computeTargetMaskVisualMetrics(captureFiles, targetMaskFiles, errors) {
+  const metrics = new Map();
+  const presentation = (filename) => {
+    const file = captureFiles.get(filename);
+    if (!file) throw new Error(`missing presentation PNG ${filename}`);
+    return Object.freeze({ ...file, decoded: decodePngRaster(file.bytes) });
+  };
+  const mask = (filename) => {
+    const file = targetMaskFiles.get(filename);
+    if (!file) throw new Error(`missing binary target mask ${filename}`);
+    return file;
+  };
+  const record = (id, value, metric, field, files, details) => metrics.set(id, Object.freeze({
+    value,
+    source: computeCorpusTargetMaskMetricSource(metric, field, files),
+    metric,
+    field,
+    details,
+  }));
+  try {
+    for (const subjectId of SCULPT_TARGET_IDS) {
+      const fullImage = presentation(`${subjectId}.final.full.design.png`);
+      const fullMask = mask(`${subjectId}.final.full.target-mask.png`);
+      for (const tier of ["budgeted", "minimum"]) {
+        const candidateImage = presentation(`${subjectId}.final.${tier}.design.png`);
+        const candidateMask = mask(`${subjectId}.final.${tier}.target-mask.png`);
+        const measured = computeMaskedTierError(fullImage.decoded, candidateImage.decoded, fullMask.decoded, candidateMask.decoded);
+        record(
+          `tier-visual-error:${subjectId}:${tier}`,
+          measured.maskedP95,
+          measured.metric,
+          "maskedP95",
+          [fullImage, candidateImage, fullMask, candidateMask],
+          measured,
+        );
+      }
+      const startImage = presentation(`${subjectId}.action-ready.full.design.t000.png`);
+      const endImage = presentation(`${subjectId}.action-ready.full.design.t200.png`);
+      const startMask = mask(`${subjectId}.action-ready.full.design.t000.target-mask.png`);
+      const endMask = mask(`${subjectId}.action-ready.full.design.t200.target-mask.png`);
+      const motion = computeNamedMotionOverlap(startImage.decoded, endImage.decoded, startMask.decoded, endMask.decoded);
+      if (motion.namedRegionChangedRatio < CORPUS_TARGET_MASK_GATES.motionNamedRegionChangedRatioMinimum) {
+        errors.push(`${subjectId} named moving region changed ratio ${motion.namedRegionChangedRatio} is below ${CORPUS_TARGET_MASK_GATES.motionNamedRegionChangedRatioMinimum}`);
+      }
+      if (motion.changedPixelOverlapRatio < CORPUS_TARGET_MASK_GATES.motionChangedPixelOverlapRatioMinimum) {
+        errors.push(`${subjectId} changed-pixel semantic overlap ${motion.changedPixelOverlapRatio} is below ${CORPUS_TARGET_MASK_GATES.motionChangedPixelOverlapRatioMinimum}`);
+      }
+      record(
+        `action-motion-delta:${subjectId}`,
+        motion.rgbMaeCodeValues,
+        motion.metric,
+        "rgbMaeCodeValues",
+        [startImage, endImage, startMask, endMask],
+        motion,
+      );
+    }
+    for (let left = 0; left < SCULPT_TARGET_IDS.length; left += 1) for (let right = left + 1; right < SCULPT_TARGET_IDS.length; right += 1) {
+      const leftId = SCULPT_TARGET_IDS[left];
+      const rightId = SCULPT_TARGET_IDS[right];
+      const leftMask = mask(`${leftId}.final.full.target-mask.png`);
+      const rightMask = mask(`${rightId}.final.full.target-mask.png`);
+      const measured = computeNormalizedSymmetricBoundaryDistance(leftMask.decoded, rightMask.decoded);
+      record(
+        `subject-distinctness:${leftId}:${rightId}`,
+        measured.normalizedDistance,
+        measured.metric,
+        "normalizedDistance",
+        [leftMask, rightMask],
+        measured,
+      );
+    }
+  } catch (error) {
+    errors.push(`target-mask visual metric recomputation failed: ${error.message}`);
+  }
+  return metrics;
 }
 
 function validateFileReferenceSequence(bundleDir, actual, filenames, context, label, errors) {
@@ -1654,7 +1841,15 @@ function validateVisualErrors(document, bundleDir, context, header, contractById
       errors.push(`${expected.id} result threshold must exactly match the frozen visual contract`);
     }
     const rasterComparisonId = corpusRasterComparisonIdForInvariant(expected.id);
-    if (rasterComparisonId !== null) {
+    const targetMaskMetric = context.targetMaskMetrics.get(expected.id);
+    if (targetMaskMetric) {
+      if (!almostEqual(measured, targetMaskMetric.value, 1e-12)) {
+        errors.push(`${expected.id} measurement must equal the validator-recomputed target-mask metric`);
+      }
+      if (result.measurement?.source !== targetMaskMetric.source) {
+        errors.push(`${expected.id} measurement source does not bind the validator algorithm and exact presentation/mask hashes`);
+      }
+    } else if (rasterComparisonId !== null) {
       const rasterComparison = context.rasterComparisons.get(rasterComparisonId);
       if (!rasterComparison || !almostEqual(measured, rasterComparison.rgbMaeCodeValues, 1e-12)) {
         errors.push(`${expected.id} measurement must equal the independently decoded PNG raster comparison`);
@@ -2562,6 +2757,7 @@ function validateEvidenceManifest(document, bundleDir, context, errors) {
     "routeRuntimeEvidence",
     "visualContract",
     "captures",
+    "targetMasks",
     "standardOutputs",
   ], "evidence-manifest.json", errors);
   if (document.schemaVersion !== 2 || document.labId !== LAB_ID) errors.push("evidence-manifest identity drifted");
@@ -2605,6 +2801,22 @@ function validateEvidenceManifest(document, bundleDir, context, errors) {
     }
     confinedFileReference(bundleDir, capture.file, `${planned.filename}.manifestFile`, errors, { extensions: [".png"] });
     sameFileReference(capture.file, context.captureFiles.get(planned.filename), `${planned.filename}.manifestFile`, errors);
+  }
+  if (!Array.isArray(document.targetMasks) || document.targetMasks.length !== CORPUS_TARGET_MASK_PLAN.length) {
+    errors.push(`evidence-manifest must contain exactly ${CORPUS_TARGET_MASK_PLAN.length} target-mask rows`);
+  } else for (let index = 0; index < CORPUS_TARGET_MASK_PLAN.length; index += 1) {
+    const planned = CORPUS_TARGET_MASK_PLAN[index];
+    const mask = document.targetMasks[index];
+    const label = `evidence-manifest.targetMasks[${index}]`;
+    if (!exactKeys(mask, ["id", "filename", "subjectId", "maskKind", "sourceCaptureFilename", "semanticNodeIds", "selectedPixels", "file"], label, errors)) continue;
+    for (const field of ["id", "filename", "subjectId", "maskKind", "sourceCaptureFilename"]) {
+      if (mask[field] !== planned[field]) errors.push(`${label}.${field} drifted from the frozen target-mask plan`);
+    }
+    const accepted = context.targetMaskFiles.get(planned.filename);
+    if (JSON.stringify(mask.semanticNodeIds) !== JSON.stringify(accepted?.metadata?.semanticNodeIds)) errors.push(`${label}.semanticNodeIds drifted from capture metadata`);
+    if (mask.selectedPixels !== accepted?.binary?.selectedPixels) errors.push(`${label}.selectedPixels drifted from decoded mask pixels`);
+    confinedFileReference(bundleDir, mask.file, `${label}.file`, errors, { extensions: [".png"] });
+    sameFileReference(mask.file, accepted, `${label}.file`, errors);
   }
   if (!Array.isArray(document.standardOutputs) || document.standardOutputs.length !== STANDARD_OUTPUT_IDS.length) {
     errors.push(`evidence-manifest must contain exactly ${STANDARD_OUTPUT_IDS.length} standard output records`);
@@ -2710,6 +2922,8 @@ export function validateCorpusArtifacts({ bundleDirectory } = {}) {
     runId: null,
     backend: null,
     captureFiles: new Map(),
+    targetMaskFiles: new Map(),
+    targetMaskMetrics: new Map(),
     standardOutputFiles: new Map(),
     rasterComparisons: new Map(),
     sourceHash: null,
@@ -2739,6 +2953,8 @@ export function validateCorpusArtifacts({ bundleDirectory } = {}) {
     structuralVerdict,
     claimVerdict,
     captureCountRequired: CORPUS_CAPTURE_PLAN.length,
+    targetMaskCountRequired: CORPUS_TARGET_MASK_PLAN.length,
+    nativeReadbackCountRequired: CORPUS_CAPTURE_PLAN.length + CORPUS_TARGET_MASK_PLAN.length,
     physicalRouteRecordsRequired: CORPUS_PHYSICAL_ROUTE_PLAN.length,
     visualInvariantResultsRequired: CORPUS_VISUAL_INVARIANT_PLAN.length,
     structuralErrors: Object.freeze(structuralErrors),

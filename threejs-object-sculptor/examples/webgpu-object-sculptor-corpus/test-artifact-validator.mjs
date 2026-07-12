@@ -54,15 +54,23 @@ import {
   CORPUS_RESOURCE_PEAK_GATE_BYTES,
   CORPUS_SCULPT_SPEC_EVIDENCE,
   CORPUS_TIMING_GATES,
+  CORPUS_TARGET_MASK_GATES,
   CORPUS_VISUAL_INVARIANT_PLAN,
   REQUIRED_ACCEPTANCE_GATES,
   computeCorpusSourceProvenance,
+  computeCorpusTargetMaskMetricSource,
   computeCorpusTimingDeviceBinding,
   corpusRasterComparisonIdForInvariant,
   validateCorpusCorrectnessCaptureProfile,
   validateCorpusArtifacts,
 } from "./validate-artifacts.mjs";
 import { comparePngRgb, decodePngRaster } from "./png-raster.mjs";
+import {
+  CORPUS_TARGET_MASK_PLAN,
+  computeMaskedTierError,
+  computeNamedMotionOverlap,
+  computeNormalizedSymmetricBoundaryDistance,
+} from "./mask-raster.mjs";
 
 const LAB_ID = "webgpu-object-sculptor-corpus";
 const BUNDLE_ID = "bundle-fixture-0001";
@@ -80,6 +88,8 @@ const BACKEND = Object.freeze({
   threeRevision: "185",
   outputColorSpace: "srgb",
 });
+const FIXTURE_WIDTH = 24;
+const FIXTURE_HEIGHT = 24;
 const SOURCE_PROVENANCE = computeCorpusSourceProvenance();
 const RESOURCE_CATEGORIES = Object.freeze([
   "renderer",
@@ -179,20 +189,68 @@ function datum(value, unit, label, source) {
   return Object.freeze({ value, unit, label, source });
 }
 
+function subjectMaskSelected(subjectId, x, y) {
+  if (subjectId === "articulated-desk-lamp") return x >= 1 && x <= 5 && y >= 2 && y <= 21;
+  if (subjectId === "potted-bonsai") {
+    const canopy = (x - 12) ** 2 + (y - 6) ** 2 <= 30;
+    const trunk = x >= 11 && x <= 13 && y >= 6 && y <= 21;
+    return canopy || trunk;
+  }
+  const body = (x - 18) ** 2 + (y - 17) ** 2 <= 30;
+  const spout = x >= 9 && x <= 15 && y >= 13 && y <= 16;
+  return body || spout;
+}
+
+function movingMaskSelected(subjectId, time, x, y) {
+  const moved = time >= 2;
+  if (subjectId === "articulated-desk-lamp") return x >= (moved ? 7 : 3) && x <= (moved ? 11 : 7) && y >= 3 && y <= 7;
+  if (subjectId === "potted-bonsai") return x >= (moved ? 12 : 8) && x <= (moved ? 17 : 13) && y >= (moved ? 3 : 6) && y <= (moved ? 7 : 10);
+  return x >= 15 && x <= 21 && y >= (moved ? 8 : 11) && y <= (moved ? 10 : 13);
+}
+
+function targetMaskPixels(plan) {
+  const rgba = new Uint8Array(FIXTURE_WIDTH * FIXTURE_HEIGHT * 4);
+  let selectedPixels = 0;
+  for (let y = 0; y < FIXTURE_HEIGHT; y += 1) for (let x = 0; x < FIXTURE_WIDTH; x += 1) {
+    const selected = plan.maskKind === "subject-silhouette"
+      ? subjectMaskSelected(plan.subjectId, x, y)
+      : movingMaskSelected(plan.subjectId, plan.time, x, y);
+    const offset = (y * FIXTURE_WIDTH + x) * 4;
+    const value = selected ? 255 : 0;
+    rgba[offset] = value;
+    rgba[offset + 1] = value;
+    rgba[offset + 2] = value;
+    rgba[offset + 3] = 255;
+    selectedPixels += selected ? 1 : 0;
+  }
+  return Object.freeze({ rgba, selectedPixels });
+}
+
 function pixelBytesForState(state) {
-  const stableState = {
-    subjectId: state.subjectId,
-    mode: state.mode,
-    tier: state.tier,
-    camera: state.camera,
-    seed: state.seed,
-    time: state.time,
-  };
-  const digest = createHash("sha256").update(JSON.stringify(stableState)).digest();
-  return Uint8Array.of(
-    digest[0], digest[1], digest[2], 255,
-    digest[3] ^ 0x5a, digest[4] ^ 0xa5, digest[5] ^ 0x3c, 255,
-  );
+  const subjectIndex = SCULPT_TARGET_IDS.indexOf(state.subjectId);
+  const tierShift = { full: 0, budgeted: 2, minimum: 4 }[state.tier] ?? 0;
+  const modeShift = ["final", "blockout", "hierarchy", "materials", "action-ready"].indexOf(state.mode) * 9;
+  const cameraShift = ["design", "profile", "attachment", "close-material"].indexOf(state.camera) * 3;
+  const stressShift = state.seed === 0x9e3779b9 ? 48 : 0;
+  const rgba = new Uint8Array(FIXTURE_WIDTH * FIXTURE_HEIGHT * 4);
+  for (let y = 0; y < FIXTURE_HEIGHT; y += 1) for (let x = 0; x < FIXTURE_WIDTH; x += 1) {
+    const offset = (y * FIXTURE_WIDTH + x) * 4;
+    rgba[offset] = 12 + cameraShift;
+    rgba[offset + 1] = 18 + modeShift;
+    rgba[offset + 2] = 24 + subjectIndex * 4;
+    rgba[offset + 3] = 255;
+    if (subjectMaskSelected(state.subjectId, x, y)) {
+      rgba[offset] = Math.min(255, 70 + subjectIndex * 45 + tierShift + stressShift + modeShift);
+      rgba[offset + 1] = Math.min(255, 105 + subjectIndex * 25 + tierShift + stressShift);
+      rgba[offset + 2] = Math.min(255, 145 - subjectIndex * 20 + tierShift + stressShift + cameraShift);
+    }
+    if (state.mode === "action-ready" && movingMaskSelected(state.subjectId, state.time, x, y)) {
+      rgba[offset] = state.time >= 2 ? 245 : 35;
+      rgba[offset + 1] = state.time >= 2 ? 65 : 225;
+      rgba[offset + 2] = state.seed === 0x9e3779b9 ? 185 : 95;
+    }
+  }
+  return rgba;
 }
 
 function paddedRgbaBytes(packed, width, height) {
@@ -695,7 +753,7 @@ async function makeFixtureBundle() {
   const capturePixels = new Map();
   for (const planned of CORPUS_CAPTURE_PLAN) {
     const pixels = pixelBytesForState(planned.state);
-    const png = encodeRgbaPng({ width: 2, height: 1, data: pixels });
+    const png = encodeRgbaPng({ width: FIXTURE_WIDTH, height: FIXTURE_HEIGHT, data: pixels });
     writeFileSync(join(directory, planned.filename), png);
     captureFiles.set(planned.filename, fileReference(directory, planned.filename));
     capturePixels.set(planned.filename, pixels);
@@ -709,17 +767,17 @@ async function makeFixtureBundle() {
       filename: planned.filename,
       state: planned.state,
       target: "presentation",
-      width: 2,
-      height: 1,
+      width: FIXTURE_WIDTH,
+      height: FIXTURE_HEIGHT,
       bytesPerPixel: 4,
-      bytesPerRow: 8,
+      bytesPerRow: FIXTURE_WIDTH * 4,
       sourceBytesPerRow: 256,
-      sourceByteLength: 256,
-      transportByteLength: 8,
+      sourceByteLength: 256 * FIXTURE_HEIGHT,
+      transportByteLength: FIXTURE_WIDTH * FIXTURE_HEIGHT * 4,
       sourceLayout: "padded",
       format: "rgba8",
       colorEncoding: "srgb",
-      packedBytesPerRow: 8,
+      packedBytesPerRow: FIXTURE_WIDTH * 4,
       sourceRowStride: 256,
       outputColorSpace: "srgb",
       captureSource: "native-webgpu-render-target-readback",
@@ -728,8 +786,8 @@ async function makeFixtureBundle() {
         directory,
         planned.filename.replace(/\.png$/, ""),
         capturePixels.get(planned.filename),
-        2,
-        1,
+        FIXTURE_WIDTH,
+        FIXTURE_HEIGHT,
         captureFiles.get(planned.filename),
       ),
       runtimeState: {
@@ -769,6 +827,62 @@ async function makeFixtureBundle() {
     };
   });
   for (const capture of captures) capture.file = capture.pixelEvidence.png;
+  const targetMasks = CORPUS_TARGET_MASK_PLAN.map((plan, index) => {
+    const { rgba, selectedPixels } = targetMaskPixels(plan);
+    writeFileSync(join(directory, plan.filename), encodeRgbaPng({
+      width: FIXTURE_WIDTH,
+      height: FIXTURE_HEIGHT,
+      data: rgba,
+    }));
+    const pngReference = fileReference(directory, plan.filename);
+    const pixelEvidence = retainedPixelEvidence(
+      directory,
+      plan.filename.replace(/\.png$/, ""),
+      rgba,
+      FIXTURE_WIDTH,
+      FIXTURE_HEIGHT,
+      pngReference,
+    );
+    return {
+      ...plan,
+      target: "target-mask",
+      width: FIXTURE_WIDTH,
+      height: FIXTURE_HEIGHT,
+      bytesPerPixel: 4,
+      bytesPerRow: FIXTURE_WIDTH * 4,
+      sourceBytesPerRow: 256,
+      sourceByteLength: 256 * FIXTURE_HEIGHT,
+      transportByteLength: FIXTURE_WIDTH * FIXTURE_HEIGHT * 4,
+      sourceLayout: "padded",
+      format: "rgba8",
+      colorEncoding: "srgb",
+      packedBytesPerRow: FIXTURE_WIDTH * 4,
+      sourceRowStride: 256,
+      outputColorSpace: "srgb",
+      captureSource: "native-webgpu-render-target-readback",
+      semanticNodeIds: plan.maskKind === "named-moving-semantic-regions"
+        ? [`${plan.subjectId}-moving-root`]
+        : [],
+      selectedPixels,
+      file: pixelEvidence.png,
+      pixelEvidence,
+      runtimeState: {
+        subjectId: plan.subjectId,
+        mode: plan.mode,
+        tier: plan.tier,
+        camera: plan.camera,
+        seed: plan.seed,
+        time: plan.time,
+        backend: "webgpu",
+        nativeWebGPU: true,
+        initialized: true,
+        firstFrameCompleted: true,
+        renderSubmissions: captures.length + index + 2,
+        completedFrames: captures.length + index + 2,
+        lastFrameError: null,
+      },
+    };
+  });
   const rasterComparisons = computeCorpusRasterComparisons((filename) => readFileSync(join(directory, filename)));
   const rasterComparisonById = new Map(rasterComparisons.map((comparison) => [comparison.id, comparison]));
 
@@ -971,8 +1085,8 @@ async function makeFixtureBundle() {
       },
     };
   });
-  const writtenCaptures = captures.map((capture) => ({
-    target: "presentation",
+  const writtenCaptures = [...captures, ...targetMasks].map((capture) => ({
+    target: capture.target,
     width: capture.width,
     height: capture.height,
     bytesPerPixel: 4,
@@ -1105,6 +1219,12 @@ async function makeFixtureBundle() {
     recordArtifactWrite(capture.pixelEvidence.normalized.rawArtifact.path, "writeCapture-normalized");
     recordArtifactWrite(capture.pixelEvidence.normalized.packedArtifact.path, "hook-artifact");
   }
+  for (const mask of targetMasks) {
+    recordArtifactWrite(mask.pixelEvidence.png.path, "writeCapture-png");
+    recordArtifactWrite(mask.pixelEvidence.transport.rawArtifact.path, "writeCapture-transport");
+    recordArtifactWrite(mask.pixelEvidence.normalized.rawArtifact.path, "writeCapture-normalized");
+    recordArtifactWrite(mask.pixelEvidence.normalized.packedArtifact.path, "hook-artifact");
+  }
   for (const output of standardOutputs) {
     if (output.status !== "CAPTURED") continue;
     recordArtifactWrite(output.pixelEvidence.png.path, "hook-artifact");
@@ -1122,7 +1242,7 @@ async function makeFixtureBundle() {
     buildRevision: SOURCE_PROVENANCE.buildRevision,
     threeRevision: SOURCE_PROVENANCE.threeRevision,
     profile: "contract-fixture",
-    profileConfig: { width: 2, height: 1, dpr: 1 },
+    profileConfig: { width: FIXTURE_WIDTH, height: FIXTURE_HEIGHT, dpr: 1 },
     automationSurface: "playwright-headless-chromium",
     adapterClass: "hardware",
     adapterIdentity: {
@@ -1195,6 +1315,8 @@ async function makeFixtureBundle() {
       schemaVersion: 2,
       evidenceRunId: RUN_BINDINGS.correctness,
       captures,
+      targetMaskPlan: CORPUS_TARGET_MASK_PLAN,
+      targetMasks,
       tierContracts,
       backendProof: {
         backend: "webgpu",
@@ -1318,19 +1440,72 @@ async function makeFixtureBundle() {
   };
   writeJson(directory, "visual-reviews.json", visualReviews);
 
+  const presentationRaster = (filename) => ({
+    ...captureFiles.get(filename),
+    decoded: decodePngRaster(readFileSync(join(directory, filename))),
+  });
+  const targetMaskRaster = (filename) => {
+    const mask = targetMasks.find((candidate) => candidate.filename === filename);
+    assert(mask, `missing fixture target mask ${filename}`);
+    return {
+      path: mask.file.path,
+      sha256: mask.file.sha256,
+      decoded: decodePngRaster(readFileSync(join(directory, filename))),
+    };
+  };
+  const targetMaskMetricByInvariant = new Map();
+  const recordTargetMaskMetric = (id, measured, field, files) => {
+    targetMaskMetricByInvariant.set(id, {
+      value: measured[field],
+      source: computeCorpusTargetMaskMetricSource(measured.metric, field, files),
+      details: measured,
+    });
+  };
+  for (const subjectId of SCULPT_TARGET_IDS) {
+    const fullImage = presentationRaster(`${subjectId}.final.full.design.png`);
+    const fullMask = targetMaskRaster(`${subjectId}.final.full.target-mask.png`);
+    for (const tier of ["budgeted", "minimum"]) {
+      const candidateImage = presentationRaster(`${subjectId}.final.${tier}.design.png`);
+      const candidateMask = targetMaskRaster(`${subjectId}.final.${tier}.target-mask.png`);
+      const measured = computeMaskedTierError(fullImage.decoded, candidateImage.decoded, fullMask.decoded, candidateMask.decoded);
+      recordTargetMaskMetric(`tier-visual-error:${subjectId}:${tier}`, measured, "maskedP95", [fullImage, candidateImage, fullMask, candidateMask]);
+    }
+    const startImage = presentationRaster(`${subjectId}.action-ready.full.design.t000.png`);
+    const endImage = presentationRaster(`${subjectId}.action-ready.full.design.t200.png`);
+    const startMask = targetMaskRaster(`${subjectId}.action-ready.full.design.t000.target-mask.png`);
+    const endMask = targetMaskRaster(`${subjectId}.action-ready.full.design.t200.target-mask.png`);
+    const measured = computeNamedMotionOverlap(startImage.decoded, endImage.decoded, startMask.decoded, endMask.decoded);
+    assert(measured.namedRegionChangedRatio >= CORPUS_TARGET_MASK_GATES.motionNamedRegionChangedRatioMinimum);
+    assert(measured.changedPixelOverlapRatio >= CORPUS_TARGET_MASK_GATES.motionChangedPixelOverlapRatioMinimum);
+    recordTargetMaskMetric(`action-motion-delta:${subjectId}`, measured, "rgbMaeCodeValues", [startImage, endImage, startMask, endMask]);
+  }
+  for (let left = 0; left < SCULPT_TARGET_IDS.length; left += 1) for (let right = left + 1; right < SCULPT_TARGET_IDS.length; right += 1) {
+    const leftId = SCULPT_TARGET_IDS[left];
+    const rightId = SCULPT_TARGET_IDS[right];
+    const leftMask = targetMaskRaster(`${leftId}.final.full.target-mask.png`);
+    const rightMask = targetMaskRaster(`${rightId}.final.full.target-mask.png`);
+    const measured = computeNormalizedSymmetricBoundaryDistance(leftMask.decoded, rightMask.decoded);
+    recordTargetMaskMetric(`subject-distinctness:${leftId}:${rightId}`, measured, "normalizedDistance", [leftMask, rightMask]);
+  }
+
   const visualErrors = {
     ...commonDocument(RUN_BINDINGS.correctness),
     contractId: visualContract.contractId,
     results: CORPUS_VISUAL_INVARIANT_PLAN.map((invariant, index) => {
       const contract = visualContract.invariants[index];
       const rasterComparisonId = corpusRasterComparisonIdForInvariant(invariant.id);
-      const measurement = rasterComparisonId !== null
+      const targetMaskMetric = targetMaskMetricByInvariant.get(invariant.id);
+      const measurement = targetMaskMetric
+        ? targetMaskMetric.value
+        : rasterComparisonId !== null
         ? rasterComparisonById.get(rasterComparisonId).rgbMaeCodeValues
         : invariant.comparison === "lte"
           ? 0.2
           : (invariant.unit === "score" ? 0.9 : 0.5);
       const measurementSource = invariant.id.startsWith("final-authored-contract:")
         ? `AI-review:${invariant.id.split(":")[1]}:final-authored-contract`
+        : targetMaskMetric
+          ? targetMaskMetric.source
         : rasterComparisonId !== null
           ? `capture-session.rasterComparisons:${rasterComparisonId}:rgbMaeCodeValues`
           : `fixture measurement for ${invariant.id}`;
@@ -1999,6 +2174,16 @@ async function makeFixtureBundle() {
       state: planned.state,
       file: captureFiles.get(planned.filename),
     })),
+    targetMasks: targetMasks.map((mask) => ({
+      id: mask.id,
+      filename: mask.filename,
+      subjectId: mask.subjectId,
+      maskKind: mask.maskKind,
+      sourceCaptureFilename: mask.sourceCaptureFilename,
+      semanticNodeIds: mask.semanticNodeIds,
+      selectedPixels: mask.selectedPixels,
+      file: { path: mask.file.path, sha256: mask.file.sha256 },
+    })),
     standardOutputs: standardOutputs.map((output) => ({
       id: output.id,
       status: output.status,
@@ -2089,6 +2274,8 @@ assert(contractFixture.structuralErrors.every((error) => (
 )), contractFixture.structuralErrors.join("\n"));
 assert.equal(contractFixture.evidenceErrors.length, 0, contractFixture.evidenceErrors.join("\n"));
 assert.equal(contractFixture.captureCountRequired, CORPUS_CAPTURE_PLAN.length);
+assert.equal(contractFixture.targetMaskCountRequired, CORPUS_TARGET_MASK_PLAN.length);
+assert.equal(contractFixture.nativeReadbackCountRequired, CORPUS_CAPTURE_PLAN.length + CORPUS_TARGET_MASK_PLAN.length);
 assert.equal(contractFixture.physicalRouteRecordsRequired, 15);
 
 let adversarialMutationCount = 0;
@@ -2247,10 +2434,35 @@ mutateJson("capture-session.json", (document) => {
   tierCapture.identityEvidence.instanceGeneration += 1;
   return document;
 }, /tier transition did not preserve/);
+mutateJson("capture-session.json", (document) => {
+  document.hookResult.targetMaskPlan.pop();
+  return document;
+}, /target-mask plan drifted/);
+mutateJson("capture-session.json", (document) => {
+  document.hookResult.targetMasks[0].selectedPixels += 1;
+  return document;
+}, /selectedPixels does not equal the decoded binary population/);
+mutateJson("capture-session.json", (document) => {
+  document.hookResult.targetMasks[0].semanticNodeIds.push("forged-moving-root");
+  return document;
+}, /subject silhouette must not claim moving semantic nodes/);
+mutateJson("capture-session.json", (document) => {
+  const actionMask = document.hookResult.targetMasks.find(({ maskKind }) => maskKind === "named-moving-semantic-regions");
+  actionMask.semanticNodeIds = [];
+  return document;
+}, /semanticNodeIds must be a nonempty ID array/);
 mutateJson("evidence-manifest.json", (document) => {
   document.captureProvenance.profile = "performance";
   return document;
 }, /captureProvenance does not exactly bind/);
+mutateJson("evidence-manifest.json", (document) => {
+  document.targetMasks.pop();
+  return document;
+}, /must contain exactly 15 target-mask rows/);
+mutateJson("evidence-manifest.json", (document) => {
+  document.targetMasks[0].file = structuredClone(document.targetMasks[1].file);
+  return document;
+}, /does not match the canonical capture\/file reference/);
 mutateJson("visual-reviews.json", (document) => {
   document.reviews[0].aiVisionScore.value = 0.1;
   return document;
@@ -2270,7 +2482,20 @@ mutateJson("visual-error-results.json", (document) => {
 mutateJson("visual-error-results.json", (document) => {
   document.results.find(({ id }) => id === `action-motion-delta:${SCULPT_TARGET_IDS[0]}`).measurement.value = 0.5;
   return document;
-}, /measurement must equal the independently decoded PNG raster comparison/);
+}, /measurement must equal the validator-recomputed target-mask metric/);
+mutateJson("visual-error-results.json", (document) => {
+  document.results.find(({ id }) => id === `action-motion-delta:${SCULPT_TARGET_IDS[0]}`).measurement.source = "authored animation claim";
+  return document;
+}, /measurement source does not bind the validator algorithm and exact presentation\/mask hashes/);
+mutateJson("visual-error-results.json", (document) => {
+  document.results.find(({ id }) => id === `tier-visual-error:${SCULPT_TARGET_IDS[0]}:budgeted`).measurement.value = 0;
+  return document;
+}, /measurement must equal the validator-recomputed target-mask metric/);
+mutateJson("visual-error-results.json", (document) => {
+  const id = `subject-distinctness:${SCULPT_TARGET_IDS[0]}:${SCULPT_TARGET_IDS[1]}`;
+  document.results.find((result) => result.id === id).measurement.value = 1;
+  return document;
+}, /measurement must equal the validator-recomputed target-mask metric/);
 mutateJson("visual-error-results.json", (document) => ({
   schemaVersion: 2,
   labId: LAB_ID,
@@ -2457,6 +2682,19 @@ mutateJson("visual-reviews.json", (document) => {
 
 {
   adversarialMutationCount += 1;
+  const maskPath = join(fixture.directory, CORPUS_TARGET_MASK_PLAN[0].filename);
+  const original = readFileSync(maskPath);
+  const mutated = Buffer.from(original);
+  mutated[mutated.length - 1] ^= 1;
+  writeFileSync(maskPath, mutated);
+  const result = validateCorpusArtifacts({ bundleDirectory: fixture.directory });
+  assert.notEqual(result.claimVerdict, "PASS");
+  assert.match(result.structuralErrors.join("\n"), /sha256 does not match/);
+  writeFileSync(maskPath, original);
+}
+
+{
+  adversarialMutationCount += 1;
   const finalPath = join(fixture.directory, "final.design.png");
   const original = readFileSync(finalPath);
   writeFileSync(finalPath, encodeRgbaPng({
@@ -2517,13 +2755,15 @@ mutateJson("visual-reviews.json", (document) => {
   expectRouteRejection(aliasedRouteReadback, /normalized artifact path drifted|artifact paths alias/);
 }
 
-const EXPECTED_ADVERSARIAL_MUTATIONS = 80;
+const EXPECTED_ADVERSARIAL_MUTATIONS = 90;
 assert.equal(adversarialMutationCount, EXPECTED_ADVERSARIAL_MUTATIONS, "adversarial mutation inventory drifted; update the frozen count intentionally");
 
 console.log(JSON.stringify({
   ok: true,
   contractFixture: fixture.directory,
   captures: contractFixture.captureCountRequired,
+  targetMasks: contractFixture.targetMaskCountRequired,
+  nativeReadbacks: contractFixture.nativeReadbackCountRequired,
   physicalRoutes: contractFixture.physicalRouteRecordsRequired,
   visualInvariants: contractFixture.visualInvariantResultsRequired,
   adversarialMutations: adversarialMutationCount,
