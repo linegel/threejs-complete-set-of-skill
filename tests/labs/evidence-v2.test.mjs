@@ -3,6 +3,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -18,6 +19,16 @@ import {
 import {
   createUnifiedV2ContractFixtureManifest,
 } from '../../threejs-visual-validation/examples/webgpu-validation-harness/src/unified-v2-fixture.js';
+import {
+  createUnifiedReleaseBundleFixture,
+  fixtureImageBytes,
+  fixtureSha256,
+  readFixtureManifest,
+  rebindFixturePromotion,
+  rewriteBoundFixtureImage,
+  rewriteBoundFixtureJson,
+  writeFixtureManifest,
+} from './unified-release-fixture.mjs';
 
 const datum = (value, unit = 'count', source = 'fixture measurement') => ({
   value,
@@ -169,4 +180,102 @@ test('unified v2 schema mutations fail before an evidence claim can be consumed'
   const result = validateEvidenceBundle(directory);
   assert.equal(result.valid, false);
   assert(result.errors.some((error) => error.includes('unknown property browserLauncher')));
+});
+
+test('a fully materialized unified release bundle satisfies strict acceptance', () => {
+  const result = validateEvidenceBundle(createUnifiedReleaseBundleFixture(), {
+    requireRequiredClaimsPass: true,
+  });
+  assert.equal(result.valid, true, result.errors.join('\n'));
+  assert.equal(result.protocol, 'unified-v2');
+  assert.equal(result.canonicalAcceptanceEligible, true);
+});
+
+test('unified release validation rejects stale and rehashed normative bytes', () => {
+  const stale = createUnifiedReleaseBundleFixture();
+  const contractPath = join(stale, 'visual-contract.json');
+  writeFileSync(contractPath, Buffer.concat([readFileSync(contractPath), Buffer.from(' ')]));
+  const staleResult = validateEvidenceBundle(stale);
+  assert.equal(staleResult.valid, false);
+  assert(staleResult.errors.some((error) => error.includes('differs from its ledger')));
+
+  const rehashed = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(rehashed, 'visual-contract.json', (contract) => {
+    contract.unlabelledThreshold = 17;
+  });
+  const rehashedResult = validateEvidenceBundle(rehashed);
+  assert.equal(rehashedResult.valid, false);
+  assert(rehashedResult.errors.some((error) => error.includes('unlabelled numeric value')));
+});
+
+test('unified release validation decodes pixels and rejects flat or aliased evidence', () => {
+  const flat = createUnifiedReleaseBundleFixture();
+  const pixels = new Uint8Array(1200 * 800 * 4);
+  pixels.fill(255);
+  rewriteBoundFixtureImage(flat, 'final.design.png', encodeRgbaPng({
+    width: 1200,
+    height: 800,
+    data: pixels,
+  }));
+  const flatResult = validateEvidenceBundle(flat);
+  assert.equal(flatResult.valid, false);
+  assert(flatResult.errors.some((error) => error.includes('blank or effectively flat')));
+
+  const aliased = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureImage(aliased, 'diagnostics.mosaic.png', fixtureImageBytes(1));
+  const aliasedResult = validateEvidenceBundle(aliased);
+  assert.equal(aliasedResult.valid, false);
+  assert(aliasedResult.errors.some((error) => (
+    error.includes('identical hashes') || error.includes('does not differ materially')
+  )));
+});
+
+test('unified release validation rejects bad stride, timing attribution, and lifecycle depth', () => {
+  const badStride = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(badStride, 'render-targets.json', (targets) => {
+    targets.readbacks[0].bytesPerRow.value = 4800;
+  });
+  const strideResult = validateEvidenceBundle(badStride);
+  assert.equal(strideResult.valid, false);
+  assert(strideResult.errors.some((error) => error.includes('256-byte-aligned row stride')));
+
+  const cpuTiming = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(cpuTiming, 'frame-trace.json', (trace) => {
+    trace.summary.gpuP95.source = 'CPU wall-clock fixture';
+  });
+  const timingResult = validateEvidenceBundle(cpuTiming);
+  assert.equal(timingResult.valid, false);
+  assert(timingResult.errors.some((error) => error.includes('GPU p95 timestamp')));
+
+  const shortLifecycle = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(shortLifecycle, 'leak-loop.json', (loop) => {
+    loop.cycles.value = 49;
+  });
+  const lifecycleResult = validateEvidenceBundle(shortLifecycle);
+  assert.equal(lifecycleResult.valid, false);
+  assert(lifecycleResult.errors.some((error) => error.includes('at least 50 measured lifecycle cycles')));
+});
+
+test('unified release validation confines captured file realpaths', () => {
+  const directory = createUnifiedReleaseBundleFixture();
+  const outside = mkdtempSync(join(tmpdir(), 'threejs-unified-release-outside-'));
+  const outsidePath = join(outside, 'escaped.json');
+  const outsideBytes = Buffer.from('{"escaped":true}\n');
+  writeFileSync(outsidePath, outsideBytes);
+  symlinkSync(outsidePath, join(directory, 'escaped.json'));
+
+  const manifest = readFixtureManifest(directory);
+  manifest.files.push({
+    path: 'escaped.json',
+    status: 'captured',
+    kind: 'supplementary-json',
+    sha256: fixtureSha256(outsideBytes),
+    byteLength: outsideBytes.byteLength,
+  });
+  rebindFixturePromotion(manifest);
+  writeFixtureManifest(directory, manifest);
+
+  const result = validateEvidenceBundle(directory);
+  assert.equal(result.valid, false);
+  assert(result.errors.some((error) => error.includes('realpath escapes its bundle')));
 });
