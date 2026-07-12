@@ -4,7 +4,10 @@ export const FROST_CAPTURE_RECIPE_SCHEMA_VERSION = 1;
 const EXPECTED_RECIPE_IDS = Object.freeze([
   "final.design",
   "no-post.design",
-  "diagnostics.mosaic",
+  "diagnostic.previous-history-ra",
+  "diagnostic.deposit-ra",
+  "diagnostic.next-history-ra",
+  "diagnostic.frost-mask-after-pointer",
   "camera.near",
   "camera.design",
   "camera.far",
@@ -13,7 +16,14 @@ const EXPECTED_RECIPE_IDS = Object.freeze([
   "temporal.t000",
   "temporal.t001",
 ]);
-const CAPTURE_TARGETS = Object.freeze(["final", "scene-color", "diagnostic-mosaic"]);
+const CAPTURE_TARGETS = Object.freeze([
+  "final",
+  "scene-color",
+  "previous-history-ra",
+  "deposit-ra",
+  "next-history-ra",
+  "frost-mask-after-pointer",
+]);
 const CAMERAS = Object.freeze(["near", "design", "far"]);
 const TRANSACTION = Object.freeze({
   owner: "webgpu-touch-history-frost",
@@ -47,6 +57,13 @@ export const FROST_DIAGNOSTIC_RECIPE_MODES = Object.freeze([
   "frost-mask-after-pointer",
 ]);
 
+const DIAGNOSTIC_RECIPE_IDS = Object.freeze([
+  "diagnostic.previous-history-ra",
+  "diagnostic.deposit-ra",
+  "diagnostic.next-history-ra",
+  "diagnostic.frost-mask-after-pointer",
+]);
+
 function recipe(id, target, overrides = {}) {
   const initialTrace = overrides.initialTrace ?? overrides.trace ?? BASE_TRACE;
   const temporalTrace = overrides.temporalTrace ?? [];
@@ -68,7 +85,7 @@ function recipe(id, target, overrides = {}) {
     temporalTraceLength: temporalTrace.length,
     expectedTimeSeconds: trace.reduce((sum, step) => sum + step.deltaSeconds, 0),
     historySource: "real pointer segments submitted through the storage-texture compute history update",
-    diagnosticModes: target === "diagnostic-mosaic" ? FROST_DIAGNOSTIC_RECIPE_MODES : Object.freeze([]),
+    diagnosticModes: id.startsWith("diagnostic.") ? Object.freeze([target]) : Object.freeze([]),
     transaction: TRANSACTION,
   });
 }
@@ -76,7 +93,10 @@ function recipe(id, target, overrides = {}) {
 const RECIPES = Object.freeze([
   recipe("final.design", "final"),
   recipe("no-post.design", "scene-color"),
-  recipe("diagnostics.mosaic", "diagnostic-mosaic"),
+  recipe("diagnostic.previous-history-ra", "previous-history-ra"),
+  recipe("diagnostic.deposit-ra", "deposit-ra"),
+  recipe("diagnostic.next-history-ra", "next-history-ra"),
+  recipe("diagnostic.frost-mask-after-pointer", "frost-mask-after-pointer"),
   recipe("camera.near", "final", { camera: "near", trace: CAMERA_TRACE }),
   recipe("camera.design", "final", { trace: CAMERA_TRACE }),
   recipe("camera.far", "final", { camera: "far", trace: CAMERA_TRACE }),
@@ -91,6 +111,13 @@ if (RECIPE_BY_ID.size !== RECIPES.length) throw new Error("frost capture recipe 
 
 export const FROST_CAPTURE_RECIPES = RECIPES;
 export const FROST_CAPTURE_RECIPE_IDS = Object.freeze(RECIPES.map(({ id }) => id));
+export const FROST_STANDARD_OUTPUT_PLAN = Object.freeze([
+  Object.freeze({ id: "final.design", filename: "final.design.png", kind: "direct", recipeIds: Object.freeze(["final.design"]) }),
+  Object.freeze({ id: "no-post.design", filename: "no-post.design.png", kind: "direct", recipeIds: Object.freeze(["no-post.design"]) }),
+  Object.freeze({ id: "diagnostics.mosaic", filename: "diagnostics.mosaic.png", kind: "derived-mosaic", recipeIds: DIAGNOSTIC_RECIPE_IDS }),
+  ...["camera.near", "camera.design", "camera.far", "seed-0001.final", "seed-9e3779b9.final", "temporal.t000", "temporal.t001"]
+    .map((id) => Object.freeze({ id, filename: `${id}.png`, kind: "direct", recipeIds: Object.freeze([id]) })),
+]);
 
 function requireExactKeys(value, expected, label) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError(`${label} must be an object`);
@@ -141,7 +168,9 @@ function recipeSemanticSignature(recipeDefinition) {
 
 export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { requireFrozen = recipes === FROST_CAPTURE_RECIPES } = {}) {
   if (!Array.isArray(recipes)) throw new TypeError("frost capture recipes must be an array");
-  if (recipes.length !== EXPECTED_RECIPE_IDS.length) throw new Error("frost capture recipes must cover all ten standard outputs");
+  if (recipes.length !== EXPECTED_RECIPE_IDS.length) {
+    throw new Error("frost capture recipes must cover nine direct standard outputs and four diagnostic components");
+  }
   const ids = recipes.map(({ id }) => id);
   if (JSON.stringify(ids) !== JSON.stringify(EXPECTED_RECIPE_IDS)) {
     throw new Error(`frost capture recipe order ${ids.join(",")} does not match the standard output order`);
@@ -185,7 +214,7 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
       || entry.transaction.parentRouteMutationAllowed !== false) {
       throw new Error(`${label} transaction contract drifted`);
     }
-    const expectedDiagnostics = entry.target === "diagnostic-mosaic" ? FROST_DIAGNOSTIC_RECIPE_MODES : [];
+    const expectedDiagnostics = entry.id.startsWith("diagnostic.") ? [entry.target] : [];
     if (JSON.stringify(entry.diagnosticModes) !== JSON.stringify(expectedDiagnostics)) {
       throw new Error(`${label} diagnostic source modes drifted`);
     }
@@ -216,7 +245,36 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
   if (seedBaseline.seed === seedStress.seed) {
     throw new Error("fixed-seed recipes must declare distinct uint32 seeds");
   }
+  const diagnosticTargets = DIAGNOSTIC_RECIPE_IDS.map((id) => byId.get(id)?.target);
+  if (JSON.stringify(diagnosticTargets) !== JSON.stringify(FROST_DIAGNOSTIC_RECIPE_MODES)) {
+    throw new Error("diagnostic component recipes must preserve the four-source mosaic order");
+  }
   if (requireFrozen) requireDeepFrozen(recipes, "frost capture recipe table");
+  return true;
+}
+
+export function validateFrostStandardOutputPlan(
+  plan = FROST_STANDARD_OUTPUT_PLAN,
+  { requireFrozen = plan === FROST_STANDARD_OUTPUT_PLAN } = {},
+) {
+  if (!Array.isArray(plan) || plan.length !== 10) throw new Error("Frost standard output plan must contain ten outputs");
+  const filenames = plan.map((entry) => entry.filename);
+  if (new Set(filenames).size !== filenames.length) throw new Error("Frost standard output filenames must be unique");
+  for (const entry of plan) {
+    requireExactKeys(entry, ["id", "filename", "kind", "recipeIds"], `Frost standard output ${entry?.id}`);
+    if (entry.filename !== `${entry.id}.png`) throw new Error(`Frost standard output ${entry.id} filename drifted`);
+    if (!new Set(["direct", "derived-mosaic"]).has(entry.kind)) throw new Error(`Frost standard output ${entry.id} kind drifted`);
+    if (!Array.isArray(entry.recipeIds) || entry.recipeIds.length === 0) throw new Error(`Frost standard output ${entry.id} has no recipes`);
+    for (const recipeId of entry.recipeIds) {
+      if (!RECIPE_BY_ID.has(recipeId)) throw new Error(`Frost standard output ${entry.id} references unknown recipe ${recipeId}`);
+    }
+    if (entry.kind === "direct" && entry.recipeIds.length !== 1) throw new Error(`Frost direct output ${entry.id} must bind one recipe`);
+    if (entry.kind === "derived-mosaic" && JSON.stringify(entry.recipeIds) !== JSON.stringify(DIAGNOSTIC_RECIPE_IDS)) {
+      throw new Error("Frost diagnostics mosaic must bind all four ordered component recipes");
+    }
+    if (requireFrozen) requireDeepFrozen(entry, `Frost standard output ${entry.id}`);
+  }
+  if (requireFrozen) requireDeepFrozen(plan, "Frost standard output plan");
   return true;
 }
 
@@ -227,3 +285,4 @@ export function resolveFrostCaptureRecipe(id) {
 }
 
 validateFrostCaptureRecipes();
+validateFrostStandardOutputPlan();

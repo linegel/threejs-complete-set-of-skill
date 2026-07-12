@@ -4,8 +4,10 @@ import {
   FROST_CAPTURE_RECIPES,
   FROST_CAPTURE_RECIPE_IDS,
   FROST_DIAGNOSTIC_RECIPE_MODES,
+  FROST_STANDARD_OUTPUT_PLAN,
   resolveFrostCaptureRecipe,
   validateFrostCaptureRecipes,
+  validateFrostStandardOutputPlan,
 } from "./capture-recipes.js";
 
 function mutableRecipes() {
@@ -13,10 +15,14 @@ function mutableRecipes() {
 }
 
 assert.equal(validateFrostCaptureRecipes(), true);
+assert.equal(validateFrostStandardOutputPlan(), true);
 assert.deepEqual(FROST_CAPTURE_RECIPE_IDS, [
   "final.design",
   "no-post.design",
-  "diagnostics.mosaic",
+  "diagnostic.previous-history-ra",
+  "diagnostic.deposit-ra",
+  "diagnostic.next-history-ra",
+  "diagnostic.frost-mask-after-pointer",
   "camera.near",
   "camera.design",
   "camera.far",
@@ -27,8 +33,16 @@ assert.deepEqual(FROST_CAPTURE_RECIPE_IDS, [
 ]);
 assert.equal(Object.isFrozen(FROST_CAPTURE_RECIPES), true);
 assert.equal(Object.isFrozen(resolveFrostCaptureRecipe("final.design").trace[0].start), true);
-assert.deepEqual(resolveFrostCaptureRecipe("diagnostics.mosaic").diagnosticModes, FROST_DIAGNOSTIC_RECIPE_MODES);
-assert.equal(resolveFrostCaptureRecipe("diagnostics.mosaic").target, "diagnostic-mosaic");
+assert.deepEqual(
+  FROST_CAPTURE_RECIPE_IDS.slice(2, 6).map((id) => resolveFrostCaptureRecipe(id).target),
+  FROST_DIAGNOSTIC_RECIPE_MODES,
+);
+assert.deepEqual(FROST_STANDARD_OUTPUT_PLAN[2], {
+  id: "diagnostics.mosaic",
+  filename: "diagnostics.mosaic.png",
+  kind: "derived-mosaic",
+  recipeIds: FROST_CAPTURE_RECIPE_IDS.slice(2, 6),
+});
 assert.equal(resolveFrostCaptureRecipe("no-post.design").target, "scene-color");
 assert.equal(resolveFrostCaptureRecipe("final.design").mechanism, "refraction-and-fresnel");
 assert.equal(resolveFrostCaptureRecipe("final.design").tier, "balanced");
@@ -61,26 +75,26 @@ for (const [name, mutate, pattern] of [
   ["automatic-parent-mutation", (recipes) => { recipes[0].transaction.parentRouteMutationAllowed = true; }, /transaction contract drifted/],
   ["diagnostic-source-loss", (recipes) => { recipes[2].diagnosticModes.pop(); }, /diagnostic source modes drifted/],
   ["temporal-extra-step", (recipes) => {
-    recipes[9].trace.push(structuredClone(recipes[9].trace.at(-1)));
-    recipes[9].temporalTraceLength += 1;
-    recipes[9].expectedTimeSeconds += 1 / 60;
+    recipes[12].trace.push(structuredClone(recipes[12].trace.at(-1)));
+    recipes[12].temporalTraceLength += 1;
+    recipes[12].expectedTimeSeconds += 1 / 60;
   }, /exactly one authored temporal step/],
   ["semantic-duplicate", (recipes) => {
-    recipes[4].target = recipes[0].target;
-    recipes[4].camera = recipes[0].camera;
-    recipes[4].seed = recipes[0].seed;
-    recipes[4].trace = structuredClone(recipes[0].trace);
-    recipes[4].initialTraceLength = recipes[0].initialTraceLength;
-    recipes[4].temporalTraceLength = recipes[0].temporalTraceLength;
-    recipes[4].expectedTimeSeconds = recipes[0].expectedTimeSeconds;
+    recipes[7].target = recipes[0].target;
+    recipes[7].camera = recipes[0].camera;
+    recipes[7].seed = recipes[0].seed;
+    recipes[7].trace = structuredClone(recipes[0].trace);
+    recipes[7].initialTraceLength = recipes[0].initialTraceLength;
+    recipes[7].temporalTraceLength = recipes[0].temporalTraceLength;
+    recipes[7].expectedTimeSeconds = recipes[0].expectedTimeSeconds;
   }, /semantically duplicates/],
   ["camera-trace-confound", (recipes) => {
-    recipes[4].trace = structuredClone(recipes[4].trace);
-    recipes[4].trace[0].pressure = 0.5;
-  }, /camera recipes must share the exact authored pointer trace/],
-  ["seed-trace-confound", (recipes) => {
     recipes[7].trace = structuredClone(recipes[7].trace);
     recipes[7].trace[0].pressure = 0.5;
+  }, /camera recipes must share the exact authored pointer trace/],
+  ["seed-trace-confound", (recipes) => {
+    recipes[10].trace = structuredClone(recipes[10].trace);
+    recipes[10].trace[0].pressure = 0.5;
   }, /fixed-seed recipes must isolate seed/],
 ]) {
   const recipes = mutableRecipes();
@@ -91,5 +105,12 @@ for (const [name, mutate, pattern] of [
     `${name} mutation must fail`,
   );
 }
+
+const outputPlanMutation = structuredClone(FROST_STANDARD_OUTPUT_PLAN);
+outputPlanMutation[2].recipeIds.pop();
+assert.throws(
+  () => validateFrostStandardOutputPlan(outputPlanMutation, { requireFrozen: false }),
+  /bind all four ordered component recipes/,
+);
 
 console.log("frost capture recipe contract passed");
