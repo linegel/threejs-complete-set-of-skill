@@ -31,8 +31,6 @@ export const HARDWARE_PERFORMANCE_ROUTE_PLAN = Object.freeze( [
 	planRecord( 'tier', 'governor-stress' )
 ] );
 
-export const CORRECTNESS_ROUTE_PLAN = Object.freeze( PHYSICAL_ROUTE_PLAN.filter( ( route ) => route.runtimeProfile === 'correctness' ) );
-
 export const HARDWARE_PERFORMANCE_CONTRACT = Object.freeze( {
 	viewport: Object.freeze( {
 		width: numericDatum( 1920, 'pixel', 'Gated', 'hardware performance capture contract' ),
@@ -49,4 +47,3 @@ export const HARDWARE_PERFORMANCE_CONTRACT = Object.freeze( {
 } );
 
 if ( PHYSICAL_ROUTE_PLAN.length !== 19 ) throw new Error( `Physical evidence plan must contain exactly 19 routes; received ${ PHYSICAL_ROUTE_PLAN.length }.` );
-if ( CORRECTNESS_ROUTE_PLAN.length !== 14 ) throw new Error( `Correctness evidence plan must contain exactly 14 timestamp-free routes; received ${ CORRECTNESS_ROUTE_PLAN.length }.` );

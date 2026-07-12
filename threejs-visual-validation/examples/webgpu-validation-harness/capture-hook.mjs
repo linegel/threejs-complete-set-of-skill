@@ -19,8 +19,6 @@ import {
 } from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
-const GOVERNOR_MEAN_VISUAL_ERROR_GATE = 8;
-const GOVERNOR_EDGE_P95_VISUAL_ERROR_GATE = 32;
 export { DIAGNOSTIC_MOSAIC_RECIPE, DIAGNOSTIC_MOSAIC_SOURCES };
 
 export const outputPlan = Object.freeze( [
@@ -218,9 +216,20 @@ export function derivedMosaicCaptureRecord( mosaicOutput ) {
 
 }
 
+export function assertCanonicalCaptureLane( session ) {
+
+	if ( session?.profile !== 'correctness' || session?.automationSurface !== 'playwright-headless-chromium' ) {
+
+		throw new Error( 'Deterministic correctness capture requires the shared Playwright headless Chromium runner; physical-route and performance evidence use the immutable Codex in-app Browser runner.' );
+
+	}
+	return true;
+
+}
+
 export async function captureLab( session ) {
 
-	if ( session.automationSurface !== 'codex-in-app-browser' ) throw new Error( 'Canonical capture requires the immutable Codex in-app Browser evidence surface; external browser launchers are nonpublishable.' );
+	assertCanonicalCaptureLane( session );
 	const sourceClosure = computeCaptureSourceClosure();
 	const captures = [];
 	await session.controllerCall( 'setScenario', 'browser-capture' );
@@ -276,42 +285,11 @@ export async function captureLab( session ) {
 	const odd = await captureAndWrite( session, captures, 'odd-size.final.png', 'final' );
 	if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
 
-	let performanceTrace = null;
-	let governorTrace = null;
-	if ( session.profile === 'performance' ) {
-
-		await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
-		await session.controllerCall( 'setTier', 'target-performance' );
-		await session.controllerCall( 'setCamera', 'design' );
-		await session.controllerCall( 'setSeed', 0x00000001 );
-		await session.controllerCall( 'setTime', 0 );
-		await captureAndWrite( session, captures, 'final.performance.png', 'final' );
-		performanceTrace = await session.controllerCall( 'runPerformanceProfile', {
-			warmupFrames: 30,
-			sampleFrames: 120,
-			presentationFrames: 120
-		} );
-		governorTrace = await session.controllerCall( 'runGovernorStressProfile', {
-			windowCount: 6,
-			framesPerWindow: 30
-		} );
-		await session.controllerCall( 'setTier', 'target-performance' );
-		const targetTier = await captureAndWrite( session, captures, 'tier.target-performance.png', 'final' );
-		await session.controllerCall( 'setTier', 'governor-stress' );
-		const governorTier = await captureAndWrite( session, captures, 'tier.governor-stress.png', 'final' );
-		governorTrace.visualErrorByTier = {
-			'target-performance': tierVisualErrorMetrics( targetTier, targetTier ),
-			'governor-stress': tierVisualErrorMetrics( targetTier, governorTier )
-		};
-		governorTrace.visualErrorGates = {
-			meanRgbByteDifference: GOVERNOR_MEAN_VISUAL_ERROR_GATE,
-			edgeP95RgbByteDifference: GOVERNOR_EDGE_P95_VISUAL_ERROR_GATE
-		};
-
-	}
+	const performanceTrace = null;
+	const governorTrace = null;
 
 	await session.controllerCall( 'resize', session.profileConfig.width, session.profileConfig.height, session.profileConfig.dpr );
-	await session.controllerCall( 'setTier', session.profile === 'performance' ? 'target-performance' : 'webgpu-correctness' );
+	await session.controllerCall( 'setTier', 'webgpu-correctness' );
 	await session.controllerCall( 'setCamera', 'design' );
 	await session.controllerCall( 'setSeed', 0x00000001 );
 	await session.controllerCall( 'setTime', 0 );

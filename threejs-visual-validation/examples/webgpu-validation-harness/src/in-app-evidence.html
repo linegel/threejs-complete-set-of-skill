@@ -23,9 +23,8 @@
 <body>
 	<main>
 		<h1>Codex Browser evidence runner</h1>
-		<p>This surface only runs from an immutable production build in the Codex in-app Browser. It exports separate, incomplete correctness, physical-route, and performance session records for offline served-byte binding and validation; it does not promote evidence.</p>
+		<p>This surface only runs from an immutable production build in the Codex in-app Browser. It exports separate, incomplete physical-route and hardware-performance session records for offline served-byte binding and validation; deterministic correctness is captured by the shared Playwright runner.</p>
 		<div class="controls">
-			<button id="run-correctness" type="button">Run correctness lane</button>
 			<button id="run-routes" type="button">Run 19 physical routes</button>
 			<button id="run-performance" type="button">Run hardware performance profile</button>
 			<button id="download" type="button" disabled>Download current record</button>

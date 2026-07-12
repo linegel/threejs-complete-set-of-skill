@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { resolvePhysicalRuntimeProfile } from './physical-runtime-profile.js';
+import {
+	PLAYWRIGHT_CORRECTNESS_SURFACE,
+	resolvePhysicalRuntimeProfile
+} from './physical-runtime-profile.js';
 import { getRouteLock } from './route-locks.js';
 
 const SESSION_TOKEN = '0123456789abcdef0123456789abcdef';
@@ -50,7 +53,7 @@ test( 'performance route enables timestamps only in immutable in-app host', () =
 
 } );
 
-test( 'all evidence lanes reject WebDriver and non-Codex browser surfaces', () => {
+test( 'physical and performance lanes reject WebDriver and non-Codex browser surfaces', () => {
 
 	const routeLock = getRouteLock( 'tier', 'target-performance' );
 	assert.throws( () => resolvePhysicalRuntimeProfile( {
@@ -59,16 +62,30 @@ test( 'all evidence lanes reject WebDriver and non-Codex browser surfaces', () =
 		environment: environment( { webdriver: true } )
 	} ), /rejects WebDriver\/headless/ );
 	assert.throws( () => resolvePhysicalRuntimeProfile( {
-		parameters: new URLSearchParams(),
-		routeLock: null,
-		injectedProfile: { id: 'correctness', automationSurface: 'playwright-headless-chromium' },
-		environment: environment( { webdriver: true, parentIsSelf: true, parentHost: null } )
-	} ), /rejects WebDriver\/headless/ );
-	assert.throws( () => resolvePhysicalRuntimeProfile( {
 		parameters: new URLSearchParams( { profile: 'correctness', automationSurface: 'chrome' } ),
 		routeLock: null,
 		environment: environment( { parentHost: null } )
-	} ), /requires the immutable Codex in-app Browser/ );
+	} ), /requires the injected Playwright capture runner/ );
+
+} );
+
+test( 'deterministic correctness admits only the injected Playwright surface', () => {
+
+	const result = resolvePhysicalRuntimeProfile( {
+		parameters: new URLSearchParams( { profile: 'correctness' } ),
+		routeLock: getRouteLock( 'scenario', 'browser-capture' ),
+		injectedProfile: { id: 'correctness', labId: 'webgpu-validation-harness' },
+		environment: environment( { webdriver: true, parentIsSelf: true, parentHost: null } )
+	} );
+	assert.equal( result.runtimeProfile, 'correctness' );
+	assert.equal( result.automationSurface, PLAYWRIGHT_CORRECTNESS_SURFACE );
+	assert.equal( result.physicalSession, null );
+	assert.throws( () => resolvePhysicalRuntimeProfile( {
+		parameters: new URLSearchParams( { profile: 'correctness' } ),
+		routeLock: getRouteLock( 'scenario', 'browser-capture' ),
+		injectedProfile: { id: 'correctness' },
+		environment: environment( { webdriver: true, parentIsSelf: true, parentHost: null } )
+	} ), /requires the injected Playwright capture runner/ );
 
 } );
 

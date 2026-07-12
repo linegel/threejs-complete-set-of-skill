@@ -2,8 +2,13 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { numericDatum } from './physical-evidence-common.js';
-import { CORRECTNESS_ROUTE_PLAN, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
-import { hashPhysicalRecord, validateCorrectnessSession, validateHardwarePerformanceSession, validatePhysicalRouteSession } from './physical-session-validator.js';
+import { HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
+import {
+	hashPhysicalRecord,
+	validateCorrectnessCaptureSession,
+	validateHardwarePerformanceSession,
+	validatePhysicalRouteSession
+} from './physical-session-validator.js';
 
 const HASH_A = `sha256:${ 'a'.repeat( 64 ) }`;
 const HASH_B = `sha256:${ 'b'.repeat( 64 ) }`;
@@ -225,6 +230,93 @@ function performanceSession() {
 
 }
 
+const STANDARD_OUTPUTS = [
+	'final.design.png',
+	'no-post.design.png',
+	'diagnostics.mosaic.png',
+	'camera.near.png',
+	'camera.design.png',
+	'camera.far.png',
+	'seed-0001.final.png',
+	'seed-9e3779b9.final.png',
+	'temporal.t000.png',
+	'temporal.t001.png'
+];
+
+function correctnessCaptureSession() {
+
+	const normalizedBytesPerRow = 4864;
+	const outputWrites = STANDARD_OUTPUTS.map( ( path, index ) => ( {
+		sequence: index + 1,
+		path,
+		kind: 'hook-artifact',
+		contentBinding: 'sha256-byte-length-immutable-buffer-v1',
+		sha256: HASH_A,
+		byteLength: 64
+	} ) );
+	return {
+		schemaVersion: 2,
+		labId: 'webgpu-validation-harness',
+		sourceHash: HASH_A,
+		sourceClosureHash: HASH_A,
+		sourceClosure: { sourceHash: HASH_A, buildRevision: HASH_B, threeRevision: '0.185.1' },
+		buildRevision: HASH_B,
+		threeRevision: '0.185.1',
+		profile: 'correctness',
+		profileConfig: { width: 1200, height: 800, dpr: 1 },
+		automationSurface: 'playwright-headless-chromium',
+		adapterClass: 'hardware',
+		adapterIdentity: { vendor: 'Apple', device: 'M-series' },
+		browser: { automationSurface: 'playwright-headless-chromium', name: 'Chromium', platform: 'macOS' },
+		browserEntry: 'threejs-visual-validation/examples/webgpu-validation-harness/index.html',
+		url: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
+		finalUrl: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
+		route: {
+			requestedUrl: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
+			finalUrl: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
+			browserEntry: 'threejs-visual-validation/examples/webgpu-validation-harness/index.html',
+			manifestLabId: 'webgpu-validation-harness',
+			lockedState: { scenario: 'browser-capture', mode: 'final', tier: 'webgpu-correctness', camera: 'design' },
+			observedState: { scenario: 'browser-capture', mode: 'final', tier: 'webgpu-correctness', camera: 'design' },
+			finalState: { scenario: 'browser-capture', mode: 'final', tier: 'webgpu-correctness', camera: 'design' }
+		},
+		startedAt: '2026-07-12T09:00:00.000Z',
+		finishedAt: '2026-07-12T09:01:00.000Z',
+		runtime: { metrics: { nativeWebGPU: true, initialized: true, backend: 'webgpu' } },
+		outputPlan: STANDARD_OUTPUTS.map( ( filename ) => ( {
+			id: filename.slice( 0, -4 ),
+			status: 'CAPTURED',
+			filename,
+			artifact: { path: filename, sha256: HASH_A, byteLength: 64 }
+		} ) ),
+		writtenCaptures: [ {
+			width: 1200,
+			height: 800,
+			bytesPerPixel: 4,
+			bytesPerRow: 4800,
+			origin: 'top-left',
+			png: { path: 'final.design.png', sha256: HASH_A, byteLength: 64 },
+			transport: { artifact: { path: 'transport-readbacks/final.design.rgba8.bin', sha256: HASH_B, byteLength: 3840000 } },
+			normalized: {
+				origin: 'top-left',
+				bytesPerRow: normalizedBytesPerRow,
+				byteLength: normalizedBytesPerRow * 800,
+				artifact: { path: 'normalized-readbacks/final.design.rgba8.padded.bin', sha256: HASH_C, byteLength: normalizedBytesPerRow * 800 }
+			}
+		} ],
+		artifactWrites: [
+			...outputWrites,
+			{ sequence: 11, path: 'transport-readbacks/final.design.rgba8.bin', kind: 'writeCapture-transport', contentBinding: 'sha256-byte-length-immutable-buffer-v1', sha256: HASH_B, byteLength: 3840000 },
+			{ sequence: 12, path: 'normalized-readbacks/final.design.rgba8.padded.bin', kind: 'writeCapture-normalized', contentBinding: 'sha256-byte-length-immutable-buffer-v1', sha256: HASH_C, byteLength: normalizedBytesPerRow * 800 },
+			{ sequence: 13, path: 'capture-session.json', kind: 'capture-session-record', contentBinding: 'self-excluded-finalized-offline', sha256: null, byteLength: null }
+		],
+		pageErrors: [],
+		consoleErrors: [],
+		requestErrors: []
+	};
+
+}
+
 test( 'complete 19-route physical session passes strict validation', () => {
 
 	const session = baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN );
@@ -232,10 +324,19 @@ test( 'complete 19-route physical session passes strict validation', () => {
 
 } );
 
-test( 'complete correctness session uses the same immutable Codex Browser surface', () => {
+test( 'complete correctness session uses the shared Playwright capture surface', () => {
 
-	const session = baseSession( 'correctness', CORRECTNESS_ROUTE_PLAN );
-	assert.deepEqual( validateCorrectnessSession( session ), { valid: true, profile: 'correctness', routeCount: 14 } );
+	const session = correctnessCaptureSession();
+	assert.deepEqual( validateCorrectnessCaptureSession( session ), {
+		valid: true,
+		profile: 'correctness',
+		outputCount: 10,
+		captureCount: 1,
+		adapterClass: 'hardware'
+	} );
+	const crossed = structuredClone( session );
+	crossed.automationSurface = 'codex-in-app-browser';
+	assert.throws( () => validateCorrectnessCaptureSession( crossed ), /playwright-headless-chromium/ );
 
 } );
 

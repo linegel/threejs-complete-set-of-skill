@@ -62,15 +62,15 @@ function selfManifestFile() {
 
 function session( profile, rootRoute, sourceClosureHash, buildRevision ) {
 
-	const physical = true;
+	const physical = profile !== 'correctness';
 	const sessionId = `webgpu-validation-harness:${ profile }:release`;
 	return {
 		sessionId,
 		profile,
-		automationSurface: 'codex-in-app-browser',
+		automationSurface: physical ? 'codex-in-app-browser' : 'playwright-headless-chromium',
 		adapterClass: 'hardware',
-		adapterIdentity: { kind: 'gpu-adapter', digest: physical ? hash( 'physical-adapter' ) : hash( 'software-adapter' ) },
-		deviceIdentity: { kind: 'gpu-device', digest: physical ? hash( 'physical-device' ) : hash( 'software-device' ) },
+		adapterIdentity: { kind: 'gpu-adapter', digest: physical ? hash( 'physical-adapter' ) : hash( 'headless-hardware-adapter' ) },
+		deviceIdentity: { kind: 'gpu-device', digest: physical ? hash( 'physical-device' ) : hash( 'headless-hardware-device' ) },
 		browserIdentity: { kind: 'browser', digest: physical ? hash( 'physical-browser' ) : hash( 'headless-browser' ) },
 		osIdentity: { kind: 'operating-system', digest: physical ? hash( 'physical-os' ) : hash( 'headless-os' ) },
 		refreshIdentity: { kind: 'display-refresh', digest: physical ? hash( 'physical-refresh' ) : hash( 'headless-refresh' ) },
@@ -385,7 +385,7 @@ test( 'rejects missing, cross-lane, and swapped capture sessions', () => {
 	assert.match( messages( missing ), /missing the physical-route capture lane/ );
 
 	const crossed = releaseManifest();
-	crossed.captureSessions.find( ( entry ) => entry.profile === 'correctness' ).automationSurface = 'playwright-headless-chromium';
+	crossed.captureSessions.find( ( entry ) => entry.profile === 'correctness' ).automationSurface = 'codex-in-app-browser';
 	assert.match( messages( crossed ), /crosses capture lanes/ );
 
 	const swapped = releaseManifest();

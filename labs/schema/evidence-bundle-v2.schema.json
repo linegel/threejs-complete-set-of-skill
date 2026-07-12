@@ -371,7 +371,10 @@
           "type": "string",
           "enum": ["correctness", "physical-route", "performance"]
         },
-        "automationSurface": { "const": "codex-in-app-browser" },
+        "automationSurface": {
+          "type": "string",
+          "enum": ["playwright-headless-chromium", "codex-in-app-browser"]
+        },
         "adapterClass": { "$ref": "#/$defs/adapterClass" },
         "adapterIdentity": { "$ref": "#/$defs/adapterIdentityRef" },
         "deviceIdentity": { "$ref": "#/$defs/deviceIdentityRef" },
@@ -405,7 +408,7 @@
           },
           "then": {
             "properties": {
-              "automationSurface": { "const": "codex-in-app-browser" }
+              "automationSurface": { "const": "playwright-headless-chromium" }
             }
           }
         },
@@ -970,7 +973,7 @@
                 "required": ["profile", "automationSurface", "adapterClass"],
                 "properties": {
                   "profile": { "const": "correctness" },
-                  "automationSurface": { "const": "codex-in-app-browser" },
+                  "automationSurface": { "const": "playwright-headless-chromium" },
                   "adapterClass": { "const": "hardware" }
                 }
               },

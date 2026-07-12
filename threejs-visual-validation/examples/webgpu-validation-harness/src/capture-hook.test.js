@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+	assertCanonicalCaptureLane,
 	captureRecord,
 	derivedMosaicCaptureRecord,
 	DIAGNOSTIC_MOSAIC_RECIPE,
@@ -9,6 +10,14 @@ import {
 	reconstructDiagnosticMosaic,
 	tierVisualErrorMetrics
 } from '../capture-hook.mjs';
+
+test( 'canonical correctness capture is Playwright-only and cannot impersonate physical or performance evidence', () => {
+
+	assert.equal( assertCanonicalCaptureLane( { profile: 'correctness', automationSurface: 'playwright-headless-chromium' } ), true );
+	assert.throws( () => assertCanonicalCaptureLane( { profile: 'correctness', automationSurface: 'codex-in-app-browser' } ), /shared Playwright/ );
+	assert.throws( () => assertCanonicalCaptureLane( { profile: 'performance', automationSurface: 'playwright-headless-chromium' } ), /physical-route and performance/ );
+
+} );
 
 function solidReadback( width, height, rgba ) {
 

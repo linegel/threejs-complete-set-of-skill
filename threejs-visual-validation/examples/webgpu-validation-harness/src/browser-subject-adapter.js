@@ -5,6 +5,7 @@ import {
 	DirectionalLight,
 	FloatType,
 	HalfFloatType,
+	InspectorBase,
 	Mesh,
 	MeshStandardNodeMaterial,
 	NeutralToneMapping,
@@ -21,7 +22,7 @@ import {
 import { color, emissive, float, mrt, normalView, output, pass, renderOutput, vec4 } from 'three/tsl';
 
 import { unpackAlignedReadback } from './readback.js';
-import { buildValidationResourceLedger } from './resource-ledger.js';
+import { buildValidationResourceLedger, emptyValidationResourceLedger } from './resource-ledger.js';
 import { snapshotGpuAdapter, snapshotRendererInfo } from './renderer-info-snapshot.js';
 
 const SCENARIO_IDS = [
@@ -49,6 +50,129 @@ const CAMERAS = new Map( [
 	[ 'far', { position: [ 7.5, 5, 12 ], target: [ 0, 0.25, 0 ] } ]
 ] );
 const SEEDS = new Set( [ 0x00000001, 0x9e3779b9 ] );
+const RUNTIME_PROFILES = new Set( [ 'correctness', 'performance' ] );
+const MODE_OUTPUT_NODE_IDS = Object.freeze( {
+	final: 'final-output-node',
+	'no-post': 'no-post-output-node',
+	normal: 'normal-output-node',
+	emissive: 'emissive-output-node'
+} );
+let nextControllerGeneration = 1;
+let nextRendererDeviceGeneration = 1;
+
+export const timestampResolutionPolicy = Object.freeze( {
+	mappingCadence: 'once-per-batch',
+	maximumQueriesPerBatch: 2048,
+	contextsPerFrame: 2
+} );
+
+export function parseRenderTimestampUid( uid ) {
+
+	const match = typeof uid === 'string' ? uid.match( /^r:(\d+):(\d+):f(\d+)$/ ) : null;
+	if ( match === null ) throw new Error( `Render timestamp UID ${ String( uid ) } does not match Three r185 r:<frameCall>:<contextId>:f<frameId>.` );
+	return Object.freeze( {
+		uid,
+		frameCall: Number.parseInt( match[ 1 ], 10 ),
+		contextId: Number.parseInt( match[ 2 ], 10 ),
+		frameId: Number.parseInt( match[ 3 ], 10 )
+	} );
+
+}
+
+export function assertRendererBackendDeviceIdentity( requestedDevice, backendDevice ) {
+
+	if ( backendDevice === null || typeof backendDevice !== 'object' ) throw new Error( 'Initialized WebGPU backend did not expose its actual GPUDevice.' );
+	if ( requestedDevice === null || typeof requestedDevice !== 'object' || backendDevice !== requestedDevice ) throw new Error( 'Initialized WebGPU backend did not retain the exact requested GPUDevice.' );
+	return backendDevice;
+
+}
+
+export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } ) {
+
+	if ( Array.isArray( entries ) === false || entries.length === 0 ) throw new Error( 'Timestamp batch requires a nonempty explicit-stage population.' );
+	const frames = new Map();
+	const stageContextIds = new Map();
+	for ( const entry of entries ) {
+
+		const parsed = parseRenderTimestampUid( entry?.uid );
+		if ( entry.stage !== 'scene-mrt' && entry.stage !== 'final-output' ) throw new Error( `Timestamp UID ${ parsed.uid } has no inspected render stage.` );
+		if ( Number.isFinite( entry.durationMs ) === false || entry.durationMs < 0 ) throw new Error( `Timestamp UID ${ parsed.uid } has an invalid duration.` );
+		if ( stageContextIds.has( entry.stage ) === false ) stageContextIds.set( entry.stage, parsed.contextId );
+		if ( stageContextIds.get( entry.stage ) !== parsed.contextId ) throw new Error( `Timestamp stage ${ entry.stage } changed render-context identity within the batch.` );
+		if ( frames.has( parsed.frameId ) === false ) frames.set( parsed.frameId, new Map() );
+		const stages = frames.get( parsed.frameId );
+		if ( stages.has( entry.stage ) ) throw new Error( `Timestamp frame ${ parsed.frameId } duplicates stage ${ entry.stage }.` );
+		stages.set( entry.stage, { ...parsed, durationMs: entry.durationMs } );
+
+	}
+	if ( stageContextIds.size !== timestampResolutionPolicy.contextsPerFrame || stageContextIds.get( 'scene-mrt' ) === stageContextIds.get( 'final-output' ) ) throw new Error( 'Timestamp batch must bind two distinct stable render contexts to scene-mrt and final-output.' );
+	const frameIds = [ ...frames.keys() ].sort( ( left, right ) => left - right );
+	for ( let index = 1; index < frameIds.length; index ++ ) if ( frameIds[ index ] !== frameIds[ index - 1 ] + 1 ) throw new Error( 'Timestamp batch frame IDs must be contiguous.' );
+	const rows = frameIds.map( ( frameId ) => {
+
+		const stages = frames.get( frameId );
+		const scene = stages.get( 'scene-mrt' );
+		const output = stages.get( 'final-output' );
+		if ( ! scene || ! output || stages.size !== timestampResolutionPolicy.contextsPerFrame ) throw new Error( `Timestamp frame ${ frameId } must contain exactly one scene-mrt and one final-output stage.` );
+		return Object.freeze( {
+			frameId,
+			sceneUid: scene.uid,
+			outputUid: output.uid,
+			sceneMs: scene.durationMs,
+			outputMs: output.durationMs,
+			totalMs: scene.durationMs + output.durationMs,
+			residualMs: null,
+			totalProvenance: 'Derived',
+			independentPerFrameTotalAvailable: false
+		} );
+
+	} );
+	const stageSamples = {
+		'scene-mrt': rows.map( ( row ) => row.sceneMs ),
+		'final-output': rows.map( ( row ) => row.outputMs )
+	};
+	const totalSamples = rows.map( ( row ) => row.totalMs );
+	if ( Number.isFinite( resolvedLastFrameTotalMs ) === false || resolvedLastFrameTotalMs < 0 ) throw new Error( 'Timestamp batch has no finite resolved final-frame total.' );
+	return {
+		rows,
+		totalSamples,
+		stageSamples,
+		stageContextIds: Object.fromEntries( stageContextIds ),
+		resolveCount: 1,
+		lastFrameResolveResidualMs: Math.abs( resolvedLastFrameTotalMs - totalSamples.at( -1 ) ),
+		independentPerFrameTotalsAvailable: false,
+		reconciliationScope: 'Every frame is explicitly stage-bound and summed; Three r185 independently returns only the final-frame aggregate, checked separately.'
+	};
+
+}
+
+class ValidationTimestampInspector extends InspectorBase {
+
+	constructor( classifyStage ) {
+
+		super();
+		this.classifyStage = classifyStage;
+		this.renderStages = new Map();
+
+	}
+
+	beginRender( uid, scene, camera, renderTarget ) {
+
+		const stage = this.classifyStage( { uid, scene, camera, renderTarget } );
+		if ( stage === null ) throw new Error( `Unclassified render context ${ uid } entered the validation timestamp population.` );
+		const existing = this.renderStages.get( uid );
+		if ( existing !== undefined && existing !== stage ) throw new Error( `Render context ${ uid } changed stage identity.` );
+		this.renderStages.set( uid, stage );
+
+	}
+
+	stageFor( uid ) {
+
+		return this.renderStages.get( uid ) ?? null;
+
+	}
+
+}
 
 function requireKnown( collection, value, label ) {
 
@@ -101,6 +225,12 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 	if ( canvas === null || typeof canvas !== 'object' ) throw new Error( 'A canvas is required.' );
 	if ( navigator.gpu === undefined ) throw new Error( 'WebGPU adapter required for canonical visual validation. No fallback is activated.' );
+	const runtimeProfile = options.runtimeProfile ?? 'correctness';
+	const controllerGeneration = nextControllerGeneration ++;
+	const rendererDeviceGeneration = nextRendererDeviceGeneration ++;
+	requireKnown( RUNTIME_PROFILES, runtimeProfile, 'runtime profile' );
+	const timestampQueriesRequired = runtimeProfile === 'performance';
+	const timestampQueriesRequested = timestampQueriesRequired;
 	const rendererParameters = { ...options.rendererParameters };
 	let ownedDevice = null;
 	let adapterSnapshot = null;
@@ -124,8 +254,8 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		canvas,
 		antialias: false,
 		outputBufferType: HalfFloatType,
-		trackTimestamp: true,
-		...rendererParameters
+		...rendererParameters,
+		trackTimestamp: timestampQueriesRequested
 	} );
 	renderer.outputColorSpace = SRGBColorSpace;
 	renderer.toneMapping = NeutralToneMapping;
@@ -136,6 +266,50 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		renderer.dispose();
 		ownedDevice?.destroy();
 		throw new Error( 'WebGPU backend required for canonical visual validation. No fallback is activated.' );
+
+	}
+	const requestedDevice = rendererParameters.device ?? null;
+	const rendererDevice = assertRendererBackendDeviceIdentity( requestedDevice, renderer.backend.device ?? null );
+	let rendererDeviceStatus = 'active';
+	let deviceLossGeneration = 0;
+	let deviceLostObserved = false;
+	let intentionalDeviceDestroyObserved = false;
+	let lastDeviceError = null;
+	const uncapturedErrors = [];
+	let uncapturedErrorListenerInstalled = false;
+	let disposeEvidence = null;
+	let lossPromiseObservedOnActualDevice = false;
+	if ( rendererDevice.lost && typeof rendererDevice.lost.then === 'function' ) {
+
+		lossPromiseObservedOnActualDevice = true;
+		rendererDevice.lost.then( ( info ) => {
+
+			const reason = String( info?.reason ?? '' ).toLowerCase();
+			if ( ( rendererDeviceStatus === 'disposing' || rendererDeviceStatus === 'disposed' ) && reason === 'destroyed' ) {
+
+				intentionalDeviceDestroyObserved = true;
+				return;
+
+			}
+			deviceLostObserved = true;
+			deviceLossGeneration ++;
+			rendererDeviceStatus = 'lost';
+			lastDeviceError = String( info?.message ?? info?.reason ?? 'GPU device lost' );
+
+		} );
+
+	}
+	const onUncapturedError = ( event ) => {
+
+		const message = String( event?.error?.message ?? event?.message ?? 'uncaptured GPU device error' );
+		uncapturedErrors.push( message );
+		lastDeviceError = message;
+
+	};
+	if ( typeof rendererDevice.addEventListener === 'function' ) {
+
+		rendererDevice.addEventListener( 'uncapturederror', onUncapturedError );
+		uncapturedErrorListenerInstalled = true;
 
 	}
 
@@ -191,9 +365,27 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 		normal: renderOutput( vec4( normalNode.rgb.mul( 0.5 ).add( 0.5 ), 1 ) ),
 		emissive: renderOutput( vec4( emissiveNode.rgb, 1 ) )
 	};
+	if ( new Set( Object.values( modeNodes ) ).size !== Object.keys( modeNodes ).length ) throw new Error( 'Validation output routes must own distinct TSL output nodes.' );
 	renderPipeline.outputColorTransform = false;
 	renderPipeline.outputNode = modeNodes.final;
 	renderPipeline.needsUpdate = true;
+	let activeFinalRenderTarget = null;
+	const timestampInspector = new ValidationTimestampInspector( ( render ) => {
+
+		if ( render.scene === scene && render.camera === camera && render.renderTarget === scenePass.renderTarget ) return 'scene-mrt';
+		if ( render.scene !== scene && render.renderTarget === activeFinalRenderTarget ) return 'final-output';
+		return null;
+
+	} );
+	renderer.inspector = timestampInspector;
+	let scenePassExecutionCount = 0;
+	const updateScenePass = scenePass.updateBefore.bind( scenePass );
+	scenePass.updateBefore = ( frame ) => {
+
+		scenePassExecutionCount ++;
+		return updateScenePass( frame );
+
+	};
 
 	let scenario = 'browser-capture';
 	let mode = 'final';
@@ -210,6 +402,8 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	captureTarget.texture.name = 'validation-capture-rgba8';
 	const cpuFrameSamples = [];
 	const resetEvents = [];
+	let renderSubmissionCount = 0;
+	let modeSelectionCount = 0;
 
 	function requireLive() {
 
@@ -245,40 +439,45 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 		renderPipeline.outputNode = modeNodes[ mode ];
 		renderPipeline.needsUpdate = true;
+		modeSelectionCount ++;
 
 	}
 
 	async function renderTo( target ) {
 
 		const previousTarget = renderer.getRenderTarget();
-		renderer.setRenderTarget( target );
-		const start = performance.now();
-		renderPipeline.render();
-		const cpuMs = performance.now() - start;
-		cpuFrameSamples.push( cpuMs );
-		renderer.setRenderTarget( previousTarget );
-		return cpuMs;
+		activeFinalRenderTarget = target;
+		try {
+
+			renderer.setRenderTarget( target );
+			const start = performance.now();
+			renderPipeline.render();
+			renderSubmissionCount ++;
+			const cpuMs = performance.now() - start;
+			cpuFrameSamples.push( cpuMs );
+			return cpuMs;
+
+		} finally {
+
+			renderer.setRenderTarget( previousTarget );
+			activeFinalRenderTarget = null;
+
+		}
 
 	}
 
-	async function resolveAttributedRenderFrame( label ) {
+	async function resolveAttributedRenderBatch( label, expectedFrames ) {
 
 		const queryPool = renderer.backend.timestampQueryPool.render;
 		const pendingUids = queryPool ? [ ...queryPool.queryOffsets.keys() ] : [];
-		const totalMs = await renderer.resolveTimestampsAsync( 'render' );
-		if ( Number.isFinite( totalMs ) === false ) throw new Error( `${ label } has no GPU timestamp.` );
-		if ( pendingUids.length !== 2 ) throw new Error( `${ label } expected two render contexts, received ${ pendingUids.length }.` );
-		const durations = pendingUids.map( ( uid ) => renderer.backend.getTimestamp( uid ) );
-		if ( durations.some( ( value ) => Number.isFinite( value ) === false || value < 0 ) ) throw new Error( `${ label } has an invalid per-context timestamp.` );
-		return {
-			totalMs,
-			stages: {
-				'scene-mrt': durations[ 0 ],
-				'final-output': durations[ 1 ]
-			},
-			reconciliationErrorMs: Math.abs( totalMs - durations[ 0 ] - durations[ 1 ] ),
-			contextUids: pendingUids
-		};
+		if ( pendingUids.length !== expectedFrames * timestampResolutionPolicy.contextsPerFrame ) throw new Error( `${ label } expected ${ expectedFrames * timestampResolutionPolicy.contextsPerFrame } render contexts, received ${ pendingUids.length }.` );
+		const resolvedLastFrameTotalMs = await renderer.resolveTimestampsAsync( 'render' );
+		const entries = pendingUids.map( ( uid ) => ( {
+			uid,
+			stage: timestampInspector.stageFor( uid ),
+			durationMs: renderer.backend.getTimestamp( uid )
+		} ) );
+		return summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } );
 
 	}
 
@@ -289,7 +488,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			sceneHeight: scenePass.renderTarget.height,
 			captureWidth: captureTarget.width,
 			captureHeight: captureTarget.height
-		} ).renderTargets.reduce( ( sum, target ) => sum + target.bytes, 0 );
+		} ).trackedRenderTargetBytes;
 
 	}
 
@@ -323,6 +522,66 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			requireKnown( MODES, id, 'mode' );
 			mode = id;
 			applyMode();
+
+		},
+
+		async runMechanismReachabilityProfile() {
+
+			requireLive();
+			const originalMode = mode;
+			const routeExecutions = [];
+			for ( const id of Object.keys( MODE_OUTPUT_NODE_IDS ) ) {
+
+				await this.setMode( id );
+				const before = renderSubmissionCount;
+				const selectedOutputNodeId = Object.entries( modeNodes ).find( ( [ , node ] ) => node === renderPipeline.outputNode )?.[ 0 ] ?? null;
+				const selectedOutputNodeIdentityVerified = renderPipeline.outputNode === modeNodes[ id ];
+				const graphMarkedDirtyBeforeRender = renderPipeline.needsUpdate === true;
+				await renderTo( null );
+				routeExecutions.push( {
+					mode: id,
+					outputNodeId: MODE_OUTPUT_NODE_IDS[ id ],
+					selectedOutputNodeId: selectedOutputNodeId === null ? null : MODE_OUTPUT_NODE_IDS[ selectedOutputNodeId ],
+					selectedOutputNodeIdentityVerified,
+					graphMarkedDirtyBeforeRender,
+					renderSubmissionCountBefore: before,
+					renderSubmissionCountAfter: renderSubmissionCount,
+					renderSubmissionDelta: renderSubmissionCount - before
+				} );
+
+			}
+
+			const modeBeforeNegativeControl = mode;
+			const outputNodeBeforeNegativeControl = renderPipeline.outputNode;
+			let unknownModeRejected = false;
+			let unknownModeError = null;
+			try {
+
+				await this.setMode( '__invalid-mechanism-route__' );
+
+			} catch ( error ) {
+
+				unknownModeRejected = true;
+				unknownModeError = error.message;
+
+			}
+			const negativeControls = {
+				unknownModeRejected,
+				unknownModeError,
+				modeStatePreserved: mode === modeBeforeNegativeControl,
+				outputNodeIdentityPreserved: renderPipeline.outputNode === outputNodeBeforeNegativeControl
+			};
+			await this.setMode( originalMode );
+			return {
+				proofKind: 'native-browser-runtime',
+				runtimeProfile,
+				routeExecutions,
+				negativeControls,
+				modeSelectionCount,
+				renderSubmissionCount,
+				reachableSignals: [ 'output', 'normal', 'emissive', 'depth' ],
+				reachableResources: [ 'output', 'normal', 'emissive', 'depth', 'capture-target' ]
+			};
 
 		},
 
@@ -412,6 +671,11 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			const pixelHeight = captureTarget.height;
 			const padded = await renderer.readRenderTargetPixelsAsync( captureTarget, 0, 0, pixelWidth, pixelHeight );
 			const unpacked = unpackAlignedReadback( padded, pixelWidth, pixelHeight, 4 );
+			const normalizedPadded = new Uint8Array( unpacked.layout.fullyPaddedByteLength );
+			for ( let row = 0; row < pixelHeight; row ++ ) normalizedPadded.set(
+				unpacked.pixels.subarray( row * unpacked.layout.rowBytes, ( row + 1 ) * unpacked.layout.rowBytes ),
+				row * unpacked.layout.bytesPerRow
+			);
 			if ( previousMode !== mode ) await this.setMode( previousMode );
 			return {
 				target,
@@ -424,6 +688,32 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				colorManaged: true,
 				outputColorSpace: renderer.outputColorSpace,
 				encoding: renderer.outputColorSpace,
+				origin: 'top-left',
+				transport: {
+					layout: {
+						width: pixelWidth,
+						height: pixelHeight,
+						rowBytes: unpacked.layout.rowBytes,
+						bytesPerRow: unpacked.layout.bytesPerRow,
+						byteLength: unpacked.sourceByteLength,
+						format: 'rgba8unorm',
+						origin: 'top-left',
+						padding: unpacked.sourceByteLength === unpacked.layout.fullyPaddedByteLength ? 'full-final-row' : 'tight-final-row'
+					},
+					data: padded
+				},
+				normalized: {
+					layout: {
+						width: pixelWidth,
+						height: pixelHeight,
+						rowBytes: unpacked.layout.rowBytes,
+						bytesPerRow: unpacked.layout.bytesPerRow,
+						byteLength: unpacked.layout.fullyPaddedByteLength,
+						format: 'rgba8unorm',
+						origin: 'top-left'
+					},
+					data: normalizedPadded
+				},
 				pixels: unpacked.pixels,
 				readbackLayout: unpacked.layout,
 				sourceByteLength: unpacked.sourceByteLength
@@ -433,7 +723,13 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 		describePipeline() {
 
+			const timestampQueriesActive = timestampQueriesRequested && renderer.backend?.trackTimestamp === true;
 			return {
+				runtimeProfile,
+				performanceTimestampMode: runtimeProfile === 'performance' ? 'auto' : 'disabled',
+				timestampQueriesRequired,
+				timestampQueriesRequested,
+				timestampQueriesActive,
 				owners: {
 					renderer: 'native-validation-subject',
 					renderPipeline: 'native-validation-subject',
@@ -449,18 +745,22 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				sceneSubmissions: [ { id: 'scene-pass', kind: 'full-lit', count: 1 } ],
 				computeDispatches: [],
 				resources: [ 'output', 'normal', 'emissive', 'depth', 'capture-target' ],
+				captureRoutes: Object.fromEntries( Object.entries( MODE_OUTPUT_NODE_IDS ).map( ( [ id, outputNodeId ] ) => [ id, { mode: id, outputNodeId } ] ) ),
 				finalToneMapOwner: 'renderOutput',
 				finalOutputTransformOwner: 'renderOutput',
 				outputColorTransform: renderPipeline.outputColorTransform,
 				activeMode: mode,
 				activeOutputNode: `${ mode }-output-node`,
-				needsUpdate: renderPipeline.needsUpdate
+				needsUpdate: renderPipeline.needsUpdate,
+				renderSubmissionCount,
+				modeSelectionCount
 			};
 
 		},
 
 		describeResources() {
 
+			if ( disposed ) return emptyValidationResourceLedger();
 			return buildValidationResourceLedger( {
 				sceneWidth: scenePass.renderTarget.width,
 				sceneHeight: scenePass.renderTarget.height,
@@ -472,11 +772,49 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 		getMetrics() {
 
+			const adapterClass = adapterSnapshot?.adapterClass ?? 'unknown';
+			const adapterIdentity = {
+				source: adapterSnapshot?.identitySource ?? 'renderer GPUDevice without retained adapter metadata',
+				adapterClass,
+				deviceType: adapterClass,
+				deviceLabel: adapterSnapshot?.info?.description ?? adapterSnapshot?.info?.device ?? adapterSnapshot?.info?.architecture ?? 'unidentified WebGPU device',
+				info: adapterSnapshot?.info ?? {},
+				features: adapterSnapshot?.features ?? [],
+				limits: adapterSnapshot?.limits ?? {}
+			};
+			const timestampQueriesActive = timestampQueriesRequested && renderer.backend?.trackTimestamp === true;
+			const rendererInfo = snapshotRendererInfo( renderer.info );
 			return {
-				backend: {
+				labId: 'webgpu-validation-harness',
+				threeRevision: '185',
+				runtimeProfile,
+				performanceTimestampMode: runtimeProfile === 'performance' ? 'auto' : 'disabled',
+				timestampQueriesRequired,
+				timestampQueriesRequested,
+				timestampQueriesActive,
+				nativeWebGPU: renderer.backend?.isWebGPUBackend === true,
+				initialized: renderer.backend?.isWebGPUBackend === true,
+				rendererType: 'WebGPURenderer',
+				backend: 'WebGPU',
+				backendKind: 'WebGPU',
+				rendererBackend: 'WebGPUBackend',
+				rendererDeviceStatus,
+				controllerGeneration,
+				rendererDeviceGeneration,
+				deviceLossGeneration,
+				rendererBackendEvidence: {
+					backendKind: 'WebGPU',
+					backendType: 'WebGPUBackend',
 					isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
-					type: renderer.backend?.constructor?.name ?? 'unknown'
+					initialized: true,
+					deviceIdentityVerified: rendererDevice === requestedDevice && rendererDevice === renderer.backend.device,
+					deviceIdentitySource: 'strict identity equality between requested GPUDevice and renderer.backend.device after renderer.init()',
+					deviceType: adapterClass,
+					lossPromiseObservedOnActualDevice,
+					rendererDeviceGeneration
 				},
+				adapterClass,
+				adapterIdentity,
 				scenario,
 				mode,
 				tier,
@@ -487,7 +825,8 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 					near: camera.near,
 					far: camera.far
 				},
-				seed: `0x${ seed.toString( 16 ).padStart( 8, '0' ) }`,
+				seed,
+				seedHex: `0x${ seed.toString( 16 ).padStart( 8, '0' ) }`,
 				timeSeconds,
 				viewport: { width, height, dpr },
 				cpuFrameMs: {
@@ -497,6 +836,15 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				},
 				resetEvents: [ ...resetEvents ],
 				adapter: adapterSnapshot,
+				deviceLostObserved,
+				intentionalDeviceDestroyObserved,
+				uncapturedErrors: [ ...uncapturedErrors ],
+				lastDeviceError,
+				listenerState: {
+					uncapturedErrorListeners: uncapturedErrorListenerInstalled ? 1 : 0,
+					runtimeEventListeners: uncapturedErrorListenerInstalled ? 1 : 0
+				},
+				disposeEvidence,
 				rendererState: {
 					renderer: 'WebGPURenderer',
 					outputColorSpace: renderer.outputColorSpace,
@@ -507,13 +855,23 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 					depthMode: 'standard',
 					compatibilityMode: null
 				},
-				rendererInfo: snapshotRendererInfo( renderer.info )
+				rendererInfo: {
+					...rendererInfo,
+					rendererType: 'WebGPURenderer',
+					threeRevision: '185',
+					backendType: 'WebGPUBackend',
+					adapterClass,
+					adapterIdentity
+				},
+				renderSubmissionCount,
+				modeSelectionCount
 			};
 
 		},
 
 		async resolveGpuTimings() {
 
+			if ( timestampQueriesRequested === false ) return { verdict: 'NOT_CLAIMED', renderMs: null, computeMs: null, reason: 'Correctness profile does not request GPU timestamps.' };
 			try {
 
 				const renderMs = await renderer.resolveTimestampsAsync( 'render' );
@@ -541,27 +899,25 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			const cpuSamples = [];
 			const gpuSamples = [];
 			const gpuStageSamples = { 'scene-mrt': [], 'final-output': [] };
-			const gpuAttributionErrors = [];
 			const presentationSamples = [];
 			await renderer.resolveTimestampsAsync( 'render' );
 
 			for ( let frame = 0; frame < warmupFrames; frame ++ ) {
 
 				warmupCpuSamples.push( await renderTo( null ) );
-				await resolveAttributedRenderFrame( `Warm-up frame ${ frame }` );
 
 			}
+			await resolveAttributedRenderBatch( 'Warm-up batch', warmupFrames );
 
 			for ( let frame = 0; frame < sampleFrames; frame ++ ) {
 
 				cpuSamples.push( await renderTo( null ) );
-				const gpuFrame = await resolveAttributedRenderFrame( `Sustained frame ${ frame }` );
-				gpuSamples.push( gpuFrame.totalMs );
-				gpuStageSamples[ 'scene-mrt' ].push( gpuFrame.stages[ 'scene-mrt' ] );
-				gpuStageSamples[ 'final-output' ].push( gpuFrame.stages[ 'final-output' ] );
-				gpuAttributionErrors.push( gpuFrame.reconciliationErrorMs );
 
 			}
+			const sustainedBatch = await resolveAttributedRenderBatch( 'Sustained batch', sampleFrames );
+			gpuSamples.push( ...sustainedBatch.totalSamples );
+			gpuStageSamples[ 'scene-mrt' ].push( ...sustainedBatch.stageSamples[ 'scene-mrt' ] );
+			gpuStageSamples[ 'final-output' ].push( ...sustainedBatch.stageSamples[ 'final-output' ] );
 
 			let previousPresentationTime = null;
 			for ( let frame = 0; frame < presentationFrames; frame ++ ) {
@@ -576,6 +932,8 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 			const refreshPeriodMs = 1000 / 60;
 			return {
+				adapterClass: adapterSnapshot?.adapterClass ?? 'unknown',
+				adapterIdentity: adapterSnapshot?.info ?? {},
 				warmupFrames,
 				sampleFrames,
 				presentationFrames,
@@ -585,7 +943,13 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				gpuStageSamples,
 				gpuStageP50: Object.fromEntries( Object.entries( gpuStageSamples ).map( ( [ id, values ] ) => [ id, percentile( values, 0.5 ) ] ) ),
 				gpuStageP95: Object.fromEntries( Object.entries( gpuStageSamples ).map( ( [ id, values ] ) => [ id, percentile( values, 0.95 ) ] ) ),
-				gpuAttributionMaxErrorMs: Math.max( ...gpuAttributionErrors ),
+				timestampRows: sustainedBatch.rows,
+				stageContextIds: sustainedBatch.stageContextIds,
+				lastFrameResolveResidualMs: sustainedBatch.lastFrameResolveResidualMs,
+				independentPerFrameTotalsAvailable: sustainedBatch.independentPerFrameTotalsAvailable,
+				timestampResolveCount: sustainedBatch.resolveCount,
+				timestampMappingCadence: timestampResolutionPolicy.mappingCadence,
+				timestampReconciliationScope: sustainedBatch.reconciliationScope,
 				presentationSamples,
 				cpuP50: percentile( cpuSamples, 0.5 ),
 				cpuP95: percentile( cpuSamples, 0.95 ),
@@ -593,9 +957,10 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				gpuP95: percentile( gpuSamples, 0.95 ),
 				presentationP50: percentile( presentationSamples, 0.5 ),
 				presentationP95: percentile( presentationSamples, 0.95 ),
+				deadlineIntervalMs: refreshPeriodMs,
 				deadlineMissRatio: presentationSamples.filter( ( value ) => value > refreshPeriodMs ).length / presentationSamples.length,
-				timestampScope: 'one resolved WebGPU render timestamp per sustained RenderPipeline frame',
-				presentationScope: 'requestAnimationFrame cadence with rendering enabled and timestamp mapping disabled'
+				timestampScope: 'one batched WebGPU query resolve for the sustained population; per-frame totals are derived from two measured render-context timestamps',
+				presentationScope: 'requestAnimationFrame cadence with rendering enabled; timestamp resolution and mapping are deferred until after the cadence window'
 			};
 
 		},
@@ -626,9 +991,10 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				for ( let frame = 0; frame < framesPerWindow; frame ++ ) {
 
 					await renderTo( null );
-					gpuSamples.push( ( await resolveAttributedRenderFrame( `Governor window ${ window } frame ${ frame }` ) ).totalMs );
 
 				}
+				const timestampBatch = await resolveAttributedRenderBatch( `Governor window ${ window } batch`, framesPerWindow );
+				gpuSamples.push( ...timestampBatch.totalSamples );
 				const gpuP95 = percentile( gpuSamples, 0.95 );
 				residence ++;
 				if ( cooldown > 0 ) cooldown --;
@@ -643,10 +1009,11 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 						tier = states[ stateIndex ];
 						applyTier();
 						const rebuildCpuSubmissionMs = await renderTo( null );
-						const rebuildGpuMs = ( await resolveAttributedRenderFrame( `Governor transition ${ window } degrade rebuild` ) ).totalMs;
+						const rebuildBatch = await resolveAttributedRenderBatch( `Governor transition ${ window } degrade rebuild`, 1 );
+						const rebuildGpuMs = rebuildBatch.totalSamples[ 0 ];
 						const toResourceBytes = currentRenderTargetBytes();
 						decision = 'degrade';
-						transitions.push( { window, from, to: tier, cause: 'gpu-p95-over-budget', gpuP95, rebuildCpuSubmissionMs, rebuildGpuMs, fromResourceBytes, toResourceBytes } );
+						transitions.push( { window, from, to: tier, cause: 'gpu-p95-over-budget', gpuP95, rebuildCpuSubmissionMs, rebuildGpuMs, rebuildTimestampRow: rebuildBatch.rows[ 0 ], lastFrameResolveResidualMs: rebuildBatch.lastFrameResolveResidualMs, fromResourceBytes, toResourceBytes } );
 						residence = 0;
 						cooldown = cooldownWindows;
 
@@ -658,17 +1025,29 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 						tier = states[ stateIndex ];
 						applyTier();
 						const rebuildCpuSubmissionMs = await renderTo( null );
-						const rebuildGpuMs = ( await resolveAttributedRenderFrame( `Governor transition ${ window } upgrade rebuild` ) ).totalMs;
+						const rebuildBatch = await resolveAttributedRenderBatch( `Governor transition ${ window } upgrade rebuild`, 1 );
+						const rebuildGpuMs = rebuildBatch.totalSamples[ 0 ];
 						const toResourceBytes = currentRenderTargetBytes();
 						decision = 'upgrade';
-						transitions.push( { window, from, to: tier, cause: 'gpu-p95-below-hysteresis', gpuP95, rebuildCpuSubmissionMs, rebuildGpuMs, fromResourceBytes, toResourceBytes } );
+						transitions.push( { window, from, to: tier, cause: 'gpu-p95-below-hysteresis', gpuP95, rebuildCpuSubmissionMs, rebuildGpuMs, rebuildTimestampRow: rebuildBatch.rows[ 0 ], lastFrameResolveResidualMs: rebuildBatch.lastFrameResolveResidualMs, fromResourceBytes, toResourceBytes } );
 						residence = 0;
 						cooldown = cooldownWindows;
 
 					}
 
 				}
-				windows.push( { window, tier: states[ stateIndex ], measuredTier, gpuSamples, gpuP95, decision, residence, cooldown } );
+				windows.push( {
+					window,
+					tier: states[ stateIndex ],
+					measuredTier,
+					gpuSamples,
+					gpuP95,
+					timestampRows: timestampBatch.rows,
+					lastFrameResolveResidualMs: timestampBatch.lastFrameResolveResidualMs,
+					decision,
+					residence,
+					cooldown
+				} );
 
 			}
 			const transitionDirections = transitions.map( ( transition ) => transition.to === 'governor-stress' ? 1 : - 1 );
@@ -676,6 +1055,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			tier = states[ stateIndex ];
 			applyTier();
 			return {
+				adapterClass: adapterSnapshot?.adapterClass ?? 'unknown',
 				windowCount,
 				framesPerWindow,
 				targetMs,
@@ -693,14 +1073,62 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 		async dispose() {
 
-			if ( disposed ) return;
+			if ( disposed ) return disposeEvidence;
 			disposed = true;
+			rendererDeviceStatus = 'disposing';
+			const queueSettlement = { status: 'PENDING', durationMs: null, error: null };
+			try {
+
+				if ( typeof rendererDevice.queue?.onSubmittedWorkDone !== 'function' ) throw new Error( 'GPUQueue.onSubmittedWorkDone is unavailable.' );
+				const started = performance.now();
+				await rendererDevice.queue.onSubmittedWorkDone();
+				queueSettlement.status = 'PASS';
+				queueSettlement.durationMs = performance.now() - started;
+
+			} catch ( error ) {
+
+				queueSettlement.status = 'FAIL';
+				queueSettlement.error = String( error?.message ?? error );
+
+			}
+			if ( uncapturedErrorListenerInstalled && typeof rendererDevice.removeEventListener === 'function' ) {
+
+				rendererDevice.removeEventListener( 'uncapturederror', onUncapturedError );
+				uncapturedErrorListenerInstalled = false;
+
+			}
 			scene.traverse( disposeObject );
 			captureTarget.dispose();
 			renderPipeline.dispose();
 			renderer.dispose();
-			ownedDevice?.destroy();
+			let deviceDestroy = { status: 'NOT_APPLICABLE', reason: 'renderer uses a caller-owned GPUDevice', intentionalDestroyObserved: false };
+			if ( ownedDevice ) {
+
+				ownedDevice.destroy();
+				const lossInfo = await rendererDevice.lost;
+				await Promise.resolve();
+				const reason = String( lossInfo?.reason ?? '' ).toLowerCase();
+				deviceDestroy = {
+					status: reason === 'destroyed' && intentionalDeviceDestroyObserved ? 'PASS' : 'FAIL',
+					reason: String( lossInfo?.reason ?? '' ),
+					message: String( lossInfo?.message ?? '' ),
+					intentionalDestroyObserved: intentionalDeviceDestroyObserved
+				};
+
+			}
 			captureTarget = null;
+			rendererDeviceStatus = 'disposed';
+			disposeEvidence = Object.freeze( {
+				controllerGeneration,
+				rendererDeviceGeneration,
+				queueSettlement: Object.freeze( queueSettlement ),
+				deviceDestroy: Object.freeze( deviceDestroy ),
+				listenersAfterDispose: 0,
+				uncapturedErrorsAfterDispose: [ ...uncapturedErrors ],
+				deviceLostObserved
+			} );
+			if ( queueSettlement.status !== 'PASS' || deviceDestroy.status === 'FAIL' ) throw new Error( `Validation subject disposal settlement failed: ${ queueSettlement.error ?? deviceDestroy.reason }.` );
+			return disposeEvidence;
 
 		}
 	};

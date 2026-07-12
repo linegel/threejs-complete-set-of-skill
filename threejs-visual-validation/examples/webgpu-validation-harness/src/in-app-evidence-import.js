@@ -7,7 +7,6 @@ import { loadAndValidateImmutableBuild } from './immutable-physical-build.js';
 import { physicalLaneReference } from './physical-lane-join.js';
 import {
 	hashPhysicalRecord,
-	validateCorrectnessSession,
 	validateHardwarePerformanceSession,
 	validatePhysicalRouteSession
 } from './physical-session-validator.js';
@@ -55,6 +54,8 @@ export async function importInAppEvidenceRecord( { recordPath, ledgerPath, build
 
 	if ( ! recordPath || ! ledgerPath || ! buildDirectory ) throw new Error( 'Physical evidence import requires recordPath, ledgerPath, and buildDirectory.' );
 	const record = JSON.parse( await readFile( recordPath, 'utf8' ) );
+	if ( record.profile === 'correctness' ) throw new Error( 'Correctness records come from the shared Playwright capture runner, not the Codex in-app Browser importer.' );
+	if ( record.profile !== 'physical-route' && record.profile !== 'performance' ) throw new Error( `Unsupported in-app evidence profile ${ record.profile ?? '<missing>' }.` );
 	const immutableBuild = await loadAndValidateImmutableBuild( buildDirectory );
 	if ( JSON.stringify( record.immutableBuild ) !== JSON.stringify( immutableBuild.manifest ) ) throw new Error( 'Session immutable-build identity differs from the exact build directory.' );
 	const ledgerSource = await readFile( ledgerPath, 'utf8' );
@@ -82,11 +83,9 @@ export async function importInAppEvidenceRecord( { recordPath, ledgerPath, build
 		publishable: false,
 		acceptanceStatus: 'incomplete'
 	};
-	const validation = imported.profile === 'correctness'
-		? validateCorrectnessSession( imported )
-		: imported.profile === 'physical-route'
-			? validatePhysicalRouteSession( imported )
-			: validateHardwarePerformanceSession( imported );
+	const validation = imported.profile === 'physical-route'
+		? validatePhysicalRouteSession( imported )
+		: validateHardwarePerformanceSession( imported );
 	const recordSha256 = hashPhysicalRecord( imported );
 	return { record: imported, validation, recordSha256, laneReference: physicalLaneReference( imported, recordSha256 ) };
 

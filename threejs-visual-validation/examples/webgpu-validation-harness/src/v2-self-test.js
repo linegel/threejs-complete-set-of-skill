@@ -36,13 +36,13 @@ export async function runV2MutationSuite() {
 		mutation( 'route-state-digest', /semantic contract failed/, ( manifest ) => { manifest.route.camera = 'near'; } ),
 		mutation( 'unknown-manifest-field', /unknown property/, ( manifest ) => { manifest.browserLauncher = 'chrome'; } ),
 		mutation( 'legacy-browser-bundle-kind', /allowed enum value/, ( manifest ) => { manifest.bundleKind = 'browser-capture'; } ),
-		mutation( 'playwright-capture-lane', /codex-in-app-browser|allowed enum value|must equal/, ( manifest ) => {
+		mutation( 'crossed-correctness-capture-lane', /playwright-headless-chromium|must equal/, ( manifest ) => {
 
 			manifest.bundleKind = 'raw-capture-session';
 			manifest.captureSessions = [ {
 				sessionId: 'webgpu-validation-harness:correctness:mutation',
 				profile: 'correctness',
-				automationSurface: 'playwright-headless-chromium'
+				automationSurface: 'codex-in-app-browser'
 			} ];
 
 		} ),

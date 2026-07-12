@@ -8,13 +8,25 @@ import {
 	stableStringify
 } from './physical-evidence-common.js';
 import {
-	CORRECTNESS_ROUTE_PLAN,
 	HARDWARE_PERFORMANCE_CONTRACT,
 	HARDWARE_PERFORMANCE_ROUTE_PLAN,
 	PHYSICAL_ROUTE_PLAN
 } from './in-app-evidence-plan.js';
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
+const PLAYWRIGHT_CORRECTNESS_SURFACE = 'playwright-headless-chromium';
+const STANDARD_OUTPUTS = Object.freeze( [
+	'final.design.png',
+	'no-post.design.png',
+	'diagnostics.mosaic.png',
+	'camera.near.png',
+	'camera.design.png',
+	'camera.far.png',
+	'seed-0001.final.png',
+	'seed-9e3779b9.final.png',
+	'temporal.t000.png',
+	'temporal.t001.png'
+] );
 
 function fail( message ) {
 
@@ -218,6 +230,109 @@ function assertRouteSequence( session, plan, build ) {
 
 }
 
+function assertCaptureSessionInterval( session ) {
+
+	const startedAt = Date.parse( session.startedAt );
+	const finishedAt = Date.parse( session.finishedAt );
+	if ( Number.isFinite( startedAt ) === false || Number.isFinite( finishedAt ) === false || finishedAt < startedAt ) fail( 'Correctness capture session has an invalid capture interval.' );
+
+}
+
+function assertCorrectnessArtifactWrites( session ) {
+
+	const writes = requireArray( session.artifactWrites, 'artifactWrites' );
+	if ( writes.length === 0 ) fail( 'Correctness capture artifact write ledger is empty.' );
+	const paths = new Set();
+	let captureSessionExcluded = false;
+	for ( const [ index, write ] of writes.entries() ) {
+
+		const label = `artifactWrites[${ index }]`;
+		requireObject( write, label );
+		if ( typeof write.path !== 'string' || write.path.length === 0 || paths.has( write.path ) ) fail( `${ label } has a missing or duplicated path.` );
+		paths.add( write.path );
+		if ( write.contentBinding === 'self-excluded-finalized-offline' ) {
+
+			if ( write.path !== 'capture-session.json' || write.sha256 !== null || write.byteLength !== null ) fail( 'Only capture-session.json may use the finalized self-exclusion record.' );
+			captureSessionExcluded = true;
+			continue;
+
+		}
+		if ( write.contentBinding !== 'sha256-byte-length-immutable-buffer-v1' ) fail( `${ label } has an unsupported content binding.` );
+		requireHash( write.sha256, `${ label }.sha256` );
+		requireFinite( write.byteLength, `${ label }.byteLength`, 1 );
+
+	}
+	if ( captureSessionExcluded === false ) fail( 'Correctness capture did not finalize capture-session.json outside its own hash ledger.' );
+	return paths;
+
+}
+
+function assertCorrectnessReadbackCapture( capture, writePaths, label ) {
+
+	requireObject( capture, label );
+	for ( const [ kind, descriptor ] of [
+		[ 'PNG', capture.png ],
+		[ 'transport', capture.transport?.artifact ],
+		[ 'normalized', capture.normalized?.artifact ]
+	] ) {
+
+		requireObject( descriptor, `${ label}.${ kind }` );
+		if ( typeof descriptor.path !== 'string' || writePaths.has( descriptor.path ) === false ) fail( `${ label} ${ kind } artifact is absent from the immutable write ledger.` );
+		requireHash( descriptor.sha256, `${ label}.${ kind }.sha256` );
+		requireFinite( descriptor.byteLength, `${ label}.${ kind }.byteLength`, 1 );
+
+	}
+	if ( capture.bytesPerPixel !== 4 || capture.bytesPerRow !== capture.width * 4 ) fail( `${ label } is not compact RGBA8.` );
+	if ( Number.isInteger( capture.normalized?.bytesPerRow ) === false || capture.normalized.bytesPerRow < capture.bytesPerRow || capture.normalized.bytesPerRow % 256 !== 0 ) fail( `${ label } normalized row stride is not 256-byte aligned.` );
+	if ( capture.normalized?.byteLength !== capture.normalized.bytesPerRow * capture.height ) fail( `${ label } normalized byte length is inconsistent.` );
+	if ( capture.origin !== 'top-left' || capture.normalized?.origin !== 'top-left' ) fail( `${ label } does not preserve top-left readback origin.` );
+
+}
+
+export function validateCorrectnessCaptureSession( session ) {
+
+	requireObject( session, 'correctness capture session' );
+	if ( session.schemaVersion !== 2 || session.profile !== CORRECTNESS_PROFILE ) fail( 'Expected a schema-v2 correctness capture session.' );
+	if ( session.automationSurface !== PLAYWRIGHT_CORRECTNESS_SURFACE || session.browser?.automationSurface !== PLAYWRIGHT_CORRECTNESS_SURFACE ) fail( 'Correctness capture requires automationSurface=playwright-headless-chromium.' );
+	if ( session.profileConfig?.width !== 1200 || session.profileConfig?.height !== 800 || session.profileConfig?.dpr !== 1 ) fail( 'Correctness capture must use 1200x800 at DPR 1.' );
+	if ( ! [ 'hardware', 'software', 'unknown' ].includes( session.adapterClass ) ) fail( 'Correctness capture adapter class is invalid.' );
+	requireObject( session.adapterIdentity, 'adapterIdentity' );
+	if ( session.threeRevision !== '0.185.1' ) fail( 'Correctness capture must use Three.js 0.185.1.' );
+	for ( const key of [ 'sourceHash', 'sourceClosureHash', 'buildRevision' ] ) requireHash( session[ key ], key );
+	if ( session.sourceHash !== session.sourceClosureHash ) fail( 'Correctness capture source and source-closure hashes differ.' );
+	requireObject( session.sourceClosure, 'sourceClosure' );
+	if ( session.sourceClosure.sourceHash !== session.sourceClosureHash || session.sourceClosure.buildRevision !== session.buildRevision || session.sourceClosure.threeRevision !== session.threeRevision ) fail( 'Correctness capture source closure identity is inconsistent.' );
+	assertCaptureSessionInterval( session );
+	if ( session.route?.requestedUrl !== session.url || session.route?.finalUrl !== session.finalUrl || session.route?.browserEntry !== session.browserEntry || session.route?.manifestLabId !== session.labId ) fail( 'Correctness capture route identity is inconsistent.' );
+	for ( const field of [ 'pageErrors', 'consoleErrors', 'requestErrors' ] ) if ( requireArray( session[ field ], field ).length > 0 ) fail( `Correctness capture contains ${ field }.` );
+	const metrics = requireObject( session.runtime?.metrics, 'runtime.metrics' );
+	if ( metrics.nativeWebGPU !== true || metrics.initialized !== true || String( metrics.backend ?? metrics.backendKind ?? '' ).toLowerCase() !== 'webgpu' ) fail( 'Correctness capture lacks initialized native WebGPU proof.' );
+	const writePaths = assertCorrectnessArtifactWrites( session );
+	const captures = requireArray( session.writtenCaptures, 'writtenCaptures' );
+	if ( captures.length === 0 ) fail( 'Correctness capture contains no render-target readbacks.' );
+	captures.forEach( ( capture, index ) => assertCorrectnessReadbackCapture( capture, writePaths, `writtenCaptures[${ index }]` ) );
+	const outputs = requireArray( session.outputPlan, 'outputPlan' );
+	if ( outputs.length !== STANDARD_OUTPUTS.length ) fail( `Correctness capture must disposition all ${ STANDARD_OUTPUTS.length } standard outputs.` );
+	const names = new Set();
+	for ( const filename of STANDARD_OUTPUTS ) {
+
+		const output = outputs.find( ( candidate ) => candidate?.id === filename.slice( 0, -4 ) );
+		if ( ! output || names.has( output.id ) ) fail( `Correctness capture omits or duplicates ${ filename }.` );
+		names.add( output.id );
+		if ( output.status === 'CAPTURED' ) {
+
+			if ( output.filename !== filename || writePaths.has( filename ) === false ) fail( `${ filename } is not bound to this capture session.` );
+			requireHash( output.artifact?.sha256, `${ filename } artifact hash` );
+			requireFinite( output.artifact?.byteLength, `${ filename } artifact byteLength`, 1 );
+
+		} else if ( output.status !== 'NOT_APPLICABLE' || typeof output.reason !== 'string' || output.reason.length === 0 || ! output.graphProof ) fail( `${ filename } has no captured output or structural N/A proof.` );
+
+	}
+	for ( const required of [ 'final.design.png', 'diagnostics.mosaic.png' ] ) if ( outputs.find( ( output ) => output.filename === required )?.status !== 'CAPTURED' ) fail( `${ required } is required correctness evidence.` );
+	return { valid: true, profile: session.profile, outputCount: outputs.length, captureCount: captures.length, adapterClass: session.adapterClass };
+
+}
+
 export function validatePhysicalRouteSession( session ) {
 
 	requireObject( session, 'physical route session' );
@@ -225,17 +340,6 @@ export function validatePhysicalRouteSession( session ) {
 	const build = assertCaptureEnvironment( session );
 	assertRouteSequence( session, PHYSICAL_ROUTE_PLAN, build );
 	assertServedBytes( session, build, PHYSICAL_ROUTE_PLAN );
-	return { valid: true, profile: session.profile, routeCount: session.routes.length };
-
-}
-
-export function validateCorrectnessSession( session ) {
-
-	requireObject( session, 'correctness session' );
-	if ( session.profile !== CORRECTNESS_PROFILE ) fail( 'Expected a correctness session.' );
-	const build = assertCaptureEnvironment( session );
-	assertRouteSequence( session, CORRECTNESS_ROUTE_PLAN, build );
-	assertServedBytes( session, build, CORRECTNESS_ROUTE_PLAN );
 	return { valid: true, profile: session.profile, routeCount: session.routes.length };
 
 }

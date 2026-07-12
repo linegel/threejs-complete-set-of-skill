@@ -67,10 +67,10 @@ export function createV2ContractFixtureArtifacts() {
 				statement: 'The diagnostics route is distinct from the final route.',
 				domain: 'image',
 				truthSource: 'pipeline-graph.json captureRoutes',
-				diagnostic: 'images/diagnostics.mosaic.png',
+				diagnostic: 'diagnostics.mosaic.png',
 				metric: 'differing-pixel ratio',
 				gate: G( 0.01, 'ratio', 'frozen transport mutation threshold' ),
-				requiredArtifacts: [ 'pipeline-graph.json', 'images/final.design.png', 'images/diagnostics.mosaic.png' ],
+				requiredArtifacts: [ 'pipeline-graph.json', 'final.design.png', 'diagnostics.mosaic.png' ],
 				blockingFailure: 'false diagnostic route'
 			}
 		],
@@ -83,8 +83,8 @@ export function createV2ContractFixtureArtifacts() {
 		imageComparisons: [
 			{
 				id: 'deterministic-seed-transport',
-				baseline: 'images/seed-0001.final.png',
-				candidate: 'images/seed-9e3779b9.final.png',
+				baseline: 'seed-0001.final.png',
+				candidate: 'seed-9e3779b9.final.png',
 				maxDifferingRatio: G( 0, 'ratio', 'fixture images are intentionally identical transport sentinels' )
 			}
 		]
@@ -96,6 +96,11 @@ export function createV2ContractFixtureArtifacts() {
 		skill: 'threejs-visual-validation',
 		sceneId: 'schema-v2-contract-fixture',
 		threeRevision: '0.185.1',
+		captureProfile: 'schema-fixture',
+		automationSurface: 'contract-fixture',
+		adapterClass: 'unknown',
+		sourceClosureHash: 'fixture-source-closure',
+		buildRevision: 'fixture-build-revision',
 		evidenceBundleId: 'fixture-v2-0001',
 		targetId: 'not-a-runtime-target',
 		device: 'not-run',
@@ -142,13 +147,16 @@ export function createV2ContractFixtureArtifacts() {
 		stochasticMasks: [],
 		knownCompromises: [ 'Synthetic fixture; forbidden from canonical evidence paths.' ],
 		pipelineGraphDigest: 'fixture-graph-digest-1',
-		claimVerdicts
+		claimVerdicts,
+		promotion: { status: 'NOT_APPLICABLE', bindingDigest: null, binding: null, visualSignoff: null }
 	} );
 
 	const rendererInfo = schema( {
 		threeRevision: '0.185.1',
 		renderer: 'WebGPURenderer requirement; not instantiated',
 		backend: 'unavailable-contract-fixture',
+		captureProfile: 'schema-fixture',
+		adapterClass: 'unknown',
 		outputColorSpace: 'SRGBColorSpace',
 		toneMapping: 'NeutralToneMapping',
 		toneMappingExposure: A( 1, 'ratio' ),
@@ -160,12 +168,19 @@ export function createV2ContractFixtureArtifacts() {
 		adapterFeatures: [],
 		adapterLimits: {},
 		initializationState: 'not-run-contract-fixture',
+		deviceLostObserved: false,
+		uncapturedErrors: [],
 		deviceErrors: [],
 		rendererInfoSnapshots: []
 	} );
 
 	const pipelineGraph = schema( {
 		graphDigest: 'fixture-graph-digest-1',
+		runtimeProfile: 'schema-fixture',
+		performanceTimestampMode: 'disabled',
+		timestampQueriesRequired: false,
+		timestampQueriesRequested: false,
+		timestampQueriesActive: false,
 		owners: {
 			renderer: 'validation-subject-adapter',
 			renderPipeline: 'validation-subject-adapter',
@@ -191,7 +206,8 @@ export function createV2ContractFixtureArtifacts() {
 		captureRoutes: {
 			final: { mode: 'final', outputNodeId: 'final-output-node' },
 			'no-post': { mode: 'no-post', outputNodeId: 'no-post-output-node' },
-			diagnostics: { mode: 'diagnostics', outputNodeId: 'diagnostics-output-node' }
+			normal: { mode: 'normal', outputNodeId: 'normal-output-node' },
+			emissive: { mode: 'emissive', outputNodeId: 'emissive-output-node' }
 		}
 	} );
 
@@ -213,11 +229,13 @@ export function createV2ContractFixtureArtifacts() {
 		cpuSamples: AA( [ 0.8, 0.9, 1 ], 'ms' ),
 		presentationSamples: AA( [ 16.6, 16.7, 16.6 ], 'ms' ),
 		cpuP50: A( 0.9, 'ms' ),
-		cpuP95: A( 1, 'ms' ),
-		presentationP95: A( 16.7, 'ms' ),
-		deadlineMissRatio: A( 0, 'ratio' )
+		cpuP95: A( 0.99, 'ms' ),
+		presentationP95: A( 16.69, 'ms' ),
+		deadlineMissRatio: A( 1 / 3, 'ratio' )
 	} );
 	const frameTrace = schema( {
+		captureProfile: 'schema-fixture',
+		adapterClass: 'unknown',
 		clockSource: 'fixture-authored-values',
 		warmup: makeTraceSegment(),
 		cold: makeTraceSegment(),
@@ -262,8 +280,10 @@ export function createV2ContractFixtureArtifacts() {
 			target( 'normal', 'view-space normal', 'scene-pass' ),
 			target( 'emissive', 'scene-linear emissive', 'scene-pass' )
 		],
-		totalResidentBytes: D( targetBytes, 'byte', 'sum target memory' ),
-		peakTransientBytes: D( targetBytes, 'byte', 'all fixture targets simultaneously live' )
+		accountingScope: 'contract-fixture-only',
+		completeness: 'FIXTURE',
+		trackedRenderTargetBytes: D( targetBytes, 'byte', 'sum target memory' ),
+		trackedPeakLiveRenderTargetBytes: D( targetBytes, 'byte', 'all fixture targets simultaneously live' )
 	} );
 
 	const storageResources = schema( {
@@ -282,9 +302,14 @@ export function createV2ContractFixtureArtifacts() {
 		staging: [],
 		readback: [ 'capture-target' ],
 		pipelineEstimate: 'not measured in contract fixture',
-		residentBytes: D( targetBytes, 'byte', 'render target sum only' ),
-		peakLiveTransientBytes: D( targetBytes, 'byte', 'fixture target liveness' ),
-		uploadChurnPerFrame: A( 0, 'byte/frame' )
+		accountingScope: 'contract-fixture-only',
+		completeness: 'FIXTURE',
+		inventoryCompleteness: 'FIXTURE',
+		labOwnedNonTargetResources: [],
+		opaqueRendererInternalResidency: { status: 'NOT_CLAIMED', reason: 'Contract fixture has no renderer residency.' },
+		trackedRenderTargetBytes: D( targetBytes, 'byte', 'render target sum only' ),
+		trackedPeakLiveRenderTargetBytes: D( targetBytes, 'byte', 'fixture target liveness' ),
+		uploadChurnPerFrame: { status: 'NOT_CLAIMED', value: null, reason: 'Contract fixture does not measure uploads.' }
 	} );
 
 	const bandwidthModel = schema( {
@@ -308,11 +333,11 @@ export function createV2ContractFixtureArtifacts() {
 				measured: A( 0, 'ratio' ),
 				gate: G( 0, 'ratio', 'exact fixture sentinel' ),
 				verdict: 'NOT_CLAIMED',
-				worstCaseArtifact: 'images/seed-9e3779b9.final.png'
+				worstCaseArtifact: 'seed-9e3779b9.final.png'
 			}
 		],
 		spatialErrorMaps: [],
-		worstCaseArtifacts: [ 'images/seed-9e3779b9.final.png' ]
+		worstCaseArtifacts: [ 'seed-9e3779b9.final.png' ]
 	} );
 
 	const leakLoop = schema( {
@@ -329,9 +354,16 @@ export function createV2ContractFixtureArtifacts() {
 
 	const mechanismMetrics = schema( {
 		subjectAdapter: 'contract-fixture-only',
-		runtimeReachability: [],
+		proofKind: 'contract-fixture',
+		captureProfile: 'schema-fixture',
+		pipelineGraphDigest: 'fixture-graph-digest-1',
+		runtimeReachability: { signals: [], resources: [], routes: [] },
+		routeExecutions: [],
+		negativeControls: {},
+		diagnosticComparisons: [],
 		metrics: [],
-		verdicts: claimVerdicts
+		verdicts: claimVerdicts,
+		verdict: 'NOT_CLAIMED'
 	} );
 
 	return {
@@ -355,7 +387,7 @@ export function createV2ContractFixtureArtifacts() {
 
 export async function writeV2ContractFixture( artifactDir ) {
 
-	await mkdir( join( artifactDir, 'images' ), { recursive: true } );
+	await mkdir( artifactDir, { recursive: true } );
 	const artifacts = createV2ContractFixtureArtifacts();
 	for ( const [ name, artifact ] of Object.entries( artifacts ) ) {
 

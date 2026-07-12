@@ -1,6 +1,7 @@
 import { PERFORMANCE_TIER_IDS, routeRequiresPerformanceProfile } from './route-locks.js';
 
 export const CODEX_IN_APP_SURFACE = 'codex-in-app-browser';
+export const PLAYWRIGHT_CORRECTNESS_SURFACE = 'playwright-headless-chromium';
 
 function readRequestedProfile( parameters, injectedProfile ) {
 
@@ -25,7 +26,11 @@ export function resolvePhysicalRuntimeProfile( {
 	const requestedProfile = readRequestedProfile( parameters, injectedProfile );
 	const requestedTier = routeLock?.startup.tier ?? parameters.get( 'tier' );
 	const requiresPerformance = routeRequiresPerformanceProfile( routeLock ) || PERFORMANCE_TIER_IDS.includes( requestedTier );
-	const automationSurface = parameters.get( 'automationSurface' ) ?? injectedProfile?.automationSurface ?? 'interactive-browser';
+	const injectedAutomationSurface = injectedProfile?.automationSurface
+		?? ( injectedProfile?.id === 'correctness' && typeof injectedProfile?.labId === 'string'
+			? PLAYWRIGHT_CORRECTNESS_SURFACE
+			: null );
+	const automationSurface = parameters.get( 'automationSurface' ) ?? injectedAutomationSurface ?? 'interactive-browser';
 	const sessionToken = parameters.get( 'physicalSession' );
 	const host = environment.parentHost ?? null;
 	const validInAppHost = automationSurface === CODEX_IN_APP_SURFACE
@@ -36,10 +41,16 @@ export function resolvePhysicalRuntimeProfile( {
 		&& typeof sessionToken === 'string'
 		&& sessionToken.length >= 16
 		&& host.sessionToken === sessionToken;
+	const validPlaywrightCorrectness = requestedProfile === 'correctness'
+		&& automationSurface === PLAYWRIGHT_CORRECTNESS_SURFACE
+		&& environment.webdriver === true
+		&& environment.parentIsSelf === true
+		&& host === null
+		&& sessionToken === null
+		&& injectedProfile?.id === 'correctness'
+		&& typeof injectedProfile?.labId === 'string';
 
 	const evidenceRequested = requestedProfile !== null || automationSurface === CODEX_IN_APP_SURFACE || sessionToken !== null;
-	if ( evidenceRequested && environment.webdriver === true ) throw new Error( 'Canonical evidence rejects WebDriver/headless execution; use the Codex in-app Browser.' );
-	if ( evidenceRequested && validInAppHost === false ) throw new Error( 'Canonical evidence requires the immutable Codex in-app Browser surface.' );
 	if ( requiresPerformance ) {
 
 		if ( validInAppHost === false ) throw new Error( 'Timestamp-enabled performance routes require the immutable Codex in-app Browser surface.' );
@@ -49,6 +60,11 @@ export function resolvePhysicalRuntimeProfile( {
 	}
 
 	if ( requestedProfile === 'performance' ) throw new Error( 'The timestamp-enabled performance runtime profile is reserved for declared performance routes.' );
+	if ( evidenceRequested && validInAppHost === false && validPlaywrightCorrectness === false ) {
+
+		throw new Error( 'Correctness evidence requires the injected Playwright capture runner; physical and performance evidence require the immutable Codex in-app Browser surface.' );
+
+	}
 	return Object.freeze( {
 		runtimeProfile: 'correctness',
 		automationSurface,

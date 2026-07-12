@@ -1,11 +1,12 @@
 import { createHash } from 'node:crypto';
 
 import { CORRECTNESS_PROFILE, HARDWARE_PERFORMANCE_PROFILE, PHYSICAL_ROUTE_PROFILE, stableStringify } from './physical-evidence-common.js';
+import { validateCorrectnessCaptureSession } from './physical-session-validator.js';
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
 
 const LANE_CONTRACTS = Object.freeze( {
-	correctness: Object.freeze( { profile: CORRECTNESS_PROFILE, automationSurface: 'codex-in-app-browser' } ),
+	correctness: Object.freeze( { profile: CORRECTNESS_PROFILE, automationSurface: 'playwright-headless-chromium' } ),
 	physicalRoute: Object.freeze( { profile: PHYSICAL_ROUTE_PROFILE, automationSurface: 'codex-in-app-browser' } ),
 	hardwarePerformance: Object.freeze( { profile: HARDWARE_PERFORMANCE_PROFILE, automationSurface: 'codex-in-app-browser' } )
 } );
@@ -87,8 +88,8 @@ function assertLaneReference( reference, lane ) {
 
 export function physicalLaneReference( record, sessionSha256 ) {
 
-	if ( ! [ CORRECTNESS_PROFILE, PHYSICAL_ROUTE_PROFILE, HARDWARE_PERFORMANCE_PROFILE ].includes( record?.profile ) ) throw new Error( 'Physical lane reference requires a validated correctness, physical-route, or performance record.' );
-	const lane = record.profile === CORRECTNESS_PROFILE ? 'correctness' : record.profile === PHYSICAL_ROUTE_PROFILE ? 'physicalRoute' : 'hardwarePerformance';
+	if ( ! [ PHYSICAL_ROUTE_PROFILE, HARDWARE_PERFORMANCE_PROFILE ].includes( record?.profile ) ) throw new Error( 'Physical lane reference requires a validated physical-route or performance record.' );
+	const lane = record.profile === PHYSICAL_ROUTE_PROFILE ? 'physicalRoute' : 'hardwarePerformance';
 	const reference = {
 		lane,
 		profile: record.profile,
@@ -130,6 +131,70 @@ export function physicalLaneReference( record, sessionSha256 ) {
 		buildRevision: record.immutableBuild?.buildRevision,
 		threeRevision: record.immutableBuild?.threeRevision,
 		finalized: record.serving?.status === 'FINALIZED_EXACT_STATIC_BYTES',
+		publishable: false
+	};
+	reference.identityBindingDigest = laneIdentityBindingDigest( reference );
+	return Object.freeze( reference );
+
+}
+
+export function correctnessLaneReference( record, sessionSha256 ) {
+
+	validateCorrectnessCaptureSession( record );
+	if ( SHA256.test( sessionSha256 ?? '' ) === false ) throw new Error( 'Correctness lane requires the finalized capture-session file hash.' );
+	const state = {
+		locked: record.route?.lockedState,
+		observed: record.route?.observedState,
+		final: record.route?.finalState
+	};
+	const reference = {
+		lane: 'correctness',
+		profile: CORRECTNESS_PROFILE,
+		automationSurface: 'playwright-headless-chromium',
+		sessionId: `${ CORRECTNESS_PROFILE }:${ record.startedAt }:${ sessionSha256.slice( - 12 ) }`,
+		sessionSha256,
+		startedAt: record.startedAt,
+		finishedAt: record.finishedAt,
+		adapterClass: record.adapterClass,
+		adapterIdentityDigest: stableHash( record.adapterIdentity ),
+		browserIdentityDigest: stableHash( record.browser ),
+		deviceIdentityType: 'gpu-adapter-backend-generation-v1',
+		deviceIdentityDigest: stableHash( {
+			adapter: record.adapterIdentity,
+			backend: record.runtime?.metrics?.backend ?? record.runtime?.metrics?.backendKind,
+			nativeWebGPU: record.runtime?.metrics?.nativeWebGPU,
+			deviceGeneration: record.runtime?.metrics?.rendererDeviceGeneration ?? null
+		} ),
+		osIdentityType: 'browser-platform-v1',
+		osIdentityDigest: stableHash( { platform: record.browser?.platform, userAgent: record.browser?.userAgent } ),
+		refreshIdentityType: 'not-measured-correctness-v1',
+		refreshIdentityDigest: stableHash( { verdict: 'NOT_CLAIMED', profile: CORRECTNESS_PROFILE } ),
+		colorIdentityType: 'capture-resource-copy-output-v1',
+		colorIdentityDigest: stableHash( record.writtenCaptures?.map( ( capture ) => ( {
+			path: capture.png?.path,
+			format: capture.format,
+			colorEncoding: capture.colorEncoding,
+			origin: capture.origin,
+			transport: capture.transport?.layout,
+			normalized: {
+				bytesPerRow: capture.normalized?.bytesPerRow,
+				origin: capture.normalized?.origin,
+				orientationTransform: capture.normalized?.orientationTransform
+			}
+		} ) ) ),
+		limitationsDigest: stableHash( {
+			note: record.note ?? null,
+			hookReason: record.hookResult?.reason ?? record.hookResult?.note ?? null
+		} ),
+		routeDigest: stableHash( record.route ),
+		stateDigest: stableHash( state ),
+		routeStateDigest: stableHash( { route: record.route, state } ),
+		captureSessionDocumentHash: sessionSha256,
+		captureSessionWriteLedgerHash: stableHash( record.artifactWrites ),
+		sourceClosureHash: record.sourceClosureHash,
+		buildRevision: record.buildRevision,
+		threeRevision: record.threeRevision,
+		finalized: true,
 		publishable: false
 	};
 	reference.identityBindingDigest = laneIdentityBindingDigest( reference );

@@ -2,17 +2,19 @@
 
 This lab has one canonical evidence contract: the checked
 `labs/schema/evidence-bundle-v2.schema.json` manifest plus its semantic and
-byte-ledger reconciliation. Runtime capture is performed only in Codex's
-in-app Browser from an immutable production build.
+byte-ledger reconciliation. Deterministic correctness capture runs through the
+shared pinned Playwright runner. Physical-route inspection and hardware
+performance capture run in Codex's in-app Browser from an immutable production
+build.
 
 The three capture lanes are deliberately separate:
 
-- `correctness`: native-WebGPU readbacks, fixed states, standard images and
-  correctness diagnostics;
-- `physical-route`: all 19 locked scenario/mechanism/tier routes, disposal and
-  exact served-byte proof;
-- `performance`: hardware-only cold, cadence, timestamp, sustained and governor
-  populations.
+- `correctness` (`playwright-headless-chromium`): native-WebGPU readbacks,
+  fixed states, standard images and correctness diagnostics;
+- `physical-route` (`codex-in-app-browser`): all 19 locked
+  scenario/mechanism/tier routes, disposal and exact served-byte proof;
+- `performance` (`codex-in-app-browser`): hardware-only cold, cadence,
+  timestamp, sustained and governor populations.
 
 Every raw lane remains `bundleKind: "raw-capture-session"` and
 `publishable: false`. Offline promotion copies the finalized lane documents and
@@ -42,14 +44,24 @@ npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run ca
 ```
 
 The command builds a unique sibling staging directory outside the repository,
-validates every staged byte, atomically renames it to its content-addressed
-final directory, starts an exact-byte HTTP server, and prints the runner URL and
-served-byte ledger. It does not launch a browser. Open the printed
-`/src/in-app-evidence.html` URL using Codex's in-app Browser.
+launches the pinned Playwright Chromium correctness runner, performs native
+render-target readback, and writes a nonpublishable correctness session under
+`artifacts/visual-validation/webgpu-validation-harness/correctness/`.
 
-The runner rejects WebDriver/headless execution and offers independent buttons
-for correctness, physical-route and performance records. Import each downloaded
-record with the served-byte ledger and immutable build directory:
+To collect the physical-route or hardware-performance lanes, prepare and serve
+the immutable build separately:
+
+```bash
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture:physical
+```
+
+That command validates every staged byte, atomically renames it to its
+content-addressed final directory, starts an exact-byte HTTP server, and prints
+the runner URL and served-byte ledger. It does not launch a browser. Open the
+printed `/src/in-app-evidence.html` URL using Codex's in-app Browser. The runner
+rejects WebDriver/headless execution and offers independent physical-route and
+hardware-performance buttons. Import each downloaded record with the served-byte
+ledger and immutable build directory:
 
 ```bash
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run physical:import -- \

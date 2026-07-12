@@ -206,7 +206,7 @@ function claims({ performance = false, visualError = true } = {}) {
 function session(profile, options = {}) {
   const defaults = {
     correctness: {
-      automationSurface: 'codex-in-app-browser',
+      automationSurface: 'playwright-headless-chromium',
       adapterClass: 'hardware',
       adapterHash: '1',
       deviceHash: '5',
@@ -613,7 +613,7 @@ test('release bundles require separate correctness and physical-route lanes', ()
 
 test('capture profiles reject cross-lane automation surfaces', () => {
   for (const [profile, wrongSurface] of [
-    ['correctness', 'playwright-headless-chromium'],
+    ['correctness', 'codex-in-app-browser'],
     ['physical-route', 'playwright-headless-chromium'],
     ['performance', 'playwright-headless-chromium'],
   ]) {
@@ -623,14 +623,25 @@ test('capture profiles reject cross-lane automation surfaces', () => {
   }
 });
 
-test('every publishable capture lane is Codex in-app Browser only', () => {
-  assert.equal(schema.$defs.captureSessionRef.properties.automationSurface.const, 'codex-in-app-browser');
+test('publishable capture lanes use their profile-specific automation surfaces', () => {
+  assert.deepEqual(
+    schema.$defs.captureSessionRef.properties.automationSurface.enum,
+    ['playwright-headless-chromium', 'codex-in-app-browser'],
+  );
   const candidate = releaseRecord({ performance: true });
-  assert.ok(candidate.captureSessions.every((entry) => entry.automationSurface === 'codex-in-app-browser'));
+  assert.deepEqual(
+    candidate.captureSessions.map(({ profile, automationSurface }) => [profile, automationSurface]),
+    [
+      ['correctness', 'playwright-headless-chromium'],
+      ['physical-route', 'codex-in-app-browser'],
+      ['performance', 'codex-in-app-browser'],
+    ],
+  );
   for (const entry of candidate.captureSessions) {
+    const expectedSurface = entry.automationSurface;
     entry.automationSurface = 'chrome';
     assertSchemaInvalid(candidate, `${entry.profile} lane on Chrome`);
-    entry.automationSurface = 'codex-in-app-browser';
+    entry.automationSurface = expectedSurface;
   }
 });
 

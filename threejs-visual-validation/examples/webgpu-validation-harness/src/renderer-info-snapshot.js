@@ -119,6 +119,23 @@ const ADAPTER_LIMIT_FIELDS = [
 	'maxComputeWorkgroupSizeY', 'maxComputeWorkgroupSizeZ', 'maxComputeWorkgroupsPerDimension'
 ];
 
+const SOFTWARE_ADAPTER_PATTERN = /swiftshader|llvmpipe|lavapipe|softpipe|swrast|software raster|software adapter|warp|basic render driver|null adapter|mock adapter|cpu renderer/i;
+const VIRTUAL_ADAPTER_PATTERN = /vmware|virtualbox|parallels|virgl|virtio|gfxstream|virtual gpu|virtual adapter|remote display/i;
+const HARDWARE_ADAPTER_PATTERN = /\b(?:apple|nvidia|geforce|quadro|rtx|gtx|amd|radeon|intel|iris|arc|adreno|qualcomm|mali|powervr)\b/i;
+const UNKNOWN_ADAPTER_PATTERN = /^(?:unknown|unidentified|unexposed|unavailable|not available|none|n\/a)$/i;
+
+export function classifyGpuAdapterSnapshot( snapshot ) {
+
+	if ( snapshot === null || typeof snapshot !== 'object' || Array.isArray( snapshot ) ) throw new TypeError( 'GPU adapter snapshot must be an object.' );
+	const identity = Object.values( snapshot.info ?? {} ).filter( ( value ) => typeof value === 'string' ).join( ' ' ).trim();
+	if ( SOFTWARE_ADAPTER_PATTERN.test( identity ) ) return 'software';
+	if ( VIRTUAL_ADAPTER_PATTERN.test( identity ) ) return 'virtual';
+	if ( identity.length === 0 || UNKNOWN_ADAPTER_PATTERN.test( identity ) ) return 'unknown';
+	if ( HARDWARE_ADAPTER_PATTERN.test( identity ) ) return 'hardware';
+	return 'unknown';
+
+}
+
 export function snapshotGpuAdapter( adapter ) {
 
 	if ( adapter === null || typeof adapter !== 'object' ) throw new TypeError( 'GPU adapter must be an object.' );
@@ -140,11 +157,12 @@ export function snapshotGpuAdapter( adapter ) {
 	const features = adapter.features && typeof adapter.features[ Symbol.iterator ] === 'function'
 		? [ ...adapter.features ].filter( ( value ) => typeof value === 'string' ).sort()
 		: [];
-	return {
+	const snapshot = {
 		info,
 		features,
 		limits,
 		identitySource: 'GPUAdapter retained by the canonical renderer device request'
 	};
+	return { ...snapshot, adapterClass: classifyGpuAdapterSnapshot( snapshot ) };
 
 }

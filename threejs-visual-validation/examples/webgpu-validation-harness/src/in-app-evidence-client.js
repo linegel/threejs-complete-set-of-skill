@@ -1,5 +1,4 @@
 import {
-	CORRECTNESS_PROFILE,
 	HARDWARE_PERFORMANCE_PROFILE,
 	PHYSICAL_EVIDENCE_SCHEMA_VERSION,
 	PHYSICAL_ROUTE_PROFILE,
@@ -7,7 +6,6 @@ import {
 	sha256Hex
 } from './physical-evidence-common.js';
 import {
-	CORRECTNESS_ROUTE_PLAN,
 	HARDWARE_PERFORMANCE_CONTRACT,
 	HARDWARE_PERFORMANCE_ROUTE_PLAN,
 	PHYSICAL_ROUTE_PLAN
@@ -17,7 +15,6 @@ import { canonicalUrlForRoute } from './route-locks.js';
 const status = document.querySelector( '#status' );
 const result = document.querySelector( '#result' );
 const routeHost = document.querySelector( '#route-host' );
-const correctnessButton = document.querySelector( '#run-correctness' );
 const routeButton = document.querySelector( '#run-routes' );
 const performanceButton = document.querySelector( '#run-performance' );
 const downloadButton = document.querySelector( '#download' );
@@ -313,25 +310,9 @@ async function collectBaseSession( profile, plan, refresh ) {
 		acceptanceStatus: 'incomplete',
 		limitations: [
 			'Raw in-app sessions are nonpublishable inputs to a separate offline release-bundle join.',
-			'No evidence is promoted without distinct finalized correctness and physical-route Codex Browser sessions.'
+			'No evidence is promoted without a finalized Playwright correctness session and a distinct finalized Codex Browser physical-route session.'
 		]
 	};
-
-}
-
-async function runCorrectnessRoutes() {
-
-	const refresh = await measureIdleRefresh();
-	const session = await collectBaseSession( CORRECTNESS_PROFILE, CORRECTNESS_ROUTE_PLAN, refresh );
-	for ( const plan of CORRECTNESS_ROUTE_PLAN ) {
-
-		const { record, metrics } = await collectRoute( plan );
-		session.routes.push( record );
-		session.adapter ??= { adapterClass: metrics.adapterClass, identity: metrics.adapterIdentity?.info ?? {} };
-
-	}
-	session.finishedAt = new Date().toISOString();
-	return session;
 
 }
 
@@ -406,7 +387,6 @@ function downloadCurrentRecord() {
 
 async function run( operation ) {
 
-	correctnessButton.disabled = true;
 	routeButton.disabled = true;
 	performanceButton.disabled = true;
 	downloadButton.disabled = true;
@@ -425,7 +405,6 @@ async function run( operation ) {
 
 	} finally {
 
-		correctnessButton.disabled = false;
 		routeButton.disabled = false;
 		performanceButton.disabled = false;
 
@@ -451,7 +430,6 @@ async function initialize() {
 
 }
 
-correctnessButton.addEventListener( 'click', () => run( runCorrectnessRoutes ) );
 routeButton.addEventListener( 'click', () => run( runPhysicalRoutes ) );
 performanceButton.addEventListener( 'click', () => run( runHardwarePerformance ) );
 downloadButton.addEventListener( 'click', downloadCurrentRecord );
@@ -459,7 +437,6 @@ downloadButton.addEventListener( 'click', downloadCurrentRecord );
 initialize().catch( ( error ) => {
 
 	status.textContent = error.message;
-	correctnessButton.disabled = true;
 	routeButton.disabled = true;
 	performanceButton.disabled = true;
 	window.__THREEJS_PHYSICAL_EVIDENCE_ERROR__ = error;
