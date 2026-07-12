@@ -10,8 +10,8 @@ for ( const tierId of Object.keys( SWE_GPU_TIERS ) ) {
 	const contract = deriveSweGpuContract( tierId );
 	assert.equal( validateSweGpuContract( contract ), true );
 	assert.ok( contract.tier.fixedTimeStepSeconds <= contract.stableTimeStepSeconds );
-	assert.equal( contract.dispatchOrder.length, 7 );
-	assert.equal( contract.resourceBytes.diagnostics, 48 );
+	assert.equal( contract.dispatchOrder.length, 8 );
+	assert.equal( contract.resourceBytes.diagnostics, 64 );
 	summaries.push( { tierId, bytes: contract.totalLogicalBytes, cflRatio: contract.cflRatio } );
 
 }

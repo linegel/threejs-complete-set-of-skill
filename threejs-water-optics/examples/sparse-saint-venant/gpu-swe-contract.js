@@ -23,7 +23,7 @@ export const SWE_GPU_LAYOUT = Object.freeze( {
 	faceFlux: Object.freeze( { type: 'vec4<f32>', channels: Object.freeze( [ 'massFluxM2ps', 'normalMomentumFluxM3ps2', 'tangentMomentumFluxM3ps2', 'reserved' ] ), orientations: 2 } ),
 	hydrostaticCorrection: Object.freeze( { type: 'vec2<f32>', channels: Object.freeze( [ 'leftOrSouthMomentumCorrectionM3ps2', 'rightOrNorthMomentumCorrectionM3ps2' ] ), orientations: 2 } ),
 	descriptor: Object.freeze( { type: 'vec4<i32>', channels: Object.freeze( [ 'logicalTileX', 'logicalTileZ', 'roleCode', 'resident' ] ) } ),
-	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta' ] ) } )
+	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta', 'foamCoveredCells', 'foamSourceRateQuanta', 'foamClampCells', 'foamCoverageQuanta' ] ) } )
 } );
 
 export function resolveSweGpuTier( tierId ) {
@@ -46,6 +46,7 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 	const zFaceRecords = tier.capacityTiles * tier.tileSize * ( tier.tileSize + 1 );
 	const resourceBytes = Object.freeze( {
 		statePingPong: stateRecords * 16 * 2,
+		foamPingPong: stateRecords * 4 * 2,
 		xFaceFlux: xFaceRecords * 16,
 		zFaceFlux: zFaceRecords * 16,
 		xHydrostaticCorrection: xFaceRecords * 8,
@@ -53,7 +54,7 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		descriptors: tier.capacityTiles * 16,
 		logicalLookup: tier.logicalTilesX * tier.logicalTilesZ * 4,
 		displayIndices: tier.capacityTiles * tier.tileSize * tier.tileSize * 4,
-		diagnostics: SWE_GPU_LAYOUT.diagnostic.channels.length * 4
+		diagnostics: 16 * 4
 	} );
 	const totalLogicalBytes = Object.values( resourceBytes ).reduce( ( sum, bytes ) => sum + bytes, 0 );
 	return Object.freeze( {
@@ -70,7 +71,7 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		zFaceRecords,
 		resourceBytes,
 		totalLogicalBytes,
-		dispatchOrder: Object.freeze( [ 'reset-validation', 'halo-and-boundary', 'x-face-flux', 'z-face-flux', 'cell-update', 'candidate-validation', 'atomic-commit' ] )
+		dispatchOrder: Object.freeze( [ 'reset-validation', 'halo-and-boundary', 'x-face-flux', 'z-face-flux', 'cell-update', 'foam-transport-reaction', 'candidate-validation', 'atomic-commit' ] )
 	} );
 
 }
@@ -82,7 +83,7 @@ export function validateSweGpuContract( contract ) {
 	if ( SWE_GPU_EXECUTION_DECISION.selectedCandidateId !== 'separate-face-flux-transaction' ) throw new Error( 'SWE GPU execution winner drifted' );
 	if ( SWE_GPU_EXECUTION_DECISION.candidates.find( ( candidate ) => candidate.id === SWE_GPU_EXECUTION_DECISION.selectedCandidateId )?.hardGate !== 'pass' ) throw new Error( 'SWE GPU execution winner fails its hard gate' );
 	if ( contract.tier.fixedTimeStepSeconds > contract.stableTimeStepSeconds ) throw new Error( `SWE ${ contract.tierId } fixed step exceeds its derived unsplit CFL bound` );
-	if ( contract.dispatchOrder.join( '>' ) !== 'reset-validation>halo-and-boundary>x-face-flux>z-face-flux>cell-update>candidate-validation>atomic-commit' ) throw new Error( 'SWE GPU dispatch dependency order drifted' );
+	if ( contract.dispatchOrder.join( '>' ) !== 'reset-validation>halo-and-boundary>x-face-flux>z-face-flux>cell-update>foam-transport-reaction>candidate-validation>atomic-commit' ) throw new Error( 'SWE GPU dispatch dependency order drifted' );
 	if ( contract.resourceBytes.statePingPong !== contract.stateRecords * 16 * 2 ) throw new Error( 'SWE state ping-pong byte accounting drifted' );
 	if ( contract.xFaceRecords !== contract.tier.capacityTiles * ( contract.tier.tileSize + 1 ) * contract.tier.tileSize ) throw new Error( 'SWE x-face ownership count drifted' );
 	if ( contract.zFaceRecords !== contract.tier.capacityTiles * contract.tier.tileSize * ( contract.tier.tileSize + 1 ) ) throw new Error( 'SWE z-face ownership count drifted' );

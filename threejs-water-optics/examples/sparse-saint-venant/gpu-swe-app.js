@@ -99,10 +99,12 @@ function buildDisplayMesh() {
 	const material = new MeshBasicNodeMaterial();
 	const stateIndex = owner.displayIndexNode.element( instanceIndex.toUint() );
 	const state = owner.committedStateNode.element( stateIndex );
+	const foamCoverage = owner.foamCommittedNode.element( stateIndex );
 	const depthRatio = clamp( state.x.div( float( contract.tier.maximumDepthMeters ) ), 0, 1 );
 	const wetColor = mix( color( 0x45e0e8 ), color( 0x0756a8 ), depthRatio );
+	const foamedWaterColor = mix( wetColor, color( 0xf4fbf1 ), clamp( foamCoverage.mul( 1.4 ), 0, 1 ) );
 	const dryColor = mix( color( 0xc6a56c ), color( 0x426653 ), clamp( state.w.add( 0.12 ).mul( 5 ), 0, 1 ) );
-	material.colorNode = select( state.x.lessThan( -1e-6 ), color( 0xff00cc ), select( state.x.greaterThan( 1e-5 ), wetColor, dryColor ) );
+	material.colorNode = select( state.x.lessThan( -1e-6 ), color( 0xff00cc ), select( state.x.greaterThan( 1e-5 ), foamedWaterColor, dryColor ) );
 	// positionLocal already contains the InstancedMesh transform when the custom
 	// position node is assigned; positionGeometry would collapse every cell to
 	// the source plane at the origin in r185.
@@ -152,7 +154,7 @@ async function captureDiagnostic() {
 	try {
 
 		const diagnostic = await owner.captureDiagnostics();
-		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
+		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
 		return diagnostic;
 

@@ -83,6 +83,13 @@ bounded source/decay reaction. The oracle keeps transport residual, source gain,
 decay loss, and clamp count separate; foam appearance is not allowed to invent
 coverage or breaking ownership.
 
+The native graph carries committed/candidate foam coverage beside water state.
+The shared halo pass transfers stable-frame coverage, one conservative upwind
+pass transports it with depth-averaged carrier velocity and applies exact
+source/decay reaction, validation gates coverage and carrier velocity, and the
+water transaction commits or rejects both states together. The display samples
+that coverage; unrelated texture noise cannot create whitewater.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,
