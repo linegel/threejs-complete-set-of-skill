@@ -42,6 +42,8 @@ export const FROST_MODE_TO_DEBUG_VIEW = Object.freeze({
 });
 
 export const FROST_LAB_MODES = Object.freeze(Object.keys(FROST_MODE_TO_DEBUG_VIEW));
+export const FROST_LAB_ID = "webgpu-touch-history-frost";
+export const FROST_SCENARIO_ID = "touch-history-frost";
 
 const FROST_DEBUG_VIEW_TO_MODE = Object.freeze(Object.fromEntries(
   Object.entries(FROST_MODE_TO_DEBUG_VIEW).map(([mode, debugView]) => [debugView, mode]),
@@ -114,6 +116,7 @@ function createBackdropScene() {
 export class WebGPUFrostLab {
   constructor({ canvas, tier = "balanced", mechanism = "history-and-deposit", seed = 1 } = {}) {
     this.canvas = canvas;
+    this.scenario = FROST_SCENARIO_ID;
     this.tier = FROST_QUALITY_TIERS[tier];
     if (!this.tier) throw new RangeError(`unknown frost tier "${tier}"`);
     if (!FROST_MECHANISMS.includes(mechanism)) throw new RangeError(`unknown frost mechanism "${mechanism}"`);
@@ -165,6 +168,11 @@ export class WebGPUFrostLab {
   }
 
   async setScenario(id) {
+    if (id !== FROST_SCENARIO_ID) throw new RangeError(`unknown frost scenario "${id}"`);
+    this.scenario = id;
+  }
+
+  async setMechanism(id) {
     if (!FROST_MECHANISMS.includes(id)) throw new RangeError(`unknown frost mechanism "${id}"`);
     this.mechanism = id;
     const profile = this.effect.setMechanism(id);
@@ -337,7 +345,9 @@ export class WebGPUFrostLab {
   getMetrics() {
     return {
       ...this.effect.getMetrics(),
+      labId: FROST_LAB_ID,
       backendIsWebGPU: this.renderer.backend?.isWebGPUBackend === true,
+      scenario: this.scenario,
       mechanism: this.mechanism,
       mode: this.mode,
       camera: this.cameraId,
@@ -351,6 +361,10 @@ export class WebGPUFrostLab {
     this.backdrop?.dispose();
     this.renderer?.dispose();
     this.disposed = true;
+  }
+
+  get labId() {
+    return FROST_LAB_ID;
   }
 }
 

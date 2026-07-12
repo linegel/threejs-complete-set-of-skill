@@ -32,7 +32,13 @@ import {
   updateHistorySample,
   validateDiffusionStep,
 } from "./frost-surface-effect.js";
-import { FROST_LAB_MODES, parseFrostLabRoute } from "./frost-webgpu-lab.js";
+import {
+  FROST_LAB_ID,
+  FROST_LAB_MODES,
+  FROST_SCENARIO_ID,
+  WebGPUFrostLab,
+  parseFrostLabRoute,
+} from "./frost-webgpu-lab.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../..");
@@ -356,6 +362,8 @@ assert.equal(labManifest.threeRevision, "0.185.1");
 assert.deepEqual(labManifest.mechanisms.map(({ id }) => id), FROST_MECHANISMS);
 assert.deepEqual(labManifest.tiers.map(({ id }) => id), Object.keys(FROST_QUALITY_TIERS));
 assert.deepEqual(labManifest.modes, FROST_LAB_MODES);
+assert.equal(labManifest.id, FROST_LAB_ID);
+assert.deepEqual(labManifest.scenarios.map(({ id }) => id), [FROST_SCENARIO_ID]);
 assert(existsSync(resolve(here, labManifest.browserEntry)), "canonical browser entry is missing");
 for (const { id } of labManifest.mechanisms) {
   const wrapper = resolve(here, "mechanism", id, "index.html");
@@ -372,6 +380,13 @@ for (const { id } of labManifest.tiers) {
 assert.throws(() => parseFrostLabRoute("/demos/frost/mechanism/not-a-mechanism/"), /unknown frost mechanism/);
 assert.throws(() => parseFrostLabRoute("/demos/frost/tier/not-a-tier/"), /unknown frost tier/);
 
+const controllerContract = new WebGPUFrostLab({ mechanism: "diffusion" });
+assert.equal(controllerContract.labId, FROST_LAB_ID);
+await controllerContract.setScenario(FROST_SCENARIO_ID);
+assert.equal(controllerContract.scenario, FROST_SCENARIO_ID);
+assert.equal(controllerContract.mechanism, "diffusion", "scenario selection must not mutate the mechanism");
+await assert.rejects(controllerContract.setScenario("history-and-deposit"), /unknown frost scenario/);
+
 const browserSource = readFileSync(resolve(here, "frost-webgpu-lab.js"), "utf8");
 for (const token of [
   "await this.renderer.init()",
@@ -381,5 +396,9 @@ for (const token of [
 ]) {
   assert(browserSource.includes(token), `canonical frost browser source is missing ${token}`);
 }
+const entrySource = readFileSync(resolve(here, "main.js"), "utf8");
+assert(entrySource.includes("globalThis.labController = lab"), "canonical frost controller is not published through labController");
+assert(entrySource.includes("globalThis.__LAB_CONTROLLER__ = lab"), "canonical frost controller compatibility alias is missing");
+assert(entrySource.includes("lab.setMechanism(mechanismSelect.value)"), "mechanism UI still mutates the scenario channel");
 
 console.log("webgpu-touch-history-frost validation passed");

@@ -6,6 +6,7 @@ const status = document.querySelector("[data-status]");
 const route = parseFrostLabRoute(location.pathname, location.search);
 const lab = await createFrostLab({ canvas, ...route, seed: 0x00000001 });
 
+globalThis.labController = lab;
 globalThis.__LAB_CONTROLLER__ = lab;
 globalThis.__LAB_READY__ = true;
 
@@ -34,7 +35,7 @@ const tierLocked = location.pathname.split("/").includes("tier");
 mechanismSelect.disabled = mechanismLocked;
 tierSelect.disabled = tierLocked;
 if (!mechanismLocked) mechanismSelect.addEventListener("change", async () => {
-  await lab.setScenario(mechanismSelect.value);
+  await lab.setMechanism(mechanismSelect.value);
   refreshModes();
 });
 if (!tierLocked) tierSelect.addEventListener("change", async () => {
