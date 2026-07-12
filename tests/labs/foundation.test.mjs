@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   mkdirSync,
+  readFileSync,
   writeFileSync,
 } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -278,6 +279,12 @@ test('Pages smoke plan enumerates every primary base and fixed route from the re
   const browserRoutes = plannedPagesBrowserRoutes(routes);
   assert.equal(browserRoutes.length, primaryBase.length + primaryFixed.length);
   assert.ok(browserRoutes.every((route) => ['primary-base', 'primary-fixed'].includes(route.category)));
+});
+
+test('Pages smoke uses the authoritative skill roster rather than filesystem discovery', () => {
+  const source = readFileSync(new URL('../../scripts/pages-smoke.mjs', import.meta.url), 'utf8');
+  assert.match(source, /authoritativeSkillDirs\(loadCanonicalTargets\(\)\)/);
+  assert.doesNotMatch(source, /readdirSync|startsWith\(['"]threejs-/);
 });
 
 test('Pages route identity rejects a Vite homepage fallback with HTTP 200', () => {

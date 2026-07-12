@@ -1,9 +1,13 @@
 #!/usr/bin/env node
-import { existsSync, readdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { preview } from 'vite';
-import { join } from 'node:path';
-import { PRIMARY_DEMO_KINDS, REPO_ROOT, buildDemoRegistry } from './lib/lab-registry.mjs';
+import {
+  PRIMARY_DEMO_KINDS,
+  REPO_ROOT,
+  authoritativeSkillDirs,
+  buildDemoRegistry,
+  loadCanonicalTargets,
+} from './lib/lab-registry.mjs';
 import {
   LAB_CONTROLLER_GLOBALS,
   assertPagesBrowserObservation,
@@ -27,12 +31,7 @@ if (!baseUrl) {
 let browser = null;
 try {
   const registry = buildDemoRegistry();
-  const skillIds = [];
-  for (const directory of readdirSync(REPO_ROOT)) {
-    if (directory.startsWith('threejs-') && existsSync(join(REPO_ROOT, directory, 'SKILL.md'))) {
-      skillIds.push(directory);
-    }
-  }
+  const skillIds = authoritativeSkillDirs(loadCanonicalTargets());
   const routes = plannedPagesSmokeRoutes({ registry, skillIds, primaryDemoKinds: PRIMARY_DEMO_KINDS });
   for (const route of routes) {
     const response = await fetch(new URL(route.path.replace(/^\//, ''), baseUrl), { redirect: 'manual' });
