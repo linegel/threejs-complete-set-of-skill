@@ -4,6 +4,7 @@ import { relative } from 'node:path';
 import {
   REPO_ROOT,
   REGISTRY_PATH,
+  authoritativeSkillDirs,
   buildDemoRegistry,
   listRawLabManifestPaths,
   loadCanonicalTargets,
@@ -17,15 +18,16 @@ const write = args.has('--write-registry');
 const requireComplete = args.has('--require-complete');
 const skipRegistryDrift = args.has('--skip-registry-drift');
 
+let targetData;
 try {
-  loadCanonicalTargets();
+  targetData = loadCanonicalTargets();
 } catch (error) {
   console.error(error.message);
   process.exit(1);
 }
 
 const rawErrors = [];
-for (const path of listRawLabManifestPaths()) {
+for (const path of listRawLabManifestPaths(authoritativeSkillDirs(targetData))) {
   const label = relative(REPO_ROOT, path).split('\\').join('/');
   try {
     const result = validateRawLabManifest(readJson(path));

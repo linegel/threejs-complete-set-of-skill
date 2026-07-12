@@ -8,11 +8,11 @@ import {
   PRIMARY_DEMO_KINDS,
   REPO_ROOT,
   authoritativePrimaryRoster,
+  authoritativeSkillDirs,
   computeManifestSourceHash,
   deriveRegistryCounts,
   deriveRegistryPrimaryIds,
   deriveSkillCoverage,
-  listSkillDirs,
   loadCanonicalTargets,
   validatePrimaryRosterClosure,
 } from './lab-registry.mjs';
@@ -457,7 +457,7 @@ export function validateRegistry(registry, { requireComplete = false, validateEv
   const errors = [];
   const targetData = loadCanonicalTargets();
   const roster = authoritativePrimaryRoster(targetData);
-  const skills = listSkillDirs();
+  const skills = authoritativeSkillDirs(targetData);
   const demos = registry?.demos ?? [];
   const primary = demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
 
