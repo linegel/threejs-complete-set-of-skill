@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:2a5a81363562395a1959d2e55b3cba80e51f70b1eeca7b2357aad945aa3821c2",
+  "buildRevision": "sha256:b63a46b057c7f5d865085114d168cb3d04e24b9ea6ace47d08bd04fc84ca02bf",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -432,6 +432,7 @@
       "canonicalSource": [
         "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-core.mjs",
         "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-fixtures.json",
+        "threejs-compatibility-fallbacks/examples/browser-fallback-harness/route-state.mjs",
         "threejs-compatibility-fallbacks/examples/browser-fallback-harness/app.mjs",
         "threejs-compatibility-fallbacks/examples/browser-fallback-harness/compatibility-renderer.mjs",
         "threejs-compatibility-fallbacks/examples/browser-fallback-harness/capture.mjs",
@@ -615,7 +616,7 @@
         "validateQuick": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run validate:quick",
         "validateFull": "npm --prefix threejs-compatibility-fallbacks/examples/browser-fallback-harness run validate:full"
       },
-      "sourceHash": "sha256:f54009407068a1ad3c0f350884f7605f9ce1e356889ac38b12b9b2bac1383229",
+      "sourceHash": "sha256:e7931606489adaaac2e9711985f7f079d7d549adba62abe69fff2f3cf0598eed",
       "proxyStatus": null,
       "notes": [
         "Browser acceptance remains incomplete until a live no-WebGPU capture proves the backend gate and isolated compatibility branch."
