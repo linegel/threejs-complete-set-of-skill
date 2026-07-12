@@ -3,7 +3,9 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  articleDependencyHash,
   manifestOwnedOutputPaths,
+  ownerIdForSiteImageUrl,
   ownerIdForResponsiveSource,
   responsiveDependencyHash,
   sha256,
@@ -22,10 +24,16 @@ const ARTICLE_IMAGE_SPECS = [
 const errors = [];
 const responsiveSourcesSeen = new Set();
 let responsiveManifest = { sources: {} };
+let articleManifest = { skills: {} };
 try {
   responsiveManifest = JSON.parse(readFileSync(join(DOCS, 'seo', 'responsive-images.json'), 'utf8'));
 } catch (error) {
   errors.push(`responsive image manifest is missing or invalid (${error.message})`);
+}
+try {
+  articleManifest = JSON.parse(readFileSync(join(DOCS, 'seo', 'article', 'manifest.json'), 'utf8'));
+} catch (error) {
+  errors.push(`Article image manifest is missing or invalid (${error.message})`);
 }
 
 function assert(condition, message) {
@@ -362,15 +370,55 @@ for (const url of pageUrls) {
   pageRecords.push({ url, ...record });
 }
 
+const skillsWithArticleImages = new Set();
 for (const url of pageUrls.filter((value) => new URL(value).pathname.startsWith('/skills/'))) {
   const slug = new URL(url).pathname.match(/^\/skills\/([^/]+)\.html$/)?.[1];
   const skillHtml = readFileSync(localPathForUrl(url), 'utf8');
   const hasSocialImage = headValue(skillHtml, 'property', 'og:image').length === 1;
+  if (hasSocialImage) skillsWithArticleImages.add(slug);
   const sitemapImage = `<image:loc>${SITE}seo/article/${slug}-16x9.png</image:loc>`;
   assert(
     sitemap.includes(sitemapImage) === hasSocialImage,
     `sitemap.xml: ${slug} image entry does not match same-lab evidence availability`,
   );
+}
+assert(articleManifest.schemaVersion === 2, 'Article image manifest: schemaVersion must equal 2');
+assert(articleManifest.generatedBy === 'scripts/generate-seo-images.mjs', 'Article image manifest: unexpected generator identity');
+const articleManifestSkills = Object.keys(articleManifest.skills ?? {});
+assert(articleManifestSkills.length === skillsWithArticleImages.size, `Article image manifest: ${articleManifestSkills.length} entries but ${skillsWithArticleImages.size} skills publish images`);
+const registeredArticleOutputs = new Set();
+for (const slug of articleManifestSkills) {
+  const record = articleManifest.skills[slug];
+  const skillPath = join(DOCS, 'skills', `${slug}.html`);
+  const skillHtml = existsSync(skillPath) ? readFileSync(skillPath, 'utf8') : '';
+  const sourceUrl = headValue(skillHtml, 'property', 'og:image')[0];
+  assert(skillsWithArticleImages.has(slug), `Article image manifest: stale skill ${slug}`);
+  assert(record.source === sourceUrl, `Article image manifest: social source drift for ${slug}`);
+  if (sourceUrl) {
+    const sourcePath = localPathForUrl(sourceUrl);
+    assert(record.ownerId === ownerIdForSiteImageUrl(sourceUrl, SITE), `Article image manifest: owner drift for ${slug}`);
+    if (sourcePath && existsSync(sourcePath)) {
+      assert(record.sourceSha256 === sha256(readFileSync(sourcePath)), `Article image manifest: source hash drift for ${slug}`);
+    }
+  }
+  assert(record.dependencyClosureHash === articleDependencyHash(slug, record), `Article image manifest: dependency closure drift for ${slug}`);
+  assert(Object.keys(record.images ?? {}).length === ARTICLE_IMAGE_SPECS.length, `Article image manifest: ${slug} does not have all ratio crops`);
+  for (const spec of ARTICLE_IMAGE_SPECS) {
+    const output = record.images?.[spec.id];
+    const outputPath = output?.url ? localPathForUrl(output.url) : null;
+    assert(Boolean(outputPath && existsSync(outputPath)), `Article image manifest: missing ${slug} ${spec.id} crop`);
+    if (!outputPath || !existsSync(outputPath)) continue;
+    registeredArticleOutputs.add(outputPath);
+    const dimensions = pngDimensions(outputPath);
+    assert(dimensions?.width === spec.width && dimensions?.height === spec.height, `Article image manifest: ${slug} ${spec.id} dimensions drift`);
+    assert(output.bytes === statSync(outputPath).size, `Article image manifest: ${slug} ${spec.id} byte count drift`);
+    assert(output.sha256 === sha256(readFileSync(outputPath)), `Article image manifest: ${slug} ${spec.id} hash drift`);
+  }
+}
+const publishedArticleOutputs = new Set(walk(join(DOCS, 'seo', 'article'), (file) => file.endsWith('.png')));
+assert(registeredArticleOutputs.size === publishedArticleOutputs.size, `Article image manifest: ${registeredArticleOutputs.size} registered crops but ${publishedArticleOutputs.size} are published`);
+for (const output of publishedArticleOutputs) {
+  assert(registeredArticleOutputs.has(output), `Article image manifest: unregistered crop ${relative(DOCS, output)}`);
 }
 const responsiveManifestSources = Object.keys(responsiveManifest.sources ?? {});
 assert(responsiveManifest.schemaVersion === 2, 'responsive image manifest: schemaVersion must equal 2');

@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  articleDependencyHash,
   manifestOwnedOutputPaths,
   ownerIdForResponsiveSource,
+  ownerIdForSiteImageUrl,
   responsiveDependencyHash,
   staleManifestOwnedOutputPaths,
 } from '../../scripts/lib/generated-asset-ledger.mjs';
@@ -38,6 +40,41 @@ test('dependency hashes are format-order independent and bind source plus output
   assert.equal(left.dependencyClosureHash, right.dependencyClosureHash);
   const mutated = record('lab', 'sha256:changed', { avif, webp });
   assert.notEqual(left.dependencyClosureHash, mutated.dependencyClosureHash);
+});
+
+test('article owners accept primary evidence and reject secondary or generic media', () => {
+  assert.equal(
+    ownerIdForSiteImageUrl(`${SITE}visual-validation/webgpu-ocean/final.design.png`, SITE),
+    'webgpu-ocean',
+  );
+  assert.equal(
+    ownerIdForSiteImageUrl(`${SITE}previews/primary/router-manifest-lab.png`, SITE),
+    'router-manifest-lab',
+  );
+  for (const url of [
+    'https://cdn.example/evidence.png',
+    `${SITE}previews/provider/legacy-water.png`,
+    `${SITE}generated-asset-contact-sheet.png`,
+  ]) {
+    assert.throws(() => ownerIdForSiteImageUrl(url, SITE));
+  }
+});
+
+test('article dependency hashes bind source and all ratio crops', () => {
+  const record = {
+    ownerId: 'lab',
+    source: `${SITE}visual-validation/lab/final.design.png`,
+    sourceSha256: 'sha256:source',
+    sourceWidth: 1200,
+    sourceHeight: 800,
+    images: {
+      '16x9': { url: `${SITE}seo/article/lab-16x9.png`, bytes: 30, sha256: 'sha256:wide' },
+      '1x1': { url: `${SITE}seo/article/lab-1x1.png`, bytes: 40, sha256: 'sha256:square' },
+    },
+  };
+  const baseline = articleDependencyHash('lab', record);
+  assert.equal(baseline, articleDependencyHash('lab', { ...record, images: { '1x1': record.images['1x1'], '16x9': record.images['16x9'] } }));
+  assert.notEqual(baseline, articleDependencyHash('lab', { ...record, sourceSha256: 'sha256:mutated' }));
 });
 
 test('stale output selection is confined to prior manifest ownership', () => {

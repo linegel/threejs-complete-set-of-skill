@@ -33,10 +33,9 @@ export function ownerIdForSiteImageUrl(urlString, siteOrigin) {
   const url = new URL(urlString, siteOrigin);
   if (url.origin !== new URL(siteOrigin).origin) throw new Error(`site image has foreign origin: ${urlString}`);
   const relativeSource = decodeURIComponent(url.pathname).replace(/^\/+/, '');
-  const ownerId = ownerIdForResponsiveSource(relativeSource);
-  if (ownerId === 'site' || ownerId === 'generated-asset-archive') {
-    throw new Error(`site image has no primary lab owner: ${urlString}`);
-  }
+  const ownerId = relativeSource.match(/^visual-validation\/([^/]+)\//)?.[1]
+    ?? relativeSource.match(/^previews\/primary\/([^/.]+)\.png$/)?.[1];
+  if (!ownerId) throw new Error(`site image has no primary lab owner: ${urlString}`);
   return ownerId;
 }
 
