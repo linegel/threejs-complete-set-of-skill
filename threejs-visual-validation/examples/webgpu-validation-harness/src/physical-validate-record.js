@@ -1,19 +1,20 @@
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-import { validateHardwarePerformanceSession, validatePhysicalRouteSession } from './physical-session-validator.js';
+import { loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
 
 export async function validatePhysicalEvidenceRecordFile( path ) {
 
 	if ( typeof path !== 'string' || path.length === 0 ) throw new Error( 'Physical evidence validation requires a record path.' );
-	const parsed = JSON.parse( await readFile( path, 'utf8' ) );
-	const record = parsed.record ?? parsed;
-	if ( record.profile === 'correctness' ) throw new Error( 'Use the shared correctness capture-session validator for Playwright evidence.' );
-	if ( record.profile !== 'physical-route' && record.profile !== 'performance' ) throw new Error( `Unsupported physical evidence profile ${ record.profile ?? '<missing>' }.` );
-	const validation = record.profile === 'physical-route'
-		? validatePhysicalRouteSession( record )
-		: validateHardwarePerformanceSession( record );
-	return { validation, profile: record.profile, publishable: false, acceptanceStatus: 'incomplete' };
+	const verified = await loadVerifiedImportedPhysicalRecord( path );
+	return {
+		validation: verified.validation,
+		profile: verified.record.profile,
+		recordSha256: verified.recordSha256,
+		sourceDocumentSha256: verified.sourceDocumentSha256,
+		sourceDocumentByteLength: verified.sourceDocumentByteLength,
+		publishable: false,
+		acceptanceStatus: 'incomplete'
+	};
 
 }
 

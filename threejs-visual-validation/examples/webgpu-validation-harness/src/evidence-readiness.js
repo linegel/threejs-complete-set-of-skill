@@ -1,4 +1,4 @@
-import { access, readFile } from 'node:fs/promises';
+import { access } from 'node:fs/promises';
 import { isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,13 +6,12 @@ import {
 	canonicalRawBundleDirectory,
 	canonicalReleaseBundleDirectory,
 	resolveValidationBundleDirectory,
-	VALIDATION_HARNESS_LAB_ID
+	VALIDATION_HARNESS_LAB_ID,
+	VALIDATION_HARNESS_REPOSITORY_ROOT
 } from './artifact-paths.js';
 import { readUnifiedEvidenceManifest } from './evidence-bundle-v2.js';
-import { physicalLaneReference } from './physical-lane-join.js';
-import { stableStringify } from './physical-evidence-common.js';
-import { hashPhysicalRecord, validateHardwarePerformanceSession, validatePhysicalRouteSession } from './physical-session-validator.js';
 import { validateVersionedArtifactBundle } from './schema/dispatcher.js';
+import { loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
 
 const REQUIRED_RELEASE_CLAIMS = Object.freeze( [
 	'visualCorrectness',
@@ -132,22 +131,15 @@ async function inspectPhysicalRecord( input, path, expectedProfile ) {
 	if ( await pathExists( path ) === false ) return inputSummary( input, path, 'MISSING' );
 	try {
 
-		const parsed = JSON.parse( await readFile( path, 'utf8' ) );
-		const record = parsed.record ?? parsed;
-		if ( record.profile !== expectedProfile ) throw new Error( `Expected profile ${ expectedProfile }, received ${ record.profile ?? '<missing>' }.` );
-		const validation = expectedProfile === 'physical-route'
-			? validatePhysicalRouteSession( record )
-			: validateHardwarePerformanceSession( record );
-		const recordSha256 = hashPhysicalRecord( record );
-		if ( parsed.recordSha256 === undefined || parsed.laneReference === undefined ) throw new Error( 'Physical record must be finalized by physical:import before readiness inspection.' );
-		if ( parsed.recordSha256 !== recordSha256 ) throw new Error( 'Imported recordSha256 no longer binds the physical record.' );
-		const expectedReference = physicalLaneReference( record, recordSha256 );
-		if ( stableStringify( parsed.laneReference ) !== stableStringify( expectedReference ) ) throw new Error( 'Imported laneReference no longer binds the physical record.' );
+		const verified = await loadVerifiedImportedPhysicalRecord( path, { expectedProfile } );
+		const { record, validation, recordSha256 } = verified;
 		return inputSummary( input, path, 'READY', {
 			profile: expectedProfile,
 			automationSurface: record.automationSurface,
 			adapterClass: record.adapter?.adapterClass ?? null,
 			recordSha256,
+			sourceDocumentSha256: verified.sourceDocumentSha256,
+			sourceDocumentByteLength: verified.sourceDocumentByteLength,
 			sourceClosureHash: record.immutableBuild?.sourceClosureHash ?? null,
 			buildRevision: record.immutableBuild?.buildRevision ?? null,
 			threeRevision: record.immutableBuild?.threeRevision ?? null,

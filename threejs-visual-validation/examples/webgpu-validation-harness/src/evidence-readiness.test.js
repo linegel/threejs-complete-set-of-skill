@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
 
-import { deriveHarnessAcceptanceReadiness } from './evidence-readiness.js';
+import { deriveHarnessAcceptanceReadiness, inspectHarnessAcceptanceReadiness } from './evidence-readiness.js';
 
 function input( name, status, message = null ) {
 
@@ -94,5 +97,18 @@ test( 'an invalid canonical release remains an explicit blocker', () => {
 		'CORRECTNESS_INVALID',
 		'RELEASE_BUNDLE_INVALID'
 	] );
+
+} );
+
+test( 'candidate readiness confines external candidates without a missing root import', async () => {
+
+	const directory = await mkdtemp( join( tmpdir(), 'threejs-readiness-candidate-' ) );
+	const result = await inspectHarnessAcceptanceReadiness( {
+		correctnessPath: join( directory, 'missing-correctness' ),
+		releaseCandidatePath: join( directory, 'missing-candidate' ),
+		releasePath: join( directory, 'missing-release' )
+	} );
+	assert.equal( result.inputs.releaseCandidate.status, 'MISSING' );
+	assert.equal( result.accepted, false );
 
 } );

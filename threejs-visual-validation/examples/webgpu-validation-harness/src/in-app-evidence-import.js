@@ -4,12 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { REPO_ROOT } from '../../../../scripts/lib/lab-registry.mjs';
 import { loadAndValidateImmutableBuild } from './immutable-physical-build.js';
-import { physicalLaneReference } from './physical-lane-join.js';
-import {
-	hashPhysicalRecord,
-	validateHardwarePerformanceSession,
-	validatePhysicalRouteSession
-} from './physical-session-validator.js';
+import { hashPhysicalRecord } from './physical-session-validator.js';
+import { finalizeImportedPhysicalRecord } from './verified-physical-record.js';
 
 function isWithin( path, parent ) {
 
@@ -83,11 +79,7 @@ export async function importInAppEvidenceRecord( { recordPath, ledgerPath, build
 		publishable: false,
 		acceptanceStatus: 'incomplete'
 	};
-	const validation = imported.profile === 'physical-route'
-		? validatePhysicalRouteSession( imported )
-		: validateHardwarePerformanceSession( imported );
-	const recordSha256 = hashPhysicalRecord( imported );
-	return { record: imported, validation, recordSha256, laneReference: physicalLaneReference( imported, recordSha256 ) };
+	return finalizeImportedPhysicalRecord( imported );
 
 }
 

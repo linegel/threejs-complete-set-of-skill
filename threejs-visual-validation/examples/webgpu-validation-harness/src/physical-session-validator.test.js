@@ -1,14 +1,19 @@
 import assert from 'node:assert/strict';
+import { mkdtemp, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { numericDatum } from './physical-evidence-common.js';
 import { HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
+import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
 	validateCorrectnessCaptureSession,
 	validateHardwarePerformanceSession,
 	validatePhysicalRouteSession
 } from './physical-session-validator.js';
+import { finalizeImportedPhysicalRecord, loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
 
 const HASH_A = `sha256:${ 'a'.repeat( 64 ) }`;
 const HASH_B = `sha256:${ 'b'.repeat( 64 ) }`;
@@ -158,6 +163,9 @@ function baseSession( profile, plan ) {
 		schemaVersion: 1,
 		profile,
 		automationSurface: 'codex-in-app-browser',
+		startedAt: '2026-07-12T09:00:00.000Z',
+		servedLedgerStartedAt: '2026-07-12T09:00:00.000Z',
+		finishedAt: '2026-07-12T09:01:00.000Z',
 		browser: { webdriver: false, headless: false, visibilityState: 'visible' },
 		adapter: { adapterClass: 'hardware', identity: { vendor: 'Apple', device: 'M-series' } },
 		refresh: {
@@ -172,6 +180,21 @@ function baseSession( profile, plan ) {
 		routes: plan.map( routeRecord ),
 		serving: serving( plan )
 	};
+
+}
+
+async function importedWrapper( record, options = {} ) {
+
+	const finalized = structuredClone( record );
+	finalized.publishable = options.publishable ?? false;
+	finalized.acceptanceStatus = options.acceptanceStatus ?? 'incomplete';
+	finalized.serving.ledgerSha256 = options.servedLedgerSha256 ?? hashPhysicalRecord( finalized.serving.entries );
+	const wrapper = finalizeImportedPhysicalRecord( finalized );
+	const directory = options.directory ?? await mkdtemp( join( tmpdir(), 'threejs-verified-physical-' ) );
+	const path = join( directory, options.filename ?? `${ finalized.profile }.json` );
+	const bytes = Buffer.from( options.compact === true ? JSON.stringify( wrapper ) : `${ JSON.stringify( wrapper, null, 2 ) }\n` );
+	await writeFile( path, bytes, { flag: 'wx' } );
+	return { path, bytes, wrapper };
 
 }
 
@@ -550,5 +573,73 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 		assert.throws( () => validateHardwarePerformanceSession( value ), pattern, name );
 
 	}
+
+} );
+
+test( 'verified physical wrapper loader preserves exact bytes and recomputes both lane types', async () => {
+
+	const physical = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ) );
+	const performance = await importedWrapper( performanceSession() );
+	for ( const fixture of [ physical, performance ] ) {
+
+		const verified = await loadVerifiedImportedPhysicalRecord( fixture.path, { expectedProfile: fixture.wrapper.record.profile } );
+		assert.deepEqual( verified.sourceBytes, fixture.bytes );
+		assert.equal( verified.recordSha256, fixture.wrapper.recordSha256 );
+		assert.deepEqual( verified.laneReference, fixture.wrapper.laneReference );
+		assert.equal( verified.servedLedgerSha256, fixture.wrapper.record.serving.ledgerSha256 );
+		assert.equal( verified.sourceDocumentByteLength, fixture.bytes.byteLength );
+		const cliValidation = await validatePhysicalEvidenceRecordFile( fixture.path );
+		assert.equal( cliValidation.recordSha256, verified.recordSha256 );
+		assert.equal( cliValidation.sourceDocumentSha256, verified.sourceDocumentSha256 );
+
+	}
+
+} );
+
+test( 'verified physical wrapper loader rejects raw, stale, promoted, and cross-profile inputs', async () => {
+
+	const directory = await mkdtemp( join( tmpdir(), 'threejs-verified-physical-mutations-' ) );
+	const baseline = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { directory, filename: 'baseline.json' } );
+	const mutations = [
+		[ 'raw record', structuredClone( baseline.wrapper.record ), /omits record/ ],
+		[ 'stale validation', { ...structuredClone( baseline.wrapper ), validation: { valid: false } }, /validation summary/ ],
+		[ 'stale record hash', { ...structuredClone( baseline.wrapper ), recordSha256: HASH_D }, /recordSha256/ ],
+		[ 'stale lane reference', { ...structuredClone( baseline.wrapper ), laneReference: { ...baseline.wrapper.laneReference, sessionId: 'swapped' } }, /laneReference/ ]
+	];
+	for ( const [ name, value, pattern ] of mutations ) {
+
+		const path = join( directory, `${ name.replaceAll( ' ', '-' ) }.json` );
+		await writeFile( path, `${ JSON.stringify( value, null, 2 ) }\n`, { flag: 'wx' } );
+		await assert.rejects( loadVerifiedImportedPhysicalRecord( path ), pattern, name );
+
+	}
+	await assert.rejects( loadVerifiedImportedPhysicalRecord( baseline.path, { expectedProfile: 'performance' } ), /Expected profile performance/ );
+	for ( const [ filename, mutate ] of [
+		[ 'promoted.json', ( value ) => { value.record.publishable = true; } ],
+		[ 'accepted.json', ( value ) => { value.record.acceptanceStatus = 'accepted'; } ]
+	] ) {
+
+		const value = structuredClone( baseline.wrapper );
+		mutate( value );
+		const path = join( directory, filename );
+		await writeFile( path, `${ JSON.stringify( value, null, 2 ) }\n`, { flag: 'wx' } );
+		await assert.rejects( loadVerifiedImportedPhysicalRecord( path ), /nonpublishable and incomplete/ );
+
+	}
+	const staleLedger = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { directory, filename: 'stale-ledger.json', servedLedgerSha256: HASH_D } );
+	await assert.rejects( loadVerifiedImportedPhysicalRecord( staleLedger.path ), /served-byte ledger hash/ );
+
+} );
+
+test( 'verified wrapper distinguishes semantic record identity from exact document bytes', async () => {
+
+	const directory = await mkdtemp( join( tmpdir(), 'threejs-verified-physical-format-' ) );
+	const record = baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN );
+	const pretty = await importedWrapper( record, { directory, filename: 'pretty.json' } );
+	const compact = await importedWrapper( record, { directory, filename: 'compact.json', compact: true } );
+	const prettyVerified = await loadVerifiedImportedPhysicalRecord( pretty.path );
+	const compactVerified = await loadVerifiedImportedPhysicalRecord( compact.path );
+	assert.equal( prettyVerified.recordSha256, compactVerified.recordSha256 );
+	assert.notEqual( prettyVerified.sourceDocumentSha256, compactVerified.sourceDocumentSha256 );
 
 } );
