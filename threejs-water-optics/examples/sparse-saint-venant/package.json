@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check swe-core.js && node --check test-swe-core.mjs",
-    "test": "node test-swe-core.mjs"
+    "check": "node --check swe-core.js && node --check sparse-tile-domain.js && node --check test-swe-core.mjs && node --check test-sparse-tile-domain.mjs",
+    "test": "node test-swe-core.mjs && node test-sparse-tile-domain.mjs"
   }
 }
