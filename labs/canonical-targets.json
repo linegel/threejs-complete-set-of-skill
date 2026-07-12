@@ -5,7 +5,7 @@
   "primaryExpected": 41,
   "integrationsExpected": 10,
   "flagshipsExpected": 5,
-  "fixedRoutesExpected": 516,
+  "fixedRoutesExpected": 517,
   "requiredCapabilitiesExpected": 90,
   "requiredRuntimeProofsExpected": 224,
   "primaryRoster": [
@@ -639,7 +639,7 @@
       "skill": "threejs-procedural-creatures",
       "id": "webgpu-procedural-creature-lab",
       "canonicalDir": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab",
-      "mechanisms": ["field-and-surface-certification", "snap-and-ownership", "locomotion-and-foot-planting", "tails-ears-and-secondary-motion", "crowd-and-culling", "outline-and-shadow", "genome-variation"],
+      "mechanisms": ["field-and-surface-certification", "snap-and-ownership", "locomotion-and-foot-planting", "tails-ears-and-secondary-motion", "crowd-and-culling", "outline-and-shadow", "genome-variation", "coastal-crab"],
       "tiers": ["hero", "crowd", "background"]
     },
     {

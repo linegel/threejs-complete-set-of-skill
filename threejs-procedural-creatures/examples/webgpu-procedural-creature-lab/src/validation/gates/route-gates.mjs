@@ -29,6 +29,12 @@ async function runRoutesResolve() {
 		}
 		checked.push(`mechanism/${id}/`);
 	}
+	const crabPath = resolve(labRoot, 'mechanism', 'coastal-crab', 'index.html');
+	const crabHtml = await readFile(crabPath, 'utf8');
+	if (!crabHtml.includes('src="../../src/crab/crab-webgpu-app.js"') || !crabHtml.includes('INITIALIZING WEBGPU')) {
+		return { status: 'fail', details: { message: 'coastal-crab route does not load its specialized native WebGPU controller', path: crabPath } };
+	}
+	checked.push('mechanism/coastal-crab/');
 	for (const [id, expected] of Object.entries(CREATURE_TIER_ROUTES)) {
 		const resolved = resolveCreatureStartup({ tier: id });
 		if (resolved.tier !== expected.tier || resolved.locked !== true) {

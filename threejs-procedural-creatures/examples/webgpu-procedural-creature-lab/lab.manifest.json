@@ -26,7 +26,8 @@
     { "id": "tails-ears-and-secondary-motion", "route": "mechanism/tails-ears-and-secondary-motion/", "startup": { "scenario": "tails-ears-and-secondary-motion" } },
     { "id": "crowd-and-culling", "route": "mechanism/crowd-and-culling/", "startup": { "scenario": "crowd-and-culling" } },
     { "id": "outline-and-shadow", "route": "mechanism/outline-and-shadow/", "startup": { "scenario": "outline-and-shadow" } },
-    { "id": "genome-variation", "route": "mechanism/genome-variation/", "startup": { "scenario": "genome-variation" } }
+    { "id": "genome-variation", "route": "mechanism/genome-variation/", "startup": { "scenario": "genome-variation" } },
+    { "id": "coastal-crab", "route": "mechanism/coastal-crab/", "startup": {} }
   ],
   "tiers": [
     {
