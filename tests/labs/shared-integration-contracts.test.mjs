@@ -544,6 +544,20 @@ test('forcing and physics context reject malformed units, values, and ticks', ()
     state: { screenPixels: 1200 },
     stateUnits: { screenPixels: 'pixel' },
   }), /supported SI unit/);
+
+  for (const [label, state] of [
+    ['nested object', { position: { x: 1 } }],
+    ['string payload', { position: 'one meter' }],
+    ['empty vector', { position: [] }],
+    ['non-finite vector', { position: [0, Number.NaN, 0] }],
+  ]) {
+    assert.throws(() => createPhysicsStateSnapshot({
+      tick: 1,
+      fixedStepSeconds,
+      state,
+      stateUnits: { position: 'meter' },
+    }), /finite scalar or non-empty finite numeric array|must be finite|non-finite number/, label);
+  }
 });
 
 test('PhysicsGraph closes producer, consumer, work, and contractual cost ownership', () => {

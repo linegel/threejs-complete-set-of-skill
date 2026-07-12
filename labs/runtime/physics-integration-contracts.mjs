@@ -90,6 +90,23 @@ function assertVector3(value, label) {
   }
 }
 
+function assertPhysicsStateValue(value, label) {
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      throw new TypeError(`${label} must be a finite scalar or non-empty finite numeric array`);
+    }
+    for (const [index, component] of value.entries()) {
+      assertFiniteNumber(component, `${label}[${index}]`);
+    }
+    return;
+  }
+  try {
+    assertFiniteNumber(value, label);
+  } catch {
+    throw new TypeError(`${label} must be a finite scalar or non-empty finite numeric array`);
+  }
+}
+
 function assertEnvironmentForcingSnapshotValue(snapshot, { requireFrozen = true } = {}) {
   immutablePlainCopy(snapshot, 'EnvironmentForcingSnapshot validation copy');
   assertKnownKeys(snapshot, [
@@ -222,6 +239,7 @@ function assertPhysicsStateSnapshotValue(snapshot, { requireFrozen = true } = {}
     throw new Error('physics state units must cover the exact state payload key set');
   }
   for (const key of stateKeys) {
+    assertPhysicsStateValue(snapshot.state[key], `physics state field ${key}`);
     if (!SI_STATE_UNITS.has(snapshot.stateUnits[key])) {
       throw new Error(`physics state field ${key} requires an explicit supported SI unit`);
     }
