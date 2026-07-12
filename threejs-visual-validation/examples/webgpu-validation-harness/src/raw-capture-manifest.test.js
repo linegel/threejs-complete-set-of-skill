@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import test from 'node:test';
 
 import { encodeRgbaPng } from '../../../../scripts/lib/png-rgba.mjs';
@@ -35,6 +35,23 @@ function png( index, width, height ) {
 
 }
 
+function bindFinalizedSessionBytes( session, sessionBytes ) {
+
+	Object.defineProperty( session, 'finalizedCaptureSessionFile', {
+		configurable: false,
+		enumerable: false,
+		writable: false,
+		value: {
+			path: 'capture-session.json',
+			contentBinding: 'finalized-file-hash-for-offline-promotion',
+			sha256: sha256( sessionBytes ),
+			byteLength: sessionBytes.byteLength
+		}
+	} );
+	return session;
+
+}
+
 async function createRawSessionFixture() {
 
 	const outputDir = await mkdtemp( join( tmpdir(), 'threejs-raw-capture-manifest-' ) );
@@ -43,6 +60,7 @@ async function createRawSessionFixture() {
 	const write = async ( path, bytes, kind = 'hook-artifact' ) => {
 
 		const payload = Buffer.isBuffer( bytes ) ? bytes : Buffer.from( bytes );
+		await mkdir( dirname( join( outputDir, path ) ), { recursive: true } );
 		await writeFile( join( outputDir, path ), payload );
 		artifactWrites.push( {
 			sequence: ++ sequence,
@@ -77,12 +95,17 @@ async function createRawSessionFixture() {
 		await write( path, png( index, width, height ), path === 'diagnostics.mosaic.png' ? 'hook-artifact' : 'capture-png' );
 
 	}
+	const transportPath = 'transport-readbacks/final.design.rgba8.bin';
+	const normalizedPath = 'normalized-readbacks/final.design.rgba8.padded.bin';
+	await write( transportPath, Buffer.from( [ 1, 2, 3, 255 ] ), 'raw-readback' );
+	await write( normalizedPath, Buffer.alloc( 256, 0x5a ), 'raw-readback' );
 	await write( 'capture-boundary.json', `${ JSON.stringify( { schemaVersion: 2, publishable: false } ) }\n` );
 	const sourceClosureHash = canonicalSha256( { source: 'raw-capture-test' } );
 	const buildRevision = canonicalSha256( { build: 'raw-capture-test' } );
 	const metrics = {
 		initialized: true,
 		nativeWebGPU: true,
+		backend: 'webgpu',
 		rendererBackendEvidence: {
 			isWebGPUBackend: true,
 			deviceIdentityVerified: true,
@@ -99,18 +122,87 @@ async function createRawSessionFixture() {
 		seedHex: '0x00000001',
 		timeSeconds: 0
 	};
+	const state = {
+		scenario: 'browser-capture',
+		mode: 'final',
+		tier: 'webgpu-correctness',
+		camera: 'design',
+		seed: 1,
+		seedHex: '0x00000001',
+		timeSeconds: 0,
+		viewport: { width: 1200, height: 800, dpr: 1 }
+	};
+	const url = 'http://127.0.0.1:4173/demos/webgpu-validation-harness/tier/webgpu-correctness/';
+	const browserEntry = 'threejs-visual-validation/examples/webgpu-validation-harness/tier/webgpu-correctness/index.html';
+	const imageWrites = new Map( artifactWrites.filter( ( record ) => RAW_IMAGE_PATHS.includes( record.path ) ).map( ( record ) => [ record.path, record ] ) );
+	const outputPlan = RAW_IMAGE_PATHS.filter( ( path ) => path !== 'diagnostic.normal.png' && path !== 'diagnostic.emissive.png' && path !== 'odd-size.final.png' ).map( ( filename ) => {
+
+		const binding = imageWrites.get( filename );
+		return {
+			id: filename.slice( 0, - '.png'.length ),
+			status: 'CAPTURED',
+			filename,
+			artifact: { path: filename, sha256: binding.sha256, byteLength: binding.byteLength }
+		};
+
+	} );
+	const transportBinding = artifactWrites.find( ( record ) => record.path === transportPath );
+	const normalizedBinding = artifactWrites.find( ( record ) => record.path === normalizedPath );
+	const finalBinding = imageWrites.get( 'final.design.png' );
 	const session = {
+		schemaVersion: 2,
 		labId: 'webgpu-validation-harness',
+		sourceHash: sourceClosureHash,
+		sourceClosure: {
+			sourceHash: sourceClosureHash,
+			buildRevision,
+			threeRevision: '0.185.1'
+		},
 		profile: 'correctness',
+		profileConfig: { width: 1200, height: 800, dpr: 1 },
 		automationSurface: 'playwright-headless-chromium',
 		adapterClass: 'software',
 		adapterIdentity: { vendor: 'fixture', architecture: 'software' },
-		browser: { name: 'Chromium', version: 'fixture', platform: 'fixture-os' },
+		browser: { name: 'Chromium', version: 'fixture', platform: 'fixture-os', automationSurface: 'playwright-headless-chromium' },
 		sourceClosureHash,
 		buildRevision,
+		threeRevision: '0.185.1',
+		browserEntry,
+		url,
+		finalUrl: url,
+		route: {
+			requestedUrl: url,
+			finalUrl: url,
+			browserEntry,
+			manifestLabId: 'webgpu-validation-harness',
+			observedRuntimeLabId: 'webgpu-validation-harness',
+			lockedState: state,
+			observedState: state,
+			finalState: state
+		},
 		startedAt: '2026-07-12T12:00:00.000Z',
 		finishedAt: '2026-07-12T12:01:00.000Z',
+		runtime: { metrics },
 		finalRuntime: { metrics },
+		postDisposeSnapshot: { disposed: true },
+		outputPlan,
+		writtenCaptures: [ {
+			width: 1,
+			height: 1,
+			bytesPerPixel: 4,
+			bytesPerRow: 4,
+			origin: 'top-left',
+			png: { path: 'final.design.png', sha256: finalBinding.sha256, byteLength: finalBinding.byteLength },
+			transport: {
+				artifact: { path: transportPath, sha256: transportBinding.sha256, byteLength: transportBinding.byteLength }
+			},
+			normalized: {
+				bytesPerRow: 256,
+				byteLength: 256,
+				origin: 'top-left',
+				artifact: { path: normalizedPath, sha256: normalizedBinding.sha256, byteLength: normalizedBinding.byteLength }
+			}
+		} ],
 		artifactWrites,
 		hookResult: {
 			bundle: {
@@ -124,7 +216,10 @@ async function createRawSessionFixture() {
 				sourceCaptures: [ 'final.design.png', 'no-post.design.png', 'diagnostic.normal.png', 'diagnostic.emissive.png' ],
 				derivation: { algorithm: 'quadrant-copy' }
 			} ]
-		}
+		},
+		pageErrors: [],
+		consoleErrors: [],
+		requestErrors: []
 	};
 	artifactWrites.push( {
 		sequence: ++ sequence,
@@ -137,14 +232,7 @@ async function createRawSessionFixture() {
 	} );
 	const sessionBytes = Buffer.from( `${ JSON.stringify( session, null, 2 ) }\n` );
 	await writeFile( join( outputDir, 'capture-session.json' ), sessionBytes );
-	Object.defineProperty( session, 'finalizedCaptureSessionFile', {
-		value: {
-			path: 'capture-session.json',
-			contentBinding: 'finalized-file-hash-for-offline-promotion',
-			sha256: sha256( sessionBytes ),
-			byteLength: sessionBytes.byteLength
-		}
-	} );
+	bindFinalizedSessionBytes( session, sessionBytes );
 	return { outputDir, session };
 
 }
@@ -193,15 +281,79 @@ test( 'offline raw finalization binds the current correctness session without cl
 test( 'raw finalization rejects a browser hook that prewrites the manifest', async () => {
 
 	const { outputDir, session } = await createRawSessionFixture();
-	session.artifactWrites.push( {
-		sequence: session.artifactWrites.length + 1,
+	const finalizedDocument = JSON.parse( JSON.stringify( session ) );
+	finalizedDocument.artifactWrites.push( {
+		sequence: finalizedDocument.artifactWrites.length + 1,
 		path: 'evidence-manifest.json',
 		kind: 'hook-artifact',
 		contentBinding: 'sha256-byte-length-immutable-buffer-v1',
 		sha256: canonicalSha256( { stale: true } ),
 		byteLength: 1
 	} );
-	await assert.rejects( finalizeRawCorrectnessCapture( session, outputDir ), /must not write evidence-manifest/ );
+	const finalizedBytes = Buffer.from( `${ JSON.stringify( finalizedDocument, null, 2 ) }\n` );
+	await writeFile( join( outputDir, 'capture-session.json' ), finalizedBytes );
+	bindFinalizedSessionBytes( finalizedDocument, finalizedBytes );
+	await assert.rejects( finalizeRawCorrectnessCapture( finalizedDocument, outputDir ), /must not write evidence-manifest/ );
+
+} );
+
+test( 'raw finalization rejects post-finalization in-memory route, evidence, and hook-result drift', async () => {
+
+	for ( const mutate of [
+		( session ) => { session.finalRuntime.metrics.mode = 'no-post'; },
+		( session ) => { session.artifactWrites[ 0 ].sha256 = canonicalSha256( { forged: 'evidence-binding' } ); },
+		( session ) => { session.hookResult.bundle.claimVerdicts.mechanismCorrectness = 'FAIL'; }
+	] ) {
+
+		const { outputDir, session } = await createRawSessionFixture();
+		mutate( session );
+		await assert.rejects( finalizeRawCorrectnessCapture( session, outputDir ), /canonically drifted from finalized capture-session\.json/ );
+
+	}
+
+} );
+
+test( 'raw finalization rejects enumerable-order drift from the finalized session document', async () => {
+
+	const { outputDir, session } = await createRawSessionFixture();
+	const reorderedSession = Object.fromEntries( Object.entries( session ).reverse() );
+	bindFinalizedSessionBytes( reorderedSession, await readFile( join( outputDir, 'capture-session.json' ) ) );
+	await assert.rejects( finalizeRawCorrectnessCapture( reorderedSession, outputDir ), /enumerable serialization drifted/ );
+
+} );
+
+test( 'raw finalization rejects malformed and noncanonical finalized session bytes', async () => {
+
+	{
+
+		const { outputDir } = await createRawSessionFixture();
+		const malformed = Buffer.from( '{"schemaVersion":2' );
+		await writeFile( join( outputDir, 'capture-session.json' ), malformed );
+		const supplied = bindFinalizedSessionBytes( { schemaVersion: 2 }, malformed );
+		await assert.rejects( finalizeRawCorrectnessCapture( supplied, outputDir ), /invalid JSON/ );
+
+	}
+	{
+
+		const { outputDir } = await createRawSessionFixture();
+		const document = JSON.parse( await readFile( join( outputDir, 'capture-session.json' ), 'utf8' ) );
+		const noncanonical = Buffer.from( JSON.stringify( document ) );
+		await writeFile( join( outputDir, 'capture-session.json' ), noncanonical );
+		const supplied = bindFinalizedSessionBytes( document, noncanonical );
+		await assert.rejects( finalizeRawCorrectnessCapture( supplied, outputDir ), /not the canonical two-space JSON document/ );
+
+	}
+	{
+
+		const { outputDir } = await createRawSessionFixture();
+		const document = JSON.parse( await readFile( join( outputDir, 'capture-session.json' ), 'utf8' ) );
+		document.profile = 'performance';
+		const invalidCorrectnessSession = Buffer.from( `${ JSON.stringify( document, null, 2 ) }\n` );
+		await writeFile( join( outputDir, 'capture-session.json' ), invalidCorrectnessSession );
+		const supplied = bindFinalizedSessionBytes( document, invalidCorrectnessSession );
+		await assert.rejects( finalizeRawCorrectnessCapture( supplied, outputDir ), /Expected a schema-v2 correctness capture session/ );
+
+	}
 
 } );
 

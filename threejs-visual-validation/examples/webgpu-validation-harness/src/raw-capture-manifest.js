@@ -11,6 +11,7 @@ import {
 	canonicalSha256,
 	routeStateDigest
 } from './evidence-manifest-contract.js';
+import { validateCorrectnessCaptureSession } from './physical-session-validator.js';
 
 const RAW_IMAGE_PATHS = Object.freeze( [
 	...STANDARD_IMAGE_PATHS,
@@ -38,6 +39,30 @@ function jsonSafe( value ) {
 
 	if ( value === undefined ) return null;
 	return JSON.parse( JSON.stringify( value ) );
+
+}
+
+function parseFinalizedCorrectnessSession( suppliedSession, sessionBytes ) {
+
+	let parsedSession;
+	try {
+
+		parsedSession = JSON.parse( sessionBytes.toString( 'utf8' ) );
+
+	} catch ( error ) {
+
+		throw new Error( `Finalized capture-session.json is invalid JSON: ${ error.message }` );
+
+	}
+	const canonicalBytes = jsonBytes( parsedSession );
+	if ( canonicalBytes.equals( sessionBytes ) === false ) throw new Error( 'Finalized capture-session.json is not the canonical two-space JSON document emitted by the shared capture runner.' );
+
+	const enumerableSession = jsonSafe( suppliedSession );
+	if ( canonicalSha256( enumerableSession ) !== canonicalSha256( parsedSession ) ) throw new Error( 'Supplied in-memory capture session canonically drifted from finalized capture-session.json.' );
+	if ( jsonBytes( enumerableSession ).equals( sessionBytes ) === false ) throw new Error( 'Supplied in-memory capture session enumerable serialization drifted from finalized capture-session.json.' );
+
+	validateCorrectnessCaptureSession( parsedSession );
+	return parsedSession;
 
 }
 
@@ -290,34 +315,40 @@ function promotionNotEligible() {
 
 export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 
-	if ( session?.profile !== 'correctness' || session?.automationSurface !== 'playwright-headless-chromium' ) throw new Error( 'Raw correctness finalization accepts only the Playwright correctness lane.' );
 	if ( typeof outputDir !== 'string' || outputDir.length === 0 ) throw new Error( 'Raw correctness finalization requires its output directory.' );
-	const writeIndex = currentWriteIndex( session );
-	const sessionBinding = session.finalizedCaptureSessionFile;
-	if ( sessionBinding?.path !== SESSION_PATH ) throw new Error( 'Finalized shared capture-session binding is unavailable.' );
+	const sessionBinding = session?.finalizedCaptureSessionFile;
+	if ( sessionBinding?.path !== SESSION_PATH || sessionBinding.contentBinding !== 'finalized-file-hash-for-offline-promotion' ) throw new Error( 'Finalized shared capture-session binding is unavailable.' );
 	const sessionBytes = await readFile( join( outputDir, SESSION_PATH ) );
 	if ( sessionBinding.sha256 !== sha256( sessionBytes ) || sessionBinding.byteLength !== sessionBytes.byteLength ) throw new Error( 'Finalized capture-session bytes drifted before raw manifest assembly.' );
+	const finalizedSessionBinding = {
+		path: SESSION_PATH,
+		contentBinding: 'finalized-file-hash-for-offline-promotion',
+		sha256: sha256( sessionBytes ),
+		byteLength: sessionBytes.byteLength
+	};
+	const finalizedSession = parseFinalizedCorrectnessSession( session, sessionBytes );
+	const writeIndex = currentWriteIndex( finalizedSession );
 
-	const route = captureRoute( session );
+	const route = captureRoute( finalizedSession );
 	const limitations = limitationsForRawCorrectness();
-	const sourceClosureHash = requireSha256( session.sourceClosureHash ?? session.sourceHash, 'capture source closure hash' );
+	const sourceClosureHash = requireSha256( finalizedSession.sourceClosureHash ?? finalizedSession.sourceHash, 'capture source closure hash' );
 	const suffix = sourceClosureHash.slice( 'sha256:'.length, 'sha256:'.length + 16 );
-	const sessionId = `${ session.labId }:correctness:${ suffix }`;
-	const finalizedWrites = session.artifactWrites.map( ( record ) => record.path === SESSION_PATH ? {
+	const sessionId = `${ finalizedSession.labId }:correctness:${ suffix }`;
+	const finalizedWrites = finalizedSession.artifactWrites.map( ( record ) => record.path === SESSION_PATH ? {
 		sequence: record.sequence,
 		path: SESSION_PATH,
 		kind: 'capture-session-record',
 		contentBinding: 'finalized-file-hash-for-offline-promotion',
-		sha256: sessionBinding.sha256,
-		byteLength: sessionBinding.byteLength
+		sha256: finalizedSessionBinding.sha256,
+		byteLength: finalizedSessionBinding.byteLength
 	} : jsonSafe( record ) );
 	const writeLedgerDocument = {
 		schemaVersion: 2,
-		labId: session.labId,
+		labId: finalizedSession.labId,
 		sessionId,
-		profile: session.profile,
+		profile: finalizedSession.profile,
 		sourceClosureHash,
-		buildRevision: session.buildRevision,
+		buildRevision: finalizedSession.buildRevision,
 		entries: finalizedWrites
 	};
 	const writeLedgerBytes = jsonBytes( writeLedgerDocument );
@@ -331,8 +362,8 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 	const documentBinding = {
 		kind: 'capture-session-document',
 		path: SESSION_PATH,
-		sha256: sessionBinding.sha256,
-		byteLength: sessionBinding.byteLength
+		sha256: finalizedSessionBinding.sha256,
+		byteLength: finalizedSessionBinding.byteLength
 	};
 
 	const normative = [];
@@ -352,7 +383,7 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 	for ( const path of RAW_IMAGE_PATHS ) {
 
 		const { record } = await requireCurrentWrite( outputDir, writeIndex, path );
-		images.push( capturedImage( path, record, session.hookResult ) );
+		images.push( capturedImage( path, record, finalizedSession.hookResult ) );
 
 	}
 	const consumed = new Set( [ ...NORMATIVE_JSON_PATHS, ...RAW_IMAGE_PATHS, SESSION_PATH ] );
@@ -367,7 +398,7 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 
 	}
 	const captureSession = captureSessionReference(
-		session,
+		finalizedSession,
 		route,
 		limitations,
 		documentBinding,
@@ -376,21 +407,21 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 	if ( captureSession.sessionId !== sessionId ) throw new Error( 'Capture-session identity changed during raw manifest assembly.' );
 	const manifest = {
 		schemaVersion: 2,
-		labId: session.labId,
-		bundleId: `${ session.labId }:raw-correctness:${ suffix }:v2`,
+		labId: finalizedSession.labId,
+		bundleId: `${ finalizedSession.labId }:raw-correctness:${ suffix }:v2`,
 		bundleKind: 'raw-capture-session',
 		publishable: false,
 		skill: 'threejs-visual-validation',
 		threeRevision: '0.185.1',
 		sourceClosureHash,
-		buildRevision: session.buildRevision,
+		buildRevision: finalizedSession.buildRevision,
 		route,
 		limitations,
-		claimVerdicts: rawClaimVerdicts( session ),
+		claimVerdicts: rawClaimVerdicts( finalizedSession ),
 		captureSessions: [ captureSession ],
 		files: [
 			...normative,
-			capturedFile( SESSION_PATH, 'capture-session-document', sessionBinding ),
+			capturedFile( SESSION_PATH, 'capture-session-document', finalizedSessionBinding ),
 			capturedFile( WRITE_LEDGER_PATH, 'capture-session-write-ledger', writeLedgerBinding ),
 			...supplemental
 		],
