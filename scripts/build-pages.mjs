@@ -7,7 +7,7 @@
 //   docs/skills.json           machine-readable manifest
 //   docs/sitemap.xml, robots.txt
 // Re-run after adding or renaming skills: node scripts/build-pages.mjs
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { cpSync, readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +17,11 @@ import { PROVIDER_DEMOS } from './provider-demos.mjs';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const siteVendorSource = join(root, 'assets', 'site', 'vendor', 'katex');
+const siteVendorOutput = join(root, 'docs', 'assets', 'vendor', 'katex');
+if (!existsSync(siteVendorSource)) throw new Error(`missing vendored site assets: ${siteVendorSource}`);
+mkdirSync(dirname(siteVendorOutput), { recursive: true });
+cpSync(siteVendorSource, siteVendorOutput, { recursive: true, force: true });
 const runtimeEvidencePreviewConfig = JSON.parse(readFileSync(join(root, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
 const configuredRuntimeEvidencePreviews = new Set(
   (runtimeEvidencePreviewConfig.previews ?? []).map((preview) => preview.labId),
@@ -288,14 +293,20 @@ const primaryKindLabel = (kind) => ({
   'integration-demo': 'Integration',
 }[kind] ?? kind);
 
-const FONTS = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap';
+const localFontHead = `
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />`;
 
 const baseCss = `
 @view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 :root{
   --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
   --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
-  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
   --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
@@ -702,9 +713,7 @@ ${JSON.stringify({
   ],
 }, null, 1)}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="${esc(FONTS)}" rel="stylesheet" />
+${localFontHead}
 <style>
 ${baseCss}
 header.hero{position:relative;overflow:hidden;min-height:calc(100svh - 76px);display:grid;align-items:center;padding:clamp(64px,8vw,112px) 0}
@@ -970,9 +979,7 @@ ${JSON.stringify({
   ],
 }, null, 1)}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="${esc(FONTS)}" rel="stylesheet" />
+${localFontHead}
 <style>
 ${baseCss}
 .about-hero{padding:clamp(66px,9vw,120px) 0 clamp(52px,7vw,88px);background:radial-gradient(circle at 82% 18%,rgba(127,212,193,.12),transparent 27%),radial-gradient(circle at 10% 8%,rgba(255,180,84,.1),transparent 26%)}
@@ -1241,13 +1248,11 @@ ${JSON.stringify({
   ],
 }, null, 1)}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="${esc(FONTS)}" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+${localFontHead}
+${science ? `<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css" />
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>` : ''}
 <style>
 ${baseCss}
 header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}

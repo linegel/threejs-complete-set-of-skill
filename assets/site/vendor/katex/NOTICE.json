@@ -1,0 +1,13 @@
+{
+  "name": "KaTeX",
+  "version": "0.16.47",
+  "source": "https://registry.npmjs.org/katex/-/katex-0.16.47.tgz",
+  "integrity": "sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==",
+  "license": "MIT",
+  "included": [
+    "katex.min.css",
+    "katex.min.js",
+    "auto-render.min.js",
+    "fonts/"
+  ]
+}
