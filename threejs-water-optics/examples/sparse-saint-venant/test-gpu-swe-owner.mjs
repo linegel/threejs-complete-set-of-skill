@@ -27,9 +27,9 @@ assert.throws( () => buildGpuSweInitialData( prepared, contract, () => ( { depth
 const source = await readFile( new URL( './gpu-swe-owner.js', import.meta.url ), 'utf8' );
 for ( const required of [
 	'sparse-swe:halo-and-boundary', 'sparse-swe:x-face-flux', 'sparse-swe:z-face-flux',
-	'sparse-swe:cell-update', 'sparse-swe:candidate-validation', 'sparse-swe:atomic-commit',
+	'sparse-swe:cell-update', 'sparse-swe:inject-rollback-mutation', 'sparse-swe:candidate-validation', 'sparse-swe:atomic-commit',
 	'for ( const dispatch of stepGraph ) renderer.compute( dispatch )', 'receipt.addAssign( atomicAdd',
-	'getArrayBufferAsync( diagnosticBuffer', 'frameCriticalReadbackCount: 0'
+	'dispatchRollbackMutationProbe', 'getArrayBufferAsync( diagnosticBuffer', 'frameCriticalReadbackCount: 0'
 ] ) assert.ok( source.includes( required ), `GPU SWE owner is missing '${ required }'` );
 assert.ok( ! source.includes( 'atomicStore(' ), 'Three r185 atomicStore lowering must not reintroduce invalid void-as-uint WGSL' );
 assert.ok( source.indexOf( 'getArrayBufferAsync( diagnosticBuffer' ) > source.indexOf( 'async function captureDiagnostics' ), 'GPU readback escaped the diagnostic-only method' );

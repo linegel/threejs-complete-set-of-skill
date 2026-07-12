@@ -12,6 +12,7 @@ const contract = deriveSweGpuContract( tierId );
 const canvas = document.getElementById( 'lab-canvas' );
 const status = document.getElementById( 'status' );
 const diagnosticButton = document.getElementById( 'diagnostic' );
+const rollbackButton = document.getElementById( 'rollback' );
 const renderer = new WebGPURenderer( { canvas, antialias: false, trackTimestamp: false } );
 renderer.setPixelRatio( Math.min( devicePixelRatio, tierId === 'full' ? 1.5 : 1 ) );
 const scene = new Scene();
@@ -163,6 +164,37 @@ async function captureDiagnostic() {
 
 }
 
+async function runRollbackMutation() {
+
+	pausedForDiagnostic = true;
+	diagnosticButton.disabled = true;
+	rollbackButton.disabled = true;
+	rollbackButton.textContent = 'Proving rollback…';
+	try {
+
+		const before = await owner.captureDiagnostics();
+		owner.dispatchRollbackMutationProbe();
+		const after = await owner.captureDiagnostics();
+		const rollbackPassed = after.negativeDepthCells >= 1
+			&& after.committedGeneration === before.committedGeneration
+			&& after.acceptedCommits === before.acceptedCommits
+			&& after.rejectedCommits === before.rejectedCommits + 1;
+		if ( ! rollbackPassed ) throw new Error( `rollback mutation was admitted: before=${ JSON.stringify( before ) } after=${ JSON.stringify( after ) }` );
+		lastDiagnosticSummary = `ROLLBACK PASS · injected negative ${ after.negativeDepthCells } · generation held ${ after.committedGeneration } · accepted held ${ after.acceptedCommits } · rejected ${ before.rejectedCommits }→${ after.rejectedCommits }`;
+		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
+		return Object.freeze( { passed: true, before, after } );
+
+	} finally {
+
+		diagnosticButton.disabled = false;
+		rollbackButton.disabled = false;
+		rollbackButton.textContent = 'Run rollback mutation';
+		pausedForDiagnostic = false;
+
+	}
+
+}
+
 function formatGpuError( event ) {
 
 	return `${ event.error?.constructor?.name ?? 'GPUError' }: ${ event.error?.message ?? 'unknown uncaptured GPU error' }`;
@@ -215,8 +247,10 @@ async function boot() {
 	scene.add( display );
 	const bootstrapDiagnostic = await verifyNativeBootstrap( device );
 	diagnosticButton.disabled = false;
+	rollbackButton.disabled = false;
 	diagnosticButton.addEventListener( 'click', captureDiagnostic );
-	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, bootstrapDiagnostic, gpuErrors } );
+	rollbackButton.addEventListener( 'click', runRollbackMutation );
+	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, bootstrapDiagnostic, gpuErrors } );
 	status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · verified gen ${ bootstrapDiagnostic.committedGeneration } · ${ owner.initial.residentTileCount }/${ contract.tier.logicalTilesX * contract.tier.logicalTilesZ } tiles · ${ owner.initial.residentCellCount } cells · ${ contract.totalLogicalBytes } logical bytes`;
 	renderer.setAnimationLoop( ( time ) => {
 

@@ -40,7 +40,10 @@ zero readbacks.
 Open `index.html?tier=budgeted&camera=hero` in Codex's in-app Browser for the
 native diagnostic. Keys `1`, `2`, and `3` select hero, top, and profile views.
 The button pauses solver admission before reading the eight-word GPU validation
-ledger; no render-frame code invokes readback.
+ledger; no render-frame code invokes readback. `Run rollback mutation` inserts
+one diagnostic-only pass between candidate update and validation. It must report
+at least one negative candidate, hold committed generation and accepted count,
+and advance only the rejection count. Normal stepping remains seven passes.
 
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL

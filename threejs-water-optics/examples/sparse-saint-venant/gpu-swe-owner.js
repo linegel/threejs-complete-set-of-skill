@@ -331,6 +331,14 @@ export function createGpuSparseSweOwner( renderer, {
 
 	} )().compute( contract.tier.capacityTiles * interiorCells, [ 64 ] ).setName( 'sparse-swe:candidate-validation' );
 
+	const injectRollbackMutation = Fn( () => {
+
+		const stateIndex = displayIndices.element( uint( 0 ) );
+		const prior = candidate.element( stateIndex );
+		candidate.element( stateIndex ).assign( vec4( float( -0.25 ), prior.y, prior.z, prior.w ) );
+
+	} )().compute( 1, [ 1 ] ).setName( 'sparse-swe:inject-rollback-mutation' );
+
 	const atomicCommit = Fn( () => {
 
 		const linear = globalId.x;
@@ -369,11 +377,13 @@ export function createGpuSparseSweOwner( renderer, {
 	} )().compute( contract.tier.capacityTiles * interiorCells, [ 64 ] ).setName( 'sparse-swe:atomic-commit' );
 
 	const stepGraph = Object.freeze( [ resetValidation, haloAndBoundary, xFaceFlux, zFaceFlux, cellUpdate, candidateValidation, atomicCommit ] );
+	const rollbackMutationGraph = Object.freeze( [ resetValidation, haloAndBoundary, xFaceFlux, zFaceFlux, cellUpdate, injectRollbackMutation, candidateValidation, atomicCommit ] );
 	let accumulatorSeconds = 0;
 	let submittedTicks = 0;
 	let dispatchCount = 0;
 	let droppedTimeSeconds = 0;
 	let diagnosticReadbackCount = 0;
+	let rollbackMutationProbeCount = 0;
 	let disposed = false;
 
 	function requireLive() { if ( disposed ) throw new Error( 'GPU sparse SWE owner is disposed' ); }
@@ -386,6 +396,15 @@ export function createGpuSparseSweOwner( renderer, {
 		for ( const dispatch of stepGraph ) renderer.compute( dispatch );
 		submittedTicks += 1;
 		dispatchCount += stepGraph.length;
+
+	}
+	function dispatchRollbackMutationProbe() {
+
+		requireLive();
+		for ( const dispatch of rollbackMutationGraph ) renderer.compute( dispatch );
+		submittedTicks += 1;
+		dispatchCount += rollbackMutationGraph.length;
+		rollbackMutationProbeCount += 1;
 
 	}
 
@@ -419,6 +438,7 @@ export function createGpuSparseSweOwner( renderer, {
 		committedStateNode: committed,
 		displayIndexNode: displayIndices,
 		dispatchFixedStep,
+		dispatchRollbackMutationProbe,
 		advancePresentationDelta( deltaSeconds ) {
 
 			requireLive();
@@ -438,7 +458,7 @@ export function createGpuSparseSweOwner( renderer, {
 
 			return Object.freeze( {
 				backend: 'native-webgpu', model: 'nonlinear-Saint-Venant-HLL-hydrostatic', authority: 'gpu-float32',
-				tierId, submittedTicks, dispatchCount, droppedTimeSeconds, diagnosticReadbackCount, frameCriticalReadbackCount: 0,
+				tierId, submittedTicks, dispatchCount, droppedTimeSeconds, diagnosticReadbackCount, rollbackMutationProbeCount, frameCriticalReadbackCount: 0,
 				residentTileCount: initial.residentTileCount, residentCellCount: initial.residentCellCount,
 				logicalResourceBytes: contract.totalLogicalBytes, dispatchOrder: contract.dispatchOrder
 			} );
