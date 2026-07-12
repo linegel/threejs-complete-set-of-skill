@@ -214,6 +214,16 @@ function validateIndexablePage(path, expectedUrl, {
     assert(/\bdata-owning-skill=["'][^"']+["']/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks owning-skill identity`);
     assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks supported mechanisms`);
     assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${label}: demo SEO shell lacks evidence status`);
+    const roadmap = shell?.[0]?.match(/<details\b[^>]*data-demo-roadmap[^>]*>[\s\S]*?<\/details>/i);
+    assert(Boolean(roadmap), `${label}: demo SEO shell lacks readiness and remaining fixes`);
+    assert(/Readiness\s*&amp;\s*remaining fixes/i.test(roadmap?.[0] ?? ''), `${label}: demo roadmap lacks its user-facing label`);
+    assert(/\bdata-roadmap-status=["'][^"']+["']/i.test(roadmap?.[0] ?? ''), `${label}: demo roadmap lacks status provenance`);
+    const openCount = Number(attribute(roadmap?.[0] ?? '', 'data-open-count'));
+    assert(Number.isInteger(openCount) && openCount >= 0, `${label}: demo roadmap has an invalid open-item count`);
+    assert(/\bdata-roadmap-item\b/i.test(roadmap?.[0] ?? ''), `${label}: demo roadmap has no rendered closure item`);
+    if (!/data-roadmap-status=["']accepted["']/i.test(roadmap?.[0] ?? '')) {
+      assert(openCount > 0, `${label}: non-accepted demo roadmap reports no open items`);
+    }
     assert(/<nav\b[^>]*aria-label=["']Demo documentation and provenance["']/i.test(shell?.[0] ?? ''), `${label}: demo SEO shell lacks provenance navigation`);
   }
   if (validateImages) {

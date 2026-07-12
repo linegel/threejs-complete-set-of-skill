@@ -128,9 +128,9 @@ function renderApp( controller, fixture, result ) {
 		</div>
 		<section class="demo-launcher" aria-labelledby="demo-launcher-title">
 			<div class="demo-launcher-copy">
-				<p class="demo-launcher-kicker">Runnable WebGPU implementation</p>
+				<p class="demo-launcher-kicker">Loadable WebGPU implementation</p>
 				<h2 id="demo-launcher-title">Open the primary owner’s canonical lab</h2>
-				<p>This page validates the routing decision; it does not render the workload. The primary action opens the closest runnable implementation owned by <code>${ escapeHtml( fixture.route.primaryOwner ) }</code>.</p>
+				<p>This page validates the routing decision; it does not render the workload. The primary action opens the closest loadable implementation owned by <code>${ escapeHtml( fixture.route.primaryOwner ) }</code>. Its page exposes the current evidence status and remaining-fixes roadmap; loadable does not mean performance-accepted.</p>
 			</div>
 			<a class="run-demo-button" data-testid="run-primary-demo" href="${ escapeHtml( runnableDemos.primary.href ) }" target="_top" aria-label="Run ${ escapeHtml( runnableDemos.primary.title ) }">
 				<span>Run demo</span>

@@ -19,6 +19,17 @@
   readback call, then loses the device during `copyTextureToBuffer` /
   `readRenderTargetPixelsAsync`. No current-source evidence bundle or performance claim is
   accepted until that blocker is resolved and the required images are directly inspected.
+- Public performance is **insufficient evidence**, not passing. A 2026-07-11 live Chrome
+  audit at a 1200×834 CSS viewport observed 92 ms LCP and 0 CLS for cold document load,
+  but the animation environment itself produced an approximately 33.3 ms requestAnimationFrame
+  p50 both with the creature render loop active and with it paused. That cadence therefore
+  cannot isolate lab GPU cost. The renderer is constructed without `trackTimestamp`, even
+  though the adapter exposes `timestamp-query`, and `measureSteadyFrames()` measures the
+  host interval around `renderAsync` submission rather than timestamp-resolved GPU completion.
+  All three tiers still declare `frameTargetMs: null`. Closure requires a frozen target-device
+  contract, `trackTimestamp: true` before renderer initialization for the performance profile,
+  resolved GPU scopes, sustained CPU/GPU/presentation p50/p95, deadline misses, memory, and
+  settled-tier evidence. The old approximately 0.1 ms submission median is not a GPU result.
 - The sections below are a chronological engineering log. Past phrases such as “passes,”
   “shipped,” and measured image/timing values describe the source revision that produced
   them; they are not present-revision acceptance claims unless repeated above.
