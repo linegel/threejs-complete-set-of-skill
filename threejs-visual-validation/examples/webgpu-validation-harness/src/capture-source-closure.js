@@ -11,6 +11,7 @@ const EXCLUDED_SEGMENTS = new Set( [ '.DS_Store', '.git', 'artifacts', 'node_mod
 
 export const CAPTURE_CLOSURE_ROOTS = Object.freeze( [
 	LAB_ROOT,
+	'scripts/capture-lab-browser.mjs',
 	'scripts/lib/lab-registry.mjs',
 	'scripts/lib/png-rgba.mjs',
 	'scripts/lib/vite-lab-config.mjs',

@@ -1006,6 +1006,39 @@ function defaultCaptureState(lab, target) {
   return Object.freeze({ scenario, mode, tier, camera, seed, timeSeconds: 0 });
 }
 
+export function resolveCaptureState(lab, target, requestedState = null) {
+  const fallback = defaultCaptureState(lab, target);
+  if (requestedState === null || requestedState === undefined) return fallback;
+  if (typeof requestedState !== 'object' || Array.isArray(requestedState)) {
+    throw new TypeError('explicit captureState must be an object');
+  }
+  const fields = ['scenario', 'mode', 'tier', 'camera', 'seed', 'timeSeconds'];
+  const unknown = Object.keys(requestedState).filter((key) => !fields.includes(key));
+  const missing = fields.filter((key) => !(key in requestedState));
+  if (unknown.length > 0) throw new Error(`explicit captureState has unknown fields: ${unknown.join(', ')}`);
+  if (missing.length > 0) throw new Error(`explicit captureState omits fields: ${missing.join(', ')}`);
+  const scenarioIds = (lab.scenarios ?? []).map((scenario) => scenario.id);
+  for (const [field, choices] of [
+    ['scenario', scenarioIds],
+    ['mode', lab.modes ?? []],
+    ['tier', (lab.tiers ?? []).map((tier) => tier.id)],
+    ['camera', lab.cameras ?? []],
+  ]) {
+    const value = requestedState[field];
+    if (choices.length === 0 ? value !== null : !choices.includes(value)) {
+      throw new Error(`explicit captureState ${field}=${value} is not declared by ${lab.id}`);
+    }
+  }
+  if (!Number.isInteger(requestedState.seed) || requestedState.seed < 0 || requestedState.seed > 0xffffffff
+      || !(lab.seeds ?? []).includes(requestedState.seed)) {
+    throw new Error(`explicit captureState seed=${requestedState.seed} is not a declared uint32 seed for ${lab.id}`);
+  }
+  if (!Number.isFinite(requestedState.timeSeconds) || requestedState.timeSeconds < 0) {
+    throw new Error('explicit captureState timeSeconds must be a finite nonnegative number');
+  }
+  return Object.freeze(Object.fromEntries(fields.map((field) => [field, requestedState[field]])));
+}
+
 async function applyCaptureState(page, state) {
   for (const [method, value] of [
     ['setScenario', state.scenario],
@@ -1661,6 +1694,8 @@ export async function captureLabBrowser({
   outputDir = null,
   hookPath = null,
   target = 'final',
+  browserEntryOverride = null,
+  captureState = null,
 } = {}) {
   if (!labId) throw new Error('--lab is required (or set LAB_ID)');
   const profileConfig = CAPTURE_PROFILES[profile];
@@ -1668,7 +1703,13 @@ export async function captureLabBrowser({
   const registry = buildDemoRegistry();
   const lab = registry.demos.find((entry) => entry.id === labId);
   if (!lab || !PRIMARY_DEMO_KINDS.includes(lab.kind)) throw new Error(`unknown primary lab: ${labId}`);
-  if (!lab.browserEntry || !existsSync(join(REPO_ROOT, lab.browserEntry))) throw new Error(`${labId} has no executable browserEntry`);
+  const browserEntry = browserEntryOverride ?? lab.browserEntry;
+  if (typeof browserEntry !== 'string' || browserEntry.length === 0) throw new Error(`${labId} has no executable browserEntry`);
+  const browserEntryPath = resolve(REPO_ROOT, browserEntry);
+  if (!isWithin(browserEntryPath, REPO_ROOT) || !existsSync(browserEntryPath)) throw new Error(`${labId} capture browserEntry is missing or escapes the repository: ${browserEntry}`);
+  const canonicalRoots = lab.canonicalSource.map((sourcePath) => resolve(REPO_ROOT, sourcePath));
+  if (!canonicalRoots.some((sourceRoot) => isWithin(browserEntryPath, sourceRoot))) throw new Error(`${labId} capture browserEntry is outside its canonical source closure: ${browserEntry}`);
+  assertSymlinkConfinedPath(browserEntryPath, REPO_ROOT);
   if (lab.threeRevision !== EXPECTED_THREE_PACKAGE_REVISION) {
     throw new Error(`${labId} manifest requires Three ${lab.threeRevision}; expected ${EXPECTED_THREE_PACKAGE_REVISION}`);
   }
@@ -1740,7 +1781,7 @@ export async function captureLabBrowser({
     await vite.listen();
     const address = vite.httpServer.address();
     if (!address || typeof address === 'string') throw new Error('Vite did not expose a TCP capture address');
-    const url = buildCaptureUrl({ port: address.port, browserEntry: lab.browserEntry, profile });
+    const url = buildCaptureUrl({ port: address.port, browserEntry, profile });
     browser = await chromium.launch({
       headless: true,
       args: chromiumWebGpuLaunchArgs(),
@@ -1796,7 +1837,7 @@ export async function captureLabBrowser({
     if (blocker) throw new Error(`canonical lab blocker: ${blocker}`);
     await awaitCanonicalReady(page);
     await controllerCall(page, 'resize', [profileConfig.width, profileConfig.height, profileConfig.dpr]);
-    const lockedState = defaultCaptureState(lab, target);
+    const lockedState = resolveCaptureState(lab, target, captureState);
     await applyCaptureState(page, lockedState);
 
     const runtime = {
@@ -1951,13 +1992,13 @@ export async function captureLabBrowser({
       adapterClass: browserRecord.adapterClass,
       adapterIdentity: browserRecord.adapterIdentity,
       browser: browserRecord,
-      browserEntry: lab.browserEntry,
+      browserEntry,
       url,
       finalUrl,
       route: Object.freeze({
         requestedUrl: url,
         finalUrl,
-        browserEntry: lab.browserEntry,
+        browserEntry,
         manifestLabId: labId,
         observedRuntimeLabId: observedLabId ?? null,
         lockedState,

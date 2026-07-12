@@ -8,7 +8,7 @@ import test from 'node:test';
 import { encodeRgbaPng } from '../../../../scripts/lib/png-rgba.mjs';
 import { validateUnifiedV2ArtifactBundle } from './evidence-bundle-v2.js';
 import { canonicalSha256, NORMATIVE_JSON_PATHS } from './evidence-manifest-contract.js';
-import { parseCorrectnessCaptureArgs } from './capture-correctness.js';
+import { correctnessCaptureRequest, parseCorrectnessCaptureArgs } from './capture-correctness.js';
 import { RAW_IMAGE_PATHS, finalizeRawCorrectnessCapture } from './raw-capture-manifest.js';
 
 function sha256( bytes ) {
@@ -209,6 +209,16 @@ test( 'the correctness wrapper forwards only the deterministic capture lane', ()
 
 	assert.equal( parseCorrectnessCaptureArgs( [] ).profile, 'correctness' );
 	assert.equal( parseCorrectnessCaptureArgs( [ '--profile', 'correctness', '--target', 'presentation' ] ).target, 'presentation' );
+	const request = correctnessCaptureRequest( parseCorrectnessCaptureArgs( [] ) );
+	assert.equal( request.browserEntryOverride, 'threejs-visual-validation/examples/webgpu-validation-harness/tier/webgpu-correctness/index.html' );
+	assert.deepEqual( request.captureState, {
+		tier: 'webgpu-correctness',
+		mode: 'final',
+		camera: 'design',
+		seed: 1,
+		timeSeconds: 0,
+		scenario: 'browser-capture'
+	} );
 	assert.throws( () => parseCorrectnessCaptureArgs( [ '--profile', 'performance' ] ), /immutable Codex in-app Browser/ );
 	assert.throws( () => parseCorrectnessCaptureArgs( [ '--profile' ] ), /requires a value/ );
 

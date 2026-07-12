@@ -4,8 +4,10 @@ import { fileURLToPath } from 'node:url';
 import { captureLabBrowser } from '../../../../scripts/capture-lab-browser.mjs';
 import { canonicalRawBundleDirectory } from './artifact-paths.js';
 import { finalizeRawCorrectnessCapture } from './raw-capture-manifest.js';
+import { getRouteLock } from './route-locks.js';
 
 const CAPTURE_HOOK = fileURLToPath( new URL( '../capture-hook.mjs', import.meta.url ) );
+const CORRECTNESS_BROWSER_ENTRY = 'threejs-visual-validation/examples/webgpu-validation-harness/tier/webgpu-correctness/index.html';
 
 function optionValue( argv, name ) {
 
@@ -36,15 +38,25 @@ export function parseCorrectnessCaptureArgs( argv ) {
 
 export async function captureCorrectness( options ) {
 
-	const session = await captureLabBrowser( {
+	const session = await captureLabBrowser( correctnessCaptureRequest( options ) );
+	const evidence = await finalizeRawCorrectnessCapture( session, options.outputDir );
+	return { session, evidence };
+
+}
+
+export function correctnessCaptureRequest( options ) {
+
+	const startup = getRouteLock( 'tier', 'webgpu-correctness' ).startup;
+	const captureState = Object.fromEntries( [ 'scenario', 'mode', 'tier', 'camera', 'seed', 'timeSeconds' ].map( ( key ) => [ key, startup[ key ] ] ) );
+	return {
 		labId: 'webgpu-validation-harness',
 		profile: options.profile,
 		outputDir: options.outputDir,
 		hookPath: CAPTURE_HOOK,
-		target: options.target
-	} );
-	const evidence = await finalizeRawCorrectnessCapture( session, options.outputDir );
-	return { session, evidence };
+		target: options.target,
+		browserEntryOverride: CORRECTNESS_BROWSER_ENTRY,
+		captureState
+	};
 
 }
 

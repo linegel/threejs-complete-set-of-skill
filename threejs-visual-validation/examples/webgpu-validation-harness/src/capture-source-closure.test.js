@@ -11,6 +11,7 @@ test( 'capture source closure includes shared runner, schemas, locks, and exact 
 
 	const closure = computeCaptureSourceClosure();
 	for ( const required of [
+		'scripts/capture-lab-browser.mjs',
 		'labs/runtime/aligned-readback.mjs',
 		'labs/schema/evidence-bundle-v2.schema.json',
 		'labs/schema/runtime-graph.schema.json',
@@ -18,7 +19,7 @@ test( 'capture source closure includes shared runner, schemas, locks, and exact 
 		'package-lock.json'
 	] ) assert.ok( CAPTURE_CLOSURE_ROOTS.includes( required ) );
 	assert.ok( closure.files.some( ( file ) => file.repositoryPath.endsWith( '/src/in-app-evidence-client.js' ) ) );
-	assert.ok( closure.files.every( ( file ) => file.repositoryPath !== 'scripts/capture-lab-browser.mjs' ) );
+	assert.ok( closure.files.some( ( file ) => file.repositoryPath === 'scripts/capture-lab-browser.mjs' ) );
 	assert.ok( closure.files.every( ( file ) => /^sha256:[0-9a-f]{64}$/.test( file.sha256 ) && Number.isInteger( file.byteLength ) && file.byteLength > 0 ) );
 	assert.match( closure.sourceHash, /^sha256:[0-9a-f]{64}$/ );
 	assert.equal( validateCaptureSourceClosure( closure ), true );

@@ -67,7 +67,9 @@ function captureRoute( session ) {
 
 	const state = session.finalRuntime?.metrics ?? session.route?.finalState ?? session.route?.observedState ?? {};
 	const route = {
-		path: '/demos/webgpu-validation-harness/',
+		path: state.tier === 'webgpu-correctness'
+			? '/demos/webgpu-validation-harness/tier/webgpu-correctness/'
+			: '/demos/webgpu-validation-harness/',
 		scenario: state.scenario ?? 'browser-capture',
 		mechanism: null,
 		mode: state.mode ?? 'final',

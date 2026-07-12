@@ -20,6 +20,7 @@ import {
   extractCaptureState,
   normalizePixelCapture,
   reconcileControllerNormalizedCapture,
+  resolveCaptureState,
   resolveCaptureSourceClosure,
   runtimeFailureMessages,
   validateCaptureOutputPlan,
@@ -697,6 +698,32 @@ test('capture state extraction freezes canonical route fields and rejects silent
     () => assertCaptureState({ ...state, camera: null }, state),
     /omitted locked capture state camera/,
   );
+});
+
+test('explicit capture state is complete, declared, and independent of manifest ordering', () => {
+  const lab = {
+    id: 'fixed-state-lab',
+    scenarios: [{ id: 'schema-fixture' }, { id: 'browser-capture' }],
+    modes: ['normal', 'final'],
+    tiers: [{ id: 'schema-fixture' }, { id: 'webgpu-correctness' }],
+    cameras: ['near', 'design'],
+    seeds: [1, 2654435769],
+  };
+  const requested = {
+    scenario: 'browser-capture',
+    mode: 'final',
+    tier: 'webgpu-correctness',
+    camera: 'design',
+    seed: 1,
+    timeSeconds: 0,
+  };
+  assert.deepEqual(resolveCaptureState(lab, 'final', requested), requested);
+  assert.equal(Object.isFrozen(resolveCaptureState(lab, 'final', requested)), true);
+  assert.throws(() => resolveCaptureState(lab, 'final', { ...requested, tier: 'invented' }), /not declared/);
+  assert.throws(() => resolveCaptureState(lab, 'final', { ...requested, extra: true }), /unknown fields/);
+  const { camera, ...missingCamera } = requested;
+  assert.equal(camera, 'design');
+  assert.throws(() => resolveCaptureState(lab, 'final', missingCamera), /omits fields: camera/);
 });
 
 test('browser, request, and device failures remain independent blocking channels', () => {
