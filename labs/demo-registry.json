@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:2c5430c1d65795b733dfe4ed2dd56ffda71f176f56e2b79542a03ffcb98a01c1",
+  "buildRevision": "sha256:90cea079d9500880a0b47101c7c482c4e4f0edd66aa26ea8b4c3b651c76ed1f8",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -1085,7 +1085,7 @@
         "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
         "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
       },
-      "sourceHash": "sha256:c5631f7273ceb5353735cd5f64a4ddafabab5b75a87cc9cf5dcdb9cf6d1b2d3c",
+      "sourceHash": "sha256:db56dd3ea92e51ab3466af47d13fd377bf27c4e8f2e85efc96d2bf1a5c2383e4",
       "proxyStatus": null,
       "notes": [
         "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
@@ -1310,7 +1310,7 @@
         "validateQuick": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:quick",
         "validateFull": "npm --prefix threejs-debugging/examples/debugging-contract-lab run validate:full"
       },
-      "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
+      "sourceHash": "sha256:1f31959c9ecc66f8409b2859deda736fa01080914f4765d59449dbd648c71340",
       "proxyStatus": null,
       "nonRenderingScenarioSuite": true,
       "executionClass": "non-rendering",
@@ -1899,7 +1899,7 @@
         "validateQuick": "npm --prefix integration-labs/final-image-flight run validate:quick",
         "validateFull": "npm --prefix integration-labs/final-image-flight run validate:full"
       },
-      "sourceHash": "sha256:0e56ab6926da5d5697e342c0f70e4563091c0ec3f5daeec6f94ab5b70aa8c99e",
+      "sourceHash": "sha256:7cd9ba75fa32d872b77218d7482be199eb414ea2939c65943063fe8dba23a6c2",
       "proxyStatus": null,
       "notes": [
         "This integration is a real host-owned native-WebGPU implementation, not the generic integration dashboard.",
@@ -11120,7 +11120,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:d9300c6bab640c16099881b42ef2a5cba7a50b463ce9aece18af089edf7b49e8",
+      "sourceHash": "sha256:51332e75fbc3bff2394d6a1b848edec2a2be14c9ea2472f03e7b80b97d70ad65",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
