@@ -224,4 +224,4 @@ assert.throws(
   /position parity/,
 );
 
-console.log("motion capture plan uses real diagnostic routes and a graph-backed no-post disposition");
+console.log("motion evidence plan uses real diagnostic routes and a graph-backed no-post disposition");

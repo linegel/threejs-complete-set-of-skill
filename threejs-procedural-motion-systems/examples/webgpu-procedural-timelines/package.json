@@ -3,8 +3,8 @@
   "name": "threejs-webgpu-procedural-timelines-lab",
   "private": true,
   "scripts": {
-    "check": "node --check timeline.js && node --check quaternion-helpers.js && node --check gpu-instance-motion.js && node --check route-state.js && node --check main.js && node --check browser.mjs && node --check capture-hook.mjs && node --check capture.mjs && node --check validation.js && node --check mutation-test.js && node --check shader-identifier-test.mjs && node --check capture-hook-test.mjs && node --check manifest-test.mjs && node --check validate-artifacts.mjs && node --check local-lab-command.mjs",
-    "validate:unit": "node validation.js && node shader-identifier-test.mjs && node capture-hook-test.mjs && node manifest-test.mjs",
+    "check": "node --check timeline.js && node --check quaternion-helpers.js && node --check gpu-instance-motion.js && node --check route-state.js && node --check main.js && node --check browser.mjs && node --check capture-hook.mjs && node --check capture.mjs && node --check validation.js && node --check mutation-test.js && node --check shader-identifier-test.mjs && node --check evidence-plan-test.mjs && node --check manifest-test.mjs && node --check validate-artifacts.mjs && node --check local-lab-command.mjs",
+    "validate:unit": "node validation.js && node shader-identifier-test.mjs && node evidence-plan-test.mjs && node manifest-test.mjs",
     "test:mutations": "node mutation-test.js",
     "capture": "node capture.mjs --target presentation",
     "validate:artifacts": "node manifest-test.mjs && node validate-artifacts.mjs",
