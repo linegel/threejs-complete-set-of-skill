@@ -2,6 +2,7 @@ import { evaluateScenario, getScenario } from './router-core.mjs';
 import { scenarioHref } from './route-urls.mjs';
 import { runnableDemosForFixture } from './runnable-demos.mjs';
 
+const LAB_ID = 'router-manifest-lab';
 const catalogUrl = new URL( './router-fixtures.json', import.meta.url );
 
 function readFixedScenario() {
@@ -39,6 +40,8 @@ export class RouterLabController {
 		this.#scenarioId = scenarioId;
 
 	}
+
+	get labId() { return LAB_ID; }
 
 	async ready() { this.#assertLive(); await this.renderOnce(); }
 	async setScenario( id ) { this.#assertLive(); getScenario( this.#catalog, id ); this.#scenarioId = id; await this.renderOnce(); }
@@ -79,7 +82,7 @@ export class RouterLabController {
 	}
 
 	describeResources() { this.#assertLive(); return { resources: [], reason: 'non-rendering scenario suite' }; }
-	getMetrics() { this.#assertLive(); return { scenarioId: this.#scenarioId, result: this.#result }; }
+	getMetrics() { this.#assertLive(); return { labId: this.labId, scenarioId: this.#scenarioId, result: this.#result }; }
 	async dispose() { this.#disposed = true; }
 
 	#assertLive() {
