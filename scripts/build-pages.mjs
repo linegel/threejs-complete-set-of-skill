@@ -388,7 +388,7 @@ footer code{color:var(--cyan);font-size:11px}
 
 const navHtml = (depth) => `<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="${depth}">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="${depth}#matrix">Matrix</a><a href="${depth}#flagships">Flagships</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}evidence/">Evidence</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
 </nav></div></div>`;
 
 const footerHtml = `<div class="wrap"><footer>
@@ -797,7 +797,7 @@ ${navHtml('')}
           <div class="hero-ledger-row"><dt>Pending</dt><dd data-state="pending"><strong>${primaryDemos.length - acceptedPrimaryDemos.length}</strong><span>Current-adapter capture or review still required</span></dd></div>
           <div class="hero-ledger-row"><dt>Fixed states</dt><dd><strong>${fixedRouteCount}</strong><span>${scenarioRouteCount} scenarios · ${mechanismRouteCount} mechanisms · ${tierRouteCount} tiers</span></dd></div>
         </dl>
-        <div class="hero-ledger-actions"><a class="hero-ledger-link" href="#labs">Inspect every lab&nbsp;→</a><a class="hero-ledger-link" href="demos/registry.json">Open registry JSON&nbsp;→</a></div>
+        <div class="hero-ledger-actions"><a class="hero-ledger-link" href="#labs">Inspect every lab&nbsp;→</a><a class="hero-ledger-link" href="evidence/">Open evidence reports&nbsp;→</a><a class="hero-ledger-link" href="demos/registry.json">Open registry JSON&nbsp;→</a></div>
       </aside>
     </div>
   </div>
@@ -849,7 +849,7 @@ ${navHtml('')}
 
 <section class="section" id="labs" aria-labelledby="labs-title"><div class="wrap">
   <h2 id="labs-title">The complete primary lab matrix</h2>
-  <p class="sub">Every card is a distinct published base route generated from the canonical source revision. “Evidence pending” means the implementation exists and loads, but its v2 runtime bundle has not yet earned acceptance.</p>
+  <p class="sub">Every card is a distinct published base route generated from the canonical source revision. “Evidence pending” means the implementation exists and loads, but its v2 runtime bundle has not yet earned acceptance. <a href="evidence/">Inspect all ${primaryDemos.length} evidence reports.</a></p>
 ${primaryLabHtml}
 </div></section>
 
@@ -1534,11 +1534,16 @@ writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}${homepageSocialImage ? `<image:image><image:loc>${new URL(homepageSocialImage, SITE).href}</image:loc><image:title>${SITE_NAME}</image:title></image:image>` : ''}</url>
   <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}</url>
+  <url><loc>${SITE}evidence/</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}</url>
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
   const preview = canonicalSkillPreview(s);
   const image = preview ? articleImageUrls(s)[2] : null;
   return `  <url><loc>${SITE}skills/${s}.html</loc>${lastmod}${image ? `<image:image><image:loc>${image}</image:loc><image:title>${esc(skills[s].title)}</image:title></image:image>` : ''}</url>`;
+}).join('\n')}
+${primaryDemos.map((demo) => {
+  const lastmod = latestPathDate(demo.canonicalSource ?? []);
+  return `  <url><loc>${SITE}evidence/${demo.id}/</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
 }).join('\n')}
 ${DEMO_REGISTRY.demos.filter((demo) => demo.publishPath && (
   demo.status === 'secondary'

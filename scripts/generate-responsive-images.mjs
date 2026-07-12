@@ -44,20 +44,27 @@ function attribute(tag, name) {
   return tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'))?.[1] ?? null;
 }
 
+function htmlFilesUnder(directory) {
+  if (!existsSync(directory)) return [];
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return htmlFilesUnder(path);
+    return entry.isFile() && entry.name.endsWith('.html') ? [path] : [];
+  });
+}
+
 function pageFiles() {
   return [
     join(DOCS, 'index.html'),
-    ...readdirSync(join(DOCS, 'skills'))
-      .filter((name) => name.endsWith('.html'))
-      .sort()
-      .map((name) => join(DOCS, 'skills', name)),
-  ];
+    ...htmlFilesUnder(join(DOCS, 'skills')),
+    ...htmlFilesUnder(join(DOCS, 'evidence')),
+  ].sort();
 }
 
 function localSourcePath(pagePath, src) {
   const url = new URL(src, new URL(relative(DOCS, pagePath).split(sep).join('/'), SITE));
   if (url.origin !== SITE.origin) throw new Error(`${pagePath}: responsive source is outside ${SITE.origin}: ${src}`);
-  const path = resolve(dirname(pagePath), decodeURIComponent(src).split(/[?#]/, 1)[0]);
+  const path = resolve(DOCS, decodeURIComponent(url.pathname).replace(/^\/+/, ''));
   if (!path.startsWith(`${resolve(DOCS)}${sep}`)) throw new Error(`${pagePath}: responsive source escapes docs/: ${src}`);
   if (!existsSync(path)) throw new Error(`${pagePath}: responsive source does not exist: ${src}`);
   if (!/\.png$/i.test(path)) throw new Error(`${pagePath}: responsive source must be PNG: ${src}`);
