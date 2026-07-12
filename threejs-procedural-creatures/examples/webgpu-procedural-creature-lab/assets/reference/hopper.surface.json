@@ -201,25 +201,25 @@
       "length": 89540,
       "byteLength": 358160
     },
-    "correctionMask": {
-      "type": "Uint8Array",
+    "correctionWeights": {
+      "type": "Float32Array",
       "byteOffset": 2193728,
       "length": 22385,
-      "byteLength": 22385
+      "byteLength": 89540
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 2216128,
+      "byteOffset": 2283280,
       "length": 134310,
       "byteLength": 537240
     }
   },
   "binary": {
-    "byteLength": 2753376,
+    "byteLength": 2820528,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "32b8618795ce72b55cf99fbb04390085",
-    "sha256": "aaba0413e789dfc757708245b9067c2f9e61e9c454bd25c5c135349e9e97e119",
+    "contentDigest128": "f4aa0e47ddebb9f56b8d84bb69c97b85",
+    "sha256": "d66336de05360ce1d8f595ed789ae67fe38478dca273bd06b28c9c3c5c55d6fe",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "hopper",

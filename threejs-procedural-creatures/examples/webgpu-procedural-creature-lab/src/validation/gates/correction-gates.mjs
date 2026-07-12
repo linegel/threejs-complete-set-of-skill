@@ -1,4 +1,4 @@
-import { buildCorrectionRegion, correctPointBounded } from '../../core/correction.js';
+import { applyCorrectionToSurface, buildCorrectionRegion, correctPointBounded } from '../../core/correction.js';
 
 function sphereField(point) {
 	const length = Math.hypot(...point);
@@ -40,7 +40,18 @@ async function runCorrectionRegion() {
 	}
 	const rejected = buildCorrectionRegion(mesh, new Float32Array([0.2, 0, 0, 0]), { threshold: 0.1, maximumFraction: 0.25, minimumIslandVertices: 1 });
 	if (rejected.status !== 'rejected') return { status: 'fail', details: { message: 'whole-body correction disguise exceeded 25% but passed', rejected } };
-	return { status: 'pass', details: { grownCount: region.grownCount, rejectedFraction: rejected.fraction, maximumFraction: rejected.maximumFraction } };
+	const feathered = buildCorrectionRegion(mesh, new Float32Array([0.2, 0, 0, 0]), { threshold: 0.1, maximumFraction: 1, minimumIslandVertices: 1, featherRings: 2 });
+	if (feathered.weights[0] !== 1 || feathered.weights.some((value, vertex) => value < 0 || value > 1 || (vertex !== 0 && value >= 1))) {
+		return { status: 'fail', details: { message: 'feathered region weights are not bounded and decreasing away from the direct defect', weights: [...feathered.weights] } };
+	}
+	const correctedSurface = applyCorrectionToSurface(
+		{ ...mesh, normals: new Float32Array(mesh.positions.length) },
+		new Float32Array([0.5, 0, 0, 0]),
+		(point) => ({ d: point[0] - 0.4, grad: [1, 0, 0] }),
+		{ trustRadius: 1, maximumTrials: 1 },
+	);
+	if (Math.abs(correctedSurface.positions[0] - 0.2) > 1e-7) return { status: 'fail', details: { message: 'weighted correction did not blend the accepted displacement', position: correctedSurface.positions[0] } };
+	return { status: 'pass', details: { grownCount: region.grownCount, rejectedFraction: rejected.fraction, maximumFraction: rejected.maximumFraction, featherWeights: [...feathered.weights] } };
 }
 
 export const gates = [

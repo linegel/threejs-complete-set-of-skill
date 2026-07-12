@@ -201,25 +201,25 @@
       "length": 44116,
       "byteLength": 176464
     },
-    "correctionMask": {
-      "type": "Uint8Array",
+    "correctionWeights": {
+      "type": "Float32Array",
       "byteOffset": 1080832,
       "length": 11029,
-      "byteLength": 11029
+      "byteLength": 44116
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 1091872,
+      "byteOffset": 1124960,
       "length": 66174,
       "byteLength": 264696
     }
   },
   "binary": {
-    "byteLength": 1356576,
+    "byteLength": 1389664,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "53960e2ceffb0f1866aa93aaba373a34",
-    "sha256": "8f38b1ce6f2ded9e47ed1926129ccac6d90b7a3462819e661628b4be8b59a8be",
+    "contentDigest128": "d3be362c907ae518b7ca53aafdfc8234",
+    "sha256": "b1e1ab2354d68476351312e806e4e87ca97f1342a974cf964ff21a0fcb171c4b",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "biped",
@@ -238,7 +238,7 @@
     "status": "accepted-deformation-selection",
     "selectedMethod": "lbs",
     "correctionLayout": "none",
-    "selectionRule": "Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded correction mask only when it covers at most 25% and the corrected full sweep passes; otherwise reject.",
+    "selectionRule": "Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded binary or geodesically feathered correction region only when it covers at most 25% and the corrected full sweep passes; otherwise reject.",
     "corpus": {
       "version": "creature-deformation-sweep-v2",
       "locomotionType": "biped",
@@ -265,9 +265,30 @@
       "invertedTriangles": 0,
       "nonAdjacentSelfIntersections": 0
     },
-    "dqsFailures": [
-      "57 pose self-intersections"
-    ],
+    "correctionRegion": null,
+    "alternatives": {
+      "lbs": {
+        "status": "accepted-candidate",
+        "failures": [],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 0
+        }
+      },
+      "dqs": {
+        "status": "rejected",
+        "failures": [
+          "57 pose self-intersections"
+        ],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 57
+        }
+      },
+      "lbsCorrected": null
+    },
     "limitations": [
       "Deterministic CPU silhouettes certify three orthographic design directions; browser near/design/far perspective captures remain required evidence.",
       "Morphology-envelope endpoint poses are not included unless supplied through options.corpus."

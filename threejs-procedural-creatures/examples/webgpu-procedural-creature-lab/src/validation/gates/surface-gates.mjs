@@ -193,7 +193,7 @@ async function runBundledReferenceConnectivity() {
 
 async function runBundledReferenceAssets() {
 	const records = [];
-	const requiredArrays = ['positions', 'normals', 'indices', 'skinIndices', 'skinWeights', 'semanticIndices', 'colorIndices', 'colorWeights', 'correctionMask', 'restRadialFrames'];
+	const requiredArrays = ['positions', 'normals', 'indices', 'skinIndices', 'skinWeights', 'semanticIndices', 'colorIndices', 'colorWeights', 'correctionWeights', 'restRadialFrames'];
 	for (const name of bundledSpecNames) {
 		const manifest = JSON.parse(await readFile(resolve(referenceAssetsDir, `${name}.surface.json`), 'utf8'));
 		const binary = new Uint8Array(await readFile(resolve(referenceAssetsDir, `${name}.surface.bin`)));
@@ -206,15 +206,24 @@ async function runBundledReferenceAssets() {
 		if (missing.length > 0) return { status: 'fail', details: { message: `bundled asset '${name}' lacks required arrays`, missing } };
 		const vertices = arrays.positions.length / 3;
 		if (arrays.normals.length !== arrays.positions.length || arrays.skinIndices.length !== vertices * 4 || arrays.skinWeights.length !== vertices * 4
-			|| arrays.semanticIndices.length !== vertices || arrays.correctionMask.length !== vertices || arrays.restRadialFrames.length !== vertices * 6) {
+			|| arrays.semanticIndices.length !== vertices || arrays.correctionWeights.length !== vertices || arrays.restRadialFrames.length !== vertices * 6) {
 			return { status: 'fail', details: { message: `bundled asset '${name}' array cardinality mismatch` } };
 		}
 		if (manifest.acceptanceStatus !== 'provisional-reference-candidate' || manifest.representation !== 'canonical-reference-surface-candidate') {
 			return { status: 'fail', details: { message: `bundled asset '${name}' overstates acceptance`, acceptanceStatus: manifest.acceptanceStatus, representation: manifest.representation } };
 		}
-		const expectedDeformationStatus = name === 'biped' ? 'accepted-deformation-selection' : 'not-certified';
-		if (manifest.deformation?.status !== expectedDeformationStatus || (name === 'biped' && manifest.deformation?.selectedMethod !== 'lbs')) {
+		const expectedDeformationStatus = name === 'biped' || name === 'flyer' ? 'accepted-deformation-selection' : 'not-certified';
+		const expectedMethod = name === 'biped' ? 'lbs' : name === 'flyer' ? 'dqs-log-scale' : null;
+		const expectedCorrection = name === 'biped' ? 'none' : name === 'flyer' ? 'bounded-static-feather' : null;
+		if (manifest.deformation?.status !== expectedDeformationStatus || manifest.deformation?.selectedMethod !== expectedMethod
+			|| manifest.deformation?.correctionLayout !== expectedCorrection) {
 			return { status: 'fail', details: { message: `bundled asset '${name}' deformation status drifted`, expectedDeformationStatus, deformation: manifest.deformation } };
+		}
+		const positiveCorrectionWeights = arrays.correctionWeights.reduce((count, value) => count + (value > 0 ? 1 : 0), 0);
+		if (arrays.correctionWeights.some((value) => !(value >= 0 && value <= 1))
+			|| (name === 'flyer' && positiveCorrectionWeights !== manifest.deformation.correctionRegion?.grownCount)
+			|| (name !== 'flyer' && positiveCorrectionWeights !== 0)) {
+			return { status: 'fail', details: { message: `bundled asset '${name}' correction weights drifted`, positiveCorrectionWeights, correctionRegion: manifest.deformation?.correctionRegion } };
 		}
 		records.push({ name, vertices, triangles: arrays.indices.length / 3, bytes: binary.byteLength, sha256 });
 	}
@@ -380,6 +389,47 @@ async function runBipedDeformationSweep() {
 	return { status: 'pass', details: { sigma: manifest.skinning.sigma, selectedMethod: result.selectedMethod, corpus: result.corpus, worst: result.candidates.lbs.worst, totals: result.candidates.lbs.totals, dqsFailures: result.candidates.dqs.failures } };
 }
 
+async function runFlyerDeformationSweep() {
+	const [specText, manifestText, binary] = await Promise.all([
+		readFile(resolve(specsDir, 'flyer.json'), 'utf8'),
+		readFile(resolve(referenceAssetsDir, 'flyer.surface.json'), 'utf8'),
+		readFile(resolve(referenceAssetsDir, 'flyer.surface.bin')),
+	]);
+	const spec = JSON.parse(specText);
+	const manifest = JSON.parse(manifestText);
+	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileFixture(spec);
+	const result = certifyDeformationSelection(
+		spec,
+		compiled,
+		{ positions: arrays.positions, normals: arrays.normals, indices: arrays.indices },
+		{ skinIndices: arrays.skinIndices, skinWeights: arrays.skinWeights },
+		{
+			durationSeconds: 4,
+			sampleCount: 25,
+			worldUnitsPerPixel: manifest.extraction.cellSize,
+			maximumSilhouetteErrorPx: 1,
+			silhouetteResolution: 32,
+			silhouetteRayStep: manifest.extraction.cellSize,
+			maximumCorrectionTrials: 2,
+			correctionTrustRadius: 0.024,
+			correctionFeatherRings: 2,
+			checkSelfIntersections: true,
+		},
+	);
+	const winner = result.candidates.dqsCorrected;
+	if (manifest.skinning?.sigma !== 0.035 || result.status !== 'accepted-deformation-selection'
+		|| result.selectedMethod !== 'dqs-log-scale' || result.correctionLayout !== 'bounded-static-feather'
+		|| winner?.totals.collapsedTriangles !== 0 || winner?.totals.nonAdjacentSelfIntersections !== 0
+		|| winner?.totals.backtracks !== 0 || winner?.region?.grownCount !== 87
+		|| result.candidates.lbs.totals.nonAdjacentSelfIntersections !== 14
+		|| result.candidates.dqs.totals.nonAdjacentSelfIntersections !== 10
+		|| result.candidates.lbsCorrected?.totals.nonAdjacentSelfIntersections !== 52) {
+		return { status: 'fail', details: { message: 'frozen flyer method/correction sweep rejected', sigma: manifest.skinning?.sigma, status: result.status, selectedMethod: result.selectedMethod, correctionLayout: result.correctionLayout, winner: winner && { failures: winner.failures, totals: winner.totals, region: winner.region }, alternatives: { lbs: result.candidates.lbs.totals, dqs: result.candidates.dqs.totals, lbsCorrected: result.candidates.lbsCorrected?.totals } } };
+	}
+	return { status: 'pass', details: { sigma: manifest.skinning.sigma, selectedMethod: result.selectedMethod, correctionLayout: result.correctionLayout, corpus: result.corpus, worst: winner.worst, totals: winner.totals, region: { fraction: winner.region.fraction, grownCount: winner.region.grownCount, featherRings: winner.region.featherRings } } };
+}
+
 export const gates = [
 	{ id: 'reference-surface-sphere', run: runReferenceSphere },
 	{ id: 'reference-surface-determinism', run: runReferenceDeterminism },
@@ -394,4 +444,5 @@ export const gates = [
 	{ id: 'projected-silhouette-fixture', run: runProjectedSilhouetteFixture },
 	{ id: 'deformation-selection-fixture', run: runDeformationSelectionFixture },
 	{ id: 'biped-deformation-sweep', run: runBipedDeformationSweep },
+	{ id: 'flyer-deformation-sweep', run: runFlyerDeformationSweep },
 ];

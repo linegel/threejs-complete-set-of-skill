@@ -1,7 +1,8 @@
 import { instancedArray } from 'three/tsl';
 
 export const REFERENCE_TRANSFORM_VEC4S = 6;
-export const REFERENCE_PAGE_STORAGE_VERSION = 'creature-reference-page-storage-v1';
+export const REFERENCE_POSE_VEC4S = 3;
+export const REFERENCE_PAGE_STORAGE_VERSION = 'creature-reference-page-storage-v2';
 
 function positiveInteger(value, name) {
 	const result = Math.floor(Number(value));
@@ -41,12 +42,15 @@ export function createReferencePageStorage(options = {}) {
 	const capacity = positiveInteger(options.capacity, 'reference page capacity');
 	const slotCount = positiveInteger(options.slotCount, 'reference page slotCount');
 	const transformsNode = instancedArray(capacity * slotCount * REFERENCE_TRANSFORM_VEC4S, 'vec4').setName(options.transformsLabel ?? 'CreatureReferenceTransforms');
+	const posesNode = instancedArray(capacity * slotCount * REFERENCE_POSE_VEC4S, 'vec4').setName(options.posesLabel ?? 'CreatureReferencePoses');
 	const rootsNode = instancedArray(capacity, 'vec4').setName(options.rootsLabel ?? 'CreatureReferenceRoots');
 	const visibleSlotsNode = instancedArray(capacity, 'int').setName(options.visibleLabel ?? 'CreatureReferenceVisibleSlots');
 	const transforms = mapped(transformsNode);
+	const poses = mapped(posesNode);
 	const roots = mapped(rootsNode);
 	const visible = mapped(visibleSlotsNode);
 	const transformDirty = dirtyTracker();
+	const poseDirty = dirtyTracker();
 	const rootDirty = dirtyTracker();
 	const visibleDirty = dirtyTracker();
 	let visibleCount = 0;
@@ -68,6 +72,19 @@ export function createReferencePageStorage(options = {}) {
 		if (!changed) return { slot, offset, count: 0 };
 		transforms.array.set(values, offset);
 		include(transformDirty, offset, expected);
+		return { slot, offset, count: expected };
+	}
+
+	function writePose(slotValue, values) {
+		const slot = stableSlot(slotValue);
+		const expected = slotCount * REFERENCE_POSE_VEC4S * 4;
+		if (!(values instanceof Float32Array) || values.length !== expected) throw new Error(`reference pose requires ${expected} Float32 values`);
+		const offset = slot * expected;
+		let changed = false;
+		for (let index = 0; index < expected; index++) if (poses.array[offset + index] !== values[index]) { changed = true; break; }
+		if (!changed) return { slot, offset, count: 0 };
+		poses.array.set(values, offset);
+		include(poseDirty, offset, expected);
 		return { slot, offset, count: expected };
 	}
 
@@ -102,13 +119,15 @@ export function createReferencePageStorage(options = {}) {
 	function markDirty() {
 		if (disposed) throw new Error('reference page storage is disposed');
 		const transformUpload = upload(transforms.attribute, transforms.array, transformDirty);
+		const poseUpload = upload(poses.attribute, poses.array, poseDirty);
 		const rootUpload = upload(roots.attribute, roots.array, rootDirty);
 		const visibleUpload = upload(visible.attribute, visible.array, visibleDirty);
 		return {
 			transforms: transformUpload,
+			poses: poseUpload,
 			roots: rootUpload,
 			visibleSlots: visibleUpload,
-			totalBytes: transformUpload.bytes + rootUpload.bytes + visibleUpload.bytes,
+			totalBytes: transformUpload.bytes + poseUpload.bytes + rootUpload.bytes + visibleUpload.bytes,
 		};
 	}
 
@@ -118,12 +137,15 @@ export function createReferencePageStorage(options = {}) {
 		slotCount,
 		transformsNode: transforms.node,
 		transformsArray: transforms.array,
+		posesNode: poses.node,
+		posesArray: poses.array,
 		rootsNode: roots.node,
 		rootsArray: roots.array,
 		visibleSlotsNode: visible.node,
 		visibleSlotsArray: visible.array,
 		get visibleCount() { return visibleCount; },
 		writeTransforms,
+		writePose,
 		writeRoot,
 		writeVisibleSlots,
 		markDirty,
@@ -131,6 +153,7 @@ export function createReferencePageStorage(options = {}) {
 			if (disposed) return;
 			disposed = true;
 			transforms.node.dispose?.();
+			poses.node.dispose?.();
 			roots.node.dispose?.();
 			visible.node.dispose?.();
 		},

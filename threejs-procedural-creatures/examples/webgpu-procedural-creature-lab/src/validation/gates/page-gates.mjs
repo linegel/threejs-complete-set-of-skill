@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildAffineSlotTransforms, restPoseFromCompiled } from '../../core/deformation.js';
+import { buildAffineSlotTransforms, buildDualQuaternionSlotTransforms, restPoseFromCompiled } from '../../core/deformation.js';
 import { unpackReferenceAsset } from '../../core/reference-asset-format.js';
 import { compileSpec } from '../../core/rig-compiler.js';
 import { buildReferenceBufferGeometry } from '../../lab/reference-geometry.js';
@@ -57,14 +57,18 @@ async function runPageReuseGeneration() {
 async function runReferencePageStorage() {
 	const storage = createReferencePageStorage({ capacity: 4, slotCount: 2 });
 	const transform = new Float32Array(2 * 24);
+	const pose = new Float32Array(2 * 12);
 	transform.fill(0.25);
+	pose.fill(0.5);
 	storage.writeTransforms(2, transform);
+	storage.writePose(2, pose);
 	storage.writeRoot(2, 1, 2, 3, 0.5);
 	storage.writeVisibleSlots([2]);
 	const upload = storage.markDirty();
 	const expectedTransformBytes = transform.byteLength;
-	if (upload.transforms.bytes !== expectedTransformBytes || upload.roots.bytes !== 16 || upload.visibleSlots.bytes !== 4
-		|| upload.totalBytes !== expectedTransformBytes + 20 || storage.visibleSlotsArray[0] !== 2 || storage.visibleCount !== 1) {
+	const expectedPoseBytes = pose.byteLength;
+	if (upload.transforms.bytes !== expectedTransformBytes || upload.poses.bytes !== expectedPoseBytes || upload.roots.bytes !== 16 || upload.visibleSlots.bytes !== 4
+		|| upload.totalBytes !== expectedTransformBytes + expectedPoseBytes + 20 || storage.visibleSlotsArray[0] !== 2 || storage.visibleCount !== 1) {
 		return { status: 'fail', details: { message: 'reference page storage layout or exact dirty bytes drifted', upload } };
 	}
 	const idle = storage.markDirty();
@@ -88,7 +92,9 @@ async function runReferenceRenderBindings() {
 	const compiled = compileSpec(JSON.parse(specText), { tier: 'hero', maxParts: 64, candidateK: 64 });
 	const geometry = buildReferenceBufferGeometry({ manifest, arrays }, compiled);
 	const storage = createReferencePageStorage({ capacity: 4, slotCount: compiled.slots.length });
-	storage.writeTransforms(0, buildAffineSlotTransforms(compiled, restPoseFromCompiled(compiled)));
+	const restPose = restPoseFromCompiled(compiled);
+	storage.writeTransforms(0, buildAffineSlotTransforms(compiled, restPose));
+	storage.writePose(0, restPose);
 	storage.writeRoot(0, 0, 0, 0, 0);
 	storage.writeVisibleSlots([0]);
 	const material = createReferenceCreatureMaterial({ storage, slotCount: compiled.slots.length, tier: 'hero' });
@@ -98,13 +104,55 @@ async function runReferenceRenderBindings() {
 		&& geometry.userData.deformationStatus === 'accepted-deformation-selection'
 		&& geometry.userData.skinningMethod === 'lbs'
 		&& material.positionNode === material.castShadowPositionNode
-		&& material.userData.fieldEvaluation === 'none in canonical fragment shading'
+		&& material.userData.fieldEvaluation === 'none in canonical reference shading'
 		&& material.flatShading === true;
 	const details = { vertices: geometry.attributes.position.count, triangles: geometry.index.count / 3, representation: geometry.userData.representation, sharedShadowNode: material.positionNode === material.castShadowPositionNode };
 	material.dispose();
 	geometry.dispose();
 	storage.dispose();
 	if (!valid) return { status: 'fail', details: { message: 'reference render bindings drifted', ...details } };
+	return { status: 'pass', details };
+}
+
+async function runFlyerReferenceRenderBindings() {
+	const labRoot = resolve(here, '../../..');
+	const [manifestText, binary, specText] = await Promise.all([
+		readFile(resolve(labRoot, 'assets/reference/flyer.surface.json'), 'utf8'),
+		readFile(resolve(labRoot, 'assets/reference/flyer.surface.bin')),
+		readFile(resolve(labRoot, 'src/lab/specs/flyer.json'), 'utf8'),
+	]);
+	const manifest = JSON.parse(manifestText);
+	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileSpec(JSON.parse(specText), { tier: 'hero', maxParts: 64, candidateK: 64 });
+	const geometry = buildReferenceBufferGeometry({ manifest, arrays }, compiled);
+	const storage = createReferencePageStorage({ capacity: 4, slotCount: compiled.slots.length });
+	const restPose = restPoseFromCompiled(compiled);
+	storage.writeTransforms(0, buildDualQuaternionSlotTransforms(compiled, restPose));
+	storage.writePose(0, restPose);
+	storage.writeRoot(0, 0, 0, 0, 0);
+	storage.writeVisibleSlots([0]);
+	const material = createReferenceCreatureMaterial({
+		storage,
+		slotCount: compiled.slots.length,
+		tier: 'hero',
+		skinningMethod: manifest.deformation.selectedMethod,
+		correctionLayout: manifest.deformation.correctionLayout,
+		correctionTrustRadius: manifest.deformation.correctionRegion.trustRadius,
+		correctionTrials: manifest.deformation.correctionRegion.maximumTrials,
+		blendDag: compiled.blendDag,
+	});
+	const positiveCorrectionWeights = arrays.correctionWeights.reduce((count, value) => count + (value > 0 ? 1 : 0), 0);
+	const valid = geometry.userData.skinningMethod === 'dqs-log-scale'
+		&& positiveCorrectionWeights === manifest.deformation.correctionRegion.grownCount
+		&& material.userData.skinningMethod === 'dqs-log-scale'
+		&& material.userData.correctionLayout === 'bounded-static-feather'
+		&& material.userData.fieldEvaluation.includes('vertex-stage field trials')
+		&& material.positionNode === material.castShadowPositionNode;
+	const details = { positiveCorrectionWeights, method: material.userData.skinningMethod, correctionLayout: material.userData.correctionLayout, sharedShadowNode: material.positionNode === material.castShadowPositionNode };
+	material.dispose();
+	geometry.dispose();
+	storage.dispose();
+	if (!valid) return { status: 'fail', details: { message: 'flyer DQ/correction render bindings drifted', ...details } };
 	return { status: 'pass', details };
 }
 
@@ -143,5 +191,6 @@ export const gates = [
 	{ id: 'page-reuse-generation', run: runPageReuseGeneration },
 	{ id: 'reference-page-storage', run: runReferencePageStorage },
 	{ id: 'reference-render-bindings', run: runReferenceRenderBindings },
+	{ id: 'flyer-reference-render-bindings', run: runFlyerReferenceRenderBindings },
 	{ id: 'reference-identity-mutation', run: runReferenceIdentityMutation },
 ];

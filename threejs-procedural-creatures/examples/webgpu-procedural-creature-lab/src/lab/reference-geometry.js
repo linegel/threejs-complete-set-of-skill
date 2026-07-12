@@ -38,7 +38,7 @@ export function buildReferenceBufferGeometry(asset, compiled) {
 	geometry.setAttribute('skinIndex', new BufferAttribute(arrays.skinIndices, 4));
 	geometry.setAttribute('skinWeight', new BufferAttribute(arrays.skinWeights, 4));
 	geometry.setAttribute('color', new BufferAttribute(colors, 3));
-	geometry.setAttribute('correctionMask', new BufferAttribute(arrays.correctionMask, 1));
+	geometry.setAttribute('correctionWeight', new BufferAttribute(arrays.correctionWeights, 1));
 	geometry.setIndex(new BufferAttribute(arrays.indices, 1));
 	geometry.computeBoundingBox();
 	geometry.computeBoundingSphere();

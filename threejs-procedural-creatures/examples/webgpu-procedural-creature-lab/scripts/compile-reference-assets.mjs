@@ -19,6 +19,14 @@ const skinWeightOptions = Object.freeze({
 	// Frozen 25-pose topology sweep: sigma 0.13 yields zero LBS
 	// self-intersections; 0.12 and 0.14 reintroduce 3 and 6 respectively.
 	biped: Object.freeze({ sigma: 0.13 }),
+	// Frozen 25-pose method/correction sweep: raw LBS and DQ retain 14 and 10
+	// intersections; corrected LBS worsens to 52, while DQ with the frozen
+	// feathered region clears every topology, silhouette, and normal gate.
+	flyer: Object.freeze({ sigma: 0.035 }),
+});
+const deformationOptions = Object.freeze({
+	biped: Object.freeze({ maximumCorrectionTrials: 0 }),
+	flyer: Object.freeze({ maximumCorrectionTrials: 2, correctionTrustRadius: 0.024, correctionFeatherRings: 2 }),
 });
 
 function parseArgs(argv) {
@@ -36,24 +44,27 @@ function radialFrames(surface, compiled, skinning) {
 	return frames;
 }
 
-function compileArrays(surface, compiled, skinning) {
+function compileArrays(surface, compiled, skinning, correctionWeights) {
 	return {
 		skinIndices: skinning.skinIndices,
 		skinWeights: skinning.skinWeights,
 		semanticIndices: skinning.ownerParts,
 		colorIndices: skinning.skinIndices.slice(),
 		colorWeights: skinning.skinWeights.slice(),
-		correctionMask: new Uint8Array(surface.positions.length / 3),
+		correctionWeights,
 		restRadialFrames: radialFrames(surface, compiled, skinning),
 	};
 }
 
-function deformationSummary(name, spec, compiled, surface, skinning, cellSize) {
-	if (name !== 'biped') return {
-		status: 'not-certified',
-		selectedMethod: null,
-		correctionLayout: null,
-		limitation: 'The full deterministic deformation selection sweep has not produced an accepted candidate for this species.',
+function deformationSelection(name, spec, compiled, surface, skinning, cellSize) {
+	if (!deformationOptions[name]) return {
+		summary: {
+			status: 'not-certified',
+			selectedMethod: null,
+			correctionLayout: null,
+			limitation: 'The full deterministic deformation selection sweep has not produced an accepted candidate for this species.',
+		},
+		correctionWeights: new Float32Array(surface.positions.length / 3),
 	};
 	const result = certifyDeformationSelection(spec, compiled, surface, skinning, {
 		durationSeconds: 4,
@@ -62,25 +73,46 @@ function deformationSummary(name, spec, compiled, surface, skinning, cellSize) {
 		maximumSilhouetteErrorPx: 1,
 		silhouetteResolution: 32,
 		silhouetteRayStep: cellSize,
-		maximumCorrectionTrials: 0,
+		...deformationOptions[name],
 		checkSelfIntersections: true,
 	});
-	if (result.status !== 'accepted-deformation-selection' || result.selectedMethod !== 'lbs') {
-		throw new Error(`biped frozen deformation selection rejected: ${JSON.stringify(result.candidates.lbs.failures)}`);
+	const expectedMethod = name === 'biped' ? 'lbs' : 'dqs-log-scale';
+	const expectedCorrection = name === 'biped' ? 'none' : 'bounded-static-feather';
+	if (result.status !== 'accepted-deformation-selection' || result.selectedMethod !== expectedMethod || result.correctionLayout !== expectedCorrection) {
+		throw new Error(`${name} frozen deformation selection rejected: ${JSON.stringify({ status: result.status, method: result.selectedMethod, correction: result.correctionLayout, lbs: result.candidates.lbs.failures, dqs: result.candidates.dqs.failures, lbsCorrected: result.candidates.lbsCorrected?.failures, dqsCorrected: result.candidates.dqsCorrected?.failures })}`);
 	}
-	return {
+	const selected = expectedMethod === 'lbs'
+		? (expectedCorrection === 'none' ? result.candidates.lbs : result.candidates.lbsCorrected)
+		: (expectedCorrection === 'none' ? result.candidates.dqs : result.candidates.dqsCorrected);
+	const correctionWeights = selected.region?.weights?.slice() ?? new Float32Array(surface.positions.length / 3);
+	return { summary: {
 		version: result.version,
 		status: result.status,
 		selectedMethod: result.selectedMethod,
 		correctionLayout: result.correctionLayout,
 		selectionRule: result.selectionRule,
 		corpus: result.corpus,
-		thresholds: result.candidates.lbs.thresholds,
-		worst: result.candidates.lbs.worst,
-		totals: result.candidates.lbs.totals,
-		dqsFailures: result.candidates.dqs.failures,
+		thresholds: selected.thresholds,
+		worst: selected.worst,
+		totals: selected.totals,
+		correctionRegion: selected.region ? {
+			version: selected.region.version,
+			fraction: selected.region.fraction,
+			maximumFraction: selected.region.maximumFraction,
+			directCount: selected.region.directCount,
+			grownCount: selected.region.grownCount,
+			featherRings: selected.region.featherRings,
+			growthPolicy: selected.region.growthPolicy,
+			trustRadius: selected.thresholds.trustRadius,
+			maximumTrials: selected.thresholds.maximumTrials,
+		} : null,
+		alternatives: {
+			lbs: { status: result.candidates.lbs.status, failures: result.candidates.lbs.failures, totals: result.candidates.lbs.totals },
+			dqs: { status: result.candidates.dqs.status, failures: result.candidates.dqs.failures, totals: result.candidates.dqs.totals },
+			lbsCorrected: result.candidates.lbsCorrected ? { status: result.candidates.lbsCorrected.status, failures: result.candidates.lbsCorrected.failures, totals: result.candidates.lbsCorrected.totals } : null,
+		},
 		limitations: result.limitations,
-	};
+	}, correctionWeights };
 }
 
 async function compileOne(name) {
@@ -99,18 +131,18 @@ async function compileOne(name) {
 	if (surface.certification.status === 'rejected') throw new Error(`${name} surface certification rejected: ${JSON.stringify(surface.certification)}`);
 	const skinning = generateGeodesicSkinWeights(surface, compiled, skinWeightOptions[name]);
 	if (skinning.certification.status !== 'accepted-weight-baseline') throw new Error(`${name} skin weights rejected: ${JSON.stringify(skinning.certification)}`);
-	const deformation = deformationSummary(name, spec, compiled, surface, skinning, cellSize);
-	const packed = packReferenceAsset(surface, compileArrays(surface, compiled, skinning));
+	const deformation = deformationSelection(name, spec, compiled, surface, skinning, cellSize);
+	const packed = packReferenceAsset(surface, compileArrays(surface, compiled, skinning, deformation.correctionWeights));
 	const sha256 = createHash('sha256').update(packed.binary).digest('hex');
 	const manifest = finalizeReferenceAssetManifest({
 		...packed.manifest,
 		name,
 		specName: spec.name,
 		skinning: skinning.certification,
-		deformation,
+		deformation: deformation.summary,
 		acceptanceStatus: 'provisional-reference-candidate',
 		limitations: [
-			deformation.status === 'accepted-deformation-selection'
+			deformation.summary.status === 'accepted-deformation-selection'
 				? 'Deterministic orthographic deformation selection passes; direct browser near/design/far perspective evidence remains open.'
 				: 'Deformation selection and correction-region selection remain open.',
 			'Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate.',

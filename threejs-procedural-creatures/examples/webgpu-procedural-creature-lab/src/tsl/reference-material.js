@@ -17,7 +17,11 @@ export function createReferenceCreatureMaterial(options = {}) {
 	material.colorNode = attribute(options.colorAttribute ?? 'color', 'vec3');
 	material.userData.referenceDeformation = deformation;
 	material.userData.representation = 'canonical-reference-surface-candidate';
-	material.userData.fieldEvaluation = 'none in canonical fragment shading';
+	material.userData.skinningMethod = deformation.skinningMethod;
+	material.userData.correctionLayout = deformation.correctionLayout;
+	material.userData.fieldEvaluation = deformation.correctionLayout === 'none'
+		? 'none in canonical reference shading'
+		: 'two bounded vertex-stage field trials on static feathered correction weights; none in fragment shading';
 	material.userData.normalSource = 'fragment derivative of final deformed position';
 	material.userData.shadowCasterParity = {
 		sharedPositionNode: deformation.worldPosition,

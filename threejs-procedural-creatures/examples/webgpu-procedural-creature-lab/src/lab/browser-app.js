@@ -41,7 +41,7 @@ import { createLCG } from '../core/lcg.js';
 import { perceptualColorDeltaE } from '../core/locomotion/genome.js';
 import { compileSpec, digest128, TIER_CONFIG } from '../core/rig-compiler.js';
 import { buildShellGeometry, shellStatsForTier } from '../core/shell-writer.js';
-import { buildAffineSlotTransforms } from '../core/deformation.js';
+import { buildAffineSlotTransforms, buildDualQuaternionSlotTransforms } from '../core/deformation.js';
 import { validateSpec } from '../core/spec-schema.js';
 import { createGenomeSpec } from './specs/genome.js';
 import { evaluatePerformanceResult, PERFORMANCE_PROFILE_VERSION, performanceProfile } from './performance-profiles.js';
@@ -307,7 +307,12 @@ function updatePoseStorage() {
 			const pose = creature.driver.presentPose ?? creature.driver.currentPose;
 			if (species.pageStorage) {
 				creature.visibleStorageIndex = isVisible ? i : -1;
-				species.pageStorage.writeTransforms(i, buildAffineSlotTransforms(species.compiled, pose));
+				const skinningMethod = species.referenceAsset.manifest.deformation?.selectedMethod ?? 'lbs';
+				const transforms = skinningMethod === 'dqs-log-scale'
+					? buildDualQuaternionSlotTransforms(species.compiled, pose)
+					: buildAffineSlotTransforms(species.compiled, pose);
+				species.pageStorage.writeTransforms(i, transforms);
+				species.pageStorage.writePose(i, pose);
 				species.pageStorage.writeRoot(
 					i,
 					creature.layoutPosition[0] + (creature.driver.root?.position?.[0] ?? 0),
@@ -506,8 +511,17 @@ function buildSpeciesRecords(specs) {
 			});
 			state.candidateStorages.set(candidateStorageKey, candidateStorage);
 		}
-		const pageStorage = useReferenceCandidate ? createReferencePageStorage({ capacity: SPECIES_CAP, slotCount: compiled.slots.length, transformsLabel: `ReferenceTransforms_${wgslSafeLabel(spec.name)}`, rootsLabel: `ReferenceRoots_${wgslSafeLabel(spec.name)}`, visibleLabel: `ReferenceVisible_${wgslSafeLabel(spec.name)}` }) : null;
-		const material = useReferenceCandidate ? createReferenceCreatureMaterial({ storage: pageStorage, slotCount: compiled.slots.length, tier: state.tier }) : createCreatureMaterial({
+		const pageStorage = useReferenceCandidate ? createReferencePageStorage({ capacity: SPECIES_CAP, slotCount: compiled.slots.length, transformsLabel: `ReferenceTransforms_${wgslSafeLabel(spec.name)}`, posesLabel: `ReferencePoses_${wgslSafeLabel(spec.name)}`, rootsLabel: `ReferenceRoots_${wgslSafeLabel(spec.name)}`, visibleLabel: `ReferenceVisible_${wgslSafeLabel(spec.name)}` }) : null;
+		const material = useReferenceCandidate ? createReferenceCreatureMaterial({
+			storage: pageStorage,
+			slotCount: compiled.slots.length,
+			tier: state.tier,
+			skinningMethod: referenceAsset.manifest.deformation?.selectedMethod ?? 'lbs',
+			correctionLayout: referenceAsset.manifest.deformation?.correctionLayout ?? 'none',
+			correctionTrustRadius: referenceAsset.manifest.deformation?.correctionRegion?.trustRadius ?? 0,
+			correctionTrials: referenceAsset.manifest.deformation?.correctionRegion?.maximumTrials ?? 0,
+			blendDag: compiled.blendDag,
+		}) : createCreatureMaterial({
 			tier: state.tier,
 			debugMode: state.debugMode,
 			K: compiled.candidateK,
@@ -713,6 +727,7 @@ function describeResources() {
 		...[...state.referenceAssets.values()].map((asset) => ({ id: `reference-${asset.name}`, kind: 'reference-asset-cpu', bytes: asset.binaryByteLength, acceptanceStatus: asset.manifest.acceptanceStatus, sha256: asset.manifest.binary.sha256 })),
 		...state.species.filter((species) => species.pageStorage).flatMap((species) => [
 			{ id: `reference-transforms-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.transformsArray.byteLength },
+			{ id: `reference-poses-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.posesArray.byteLength },
 			{ id: `reference-roots-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.rootsArray.byteLength },
 			{ id: `reference-visible-slots-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.visibleSlotsArray.byteLength },
 		]),

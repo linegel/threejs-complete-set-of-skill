@@ -281,6 +281,7 @@ export function evaluateCorrectedDeformationCandidate(method, rawCandidate, surf
 		threshold: defectCount > 0 ? 0.5 : thresholds.maximumSurfaceErrorWorld,
 		maximumFraction: options.maximumCorrectionFraction ?? 0.25,
 		minimumIslandVertices: options.minimumCorrectionIslandVertices ?? 3,
+		featherRings: options.correctionFeatherRings ?? 0,
 	});
 	if (region.status !== 'accepted-correction-region') {
 		return { method, status: 'rejected', failures: [`correction region fraction ${region.fraction} exceeds ${region.maximumFraction}`], region, poseRecords: [] };
@@ -307,7 +308,7 @@ export function evaluateCorrectedDeformationCandidate(method, rawCandidate, surf
 			: deformReferenceSurfaceDqs(surface, skinning, transforms);
 		const slots = posedSlots(compiled, record.pose);
 		const fieldEval = (value) => fieldAt(slots, compiled.blendDag, value);
-		const corrected = applyCorrectionToSurface(skinOnly, region.mask, fieldEval, {
+		const corrected = applyCorrectionToSurface(skinOnly, region.weights, fieldEval, {
 			trustRadius,
 			maximumTrials,
 			maximumBacktracks: options.maximumCorrectionBacktracks ?? 4,
@@ -375,21 +376,22 @@ export function certifyDeformationSelection(spec, compiled, surface, skinning, o
 	const dqs = evaluateDeformationCandidate('dqs-log-scale', surface, skinning, compiled, corpus, options);
 	const lbsCorrected = lbs.status === 'accepted-candidate' ? null : evaluateCorrectedDeformationCandidate('lbs', lbs, surface, skinning, compiled, corpus, options);
 	const dqsCorrected = dqs.status === 'accepted-candidate' ? null : evaluateCorrectedDeformationCandidate('dqs-log-scale', dqs, surface, skinning, compiled, corpus, options);
+	const correctionLayout = (candidate) => candidate?.region?.featherRings > 0 ? 'bounded-static-feather' : 'bounded-static-mask';
 	const selection = lbs.status === 'accepted-candidate'
 		? { method: 'lbs', correction: 'none' }
 		: dqs.status === 'accepted-candidate'
 			? { method: 'dqs-log-scale', correction: 'none' }
 			: lbsCorrected?.status === 'accepted-corrected-candidate'
-				? { method: 'lbs', correction: 'bounded-static-mask' }
+				? { method: 'lbs', correction: correctionLayout(lbsCorrected) }
 				: dqsCorrected?.status === 'accepted-corrected-candidate'
-					? { method: 'dqs-log-scale', correction: 'bounded-static-mask' }
+					? { method: 'dqs-log-scale', correction: correctionLayout(dqsCorrected) }
 					: null;
 	return {
 		version: DEFORMATION_SWEEP_VERSION,
 		status: selection ? 'accepted-deformation-selection' : 'rejected',
 		selectedMethod: selection?.method ?? null,
 		correctionLayout: selection?.correction ?? null,
-		selectionRule: 'Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded correction mask only when it covers at most 25% and the corrected full sweep passes; otherwise reject.',
+		selectionRule: 'Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded binary or geodesically feathered correction region only when it covers at most 25% and the corrected full sweep passes; otherwise reject.',
 		corpus: {
 			version: corpus.version,
 			locomotionType: corpus.locomotionType,

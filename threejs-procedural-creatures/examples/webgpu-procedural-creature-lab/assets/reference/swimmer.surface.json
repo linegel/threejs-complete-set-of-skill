@@ -201,25 +201,25 @@
       "length": 133380,
       "byteLength": 533520
     },
-    "correctionMask": {
-      "type": "Uint8Array",
+    "correctionWeights": {
+      "type": "Float32Array",
       "byteOffset": 3267808,
       "length": 33345,
-      "byteLength": 33345
+      "byteLength": 133380
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 3301168,
+      "byteOffset": 3401200,
       "length": 200070,
       "byteLength": 800280
     }
   },
   "binary": {
-    "byteLength": 4101456,
+    "byteLength": 4201488,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "5a2fc90b30a8e81d26e4b19b3f08e7a5",
-    "sha256": "4df39e9c54b91ea6f1a2c7bcf089f294f91da1a39fc04e4a010a7b25551ddc51",
+    "contentDigest128": "633fa20b2c99771d358e9d9b0d367ba5",
+    "sha256": "412863bc0a904771b3d0972298d62dfe74fed6b3b93c60901293065f43aa77fb",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "swimmer",

@@ -201,25 +201,25 @@
       "length": 240388,
       "byteLength": 961552
     },
-    "correctionMask": {
-      "type": "Uint8Array",
+    "correctionWeights": {
+      "type": "Float32Array",
       "byteOffset": 5889504,
       "length": 60097,
-      "byteLength": 60097
+      "byteLength": 240388
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 5949616,
+      "byteOffset": 6129904,
       "length": 360582,
       "byteLength": 1442328
     }
   },
   "binary": {
-    "byteLength": 7391952,
+    "byteLength": 7572240,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "03e85de9e3ef962bc0d66dade510e6d3",
-    "sha256": "cde59a9ab15262b91c9651b8d3b41817f5c262d04bffa8eca5769f664af11204",
+    "contentDigest128": "c4ac6de9ab47702b1904fdada4bcbed3",
+    "sha256": "148660e4eb449f77046bf92e8823f76a529874c8887f6588965bee2f43439ecf",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "hexapod",

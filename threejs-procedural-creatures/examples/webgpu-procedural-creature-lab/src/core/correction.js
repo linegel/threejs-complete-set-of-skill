@@ -1,4 +1,4 @@
-export const CORRECTION_VERSION = 'creature-bounded-correction-v1';
+export const CORRECTION_VERSION = 'creature-bounded-correction-v2';
 
 function dot(a, b) {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -93,13 +93,38 @@ export function buildCorrectionRegion(mesh, vertexWorstDistance, options = {}) {
 	const threshold = Number(options.threshold);
 	if (!(threshold >= 0 && Number.isFinite(threshold))) throw new Error('correction threshold must be finite and >= 0');
 	const neighbors = adjacency(mesh);
-	const mask = new Uint8Array(vertexWorstDistance.length);
-	for (let vertex = 0; vertex < mask.length; vertex++) if (vertexWorstDistance[vertex] > threshold) mask[vertex] = 1;
-	const directCount = mask.reduce((sum, value) => sum + value, 0);
-	const grown = mask.slice();
-	for (let vertex = 0; vertex < mask.length; vertex++) {
-		if (mask[vertex] === 0) continue;
-		for (const neighbor of neighbors[vertex]) grown[neighbor] = 1;
+	const direct = new Uint8Array(vertexWorstDistance.length);
+	for (let vertex = 0; vertex < direct.length; vertex++) if (vertexWorstDistance[vertex] > threshold) direct[vertex] = 1;
+	const directCount = direct.reduce((sum, value) => sum + value, 0);
+	const featherRings = Math.max(0, Math.floor(options.featherRings ?? 0));
+	const growthRings = featherRings > 0 ? featherRings : 1;
+	const ringDistance = new Int32Array(direct.length);
+	ringDistance.fill(-1);
+	let frontier = [];
+	for (let vertex = 0; vertex < direct.length; vertex++) {
+		if (direct[vertex] === 0) continue;
+		ringDistance[vertex] = 0;
+		frontier.push(vertex);
+	}
+	for (let ring = 1; ring <= growthRings && frontier.length > 0; ring++) {
+		const next = [];
+		for (const vertex of frontier) {
+			for (const neighbor of neighbors[vertex]) {
+				if (ringDistance[neighbor] >= 0) continue;
+				ringDistance[neighbor] = ring;
+				next.push(neighbor);
+			}
+		}
+		frontier = next;
+	}
+	const grown = new Uint8Array(direct.length);
+	const weights = new Float32Array(direct.length);
+	for (let vertex = 0; vertex < direct.length; vertex++) {
+		const ring = ringDistance[vertex];
+		if (ring < 0) continue;
+		grown[vertex] = 1;
+		const cosine = featherRings > 0 ? Math.cos(ring / (featherRings + 1) * Math.PI * 0.5) : 1;
+		weights[vertex] = cosine * cosine;
 	}
 	const minimumIslandVertices = Math.max(1, Math.floor(options.minimumIslandVertices ?? 3));
 	const visited = new Uint8Array(grown.length);
@@ -117,7 +142,7 @@ export function buildCorrectionRegion(mesh, vertexWorstDistance, options = {}) {
 			}
 		}
 		if (component.length < minimumIslandVertices) {
-			for (const member of component) grown[member] = 0;
+			for (const member of component) { grown[member] = 0; weights[member] = 0; }
 			removedIslandVertices += component.length;
 		}
 	}
@@ -129,6 +154,7 @@ export function buildCorrectionRegion(mesh, vertexWorstDistance, options = {}) {
 		version: CORRECTION_VERSION,
 		status: fraction <= maximumFraction ? 'accepted-correction-region' : 'rejected',
 		mask: grown,
+		weights,
 		correctionVertices: new Uint32Array(correctionVertices),
 		threshold,
 		directCount,
@@ -136,12 +162,14 @@ export function buildCorrectionRegion(mesh, vertexWorstDistance, options = {}) {
 		fraction,
 		maximumFraction,
 		removedIslandVertices,
-		growthPolicy: 'one mesh ring',
+		growthPolicy: featherRings > 0 ? `${featherRings} geodesic mesh rings with cosine-squared feather weights` : 'one binary mesh ring',
+		featherRings,
 	};
 }
 
 export function applyCorrectionToSurface(surface, correctionMask, fieldEval, options = {}) {
-	if (!(correctionMask instanceof Uint8Array) || correctionMask.length !== surface.positions.length / 3) throw new Error('applyCorrectionToSurface mask must match surface vertices');
+	if (!(correctionMask instanceof Uint8Array) && !(correctionMask instanceof Float32Array)) throw new Error('applyCorrectionToSurface weights must be Uint8Array or Float32Array');
+	if (correctionMask.length !== surface.positions.length / 3) throw new Error('applyCorrectionToSurface weights must match surface vertices');
 	const positions = surface.positions.slice();
 	const normals = surface.normals.slice();
 	let attemptedVertices = 0;
@@ -152,21 +180,28 @@ export function applyCorrectionToSurface(surface, correctionMask, fieldEval, opt
 	let maximumInitialResidual = 0;
 	let maximumFinalResidual = 0;
 	for (let vertex = 0; vertex < correctionMask.length; vertex++) {
-		if (correctionMask[vertex] === 0) continue;
+		const correctionWeight = correctionMask[vertex];
+		if (!(correctionWeight > 0 && correctionWeight <= 1)) {
+			if (correctionWeight !== 0) throw new Error(`correction weight ${correctionWeight} at vertex ${vertex} is outside [0, 1]`);
+			continue;
+		}
 		attemptedVertices += 1;
 		const original = [...surface.positions.subarray(vertex * 3, vertex * 3 + 3)];
 		const result = correctPointBounded(fieldEval, original, options);
 		backtracks += result.backtracks;
 		maximumInitialResidual = Math.max(maximumInitialResidual, result.initialResidual);
-		maximumFinalResidual = Math.max(maximumFinalResidual, result.finalResidual);
 		if (!result.applied) {
 			preservedVertices += 1;
+			maximumFinalResidual = Math.max(maximumFinalResidual, result.finalResidual);
 			continue;
 		}
 		correctedVertices += 1;
-		maximumMoveDistance = Math.max(maximumMoveDistance, result.moveDistance);
-		positions.set(result.position, vertex * 3);
-		const gradient = fieldEval(result.position).grad;
+		const weightedPosition = original.map((component, axis) => component + (result.position[axis] - component) * correctionWeight);
+		positions.set(weightedPosition, vertex * 3);
+		maximumMoveDistance = Math.max(maximumMoveDistance, distance(weightedPosition, original));
+		const weightedField = fieldEval(weightedPosition);
+		maximumFinalResidual = Math.max(maximumFinalResidual, residual(weightedField));
+		const gradient = weightedField.grad;
 		const gradientLength = Math.hypot(...gradient);
 		if (gradientLength > 1e-8) normals.set(gradient.map((component) => component / gradientLength), vertex * 3);
 	}

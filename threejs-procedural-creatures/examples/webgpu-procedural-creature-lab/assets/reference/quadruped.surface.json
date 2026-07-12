@@ -201,25 +201,25 @@
       "length": 73344,
       "byteLength": 293376
     },
-    "correctionMask": {
-      "type": "Uint8Array",
+    "correctionWeights": {
+      "type": "Float32Array",
       "byteOffset": 1796880,
       "length": 18336,
-      "byteLength": 18336
+      "byteLength": 73344
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 1815216,
+      "byteOffset": 1870224,
       "length": 110016,
       "byteLength": 440064
     }
   },
   "binary": {
-    "byteLength": 2255280,
+    "byteLength": 2310288,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "6e6ddad3998fe3fd4184771b61a37925",
-    "sha256": "c1ea20886881319911a3f400f5e5792d6a939f4cfd0a7678ada1dc1d28116587",
+    "contentDigest128": "53aa3953bbd9bc7da549b11b31a5bf25",
+    "sha256": "11a1db842765a046e798dd4b69cfc833c0429905e4b21eabaab06d1e27de74b9",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "quadruped",

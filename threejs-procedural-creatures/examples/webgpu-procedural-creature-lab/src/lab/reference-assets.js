@@ -1,6 +1,6 @@
 import { unpackReferenceAsset, verifyReferenceAssetSha256 } from '../core/reference-asset-format.js';
 
-const REQUIRED_ARRAYS = Object.freeze(['positions', 'normals', 'indices', 'skinIndices', 'skinWeights', 'semanticIndices', 'colorIndices', 'colorWeights', 'correctionMask', 'restRadialFrames']);
+const REQUIRED_ARRAYS = Object.freeze(['positions', 'normals', 'indices', 'skinIndices', 'skinWeights', 'semanticIndices', 'colorIndices', 'colorWeights', 'correctionWeights', 'restRadialFrames']);
 
 function assetUrls(name) {
 	return {
@@ -30,7 +30,7 @@ export async function loadReferenceAsset(name) {
 	const vertices = arrays.positions.length / 3;
 	if (manifest.name !== name || arrays.normals.length !== arrays.positions.length || arrays.skinIndices.length !== vertices * 4
 		|| arrays.skinWeights.length !== vertices * 4 || arrays.semanticIndices.length !== vertices
-		|| arrays.correctionMask.length !== vertices || arrays.restRadialFrames.length !== vertices * 6) {
+		|| arrays.correctionWeights.length !== vertices || arrays.restRadialFrames.length !== vertices * 6) {
 		throw new Error(`reference asset '${name}' identity or array cardinality mismatch`);
 	}
 	return Object.freeze({ name, manifest, arrays, binaryByteLength: binary.byteLength, acceptanceEligible: manifest.acceptanceStatus === 'accepted' });

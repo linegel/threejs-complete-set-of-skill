@@ -34,6 +34,7 @@ function parseArgs(argv) {
 		stopAfter: 16,
 		correctionTrials: 0,
 		correctionTrustRadius: null,
+		correctionFeatherRings: 0,
 	};
 	for (let index = 0; index < argv.length; index += 2) {
 		const flag = argv[index];
@@ -49,6 +50,7 @@ function parseArgs(argv) {
 		else if (flag === '--stop-after') values.stopAfter = parsePositiveInteger(value, 'stop-after');
 		else if (flag === '--correction-trials') values.correctionTrials = parsePositiveInteger(value, 'correction trials');
 		else if (flag === '--correction-trust-radius') values.correctionTrustRadius = parsePositiveNumber(value, 'correction trust radius');
+		else if (flag === '--correction-feather-rings') values.correctionFeatherRings = parsePositiveInteger(value, 'correction feather rings');
 		else throw new Error(`unknown tuning option '${flag}'`);
 	}
 	if (!validSpecies.has(values.species)) throw new Error(`--species must be one of ${[...validSpecies].join(', ')}`);
@@ -115,6 +117,7 @@ for (const sigma of options.sigmas) {
 		stopAfterSelfIntersections: options.stopAfter,
 		maximumCorrectionTrials: options.correctionTrials,
 		...(options.correctionTrustRadius === null ? {} : { correctionTrustRadius: options.correctionTrustRadius }),
+		correctionFeatherRings: options.correctionFeatherRings,
 	};
 	const rawCandidate = evaluateDeformationCandidate(options.method, inputs.surface, skinning, inputs.compiled, corpus, evaluationOptions);
 	const candidate = options.correctionTrials > 0 && rawCandidate.status !== 'accepted-candidate'
@@ -136,6 +139,6 @@ console.log(JSON.stringify({
 	version: 'creature-deformation-tuner-v1',
 	species: options.species,
 	method: options.method,
-	corpus: { sampleCount: corpus.sampleCount, durationSeconds: corpus.durationSeconds, resolution: options.resolution, correctionTrials: options.correctionTrials, correctionTrustRadius: options.correctionTrustRadius },
+	corpus: { sampleCount: corpus.sampleCount, durationSeconds: corpus.durationSeconds, resolution: options.resolution, correctionTrials: options.correctionTrials, correctionTrustRadius: options.correctionTrustRadius, correctionFeatherRings: options.correctionFeatherRings },
 	results,
 }, null, 2));

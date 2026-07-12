@@ -201,25 +201,25 @@
       "length": 145952,
       "byteLength": 583808
     },
-    "correctionMask": {
-      "type": "Uint8Array",
+    "correctionWeights": {
+      "type": "Float32Array",
       "byteOffset": 3575776,
       "length": 36488,
-      "byteLength": 36488
+      "byteLength": 145952
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 3612272,
+      "byteOffset": 3721728,
       "length": 218928,
       "byteLength": 875712
     }
   },
   "binary": {
-    "byteLength": 4487984,
+    "byteLength": 4597440,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "d3cca649e7b3627b7be868e5286fc59b",
-    "sha256": "6b34f36eae29a940ef35c2590c3dbb1dd2402acace447b460fe71cdee47b8a76",
+    "contentDigest128": "37d3fe2009b65f900a8671ea7bd40134",
+    "sha256": "4b543ff691e71af984366cb517c70a2ce64ae6850b5ad781b1d77c707df38f87",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "flyer",
@@ -230,18 +230,103 @@
     "maximumPartitionError": 2.9802322387695312e-8,
     "maximumBarrierLeakage": 0,
     "fallbackVertices": 0,
-    "sigma": 0.27,
+    "sigma": 0.035,
     "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
   },
   "deformation": {
-    "status": "not-certified",
-    "selectedMethod": null,
-    "correctionLayout": null,
-    "limitation": "The full deterministic deformation selection sweep has not produced an accepted candidate for this species."
+    "version": "creature-deformation-sweep-v2",
+    "status": "accepted-deformation-selection",
+    "selectedMethod": "dqs-log-scale",
+    "correctionLayout": "bounded-static-feather",
+    "selectionRule": "Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded binary or geodesically feathered correction region only when it covers at most 25% and the corrected full sweep passes; otherwise reject.",
+    "corpus": {
+      "version": "creature-deformation-sweep-v2",
+      "locomotionType": "flyer",
+      "durationSeconds": 4,
+      "sampleCount": 25,
+      "deterministicSampling": "integer 60 Hz ticks addressed by seek()"
+    },
+    "thresholds": {
+      "worldUnitsPerPixel": 0.012,
+      "maximumSurfaceErrorWorld": 0.012,
+      "maximumSilhouetteErrorPx": 1,
+      "maximumNormalAngleRadians": 0.3665191429188092,
+      "trustRadius": 0.024,
+      "maximumTrials": 2
+    },
+    "worst": {
+      "surfaceDistance": 0.019980812741656855,
+      "normalAngleRadians": 0.16316724529059795,
+      "projectedSilhouetteErrorBoundPx": 1.6650677284714046,
+      "directSilhouetteErrorPx": 2,
+      "directSilhouetteP95ErrorPx": 1,
+      "silhouetteDisagreementFraction": 0.0400390625
+    },
+    "totals": {
+      "collapsedTriangles": 0,
+      "invertedTriangles": 0,
+      "nonAdjacentSelfIntersections": 0,
+      "preservedVertices": 0,
+      "correctedVertices": 2175,
+      "backtracks": 0
+    },
+    "correctionRegion": {
+      "version": "creature-bounded-correction-v2",
+      "fraction": 0.0023843455382591538,
+      "maximumFraction": 0.25,
+      "directCount": 14,
+      "grownCount": 87,
+      "featherRings": 2,
+      "growthPolicy": "2 geodesic mesh rings with cosine-squared feather weights",
+      "trustRadius": 0.024,
+      "maximumTrials": 2
+    },
+    "alternatives": {
+      "lbs": {
+        "status": "rejected",
+        "failures": [
+          "14 pose self-intersections"
+        ],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 14
+        }
+      },
+      "dqs": {
+        "status": "rejected",
+        "failures": [
+          "10 pose self-intersections"
+        ],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 10
+        }
+      },
+      "lbsCorrected": {
+        "status": "rejected",
+        "failures": [
+          "52 corrected self-intersections"
+        ],
+        "totals": {
+          "collapsedTriangles": 0,
+          "invertedTriangles": 0,
+          "nonAdjacentSelfIntersections": 52,
+          "preservedVertices": 0,
+          "correctedVertices": 4175,
+          "backtracks": 0
+        }
+      }
+    },
+    "limitations": [
+      "Deterministic CPU silhouettes certify three orthographic design directions; browser near/design/far perspective captures remain required evidence.",
+      "Morphology-envelope endpoint poses are not included unless supplied through options.corpus."
+    ]
   },
   "acceptanceStatus": "provisional-reference-candidate",
   "limitations": [
-    "Deformation selection and correction-region selection remain open.",
+    "Deterministic orthographic deformation selection passes; direct browser near/design/far perspective evidence remains open.",
     "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
   ]
 }
