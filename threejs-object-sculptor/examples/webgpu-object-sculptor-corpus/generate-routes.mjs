@@ -28,7 +28,7 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;");
 }
 
-function routeHtml(kind, id) {
+export function renderCorpusRouteHtml(kind, id) {
   const subject = kind === "scenario" ? id : "potted-bonsai";
   const routeLabel = `${kind} / ${id}`.replaceAll("-", " ");
   return `<!doctype html>
@@ -38,6 +38,17 @@ function routeHtml(kind, id) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#08100f" />
     <title>Object Sculptor Corpus · ${escapeHtml(routeLabel)}</title>
+    <script src="../../route-evidence-bootstrap.js" data-surface="route"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+          "three/tsl": "/node_modules/three/build/three.tsl.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
     <link rel="stylesheet" href="../../styles.css" />
   </head>
   <body>
@@ -106,21 +117,35 @@ function routeHtml(kind, id) {
 `;
 }
 
-export function generateCorpusRoutes({ outputDirectory = here } = {}) {
+export function generateCorpusRoutes({ outputDirectory = here, checkOnly = false } = {}) {
   const root = resolve(outputDirectory);
   const records = [];
   for (const { kind, ids } of CORPUS_ROUTE_DIMENSIONS) {
     for (const id of ids) {
       const directory = resolve(root, kind, id);
       const path = resolve(directory, "index.html");
-      const source = routeHtml(kind, id);
-      mkdirSync(directory, { recursive: true });
+      const source = renderCorpusRouteHtml(kind, id);
       const unchanged = existsSync(path) && readFileSync(path, "utf8") === source;
-      if (!unchanged) writeFileSync(path, source, "utf8");
+      if (!checkOnly) {
+        mkdirSync(directory, { recursive: true });
+        if (!unchanged) writeFileSync(path, source, "utf8");
+      }
       records.push(Object.freeze({ kind, id, path, changed: !unchanged }));
     }
   }
   return Object.freeze(records);
+}
+
+export function parseCorpusRouteGeneratorArguments(args = []) {
+  if (!Array.isArray(args) || args.some((value) => typeof value !== "string")) {
+    throw new TypeError("Corpus route generator arguments must be an array of strings");
+  }
+  const unknown = args.filter((value) => value !== "--check");
+  if (unknown.length > 0) throw new RangeError(`Unknown corpus route generator argument: ${unknown.join(", ")}`);
+  if (args.filter((value) => value === "--check").length > 1) {
+    throw new RangeError("Corpus route generator --check may occur at most once");
+  }
+  return Object.freeze({ checkOnly: args.includes("--check") });
 }
 
 function isMainModule() {
@@ -129,11 +154,22 @@ function isMainModule() {
 }
 
 if (isMainModule()) {
-  const records = generateCorpusRoutes();
-  console.log(JSON.stringify({
-    ok: true,
-    routes: records.length,
-    changed: records.filter(({ changed }) => changed).length,
-    staleRoutePolicy: "preserved-without-deletion",
-  }, null, 2));
+  try {
+    const { checkOnly } = parseCorpusRouteGeneratorArguments(process.argv.slice(2));
+    const records = generateCorpusRoutes({ checkOnly });
+    const changed = records.filter((record) => record.changed);
+    if (checkOnly && changed.length > 0) {
+      throw new Error(`Generated corpus routes are stale: ${changed.map(({ kind, id }) => `${kind}/${id}`).join(", ")}`);
+    }
+    console.log(JSON.stringify({
+      ok: true,
+      mode: checkOnly ? "check-only" : "generate",
+      routes: records.length,
+      changed: changed.length,
+      staleRoutePolicy: "preserved-without-deletion",
+    }, null, 2));
+  } catch (error) {
+    console.error(error.stack ?? error.message);
+    process.exitCode = 1;
+  }
 }

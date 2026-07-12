@@ -1,6 +1,5 @@
 import { SCULPT_TARGETS } from "./object-catalog.js";
 import {
-  CORPUS_RUNTIME_PROFILES,
   SCULPT_MODES,
   SCULPT_TIERS,
   createObjectSculptorCorpusController,
@@ -13,6 +12,8 @@ import {
   resolveCorpusInitialState,
 } from "./route-state.js";
 import { settleCorpusControlAction } from "./frame-driver.js";
+import { runtimeOptionsFromLocation } from "./app-runtime-options.js";
+import { createCorpusRouteEvidenceProducer } from "./route-evidence-client.js";
 
 const MODE_COPY = Object.freeze({
   final: ["Final reconstruction", "Complete procedural form, authored material zones, and neutral presentation lighting."],
@@ -82,30 +83,6 @@ function finiteOrNull(...values) {
 
 function integerText(value) {
   return Number.isFinite(value) ? Math.round(value).toLocaleString() : "—";
-}
-
-function uniqueQueryValue(params, key) {
-  const values = [...new Set(params.getAll(key))];
-  if (values.length > 1) throw new RangeError(`Conflicting ${key} query values: ${values.join(", ")}`);
-  return values[0] ?? null;
-}
-
-function runtimeOptionsFromLocation({ search = "" } = {}) {
-  const params = new URLSearchParams(search);
-  const profile = uniqueQueryValue(params, "profile") ?? "correctness";
-  if (!CORPUS_RUNTIME_PROFILES.includes(profile)) {
-    throw new RangeError(`Unknown corpus runtime profile "${profile}"`);
-  }
-  const timestampValue = uniqueQueryValue(params, "timestampQueriesRequired");
-  const normalizedTimestamp = timestampValue?.toLowerCase() ?? null;
-  if (normalizedTimestamp !== null && !["1", "0", "true", "false"].includes(normalizedTimestamp)) {
-    throw new RangeError("timestampQueriesRequired must be true, false, 1, or 0");
-  }
-  const timestampQueriesRequired = normalizedTimestamp === "1" || normalizedTimestamp === "true";
-  if (timestampQueriesRequired && profile !== "performance") {
-    throw new Error("timestampQueriesRequired is only valid with profile=performance");
-  }
-  return Object.freeze({ profile, timestampQueriesRequired });
 }
 
 function targetCopy(id) {
@@ -222,6 +199,7 @@ async function boot() {
   const routeState = resolveCorpusInitialState(route);
   const runtimeOptions = runtimeOptionsFromLocation(window.location);
   const frameOwner = objectSculptorCorpusFrameOwner(window.location.search);
+  const physicalRouteLockCount = Object.values(route).filter((value) => value !== null).length;
   const initial = {
     subjectId: routeState.scenario,
     mode: routeState.mechanism,
@@ -252,6 +230,8 @@ async function boot() {
     camera: initial.camera,
     profile: runtimeOptions.profile,
     timestampQueriesRequired: runtimeOptions.timestampQueriesRequired,
+    performanceTimestampMode: runtimeOptions.performanceTimestampMode,
+    cameraInteractionEnabled: frameOwner === "live-page" && physicalRouteLockCount === 0,
   });
   let frameDriver;
   try {
@@ -282,13 +262,33 @@ async function boot() {
     updateModeCopy(metrics.mode);
   }
 
-  function observeAction(promise, onSuccess) {
-    void settleCorpusControlAction(promise, {
+  let controlActionOrdinal = 0;
+  let lastControlAction = Object.freeze({ ordinal: 0, promise: Promise.resolve(null) });
+
+  function observeAction(promise, onSuccess = () => {}) {
+    const ordinal = controlActionOrdinal + 1;
+    controlActionOrdinal = ordinal;
+    const settled = settleCorpusControlAction(promise, {
       onApplied: onSuccess,
       onRestore: restoreControlsFromMetrics,
-    }).catch(() => {
+    });
+    lastControlAction = Object.freeze({ ordinal, promise: settled });
+    void settled.catch(() => {
       // The frame driver already publishes the exact failure through reportRuntimeError().
     });
+    return settled;
+  }
+
+  async function dispatchControlChange(selectorId, nextValue) {
+    const select = { subject: subjectSelect, mode: modeSelect, tier: tierSelect, camera: cameraSelect }[selectorId];
+    if (!select) throw new RangeError(`Unknown corpus selector "${selectorId}"`);
+    const beforeOrdinal = controlActionOrdinal;
+    select.value = nextValue;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (lastControlAction.ordinal !== beforeOrdinal + 1) {
+      throw new Error(`${selectorId} evidence probe did not dispatch exactly one corpus control action`);
+    }
+    return lastControlAction.promise;
   }
 
   function onSubjectChange() {
@@ -353,6 +353,31 @@ async function boot() {
   window.addEventListener("resize", onResize);
   window.addEventListener("pagehide", onPageHide);
   window.addEventListener("pageshow", onPageShow);
+
+  if (frameOwner === "capture-harness" && physicalRouteLockCount === 1) {
+    const routeBootstrap = window.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__;
+    if (routeBootstrap?.enabled !== true || routeBootstrap?.surface !== "route") {
+      throw new Error("Physical route evidence requires the exact immutable capture origin and ?capture=1 query");
+    }
+    window.__CORPUS_ROUTE_EVIDENCE__ = createCorpusRouteEvidenceProducer({
+      controller: labController,
+      route,
+      frameOwner,
+      controls: Object.freeze({
+        subject: subjectSelect,
+        mode: modeSelect,
+        tier: tierSelect,
+        camera: cameraSelect,
+      }),
+      status,
+      dispatchControlChange,
+      disposeRoute: async () => {
+        const listenersDetached = detachListeners();
+        const controllerResult = await labController.dispose();
+        return Object.freeze({ listenersDetached, controllerResult: controllerResult ?? null });
+      },
+    });
+  }
 
   if (frameOwner === "live-page") frameDriver.start();
   else updateHud(labController.getMetrics());

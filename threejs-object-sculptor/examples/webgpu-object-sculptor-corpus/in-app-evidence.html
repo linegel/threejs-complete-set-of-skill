@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-evidence-state="idle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07100e" />
+    <title>Object Sculptor · In-app route evidence</title>
+    <script src="./route-evidence-bootstrap.js" data-surface="runner"></script>
+    <link rel="stylesheet" href="./in-app-evidence.css" />
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <div>
+          <span class="eyebrow">Required surface · Codex in-app Browser / native WebGPU</span>
+          <h1>Physical route evidence</h1>
+          <p>Sequentially verifies all 15 physical corpus routes without launching Playwright, Chrome, or a second browser process.</p>
+        </div>
+        <output id="runner-status" data-state="idle" aria-live="polite">Ready to verify</output>
+      </header>
+
+      <section class="controls" aria-label="Evidence run identity">
+        <label>
+          <span>Bundle ID</span>
+          <input id="bundle-id" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          <span>Run ID</span>
+          <input id="run-id" autocomplete="off" spellcheck="false" />
+        </label>
+        <button id="start" type="button">Run 15 routes</button>
+        <button id="copy" type="button" disabled>Copy JSON</button>
+        <button id="download" type="button" disabled>Save JSON</button>
+        <button id="download-bundle" type="button" disabled>Save TAR + readbacks</button>
+      </section>
+
+      <section class="progress-card" aria-labelledby="progress-title">
+        <header>
+          <div>
+            <span class="eyebrow">Fail-closed progress</span>
+            <h2 id="progress-title">Route matrix</h2>
+          </div>
+          <strong id="progress-count">0 / 15</strong>
+        </header>
+        <progress id="progress" max="15" value="0">0 / 15</progress>
+        <ol id="route-results" aria-live="polite"></ol>
+      </section>
+
+      <section class="frame-card" aria-labelledby="frame-title">
+        <header>
+          <div>
+            <span class="eyebrow">Current native render</span>
+            <h2 id="frame-title">Evidence viewport</h2>
+          </div>
+          <span id="current-route">No route loaded</span>
+        </header>
+        <iframe
+          id="route-frame"
+          title="Object Sculptor physical route under evidence capture"
+          width="768"
+          height="512"
+        ></iframe>
+      </section>
+
+      <section class="json-card" aria-labelledby="json-title">
+        <header>
+          <div>
+            <span class="eyebrow">Exact export</span>
+            <h2 id="json-title">route-runtime-evidence.json</h2>
+          </div>
+        </header>
+        <pre id="output-json" tabindex="0">The exact JSON appears here only after all routes pass.</pre>
+      </section>
+    </main>
+    <script type="module" src="./in-app-evidence-runner.js"></script>
+  </body>
+</html>
