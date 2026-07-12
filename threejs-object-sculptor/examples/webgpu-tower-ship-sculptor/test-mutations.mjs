@@ -17,7 +17,19 @@ puncturedHull.setIndex(puncturedIndices.slice(0, -3));
 const puncturedTopology = analyzeIndexedSurfaceTopology(puncturedHull);
 assert.equal(puncturedTopology.closedTwoManifold, false, "the production topology check must reject a missing cap triangle");
 assert(puncturedTopology.boundaryEdges > 0, "a removed cap triangle must expose boundary edges");
+assert.equal(puncturedTopology.boundaryLoops, 1, "a removed cap triangle must expose exactly one undeclared boundary loop");
+assert.equal(puncturedTopology.undeclaredOpenBoundaryLoops, 1, "Tower Ship declares no permitted hull openings");
 puncturedHull.dispose();
+
+const reversedFaceHull = buildHullGeometry(17, 12);
+const reversedIndices = Array.from(reversedFaceHull.getIndex().array);
+[reversedIndices[1], reversedIndices[2]] = [reversedIndices[2], reversedIndices[1]];
+reversedFaceHull.setIndex(reversedIndices);
+const reversedFaceTopology = analyzeIndexedSurfaceTopology(reversedFaceHull);
+assert.equal(reversedFaceTopology.boundaryEdges, 0, "a reversed face can preserve edge incidence while still being invalid");
+assert(reversedFaceTopology.inconsistentWindingEdges > 0, "directed-edge proof must expose reversed winding");
+assert.equal(reversedFaceTopology.closedTwoManifold, false, "winding inconsistency must fail the closed outward hull contract");
+reversedFaceHull.dispose();
 
 const ship = createTowerShip({ tier: "full", seed: 1 });
 const baseline = summarizeTowerShip(ship.root);
@@ -65,4 +77,4 @@ ship.runtime.destructionGroups.set("lower-roof", lowerRoof);
 validateTowerShipActionReady(sculptSpec, ship.root);
 
 ship.dispose();
-console.log(JSON.stringify({ ok: true, negativeControls: ["punctured-hull", "oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));
+console.log(JSON.stringify({ ok: true, negativeControls: ["punctured-hull", "reversed-hull-face", "oar-count", "socket-parent", "missing-attachment-socket", "collider-generation", "collider-authoring-dimensions", "destruction-group"] }, null, 2));

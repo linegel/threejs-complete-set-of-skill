@@ -176,30 +176,105 @@ function cylinderBetween(runtime, id, start, end, radius, material, segments, pa
 
 export function analyzeIndexedSurfaceTopology(geometry) {
   const index = geometry?.index?.array;
+  const position = geometry?.getAttribute?.("position");
   if (!index || index.length % 3 !== 0) throw new TypeError("indexed triangle geometry is required");
+  if (!position || position.itemSize !== 3) throw new TypeError("indexed triangle geometry requires finite vec3 positions");
   const edgeUses = new Map();
+  const triangleKeys = new Set();
   let degenerateTriangles = 0;
+  let zeroAreaTriangles = 0;
+  let duplicateTriangles = 0;
+  let signedVolume = 0;
   function addEdge(a, b) {
     const key = a < b ? `${a}:${b}` : `${b}:${a}`;
-    edgeUses.set(key, (edgeUses.get(key) ?? 0) + 1);
+    const record = edgeUses.get(key) ?? { count: 0, orientation: 0, a: Math.min(a, b), b: Math.max(a, b) };
+    record.count += 1;
+    record.orientation += a < b ? 1 : -1;
+    edgeUses.set(key, record);
   }
   for (let offset = 0; offset < index.length; offset += 3) {
     const a = index[offset];
     const b = index[offset + 1];
     const c = index[offset + 2];
+    const triangleKey = [a, b, c].sort((left, right) => left - right).join(":");
+    if (triangleKeys.has(triangleKey)) duplicateTriangles += 1;
+    triangleKeys.add(triangleKey);
     if (a === b || b === c || c === a) degenerateTriangles += 1;
+    const ax = position.getX(a);
+    const ay = position.getY(a);
+    const az = position.getZ(a);
+    const abx = position.getX(b) - ax;
+    const aby = position.getY(b) - ay;
+    const abz = position.getZ(b) - az;
+    const acx = position.getX(c) - ax;
+    const acy = position.getY(c) - ay;
+    const acz = position.getZ(c) - az;
+    const crossX = aby * acz - abz * acy;
+    const crossY = abz * acx - abx * acz;
+    const crossZ = abx * acy - aby * acx;
+    if (!Number.isFinite(crossX + crossY + crossZ)) throw new TypeError("indexed triangle geometry contains nonfinite positions");
+    if (crossX * crossX + crossY * crossY + crossZ * crossZ <= Number.EPSILON) zeroAreaTriangles += 1;
+    signedVolume += (ax * (position.getY(b) * position.getZ(c) - position.getZ(b) * position.getY(c))
+      + ay * (position.getZ(b) * position.getX(c) - position.getX(b) * position.getZ(c))
+      + az * (position.getX(b) * position.getY(c) - position.getY(b) * position.getX(c))) / 6;
     addEdge(a, b);
     addEdge(b, c);
     addEdge(c, a);
   }
-  const counts = [...edgeUses.values()];
+  const records = [...edgeUses.values()];
+  const boundaryRecords = records.filter(({ count }) => count === 1);
+  const boundaryAdjacency = new Map();
+  for (const { a, b } of boundaryRecords) {
+    if (!boundaryAdjacency.has(a)) boundaryAdjacency.set(a, new Set());
+    if (!boundaryAdjacency.has(b)) boundaryAdjacency.set(b, new Set());
+    boundaryAdjacency.get(a).add(b);
+    boundaryAdjacency.get(b).add(a);
+  }
+  const visitedBoundaryVertices = new Set();
+  const boundaryLoopLengths = [];
+  for (const vertex of boundaryAdjacency.keys()) {
+    if (visitedBoundaryVertices.has(vertex)) continue;
+    const stack = [vertex];
+    let componentVertices = 0;
+    let closed = true;
+    while (stack.length) {
+      const current = stack.pop();
+      if (visitedBoundaryVertices.has(current)) continue;
+      visitedBoundaryVertices.add(current);
+      componentVertices += 1;
+      const neighbors = boundaryAdjacency.get(current) ?? new Set();
+      if (neighbors.size !== 2) closed = false;
+      for (const neighbor of neighbors) if (!visitedBoundaryVertices.has(neighbor)) stack.push(neighbor);
+    }
+    boundaryLoopLengths.push(closed ? componentVertices : -componentVertices);
+  }
+  const inconsistentWindingEdges = records.filter(({ count, orientation }) => count === 2 && orientation !== 0).length;
+  const nonManifoldEdges = records.filter(({ count }) => count > 2).length;
+  const boundaryEdges = boundaryRecords.length;
+  const closedTwoManifold = boundaryEdges === 0
+    && nonManifoldEdges === 0
+    && degenerateTriangles === 0
+    && zeroAreaTriangles === 0
+    && duplicateTriangles === 0
+    && inconsistentWindingEdges === 0
+    && signedVolume > 0;
   return Object.freeze({
     triangles: index.length / 3,
     edges: edgeUses.size,
-    boundaryEdges: counts.filter((count) => count === 1).length,
-    nonManifoldEdges: counts.filter((count) => count > 2).length,
+    boundaryEdges,
+    boundaryLoops: boundaryLoopLengths.filter((length) => length > 0).length,
+    openBoundaryChains: boundaryLoopLengths.filter((length) => length < 0).length,
+    boundaryLoopLengths: Object.freeze(boundaryLoopLengths),
+    nonManifoldEdges,
+    inconsistentWindingEdges,
     degenerateTriangles,
-    closedTwoManifold: counts.every((count) => count === 2) && degenerateTriangles === 0,
+    zeroAreaTriangles,
+    duplicateTriangles,
+    signedVolume,
+    outwardWinding: signedVolume > 0,
+    declaredOpenBoundaryLoops: 0,
+    undeclaredOpenBoundaryLoops: boundaryLoopLengths.length,
+    closedTwoManifold,
   });
 }
 

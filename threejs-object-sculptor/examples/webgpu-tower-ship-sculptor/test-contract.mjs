@@ -32,8 +32,16 @@ for (const [stations, radial] of [[17, 12], [13, 10], [9, 8]]) {
   assert.equal(hull.getAttribute("position").count, stations * radial + 2, "hull needs one cap-center vertex per terminal ring");
   assert.equal(topology.triangles, (stations - 1) * radial * 2 + radial * 2, "hull triangle count must include both cap fans");
   assert.equal(topology.boundaryEdges, 0, "hull must not expose open terminal-ring edges");
+  assert.equal(topology.boundaryLoops, 0, "sealed hull must not expose a declared or undeclared boundary loop");
+  assert.equal(topology.openBoundaryChains, 0, "sealed hull must not expose a branched boundary chain");
+  assert.equal(topology.undeclaredOpenBoundaryLoops, 0, "Tower Ship declares no hull openings");
   assert.equal(topology.nonManifoldEdges, 0, "hull edges must have exactly two incident triangles");
+  assert.equal(topology.inconsistentWindingEdges, 0, "each shared hull edge must be traversed in opposite directions");
   assert.equal(topology.degenerateTriangles, 0, "hull caps must not introduce zero-area triangles");
+  assert.equal(topology.zeroAreaTriangles, 0, "hull triangles must retain geometric area even when their indices are distinct");
+  assert.equal(topology.duplicateTriangles, 0, "hull must not hide coincident duplicate faces");
+  assert(topology.signedVolume > 0, "hull winding must enclose positive outward-oriented volume");
+  assert.equal(topology.outwardWinding, true, "hull winding must remain outward");
   assert.equal(topology.closedTwoManifold, true, "hull must be a closed two-manifold indexed surface");
   const normals = hull.getAttribute("normal");
   assert(normals.getX(stations * radial) < -0.99, "bow cap must face outward along -X");
