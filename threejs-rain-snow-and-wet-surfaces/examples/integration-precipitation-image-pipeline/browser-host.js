@@ -44,7 +44,8 @@ import {
   requireIntegrationChoice,
 } from "./route-state.mjs";
 
-const OWNER_ID = "integration-precipitation-image-pipeline/host";
+const LAB_ID = "integration-precipitation-image-pipeline";
+const OWNER_ID = `${LAB_ID}/host`;
 const MODE_INDEX = new Map(INTEGRATION_MODES.map((id, index) => [id, index]));
 
 export function resolvePrecipitationIntegrationReadbackStride(pixels, width, height) {
@@ -81,6 +82,8 @@ export class PrecipitationImagePipelineBrowserHost {
     this.initialized = false;
     this.disposed = false;
   }
+
+  get labId() { return LAB_ID; }
 
   async ready() {
     if (this.initialized) return;
@@ -312,6 +315,7 @@ export class PrecipitationImagePipelineBrowserHost {
 
   getMetrics() {
     return {
+      labId: this.labId,
       status: "native-webgpu-runtime; evidence incomplete",
       rendererBackend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
       threeRevision: REVISION,
