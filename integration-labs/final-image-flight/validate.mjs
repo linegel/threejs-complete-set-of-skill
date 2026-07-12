@@ -175,6 +175,9 @@ assert(manifest.canonicalSource.every((source) => !source.includes("integration-
 
 const mainSource = readFileSync(join(root, "main.mjs"), "utf8");
 const captureSource = readFileSync(join(root, "capture.mjs"), "utf8");
+assert.match(mainSource, /const LAB_ID = "final-image-flight"/);
+assert.match(mainSource, /get labId\(\) \{ return LAB_ID; \}/);
+assert.match(mainSource, /labId: this\.labId/);
 assert.equal((mainSource.match(/new WebGPURenderer\s*\(/g) ?? []).length, 1, "host must construct one renderer");
 assert.equal((mainSource.match(/new RenderPipeline\s*\(/g) ?? []).length, 1, "host must construct one RenderPipeline");
 assert.match(mainSource, /await renderer\.init\(\)/);

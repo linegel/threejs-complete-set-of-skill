@@ -93,6 +93,8 @@ import {
   parseFinalImageFlightRoute,
 } from "./routes.mjs";
 
+const LAB_ID = "final-image-flight";
+
 export const FINAL_IMAGE_FLIGHT_TIER_CONFIG = Object.freeze({
   hero: Object.freeze({ dprCap: 2, sceneScale: 1, aoTier: AO_TIERS.ultra, bloomScale: 0.5, exposureTier: "full-histogram", shadowMapSize: 1024, effectInstances: 256 }),
   balanced: Object.freeze({ dprCap: 1.5, sceneScale: 1, aoTier: AO_TIERS.high, bloomScale: 0.33, exposureTier: "balanced-log-reduction", shadowMapSize: 512, effectInstances: 128 }),
@@ -594,6 +596,7 @@ export async function createFinalImageFlightLab({
   }
 
   const labController = {
+    get labId() { return LAB_ID; },
     async ready() {
       applyCamera(cameraId);
       await this.renderOnce();
@@ -727,6 +730,7 @@ export async function createFinalImageFlightLab({
     },
     getMetrics() {
       return {
+        labId: this.labId,
         threeRevision: REVISION,
         backend: renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
         scenario,
