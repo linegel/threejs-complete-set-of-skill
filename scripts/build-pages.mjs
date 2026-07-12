@@ -1072,6 +1072,10 @@ for (const slug of slugs) {
     ));
   const participatingFlagships = flagshipDemos.filter(({ demo }) => DEMO_REGISTRY.origins[demo.id]?.ownerSkills?.includes(slug));
   const externalFlagshipParticipation = participatingFlagships.filter(({ demo }) => !ownedPrimaryDemos.some((owned) => owned.id === demo.id));
+  const relatedEvidenceDemos = [...new Map([
+    ...ownedPrimaryDemos,
+    ...participatingFlagships.map(({ demo }) => demo),
+  ].map((demo) => [demo.id, demo])).values()];
   const pageUrl = `${SITE}skills/${slug}.html`;
   const resolvedSkillPreview = canonicalSkillPreview(slug);
   const skillHeroImg = resolvedSkillPreview?.path ?? null;
@@ -1142,6 +1146,13 @@ for (const slug of slugs) {
     }).join('')}
     </div>
   </div></section>` : '';
+
+  const evidenceReportsHtml = `
+  <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
+    <h2 id="evidence-reports-title">Evidence reports</h2>
+    <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
+    <nav class="evidence-report-links" aria-label="Evidence reports for ${esc(s.title)}">${relatedEvidenceDemos.map((demo) => `<a href="../evidence/${esc(demo.id)}/"><code>${esc(demo.id)}</code><span>${demo.status === 'accepted' ? 'accepted' : 'evidence pending'}</span></a>`).join('')}</nav>
+  </div></section>`;
 
   const examplesHtml = s.examples.length ? `
   <div class="section" id="examples"><div class="wrap">
@@ -1307,6 +1318,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-head{display:flex;align-items:start;justify-content:space-between;gap:18px}.runtime-evidence-head code{color:var(--cyan);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.runtime-evidence-head h3{margin-top:6px;font-size:21px}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
+.evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -1342,6 +1354,7 @@ ${attributionChipHtml ? `      ${attributionChipHtml}\n` : ''}      ${ownedPrima
 
 ${primarySurfaceHtml}
 ${flagshipParticipationHtml}
+${evidenceReportsHtml}
 ${scienceHtml}
 ${attributionHtml}
 ${examplesHtml}

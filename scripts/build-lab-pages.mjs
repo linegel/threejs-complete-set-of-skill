@@ -183,9 +183,16 @@ function demoSeoShell(lab, { hasH1, hasMain }) {
   const canonicalLabLink = lab.proxyStatus?.canonicalLabId
     ? `<a href="../${escapeHtml(lab.proxyStatus.canonicalLabId)}/">Canonical lab</a>`
     : '';
+  const evidenceLabId = PRIMARY_DEMO_KINDS.includes(lab.kind)
+    ? lab.id
+    : lab.proxyStatus?.canonicalLabId;
+  const evidenceReportLink = evidenceLabId
+    ? `<a href="../../evidence/${escapeHtml(evidenceLabId)}/">Evidence report</a>`
+    : '';
   const links = [
     `<a href="../../skills/${escapeHtml(lab.skill)}.html">Owning skill</a>`,
     canonicalLabLink,
+    evidenceReportLink,
     '<a href="../registry.json">Demo registry</a>',
     `<a href="${REPOSITORY}/tree/main/${escapeHtml(lab.skill)}">Source repository</a>`,
   ].filter(Boolean).join('');
