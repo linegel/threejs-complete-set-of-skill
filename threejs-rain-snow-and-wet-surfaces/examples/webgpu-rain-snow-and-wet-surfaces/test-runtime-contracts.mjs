@@ -174,6 +174,7 @@ const controller = new WebGPUWeatherSurfaceLab({
   mechanism: "weather-envelope-coupling",
   seed: 1,
 });
+assert.equal(controller.labId, "webgpu-rain-snow-and-wet-surfaces");
 controller.scene = new Scene();
 controller.uniforms = controllerUniforms;
 controller.surfaces = createWeatherSurfaceResponseStage(controllerUniforms);

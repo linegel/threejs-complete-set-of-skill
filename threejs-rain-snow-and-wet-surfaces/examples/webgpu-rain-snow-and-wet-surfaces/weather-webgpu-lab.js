@@ -63,6 +63,8 @@ import {
   updateWeatherEnvelope,
 } from "./precipitation-system.js";
 
+export const WEATHER_LAB_ID = "webgpu-rain-snow-and-wet-surfaces";
+
 export const WEATHER_MODES = Object.freeze([
   "final",
   "mask",
@@ -506,6 +508,8 @@ export class WebGPUWeatherSurfaceLab {
     };
   }
 
+  get labId() { return WEATHER_LAB_ID; }
+
   async initialize() {
     this.renderer = new WebGPURenderer({ canvas: this.canvas, antialias: false });
     await this.renderer.init();
@@ -880,6 +884,7 @@ export class WebGPUWeatherSurfaceLab {
 
   getMetrics() {
     return {
+      labId: WEATHER_LAB_ID,
       ...this.metrics,
       backendIsWebGPU: this.renderer.backend?.isWebGPUBackend === true,
       tier: this.tier.id,

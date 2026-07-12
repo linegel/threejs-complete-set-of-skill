@@ -291,6 +291,7 @@ assert.throws(() => parseWeatherLabRoute("/demos/weather/mechanism/not-a-mechani
 assert.throws(() => parseWeatherLabRoute("/demos/weather/tier/not-a-tier/"), /unknown weather tier/);
 
 const browserSource = readFileSync(resolve(here, "weather-webgpu-lab.js"), "utf8");
+const mainSource = readFileSync(resolve(here, "main.js"), "utf8");
 for (const token of [
   "await this.renderer.init()",
   "isWebGPUBackend !== true",
@@ -308,9 +309,13 @@ for (const token of [
   "normalDiagnosticNode",
   "applyRuntimeSelection",
   "snow-model-world-up-and-occlusion-rejected",
+  'export const WEATHER_LAB_ID = "webgpu-rain-snow-and-wet-surfaces"',
+  "get labId() { return WEATHER_LAB_ID; }",
+  "labId: WEATHER_LAB_ID",
 ]) {
   assert(browserSource.includes(token), `canonical browser source is missing ${token}`);
 }
+assert(mainSource.includes("globalThis.labController = lab"), "canonical weather entry does not publish the public controller contract");
 assert(!browserSource.includes("this.modeNodes ="), "synthetic fullscreen diagnostic table must not return");
 
 console.log("webgpu-rain-snow-and-wet-surfaces validation passed");

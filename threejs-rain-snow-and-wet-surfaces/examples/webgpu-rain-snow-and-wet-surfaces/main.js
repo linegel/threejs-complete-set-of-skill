@@ -7,6 +7,7 @@ const route = parseWeatherLabRoute(location.pathname, location.search);
 const lab = await createWeatherSurfaceLab({ canvas, ...route, seed: 0x00000001 });
 
 globalThis.__LAB_CONTROLLER__ = lab;
+globalThis.labController = lab;
 globalThis.__LAB_READY__ = true;
 
 function populate(select, values, selected) {
