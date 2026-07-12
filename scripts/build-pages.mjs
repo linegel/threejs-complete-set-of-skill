@@ -83,17 +83,20 @@ const CATEGORIES = [
   { name: 'Motion and Effects', blurb: 'Kinematics, particles, surface history, and spacetime with frame-rate-independent discipline.', slugs: ['threejs-procedural-motion-systems', 'threejs-particles-trails-and-effects', 'threejs-dynamic-surface-effects', 'threejs-black-holes-and-space-effects'] },
 ];
 
+const SHOWCASE_META = [
+  { id: 'ocean-generated-wave-seeds', copy: 'Layer directional wave seeds into displacement and slope inputs before the full FFT cascade takes ownership.' },
+  { id: 'planet-generated-craters', copy: 'Project crater masks onto a sphere and inspect relief before moving to cube-sphere quadtree LOD.' },
+  { id: 'fields-generated-biome-maps', copy: 'Drive terrain height, material response, and placement from one coherent biome field.' },
+  { id: 'materials-generated-lava-causes', copy: 'Turn one authored lava cause into PBR crust, normal relief, and raw HDR emission.' },
+  { id: 'water-generated-caustics', copy: 'Feed deterministic caustic fields into bounded water and inspect the floor-lighting response.' },
+  { id: 'cloud-generated-weather-maps', copy: 'Shape cloud density and erosion with generated weather maps across final and diagnostic views.' },
+  { id: 'frost-generated-crystals', copy: 'Use crystal structure maps to control frost tint, refraction, and thaw diagnostics.' },
+  { id: 'rain-generated-ripples', copy: 'Compare ripple-normal variants as wet asphalt responds to rain and changing light.' },
+  { id: 'space-generated-starfields', copy: 'Wrap a bounded lensing proxy in repeatable star tiles and inspect the curved-ray direction field.' },
+  { id: 'vegetation-generated-meadow-density', copy: 'Translate meadow density into placement, path clearing, flower tint, and LOD response.' },
+];
+
 const GALLERY = [
-  { img: 'visual-validation/ocean-generated-wave-seeds/final.design.png', title: 'Ocean input: generated wave seeds', note: 'threejs-spectral-ocean · generated-asset preview; not FFT renderer evidence', link: 'threejs-spectral-ocean' },
-  { img: 'visual-validation/planet-generated-craters/final.design.png', title: 'Planet input: generated crater field', note: 'threejs-procedural-planets · generated-asset preview; not quadtree renderer evidence', link: 'threejs-procedural-planets' },
-  { img: 'visual-validation/water-generated-caustics/final.design.png', title: 'Water input: generated caustics', note: 'threejs-water-optics · generated-asset preview; not caustic transport evidence', link: 'threejs-water-optics' },
-  { img: 'visual-validation/rain-generated-ripples/final.design.png', title: 'Rain input: generated ripple normals', note: 'threejs-rain-snow-and-wet-surfaces · generated-asset preview; not dynamic weather evidence', link: 'threejs-rain-snow-and-wet-surfaces' },
-  { img: 'visual-validation/cloud-generated-weather-maps/final.design.png', title: 'Cloud input: weather maps', note: 'threejs-volumetric-clouds · generated-asset channel preview; not volume-renderer evidence', link: 'threejs-volumetric-clouds' },
-  { img: 'visual-validation/frost-generated-crystals/final.design.png', title: 'Surface input: frost crystals', note: 'threejs-dynamic-surface-effects · generated-asset preview; not StorageTexture history evidence', link: 'threejs-dynamic-surface-effects' },
-  { img: 'visual-validation/materials-generated-lava-causes/final.design.png', title: 'Material input: lava causes', note: 'threejs-procedural-materials · generated-asset preview; not PBR energy or timing evidence', link: 'threejs-procedural-materials' },
-  { img: 'visual-validation/vegetation-generated-meadow-density/final.design.png', title: 'Vegetation input: meadow density', note: 'threejs-procedural-vegetation · generated-asset preview; not placement GPU evidence', link: 'threejs-procedural-vegetation' },
-  { img: 'visual-validation/space-generated-starfields/final.design.png', title: 'Space input: starfield tiles', note: 'threejs-black-holes-and-space-effects · artistic generated-asset preview; not geodesic evidence', link: 'threejs-black-holes-and-space-effects' },
-  { img: 'visual-validation/fields-generated-biome-maps/final.design.png', title: 'Field input: biome maps', note: 'threejs-procedural-fields · generated-asset preview; not compute-bake parity evidence', link: 'threejs-procedural-fields' },
   { img: 'visual-validation/planet-generated-craters/diagnostics.mosaic.png', title: 'Diagnostics mosaic: generated crater field', note: 'threejs-visual-validation · generated asset-channel mosaic; not runtime g-buffer evidence', link: 'threejs-visual-validation' },
   { img: 'visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png', title: 'Diagnostics mosaic: generated weather', note: 'threejs-visual-validation · generated-asset channel preview for cloud inputs', link: 'threejs-visual-validation' },
   { img: 'visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png', title: 'Diagnostics mosaic: generated fields', note: 'threejs-visual-validation · generated-asset channel preview for biome inputs', link: 'threejs-visual-validation' },
@@ -613,20 +616,31 @@ const liveDemoHtml = PROVIDER_DEMOS.map((demo) => `
         <figcaption><strong>${esc(demo.title)}</strong><span>${esc(classificationLabel(demo))} · ${esc(demo.skill)} · ${esc(secondaryLimitation(demo))}</span></figcaption>
       </figure></a>`).join('');
 
-const flagshipHtml = flagshipDemos.map(({ demo, domain, copy }) => {
-  const preview = previewForPrimary(demo);
-  return `
-      <a class="flagship-card${preview ? '' : ' flagship-card--no-media'}" href="${demo.publishPath.replace(/^\/+/, '')}">${preview ? `
-        <span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : ''}
-        <div class="flagship-copy">
-          <span class="flagship-kicker">${esc(domain)}</span>
+const showcaseDemos = SHOWCASE_META.map((meta) => {
+  const demo = PROVIDER_DEMOS.find((entry) => entry.id === meta.id);
+  if (!demo) throw new Error(`missing homepage showcase demo: ${meta.id}`);
+  const poster = providerPosterPath(demo);
+  if (!poster) throw new Error(`missing homepage showcase poster: ${meta.id}`);
+  if (!skills[demo.skill]) throw new Error(`missing homepage showcase skill: ${demo.skill}`);
+  return { ...meta, demo, poster };
+});
+
+const showcaseSpans = [7, 5, 5, 7, 6, 6, 7, 5, 5, 7];
+const showcaseHtml = showcaseDemos.map(({ demo, poster, copy }, index) => `
+      <article class="showcase-card showcase-card--span-${showcaseSpans[index]}" data-showcase-demo="${esc(demo.id)}" data-showcase-skill="${esc(demo.skill)}">
+        <a class="showcase-media" href="${esc(demo.livePath)}" aria-label="Open ${esc(demo.title)} demo">
+          ${previewPicture(poster, `Generated asset preview for ${demo.title}; not canonical runtime evidence`, `${imageSizeAttrs(poster)} loading="${index < 2 ? 'eager' : 'lazy'}" decoding="async"`)}
+        </a>
+        <div class="showcase-copy">
+          <span class="showcase-kind">Generated input</span>
           <h3>${esc(demo.title)}</h3>
           <p>${esc(copy)}</p>
-          <div class="flagship-meta"><span>${demo.mechanisms.length} mechanisms</span><span>${demo.tiers.length} locked tiers</span><span class="status status--${acceptanceClass(demo)}">${acceptanceLabel(demo)}</span></div>${preview ? '' : `
-          ${primaryEvidencePanel(demo)}`}
+          <div class="showcase-actions">
+            <a href="skills/${esc(demo.skill)}.html">Read skill</a>
+            <a class="showcase-action--primary" href="${esc(demo.livePath)}">Open demo&nbsp;↗</a>
+          </div>
         </div>
-      </a>`;
-}).join('');
+      </article>`).join('');
 
 const primaryLabGroups = [
   { name: 'Canonical skill labs', note: 'One native implementation surface per rendering skill, plus the non-rendering router and explicit fallback harness.', demos: canonicalDemos },
@@ -669,7 +683,7 @@ const harnessSection = HARNESSES.map((h, i) => `
       <pre><code>${esc(h.code)}</code></pre></div>`).join('');
 
 const homeTitle = 'Three.js WebGPU & TSL Skills for AI Coding Agents';
-const homeDescription = metaDescription(`Install ${total} expert Three.js WebGPU and TSL skills with ${primaryDemos.length} declared primary targets, procedural graphics systems, and evidence-gated validation.`);
+const homeDescription = metaDescription(`Install ${total} expert Three.js WebGPU and TSL skills, explore ${showcaseDemos.length} visual demos, and inspect evidence-gated implementation guidance.`);
 const indexHtml = `<!doctype html>
 <html lang="en">
 <head>
@@ -758,7 +772,6 @@ h1 em{font-style:normal;color:var(--amber)}
 .hero-action{font-family:var(--mono);font-size:12px;color:var(--ink);min-height:46px;display:inline-flex;align-items:center;padding:10px 17px;background:rgba(15,18,24,.78);border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.11),0 14px 42px rgba(0,0,0,.28);backdrop-filter:blur(10px);transition-property:scale,color,box-shadow,background-color;transition-duration:180ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .hero-action--primary{background:var(--amber);color:#171006;box-shadow:0 14px 42px rgba(255,180,84,.18)}
 .hero-action:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.45),0 18px 48px rgba(0,0,0,.36)}.hero-action--primary:hover{background:#ffc272;color:#171006;box-shadow:0 18px 48px rgba(255,180,84,.24)}.hero-action:active{scale:.96}
-.hero-note{margin-top:22px;color:var(--dim);font:11px/1.5 var(--mono)}.hero-note strong{color:var(--cyan);font-weight:500}
 .hero-showcase{position:relative;overflow:hidden;border-radius:24px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(8,11,16,.98));box-shadow:0 0 0 1px rgba(255,255,255,.12),0 32px 82px rgba(0,0,0,.38)}
 .hero-showcase-inner{position:relative;min-height:460px;display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,34px)}
 .hero-showcase-kicker{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.11em;text-transform:uppercase}
@@ -777,6 +790,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .matrix-facts{display:grid;margin-top:10px;border-top:1px solid var(--line)}.matrix-fact{display:grid;grid-template-columns:minmax(150px,.42fr) minmax(0,1fr);gap:24px;padding:16px 0;border-bottom:1px solid var(--line)}.matrix-fact dt{font:10px/1.45 var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em}.matrix-fact dd{display:grid;gap:5px}.matrix-fact strong{font:600 clamp(20px,2.3vw,30px)/1 var(--disp);font-variant-numeric:tabular-nums}.matrix-fact span{color:var(--dim);font-size:13px}.matrix-fact[data-state="accepted"] strong{color:var(--lime)}.matrix-fact[data-state="pending"] strong{color:var(--amber)}
 .matrix-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
+.showcase-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}.showcase-card{grid-column:span 6;min-width:0;overflow:hidden;display:flex;flex-direction:column;border-radius:22px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(10,13,18,.98));box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.showcase-card--span-5{grid-column:span 5}.showcase-card--span-7{grid-column:span 7}.showcase-media{display:block;overflow:hidden;background:#090c11}.showcase-media img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.08) contrast(1.03);transition-property:scale,filter;transition-duration:420ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.showcase-copy{flex:1;display:flex;flex-direction:column;padding:20px 22px 22px}.showcase-kind{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.showcase-copy h3{margin-top:8px;font-size:clamp(22px,2.5vw,32px);line-height:1.08}.showcase-copy p{max-width:52ch;margin-top:10px;color:var(--dim);font-size:14px;line-height:1.55}.showcase-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:22px}.showcase-actions a{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:11px;background:rgba(255,255,255,.035);box-shadow:0 0 0 1px rgba(255,255,255,.12);font:11px/1.2 var(--mono);white-space:nowrap;transition-property:scale,color,background-color,box-shadow;transition-duration:160ms}.showcase-actions a:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.4)}.showcase-actions a:active{scale:.97}.showcase-actions .showcase-action--primary{background:var(--amber);color:#171006;box-shadow:none}.showcase-actions .showcase-action--primary:hover{background:#ffc272;color:#171006;box-shadow:none}
 .flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:var(--bg2);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--no-media{grid-template-columns:1fr;min-height:0}
 .flagship-preview{align-self:stretch;min-height:230px}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}
 .flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
@@ -790,10 +804,10 @@ h1 em{font-style:normal;color:var(--amber)}
 .category{margin-bottom:64px;content-visibility:auto;contain-intrinsic-size:920px}.category-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 26px;margin-bottom:24px}.category-head h3{font-size:23px;color:var(--amber);font-weight:600}.category-head p{color:var(--dim);font-size:15px;max-width:60ch}
 .archive-note{display:block;margin-top:4px;font-size:10px;color:var(--dim)}
 @keyframes rise{from{opacity:0;translate:0 12px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}
-@media (prefers-reduced-motion:no-preference){.hero .kicker{animation:rise .55s ease-out both}h1{animation:rise .55s .07s ease-out both}.lede,.hero-proof{animation:rise .55s .14s ease-out both}.hero-actions{animation:rise .55s .2s ease-out both}@supports(animation-timeline:view()){.flagship-card{animation:rise linear both;animation-timeline:view();animation-range:entry 8% cover 28%}}}
-@media (hover:hover) and (pointer:fine){.flagship-card:hover,.lab-card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}.category:has(.card:hover) .category-head h3{color:var(--cyan)}}
-@media (max-width:980px){.hero-layout{grid-template-columns:1fr}.hero-showcase{max-width:700px;width:100%}.hero-showcase-inner{min-height:420px}.matrix-shell{grid-template-columns:1fr}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:48px}h1{font-size:clamp(42px,12.5vw,62px)}.hero-showcase-inner{min-height:390px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview,.flagship-preview-missing{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
+@media (prefers-reduced-motion:no-preference){.hero .kicker{animation:rise .55s ease-out both}h1{animation:rise .55s .07s ease-out both}.lede,.hero-proof{animation:rise .55s .14s ease-out both}.hero-actions{animation:rise .55s .2s ease-out both}}
+@media (hover:hover) and (pointer:fine){.showcase-card:hover,.flagship-card:hover,.lab-card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}.showcase-card:hover .showcase-media img{scale:1.025;filter:saturate(1.14) contrast(1.04)}.category:has(.card:hover) .category-head h3{color:var(--cyan)}}
+@media (max-width:980px){.hero-layout{grid-template-columns:1fr}.hero-showcase{max-width:700px;width:100%}.hero-showcase-inner{min-height:420px}.matrix-shell{grid-template-columns:1fr}.showcase-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.showcase-card,.showcase-card--span-5,.showcase-card--span-7{grid-column:span 1}.flagship-grid{grid-template-columns:1fr}.flagship-card:last-child{grid-column:auto}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.protocol-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){header.hero{min-height:auto;padding:58px 0 66px}.hero-layout{gap:0}.hero-showcase{display:none}h1{font-size:clamp(42px,12.5vw,62px)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-left:0;border-top:1px solid var(--line)}.stat:nth-child(-n+2){border-top:0}.stat:last-child{grid-column:1/-1}.achievement-grid{grid-template-columns:1fr 1fr}.showcase-grid{grid-template-columns:1fr}.flagship-card{grid-template-columns:1fr}.flagship-preview,.flagship-preview-missing{min-height:210px}.lab-grid{grid-template-columns:1fr}.protocol-grid{grid-template-columns:1fr}.protocol-flow{grid-column:auto}.install-console{grid-template-columns:1fr}.category .grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(86vw,21rem);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;padding:4px 20px 28px 4px;margin-right:-20px;scrollbar-width:thin}.category .card{scroll-snap-align:start}.gallery{grid-template-columns:1fr}.lab-group-head{align-items:start;flex-direction:column}.archive .gallery{content-visibility:auto}}
 @media (max-width:440px){.achievement-grid{grid-template-columns:1fr}.hero-showcase-inner{min-height:360px}.flagship-card{padding:18px;border-radius:18px}.matrix-rails{padding:10px 18px}.matrix-fact{grid-template-columns:1fr;gap:4px}}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}.card:hover,.flagship-card:hover,.lab-card:hover{translate:0 0}}
 </style>
@@ -810,9 +824,8 @@ ${navHtml('')}
         <p class="lede">Expert skills for WebGPU rendering, procedural worlds, and final-image pipelines, with declared labs and explicit evidence status.</p>
         <div class="hero-actions">
           <a class="hero-action hero-action--primary" href="skills/threejs-choose-skills.html">Find the right skill</a>
-          <a class="hero-action" href="#labs">Explore primary targets</a>
+          <a class="hero-action" href="#flagships">Explore visual demos</a>
         </div>
-        <p class="hero-note"><strong>${total} expert skills</strong> spanning scene architecture, simulation, materials, effects, and validation.</p>
       </div>
       <aside class="hero-showcase" aria-labelledby="hero-showcase-title" data-route-fixture="${esc(oceanPlanetRoute.id)}" data-primary-owner="${esc(oceanPlanetRoute.primaryOwner)}">
         <div class="hero-showcase-inner">
@@ -841,6 +854,12 @@ ${navHtml('')}
 </div></div>
 
 <main id="main-content" tabindex="-1">
+<section class="section" id="flagships" aria-labelledby="flagships-title"><div class="wrap">
+  <h2 id="flagships-title">See what each skill lets you build.</h2>
+  <p class="sub">Open a live WebGPU demo, then read the full skill for architecture, budgets, failure conditions, and validation.</p>
+  <div class="showcase-grid">${showcaseHtml}</div>
+</div></section>
+
 <section class="section" id="matrix" aria-labelledby="matrix-title"><div class="wrap">
   <div class="matrix-shell">
     <div class="matrix-copy">
@@ -869,12 +888,6 @@ ${navHtml('')}
       <div class="matrix-actions"><a class="hero-action" href="skills/threejs-choose-skills.html">Open the routing guide&nbsp;→</a><a class="hero-action" href="evidence/">Inspect evidence&nbsp;→</a></div>
     </div>
   </div>
-</div></section>
-
-<section class="section" id="flagships" aria-labelledby="flagships-title"><div class="wrap">
-  <h2 id="flagships-title">See complete systems, not isolated effects.</h2>
-  <p class="sub">Five integrated scenes show how individually correct techniques share world units, temporal state, render submissions, and final-image ownership.</p>
-  <div class="flagship-grid">${flagshipHtml}</div>
 </div></section>
 
 <section class="section" id="labs" aria-labelledby="labs-title"><div class="wrap">

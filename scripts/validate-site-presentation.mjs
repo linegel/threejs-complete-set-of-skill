@@ -93,6 +93,18 @@ const requiredLocalAssets = [
 ];
 const evidenceReportUrl = (labId) => `${site}evidence/${labId}/`;
 const oceanPlanetRoute = buildSiteRoutePresentation(routerFixtures, 'ocean-planet');
+const expectedShowcaseIds = [
+  'ocean-generated-wave-seeds',
+  'planet-generated-craters',
+  'fields-generated-biome-maps',
+  'materials-generated-lava-causes',
+  'water-generated-caustics',
+  'cloud-generated-weather-maps',
+  'frost-generated-crystals',
+  'rain-generated-ripples',
+  'space-generated-starfields',
+  'vegetation-generated-meadow-density',
+];
 
 for (const asset of requiredLocalAssets) {
   assert(existsSync(join(docs, asset)), `required local presentation asset is missing: ${asset}`);
@@ -177,6 +189,18 @@ assert(homepage.includes(`<meta name="skill-pack-build-revision" content="${regi
 assert(homepage.includes('class="skip-link"'), 'homepage has no skip link');
 assert(homepage.includes(':focus-visible'), 'homepage has no authored focus-visible treatment');
 assert(homepage.includes('prefers-reduced-motion:reduce'), 'homepage has no reduced-motion treatment');
+const publishedShowcaseIds = [...homepage.matchAll(/data-showcase-demo="([^"]+)"/g)].map((match) => match[1]);
+assert(publishedShowcaseIds.length === 10, `homepage showcase must publish exactly 10 cards; received ${publishedShowcaseIds.length}`);
+assert(JSON.stringify(publishedShowcaseIds) === JSON.stringify(expectedShowcaseIds), 'homepage showcase order or membership drift');
+for (const id of expectedShowcaseIds) {
+  const demo = siteDemos.find((entry) => entry.id === id);
+  assert(Boolean(demo), `homepage showcase references an unknown demo: ${id}`);
+  if (!demo) continue;
+  assert(demo.kind === 'generated-asset-demo', `homepage showcase demo is not a generated-asset surface: ${id}`);
+  assert(homepage.includes(`data-showcase-demo="${id}" data-showcase-skill="${demo.skill}"`), `homepage showcase skill binding drift: ${id}`);
+  assert(homepage.includes(`href="${relativePublishPath(demo.publishPath)}"`), `homepage showcase does not link its demo: ${id}`);
+  assert(homepage.includes(`href="skills/${demo.skill}.html"`), `homepage showcase does not link its full skill: ${id}`);
+}
 const homepageSocialImages = metaContent(homepage, 'property', 'og:image');
 assert(homepageSocialImages.length <= 1, 'homepage publishes duplicate social images');
 if (homepageSocialImages.length === 1) {
