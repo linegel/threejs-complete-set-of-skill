@@ -52,6 +52,9 @@ assert.equal( selectBloomStageKind( { quality: QUALITY_TIERS.full, mode: DEBUG_M
 assert.equal( selectBloomStageKind( { quality: QUALITY_TIERS.full, mode: DEBUG_MODES.COMBINED } ), BLOOM_STAGE_KINDS.BLOOM );
 
 assert.match( exampleSource, /mrtOutputs\s*=\s*\{\s*output\s*,\s*emissive\s*\}/ );
+assert.match( exampleSource, /const LAB_ID = 'node-selective-bloom'/ );
+assert.match( exampleSource, /get labId\(\) \{ return LAB_ID; \}/ );
+assert.match( exampleSource, /labId:\s*LAB_ID/ );
 assert.match( exampleSource, /if\s*\(\s*validationDiagnostics\s*===\s*true\s*\)\s*\{[\s\S]*?mrtOutputs\.transparentEmitter/ );
 assert.match( exampleSource, /materialReference\(\s*'userData\.transparentEmitterMask'\s*,\s*'float'\s*\)/ );
 assert.match( exampleSource, /sceneMRT\.setBlendMode\(\s*'emissive'\s*,\s*materialBlend\s*\)/ );

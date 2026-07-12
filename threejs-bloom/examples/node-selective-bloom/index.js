@@ -14,6 +14,8 @@ import {
 } from 'three/tsl';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
+const LAB_ID = 'node-selective-bloom';
+
 export const DEBUG_MODES = Object.freeze( {
 	COMBINED: 'combined',
 	EMISSIVE_ONLY: 'emissive-only',
@@ -1431,6 +1433,7 @@ export async function createNodeSelectiveBloomExample( {
 	function getMetrics() {
 
 		return {
+			labId: LAB_ID,
 			backend: renderer.backend.isWebGPUBackend === true ? 'webgpu' : 'unsupported',
 			threeRevision: THREE.REVISION,
 			tier: quality.name,
@@ -1465,6 +1468,7 @@ export async function createNodeSelectiveBloomExample( {
 	await setMode( initialDebugMode );
 
 	return {
+		get labId() { return LAB_ID; },
 		ready: async () => {},
 		setScenario,
 		setMode,
