@@ -282,68 +282,102 @@ function immutableManifest(snapshot, origin) {
   });
 }
 
-export async function startImmutableCorpusServer({ host = "127.0.0.1", port = 4174 } = {}) {
-  if (typeof host !== "string" || host.length === 0) throw new TypeError("Immutable server host is required");
-  if (!Number.isInteger(port) || port < 0 || port > 65535) throw new RangeError("Immutable server port is invalid");
-  const snapshot = buildImmutableCorpusSnapshot();
-  let manifest = null;
-  let manifestBytes = null;
-  let manifestSha256 = null;
+function immutableResponse(status, headers, body, method) {
+  return Object.freeze({
+    status,
+    headers: Object.freeze({ ...headers }),
+    body: method === "HEAD" ? null : body,
+  });
+}
+
+export function createImmutableCorpusResponder({
+  origin = CORPUS_ROUTE_EVIDENCE_ORIGIN,
+  snapshot = buildImmutableCorpusSnapshot(),
+} = {}) {
+  const parsedOrigin = new URL(origin);
+  if (!new Set(["http:", "https:"]).has(parsedOrigin.protocol) || parsedOrigin.origin !== origin) {
+    throw new TypeError("Immutable responder origin must be an exact HTTP(S) origin");
+  }
+  const manifest = immutableManifest(snapshot, origin);
+  const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  const manifestSha256 = sha256(manifestBytes);
   const routeAliases = new Map(routeHtmlPaths().map((path) => [`/${dirname(path)}/`, path]));
-  const server = createServer((request, response) => {
+
+  const respond = ({ method = "GET", url = "/" } = {}) => {
     try {
-      if (!new Set(["GET", "HEAD"]).has(request.method)) {
-        response.writeHead(405, { Allow: "GET, HEAD", "Content-Type": "text/plain; charset=utf-8" });
-        response.end("Method not allowed\n");
-        return;
+      if (!new Set(["GET", "HEAD"]).has(method)) {
+        const body = Buffer.from("Method not allowed\n", "utf8");
+        return immutableResponse(405, {
+          Allow: "GET, HEAD",
+          "Content-Length": String(body.byteLength),
+          "Content-Type": "text/plain; charset=utf-8",
+        }, body, method);
       }
-      const requestUrl = new URL(request.url, manifest.origin);
+      const requestUrl = new URL(url, manifest.origin);
       let pathname;
       try {
         pathname = decodeURIComponent(requestUrl.pathname);
       } catch {
-        response.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
-        response.end("Malformed URL path\n");
-        return;
+        const body = Buffer.from("Malformed URL path\n", "utf8");
+        return immutableResponse(400, {
+          "Content-Length": String(body.byteLength),
+          "Content-Type": "text/plain; charset=utf-8",
+        }, body, method);
       }
       if (pathname === CORPUS_ROUTE_IMMUTABLE_MANIFEST_PATH) {
-        response.writeHead(200, responseHeaders({
+        return immutableResponse(200, responseHeaders({
           contentType: "application/json; charset=utf-8",
           contentSha256: manifestSha256,
           sourcePath: CORPUS_ROUTE_IMMUTABLE_MANIFEST_PATH,
           snapshotId: snapshot.snapshotId,
           contentLength: manifestBytes.byteLength,
-        }));
-        response.end(request.method === "HEAD" ? undefined : manifestBytes);
-        return;
+        }), manifestBytes, method);
       }
       const sourcePath = routeAliases.get(pathname) ?? (pathname.startsWith("/") ? pathname.slice(1) : null);
       const resource = sourcePath ? snapshot.resources.get(sourcePath) : null;
       if (!resource) {
         const body = Buffer.from("Not found\n", "utf8");
-        response.writeHead(404, {
+        return immutableResponse(404, {
           "Cache-Control": "no-store",
           "Content-Length": String(body.byteLength),
           "Content-Type": "text/plain; charset=utf-8",
           "X-Corpus-Immutable-Snapshot": snapshot.snapshotId,
           "X-Corpus-SPA-Fallback": "disabled",
-        });
-        response.end(request.method === "HEAD" ? undefined : body);
-        return;
+        }, body, method);
       }
-      response.writeHead(200, responseHeaders({
+      return immutableResponse(200, responseHeaders({
         contentType: resource.mediaType,
         contentSha256: resource.sha256,
         sourcePath: resource.path,
         snapshotId: snapshot.snapshotId,
         contentLength: resource.byteLength,
-      }));
-      response.end(request.method === "HEAD" ? undefined : resource.bytes);
+      }), resource.bytes, method);
     } catch (error) {
       const body = Buffer.from(`Immutable server failure: ${error.message}\n`, "utf8");
-      response.writeHead(500, { "Content-Length": String(body.byteLength), "Content-Type": "text/plain; charset=utf-8" });
-      response.end(body);
+      return immutableResponse(500, {
+        "Content-Length": String(body.byteLength),
+        "Content-Type": "text/plain; charset=utf-8",
+      }, body, method);
     }
+  };
+
+  return Object.freeze({ snapshot, manifest, manifestSha256, respond });
+}
+
+export async function startImmutableCorpusServer({ host = "127.0.0.1", port = 4174 } = {}) {
+  if (typeof host !== "string" || host.length === 0) throw new TypeError("Immutable server host is required");
+  if (!Number.isInteger(port) || port < 0 || port > 65535) throw new RangeError("Immutable server port is invalid");
+  const snapshot = buildImmutableCorpusSnapshot();
+  let responder = null;
+  const server = createServer((request, response) => {
+    const result = responder?.respond({ method: request.method, url: request.url }) ?? immutableResponse(
+      503,
+      { "Content-Type": "text/plain; charset=utf-8" },
+      Buffer.from("Immutable responder is not ready\n", "utf8"),
+      request.method,
+    );
+    response.writeHead(result.status, result.headers);
+    response.end(result.body ?? undefined);
   });
   await new Promise((resolveStart, rejectStart) => {
     const onError = (error) => rejectStart(error);
@@ -356,15 +390,13 @@ export async function startImmutableCorpusServer({ host = "127.0.0.1", port = 41
   const address = server.address();
   if (!address || typeof address === "string") throw new Error("Immutable server did not expose a TCP address");
   const origin = `http://${host}:${address.port}`;
-  manifest = immutableManifest(snapshot, origin);
-  manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, "utf8");
-  manifestSha256 = sha256(manifestBytes);
+  responder = createImmutableCorpusResponder({ origin, snapshot });
   let closed = false;
   return Object.freeze({
     origin,
     snapshot,
-    manifest,
-    manifestSha256,
+    manifest: responder.manifest,
+    manifestSha256: responder.manifestSha256,
     close: async () => {
       if (closed) return false;
       closed = true;

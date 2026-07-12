@@ -8,12 +8,18 @@ import {
 } from "./route-evidence-plan.js";
 import { parseCorpusRouteGeneratorArguments } from "./generate-routes.mjs";
 import {
+  createImmutableCorpusResponder,
   discoverImmutableBrowserDependencies,
-  startImmutableCorpusServer,
 } from "./immutable-route-server.mjs";
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+function header(response, name) {
+  const expected = name.toLowerCase();
+  const entry = Object.entries(response.headers).find(([key]) => key.toLowerCase() === expected);
+  return entry?.[1] ?? null;
 }
 
 assert.deepEqual(parseCorpusRouteGeneratorArguments([]), { checkOnly: false });
@@ -103,48 +109,62 @@ const ambiguousCaptureRoute = runBootstrap({
 assert.equal(ambiguousCaptureRoute.window.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__.enabled, false);
 assert.equal(ambiguousCaptureRoute.listeners.length, 0);
 
-const running = await startImmutableCorpusServer({ port: 0 });
-try {
-  const manifestResponse = await fetch(`${running.origin}${CORPUS_ROUTE_IMMUTABLE_MANIFEST_PATH}`);
-  assert.equal(manifestResponse.status, 200);
-  assert.equal(manifestResponse.headers.get("x-corpus-transform"), "none");
-  assert.equal(manifestResponse.headers.get("x-corpus-immutable-snapshot"), running.snapshot.snapshotId);
-  const manifestBytes = new Uint8Array(await manifestResponse.arrayBuffer());
-  assert.equal(sha256(manifestBytes), manifestResponse.headers.get("x-content-sha256"));
-  const manifest = JSON.parse(new TextDecoder().decode(manifestBytes));
-  assert.equal(manifest.immutableSnapshot, true);
-  assert.equal(manifest.spaFallback, false);
-  assert.equal(manifest.viteClient, false);
-  assert.equal(manifest.transformMode, "none");
-  assert(manifest.entries.some(({ path }) => path === "node_modules/three/build/three.webgpu.js"));
-  assert(!manifest.entries.some(({ path }) => path.includes("/@vite/client")));
+const origin = "http://127.0.0.1:4174";
+const responder = createImmutableCorpusResponder({ origin });
+const manifestResponse = responder.respond({ url: CORPUS_ROUTE_IMMUTABLE_MANIFEST_PATH });
+assert.equal(manifestResponse.status, 200);
+assert.equal(header(manifestResponse, "x-corpus-transform"), "none");
+assert.equal(header(manifestResponse, "x-corpus-immutable-snapshot"), responder.snapshot.snapshotId);
+const manifestBytes = new Uint8Array(manifestResponse.body);
+assert.equal(sha256(manifestBytes), header(manifestResponse, "x-content-sha256"));
+const manifest = JSON.parse(new TextDecoder().decode(manifestBytes));
+assert.equal(manifest.origin, origin);
+assert.equal(manifest.immutableSnapshot, true);
+assert.equal(manifest.spaFallback, false);
+assert.equal(manifest.viteClient, false);
+assert.equal(manifest.transformMode, "none");
+assert(manifest.entries.some(({ path }) => path === "node_modules/three/build/three.webgpu.js"));
+assert(!manifest.entries.some(({ path }) => path.includes("/@vite/client")));
 
-  const routePath = "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/scenario/potted-bonsai/";
-  const routeResponse = await fetch(`${running.origin}${routePath}?capture=1`);
-  assert.equal(routeResponse.status, 200);
-  assert.equal(routeResponse.headers.get("x-corpus-transform"), "none");
-  assert.equal(routeResponse.headers.get("x-corpus-spa-fallback"), null);
-  const routeBytes = new Uint8Array(await routeResponse.arrayBuffer());
-  assert.equal(sha256(routeBytes), routeResponse.headers.get("x-content-sha256"));
-  assert.equal(routeResponse.headers.get("x-corpus-immutable-snapshot"), running.snapshot.snapshotId);
-  assert.match(new TextDecoder().decode(routeBytes), /<script type="importmap">/);
-  assert.doesNotMatch(new TextDecoder().decode(routeBytes), /\/@vite\/client/);
+const routePath = "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/scenario/potted-bonsai/";
+const routeResponse = responder.respond({ url: `${routePath}?capture=1` });
+assert.equal(routeResponse.status, 200);
+assert.equal(header(routeResponse, "x-corpus-transform"), "none");
+assert.equal(header(routeResponse, "x-corpus-spa-fallback"), null);
+const routeBytes = new Uint8Array(routeResponse.body);
+assert.equal(sha256(routeBytes), header(routeResponse, "x-content-sha256"));
+assert.equal(header(routeResponse, "x-corpus-immutable-snapshot"), responder.snapshot.snapshotId);
+assert.match(new TextDecoder().decode(routeBytes), /<script type="importmap">/);
+assert.doesNotMatch(new TextDecoder().decode(routeBytes), /\/@vite\/client/);
 
-  const missingResponse = await fetch(`${running.origin}/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/does-not-exist/`);
-  assert.equal(missingResponse.status, 404);
-  assert.equal(missingResponse.headers.get("x-corpus-spa-fallback"), "disabled");
-  assert.doesNotMatch(await missingResponse.text(), /<!doctype html>/i);
+const headResponse = responder.respond({ method: "HEAD", url: routePath });
+assert.equal(headResponse.status, 200);
+assert.equal(headResponse.body, null);
+assert.equal(Number(header(headResponse, "content-length")), routeBytes.byteLength);
 
-  console.log(JSON.stringify({
-    ok: true,
-    snapshotId: running.snapshot.snapshotId,
-    entries: running.snapshot.entries.length,
-    exactRouteBytes: routeBytes.byteLength,
-    missingRouteStatus: missingResponse.status,
-    captureScopeMutations: 3,
-    argumentMutations: 2,
-    networkDependencyMutations: 3,
-  }, null, 2));
-} finally {
-  await running.close();
-}
+const methodResponse = responder.respond({ method: "POST", url: routePath });
+assert.equal(methodResponse.status, 405);
+assert.equal(header(methodResponse, "allow"), "GET, HEAD");
+
+const malformedResponse = responder.respond({ url: "/%E0%A4%A" });
+assert.equal(malformedResponse.status, 400);
+
+const missingResponse = responder.respond({
+  url: "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/does-not-exist/",
+});
+assert.equal(missingResponse.status, 404);
+assert.equal(header(missingResponse, "x-corpus-spa-fallback"), "disabled");
+assert.doesNotMatch(new TextDecoder().decode(missingResponse.body), /<!doctype html>/i);
+
+console.log(JSON.stringify({
+  ok: true,
+  snapshotId: responder.snapshot.snapshotId,
+  entries: responder.snapshot.entries.length,
+  exactRouteBytes: routeBytes.byteLength,
+  missingRouteStatus: missingResponse.status,
+  captureScopeMutations: 3,
+  argumentMutations: 2,
+  networkDependencyMutations: 3,
+  requestContractMutations: 3,
+  networkSocketOpened: false,
+}, null, 2));
