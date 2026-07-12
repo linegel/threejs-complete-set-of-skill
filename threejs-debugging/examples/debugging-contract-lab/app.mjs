@@ -1,3 +1,4 @@
+const LAB_ID = 'debugging-contract-lab';
 const casesUrl = new URL('../triage-cases.json', import.meta.url);
 
 function readFixedScenario() {
@@ -40,6 +41,8 @@ class DebuggingContractController {
     this.#scenarioId = scenarioId;
   }
 
+  get labId() { return LAB_ID; }
+
   #assertLive() {
     if (this.#disposed) throw new Error('DebuggingContractController is disposed.');
   }
@@ -57,7 +60,7 @@ class DebuggingContractController {
   async capturePixels() { throw new Error('capturePixels is not applicable to this non-rendering diagnostic suite.'); }
   describePipeline() { return { owners: {}, signals: [], sceneSubmissions: [], computeDispatches: [], resources: [], finalToneMapOwner: null, finalOutputTransformOwner: null }; }
   describeResources() { return { resources: [], reason: 'non-rendering diagnostic scenario suite' }; }
-  getMetrics() { return { scenarioId: this.#scenarioId, result: this.#result }; }
+  getMetrics() { return { labId: this.labId, scenarioId: this.#scenarioId, result: this.#result }; }
   async dispose() { this.#disposed = true; }
 
   async renderOnce() {

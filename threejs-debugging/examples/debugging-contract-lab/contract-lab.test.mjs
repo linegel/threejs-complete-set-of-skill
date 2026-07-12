@@ -16,6 +16,9 @@ assert.equal(manifest.nonRenderingScenarioSuite, true);
 assert.deepEqual(manifest.tiers, []);
 assert.match(app, /fetch\(casesUrl\)/);
 assert.match(app, /Unknown debugging scenario/);
+assert.match(app, /const LAB_ID = 'debugging-contract-lab'/);
+assert.match(app, /get labId\(\) \{ return LAB_ID; \}/);
+assert.match(app, /getMetrics\(\) \{ return \{ labId: this\.labId,/);
 assert.equal(new Set(catalog.cases.map((entry) => entry.requiredOutcome)).size, 7);
 assert.deepEqual(catalog.cases.filter((entry) => !entry.activateDebugging).map((entry) => entry.id), ['ordinary-scene-design']);
 
