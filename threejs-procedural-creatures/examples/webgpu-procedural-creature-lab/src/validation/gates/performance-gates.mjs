@@ -4,6 +4,7 @@ import {
 	PERFORMANCE_PROFILES,
 	PERFORMANCE_SEED,
 } from '../../lab/performance-profiles.js';
+import { renderGraphMatchesProfile, TIER_RENDER_GRAPHS } from '../../lab/tier-render-graphs.js';
 
 const six = Array.from({ length: 6 }, (_, index) => `digest-${index}`);
 
@@ -38,6 +39,8 @@ function passingFixture(profileId = 'hero-60hz') {
 			sampleCount: profile.sampleCount,
 			shadowMapSize: profile.shadowMapSize,
 			outlineMode: profile.outlineMode,
+			colorAttachments: [...profile.colorAttachments],
+			depthAttachment: profile.depthAttachment,
 			representation: profile.representation,
 			topologySignatures: [...six],
 			geometryDigests: [...six],
@@ -94,13 +97,13 @@ function passingFixture(profileId = 'hero-60hz') {
 
 async function runPerformanceProfileContract() {
 	const expected = {
-		'hero-60hz': ['hero', 4, 4, 'shared-normal-depth-edge', 2048, 256],
-		'crowd-60hz': ['crowd', 64, 1, 'shared-normal-depth-edge', 1024, 192],
-		'background-60hz': ['background', 96, 1, 'none', 512, 128],
+		'hero-60hz': ['hero', 4, 4, 'shared-normal-depth-edge', 2048, 256, ['output', 'normal']],
+		'crowd-60hz': ['crowd', 64, 1, 'shared-normal-depth-edge', 1024, 192, ['output', 'normal']],
+		'background-60hz': ['background', 96, 1, 'none', 512, 128, ['output']],
 	};
 	for (const [id, values] of Object.entries(expected)) {
 		const profile = PERFORMANCE_PROFILES[id];
-		const actual = [profile?.tier, profile?.population, profile?.sampleCount, profile?.outlineMode, profile?.shadowMapSize, profile?.ownedGpuResidencyLimitBytes / 1024 / 1024];
+		const actual = [profile?.tier, profile?.population, profile?.sampleCount, profile?.outlineMode, profile?.shadowMapSize, profile?.ownedGpuResidencyLimitBytes / 1024 / 1024, profile?.colorAttachments];
 		if (JSON.stringify(actual) !== JSON.stringify(values)) return { status: 'fail', details: { message: `${id} drifted`, expected: values, actual } };
 		if (profile.viewport.width !== 1200 || profile.viewport.height !== 834 || profile.viewport.dpr !== 1
 			|| profile.seed !== PERFORMANCE_SEED || profile.warmupFrames !== 120 || profile.sampleFrames !== 600
@@ -109,6 +112,7 @@ async function runPerformanceProfileContract() {
 		}
 		const verdict = evaluatePerformanceResult(passingFixture(id));
 		if (verdict.verdict !== 'PASS') return { status: 'fail', details: { message: `${id} valid fixture was rejected`, failures: verdict.failures } };
+		if (!renderGraphMatchesProfile(TIER_RENDER_GRAPHS[profile.tier], profile)) return { status: 'fail', details: { message: `${id} tier graph and performance profile diverged` } };
 	}
 	return { status: 'pass', details: { profiles: Object.keys(expected), seed: PERFORMANCE_SEED } };
 }
@@ -126,6 +130,7 @@ async function runPerformanceNegativeControls() {
 		['viewport', (x) => { x.workload.viewport.width += 1; }],
 		['sample count', (x) => { x.workload.sampleCount = 1; }],
 		['outline graph', (x) => { x.workload.outlineMode = 'none'; }],
+		['MRT attachments', (x) => { x.workload.colorAttachments.push('emissive'); }],
 		['representation', (x) => { x.workload.representation = 'diagnostic-owner-masked-shell'; }],
 		['topology inventory', (x) => { x.workload.topologySignatures.pop(); }],
 		['warm-up', (x) => { x.sampling.warmupFrames = 119; }],

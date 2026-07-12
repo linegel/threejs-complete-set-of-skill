@@ -22,6 +22,7 @@ export const PERFORMANCE_PROFILES = Object.freeze({
 		...common,
 		id: 'hero-60hz', tier: 'hero', population: 4, sampleCount: 4,
 		outlineMode: 'shared-normal-depth-edge', shadowMapSize: 2048,
+		colorAttachments: TIER_RENDER_GRAPHS.hero.colorAttachments, depthAttachment: true,
 		ownedGpuResidencyLimitBytes: 256 * 1024 * 1024,
 		representation: 'canonical-reference-surface',
 	}),
@@ -29,6 +30,7 @@ export const PERFORMANCE_PROFILES = Object.freeze({
 		...common,
 		id: 'crowd-60hz', tier: 'crowd', population: 64, sampleCount: 1,
 		outlineMode: 'shared-normal-depth-edge', shadowMapSize: 1024,
+		colorAttachments: TIER_RENDER_GRAPHS.crowd.colorAttachments, depthAttachment: true,
 		ownedGpuResidencyLimitBytes: 192 * 1024 * 1024,
 		representation: 'canonical-reference-surface',
 	}),
@@ -36,6 +38,7 @@ export const PERFORMANCE_PROFILES = Object.freeze({
 		...common,
 		id: 'background-60hz', tier: 'background', population: 96, sampleCount: 1,
 		outlineMode: 'none', shadowMapSize: 512,
+		colorAttachments: TIER_RENDER_GRAPHS.background.colorAttachments, depthAttachment: true,
 		ownedGpuResidencyLimitBytes: 128 * 1024 * 1024,
 		representation: 'canonical-reference-surface',
 	}),
@@ -89,6 +92,8 @@ export function evaluatePerformanceResult(result) {
 	if (workload?.sampleCount !== profile.sampleCount) failures.push('sample count drifted from the frozen profile');
 	if (workload?.shadowMapSize !== profile.shadowMapSize) failures.push('shadow-map size drifted from the frozen profile');
 	if (workload?.outlineMode !== profile.outlineMode) failures.push('outline mode drifted from the frozen profile');
+	if (workload?.depthAttachment !== profile.depthAttachment
+		|| JSON.stringify(workload?.colorAttachments) !== JSON.stringify(profile.colorAttachments)) failures.push('tier render-target attachment graph drifted from the frozen profile');
 	if (workload?.representation !== profile.representation) failures.push('canonical reference-surface representation is not active');
 	if (!Array.isArray(workload?.topologySignatures) || workload.topologySignatures.length !== 6 || workload.topologySignatures.some((value) => typeof value !== 'string' || value.length === 0)) failures.push('six stable topology signatures are not recorded');
 	if (!Array.isArray(workload?.geometryDigests) || workload.geometryDigests.length !== 6 || workload.geometryDigests.some((value) => typeof value !== 'string' || value.length === 0)) failures.push('six geometry digests are not recorded');
@@ -126,3 +131,4 @@ export function evaluatePerformanceResult(result) {
 	if (result?.quality?.settled !== true || (result?.quality?.transitions?.length ?? 0) !== 0) failures.push('quality state did not remain settled');
 	return { verdict: failures.length === 0 ? 'PASS' : 'INSUFFICIENT_EVIDENCE', failures };
 }
+import { TIER_RENDER_GRAPHS } from './tier-render-graphs.js';

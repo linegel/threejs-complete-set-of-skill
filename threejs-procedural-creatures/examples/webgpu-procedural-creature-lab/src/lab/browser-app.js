@@ -23,7 +23,6 @@ import {
 	Fn,
 	attributeArray,
 	color,
-	emissive,
 	instanceIndex,
 	int,
 	mrt,
@@ -48,6 +47,7 @@ import { createGenomeSpec } from './specs/genome.js';
 import { evaluatePerformanceResult, PERFORMANCE_PROFILE_VERSION, performanceProfile } from './performance-profiles.js';
 import { loadBundledReferenceAssets } from './reference-assets.js';
 import { buildReferenceBufferGeometry } from './reference-geometry.js';
+import { renderGraphMatchesProfile, tierRenderGraph } from './tier-render-graphs.js';
 import {
 	CREATURE_FOCI,
 	CREATURE_MODES,
@@ -111,6 +111,7 @@ const state = {
 	light: null,
 	poseStorage: null,
 	outline: null,
+	tierGraph: null,
 	lastFrameMs: 16.667,
 	frameCount: 0,
 	bootCounters: null,
@@ -403,13 +404,34 @@ function createScene(renderer) {
 	state.camera = camera;
 	state.ground = ground;
 	state.light = sun;
-	state.scenePass = pass(scene, camera);
-	state.scenePass.setMRT(mrt({ output, normal: normalView, emissive }));
-	state.outline = createOutlinePass(state.scenePass);
 	state.renderPipeline = new RenderPipeline(renderer);
 	state.renderPipeline.outputColorTransform = false;
-	state.renderPipeline.outputNode = state.outline.outputNode;
+	configureTierRenderGraph(state.tier);
+}
+
+function configureTierRenderGraph(tier) {
+	const contract = tierRenderGraph(tier);
+	const previousPass = state.scenePass;
+	const previousOutline = state.outline;
+	const scenePass = pass(state.scene, state.camera);
+	if (contract.colorAttachments.includes('normal')) scenePass.setMRT(mrt({ output, normal: normalView }));
+	else scenePass.setMRT(mrt({ output }));
+	scenePass.renderTarget.samples = contract.sampleCount;
+	const outline = contract.outlineMode === 'shared-normal-depth-edge' ? createOutlinePass(scenePass) : null;
+	state.scenePass = scenePass;
+	state.outline = outline;
+	state.tierGraph = contract;
+	state.renderPipeline.outputNode = outline?.outputNode ?? renderOutput(scenePass.getTextureNode('output'));
 	state.renderPipeline.needsUpdate = true;
+	if (state.light.shadow.mapSize.x !== contract.shadowMapSize || state.light.shadow.mapSize.y !== contract.shadowMapSize) {
+		state.light.shadow.map?.dispose?.();
+		state.light.shadow.map = null;
+		state.light.shadow.mapSize.set(contract.shadowMapSize, contract.shadowMapSize);
+		state.light.shadow.needsUpdate = true;
+	}
+	previousOutline?.dispose?.();
+	previousPass?.dispose?.();
+	return contract;
 }
 
 function layoutForSpecies(index) {
@@ -653,6 +675,13 @@ function metricFromSamples(samples) {
 }
 
 function describePipeline() {
+	const graph = state.tierGraph ?? tierRenderGraph(state.tier);
+	const outlineConsumers = graph.outlineMode === 'shared-normal-depth-edge' ? ['outline-composite'] : ['final-output'];
+	const signals = [
+		{ id: 'output', producer: 'scene-mrt', consumers: outlineConsumers },
+		...(graph.colorAttachments.includes('normal') ? [{ id: 'normal', producer: 'scene-mrt', consumers: ['outline-composite'] }] : []),
+		{ id: 'depth', producer: 'scene-mrt-depth', consumers: graph.outlineMode === 'shared-normal-depth-edge' ? ['outline-composite'] : [] },
+	];
 	return {
 		schemaVersion: 2,
 		owners: {
@@ -663,13 +692,9 @@ function describePipeline() {
 			toneMap: 'renderOutput',
 			outputColorTransform: 'renderOutput',
 		},
-		signals: [
-			{ id: 'output', producer: 'scene-mrt', consumers: ['outline-composite'] },
-			{ id: 'normal', producer: 'scene-mrt', consumers: ['outline-composite'] },
-			{ id: 'depth', producer: 'scene-mrt-depth', consumers: ['outline-composite'] },
-			{ id: 'emissive', producer: 'scene-mrt', consumers: [] },
-		],
-		sceneSubmissions: [{ id: 'scene-mrt', kind: 'lit-scene', attachments: ['output', 'normal', 'emissive', 'depth'] }],
+		tierGraph: graph,
+		signals,
+		sceneSubmissions: [{ id: 'scene-mrt', kind: 'lit-scene', attachments: [...graph.colorAttachments, ...(graph.depthAttachment ? ['depth'] : [])] }],
 		computeDispatches: [],
 		resources: describeResources().resources,
 		finalToneMapOwner: 'renderOutput',
@@ -681,6 +706,7 @@ function describePipeline() {
 
 function describeResources() {
 	const pose = state.poseStorage;
+	const graph = state.tierGraph ?? tierRenderGraph(state.tier);
 	const candidateBytes = [...(state.candidateStorages?.values?.() ?? [])]
 		.reduce((sum, storage) => sum + storage.byteLength, 0);
 	const resources = [
@@ -694,10 +720,8 @@ function describeResources() {
 		{ id: 'creature-root-storage', kind: 'storage-buffer', bytes: pose?.rootsArray?.byteLength ?? 0 },
 		{ id: 'creature-radial-frame-storage', kind: 'storage-buffer', bytes: pose?.framesArray?.byteLength ?? 0 },
 		{ id: 'creature-candidate-storage', kind: 'storage-buffer', bytes: candidateBytes },
-		{ id: 'scene-mrt-output', kind: 'render-target', producer: 'scene-mrt' },
-		{ id: 'scene-mrt-normal', kind: 'render-target', producer: 'scene-mrt' },
-		{ id: 'scene-mrt-emissive', kind: 'render-target', producer: 'scene-mrt' },
-		{ id: 'scene-depth', kind: 'depth-target', producer: 'scene-mrt' },
+		...graph.colorAttachments.map((attachment) => ({ id: `scene-mrt-${attachment}`, kind: 'render-target', producer: 'scene-mrt' })),
+		...(graph.depthAttachment ? [{ id: 'scene-depth', kind: 'depth-target', producer: 'scene-mrt' }] : []),
 		{ id: 'directional-shadow-atlas', kind: 'depth-target', width: state.light?.shadow?.mapSize?.x ?? 0, height: state.light?.shadow?.mapSize?.y ?? 0 },
 	];
 	return {
@@ -896,6 +920,7 @@ async function setTier(value = 'hero', options = {}) {
 	for (const species of state.species) disposeSpeciesRecord(species);
 	disposeCandidateStorages();
 	state.tier = tier;
+	configureTierRenderGraph(tier);
 	buildSpeciesRecords(state.specs);
 	spawnGrid(state.startup.seed, population, { render: false });
 	renderOnce();
@@ -1371,7 +1396,9 @@ async function capturePipelinePixels(targetId = 'output') {
 		};
 	}
 	if (targetId === 'shadow-atlas') return captureShadowAtlas({ width, height });
-	if (!['normal', 'emissive', 'depth'].includes(targetId)) throw new Error(`unknown creature capture target '${targetId}'`);
+	if (!['normal', 'depth'].includes(targetId)) throw new Error(`unknown creature capture target '${targetId}'`);
+	if (targetId === 'normal' && !state.tierGraph.colorAttachments.includes('normal')) throw new Error(`tier '${state.tier}' does not allocate a normal attachment`);
+	if (targetId === 'depth' && !state.tierGraph.depthAttachment) throw new Error(`tier '${state.tier}' does not allocate a depth attachment`);
 	updatePoseStorage();
 	state.renderPipeline.render();
 	await state.renderer.backend.device.queue.onSubmittedWorkDone();
@@ -1612,16 +1639,11 @@ function adapterIdentity() {
 	return Object.keys(identity).length > 0 ? identity : null;
 }
 
-function applyPerformanceGraph(profile) {
-	state.scenePass.renderTarget.samples = profile.sampleCount;
-	state.light.shadow.map?.dispose?.();
-	state.light.shadow.map = null;
-	state.light.shadow.mapSize.set(profile.shadowMapSize, profile.shadowMapSize);
-	state.light.shadow.needsUpdate = true;
-	state.renderPipeline.outputNode = profile.outlineMode === 'none'
-		? renderOutput(state.scenePass.getTextureNode('output'))
-		: state.outline.outputNode;
-	state.renderPipeline.needsUpdate = true;
+function assertPerformanceGraph(profile) {
+	if (!renderGraphMatchesProfile(state.tierGraph, profile)) throw new Error(`tier '${profile.tier}' render graph drifted from performance profile '${profile.id}'`);
+	if (state.scenePass.renderTarget.samples !== profile.sampleCount
+		|| state.light.shadow.mapSize.x !== profile.shadowMapSize
+		|| state.light.shadow.mapSize.y !== profile.shadowMapSize) throw new Error(`tier '${profile.tier}' live render resources drifted from performance profile '${profile.id}'`);
 }
 
 async function measurePerformanceProfile(profileId) {
@@ -1629,7 +1651,7 @@ async function measurePerformanceProfile(profileId) {
 	await setTier(profile.tier, { overrideLock: true });
 	state.viewportOverride = { ...profile.viewport };
 	state.renderer.setPixelRatio(profile.viewport.dpr);
-	applyPerformanceGraph(profile);
+	assertPerformanceGraph(profile);
 	spawnGrid(profile.seed, profile.population, { render: false });
 	state.focusIsolation = false;
 	setCreatureMeshesVisible(true);
@@ -1713,6 +1735,8 @@ async function measurePerformanceProfile(profileId) {
 				sampleCount: resourceSnapshot.actualSampleCount,
 				shadowMapSize: state.light.shadow.mapSize.x,
 				outlineMode: actualOutlineMode,
+				colorAttachments: [...state.tierGraph.colorAttachments],
+				depthAttachment: state.tierGraph.depthAttachment,
 				representation: actualRepresentation,
 				topologySignatures: state.species.map((species) => species.compiled.topologySignature),
 				geometryDigests: state.species.map((species) => species.compiled.geometryDigest),
@@ -1847,6 +1871,7 @@ function dispose() {
 	state.scenePass = null;
 	state.renderPipeline = null;
 	state.outline = null;
+	state.tierGraph = null;
 	state.renderer = null;
 	state.scene = null;
 	state.camera = null;
