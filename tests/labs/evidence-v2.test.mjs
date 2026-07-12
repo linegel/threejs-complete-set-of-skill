@@ -241,7 +241,7 @@ test('unified release validation rejects bad stride, timing attribution, and lif
 
   const cpuTiming = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(cpuTiming, 'frame-trace.json', (trace) => {
-    trace.summary.gpuP95.source = 'CPU wall-clock fixture';
+    trace.gpuP95.source = 'CPU wall-clock fixture';
   });
   const timingResult = validateEvidenceBundle(cpuTiming);
   assert.equal(timingResult.valid, false);
@@ -254,6 +254,118 @@ test('unified release validation rejects bad stride, timing attribution, and lif
   const lifecycleResult = validateEvidenceBundle(shortLifecycle);
   assert.equal(lifecycleResult.valid, false);
   assert(lifecycleResult.errors.some((error) => error.includes('at least 50 measured lifecycle cycles')));
+});
+
+test('unified release performance PASS requires complete sustained populations and stage attribution', () => {
+  const missingP50 = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(missingP50, 'frame-trace.json', (trace) => {
+    delete trace.gpuP50;
+  });
+  const p50Result = validateEvidenceBundle(missingP50);
+  assert.equal(p50Result.valid, false);
+  assert(p50Result.errors.some((error) => error.includes('frame-trace.json.gpuP50')));
+
+  const shortWarmup = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(shortWarmup, 'frame-trace.json', (trace) => {
+    trace.warmup.cpuSamples.values.pop();
+  });
+  const warmupResult = validateEvidenceBundle(shortWarmup);
+  assert.equal(warmupResult.valid, false);
+  assert(warmupResult.errors.some((error) => error.includes('requires at least 30 samples')));
+
+  const perFrameMapping = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(perFrameMapping, 'frame-trace.json', (trace) => {
+    trace.timestampResolveCount.value = trace.sampleFrames.value;
+    trace.timestampMappingCadence = 'per-frame mapping';
+  });
+  const mappingResult = validateEvidenceBundle(perFrameMapping);
+  assert.equal(mappingResult.valid, false);
+  assert(mappingResult.errors.some((error) => error.includes('resolved in batches')));
+
+  const missingStages = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(missingStages, 'frame-trace.json', (trace) => {
+    trace.gpuStageAttribution = null;
+  });
+  const stagesResult = validateEvidenceBundle(missingStages);
+  assert.equal(stagesResult.valid, false);
+  assert(stagesResult.errors.some((error) => error.includes('gpuStageAttribution must be an object')));
+});
+
+test('unified release performance PASS requires exercised stable governor evidence', () => {
+  const unexercised = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(unexercised, 'quality-governor.json', (governor) => {
+    governor.transitions = [];
+  });
+  const unexercisedResult = validateEvidenceBundle(unexercised);
+  assert.equal(unexercisedResult.valid, false);
+  assert(unexercisedResult.errors.some((error) => error.includes('transitions requires at least 1 entries')));
+
+  const oscillating = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(oscillating, 'quality-governor.json', (governor) => {
+    governor.oscillationDetected = true;
+  });
+  const oscillatingResult = validateEvidenceBundle(oscillating);
+  assert.equal(oscillatingResult.valid, false);
+  assert(oscillatingResult.errors.some((error) => error.includes('governor oscillation')));
+
+  const forgedTransition = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(forgedTransition, 'quality-governor.json', (governor) => {
+    governor.transitions[0].from = 'balanced';
+    governor.transitions[0].to = 'full';
+  });
+  const forgedTransitionResult = validateEvidenceBundle(forgedTransition);
+  assert.equal(forgedTransitionResult.valid, false);
+  assert(forgedTransitionResult.errors.some((error) => error.includes('breaks source-window tier lineage')));
+
+  const unboundWindowTimestamp = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(unboundWindowTimestamp, 'quality-governor.json', (governor) => {
+    governor.windows[3].timestampRows[0].totalMs.value = 7;
+  });
+  const unboundWindowTimestampResult = validateEvidenceBundle(unboundWindowTimestamp);
+  assert.equal(unboundWindowTimestampResult.valid, false);
+  assert(unboundWindowTimestampResult.errors.some((error) => error.includes('frame 0 total')));
+});
+
+test('unified release lifecycle PASS reconciles every settled row and resource trend', () => {
+  const truncated = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(truncated, 'leak-loop.json', (loop) => {
+    loop.cycleSnapshots.pop();
+  });
+  const truncatedResult = validateEvidenceBundle(truncated);
+  assert.equal(truncatedResult.valid, false);
+  assert(truncatedResult.errors.some((error) => error.includes('at least 50 entries')));
+
+  const retained = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(retained, 'leak-loop.json', (loop) => {
+    loop.cycleSnapshots[49].retainedTargetBytes.value = 1;
+  });
+  const retainedResult = validateEvidenceBundle(retained);
+  assert.equal(retainedResult.valid, false);
+  assert(retainedResult.errors.some((error) => error.includes('retained lab-owned GPU resources')));
+
+  const forgedTrend = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(forgedTrend, 'leak-loop.json', (loop) => {
+    loop.trend.targetBytesPerCycle.value = 1;
+  });
+  const trendResult = validateEvidenceBundle(forgedTrend);
+  assert.equal(trendResult.valid, false);
+  assert(trendResult.errors.some((error) => error.includes('does not reconcile with its retained population')));
+
+  const retainedListener = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(retainedListener, 'leak-loop.json', (loop) => {
+    loop.cycleSnapshots[11].retainedListenerCount.value = 1;
+  });
+  const retainedListenerResult = validateEvidenceBundle(retainedListener);
+  assert.equal(retainedListenerResult.valid, false);
+  assert(retainedListenerResult.errors.some((error) => error.includes('retained listener state')));
+
+  const unrestoredRenderer = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(unrestoredRenderer, 'leak-loop.json', (loop) => {
+    loop.cycleSnapshots[19].rendererStateRestored = false;
+  });
+  const unrestoredRendererResult = validateEvidenceBundle(unrestoredRenderer);
+  assert.equal(unrestoredRendererResult.valid, false);
+  assert(unrestoredRendererResult.errors.some((error) => error.includes('did not restore renderer state')));
 });
 
 test('unified release validation confines captured file realpaths', () => {

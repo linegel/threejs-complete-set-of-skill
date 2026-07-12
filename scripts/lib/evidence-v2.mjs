@@ -16,6 +16,10 @@ import { assertLabelledNumerics } from '../../labs/runtime/numeric-evidence.mjs'
 import {
   assertEvidenceManifestContract,
 } from './evidence-manifest-contract.mjs';
+import {
+  assertLifecycleClaimEvidence,
+  assertPerformanceClaimEvidence,
+} from './evidence-runtime-claims.mjs';
 import { loadCheckedSchemas, validateCheckedJsonSchema } from './checked-json-schema.mjs';
 import { compareRgbaPngs, inspectRgbaPng } from './png-rgba.mjs';
 
@@ -363,6 +367,16 @@ function validateUnifiedV2Bundle(bundleDir, manifest, requireRequiredClaimsPass)
   validateClaimVerdicts(manifest, errors, requireRequiredClaimsPass);
   validateAllVerdicts(json, errors);
   validateRuntimeClaims(json, manifest, errors);
+  try {
+    assertPerformanceClaimEvidence(json, manifest);
+  } catch (error) {
+    appendError(errors, 'performance evidence', error);
+  }
+  try {
+    assertLifecycleClaimEvidence(json, manifest);
+  } catch (error) {
+    appendError(errors, 'lifecycle evidence', error);
+  }
   if (requireRequiredClaimsPass && (
     manifest.bundleKind !== 'release-bundle'
     || manifest.publishable !== true
