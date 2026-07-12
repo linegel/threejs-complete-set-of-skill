@@ -8,10 +8,11 @@
     "validate:v2": "node src/validate-v2.js",
     "validate:unit": "node src/validate-v2.js",
     "test:mutations": "node src/v2-self-test.js",
-    "test:routes": "node --test src/route-locks.test.js src/renderer-info-snapshot.test.js src/resource-ledger.test.js src/runtime-v2-bundle.test.js",
+    "test:routes": "node --test src/artifact-paths.test.js src/route-locks.test.js src/renderer-info-snapshot.test.js src/resource-ledger.test.js src/runtime-v2-bundle.test.js",
     "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-validation-harness --target final --hook capture-hook.mjs",
     "capture:evidence": "node src/capture-browser.js",
-    "validate:artifacts": "node src/validate-browser-artifacts.js",
+    "validate:artifacts": "node src/validate-browser-artifacts.js --bundle release",
+    "validate:raw": "node src/validate-browser-artifacts.js --bundle raw --profile performance",
     "validate:quick": "npm run check && npm run test:routes && npm run test:mutations",
     "validate:full": "npm run check && npm run test:routes && npm run validate:v1 && npm run validate:v2 && npm run validate:artifacts",
     "check": "node --check src/*.js src/schema/*.js && node src/check-imports.mjs"

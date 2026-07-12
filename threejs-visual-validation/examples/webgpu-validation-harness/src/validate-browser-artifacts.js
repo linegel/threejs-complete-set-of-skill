@@ -1,6 +1,5 @@
 import { access } from 'node:fs/promises';
-import { resolve } from 'node:path';
-
+import { resolveValidationBundleDirectory } from './artifact-paths.js';
 import { validateVersionedArtifactBundle } from './schema/dispatcher.js';
 
 function option( name, fallback ) {
@@ -10,8 +9,13 @@ function option( name, fallback ) {
 
 }
 
-const defaultDirectory = 'artifacts/visual-validation/webgpu-validation-harness/correctness';
-const artifactDir = resolve( option( '--artifacts', process.env.LAB_EVIDENCE_DIR ?? defaultDirectory ) );
+const bundle = option( '--bundle', 'release' );
+const profile = option( '--profile', 'performance' );
+const artifactDir = resolveValidationBundleDirectory( {
+	override: option( '--artifacts', process.env.LAB_EVIDENCE_DIR ?? null ),
+	bundle,
+	profile
+} );
 
 try {
 
@@ -24,6 +28,7 @@ try {
 }
 
 const result = await validateVersionedArtifactBundle( artifactDir );
+if ( bundle === 'raw' && result.captureProfile !== profile ) throw new Error( `INSUFFICIENT_EVIDENCE: raw ${ profile } path contains a ${ result.captureProfile } bundle.` );
 if ( result.schemaVersion !== 2 || result.bundleKind !== 'browser-capture' || result.publishable !== true ) {
 
 	throw new Error( 'INSUFFICIENT_EVIDENCE: canonical artifact validation requires a publishable browser-capture bundle; fixtures, schema-v1 bundles, and browser-capture-incomplete bundles cannot satisfy acceptance.' );
@@ -41,5 +46,6 @@ console.log( JSON.stringify( {
 	schemaVersion: result.schemaVersion,
 	bundleKind: result.bundleKind,
 	publishable: result.publishable,
+	captureProfile: result.captureProfile,
 	claimVerdicts: result.claimVerdicts
 }, null, 2 ) );
