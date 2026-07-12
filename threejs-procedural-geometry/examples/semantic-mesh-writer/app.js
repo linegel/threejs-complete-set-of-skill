@@ -40,33 +40,67 @@ const controller = await createGeometryLabController({
     tier: route.tier,
   },
 });
-window.labController = controller;
 
 modeSelect.disabled = Boolean(route.mechanism);
 tierSelect.disabled = Boolean(route.tier);
-modeSelect.addEventListener("change", async () => controller.setMode(modeSelect.value));
-tierSelect.addEventListener("change", async () => controller.setTier(tierSelect.value));
+const onModeChange = () => controller.setMode(modeSelect.value);
+const onTierChange = () => controller.setTier(tierSelect.value);
 const resize = () => controller.resize(
   window.innerWidth,
   window.innerHeight,
   Math.min(window.devicePixelRatio, 2),
 );
+modeSelect.addEventListener("change", onModeChange);
+tierSelect.addEventListener("change", onTierChange);
 window.addEventListener("resize", resize);
-window.addEventListener("beforeunload", () => {
+
+let animationFrameHandle = null;
+let acceptingFrames = true;
+let disposalPromise = null;
+function detachListeners() {
+  modeSelect.removeEventListener("change", onModeChange);
+  tierSelect.removeEventListener("change", onTierChange);
   window.removeEventListener("resize", resize);
-  controller.dispose();
-}, { once: true });
+  window.removeEventListener("beforeunload", onBeforeUnload);
+}
+function disposeApp() {
+  if (disposalPromise) return disposalPromise;
+  acceptingFrames = false;
+  if (animationFrameHandle !== null) cancelAnimationFrame(animationFrameHandle);
+  animationFrameHandle = null;
+  detachListeners();
+  disposalPromise = Promise.resolve(controller.dispose());
+  return disposalPromise;
+}
+function onBeforeUnload() {
+  void disposeApp();
+}
+window.addEventListener("beforeunload", onBeforeUnload, { once: true });
+window.labController = Object.freeze({ ...controller, dispose: disposeApp });
 
 let previous = performance.now();
 async function frame(now) {
+  if (!acceptingFrames) return;
   const delta = Math.min((now - previous) / 1000, 0.1);
   previous = now;
-  await controller.step(delta);
-  await controller.renderOnce();
-  const metrics = controller.getMetrics();
-  status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU`;
-  requestAnimationFrame(frame);
+  try {
+    await controller.step(delta);
+    await controller.renderOnce();
+    if (!acceptingFrames) return;
+    const metrics = controller.getMetrics();
+    status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU`;
+    animationFrameHandle = requestAnimationFrame(frame);
+  } catch (error) {
+    acceptingFrames = false;
+    animationFrameHandle = null;
+    window.__LAB_ERROR__ = Object.freeze({
+      name: error?.name ?? "Error",
+      message: error?.message ?? String(error),
+    });
+    status.textContent = `runtime error · ${window.__LAB_ERROR__.message}`;
+    throw error;
+  }
 }
 if (new URLSearchParams(window.location.search).get("capture") !== "1") {
-  requestAnimationFrame(frame);
+  animationFrameHandle = requestAnimationFrame(frame);
 }
