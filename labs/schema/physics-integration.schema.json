@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linegel.github.io/threejs-complete-set-of-skill/schemas/physics-integration-v1.json",
+  "title": "Shared physics integration ownership records",
+  "description": "Checked structural contract for authored forcing, fixed-step SI state, runtime context, and producer-consumer ownership graphs.",
+  "oneOf": [
+    { "$ref": "#/$defs/environmentForcingSnapshot" },
+    { "$ref": "#/$defs/physicsStateSnapshot" },
+    { "$ref": "#/$defs/physicsContext" },
+    { "$ref": "#/$defs/physicsGraph" }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]*$"
+    },
+    "identifierArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identifier" }
+    },
+    "vector3": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "stateValue": {
+      "oneOf": [
+        { "type": "number" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "number" }
+        }
+      ]
+    },
+    "stateUnit": {
+      "type": "string",
+      "enum": [
+        "dimensionless",
+        "kelvin",
+        "kilogram",
+        "kilogram-per-cubic-meter",
+        "meter",
+        "meter-per-second",
+        "meter-per-second-squared",
+        "pascal",
+        "radian",
+        "radian-per-second",
+        "second"
+      ]
+    },
+    "environmentForcingSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "schemaId",
+        "contractScope",
+        "provenance",
+        "unitSystem",
+        "units",
+        "seed",
+        "timeSeconds",
+        "wind",
+        "temperatureK",
+        "precipitationRate",
+        "cloudForcing",
+        "waterForcing"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "schemaId": { "const": "environment-forcing-snapshot-v1" },
+        "contractScope": { "const": "physics-integration-ownership-shell-v1" },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "claim", "source"],
+          "properties": {
+            "kind": { "const": "authored-project-input" },
+            "claim": { "const": "not-meteorological-synthesis" },
+            "source": { "type": "string", "minLength": 1 }
+          }
+        },
+        "unitSystem": { "const": "SI" },
+        "units": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timeSeconds",
+            "wind",
+            "temperatureK",
+            "precipitationRate",
+            "cloudForcing",
+            "waterForcing"
+          ],
+          "properties": {
+            "timeSeconds": { "const": "second" },
+            "wind": { "const": "meter-per-second" },
+            "temperatureK": { "const": "kelvin" },
+            "precipitationRate": { "const": "kilogram-per-square-meter-second" },
+            "cloudForcing": { "const": "dimensionless" },
+            "waterForcing": { "const": "dimensionless" }
+          }
+        },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "timeSeconds": { "type": "number", "minimum": 0 },
+        "wind": { "$ref": "#/$defs/vector3" },
+        "temperatureK": { "type": "number", "exclusiveMinimum": 0 },
+        "precipitationRate": { "type": "number", "minimum": 0 },
+        "cloudForcing": { "type": "number", "minimum": 0, "maximum": 1 },
+        "waterForcing": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "physicsStateSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "schemaId",
+        "contractScope",
+        "unitSystem",
+        "tick",
+        "fixedStepSeconds",
+        "timeSeconds",
+        "state",
+        "stateUnits"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "schemaId": { "const": "physics-state-snapshot-v1" },
+        "contractScope": { "const": "physics-integration-ownership-shell-v1" },
+        "unitSystem": { "const": "SI" },
+        "tick": { "type": "integer", "minimum": 0 },
+        "fixedStepSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "timeSeconds": { "type": "number", "minimum": 0 },
+        "state": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/stateValue" }
+        },
+        "stateUnits": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/stateUnit" }
+        }
+      }
+    },
+    "physicsContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "schemaId",
+        "contractScope",
+        "unitConvention",
+        "worldUnitsPerMeter",
+        "fixedStepSeconds",
+        "currentTick",
+        "previousState",
+        "currentState",
+        "forcing"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "schemaId": { "const": "physics-context-runtime-v1" },
+        "contractScope": { "const": "physics-integration-ownership-shell-v1" },
+        "unitConvention": { "const": "world-units-per-meter" },
+        "worldUnitsPerMeter": { "type": "number", "exclusiveMinimum": 0 },
+        "fixedStepSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "currentTick": { "type": "integer", "minimum": 1 },
+        "previousState": { "$ref": "#/$defs/physicsStateSnapshot" },
+        "currentState": { "$ref": "#/$defs/physicsStateSnapshot" },
+        "forcing": { "$ref": "#/$defs/environmentForcingSnapshot" }
+      }
+    },
+    "workRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "owner", "reads", "writes", "costId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "owner": { "$ref": "#/$defs/identifier" },
+        "reads": { "$ref": "#/$defs/identifierArray" },
+        "writes": { "$ref": "#/$defs/identifierArray" },
+        "costId": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "costRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "owner", "scope", "accounting", "includes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "owner": { "$ref": "#/$defs/identifier" },
+        "scope": { "enum": ["coordination", "commit", "presentation"] },
+        "accounting": { "const": "unmeasured-contract" },
+        "includes": { "$ref": "#/$defs/identifierArray" }
+      }
+    },
+    "physicsGraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "schemaId",
+        "contractScope",
+        "context",
+        "producers",
+        "consumers",
+        "coordination",
+        "commits",
+        "presentation",
+        "costs"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "schemaId": { "const": "physics-graph-runtime-v1" },
+        "contractScope": { "const": "physics-integration-ownership-shell-v1" },
+        "context": { "$ref": "#/$defs/physicsContext" },
+        "producers": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/identifier" }
+        },
+        "consumers": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/identifierArray" }
+        },
+        "coordination": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/workRecord" }
+        },
+        "commits": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/workRecord" }
+        },
+        "presentation": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/workRecord" }
+        },
+        "costs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/costRecord" }
+        }
+      }
+    }
+  }
+}

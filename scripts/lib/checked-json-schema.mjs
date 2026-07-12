@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 const SCHEMA_URLS = Object.freeze({
   evidenceManifest: new URL('../../labs/schema/evidence-bundle-v2.schema.json', import.meta.url),
   labManifest: new URL('../../labs/schema/lab-manifest.schema.json', import.meta.url),
+  physicsIntegration: new URL('../../labs/schema/physics-integration.schema.json', import.meta.url),
   runtimeGraph: new URL('../../labs/schema/runtime-graph.schema.json', import.meta.url),
 });
 

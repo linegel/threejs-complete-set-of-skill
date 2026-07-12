@@ -15,7 +15,12 @@ const routerManifest = JSON.parse(readFileSync(
 
 test('shared checked schemas validate the canonical raw manifest and runtime graph surfaces', () => {
   const schemas = loadCheckedSchemas();
-  assert.deepEqual(Object.keys(schemas).sort(), ['evidenceManifest', 'labManifest', 'runtimeGraph']);
+  assert.deepEqual(Object.keys(schemas).sort(), [
+    'evidenceManifest',
+    'labManifest',
+    'physicsIntegration',
+    'runtimeGraph',
+  ]);
   assert.deepEqual(validateCheckedJsonSchema(schemas.labManifest, routerManifest), {
     valid: true,
     errors: [],
