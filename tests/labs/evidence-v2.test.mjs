@@ -359,13 +359,44 @@ test('unified release lifecycle PASS reconciles every settled row and resource t
   assert.equal(retainedListenerResult.valid, false);
   assert(retainedListenerResult.errors.some((error) => error.includes('retained listener state')));
 
+  for (const [field, value, reason] of [
+    ['retainedControlCount', 1, 'retained control state'],
+    ['retainedMaterialCount', 1, 'retained material state'],
+    ['postDisposeErrorCount', 1, 'retained post-disposal error state'],
+  ]) {
+    const directory = createUnifiedReleaseBundleFixture();
+    rewriteBoundFixtureJson(directory, 'leak-loop.json', (loop) => {
+      loop.cycleSnapshots[13][field].value = value;
+    });
+    const result = validateEvidenceBundle(directory);
+    assert.equal(result.valid, false);
+    assert(result.errors.some((error) => error.includes(reason)));
+  }
+
+  const lostDevice = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(lostDevice, 'leak-loop.json', (loop) => {
+    loop.cycleSnapshots[17].deviceLossObserved = true;
+  });
+  const lostDeviceResult = validateEvidenceBundle(lostDevice);
+  assert.equal(lostDeviceResult.valid, false);
+  assert(lostDeviceResult.errors.some((error) => error.includes('observed device loss')));
+
   const unrestoredRenderer = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(unrestoredRenderer, 'leak-loop.json', (loop) => {
-    loop.cycleSnapshots[19].rendererStateRestored = false;
+    loop.cycleSnapshots[19].rendererStateDisposition = 'ASSUMED_CLEAN';
   });
   const unrestoredRendererResult = validateEvidenceBundle(unrestoredRenderer);
   assert.equal(unrestoredRendererResult.valid, false);
-  assert(unrestoredRendererResult.errors.some((error) => error.includes('did not restore renderer state')));
+  assert(unrestoredRendererResult.errors.some((error) => error.includes('no truthful renderer-state disposition')));
+
+  const mismatchedRendererSnapshot = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(mismatchedRendererSnapshot, 'leak-loop.json', (loop) => {
+    loop.cycleSnapshots[23].rendererStateDisposition = 'RESTORED';
+    loop.cycleSnapshots[23].rendererStateAfterDigest = `sha256:${'f'.repeat(64)}`;
+  });
+  const mismatchedRendererSnapshotResult = validateEvidenceBundle(mismatchedRendererSnapshot);
+  assert.equal(mismatchedRendererSnapshotResult.valid, false);
+  assert(mismatchedRendererSnapshotResult.errors.some((error) => error.includes('did not restore its renderer-state snapshot')));
 });
 
 test('unified release validation confines captured file realpaths', () => {

@@ -72,12 +72,16 @@ function lifecycleFixture( mutate = () => {} ) {
 			controllerGeneration: cycle + 1,
 			backend: { isWebGPUBackend: true, rendererDeviceGeneration: cycle + 101 },
 			listenerState: { runtimeEventListeners: 1 },
+			lifecycleState: { activeControls: 0, activeMaterials: 3, rendererStateDisposition: 'ACTIVE_OWNED_RENDERER' },
+			rendererState: { outputColorSpace: 'srgb', toneMapping: 'NeutralToneMapping', exposure: 1 },
 			rendererInfo: { memory: { total: 1024 + cycle, textures: 2, renderTargets: 1 } }
 		},
 		afterDispose: {
 			controllerGeneration: cycle + 1,
 			backend: { isWebGPUBackend: true, rendererDeviceGeneration: cycle + 101 },
 			listenerState: { runtimeEventListeners: 0 },
+			lifecycleState: { activeControls: 0, activeMaterials: 0, rendererStateDisposition: 'OWNED_RENDERER_DISPOSED' },
+			rendererState: { outputColorSpace: 'srgb', toneMapping: 'NeutralToneMapping', exposure: 1 },
 			rendererInfo: { memory: { total: 0, textures: 0, renderTargets: 0 } }
 		},
 		resourcesBeforeDispose: {
@@ -93,7 +97,10 @@ function lifecycleFixture( mutate = () => {} ) {
 				rendererDeviceGeneration: cycle + 101,
 				queueSettlement: { status: 'PASS' },
 				deviceDestroy: { status: 'PASS', intentionalDestroyObserved: true },
-				listenersAfterDispose: 0
+				listenersAfterDispose: 0,
+				controlsAfterDispose: 0,
+				materialsAfterDispose: 0,
+				rendererStateDisposition: 'OWNED_RENDERER_DISPOSED'
 			}
 		},
 		settle: { status: 'PASS', policyAnimationFrames: 2, observedAnimationFrames: 2, queueSettled: true, delayedErrors: [] },
@@ -113,6 +120,12 @@ test( 'lifecycle reducer accepts complete native-WebGPU zero-retention evidence'
 	assert.equal( summary.targetBytesMin, 4096 );
 	assert.equal( summary.targetBytesMax, 4145 );
 	assert.equal( summary.storageBytesMax, 0 );
+	assert.equal( summary.cycleSnapshots[ 0 ].retainedListenerCount, 0 );
+	assert.equal( summary.cycleSnapshots[ 0 ].retainedControlCount, 0 );
+	assert.equal( summary.cycleSnapshots[ 0 ].retainedMaterialCount, 0 );
+	assert.equal( summary.cycleSnapshots[ 0 ].rendererStateDisposition, 'OWNED_RENDERER_DISPOSED' );
+	assert.match( summary.cycleSnapshots[ 0 ].rendererStateBeforeDigest, /^sha256:[0-9a-f]{64}$/ );
+	assert.equal( summary.cycleSnapshots[ 0 ].rendererStateAfterDigest, summary.cycleSnapshots[ 0 ].rendererStateBeforeDigest );
 
 } );
 
@@ -130,6 +143,10 @@ test( 'lifecycle reducer rejects missing, non-WebGPU, and retained-resource cycl
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].dispose.evidence.queueSettlement.status = 'FAIL'; } ) ), /actual GPU queue/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].dispose.evidence.rendererDeviceGeneration ++; } ) ), /generation identity/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.listenerState.runtimeEventListeners = 1; } ) ), /listener census/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.lifecycleState.activeMaterials = 1; } ) ), /retained controls or materials/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].dispose.evidence.controlsAfterDispose = 1; } ) ), /registry evidence disagrees/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.lifecycleState.rendererStateDisposition = 'RESTORED'; } ) ), /truthful owned-renderer disposal/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.rendererState = null; } ) ), /renderer state snapshot/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].resourcesAfterDispose.renderTargets.push( { bytes: 4 } ); } ) ), /resources after disposal/ );
 
 } );

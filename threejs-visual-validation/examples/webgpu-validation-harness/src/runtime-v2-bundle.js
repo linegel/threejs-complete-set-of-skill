@@ -384,6 +384,27 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 		if ( disposeEvidence?.queueSettlement?.status !== 'PASS' ) throw new Error( `Runtime lifecycle cycle ${ index } did not settle its actual GPU queue.` );
 		if ( disposeEvidence?.deviceDestroy?.status !== 'PASS' || disposeEvidence.deviceDestroy.intentionalDestroyObserved !== true ) throw new Error( `Runtime lifecycle cycle ${ index } did not observe intentional owned-device destruction.` );
 		if ( disposeEvidence.listenersAfterDispose !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } retained runtime listeners after disposal.` );
+		const beforeControls = snapshot.beforeDispose?.lifecycleState?.activeControls;
+		const beforeMaterials = snapshot.beforeDispose?.lifecycleState?.activeMaterials;
+		const retainedControls = snapshot.afterDispose?.lifecycleState?.activeControls;
+		const retainedMaterials = snapshot.afterDispose?.lifecycleState?.activeMaterials;
+		for ( const [ value, label ] of [
+			[ beforeControls, 'before controls' ],
+			[ beforeMaterials, 'before materials' ],
+			[ retainedControls, 'retained controls' ],
+			[ retainedMaterials, 'retained materials' ]
+		] ) if ( Number.isInteger( value ) === false || value < 0 ) throw new Error( `Runtime lifecycle cycle ${ index } has an invalid ${ label } registry count.` );
+		if ( beforeMaterials < 1 ) throw new Error( `Runtime lifecycle cycle ${ index } did not observe the subject material registry before disposal.` );
+		if ( retainedControls !== 0 || retainedMaterials !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } retained controls or materials after disposal.` );
+		if ( disposeEvidence.controlsAfterDispose !== retainedControls || disposeEvidence.materialsAfterDispose !== retainedMaterials ) throw new Error( `Runtime lifecycle cycle ${ index } disposal registry evidence disagrees with the settled snapshot.` );
+		const rendererStateDisposition = snapshot.afterDispose?.lifecycleState?.rendererStateDisposition;
+		if ( rendererStateDisposition !== 'OWNED_RENDERER_DISPOSED' || disposeEvidence.rendererStateDisposition !== rendererStateDisposition ) throw new Error( `Runtime lifecycle cycle ${ index } has no truthful owned-renderer disposal disposition.` );
+		for ( const [ state, label ] of [
+			[ snapshot.beforeDispose?.rendererState, 'before-disposal renderer state' ],
+			[ snapshot.afterDispose?.rendererState, 'after-disposal renderer state' ]
+		] ) if ( state === null || typeof state !== 'object' || Array.isArray( state ) ) throw new Error( `Runtime lifecycle cycle ${ index } omits its ${ label } snapshot.` );
+		const rendererStateBeforeDigest = digest( canonicalize( snapshot.beforeDispose.rendererState ) );
+		const rendererStateAfterDigest = digest( canonicalize( snapshot.afterDispose.rendererState ) );
 		const controllerGeneration = snapshot.beforeDispose?.controllerGeneration;
 		const rendererDeviceGeneration = snapshot.beforeDispose?.backend?.rendererDeviceGeneration;
 		if (
@@ -397,8 +418,10 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 		if ( snapshot.beforeDispose?.listenerState?.runtimeEventListeners !== 1 || snapshot.afterDispose?.listenerState?.runtimeEventListeners !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } listener census did not close.` );
 		if ( hasNativeWebGpuIdentity( snapshot.beforeDispose ) === false ) throw new Error( `Runtime lifecycle cycle ${ index } did not initialize native WebGPU.` );
 		if ( hasNativeWebGpuIdentity( snapshot.afterDispose ) === false ) throw new Error( `Runtime lifecycle cycle ${ index } lost its backend identity before post-disposal measurement.` );
-		if ( snapshot.beforeDispose.deviceLostObserved === true || snapshot.afterDispose.deviceLostObserved === true || ( snapshot.beforeDispose.deviceLossGeneration ?? 0 ) !== 0 || ( snapshot.afterDispose.deviceLossGeneration ?? 0 ) !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } observed device loss.` );
-		if ( runtimeDeviceErrors( snapshot.beforeDispose ).length > 0 || runtimeDeviceErrors( snapshot.afterDispose ).length > 0 ) throw new Error( `Runtime lifecycle cycle ${ index } contains a device error.` );
+		const deviceLossObserved = snapshot.beforeDispose.deviceLostObserved === true || snapshot.afterDispose.deviceLostObserved === true || ( snapshot.beforeDispose.deviceLossGeneration ?? 0 ) !== 0 || ( snapshot.afterDispose.deviceLossGeneration ?? 0 ) !== 0;
+		if ( deviceLossObserved ) throw new Error( `Runtime lifecycle cycle ${ index } observed device loss.` );
+		const postDisposeErrorCount = snapshot.settle.delayedErrors.length + runtimeDeviceErrors( snapshot.afterDispose ).length;
+		if ( runtimeDeviceErrors( snapshot.beforeDispose ).length > 0 || postDisposeErrorCount > 0 ) throw new Error( `Runtime lifecycle cycle ${ index } contains a device error.` );
 		const beforeMemory = rendererMemory( snapshot.beforeDispose, `lifecycle cycle ${ index } beforeDispose` );
 		const afterMemory = rendererMemory( snapshot.afterDispose, `lifecycle cycle ${ index } afterDispose` );
 		const beforeCounters = finiteNonnegativeCounters( beforeMemory, `lifecycle cycle ${ index } beforeDispose.rendererInfo.memory` );
@@ -423,6 +446,14 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 			storageBytes,
 			retainedTargetBytes,
 			retainedStorageBytes,
+			retainedListenerCount: snapshot.afterDispose.listenerState.runtimeEventListeners,
+			retainedControlCount: retainedControls,
+			retainedMaterialCount: retainedMaterials,
+			postDisposeErrorCount,
+			rendererStateDisposition,
+			rendererStateBeforeDigest,
+			rendererStateAfterDigest,
+			deviceLossObserved,
 			settleAnimationFrames: snapshot.settle.observedAnimationFrames,
 			disposeStatus: snapshot.dispose.status,
 			beforeCounterCount: beforeCounters.length
@@ -1058,6 +1089,14 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 			storageBytes: M( snapshot.storageBytes, 'byte', 'described storage bytes before disposal' ),
 			retainedTargetBytes: M( snapshot.retainedTargetBytes, 'byte', 'post-settle render-target inventory' ),
 			retainedStorageBytes: M( snapshot.retainedStorageBytes, 'byte', 'post-settle storage inventory' ),
+			retainedListenerCount: M( snapshot.retainedListenerCount, 'listener', 'post-settle subject listener registry' ),
+			retainedControlCount: M( snapshot.retainedControlCount, 'control', 'post-settle subject control registry' ),
+			retainedMaterialCount: M( snapshot.retainedMaterialCount, 'material', 'post-settle subject material registry' ),
+			postDisposeErrorCount: M( snapshot.postDisposeErrorCount, 'error', 'post-settle delayed and device error channels' ),
+			rendererStateDisposition: snapshot.rendererStateDisposition,
+			rendererStateBeforeDigest: snapshot.rendererStateBeforeDigest,
+			rendererStateAfterDigest: snapshot.rendererStateAfterDigest,
+			deviceLossObserved: snapshot.deviceLossObserved,
 			settleAnimationFrames: M( snapshot.settleAnimationFrames, 'frame', 'post-disposal observation window' ),
 			disposeStatus: snapshot.disposeStatus
 		} ) )

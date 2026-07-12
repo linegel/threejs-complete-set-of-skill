@@ -489,16 +489,40 @@ export function assertLifecycleClaimEvidence(json, manifest) {
       labels: ['Measured'], minimum: 2,
     });
     if (!Number.isInteger(settleFrames)) throw new Error(`lifecycle cycle ${index} settleAnimationFrames must be an integer`);
-    for (const key of ['retainedListenerCount', 'retainedControlCount', 'retainedMaterialCount', 'postDisposeErrorCount']) {
+    const zeroCountFields = {
+      retainedListenerCount: 'listener',
+      retainedControlCount: 'control',
+      retainedMaterialCount: 'material',
+      postDisposeErrorCount: 'post-disposal error',
+    };
+    for (const [key, label] of Object.entries(zeroCountFields)) {
       const retained = requireDatum(snapshot[key], `leak-loop.json.cycleSnapshots[${index}].${key}`, {
         labels: ['Measured'], minimum: 0,
       });
       if (!Number.isInteger(retained) || retained !== 0) {
-        throw new Error(`lifecycle cycle ${index} retained ${key.replace(/^retained|Count$/g, '').toLowerCase()} state`);
+        throw new Error(`lifecycle cycle ${index} retained ${label} state`);
       }
     }
-    if (requireBoolean(snapshot.rendererStateRestored, `leak-loop.json.cycleSnapshots[${index}].rendererStateRestored`) !== true) {
-      throw new Error(`lifecycle cycle ${index} did not restore renderer state`);
+    const rendererStateDisposition = requireString(
+      snapshot.rendererStateDisposition,
+      `leak-loop.json.cycleSnapshots[${index}].rendererStateDisposition`,
+    );
+    if (!['RESTORED', 'OWNED_RENDERER_DISPOSED'].includes(rendererStateDisposition)) {
+      throw new Error(`lifecycle cycle ${index} has no truthful renderer-state disposition`);
+    }
+    const rendererStateBeforeDigest = requireString(
+      snapshot.rendererStateBeforeDigest,
+      `leak-loop.json.cycleSnapshots[${index}].rendererStateBeforeDigest`,
+    );
+    const rendererStateAfterDigest = requireString(
+      snapshot.rendererStateAfterDigest,
+      `leak-loop.json.cycleSnapshots[${index}].rendererStateAfterDigest`,
+    );
+    if (![rendererStateBeforeDigest, rendererStateAfterDigest].every((value) => /^sha256:[0-9a-f]{64}$/.test(value))) {
+      throw new Error(`lifecycle cycle ${index} has an invalid renderer-state snapshot digest`);
+    }
+    if (rendererStateDisposition === 'RESTORED' && rendererStateBeforeDigest !== rendererStateAfterDigest) {
+      throw new Error(`lifecycle cycle ${index} did not restore its renderer-state snapshot`);
     }
     if (requireBoolean(snapshot.deviceLossObserved, `leak-loop.json.cycleSnapshots[${index}].deviceLossObserved`) !== false) {
       throw new Error(`lifecycle cycle ${index} observed device loss`);

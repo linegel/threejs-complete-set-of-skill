@@ -983,11 +983,35 @@ function validateLeakLoop( leakLoop, manifest ) {
 
 			requireKeys( snapshot, [
 				'rowType', 'cycle', 'beforeRendererBytes', 'afterRendererBytes', 'targetBytes', 'storageBytes',
-				'retainedTargetBytes', 'retainedStorageBytes', 'settleAnimationFrames', 'disposeStatus'
+				'retainedTargetBytes', 'retainedStorageBytes', 'retainedListenerCount', 'retainedControlCount',
+				'retainedMaterialCount', 'postDisposeErrorCount', 'rendererStateDisposition',
+				'rendererStateBeforeDigest', 'rendererStateAfterDigest', 'deviceLossObserved',
+				'settleAnimationFrames', 'disposeStatus'
 			], `leak-loop.json.cycleSnapshots[${ index }]` );
 			if ( snapshot.rowType !== 'settled-lifecycle-cycle-v2' || snapshot.disposeStatus !== 'PASS' ) throw new Error( `Lifecycle cycle ${ index } is not a successful typed settled row.` );
-			for ( const key of [ 'cycle', 'beforeRendererBytes', 'afterRendererBytes', 'targetBytes', 'storageBytes', 'retainedTargetBytes', 'retainedStorageBytes', 'settleAnimationFrames' ] ) validateNumericDatum( snapshot[ key ], `leak-loop.json.cycleSnapshots[${ index }].${ key }` );
-			if ( numericValue( snapshot.cycle ) !== index || numericValue( snapshot.retainedTargetBytes ) !== 0 || numericValue( snapshot.retainedStorageBytes ) !== 0 || numericValue( snapshot.settleAnimationFrames ) < 2 ) throw new Error( `Lifecycle cycle ${ index } retained resources or skipped post-dispose settling.` );
+			for ( const key of [
+				'cycle', 'beforeRendererBytes', 'afterRendererBytes', 'targetBytes', 'storageBytes',
+				'retainedTargetBytes', 'retainedStorageBytes', 'retainedListenerCount', 'retainedControlCount',
+				'retainedMaterialCount', 'postDisposeErrorCount', 'settleAnimationFrames'
+			] ) validateNumericDatum( snapshot[ key ], `leak-loop.json.cycleSnapshots[${ index }].${ key }` );
+			requireString( snapshot.rendererStateDisposition, `leak-loop.json.cycleSnapshots[${ index }].rendererStateDisposition` );
+			for ( const key of [ 'rendererStateBeforeDigest', 'rendererStateAfterDigest' ] ) {
+
+				requireString( snapshot[ key ], `leak-loop.json.cycleSnapshots[${ index }].${ key }` );
+				if ( /^sha256:[0-9a-f]{64}$/.test( snapshot[ key ] ) === false ) throw new Error( `Lifecycle cycle ${ index } has an invalid ${ key }.` );
+
+			}
+			requireBoolean( snapshot.deviceLossObserved, `leak-loop.json.cycleSnapshots[${ index }].deviceLossObserved` );
+			if (
+				numericValue( snapshot.cycle ) !== index ||
+				numericValue( snapshot.afterRendererBytes ) !== 0 ||
+				[ 'retainedTargetBytes', 'retainedStorageBytes', 'retainedListenerCount', 'retainedControlCount', 'retainedMaterialCount', 'postDisposeErrorCount' ]
+					.some( ( key ) => numericValue( snapshot[ key ] ) !== 0 ) ||
+				![ 'RESTORED', 'OWNED_RENDERER_DISPOSED' ].includes( snapshot.rendererStateDisposition ) ||
+				( snapshot.rendererStateDisposition === 'RESTORED' && snapshot.rendererStateBeforeDigest !== snapshot.rendererStateAfterDigest ) ||
+				snapshot.deviceLossObserved !== false ||
+				numericValue( snapshot.settleAnimationFrames ) < 2
+			) throw new Error( `Lifecycle cycle ${ index } retained runtime state, lost its device, or skipped post-dispose settling.` );
 
 		}
 
@@ -1119,7 +1143,11 @@ export function validatePublishableProvenance( artifacts ) {
 
 	}
 	requireNumericProvenance( leakLoop.cycles, [ 'Measured' ], 'leak-loop.json.cycles' );
-	for ( const [ index, snapshot ] of leakLoop.cycleSnapshots.entries() ) for ( const key of [ 'cycle', 'beforeRendererBytes', 'afterRendererBytes', 'targetBytes', 'storageBytes', 'retainedTargetBytes', 'retainedStorageBytes', 'settleAnimationFrames' ] ) requireNumericProvenance( snapshot[ key ], [ 'Measured' ], `leak-loop.json.cycleSnapshots[${ index }].${ key }` );
+	for ( const [ index, snapshot ] of leakLoop.cycleSnapshots.entries() ) for ( const key of [
+		'cycle', 'beforeRendererBytes', 'afterRendererBytes', 'targetBytes', 'storageBytes',
+		'retainedTargetBytes', 'retainedStorageBytes', 'retainedListenerCount', 'retainedControlCount',
+		'retainedMaterialCount', 'postDisposeErrorCount', 'settleAnimationFrames'
+	] ) requireNumericProvenance( snapshot[ key ], [ 'Measured' ], `leak-loop.json.cycleSnapshots[${ index }].${ key }` );
 	for ( const execution of mechanism.routeExecutions ) for ( const key of [ 'renderSubmissionCountBefore', 'renderSubmissionCountAfter', 'renderSubmissionDelta' ] ) requireNumericProvenance( execution[ key ], [ 'Measured' ], `mechanism-metrics.json.${ execution.mode }.${ key }` );
 	for ( const comparison of mechanism.diagnosticComparisons ) {
 

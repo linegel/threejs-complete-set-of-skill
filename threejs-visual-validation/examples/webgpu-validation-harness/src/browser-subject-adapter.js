@@ -348,6 +348,8 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	const marker = new Mesh( new BoxGeometry( 0.65, 0.65, 0.65 ), markerMaterial );
 	marker.position.set( - 2.15, 0.35, - 0.5 );
 	scene.add( marker );
+	const ownedControls = new Set();
+	const ownedMaterials = new Set( [ subjectMaterial, groundMaterial, markerMaterial ] );
 
 	const renderPipeline = new RenderPipeline( renderer );
 	const scenePass = pass( scene, camera );
@@ -844,6 +846,11 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 					uncapturedErrorListeners: uncapturedErrorListenerInstalled ? 1 : 0,
 					runtimeEventListeners: uncapturedErrorListenerInstalled ? 1 : 0
 				},
+				lifecycleState: {
+					activeControls: ownedControls.size,
+					activeMaterials: ownedMaterials.size,
+					rendererStateDisposition: disposed ? 'OWNED_RENDERER_DISPOSED' : 'ACTIVE_OWNED_RENDERER'
+				},
 				disposeEvidence,
 				rendererState: {
 					renderer: 'WebGPURenderer',
@@ -1098,6 +1105,9 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 			}
 			scene.traverse( disposeObject );
+			scene.clear();
+			ownedControls.clear();
+			ownedMaterials.clear();
 			captureTarget.dispose();
 			renderPipeline.dispose();
 			renderer.dispose();
@@ -1123,7 +1133,10 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				rendererDeviceGeneration,
 				queueSettlement: Object.freeze( queueSettlement ),
 				deviceDestroy: Object.freeze( deviceDestroy ),
-				listenersAfterDispose: 0,
+				listenersAfterDispose: uncapturedErrorListenerInstalled ? 1 : 0,
+				controlsAfterDispose: ownedControls.size,
+				materialsAfterDispose: ownedMaterials.size,
+				rendererStateDisposition: 'OWNED_RENDERER_DISPOSED',
 				uncapturedErrorsAfterDispose: [ ...uncapturedErrors ],
 				deviceLostObserved
 			} );
