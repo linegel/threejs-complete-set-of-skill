@@ -254,6 +254,20 @@ export function authoritativePrimaryRoster(targetData = loadCanonicalTargets()) 
   }));
 }
 
+export function authoritativeSkillDirs(targetData = loadCanonicalTargets()) {
+  const skills = [...new Set(targetData.targets.map((entry) => entry.canonicalDir.split('/')[0]))]
+    .sort((a, b) => a.localeCompare(b));
+  if (skills.length !== targetData.skillsExpected) {
+    throw new Error(`authoritative skill directory count drift: expected ${targetData.skillsExpected}, received ${skills.length}`);
+  }
+  for (const skill of skills) {
+    if (!/^threejs-[a-z0-9-]+$/.test(skill) || !existsSync(join(REPO_ROOT, skill, 'SKILL.md'))) {
+      throw new Error(`authoritative skill directory is missing or invalid: ${skill}`);
+    }
+  }
+  return skills;
+}
+
 function toPosix(path) {
   return path.split(sep).join('/');
 }
@@ -642,9 +656,9 @@ export function computeManifestSourceHash(manifest) {
   return computeSourceHash(computeManifestSourceHashInputs(manifest));
 }
 
-export function listRawLabManifestPaths() {
+export function listRawLabManifestPaths(skills = listSkillDirs()) {
   const paths = [];
-  for (const skill of listSkillDirs()) {
+  for (const skill of skills) {
     const examplesDir = join(REPO_ROOT, skill, 'examples');
     if (!existsSync(examplesDir)) continue;
     for (const entry of readdirSync(examplesDir, { withFileTypes: true })) {
@@ -678,9 +692,9 @@ export function listSkillDirs() {
     .sort();
 }
 
-function exampleDirs() {
+function exampleDirs(skills = listSkillDirs()) {
   const paths = [];
-  for (const skill of listSkillDirs()) {
+  for (const skill of skills) {
     const examplesDir = join(REPO_ROOT, skill, 'examples');
     if (!existsSync(examplesDir)) continue;
     for (const entry of readdirSync(examplesDir, { withFileTypes: true })) {
@@ -884,8 +898,8 @@ export function buildDemoRegistry() {
   const targetData = loadCanonicalTargets();
   const roster = authoritativePrimaryRoster(targetData);
   const rosterById = new Map(roster.map((entry) => [entry.id, entry]));
-  const skills = listSkillDirs();
-  const sourceManifests = listRawLabManifestPaths().map((path) => ({
+  const skills = authoritativeSkillDirs(targetData);
+  const sourceManifests = listRawLabManifestPaths(skills).map((path) => ({
     path: repoRelative(path),
     directory: repoRelative(dirname(path)),
     manifest: normalizeSourceManifest(readJson(path), path),
@@ -939,7 +953,7 @@ export function buildDemoRegistry() {
     if (source.directory.includes('/examples/')) coveredExampleDirs.add(source.directory);
   }
 
-  for (const path of exampleDirs()) {
+  for (const path of exampleDirs(skills)) {
     if (coveredExampleDirs.has(path)) continue;
     const manifest = secondaryExampleManifest(path);
     demos.push(finalizeManifest(manifest));
@@ -955,6 +969,7 @@ export function buildDemoRegistry() {
   }
 
   for (const provider of PROVIDER_DEMOS) {
+    if (!skills.includes(provider.skill)) continue;
     const canonicalLabId = primaryBySkill.get(provider.skill)?.[0] ?? null;
     const manifest = providerManifest(provider, canonicalLabId);
     demos.push(finalizeManifest(manifest));
