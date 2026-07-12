@@ -5,6 +5,7 @@ const SCHEMA_URLS = Object.freeze({
   labManifest: new URL('../../labs/schema/lab-manifest.schema.json', import.meta.url),
   physicsIntegration: new URL('../../labs/schema/physics-integration.schema.json', import.meta.url),
   runtimeGraph: new URL('../../labs/schema/runtime-graph.schema.json', import.meta.url),
+  tierVisualEvidence: new URL('../../labs/schema/tier-visual-evidence.schema.json', import.meta.url),
 });
 
 function typeMatches(value, type) {

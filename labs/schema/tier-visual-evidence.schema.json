@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linegel.github.io/threejs-complete-set-of-skill/schemas/tier-visual-evidence-v1.json",
+  "title": "Validation Harness Tier Visual Evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "binding", "metrics", "gates", "bindingSha256", "verdict"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "validation-harness-tier-visual-evidence-v1" },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "candidate"],
+      "properties": {
+        "reference": {
+          "allOf": [
+            { "$ref": "#/$defs/tierBinding" },
+            {
+              "properties": {
+                "recipeId": { "const": "tier.target-performance.final" },
+                "filename": { "const": "tier.target-performance.final.png" },
+                "passScale": { "const": 1 },
+                "normalized": { "properties": { "width": { "const": 1920 }, "height": { "const": 1080 } } },
+                "effectiveState": { "properties": { "tier": { "const": "target-performance" } }, "required": ["tier"] },
+                "resources": { "$ref": "#/$defs/referenceResources" }
+              }
+            }
+          ]
+        },
+        "candidate": {
+          "allOf": [
+            { "$ref": "#/$defs/tierBinding" },
+            {
+              "properties": {
+                "recipeId": { "const": "tier.governor-stress.final" },
+                "filename": { "const": "tier.governor-stress.final.png" },
+                "passScale": { "const": 0.5 },
+                "normalized": { "properties": { "width": { "const": 1920 }, "height": { "const": 1080 } } },
+                "effectiveState": { "properties": { "tier": { "const": "governor-stress" } }, "required": ["tier"] },
+                "resources": { "$ref": "#/$defs/candidateResources" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meanRgbByteDifference", "edgeMaskPixels", "edgeMeanRgbByteDifference", "edgeP95RgbByteDifference"],
+      "properties": {
+        "meanRgbByteDifference": { "$ref": "#/$defs/measuredNumericEvidence" },
+        "edgeMaskPixels": { "$ref": "#/$defs/measuredNumericEvidence" },
+        "edgeMeanRgbByteDifference": { "$ref": "#/$defs/measuredNumericEvidence" },
+        "edgeP95RgbByteDifference": { "$ref": "#/$defs/measuredNumericEvidence" }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meanRgbByteDifference", "edgeP95RgbByteDifference"],
+      "properties": {
+        "meanRgbByteDifference": { "$ref": "#/$defs/gatedNumericEvidence" },
+        "edgeP95RgbByteDifference": { "$ref": "#/$defs/gatedNumericEvidence" }
+      }
+    },
+    "bindingSha256": { "$ref": "#/$defs/sha256" },
+    "verdict": { "type": "string", "enum": ["PASS", "FAIL"] }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "byteLength"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "transaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transactionId", "sequence", "status", "entryStateDigest", "restoredStateDigest", "restorationVerdict"],
+      "properties": {
+        "transactionId": { "type": "string", "minLength": 1 },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "status": { "const": "COMMITTED" },
+        "entryStateDigest": { "$ref": "#/$defs/sha256" },
+        "restoredStateDigest": { "$ref": "#/$defs/sha256" },
+        "restorationVerdict": { "const": "PASS" }
+      }
+    },
+    "normalized": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact", "compactRgbaSha256", "compactByteLength", "width", "height"],
+      "properties": {
+        "artifact": { "$ref": "#/$defs/artifact" },
+        "compactRgbaSha256": { "$ref": "#/$defs/sha256" },
+        "compactByteLength": { "const": 8294400 },
+        "width": { "const": 1920 },
+        "height": { "const": 1080 }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic", "owner", "targetName", "textureUuid", "width", "height", "format", "bytes", "logicalBytes", "liveBytes", "liveness"],
+      "properties": {
+        "semantic": { "type": "string", "minLength": 1 },
+        "owner": { "type": ["string", "null"] },
+        "targetName": { "type": ["string", "null"] },
+        "textureUuid": { "type": ["string", "null"] },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "format": { "type": ["string", "null"] },
+        "bytes": {},
+        "logicalBytes": {},
+        "liveBytes": {},
+        "liveness": {}
+      }
+    },
+    "referenceResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captureTarget", "sceneMrt"],
+      "properties": {
+        "captureTarget": { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "capture-target" }, "width": { "const": 1920 }, "height": { "const": 1080 } } }] },
+        "sceneMrt": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [
+            { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "output" }, "width": { "const": 1920 }, "height": { "const": 1080 } } }] },
+            { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "normal" }, "width": { "const": 1920 }, "height": { "const": 1080 } } }] },
+            { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "emissive" }, "width": { "const": 1920 }, "height": { "const": 1080 } } }] }
+          ],
+          "items": false
+        }
+      }
+    },
+    "candidateResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captureTarget", "sceneMrt"],
+      "properties": {
+        "captureTarget": { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "capture-target" }, "width": { "const": 1920 }, "height": { "const": 1080 } } }] },
+        "sceneMrt": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [
+            { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "output" }, "width": { "const": 960 }, "height": { "const": 540 } } }] },
+            { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "normal" }, "width": { "const": 960 }, "height": { "const": 540 } } }] },
+            { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "semantic": { "const": "emissive" }, "width": { "const": 960 }, "height": { "const": 540 } } }] }
+          ],
+          "items": false
+        }
+      }
+    },
+    "tierBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipeId", "recipeDigest", "filename", "pngSha256", "transaction", "normalized", "captureEvidenceSha256", "effectiveState", "passScale", "resources"],
+      "properties": {
+        "recipeId": { "type": "string", "minLength": 1 },
+        "recipeDigest": { "$ref": "#/$defs/sha256" },
+        "filename": { "type": "string", "minLength": 1 },
+        "pngSha256": { "$ref": "#/$defs/sha256" },
+        "transaction": { "$ref": "#/$defs/transaction" },
+        "normalized": { "$ref": "#/$defs/normalized" },
+        "captureEvidenceSha256": { "$ref": "#/$defs/sha256" },
+        "effectiveState": { "type": "object" },
+        "passScale": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "resources": { "type": "object" }
+      }
+    },
+    "numericEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "label", "source"],
+      "properties": {
+        "value": { "type": "number" },
+        "unit": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "enum": ["Authored", "Derived", "Measured", "Gated"] },
+        "source": { "type": "string", "minLength": 1 }
+      }
+    },
+    "measuredNumericEvidence": { "allOf": [{ "$ref": "#/$defs/numericEvidence" }, { "properties": { "label": { "const": "Measured" } } }] },
+    "gatedNumericEvidence": { "allOf": [{ "$ref": "#/$defs/numericEvidence" }, { "properties": { "label": { "const": "Gated" } } }] }
+  }
+}

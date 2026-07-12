@@ -13,6 +13,7 @@ import {
 	routeStateDigest
 } from './evidence-manifest-contract.js';
 import { validateCorrectnessCaptureSession } from './physical-session-validator.js';
+import { readPngDimensions } from './png-image-contract.js';
 
 const SUPPLEMENTAL_NORMATIVE_IMAGE_PATHS = Object.freeze( [
 	'diagnostic.normal.png',
@@ -253,6 +254,8 @@ async function requireTierVisualEvidence( session, outputDir, writeIndex ) {
 
 	}
 	if ( jsonBytes( document ).equals( bytes ) === false ) throw new Error( `${ path } is not canonical two-space JSON.` );
+	const schemas = await loadCheckedEvidenceSchemas();
+	assertCheckedJsonSchema( schemas.tierVisualEvidence, document, path );
 	if ( document.schemaVersion !== 1 || document.kind !== 'validation-harness-tier-visual-evidence-v1' || document.verdict !== 'PASS' ) throw new Error( `${ path } does not contain the passing producer contract.` );
 	if ( canonicalSha256( document ) !== canonicalSha256( session.hookResult?.tierVisualEvidence ) ) throw new Error( `${ path } drifted from the finalized hook result.` );
 	if ( document.bindingSha256 !== canonicalSha256( { binding: document.binding, metrics: document.metrics, gates: document.gates } ) ) throw new Error( `${ path } binding digest is invalid.` );
@@ -265,6 +268,8 @@ async function requireTierVisualEvidence( session, outputDir, writeIndex ) {
 		if ( binding?.recipeId !== recipeId || binding.filename !== filename ) throw new Error( `${ path } ${ side } identity drifted from ${ recipeId }.` );
 		const image = await requireCurrentWrite( outputDir, writeIndex, filename );
 		if ( binding.pngSha256 !== image.record.sha256 ) throw new Error( `${ path } ${ side } PNG hash does not bind ${ filename }.` );
+		const dimensions = readPngDimensions( image.bytes, filename );
+		if ( dimensions.width !== 1920 || dimensions.height !== 1080 ) throw new Error( `${ filename } dimensions ${ dimensions.width }x${ dimensions.height } do not match 1920x1080.` );
 		const normalized = binding.normalized?.artifact;
 		if ( typeof normalized?.path !== 'string' ) throw new Error( `${ path } ${ side } normalized artifact is missing.` );
 		const normalizedWrite = await requireCurrentWrite( outputDir, writeIndex, normalized.path );

@@ -15,7 +15,8 @@ export async function loadCheckedEvidenceSchemas() {
 		const schemas = loadCheckedSchemas();
 		checkedEvidenceSchemas = Object.freeze( {
 			evidenceManifest: schemas.evidenceManifest,
-			runtimeGraph: schemas.runtimeGraph
+			runtimeGraph: schemas.runtimeGraph,
+			tierVisualEvidence: schemas.tierVisualEvidence
 		} );
 
 	}
