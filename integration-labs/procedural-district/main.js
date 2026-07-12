@@ -54,6 +54,8 @@ import { createDistrictMaterials } from "./district-materials.js";
 import { createDistrictCauseFieldStage } from "./shared-cause-field.js";
 import { createDistrictStaticGeometry } from "./terrain-geometry.js";
 
+const LAB_ID = "procedural-district";
+
 const CAPTURE_TARGETS = Object.freeze([
   "final",
   "display",
@@ -613,6 +615,7 @@ export async function createProceduralDistrictLab({
     );
     return {
       schemaVersion: 2,
+      labId: LAB_ID,
       backend: renderer.backend.isWebGPUBackend === true ? "webgpu" : "unsupported",
       threeRevision: String(renderer.constructor.REVISION ?? "185"),
       scenario,
@@ -680,6 +683,7 @@ export async function createProceduralDistrictLab({
   await ready();
 
   return {
+    get labId() { return LAB_ID; },
     ready,
     setScenario,
     setMode,

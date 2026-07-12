@@ -35,6 +35,7 @@ import { validateDistrictRuntimeGraph, validateProceduralDistrict } from "./vali
 const here = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(await readFile(join(here, "package.json"), "utf8"));
 const manifest = JSON.parse(await readFile(join(here, "lab.manifest.json"), "utf8"));
+const mainSource = await readFile(join(here, "main.js"), "utf8");
 const captureHookSource = await readFile(join(here, "capture-hook.mjs"), "utf8");
 const standardScripts = ["check", "validate:unit", "test:mutations", "capture", "validate:artifacts", "validate:quick", "validate:full"];
 
@@ -46,6 +47,9 @@ assert.deepEqual(manifest.tiers.map((entry) => entry.id), Object.keys(DISTRICT_T
 assert.deepEqual(manifest.modes, DISTRICT_MODES);
 assert.deepEqual(manifest.cameras, DISTRICT_CAMERAS);
 assert.deepEqual(manifest.seeds, DISTRICT_SEEDS);
+assert.match(mainSource, /const LAB_ID = "procedural-district";/);
+assert.match(mainSource, /get labId\(\) \{ return LAB_ID; \}/);
+assert.match(mainSource, /labId: LAB_ID,/);
 
 for (const mechanism of DISTRICT_MECHANISMS) {
   const path = join(here, "mechanism", mechanism, "index.html");
