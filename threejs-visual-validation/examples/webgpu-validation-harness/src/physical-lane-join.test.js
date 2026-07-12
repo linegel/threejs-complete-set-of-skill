@@ -8,6 +8,7 @@ import {
 	physicalLaneReference,
 	validateEvidenceLaneJoin
 } from './physical-lane-join.js';
+import { createCorrectnessCaptureSessionFixture } from './correctness-capture-session.fixture.js';
 
 const HASHES = Array.from( { length: 40 }, ( _, index ) => `sha256:${ index.toString( 16 ).padStart( 64, '0' ) }` );
 
@@ -68,74 +69,9 @@ function joined() {
 
 function correctnessCaptureRecord() {
 
-	const filenames = [
-		'final.design.png', 'no-post.design.png', 'diagnostics.mosaic.png', 'camera.near.png', 'camera.design.png',
-		'camera.far.png', 'seed-0001.final.png', 'seed-9e3779b9.final.png', 'temporal.t000.png', 'temporal.t001.png'
-	];
-	const writes = filenames.map( ( path, index ) => ( {
-		sequence: index + 1,
-		path,
-		kind: 'capture-output',
-		contentBinding: 'sha256-byte-length-immutable-buffer-v1',
-		sha256: HASHES[ 1 ],
-		byteLength: 64
-	} ) );
-	const normalizedBytesPerRow = 4864;
-	return {
-		schemaVersion: 2,
-		labId: 'webgpu-validation-harness',
-		sourceHash: HASHES[ 3 ],
-		sourceClosureHash: HASHES[ 3 ],
-		sourceClosure: { sourceHash: HASHES[ 3 ], buildRevision: HASHES[ 4 ], threeRevision: '0.185.1' },
-		buildRevision: HASHES[ 4 ],
-		threeRevision: '0.185.1',
-		profile: 'correctness',
-		profileConfig: { width: 1200, height: 800, dpr: 1 },
-		automationSurface: 'playwright-headless-chromium',
-		adapterClass: 'hardware',
-		adapterIdentity: { vendor: 'Apple', device: 'M-series' },
-		browser: { automationSurface: 'playwright-headless-chromium', platform: 'macOS', userAgent: 'Chromium fixture' },
-		browserEntry: 'threejs-visual-validation/examples/webgpu-validation-harness/index.html',
-		url: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
-		finalUrl: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
-		route: {
-			requestedUrl: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
-			finalUrl: 'http://127.0.0.1:4173/index.html?capture=1&profile=correctness',
-			browserEntry: 'threejs-visual-validation/examples/webgpu-validation-harness/index.html',
-			manifestLabId: 'webgpu-validation-harness',
-			lockedState: { scenario: 'browser-capture', mode: 'final' },
-			observedState: { scenario: 'browser-capture', mode: 'final' },
-			finalState: { scenario: 'browser-capture', mode: 'final' }
-		},
-		startedAt: '2026-07-12T01:00:00.000Z',
-		finishedAt: '2026-07-12T01:01:00.000Z',
-		runtime: { metrics: { nativeWebGPU: true, initialized: true, backend: 'webgpu', rendererDeviceGeneration: 1 } },
-		outputPlan: filenames.map( ( filename ) => ( { id: filename.slice( 0, -4 ), status: 'CAPTURED', filename, artifact: { path: filename, sha256: HASHES[ 1 ], byteLength: 64 } } ) ),
-		writtenCaptures: [ {
-			width: 1200,
-			height: 800,
-			bytesPerPixel: 4,
-			bytesPerRow: 4800,
-			origin: 'top-left',
-			format: 'rgba8',
-			colorEncoding: 'srgb',
-			png: { path: 'final.design.png', sha256: HASHES[ 1 ], byteLength: 64 },
-			transport: { artifact: { path: 'transport/final.bin', sha256: HASHES[ 2 ], byteLength: 3840000 }, layout: { format: 'rgba8unorm', origin: 'top-left' } },
-			normalized: { artifact: { path: 'normalized/final.bin', sha256: HASHES[ 3 ], byteLength: normalizedBytesPerRow * 800 }, bytesPerRow: normalizedBytesPerRow, byteLength: normalizedBytesPerRow * 800, origin: 'top-left', orientationTransform: 'none' }
-		} ],
-		artifactWrites: [
-			...writes,
-			{ sequence: 11, path: 'transport/final.bin', kind: 'transport', contentBinding: 'sha256-byte-length-immutable-buffer-v1', sha256: HASHES[ 2 ], byteLength: 3840000 },
-			{ sequence: 12, path: 'normalized/final.bin', kind: 'normalized', contentBinding: 'sha256-byte-length-immutable-buffer-v1', sha256: HASHES[ 3 ], byteLength: normalizedBytesPerRow * 800 },
-			{ sequence: 13, path: 'capture-session.json', kind: 'capture-session-record', contentBinding: 'self-excluded-finalized-offline', sha256: null, byteLength: null }
-		],
-		pageErrors: [],
-		consoleErrors: [],
-		requestErrors: []
-	};
+	return createCorrectnessCaptureSessionFixture();
 
 }
-
 test( 'offline promotion hook requires three distinct matching lanes for performance claims', () => {
 
 	assert.deepEqual( validateEvidenceLaneJoin( joined() ), {

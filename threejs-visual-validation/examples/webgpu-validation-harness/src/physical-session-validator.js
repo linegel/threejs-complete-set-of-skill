@@ -12,6 +12,13 @@ import {
 	HARDWARE_PERFORMANCE_ROUTE_PLAN,
 	PHYSICAL_ROUTE_PLAN
 } from './in-app-evidence-plan.js';
+import {
+	CORRECTNESS_CAPTURE_RECIPE_KIND,
+	CORRECTNESS_CAPTURE_RECIPE_SCHEMA_VERSION,
+	CORRECTNESS_CAPTURE_RECIPES
+} from './correctness-capture-recipes.js';
+import { VALIDATION_MODE_OUTPUT_NODE_IDS } from './browser-subject-adapter.js';
+import { TIER_ROUTE_LOCKS } from './route-locks.js';
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
 const PLAYWRIGHT_CORRECTNESS_SURFACE = 'playwright-headless-chromium';
@@ -26,6 +33,30 @@ const STANDARD_OUTPUTS = Object.freeze( [
 	'seed-9e3779b9.final.png',
 	'temporal.t000.png',
 	'temporal.t001.png'
+] );
+const CORRECTNESS_RECIPE_SET_DIGEST = stableHash( {
+	schemaVersion: CORRECTNESS_CAPTURE_RECIPE_SCHEMA_VERSION,
+	recipeKind: CORRECTNESS_CAPTURE_RECIPE_KIND,
+	recipes: CORRECTNESS_CAPTURE_RECIPES
+} );
+const CORRECTNESS_PARENT_LOCK = TIER_ROUTE_LOCKS[ 'webgpu-correctness' ];
+const CORRECTNESS_PARENT_STATE = Object.freeze( Object.fromEntries(
+	[ 'scenario', 'mode', 'tier', 'camera', 'seed', 'timeSeconds' ].map( ( key ) => [ key, CORRECTNESS_PARENT_LOCK[ key ] ] )
+) );
+const REQUIRED_RESOURCE_SEMANTICS = Object.freeze( [ 'output', 'normal', 'emissive', 'depth', 'capture-target' ] );
+const SCENE_RESOURCE_SEMANTICS = Object.freeze( [ 'output', 'normal', 'emissive', 'depth' ] );
+const RESOURCE_FORMATS = Object.freeze( {
+	output: { format: 'rgba16float', bytesPerTexel: 8 },
+	normal: { format: 'rgba16float', bytesPerTexel: 8 },
+	emissive: { format: 'rgba16float', bytesPerTexel: 8 },
+	depth: { format: 'depth32float', bytesPerTexel: 4 },
+	'capture-target': { format: 'rgba8unorm-srgb', bytesPerTexel: 4 }
+} );
+const DIAGNOSTIC_MOSAIC_SOURCES = Object.freeze( [
+	'final.design.png',
+	'no-post.design.png',
+	'diagnostic.normal.png',
+	'diagnostic.emissive.png'
 ] );
 
 function fail( message ) {
@@ -255,54 +286,608 @@ function assertCaptureSessionInterval( session ) {
 
 }
 
+function requirePositiveInteger( value, label ) {
+
+	if ( Number.isInteger( value ) === false || value < 1 ) fail( `${ label } must be a positive integer.` );
+	return value;
+
+}
+
+function requireNonnegativeInteger( value, label ) {
+
+	if ( Number.isInteger( value ) === false || value < 0 ) fail( `${ label } must be a nonnegative integer.` );
+	return value;
+
+}
+
+function requireFiniteArray( value, length, label ) {
+
+	const entries = requireArray( value, label );
+	if ( entries.length !== length || entries.some( ( entry ) => Number.isFinite( entry ) === false ) ) fail( `${ label } must contain exactly ${ length } finite values.` );
+	return entries;
+
+}
+
+function assertStableDigest( value, digest, label ) {
+
+	requireHash( digest, `${ label } digest` );
+	if ( stableHash( value ) !== digest ) fail( `${ label } digest does not bind its complete state.` );
+
+}
+
+function assertCanonicalParentState( state, label ) {
+
+	requireObject( state, label );
+	for ( const [ key, expected ] of Object.entries( CORRECTNESS_PARENT_STATE ) ) if ( state[ key ] !== expected ) fail( `${ label}.${ key } differs from the tier/webgpu-correctness parent lock.` );
+
+}
+
+function assertCaptureStateSnapshot( state, label ) {
+
+	requireObject( state, label );
+	const viewport = requireObject( state.viewport, `${ label }.viewport` );
+	for ( const key of [ 'width', 'height', 'dpr' ] ) requireFinite( viewport[ key ], `${ label }.viewport.${ key }`, Number.EPSILON );
+	requireFinite( state.passScale, `${ label }.passScale`, Number.EPSILON );
+	for ( const key of [ 'outputNodeMode', 'outputNodeId', 'outputNodeUuid', 'outputNodeType' ] ) if ( typeof state[ key ] !== 'string' || state[ key ].length === 0 ) fail( `${ label }.${ key } is required.` );
+	if ( state.outputNodeMode !== state.mode || state.outputNodeId !== VALIDATION_MODE_OUTPUT_NODE_IDS[ state.mode ] ) fail( `${ label } output-node identity does not match its active mode.` );
+	requireFiniteArray( state.cameraState?.matrixWorld, 16, `${ label }.cameraState.matrixWorld` );
+	requireFiniteArray( state.cameraState?.projectionMatrix, 16, `${ label }.cameraState.projectionMatrix` );
+	requireFiniteArray( state.subjectMatrixWorld, 16, `${ label }.subjectMatrixWorld` );
+	requireFiniteArray( state.markerPosition, 3, `${ label }.markerPosition` );
+	for ( const target of [ 'captureTarget', 'sceneTarget' ] ) {
+
+		requirePositiveInteger( state[ target ]?.width, `${ label }.${ target }.width` );
+		requirePositiveInteger( state[ target ]?.height, `${ label }.${ target }.height` );
+
+	}
+	const rendererTarget = requireObject( state.rendererTarget, `${ label }.rendererTarget` );
+	if ( rendererTarget.kind !== 'presentation' || rendererTarget.textureUuid !== null ) fail( `${ label } did not restore presentation as the renderer target before evidence sampling.` );
+	const device = requireObject( state.device, `${ label }.device` );
+	for ( const key of [ 'controllerGeneration', 'rendererDeviceGeneration' ] ) requirePositiveInteger( device[ key ], `${ label }.device.${ key }` );
+	requireNonnegativeInteger( device.deviceLossGeneration, `${ label }.device.deviceLossGeneration` );
+	requireNonnegativeInteger( device.uncapturedErrorCount, `${ label }.device.uncapturedErrorCount` );
+	if ( device.rendererDeviceStatus !== 'active' || device.deviceLostObserved !== false || device.backendDeviceIdentityVerified !== true || device.nativeWebGPUBackend !== true || device.deviceLossGeneration !== 0 || device.uncapturedErrorCount !== 0 ) fail( `${ label } does not bind one healthy native WebGPU device generation.` );
+	return state;
+
+}
+
+function resourceTargetIndex( ledger, label ) {
+
+	requireObject( ledger, label );
+	if ( ledger.schemaVersion !== 1 || ledger.state !== 'live' ) fail( `${ label } must be a live schema-v1 resource ledger.` );
+	const targets = requireArray( ledger.renderTargets, `${ label }.renderTargets` );
+	if ( targets.length !== REQUIRED_RESOURCE_SEMANTICS.length ) fail( `${ label } must contain exactly ${ REQUIRED_RESOURCE_SEMANTICS.length } render-target resources.` );
+	const index = new Map();
+	for ( const [ rowIndex, target ] of targets.entries() ) {
+
+		const rowLabel = `${ label }.renderTargets[${ rowIndex }]`;
+		requireObject( target, rowLabel );
+		if ( REQUIRED_RESOURCE_SEMANTICS.includes( target.semantic ) === false || index.has( target.semantic ) ) fail( `${ rowLabel } has an unknown or duplicated semantic.` );
+		if ( typeof target.textureUuid !== 'string' || target.textureUuid.length === 0 ) fail( `${ rowLabel }.textureUuid is required.` );
+		if ( typeof target.owner !== 'string' || target.owner.length === 0 ) fail( `${ rowLabel }.owner is required.` );
+		const contract = RESOURCE_FORMATS[ target.semantic ];
+		for ( const key of [ 'width', 'height', 'depth', 'sampleCount', 'bytesPerTexel', 'bytes', 'logicalBytes', 'liveBytes' ] ) requirePositiveInteger( target[ key ], `${ rowLabel }.${ key }` );
+		if ( target.depth !== 1 || target.sampleCount !== 1 || target.format !== contract.format || target.bytesPerTexel !== contract.bytesPerTexel || target.liveness !== 'live' ) fail( `${ rowLabel } format, sampling, or liveness differs from the validation-subject contract.` );
+		const expectedBytes = target.width * target.height * target.depth * target.sampleCount * target.bytesPerTexel;
+		if ( target.bytes !== expectedBytes || target.logicalBytes !== expectedBytes || target.liveBytes !== expectedBytes ) fail( `${ rowLabel } byte accounting does not reconcile with its extent and format.` );
+		index.set( target.semantic, target );
+
+	}
+	for ( const semantic of REQUIRED_RESOURCE_SEMANTICS ) if ( index.has( semantic ) === false ) fail( `${ label } omits ${ semantic }.` );
+	const textureUuids = [ ...index.values() ].map( ( target ) => target.textureUuid );
+	if ( new Set( textureUuids ).size !== textureUuids.length ) fail( `${ label } aliases required render-target texture identities.` );
+	const mrt = requireObject( ledger.sceneMrt, `${ label }.sceneMrt` );
+	if ( typeof mrt.uuid !== 'string' || mrt.uuid.length === 0 || mrt.type !== 'MRTNode' || mrt.liveness !== 'live' ) fail( `${ label }.sceneMrt has no live MRT identity.` );
+	const outputs = requireArray( mrt.outputs, `${ label }.sceneMrt.outputs` );
+	if ( stableStringify( outputs.map( ( output ) => output.semantic ).sort() ) !== stableStringify( [ 'emissive', 'normal', 'output' ] ) ) fail( `${ label }.sceneMrt outputs are incomplete.` );
+	if ( new Set( outputs.map( ( output ) => output.nodeUuid ) ).size !== outputs.length || outputs.some( ( output ) => typeof output.nodeUuid !== 'string' || output.nodeUuid.length === 0 ) ) fail( `${ label }.sceneMrt output identities are invalid.` );
+	for ( const key of [ 'geometries', 'geometryAllocations', 'storageResources' ] ) requireArray( ledger[ key ], `${ label }.${ key }` );
+	if ( ledger.geometries.length === 0 || ledger.geometryAllocations.length === 0 || ledger.storageResources.length !== 0 ) fail( `${ label } does not describe the static subject's geometry/no-storage contract.` );
+	const trackedTargetBytes = [ ...index.values() ].reduce( ( sum, target ) => sum + target.liveBytes, 0 );
+	if ( ledger.trackedRenderTargetBytes !== trackedTargetBytes ) fail( `${ label }.trackedRenderTargetBytes does not reconcile with live target identities.` );
+	return index;
+
+}
+
+function resourceIdentityClosure( ledger ) {
+
+	return {
+		sceneMrt: {
+			uuid: ledger.sceneMrt.uuid,
+			type: ledger.sceneMrt.type,
+			outputs: ledger.sceneMrt.outputs.map( ( output ) => ( { semantic: output.semantic, nodeUuid: output.nodeUuid, nodeType: output.nodeType ?? null } ) ).sort( ( left, right ) => left.semantic.localeCompare( right.semantic ) )
+		},
+		renderTargets: ledger.renderTargets.map( ( target ) => ( {
+			semantic: target.semantic,
+			owner: target.owner,
+			textureUuid: target.textureUuid,
+			format: target.format,
+			depth: target.depth,
+			sampleCount: target.sampleCount,
+			bytesPerTexel: target.bytesPerTexel
+		} ) ).sort( ( left, right ) => left.semantic.localeCompare( right.semantic ) ),
+		geometries: ledger.geometries.map( ( geometry ) => ( {
+			uuid: geometry.uuid,
+			allocationIds: [ ...( geometry.allocationIds ?? [] ) ].sort(),
+			liveness: geometry.liveness
+		} ) ).sort( ( left, right ) => String( left.uuid ).localeCompare( String( right.uuid ) ) ),
+		geometryAllocations: ledger.geometryAllocations.map( ( allocation ) => ( {
+			id: allocation.id,
+			bindings: [ ...( allocation.bindings ?? [] ) ].sort(),
+			logicalBytes: allocation.logicalBytes,
+			liveBytes: allocation.liveBytes,
+			liveness: allocation.liveness
+		} ) ).sort( ( left, right ) => String( left.id ).localeCompare( String( right.id ) ) )
+	};
+
+}
+
+function restorableResourceState( ledger ) {
+
+	return {
+		identity: resourceIdentityClosure( ledger ),
+		extents: ledger.renderTargets.map( ( target ) => ( {
+			semantic: target.semantic,
+			width: target.width,
+			height: target.height,
+			logicalBytes: target.logicalBytes,
+			liveBytes: target.liveBytes
+		} ) ).sort( ( left, right ) => left.semantic.localeCompare( right.semantic ) ),
+		trackedRenderTargetBytes: ledger.trackedRenderTargetBytes,
+		trackedGeometryBytes: ledger.trackedGeometryBytes
+	};
+
+}
+
+function assertResourcePhase( resources, recipe, label ) {
+
+	requireObject( resources, label );
+	const entry = requireObject( resources.entry, `${ label }.entry` );
+	const effective = requireObject( resources.effective, `${ label }.effective` );
+	const restored = requireObject( resources.restored, `${ label }.restored` );
+	const entryTargets = resourceTargetIndex( entry, `${ label }.entry` );
+	const effectiveTargets = resourceTargetIndex( effective, `${ label }.effective` );
+	resourceTargetIndex( restored, `${ label }.restored` );
+	if ( stableStringify( restorableResourceState( entry ) ) !== stableStringify( restorableResourceState( restored ) ) ) fail( `${ label } did not restore resource identities, extents, and live bytes.` );
+	if ( stableStringify( resourceIdentityClosure( entry ) ) !== stableStringify( resourceIdentityClosure( effective ) ) ) fail( `${ label } changed live resource identities while applying the recipe.` );
+	const viewport = recipe.effectiveState.viewport;
+	const fullWidth = Math.round( viewport.width * viewport.dpr );
+	const fullHeight = Math.round( viewport.height * viewport.dpr );
+	const sceneWidth = Math.max( 1, Math.round( fullWidth * recipe.expectedSceneScale ) );
+	const sceneHeight = Math.max( 1, Math.round( fullHeight * recipe.expectedSceneScale ) );
+	for ( const semantic of REQUIRED_RESOURCE_SEMANTICS ) {
+
+		const target = effectiveTargets.get( semantic );
+		const width = semantic === 'capture-target' ? fullWidth : sceneWidth;
+		const height = semantic === 'capture-target' ? fullHeight : sceneHeight;
+		if ( target.width !== width || target.height !== height ) fail( `${ label }.effective ${ semantic} extent ${ target.width }x${ target.height } does not match ${ width }x${ height }.` );
+
+	}
+	for ( const semantic of REQUIRED_RESOURCE_SEMANTICS ) {
+
+		const target = entryTargets.get( semantic );
+		if ( target.width !== CORRECTNESS_PARENT_LOCK.width || target.height !== CORRECTNESS_PARENT_LOCK.height ) fail( `${ label }.entry ${ semantic } does not retain the canonical ${ CORRECTNESS_PARENT_LOCK.width }x${ CORRECTNESS_PARENT_LOCK.height } parent extent.` );
+
+	}
+	return { entry, effective, restored };
+
+}
+
+function counterSnapshot( value, label ) {
+
+	requireObject( value, label );
+	for ( const key of [ 'renderSubmissionCount', 'scenePassExecutionCount', 'modeSelectionCount' ] ) requireNonnegativeInteger( value[ key ], `${ label }.${ key }` );
+	return value;
+
+}
+
+function assertSubmissionArithmetic( submissions, recipe, entryState, previousRestored, label ) {
+
+	requireObject( submissions, label );
+	const entry = counterSnapshot( submissions.entry, `${ label }.entry` );
+	const effective = counterSnapshot( submissions.effective, `${ label }.effective` );
+	const restored = counterSnapshot( submissions.restored, `${ label }.restored` );
+	if ( previousRestored !== null && stableStringify( entry ) !== stableStringify( previousRestored ) ) fail( `${ label }.entry does not continue from the previous committed restoration.` );
+	const expectedCaptureRenders = 1 + recipe.effectiveState.timeline.stepSeconds.length;
+	const expected = {
+		captureDelta: { renderSubmissions: expectedCaptureRenders, scenePassExecutions: expectedCaptureRenders, modeSelections: 1 },
+		restorationDelta: { renderSubmissions: 1, scenePassExecutions: 1, modeSelections: 1 }
+	};
+	for ( const [ deltaName, before, after ] of [
+		[ 'captureDelta', entry, effective ],
+		[ 'restorationDelta', effective, restored ]
+	] ) {
+
+		const delta = requireObject( submissions[ deltaName ], `${ label }.${ deltaName }` );
+		const observed = {
+			renderSubmissions: after.renderSubmissionCount - before.renderSubmissionCount,
+			scenePassExecutions: after.scenePassExecutionCount - before.scenePassExecutionCount,
+			modeSelections: after.modeSelectionCount - before.modeSelectionCount
+		};
+		if ( stableStringify( delta ) !== stableStringify( observed ) ) fail( `${ label }.${ deltaName } does not reconcile with its cumulative counters.` );
+		if ( stableStringify( delta ) !== stableStringify( expected[ deltaName ] ) ) fail( `${ label }.${ deltaName } differs from the frozen recipe execution cost.` );
+
+	}
+	const captureRenderTrace = requireArray( submissions.captureRenderTrace, `${ label }.captureRenderTrace` );
+	const restorationRenderTrace = requireArray( submissions.restorationRenderTrace, `${ label }.restorationRenderTrace` );
+	const expectedCaptureTrace = [];
+	let renderTime = recipe.effectiveState.timeline.initialTimeSeconds;
+	for ( const deltaSeconds of recipe.effectiveState.timeline.stepSeconds ) {
+
+		expectedCaptureTrace.push( {
+			sequence: entry.renderSubmissionCount + expectedCaptureTrace.length + 1,
+			timeSeconds: renderTime,
+			target: 'presentation',
+			mode: recipe.effectiveState.mode,
+			tier: recipe.effectiveState.tier
+		} );
+		renderTime += deltaSeconds;
+
+	}
+	expectedCaptureTrace.push( {
+		sequence: entry.renderSubmissionCount + expectedCaptureTrace.length + 1,
+		timeSeconds: renderTime,
+		target: 'capture-target',
+		mode: recipe.effectiveState.mode,
+		tier: recipe.effectiveState.tier
+	} );
+	const expectedRestorationTrace = [ {
+		sequence: effective.renderSubmissionCount + 1,
+		timeSeconds: entryState.timeSeconds,
+		target: 'presentation',
+		mode: entryState.mode,
+		tier: entryState.tier
+	} ];
+	if ( stableStringify( captureRenderTrace ) !== stableStringify( expectedCaptureTrace ) ) fail( `${ label }.captureRenderTrace does not bind the recipe's adjacent render timeline.` );
+	if ( stableStringify( restorationRenderTrace ) !== stableStringify( expectedRestorationTrace ) ) fail( `${ label }.restorationRenderTrace does not bind the single parent-state restoration render.` );
+	return restored;
+
+}
+
+function assertCaptureEnvelopeLayouts( layouts, capture, label ) {
+
+	requireObject( layouts, label );
+	const rowBytes = capture.width * 4;
+	const bytesPerRow = Math.ceil( rowBytes / 256 ) * 256;
+	const minimumByteLength = bytesPerRow * ( capture.height - 1 ) + rowBytes;
+	const fullyPaddedByteLength = bytesPerRow * capture.height;
+	const expectedReadback = {
+		width: capture.width,
+		height: capture.height,
+		bytesPerTexel: 4,
+		rowBytes,
+		bytesPerRow,
+		minimumByteLength,
+		fullyPaddedByteLength,
+		alignment: 256
+	};
+	const expectedTransport = {
+		width: capture.width,
+		height: capture.height,
+		rowBytes,
+		bytesPerRow,
+		byteLength: capture.sourceByteLength,
+		format: 'rgba8unorm',
+		origin: 'top-left',
+		padding: capture.sourceByteLength === fullyPaddedByteLength ? 'full-final-row' : 'tight-final-row'
+	};
+	const expectedNormalized = {
+		width: capture.width,
+		height: capture.height,
+		rowBytes,
+		bytesPerRow,
+		byteLength: fullyPaddedByteLength,
+		format: 'rgba8unorm',
+		origin: 'top-left'
+	};
+	if ( stableStringify( layouts.readback ) !== stableStringify( expectedReadback ) || stableStringify( layouts.transport ) !== stableStringify( expectedTransport ) || stableStringify( layouts.normalized ) !== stableStringify( expectedNormalized ) ) fail( `${ label } does not exactly join the renderer, retained transport, and normalized artifact layouts.` );
+	if ( capture.sourceBytesPerRow !== bytesPerRow || capture.normalized.bytesPerRow !== bytesPerRow || capture.normalized.byteLength !== fullyPaddedByteLength ) fail( `${ label } disagrees with serialized capture stride or length metadata.` );
+
+}
+
+function resetTelemetrySnapshot( value, label ) {
+
+	requireObject( value, label );
+	const count = requireNonnegativeInteger( value.resetEventCount, `${ label }.resetEventCount` );
+	const events = requireArray( value.resetEvents, `${ label }.resetEvents` );
+	if ( events.length !== count ) fail( `${ label }.resetEventCount does not match its append-only event rows.` );
+	for ( const [ index, event ] of events.entries() ) {
+
+		requireObject( event, `${ label }.resetEvents[${ index }]` );
+		if ( typeof event.cause !== 'string' || event.cause.length === 0 || Number.isFinite( event.timeSeconds ) === false || event.timeSeconds < 0 ) fail( `${ label }.resetEvents[${ index }] is invalid.` );
+
+	}
+	return value;
+
+}
+
+function assertResetTelemetry( telemetry, recipe, previousRestored, label ) {
+
+	requireObject( telemetry, label );
+	const entry = resetTelemetrySnapshot( telemetry.entry, `${ label }.entry` );
+	const effective = resetTelemetrySnapshot( telemetry.effective, `${ label }.effective` );
+	const restored = resetTelemetrySnapshot( telemetry.restored, `${ label }.restored` );
+	if ( previousRestored !== null && stableStringify( entry ) !== stableStringify( previousRestored ) ) fail( `${ label }.entry does not continue the prior append-only reset telemetry.` );
+	if ( stableStringify( effective.resetEvents.slice( 0, entry.resetEventCount ) ) !== stableStringify( entry.resetEvents ) ) fail( `${ label } rewrote or removed preexisting reset telemetry.` );
+	if ( stableStringify( restored ) !== stableStringify( effective ) ) fail( `${ label } restoration mutated append-only reset telemetry.` );
+	const expectedCaptureDelta = recipe.effectiveState.timeline.resetHistoryCause === null ? 0 : 1;
+	if ( telemetry.historyResetDelta !== expectedCaptureDelta || telemetry.restorationHistoryResetDelta !== 0 ) fail( `${ label } reset deltas differ from the frozen recipe/restoration contract.` );
+	const appendedDuringCapture = requireArray( telemetry.appendedDuringCapture, `${ label }.appendedDuringCapture` );
+	const appendedDuringRestoration = requireArray( telemetry.appendedDuringRestoration, `${ label }.appendedDuringRestoration` );
+	if ( appendedDuringCapture.length !== expectedCaptureDelta || appendedDuringRestoration.length !== 0 ) fail( `${ label } reset append populations differ from their declared deltas.` );
+	if ( stableStringify( appendedDuringCapture ) !== stableStringify( effective.resetEvents.slice( entry.resetEventCount ) ) ) fail( `${ label }.appendedDuringCapture is not the exact append slice.` );
+	if ( expectedCaptureDelta === 1 ) {
+
+		const expected = { cause: recipe.effectiveState.timeline.resetHistoryCause, timeSeconds: recipe.effectiveState.timeline.initialTimeSeconds };
+		if ( stableStringify( appendedDuringCapture[ 0 ] ) !== stableStringify( expected ) ) fail( `${ label } appended the wrong reset cause or event time.` );
+
+	}
+	return restored;
+
+}
+
 function assertCorrectnessArtifactWrites( session ) {
 
 	const writes = requireArray( session.artifactWrites, 'artifactWrites' );
 	if ( writes.length === 0 ) fail( 'Correctness capture artifact write ledger is empty.' );
-	const paths = new Set();
+	const writeIndex = new Map();
 	let captureSessionExcluded = false;
-	for ( const [ index, write ] of writes.entries() ) {
+	for ( const [ rowIndex, write ] of writes.entries() ) {
 
-		const label = `artifactWrites[${ index }]`;
+		const label = `artifactWrites[${ rowIndex }]`;
 		requireObject( write, label );
-		if ( typeof write.path !== 'string' || write.path.length === 0 || paths.has( write.path ) ) fail( `${ label } has a missing or duplicated path.` );
-		paths.add( write.path );
+		if ( write.sequence !== rowIndex + 1 ) fail( `${ label }.sequence is not contiguous and canonical.` );
+		if ( typeof write.path !== 'string' || write.path.length === 0 || write.path.startsWith( '/' ) || write.path.includes( '\\' ) || write.path.split( '/' ).includes( '..' ) ) fail( `${ label } has an invalid confined path.` );
+		if ( writeIndex.has( write.path ) ) fail( `${ label } duplicates ${ write.path }.` );
+		if ( typeof write.kind !== 'string' || write.kind.length === 0 || typeof write.existedBefore !== 'boolean' ) fail( `${ label } omits write provenance.` );
 		if ( write.contentBinding === 'self-excluded-finalized-offline' ) {
 
-			if ( write.path !== 'capture-session.json' || write.sha256 !== null || write.byteLength !== null ) fail( 'Only capture-session.json may use the finalized self-exclusion record.' );
+			if ( write.path !== 'capture-session.json' || write.kind !== 'capture-session-record' || write.sha256 !== null || write.byteLength !== null || rowIndex !== writes.length - 1 ) fail( 'Only the final capture-session.json row may use the finalized self-exclusion record.' );
 			captureSessionExcluded = true;
+			writeIndex.set( write.path, write );
 			continue;
 
 		}
 		if ( write.contentBinding !== 'sha256-byte-length-immutable-buffer-v1' ) fail( `${ label } has an unsupported content binding.` );
 		requireHash( write.sha256, `${ label }.sha256` );
-		requireFinite( write.byteLength, `${ label }.byteLength`, 1 );
+		requirePositiveInteger( write.byteLength, `${ label }.byteLength` );
+		writeIndex.set( write.path, write );
 
 	}
 	if ( captureSessionExcluded === false ) fail( 'Correctness capture did not finalize capture-session.json outside its own hash ledger.' );
-	return paths;
+	return writeIndex;
 
 }
 
-function assertCorrectnessReadbackCapture( capture, writePaths, label ) {
+function assertArtifactWriteJoin( descriptor, writeIndex, label, expectedPath = null, expectedKind = null ) {
+
+	requireObject( descriptor, label );
+	if ( typeof descriptor.path !== 'string' || ( expectedPath !== null && descriptor.path !== expectedPath ) ) fail( `${ label }.path does not match its declared artifact path.` );
+	requireHash( descriptor.sha256, `${ label }.sha256` );
+	requirePositiveInteger( descriptor.byteLength, `${ label }.byteLength` );
+	const write = writeIndex.get( descriptor.path );
+	if ( write === undefined || write.contentBinding !== 'sha256-byte-length-immutable-buffer-v1' ) fail( `${ label } is absent from the immutable write ledger.` );
+	if ( expectedKind !== null && write.kind !== expectedKind ) fail( `${ label } write kind ${ write.kind } does not match ${ expectedKind }.` );
+	if ( write.sha256 !== descriptor.sha256 || write.byteLength !== descriptor.byteLength ) fail( `${ label } hash/length does not exactly join its immutable write-ledger row.` );
+	return write;
+
+}
+
+function assertCorrectnessReadbackCapture( capture, recipe, writeIndex, label ) {
 
 	requireObject( capture, label );
-	for ( const [ kind, descriptor ] of [
-		[ 'PNG', capture.png ],
-		[ 'transport', capture.transport?.artifact ],
-		[ 'normalized', capture.normalized?.artifact ]
-	] ) {
+	if ( capture.target !== recipe.id ) fail( `${ label }.target does not match recipe ${ recipe.id }.` );
+	if ( capture.captureMode !== recipe.capture.target || capture.captureMode !== capture.evidence?.recipe?.target || capture.captureMode !== capture.evidence?.effectiveState?.mode ) fail( `${ label }.captureMode does not match the frozen recipe target and effective output mode.` );
+	const width = Math.round( recipe.effectiveState.viewport.width * recipe.effectiveState.viewport.dpr );
+	const height = Math.round( recipe.effectiveState.viewport.height * recipe.effectiveState.viewport.dpr );
+	if ( capture.width !== width || capture.height !== height ) fail( `${ label } dimensions do not match recipe ${ recipe.id }.` );
+	if ( capture.bytesPerPixel !== 4 || capture.bytesPerRow !== width * 4 ) fail( `${ label } is not compact RGBA8.` );
+	if ( Number.isInteger( capture.sourceBytesPerRow ) === false || capture.sourceBytesPerRow < capture.bytesPerRow || capture.sourceBytesPerRow % 256 !== 0 ) fail( `${ label } renderer-returned row stride is not 256-byte aligned.` );
+	const tightTransportLength = ( height - 1 ) * capture.sourceBytesPerRow + capture.bytesPerRow;
+	const paddedTransportLength = capture.sourceBytesPerRow * height;
+	if ( capture.sourceByteLength !== tightTransportLength && capture.sourceByteLength !== paddedTransportLength ) fail( `${ label } renderer-returned byte length is not a valid tight/full-final-row copy.` );
+	if ( capture.transportByteLength !== capture.sourceByteLength ) fail( `${ label } retained transport length differs from the renderer-returned bytes.` );
+	if ( capture.origin !== 'top-left' || capture.format !== 'rgba8' ) fail( `${ label } does not retain normalized top-left RGBA8 pixels.` );
+	const stem = recipe.capture.filename.slice( 0, - 4 );
+	const png = requireObject( capture.png, `${ label }.png` );
+	const transport = requireObject( capture.transport, `${ label }.transport` );
+	const normalized = requireObject( capture.normalized, `${ label }.normalized` );
+	assertArtifactWriteJoin( png, writeIndex, `${ label }.png`, recipe.capture.filename, 'writeCapture-png' );
+	assertArtifactWriteJoin( transport.artifact, writeIndex, `${ label }.transport.artifact`, `transport-readbacks/${ stem }.rgba8.bin`, 'writeCapture-transport' );
+	assertArtifactWriteJoin( normalized.artifact, writeIndex, `${ label }.normalized.artifact`, `normalized-readbacks/${ stem }.rgba8.padded.bin`, 'writeCapture-normalized' );
+	if ( transport.artifact.byteLength !== capture.transportByteLength ) fail( `${ label } transport artifact length does not match its retained bytes.` );
+	const transportLayout = requireObject( transport.layout, `${ label }.transport.layout` );
+	if ( transportLayout.width !== width || transportLayout.height !== height || transportLayout.rowBytes !== capture.bytesPerRow || transportLayout.bytesPerRow !== capture.sourceBytesPerRow || transportLayout.byteLength !== capture.sourceByteLength || transportLayout.origin !== 'top-left' ) fail( `${ label }.transport.layout does not bind the renderer-returned copy layout.` );
+	if ( normalized.layout !== 'cpu-normalized-padded-rgba8' || normalized.origin !== 'top-left' || normalized.alignmentBytes !== 256 || Number.isInteger( normalized.bytesPerRow ) === false || normalized.bytesPerRow < capture.bytesPerRow || normalized.bytesPerRow % 256 !== 0 ) fail( `${ label } normalized row layout is not a 256-byte-aligned top-left RGBA8 artifact.` );
+	if ( normalized.byteLength !== normalized.bytesPerRow * height || normalized.artifact.byteLength !== normalized.byteLength ) fail( `${ label } normalized byte length is inconsistent.` );
+	const compact = requireObject( normalized.compact, `${ label }.normalized.compact` );
+	if ( compact.layout !== 'compact-rgba8' || compact.origin !== 'top-left' || compact.bytesPerRow !== capture.bytesPerRow || compact.byteLength !== capture.bytesPerRow * height || compact.sha256 !== normalized.compactRgbaSha256 || compact.byteLength !== normalized.compactByteLength ) fail( `${ label } compact readback derivation is inconsistent.` );
+	requireHash( normalized.compactRgbaSha256, `${ label }.normalized.compactRgbaSha256` );
+	if ( png.encoding !== 'png-rgba8-srgb' || png.width !== width || png.height !== height || png.derivedFromCompactRgbaSha256 !== normalized.compactRgbaSha256 ) fail( `${ label } PNG is not bound to its retained compact RGBA pixels.` );
+	return capture;
 
-		requireObject( descriptor, `${ label}.${ kind }` );
-		if ( typeof descriptor.path !== 'string' || writePaths.has( descriptor.path ) === false ) fail( `${ label} ${ kind } artifact is absent from the immutable write ledger.` );
-		requireHash( descriptor.sha256, `${ label}.${ kind }.sha256` );
-		requireFinite( descriptor.byteLength, `${ label}.${ kind }.byteLength`, 1 );
+}
+
+function assertRecipeCaptureEvidence( capture, recipe, index, previous, label ) {
+
+	const evidence = requireObject( capture.evidence, `${ label }.evidence` );
+	if ( evidence.schemaVersion !== 1 || evidence.evidenceKind !== 'validation-harness-correctness-capture-transaction-v1' || evidence.runtimeProfile !== CORRECTNESS_PROFILE ) fail( `${ label }.evidence is not a correctness-only recipe transaction envelope.` );
+	if ( stableStringify( evidence.claimScope ) !== stableStringify( { correctness: true, performance: false, gpuAttribution: false } ) ) fail( `${ label }.evidence claim scope is not correctness-only.` );
+	const recipeEvidence = requireObject( evidence.recipe, `${ label }.evidence.recipe` );
+	if ( recipeEvidence.id !== recipe.id || recipeEvidence.schemaVersion !== recipe.schemaVersion || recipeEvidence.captureFilename !== recipe.capture.filename || recipeEvidence.target !== recipe.capture.target || recipeEvidence.expectedSceneScale !== recipe.expectedSceneScale ) fail( `${ label } recipe identity differs from the frozen contract.` );
+	if ( stableStringify( recipeEvidence.parentRoute ) !== stableStringify( recipe.parentRoute ) || stableStringify( recipeEvidence.declaredEffectiveState ) !== stableStringify( recipe.effectiveState ) ) fail( `${ label } recipe parent/effective-state contract drifted.` );
+	if ( recipeEvidence.digest !== stableHash( recipe ) || recipeEvidence.setDigest !== CORRECTNESS_RECIPE_SET_DIGEST ) fail( `${ label } recipe or recipe-set digest does not bind the canonical recipe table.` );
+	const transaction = requireObject( evidence.transaction, `${ label }.evidence.transaction` );
+	if ( transaction.schemaVersion !== 1 || transaction.status !== 'COMMITTED' || transaction.recipeId !== recipe.id || transaction.restorationVerdict !== 'PASS' ) fail( `${ label } transaction is not a committed recipe restoration.` );
+	if ( transaction.sequence !== index + 1 || transaction.transactionId !== `capture-${ index + 1 }` ) fail( `${ label } transaction provenance is not canonical and ordered.` );
+	const phases = requireObject( transaction.phaseVerdicts, `${ label }.evidence.transaction.phaseVerdicts` );
+	if ( stableStringify( phases ) !== stableStringify( { capture: 'PASS', restore: 'PASS', settle: 'PASS', verify: 'PASS' } ) ) fail( `${ label } transaction phase verdicts are incomplete.` );
+	const entryState = assertCaptureStateSnapshot( evidence.entryState, `${ label }.evidence.entryState` );
+	const effectiveState = assertCaptureStateSnapshot( evidence.effectiveState, `${ label }.evidence.effectiveState` );
+	const restoredState = assertCaptureStateSnapshot( evidence.restoredState, `${ label }.evidence.restoredState` );
+	assertStableDigest( entryState, transaction.entryStateDigest, `${ label } entry state` );
+	assertStableDigest( effectiveState, evidence.effectiveStateDigest, `${ label } effective state` );
+	assertStableDigest( restoredState, transaction.restoredStateDigest, `${ label } restored state` );
+	if ( evidence.parentStartupStateDigest !== transaction.entryStateDigest ) fail( `${ label } parent startup digest does not bind the transaction entry state.` );
+	if ( transaction.entryStateDigest !== transaction.restoredStateDigest || stableStringify( entryState ) !== stableStringify( restoredState ) ) fail( `${ label } did not restore the full entry-state snapshot.` );
+	assertCanonicalParentState( entryState, `${ label }.evidence.entryState` );
+	if ( entryState.viewport.width !== CORRECTNESS_PARENT_LOCK.width || entryState.viewport.height !== CORRECTNESS_PARENT_LOCK.height || entryState.viewport.dpr !== CORRECTNESS_PARENT_LOCK.dpr || entryState.passScale !== 1 || entryState.outputNodeMode !== CORRECTNESS_PARENT_LOCK.mode || entryState.outputNodeId !== VALIDATION_MODE_OUTPUT_NODE_IDS[ CORRECTNESS_PARENT_LOCK.mode ] || entryState.captureTarget.width !== CORRECTNESS_PARENT_LOCK.width || entryState.captureTarget.height !== CORRECTNESS_PARENT_LOCK.height || entryState.sceneTarget.width !== CORRECTNESS_PARENT_LOCK.width || entryState.sceneTarget.height !== CORRECTNESS_PARENT_LOCK.height ) fail( `${ label } entry state is not the canonical correctness parent render state.` );
+	for ( const key of [ 'scenario', 'tier', 'mode', 'camera', 'seed', 'timeSeconds' ] ) if ( effectiveState[ key ] !== recipe.effectiveState[ key ] ) fail( `${ label } effective ${ key } differs from its recipe.` );
+	if ( stableStringify( effectiveState.viewport ) !== stableStringify( recipe.effectiveState.viewport ) || effectiveState.passScale !== recipe.expectedSceneScale || evidence.passScale !== recipe.expectedSceneScale ) fail( `${ label } effective viewport or scene scale differs from its recipe.` );
+	if ( effectiveState.outputNodeMode !== recipe.capture.target || effectiveState.outputNodeId !== VALIDATION_MODE_OUTPUT_NODE_IDS[ recipe.capture.target ] ) fail( `${ label } effective output node does not match recipe target ${ recipe.capture.target }.` );
+	const fullWidth = Math.round( recipe.effectiveState.viewport.width * recipe.effectiveState.viewport.dpr );
+	const fullHeight = Math.round( recipe.effectiveState.viewport.height * recipe.effectiveState.viewport.dpr );
+	if ( effectiveState.captureTarget.width !== fullWidth || effectiveState.captureTarget.height !== fullHeight || effectiveState.sceneTarget.width !== Math.max( 1, Math.round( fullWidth * recipe.expectedSceneScale ) ) || effectiveState.sceneTarget.height !== Math.max( 1, Math.round( fullHeight * recipe.expectedSceneScale ) ) ) fail( `${ label } effective target extents differ from its recipe.` );
+	if ( stableStringify( entryState.device ) !== stableStringify( effectiveState.device ) || stableStringify( entryState.device ) !== stableStringify( restoredState.device ) ) fail( `${ label } crossed a device identity or generation during capture.` );
+	const resources = assertResourcePhase( evidence.resources, recipe, `${ label }.evidence.resources` );
+	const restoredSubmissions = assertSubmissionArithmetic( evidence.submissions, recipe, entryState, previous?.restoredSubmissions ?? null, `${ label }.evidence.submissions` );
+	const restoredTelemetry = assertResetTelemetry( evidence.telemetry, recipe, previous?.restoredTelemetry ?? null, `${ label }.evidence.telemetry` );
+	if ( previous !== null ) {
+
+		if ( stableStringify( entryState ) !== stableStringify( previous.restoredState ) ) fail( `${ label } entry state does not continue from the previous committed recipe.` );
+		if ( stableStringify( restorableResourceState( resources.entry ) ) !== stableStringify( restorableResourceState( previous.restoredResources ) ) ) fail( `${ label } entry resources do not continue from the previous committed recipe.` );
 
 	}
-	if ( capture.bytesPerPixel !== 4 || capture.bytesPerRow !== capture.width * 4 ) fail( `${ label } is not compact RGBA8.` );
-	if ( Number.isInteger( capture.normalized?.bytesPerRow ) === false || capture.normalized.bytesPerRow < capture.bytesPerRow || capture.normalized.bytesPerRow % 256 !== 0 ) fail( `${ label } normalized row stride is not 256-byte aligned.` );
-	if ( capture.normalized?.byteLength !== capture.normalized.bytesPerRow * capture.height ) fail( `${ label } normalized byte length is inconsistent.` );
-	if ( capture.origin !== 'top-left' || capture.normalized?.origin !== 'top-left' ) fail( `${ label } does not preserve top-left readback origin.` );
+	assertCaptureEnvelopeLayouts( evidence.layouts, capture, `${ label }.evidence.layouts` );
+	return { transaction, entryState, effectiveState, restoredState, restoredResources: resources.restored, restoredSubmissions, restoredTelemetry };
+
+}
+
+function assertTierVisualEvidence( session, capturesByRecipe, writeIndex ) {
+
+	const evidence = requireObject( session.hookResult?.tierVisualEvidence, 'hookResult.tierVisualEvidence' );
+	if ( evidence.schemaVersion !== 1 || evidence.kind !== 'validation-harness-tier-visual-evidence-v1' || evidence.verdict !== 'PASS' ) fail( 'Tier visual evidence is not a passing schema-v1 comparison.' );
+	const referenceCapture = capturesByRecipe.get( 'tier.target-performance.final' );
+	const candidateCapture = capturesByRecipe.get( 'tier.governor-stress.final' );
+	const bindings = [
+		[ 'reference', referenceCapture, 'target-performance', 1, 1920, 1080 ],
+		[ 'candidate', candidateCapture, 'governor-stress', 0.5, 960, 540 ]
+	];
+	for ( const [ key, capture, tier, passScale, sceneWidth, sceneHeight ] of bindings ) {
+
+		const binding = requireObject( evidence.binding?.[ key ], `tierVisualEvidence.binding.${ key }` );
+		const recipe = capture.evidence.recipe;
+		const transaction = capture.evidence.transaction;
+		if ( binding.recipeId !== recipe.id || binding.recipeDigest !== recipe.digest || binding.filename !== capture.png.path || binding.pngSha256 !== capture.png.sha256 || binding.passScale !== passScale ) fail( `Tier ${ key } binding does not identify its direct recipe capture.` );
+		if ( stableStringify( binding.transaction ) !== stableStringify( {
+			transactionId: transaction.transactionId,
+			sequence: transaction.sequence,
+			status: transaction.status,
+			entryStateDigest: transaction.entryStateDigest,
+			restoredStateDigest: transaction.restoredStateDigest,
+			restorationVerdict: transaction.restorationVerdict
+		} ) ) fail( `Tier ${ key } transaction binding drifted from its capture.` );
+		if ( stableStringify( binding.effectiveState ) !== stableStringify( capture.evidence.effectiveState ) || binding.effectiveState.tier !== tier ) fail( `Tier ${ key } effective-state binding drifted.` );
+		const normalized = capture.normalized;
+		if ( binding.normalized?.artifact?.path !== normalized.artifact.path || binding.normalized?.artifact?.sha256 !== normalized.artifact.sha256 || binding.normalized?.artifact?.byteLength !== normalized.artifact.byteLength || binding.normalized?.compactRgbaSha256 !== normalized.compactRgbaSha256 || binding.normalized?.compactByteLength !== normalized.compactByteLength || binding.normalized?.width !== capture.width || binding.normalized?.height !== capture.height ) fail( `Tier ${ key } normalized readback binding drifted.` );
+		if ( binding.captureEvidenceSha256 !== stableHash( capture.evidence ) ) fail( `Tier ${ key } capture-evidence digest is stale.` );
+		const effectiveTargets = new Map( capture.evidence.resources.effective.renderTargets.map( ( target ) => [ target.semantic, target ] ) );
+		const boundTargets = [ binding.resources?.captureTarget, ...( binding.resources?.sceneMrt ?? [] ) ];
+		for ( const bound of boundTargets ) {
+
+			const target = effectiveTargets.get( bound?.semantic );
+			if ( target === undefined ) fail( `Tier ${ key } binds an unknown resource semantic.` );
+			for ( const field of [ 'semantic', 'owner', 'targetName', 'textureUuid', 'width', 'height', 'format', 'bytes', 'logicalBytes', 'liveBytes', 'liveness' ] ) if ( bound[ field ] !== ( target[ field ] ?? null ) ) fail( `Tier ${ key } ${ bound.semantic } resource field ${ field } drifted.` );
+
+		}
+		if ( binding.resources.captureTarget.width !== 1920 || binding.resources.captureTarget.height !== 1080 ) fail( `Tier ${ key } capture-target extent is not 1920x1080.` );
+		if ( binding.resources.sceneMrt.length !== 3 || binding.resources.sceneMrt.some( ( target ) => target.width !== sceneWidth || target.height !== sceneHeight ) ) fail( `Tier ${ key } scene-MRT extents are not bound to its tier scale.` );
+
+	}
+	if ( evidence.binding.reference.transaction.transactionId === evidence.binding.candidate.transaction.transactionId || evidence.binding.reference.transaction.sequence === evidence.binding.candidate.transaction.sequence || evidence.binding.reference.normalized.artifact.path === evidence.binding.candidate.normalized.artifact.path ) fail( 'Tier visual captures alias transaction or artifact provenance.' );
+	const metrics = requireObject( evidence.metrics, 'tierVisualEvidence.metrics' );
+	for ( const key of [ 'meanRgbByteDifference', 'edgeMaskPixels', 'edgeMeanRgbByteDifference', 'edgeP95RgbByteDifference' ] ) numeric( metrics[ key ], `tierVisualEvidence.metrics.${ key }`, 'Measured' );
+	const gates = requireObject( evidence.gates, 'tierVisualEvidence.gates' );
+	if ( numeric( gates.meanRgbByteDifference, 'tierVisualEvidence.gates.meanRgbByteDifference', 'Gated' ) !== 8 || numeric( gates.edgeP95RgbByteDifference, 'tierVisualEvidence.gates.edgeP95RgbByteDifference', 'Gated' ) !== 32 ) fail( 'Tier visual gates differ from the frozen correctness contract.' );
+	if ( metrics.meanRgbByteDifference.value > gates.meanRgbByteDifference.value || metrics.edgeP95RgbByteDifference.value > gates.edgeP95RgbByteDifference.value || metrics.edgeMaskPixels.value < 1 ) fail( 'Tier visual PASS verdict exceeds its measured gates.' );
+	if ( evidence.bindingSha256 !== stableHash( { binding: evidence.binding, metrics, gates } ) ) fail( 'Tier visual bindingSha256 does not bind its comparison record.' );
+	const serialized = Buffer.from( `${ JSON.stringify( evidence, null, 2 ) }\n` );
+	const descriptor = { path: 'tier-visual-evidence.json', sha256: `sha256:${ createHash( 'sha256' ).update( serialized ).digest( 'hex' ) }`, byteLength: serialized.byteLength };
+	assertArtifactWriteJoin( descriptor, writeIndex, 'tier-visual-evidence.json', 'tier-visual-evidence.json', 'hook-artifact' );
+
+}
+
+function assertCorrectnessClaimScope( session ) {
+
+	for ( const [ rootLabel, runtime ] of [ [ 'runtime', session.runtime ], [ 'finalRuntime', session.finalRuntime ] ] ) {
+
+		const metrics = requireObject( runtime?.metrics, `${ rootLabel }.metrics` );
+		const pipeline = requireObject( runtime?.pipeline, `${ rootLabel }.pipeline` );
+		if ( metrics.runtimeProfile !== CORRECTNESS_PROFILE || pipeline.runtimeProfile !== CORRECTNESS_PROFILE ) fail( `${ rootLabel } crossed out of the correctness runtime profile.` );
+		if ( stableStringify( metrics.routeLock ) !== stableStringify( { kind: 'tier', id: 'webgpu-correctness' } ) ) fail( `${ rootLabel }.metrics does not bind the tier/webgpu-correctness controller route lock.` );
+		for ( const [ label, value ] of [
+			[ 'metrics.timestampQueriesRequired', metrics.timestampQueriesRequired ],
+			[ 'metrics.timestampQueriesRequested', metrics.timestampQueriesRequested ],
+			[ 'metrics.timestampQueriesActive', metrics.timestampQueriesActive ],
+			[ 'pipeline.timestampQueriesRequired', pipeline.timestampQueriesRequired ],
+			[ 'pipeline.timestampQueriesRequested', pipeline.timestampQueriesRequested ],
+			[ 'pipeline.timestampQueriesActive', pipeline.timestampQueriesActive ]
+		] ) if ( value !== false ) fail( `${ rootLabel}.${ label } must be false in correctness-only evidence.` );
+		assertCanonicalParentState( metrics, `${ rootLabel }.metrics` );
+		if ( metrics.viewport?.width !== CORRECTNESS_PARENT_LOCK.width || metrics.viewport?.height !== CORRECTNESS_PARENT_LOCK.height || metrics.viewport?.dpr !== CORRECTNESS_PARENT_LOCK.dpr ) fail( `${ rootLabel }.metrics viewport escaped the correctness parent route.` );
+
+	}
+	const hookResult = requireObject( session.hookResult, 'hookResult' );
+	if ( hookResult.status !== 'incomplete' || hookResult.publishable !== false ) fail( 'Correctness capture hook result must remain nonpublishable and incomplete before lane joining and visual sign-off.' );
+	const bundle = requireObject( hookResult.bundle, 'hookResult.bundle' );
+	if ( bundle.bundleKind !== 'raw-capture-candidate' || bundle.publishable !== false ) fail( 'Correctness capture bundle must remain a raw nonpublishable candidate.' );
+	const verdicts = requireObject( bundle.claimVerdicts, 'hookResult.bundle.claimVerdicts' );
+	if ( verdicts.performanceCompliance !== 'NOT_CLAIMED' ) fail( 'Correctness-only capture must leave performanceCompliance NOT_CLAIMED.' );
+	if ( verdicts.gpuAttribution !== 'INSUFFICIENT_EVIDENCE' ) fail( 'Correctness-only capture must leave gpuAttribution INSUFFICIENT_EVIDENCE.' );
+	const gpuTiming = requireObject( hookResult.gpuTiming, 'hookResult.gpuTiming' );
+	if ( gpuTiming.verdict !== 'NOT_CLAIMED' || gpuTiming.renderMs !== null || gpuTiming.computeMs !== null ) fail( 'Correctness-only capture must leave GPU timing NOT_CLAIMED with no timing values.' );
+	const finalMetrics = requireObject( session.finalRuntime.metrics, 'finalRuntime.metrics' );
+	const captureTransaction = requireObject( finalMetrics.captureTransaction, 'finalRuntime.metrics.captureTransaction' );
+	if ( captureTransaction.active !== null || captureTransaction.poisoned !== null || captureTransaction.nextSequence !== CORRECTNESS_CAPTURE_RECIPES.length + 1 ) fail( 'Correctness session did not finalize all recipe transactions in a clean idle coordinator.' );
+	if ( finalMetrics.postCommitPoison !== null ) fail( 'Correctness session retained a post-commit poison record.' );
+	if ( finalMetrics.controllerOperation?.active !== null ) fail( 'Correctness session finalized while a controller operation was active.' );
+	if ( finalMetrics.disposal?.started !== false ) fail( 'Correctness session final runtime was sampled after disposal began.' );
+
+}
+
+function assertCorrectnessRoute( session ) {
+
+	if ( typeof session.browserEntry !== 'string' || session.browserEntry.endsWith( '/tier/webgpu-correctness/index.html' ) === false ) fail( 'Correctness capture must execute the locked tier/webgpu-correctness browser entry.' );
+	let requested;
+	let final;
+	try {
+
+		requested = new URL( session.url );
+		final = new URL( session.finalUrl );
+
+	} catch {
+
+		fail( 'Correctness capture URL is invalid.' );
+
+	}
+	if ( requested.href !== final.href || requested.searchParams.getAll( 'capture' ).length !== 1 || requested.searchParams.get( 'capture' ) !== '1' || requested.searchParams.getAll( 'profile' ).length !== 1 || requested.searchParams.get( 'profile' ) !== CORRECTNESS_PROFILE || [ ...requested.searchParams.keys() ].some( ( key ) => ! [ 'capture', 'profile' ].includes( key ) ) ) fail( 'Correctness capture did not preserve its exact locked profile URL.' );
+	const route = requireObject( session.route, 'route' );
+	if ( route.requestedUrl !== session.url || route.finalUrl !== session.finalUrl || route.browserEntry !== session.browserEntry || route.manifestLabId !== session.labId ) fail( 'Correctness capture route identity is inconsistent.' );
+	for ( const stateName of [ 'lockedState', 'observedState', 'finalState' ] ) {
+
+		assertCanonicalParentState( route[ stateName ], `route.${ stateName }` );
+		if ( stableStringify( route[ stateName ] ) !== stableStringify( route.lockedState ) ) fail( `route.${ stateName } differs from the immutable parent route state.` );
+
+	}
+
+}
+
+function assertDiagnosticMosaicBinding( session, writeIndex ) {
+
+	const output = session.outputPlan.find( ( entry ) => entry.id === 'diagnostics.mosaic' );
+	const final = session.outputPlan.find( ( entry ) => entry.id === 'final.design' );
+	if ( output.artifact.sha256 === final.artifact.sha256 ) fail( 'Diagnostics mosaic aliases final output.' );
+	if ( stableStringify( output.sourceCaptures ) !== stableStringify( DIAGNOSTIC_MOSAIC_SOURCES ) || output.derivation?.kind !== 'hook-validated-derived-output' || output.derivation?.validationStatus !== 'PASS' ) fail( 'Diagnostics mosaic is not a validated derivation of the four direct output-node captures.' );
+	const hookOutput = session.hookResult?.standardOutputs?.find( ( entry ) => entry?.filename === 'diagnostics.mosaic.png' );
+	requireObject( hookOutput, 'hookResult diagnostics mosaic' );
+	if ( hookOutput.id !== 'diagnostics.mosaic' || hookOutput.status !== 'CAPTURED' || stableStringify( hookOutput.sourceCaptures ) !== stableStringify( DIAGNOSTIC_MOSAIC_SOURCES ) ) fail( 'Hook result diagnostics mosaic identity is invalid.' );
+	assertArtifactWriteJoin( hookOutput.file, writeIndex, 'hookResult diagnostics mosaic file', 'diagnostics.mosaic.png', 'hook-artifact' );
+	if ( hookOutput.file.sha256 !== output.artifact.sha256 || hookOutput.file.byteLength !== output.artifact.byteLength ) fail( 'Output-plan mosaic does not join the hook-derived file evidence.' );
+	const pixel = requireObject( hookOutput.pixelEvidence, 'hookResult diagnostics mosaic pixelEvidence' );
+	assertArtifactWriteJoin( pixel.png, writeIndex, 'hookResult diagnostics mosaic PNG evidence', 'diagnostics.mosaic.png', 'hook-artifact' );
+	assertArtifactWriteJoin( pixel.normalized?.rawArtifact, writeIndex, 'hookResult diagnostics mosaic normalized raw', 'normalized-readbacks/diagnostics.mosaic.rgba8.padded.bin', 'hook-artifact' );
+	assertArtifactWriteJoin( pixel.normalized?.packedArtifact, writeIndex, 'hookResult diagnostics mosaic normalized packed', 'normalized-readbacks/diagnostics.mosaic.rgba8.compact.bin', 'hook-artifact' );
+	if ( pixel.png.derivedFromPackedRgbaSha256 !== pixel.normalized.packedRgbaSha256 || pixel.normalized.packedArtifact.sha256 !== pixel.normalized.packedRgbaSha256 || pixel.normalized.paddingVerifiedZero !== true || pixel.normalized.origin !== 'top-left' ) fail( 'Diagnostics mosaic PNG is not bound to its retained normalized pixels.' );
 
 }
 
@@ -311,7 +896,7 @@ export function validateCorrectnessCaptureSession( session ) {
 	requireObject( session, 'correctness capture session' );
 	if ( session.schemaVersion !== 2 || session.profile !== CORRECTNESS_PROFILE ) fail( 'Expected a schema-v2 correctness capture session.' );
 	if ( session.automationSurface !== PLAYWRIGHT_CORRECTNESS_SURFACE || session.browser?.automationSurface !== PLAYWRIGHT_CORRECTNESS_SURFACE ) fail( 'Correctness capture requires automationSurface=playwright-headless-chromium.' );
-	if ( session.profileConfig?.width !== 1200 || session.profileConfig?.height !== 800 || session.profileConfig?.dpr !== 1 ) fail( 'Correctness capture must use 1200x800 at DPR 1.' );
+	if ( session.profileConfig?.width !== CORRECTNESS_PARENT_LOCK.width || session.profileConfig?.height !== CORRECTNESS_PARENT_LOCK.height || session.profileConfig?.dpr !== CORRECTNESS_PARENT_LOCK.dpr ) fail( `Correctness capture must use ${ CORRECTNESS_PARENT_LOCK.width }x${ CORRECTNESS_PARENT_LOCK.height } at DPR ${ CORRECTNESS_PARENT_LOCK.dpr }.` );
 	if ( ! [ 'hardware', 'software', 'unknown' ].includes( session.adapterClass ) ) fail( 'Correctness capture adapter class is invalid.' );
 	requireObject( session.adapterIdentity, 'adapterIdentity' );
 	if ( session.threeRevision !== '0.185.1' ) fail( 'Correctness capture must use Three.js 0.185.1.' );
@@ -320,33 +905,64 @@ export function validateCorrectnessCaptureSession( session ) {
 	requireObject( session.sourceClosure, 'sourceClosure' );
 	if ( session.sourceClosure.sourceHash !== session.sourceClosureHash || session.sourceClosure.buildRevision !== session.buildRevision || session.sourceClosure.threeRevision !== session.threeRevision ) fail( 'Correctness capture source closure identity is inconsistent.' );
 	assertCaptureSessionInterval( session );
-	if ( session.route?.requestedUrl !== session.url || session.route?.finalUrl !== session.finalUrl || session.route?.browserEntry !== session.browserEntry || session.route?.manifestLabId !== session.labId ) fail( 'Correctness capture route identity is inconsistent.' );
+	assertCorrectnessRoute( session );
 	for ( const field of [ 'pageErrors', 'consoleErrors', 'requestErrors' ] ) if ( requireArray( session[ field ], field ).length > 0 ) fail( `Correctness capture contains ${ field }.` );
 	const metrics = requireObject( session.runtime?.metrics, 'runtime.metrics' );
 	if ( metrics.nativeWebGPU !== true || metrics.initialized !== true || String( metrics.backend ?? metrics.backendKind ?? '' ).toLowerCase() !== 'webgpu' ) fail( 'Correctness capture lacks initialized native WebGPU proof.' );
-	const writePaths = assertCorrectnessArtifactWrites( session );
+	assertCorrectnessClaimScope( session );
+	const writeIndex = assertCorrectnessArtifactWrites( session );
 	const captures = requireArray( session.writtenCaptures, 'writtenCaptures' );
-	if ( captures.length === 0 ) fail( 'Correctness capture contains no render-target readbacks.' );
-	captures.forEach( ( capture, index ) => assertCorrectnessReadbackCapture( capture, writePaths, `writtenCaptures[${ index }]` ) );
-	const outputs = requireArray( session.outputPlan, 'outputPlan' );
-	if ( outputs.length !== STANDARD_OUTPUTS.length ) fail( `Correctness capture must disposition all ${ STANDARD_OUTPUTS.length } standard outputs.` );
-	const names = new Set();
-	for ( const filename of STANDARD_OUTPUTS ) {
+	if ( captures.length !== CORRECTNESS_CAPTURE_RECIPES.length ) fail( `Correctness capture requires exactly ${ CORRECTNESS_CAPTURE_RECIPES.length } direct recipe readbacks.` );
+	const capturesByRecipe = new Map();
+	const transactions = new Set();
+	const capturePaths = new Set();
+	const outputNodesByMode = new Map();
+	const outputModesByUuid = new Map();
+	let previous = null;
+	for ( let index = 0; index < CORRECTNESS_CAPTURE_RECIPES.length; index ++ ) {
 
-		const output = outputs.find( ( candidate ) => candidate?.id === filename.slice( 0, -4 ) );
-		if ( ! output || names.has( output.id ) ) fail( `Correctness capture omits or duplicates ${ filename }.` );
-		names.add( output.id );
-		if ( output.status === 'CAPTURED' ) {
+		const recipe = CORRECTNESS_CAPTURE_RECIPES[ index ];
+		const capture = assertCorrectnessReadbackCapture( captures[ index ], recipe, writeIndex, `writtenCaptures[${ index }]` );
+		const proof = assertRecipeCaptureEvidence( capture, recipe, index, previous, `writtenCaptures[${ index }]` );
+		if ( transactions.has( proof.transaction.transactionId ) ) fail( `Correctness capture aliases transaction ${ proof.transaction.transactionId }.` );
+		transactions.add( proof.transaction.transactionId );
+		const outputIdentity = { uuid: proof.effectiveState.outputNodeUuid, type: proof.effectiveState.outputNodeType };
+		const priorIdentity = outputNodesByMode.get( proof.effectiveState.mode );
+		if ( priorIdentity !== undefined && stableStringify( priorIdentity ) !== stableStringify( outputIdentity ) ) fail( `Correctness capture changed ${ proof.effectiveState.mode } output-node identity between recipes.` );
+		const priorMode = outputModesByUuid.get( outputIdentity.uuid );
+		if ( priorMode !== undefined && priorMode !== proof.effectiveState.mode ) fail( `Correctness capture aliases output-node UUID ${ outputIdentity.uuid } across ${ priorMode } and ${ proof.effectiveState.mode }.` );
+		outputNodesByMode.set( proof.effectiveState.mode, outputIdentity );
+		outputModesByUuid.set( outputIdentity.uuid, proof.effectiveState.mode );
+		for ( const path of [ capture.png.path, capture.transport.artifact.path, capture.normalized.artifact.path ] ) {
 
-			if ( output.filename !== filename || writePaths.has( filename ) === false ) fail( `${ filename } is not bound to this capture session.` );
-			requireHash( output.artifact?.sha256, `${ filename } artifact hash` );
-			requireFinite( output.artifact?.byteLength, `${ filename } artifact byteLength`, 1 );
+			if ( capturePaths.has( path ) ) fail( `Correctness capture aliases artifact path ${ path }.` );
+			capturePaths.add( path );
 
-		} else if ( output.status !== 'NOT_APPLICABLE' || typeof output.reason !== 'string' || output.reason.length === 0 || ! output.graphProof ) fail( `${ filename } has no captured output or structural N/A proof.` );
+		}
+		capturesByRecipe.set( recipe.id, capture );
+		previous = proof;
 
 	}
-	for ( const required of [ 'final.design.png', 'diagnostics.mosaic.png' ] ) if ( outputs.find( ( output ) => output.filename === required )?.status !== 'CAPTURED' ) fail( `${ required } is required correctness evidence.` );
-	return { valid: true, profile: session.profile, outputCount: outputs.length, captureCount: captures.length, adapterClass: session.adapterClass };
+	if ( stableStringify( [ ...outputNodesByMode.keys() ].sort() ) !== stableStringify( Object.keys( VALIDATION_MODE_OUTPUT_NODE_IDS ).sort() ) ) fail( 'Correctness recipe set did not execute every canonical output-node identity.' );
+	const outputs = requireArray( session.outputPlan, 'outputPlan' );
+	if ( outputs.length !== STANDARD_OUTPUTS.length ) fail( `Correctness capture must disposition all ${ STANDARD_OUTPUTS.length } standard outputs.` );
+	for ( let index = 0; index < STANDARD_OUTPUTS.length; index ++ ) {
+
+		const filename = STANDARD_OUTPUTS[ index ];
+		const output = requireObject( outputs[ index ], `outputPlan[${ index }]` );
+		if ( output.id !== filename.slice( 0, - 4 ) || output.status !== 'CAPTURED' || output.filename !== filename ) fail( `Correctness output ${ filename } is missing, reordered, or not captured.` );
+		assertArtifactWriteJoin( output.artifact, writeIndex, `${ filename } output artifact`, filename );
+		if ( filename !== 'diagnostics.mosaic.png' ) {
+
+			const capture = capturesByRecipe.get( filename.slice( 0, - 4 ) );
+			if ( capture === undefined || output.derivation?.kind !== 'direct-render-target-readback' || output.derivation?.validationStatus !== 'PASS' || output.artifact.sha256 !== capture.png.sha256 || output.artifact.byteLength !== capture.png.byteLength ) fail( `${ filename } is not joined to its direct recipe readback.` );
+
+		}
+
+	}
+	assertDiagnosticMosaicBinding( session, writeIndex );
+	assertTierVisualEvidence( session, capturesByRecipe, writeIndex );
+	return { valid: true, profile: session.profile, outputCount: outputs.length, captureCount: captures.length, recipeCount: CORRECTNESS_CAPTURE_RECIPES.length, adapterClass: session.adapterClass };
 
 }
 
