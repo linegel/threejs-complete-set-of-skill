@@ -5,7 +5,6 @@ import {
   CAPTURE_PROFILES,
   LAB_CONTROLLER_GLOBALS,
   awaitCanonicalReady,
-  assertRecipeCaptureMode,
   backendProven,
   captureLabBrowser,
   capturePixels,
@@ -208,111 +207,32 @@ test('recipe capture uses the explicit controller method and enforces recipe ide
       __THREEJS_LAB__: {
         captureRecipe: async (recipeId) => ({
           target: recipeId,
-          captureMode: 'final',
           width: 1,
           height: 1,
           bytesPerPixel: 4,
           format: 'rgba8unorm',
           outputColorSpace: 'srgb',
           pixels,
-          evidence: {
-            recipe: { id: recipeId, target: 'final' },
-            effectiveState: { mode: 'final' },
-            restoration: { status: 'PASS' },
-          },
+          evidence: { recipe: { id: recipeId }, restoration: { status: 'PASS' } },
         }),
       },
     };
     const capture = await captureRecipePixels(page, 'camera.near');
     assert.equal(capture.target, 'camera.near');
-    assert.equal(capture.captureMode, 'final');
     assert.equal(capture.evidence.recipe.id, 'camera.near');
-    assert.equal(assertRecipeCaptureMode(capture, 'camera.near', ['final', 'normal']), 'final');
 
     globalThis.window.__THREEJS_LAB__.captureRecipe = async () => ({
       target: 'final.design',
-      captureMode: 'final',
       width: 1,
       height: 1,
       bytesPerPixel: 4,
       format: 'rgba8unorm',
       outputColorSpace: 'srgb',
       pixels,
-      evidence: {
-        recipe: { id: 'final.design', target: 'final' },
-        effectiveState: { mode: 'final' },
-      },
     });
     await assert.rejects(
       captureRecipePixels(page, 'camera.near'),
       /capture target final\.design for requested recipe camera\.near/,
-    );
-  } finally {
-    if (previousWindow === undefined) delete globalThis.window;
-    else globalThis.window = previousWindow;
-  }
-});
-
-test('recipe capture rejects missing and forged render-mode provenance', async () => {
-  const previousWindow = globalThis.window;
-  const page = { evaluate: async (callback, argument) => callback(argument) };
-  const pixels = Uint8Array.from([21, 43, 65, 255]);
-  const recipeCapture = (overrides = {}) => ({
-    target: 'camera.near',
-    captureMode: 'final',
-    width: 1,
-    height: 1,
-    bytesPerPixel: 4,
-    format: 'rgba8unorm',
-    outputColorSpace: 'srgb',
-    pixels,
-    evidence: {
-      recipe: { id: 'camera.near', target: 'final' },
-      effectiveState: { mode: 'final' },
-    },
-    ...overrides,
-  });
-  try {
-    globalThis.window = {
-      __THREEJS_LAB__: {
-        captureRecipe: async () => {
-          const capture = recipeCapture();
-          delete capture.captureMode;
-          return capture;
-        },
-      },
-    };
-    await assert.rejects(
-      captureRecipePixels(page, 'camera.near'),
-      /omitted captureMode/,
-    );
-
-    globalThis.window.__THREEJS_LAB__.captureRecipe = async () => recipeCapture({ captureMode: 'emissive' });
-    await assert.rejects(
-      captureRecipePixels(page, 'camera.near'),
-      /captureMode emissive does not match evidence recipe target final and effective mode final/,
-    );
-
-    globalThis.window.__THREEJS_LAB__.captureRecipe = async () => recipeCapture({
-      evidence: {
-        recipe: { id: 'camera.near', target: 'normal' },
-        effectiveState: { mode: 'final' },
-      },
-    });
-    await assert.rejects(
-      captureRecipePixels(page, 'camera.near'),
-      /captureMode final does not match evidence recipe target normal and effective mode final/,
-    );
-
-    globalThis.window.__THREEJS_LAB__.captureRecipe = async () => recipeCapture({
-      evidence: {
-        recipe: { id: 'camera.far', target: 'final' },
-        effectiveState: { mode: 'final' },
-      },
-    });
-    await assert.rejects(
-      captureRecipePixels(page, 'camera.near'),
-      /evidence recipe id camera\.far does not match its requested recipe/,
     );
   } finally {
     if (previousWindow === undefined) delete globalThis.window;

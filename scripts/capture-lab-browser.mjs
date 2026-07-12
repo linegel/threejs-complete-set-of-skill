@@ -226,69 +226,6 @@ export function normalizeCaptureEvidence(value) {
   return cloneJsonEvidenceValue(value, 'PixelCapture.evidence', new WeakSet());
 }
 
-function requireCaptureMode(value, label = 'PixelCapture.captureMode') {
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new TypeError(`${label} must be a known nonempty string`);
-  }
-  return value;
-}
-
-/**
- * Bind a recipe capture's public recipe identity to the render mode that was
- * actually selected for its readback. The recipe id remains `target`; the
- * underlying output-node mode is carried separately as `captureMode`.
- */
-export function assertRecipeCaptureMode(capture, recipeId, knownModes = null) {
-  if (!capture || typeof capture !== 'object' || Array.isArray(capture)) {
-    throw new TypeError('recipe PixelCapture metadata must be an object');
-  }
-  if (typeof recipeId !== 'string' || recipeId.trim().length === 0) {
-    throw new TypeError('recipeId must be a nonempty string');
-  }
-  if (capture.target !== recipeId) {
-    throw new Error(`recipe PixelCapture target ${capture.target ?? '<missing>'} does not match ${recipeId}`);
-  }
-  if (!Object.hasOwn(capture, 'captureMode')) {
-    throw new Error(`recipe PixelCapture ${recipeId} omitted captureMode`);
-  }
-  const captureMode = requireCaptureMode(capture.captureMode);
-  const recipe = capture.evidence?.recipe;
-  const effectiveState = capture.evidence?.effectiveState;
-  if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) {
-    throw new Error(`recipe PixelCapture ${recipeId} omitted evidence.recipe`);
-  }
-  if (recipe.id !== recipeId) {
-    throw new Error(
-      `recipe PixelCapture ${recipeId} evidence recipe id ${recipe.id ?? '<missing>'} does not match its requested recipe`,
-    );
-  }
-  if (!effectiveState || typeof effectiveState !== 'object' || Array.isArray(effectiveState)) {
-    throw new Error(`recipe PixelCapture ${recipeId} omitted evidence.effectiveState`);
-  }
-  const declaredTarget = requireCaptureMode(
-    recipe.target,
-    `recipe PixelCapture ${recipeId} evidence.recipe.target`,
-  );
-  const effectiveMode = requireCaptureMode(
-    effectiveState.mode,
-    `recipe PixelCapture ${recipeId} evidence.effectiveState.mode`,
-  );
-  if (captureMode !== declaredTarget || captureMode !== effectiveMode) {
-    throw new Error(
-      `recipe PixelCapture ${recipeId} captureMode ${captureMode} does not match evidence recipe target ${declaredTarget} and effective mode ${effectiveMode}`,
-    );
-  }
-  if (knownModes !== null) {
-    if (!Array.isArray(knownModes) || knownModes.some((mode) => typeof mode !== 'string' || mode.trim().length === 0)) {
-      throw new TypeError('known recipe capture modes must be an array of nonempty strings');
-    }
-    if (!knownModes.includes(captureMode)) {
-      throw new Error(`recipe PixelCapture ${recipeId} captureMode ${captureMode} is not a known lab mode`);
-    }
-  }
-  return captureMode;
-}
-
 function requireCaptureFilename(filename, label = 'capture filename') {
   if (typeof filename !== 'string' || !/^[a-z0-9][a-z0-9._-]*\.png$/.test(filename)) {
     throw new Error(`${label} must be a confined lowercase PNG filename`);
@@ -665,9 +602,6 @@ function orientRowsTopLeft(data, width, height, bytesPerPixel, sourceOrigin) {
  */
 export function normalizePixelCapture(payload) {
   if (!payload || typeof payload !== 'object') throw new TypeError('PixelCapture must be an object');
-  const captureMode = Object.hasOwn(payload, 'captureMode')
-    ? requireCaptureMode(payload.captureMode)
-    : null;
   const width = optionalPositiveInteger(payload.width, 'width');
   const height = optionalPositiveInteger(payload.height, 'height');
   if (width === null || height === null) throw new RangeError('PixelCapture width and height are required');
@@ -767,7 +701,6 @@ export function normalizePixelCapture(payload) {
 
   return {
     target: payload.target ?? 'final',
-    ...(captureMode === null ? {} : { captureMode }),
     width,
     height,
     bytesPerPixel,
@@ -1030,14 +963,8 @@ async function capturePixelsThroughController(page, method, target) {
       }
       assertJsonEvidence(capture.evidence, 'PixelCapture.evidence', new WeakSet());
     }
-    if (Object.hasOwn(capture, 'captureMode')) {
-      if (typeof capture.captureMode !== 'string' || capture.captureMode.trim().length === 0) {
-        throw new TypeError('PixelCapture.captureMode must be a known nonempty string');
-      }
-    }
     return {
       target: capture.target ?? captureTarget,
-      ...(Object.hasOwn(capture, 'captureMode') ? { captureMode: capture.captureMode } : {}),
       width: transportLayout?.width ?? capture.width,
       height: transportLayout?.height ?? capture.height,
       bytesPerPixel: capture.bytesPerPixel,
@@ -1102,8 +1029,9 @@ export async function capturePixels(page, target) {
 
 export async function captureRecipePixels(page, recipeId) {
   const capture = await capturePixelsThroughController(page, 'captureRecipe', recipeId);
-  if (capture.target !== recipeId) throw new Error(`LabController returned capture target ${capture.target} for requested recipe ${recipeId}`);
-  assertRecipeCaptureMode(capture, recipeId);
+  if (capture.target !== recipeId) {
+    throw new Error(`LabController returned capture target ${capture.target} for requested recipe ${recipeId}`);
+  }
   return capture;
 }
 
@@ -1567,9 +1495,6 @@ export function buildCaptureArtifactPayload(capture, filename) {
   });
   return Object.freeze({
     target: capture.target,
-    ...(Object.hasOwn(capture, 'captureMode')
-      ? { captureMode: requireCaptureMode(capture.captureMode) }
-      : {}),
     width: capture.width,
     height: capture.height,
     bytesPerPixel: capture.bytesPerPixel,
@@ -2020,7 +1945,6 @@ export async function captureLabBrowser({
   const consoleErrors = [];
   const requestErrors = [];
   const writtenCaptures = [];
-  const recipeCaptureBindings = [];
   const startedAt = new Date().toISOString();
   try {
     await vite.listen();
@@ -2110,18 +2034,15 @@ export async function captureLabBrowser({
     assertCaptureState(observedState, lockedState);
     assertNoCaptureFailures({ pageErrors, consoleErrors, requestErrors, runtime });
     const browserRecord = await collectBrowserRecord(browser, page, runtime.metrics);
-    const persistCapture = async (filename, captureTarget, readCapture, recipeId = null) => {
+    const persistCapture = async (filename, captureTarget, readCapture) => {
       const capture = await readCapture();
       if (capture.target !== captureTarget) {
         throw new Error(`LabController returned capture target ${capture.target} for requested ${captureTarget}`);
       }
-      if (recipeId !== null) assertRecipeCaptureMode(capture, recipeId, lab.modes);
       const payload = buildCaptureArtifactPayload(capture, filename);
-      if (recipeId !== null) assertRecipeCaptureMode(payload, recipeId, lab.modes);
       writeCapturePayload(output, payload, writeLedger);
       const metadata = captureMetadataOnly(payload);
       writtenCaptures.push(metadata);
-      if (recipeId !== null) recipeCaptureBindings.push(Object.freeze({ recipeId, metadata }));
       return metadata;
     };
     const session = {
@@ -2156,16 +2077,13 @@ export async function captureLabBrowser({
         return persistCapture(filename, captureTarget, () => capturePixels(page, captureTarget));
       },
       async writeRecipeCapture(filename, recipeId) {
-        return persistCapture(filename, recipeId, () => captureRecipePixels(page, recipeId), recipeId);
+        return persistCapture(filename, recipeId, () => captureRecipePixels(page, recipeId));
       },
     };
 
     const hookResult = captureHook
       ? await captureHook(session)
       : await runBuiltinCapture(session, target);
-    for (const { recipeId, metadata } of recipeCaptureBindings) {
-      assertRecipeCaptureMode(metadata, recipeId, lab.modes);
-    }
     const verifiedOutputs = validateCapturedOutputs(
       output,
       outputPlan,
@@ -2230,11 +2148,6 @@ export async function captureLabBrowser({
         hookResultValidated: hookResultSourceClosureValidated,
       }),
     });
-
-    for (const { recipeId, metadata } of recipeCaptureBindings) {
-      assertRecipeCaptureMode(metadata, recipeId, lab.modes);
-      Object.freeze(metadata);
-    }
 
     verifyCaptureWriteLedgerOnDisk(output, writeLedger);
     const captureSessionPath = prepareArtifactWrite(output, 'capture-session.json');
