@@ -1,14 +1,56 @@
-import { mkdir, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 
+import { unpackAlignedRows } from '../../../labs/runtime/aligned-readback.mjs';
 import { encodeRgbaPng } from '../../../scripts/lib/png-rgba.mjs';
-import { classifyGpuStageAttribution, classifyPerformanceTrace, writeIncompleteV2RuntimeBundle } from './src/runtime-v2-bundle.js';
+import {
+	computeCaptureSourceClosure,
+	validateCaptureSourceClosure
+} from './src/capture-source-closure.js';
+import {
+	DIAGNOSTIC_MOSAIC_RECIPE,
+	DIAGNOSTIC_MOSAIC_SOURCES,
+	reconstructDiagnosticMosaic as reconstructNamedDiagnosticMosaic
+} from './src/diagnostic-mosaic.js';
+import {
+	classifyGpuStageAttribution,
+	classifyMechanismProof,
+	classifyPerformanceTrace,
+	writeIncompleteV2RuntimeBundle
+} from './src/runtime-v2-bundle.js';
 
 const DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE = 1;
 const GOVERNOR_MEAN_VISUAL_ERROR_GATE = 8;
 const GOVERNOR_EDGE_P95_VISUAL_ERROR_GATE = 32;
+export { DIAGNOSTIC_MOSAIC_RECIPE, DIAGNOSTIC_MOSAIC_SOURCES };
 
-function captureRecord( filename, capture ) {
+export const outputPlan = Object.freeze( [
+	{ id: 'final.design', status: 'CAPTURED', filename: 'final.design.png' },
+	{ id: 'no-post.design', status: 'CAPTURED', filename: 'no-post.design.png' },
+	{
+		id: 'diagnostics.mosaic',
+		status: 'CAPTURED',
+		filename: 'diagnostics.mosaic.png',
+		sourceCaptures: [ 'final.design.png', 'no-post.design.png', 'diagnostic.normal.png', 'diagnostic.emissive.png' ]
+	},
+	{ id: 'camera.near', status: 'CAPTURED', filename: 'camera.near.png' },
+	{ id: 'camera.design', status: 'CAPTURED', filename: 'camera.design.png' },
+	{ id: 'camera.far', status: 'CAPTURED', filename: 'camera.far.png' },
+	{ id: 'seed-0001.final', status: 'CAPTURED', filename: 'seed-0001.final.png' },
+	{ id: 'seed-9e3779b9.final', status: 'CAPTURED', filename: 'seed-9e3779b9.final.png' },
+	{ id: 'temporal.t000', status: 'CAPTURED', filename: 'temporal.t000.png' },
+	{ id: 'temporal.t001', status: 'CAPTURED', filename: 'temporal.t001.png' }
+] );
+
+export const recomputeCaptureSourceClosure = computeCaptureSourceClosure;
+export { validateCaptureSourceClosure };
+
+function sha256( bytes ) {
+
+	return `sha256:${ createHash( 'sha256' ).update( bytes ).digest( 'hex' ) }`;
+
+}
+
+export function captureRecord( filename, capture ) {
 
 	return {
 		filename,
@@ -21,19 +63,35 @@ function captureRecord( filename, capture ) {
 		sourceByteLength: capture.sourceByteLength,
 		transportByteLength: capture.transportByteLength,
 		sourceLayout: capture.sourceLayout,
+		requestedLayout: capture.transport?.rendererCopy?.requestedLayout ?? null,
+		transportLayout: capture.transport?.layout ?? null,
+		normalizedLayout: capture.normalized?.layout ?? null,
+		normalizedBytesPerRow: capture.normalized?.bytesPerRow ?? null,
+		normalizedByteLength: capture.normalized?.byteLength ?? null,
+		controllerNormalized: capture.controllerNormalized ?? null,
 		format: capture.format,
-		colorEncoding: capture.colorEncoding
+		colorEncoding: capture.colorEncoding,
+		pngSha256: capture.png.sha256,
+		transportSha256: capture.transport.artifact.sha256,
+		normalizedSha256: capture.normalized.artifact.sha256
 	};
 
 }
 
 async function captureAndWrite( session, captures, filename, target ) {
 
-	await session.controllerCall( 'renderOnce' );
-	const capture = await session.capturePixels( target );
-	await writeFile( resolve( session.outputDir, filename ), encodeRgbaPng( capture ) );
-	captures.push( captureRecord( filename, capture ) );
-	return capture;
+	const metadata = await session.writeCapture( filename, target );
+	captures.push( captureRecord( filename, metadata ) );
+	const normalizedBytes = await session.readArtifact( metadata.normalized.artifact.path );
+	const compact = unpackAlignedRows( {
+		source: normalizedBytes,
+		width: metadata.width,
+		height: metadata.height,
+		bytesPerPixel: 4,
+		bytesPerRow: metadata.normalized.bytesPerRow
+	} );
+	if ( sha256( compact ) !== metadata.normalized.compactRgbaSha256 ) throw new Error( `${ filename } normalized readback hash drifted before mosaic construction.` );
+	return { filename, width: metadata.width, height: metadata.height, data: compact, metadata };
 
 }
 
@@ -62,7 +120,7 @@ function percentile( values, quantile ) {
 
 }
 
-function tierVisualErrorMetrics( reference, candidate ) {
+export function tierVisualErrorMetrics( reference, candidate ) {
 
 	if ( reference.width !== candidate.width || reference.height !== candidate.height ) throw new Error( 'Tier comparison dimensions differ.' );
 	const edgeDifferences = [];
@@ -91,39 +149,80 @@ function tierVisualErrorMetrics( reference, candidate ) {
 
 }
 
-function diagnosticMosaic( entries ) {
+export function reconstructDiagnosticMosaic( sources ) {
 
-	const width = entries[ 0 ].width;
-	const height = entries[ 0 ].height;
-	if ( entries.some( ( entry ) => entry.width !== width || entry.height !== height ) ) throw new Error( 'Diagnostic mosaic inputs must share dimensions.' );
-	const data = new Uint8Array( width * height * 4 );
-	const halfWidth = Math.ceil( width / 2 );
-	const halfHeight = Math.ceil( height / 2 );
+	return reconstructNamedDiagnosticMosaic( sources, { hashPixels: sha256 } );
 
-	for ( let y = 0; y < height; y ++ ) for ( let x = 0; x < width; x ++ ) {
+}
 
-		const column = x >= halfWidth ? 1 : 0;
-		const row = y >= halfHeight ? 1 : 0;
-		const source = entries[ row * 2 + column ];
-		const tileWidth = column === 0 ? halfWidth : width - halfWidth;
-		const tileHeight = row === 0 ? halfHeight : height - halfHeight;
-		const localX = column === 0 ? x : x - halfWidth;
-		const localY = row === 0 ? y : y - halfHeight;
-		const sourceX = Math.min( width - 1, Math.floor( localX * width / tileWidth ) );
-		const sourceY = Math.min( height - 1, Math.floor( localY * height / tileHeight ) );
-		const sourceOffset = ( sourceY * width + sourceX ) * 4;
-		const targetOffset = ( y * width + x ) * 4;
-		data.set( source.data.subarray( sourceOffset, sourceOffset + 4 ), targetOffset );
+async function writeDerivedMosaic( session, mosaic ) {
 
-	}
-	return { width, height, data };
+	const png = encodeRgbaPng( mosaic );
+	const rowBytes = mosaic.width * 4;
+	const bytesPerRow = Math.ceil( rowBytes / 256 ) * 256;
+	const padded = new Uint8Array( bytesPerRow * mosaic.height );
+	for ( let row = 0; row < mosaic.height; row ++ ) padded.set(
+		mosaic.data.subarray( row * rowBytes, ( row + 1 ) * rowBytes ),
+		row * bytesPerRow
+	);
+	const pngPath = 'diagnostics.mosaic.png';
+	const rawPath = 'normalized-readbacks/diagnostics.mosaic.rgba8.padded.bin';
+	const packedPath = 'normalized-readbacks/diagnostics.mosaic.rgba8.compact.bin';
+	await session.writeArtifact( pngPath, png );
+	await session.writeArtifact( rawPath, padded );
+	await session.writeArtifact( packedPath, mosaic.data );
+	return {
+		id: 'diagnostics.mosaic',
+		status: 'CAPTURED',
+		filename: pngPath,
+		width: mosaic.width,
+		height: mosaic.height,
+		sourceCaptures: [ 'final.design.png', 'no-post.design.png', 'diagnostic.normal.png', 'diagnostic.emissive.png' ],
+		derivation: mosaic.recipe,
+		file: { path: pngPath, sha256: sha256( png ), byteLength: png.byteLength },
+		pixelEvidence: {
+			png: {
+				path: pngPath,
+				sha256: sha256( png ),
+				byteLength: png.byteLength,
+				derivedFromPackedRgbaSha256: sha256( mosaic.data )
+			},
+			normalized: {
+				rawArtifact: { path: rawPath, sha256: sha256( padded ), byteLength: padded.byteLength },
+				packedArtifact: { path: packedPath, sha256: sha256( mosaic.data ), byteLength: mosaic.data.byteLength },
+				packedRgbaSha256: sha256( mosaic.data ),
+				packedByteLength: mosaic.data.byteLength,
+				paddedBytesPerRow: bytesPerRow,
+				width: mosaic.width,
+				height: mosaic.height,
+				rowBytes,
+				bytesPerRow,
+				origin: 'top-left',
+				paddingVerifiedZero: true
+			}
+		}
+	};
+
+}
+
+export function derivedMosaicCaptureRecord( mosaicOutput ) {
+
+	return {
+		filename: 'diagnostics.mosaic.png',
+		target: 'final/no-post/normal/emissive',
+		width: mosaicOutput.width,
+		height: mosaicOutput.height,
+		source: 'four actual output-node captures',
+		pngSha256: mosaicOutput.file.sha256
+	};
 
 }
 
 export async function captureLab( session ) {
 
+	if ( session.automationSurface !== 'codex-in-app-browser' ) throw new Error( 'Canonical capture requires the immutable Codex in-app Browser evidence surface; external browser launchers are nonpublishable.' );
+	const sourceClosure = computeCaptureSourceClosure();
 	const captures = [];
-	await mkdir( resolve( session.outputDir, 'images' ), { recursive: true } );
 	await session.controllerCall( 'setScenario', 'browser-capture' );
 	await session.controllerCall( 'setTier', 'webgpu-correctness' );
 	await session.controllerCall( 'resize', 1200, 800, 1 );
@@ -131,25 +230,28 @@ export async function captureLab( session ) {
 	await session.controllerCall( 'setSeed', 0x00000001 );
 	await session.controllerCall( 'setTime', 0 );
 
-	const final = await captureAndWrite( session, captures, 'images/final.design.png', 'final' );
-	const noPost = await captureAndWrite( session, captures, 'images/no-post.design.png', 'no-post' );
-	const normal = await captureAndWrite( session, captures, 'images/diagnostic.normal.png', 'normal' );
-	const emissive = await captureAndWrite( session, captures, 'images/diagnostic.emissive.png', 'emissive' );
-	const diagnosticDifference = Math.min(
-		meanRgbByteDifference( final, normal ),
-		meanRgbByteDifference( final, emissive )
-	);
+	const final = await captureAndWrite( session, captures, 'final.design.png', 'final' );
+	const noPost = await captureAndWrite( session, captures, 'no-post.design.png', 'no-post' );
+	const normal = await captureAndWrite( session, captures, 'diagnostic.normal.png', 'normal' );
+	const emissive = await captureAndWrite( session, captures, 'diagnostic.emissive.png', 'emissive' );
+	const diagnosticDifferences = {
+		normal: meanRgbByteDifference( final, normal ),
+		emissive: meanRgbByteDifference( final, emissive )
+	};
+	const diagnosticDifference = Math.min( diagnosticDifferences.normal, diagnosticDifferences.emissive );
 	if ( diagnosticDifference <= DISTINCT_IMAGE_MEAN_RGB_BYTE_GATE ) throw new Error( 'Diagnostic outputs are not materially distinct from final output.' );
-	await writeFile(
-		resolve( session.outputDir, 'images/diagnostics.mosaic.png' ),
-		encodeRgbaPng( diagnosticMosaic( [ final, noPost, normal, emissive ] ) )
-	);
-	captures.push( { filename: 'images/diagnostics.mosaic.png', target: 'final/no-post/normal/emissive', width: final.width, height: final.height, source: 'four actual output-node captures' } );
+	const mosaicOutput = await writeDerivedMosaic( session, reconstructDiagnosticMosaic( new Map( [
+		[ final.filename, final ],
+		[ noPost.filename, noPost ],
+		[ normal.filename, normal ],
+		[ emissive.filename, emissive ]
+	] ) ) );
+	captures.push( derivedMosaicCaptureRecord( mosaicOutput ) );
 
 	for ( const camera of [ 'near', 'design', 'far' ] ) {
 
 		await session.controllerCall( 'setCamera', camera );
-		await captureAndWrite( session, captures, `images/camera.${ camera }.png`, 'final' );
+		await captureAndWrite( session, captures, `camera.${ camera }.png`, 'final' );
 
 	}
 
@@ -159,19 +261,19 @@ export async function captureLab( session ) {
 		await session.controllerCall( 'setSeed', seed );
 		await session.controllerCall( 'setTime', 0 );
 		const seedName = seed === 0x00000001 ? '0001' : seed.toString( 16 ).padStart( 8, '0' );
-		await captureAndWrite( session, captures, `images/seed-${ seedName }.final.png`, 'final' );
+		await captureAndWrite( session, captures, `seed-${ seedName }.final.png`, 'final' );
 
 	}
 
 	await session.controllerCall( 'setSeed', 0x00000001 );
 	await session.controllerCall( 'resetHistory', 'correctness-capture' );
 	await session.controllerCall( 'setTime', 0 );
-	await captureAndWrite( session, captures, 'images/temporal.t000.png', 'final' );
+	await captureAndWrite( session, captures, 'temporal.t000.png', 'final' );
 	await session.controllerCall( 'step', 1 / 60 );
-	await captureAndWrite( session, captures, 'images/temporal.t001.png', 'final' );
+	await captureAndWrite( session, captures, 'temporal.t001.png', 'final' );
 
 	await session.controllerCall( 'resize', 641, 359, 1 );
-	const odd = await captureAndWrite( session, captures, 'images/odd-size.final.png', 'final' );
+	const odd = await captureAndWrite( session, captures, 'odd-size.final.png', 'final' );
 	if ( odd.width !== 641 || odd.height !== 359 ) throw new Error( `Odd-size capture drifted to ${ odd.width }x${ odd.height }.` );
 
 	let performanceTrace = null;
@@ -183,7 +285,7 @@ export async function captureLab( session ) {
 		await session.controllerCall( 'setCamera', 'design' );
 		await session.controllerCall( 'setSeed', 0x00000001 );
 		await session.controllerCall( 'setTime', 0 );
-		await captureAndWrite( session, captures, 'images/final.performance.png', 'final' );
+		await captureAndWrite( session, captures, 'final.performance.png', 'final' );
 		performanceTrace = await session.controllerCall( 'runPerformanceProfile', {
 			warmupFrames: 30,
 			sampleFrames: 120,
@@ -194,11 +296,11 @@ export async function captureLab( session ) {
 			framesPerWindow: 30
 		} );
 		await session.controllerCall( 'setTier', 'target-performance' );
-		const targetTier = await captureAndWrite( session, captures, 'images/tier.target-performance.png', 'final' );
+		const targetTier = await captureAndWrite( session, captures, 'tier.target-performance.png', 'final' );
 		await session.controllerCall( 'setTier', 'governor-stress' );
-		const governorTier = await captureAndWrite( session, captures, 'images/tier.governor-stress.png', 'final' );
+		const governorTier = await captureAndWrite( session, captures, 'tier.governor-stress.png', 'final' );
 		governorTrace.visualErrorByTier = {
-			'target-performance': { meanRgbByteDifference: 0, edgeMaskPixels: 0, edgeMeanRgbByteDifference: 0, edgeP95RgbByteDifference: 0 },
+			'target-performance': tierVisualErrorMetrics( targetTier, targetTier ),
 			'governor-stress': tierVisualErrorMetrics( targetTier, governorTier )
 		};
 		governorTrace.visualErrorGates = {
@@ -215,9 +317,8 @@ export async function captureLab( session ) {
 	await session.controllerCall( 'setTime', 0 );
 	await session.controllerCall( 'setMode', 'final' );
 	await session.controllerCall( 'renderOnce' );
-	const lifecycle = await session.page.evaluate( async () => (
-		window.__THREEJS_LAB_LIFECYCLE__( 50 )
-	) );
+	const mechanismProof = await session.controllerCall( 'runMechanismReachabilityProfile' );
+	const lifecycle = await session.page.evaluate( async () => window.__THREEJS_LAB_LIFECYCLE__( 50 ) );
 
 	const runtime = {
 		metrics: await session.controllerCall( 'getMetrics' ),
@@ -226,14 +327,16 @@ export async function captureLab( session ) {
 		gpuTiming: await session.controllerCall( 'resolveGpuTimings' ),
 		performanceTrace,
 		governorTrace,
+		mechanismProof,
 		lifecycle
 	};
 	const performanceCompliance = classifyPerformanceTrace( performanceTrace, {
 		cpuP95: 1000 / 60 - 2,
 		gpuP95: 1000 / 60 - 2,
 		deadlineMissRatio: 0.01
-	} );
+	}, runtime.metrics.adapterClass );
 	const gpuAttribution = classifyGpuStageAttribution( performanceTrace );
+	const mechanismCorrectness = classifyMechanismProof( mechanismProof, diagnosticDifferences, runtime.pipeline );
 	const boundary = {
 		schemaVersion: 2,
 		bundleKind: 'browser-capture-session',
@@ -243,12 +346,14 @@ export async function captureLab( session ) {
 		sourceHash: session.lab.sourceHash,
 		evidenceContract: 'v2',
 		reason: performanceTrace === null
-			? 'Real render-target captures and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness, sustained timing, GPU-stage attribution, and visual sign-off.'
-			: 'Real render-target captures, a sustained attributed CPU/GPU/cadence trace, a measured governor stress run, and a 50-cycle lifecycle run exist; acceptance still requires mechanism completeness and visual sign-off.',
+			? 'Native readbacks, runtime mechanism proof, and 50 lifecycle cycles exist; hardware performance and GPU attribution are not claimed by the correctness profile.'
+			: runtime.metrics.adapterClass === 'software'
+				? 'Native readbacks, runtime mechanism proof, attributed software-adapter diagnostics, governor diagnostics, and 50 lifecycle cycles exist; software timing cannot support hardware performance acceptance.'
+				: 'Native readbacks, runtime mechanism proof, hardware timing, governor evidence, and 50 lifecycle cycles were captured; release promotion and direct visual sign-off remain separate.',
 		claimVerdicts: {
 			nativeWebGPUCorrectness: 'PASS',
 			renderTargetReadback: 'PASS',
-			mechanismCorrectness: 'INSUFFICIENT_EVIDENCE',
+			mechanismCorrectness,
 			performanceCompliance,
 			gpuTimestampAvailability: runtime.gpuTiming.verdict,
 			gpuAttribution,
@@ -260,16 +365,27 @@ export async function captureLab( session ) {
 			label: 'Measured',
 			source: 'render-target output-node comparison'
 		},
+		diagnosticDifferences,
 		captures,
 		runtime
 	};
 	const bundle = await writeIncompleteV2RuntimeBundle( session, {
 		captures,
 		runtime,
-		diagnosticDifference: boundary.diagnosticDifference.value
+		diagnosticDifference,
+		diagnosticDifferences,
+		sourceClosure
 	} );
-	await writeFile( resolve( session.outputDir, 'capture-boundary.json' ), `${ JSON.stringify( boundary, null, 2 ) }\n` );
-	return { status: 'incomplete', publishable: false, captures, gpuTiming: runtime.gpuTiming, bundle };
+	await session.writeArtifact( 'capture-boundary.json', `${ JSON.stringify( boundary, null, 2 ) }\n` );
+	return {
+		status: 'incomplete',
+		publishable: false,
+		captures,
+		gpuTiming: runtime.gpuTiming,
+		bundle,
+		sourceClosure,
+		standardOutputs: [ mosaicOutput ]
+	};
 
 }
 

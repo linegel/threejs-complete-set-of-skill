@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="icon" href="data:,">
+	<title>Validation Harness Physical Evidence</title>
+	<style>
+		html { color-scheme: dark; background: #070b14; color: #dce8ff; font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+		body { margin: 0; padding: 24px; }
+		main { width: min(880px, 100%); margin: 0 auto; }
+		h1 { font: 600 clamp(24px, 5vw, 42px)/1.05 system-ui, sans-serif; }
+		p { color: #aab9d2; max-width: 72ch; }
+		.controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+		button { border: 1px solid #5d7fac; background: #10213a; color: inherit; padding: 10px 14px; font: inherit; cursor: pointer; }
+		button:disabled { cursor: not-allowed; opacity: .45; }
+		#route-host { position: fixed; inset: 0; z-index: 2; background: #070b14; visibility: hidden; }
+		#route-host[data-active="true"] { visibility: visible; }
+		#route-host iframe { width: 100%; height: 100%; border: 0; }
+		pre { overflow: auto; max-height: 50vh; padding: 16px; border: 1px solid #24334a; background: #090f1a; white-space: pre-wrap; }
+	</style>
+</head>
+<body>
+	<main>
+		<h1>Codex Browser evidence runner</h1>
+		<p>This surface only runs from an immutable production build in the Codex in-app Browser. It exports separate, incomplete correctness, physical-route, and performance session records for offline served-byte binding and validation; it does not promote evidence.</p>
+		<div class="controls">
+			<button id="run-correctness" type="button">Run correctness lane</button>
+			<button id="run-routes" type="button">Run 19 physical routes</button>
+			<button id="run-performance" type="button">Run hardware performance profile</button>
+			<button id="download" type="button" disabled>Download current record</button>
+		</div>
+		<div id="status" role="status">Checking immutable build…</div>
+		<pre id="result" aria-live="polite"></pre>
+	</main>
+	<div id="route-host" aria-hidden="true"></div>
+	<script type="module">
+		import './physical-observer.js';
+		import './in-app-evidence-client.js';
+	</script>
+</body>
+</html>
