@@ -819,7 +819,7 @@ ${navHtml('')}
     <div class="matrix-copy">
       <span class="matrix-label">Implementation ≠ acceptance</span>
       <h2 id="matrix-title">The matrix is built. Evidence still has veto power.</h2>
-      <p><strong>All ${primaryDemos.length} primary targets are loadable from canonical source.</strong> Acceptance is a separate runtime claim: only the non-rendering router suite is accepted today; ${primaryDemos.length - acceptedPrimaryDemos.length} native-WebGPU surfaces remain explicitly pending current-adapter capture, timing, lifecycle, and visual review.</p>
+      <p><strong>All ${primaryDemos.length} primary targets are loadable from canonical source.</strong> Acceptance is a separate runtime claim: ${acceptedPrimaryDemos.length} non-rendering contract suites are accepted today; ${primaryDemos.length - acceptedPrimaryDemos.length} native-WebGPU surfaces remain explicitly pending current-adapter capture, timing, lifecycle, and visual review.</p>
       <div class="achievement-grid">
         <div class="achievement"><code>canonical</code><b>${canonicalDemos.length}</b><span>skill-owned labs built from native source</span></div>
         <div class="achievement"><code>support</code><b>${supportPrimaryDemos.length}</b><span>focused integrations and mechanism benches</span></div>
@@ -834,7 +834,7 @@ ${navHtml('')}
         <div class="matrix-fact"><dt>Loadable primary routes</dt><dd><strong>${loadablePrimaryDemos.length} / ${primaryDemos.length}</strong><span>Browser entry, fixed route, capture wiring, and canonical source hash.</span></dd></div>
         <div class="matrix-fact" data-state="accepted"><dt>Accepted evidence</dt><dd><strong>${acceptedPrimaryDemos.length} / ${primaryDemos.length}</strong><span>Every required claim passed the current evidence gate.</span></dd></div>
         <div class="matrix-fact" data-state="pending"><dt>Still pending</dt><dd><strong>${primaryDemos.length - acceptedPrimaryDemos.length}</strong><span>Native capture, timing, lifecycle, or direct visual review remains open.</span></dd></div>
-        <div class="matrix-fact"><dt>Required proof records</dt><dd><strong>${DEMO_REGISTRY.counts.requiredRuntimeProofs}</strong><span>${DEMO_REGISTRY.counts.requiredCapabilities} capability records and ${fixedRouteCount} fixed startup contracts.</span></dd></div>
+        <div class="matrix-fact"><dt>Runtime-proof records</dt><dd><strong>${DEMO_REGISTRY.counts.requiredRuntimeProofs}</strong><span>${DEMO_REGISTRY.counts.requiredCapabilities} capability requirements and ${fixedRouteCount} fixed startup contracts are tracked separately.</span></dd></div>
       </dl>
       <div class="matrix-actions"><a class="hero-action" href="demos/registry.json">Inspect the versioned registry</a></div>
     </div>
