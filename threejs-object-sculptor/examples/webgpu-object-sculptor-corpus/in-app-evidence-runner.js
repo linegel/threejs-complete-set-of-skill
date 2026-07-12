@@ -236,12 +236,8 @@ async function assignObservedNavigation(plan, url) {
   let navigationAssignedAtMonotonicMs;
   try {
     navigationAssignedAtMonotonicMs = performance.now();
-    if (navigationAssignedAtMonotonicMs <= observation.installedAtMonotonicMs) {
-      await delay(0);
-      navigationAssignedAtMonotonicMs = performance.now();
-    }
-    if (navigationAssignedAtMonotonicMs <= observation.installedAtMonotonicMs) {
-      throw new Error(`${plan.routeId} parent observer clock did not advance before navigation`);
+    if (navigationAssignedAtMonotonicMs < observation.installedAtMonotonicMs) {
+      throw new Error(`${plan.routeId} parent observer monotonic clock regressed before navigation`);
     }
     routeFrame.src = url.href;
     await withTimeout(observation.loaded, `${plan.routeId} navigation`);

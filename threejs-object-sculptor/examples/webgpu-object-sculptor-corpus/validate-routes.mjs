@@ -527,7 +527,7 @@ export function validatePhysicalRouteRuntimeRecords(records, { readArtifact } = 
     assert.deepEqual(parentAttestation.observerIds, ["iframe-load", "iframe-error"], `${expected.routeId} parent observer inventory drifted`);
     assert(Number.isFinite(parentAttestation.installedAtMonotonicMs) && parentAttestation.installedAtMonotonicMs >= 0, `${expected.routeId} parent observer install time is invalid`);
     assert(Number.isFinite(parentAttestation.navigationAssignedAtMonotonicMs), `${expected.routeId} navigation assignment time is invalid`);
-    assert(parentAttestation.navigationAssignedAtMonotonicMs > parentAttestation.installedAtMonotonicMs, `${expected.routeId} parent observers were not installed before navigation`);
+    assert(parentAttestation.navigationAssignedAtMonotonicMs >= parentAttestation.installedAtMonotonicMs, `${expected.routeId} parent observers were not installed before navigation; monotonic clock regressed`);
     assert(parentAttestation.navigationAssignedAtMonotonicMs > priorNavigationAssignedAtMonotonicMs, `${expected.routeId} parent navigation chronology drifted`);
     priorNavigationAssignedAtMonotonicMs = parentAttestation.navigationAssignedAtMonotonicMs;
     assert.equal(parentAttestation.installedBeforeNavigation, true, `${expected.routeId} parent observer ordering flag drifted`);

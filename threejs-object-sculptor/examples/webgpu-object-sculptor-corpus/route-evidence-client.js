@@ -1,10 +1,11 @@
-import { SCULPT_MODES, SCULPT_TIERS } from "../shared/sculpt-runtime.js";
-import { SCULPT_TARGET_IDS } from "./object-catalog.js";
-import { CORPUS_CAMERAS } from "./route-state.js";
 import {
+  CORPUS_ROUTE_CAMERA_IDS,
   CORPUS_ROUTE_EVIDENCE_BASE_PATH,
   CORPUS_ROUTE_EVIDENCE_ORIGIN,
   CORPUS_ROUTE_IMMUTABLE_MANIFEST_PATH,
+  CORPUS_ROUTE_MECHANISM_IDS,
+  CORPUS_ROUTE_SCENARIO_IDS,
+  CORPUS_ROUTE_TIER_IDS,
 } from "./route-evidence-plan.js";
 import {
   CORPUS_EXECUTABLE_SOURCE_CLOSURE,
@@ -17,25 +18,25 @@ const ROUTE_DIMENSIONS = Object.freeze({
   scenario: Object.freeze({
     selectorId: "subject",
     stateKey: "subjectId",
-    values: SCULPT_TARGET_IDS,
+    values: CORPUS_ROUTE_SCENARIO_IDS,
     methods: Object.freeze(["setSubject", "setScenario"]),
   }),
   mechanism: Object.freeze({
     selectorId: "mode",
     stateKey: "mode",
-    values: SCULPT_MODES,
+    values: CORPUS_ROUTE_MECHANISM_IDS,
     methods: Object.freeze(["setMode"]),
   }),
   tier: Object.freeze({
     selectorId: "tier",
     stateKey: "tier",
-    values: SCULPT_TIERS,
+    values: CORPUS_ROUTE_TIER_IDS,
     methods: Object.freeze(["setTier"]),
   }),
   camera: Object.freeze({
     selectorId: "camera",
     stateKey: "camera",
-    values: CORPUS_CAMERAS,
+    values: CORPUS_ROUTE_CAMERA_IDS,
     methods: Object.freeze(["setCamera"]),
   }),
 });
@@ -879,5 +880,16 @@ export function createCorpusRouteEvidenceProducer({
     return retainedArtifacts;
   }
 
-  return Object.freeze({ routeId: definition.routeId, collect, dispose: disposeRoute, finalizeAfterDispose, takeArtifacts });
+  async function disposeWithExpectedDeviceDestruction() {
+    assert(collectionComplete, `Route ${definition.routeId} cannot dispose before successful collection`);
+    assert(typeof bootstrap?.beginExpectedDeviceDestruction === "function", "route evidence bootstrap cannot distinguish explicit renderer destruction");
+    const marker = bootstrap.beginExpectedDeviceDestruction();
+    assert(marker?.armed === true
+      && marker.phase === "after-successful-readback-before-explicit-renderer-dispose"
+      && Number.isInteger(marker.monitoredDeviceCount)
+      && marker.monitoredDeviceCount >= 1, "explicit renderer-destruction marker is invalid");
+    return disposeRoute();
+  }
+
+  return Object.freeze({ routeId: definition.routeId, collect, dispose: disposeWithExpectedDeviceDestruction, finalizeAfterDispose, takeArtifacts });
 }

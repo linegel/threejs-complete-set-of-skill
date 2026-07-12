@@ -89,6 +89,8 @@
   const instrumentedAdapters = new WeakSet();
   const monitoredDevices = new WeakSet();
   let monitoredDeviceCount = 0;
+  let expectedDeviceDestructionArmed = false;
+  let expectedDeviceDestructionObserved = 0;
 
   function valueRecord(value) {
     if (value instanceof Error) {
@@ -154,6 +156,10 @@
     }
     try {
       Promise.resolve(device.lost).then((info) => {
+        if (expectedDeviceDestructionArmed && info?.reason === "destroyed") {
+          expectedDeviceDestructionObserved += 1;
+          return;
+        }
         deviceLossEvents.push(Object.freeze({
           kind: "device-lost",
           reason: info?.reason ?? null,
@@ -253,10 +259,24 @@
     });
   }
 
+  function beginExpectedDeviceDestruction() {
+    if (requestedSurface !== "route") throw new Error("Expected GPU device destruction is route-disposal-only");
+    if (expectedDeviceDestructionArmed) throw new Error("Expected GPU device destruction was already armed");
+    if (monitoredDeviceCount < 1) throw new Error("Expected GPU device destruction requires an observed renderer device");
+    if (deviceLossEvents.length > 0) throw new Error("Cannot arm expected GPU device destruction after a device failure");
+    expectedDeviceDestructionArmed = true;
+    return Object.freeze({
+      armed: true,
+      phase: "after-successful-readback-before-explicit-renderer-dispose",
+      monitoredDeviceCount,
+      observedAtArm: expectedDeviceDestructionObserved,
+    });
+  }
+
   Object.defineProperty(window, BOOTSTRAP_KEY, {
     configurable: false,
     enumerable: false,
     writable: false,
-    value: Object.freeze({ enabled: true, surface: requestedSurface, snapshot }),
+    value: Object.freeze({ enabled: true, surface: requestedSurface, snapshot, beginExpectedDeviceDestruction }),
   });
 })();

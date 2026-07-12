@@ -39,6 +39,29 @@ function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
+function assertImportMapFreeModuleGraph(entryPath) {
+  const pending = [resolve(here, entryPath)];
+  const visited = new Set();
+  while (pending.length > 0) {
+    const absolutePath = pending.pop();
+    if (visited.has(absolutePath)) continue;
+    assert(absolutePath.startsWith(`${here}/`), `runner module escaped its immutable source root: ${absolutePath}`);
+    visited.add(absolutePath);
+    const text = readFileSync(absolutePath, "utf8");
+    const specifiers = [
+      ...text.matchAll(/^\s*(?:import|export)\s+(?:[^"'()]*?\sfrom\s+)?["']([^"']+)["']/gm),
+      ...text.matchAll(/\bimport\(\s*["']([^"']+)["']\s*\)/g),
+    ].map((match) => match[1]);
+    for (const specifier of specifiers) {
+      assert(specifier.startsWith("./") || specifier.startsWith("../"), `runner module graph requires an import map for bare specifier ${specifier}`);
+      const dependency = resolve(dirname(absolutePath), specifier);
+      assert(dependency.startsWith(`${here}/`), `runner module dependency escaped its immutable source root: ${specifier}`);
+      pending.push(dependency);
+    }
+  }
+  return Object.freeze([...visited].sort());
+}
+
 function activeElementsWithId(elements, id) {
   return elements.filter(({ attributes }) => attributes.get("id") === id);
 }
@@ -173,6 +196,11 @@ export function validateInAppEvidenceRunner() {
   assert(evidenceClient.includes("independently zero-filled"), "route evidence must prove normalized row padding is zero-filled");
   assert(evidenceClient.includes("executed same-origin resource is absent from immutable manifest"), "route evidence must reject executable resources outside the immutable manifest");
   const runnerSource = source("in-app-evidence-runner.js");
+  const runnerModuleGraph = assertImportMapFreeModuleGraph("in-app-evidence-runner.js");
+  assert(runnerModuleGraph.includes(resolve(here, "route-evidence-client.js")), "runner module graph must include its route evidence client");
+  assert(!evidenceClient.includes("../shared/sculpt-runtime.js")
+    && !evidenceClient.includes("./object-catalog.js")
+    && !evidenceClient.includes("./route-state.js"), "runner evidence client must not pull render-graph modules into its import-map-free parent page");
   assert(runnerSource.includes("CORPUS_IN_APP_ROUTE_PLAN.length * 2"), "runner must require two retained readback artifacts per physical route");
   assert(runnerSource.includes("waitForChildAnimationFrames"), "runner must settle two child animation frames before post-disposal error closure");
   const tarBuildIndex = runnerSource.indexOf("evidenceTar = await buildRouteEvidenceTar");
@@ -183,6 +211,9 @@ export function validateInAppEvidenceRunner() {
   for (const observer of ["window.addEventListener(\"error\"", "console.error =", "window.addEventListener(\"unhandledrejection\"", "uncapturederror", "device.lost"]) {
     assert(bootstrapSource.includes(observer), `route evidence bootstrap is missing ${observer}`);
   }
+  assert(bootstrapSource.includes("beginExpectedDeviceDestruction"), "route evidence bootstrap must distinguish explicit renderer destruction from spontaneous device loss");
+  assert(bootstrapSource.includes('expectedDeviceDestructionArmed && info?.reason === "destroyed"'), "only an armed destroyed reason may be excluded from device-loss failures");
+  assert(evidenceClient.includes("disposeWithExpectedDeviceDestruction"), "route evidence client must arm expected destruction only at the explicit post-readback disposal boundary");
 
   const generator = source("generate-routes.mjs");
   assert(generator.includes('<script src="../../route-evidence-bootstrap.js" data-surface="route"></script>'), "route generator does not own the capture-scoped observer bootstrap tag");
