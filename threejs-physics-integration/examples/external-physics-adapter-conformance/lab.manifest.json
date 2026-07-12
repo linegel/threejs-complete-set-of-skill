@@ -10,9 +10,11 @@
     "threejs-physics-integration/SKILL.md",
     "threejs-physics-integration/references/solver-selection-and-architecture.md",
     "threejs-physics-integration/references/external-solver-boundaries.md",
+    "threejs-physics-integration/references/bounded-dynamic-skiff-architecture.md",
     "threejs-physics-integration/examples/external-physics-adapter-conformance/decision-record.js",
     "threejs-physics-integration/examples/external-physics-adapter-conformance/external-adapter-contract.js",
-    "threejs-physics-integration/examples/external-physics-adapter-conformance/fixtures.js"
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/fixtures.js",
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/bounded-skiff-coupling.js"
   ],
   "browserEntry": "threejs-physics-integration/examples/external-physics-adapter-conformance/index.html",
   "publishPath": "/demos/external-physics-adapter-conformance/",
@@ -38,6 +40,7 @@
   "runtimeProof": [
     { "id": "five-distinct-solutions", "required": true, "evidence": "Every fixture rejects fewer than five distinct algorithm families and scores six frozen axes.", "status": "accepted" },
     { "id": "external-adapter-conformance", "required": true, "evidence": "Positive and mutation fixtures validate ownership, SI/frame/clock maps, capabilities, exact-once receipts, synchronization, recovery, and cost closure.", "status": "accepted" },
+    { "id": "bounded-skiff-coupling-oracle", "required": true, "evidence": "A fixed-step nine-point hydrostatic oracle validates equilibrium, visible heave/roll/pitch response, equal-and-opposite force/torque closure, water feedback, deterministic replay, and exact-once ledgers with 11 rejection mutations.", "status": "accepted" },
     { "id": "native-webgpu-skiff-coupling", "required": true, "evidence": null, "status": "incomplete" }
   ],
   "evidenceContract": "v2",

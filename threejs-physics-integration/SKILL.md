@@ -16,6 +16,9 @@ before emitting serialized physics records. Read
 for broadphase, narrowphase, CCD, constraint, sleeping, residency, and mobile
 tradeoffs. Read [external solver boundaries](references/external-solver-boundaries.md)
 when a library, worker, WASM module, process, server, or another GPU owns state.
+For a bounded floating body, read the scored
+[dynamic-skiff architecture decision](references/bounded-dynamic-skiff-architecture.md)
+before selecting hull quadrature, water residency, or coupling direction.
 
 ## Decision protocol
 

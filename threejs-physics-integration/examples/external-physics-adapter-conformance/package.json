@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check decision-record.js && node --check external-adapter-contract.js && node --check fixtures.js && node --check app.mjs && node --check validate-conformance.mjs && node --check test-mutations.mjs",
-    "validate:unit": "node validate-conformance.mjs",
-    "test:mutations": "node test-mutations.mjs",
+    "check": "node --check decision-record.js && node --check external-adapter-contract.js && node --check fixtures.js && node --check bounded-skiff-coupling.js && node --check app.mjs && node --check validate-conformance.mjs && node --check validate-bounded-skiff.mjs && node --check test-mutations.mjs && node --check test-bounded-skiff-mutations.mjs",
+    "validate:unit": "node validate-conformance.mjs && node validate-bounded-skiff.mjs",
+    "test:mutations": "node test-mutations.mjs && node test-bounded-skiff-mutations.mjs",
     "capture": "node validate-conformance.mjs",
     "validate:artifacts": "node validate-conformance.mjs",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
