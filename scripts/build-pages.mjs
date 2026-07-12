@@ -585,14 +585,14 @@ const liveDemoHtml = PROVIDER_DEMOS.map((demo) => `
 const flagshipHtml = flagshipDemos.map(({ demo, domain, copy }) => {
   const preview = previewForPrimary(demo);
   return `
-      <a class="flagship-card${preview ? '' : ' flagship-card--no-media'}" href="${demo.publishPath.replace(/^\/+/, '')}">
-        ${preview ? `<span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : ''}
+      <a class="flagship-card${preview ? '' : ' flagship-card--no-media'}" href="${demo.publishPath.replace(/^\/+/, '')}">${preview ? `
+        <span class="flagship-preview" data-preview-for="${esc(demo.id)}" data-preview-source="${esc(preview.sourceId)}" data-preview-classification="${esc(preview.classification)}">${previewPicture(preview.path, `${preview.label} for ${primaryTitle(demo)}`, `${imageSizeAttrs(preview.path)} loading="lazy" decoding="async"`)}<span class="media-caption">${esc(preview.label)}</span></span>` : ''}
         <div class="flagship-copy">
           <span class="flagship-kicker">${esc(domain)}</span>
           <h3>${esc(demo.title)}</h3>
           <p>${esc(copy)}</p>
-          <div class="flagship-meta"><span>${demo.mechanisms.length} mechanisms</span><span>${demo.tiers.length} locked tiers</span><span class="status status--pending">Evidence pending</span></div>
-          ${preview ? '' : primaryEvidencePanel(demo)}
+          <div class="flagship-meta"><span>${demo.mechanisms.length} mechanisms</span><span>${demo.tiers.length} locked tiers</span><span class="status status--pending">Evidence pending</span></div>${preview ? '' : `
+          ${primaryEvidencePanel(demo)}`}
         </div>
       </a>`;
 }).join('');
@@ -1315,19 +1315,19 @@ a.chip:active{scale:.96}
 ${navHtml('../')}
 
 <main id="main-content" tabindex="-1">
-<header class="${skillHeroImg ? 'skill-hero' : ''}">
-${skillHeroImg ? `  ${previewPicture(`../${skillHeroImg}`, '', `class="skill-hero-bg" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async"`)}\n` : ''}  <div class="wrap">
+<header class="${skillHeroImg ? 'skill-hero' : ''}">${skillHeroImg ? `
+  ${previewPicture(`../${skillHeroImg}`, '', `class="skill-hero-bg" aria-hidden="true" ${imageSizeAttrs(skillHeroImg)} fetchpriority="high" decoding="async"`)}` : ''}
+  <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">${esc(cat ? cat.name : 'Skills')}</a></li><li aria-current="page">${esc(s.title)}</li></ol></nav>
     <h1 style="view-transition-name:skill-${safeClass(slug)}">${esc(s.title)}</h1>
-    <p class="lede">${esc(s.desc)}</p>
-    ${resolvedSkillPreview ? `<p class="hero-evidence-caption">Image: ${esc(resolvedSkillPreview.label)}. Source lab: ${esc(resolvedSkillPreview.sourceId)}.</p>` : ''}
+    <p class="lede">${esc(s.desc)}</p>${resolvedSkillPreview ? `
+    <p class="hero-evidence-caption">Image: ${esc(resolvedSkillPreview.label)}. Source lab: ${esc(resolvedSkillPreview.sourceId)}.</p>` : ''}
     <div class="meta-row">
       <span class="chip a">$${slug}</span>
       ${primaryChipHtml}
 ${flagshipChipHtml}
 ${demoChipHtml}
-      ${attributionChipHtml}
-      ${ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>'}
+${attributionChipHtml ? `      ${attributionChipHtml}\n` : ''}      ${ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>'}
       ${updateHtml}
       <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${slug}/SKILL.md">raw (for agents) ↗</a>
