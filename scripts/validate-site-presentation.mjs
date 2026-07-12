@@ -226,6 +226,24 @@ for (const demo of flagships) {
   assert(origin?.ownerSkills?.length > 1, `flagship ${demo.id} has no cross-skill owner set`);
 }
 
+for (const demo of registry.demos.filter((entry) => (
+  entry.publishPath
+  && (PRIMARY_DEMO_KINDS.includes(entry.kind) || ['proxy-demo', 'generated-asset-demo'].includes(entry.kind))
+))) {
+  const pagePath = join(docs, relativePublishPath(demo.publishPath), 'index.html');
+  assert(existsSync(pagePath), `published demo page is missing: ${demo.id}`);
+  if (!existsSync(pagePath)) continue;
+  const page = readFileSync(pagePath, 'utf8');
+  const staticPage = page.replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/gi, '');
+  const shell = staticPage.match(/<(aside|main)\b[^>]*data-demo-seo-shell[^>]*>[\s\S]*?<\/\1>/i)?.[0] ?? '';
+  const outerDetails = shell.match(/<details\b[^>]*>/i)?.[0] ?? '';
+  assert(Boolean(shell), `${demo.id} has no opt-in evidence drawer`);
+  assert(Boolean(outerDetails) && !/\bopen\b/i.test(outerDetails), `${demo.id} opens its evidence drawer over the canvas by default`);
+  assert(shell.includes('demo-seo-shell__summary-state'), `${demo.id} compact drawer control omits acceptance state`);
+  assert(!page.includes('lab-status-banner'), `${demo.id} adds a second fixed primary status banner`);
+  assert(!page.includes('classification-banner'), `${demo.id} adds a second fixed secondary classification banner`);
+}
+
 for (const skill of skillManifest.skills) {
   const pagePath = join(docs, 'skills', `${skill.name}.html`);
   assert(existsSync(pagePath), `missing generated skill page ${skill.name}`);
