@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 export const VALIDATION_HARNESS_LAB_ID = 'webgpu-validation-harness';
 export const VALIDATION_HARNESS_REPOSITORY_ROOT = fileURLToPath( new URL( '../../../../', import.meta.url ) );
 
-const RAW_PROFILES = new Set( [ 'correctness', 'performance' ] );
+const RAW_PROFILES = new Set( [ 'correctness' ] );
 const BUNDLE_KINDS = new Set( [ 'raw', 'release' ] );
 
 function requireChoice( choices, value, label ) {

@@ -15,10 +15,7 @@ test( 'raw and release evidence paths are anchored at the repository root', () =
 		canonicalRawBundleDirectory( 'correctness' ),
 		join( VALIDATION_HARNESS_REPOSITORY_ROOT, 'artifacts/visual-validation/webgpu-validation-harness/correctness' )
 	);
-	assert.equal(
-		canonicalRawBundleDirectory( 'performance' ),
-		join( VALIDATION_HARNESS_REPOSITORY_ROOT, 'artifacts/visual-validation/webgpu-validation-harness/performance' )
-	);
+	assert.throws( () => canonicalRawBundleDirectory( 'performance' ), /Unknown raw capture profile/ );
 	assert.equal(
 		canonicalReleaseBundleDirectory(),
 		join( VALIDATION_HARNESS_REPOSITORY_ROOT, 'docs/visual-validation/webgpu-validation-harness/bundle' )
@@ -33,10 +30,8 @@ test( 'relative overrides resolve from the repository instead of npm prefix cwd'
 		join( VALIDATION_HARNESS_REPOSITORY_ROOT, 'artifacts/custom-validation-bundle' )
 	);
 	assert.equal( resolveValidationBundleDirectory(), canonicalReleaseBundleDirectory() );
-	assert.equal(
-		resolveValidationBundleDirectory( { bundle: 'raw', profile: 'performance' } ),
-		canonicalRawBundleDirectory( 'performance' )
-	);
+	assert.equal( resolveValidationBundleDirectory( { bundle: 'raw', profile: 'correctness' } ), canonicalRawBundleDirectory( 'correctness' ) );
+	assert.throws( () => resolveValidationBundleDirectory( { bundle: 'raw', profile: 'performance' } ), /Unknown raw capture profile/ );
 	assert.throws( () => resolveValidationBundleDirectory( { bundle: 'raw', profile: 'typo' } ), /Unknown raw capture profile/ );
 	assert.throws( () => resolveValidationBundleDirectory( { bundle: 'shadow' } ), /Unknown bundle kind/ );
 

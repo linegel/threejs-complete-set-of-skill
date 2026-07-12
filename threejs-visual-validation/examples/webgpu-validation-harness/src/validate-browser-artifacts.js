@@ -10,7 +10,7 @@ function option( name, fallback ) {
 }
 
 const bundle = option( '--bundle', 'release' );
-const profile = option( '--profile', 'performance' );
+const profile = option( '--profile', 'correctness' );
 const artifactDir = resolveValidationBundleDirectory( {
 	override: option( '--artifacts', process.env.LAB_EVIDENCE_DIR ?? null ),
 	bundle,

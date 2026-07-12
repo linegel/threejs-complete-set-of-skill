@@ -19,7 +19,7 @@
     "physical:validate": "node src/physical-validate-record.js",
     "evidence:readiness": "node src/evidence-readiness.js",
     "validate:artifacts": "node src/validate-browser-artifacts.js --bundle release",
-    "validate:raw": "node src/validate-browser-artifacts.js --bundle raw --profile performance",
+    "validate:raw": "node src/validate-browser-artifacts.js --bundle raw --profile correctness",
     "validate:quick": "npm run check && npm run test:routes && npm run test:mutations",
     "validate:full": "npm run check && npm run test:routes && npm run validate:v1 && npm run validate:v2 && npm run validate:artifacts",
     "check": "node --check src/*.js src/schema/*.js && node src/check-imports.mjs"
