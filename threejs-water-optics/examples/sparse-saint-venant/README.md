@@ -56,6 +56,13 @@ display, controls, and renderer resources, and requires the owned device-loss
 reason to be `destroyed`. This is a single-owner disposal proof, not the later
 50-cycle harness stress profile.
 
+`offshore-boundary.js` is the float64 phase-resolved handoff oracle. It derives
+finite-depth Airy elevation and wave discharge from the same absolute phase
+clock, filters incident modes by a declared characteristic-impedance reflection
+gate, injects only `q_n-c eta`, and preserves the coastal solver's outgoing
+`q_n+c eta` plus tangential discharge. It does not claim that the one-way donor
+renders coastal reflection beyond the coupling curve.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,
