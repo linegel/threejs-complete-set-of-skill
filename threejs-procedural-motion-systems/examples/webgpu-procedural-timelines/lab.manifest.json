@@ -45,7 +45,7 @@
       "frameTargetMs": null,
       "resolutionPolicy": { "dprCap": { "value": 2, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
       "mechanismLimits": { "instanceCapacity": { "value": 4096, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
-      "resourceLimits": { "motionStorageBytes": { "value": 589824, "unit": "bytes", "label": "Derived", "source": "4096 * 144" } },
+      "resourceLimits": { "motionStorageBytes": { "value": 851968, "unit": "bytes", "label": "Derived", "source": "4096 * 208" } },
       "degradationFromPrevious": [],
       "preservedInvariants": ["fixed-step semantics", "exact terminal lock", "previous/current transforms"],
       "acceptanceStatus": "incomplete"
@@ -56,7 +56,7 @@
       "frameTargetMs": null,
       "resolutionPolicy": { "dprCap": { "value": 1.5, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
       "mechanismLimits": { "instanceCapacity": { "value": 2048, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
-      "resourceLimits": { "motionStorageBytes": { "value": 294912, "unit": "bytes", "label": "Derived", "source": "2048 * 144" } },
+      "resourceLimits": { "motionStorageBytes": { "value": 425984, "unit": "bytes", "label": "Derived", "source": "2048 * 208" } },
       "degradationFromPrevious": ["halve recurrent instance capacity", "lower DPR cap"],
       "preservedInvariants": ["fixed-step semantics", "exact terminal lock", "previous/current transforms"],
       "acceptanceStatus": "incomplete"
@@ -67,7 +67,7 @@
       "frameTargetMs": null,
       "resolutionPolicy": { "dprCap": { "value": 1, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
       "mechanismLimits": { "instanceCapacity": { "value": 64, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
-      "resourceLimits": { "motionStorageBytes": { "value": 9216, "unit": "bytes", "label": "Derived", "source": "64 * 144" } },
+      "resourceLimits": { "motionStorageBytes": { "value": 13312, "unit": "bytes", "label": "Derived", "source": "64 * 208" } },
       "degradationFromPrevious": ["reduce recurrent instance capacity to fixture scale", "lower DPR cap"],
       "preservedInvariants": ["native WebGPU", "fixed-step semantics", "exact terminal lock", "previous/current transforms"],
       "acceptanceStatus": "incomplete"
