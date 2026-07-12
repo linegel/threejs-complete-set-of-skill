@@ -249,6 +249,18 @@ for (const skill of skillManifest.skills) {
   assert(existsSync(pagePath), `missing generated skill page ${skill.name}`);
   if (!existsSync(pagePath)) continue;
   const page = readFileSync(pagePath, 'utf8');
+  const primarySection = page.match(/<section\b[^>]*\bid=["']primary-implementations["'][^>]*>[\s\S]*?<\/section>/i)?.[0] ?? '';
+  const firstPrimaryCard = primarySection.match(/<a\b[^>]*\bclass=["']card["'][^>]*\bhref=["']([^"']+)["'][^>]*>[\s\S]*?<span\b[^>]*\bclass=["']card-kind["'][^>]*>([^<]+)<\/span>/i);
+  const expectedCanonical = primary
+    .filter((demo) => demo.skill === skill.name && demo.kind === 'canonical-lab')
+    .sort((a, b) => a.id.localeCompare(b.id))[0];
+  assert(Boolean(primarySection), `${skill.name} has no primary implementation section`);
+  assert(Boolean(firstPrimaryCard), `${skill.name} has no first primary implementation card`);
+  assert(firstPrimaryCard?.[2] === 'Canonical lab', `${skill.name} does not present its canonical lab first`);
+  assert(
+    !expectedCanonical || firstPrimaryCard?.[1] === `../${relativePublishPath(expectedCanonical.publishPath)}`,
+    `${skill.name} first primary card does not link its first canonical lab`,
+  );
   const ownedPrimaryIds = new Set(primary.filter((demo) => demo.skill === skill.name).map((demo) => demo.id));
   const participatingFlagshipIds = new Set(flagships
     .filter((demo) => registry.origins[demo.id]?.ownerSkills?.includes(skill.name))
