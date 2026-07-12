@@ -2,19 +2,15 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
-	artifactLedgerDigest,
 	assertEvidenceManifestContract,
 	canonicalSha256,
-	captureSessionSetDigest,
-	imageLedgerDigest,
-	manifestCoreDigest,
 	NORMATIVE_JSON_PATHS,
 	routeStateDigest,
 	STANDARD_IMAGE_PATHS,
 	validateEvidenceManifestContract,
 	visualReviewDigest
 } from './evidence-manifest-contract.js';
-import { resolveOfflinePromotionManifest } from './offline-promotion.js';
+import { createOfflinePromotionBinding, resolveOfflinePromotionManifest } from './offline-promotion.js';
 
 const hash = ( label ) => canonicalSha256( { label } );
 const numeric = ( value, unit, label, source ) => ( { value, unit, label, source } );
@@ -173,22 +169,7 @@ function releaseImages( pipelineGraphDigest ) {
 
 function bindPromotion( manifest ) {
 
-	const binding = {
-		manifestCoreDigest: manifestCoreDigest( manifest ),
-		sourceClosureHash: manifest.sourceClosureHash,
-		buildRevision: manifest.buildRevision,
-		threeRevision: manifest.threeRevision,
-		route: structuredClone( manifest.route ),
-		routeDigest: canonicalSha256( manifest.route ),
-		limitations: structuredClone( manifest.limitations ),
-		limitationsDigest: canonicalSha256( manifest.limitations ),
-		claimVerdicts: structuredClone( manifest.claimVerdicts ),
-		claimVerdictsDigest: canonicalSha256( manifest.claimVerdicts ),
-		captureSessions: structuredClone( manifest.captureSessions ),
-		captureSessionSetDigest: captureSessionSetDigest( manifest.captureSessions ),
-		artifactLedgerDigest: artifactLedgerDigest( manifest.files ),
-		imageLedgerDigest: imageLedgerDigest( manifest.images )
-	};
+	const binding = createOfflinePromotionBinding( manifest );
 	const visualSignoff = {
 		status: 'APPROVED',
 		reviewer: 'graphics-reviewer',

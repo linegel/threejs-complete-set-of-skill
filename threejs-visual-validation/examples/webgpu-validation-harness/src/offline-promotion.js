@@ -11,7 +11,7 @@ import {
 } from './evidence-manifest-contract.js';
 import { readUnifiedEvidenceManifest, validateUnifiedV2ArtifactBundle } from './evidence-bundle-v2.js';
 
-function createBinding( manifest ) {
+export function createOfflinePromotionBinding( manifest ) {
 
 	return {
 		manifestCoreDigest: manifestCoreDigest( manifest ),
@@ -68,7 +68,7 @@ export async function resolveOfflinePromotionManifest( manifest, visualReview = 
 		...manifest,
 		publishable: approved
 	};
-	const binding = createBinding( targetManifest );
+	const binding = createOfflinePromotionBinding( targetManifest );
 	const promotedManifest = {
 		...targetManifest,
 		promotion: {
