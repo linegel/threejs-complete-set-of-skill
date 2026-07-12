@@ -7,6 +7,8 @@ import {
 } from './main.js';
 import { EXPOSURE_QUALITY_TIERS } from './constants.js';
 
+const LAB_ID = 'webgpu-exposure-color-pipeline';
+
 const canvas = document.querySelector( '#view' );
 const status = document.querySelector( '#status' );
 let resolvePublishedController;
@@ -110,6 +112,7 @@ async function initialize() {
 	}
 
 	const controller = {
+		get labId() { return LAB_ID; },
 		async ready() {},
 		async setScenario( id ) { return app.setScenario( id ); },
 		async setMode( id ) { return app.setMode( id ); },
@@ -144,6 +147,7 @@ async function initialize() {
 
 			const pipeline = app.describePipeline();
 			return {
+				labId: LAB_ID,
 				renderer: 'WebGPURenderer',
 				backend: {
 					name: app.renderer.backend?.constructor?.name ?? 'unknown',

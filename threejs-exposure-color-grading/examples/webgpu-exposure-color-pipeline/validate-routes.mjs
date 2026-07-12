@@ -56,6 +56,8 @@ const browserSource = await readFile( new URL( './browser-app.js', import.meta.u
 assert( browserSource.includes( 'Locked exposure route rejects' ), 'Browser app does not reject locked-route overrides.' );
 assert( browserSource.includes( 'Object.freeze( { ...locked } )' ), 'Locked exposure startup is mutable.' );
 assert( browserSource.includes( 'window.labController = controller' ) && browserSource.includes( 'routeSelection:' ), 'Published routes cannot acknowledge their locked startup through getMetrics().' );
+assert( browserSource.includes( "const LAB_ID = 'webgpu-exposure-color-pipeline'" ), 'Published exposure controller lacks a canonical lab identity.' );
+assert( browserSource.includes( 'get labId() { return LAB_ID; }' ) && browserSource.includes( 'labId: LAB_ID' ), 'Exposure controller and metrics identity can drift.' );
 const captureSource = await readFile( new URL( './capture.mjs', import.meta.url ), 'utf8' );
 assert( captureSource.includes( "import { createServer } from 'vite'" ) && captureSource.includes( 'if ( ! url )' ), 'Root capture lacks a deterministic self-serving URL.' );
 assert( captureSource.includes( "--profile" ) && captureSource.includes( "'correctness', 'performance'" ), 'Root capture does not enforce the standard profile contract.' );
