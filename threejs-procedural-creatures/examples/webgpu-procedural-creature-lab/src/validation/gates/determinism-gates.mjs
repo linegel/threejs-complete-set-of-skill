@@ -78,6 +78,7 @@ async function runGateCoverage() {
 		'reference-component-policy',
 		'mesh-self-intersection-rejection',
 		'bundled-reference-connectivity',
+		'bundled-reference-assets',
 		'skin-weight-baseline',
 		'lbs-rest-identity',
 		'dq-rest-antipodal',

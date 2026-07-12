@@ -1,4 +1,4 @@
-export const REFERENCE_ASSET_SCHEMA = 'creature-reference-asset-v1';
+export const REFERENCE_ASSET_SCHEMA = 'creature-reference-asset-v2';
 
 const TYPE_INFO = Object.freeze({
 	Float32Array: { bytes: 4, constructor: Float32Array },
@@ -31,7 +31,13 @@ function digestBytes(bytes) {
 	return [h1, h2, h3, h4].map((lane) => (lane >>> 0).toString(16).padStart(8, '0')).join('');
 }
 
+function requireLittleEndian() {
+	const probe = new Uint8Array(new Uint16Array([0x0102]).buffer);
+	if (probe[0] !== 0x02) throw new Error('reference asset compiler requires a little-endian typed-array platform');
+}
+
 export function packReferenceAsset(surface, extraArrays = {}) {
+	requireLittleEndian();
 	if (!surface?.identity || !(surface.positions instanceof Float32Array) || !(surface.indices instanceof Uint32Array)) {
 		throw new Error('packReferenceAsset requires an extracted reference surface');
 	}
@@ -71,6 +77,7 @@ export function packReferenceAsset(surface, extraArrays = {}) {
 		binary: {
 			byteLength,
 			alignment: 16,
+			byteOrder: 'little-endian',
 			contentDigest128: digestBytes(binary),
 			sha256: null,
 			sha256Status: 'pending-node-asset-writer',
@@ -79,8 +86,28 @@ export function packReferenceAsset(surface, extraArrays = {}) {
 	return { manifest, binary };
 }
 
-export function unpackReferenceAsset(manifest, binaryInput) {
+export function finalizeReferenceAssetManifest(manifest, sha256) {
 	if (manifest?.schemaVersion !== REFERENCE_ASSET_SCHEMA) throw new Error('reference asset schema mismatch');
+	if (!/^[a-f0-9]{64}$/.test(sha256 ?? '')) throw new Error('reference asset SHA-256 must be 64 lowercase hexadecimal characters');
+	return {
+		...manifest,
+		binary: { ...manifest.binary, sha256, sha256Status: 'verified-by-asset-writer' },
+	};
+}
+
+export async function verifyReferenceAssetSha256(manifest, binaryInput) {
+	if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 is unavailable');
+	const binary = binaryInput instanceof Uint8Array ? binaryInput : new Uint8Array(binaryInput);
+	const digest = new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256', binary));
+	const actual = [...digest].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+	if (actual !== manifest?.binary?.sha256) throw new Error('reference asset SHA-256 mismatch');
+	return actual;
+}
+
+export function unpackReferenceAsset(manifest, binaryInput) {
+	requireLittleEndian();
+	if (manifest?.schemaVersion !== REFERENCE_ASSET_SCHEMA) throw new Error('reference asset schema mismatch');
+	if (manifest.binary?.byteOrder !== 'little-endian') throw new Error('reference asset byte order mismatch');
 	const binary = binaryInput instanceof Uint8Array ? binaryInput : new Uint8Array(binaryInput);
 	if (binary.byteLength !== manifest.binary?.byteLength) throw new Error('reference asset byte length mismatch');
 	if (digestBytes(binary) !== manifest.binary?.contentDigest128) throw new Error('reference asset content digest mismatch');

@@ -45,6 +45,7 @@ import { buildShellGeometry, shellStatsForTier } from '../core/shell-writer.js';
 import { validateSpec } from '../core/spec-schema.js';
 import { createGenomeSpec } from './specs/genome.js';
 import { evaluatePerformanceResult, PERFORMANCE_PROFILE_VERSION, performanceProfile } from './performance-profiles.js';
+import { loadBundledReferenceAssets } from './reference-assets.js';
 import {
 	CREATURE_FOCI,
 	CREATURE_MODES,
@@ -86,6 +87,7 @@ const statusEl = document.getElementById('status');
 const state = {
 	ready: false,
 	specs: [],
+	referenceAssets: new Map(),
 	species: [],
 	activeCreatures: [],
 	focusIndex: Math.max(0, specNames.indexOf(startup.focus)),
@@ -633,6 +635,7 @@ function describeResources() {
 	const candidateBytes = [...(state.candidateStorages?.values?.() ?? [])]
 		.reduce((sum, storage) => sum + storage.byteLength, 0);
 	const resources = [
+		...[...state.referenceAssets.values()].map((asset) => ({ id: `reference-${asset.name}`, kind: 'reference-asset-cpu', bytes: asset.binaryByteLength, acceptanceStatus: asset.manifest.acceptanceStatus, sha256: asset.manifest.binary.sha256 })),
 		{ id: 'creature-pose-storage', kind: 'storage-buffer', bytes: pose?.poseArray?.byteLength ?? 0 },
 		{ id: 'creature-root-storage', kind: 'storage-buffer', bytes: pose?.rootsArray?.byteLength ?? 0 },
 		{ id: 'creature-radial-frame-storage', kind: 'storage-buffer', bytes: pose?.framesArray?.byteLength ?? 0 },
@@ -1959,11 +1962,14 @@ async function init() {
 	state.bootCounters.mark('scene');
 
 	setStatus('Creature Lab Loading Specs');
-	state.specs = await Promise.all(specNames.map((name) => {
-		const url = specUrls[name];
-		if (!url) throw new Error(`missing browser spec URL for '${name}'`);
-		return fetchJson(url);
-	}));
+	[state.specs, state.referenceAssets] = await Promise.all([
+		Promise.all(specNames.map((name) => {
+			const url = specUrls[name];
+			if (!url) throw new Error(`missing browser spec URL for '${name}'`);
+			return fetchJson(url);
+		})),
+		loadBundledReferenceAssets(specNames),
+	]);
 	for (const tierName of tiers) buildShellGeometry(1, tierName);
 	buildSpeciesRecords(state.specs);
 	spawnGrid(startup.seed, startup.population, { render: false });

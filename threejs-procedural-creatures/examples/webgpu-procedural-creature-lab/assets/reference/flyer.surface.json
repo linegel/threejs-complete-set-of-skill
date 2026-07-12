@@ -1,0 +1,241 @@
+{
+  "schemaVersion": "creature-reference-asset-v2",
+  "identity": {
+    "compilerSignature": "8e3c7c1738781d4fe788baedd74112d3",
+    "topologySignature": "326908c0c73ab41ea5ce0af0e982658e",
+    "geometryDigest": "8ab21d3e28826bc88e5142a6b1b18d58",
+    "sourceRigIdentity": {
+      "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
+      "topologySignature": "e2eaca7481dc3c5ac799ed14ada9060a",
+      "geometryDigest": "f94a8442aba9879052c818e6afaf28f8"
+    }
+  },
+  "tier": "hero",
+  "representation": "canonical-reference-surface-candidate",
+  "extraction": {
+    "algorithm": "marching-cubes-kuhn-ambiguity-v2",
+    "ambiguityPolicy": "globally-consistent-kuhn-tetrahedral-subdivision",
+    "cellSize": 0.012,
+    "cellSizeDerivation": {
+      "cellSize": 0.012,
+      "formula": "explicit test/fixture cellSize"
+    },
+    "bounds": {
+      "min": [
+        -1.2784,
+        -0.3832,
+        -0.5831999999999999
+      ],
+      "max": [
+        0.8151999999999999,
+        1.0784,
+        0.6284
+      ]
+    },
+    "grid": {
+      "cells": [
+        175,
+        122,
+        101
+      ],
+      "points": [
+        176,
+        123,
+        102
+      ],
+      "step": [
+        0.011963428571428571,
+        0.01198032786885246,
+        0.011996039603960394
+      ],
+      "requestedCellSize": 0.012,
+      "sampleCount": 368056,
+      "activeCellCount": 349294,
+      "intersectedCells": 11688
+    }
+  },
+  "componentPolicy": {
+    "kind": "main-semantic-handle-single-component",
+    "mainSlot": 1,
+    "mainPartId": "chassis",
+    "handle": [
+      0,
+      0.315,
+      0
+    ],
+    "componentCount": 1,
+    "selectedComponent": 0,
+    "selectedDistanceSquared": 0.03235709988867497
+  },
+  "certification": {
+    "status": "provisional",
+    "topology": {
+      "status": "accepted-topology-baseline",
+      "failures": [],
+      "vertexCount": 36526,
+      "triangleCount": 73048,
+      "finitePositions": true,
+      "finiteNormals": true,
+      "invalidIndices": 0,
+      "collapsedTriangles": 0,
+      "duplicateTriangles": 0,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "inwardTriangles": 0,
+      "duplicateCoincidentCoverage": 0,
+      "nonAdjacentSelfIntersections": {
+        "count": 0,
+        "coincidentCoveragePairs": 0,
+        "pairs": [],
+        "truncated": false,
+        "epsilon": 1.7921419147713215e-9,
+        "broadPhase": "deterministic-median-bvh-v1"
+      },
+      "area": {
+        "min": 2.6957652419812655e-12,
+        "p05": 3.588511861011704e-7,
+        "median": 0.000013096148922175745
+      },
+      "minimumAngleRadians": {
+        "min": 0.00027473679572332884,
+        "p05": 0.07863324425455769
+      },
+      "signedOrientation": {
+        "min": 5.380519839061785e-12,
+        "p05": 7.040158184396249e-7,
+        "median": 0.00002544337287701825
+      },
+      "limitations": []
+    },
+    "meshToFieldVertexResidual": {
+      "samples": 36526,
+      "maximum": 0.003272599791654174,
+      "mean": 0.00007512154537907404
+    },
+    "meshToFieldHausdorff": {
+      "samples": 109574,
+      "maximum": 0.003538774991152571,
+      "p95": 0.00039940892997412356,
+      "mean": 0.00011409050053529695,
+      "sampling": "all vertices plus all triangle centroids; |field| / max(|gradient|, 1e-8)"
+    },
+    "fieldToMeshHausdorff": {
+      "samples": 232,
+      "maximum": 0.0011183996795542381,
+      "p95": 0.0005637721359193389,
+      "mean": 0.00015134918424241853,
+      "signChangeRoots": 232,
+      "rayResolution": 18,
+      "rayStep": 0.009000000000000001,
+      "rootIterations": 18,
+      "directions": [
+        "x",
+        "y",
+        "z"
+      ],
+      "broadPhase": "deterministic-median-bvh-v1",
+      "sampling": "stratified axis rays; every complete-field sign-change root to nearest reference triangle"
+    },
+    "normalAngleError": {
+      "samples": 36526,
+      "maximum": 0.0000029840668208529006,
+      "p95": 2.8585383434967613e-7,
+      "mean": 7.309559019549468e-8,
+      "unit": "radians",
+      "sampling": "every reference vertex against analytic complete-field gradient"
+    },
+    "thresholds": {
+      "maximumSurfaceDistance": 0.006,
+      "maximumNormalAngleRadians": 0.2617993877991494
+    },
+    "limitations": [
+      "Projected silhouette and deformation gates are still required before acceptance."
+    ]
+  },
+  "arrays": {
+    "positions": {
+      "type": "Float32Array",
+      "byteOffset": 0,
+      "length": 109578,
+      "byteLength": 438312
+    },
+    "normals": {
+      "type": "Float32Array",
+      "byteOffset": 438320,
+      "length": 109578,
+      "byteLength": 438312
+    },
+    "indices": {
+      "type": "Uint32Array",
+      "byteOffset": 876640,
+      "length": 219144,
+      "byteLength": 876576
+    },
+    "skinIndices": {
+      "type": "Uint16Array",
+      "byteOffset": 1753216,
+      "length": 146104,
+      "byteLength": 292208
+    },
+    "skinWeights": {
+      "type": "Float32Array",
+      "byteOffset": 2045424,
+      "length": 146104,
+      "byteLength": 584416
+    },
+    "semanticIndices": {
+      "type": "Uint16Array",
+      "byteOffset": 2629840,
+      "length": 36526,
+      "byteLength": 73052
+    },
+    "colorIndices": {
+      "type": "Uint16Array",
+      "byteOffset": 2702896,
+      "length": 146104,
+      "byteLength": 292208
+    },
+    "colorWeights": {
+      "type": "Float32Array",
+      "byteOffset": 2995104,
+      "length": 146104,
+      "byteLength": 584416
+    },
+    "correctionMask": {
+      "type": "Uint8Array",
+      "byteOffset": 3579520,
+      "length": 36526,
+      "byteLength": 36526
+    },
+    "restRadialFrames": {
+      "type": "Float32Array",
+      "byteOffset": 3616048,
+      "length": 219156,
+      "byteLength": 876624
+    }
+  },
+  "binary": {
+    "byteLength": 4492672,
+    "alignment": 16,
+    "byteOrder": "little-endian",
+    "contentDigest128": "970ceb159de26ba33f989ec5d5b7ff3b",
+    "sha256": "746367ba9cc2c5426f24a37aaf224cca66be83ef3c37d179aa02e2346f004d37",
+    "sha256Status": "verified-by-asset-writer"
+  },
+  "name": "flyer",
+  "specName": "Flyer Flap Wings",
+  "skinning": {
+    "status": "accepted-weight-baseline",
+    "maximumInfluences": 4,
+    "maximumPartitionError": 2.9802322387695312e-8,
+    "maximumBarrierLeakage": 0,
+    "fallbackVertices": 0,
+    "sigma": 0.27,
+    "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
+  },
+  "acceptanceStatus": "provisional-reference-candidate",
+  "limitations": [
+    "Deformation selection, correction-region selection, and direct near/design/far silhouette evidence remain open.",
+    "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
+  ]
+}

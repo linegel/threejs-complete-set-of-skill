@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,6 +21,7 @@ import { compareProjectedSilhouettes } from '../../core/silhouette.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const specsDir = resolve(here, '../../lab/specs');
+const referenceAssetsDir = resolve(here, '../../../assets/reference');
 const bundledSpecNames = ['biped', 'quadruped', 'hexapod', 'hopper', 'flyer', 'swimmer'];
 
 const sphereSpec = Object.freeze({
@@ -188,6 +190,32 @@ async function runBundledReferenceConnectivity() {
 	return { status: 'pass', details: { records, status: 'provisional-topology-and-intersection-only' } };
 }
 
+async function runBundledReferenceAssets() {
+	const records = [];
+	const requiredArrays = ['positions', 'normals', 'indices', 'skinIndices', 'skinWeights', 'semanticIndices', 'colorIndices', 'colorWeights', 'correctionMask', 'restRadialFrames'];
+	for (const name of bundledSpecNames) {
+		const manifest = JSON.parse(await readFile(resolve(referenceAssetsDir, `${name}.surface.json`), 'utf8'));
+		const binary = new Uint8Array(await readFile(resolve(referenceAssetsDir, `${name}.surface.bin`)));
+		const sha256 = createHash('sha256').update(binary).digest('hex');
+		if (sha256 !== manifest.binary?.sha256 || manifest.binary?.sha256Status !== 'verified-by-asset-writer') {
+			return { status: 'fail', details: { message: `bundled asset '${name}' SHA-256 mismatch`, expected: manifest.binary?.sha256, actual: sha256 } };
+		}
+		const arrays = unpackReferenceAsset(manifest, binary);
+		const missing = requiredArrays.filter((array) => !arrays[array]);
+		if (missing.length > 0) return { status: 'fail', details: { message: `bundled asset '${name}' lacks required arrays`, missing } };
+		const vertices = arrays.positions.length / 3;
+		if (arrays.normals.length !== arrays.positions.length || arrays.skinIndices.length !== vertices * 4 || arrays.skinWeights.length !== vertices * 4
+			|| arrays.semanticIndices.length !== vertices || arrays.correctionMask.length !== vertices || arrays.restRadialFrames.length !== vertices * 6) {
+			return { status: 'fail', details: { message: `bundled asset '${name}' array cardinality mismatch` } };
+		}
+		if (manifest.acceptanceStatus !== 'provisional-reference-candidate' || manifest.representation !== 'canonical-reference-surface-candidate') {
+			return { status: 'fail', details: { message: `bundled asset '${name}' overstates acceptance`, acceptanceStatus: manifest.acceptanceStatus, representation: manifest.representation } };
+		}
+		records.push({ name, vertices, triangles: arrays.indices.length / 3, bytes: binary.byteLength, sha256 });
+	}
+	return { status: 'pass', details: { records, acceptanceStatus: 'provisional-reference-candidate' } };
+}
+
 async function runSkinWeightBaseline() {
 	const spec = JSON.parse(await readFile(resolve(specsDir, 'biped.json'), 'utf8'));
 	const compiled = compileFixture(spec);
@@ -295,6 +323,7 @@ export const gates = [
 	{ id: 'reference-component-policy', run: runReferenceComponentPolicy },
 	{ id: 'mesh-self-intersection-rejection', run: runSelfIntersectionRejection },
 	{ id: 'bundled-reference-connectivity', run: runBundledReferenceConnectivity },
+	{ id: 'bundled-reference-assets', run: runBundledReferenceAssets },
 	{ id: 'skin-weight-baseline', run: runSkinWeightBaseline },
 	{ id: 'lbs-rest-identity', run: runLbsRestIdentity },
 	{ id: 'dq-rest-antipodal', run: runDqRestAndAntipodal },
