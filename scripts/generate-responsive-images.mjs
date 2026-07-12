@@ -1,14 +1,44 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import {
+  ownerIdForResponsiveSource,
+  responsiveDependencyHash,
+  sha256,
+  staleManifestOwnedOutputPaths,
+} from './lib/generated-asset-ledger.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
 const SITE = new URL('https://threejs-skills.com/');
 const MANIFEST_PATH = join(DOCS, 'seo', 'responsive-images.json');
+
+function parseManifest(source, label) {
+  try {
+    return JSON.parse(source);
+  } catch (error) {
+    throw new Error(`${label} is not valid JSON: ${error.message}`);
+  }
+}
+
+const previousManifests = [];
+if (existsSync(MANIFEST_PATH)) {
+  previousManifests.push(parseManifest(readFileSync(MANIFEST_PATH, 'utf8'), MANIFEST_PATH));
+}
+try {
+  const tracked = execFileSync('git', ['show', 'HEAD:docs/seo/responsive-images.json'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  previousManifests.push(parseManifest(tracked, 'tracked responsive image manifest'));
+} catch {
+  // A source archive may not contain Git metadata; the on-disk manifest remains authoritative there.
+}
 
 function attribute(tag, name) {
   return tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'))?.[1] ?? null;
@@ -67,10 +97,12 @@ for (const sourcePath of [...sources].sort()) {
     },
   ];
   manifest[relativeSource] = {
+    ownerId: ownerIdForResponsiveSource(relativeSource),
     url: new URL(relativeSource, SITE).href,
     width: sourceMetadata.width,
     height: sourceMetadata.height,
     bytes: sourceBytes,
+    sourceSha256: sha256(readFileSync(sourcePath)),
     formats: {},
   };
 
@@ -91,13 +123,26 @@ for (const sourcePath of [...sources].sort()) {
       height: outputMetadata.height,
       bytes: statSync(output.path).size,
       encoding: selected.id,
+      sha256: sha256(selected.bytes),
     };
   }
+  manifest[relativeSource].dependencyClosureHash = responsiveDependencyHash(
+    relativeSource,
+    manifest[relativeSource],
+  );
 }
 
 mkdirSync(dirname(MANIFEST_PATH), { recursive: true });
-writeFileSync(MANIFEST_PATH, `${JSON.stringify({
+const outputManifest = {
+  schemaVersion: 2,
   generatedBy: 'scripts/generate-responsive-images.mjs',
   sources: manifest,
-}, null, 2)}\n`);
-console.log(`Generated AVIF and WebP variants for ${sources.size} visible PNG previews.`);
+};
+let pruned = 0;
+for (const stalePath of staleManifestOwnedOutputPaths(previousManifests, outputManifest, DOCS, SITE)) {
+  if (!existsSync(stalePath)) continue;
+  unlinkSync(stalePath);
+  pruned += 1;
+}
+writeFileSync(MANIFEST_PATH, `${JSON.stringify(outputManifest, null, 2)}\n`);
+console.log(`Generated AVIF and WebP variants for ${sources.size} visible PNG previews; pruned ${pruned} stale manifest-owned output(s).`);
