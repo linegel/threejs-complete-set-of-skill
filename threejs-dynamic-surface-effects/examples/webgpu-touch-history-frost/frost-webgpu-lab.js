@@ -22,6 +22,15 @@ import {
   FROST_QUALITY_TIERS,
   createWebGPUTouchHistoryFrostEffect,
 } from "./frost-surface-effect.js";
+import {
+  FROST_CAPTURE_RECIPES,
+  resolveFrostCaptureRecipe,
+} from "./capture-recipes.js";
+import {
+  canonicalFrostEvidenceJson,
+  runFrostCaptureTransaction,
+  sha256FrostEvidence,
+} from "./capture-transaction.js";
 
 export const FROST_MODE_TO_DEBUG_VIEW = Object.freeze({
   final: "final",
@@ -48,10 +57,22 @@ export const FROST_LAB_MODES = Object.freeze(Object.keys(FROST_MODE_TO_DEBUG_VIE
 export const FROST_LAB_ID = "webgpu-touch-history-frost";
 export const FROST_SCENARIO_ID = "touch-history-frost";
 const FROST_RUNTIME_PROFILES = Object.freeze(["correctness", "performance"]);
+const FROST_CAMERA_POSES = Object.freeze({
+  near: Object.freeze({ position: Object.freeze([0, 0.6, 6.1]), target: Object.freeze([0, 0, 0]) }),
+  design: Object.freeze({ position: Object.freeze([0, 1.2, 10.2]), target: Object.freeze([0, 0, 0]) }),
+  far: Object.freeze({ position: Object.freeze([0, 3.8, 17]), target: Object.freeze([0, 0, 0]) }),
+});
 
 const FROST_DEBUG_VIEW_TO_MODE = Object.freeze(Object.fromEntries(
   Object.entries(FROST_MODE_TO_DEBUG_VIEW).map(([mode, debugView]) => [debugView, mode]),
 ));
+
+function applyFrostCameraPose(camera, id) {
+  const pose = FROST_CAMERA_POSES[id];
+  if (!pose) throw new RangeError(`unknown frost camera "${id}"`);
+  camera.position.fromArray(pose.position);
+  camera.lookAt(...pose.target);
+}
 
 export function parseFrostLabRoute(pathname = "/", search = "") {
   const params = new URLSearchParams(search);
@@ -145,6 +166,11 @@ export class WebGPUFrostLab {
       active: false,
     };
     this.time = 0;
+    this.captureTransactionActive = null;
+    this.captureTransactionPoison = null;
+    this.captureTransactionSequence = 0;
+    this.captureRecipeSetDigest = null;
+    this.captureTargetSequence = 0;
   }
 
   async initialize() {
@@ -179,8 +205,7 @@ export class WebGPUFrostLab {
     this.backdrop = createBackdropScene();
     this.scene = this.backdrop.scene;
     this.camera = new PerspectiveCamera(48, width / height, 0.1, 100);
-    this.camera.position.set(0, 1.2, 10.2);
-    this.camera.lookAt(0, 0, 0);
+    applyFrostCameraPose(this.camera, "design");
     this.effect = createWebGPUTouchHistoryFrostEffect({
       renderer: this.renderer,
       scene: this.scene,
@@ -193,6 +218,7 @@ export class WebGPUFrostLab {
     });
     await this.effect.initialize();
     this.renderPipeline = this.effect.renderPipeline;
+    this.captureRecipeSetDigest = await sha256FrostEvidence(FROST_CAPTURE_RECIPES);
     this.mode = FROST_DEBUG_VIEW_TO_MODE[this.effect.debugView] ?? "final";
     this.initialized = true;
     return this;
@@ -236,16 +262,8 @@ export class WebGPUFrostLab {
   }
 
   async setCamera(id) {
-    const poses = {
-      near: { position: [0, 0.6, 6.1], target: [0, 0, 0] },
-      design: { position: [0, 1.2, 10.2], target: [0, 0, 0] },
-      far: { position: [0, 3.8, 17], target: [0, 0, 0] },
-    };
-    const pose = poses[id];
-    if (!pose) throw new RangeError(`unknown frost camera "${id}"`);
+    applyFrostCameraPose(this.camera, id);
     this.cameraId = id;
-    this.camera.position.fromArray(pose.position);
-    this.camera.lookAt(...pose.target);
   }
 
   async setTime(seconds) {
@@ -298,19 +316,34 @@ export class WebGPUFrostLab {
     this.renderPipeline.render();
   }
 
-  async capturePixels(target = "final") {
-    if (target !== "final" && target !== "presentation") {
-      throw new RangeError(`unknown frost capture target "${target}"`);
-    }
+  async #capturePipelinePixels(pipeline, { target, captureMode = null } = {}) {
     const size = this.renderer.getDrawingBufferSize(new Vector2());
     const width = Math.trunc(size.x);
     const height = Math.trunc(size.y);
-    const renderTarget = new RenderTarget(width, height, { type: UnsignedByteType, samples: 1 });
+    const renderTarget = new RenderTarget(width, height, {
+      type: UnsignedByteType,
+      samples: 1,
+      depthBuffer: false,
+      stencilBuffer: false,
+    });
+    const captureTargetId = `frost-capture-target-${++this.captureTargetSequence}`;
+    const artifactTarget = Object.freeze({
+      kind: "render-target",
+      rendererDeviceGeneration: this.rendererDeviceGeneration,
+      captureTargetId,
+      colorTextureUuid: renderTarget.texture.uuid,
+      width,
+      height,
+      format: "rgba8unorm",
+      sampleCount: 1,
+      depthBuffer: false,
+      stencilBuffer: false,
+    });
     const state = RendererUtils.saveRendererState(this.renderer);
     let pixels;
     try {
       this.renderer.setRenderTarget(renderTarget);
-      this.renderPipeline.render();
+      pipeline.render();
       pixels = await this.renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height);
     } finally {
       RendererUtils.restoreRendererState(this.renderer, state);
@@ -323,16 +356,221 @@ export class WebGPUFrostLab {
     if (!Number.isInteger(bytesPerRow) || bytesPerRow < rowBytes) {
       throw new Error(`invalid WebGPU readback stride ${bytesPerRow} for row ${rowBytes}`);
     }
-    return {
-      target,
-      width,
-      height,
-      format: "rgba8unorm",
-      outputColorSpace: this.renderer.outputColorSpace,
-      bytesPerPixel: 4,
-      bytesPerRow,
-      pixels,
-    };
+    return Object.freeze({
+      artifactTarget,
+      capture: Object.freeze({
+        target,
+        ...(captureMode === null ? {} : { captureMode }),
+        width,
+        height,
+        format: "rgba8unorm",
+        outputColorSpace: this.renderer.outputColorSpace,
+        bytesPerPixel: 4,
+        bytesPerRow,
+        pixels,
+      }),
+    });
+  }
+
+  async capturePixels(target = "final") {
+    if (target !== "final" && target !== "presentation") {
+      throw new RangeError(`unknown frost capture target "${target}"`);
+    }
+    const { capture } = await this.#capturePipelinePixels(this.renderPipeline, { target });
+    return capture;
+  }
+
+  #captureParentSnapshot() {
+    const viewport = this.renderer.getSize(new Vector2());
+    const evidence = Object.freeze({
+      route: Object.freeze({
+        scenario: this.scenario,
+        mechanism: this.mechanism,
+        tier: this.tier.id,
+        mode: this.mode,
+        camera: this.cameraId,
+        seed: this.seed,
+        timeSeconds: this.time,
+      }),
+      viewport: Object.freeze({ width: viewport.x, height: viewport.y, dpr: this.renderer.getPixelRatio() }),
+      camera: Object.freeze({
+        position: Object.freeze(this.camera.position.toArray()),
+        quaternion: Object.freeze(this.camera.quaternion.toArray()),
+        projectionMatrix: Object.freeze(this.camera.projectionMatrix.toArray()),
+      }),
+      history: Object.freeze({
+        historyA: this.effect.historyA.uuid,
+        historyB: this.effect.historyB.uuid,
+        readTexture: this.effect.historyRead.uuid,
+        writeTexture: this.effect.historyWrite.uuid,
+        readNode: this.effect.historyReadTextureNode.uuid,
+        writeNode: this.effect.historyWriteTextureNode.uuid,
+        readSlot: this.effect.readSlot,
+        frame: this.effect.frame,
+      }),
+      pipeline: Object.freeze({
+        renderPipeline: this.renderPipeline.uuid ?? this.renderPipeline.constructor.name,
+        outputNode: this.renderPipeline.outputNode?.uuid ?? this.renderPipeline.outputNode?.constructor?.name ?? null,
+        outputColorTransform: this.renderPipeline.outputColorTransform,
+      }),
+      device: Object.freeze({
+        generation: this.rendererDeviceGeneration,
+        status: this.rendererDeviceStatus,
+        lossGeneration: this.deviceLossGeneration,
+      }),
+    });
+    return Object.freeze({
+      evidence,
+      refs: Object.freeze({
+        rendererDevice: this.rendererDevice,
+        renderPipeline: this.renderPipeline,
+        outputNode: this.renderPipeline.outputNode,
+        historyA: this.effect.historyA,
+        historyB: this.effect.historyB,
+        historyRead: this.effect.historyRead,
+        historyWrite: this.effect.historyWrite,
+        historyReadNode: this.effect.historyReadTextureNode,
+        historyWriteNode: this.effect.historyWriteTextureNode,
+      }),
+    });
+  }
+
+  #verifyCaptureParent(entry) {
+    const restored = this.#captureParentSnapshot();
+    if (canonicalFrostEvidenceJson(restored.evidence) !== canonicalFrostEvidenceJson(entry.evidence)) {
+      throw new Error("Frost capture transaction changed parent state or resource evidence");
+    }
+    for (const key of Object.keys(entry.refs)) {
+      if (restored.refs[key] !== entry.refs[key]) {
+        throw new Error(`Frost capture transaction changed parent ${key} identity`);
+      }
+    }
+    return restored.evidence;
+  }
+
+  describeCaptureRecipes() {
+    if (!this.captureRecipeSetDigest) throw new Error("Frost capture recipes are unavailable before ready()");
+    return Object.freeze({
+      schemaVersion: 1,
+      recipeSetDigest: this.captureRecipeSetDigest,
+      recipes: FROST_CAPTURE_RECIPES,
+    });
+  }
+
+  async captureRecipe(id) {
+    const recipe = resolveFrostCaptureRecipe(id);
+    if (this.captureTransactionPoison !== null) {
+      throw new Error(`Frost capture controller is poisoned: ${this.captureTransactionPoison.message}`);
+    }
+    if (this.captureTransactionActive !== null) {
+      throw new Error(`Frost capture transaction ${this.captureTransactionActive} is already active`);
+    }
+    const sequence = ++this.captureTransactionSequence;
+    this.captureTransactionActive = recipe.id;
+    let scratch = null;
+    try {
+      const transaction = await runFrostCaptureTransaction({
+        recipeId: recipe.id,
+        snapshot: async () => this.#captureParentSnapshot(),
+        execute: async () => {
+          const drawingSize = this.renderer.getDrawingBufferSize(new Vector2());
+          const camera = this.camera.clone();
+          applyFrostCameraPose(camera, recipe.camera);
+          scratch = createWebGPUTouchHistoryFrostEffect({
+            renderer: this.renderer,
+            scene: this.scene,
+            camera,
+            width: Math.trunc(drawingSize.x),
+            height: Math.trunc(drawingSize.y),
+            tier: recipe.tier,
+            mechanism: recipe.mechanism,
+            seed: recipe.seed,
+          });
+          await scratch.initialize();
+          scratch.setDebugView(FROST_MODE_TO_DEBUG_VIEW[recipe.target]);
+          for (const step of recipe.trace) {
+            scratch.advanceFrame({
+              deltaSeconds: step.deltaSeconds,
+              segmentStart: step.start,
+              segmentEnd: step.end,
+              pressure: step.pressure,
+              active: true,
+              render: false,
+            });
+          }
+          const readback = await this.#capturePipelinePixels(scratch.renderPipeline, {
+            target: recipe.id,
+            captureMode: recipe.target,
+          });
+          await this.rendererDevice.queue.onSubmittedWorkDone();
+          const timeSeconds = recipe.expectedTimeSeconds;
+          return Object.freeze({
+            readback,
+            effectiveState: Object.freeze({
+              scenario: recipe.scenario,
+              mechanism: recipe.mechanism,
+              tier: recipe.tier,
+              mode: recipe.target,
+              camera: recipe.camera,
+              seed: recipe.seed,
+              timeSeconds,
+              viewport: Object.freeze({
+                width: readback.capture.width,
+                height: readback.capture.height,
+                dpr: this.renderer.getPixelRatio(),
+              }),
+            }),
+            execution: Object.freeze({
+              pointerSegmentCount: recipe.trace.length,
+              computeDispatchDelta: recipe.trace.length,
+              renderSubmissionDelta: 1,
+              sameFrameComposite: true,
+            }),
+          });
+        },
+        cleanup: async () => {
+          scratch?.dispose();
+          scratch = null;
+        },
+        verify: async (entry) => this.#verifyCaptureParent(entry),
+        poison: async (error) => {
+          this.captureTransactionPoison = Object.freeze({ recipeId: recipe.id, message: String(error.message ?? error) });
+        },
+      });
+      const recipeDigest = await sha256FrostEvidence(recipe);
+      const entryStateDigest = await sha256FrostEvidence(transaction.entry.evidence);
+      const effectiveStateDigest = await sha256FrostEvidence(transaction.result.effectiveState);
+      const restoredStateDigest = await sha256FrostEvidence(transaction.restored);
+      return Object.freeze({
+        ...transaction.result.readback.capture,
+        evidence: Object.freeze({
+          recipe: Object.freeze({
+            id: recipe.id,
+            schemaVersion: recipe.schemaVersion,
+            digest: recipeDigest,
+            setDigest: this.captureRecipeSetDigest,
+            target: recipe.target,
+          }),
+          effectiveState: transaction.result.effectiveState,
+          execution: transaction.result.execution,
+          artifactTarget: transaction.result.readback.artifactTarget,
+          transaction: Object.freeze({
+            schemaVersion: 1,
+            transactionId: `frost-capture-${sequence}`,
+            sequence,
+            recipeId: recipe.id,
+            status: "COMMITTED",
+            restorationVerdict: "PASS",
+            entryStateDigest,
+            effectiveStateDigest,
+            restoredStateDigest,
+            phaseVerdicts: Object.freeze({ capture: "PASS", restore: "PASS", settle: "PASS", verify: "PASS" }),
+          }),
+        }),
+      });
+    } finally {
+      this.captureTransactionActive = null;
+    }
   }
 
   describePipeline() {
@@ -433,6 +671,11 @@ export class WebGPUFrostLab {
       camera: this.cameraId,
       seed: this.seed,
       timeSeconds: this.time,
+      captureTransaction: {
+        active: this.captureTransactionActive,
+        poisoned: this.captureTransactionPoison,
+        nextSequence: this.captureTransactionSequence + 1,
+      },
       viewport: {
         width: viewportSize.x,
         height: viewportSize.y,

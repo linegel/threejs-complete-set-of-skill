@@ -404,6 +404,10 @@ assert.equal(controllerContract.scenario, FROST_SCENARIO_ID);
 assert.equal(controllerContract.mechanism, "diffusion", "scenario selection must not mutate the mechanism");
 await assert.rejects(controllerContract.setScenario("history-and-deposit"), /unknown frost scenario/);
 assert.throws(() => new WebGPUFrostLab({ runtimeProfile: "invented" }), /unknown frost runtime profile/);
+assert.equal(typeof controllerContract.describeCaptureRecipes, "function");
+assert.equal(typeof controllerContract.captureRecipe, "function");
+assert.throws(() => controllerContract.describeCaptureRecipes(), /unavailable before ready/);
+await assert.rejects(controllerContract.captureRecipe("invented"), /unknown frost capture recipe/);
 
 const browserSource = readFileSync(resolve(here, "frost-webgpu-lab.js"), "utf8");
 for (const token of [
@@ -417,6 +421,12 @@ for (const token of [
   "timeSeconds: this.time",
   "this.renderer.getSize(new Vector2())",
   "dpr: this.renderer.getPixelRatio()",
+  "runFrostCaptureTransaction",
+  "scratch = createWebGPUTouchHistoryFrostEffect",
+  "await this.rendererDevice.queue.onSubmittedWorkDone()",
+  "captureTargetId",
+  "depthBuffer: false",
+  'restorationVerdict: "PASS"',
 ]) {
   assert(browserSource.includes(token), `canonical frost browser source is missing ${token}`);
 }
