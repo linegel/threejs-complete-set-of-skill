@@ -35,6 +35,10 @@ const controller = await createGeometryLabController({
   dpr: Math.min(window.devicePixelRatio, 2),
   mode: modeSelect.value,
   tier: tierSelect.value,
+  routeLock: {
+    mode: route.mechanism,
+    tier: route.tier,
+  },
 });
 window.labController = controller;
 
@@ -42,7 +46,16 @@ modeSelect.disabled = Boolean(route.mechanism);
 tierSelect.disabled = Boolean(route.tier);
 modeSelect.addEventListener("change", async () => controller.setMode(modeSelect.value));
 tierSelect.addEventListener("change", async () => controller.setTier(tierSelect.value));
-window.addEventListener("resize", () => controller.resize(window.innerWidth, window.innerHeight, Math.min(window.devicePixelRatio, 2)));
+const resize = () => controller.resize(
+  window.innerWidth,
+  window.innerHeight,
+  Math.min(window.devicePixelRatio, 2),
+);
+window.addEventListener("resize", resize);
+window.addEventListener("beforeunload", () => {
+  window.removeEventListener("resize", resize);
+  controller.dispose();
+}, { once: true });
 
 let previous = performance.now();
 async function frame(now) {
@@ -54,4 +67,6 @@ async function frame(now) {
   status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU`;
   requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+if (new URLSearchParams(window.location.search).get("capture") !== "1") {
+  requestAnimationFrame(frame);
+}

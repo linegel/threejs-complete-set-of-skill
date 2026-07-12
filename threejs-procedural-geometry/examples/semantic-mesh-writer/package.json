@@ -2,10 +2,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "check": "node --check app.js && node --check lab-controller.js && node --check validate-geometry.js && node validate-routes.mjs",
+    "check": "node --check app.js && node --check batching-demo.js && node --check branch-rings.js && node --check capture-hook.mjs && node --check dynamic-component-fixture.js && node --check dynamic-updates.js && node --check frame-profile.js && node --check indirect-fixture.js && node --check lab-controller.js && node --check lod-presets.js && node --check mesh-writer.js && node --check readback-layout.js && node --check tangents.js && node --check validate-geometry.js && node validate-routes.mjs",
     "validate:unit": "node validate-geometry.js --sweep all --json",
     "test:mutations": "node test-mutations.js",
-    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab semantic-mesh-writer --target presentation",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab semantic-mesh-writer --target presentation --hook ./capture-hook.mjs",
     "validate:artifacts": "node evidence-status.mjs validate:artifacts",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
     "validate:full": "npm run validate:quick && npm run validate:artifacts"
