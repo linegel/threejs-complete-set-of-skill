@@ -113,8 +113,8 @@
     },
     {
       "id": "current-adapter-performance",
-      "required": true,
-      "evidence": "INSUFFICIENT_EVIDENCE: measureSteadyFrames times renderAsync submission rather than timestamp-resolved GPU completion; WebGPURenderer is constructed without trackTimestamp; every tier has frameTargetMs null. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused, so that environment cannot attribute cadence cost to the lab.",
+      "required": false,
+      "evidence": "NOT_CLAIMED: every tier has frameTargetMs null, so this lab makes no performance claim. measureSteadyFrames times renderAsync submission rather than timestamp-resolved GPU completion, and WebGPURenderer is constructed without trackTimestamp. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused, so those timing rows remain diagnostic and cannot support acceptance.",
       "status": "incomplete"
     }
   ],
