@@ -51,6 +51,11 @@ export function resolvePhysicalRuntimeProfile( {
 		&& typeof injectedProfile?.labId === 'string';
 
 	const evidenceRequested = requestedProfile !== null || automationSurface === CODEX_IN_APP_SURFACE || sessionToken !== null;
+	if ( automationSurface === CODEX_IN_APP_SURFACE && environment.webdriver === true ) {
+
+		throw new Error( 'Physical and performance evidence rejects WebDriver/headless execution; use the Codex in-app Browser.' );
+
+	}
 	if ( requiresPerformance ) {
 
 		if ( validInAppHost === false ) throw new Error( 'Timestamp-enabled performance routes require the immutable Codex in-app Browser surface.' );
