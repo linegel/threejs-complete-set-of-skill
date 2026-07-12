@@ -1,5 +1,16 @@
+import { readFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { buildAffineSlotTransforms, restPoseFromCompiled } from '../../core/deformation.js';
+import { unpackReferenceAsset } from '../../core/reference-asset-format.js';
+import { compileSpec } from '../../core/rig-compiler.js';
+import { buildReferenceBufferGeometry } from '../../lab/reference-geometry.js';
 import { IdentityPagePool } from '../../runtime/identity-pages.js';
 import { createReferencePageStorage } from '../../tsl/reference-page-storage.js';
+import { createReferenceCreatureMaterial } from '../../tsl/reference-material.js';
+
+const here = dirname(fileURLToPath(import.meta.url));
 
 const identity = Object.freeze({ compilerSignature: 'compiler', topologySignature: 'topology', geometryDigest: 'geometry', tier: 'hero', skinningMethod: 'lbs', correctionLayout: 'none' });
 
@@ -65,8 +76,69 @@ async function runReferencePageStorage() {
 	return { status: 'pass', details: { upload, idle, duplicateRejected } };
 }
 
+async function runReferenceRenderBindings() {
+	const labRoot = resolve(here, '../../..');
+	const [manifestText, binary, specText] = await Promise.all([
+		readFile(resolve(labRoot, 'assets/reference/biped.surface.json'), 'utf8'),
+		readFile(resolve(labRoot, 'assets/reference/biped.surface.bin')),
+		readFile(resolve(labRoot, 'src/lab/specs/biped.json'), 'utf8'),
+	]);
+	const manifest = JSON.parse(manifestText);
+	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileSpec(JSON.parse(specText), { tier: 'hero', maxParts: 64, candidateK: 64 });
+	const geometry = buildReferenceBufferGeometry({ manifest, arrays }, compiled);
+	const storage = createReferencePageStorage({ capacity: 4, slotCount: compiled.slots.length });
+	storage.writeTransforms(0, buildAffineSlotTransforms(compiled, restPoseFromCompiled(compiled)));
+	storage.writeRoot(0, 0, 0, 0, 0);
+	storage.writeVisibleSlots([0]);
+	const material = createReferenceCreatureMaterial({ storage, slotCount: compiled.slots.length, tier: 'hero' });
+	const valid = geometry.attributes.position.count === manifest.certification.topology.vertexCount
+		&& geometry.index.count === manifest.certification.topology.triangleCount * 3
+		&& geometry.userData.representation === 'canonical-reference-surface-candidate'
+		&& material.positionNode === material.castShadowPositionNode
+		&& material.userData.fieldEvaluation === 'none in canonical fragment shading';
+	const details = { vertices: geometry.attributes.position.count, triangles: geometry.index.count / 3, representation: geometry.userData.representation, sharedShadowNode: material.positionNode === material.castShadowPositionNode };
+	material.dispose();
+	geometry.dispose();
+	storage.dispose();
+	if (!valid) return { status: 'fail', details: { message: 'reference render bindings drifted', ...details } };
+	return { status: 'pass', details };
+}
+
+async function runReferenceIdentityMutation() {
+	const labRoot = resolve(here, '../../..');
+	const [manifestText, binary, specText] = await Promise.all([
+		readFile(resolve(labRoot, 'assets/reference/biped.surface.json'), 'utf8'),
+		readFile(resolve(labRoot, 'assets/reference/biped.surface.bin')),
+		readFile(resolve(labRoot, 'src/lab/specs/biped.json'), 'utf8'),
+	]);
+	const manifest = JSON.parse(manifestText);
+	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileSpec(JSON.parse(specText), { tier: 'hero', maxParts: 64, candidateK: 64 });
+	const mutations = [
+		['compilerSignature', { ...compiled, compilerSignature: `${compiled.compilerSignature}-mutated` }],
+		['topologySignature', { ...compiled, topologySignature: `${compiled.topologySignature}-mutated` }],
+		['geometryDigest', { ...compiled, geometryDigest: `${compiled.geometryDigest}-mutated` }],
+		['tier', { ...compiled, tier: 'crowd' }],
+	];
+	const rejected = [];
+	for (const [name, mutated] of mutations) {
+		try {
+			buildReferenceBufferGeometry({ manifest, arrays }, mutated).dispose();
+		} catch (error) {
+			rejected.push({ name, message: error.message });
+		}
+	}
+	if (rejected.length !== mutations.length) {
+		return { status: 'fail', details: { message: 'reference asset identity mutation was accepted', rejected, expected: mutations.map(([name]) => name) } };
+	}
+	return { status: 'pass', details: { rejected } };
+}
+
 export const gates = [
 	{ id: 'stable-identity-pages', run: runStableIdentityPages },
 	{ id: 'page-reuse-generation', run: runPageReuseGeneration },
 	{ id: 'reference-page-storage', run: runReferencePageStorage },
+	{ id: 'reference-render-bindings', run: runReferenceRenderBindings },
+	{ id: 'reference-identity-mutation', run: runReferenceIdentityMutation },
 ];

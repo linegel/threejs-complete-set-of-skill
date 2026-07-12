@@ -63,6 +63,9 @@ export function createReferencePageStorage(options = {}) {
 		const expected = slotCount * REFERENCE_TRANSFORM_VEC4S * 4;
 		if (!(values instanceof Float32Array) || values.length !== expected) throw new Error(`reference transforms require ${expected} Float32 values`);
 		const offset = slot * expected;
+		let changed = false;
+		for (let index = 0; index < expected; index++) if (transforms.array[offset + index] !== values[index]) { changed = true; break; }
+		if (!changed) return { slot, offset, count: 0 };
 		transforms.array.set(values, offset);
 		include(transformDirty, offset, expected);
 		return { slot, offset, count: expected };
@@ -71,7 +74,9 @@ export function createReferencePageStorage(options = {}) {
 	function writeRoot(slotValue, x, y, z, yaw) {
 		const slot = stableSlot(slotValue);
 		const offset = slot * 4;
-		roots.array.set([x, y, z, yaw].map((value) => Number.isFinite(value) ? value : 0), offset);
+		const values = [x, y, z, yaw].map((value) => Number.isFinite(value) ? value : 0);
+		if (values.every((value, index) => roots.array[offset + index] === value)) return { slot, offset, count: 0 };
+		roots.array.set(values, offset);
 		include(rootDirty, offset, 4);
 		return { slot, offset, count: 4 };
 	}
@@ -79,6 +84,7 @@ export function createReferencePageStorage(options = {}) {
 	function writeVisibleSlots(slots) {
 		if (!Array.isArray(slots) && !(slots instanceof Uint32Array) && !(slots instanceof Int32Array)) throw new Error('visible slots must be an integer array');
 		if (slots.length > capacity) throw new Error(`visible slot count ${slots.length} exceeds page capacity ${capacity}`);
+		if (slots.length === visibleCount && slots.every((slot, index) => visible.array[index] === slot)) return visibleCount;
 		const seen = new Set();
 		for (let index = 0; index < slots.length; index++) {
 			const slot = stableSlot(slots[index]);

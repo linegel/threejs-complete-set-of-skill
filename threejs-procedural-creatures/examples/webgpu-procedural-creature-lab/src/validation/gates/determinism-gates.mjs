@@ -121,6 +121,8 @@ async function runGateCoverage() {
 		'stable-identity-pages',
 		'page-reuse-generation',
 		'reference-page-storage',
+		'reference-render-bindings',
+		'reference-identity-mutation',
 	];
 	// Real assertion, not a vacuous pass: dynamically import every gate module and
 	// require the expected-id list to be a subset of what actually registered.
