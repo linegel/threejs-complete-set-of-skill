@@ -256,6 +256,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-head{display:flex;align-items:start;justify-content:space-between;gap:18px}.runtime-evidence-head code{color:var(--cyan);font:10px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase}.runtime-evidence-head h3{margin-top:6px;font-size:21px}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
+.evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -268,7 +269,7 @@ a.chip:active{scale:.96}
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
   <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
+  <div class="links"><a href="../#matrix">Matrix</a><a href="../#flagships">Flagships</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
@@ -327,6 +328,12 @@ a.chip:active{scale:.96}
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
     </div>
+  </div></section>
+
+  <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
+    <h2 id="evidence-reports-title">Evidence reports</h2>
+    <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Sky, Atmosphere, and Haze"><a href="../evidence/webgpu-lut-atmosphere/"><code>webgpu-lut-atmosphere</code><span>evidence pending</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">

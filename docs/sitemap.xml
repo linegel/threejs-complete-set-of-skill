@@ -2,6 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>https://threejs-skills.com/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/about/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-ambient-contact-shading.html</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-bloom.html</loc><lastmod>2026-07-12</lastmod></url>
@@ -29,6 +30,47 @@
   <url><loc>https://threejs-skills.com/skills/threejs-visual-validation.html</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-volumetric-clouds.html</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-water-optics.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/browser-fallback-harness/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/creature-habitat/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/debugging-contract-lab/</loc><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/final-image-flight/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/integration-image-pipeline-ao/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/integration-precipitation-image-pipeline/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/integration-temporal-surface/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/node-selective-bloom/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/procedural-district/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/relativistic-space-shot/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/router-manifest-lab/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/semantic-mesh-writer/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/structured-ash-growth/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/tsl-curved-ray/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/tsl-procedural-pbr/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/weathered-world/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-bounded-water/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-cached-clipmap-shadow/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-camera-rig/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-dense-grass/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-exposure-color-pipeline/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-fft-ocean/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-field-bake/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-image-pipeline/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-lut-atmosphere/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-material-slot-compiler/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-node-gtao/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-object-sculptor-corpus/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-pooled-effects/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-procedural-creature-lab/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-procedural-timelines/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-quadtree-planet/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-rain-snow-and-wet-surfaces/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-shadow-architecture-bench/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-shadow-pipeline-integration/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-temporal-history/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-touch-history-frost/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-tower-ship-sculptor/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-validation-harness/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-vegetation-integration/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-weather-volume-clouds/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/ambient-contact-shading-demo/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/browser-fallback-harness/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/camera-rig-handoff-demo/</loc><lastmod>2026-07-12</lastmod></url>
