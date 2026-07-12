@@ -13,6 +13,8 @@ import {
 	stepCrabGait,
 	validateOneWayCrabWaterInteraction
 } from '../../crab/crab-gait.js';
+import { CylinderGeometry, SphereGeometry } from 'three';
+import { CRAB_RENDER_DECISION, CRAB_RENDER_TIERS, validateCrabGeometryStats } from '../../crab/crab-render-contract.js';
 
 function assert( condition, message ) {
 
@@ -21,6 +23,24 @@ function assert( condition, message ) {
 }
 
 validateCoastalCrabSpec();
+assert( CRAB_RENDER_DECISION.candidates.length >= 5, 'crab render decision compares fewer than five presentation architectures' );
+assert( CRAB_RENDER_DECISION.selectedCandidateId === 'instanced-closed-rigid-links', 'crab selected render architecture drifted' );
+for ( const [ tierId, tier ] of Object.entries( CRAB_RENDER_TIERS ) ) {
+
+	const sphere = new SphereGeometry( 1, tier.sphereWidth, tier.sphereHeight );
+	const eye = new SphereGeometry( 1, Math.max( 6, Math.floor( tier.sphereWidth / 2 ) ), Math.max( 4, Math.floor( tier.sphereHeight / 2 ) ) );
+	const segment = new CylinderGeometry( 1, 0.78, 1, tier.radialSegments, 1, false );
+	validateCrabGeometryStats( tierId, {
+		semanticSlots: 40,
+		drawFamilies: 5,
+		triangles: sphere.index.count / 3 * 2 + eye.index.count / 3 * 2 + segment.index.count / 3 * 36,
+		vertices: sphere.attributes.position.count * 2 + eye.attributes.position.count * 2 + segment.attributes.position.count * 36
+	} );
+	sphere.dispose();
+	eye.dispose();
+	segment.dispose();
+
+}
 assert( CRAB_REPRESENTATION_DECISION.candidates.length >= 5, 'crab decision compares fewer than five representations' );
 assert( new Set( CRAB_REPRESENTATION_DECISION.candidates.map( ( candidate ) => candidate.family ) ).size === CRAB_REPRESENTATION_DECISION.candidates.length, 'crab decision families are not distinct' );
 assert( CRAB_REPRESENTATION_DECISION.selectedCandidateId === 'closed-segmented-rigid-reference', 'crab selected representation drifted' );
