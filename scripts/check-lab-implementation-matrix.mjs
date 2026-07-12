@@ -4,8 +4,8 @@ import { dirname, join, resolve } from 'node:path';
 import {
   PRIMARY_DEMO_KINDS,
   REPO_ROOT,
-  TARGETS_PATH,
   buildDemoRegistry,
+  loadCanonicalTargets,
   readJson,
 } from './lib/lab-registry.mjs';
 import { validateRawLabManifest } from './lib/lab-validation.mjs';
@@ -203,7 +203,7 @@ function verifyTarget(target, { integration = false } = {}) {
   return errors;
 }
 
-const targetData = readJson(TARGETS_PATH);
+const targetData = loadCanonicalTargets();
 const errors = rootBrowserToolchainDrift(ROOT_PACKAGE, ROOT_PACKAGE_LOCK, ROOT_BROWSER_TOOLCHAIN);
 for (const target of targetData.targets) errors.push(...verifyTarget(target));
 for (const target of targetData.integrations ?? []) errors.push(...verifyTarget(target, { integration: true }));
@@ -255,4 +255,9 @@ if (errors.length > 0) {
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
-console.log(`Implemented ${targetData.targets.length} canonical targets and ${(targetData.integrations ?? []).length} integration flagships with strict raw manifests, browser entries, scripts, and generated route contracts.`);
+console.log(
+  `Implemented the authoritative ${targetData.primaryRoster.length}-primary matrix `
+  + `with ${targetData.primaryRoster.filter((entry) => entry.kind === 'integration-demo').length} integrations, `
+  + `${targetData.primaryRoster.filter((entry) => entry.flagship).length} flagships, strict raw manifests, `
+  + 'browser entries, scripts, and generated route contracts.',
+);

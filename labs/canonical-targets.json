@@ -2,6 +2,401 @@
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
   "skillsExpected": 27,
+  "primaryExpected": 41,
+  "integrationsExpected": 10,
+  "flagshipsExpected": 5,
+  "fixedRoutesExpected": 516,
+  "requiredCapabilitiesExpected": 90,
+  "requiredRuntimeProofsExpected": 223,
+  "primaryRoster": [
+    {
+      "id": "browser-fallback-harness",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-compatibility-fallbacks/examples/browser-fallback-harness",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "creature-habitat",
+      "kind": "integration-demo",
+      "canonicalDir": "integration-labs/creature-habitat",
+      "executionClass": "rendering",
+      "flagship": true,
+      "dependencyLabIds": [
+        "webgpu-procedural-creature-lab",
+        "webgpu-dense-grass",
+        "structured-ash-growth",
+        "webgpu-vegetation-integration",
+        "webgpu-bounded-water",
+        "webgpu-rain-snow-and-wet-surfaces",
+        "integration-precipitation-image-pipeline",
+        "webgpu-camera-rig",
+        "webgpu-cached-clipmap-shadow",
+        "webgpu-shadow-pipeline-integration",
+        "webgpu-image-pipeline"
+      ]
+    },
+    {
+      "id": "debugging-contract-lab",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-debugging/examples/debugging-contract-lab",
+      "executionClass": "non-rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "final-image-flight",
+      "kind": "integration-demo",
+      "canonicalDir": "integration-labs/final-image-flight",
+      "executionClass": "rendering",
+      "flagship": true,
+      "dependencyLabIds": [
+        "webgpu-camera-rig",
+        "webgpu-procedural-timelines",
+        "webgpu-image-pipeline",
+        "webgpu-temporal-history",
+        "webgpu-node-gtao",
+        "integration-image-pipeline-ao",
+        "node-selective-bloom",
+        "webgpu-exposure-color-pipeline",
+        "webgpu-cached-clipmap-shadow",
+        "webgpu-shadow-pipeline-integration",
+        "webgpu-validation-harness"
+      ]
+    },
+    {
+      "id": "integration-image-pipeline-ao",
+      "kind": "integration-demo",
+      "canonicalDir": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": ["webgpu-node-gtao", "webgpu-image-pipeline"]
+    },
+    {
+      "id": "integration-precipitation-image-pipeline",
+      "kind": "integration-demo",
+      "canonicalDir": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": ["webgpu-rain-snow-and-wet-surfaces", "webgpu-image-pipeline"]
+    },
+    {
+      "id": "integration-temporal-surface",
+      "kind": "integration-demo",
+      "canonicalDir": "threejs-dynamic-surface-effects/examples/integration-temporal-surface",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": ["webgpu-touch-history-frost", "webgpu-image-pipeline", "webgpu-temporal-history"]
+    },
+    {
+      "id": "node-selective-bloom",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-bloom/examples/node-selective-bloom",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "procedural-district",
+      "kind": "integration-demo",
+      "canonicalDir": "integration-labs/procedural-district",
+      "executionClass": "rendering",
+      "flagship": true,
+      "dependencyLabIds": [
+        "webgpu-field-bake",
+        "semantic-mesh-writer",
+        "tsl-procedural-pbr",
+        "webgpu-material-slot-compiler",
+        "webgpu-rain-snow-and-wet-surfaces",
+        "webgpu-cached-clipmap-shadow",
+        "webgpu-node-gtao",
+        "integration-image-pipeline-ao",
+        "webgpu-image-pipeline"
+      ]
+    },
+    {
+      "id": "relativistic-space-shot",
+      "kind": "integration-demo",
+      "canonicalDir": "integration-labs/relativistic-space-shot",
+      "executionClass": "rendering",
+      "flagship": true,
+      "dependencyLabIds": [
+        "tsl-curved-ray",
+        "webgpu-pooled-effects",
+        "webgpu-camera-rig",
+        "webgpu-procedural-timelines",
+        "node-selective-bloom",
+        "webgpu-exposure-color-pipeline",
+        "webgpu-image-pipeline",
+        "webgpu-temporal-history"
+      ]
+    },
+    {
+      "id": "router-manifest-lab",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-choose-skills/examples/router-manifest-lab",
+      "executionClass": "non-rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "semantic-mesh-writer",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-geometry/examples/semantic-mesh-writer",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "structured-ash-growth",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-vegetation/examples/structured-ash-growth",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "tsl-curved-ray",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "tsl-procedural-pbr",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-materials/examples/tsl-procedural-pbr",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "weathered-world",
+      "kind": "integration-demo",
+      "canonicalDir": "integration-labs/weathered-world",
+      "executionClass": "rendering",
+      "flagship": true,
+      "dependencyLabIds": [
+        "webgpu-quadtree-planet",
+        "webgpu-lut-atmosphere",
+        "webgpu-weather-volume-clouds",
+        "webgpu-fft-ocean",
+        "webgpu-bounded-water",
+        "webgpu-rain-snow-and-wet-surfaces",
+        "integration-precipitation-image-pipeline",
+        "webgpu-dense-grass",
+        "structured-ash-growth",
+        "webgpu-vegetation-integration",
+        "webgpu-cached-clipmap-shadow",
+        "webgpu-shadow-architecture-bench",
+        "webgpu-shadow-pipeline-integration",
+        "webgpu-image-pipeline",
+        "webgpu-temporal-history"
+      ]
+    },
+    {
+      "id": "webgpu-bounded-water",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-water-optics/examples/webgpu-bounded-water",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-cached-clipmap-shadow",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-camera-rig",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-dense-grass",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-vegetation/examples/webgpu-dense-grass",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-exposure-color-pipeline",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-fft-ocean",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-spectral-ocean/examples/webgpu-fft-ocean",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-field-bake",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-fields/examples/webgpu-field-bake",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-image-pipeline",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-image-pipeline/examples/webgpu-image-pipeline",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-lut-atmosphere",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-material-slot-compiler",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-node-gtao",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-ambient-contact-shading/examples/webgpu-node-gtao",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-object-sculptor-corpus",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-pooled-effects",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-procedural-creature-lab",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-procedural-timelines",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-quadtree-planet",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-procedural-planets/examples/webgpu-quadtree-planet",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-rain-snow-and-wet-surfaces",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-shadow-architecture-bench",
+      "kind": "mechanism-demo",
+      "canonicalDir": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-shadow-pipeline-integration",
+      "kind": "integration-demo",
+      "canonicalDir": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": ["webgpu-cached-clipmap-shadow", "webgpu-shadow-architecture-bench", "webgpu-image-pipeline"]
+    },
+    {
+      "id": "webgpu-temporal-history",
+      "kind": "mechanism-demo",
+      "canonicalDir": "threejs-image-pipeline/examples/webgpu-temporal-history",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-touch-history-frost",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-tower-ship-sculptor",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-validation-harness",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-visual-validation/examples/webgpu-validation-harness",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "webgpu-vegetation-integration",
+      "kind": "integration-demo",
+      "canonicalDir": "threejs-procedural-vegetation/examples/webgpu-vegetation-integration",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": ["webgpu-dense-grass", "structured-ash-growth", "webgpu-image-pipeline"]
+    },
+    {
+      "id": "webgpu-weather-volume-clouds",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds",
+      "executionClass": "rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    }
+  ],
   "integrations": [
     {
       "id": "final-image-flight",
@@ -74,8 +469,7 @@
       "canonicalDir": "threejs-compatibility-fallbacks/examples/browser-fallback-harness",
       "scenarios": ["blocked-default", "native-budget-reduction", "precomputed-static", "cpu-offline", "feature-removed", "maintained-legacy", "invariant-loss-comparison"],
       "mechanisms": ["explicit-activation-gate", "ordered-degradation-trace", "bounded-water-loss-oracle", "invariant-ledger", "force-webgl-branch-isolation", "maintenance-acceptance"],
-      "tiers": [],
-      "nonRenderingScenarioSuite": true
+      "tiers": []
     },
     {
       "skill": "threejs-visual-validation",

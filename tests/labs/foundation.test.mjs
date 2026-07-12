@@ -11,6 +11,7 @@ import {
   computeBuildRevision,
   computeManifestSourceHash,
   computeManifestSourceHashInputs,
+  loadCanonicalTargets,
 } from '../../scripts/lib/lab-registry.mjs';
 import { computePublishedBundleHash } from '../../scripts/lib/published-pages.mjs';
 import { validateLabManifest, validateRawLabManifest, validateRegistry } from '../../scripts/lib/lab-validation.mjs';
@@ -74,14 +75,15 @@ import {
   plannedPublishedRoutes,
 } from '../../scripts/lib/page-routes.mjs';
 
-test('inventory freezes exactly 27 skills and all five integrations', () => {
+test('inventory follows the authoritative skill, primary, integration, and flagship roster', () => {
   const registry = buildDemoRegistry();
-  assert.equal(registry.skillsExpected, 27);
+  const targetData = loadCanonicalTargets();
+  assert.equal(registry.skillsExpected, targetData.skillsExpected);
   assert.equal(registry.counts.skills, registry.skillsExpected);
-  assert.deepEqual(
-    [...registry.integrationIds].sort(),
-    ['creature-habitat', 'final-image-flight', 'procedural-district', 'relativistic-space-shot', 'weathered-world'],
-  );
+  assert.equal(registry.primaryIds.length, targetData.primaryExpected);
+  assert.equal(registry.integrationPrimaryIds.length, targetData.integrationsExpected);
+  assert.equal(registry.flagshipIds.length, targetData.flagshipsExpected);
+  assert.deepEqual(registry.integrationIds, registry.flagshipIds);
   assert.equal(validateRegistry(registry).valid, true);
   assert.ok(registry.demos.every((demo) => Array.isArray(demo.sourceHashInputs) && demo.sourceHashInputs.length > 0));
 });

@@ -46,6 +46,17 @@ export const ACCEPTANCE_STATUSES = Object.freeze([
   'not-applicable',
 ]);
 
+export const EXECUTION_CLASSES = Object.freeze([
+  'rendering',
+  'non-rendering',
+]);
+
+export const AUTHORITATIVE_COUNT_FIELDS = Object.freeze({
+  fixedRoutes: 'fixedRoutesExpected',
+  requiredCapabilities: 'requiredCapabilitiesExpected',
+  requiredRuntimeProofs: 'requiredRuntimeProofsExpected',
+});
+
 const GENERATED_PROVIDER_IDS = new Set([
   'water-generated-caustics',
   'cloud-generated-weather-maps',
@@ -72,6 +83,175 @@ const DEFAULT_MODES = Object.freeze(['final', 'no-post', 'diagnostics']);
 
 export function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function sameValues(actual, expected) {
+  return JSON.stringify([...actual].sort()) === JSON.stringify([...expected].sort());
+}
+
+function duplicateValues(values) {
+  const seen = new Set();
+  return values.filter((value) => {
+    const duplicate = seen.has(value);
+    seen.add(value);
+    return duplicate;
+  });
+}
+
+export function validateCanonicalTargets(targetData) {
+  const errors = [];
+  const roster = targetData?.primaryRoster;
+  const targets = Array.isArray(targetData?.targets) ? targetData.targets : [];
+  const integrations = Array.isArray(targetData?.integrations) ? targetData.integrations : [];
+  if (targetData?.schemaVersion !== 2) errors.push('canonical targets schemaVersion must be 2');
+  if (targetData?.threeRevision !== '0.185.1') errors.push('canonical targets Three revision must be 0.185.1');
+  if (!Array.isArray(targetData?.targets)) errors.push('canonical targets targets must be an array');
+  if (!Array.isArray(targetData?.integrations)) errors.push('canonical targets integrations must be an array');
+  for (const key of [
+    'skillsExpected',
+    'primaryExpected',
+    'integrationsExpected',
+    'flagshipsExpected',
+    ...Object.values(AUTHORITATIVE_COUNT_FIELDS),
+  ]) {
+    if (!Number.isInteger(targetData?.[key]) || targetData[key] <= 0) {
+      errors.push(`canonical targets ${key} must be a positive integer`);
+    }
+  }
+  if (!Array.isArray(roster) || roster.length === 0) {
+    errors.push('canonical targets primaryRoster must be a non-empty array');
+    return { valid: false, errors };
+  }
+  if (roster.length !== targetData.primaryExpected) {
+    errors.push(`primaryRoster contains ${roster.length} records; primaryExpected is ${targetData.primaryExpected}`);
+  }
+
+  const allowedKeys = new Set([
+    'id', 'kind', 'canonicalDir', 'executionClass', 'flagship', 'dependencyLabIds',
+  ]);
+  const rosterIds = roster.map((entry) => entry?.id);
+  const rosterIdSet = new Set(rosterIds);
+  const duplicateIds = duplicateValues(rosterIds);
+  if (duplicateIds.length > 0) errors.push(`primaryRoster has duplicate ids: ${[...new Set(duplicateIds)].join(', ')}`);
+  const directories = roster.map((entry) => entry?.canonicalDir);
+  const duplicateDirectories = duplicateValues(directories);
+  if (duplicateDirectories.length > 0) {
+    errors.push(`primaryRoster has duplicate canonical directories: ${[...new Set(duplicateDirectories)].join(', ')}`);
+  }
+
+  for (const [index, entry] of roster.entries()) {
+    const path = `primaryRoster[${index}]`;
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      errors.push(`${path} must be an object`);
+      continue;
+    }
+    const extras = Object.keys(entry).filter((key) => !allowedKeys.has(key));
+    if (extras.length > 0) errors.push(`${path} has unknown properties: ${extras.join(', ')}`);
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(entry.id ?? '')) errors.push(`${path}.id is invalid`);
+    if (!PRIMARY_DEMO_KINDS.includes(entry.kind)) errors.push(`${path}.kind is not a primary demo kind`);
+    if (typeof entry.canonicalDir !== 'string' || entry.canonicalDir.length === 0
+        || entry.canonicalDir.startsWith('/') || entry.canonicalDir.split('/').includes('..')) {
+      errors.push(`${path}.canonicalDir must be a confined repository path`);
+    }
+    if (!EXECUTION_CLASSES.includes(entry.executionClass)) errors.push(`${path}.executionClass is invalid`);
+    if (typeof entry.flagship !== 'boolean') errors.push(`${path}.flagship must be boolean`);
+    if (!Array.isArray(entry.dependencyLabIds)
+        || entry.dependencyLabIds.some((id) => !/^[a-z0-9][a-z0-9-]*$/.test(id))) {
+      errors.push(`${path}.dependencyLabIds must be an id array`);
+      continue;
+    }
+    const duplicateDependencies = duplicateValues(entry.dependencyLabIds);
+    if (duplicateDependencies.length > 0) {
+      errors.push(`${path}.dependencyLabIds has duplicates: ${[...new Set(duplicateDependencies)].join(', ')}`);
+    }
+    if (entry.kind === 'integration-demo' && entry.dependencyLabIds.length === 0) {
+      errors.push(`${path} integration demos require at least one dependency`);
+    }
+    if (entry.kind !== 'integration-demo' && entry.dependencyLabIds.length > 0) {
+      errors.push(`${path} non-integration primaries cannot declare integration dependencies`);
+    }
+    if (entry.flagship && entry.kind !== 'integration-demo') errors.push(`${path} flagships must be integration demos`);
+    if (entry.dependencyLabIds.includes(entry.id)) errors.push(`${path} cannot depend on itself`);
+    for (const dependencyId of entry.dependencyLabIds) {
+      if (!rosterIdSet.has(dependencyId)) errors.push(`${path} depends on missing primary ${dependencyId}`);
+    }
+  }
+
+  const integrationCount = roster.filter((entry) => entry.kind === 'integration-demo').length;
+  if (integrationCount !== targetData.integrationsExpected) {
+    errors.push(`primaryRoster contains ${integrationCount} integrations; integrationsExpected is ${targetData.integrationsExpected}`);
+  }
+  const flagshipCount = roster.filter((entry) => entry.flagship === true).length;
+  if (flagshipCount !== targetData.flagshipsExpected) {
+    errors.push(`primaryRoster contains ${flagshipCount} flagships; flagshipsExpected is ${targetData.flagshipsExpected}`);
+  }
+
+  const declaredTargets = [...targets, ...integrations];
+  const duplicateTargetIds = duplicateValues(declaredTargets.map((entry) => entry.id));
+  if (duplicateTargetIds.length > 0) {
+    errors.push(`canonical target declarations have duplicate ids: ${[...new Set(duplicateTargetIds)].join(', ')}`);
+  }
+  const rosterById = new Map(roster.map((entry) => [entry.id, entry]));
+  for (const target of targets) {
+    const entry = rosterById.get(target.id);
+    if (!entry) errors.push(`target ${target.id} is absent from primaryRoster`);
+    else if (entry.kind !== 'canonical-lab' || entry.canonicalDir !== target.canonicalDir) {
+      errors.push(`target ${target.id} disagrees with its primaryRoster kind or canonicalDir`);
+    }
+  }
+  for (const target of integrations) {
+    const entry = rosterById.get(target.id);
+    if (!entry) errors.push(`flagship target ${target.id} is absent from primaryRoster`);
+    else if (entry.kind !== 'integration-demo' || entry.flagship !== true || entry.canonicalDir !== target.canonicalDir) {
+      errors.push(`flagship target ${target.id} disagrees with its primaryRoster metadata`);
+    }
+  }
+  const expectedTargetIds = roster.filter((entry) => entry.kind === 'canonical-lab').map((entry) => entry.id);
+  const declaredTargetIds = targets.map((entry) => entry.id);
+  if (!sameValues(declaredTargetIds, expectedTargetIds)) {
+    errors.push('canonical targets declarations must exactly cover every canonical-lab primaryRoster entry');
+  }
+  const expectedFlagshipIds = roster.filter((entry) => entry.flagship === true).map((entry) => entry.id);
+  const declaredFlagshipIds = integrations.map((entry) => entry.id);
+  if (!sameValues(declaredFlagshipIds, expectedFlagshipIds)) {
+    errors.push('canonical integration declarations must exactly cover every flagship primaryRoster entry');
+  }
+  if (integrations.length !== targetData.flagshipsExpected) {
+    errors.push(`canonical flagship declarations contain ${integrations.length} records; flagshipsExpected is ${targetData.flagshipsExpected}`);
+  }
+
+  const visiting = new Set();
+  const visited = new Set();
+  const visit = (id, stack) => {
+    if (visiting.has(id)) {
+      const start = stack.indexOf(id);
+      errors.push(`primaryRoster dependency cycle: ${[...stack.slice(start), id].join(' -> ')}`);
+      return;
+    }
+    if (visited.has(id)) return;
+    visiting.add(id);
+    const nextStack = [...stack, id];
+    for (const dependencyId of rosterById.get(id)?.dependencyLabIds ?? []) visit(dependencyId, nextStack);
+    visiting.delete(id);
+    visited.add(id);
+  };
+  for (const id of rosterIds) visit(id, []);
+
+  return { valid: errors.length === 0, errors };
+}
+
+export function loadCanonicalTargets() {
+  const targetData = readJson(TARGETS_PATH);
+  const result = validateCanonicalTargets(targetData);
+  if (!result.valid) throw new Error(`canonical targets invalid:\n- ${result.errors.join('\n- ')}`);
+  return targetData;
+}
+
+export function authoritativePrimaryRoster(targetData = loadCanonicalTargets()) {
+  return targetData.primaryRoster.map((entry) => ({
+    ...entry,
+    dependencyLabIds: [...entry.dependencyLabIds],
+  }));
 }
 
 function toPosix(path) {
@@ -228,6 +408,17 @@ function normalizeSourceManifest(raw, manifestPath) {
     proxyStatus: raw.proxyStatus ?? null,
     ...(nonRenderingScenarioSuite ? { nonRenderingScenarioSuite: true } : {}),
     ...(notes.length > 0 ? { notes } : {}),
+  };
+}
+
+function attachRosterMetadata(manifest, rosterById) {
+  const roster = rosterById.get(manifest.id);
+  if (!roster) return manifest;
+  return {
+    ...manifest,
+    executionClass: roster.executionClass,
+    flagship: roster.flagship,
+    dependencyLabIds: [...roster.dependencyLabIds],
   };
 }
 
@@ -576,6 +767,91 @@ function providerManifest(provider, canonicalLabId) {
   };
 }
 
+export function deriveRegistryPrimaryIds(demos) {
+  return demos
+    .filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind))
+    .map((demo) => demo.id)
+    .sort((a, b) => a.localeCompare(b));
+}
+
+export function deriveSkillCoverage(demos, skills) {
+  return [...skills].sort((a, b) => a.localeCompare(b)).map((skill) => {
+    const primary = demos
+      .filter((demo) => demo.skill === skill && PRIMARY_DEMO_KINDS.includes(demo.kind))
+      .sort((a, b) => a.id.localeCompare(b.id));
+    const accepted = primary.filter((demo) => demo.status === 'accepted');
+    return {
+      skill,
+      primaryLabIds: primary.map((demo) => demo.id),
+      acceptedPrimaryLabIds: accepted.map((demo) => demo.id),
+      status: accepted.length > 0
+        ? 'accepted'
+        : primary.some((demo) => demo.status === 'blocked') ? 'blocked' : 'incomplete',
+    };
+  });
+}
+
+export function deriveRegistryCounts(demos, skills) {
+  const primary = demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
+  const requiredCapabilities = primary.flatMap((demo) => demo.capabilityRequirements ?? [])
+    .filter((entry) => entry.required === true);
+  const requiredRuntimeProofs = primary.flatMap((demo) => demo.runtimeProof ?? [])
+    .filter((entry) => entry.required === true);
+  return {
+    skills: skills.length,
+    demos: demos.length,
+    primary: primary.length,
+    acceptedPrimary: primary.filter((demo) => demo.status === 'accepted').length,
+    secondary: demos.filter((demo) => demo.status === 'secondary').length,
+    integrations: primary.filter((demo) => demo.kind === 'integration-demo').length,
+    flagships: primary.filter((demo) => demo.flagship === true).length,
+    fixedRoutes: primary.reduce(
+      (sum, demo) => sum + (demo.scenarios?.length ?? 0) + (demo.mechanisms?.length ?? 0) + (demo.tiers?.length ?? 0),
+      0,
+    ),
+    requiredCapabilities: requiredCapabilities.length,
+    requiredRuntimeProofs: requiredRuntimeProofs.length,
+  };
+}
+
+export function validatePrimaryRosterClosure(demos, origins, targetData = loadCanonicalTargets()) {
+  const errors = [];
+  const roster = authoritativePrimaryRoster(targetData);
+  const rosterById = new Map(roster.map((entry) => [entry.id, entry]));
+  const primary = demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
+  const actualIds = primary.map((demo) => demo.id);
+  const expectedIds = roster.map((entry) => entry.id);
+  const missing = expectedIds.filter((id) => !actualIds.includes(id));
+  const extra = actualIds.filter((id) => !rosterById.has(id));
+  if (missing.length > 0) errors.push(`primary roster is missing demos: ${missing.join(', ')}`);
+  if (extra.length > 0) errors.push(`unrostered primary demos are forbidden: ${extra.join(', ')}`);
+  if (!sameValues(actualIds, expectedIds)) {
+    errors.push(`primary demo set does not equal the authoritative ${targetData.primaryExpected}-entry roster`);
+  }
+
+  const primaryById = new Map(primary.map((demo) => [demo.id, demo]));
+  for (const rosterEntry of roster) {
+    const demo = primaryById.get(rosterEntry.id);
+    if (!demo) continue;
+    if (demo.kind !== rosterEntry.kind) {
+      errors.push(`${demo.id}: kind ${demo.kind} disagrees with primaryRoster ${rosterEntry.kind}`);
+    }
+    if (demo.executionClass !== rosterEntry.executionClass) {
+      errors.push(`${demo.id}: executionClass ${demo.executionClass ?? '(missing)'} disagrees with primaryRoster ${rosterEntry.executionClass}`);
+    }
+    if (demo.flagship !== rosterEntry.flagship) {
+      errors.push(`${demo.id}: flagship ${String(demo.flagship)} disagrees with primaryRoster ${String(rosterEntry.flagship)}`);
+    }
+    if (!sameValues(demo.dependencyLabIds ?? [], rosterEntry.dependencyLabIds)) {
+      errors.push(`${demo.id}: dependencyLabIds disagree with primaryRoster`);
+    }
+    if (origins?.[demo.id]?.canonicalDir !== rosterEntry.canonicalDir) {
+      errors.push(`${demo.id}: canonicalDir ${origins?.[demo.id]?.canonicalDir ?? '(missing)'} disagrees with primaryRoster ${rosterEntry.canonicalDir}`);
+    }
+  }
+  return { valid: errors.length === 0, errors };
+}
+
 export function computeBuildRevision(demos, lockfile = readFileSync(join(REPO_ROOT, 'package-lock.json'))) {
   const primarySources = demos
     .filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind))
@@ -605,7 +881,9 @@ function finalizeManifest(manifest, { canonicalDir = null } = {}) {
 }
 
 export function buildDemoRegistry() {
-  const targetData = readJson(TARGETS_PATH);
+  const targetData = loadCanonicalTargets();
+  const roster = authoritativePrimaryRoster(targetData);
+  const rosterById = new Map(roster.map((entry) => [entry.id, entry]));
   const skills = listSkillDirs();
   const sourceManifests = listRawLabManifestPaths().map((path) => ({
     path: repoRelative(path),
@@ -626,7 +904,7 @@ export function buildDemoRegistry() {
 
   for (const target of targetData.targets) {
     const source = sourceByDirectory.get(target.canonicalDir);
-    const manifest = source?.manifest ?? targetManifest(target);
+    const manifest = attachRosterMetadata(source?.manifest ?? targetManifest(target), rosterById);
     demos.push(finalizeManifest(manifest, { canonicalDir: target.canonicalDir }));
     origins[manifest.id] = {
       type: source ? 'source-manifest' : 'completion-target',
@@ -638,7 +916,7 @@ export function buildDemoRegistry() {
 
   for (const target of targetData.integrations ?? []) {
     const source = sourceByDirectory.get(target.canonicalDir);
-    const manifest = source?.manifest ?? integrationTargetManifest(target);
+    const manifest = attachRosterMetadata(source?.manifest ?? integrationTargetManifest(target), rosterById);
     demos.push(finalizeManifest(manifest, { canonicalDir: target.canonicalDir }));
     origins[manifest.id] = {
       type: source ? 'source-manifest' : 'integration-target',
@@ -653,10 +931,11 @@ export function buildDemoRegistry() {
     const knownTarget = [...targetData.targets, ...(targetData.integrations ?? [])]
       .some((target) => target.canonicalDir === source.directory);
     if (knownTarget) continue;
-    demos.push(finalizeManifest(source.manifest, {
+    const manifest = attachRosterMetadata(source.manifest, rosterById);
+    demos.push(finalizeManifest(manifest, {
       canonicalDir: PRIMARY_DEMO_KINDS.includes(source.manifest.kind) ? source.directory : null,
     }));
-    origins[source.manifest.id] = { type: 'source-manifest', path: source.path, canonicalDir: source.directory };
+    origins[manifest.id] = { type: 'source-manifest', path: source.path, canonicalDir: source.directory };
     if (source.directory.includes('/examples/')) coveredExampleDirs.add(source.directory);
   }
 
@@ -685,17 +964,21 @@ export function buildDemoRegistry() {
   demos.sort((a, b) => a.id.localeCompare(b.id));
   const duplicateIds = demos.filter((demo, index) => demos.findIndex((entry) => entry.id === demo.id) !== index);
   if (duplicateIds.length > 0) throw new Error(`duplicate demo ids: ${[...new Set(duplicateIds.map((demo) => demo.id))].join(', ')}`);
+  const closure = validatePrimaryRosterClosure(demos, origins, targetData);
+  if (!closure.valid) throw new Error(`primary roster closure invalid:\n- ${closure.errors.join('\n- ')}`);
 
-  const skillCoverage = skills.map((skill) => {
-    const primary = demos.filter((demo) => demo.skill === skill && PRIMARY_DEMO_KINDS.includes(demo.kind));
-    const accepted = primary.filter((demo) => demo.status === 'accepted');
-    return {
-      skill,
-      primaryLabIds: primary.map((demo) => demo.id),
-      acceptedPrimaryLabIds: accepted.map((demo) => demo.id),
-      status: accepted.length > 0 ? 'accepted' : primary.some((demo) => demo.status === 'blocked') ? 'blocked' : 'incomplete',
-    };
-  });
+  const skillCoverage = deriveSkillCoverage(demos, skills);
+  const counts = deriveRegistryCounts(demos, skills);
+  for (const [countKey, expectedKey] of Object.entries(AUTHORITATIVE_COUNT_FIELDS)) {
+    if (counts[countKey] !== targetData[expectedKey]) {
+      throw new Error(
+        `authoritative ${countKey} denominator drift: derived ${counts[countKey]}, expected ${targetData[expectedKey]}`,
+      );
+    }
+  }
+  const primaryIds = roster.map((entry) => entry.id);
+  const integrationPrimaryIds = roster.filter((entry) => entry.kind === 'integration-demo').map((entry) => entry.id);
+  const flagshipIds = roster.filter((entry) => entry.flagship).map((entry) => entry.id);
 
   return {
     schemaVersion: 2,
@@ -705,15 +988,12 @@ export function buildDemoRegistry() {
     primaryDemoKinds: [...PRIMARY_DEMO_KINDS],
     acceptanceStatuses: [...ACCEPTANCE_STATUSES],
     skillsExpected: targetData.skillsExpected,
-    integrationIds: (targetData.integrations ?? []).map((entry) => entry.id),
+    primaryIds,
+    integrationPrimaryIds,
+    flagshipIds,
+    integrationIds: [...flagshipIds],
     coverage: skillCoverage,
-    counts: {
-      skills: skills.length,
-      demos: demos.length,
-      primary: demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind)).length,
-      acceptedPrimary: demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind) && demo.status === 'accepted').length,
-      secondary: demos.filter((demo) => demo.status === 'secondary').length,
-    },
+    counts,
     demos,
     origins,
   };

@@ -6,6 +6,7 @@ import {
   REGISTRY_PATH,
   buildDemoRegistry,
   listRawLabManifestPaths,
+  loadCanonicalTargets,
   readJson,
   registryJson,
 } from './lib/lab-registry.mjs';
@@ -15,6 +16,13 @@ const args = new Set(process.argv.slice(2));
 const write = args.has('--write-registry');
 const requireComplete = args.has('--require-complete');
 const skipRegistryDrift = args.has('--skip-registry-drift');
+
+try {
+  loadCanonicalTargets();
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
 
 const rawErrors = [];
 for (const path of listRawLabManifestPaths()) {

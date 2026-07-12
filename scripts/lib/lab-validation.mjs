@@ -2,10 +2,19 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   ACCEPTANCE_STATUSES,
+  AUTHORITATIVE_COUNT_FIELDS,
   DEMO_KINDS,
+  EXECUTION_CLASSES,
   PRIMARY_DEMO_KINDS,
   REPO_ROOT,
+  authoritativePrimaryRoster,
   computeManifestSourceHash,
+  deriveRegistryCounts,
+  deriveRegistryPrimaryIds,
+  deriveSkillCoverage,
+  listSkillDirs,
+  loadCanonicalTargets,
+  validatePrimaryRosterClosure,
 } from './lab-registry.mjs';
 import { validateEvidenceBundle } from './evidence-v2.mjs';
 
@@ -32,6 +41,14 @@ const RAW_PROXY_STATUS_KEYS = new Set(['limitation', 'canonicalLabId']);
 const NUMERIC_LABELS = new Set(['Authored', 'Derived', 'Measured', 'Gated']);
 const REPO_PATH = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/;
 
+export const REQUIRED_RENDERING_PROOF_IDS = Object.freeze([
+  'renderer-init',
+  'backend-is-webgpu',
+  'mechanism-reachable',
+  'render-or-compute-work',
+  'aligned-readback',
+]);
+
 function validRouteId(value) {
   return ROUTE_ID.test(value) && !String(value).split('/').some((segment) => segment === '.' || segment === '..' || segment === '');
 }
@@ -41,7 +58,7 @@ function unknownKeys(value, allowed) {
 }
 
 function nonEmptyString(value) {
-  return typeof value === 'string' && value.length > 0;
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function plainObject(value) {
@@ -290,6 +307,10 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
   for (const [index, tier] of (manifest?.tiers ?? []).entries()) validateTier(tier, `tiers[${index}]`, errors);
   const tierDuplicates = duplicateIds(manifest?.tiers ?? []);
   if (tierDuplicates.length > 0) errors.push(`tiers has duplicate ids: ${tierDuplicates.join(', ')}`);
+  for (const key of ['capabilityRequirements', 'runtimeProof']) {
+    const duplicates = duplicateIds(manifest?.[key] ?? []);
+    if (duplicates.length > 0) errors.push(`${key} has duplicate ids: ${duplicates.join(', ')}`);
+  }
 
   if (manifest?.publishPath !== null && !/^\/demos\/[a-z0-9][a-z0-9-]*\/$/.test(manifest.publishPath)) {
     errors.push('publishPath must be /demos/<lab-id>/');
@@ -306,6 +327,21 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
   }
 
   const primary = PRIMARY_DEMO_KINDS.includes(manifest?.kind);
+  if (primary) {
+    if (!EXECUTION_CLASSES.includes(manifest?.executionClass)) {
+      errors.push('primary demo requires an authoritative executionClass');
+    } else {
+      const nonRendering = manifest.executionClass === 'non-rendering';
+      if ((manifest.nonRenderingScenarioSuite === true) !== nonRendering) {
+        errors.push(`nonRenderingScenarioSuite disagrees with authoritative executionClass ${manifest.executionClass}`);
+      }
+    }
+    if (typeof manifest?.flagship !== 'boolean') errors.push('primary demo requires an authoritative flagship flag');
+    if (!Array.isArray(manifest?.dependencyLabIds)) errors.push('primary demo requires authoritative dependencyLabIds');
+    if (manifest?.kind !== 'integration-demo' && (manifest?.dependencyLabIds?.length ?? 0) > 0) {
+      errors.push('non-integration primary cannot declare dependencyLabIds');
+    }
+  }
   if (!primary && manifest?.status === 'accepted') errors.push(`${manifest.kind} cannot have accepted status`);
   if (['proxy-demo', 'generated-asset-demo', 'legacy-deprecated', 'contract-fixture'].includes(manifest?.kind)
       && !['secondary', 'not-applicable'].includes(manifest?.status)) {
@@ -322,11 +358,26 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
     if (!manifest.publishPath) errors.push('accepted primary demo requires publishPath');
     if (manifest.evidenceContract !== 'v2') errors.push('accepted primary demo requires evidence contract v2');
     if (!manifest.validationCommand) errors.push('accepted primary demo requires validationCommand');
-    if ((manifest.tiers ?? []).some((tier) => tier.acceptanceStatus !== 'accepted')) {
-      errors.push('accepted primary demo requires every declared tier to be accepted');
+    if (!/^sha256:[a-f0-9]{64}$/.test(manifest.sourceHash ?? '')) {
+      errors.push('accepted primary demo requires a current sourceHash');
+    }
+    for (const key of ['scenarios', 'mechanisms', 'tiers']) {
+      if ((manifest[key] ?? []).some((entry) => entry.acceptanceStatus !== 'accepted')) {
+        errors.push(`accepted primary demo requires every declared ${key.slice(0, -1)} to be accepted`);
+      }
+    }
+    for (const key of ['capabilityRequirements', 'runtimeProof']) {
+      for (const requirement of (manifest[key] ?? []).filter((entry) => entry.required === true)) {
+        if (requirement.status !== 'accepted') {
+          errors.push(`accepted primary demo requires ${key}.${requirement.id} status accepted`);
+        }
+        if (!nonEmptyString(requirement.evidence)) {
+          errors.push(`accepted primary demo requires nonempty evidence for ${key}.${requirement.id}`);
+        }
+      }
     }
 
-    if (!manifest.nonRenderingScenarioSuite) {
+    if (manifest.executionClass === 'rendering') {
       if (!manifest.evidenceBundle || !existsSync(join(root, manifest.evidenceBundle))) {
         errors.push('accepted rendering demo requires an existing evidenceBundle');
       } else if (validateEvidence) {
@@ -336,7 +387,7 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
         errors.push(...result.errors.map((error) => `evidence: ${error}`));
       }
       const requiredProof = new Set((manifest.runtimeProof ?? []).filter((entry) => entry.required).map((entry) => entry.id));
-      for (const id of ['renderer-init', 'backend-is-webgpu', 'mechanism-reachable', 'aligned-readback']) {
+      for (const id of REQUIRED_RENDERING_PROOF_IDS) {
         if (!requiredProof.has(id)) errors.push(`accepted rendering demo runtimeProof must require ${id}`);
       }
     }
@@ -345,35 +396,157 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
   return { valid: errors.length === 0, errors };
 }
 
-export function validateRegistry(registry, { requireComplete = false, validateEvidence = true } = {}) {
-  const errors = [];
-  if (registry?.schemaVersion !== 2) errors.push('registry schemaVersion must be 2');
-  if (registry?.threeRevision !== '0.185.1') errors.push('registry threeRevision must be 0.185.1');
-  const expectedSkills = registry?.skillsExpected;
-  if (!Number.isInteger(expectedSkills) || expectedSkills <= 0) errors.push('registry skillsExpected must be a positive integer');
-  if (registry?.counts?.skills !== expectedSkills) errors.push(`registry must contain exactly ${expectedSkills} skills; found ${registry?.counts?.skills}`);
-  const ids = duplicateIds(registry?.demos ?? []);
-  if (ids.length > 0) errors.push(`registry has duplicate ids: ${ids.join(', ')}`);
+function sameJson(actual, expected) {
+  return JSON.stringify(actual) === JSON.stringify(expected);
+}
 
-  for (const manifest of registry?.demos ?? []) {
-    const result = validateLabManifest(manifest, { validateEvidence });
-    errors.push(...result.errors.map((error) => `${manifest.id}: ${error}`));
-  }
-
-  const coverageSkills = new Set((registry?.coverage ?? []).map((entry) => entry.skill));
-  if (coverageSkills.size !== expectedSkills) errors.push(`coverage matrix must contain exactly ${expectedSkills} skills; found ${coverageSkills.size}`);
-  for (const coverage of registry?.coverage ?? []) {
-    if ((coverage.primaryLabIds ?? []).length === 0) errors.push(`${coverage.skill} has no declared primary target`);
-    if (requireComplete && (coverage.acceptedPrimaryLabIds ?? []).length === 0) {
-      errors.push(`${coverage.skill} has no accepted primary coverage`);
+function validateDependencyGraph(primary, allDemos, errors) {
+  const primaryById = new Map(primary.map((demo) => [demo.id, demo]));
+  const allById = new Map(allDemos.map((demo) => [demo.id, demo]));
+  for (const demo of primary) {
+    const dependencies = demo.dependencyLabIds ?? [];
+    if (demo.kind === 'integration-demo' && dependencies.length === 0) {
+      errors.push(`${demo.id}: integration demo has no dependencyLabIds`);
+    }
+    if (dependencies.includes(demo.id)) errors.push(`${demo.id}: integration dependency cannot reference itself`);
+    const duplicates = duplicateIds(dependencies.map((id) => ({ id })));
+    if (duplicates.length > 0) errors.push(`${demo.id}: dependencyLabIds has duplicates: ${duplicates.join(', ')}`);
+    for (const dependencyId of dependencies) {
+      const dependency = allById.get(dependencyId);
+      if (!dependency) {
+        errors.push(`${demo.id}: dependency ${dependencyId} is missing`);
+        continue;
+      }
+      if (!PRIMARY_DEMO_KINDS.includes(dependency.kind) || !primaryById.has(dependencyId)) {
+        errors.push(`${demo.id}: dependency ${dependencyId} is secondary, not primary coverage`);
+        continue;
+      }
+      if (demo.status === 'accepted' && dependency.status !== 'accepted') {
+        errors.push(`${demo.id}: accepted integration dependency ${dependencyId} is ${dependency.status}, not accepted`);
+      }
     }
   }
 
-  const expectedIntegrations = new Set(['final-image-flight', 'weathered-world', 'procedural-district', 'creature-habitat', 'relativistic-space-shot']);
-  for (const id of expectedIntegrations) {
-    const demo = registry?.demos?.find((entry) => entry.id === id);
-    if (!demo || demo.kind !== 'integration-demo') errors.push(`missing integration target ${id}`);
-    if (requireComplete && demo?.status !== 'accepted') errors.push(`integration ${id} is not accepted`);
+  const visiting = new Set();
+  const visited = new Set();
+  const reported = new Set();
+  const visit = (id, stack) => {
+    if (visiting.has(id)) {
+      const start = stack.indexOf(id);
+      const cycle = [...stack.slice(start), id].join(' -> ');
+      if (!reported.has(cycle)) errors.push(`integration dependency cycle: ${cycle}`);
+      reported.add(cycle);
+      return;
+    }
+    if (visited.has(id)) return;
+    visiting.add(id);
+    const nextStack = [...stack, id];
+    for (const dependencyId of primaryById.get(id)?.dependencyLabIds ?? []) {
+      if (primaryById.has(dependencyId)) visit(dependencyId, nextStack);
+    }
+    visiting.delete(id);
+    visited.add(id);
+  };
+  for (const demo of primary) visit(demo.id, []);
+}
+
+export function validateRegistry(registry, { requireComplete = false, validateEvidence = true } = {}) {
+  const errors = [];
+  const targetData = loadCanonicalTargets();
+  const roster = authoritativePrimaryRoster(targetData);
+  const skills = listSkillDirs();
+  const demos = registry?.demos ?? [];
+  const primary = demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
+
+  if (registry?.schemaVersion !== 2) errors.push('registry schemaVersion must be 2');
+  if (registry?.threeRevision !== '0.185.1') errors.push('registry threeRevision must be 0.185.1');
+  if (registry?.skillsExpected !== targetData.skillsExpected) {
+    errors.push(`registry skillsExpected must equal authoritative ${targetData.skillsExpected}`);
+  }
+  const ids = duplicateIds(demos);
+  if (ids.length > 0) errors.push(`registry has duplicate ids: ${ids.join(', ')}`);
+
+  const closure = validatePrimaryRosterClosure(demos, registry?.origins ?? {}, targetData);
+  errors.push(...closure.errors.map((error) => `primary roster: ${error}`));
+  const derivedPrimaryIds = deriveRegistryPrimaryIds(demos);
+  const expectedPrimaryIds = roster.map((entry) => entry.id).sort((a, b) => a.localeCompare(b));
+  if (!sameJson(registry?.primaryIds, expectedPrimaryIds)) {
+    errors.push('registry primaryIds drift from the authoritative primary roster');
+  }
+  if (!sameJson(derivedPrimaryIds, expectedPrimaryIds)) {
+    errors.push('derived primary demo ids drift from the authoritative primary roster');
+  }
+  const expectedIntegrationIds = roster.filter((entry) => entry.kind === 'integration-demo').map((entry) => entry.id);
+  const expectedFlagshipIds = roster.filter((entry) => entry.flagship === true).map((entry) => entry.id);
+  if (!sameJson(registry?.integrationPrimaryIds, expectedIntegrationIds)) {
+    errors.push('registry integrationPrimaryIds drift from the authoritative primary roster');
+  }
+  if (!sameJson(registry?.flagshipIds, expectedFlagshipIds)) {
+    errors.push('registry flagshipIds drift from the authoritative primary roster');
+  }
+  if (!sameJson(registry?.integrationIds, expectedFlagshipIds)) {
+    errors.push('legacy registry integrationIds must remain an exact flagshipIds alias');
+  }
+
+  const expectedCounts = deriveRegistryCounts(demos, skills);
+  if (!sameJson(registry?.counts, expectedCounts)) {
+    errors.push(`registry counts are forged or stale; expected ${JSON.stringify(expectedCounts)}, received ${JSON.stringify(registry?.counts)}`);
+  }
+  if (expectedCounts.skills !== targetData.skillsExpected) {
+    errors.push(`repository contains ${expectedCounts.skills} skills; authoritative target expects ${targetData.skillsExpected}`);
+  }
+  for (const [countKey, expectedKey] of Object.entries(AUTHORITATIVE_COUNT_FIELDS)) {
+    if (expectedCounts[countKey] !== targetData[expectedKey]) {
+      errors.push(
+        `registry ${countKey} denominator drift: derived ${expectedCounts[countKey]}, authoritative ${targetData[expectedKey]}`,
+      );
+    }
+  }
+  const expectedCoverage = deriveSkillCoverage(demos, skills);
+  if (!sameJson(registry?.coverage, expectedCoverage)) {
+    errors.push('registry coverage is forged or stale; it must be derived from primary demos');
+  }
+  const coverageSkills = (registry?.coverage ?? []).map((entry) => entry.skill);
+  const duplicateCoverage = duplicateIds(coverageSkills.map((id) => ({ id })));
+  if (duplicateCoverage.length > 0) errors.push(`coverage matrix has duplicate skills: ${duplicateCoverage.join(', ')}`);
+  for (const coverage of expectedCoverage) {
+    if (coverage.primaryLabIds.length === 0) errors.push(`${coverage.skill} has no declared primary target`);
+  }
+
+  for (const manifest of demos) {
+    const result = validateLabManifest(manifest, { validateEvidence });
+    errors.push(...result.errors.map((error) => `${manifest.id}: ${error}`));
+  }
+  validateDependencyGraph(primary, demos, errors);
+
+  if (requireComplete) {
+    for (const demo of primary) {
+      if (demo.status !== 'accepted') errors.push(`${demo.id}: primary status is ${demo.status}, not accepted`);
+      for (const key of ['scenarios', 'mechanisms', 'tiers']) {
+        for (const entry of demo[key] ?? []) {
+          if (entry.acceptanceStatus !== 'accepted') {
+            errors.push(`${demo.id}: ${key}/${entry.id} is ${entry.acceptanceStatus ?? 'missing-status'}, not accepted`);
+          }
+        }
+      }
+      for (const key of ['capabilityRequirements', 'runtimeProof']) {
+        for (const entry of (demo[key] ?? []).filter((requirement) => requirement.required === true)) {
+          if (entry.status !== 'accepted') {
+            errors.push(`${demo.id}: required ${key}/${entry.id} is ${entry.status ?? 'missing-status'}, not accepted`);
+          }
+          if (!nonEmptyString(entry.evidence)) {
+            errors.push(`${demo.id}: required ${key}/${entry.id} has no evidence`);
+          }
+        }
+      }
+    }
+    for (const id of expectedFlagshipIds) {
+      const demo = primary.find((entry) => entry.id === id);
+      if (demo?.status !== 'accepted') errors.push(`${id}: flagship is not accepted`);
+    }
+    for (const coverage of expectedCoverage) {
+      if (coverage.acceptedPrimaryLabIds.length === 0) errors.push(`${coverage.skill} has no accepted primary coverage`);
+    }
   }
 
   return { valid: errors.length === 0, errors };
