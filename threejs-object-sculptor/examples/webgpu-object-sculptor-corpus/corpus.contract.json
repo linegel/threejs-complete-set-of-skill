@@ -103,12 +103,16 @@
   "authoredPerformanceTargets": {
     "label": "Authored",
     "claimStatus": "unmeasured-target-only",
-    "currentReviewProfile": {"surface": "Codex in-app Browser", "role": "native-WebGPU correctness and visual review on the attached host only", "canPromotePhysicalDevicePerformance": false},
+    "currentReviewProfile": {"surface": "Codex in-app Browser", "role": "native-WebGPU correctness, visual review, and target-specific physical collection", "canPromotePhysicalDevicePerformance": false, "promotionCondition": "Each tier must bind a complete session from its named physical target; an attached M4 Max session cannot stand in for an M1/M2 Air session."},
     "profilesByTier": {
-      "full": {"id": "full-macbook-air-m2-60hz", "device": "Apple MacBook Air (M2)", "soc": "Apple M2", "operatingSystem": "macOS", "browser": "Codex in-app Browser", "backend": "native WebGPU", "refreshHz": 60, "viewportCssPixels": [1440, 900], "dprCap": 1.5},
-      "budgeted": {"id": "budgeted-ipad-10-60hz", "device": "Apple iPad (10th generation)", "soc": "Apple A14 Bionic", "operatingSystem": "iPadOS", "browser": "Safari", "backend": "native WebGPU", "refreshHz": 60, "viewportCssPixels": [820, 1180], "dprCap": 1.25},
-      "minimum": {"id": "minimum-pixel-6a-60hz", "device": "Google Pixel 6a", "soc": "Google Tensor", "operatingSystem": "Android", "browser": "Chrome", "backend": "native WebGPU", "refreshHz": 60, "viewportCssPixels": [360, 800], "dprCap": 1}
+      "full": {"id": "full-m4-max-60hz", "profileRole": "full-reference", "allowedDevices": ["Apple MacBook Pro (M4 Max)"], "allowedSocs": ["Apple M4 Max"], "operatingSystem": "macOS", "browser": "Codex in-app Browser", "backend": "native WebGPU", "refreshHz": 60, "viewportPolicy": "measured physical session viewport", "dprCap": 1.5},
+      "budgeted": {"id": "air-m1-or-m2-60hz", "profileRole": "constrained-reference", "allowedDevices": ["Apple MacBook Air (M1)", "Apple MacBook Air (M2)"], "allowedSocs": ["Apple M1", "Apple M2"], "operatingSystem": "macOS", "browser": "Codex in-app Browser", "backend": "native WebGPU", "refreshHz": 60, "viewportPolicy": "measured physical session viewport", "dprCap": 1.25},
+      "minimum": {"id": "air-m1-or-m2-60hz", "profileRole": "constrained-reference", "allowedDevices": ["Apple MacBook Air (M1)", "Apple MacBook Air (M2)"], "allowedSocs": ["Apple M1", "Apple M2"], "operatingSystem": "macOS", "browser": "Codex in-app Browser", "backend": "native WebGPU", "refreshHz": 60, "viewportPolicy": "measured physical session viewport", "dprCap": 1}
     },
+    "mobileArchitectureModels": [
+      {"id": "ipad-a14-budgeted-model", "tier": "budgeted", "deviceClass": "Apple iPad (10th generation)", "socClass": "Apple A14 Bionic", "status": "MODEL_ONLY_NOT_PERFORMANCE_ACCEPTANCE", "performanceClaim": "NOT_CLAIMED", "purpose": "Constrain bandwidth, DPR, storage, and submission architecture without pretending a macOS session measures iPadOS/Safari."},
+      {"id": "android-tensor-minimum-model", "tier": "minimum", "deviceClass": "Google Pixel 6a", "socClass": "Google Tensor", "status": "MODEL_ONLY_NOT_PERFORMANCE_ACCEPTANCE", "performanceClaim": "NOT_CLAIMED", "purpose": "Constrain the low-end memory and fill-rate envelope without pretending a macOS session measures Android/Chrome."}
+    ],
     "legacySpecBindingTier": "full",
     "legacySpecFieldSemantics": {
       "fpsTarget": "Authored refresh-matched presentation target; not a measured frame-rate result.",
@@ -132,18 +136,18 @@
       }
     },
     "requiredPerformanceCases": [
-      {"id": "lamp-full-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "full-macbook-air-m2-60hz"},
-      {"id": "bonsai-full-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "full-macbook-air-m2-60hz"},
-      {"id": "teapot-full-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "full-macbook-air-m2-60hz"},
-      {"id": "lamp-budgeted-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "budgeted-ipad-10-60hz"},
-      {"id": "bonsai-budgeted-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "budgeted-ipad-10-60hz"},
-      {"id": "teapot-budgeted-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "budgeted-ipad-10-60hz"},
-      {"id": "lamp-minimum-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "minimum-pixel-6a-60hz"},
-      {"id": "bonsai-minimum-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "minimum-pixel-6a-60hz"},
-      {"id": "teapot-minimum-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "minimum-pixel-6a-60hz"}
+      {"id": "lamp-full-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "full-m4-max-60hz"},
+      {"id": "bonsai-full-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "full-m4-max-60hz"},
+      {"id": "teapot-full-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "full", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "full-m4-max-60hz"},
+      {"id": "lamp-budgeted-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "air-m1-or-m2-60hz"},
+      {"id": "bonsai-budgeted-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "air-m1-or-m2-60hz"},
+      {"id": "teapot-budgeted-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "budgeted", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "air-m1-or-m2-60hz"},
+      {"id": "lamp-minimum-action-design-seed-17", "scenario": "articulated-desk-lamp", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 17, "profileId": "air-m1-or-m2-60hz"},
+      {"id": "bonsai-minimum-action-design-seed-24301", "scenario": "potted-bonsai", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "air-m1-or-m2-60hz"},
+      {"id": "teapot-minimum-action-design-seed-24301", "scenario": "ceramic-teapot", "tier": "minimum", "mode": "action-ready", "camera": "design", "seed": 24301, "profileId": "air-m1-or-m2-60hz"}
     ],
     "evidenceBindingRequirement": "Every required case needs a case-identified sustained timing window and case-identified resource snapshot; a single easy workload cannot promote all scenarios or tiers.",
-    "evidenceBindingStatus": "blocked-pending-case-identified-timing-and-resource-schema",
+    "evidenceBindingStatus": "schema-complete-pending-distinct-m4-max-and-air-physical-sessions",
     "measurementPromotionRequirement": "Sustained named-device CPU, GPU timestamp, presentation, resource, and lifecycle evidence must pass the artifact validator before any measured performance claim."
   },
   "cameras": [

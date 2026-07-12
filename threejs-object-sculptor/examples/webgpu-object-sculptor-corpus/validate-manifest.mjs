@@ -8,7 +8,11 @@ import { SCULPT_MODES, SCULPT_TIERS, summarizeSculptRuntime } from "../shared/sc
 import { CORPUS_DPR_CAPS } from "./lab-controller.js";
 import { SCULPT_TARGETS } from "./object-catalog.js";
 import { CORPUS_CAMERAS } from "./route-state.js";
-import { validateCorpusArtifacts } from "./validate-artifacts.mjs";
+import {
+  CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN,
+  CORPUS_PERFORMANCE_TARGET_PLAN,
+  validateCorpusArtifacts,
+} from "./validate-artifacts.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(here, "../../..");
@@ -403,6 +407,7 @@ function validateCorpusDeepContractShape(corpus) {
     "claimStatus",
     "currentReviewProfile",
     "profilesByTier",
+    "mobileArchitectureModels",
     "legacySpecBindingTier",
     "legacySpecFieldSemantics",
     "targetsByTier",
@@ -413,24 +418,45 @@ function validateCorpusDeepContractShape(corpus) {
   ], "corpus.authoredPerformanceTargets");
   assert.equal(performance.label, "Authored", "performance target label must be Authored");
   assert.equal(performance.claimStatus, "unmeasured-target-only", "performance targets must remain explicitly unmeasured");
-  exactKeys(performance.currentReviewProfile, ["surface", "role", "canPromotePhysicalDevicePerformance"], "corpus.authoredPerformanceTargets.currentReviewProfile");
+  exactKeys(performance.currentReviewProfile, ["surface", "role", "canPromotePhysicalDevicePerformance", "promotionCondition"], "corpus.authoredPerformanceTargets.currentReviewProfile");
   assert.equal(performance.currentReviewProfile.surface, "Codex in-app Browser", "current review must use the Codex in-app Browser");
   requireText(performance.currentReviewProfile.role, "corpus.authoredPerformanceTargets.currentReviewProfile.role");
+  requireText(performance.currentReviewProfile.promotionCondition, "corpus.authoredPerformanceTargets.currentReviewProfile.promotionCondition");
   assert.equal(performance.currentReviewProfile.canPromotePhysicalDevicePerformance, false, "attached-host review cannot promote physical-device performance");
   exactKeys(performance.profilesByTier, SCULPT_TIERS, "corpus.authoredPerformanceTargets.profilesByTier");
-  const profileIds = new Set();
+  const expectedProfileByTier = {
+    full: CORPUS_PERFORMANCE_TARGET_PLAN[0],
+    budgeted: CORPUS_PERFORMANCE_TARGET_PLAN[1],
+    minimum: CORPUS_PERFORMANCE_TARGET_PLAN[1],
+  };
   for (const tier of SCULPT_TIERS) {
     const profile = performance.profilesByTier[tier];
+    const expectedProfile = expectedProfileByTier[tier];
     const label = `corpus.authoredPerformanceTargets.profilesByTier.${tier}`;
-    exactKeys(profile, ["id", "device", "soc", "operatingSystem", "browser", "backend", "refreshHz", "viewportCssPixels", "dprCap"], label);
-    for (const field of ["id", "device", "soc", "operatingSystem", "browser", "backend"]) requireText(profile[field], `${label}.${field}`);
-    assert(!profileIds.has(profile.id), `duplicate performance profile ${profile.id}`);
-    profileIds.add(profile.id);
+    exactKeys(profile, ["id", "profileRole", "allowedDevices", "allowedSocs", "operatingSystem", "browser", "backend", "refreshHz", "viewportPolicy", "dprCap"], label);
+    for (const field of ["id", "profileRole", "operatingSystem", "browser", "backend", "viewportPolicy"]) requireText(profile[field], `${label}.${field}`);
+    assert.equal(profile.id, expectedProfile.id, `${label}.id drifted from the artifact target plan`);
+    assert.equal(profile.profileRole, expectedProfile.profileRole, `${label}.profileRole drifted from the artifact target plan`);
+    assert.deepEqual(profile.allowedDevices, expectedProfile.allowedDevices, `${label}.allowedDevices drifted from the artifact target plan`);
+    assert.deepEqual(profile.allowedSocs, expectedProfile.allowedSocs, `${label}.allowedSocs drifted from the artifact target plan`);
+    assert.equal(profile.operatingSystem, "macOS", `${label}.operatingSystem must match the physical target matrix`);
+    assert.equal(profile.browser, "Codex in-app Browser", `${label}.browser must use the physical evidence surface`);
+    assert.equal(profile.backend, "native WebGPU", `${label}.backend must remain native WebGPU`);
     requireInteger(profile.refreshHz, `${label}.refreshHz`, { minimum: 1 });
-    assert(Array.isArray(profile.viewportCssPixels) && profile.viewportCssPixels.length === 2, `${label}.viewportCssPixels must contain width and height`);
-    profile.viewportCssPixels.forEach((value, index) => requireInteger(value, `${label}.viewportCssPixels[${index}]`, { minimum: 1 }));
     requireFiniteNumber(profile.dprCap, `${label}.dprCap`, { minimum: 0.25, maximum: 4 });
     assert.equal(profile.dprCap, CORPUS_DPR_CAPS[tier], `${tier} performance profile DPR cap drifted from runtime policy`);
+  }
+  assert(Array.isArray(performance.mobileArchitectureModels), "corpus mobile architecture models must be an array");
+  assert.equal(performance.mobileArchitectureModels.length, CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN.length, "corpus mobile model inventory drifted");
+  for (let index = 0; index < CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN.length; index += 1) {
+    const expected = CORPUS_MOBILE_ARCHITECTURE_MODEL_PLAN[index];
+    const model = performance.mobileArchitectureModels[index];
+    const label = `corpus.authoredPerformanceTargets.mobileArchitectureModels[${index}]`;
+    exactKeys(model, ["id", "tier", "deviceClass", "socClass", "status", "performanceClaim", "purpose"], label);
+    for (const field of ["id", "tier", "deviceClass", "socClass"]) assert.equal(model[field], expected[field], `${label}.${field} drifted from the artifact model plan`);
+    assert.equal(model.status, "MODEL_ONLY_NOT_PERFORMANCE_ACCEPTANCE", `${label}.status must exclude physical acceptance`);
+    assert.equal(model.performanceClaim, "NOT_CLAIMED", `${label}.performanceClaim must remain NOT_CLAIMED`);
+    requireText(model.purpose, `${label}.purpose`);
   }
   assert.equal(performance.legacySpecBindingTier, "full", "legacy spec performance fields must bind to the full authored tier");
   exactKeys(performance.legacySpecFieldSemantics, ["fpsTarget", "maxDrawCalls"], "corpus.authoredPerformanceTargets.legacySpecFieldSemantics");
@@ -473,7 +499,7 @@ function validateCorpusDeepContractShape(corpus) {
   requireText(performance.evidenceBindingRequirement, "corpus.authoredPerformanceTargets.evidenceBindingRequirement");
   assert.match(performance.evidenceBindingRequirement, /Every required case.*single easy workload cannot promote/i, "performance evidence binding must reject one-workload promotion");
   assert(
-    ["ready", "blocked-pending-case-identified-timing-and-resource-schema"].includes(performance.evidenceBindingStatus),
+    ["ready", "schema-complete-pending-distinct-m4-max-and-air-physical-sessions"].includes(performance.evidenceBindingStatus),
     "performance evidence binding status is invalid",
   );
   requireText(performance.measurementPromotionRequirement, "corpus.authoredPerformanceTargets.measurementPromotionRequirement");
@@ -1404,6 +1430,15 @@ export function validateCorpusManifest() {
   const measuredPerformanceMutation = structuredClone(corpus);
   measuredPerformanceMutation.authoredPerformanceTargets.label = "Measured";
   assert.throws(() => validateCorpusDeepContractShape(measuredPerformanceMutation), /performance target label must be Authored/);
+  const substitutedPhysicalTargetMutation = structuredClone(corpus);
+  substitutedPhysicalTargetMutation.authoredPerformanceTargets.profilesByTier.full.allowedSocs = ["Apple M2"];
+  assert.throws(() => validateCorpusDeepContractShape(substitutedPhysicalTargetMutation), /allowedSocs drifted from the artifact target plan/);
+  const promotedMobileModelMutation = structuredClone(corpus);
+  promotedMobileModelMutation.authoredPerformanceTargets.mobileArchitectureModels[0].performanceClaim = "PASS";
+  assert.throws(() => validateCorpusDeepContractShape(promotedMobileModelMutation), /performanceClaim must remain NOT_CLAIMED/);
+  const crossTierTargetMutation = structuredClone(corpus);
+  crossTierTargetMutation.authoredPerformanceTargets.requiredPerformanceCases[0].profileId = "air-m1-or-m2-60hz";
+  assert.throws(() => validateCorpusDeepContractShape(crossTierTargetMutation), /profileId drifted/);
   const commandMutation = structuredClone(corpus);
   commandMutation.commands.targets = "node arbitrary-target-check.mjs";
   assert.throws(() => validateCorpusDeepContractShape(commandMutation), /commands.targets drifted/);
@@ -1442,6 +1477,9 @@ export function validateCorpusManifest() {
       "invalid-workload-seed",
       "missing-shadow-caster-provenance",
       "measured-label-on-authored-target",
+      "substituted-physical-target-soc",
+      "promoted-mobile-model",
+      "cross-tier-physical-target",
       "deep-command-drift",
       "accepted-spec-missing-pass-review",
       "accepted-spec-forged-render-digest",
