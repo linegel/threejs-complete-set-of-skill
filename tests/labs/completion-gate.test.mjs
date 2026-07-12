@@ -5,10 +5,10 @@ import {
   AUTHORITATIVE_COUNT_FIELDS,
   PRIMARY_DEMO_KINDS,
   authoritativePrimaryRoster,
+  authoritativeSkillDirs,
   buildDemoRegistry,
   deriveRegistryCounts,
   deriveSkillCoverage,
-  listSkillDirs,
   loadCanonicalTargets,
   validateCanonicalTargets,
 } from '../../scripts/lib/lab-registry.mjs';
@@ -51,7 +51,7 @@ function acceptPrimary(demo) {
 }
 
 function refreshDerived(registry) {
-  const skills = listSkillDirs();
+  const skills = authoritativeSkillDirs(loadCanonicalTargets());
   registry.counts = deriveRegistryCounts(registry.demos, skills);
   registry.coverage = deriveSkillCoverage(registry.demos, skills);
   return registry;
@@ -60,7 +60,8 @@ function refreshDerived(registry) {
 function reconcileSyntheticProofDenominator(registry) {
   const target = loadCanonicalTargets().requiredRuntimeProofsExpected;
   const protectedIds = new Set(REQUIRED_RENDERING_PROOF_IDS);
-  let excess = deriveRegistryCounts(registry.demos, listSkillDirs()).requiredRuntimeProofs - target;
+  const skills = authoritativeSkillDirs(loadCanonicalTargets());
+  let excess = deriveRegistryCounts(registry.demos, skills).requiredRuntimeProofs - target;
   for (const demo of primaryDemos(registry)) {
     if (demo.executionClass !== 'rendering') continue;
     for (let index = demo.runtimeProof.length - 1; index >= 0 && excess > 0; index -= 1) {
@@ -161,7 +162,10 @@ test('the former one-accepted-primary-per-skill shortcut cannot pass with a part
   const registry = completeRegistryFixture();
   for (const demo of primaryDemos(registry)) demo.status = 'incomplete';
   const selected = new Set(registry.flagshipIds);
-  for (const coverage of deriveSkillCoverage(registry.demos, listSkillDirs())) {
+  for (const coverage of deriveSkillCoverage(
+    registry.demos,
+    authoritativeSkillDirs(loadCanonicalTargets()),
+  )) {
     if (coverage.primaryLabIds[0]) selected.add(coverage.primaryLabIds[0]);
   }
   for (const demo of primaryDemos(registry)) {
