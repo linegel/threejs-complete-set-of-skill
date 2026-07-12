@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { numericArray, numericDatum, NumericLabel } from './numeric-evidence.js';
+import { HARDWARE_PERFORMANCE_CONTRACT } from './in-app-evidence-plan.js';
 import { getAlignedReadbackLayout } from './readback.js';
 import { REQUIRED_V2_IMAGES } from './schema/v2.js';
 
@@ -709,9 +710,9 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	const targetRate = 60;
 	const targetIntervalMs = 1000 / targetRate;
 	const performanceGates = {
-		cpuP95: targetIntervalMs - 2,
-		gpuP95: targetIntervalMs - 2,
-		deadlineMissRatio: 0.01
+		cpuP95: HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value,
+		gpuP95: HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value,
+		deadlineMissRatio: HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value
 	};
 	const adapterClass = requireAdapterClass( metrics.adapterClass ?? performanceTrace?.adapterClass ?? 'unknown' );
 	if ( performanceTrace !== null && performanceTrace.adapterClass !== adapterClass ) throw new Error( 'Performance trace adapter class disagrees with the runtime adapter.' );
@@ -848,8 +849,8 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		compositorGpuReserve: A( 1, 'ms', 'authored target envelope' ),
 		cpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
 		gpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
-		cpuSceneEnvelope: D( targetIntervalMs - 2, 'ms', 'refresh period - browser reserve - CPU reserve' ),
-		gpuSceneEnvelope: D( targetIntervalMs - 2, 'ms', 'refresh period - compositor reserve - GPU reserve' ),
+		cpuSceneEnvelope: D( performanceGates.cpuP95, 'ms', 'exact 60 Hz refresh period - browser reserve - CPU reserve' ),
+		gpuSceneEnvelope: D( performanceGates.gpuP95, 'ms', 'exact 60 Hz refresh period - compositor reserve - GPU reserve' ),
 		cpuP95Gate: G( performanceGates.cpuP95, 'ms', 'frozen 60 Hz scene budget' ),
 		gpuP95Gate: G( performanceGates.gpuP95, 'ms', 'frozen 60 Hz scene budget' ),
 		deadlineMissRatioGate: G( performanceGates.deadlineMissRatio, 'ratio', performanceTrace === null ? 'authored target; presentation cadence unmeasured' : 'authored target applied to measured presentation cadence' )

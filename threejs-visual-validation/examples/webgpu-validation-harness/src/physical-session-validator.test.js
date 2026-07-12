@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { numericDatum } from './physical-evidence-common.js';
-import { HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
+import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -480,6 +480,9 @@ test( 'physical session mutations reject nonphysical or mutable evidence', () =>
 
 test( 'hardware performance session passes long-window and timestamp gates', () => {
 
+	assert.equal( HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value, 1000 / 60 - 2 );
+	assert.equal( HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value, HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value );
+	assert.equal( HARDWARE_PERFORMANCE_CONTRACT.governorTarget.value, HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value );
 	assert.deepEqual( validateHardwarePerformanceSession( performanceSession() ), {
 		valid: true,
 		profile: 'performance',
