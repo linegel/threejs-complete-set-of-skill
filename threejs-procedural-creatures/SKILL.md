@@ -425,6 +425,13 @@ compiler rules, locomotion constants and gates, scale architecture, the
 surface-quality ladder, the creature-lab contract, the
 boot/compile/spawn contract, and the numeric gate table.
 
+Read [references/segmented-coastal-crab.md](references/segmented-coastal-crab.md)
+when the subject is a hard-shelled articulated creature whose visible identity
+comes from closed rigid segments rather than a continuous deforming skin. It
+defines the reference crab dimensions, stable 40-slot rig, alternating-tetrapod
+gait, batched support query, one-way water contract, mobile tier limits, and
+texture/image-generation acceptance gates.
+
 Diagnostic lab: `examples/webgpu-procedural-creature-lab/`.
 The lab currently provides a pure-core runtime, TSL adapter module boundaries,
 deterministic `window.__lab` browser surface, Playwright capture harness,
