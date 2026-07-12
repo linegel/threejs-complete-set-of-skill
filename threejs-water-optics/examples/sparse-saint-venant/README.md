@@ -76,6 +76,13 @@ difference from net flux reports sparse-interface cancellation residual. The
 open boundary never disables mass validation or hides imbalance behind a larger
 tolerance.
 
+`foam-core.js` is the float64 coastal-foam oracle. It selects stable-physics-
+frame conservative finite-volume coverage over five rejected representation
+families, gates unsplit advection and explicit diffusion, and applies the exact
+bounded source/decay reaction. The oracle keeps transport residual, source gain,
+decay loss, and clamp count separate; foam appearance is not allowed to invent
+coverage or breaking ownership.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,
