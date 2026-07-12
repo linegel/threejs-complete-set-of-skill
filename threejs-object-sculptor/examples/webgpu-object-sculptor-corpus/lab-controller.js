@@ -1205,6 +1205,7 @@ export async function createObjectSculptorCorpusController({
   let completedFrames = 0;
   let lastCompletedSubmissionOrdinal = 0;
   let lastCompletedSubmissionPhase = null;
+  let lastCompletedSceneDrawCalls = null;
   let gpuTimestampResolveAttempts = 0;
   let gpuTimestampResolveFailures = 0;
   let lastTimestampResolvedSubmissionOrdinal = 0;
@@ -2970,6 +2971,9 @@ export async function createObjectSculptorCorpusController({
     renderGenerationGuard.assert("render-start");
     const submissionOrdinal = ++renderSubmissions;
     const startedAtMs = requireFiniteNonnegative(dependencies.now(), "CPU render submit start time");
+    const drawCallsBefore = Number.isFinite(renderer.info?.render?.calls)
+      ? renderer.info.render.calls
+      : null;
     let status = "failed";
     try {
       await renderer.render(scene, perspectiveCamera);
@@ -2978,6 +2982,14 @@ export async function createObjectSculptorCorpusController({
       completedFrames += 1;
       lastCompletedSubmissionOrdinal = submissionOrdinal;
       lastCompletedSubmissionPhase = phase;
+      const drawCallsAfter = Number.isFinite(renderer.info?.render?.calls)
+        ? renderer.info.render.calls
+        : null;
+      lastCompletedSceneDrawCalls = drawCallsAfter === null
+        ? null
+        : drawCallsBefore === null || drawCallsAfter <= drawCallsBefore
+          ? drawCallsAfter
+          : drawCallsAfter - drawCallsBefore;
       lastFrameError = null;
       status = "completed";
       return {
@@ -3013,6 +3025,7 @@ export async function createObjectSculptorCorpusController({
           completedDeviceLossGeneration: deviceLossGeneration,
           frameOrdinal: status === "completed" ? completedFrames : null,
           submissionOrdinal,
+          sceneDrawCalls: status === "completed" ? lastCompletedSceneDrawCalls : null,
           sampleOrdinal: cpuRenderSubmissionSampleCount,
         }),
         CORPUS_DIAGNOSTIC_RETENTION_LIMITS.cpuRenderSubmissions,
@@ -3857,6 +3870,8 @@ export async function createObjectSculptorCorpusController({
         stepCount,
         renderSubmissions,
         completedFrames,
+        drawCalls: lastCompletedSceneDrawCalls,
+        drawCallMetric: "last-completed-app-owned-scene-submission-delta",
         rebuildCount,
         rollbackRebuildCount,
         targetAllocationAttempts,

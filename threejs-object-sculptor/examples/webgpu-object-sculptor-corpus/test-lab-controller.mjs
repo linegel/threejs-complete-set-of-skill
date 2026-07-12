@@ -997,6 +997,8 @@ assert.deepEqual(TARGET_IDS, ["articulated-desk-lamp", "potted-bonsai", "ceramic
   assert.equal(metrics.firstFrameCompleted, true);
   assert.equal(metrics.renderSubmissions, 1);
   assert.equal(metrics.completedFrames, 1);
+  assert.equal(metrics.drawCalls, 1);
+  assert.equal(metrics.drawCallMetric, "last-completed-app-owned-scene-submission-delta");
   assert.equal(metrics.rendererInfo.render.calls, 1);
 
   assert.equal(await controller.setMode("action-ready"), true);
