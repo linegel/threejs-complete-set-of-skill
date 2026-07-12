@@ -27,6 +27,9 @@ assert.equal( manifest.evidenceBundle, null );
 assert.deepEqual( manifest.scenarios.map( ( entry ) => entry.id ), INTEGRATION_SCENARIOS );
 assert.deepEqual( manifest.modes, INTEGRATION_MODES );
 assert.doesNotMatch( integrationSource, /stage\.baselineOutput/, 'integration diagnostics must not make the baseline scene pass reachable as a third submission' );
+assert.match( integrationSource, /const LAB_ID = 'integration-image-pipeline-ao'/ );
+assert.match( integrationSource, /get labId\(\) \{ return LAB_ID; \}/ );
+assert.match( integrationSource, /labId: LAB_ID/ );
 
 await access( join( here, 'index.html' ) );
 for ( const mechanism of manifest.mechanisms ) await access( join( here, mechanism.route, 'index.html' ) );

@@ -10,6 +10,8 @@ import {
 	validateImagePipelineAOOwnership
 } from './host-adapter.js';
 
+const LAB_ID = 'integration-image-pipeline-ao';
+
 export const INTEGRATION_SCENARIOS = Object.freeze( [ 'wall-receiver', 'direct-emissive' ] );
 export const INTEGRATION_MODES = Object.freeze( [
 	'final',
@@ -319,6 +321,7 @@ export async function createImagePipelineAOIntegration( {
 	function getMetrics() {
 
 		return {
+			labId: LAB_ID,
 			backend: renderer.backend.isWebGPUBackend === true ? 'webgpu' : 'unsupported',
 			threeRevision: THREE.REVISION,
 			tier: tierId,
@@ -357,6 +360,7 @@ export async function createImagePipelineAOIntegration( {
 	await setMode( initialMode );
 
 	return {
+		get labId() { return LAB_ID; },
 		ready: async () => {},
 		setScenario,
 		setMode,
