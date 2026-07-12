@@ -208,15 +208,21 @@ export async function failClosedPhysicalRouteCollection({
   assert(cause instanceof Error, "failed route cleanup requires the primary Error");
   assert(typeof resetFrame === "function", "failed route cleanup requires deterministic iframe reset");
   const cleanupErrors = [];
-  const disposalOwner = typeof producer?.dispose === "function"
-    ? producer
-    : typeof childController?.dispose === "function"
-      ? childController
-      : null;
-  try {
-    if (disposalOwner) await disposalOwner.dispose();
-  } catch (cleanupError) {
-    cleanupErrors.push(cleanupError);
+  let producerDisposed = false;
+  if (typeof producer?.dispose === "function") {
+    try {
+      await producer.dispose();
+      producerDisposed = true;
+    } catch (cleanupError) {
+      cleanupErrors.push(cleanupError);
+    }
+  }
+  if (!producerDisposed && childController !== producer && typeof childController?.dispose === "function") {
+    try {
+      await childController.dispose();
+    } catch (cleanupError) {
+      cleanupErrors.push(cleanupError);
+    }
   }
   try {
     await resetFrame();
@@ -836,6 +842,12 @@ export function createCorpusRouteEvidenceProducer({
       && settlingBarrier.timestampsMonotonicMs.length === 2
       && settlingBarrier.timestampsMonotonicMs.every(Number.isFinite)
       && settlingBarrier.timestampsMonotonicMs[1] >= settlingBarrier.timestampsMonotonicMs[0], "post-disposal settling barrier timestamps are invalid");
+    const expectedDeviceDestruction = disposeResult?.expectedDeviceDestruction;
+    assert(expectedDeviceDestruction?.observed === true
+      && expectedDeviceDestruction?.status === "observed-exact-destroyed-device"
+      && Number.isInteger(expectedDeviceDestruction.deviceGeneration)
+      && typeof expectedDeviceDestruction.tokenId === "string", "explicit renderer destruction was not observed for the exact armed GPU device generation");
+    const routeDisposeResult = disposeResult.routeDisposeResult;
     const afterDisposeErrorChannels = exactErrorChannels(bootstrap);
     const afterDisposeLabError = window.__LAB_ERROR__ ?? null;
     assert(afterDisposeLabError === null, `route published __LAB_ERROR__ during disposal: ${canonicalJson(afterDisposeLabError)}`);
@@ -848,7 +860,8 @@ export function createCorpusRouteEvidenceProducer({
       explicitDispose: Object.freeze({
         requested: true,
         fulfilled: true,
-        returnValue: disposeResult === undefined ? null : disposeResult,
+        returnValue: routeDisposeResult === undefined ? null : routeDisposeResult,
+        expectedDeviceDestruction,
       }),
       postDisposeSettlingBarrier: Object.freeze({ ...settlingBarrier }),
       beforeDispose: Object.freeze({
@@ -881,14 +894,27 @@ export function createCorpusRouteEvidenceProducer({
   }
 
   async function disposeWithExpectedDeviceDestruction() {
-    assert(collectionComplete, `Route ${definition.routeId} cannot dispose before successful collection`);
+    if (!collectionComplete) return disposeRoute();
     assert(typeof bootstrap?.beginExpectedDeviceDestruction === "function", "route evidence bootstrap cannot distinguish explicit renderer destruction");
     const marker = bootstrap.beginExpectedDeviceDestruction();
     assert(marker?.armed === true
       && marker.phase === "after-successful-readback-before-explicit-renderer-dispose"
       && Number.isInteger(marker.monitoredDeviceCount)
-      && marker.monitoredDeviceCount >= 1, "explicit renderer-destruction marker is invalid");
-    return disposeRoute();
+      && marker.monitoredDeviceCount >= 1
+      && Number.isInteger(marker.deviceGeneration)
+      && typeof marker.tokenId === "string"
+      && typeof marker.waitForObserved === "function"
+      && typeof marker.cancel === "function", "explicit renderer-destruction marker is invalid");
+    let routeDisposeResult;
+    try {
+      routeDisposeResult = await disposeRoute();
+    } catch (error) {
+      marker.cancel();
+      throw error;
+    }
+    const expectedDeviceDestruction = await marker.waitForObserved(1000);
+    assert(expectedDeviceDestruction?.observed === true, "explicit renderer disposal did not produce the exact armed GPUDevice.lost destroyed event");
+    return Object.freeze({ routeDisposeResult, expectedDeviceDestruction });
   }
 
   return Object.freeze({ routeId: definition.routeId, collect, dispose: disposeWithExpectedDeviceDestruction, finalizeAfterDispose, takeArtifacts });

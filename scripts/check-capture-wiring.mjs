@@ -59,7 +59,8 @@ function hasExternalDependency(source) {
 
 function hasSelfServingServer(source) {
   return /\bcreateServer\b/.test(source)
-    && /(?:\.listen\s*\(|await\s+[^\n;]*\.listen\s*\()/.test(source);
+    && /(?:\.listen\s*\(|await\s+[^\n;]*\.listen\s*\()/.test(source)
+    || /\bstartImmutableCorpusServer\s*\(/.test(source);
 }
 
 function hasProfileDimensions(source) {

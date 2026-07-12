@@ -2,12 +2,25 @@ import {
   CORPUS_CORRECTNESS_MAX_RETAINED_BYTES_PER_SUBJECT,
   compactCorpusCorrectnessRows,
 } from "./correctness-evidence-client.js";
+import {
+  CORPUS_CAPTURE_BUILD_REVISION,
+  CORPUS_CAPTURE_SOURCE_HASH,
+  CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION,
+} from "./trusted-runtime-source-manifest.generated.js";
 
 export const CORPUS_CORRECTNESS_DOCUMENT_PATH = "correctness-evidence.json";
 export const CORPUS_CORRECTNESS_MAX_TAR_BYTES = 192 * 1024 * 1024;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
 }
 
 function tarText(target, offset, length, value) {
@@ -67,6 +80,14 @@ async function sha256Hex(bytes) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+export async function computeCorpusCorrectnessDocumentDigest(documentRecord) {
+  if (!documentRecord || typeof documentRecord !== "object" || Array.isArray(documentRecord)) {
+    throw new TypeError("correctness segment document must be an object");
+  }
+  const { digest: _digest, digestAlgorithm: _digestAlgorithm, ...withoutDigest } = documentRecord;
+  return sha256Hex(new TextEncoder().encode(`object-sculptor-correctness-subject-v1\n${canonicalJson(withoutDigest)}`));
+}
+
 function bytesView(value, label) {
   if (!(value instanceof Uint8Array)) throw new TypeError(`${label} must be Uint8Array`);
   return value;
@@ -75,7 +96,12 @@ function bytesView(value, label) {
 export async function validateCorpusCorrectnessSegment(documentRecord, artifacts) {
   assert(documentRecord?.schemaVersion === 1 && documentRecord.labId === "webgpu-object-sculptor-corpus", "correctness segment document schema drifted");
   assert(documentRecord.profile === "correctness" && documentRecord.automationSurface === "codex-in-app-browser", "correctness segment browser surface drifted");
+  assert(documentRecord.digestAlgorithm === "sha256" && /^[a-f0-9]{64}$/.test(documentRecord.digest), "correctness segment document digest declaration drifted");
+  assert(await computeCorpusCorrectnessDocumentDigest(documentRecord) === documentRecord.digest, "correctness segment document digest does not bind its exact semantic record");
+  assert(documentRecord.sourceHash === CORPUS_CAPTURE_SOURCE_HASH, "correctness segment source hash does not match the current generated source closure");
+  assert(documentRecord.buildRevision === CORPUS_CAPTURE_BUILD_REVISION, "correctness segment build revision does not match the current generated source closure");
   assert(documentRecord.backend?.kind === "webgpu" && documentRecord.backend?.nativeWebGPU === true, "correctness segment is not native WebGPU");
+  assert(documentRecord.backend?.threeRevision === CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION, "correctness segment Three.js revision does not match the current generated source closure");
   assert(Array.isArray(documentRecord.captures) && documentRecord.captures.length === 21, "correctness segment must contain exactly 21 captures");
   assert(documentRecord.captures.filter(({ kind }) => kind === "presentation").length === 16, "correctness segment must contain 16 presentations");
   assert(documentRecord.captures.filter(({ kind }) => kind === "target-mask").length === 5, "correctness segment must contain 5 target masks");
@@ -161,30 +187,43 @@ function parseOctal(bytes, offset, length, label) {
 
 export function parseCorpusCorrectnessTar(value) {
   const bytes = bytesView(value, "correctness TAR");
-  if (bytes.byteLength > CORPUS_CORRECTNESS_MAX_TAR_BYTES || bytes.byteLength % 512 !== 0) throw new RangeError("correctness TAR size/alignment is invalid");
+  if (bytes.byteLength < 1024 || bytes.byteLength > CORPUS_CORRECTNESS_MAX_TAR_BYTES || bytes.byteLength % 512 !== 0) throw new RangeError("correctness TAR size/alignment is invalid");
   const entries = new Map();
   let offset = 0;
-  while (offset + 512 <= bytes.byteLength) {
+  while (true) {
+    assert(offset + 1024 <= bytes.byteLength, "correctness TAR omits its canonical two-block terminator");
     const header = bytes.subarray(offset, offset + 512);
-    if (header.every((byte) => byte === 0)) break;
+    if (header.every((byte) => byte === 0)) {
+      const secondTerminator = bytes.subarray(offset + 512, offset + 1024);
+      assert(secondTerminator.every((byte) => byte === 0), "correctness TAR second terminator block is dirty");
+      assert(offset + 1024 === bytes.byteLength, "correctness TAR has trailing bytes after its canonical terminator");
+      break;
+    }
     const name = new TextDecoder().decode(header.subarray(0, 100)).replaceAll("\0", "");
     const prefix = new TextDecoder().decode(header.subarray(345, 500)).replaceAll("\0", "");
     const path = prefix ? `${prefix}/${name}` : name;
     safeTarPath(path);
     const byteLength = parseOctal(header, 124, 12, `${path} length`);
+    assert(Number.isSafeInteger(byteLength) && byteLength >= 0, `${path} TAR length is outside the safe integer domain`);
     const expectedChecksum = parseOctal(header, 148, 8, `${path} checksum`);
     const checksumHeader = new Uint8Array(header);
     checksumHeader.fill(0x20, 148, 156);
     assert(checksumHeader.reduce((sum, byte) => sum + byte, 0) === expectedChecksum, `${path} TAR checksum drifted`);
+    const canonicalHeader = tarHeader(path, byteLength);
+    assert(canonicalHeader.every((byte, index) => byte === header[index]), `${path} TAR header is not canonical ustar output`);
     const start = offset + 512;
     const end = start + byteLength;
     assert(end <= bytes.byteLength, `${path} TAR body is truncated`);
     assert(!entries.has(path), `duplicate TAR path ${path}`);
     entries.set(path, new Uint8Array(bytes.slice(start, end)));
-    offset = start + Math.ceil(byteLength / 512) * 512;
+    const paddedEnd = start + Math.ceil(byteLength / 512) * 512;
+    assert(paddedEnd <= bytes.byteLength, `${path} TAR padding is truncated`);
+    assert(bytes.subarray(end, paddedEnd).every((byte) => byte === 0), `${path} TAR body padding is nonzero`);
+    offset = paddedEnd;
   }
   assert(entries.has(CORPUS_CORRECTNESS_DOCUMENT_PATH), "correctness TAR omits its evidence document");
-  const documentRecord = JSON.parse(new TextDecoder().decode(entries.get(CORPUS_CORRECTNESS_DOCUMENT_PATH)));
+  const documentBytes = entries.get(CORPUS_CORRECTNESS_DOCUMENT_PATH);
+  const documentRecord = JSON.parse(new TextDecoder().decode(documentBytes));
   entries.delete(CORPUS_CORRECTNESS_DOCUMENT_PATH);
-  return Object.freeze({ documentRecord, artifacts: entries });
+  return Object.freeze({ documentRecord, documentBytes, artifacts: entries });
 }

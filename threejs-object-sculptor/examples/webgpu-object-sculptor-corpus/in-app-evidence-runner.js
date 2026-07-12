@@ -413,7 +413,8 @@ async function collectRoute(plan) {
       throw new Error(`${plan.routeId} did not expose an explicitly disposable public controller and route lifecycle`);
     }
     const disposeResult = await withTimeout(producer.dispose(), `${plan.routeId} disposal`, 30_000);
-    if (disposeResult?.listenersDetached !== true) throw new Error(`${plan.routeId} did not detach its page listeners before disposal`);
+    if (disposeResult?.routeDisposeResult?.listenersDetached !== true) throw new Error(`${plan.routeId} did not detach its page listeners before disposal`);
+    if (disposeResult?.expectedDeviceDestruction?.observed !== true) throw new Error(`${plan.routeId} did not observe exact-device renderer destruction`);
     if (typeof producer.finalizeAfterDispose !== "function") {
       throw new Error(`${plan.routeId} producer did not expose post-disposal error closure`);
     }

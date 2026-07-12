@@ -85,11 +85,14 @@
   const requestFailures = [];
   const gpuErrors = [];
   const deviceLossEvents = [];
+  const expectedDeviceDestructionHistory = [];
   const setupFailures = [];
   const instrumentedAdapters = new WeakSet();
-  const monitoredDevices = new WeakSet();
+  const monitoredDevices = new Map();
   let monitoredDeviceCount = 0;
-  let expectedDeviceDestructionArmed = false;
+  let monitoredDeviceGeneration = 0;
+  let expectedDeviceDestructionEverArmed = false;
+  let activeExpectedDeviceDestruction = null;
   let expectedDeviceDestructionObserved = 0;
 
   function valueRecord(value) {
@@ -145,7 +148,8 @@
 
   function monitorDevice(device) {
     if (!device || monitoredDevices.has(device)) return;
-    monitoredDevices.add(device);
+    const deviceState = { device, generation: ++monitoredDeviceGeneration };
+    monitoredDevices.set(device, deviceState);
     monitoredDeviceCount += 1;
     try {
       device.addEventListener("uncapturederror", (event) => {
@@ -156,12 +160,36 @@
     }
     try {
       Promise.resolve(device.lost).then((info) => {
-        if (expectedDeviceDestructionArmed && info?.reason === "destroyed") {
+        const token = activeExpectedDeviceDestruction;
+        if (token?.armed === true && token.device === device && token.deviceGeneration === deviceState.generation) {
+          token.armed = false;
+          activeExpectedDeviceDestruction = null;
+          const observed = info?.reason === "destroyed";
+          const outcome = Object.freeze({
+            tokenId: token.tokenId,
+            deviceGeneration: token.deviceGeneration,
+            observed,
+            reason: info?.reason ?? null,
+            message: info?.message ?? null,
+            status: observed ? "observed-exact-destroyed-device" : "failed-unexpected-device-loss-reason",
+          });
+          expectedDeviceDestructionHistory.push(outcome);
+          token.resolve(outcome);
+          if (!observed) {
+            deviceLossEvents.push(Object.freeze({
+              kind: "device-lost",
+              deviceGeneration: deviceState.generation,
+              reason: info?.reason ?? null,
+              message: info?.message ?? null,
+            }));
+            return;
+          }
           expectedDeviceDestructionObserved += 1;
           return;
         }
         deviceLossEvents.push(Object.freeze({
           kind: "device-lost",
+          deviceGeneration: deviceState.generation,
           reason: info?.reason ?? null,
           message: info?.message ?? null,
         }));
@@ -256,20 +284,75 @@
           : "not applicable on the non-rendering runner surface",
         events: Object.freeze([...deviceLossEvents]),
       }),
+      expectedDeviceDestruction: Object.freeze({
+        everArmed: expectedDeviceDestructionEverArmed,
+        activeTokenId: activeExpectedDeviceDestruction?.tokenId ?? null,
+        activeDeviceGeneration: activeExpectedDeviceDestruction?.deviceGeneration ?? null,
+        observedCount: expectedDeviceDestructionObserved,
+        history: Object.freeze([...expectedDeviceDestructionHistory]),
+      }),
     });
   }
 
   function beginExpectedDeviceDestruction() {
     if (requestedSurface !== "route") throw new Error("Expected GPU device destruction is route-disposal-only");
-    if (expectedDeviceDestructionArmed) throw new Error("Expected GPU device destruction was already armed");
+    if (expectedDeviceDestructionEverArmed) throw new Error("Expected GPU device destruction is a one-shot route token and was already armed");
     if (monitoredDeviceCount < 1) throw new Error("Expected GPU device destruction requires an observed renderer device");
     if (deviceLossEvents.length > 0) throw new Error("Cannot arm expected GPU device destruction after a device failure");
-    expectedDeviceDestructionArmed = true;
+    const deviceState = [...monitoredDevices.values()].at(-1);
+    let resolveOutcome;
+    const outcome = new Promise((resolve) => { resolveOutcome = resolve; });
+    const token = {
+      tokenId: `expected-renderer-destroy:${deviceState.generation}:1`,
+      device: deviceState.device,
+      deviceGeneration: deviceState.generation,
+      armed: true,
+      resolve: resolveOutcome,
+      outcome,
+    };
+    expectedDeviceDestructionEverArmed = true;
+    activeExpectedDeviceDestruction = token;
+    const settleWithoutObservation = (status) => {
+      if (!token.armed) return false;
+      token.armed = false;
+      activeExpectedDeviceDestruction = null;
+      const record = Object.freeze({
+        tokenId: token.tokenId,
+        deviceGeneration: token.deviceGeneration,
+        observed: false,
+        reason: null,
+        message: null,
+        status,
+      });
+      expectedDeviceDestructionHistory.push(record);
+      token.resolve(record);
+      return true;
+    };
     return Object.freeze({
       armed: true,
       phase: "after-successful-readback-before-explicit-renderer-dispose",
       monitoredDeviceCount,
+      tokenId: token.tokenId,
+      deviceGeneration: token.deviceGeneration,
       observedAtArm: expectedDeviceDestructionObserved,
+      async waitForObserved(timeoutMilliseconds = 1000) {
+        if (!Number.isFinite(timeoutMilliseconds) || timeoutMilliseconds <= 0) throw new RangeError("Expected device destruction timeout must be positive");
+        let timeout;
+        try {
+          return await Promise.race([
+            token.outcome,
+            new Promise((resolve) => {
+              timeout = setTimeout(() => {
+                settleWithoutObservation("failed-timeout-without-device-destroyed-event");
+                resolve(expectedDeviceDestructionHistory.at(-1));
+              }, timeoutMilliseconds);
+            }),
+          ]);
+        } finally {
+          clearTimeout(timeout);
+        }
+      },
+      cancel: () => settleWithoutObservation("cancelled-before-explicit-renderer-dispose-completed"),
     });
   }
 

@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
 import { createHash, webcrypto } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { runInNewContext } from "node:vm";
 
 import {
   canonicalJson,
@@ -24,6 +28,50 @@ import {
 } from "./trusted-runtime-source-manifest.generated.js";
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
+
+const here = dirname(fileURLToPath(import.meta.url));
+
+function deferredDevice(label) {
+  let resolveLost;
+  const lost = new Promise((resolve) => { resolveLost = resolve; });
+  return Object.freeze({
+    device: Object.freeze({ label, lost, addEventListener() {} }),
+    lose: (info) => resolveLost(info),
+  });
+}
+
+async function bootstrapHarness(deferredDevices) {
+  const queue = [...deferredDevices];
+  const adapter = { requestDevice: async () => {
+    const next = queue.shift();
+    if (!next) throw new Error("synthetic device queue exhausted");
+    return next.device;
+  } };
+  const context = {
+    URLSearchParams,
+    clearTimeout,
+    console: { error() {} },
+    document: {
+      currentScript: { dataset: { surface: "route" } },
+      head: { contains: () => true },
+      scripts: [],
+      readyState: "loading",
+    },
+    location: {
+      origin: "http://127.0.0.1:4174",
+      pathname: "/threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/scenario/potted-bonsai/",
+      search: "?capture=1",
+    },
+    navigator: { gpu: { requestAdapter: async () => adapter } },
+    performance: { now: () => 1, timeOrigin: 1 },
+    setTimeout,
+  };
+  context.window = context;
+  context.addEventListener = () => {};
+  runInNewContext(readFileSync(join(here, "route-evidence-bootstrap.js"), "utf8"), context);
+  const instrumentedAdapter = await context.navigator.gpu.requestAdapter();
+  return Object.freeze({ context, adapter: instrumentedAdapter, bootstrap: context.__CORPUS_ROUTE_EVIDENCE_BOOTSTRAP__ });
+}
 
 const expectedRouteIds = [
   "scenario:articulated-desk-lamp",
@@ -227,6 +275,23 @@ await assert.rejects(
   (error) => error === preflightError,
 );
 assert.equal(preflightFailureResetCount, 1, "preflight failure must still reset the iframe exactly once");
+let fallbackControllerDisposals = 0;
+let fallbackFrameResets = 0;
+const producerCleanupError = new Error("producer rejected pre-collection cleanup");
+await assert.rejects(
+  failClosedPhysicalRouteCollection({
+    routeId: "scenario:potted-bonsai",
+    cause: preflightError,
+    producer: { dispose: async () => { throw producerCleanupError; } },
+    childController: { dispose: async () => { fallbackControllerDisposals += 1; } },
+    resetFrame: async () => { fallbackFrameResets += 1; },
+  }),
+  (error) => error instanceof AggregateError
+    && error.errors[0] === preflightError
+    && error.errors[1] === producerCleanupError,
+);
+assert.equal(fallbackControllerDisposals, 1, "producer cleanup failure must fall through to the child controller");
+assert.equal(fallbackFrameResets, 1, "producer cleanup failure must still reset the iframe");
 const cleanupCause = new Error("navigation failed");
 const disposalError = new Error("dispose failed");
 const resetError = new Error("reset failed");
@@ -243,6 +308,45 @@ await assert.rejects(
     && error.errors[1] === disposalError
     && error.errors[2] === resetError,
 );
+
+const exactDevice = deferredDevice("exact");
+const exactHarness = await bootstrapHarness([exactDevice]);
+await exactHarness.adapter.requestDevice();
+const exactMarker = exactHarness.bootstrap.beginExpectedDeviceDestruction();
+exactDevice.lose({ reason: "destroyed", message: "explicit fixture destruction" });
+const exactOutcome = await exactMarker.waitForObserved(50);
+assert.equal(exactOutcome.observed, true);
+assert.equal(exactOutcome.status, "observed-exact-destroyed-device");
+assert.equal(exactOutcome.deviceGeneration, 1);
+assert.throws(() => exactHarness.bootstrap.beginExpectedDeviceDestruction(), /one-shot route token/);
+assert.equal(exactHarness.bootstrap.snapshot().deviceLost.events.length, 0);
+assert.equal(exactHarness.bootstrap.snapshot().expectedDeviceDestruction.observedCount, 1);
+
+const olderDevice = deferredDevice("older");
+const currentDevice = deferredDevice("current");
+const twoDeviceHarness = await bootstrapHarness([olderDevice, currentDevice]);
+await twoDeviceHarness.adapter.requestDevice();
+await twoDeviceHarness.adapter.requestDevice();
+const currentMarker = twoDeviceHarness.bootstrap.beginExpectedDeviceDestruction();
+assert.equal(currentMarker.deviceGeneration, 2, "expected destruction must bind the newest exact device generation");
+olderDevice.lose({ reason: "destroyed", message: "extra older-device destruction" });
+await Promise.resolve();
+currentDevice.lose({ reason: "destroyed", message: "current renderer destruction" });
+assert.equal((await currentMarker.waitForObserved(50)).observed, true);
+const twoDeviceSnapshot = twoDeviceHarness.bootstrap.snapshot();
+assert.equal(twoDeviceSnapshot.deviceLost.events.length, 1, "an extra destroyed event from another device must remain a failure event");
+assert.equal(twoDeviceSnapshot.deviceLost.events[0].deviceGeneration, 1);
+
+const unobservedDevice = deferredDevice("unobserved");
+const unobservedHarness = await bootstrapHarness([unobservedDevice]);
+await unobservedHarness.adapter.requestDevice();
+const unobservedMarker = unobservedHarness.bootstrap.beginExpectedDeviceDestruction();
+const unobservedOutcome = await unobservedMarker.waitForObserved(5);
+assert.equal(unobservedOutcome.observed, false);
+assert.equal(unobservedOutcome.status, "failed-timeout-without-device-destroyed-event");
+unobservedDevice.lose({ reason: "destroyed", message: "late destruction" });
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.equal(unobservedHarness.bootstrap.snapshot().deviceLost.events.length, 1, "a late destroyed event after timeout must not be suppressed");
 
 const tarRoutes = structuredClone(routes);
 const artifacts = new Map(tarRoutes.flatMap((route) => (
@@ -309,7 +413,7 @@ console.log(JSON.stringify({
   routeRecords: routes.length,
   query: CORPUS_ROUTE_EVIDENCE_QUERY,
   exactDocumentKeys: Object.keys(documentRecord),
-  negativeCases: 17,
+  negativeCases: 23,
   digestParity: true,
   tarBytes: tar.byteLength,
 }, null, 2));

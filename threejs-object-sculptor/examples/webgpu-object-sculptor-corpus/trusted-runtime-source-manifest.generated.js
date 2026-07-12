@@ -43,8 +43,8 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence-runner.js",
-    "sha256": "8bde172292d25cd57f2b260b6a5e5f7189c35c399332387b60c040ff16ad41eb",
-    "byteLength": 28365
+    "sha256": "c2e20035a8f8f739cb86304a0812c73299ce9e0ebce792ef9b988a9505be7aa3",
+    "byteLength": 28540
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.css",
@@ -68,18 +68,18 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/package.json",
-    "sha256": "aa68ec866b7c7c317b3f11defda644f5827f3225eaa2e13e40189f1ed84af0a9",
-    "byteLength": 4804
+    "sha256": "85b2eab882b6dd53aba35416634ac3cadc49bd1b987c0df0daa9123311c1d441",
+    "byteLength": 4797
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-bootstrap.js",
-    "sha256": "4f09e1df27646c85561d28cc7f678897e24a56d668527d378a34d3639e3d59ba",
-    "byteLength": 11076
+    "sha256": "02b6399d3910b7432a1f23a6cc662f9f21c5f2830335872ffca7861692a90576",
+    "byteLength": 14600
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-client.js",
-    "sha256": "c1cb47ee5af99a844e2b23033ea8260aeb82fe4b2c4260d2960aebb15361d97f",
-    "byteLength": 45017
+    "sha256": "164bc7c22bd39eb34fff10f8056938bcd158fa0993bb7ac987ba93530c8dd8da",
+    "byteLength": 46311
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-document.js",
@@ -117,7 +117,7 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
     "byteLength": 40108
   }
 ].map((entry) => Object.freeze(entry)));
-export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "dcc908f04565cf7f2100848dbca815d0102f310476a0d55dc6b7f2a38163ee15";
+export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "a1d54234548fbbc8585f3561742cc876549916caa552b9dc0d1f123714901baa";
 export const CORPUS_TRUSTED_ROUTE_HTML_SHA256_BY_ROUTE_ID = Object.freeze({
   "scenario:articulated-desk-lamp": "a648f2c0b779c9978051e957a02fd1cf0b699f58eade01235b65f338a5f8609a",
   "scenario:potted-bonsai": "ba6b7d70751b740c5fe60b84cc540c3060297a3074f0fc8ec175b3b34b70a1f4",
@@ -208,7 +208,7 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/correctness-evidence-bundle.js",
-      "sha256": "0ea85daeeb1dc5174881cb402e22415ad47d50e6ccfd64d4f09e000262fa2ee3"
+      "sha256": "2df8c8a1bacd2fefff5d60f263596507407bdb43cb78027d2ec2e16720797797"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/correctness-evidence-client.js",
@@ -236,7 +236,7 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence-runner.js",
-      "sha256": "8bde172292d25cd57f2b260b6a5e5f7189c35c399332387b60c040ff16ad41eb"
+      "sha256": "c2e20035a8f8f739cb86304a0812c73299ce9e0ebce792ef9b988a9505be7aa3"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.css",
@@ -280,11 +280,11 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-bootstrap.js",
-      "sha256": "4f09e1df27646c85561d28cc7f678897e24a56d668527d378a34d3639e3d59ba"
+      "sha256": "02b6399d3910b7432a1f23a6cc662f9f21c5f2830335872ffca7861692a90576"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-client.js",
-      "sha256": "c1cb47ee5af99a844e2b23033ea8260aeb82fe4b2c4260d2960aebb15361d97f"
+      "sha256": "164bc7c22bd39eb34fff10f8056938bcd158fa0993bb7ac987ba93530c8dd8da"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-document.js",
@@ -374,11 +374,11 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     }
   ],
   "threeRevision": "0.185.1",
-  "sourceHash": "b89d0ee729170b8d63dc00d3ffc1b00879e053778ec9ca5ba2cb489df225e111",
-  "buildRevision": "source-sha256:b89d0ee729170b8d63dc00d3ffc1b00879e053778ec9ca5ba2cb489df225e111"
+  "sourceHash": "030beba45cb60a96464a54b44187559406125228d431e3cd95167a3b84dc91de",
+  "buildRevision": "source-sha256:030beba45cb60a96464a54b44187559406125228d431e3cd95167a3b84dc91de"
 });
-export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_SHA256 = "b89d0ee729170b8d63dc00d3ffc1b00879e053778ec9ca5ba2cb489df225e111";
+export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_SHA256 = "030beba45cb60a96464a54b44187559406125228d431e3cd95167a3b84dc91de";
 export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION = "0.185.1";
 export const CORPUS_EXECUTABLE_SOURCE_THREE_REVISION = CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION;
-export const CORPUS_CAPTURE_SOURCE_HASH = "b89d0ee729170b8d63dc00d3ffc1b00879e053778ec9ca5ba2cb489df225e111";
-export const CORPUS_CAPTURE_BUILD_REVISION = "source-sha256:b89d0ee729170b8d63dc00d3ffc1b00879e053778ec9ca5ba2cb489df225e111";
+export const CORPUS_CAPTURE_SOURCE_HASH = "030beba45cb60a96464a54b44187559406125228d431e3cd95167a3b84dc91de";
+export const CORPUS_CAPTURE_BUILD_REVISION = "source-sha256:030beba45cb60a96464a54b44187559406125228d431e3cd95167a3b84dc91de";

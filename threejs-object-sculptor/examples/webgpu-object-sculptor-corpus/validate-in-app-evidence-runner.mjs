@@ -212,8 +212,11 @@ export function validateInAppEvidenceRunner() {
     assert(bootstrapSource.includes(observer), `route evidence bootstrap is missing ${observer}`);
   }
   assert(bootstrapSource.includes("beginExpectedDeviceDestruction"), "route evidence bootstrap must distinguish explicit renderer destruction from spontaneous device loss");
-  assert(bootstrapSource.includes('expectedDeviceDestructionArmed && info?.reason === "destroyed"'), "only an armed destroyed reason may be excluded from device-loss failures");
+  assert(bootstrapSource.includes("token.device === device") && bootstrapSource.includes("token.deviceGeneration === deviceState.generation"), "expected destruction must bind one exact monitored GPU device generation");
+  assert(bootstrapSource.includes('"observed-exact-destroyed-device"'), "only the exact armed destroyed result may be classified as expected");
+  assert(bootstrapSource.includes("failed-timeout-without-device-destroyed-event"), "unobserved explicit destruction must fail closed");
   assert(evidenceClient.includes("disposeWithExpectedDeviceDestruction"), "route evidence client must arm expected destruction only at the explicit post-readback disposal boundary");
+  assert(evidenceClient.includes("if (!collectionComplete) return disposeRoute()"), "pre-collection failure cleanup must retain a direct controller teardown path");
 
   const generator = source("generate-routes.mjs");
   assert(generator.includes('<script src="../../route-evidence-bootstrap.js" data-surface="route"></script>'), "route generator does not own the capture-scoped observer bootstrap tag");
@@ -247,8 +250,8 @@ export function validateInAppEvidenceRunner() {
   const captureCommand = packageDocument.scripts?.capture ?? "";
   assert.equal(
     captureCommand,
-    "npm run generate:trusted-route-sources:check && node import-correctness-evidence.mjs --prepare",
-    "package capture must prepare only the immutable Codex in-app Browser correctness URLs",
+    "node capture.mjs",
+    "package capture must directly own the immutable Codex in-app Browser server",
   );
   assert(!/playwright|chrome|headless|capture-lab-browser/i.test(captureCommand), "canonical correctness capture must not launch an external browser harness");
   assert.equal(packageDocument.scripts?.["capture:import"], "node import-correctness-evidence.mjs", "package must expose offline in-app correctness segment import");
@@ -263,6 +266,7 @@ export function validateInAppEvidenceRunner() {
   assert(!/npm run generate:routes(?:\s|$)/.test(quickCommand.replaceAll("generate:routes:check", "")), "validate:quick must not rewrite physical routes");
   assert(!/npm run generate:trusted-route-sources(?:\s|$)/.test(quickCommand.replaceAll("generate:trusted-route-sources:check", "")), "validate:quick must not rewrite trusted source output");
   assert((packageDocument.scripts?.check ?? "").includes("route-evidence-bootstrap.js"), "syntax checks must include the route observer bootstrap");
+  assert((packageDocument.scripts?.check ?? "").includes("capture.mjs"), "syntax checks must include the immutable Codex in-app Browser capture owner");
   assert((packageDocument.scripts?.check ?? "").includes("immutable-route-server.mjs"), "syntax checks must include the immutable route server");
   assert((packageDocument.scripts?.check ?? "").includes("trusted-runtime-source-manifest.generated.js"), "syntax checks must include the generated trusted-source module");
   assert((packageDocument.scripts?.["validate:in-app-runner"] ?? "").includes("validate-in-app-evidence-runner.mjs"), "package must expose static in-app runner validation");
