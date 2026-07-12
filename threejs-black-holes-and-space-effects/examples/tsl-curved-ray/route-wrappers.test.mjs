@@ -11,6 +11,8 @@ import { SPACE_INTEGRATOR_MODES } from "./space-transfer-stage.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const manifest = JSON.parse(await readFile(join(here, "lab.manifest.json"), "utf8"));
+const browserSource = await readFile(join(here, "space-browser.mjs"), "utf8");
+const labSource = await readFile(join(here, "space-lab.mjs"), "utf8");
 const targets = JSON.parse(
   await readFile(resolve(here, "../../../labs/canonical-targets.json"), "utf8"),
 );
@@ -22,6 +24,12 @@ assert.deepEqual(manifest.mechanisms.map(({ id }) => id), target.mechanisms);
 assert.deepEqual(manifest.tiers.map(({ id }) => id), target.tiers);
 assert.deepEqual([...SPACE_INTEGRATOR_MODES], target.mechanisms);
 assert.deepEqual([...SPACE_LAB_TIERS], target.tiers);
+assert.match(labSource, /export const SPACE_LAB_ID = "tsl-curved-ray";/);
+assert.match(labSource, /get labId\(\) \{ return SPACE_LAB_ID; \}/);
+assert.match(labSource, /labId: SPACE_LAB_ID,/);
+assert.match(browserSource, /globalThis\.labController = controllerPromise;/);
+assert.match(browserSource, /globalThis\.__LAB_CONTROLLER__ = controllerPromise;/);
+assert.match(browserSource, /globalThis\.__LAB_ERROR__ = error;/);
 
 for (const id of target.mechanisms) {
   const path = join(here, "mechanism", id, "index.html");

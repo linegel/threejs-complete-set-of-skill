@@ -18,6 +18,7 @@ import {
 } from "./space-gpu-probes.js";
 import { SPACE_INTEGRATOR_MODES, createSpaceIntegratorStage } from "./space-transfer-stage.js";
 
+export const SPACE_LAB_ID = "tsl-curved-ray";
 export const SPACE_LAB_MODES = Object.freeze([
   "final",
   "no-post",
@@ -179,6 +180,8 @@ export class SpaceIntegratorLab {
     this.frameIndex = 0;
     this.disposed = false;
   }
+
+  get labId() { return SPACE_LAB_ID; }
 
   async ready() {
     if (this.disposed) throw new Error("SpaceIntegratorLab used after dispose()");
@@ -464,6 +467,7 @@ export class SpaceIntegratorLab {
 
   describeMechanism() {
     return {
+      labId: SPACE_LAB_ID,
       scenario: this.scenario,
       quality: this.quality,
       mode: this.mode,
