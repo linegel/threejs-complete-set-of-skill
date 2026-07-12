@@ -50,6 +50,38 @@ controller splits a presentation delta into bounded chunks, so equal-real-time
 produce the same f32 state hash. Direct `heightfield.step()` still reports
 dropped catch-up time rather than hiding it.
 
+## Shared physics boundary
+
+The reusable `integration-stage.js` is a render-integration shell, not the
+canonical physics ABI. Its mutable `weatherState`, `setDrop(...)`, and
+`setObjectImpulse(...)` inputs are presentation-authored local events. They do
+not publish `PhysicsContext` or `WaterSurfaceSample`, do not consume
+`SurfaceExchange` or `InteractionRecord`, have no exact-once
+`InteractionBatchLedger`, and support no conservation or two-way-coupling
+claim. The runtime exports `WATER_PHYSICS_INTEGRATION_BOUNDARY` and returns it
+from the stage so downstream code cannot infer a stronger contract from the
+helper names.
+
+Canonical integration uses the shared
+[physics-domain and interaction contract](../../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md):
+
+- query and event positions are physics-frame metres under one `PhysicsContext`;
+- the provider publishes batched, channel-requested `WaterSurfaceSample`
+  records with actual time, filter, state version, validity, and error;
+- the visible analytic-plus-heightfield surface is valid only with a measured
+  or hard live-state residual bound; the analytic CPU query alone is not
+  silently authoritative for the combined surface;
+- precipitation and moving bodies reach the solver through `SurfaceExchange`
+  and dimensioned `InteractionRecord` batches, with conservative scatter,
+  exact-once ledgers, and declared one-way or two-way coupling;
+- GPU-resident consumers use ordered bindings and graph dependencies. A
+  frame-critical synchronous readback is forbidden.
+
+The analytic query now returns the exact fixed-chart surface-point velocity,
+acceleration, and gauge-invariant geometric normal velocity. These are useful
+ingredients for an adapter, but they remain distinct from material current,
+phase speed, and a complete live-surface `WaterSurfaceSample`.
+
 ## One surface cause
 
 Visible displacement is
@@ -93,11 +125,11 @@ There is no fallback renderer.
 Every route imports this implementation but locks a distinct runtime profile:
 
 - `heightfield-simulation`: propagation and differential only;
-- `drops-and-object-ripples`: immutable drop plus object events;
+- `drops-and-object-ripples`: immutable presentation-authored drop plus moving-boundary ripple events;
 - `differential-caustics`: source deposition and receiver material;
 - `refraction-and-absorption`: water-free opaque color/depth transport;
 - `fresnel-and-tir`: exact interface classification diagnostic;
-- `buoyancy-spray-and-masks`: analytic CPU buoyancy query, object impulse,
+- `buoyancy-spray-and-masks`: analytic CPU buoyancy query, presentation-authored moving-boundary ripple,
   deterministic instanced spray, and a GPU event mask.
 
 Unknown mechanisms, modes, cameras, tiers, seeds, negative time, non-finite

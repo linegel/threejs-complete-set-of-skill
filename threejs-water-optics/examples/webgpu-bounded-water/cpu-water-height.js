@@ -18,6 +18,8 @@ export function sampleAnalyticSurfaceAtParameter( qx, qz, timeSeconds, {
 	const position = [ qx, 0, qz ];
 	const tangentX = [ 1, 0, 0 ];
 	const tangentZ = [ 0, 0, 1 ];
+	const surfacePointVelocityMps = [ 0, 0, 0 ];
+	const surfacePointAccelerationMps2 = [ 0, 0, 0 ];
 
 	for ( const wave of waves.slice( 0, analyticBandCount ) ) {
 		const k = TAU / wave.wavelength;
@@ -28,6 +30,7 @@ export function sampleAnalyticSurfaceAtParameter( qx, qz, timeSeconds, {
 		const horizontalAmplitude = wave.steepness * wave.amplitude;
 		const dx = wave.direction.x;
 		const dz = wave.direction.y;
+		const omegaSquared = omega * omega;
 
 		position[ 0 ] += horizontalAmplitude * dx * cosPhase;
 		position[ 1 ] += wave.amplitude * sinPhase;
@@ -40,6 +43,15 @@ export function sampleAnalyticSurfaceAtParameter( qx, qz, timeSeconds, {
 		tangentZ[ 0 ] -= horizontalAmplitude * k * dx * dz * sinPhase;
 		tangentZ[ 1 ] += wave.amplitude * k * dz * cosPhase;
 		tangentZ[ 2 ] -= horizontalAmplitude * k * dz * dz * sinPhase;
+
+		// Exact partial derivatives of the serialized fixed-chart map r(qx,qz,t).
+		// This is coordinate-surface velocity, not material current or phase speed.
+		surfacePointVelocityMps[ 0 ] += horizontalAmplitude * dx * omega * sinPhase;
+		surfacePointVelocityMps[ 1 ] -= wave.amplitude * omega * cosPhase;
+		surfacePointVelocityMps[ 2 ] += horizontalAmplitude * dz * omega * sinPhase;
+		surfacePointAccelerationMps2[ 0 ] -= horizontalAmplitude * dx * omegaSquared * cosPhase;
+		surfacePointAccelerationMps2[ 1 ] -= wave.amplitude * omegaSquared * sinPhase;
+		surfacePointAccelerationMps2[ 2 ] -= horizontalAmplitude * dz * omegaSquared * cosPhase;
 	}
 
 	const horizontalJacobian = tangentX[ 0 ] * tangentZ[ 2 ] - tangentZ[ 0 ] * tangentX[ 2 ];
@@ -48,6 +60,9 @@ export function sampleAnalyticSurfaceAtParameter( qx, qz, timeSeconds, {
 		horizontalJacobian,
 		tangentZ[ 0 ] * tangentX[ 1 ] - tangentZ[ 1 ] * tangentX[ 0 ]
 	] );
+	const geometricNormalVelocityMps = surfacePointVelocityMps.reduce(
+		( sum, component, index ) => sum + component * normal[ index ], 0
+	);
 
 	return {
 		parameter: [ qx, qz ],
@@ -56,6 +71,9 @@ export function sampleAnalyticSurfaceAtParameter( qx, qz, timeSeconds, {
 		tangentX,
 		tangentZ,
 		normal,
+		surfacePointVelocityMps,
+		surfacePointAccelerationMps2,
+		geometricNormalVelocityMps,
 		horizontalJacobian
 	};
 }

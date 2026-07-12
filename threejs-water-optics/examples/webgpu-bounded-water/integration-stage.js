@@ -1,6 +1,24 @@
 import { float } from 'three/tsl';
 import { createWebGPUBoundedWaterSystem } from './webgpu-bounded-water.js';
 
+export const WATER_PHYSICS_INTEGRATION_BOUNDARY = Object.freeze( {
+	id: 'bounded-water-render-integration-only-v1',
+	canonicalPhysicsAbi: false,
+	acceptedInputs: Object.freeze( [
+		'presentation-authored-weather-state',
+		'presentation-authored-drop-event'
+	] ),
+	forbiddenClaims: Object.freeze( [
+		'PhysicsContext publication',
+		'WaterSurfaceSample publication',
+		'SurfaceExchange consumption',
+		'InteractionRecord consumption',
+		'InteractionBatchLedger exact-once delivery',
+		'conservation or two-way coupling'
+	] ),
+	requiredCanonicalPath: 'physics-domain-and-interaction-contract.md plus a route-owned provider/interaction adapter'
+} );
+
 /**
  * Reusable bounded-water stage for Weathered World and Creature Habitat. The
  * host owns the RenderPipeline, opaque color/depth inputs, transparent order,
@@ -27,6 +45,7 @@ export async function createBoundedWaterStage( {
 		id: 'bounded-water-stage',
 		renderer,
 		weatherState,
+		physicsIntegrationBoundary: WATER_PHYSICS_INTEGRATION_BOUNDARY,
 		...system,
 		ownsRenderPipeline: false,
 		ownsToneMap: false,
@@ -38,8 +57,18 @@ export async function createBoundedWaterStage( {
 		},
 		describeSignals() {
 			return {
-				produces: [ 'bounded-water-height', 'bounded-water-derivatives', 'bounded-water-touch-history' ],
-				consumes: weatherState ? [ 'weather-time', 'weather-precipitation', 'weather-wind' ] : []
+				classification: WATER_PHYSICS_INTEGRATION_BOUNDARY.id,
+				produces: [
+					'presentation-authored-bounded-water-height',
+					'presentation-authored-bounded-water-derivatives',
+					'presentation-authored-bounded-water-touch-history'
+				],
+				consumes: weatherState ? [
+					'presentation-authored-weather-time',
+					'presentation-authored-weather-precipitation',
+					'presentation-authored-weather-wind'
+				] : [],
+				forbiddenClaims: WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims
 			};
 		},
 		describeResources: () => system.describeResources(),

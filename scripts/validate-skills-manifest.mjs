@@ -1068,6 +1068,40 @@ for (const dir of skillDirs) {
   }
 }
 
+const physicsOwnershipShellSource = readFileSync(join(root, 'labs', 'runtime', 'physics-integration-contracts.mjs'), 'utf8');
+for (const exclusion of [
+  'canonical-physics-abi-publication-chain',
+  'interaction-and-conservation-ledgers',
+  'performance-or-acceptance-evidence'
+]) {
+  if (!physicsOwnershipShellSource.includes(`'${exclusion}'`)) {
+    fail(`physics integration ownership shell does not exclude ${exclusion}`);
+  }
+}
+const boundedWaterIntegrationSource = readFileSync(join(root, 'threejs-water-optics', 'examples', 'webgpu-bounded-water', 'integration-stage.js'), 'utf8');
+const boundedWaterReadme = readFileSync(join(root, 'threejs-water-optics', 'examples', 'webgpu-bounded-water', 'README.md'), 'utf8');
+for (const token of [
+  'bounded-water-render-integration-only-v1',
+  'canonicalPhysicsAbi: false',
+  'InteractionRecord consumption',
+  'InteractionBatchLedger exact-once delivery',
+  'conservation or two-way coupling'
+]) {
+  if (!boundedWaterIntegrationSource.includes(token)) {
+    fail(`bounded-water render integration boundary omits ${token}`);
+  }
+}
+for (const token of [
+  'render-integration shell, not the',
+  'presentation-authored local events',
+  'live-state residual bound',
+  'frame-critical synchronous readback is forbidden'
+]) {
+  if (!boundedWaterReadme.includes(token)) {
+    fail(`bounded-water README physics boundary omits ${token}`);
+  }
+}
+
 const routerContractTestPath = join(root, 'threejs-choose-skills', 'examples', 'router-contract.test.mjs');
 if (!existsSync(routerContractTestPath)) fail('router contract test is missing from the normal skills gate');
 try {

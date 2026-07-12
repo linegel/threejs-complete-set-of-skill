@@ -9,6 +9,7 @@ import {
   DEFAULT_WATER_PARAMETERS,
   WATER_CFL_LIMIT,
   WATER_EXAMPLE_CLAIM_BOUNDARY,
+  WATER_PHYSICS_INTEGRATION_BOUNDARY,
   WATER_MECHANISM_PROFILES,
   WATER_MECHANISM_ROUTES,
   WATER_QUALITY_TIERS,
@@ -114,6 +115,17 @@ const finiteTangentX = plusX.map((value, index) => (value - minusX[index]) / (2 
 const finiteTangentZ = plusZ.map((value, index) => (value - minusZ[index]) / (2 * epsilon));
 const tangentError = Math.max(maxVectorError(analytic.tangentX, finiteTangentX), maxVectorError(analytic.tangentZ, finiteTangentZ));
 assert(tangentError < 1e-8 && analytic.horizontalJacobian > 0, "Exact authored surface differential failed its CPU oracle.");
+const timeEpsilon = 1e-6;
+const future = sampleAnalyticSurfaceAtParameter(parameterProbe.qx, parameterProbe.qz, parameterProbe.time + timeEpsilon);
+const past = sampleAnalyticSurfaceAtParameter(parameterProbe.qx, parameterProbe.qz, parameterProbe.time - timeEpsilon);
+const finiteVelocity = future.position.map((value, index) => (value - past.position[index]) / (2 * timeEpsilon));
+const finiteAcceleration = future.surfacePointVelocityMps.map((value, index) => (value - past.surfacePointVelocityMps[index]) / (2 * timeEpsilon));
+const velocityError = maxVectorError(analytic.surfacePointVelocityMps, finiteVelocity);
+const accelerationError = maxVectorError(analytic.surfacePointAccelerationMps2, finiteAcceleration);
+const projectedNormalVelocity = analytic.surfacePointVelocityMps.reduce((sum, value, index) => sum + value * analytic.normal[index], 0);
+assert(velocityError < 1e-8, "Exact fixed-chart surface velocity failed its temporal finite-difference oracle.");
+assert(accelerationError < 1e-7, "Exact fixed-chart surface acceleration failed its temporal finite-difference oracle.");
+assert(Math.abs(projectedNormalVelocity - analytic.geometricNormalVelocityMps) < 1e-12, "Geometric normal velocity drifted from the exact surface-velocity projection.");
 assert(Math.abs(getParametricWaterHeight(parameterProbe.qx, parameterProbe.qz, parameterProbe.time) - analyticSurfaceHeightAt(parameterProbe.qx, parameterProbe.qz, parameterProbe.time)) < 1e-12, "Parametric height evaluators drifted.");
 assert(AUTHORED_WAVES.every((wave) => Math.abs(wave.direction.length() - 1) < 1e-12), "Authored wave directions must be normalized.");
 
@@ -216,6 +228,10 @@ try { await createWebGPUBoundedWaterSystem(fakeNonWebGpuRenderer, { tier: "ultra
 assert(rejectedNonWebGpu, "Missing WebGPU must block without fallback.");
 
 assert(WATER_EXAMPLE_CLAIM_BOUNDARY.classification === "canonical-native-webgpu-lab-incomplete", "Claim boundary must match the canonical incomplete status.");
+assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.canonicalPhysicsAbi === false, "Render integration shell must not claim the canonical physics ABI.");
+assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims.includes("InteractionRecord consumption")
+  && WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims.includes("conservation or two-way coupling"), "Render integration shell must enumerate its forbidden physics claims.");
+assert(appSource.includes("presentation-authored moving-boundary ripple") || readFileSync(join(here, "README.md"), "utf8").includes("presentation-authored moving-boundary ripple"), "Ad-hoc water events must be labelled presentation-authored.");
 
 console.log(JSON.stringify({
   pass: true,
@@ -225,6 +241,8 @@ console.log(JSON.stringify({
   deterministicReplay: Object.fromEntries(Object.entries(replays).map(([hz, replay]) => [hz, { steps: replay.fixedStepIndex, hash: replay.stateHash }])),
   numericalChecks: {
     tangentError,
+    velocityError,
+    accelerationError,
     inversionResidual: worldProbe.horizontalResidual,
     normalIncidenceFresnel: normalFresnel.reflectance,
     tirClassified: tirProbe.totalInternalReflection,

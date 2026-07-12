@@ -45,5 +45,5 @@ export {
 } from "./webgpu-bounded-water.js";
 
 export { BOUNDED_WATER_LAB_MANIFEST } from "./lab-manifest.js";
-export { createBoundedWaterStage } from "./integration-stage.js";
+export { createBoundedWaterStage, WATER_PHYSICS_INTEGRATION_BOUNDARY } from "./integration-stage.js";
 export { depositReceiverCaustics, validateRefractedRaySample } from "./optical-oracles.js";
