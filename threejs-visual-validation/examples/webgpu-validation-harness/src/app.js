@@ -32,7 +32,7 @@ async function start() {
 		}
 	} );
 	const { runtimeProfile } = runtime;
-	const controller = await createNativeWebGPUValidationSubject( canvas, { runtimeProfile } );
+	const controller = await createNativeWebGPUValidationSubject( canvas, { runtimeProfile, routeLock } );
 	const startup = routeLock?.startup ?? {};
 	await controller.setScenario( startup.scenario ?? parameters.get( 'scenario' ) ?? 'browser-capture' );
 	await controller.setTier( startup.tier ?? parameters.get( 'tier' ) ?? 'webgpu-correctness' );
