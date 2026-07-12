@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 const here = dirname( fileURLToPath( import.meta.url ) );
 const examplePath = join( here, 'index.js' );
 const exampleSource = await readFile( examplePath, 'utf8' );
+const browserSource = await readFile( join( here, 'browser.js' ), 'utf8' );
 const example = await import( pathToFileURL( examplePath ) );
 
 const {
@@ -55,6 +56,7 @@ assert.match( exampleSource, /mrtOutputs\s*=\s*\{\s*output\s*,\s*emissive\s*\}/ 
 assert.match( exampleSource, /const LAB_ID = 'node-selective-bloom'/ );
 assert.match( exampleSource, /get labId\(\) \{ return LAB_ID; \}/ );
 assert.match( exampleSource, /labId:\s*LAB_ID/ );
+assert.match( browserSource, /window\.labController = controller/ );
 assert.match( exampleSource, /if\s*\(\s*validationDiagnostics\s*===\s*true\s*\)\s*\{[\s\S]*?mrtOutputs\.transparentEmitter/ );
 assert.match( exampleSource, /materialReference\(\s*'userData\.transparentEmitterMask'\s*,\s*'float'\s*\)/ );
 assert.match( exampleSource, /sceneMRT\.setBlendMode\(\s*'emissive'\s*,\s*materialBlend\s*\)/ );
