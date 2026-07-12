@@ -44,6 +44,7 @@ import { compileSpec, digest128, TIER_CONFIG } from '../core/rig-compiler.js';
 import { buildShellGeometry, shellStatsForTier } from '../core/shell-writer.js';
 import { validateSpec } from '../core/spec-schema.js';
 import { createGenomeSpec } from './specs/genome.js';
+import { evaluatePerformanceResult, PERFORMANCE_PROFILE_VERSION, performanceProfile } from './performance-profiles.js';
 import {
 	CREATURE_FOCI,
 	CREATURE_MODES,
@@ -115,6 +116,8 @@ const state = {
 	},
 	certifications: new Map(),
 	presentationLastMs: null,
+	gpuErrors: [],
+	deviceLoss: null,
 	viewFrustum: new Frustum(),
 	viewProjection: new Matrix4(),
 	cullingEnabled: true,
@@ -191,6 +194,7 @@ function shellToBufferGeometry(shell) {
 	geometry.computeVertexNormals();
 	geometry.computeBoundingSphere();
 	geometry.userData.shell = shell;
+	geometry.userData.representation = 'diagnostic-owner-masked-shell';
 	return geometry;
 }
 
@@ -556,16 +560,24 @@ function shadowParityTelemetry() {
 	});
 }
 
-function packedReadbackBytesPerRow(width, height, pixelLength, bytesPerTexel = 4) {
+function readbackLayout(width, height, pixelLength, bytesPerTexel = 4) {
 	const rowBytes = width * bytesPerTexel;
-	const compactLength = rowBytes * height;
-	if (pixelLength === compactLength) return rowBytes;
 	const alignedRowBytes = Math.ceil(rowBytes / 256) * 256;
-	const paddedLength = alignedRowBytes * (height - 1) + rowBytes;
-	if (pixelLength !== paddedLength) {
-		throw new Error(`Unexpected WebGPU readback length ${pixelLength}; expected ${compactLength} or ${paddedLength}.`);
+	// Three r185 WebGPUTextureUtils.copyTextureToBuffer owns this exact copy
+	// layout: every non-final row uses the aligned GPU stride and the final row
+	// stores only its tight texels. Carry that authored/inspected backend stride
+	// directly; never infer it from total buffer length divided by height.
+	const bufferByteLength = alignedRowBytes * (height - 1) + rowBytes;
+	if (pixelLength !== bufferByteLength) {
+		throw new Error(`Unexpected WebGPU readback length ${pixelLength}; expected backend copy length ${bufferByteLength}.`);
 	}
-	return alignedRowBytes;
+	return {
+		bytesPerRow: alignedRowBytes,
+		gpuCopyBytesPerRow: alignedRowBytes,
+		tightBytesPerRow: rowBytes,
+		bufferByteLength,
+		alignment: 256,
+	};
 }
 
 function bytesToBase64(bytes) {
@@ -581,9 +593,10 @@ function bytesToBase64(bytes) {
 function metricFromSamples(samples) {
 	const finite = samples.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
 	if (finite.length === 0) return { median: 0, p95: 0, samples: 0 };
+	const nearestRank = (probability) => finite[Math.max(0, Math.ceil(probability * finite.length) - 1)];
 	return {
-		median: Number(finite[Math.floor(finite.length / 2)].toFixed(4)),
-		p95: Number(finite[Math.min(finite.length - 1, Math.floor(finite.length * 0.95))].toFixed(4)),
+		median: Number(nearestRank(0.5).toFixed(4)),
+		p95: Number(nearestRank(0.95).toFixed(4)),
 		samples: finite.length,
 	};
 }
@@ -1199,7 +1212,7 @@ async function captureFrame({ width = 960, height = 600, camera = 'main' } = {})
 		return {
 			width: captureWidth,
 			height: captureHeight,
-			bytesPerRow: packedReadbackBytesPerRow(captureWidth, captureHeight, pixels.length),
+			...readbackLayout(captureWidth, captureHeight, pixels.length),
 			pixelsBase64: bytesToBase64(pixels),
 			camera,
 		};
@@ -1270,7 +1283,7 @@ async function captureShadowAtlas({ creatureIndex = 1, width = 512, height = 512
 		return {
 			width,
 			height,
-			bytesPerRow: packedReadbackBytesPerRow(width, height, pixels.length),
+			...readbackLayout(width, height, pixels.length),
 			pixelsBase64: bytesToBase64(pixels),
 			source: 'DirectionalLight.shadow.map.depthTexture sampled by a fullscreen NodeMaterial',
 			shadowMapSize: [state.light.shadow.mapSize.x, state.light.shadow.mapSize.y],
@@ -1328,7 +1341,7 @@ async function capturePipelinePixels(targetId = 'output') {
 			format: 'rgba8unorm',
 			outputColorSpace: state.renderer.outputColorSpace,
 			bytesPerPixel: 4,
-			bytesPerRow: packedReadbackBytesPerRow(width, height, pixels.length),
+			...readbackLayout(width, height, pixels.length),
 			pixels,
 		};
 	} finally {
@@ -1447,6 +1460,242 @@ function driftMarkers({ creatureIndex = 0, seconds = 4 } = {}) {
 	};
 }
 
+function stepSimulationTick() {
+	for (const species of state.species) {
+		for (const creature of species.creatures) step(creature.driver, 1, { rootVelocity: FIXED_ROOT_VELOCITY });
+	}
+}
+
+async function measureTimestampedPipelineFrame() {
+	const frameStart = instrumentationNow();
+	const simulationStart = frameStart;
+	stepSimulationTick();
+	const simulationEnd = instrumentationNow();
+	const storageStart = simulationEnd;
+	updatePoseStorage();
+	const storageEnd = instrumentationNow();
+	const submissionStart = storageEnd;
+	state.renderPipeline.render();
+	const submissionEnd = instrumentationNow();
+	const gpuRenderMs = await state.renderer.resolveTimestampsAsync('render');
+	return {
+		cpu: {
+			simulation: simulationEnd - simulationStart,
+			storageAndCulling: storageEnd - storageStart,
+			renderSubmission: submissionEnd - submissionStart,
+			total: submissionEnd - frameStart,
+		},
+		gpuRenderMs: Number.isFinite(gpuRenderMs) && gpuRenderMs > 0 ? gpuRenderMs : null,
+	};
+}
+
+function collectAnimationIntervals(durationMs) {
+	return new Promise((resolve) => {
+		const intervals = [];
+		let start = null;
+		let previous = null;
+		function sample(timestamp) {
+			if (start === null) start = timestamp;
+			if (previous !== null) intervals.push(timestamp - previous);
+			previous = timestamp;
+			if (timestamp - start >= durationMs && intervals.length > 0) resolve(intervals);
+			else requestAnimationFrame(sample);
+		}
+		requestAnimationFrame(sample);
+	});
+}
+
+function setCreatureMeshesVisible(visible) {
+	for (const species of state.species) species.mesh.visible = visible;
+}
+
+function geometryByteLength(geometry) {
+	let bytes = geometry?.index?.array?.byteLength ?? 0;
+	for (const attribute of Object.values(geometry?.attributes ?? {})) bytes += attribute?.array?.byteLength ?? 0;
+	return bytes;
+}
+
+function performanceResourceSnapshot(profile) {
+	const storageBytes = describeResources().storageBytes;
+	const geometryBytes = state.species.reduce((sum, species) => sum
+		+ geometryByteLength(species.geometry)
+		+ (species.mesh.instanceMatrix?.array?.byteLength ?? 0), 0);
+	const physicalPixels = profile.viewport.width * profile.viewport.height * profile.viewport.dpr ** 2;
+	const actualSampleCount = state.scenePass?.renderTarget?.samples ?? 1;
+	// PassNode defaults every MRT color target to RGBA16F (8 B/pixel). For MSAA,
+	// WebGPUTextureUtils owns a single-sample resolve texture plus an N-sample
+	// color attachment; depth32 is N-sample with no resolve allocation. This is
+	// an app-owned attachment ledger, not a claim about driver heap residency.
+	const colorBytesPerPixel = state.scenePass.renderTarget.textures.length * 8;
+	const colorSampleMultiplier = actualSampleCount > 1 ? 1 + actualSampleCount : 1;
+	const depthBytesPerPixel = state.scenePass.renderTarget.depthBuffer === false ? 0 : 4 * actualSampleCount;
+	const renderTargetBytes = physicalPixels * (colorBytesPerPixel * colorSampleMultiplier + depthBytesPerPixel);
+	const shadowBytes = state.light.shadow.mapSize.x * state.light.shadow.mapSize.y * 4;
+	return {
+		storageBytes,
+		geometryBytes,
+		renderTargetBytes,
+		shadowBytes,
+		ownedGpuBytes: storageBytes + geometryBytes + renderTargetBytes + shadowBytes,
+		actualSampleCount,
+		ledgerBasis: 'app-owned buffers plus rgba16f MRT resolve/MSAA, depth32, and depth32float shadow allocations',
+		excludes: ['driver allocation granularity', 'pipeline cache', 'bind-group metadata', 'browser compositor surfaces'],
+	};
+}
+
+function adapterIdentity() {
+	const info = state.renderer.backend?.device?.adapterInfo ?? state.renderer.backend?.adapterInfo;
+	if (!info) return null;
+	const identity = {};
+	for (const key of ['vendor', 'architecture', 'device', 'description', 'subgroupMinSize', 'subgroupMaxSize']) {
+		if (info[key] !== undefined && info[key] !== '') identity[key] = info[key];
+	}
+	return Object.keys(identity).length > 0 ? identity : null;
+}
+
+function applyPerformanceGraph(profile) {
+	state.scenePass.renderTarget.samples = profile.sampleCount;
+	state.light.shadow.map?.dispose?.();
+	state.light.shadow.map = null;
+	state.light.shadow.mapSize.set(profile.shadowMapSize, profile.shadowMapSize);
+	state.light.shadow.needsUpdate = true;
+	state.renderPipeline.outputNode = profile.outlineMode === 'none'
+		? renderOutput(state.scenePass.getTextureNode('output'))
+		: state.outline.outputNode;
+	state.renderPipeline.needsUpdate = true;
+}
+
+async function measurePerformanceProfile(profileId) {
+	const profile = performanceProfile(profileId);
+	await setTier(profile.tier, { overrideLock: true });
+	state.viewportOverride = { ...profile.viewport };
+	state.renderer.setPixelRatio(profile.viewport.dpr);
+	applyPerformanceGraph(profile);
+	spawnGrid(profile.seed, profile.population, { render: false });
+	state.focusIsolation = false;
+	setCreatureMeshesVisible(true);
+	frameCameraOnPopulation(false);
+	resizeRenderer();
+	const timestampSupported = state.renderer.backend?.trackTimestamp === true
+		&& state.renderer.hasFeature?.('timestamp-query') === true;
+	if (!timestampSupported) {
+		return {
+			schemaVersion: 1,
+			performanceProfileVersion: PERFORMANCE_PROFILE_VERSION,
+			profileId,
+			verdict: 'INSUFFICIENT_EVIDENCE',
+			unavailableReason: 'INSUFFICIENT_EVIDENCE_GPU_TIMING: timestamp-query is unavailable or trackTimestamp was not enabled before initialization',
+		};
+	}
+	pauseLoop();
+	try {
+		await state.renderer.resolveTimestampsAsync('render');
+		for (let frame = 0; frame < profile.warmupFrames; frame++) await measureTimestampedPipelineFrame();
+		await state.renderer.resolveTimestampsAsync('render');
+		const beforeCounters = state.bootCounters.snapshot();
+		const cpuSamples = { simulation: [], storageAndCulling: [], renderSubmission: [], total: [] };
+		const gpuSamples = [];
+		for (let frame = 0; frame < profile.sampleFrames; frame++) {
+			const sample = await measureTimestampedPipelineFrame();
+			for (const key of Object.keys(cpuSamples)) cpuSamples[key].push(sample.cpu[key]);
+			if (sample.gpuRenderMs !== null) gpuSamples.push(sample.gpuRenderMs);
+		}
+
+		const marginalBlocks = [];
+		for (let block = 0; block < profile.marginalBlocks; block++) {
+			const enabled = block % 2 === 1;
+			setCreatureMeshesVisible(enabled);
+			const samples = [];
+			for (let frame = 0; frame < profile.marginalFramesPerBlock; frame++) {
+				const sample = await measureTimestampedPipelineFrame();
+				if (sample.gpuRenderMs !== null) samples.push(sample.gpuRenderMs);
+			}
+			marginalBlocks.push({ block, creaturesEnabled: enabled, gpuRender: metricFromSamples(samples), raw: samples });
+		}
+		setCreatureMeshesVisible(true);
+		const pausedBaselineSamples = await collectAnimationIntervals(2_000);
+		resumeLoop();
+		const activePresentationSamples = await collectAnimationIntervals(profile.sustainedDurationMs);
+		pauseLoop();
+		const afterCounters = state.bootCounters.snapshot();
+		const resourceSnapshot = performanceResourceSnapshot(profile);
+		const activeMetric = metricFromSamples(activePresentationSamples);
+		const deadlineMisses = activePresentationSamples.filter((value) => value > profile.frameDeadlineMs).length;
+		const actualRepresentation = state.species.every((species) => species.geometry.userData.representation === 'canonical-reference-surface')
+			? 'canonical-reference-surface'
+			: 'diagnostic-owner-masked-shell';
+		const actualOutlineMode = state.renderPipeline.outputNode === state.outline?.outputNode ? 'shared-normal-depth-edge' : 'none';
+		const result = {
+			schemaVersion: 1,
+			performanceProfileVersion: PERFORMANCE_PROFILE_VERSION,
+			profileId,
+			environment: {
+				threeRevision: '185',
+				browser: navigator.userAgent,
+				platform: navigator.userAgentData?.platform ?? navigator.platform ?? null,
+				adapter: adapterIdentity(),
+				features: state.renderer.backend?.device?.features ? [...state.renderer.backend.device.features] : [],
+				limits: state.renderer.backend?.device?.limits ? { ...state.renderer.backend.device.limits } : {},
+				isWebGPUBackend: state.renderer.backend?.isWebGPUBackend === true,
+				trackTimestamp: state.renderer.backend?.trackTimestamp === true,
+				timestampQuery: state.renderer.hasFeature?.('timestamp-query') === true,
+				deviceLoss: state.deviceLoss,
+				uncapturedErrors: [...state.gpuErrors],
+			},
+			target: { refreshHz: profile.refreshHz, frameDeadlineMs: profile.frameDeadlineMs, allowedMissRate: profile.allowedMissRate },
+			workload: {
+				tier: state.tier,
+				population: state.species.reduce((sum, species) => sum + species.creatures.length, 0),
+				speciesMix: state.species.map((species) => ({ name: species.spec.name, instances: species.creatures.length })),
+				seed: profile.seed,
+				viewport: { width: profile.viewport.width, height: profile.viewport.height, dpr: state.renderer.getPixelRatio() },
+				sampleCount: resourceSnapshot.actualSampleCount,
+				shadowMapSize: state.light.shadow.mapSize.x,
+				outlineMode: actualOutlineMode,
+				representation: actualRepresentation,
+				topologySignatures: state.species.map((species) => species.compiled.topologySignature),
+				geometryDigests: state.species.map((species) => species.compiled.geometryDigest),
+				pages: state.species.length,
+				visibleInstances: state.culling.visibleInstances,
+			},
+			sampling: {
+				warmupFrames: profile.warmupFrames,
+				sampleFrames: profile.sampleFrames,
+				marginalBlocks: profile.marginalBlocks,
+				marginalFramesPerBlock: profile.marginalFramesPerBlock,
+				sustainedDurationMs: profile.sustainedDurationMs,
+				quantile: 'nearest-rank',
+			},
+			cpu: {
+				simulation: metricFromSamples(cpuSamples.simulation),
+				storageAndCulling: metricFromSamples(cpuSamples.storageAndCulling),
+				renderSubmission: metricFromSamples(cpuSamples.renderSubmission),
+				total: metricFromSamples(cpuSamples.total),
+			},
+			gpu: { render: metricFromSamples(gpuSamples), timestampSampleCount: gpuSamples.length, marginalBlocks },
+			presentation: {
+				pausedBaseline: metricFromSamples(pausedBaselineSamples),
+				active: activeMetric,
+				deadlineMisses,
+				missRate: activePresentationSamples.length > 0 ? deadlineMisses / activePresentationSamples.length : 1,
+			},
+			resources: {
+				...resourceSnapshot,
+				postRevealPipelineCompiles: afterCounters.createRenderPipeline + afterCounters.createRenderPipelineAsync - beforeCounters.createRenderPipeline - beforeCounters.createRenderPipelineAsync,
+				steadyStateBufferCreates: afterCounters.createBuffer - beforeCounters.createBuffer,
+				dirtyUploadBytes: state.lastPoseUpload?.bytes ?? 0,
+			},
+			quality: { selectedTier: state.tier, transitions: [], settled: true },
+			rawSamples: { cpu: cpuSamples, gpuRenderMs: gpuSamples, pausedPresentationMs: pausedBaselineSamples, activePresentationMs: activePresentationSamples },
+		};
+		Object.assign(result, evaluatePerformanceResult(result));
+		return result;
+	} finally {
+		setCreatureMeshesVisible(true);
+		resumeLoop();
+	}
+}
+
 async function measureSteadyFrames(count = 120) {
 	// Fairness contract: the first-frame ratio compares like with like. The first
 	// frame is timed as an awaited renderAsync at reveal (init), so steady frames
@@ -1483,7 +1732,15 @@ async function measureSteadyFrames(count = 120) {
 	};
 	const steady = metricFromSamples(samples);
 	state.boot.firstFrameRatio = Number((Math.max(state.timing.revealMedianMs ?? state.timing.firstFrameMs, steady.median) / Math.max(steady.median, 1e-6)).toFixed(4));
-	return { samples: samples.map((sample) => Number(sample.toFixed(4))), steady, deltas: state.bootCounters.steadyStateDeltas };
+	return {
+		metricKind: 'cpu-submission-proxy',
+		acceptanceEligible: false,
+		gpuTiming: null,
+		deprecation: 'Use measurePerformanceProfile(profileId); renderAsync submission latency is not GPU completion time.',
+		samples: samples.map((sample) => Number(sample.toFixed(4))),
+		steady,
+		deltas: state.bootCounters.steadyStateDeltas,
+	};
 }
 
 async function leakLoop(cycles = 50) {
@@ -1616,6 +1873,7 @@ function createLabController() {
 		},
 		async renderOnce() { return renderOnce(); },
 		async capturePixels(target) { return capturePipelinePixels(target); },
+		async measurePerformanceProfile(profileId) { return measurePerformanceProfile(profileId); },
 		describePipeline,
 		describeResources,
 		getMetrics() { return telemetry(); },
@@ -1656,6 +1914,7 @@ function installLabApi() {
 		spawnCostSample,
 		driftMarkers,
 		measureSteadyFrames,
+		measurePerformanceProfile,
 		leakLoop,
 		pauseLoop,
 		resumeLoop,
@@ -1675,7 +1934,17 @@ function installLabApi() {
 
 async function init() {
 	setStatus('Creature Lab Initializing WebGPU');
-	const renderer = new WebGPURenderer({ canvas, antialias: true });
+	const renderer = new WebGPURenderer({ canvas, antialias: false, trackTimestamp: true });
+	const inheritedOnError = renderer.onError.bind(renderer);
+	const inheritedOnDeviceLost = renderer.onDeviceLost.bind(renderer);
+	renderer.onError = (error) => {
+		state.gpuErrors.push({ type: error?.type ?? 'GPUError', message: error?.message ?? String(error) });
+		inheritedOnError(error);
+	};
+	renderer.onDeviceLost = (info) => {
+		state.deviceLoss = { reason: info?.reason ?? null, message: info?.message ?? 'Unknown WebGPU device loss' };
+		inheritedOnDeviceLost(info);
+	};
 	await renderer.init();
 	if (renderer.backend?.isWebGPUBackend !== true) throw new Error('WebGPU backend unavailable for the canonical creature path.');
 	state.renderer = renderer;

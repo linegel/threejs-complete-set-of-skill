@@ -270,6 +270,7 @@ async function runControllerPipelineContractMutation() {
 		'async ready()', 'async setScenario(id)', 'async setMode(id)', 'async setTier(id)', 'async setSeed(seed)',
 		'async setCamera(id)', 'async setTime(seconds)', 'async step(deltaSeconds)', 'async resetHistory(cause)',
 		'async resize(width, height, dpr)', 'async renderOnce()', 'async capturePixels(target)',
+		'async measurePerformanceProfile(profileId)',
 		'describePipeline', 'describeResources', 'getMetrics()', 'async dispose()',
 		'async function leakLoop(cycles = 50)', 'state.measureTarget?.dispose?.()',
 		'species.mesh.visible && (!state.cullingEnabled',
@@ -298,7 +299,7 @@ async function runControllerPipelineContractMutation() {
 			return { status: 'fail', details: { message: 'population distribution multiplies totals per species', tier, counts: [...counts] } };
 		}
 	}
-	return { status: 'pass', details: { controllerMethods: 16, populations, status: parsedManifest.status } };
+	return { status: 'pass', details: { controllerMethods: 17, populations, status: parsedManifest.status } };
 }
 
 export const gates = [

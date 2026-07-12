@@ -108,6 +108,8 @@ async function runGateCoverage() {
 		'mutation-partial-upload-lifecycle',
 		'mutation-support-spring-genome',
 		'mutation-controller-pipeline-contract',
+		'performance-profile-contract',
+		'performance-negative-controls',
 	];
 	// Real assertion, not a vacuous pass: dynamically import every gate module and
 	// require the expected-id list to be a subset of what actually registered.
