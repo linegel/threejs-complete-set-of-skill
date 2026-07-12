@@ -1064,7 +1064,12 @@ for (const slug of slugs) {
   const next = skills[slugs[(idx + 1) % slugs.length]];
   const science = SCIENCE[slug];
   const skillDemos = PROVIDER_DEMOS.filter((demo) => demo.skill === slug);
-  const ownedPrimaryDemos = s.demoRecords.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
+  const ownedPrimaryDemos = s.demoRecords
+    .filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind))
+    .toSorted((a, b) => (
+      PRIMARY_DEMO_KINDS.indexOf(a.kind) - PRIMARY_DEMO_KINDS.indexOf(b.kind)
+      || a.id.localeCompare(b.id)
+    ));
   const participatingFlagships = flagshipDemos.filter(({ demo }) => DEMO_REGISTRY.origins[demo.id]?.ownerSkills?.includes(slug));
   const externalFlagshipParticipation = participatingFlagships.filter(({ demo }) => !ownedPrimaryDemos.some((owned) => owned.id === demo.id));
   const pageUrl = `${SITE}skills/${slug}.html`;
