@@ -40,7 +40,8 @@ import {
   requireTemporalChoice,
 } from "./route-state.mjs";
 
-const OWNER_ID = "integration-temporal-surface/host";
+const LAB_ID = "integration-temporal-surface";
+const OWNER_ID = `${LAB_ID}/host`;
 
 class MutableSceneLinearNode extends TempNode {
   constructor(sourceNode) {
@@ -95,6 +96,8 @@ export class TemporalSurfaceBrowserHost {
     this.initialized = false;
     this.disposed = false;
   }
+
+  get labId() { return LAB_ID; }
 
   async ready() {
     if (this.initialized) return;
@@ -359,6 +362,7 @@ export class TemporalSurfaceBrowserHost {
 
   getMetrics() {
     return {
+      labId: this.labId,
       status: "native-webgpu-runtime; evidence incomplete",
       rendererBackend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
       threeRevision: REVISION,

@@ -139,6 +139,9 @@ for (const path of manifest.canonicalSource) assert(existsSync(resolve(here, pat
 const browserHost = readFileSync(resolve(here, "browser-host.js"), "utf8");
 const browserMain = readFileSync(resolve(here, "main.js"), "utf8");
 for (const token of [
+  'const LAB_ID = "integration-temporal-surface"',
+  "get labId() { return LAB_ID; }",
+  "labId: this.labId",
   "new WebGPURenderer",
   "await this.renderer.init()",
   "isWebGPUBackend !== true",
