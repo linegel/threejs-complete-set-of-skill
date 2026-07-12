@@ -74,6 +74,21 @@ npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run ph
 Keep imported raw records outside the repository until the offline release join
 and direct visual review are complete.
 
+Inspect the exact acceptance blockers without rewriting any evidence:
+
+```bash
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run evidence:readiness -- \
+  --physical-route /absolute/finalized-physical-route.json \
+  --performance /absolute/finalized-hardware-performance.json \
+  --release-candidate /absolute/nonpublishable-release-candidate
+```
+
+With no arguments, the command inspects the canonical repository-root
+correctness and tracked release paths and reports the absent external lanes. It
+distinguishes migration-only captures, invalid evidence, readiness for the
+three-lane release assembly, pending authored visual review, and a validated
+accepted release. The command is read-only and does not promote evidence.
+
 ## Immutable build and serving rules
 
 - Source closure includes the lab, checked evidence/runtime-graph schemas,

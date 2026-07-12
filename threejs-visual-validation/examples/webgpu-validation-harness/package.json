@@ -17,6 +17,7 @@
     "physical:serve": "node src/immutable-physical-server.js",
     "physical:import": "node src/in-app-evidence-import.js",
     "physical:validate": "node src/physical-validate-record.js",
+    "evidence:readiness": "node src/evidence-readiness.js",
     "validate:artifacts": "node src/validate-browser-artifacts.js --bundle release",
     "validate:raw": "node src/validate-browser-artifacts.js --bundle raw --profile performance",
     "validate:quick": "npm run check && npm run test:routes && npm run test:mutations",
