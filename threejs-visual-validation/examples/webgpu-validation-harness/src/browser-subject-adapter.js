@@ -63,6 +63,7 @@ const CAMERAS = new Map( [
 ] );
 const SEEDS = new Set( [ 0x00000001, 0x9e3779b9 ] );
 const RUNTIME_PROFILES = new Set( [ 'correctness', 'performance' ] );
+export const VALIDATION_HARNESS_LAB_ID = 'webgpu-validation-harness';
 export const VALIDATION_MODE_OUTPUT_NODE_IDS = Object.freeze( {
 	final: 'final-output-node',
 	'no-post': 'no-post-output-node',
@@ -1423,6 +1424,11 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	renderer.setSize( width, height, false );
 
 	const controller = {
+		get labId() {
+
+			return VALIDATION_HARNESS_LAB_ID;
+
+		},
 		async ready() {
 
 			return runExclusiveControllerOperation( 'ready', async () => {
@@ -1774,7 +1780,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			const timestampQueriesActive = timestampQueriesRequested && renderer.backend?.trackTimestamp === true;
 			const rendererInfo = snapshotRendererInfo( renderer.info );
 			return {
-				labId: 'webgpu-validation-harness',
+				labId: VALIDATION_HARNESS_LAB_ID,
 				threeRevision: '185',
 				runtimeProfile,
 				routeLock: routeLock === null ? null : { kind: routeLock.kind, id: routeLock.id },

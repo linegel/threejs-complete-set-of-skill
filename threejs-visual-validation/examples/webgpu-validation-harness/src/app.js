@@ -47,7 +47,10 @@ async function start() {
 	);
 	await controller.ready();
 
-	window.__THREEJS_LAB__ = routeLock === null ? controller : createLockedController( controller, routeLock );
+	const publishedController = routeLock === null ? controller : createLockedController( controller, routeLock );
+	window.labController = publishedController;
+	window.__LAB_CONTROLLER__ = publishedController;
+	window.__THREEJS_LAB__ = publishedController;
 	window.__THREEJS_LAB_CONTRACT__ = nativeSubjectContract;
 	window.__THREEJS_LAB_ROUTE_LOCK__ = routeLock;
 	window.__THREEJS_LAB_RUNTIME__ = runtime;

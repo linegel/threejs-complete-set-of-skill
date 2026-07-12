@@ -17,8 +17,20 @@ const LAB_ROOT = new URL( '../', import.meta.url );
 test( 'browser subject exposes the fresh-controller lifecycle runner', async () => {
 
 	const source = await readFile( new URL( './app.js', import.meta.url ), 'utf8' );
+	assert.match( source, /window\.labController = publishedController/ );
+	assert.match( source, /window\.__LAB_CONTROLLER__ = publishedController/ );
+	assert.match( source, /window\.__THREEJS_LAB__ = publishedController/ );
 	assert.match( source, /window\.__THREEJS_LAB_LIFECYCLE__/ );
 	assert.match( source, /createNativeWebGPUValidationSubject\( document\.createElement\( 'canvas' \), \{ runtimeProfile \} \)/ );
+
+} );
+
+test( 'native subject owns one immutable canonical lab identity', async () => {
+
+	const source = await readFile( new URL( './browser-subject-adapter.js', import.meta.url ), 'utf8' );
+	assert.match( source, /export const VALIDATION_HARNESS_LAB_ID = 'webgpu-validation-harness'/ );
+	assert.match( source, /get labId\(\)/ );
+	assert.match( source, /labId: VALIDATION_HARNESS_LAB_ID/ );
 
 } );
 
