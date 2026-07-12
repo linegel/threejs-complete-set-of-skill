@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:b63a46b057c7f5d865085114d168cb3d04e24b9ea6ace47d08bd04fc84ca02bf",
+  "buildRevision": "sha256:9321b22087b605a9c678f1f6ba8cca1d1fca39bef88deed8cf4b72e8d384771c",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -936,7 +936,7 @@
           },
           "resolutionPolicy": {
             "sceneScale": 1,
-            "waterScale": 0.75,
+            "waterScale": 0.5,
             "dprCap": 1.5
           },
           "mechanismLimits": {
@@ -975,7 +975,7 @@
           },
           "resolutionPolicy": {
             "sceneScale": 0.85,
-            "waterScale": 0.5,
+            "waterScale": 0.375,
             "dprCap": 1
           },
           "mechanismLimits": {
@@ -1085,7 +1085,7 @@
         "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
         "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
       },
-      "sourceHash": "sha256:25111e22bb87efc41efa764b6c83539ed526cb68c79f27571550502c285dc7a7",
+      "sourceHash": "sha256:b2989d735f32afd3ab7e55eae2fa890f9cde8c5f229e335642bef3a8e8589d9f",
       "proxyStatus": null,
       "notes": [
         "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
@@ -11120,7 +11120,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:a582a8a97afcf3023234bd7025d31054f6b008f3f93253affb6e5263c3b126fa",
+      "sourceHash": "sha256:d9300c6bab640c16099881b42ef2a5cba7a50b463ce9aece18af089edf7b49e8",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
