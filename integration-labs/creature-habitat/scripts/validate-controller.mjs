@@ -48,6 +48,7 @@ for (const token of [
 assert(!controller.includes("WebGLRenderer"), "Creature Habitat must not construct a legacy renderer");
 assert(!main.includes("browser-bootstrap.mjs"), "Creature Habitat must not use the generic dashboard bootstrap");
 assert(main.includes("globalThis.labController = controller"), "generated route wrappers require the canonical labController handle");
+assert(main.includes("return controller;"), "the early controller promise must resolve to the canonical controller");
 assert(main.includes("globalThis.__LAB_READY__ = controllerPromise.then(() => true)"), "explicit readiness must be an awaitable promise, not a truthy boolean race");
 assert(!main.includes("globalThis.__LAB_READY__ = false"), "readiness must not expose a defined false sentinel that the shared harness treats as ready");
 assert(capture.includes("captureLabBrowser"), "local capture must use the shared self-serving browser harness");

@@ -140,6 +140,7 @@ async function boot() {
     resizeObserver.disconnect();
     void controller.dispose();
   }, { once: true });
+  return controller;
 }
 
 const controllerPromise = boot();
