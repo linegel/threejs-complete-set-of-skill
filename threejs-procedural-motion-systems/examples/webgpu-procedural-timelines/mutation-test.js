@@ -32,6 +32,12 @@ import {
 } from "./timeline.js";
 import { fromUnitVectorsSafe, quaternionAngle, quaternionNormError, slerpQuaternionsShortest } from "./quaternion-helpers.js";
 import { parseMotionRoute } from "./route-state.js";
+import {
+  MOTION_MECHANISM_CAPTURE_STATES,
+  MOTION_STORAGE_PARITY_CHECKPOINTS,
+  MOTION_STORAGE_READBACK_FIELDS,
+  requireUsefulMotionStandardRaster,
+} from "./capture-hook.mjs";
 
 const previousCurrentMutation = spawnSync(process.execPath, ["validation.js", "--induce-violation"], {
   cwd: new URL(".", import.meta.url),
@@ -192,6 +198,9 @@ const distinctRoutePoses = [
 for (const pose of distinctRoutePoses) {
   assert(pose.position.distanceTo(evaluateDockingPose(3).position) > 0.1, "mechanism route is not a spin-docking alias");
 }
+assert.equal(new Set(MOTION_MECHANISM_CAPTURE_STATES.map(({ scenario: id }) => id)).size, 6);
+assert(MOTION_STORAGE_PARITY_CHECKPOINTS.some(({ id }) => id === "docking-terminal-event"));
+assert.equal(MOTION_STORAGE_READBACK_FIELDS.length, 13);
 const presentationMirror = createInstanceMotionMirror({ instanceCount: 1, scenario: "interpolation-and-velocity" });
 stepInstanceMotionMirror(presentationMirror, 1 / 120, 1 / 120);
 prepareInstanceMotionMirrorPresentation(presentationMirror, 0.25);
@@ -420,6 +429,20 @@ assert.throws(
 );
 
 const mainSource = readFileSync(new URL("./main.js", import.meta.url), "utf8");
+const constantStandardRaster = {
+  width: 32,
+  height: 32,
+  data: new Uint8Array(32 * 32 * 4),
+};
+assert.throws(
+  () => requireUsefulMotionStandardRaster(constantStandardRaster, "final.design.png"),
+  /blank or constant/,
+  "blank standard capture mutation must fail before retention",
+);
+const artifactValidatorSource = readFileSync(new URL("./validate-artifacts.mjs", import.meta.url), "utf8");
+assert.match(artifactValidatorSource, /validateEvidenceBundle/);
+assert.match(artifactValidatorSource, /requireRequiredClaimsPass:\s*true/);
+assert.match(artifactValidatorSource, /manifest\.status\s*!==\s*"accepted"/);
 const transactionStart = mainSource.indexOf("async reconfigureMotion");
 const debugBeforeCommit = mainSource.indexOf("this.updateDebug(0);", transactionStart);
 const commitPoint = mainSource.indexOf("committed = true;", transactionStart);
@@ -445,4 +468,4 @@ assert.throws(
   "dispose-before-last-fallible-operation mutant must fail",
 );
 
-console.log("motion mutations detected: slot collapse, scene-unit omission/double-scale, condition-relative reparent residual, event replay/time drift, non-integral schedule overshoot, terminal residuals, quaternion double cover/antiparallel fallback, SI debris cap, distinct mechanism routes, discrete boundary metadata, consecutive presented transforms, unrelated GPU mirror, missing GPU seek, matrix uploads, untyped resources, duplicate pipeline ownership, unknown scenarios/routes, mixed profiles, forged or lost device evidence, invalid WGSL names, same-frame velocity, transaction commit ordering, stale renderer binding, and storage leak");
+console.log("motion mutations detected: slot collapse, scene-unit omission/double-scale, condition-relative reparent residual, event replay/time drift, non-integral schedule overshoot, terminal residuals, quaternion double cover/antiparallel fallback, SI debris cap, distinct mechanism routes, discrete boundary metadata, consecutive presented transforms, unrelated GPU mirror, missing GPU seek, matrix uploads, untyped resources, duplicate pipeline ownership, unknown scenarios/routes, mixed profiles, forged or lost device evidence, invalid WGSL names, same-frame velocity, transaction commit ordering, stale renderer binding, storage leak, blank captures, and incomplete artifact validation");

@@ -14,18 +14,28 @@ The core now enforces:
   velocity;
 - deterministic one-shot event phases and fixed-step replay;
 - analytically integrated spin angle, independent of presentation frame count;
-- versioned previous/current position and quaternion storage;
-- actual storage inventory from allocated typed arrays (`144 bytes/instance`);
-- a real scenario-specific compute node whose parity lane evaluates the same
-  launch, docking, or debris timeline as the CPU core, plus ordered fixed-step
-  dispatch, explicit GPU reset/reseed/seek, storage readback, and an f32 oracle;
-- vertex interpolation of both position and orientation;
-- distinct previous/current camera, projection, model, position, and
-  quaternion state for velocity;
-- disposal of all nine storage attributes and the compute node;
+- versioned previous/current solver and consecutive-presented position/
+  quaternion storage;
+- actual storage inventory from allocated typed arrays (`208 bytes/instance`);
+- a real scenario-specific compute node whose parity lane is checked by native
+  storage readback against explicit f32-storage and f64-semantic oracles for
+  launch, docking, and debris checkpoints;
+- an active renderer-device-generation binding: submitted storage versions are
+  distinguished from readback-confirmed versions and device-loss races fail
+  closed;
+- linear position interpolation plus hemisphere-safe quaternion slerp into a
+  separate presented-transform pair;
+- distinct previous/current camera, projection, model, presented position, and
+  presented quaternion state for velocity;
+- disposal of all thirteen storage attributes and all bounded compute nodes;
 - explicit NodeMaterial color/emissive nodes and a shared
   `output + normal + emissive + velocity` render pass;
 - one `renderOutput(...)` owner with `outputColorTransform = false`;
+- a camera-relative launch presentation origin and scenario-aware framing so
+  planetary coordinates remain visible, plus a separately labelled,
+  non-physical stage-detachment presentation cue;
+- a declared velocity diagnostic gain applied only after the raw NDC MRT, with
+  constant and low-occupancy diagnostic rejection;
 - fixed mechanism and tier routes; unknown IDs throw.
 
 Mechanism routes:
@@ -49,9 +59,15 @@ Run:
 npm run check
 npm run validate:unit
 npm run test:mutations
+npm run capture -- --profile correctness --output <temporary-directory>
 ```
 
 The Node suite proves the CPU contract, TSL graph construction, storage byte
-reconciliation, and mutation rejection. It does not claim browser/GPU execution
-or timing. The manifest remains `incomplete` until root capture produces a real
-v2 bundle with WebGPU readback and current-adapter timestamps.
+reconciliation, mutation rejection, WGSL-safe shader identifiers, and the
+capture output contract. The correctness hook retains native presentation
+readbacks for final, normal, emissive, and velocity routes; it derives the
+diagnostic mosaic from those four readbacks and records no-post as structurally
+inapplicable because the runtime graph contains no post stage. A capture session
+is still not an accepted evidence bundle: the manifest remains `incomplete`
+until the full v2 contract, hardware timestamps, lifecycle evidence, and direct
+visual review pass.
