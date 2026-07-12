@@ -7,6 +7,7 @@ import { test } from 'node:test';
 
 import {
   STANDARD_CAPTURE_OUTPUTS,
+  applyControllerCaptureState,
   assertCaptureArtifactBinding,
   assertCaptureRuntimeProfile,
   assertCaptureState,
@@ -49,6 +50,39 @@ function completeOutputPlan(overrides = {}) {
     };
   });
 }
+
+test('capture-state transactions restore every locked field before rendering', async () => {
+  const calls = [];
+  const lockedState = {
+    scenario: 'history-and-deposit',
+    mode: 'final',
+    tier: 'full',
+    seed: 1,
+    camera: 'design',
+    timeSeconds: 0,
+  };
+  await applyControllerCaptureState(async (method, ...args) => {
+    calls.push([method, ...args]);
+  }, lockedState);
+  assert.deepEqual(calls, [
+    ['setScenario', 'history-and-deposit'],
+    ['setMode', 'final'],
+    ['setTier', 'full'],
+    ['setSeed', 1],
+    ['setCamera', 'design'],
+    ['setTime', 0],
+    ['renderOnce'],
+  ]);
+
+  await assert.rejects(
+    () => applyControllerCaptureState(null, lockedState),
+    /controller invoker must be a function/,
+  );
+  await assert.rejects(
+    () => applyControllerCaptureState(async () => {}, null),
+    /capture state must be an object/,
+  );
+});
 
 test('capture hooks must disposition every standard output without aliases', () => {
   const plan = validateCaptureOutputPlan(completeOutputPlan());

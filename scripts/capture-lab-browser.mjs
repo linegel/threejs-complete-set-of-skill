@@ -1250,7 +1250,13 @@ export function resolveCaptureState(lab, target, requestedState = null) {
   return Object.freeze(Object.fromEntries(fields.map((field) => [field, requestedState[field]])));
 }
 
-async function applyCaptureState(page, state) {
+export async function applyControllerCaptureState(invokeController, state) {
+  if (typeof invokeController !== 'function') {
+    throw new TypeError('capture-state controller invoker must be a function');
+  }
+  if (!state || typeof state !== 'object' || Array.isArray(state)) {
+    throw new TypeError('capture state must be an object');
+  }
   for (const [method, value] of [
     ['setScenario', state.scenario],
     ['setMode', state.mode],
@@ -1259,9 +1265,16 @@ async function applyCaptureState(page, state) {
     ['setCamera', state.camera],
     ['setTime', state.timeSeconds],
   ]) {
-    if (value !== null) await controllerCall(page, method, [value]);
+    if (value !== null) await invokeController(method, value);
   }
-  await controllerCall(page, 'renderOnce');
+  await invokeController('renderOnce');
+}
+
+async function applyCaptureState(page, state) {
+  await applyControllerCaptureState(
+    (method, ...args) => controllerCall(page, method, args),
+    state,
+  );
 }
 
 function equalStateValue(actual, expected) {
@@ -1852,6 +1865,7 @@ async function runBuiltinCapture(session, target) {
   await capture('seed-9e3779b9.final.png', { seed: stressSeed });
   await capture('temporal.t000.png', { time: 0 });
   await capture('temporal.t001.png', { time: 1 / 60 });
+  await applyControllerCaptureState(session.controllerCall, session.lockedState);
   return Object.freeze({ captures: Object.freeze(captures) });
 }
 
