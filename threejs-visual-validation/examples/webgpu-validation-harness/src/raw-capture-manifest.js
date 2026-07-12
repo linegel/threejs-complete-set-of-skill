@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { assertCheckedJsonSchema, loadCheckedEvidenceSchemas } from './checked-json-schema.js';
+import { CORRECTNESS_CAPTURE_RECIPES } from './correctness-capture-recipes.js';
 import { validateUnifiedV2ArtifactBundle } from './evidence-bundle-v2.js';
 import {
 	NORMATIVE_JSON_PATHS,
@@ -13,12 +14,17 @@ import {
 } from './evidence-manifest-contract.js';
 import { validateCorrectnessCaptureSession } from './physical-session-validator.js';
 
-const RAW_IMAGE_PATHS = Object.freeze( [
-	...STANDARD_IMAGE_PATHS,
+const SUPPLEMENTAL_NORMATIVE_IMAGE_PATHS = Object.freeze( [
 	'diagnostic.normal.png',
 	'diagnostic.emissive.png',
-	'odd-size.final.png'
+	'odd-size.final.png',
+	'tier.target-performance.final.png',
+	'tier.governor-stress.final.png'
 ] );
+const SUPPLEMENTAL_NORMATIVE_JSON_PATHS = Object.freeze( [ 'tier-visual-evidence.json' ] );
+const SESSION_SUPPLEMENTAL_JSON_PATHS = Object.freeze( [ 'capture-boundary.json' ] );
+const RAW_IMAGE_PATHS = Object.freeze( [ ...STANDARD_IMAGE_PATHS, ...SUPPLEMENTAL_NORMATIVE_IMAGE_PATHS ] );
+const DIRECT_RECIPE_IMAGE_PATHS = Object.freeze( CORRECTNESS_CAPTURE_RECIPES.map( ( recipe ) => recipe.capture.filename ) );
 const MANIFEST_PATH = 'evidence-manifest.json';
 const SESSION_PATH = 'capture-session.json';
 const WRITE_LEDGER_PATH = 'capture-write-ledger.json';
@@ -163,6 +169,112 @@ async function requireCurrentWrite( outputDir, writeIndex, path ) {
 
 }
 
+function assertDescriptorBinding( descriptor, record, label ) {
+
+	if ( descriptor?.path !== record.path || descriptor.sha256 !== record.sha256 || descriptor.byteLength !== record.byteLength ) throw new Error( `${ label } does not match its immutable capture write.` );
+	return descriptor.path;
+
+}
+
+function addUniqueReference( references, path, label ) {
+
+	if ( references.has( path ) ) throw new Error( `${ label } aliases an already referenced capture artifact ${ path }.` );
+	references.add( path );
+
+}
+
+async function requireFrozenRecipeCaptureClosure( session, outputDir, writeIndex ) {
+
+	if ( Array.isArray( session.writtenCaptures ) === false || session.writtenCaptures.length !== CORRECTNESS_CAPTURE_RECIPES.length ) throw new Error( `Frozen correctness capture requires exactly ${ CORRECTNESS_CAPTURE_RECIPES.length } direct recipe readbacks.` );
+	const capturesByTarget = new Map();
+	for ( const capture of session.writtenCaptures ) {
+
+		if ( typeof capture?.target !== 'string' || capturesByTarget.has( capture.target ) ) throw new Error( `Frozen correctness capture has a missing or duplicate recipe target ${ capture?.target ?? '<missing>' }.` );
+		capturesByTarget.set( capture.target, capture );
+
+	}
+
+	const rawReadbacks = new Set();
+	for ( const [ index, recipe ] of CORRECTNESS_CAPTURE_RECIPES.entries() ) {
+
+		const capture = capturesByTarget.get( recipe.id );
+		if ( capture === undefined ) throw new Error( `Frozen correctness capture omits recipe ${ recipe.id }.` );
+		if ( session.writtenCaptures[ index ] !== capture ) throw new Error( `Frozen correctness capture recipe ${ recipe.id } is out of canonical order.` );
+		if ( capture.png?.path !== recipe.capture.filename ) throw new Error( `Frozen correctness capture recipe ${ recipe.id } is not bound to ${ recipe.capture.filename }.` );
+		const png = await requireCurrentWrite( outputDir, writeIndex, recipe.capture.filename );
+		assertDescriptorBinding( capture.png, png.record, `${ recipe.id } PNG binding` );
+		for ( const [ kind, descriptor ] of [
+			[ 'transport', capture.transport?.artifact ],
+			[ 'normalized', capture.normalized?.artifact ]
+		] ) {
+
+			if ( typeof descriptor?.path !== 'string' ) throw new Error( `${ recipe.id } ${ kind } readback path is missing.` );
+			const binding = await requireCurrentWrite( outputDir, writeIndex, descriptor.path );
+			assertDescriptorBinding( descriptor, binding.record, `${ recipe.id } ${ kind } readback binding` );
+			addUniqueReference( rawReadbacks, descriptor.path, `${ recipe.id } ${ kind } readback` );
+
+		}
+
+	}
+
+	const mosaic = session.hookResult?.standardOutputs?.find( ( output ) => output?.filename === 'diagnostics.mosaic.png' );
+	if ( mosaic?.status !== 'CAPTURED' || mosaic.id !== 'diagnostics.mosaic' ) throw new Error( 'Frozen correctness capture omits the producer-declared diagnostics mosaic.' );
+	const expectedSources = [ 'final.design.png', 'no-post.design.png', 'diagnostic.normal.png', 'diagnostic.emissive.png' ];
+	if ( JSON.stringify( mosaic.sourceCaptures ) !== JSON.stringify( expectedSources ) ) throw new Error( 'Diagnostics mosaic source capture closure drifted from the hook contract.' );
+	const mosaicPng = await requireCurrentWrite( outputDir, writeIndex, 'diagnostics.mosaic.png' );
+	assertDescriptorBinding( mosaic.file ?? mosaic.pixelEvidence?.png, mosaicPng.record, 'Diagnostics mosaic PNG binding' );
+	for ( const [ kind, descriptor ] of [
+		[ 'normalized padded', mosaic.pixelEvidence?.normalized?.rawArtifact ],
+		[ 'normalized compact', mosaic.pixelEvidence?.normalized?.packedArtifact ]
+	] ) {
+
+		if ( typeof descriptor?.path !== 'string' ) throw new Error( `Diagnostics mosaic ${ kind } artifact is missing.` );
+		const binding = await requireCurrentWrite( outputDir, writeIndex, descriptor.path );
+		assertDescriptorBinding( descriptor, binding.record, `Diagnostics mosaic ${ kind } binding` );
+		addUniqueReference( rawReadbacks, descriptor.path, `Diagnostics mosaic ${ kind } artifact` );
+
+	}
+	return rawReadbacks;
+
+}
+
+async function requireTierVisualEvidence( session, outputDir, writeIndex ) {
+
+	const path = SUPPLEMENTAL_NORMATIVE_JSON_PATHS[ 0 ];
+	const { record, bytes } = await requireCurrentWrite( outputDir, writeIndex, path );
+	let document;
+	try {
+
+		document = JSON.parse( bytes.toString( 'utf8' ) );
+
+	} catch ( error ) {
+
+		throw new Error( `${ path } is invalid JSON: ${ error.message }` );
+
+	}
+	if ( jsonBytes( document ).equals( bytes ) === false ) throw new Error( `${ path } is not canonical two-space JSON.` );
+	if ( document.schemaVersion !== 1 || document.kind !== 'validation-harness-tier-visual-evidence-v1' || document.verdict !== 'PASS' ) throw new Error( `${ path } does not contain the passing producer contract.` );
+	if ( canonicalSha256( document ) !== canonicalSha256( session.hookResult?.tierVisualEvidence ) ) throw new Error( `${ path } drifted from the finalized hook result.` );
+	if ( document.bindingSha256 !== canonicalSha256( { binding: document.binding, metrics: document.metrics, gates: document.gates } ) ) throw new Error( `${ path } binding digest is invalid.` );
+	for ( const [ side, recipeId, filename ] of [
+		[ 'reference', 'tier.target-performance.final', 'tier.target-performance.final.png' ],
+		[ 'candidate', 'tier.governor-stress.final', 'tier.governor-stress.final.png' ]
+	] ) {
+
+		const binding = document.binding?.[ side ];
+		if ( binding?.recipeId !== recipeId || binding.filename !== filename ) throw new Error( `${ path } ${ side } identity drifted from ${ recipeId }.` );
+		const image = await requireCurrentWrite( outputDir, writeIndex, filename );
+		if ( binding.pngSha256 !== image.record.sha256 ) throw new Error( `${ path } ${ side } PNG hash does not bind ${ filename }.` );
+		const normalized = binding.normalized?.artifact;
+		if ( typeof normalized?.path !== 'string' ) throw new Error( `${ path } ${ side } normalized artifact is missing.` );
+		const normalizedWrite = await requireCurrentWrite( outputDir, writeIndex, normalized.path );
+		assertDescriptorBinding( normalized, normalizedWrite.record, `${ path } ${ side } normalized binding` );
+
+	}
+	return capturedFile( path, 'supplementary-json', record );
+
+}
+
 function selfManifestFile() {
 
 	return {
@@ -199,12 +311,8 @@ function capturedImage( path, binding, hookResult ) {
 		byteLength: binding.byteLength
 	};
 	const derived = hookResult?.standardOutputs?.find( ( output ) => output.filename === path );
-	const sourceCaptures = derived?.sourceCaptures ?? [
-		'final.design.png',
-		'no-post.design.png',
-		'diagnostic.normal.png',
-		'diagnostic.emissive.png'
-	];
+	if ( derived === undefined ) throw new Error( 'Diagnostics mosaic producer record is missing.' );
+	const sourceCaptures = derived.sourceCaptures;
 	return {
 		path,
 		status: 'captured',
@@ -328,6 +436,8 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 	};
 	const finalizedSession = parseFinalizedCorrectnessSession( session, sessionBytes );
 	const writeIndex = currentWriteIndex( finalizedSession );
+	const rawReadbackPaths = await requireFrozenRecipeCaptureClosure( finalizedSession, outputDir, writeIndex );
+	const tierVisualEvidence = await requireTierVisualEvidence( finalizedSession, outputDir, writeIndex );
 
 	const route = captureRoute( finalizedSession );
 	const limitations = limitationsForRawCorrectness();
@@ -386,15 +496,31 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 		images.push( capturedImage( path, record, finalizedSession.hookResult ) );
 
 	}
-	const consumed = new Set( [ ...NORMATIVE_JSON_PATHS, ...RAW_IMAGE_PATHS, SESSION_PATH ] );
-	const supplemental = [];
-	for ( const [ path, record ] of writeIndex ) {
+	const supplemental = [ tierVisualEvidence ];
+	for ( const path of SESSION_SUPPLEMENTAL_JSON_PATHS ) {
+
+		const { record } = await requireCurrentWrite( outputDir, writeIndex, path );
+		supplemental.push( capturedFile( path, 'supplementary-json', record ) );
+
+	}
+	for ( const path of rawReadbackPaths ) {
+
+		const { record } = await requireCurrentWrite( outputDir, writeIndex, path );
+		supplemental.push( capturedFile( path, 'raw-readback', record ) );
+
+	}
+	const consumed = new Set( [
+		...NORMATIVE_JSON_PATHS,
+		...RAW_IMAGE_PATHS,
+		...SUPPLEMENTAL_NORMATIVE_JSON_PATHS,
+		...SESSION_SUPPLEMENTAL_JSON_PATHS,
+		...rawReadbackPaths,
+		SESSION_PATH
+	] );
+	for ( const path of writeIndex.keys() ) {
 
 		if ( consumed.has( path ) ) continue;
-		if ( path.endsWith( '.png' ) ) throw new Error( `Current capture emitted undeclared image ${ path }.` );
-		if ( path.endsWith( '.json' ) ) supplemental.push( capturedFile( path, 'supplementary-json', record ) );
-		else if ( path.startsWith( 'transport-readbacks/' ) || path.startsWith( 'normalized-readbacks/' ) ) supplemental.push( capturedFile( path, 'raw-readback', record ) );
-		else throw new Error( `Current capture emitted an unclassified artifact ${ path }.` );
+		throw new Error( `Current capture emitted an undeclared artifact ${ path }.` );
 
 	}
 	const captureSession = captureSessionReference(
@@ -436,4 +562,9 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 
 }
 
-export { RAW_IMAGE_PATHS };
+export {
+	DIRECT_RECIPE_IMAGE_PATHS,
+	RAW_IMAGE_PATHS,
+	SUPPLEMENTAL_NORMATIVE_IMAGE_PATHS,
+	SUPPLEMENTAL_NORMATIVE_JSON_PATHS
+};
