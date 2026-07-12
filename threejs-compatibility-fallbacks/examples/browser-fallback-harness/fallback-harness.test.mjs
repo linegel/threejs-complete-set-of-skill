@@ -11,6 +11,7 @@ import {
 	planFallback
 } from './fallback-core.mjs';
 import { probeCanonicalBackend } from './backend-probe.mjs';
+import { FALLBACK_MECHANISM_IDS, resolveFallbackMechanismId } from './route-state.mjs';
 import { buildDemoRegistry } from '../../../scripts/lib/lab-registry.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 
@@ -38,6 +39,7 @@ const mechanismScenarios = new Map( [
 	[ 'force-webgl-branch-isolation', 'maintained-legacy' ],
 	[ 'maintenance-acceptance', 'maintained-legacy' ]
 ] );
+assert.deepEqual( [ ...mechanismScenarios.keys() ], FALLBACK_MECHANISM_IDS );
 
 assert.equal( catalog.schemaVersion, 2 );
 assert.deepEqual( catalog.invariantDomains, INVARIANT_DOMAINS );
@@ -142,6 +144,7 @@ assert.match( appSource, /probeCanonicalBackend/ );
 assert.match( appSource, /const LAB_ID = 'browser-fallback-harness'/ );
 assert.match( appSource, /get labId\(\) \{ return LAB_ID; \}/ );
 assert.match( appSource, /labId: this\.labId/ );
+assert.match( appSource, /mechanismId: this\.#mechanismId/ );
 assert.match( appSource, /INSUFFICIENT_EVIDENCE_GPU_TIMING/ );
 assert.match( appSource, /await import\( '\.\/compatibility-renderer\.mjs' \)/, 'compatibility renderer must be lazily imported after activation' );
 assert.match( runtimeSource, /authorization\?\.explicitRequest !== true/ );
@@ -198,6 +201,24 @@ const failedProbe = await probeCanonicalBackend( { loadWebGPU: async () => faile
 assert.equal( failedProbe.capabilities.tested, false );
 assert.equal( failedProbe.renderer, null );
 assert.equal( failedFixture.disposeCalls(), 1, 'failed probes must dispose partial renderer state' );
+
+assert.equal( resolveFallbackMechanismId(), null );
+assert.equal( resolveFallbackMechanismId( {
+	search: '?mechanism=explicit-activation-gate'
+} ), 'explicit-activation-gate' );
+assert.equal( resolveFallbackMechanismId( {
+	metadataId: 'maintenance-acceptance'
+} ), 'maintenance-acceptance' );
+assert.throws( () => resolveFallbackMechanismId( {
+	search: '?mechanism=unknown'
+} ), /Unknown fallback mechanism/ );
+assert.throws( () => resolveFallbackMechanismId( {
+	metadataId: 'maintenance-acceptance',
+	search: '?mechanism=explicit-activation-gate'
+} ), /route conflict/ );
+assert.throws( () => resolveFallbackMechanismId( {
+	search: '?mechanism=invariant-ledger&mechanism=maintenance-acceptance'
+} ), /route is duplicated/ );
 
 assert.throws( () => getFallbackScenario( catalog, 'unknown' ), ( error ) => error.code === FALLBACK_REASON.UNKNOWN );
 

@@ -9,6 +9,7 @@
   "canonicalSource": [
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-core.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-fixtures.json",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/route-state.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/app.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/compatibility-renderer.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/capture.mjs",

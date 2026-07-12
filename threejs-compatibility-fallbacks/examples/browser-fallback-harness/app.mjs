@@ -5,6 +5,7 @@ import {
 	planFallback
 } from './fallback-core.mjs';
 import { probeCanonicalBackend } from './backend-probe.mjs';
+import { resolveFallbackMechanismId } from './route-state.mjs';
 
 const fixtureUrl = new URL( './fallback-fixtures.json', import.meta.url );
 const scenarioBaseUrl = new URL( './scenario/', import.meta.url );
@@ -15,6 +16,15 @@ function fixedScenarioId() {
 	return document.querySelector( 'meta[name="lab-scenario"]' )?.content
 		?? new URL( location.href ).searchParams.get( 'scenario' )
 		?? 'blocked-default';
+
+}
+
+function fixedMechanismId() {
+
+	return resolveFallbackMechanismId( {
+		metadataId: document.querySelector( 'meta[name="lab-mechanism"]' )?.content ?? null,
+		search: location.search
+	} );
 
 }
 
@@ -76,6 +86,7 @@ export class FallbackLabController {
 
 	#catalog;
 	#scenarioId;
+	#mechanismId;
 	#explicitRequest = false;
 	#liveCapabilities = null;
 	#canonicalRenderer = null;
@@ -83,10 +94,11 @@ export class FallbackLabController {
 	#runtime = null;
 	#disposed = false;
 
-	constructor( catalog, scenarioId ) {
+	constructor( catalog, scenarioId, mechanismId ) {
 
 		this.#catalog = catalog;
 		this.#scenarioId = scenarioId;
+		this.#mechanismId = mechanismId;
 
 	}
 
@@ -210,6 +222,7 @@ export class FallbackLabController {
 		return {
 			labId: this.labId,
 			scenarioId: this.#scenarioId,
+			mechanismId: this.#mechanismId,
 			explicitRequest: this.#explicitRequest,
 			liveCapabilities: this.#liveCapabilities,
 			compatibilityRuntime: this.#runtime ? {
@@ -327,6 +340,6 @@ function renderApp( controller, scenario, result ) {
 }
 
 const catalog = await ( await fetch( fixtureUrl ) ).json();
-const controller = new FallbackLabController( catalog, fixedScenarioId() );
+const controller = new FallbackLabController( catalog, fixedScenarioId(), fixedMechanismId() );
 window.labController = controller;
 await controller.ready();

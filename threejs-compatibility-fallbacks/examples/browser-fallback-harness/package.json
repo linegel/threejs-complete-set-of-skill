@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check fallback-core.mjs && node --check backend-probe.mjs && node --check compatibility-renderer.mjs && node --check app.mjs && node --check capture.mjs && node --check validate-artifacts.mjs && node --check fallback-harness.test.mjs",
+    "check": "node --check fallback-core.mjs && node --check backend-probe.mjs && node --check route-state.mjs && node --check compatibility-renderer.mjs && node --check app.mjs && node --check capture.mjs && node --check validate-artifacts.mjs && node --check fallback-harness.test.mjs",
     "validate:unit": "node fallback-harness.test.mjs",
     "test:mutations": "node fallback-harness.test.mjs",
     "capture": "node capture.mjs",
