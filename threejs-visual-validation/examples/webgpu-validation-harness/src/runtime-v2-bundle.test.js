@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildTraceSegment, bytesPerTexel, classifyGovernorTrace, classifyGpuStageAttribution, classifyMechanismProof, classifyPerformanceCompliance, classifyPerformanceTrace, resolveBundlePromotion, summarizeLifecycleEvidence, VISUAL_SIGNOFF_IMAGES } from './runtime-v2-bundle.js';
+import { loadCheckedEvidenceSchemas, validateCheckedJsonSchema } from './checked-json-schema.js';
+import { buildTraceSegment, bytesPerTexel, classifyGovernorTrace, classifyGpuStageAttribution, classifyMechanismProof, classifyPerformanceCompliance, classifyPerformanceTrace, createRuntimePipelineGraph, resolveBundlePromotion, summarizeLifecycleEvidence, VISUAL_SIGNOFF_IMAGES } from './runtime-v2-bundle.js';
 
 function timestampTrace( adapterClass = 'hardware', overrides = {} ) {
 
@@ -139,6 +140,30 @@ test( 'runtime bundle format widths include the canonical depth allocation', () 
 	assert.equal( bytesPerTexel( 'rgba8unorm' ), 4 );
 	assert.equal( bytesPerTexel( 'depth32float' ), 4 );
 	assert.throws( () => bytesPerTexel( 'depth24plus' ), /does not know the byte width/ );
+
+} );
+
+test( 'runtime graph conversion emits only the checked ownership and resource schema', async () => {
+
+	const pipeline = {
+		owners: { renderer: 'validation-subject', renderPipeline: 'validation-subject' },
+		signals: [ { id: 'output', producer: 'scene-pass', consumers: [ 'final' ] } ],
+		sceneSubmissions: [ { id: 'scene-pass', kind: 'full-lit', count: 1 } ],
+		computeDispatches: [],
+		finalToneMapOwner: 'renderOutput',
+		finalOutputTransformOwner: 'renderOutput'
+	};
+	const resources = {
+		renderTargets: [ { name: 'output', owner: 'scene-pass', width: 1200, height: 800, bytesPerTexel: 8, bytes: 7_680_000 } ]
+	};
+	const graph = createRuntimePipelineGraph( pipeline, resources );
+	const schemas = await loadCheckedEvidenceSchemas();
+	assert.deepEqual( validateCheckedJsonSchema( schemas.runtimeGraph, graph ), { valid: true, errors: [] } );
+	assert.equal( graph.signals[ 0 ].reachable, true );
+	assert.equal( graph.sceneSubmissions[ 0 ].kind, 'lit-scene' );
+	assert.equal( graph.resources[ 0 ].residentBytes.unit, 'bytes' );
+	assert.equal( Object.hasOwn( graph, 'captureRoutes' ), false );
+	assert.throws( () => createRuntimePipelineGraph( { ...pipeline, computeDispatches: [ { id: 'fake' } ] }, resources ), /undeclared compute/ );
 
 } );
 

@@ -122,7 +122,7 @@ export function createDiagnosticPng( width = 96, height = 64, mode = 'final' ) {
 
 export function decodeGeneratedRgbaPng( buffer ) {
 
-	if ( buffer.subarray( 0, PNG_SIGNATURE.length ).equals( PNG_SIGNATURE ) === false ) {
+	if ( Buffer.isBuffer( buffer ) === false || buffer.length < PNG_SIGNATURE.length + 12 || buffer.subarray( 0, PNG_SIGNATURE.length ).equals( PNG_SIGNATURE ) === false ) {
 
 		throw new Error( 'Expected PNG signature.' );
 
@@ -132,39 +132,62 @@ export function decodeGeneratedRgbaPng( buffer ) {
 	let width = 0;
 	let height = 0;
 	const idatChunks = [];
+	let sawHeader = false;
+	let sawImageData = false;
+	let sawEnd = false;
 
 	while ( offset < buffer.length ) {
 
+		if ( offset + 12 > buffer.length ) throw new Error( 'PNG chunk header is truncated.' );
 		const length = buffer.readUInt32BE( offset );
 		const type = buffer.toString( 'ascii', offset + 4, offset + 8 );
 		const dataStart = offset + 8;
 		const dataEnd = dataStart + length;
+		const chunkEnd = dataEnd + 4;
+		if ( chunkEnd > buffer.length ) throw new Error( `PNG ${ type || '<unknown>' } chunk is truncated.` );
 		const data = buffer.subarray( dataStart, dataEnd );
+		const expectedCrc = buffer.readUInt32BE( dataEnd );
+		const actualCrc = crc32( Buffer.concat( [ Buffer.from( type, 'ascii' ), data ] ) );
+		if ( expectedCrc !== actualCrc ) throw new Error( `PNG ${ type } chunk CRC mismatch.` );
 
 		if ( type === 'IHDR' ) {
 
+			if ( sawHeader || offset !== PNG_SIGNATURE.length || length !== 13 ) throw new Error( 'PNG must contain exactly one leading 13-byte IHDR chunk.' );
 			width = data.readUInt32BE( 0 );
 			height = data.readUInt32BE( 4 );
+			if ( width <= 0 || height <= 0 || Number.isSafeInteger( width * height ) === false || width * height > 64 * 1024 * 1024 ) throw new Error( 'PNG dimensions are invalid or exceed the evidence decoder limit.' );
 
 			if ( data[ 8 ] !== 8 || data[ 9 ] !== 6 || data[ 10 ] !== 0 || data[ 11 ] !== 0 || data[ 12 ] !== 0 ) {
 
 				throw new Error( 'Only non-interlaced 8-bit RGBA PNGs are supported by this harness check.' );
 
 			}
+			sawHeader = true;
 
 		} else if ( type === 'IDAT' ) {
 
+			if ( sawHeader === false || sawEnd ) throw new Error( 'PNG IDAT chunk is out of order.' );
 			idatChunks.push( data );
+			sawImageData = true;
 
 		} else if ( type === 'IEND' ) {
 
+			if ( sawHeader === false || sawImageData === false || length !== 0 ) throw new Error( 'PNG IEND chunk is invalid or precedes image data.' );
+			sawEnd = true;
+			offset = chunkEnd;
 			break;
+
+		} else if ( type[ 0 ] === type[ 0 ].toUpperCase() ) {
+
+			throw new Error( `Unsupported critical PNG chunk ${ type }.` );
 
 		}
 
-		offset = dataEnd + 4;
+		offset = chunkEnd;
 
 	}
+	if ( sawHeader === false || sawImageData === false || sawEnd === false ) throw new Error( 'PNG is missing IHDR, IDAT, or IEND.' );
+	if ( offset !== buffer.length ) throw new Error( 'PNG contains trailing bytes after IEND.' );
 
 	const raw = inflateSync( Buffer.concat( idatChunks ) );
 	const expectedLength = height * ( 1 + width * 4 );

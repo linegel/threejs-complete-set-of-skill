@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { numericArray, numericDatum, NumericLabel } from './numeric-evidence.js';
 import { getAlignedReadbackLayout } from './readback.js';
-import { REQUIRED_V2_IMAGES, validateV2ArtifactBundle } from './schema/v2.js';
+import { REQUIRED_V2_IMAGES } from './schema/v2.js';
 
 const RUNTIME_SOURCE = 'native WebGPU correctness capture';
 const M = ( value, unit, source = RUNTIME_SOURCE ) => numericDatum( value, unit, NumericLabel.MEASURED, source );
@@ -36,6 +36,51 @@ function canonicalize( value ) {
 	if ( Array.isArray( value ) ) return value.map( canonicalize );
 	if ( value && typeof value === 'object' ) return Object.fromEntries( Object.keys( value ).sort().map( ( key ) => [ key, canonicalize( value[ key ] ) ] ) );
 	return value;
+
+}
+
+export function createRuntimePipelineGraph( pipeline, resources ) {
+
+	if ( pipeline === null || typeof pipeline !== 'object' || resources === null || typeof resources !== 'object' ) throw new Error( 'Runtime pipeline graph requires live pipeline and resource snapshots.' );
+	if ( Array.isArray( pipeline.signals ) === false || Array.isArray( pipeline.sceneSubmissions ) === false || Array.isArray( pipeline.computeDispatches ) === false ) throw new Error( 'Runtime pipeline snapshot is structurally incomplete.' );
+	if ( pipeline.computeDispatches.length !== 0 ) throw new Error( 'The static validation subject must not report undeclared compute dispatches.' );
+	if ( Array.isArray( resources.renderTargets ) === false ) throw new Error( 'Runtime resource snapshot omits render targets.' );
+	const passKinds = new Set( [ 'prepass', 'lit-scene', 'shadow', 'post', 'diagnostic', 'present' ] );
+	return schema( {
+		owners: pipeline.owners,
+		signals: pipeline.signals.map( ( signal ) => ( { ...signal, reachable: true } ) ),
+		sceneSubmissions: pipeline.sceneSubmissions.map( ( submission ) => {
+
+			const kind = submission.kind === 'full-lit' ? 'lit-scene' : submission.kind;
+			if ( passKinds.has( kind ) === false ) throw new Error( `Runtime scene submission ${ submission.id } has unsupported kind ${ submission.kind }.` );
+			return {
+				id: submission.id,
+				owner: submission.owner ?? pipeline.owners?.renderPipeline,
+				kind,
+				submissionCount: M( submission.count, 'submission/frame', 'LabController.describePipeline' )
+			};
+
+		} ),
+		computeDispatches: [],
+		resources: resources.renderTargets.map( ( target ) => {
+
+			if ( typeof target.name !== 'string' || typeof target.owner !== 'string' || Number.isFinite( target.bytes ) === false || target.bytes < 0 ) throw new Error( 'Runtime render-target record is incomplete.' );
+			return {
+				id: target.name,
+				owner: target.owner,
+				kind: 'render-target',
+				residentBytes: {
+					value: target.bytes,
+					unit: 'bytes',
+					label: 'Derived',
+					source: `${ target.width } x ${ target.height } x ${ target.bytesPerTexel } bytes/texel`
+				}
+			};
+
+		} ),
+		finalToneMapOwner: pipeline.finalToneMapOwner,
+		finalOutputTransformOwner: pipeline.finalOutputTransformOwner
+	} );
 
 }
 
@@ -630,11 +675,6 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		throw new Error( 'Runtime v2 assembler received a noncanonical final viewport state.' );
 
 	}
-	const environment = await session.page.evaluate( () => ( {
-		userAgent: navigator.userAgent,
-		platform: navigator.platform,
-		language: navigator.language
-	} ) );
 	const targetRate = 60;
 	const targetIntervalMs = 1000 / targetRate;
 	const performanceGates = {
@@ -657,33 +697,8 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		gpuAttribution: gpuAttributionVerdict,
 		lifecycleStability: lifecycle === null ? 'INSUFFICIENT_EVIDENCE' : 'PASS'
 	};
-	const graphWithoutDigest = {
-		runtimeProfile: pipeline.runtimeProfile,
-		performanceTimestampMode: pipeline.performanceTimestampMode,
-		timestampQueriesRequired: pipeline.timestampQueriesRequired,
-		timestampQueriesRequested: pipeline.timestampQueriesRequested,
-		timestampQueriesActive: pipeline.timestampQueriesActive,
-		owners: pipeline.owners,
-		ownerClaims: [
-			{ semantic: 'renderer', owner: pipeline.owners.renderer, producerCount: M( 1, 'owner', 'runtime pipeline ownership graph' ) },
-			{ semantic: 'render-pipeline', owner: pipeline.owners.renderPipeline, producerCount: M( 1, 'owner', 'runtime pipeline ownership graph' ) },
-			{ semantic: 'tone-map', owner: pipeline.finalToneMapOwner, producerCount: M( 1, 'owner', 'runtime pipeline ownership graph' ) },
-			{ semantic: 'output-transform', owner: pipeline.finalOutputTransformOwner, producerCount: M( 1, 'owner', 'runtime pipeline ownership graph' ) }
-		],
-		signals: pipeline.signals,
-		sceneSubmissions: pipeline.sceneSubmissions.map( ( submission ) => ( {
-			id: submission.id,
-			kind: submission.kind,
-			submissionCount: M( submission.count, 'submission/frame', 'LabController.describePipeline' )
-		} ) ),
-		computeDispatches: pipeline.computeDispatches,
-		resources: pipeline.resources,
-		finalToneMapOwner: pipeline.finalToneMapOwner,
-		finalOutputTransformOwner: pipeline.finalOutputTransformOwner,
-		captureRoutes: pipeline.captureRoutes
-	};
-	const pipelineGraphDigest = digest( canonicalize( graphWithoutDigest ) );
-	const pipelineGraph = schema( { graphDigest: pipelineGraphDigest, ...graphWithoutDigest } );
+	const pipelineGraph = createRuntimePipelineGraph( pipeline, resources );
+	const pipelineGraphDigest = digest( canonicalize( pipelineGraph ) );
 	const imageHashes = Object.fromEntries( VISUAL_SIGNOFF_IMAGES.map( ( filename ) => {
 
 		const capture = captures.find( ( entry ) => entry.filename === filename );
@@ -767,71 +782,6 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	} );
 	const adapterInfo = Object.fromEntries( Object.entries( metrics.adapter?.info ?? {} ).map( ( [ key, value ] ) => [ key, typeof value === 'number' ? M( value, 'adapter property', metrics.adapter.identitySource ) : value ] ) );
 	const adapterLimits = Object.fromEntries( Object.entries( metrics.adapter?.limits ?? {} ).map( ( [ key, value ] ) => [ key, M( value, 'limit unit', metrics.adapter.identitySource ) ] ) );
-	const adapterDescription = metrics.adapter?.info?.description || metrics.adapter?.info?.device || metrics.adapter?.info?.architecture || 'identity fields unavailable';
-	const evidenceManifest = schema( {
-		bundleKind: promotion.bundleKind,
-		publishable: promotion.publishable,
-		skill: 'threejs-visual-validation',
-		sceneId: 'webgpu-validation-harness-browser-capture',
-		threeRevision: '0.185.1',
-		captureProfile: session.profile,
-		automationSurface: session.automationSurface ?? 'codex-in-app-browser',
-		adapterClass,
-		sourceClosureHash: session.sourceClosureHash ?? session.lab.sourceHash,
-		buildRevision: session.buildRevision ?? 'unavailable-capture-build-revision',
-		evidenceBundleId: `runtime-${ session.profile }-${ session.lab.sourceHash }`,
-		targetId: `current-codex-in-app-webgpu-adapter:${ adapterDescription }`,
-		device: adapterDescription,
-		browser: environment.userAgent,
-		os: environment.platform,
-		gpuAdapter: { ...adapterInfo, identitySource: metrics.adapter?.identitySource ?? 'unavailable' },
-		displayRefresh: A( targetRate, 'Hz', 'capture target assumption; display refresh was not measured' ),
-		targetPresentationRate: G( targetRate, 'Hz', 'correctness contract target' ),
-		renderer: metrics.rendererState.renderer,
-		backend: {
-			isWebGPUBackend: true,
-			initialized: true,
-			timestampAvailable: gpuTiming.verdict === 'PASS',
-			unavailableReason: gpuTiming.reason,
-			features: metrics.adapter?.features ?? [],
-			limits: adapterLimits,
-			deviceLostObserved: metrics.deviceLostObserved === true,
-			uncapturedErrors: [ ...( metrics.uncapturedErrors ?? [] ) ]
-		},
-		qualityState: metrics.tier,
-		viewport: {
-			width: M( metrics.viewport.width, 'pixel', 'LabController.getMetrics' ),
-			height: M( metrics.viewport.height, 'pixel', 'LabController.getMetrics' ),
-			dpr: M( metrics.viewport.dpr, 'ratio', 'LabController.getMetrics' )
-		},
-		camera: {
-			bookmark: metrics.camera,
-			matrixWorld: MA( metrics.cameraState.matrixWorld, 'matrix element', 'live design camera matrixWorld' ),
-			projectionMatrix: MA( metrics.cameraState.projectionMatrix, 'matrix element', 'live design camera projection matrix' ),
-			near: M( metrics.cameraState.near, 'scene unit', 'live design camera clipping plane' ),
-			far: M( metrics.cameraState.far, 'scene unit', 'live design camera clipping plane' )
-		},
-		seed: metrics.seedHex,
-		time: { fixed: true, seconds: M( metrics.timeSeconds, 's', 'LabController fixed time' ), frame: M( 0, 'frame', 'fixed correctness capture frame' ) },
-		assets: [],
-		colorPipeline: {
-			rendererOutputColorSpace: metrics.rendererState.outputColorSpace,
-			rendererToneMapping: metrics.rendererState.toneMapping,
-			rendererToneMappingExposure: M( metrics.rendererState.toneMappingExposure, 'ratio', 'live renderer state' ),
-			outputBufferType: metrics.rendererState.outputBufferType,
-			toneMapOwner: pipeline.finalToneMapOwner,
-			outputTransformOwner: pipeline.finalOutputTransformOwner,
-			hdrWorkingType: metrics.rendererState.outputBufferType,
-			colorTextures: [ 'capture-target' ],
-			dataTextures: [ 'normal', 'depth' ],
-			screenshotEncoding: 'PNG RGBA8 from render-target readback'
-		},
-		stochasticMasks: [],
-		knownCompromises,
-		pipelineGraphDigest,
-		claimVerdicts,
-		promotion: promotion.promotion
-	} );
 	const rendererInfo = schema( {
 		threeRevision: '0.185.1',
 		renderer: metrics.rendererState.renderer,
@@ -1184,7 +1134,6 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 	} );
 	const artifacts = {
 		'visual-contract.json': visualContract,
-		'evidence-manifest.json': evidenceManifest,
 		'renderer-info.json': rendererInfo,
 		'pipeline-graph.json': pipelineGraph,
 		'performance-envelope.json': performanceEnvelope,
@@ -1199,15 +1148,14 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		'mechanism-metrics.json': mechanismMetrics
 	};
 	await writeArtifacts( session, artifacts );
-	const validation = await validateV2ArtifactBundle( session.outputDir );
 	return {
-		bundleKind: validation.bundleKind,
-		publishable: validation.publishable,
-		claimVerdicts: validation.claimVerdicts,
-		requiredArtifactCount: M( validation.requiredArtifacts.length, 'artifact', 'v2 validator result' ),
-		requiredImageCount: M( validation.requiredImages.length, 'image', 'v2 validator result' ),
+		bundleKind: 'raw-capture-candidate',
+		publishable: false,
+		claimVerdicts,
+		requiredArtifactCount: M( Object.keys( artifacts ).length + 1, 'artifact', 'thirteen hook-written normative JSON files plus the offline-finalized manifest' ),
+		requiredImageCount: M( REQUIRED_V2_IMAGES.length, 'image', 'v2 standard image contract' ),
 		pipelineGraphDigest,
-		diagnosticDifferingRatio: M( validation.imageEvidence.diagnosticDifferingRatio, 'ratio', 'v2 image validator result' )
+		diagnosticDifference: M( diagnosticDifference, 'mean-rgb-byte-difference', 'minimum live diagnostic separation from final output' )
 	};
 
 }
