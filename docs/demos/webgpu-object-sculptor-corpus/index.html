@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en" data-subject="potted-bonsai">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08100f" />
+    <title>Object Sculptor Multi-Subject Corpus | Three.js WebGPU Demo</title>
+    <meta name="lab-id" content="webgpu-object-sculptor-corpus">
+  <meta name="acceptance-status" content="incomplete">
+  <meta name="description" content="Interactive Three.js WebGPU/TSL demo for Object Sculptor Multi-Subject Corpus, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated…">
+  <meta name="author" content="Three.js WebGPU Skill Pack contributors">
+  <meta name="owning-skill" content="threejs-object-sculptor">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Three.js WebGPU Skill Pack">
+  <meta property="og:title" content="Object Sculptor Multi-Subject Corpus | Three.js WebGPU Demo">
+  <meta property="og:description" content="Interactive Three.js WebGPU/TSL demo for Object Sculptor Multi-Subject Corpus, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated…">
+  <meta property="og:url" content="https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Object Sculptor Multi-Subject Corpus | Three.js WebGPU Demo">
+  <meta name="twitter:description" content="Interactive Three.js WebGPU/TSL demo for Object Sculptor Multi-Subject Corpus, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated…">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/#demo","name":"Object Sculptor Multi-Subject Corpus","description":"Interactive Three.js WebGPU/TSL demo for Object Sculptor Multi-Subject Corpus, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated…","url":"https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/","applicationCategory":"DeveloperApplication","operatingSystem":"Any WebGPU-capable environment","browserRequirements":"WebGPU-capable browser","softwareVersion":"Three.js 0.185.1","isAccessibleForFree":true,"inLanguage":"en","about":["Three.js","WebGPU","TSL","Three.js Object Sculptor"],"isPartOf":{"@type":"SoftwareSourceCode","@id":"https://threejs-skills.com/#software","name":"Three.js WebGPU Skill Pack","codeRepository":"https://github.com/linegel/threejs-complete-set-of-skill","url":"https://threejs-skills.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Three.js WebGPU Skill Pack","item":"https://threejs-skills.com/"},{"@type":"ListItem","position":2,"name":"Three.js Object Sculptor","item":"https://threejs-skills.com/skills/threejs-object-sculptor.html"},{"@type":"ListItem","position":3,"name":"Object Sculptor Multi-Subject Corpus","item":"https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/"}]}]}</script>
+  <style data-demo-seo-shell-style>
+.demo-seo-shell{position:fixed;z-index:2147483000;left:12px;bottom:12px;display:block;box-sizing:border-box;width:min(460px,calc(100vw - 24px));max-height:min(64vh,640px);margin:0;color:#f3efe6;background:rgba(8,11,16,.94);border-radius:14px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 12px 36px rgba(0,0,0,.34);font:14px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;backdrop-filter:blur(18px) saturate(1.15);overflow:auto}.demo-seo-shell *{box-sizing:border-box}.demo-seo-shell details{margin:0}.demo-seo-shell summary{min-height:44px;display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;color:#ffca80;font-weight:700;list-style:none;transition-property:color,background-color,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell summary::-webkit-details-marker{display:none}.demo-seo-shell summary:after{content:"+";flex:none;font:700 18px/1 ui-monospace,monospace}.demo-seo-shell>details[open]>summary:after,.demo-roadmap[open]>summary:after{content:"−"}.demo-seo-shell summary:hover{color:#fff;background:rgba(255,255,255,.045)}.demo-seo-shell summary:active{scale:.96}.demo-seo-shell summary:focus-visible,.demo-seo-shell a:focus-visible{outline:2px solid #7fd4c1;outline-offset:-3px}.demo-seo-shell__summary-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.demo-seo-shell__summary-state{margin-left:auto;flex:none;color:#a9a69d;font:600 9px/1.3 ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase}.demo-seo-shell__body{padding:2px 16px 16px}.demo-seo-shell h1,.demo-seo-shell h2,.demo-seo-shell h3{margin:0 0 8px;color:#fff;line-height:1.14;text-wrap:balance}.demo-seo-shell h1,.demo-seo-shell h2{font-size:clamp(21px,4vw,29px)}.demo-seo-shell h3{margin-top:15px;font-size:15px;color:#ffca80}.demo-seo-shell p,.demo-seo-shell li,.demo-seo-shell dd{margin:0;text-wrap:pretty}.demo-seo-shell p+p{margin-top:9px}.demo-seo-shell strong{color:#ffca80;font:inherit;font-weight:750}.demo-seo-shell__kicker{margin-bottom:7px!important;color:#7fd4c1;font:600 10px/1.4 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}.demo-seo-shell__evidence{color:#d6d0c4}.demo-seo-shell dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 0}.demo-seo-shell dl div{min-width:0;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.045);box-shadow:0 0 0 1px rgba(255,255,255,.07)}.demo-seo-shell dt{color:#9a988f;font:600 9px/1.35 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase}.demo-seo-shell dd{margin-top:3px;color:#f3efe6;font-size:12px}.demo-seo-shell ul{display:grid;gap:4px;margin:0;padding-left:18px;color:#d6d0c4}.demo-seo-shell code{color:#7fd4c1;font:600 11px/1.4 ui-monospace,monospace}.demo-roadmap{margin:14px 0!important;border-radius:14px;background:rgba(255,180,84,.055);box-shadow:0 0 0 1px rgba(255,180,84,.18)}.demo-roadmap>summary{padding:10px 12px!important;color:#fff!important}.demo-roadmap>summary span{margin-left:auto;margin-right:10px;min-width:24px;padding:3px 7px;border-radius:999px;color:#08110e;background:#ffca80;text-align:center;font:800 10px/1 ui-monospace,monospace}.demo-roadmap__body{padding:0 12px 12px}.demo-roadmap__body>p{color:#d6d0c4;font-size:12px}.demo-roadmap ol{display:grid;gap:7px;margin:10px 0 0;padding:0;list-style:none}.demo-roadmap li{padding:9px 10px;border-radius:10px;background:rgba(0,0,0,.22);box-shadow:0 0 0 1px rgba(255,255,255,.06)}.demo-roadmap li div{display:flex;gap:8px;align-items:center}.demo-roadmap li div span{flex:none;padding:3px 5px;border-radius:5px;color:#08110e;background:#ffca80;font:800 9px/1 ui-monospace,monospace}.demo-roadmap li[data-priority="P1"] div span{background:#7fd4c1}.demo-roadmap li[data-priority="P2"] div span{background:#a9b6ff}.demo-roadmap li[data-priority="done"] div span{background:#79f0b3}.demo-roadmap li strong{color:#fff;font-size:12px}.demo-roadmap li p{margin-top:5px;color:#c5c0b6;font-size:11px;line-height:1.45}.demo-roadmap li code{display:block;margin-top:5px;color:#8caea6;font-size:9px}.demo-seo-shell nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.demo-seo-shell a{min-height:40px;display:inline-flex;align-items:center;padding:8px 11px;border-radius:10px;color:#f3efe6;background:rgba(127,212,193,.08);box-shadow:0 0 0 1px rgba(127,212,193,.2);text-decoration:none;font-weight:650;transition-property:color,background-color,box-shadow,scale;transition-duration:160ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.demo-seo-shell a:hover{color:#fff;background:rgba(127,212,193,.16);box-shadow:0 0 0 1px rgba(127,212,193,.36)}.demo-seo-shell a:active{scale:.96}@media(max-width:560px){.demo-seo-shell{max-height:58vh}.demo-seo-shell dl{grid-template-columns:1fr}.demo-seo-shell__body{padding-inline:14px}}@media(prefers-reduced-motion:reduce){.demo-seo-shell summary,.demo-seo-shell a{transition-duration:0ms}}
+</style>
+  <script type="module" crossorigin src="../assets/index-xoGTcjS5.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-Bjfb9xWU.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl-0l0bfIsw.js">
+  <link rel="modulepreload" crossorigin href="../assets/aligned-readback-XAnJComS.js">
+  <link rel="modulepreload" crossorigin href="../assets/OrbitControls-CJtJSLBE.js">
+  <link rel="stylesheet" crossorigin href="../assets/index-M60Or1av.css">
+</head>
+  <body>
+<main class="demo-seo-shell" data-demo-seo-shell data-demo-id="webgpu-object-sculptor-corpus" data-owning-skill="threejs-object-sculptor">
+  <details>
+    <summary><span class="demo-seo-shell__summary-title">Object Sculptor Multi-Subject Corpus</span><span class="demo-seo-shell__summary-state">Evidence pending</span></summary>
+    <div class="demo-seo-shell__body">
+      <p class="demo-seo-shell__kicker">Canonical Lab · Three.js 0.185.1</p>
+      <h2>Object Sculptor Multi-Subject Corpus</h2>
+      <p>Interactive Three.js WebGPU/TSL demo for Object Sculptor Multi-Subject Corpus, with 3 scenarios, 5 mechanisms, and 3 quality tiers and evidence-gated…</p>
+      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="15">
+        <summary>Readiness &amp; remaining fixes <span>15</span></summary>
+        <div class="demo-roadmap__body">
+          <p>15 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
+          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
+          <p>The full, budgeted, minimum tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
+          <code>tiers[].frameTargetMs</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
+          <p>Controller must await WebGPURenderer.init() and reject a backend where isWebGPUBackend is not true; no fallback is activated.</p>
+          <code>capabilityRequirements.native-webgpu</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Single Scene Render capability proof</strong></div>
+          <p>Frame execution must report exactly one scene render and no duplicate diagnostic or presentation render.</p>
+          <code>capabilityRequirements.single-scene-render</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>No Post Processing capability proof</strong></div>
+          <p>Runtime graph and frame record must report zero post-processing passes.</p>
+          <code>capabilityRequirements.no-post-processing</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Mobile Resource Accounting capability proof</strong></div>
+          <p>Named-device sustained evidence must report CPU/GPU/presentation timing, render items, submissions, shadow casters, materials/pipelines, and peak live bytes.</p>
+          <code>capabilityRequirements.mobile-resource-accounting</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Renderer Init runtime proof</strong></div>
+          <p>Await controller readiness after WebGPURenderer.init().</p>
+          <code>runtimeProof.renderer-init</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Backend Is Webgpu runtime proof</strong></div>
+          <p>Capture controller metrics with nativeWebGPU true.</p>
+          <code>runtimeProof.backend-is-webgpu</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Physical Routes runtime proof</strong></div>
+          <p>Load all 15 scenario/mechanism/tier/camera physical routes and prove each locks exactly one route dimension.</p>
+          <code>runtimeProof.physical-routes</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Mechanism Reachable runtime proof</strong></div>
+          <p>Load every final, blockout, hierarchy, materials, and action-ready mechanism route and bind the observed controller mode to the physical route record.</p>
+          <code>runtimeProof.mechanism-reachable</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Target Contracts runtime proof</strong></div>
+          <p>Capture protected node, socket, ColliderConstructionInput, destruction-group, mode, tier, and exact-reset inventories for all three targets.</p>
+          <code>runtimeProof.target-contracts</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Render Ownership runtime proof</strong></div>
+          <p>Capture one renderer owner, one scene render, one tone-map owner, one output-transform owner, and zero post-processing passes.</p>
+          <code>runtimeProof.render-ownership</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Aligned Readback runtime proof</strong></div>
+          <p>Capture the actual integer WebGPU row stride, 256-byte alignment, compact width, height, and normalized render-target pixels for every required PNG.</p>
+          <code>runtimeProof.aligned-readback</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Visual Contracts runtime proof</strong></div>
+          <p>Inspect final and diagnostic PNGs for each target and record AI-vision authored-contract scores; no reference-image similarity claim is permitted.</p>
+          <code>runtimeProof.visual-contracts</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Sustained Performance runtime proof</strong></div>
+          <p>Record named-device sustained CPU/GPU/presentation evidence and mobile resource accounting without inventing a universal frame target.</p>
+          <code>runtimeProof.sustained-performance</code>
+        </li><li data-roadmap-item data-priority="P2" data-category="tiers">
+          <div><span>P2</span><strong>Close tier-specific acceptance</strong></div>
+          <p>Validate and promote full, budgeted, minimum as independent visual and performance contracts without crossing their protected invariants.</p>
+          <code>tiers[].acceptanceStatus</code>
+        </li></ol>
+        </div>
+      </details>
+      <p>Use the linked skill, registry, and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
+      <dl>
+        <div><dt>Owning skill</dt><dd>Three.js Object Sculptor</dd></div>
+        <div><dt>Published routes</dt><dd>3 scenarios · 5 mechanisms · 3 quality tiers</dd></div>
+      </dl>
+      <h3>Supported mechanisms</h3>
+      <ul data-demo-mechanisms><li><code>final</code> — Final</li><li><code>blockout</code> — Blockout</li><li><code>hierarchy</code> — Hierarchy</li><li><code>materials</code> — Materials</li><li><code>action-ready</code> — Action Ready</li></ul>
+      <nav aria-label="Demo documentation and provenance"><a href="../../skills/threejs-object-sculptor.html">Owning skill</a><a href="../registry.json">Demo registry</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-object-sculptor">Source repository</a></nav>
+    </div>
+  </details>
+</main>
+    <canvas id="scene" aria-label="Interactive native WebGPU inspection of generated procedural assets"></canvas>
+
+    <header class="brand" aria-label="Corpus title">
+      <span class="eyebrow">Object Sculptor / native WebGPU</span>
+      <h1 id="subject-title">Potted Bonsai</h1>
+      <p id="subject-description">A rooted botanical sculpture with closed branch rings, tiered opaque foliage, authored sway pivots, and a ceramic vessel.</p>
+      <span class="corpus-index">01 / 03 · generated procedural asset</span>
+    </header>
+
+    <aside class="inspector" aria-label="Object Sculptor corpus controls">
+      <header class="inspector-header">
+        <div>
+          <span class="panel-kicker">Live inspection</span>
+          <h2>Corpus controls</h2>
+        </div>
+        <output id="status" data-state="initializing" aria-live="polite">Initializing WebGPU</output>
+      </header>
+
+      <div class="selects">
+        <label>
+          <span>Subject</span>
+          <select id="subject" aria-label="Subject"></select>
+        </label>
+        <label>
+          <span>Mode</span>
+          <select id="mode" aria-label="Mode"></select>
+        </label>
+        <label>
+          <span>Tier</span>
+          <select id="tier" aria-label="Tier"></select>
+        </label>
+        <label>
+          <span>Camera</span>
+          <select id="camera" aria-label="Camera"></select>
+        </label>
+      </div>
+
+      <section class="mode-copy" aria-live="polite">
+        <strong id="mode-title">Action-ready motion</strong>
+        <span id="mode-description">Named pivots move continuously while sockets and collider construction inputs remain inspectable.</span>
+      </section>
+
+      <dl class="metrics" aria-label="Live scene metrics">
+        <div class="metric"><dt>Nodes</dt><dd id="metric-nodes">—</dd></div>
+        <div class="metric"><dt>Triangles</dt><dd id="metric-triangles">—</dd></div>
+        <div class="metric"><dt>Draws</dt><dd id="metric-draws">—</dd></div>
+        <div class="metric"><dt>Submissions</dt><dd id="metric-submissions">—</dd></div>
+        <div class="metric"><dt>Collider inputs</dt><dd id="metric-handoffs">—</dd></div>
+        <div class="metric metric-wide"><dt>Physics handoff</dt><dd id="metric-physics-status">—</dd></div>
+        <div class="metric"><dt>Motion</dt><dd id="metric-motion">—</dd></div>
+        <div class="metric"><dt>Tier DPR</dt><dd id="metric-dpr">—</dd></div>
+      </dl>
+
+      <p class="claim-boundary">
+        ColliderConstructionInput records are deterministic authoring handoffs. They are not solver-proven collision, contacts, mass properties, or rigid-body motion.
+      </p>
+    </aside>
+
+    <div class="interaction-hint" aria-hidden="true">Drag to orbit · wheel or pinch to dolly · action-ready mode animates</div>
+  </body>
+</html>

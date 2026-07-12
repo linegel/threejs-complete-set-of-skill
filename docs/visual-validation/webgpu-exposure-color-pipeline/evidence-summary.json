@@ -45,7 +45,7 @@
     },
     {
       "file": "histogram-percentiles.png",
-      "meaning": "Histogram and percentile diagnostic.",
+      "meaning": "Percentile-selection mask emitted by the histogram path; not a plotted histogram.",
       "source": "images/histogram-percentiles.png",
       "sourceSha256": "sha256:e2e1431f129d4e83296185f43d3bfe6e9cb908bb616a0b43661c9e422b2fb8ad",
       "outputSha256": "sha256:e2e1431f129d4e83296185f43d3bfe6e9cb908bb616a0b43661c9e422b2fb8ad",
@@ -86,6 +86,7 @@
   ],
   "limitations": [
     "The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.",
+    "The promoted percentile frame is a selection mask, not proof that histogram bin totals, prefix scan, or f64 oracle parity pass.",
     "Lifecycle stability remains unaccepted."
   ]
 }

@@ -13,10 +13,21 @@
   "sourceHash": "sha256:8e5b5f310de4938e4041daac7f9688054085f68004fba69e6d560b9e30acf125",
   "publishedHashInputs": [
     "docs/demos/webgpu-fft-ocean",
-    "docs/demos/assets"
+    "docs/demos/assets/index-Dhvz353-.js",
+    "docs/demos/assets/integration-stage-s6vGCOlT.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:82cdfa79c54645291bd614f4a1d295488eadb7496d17190968ca2ca7093121c7",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-Dhvz353-.js",
+    "docs/demos/assets/integration-stage-s6vGCOlT.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:569af9256dce38f8b29d72c8441bf40e3e7aada4bddda2f5292e6f0e93ab6d2f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

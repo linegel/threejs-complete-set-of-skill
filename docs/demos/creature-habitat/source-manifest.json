@@ -63,13 +63,44 @@
     "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
   ],
   "browserEntry": "integration-labs/creature-habitat/index.html",
-  "sourceHash": "sha256:2d9df5888e47d42dd29081948c6414797956d6a20bdbdb3d69fa263af207f0cb",
+  "sourceHash": "sha256:4e0f768c182c289032ff33410988460cb789d950f8241e747d8766c1f98e5236",
   "publishedHashInputs": [
     "docs/demos/creature-habitat",
-    "docs/demos/assets"
+    "docs/demos/assets/CameraDirectionController-BW_oil0e.js",
+    "docs/demos/assets/dense-grass-system-DLdt83Sf.js",
+    "docs/demos/assets/index-DaYWIlwO.js",
+    "docs/demos/assets/index-KefgGsrN.css",
+    "docs/demos/assets/integration-adapter-DJwgA3KT.js",
+    "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
+    "docs/demos/assets/meadow-density-b-hrBezR3V.png",
+    "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/pose-storage-CvIYfGBz.js",
+    "docs/demos/assets/precipitation-system-CxUv8UiU.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js",
+    "docs/demos/assets/webgpu-bounded-water-BkZeiMWD.js"
   ],
-  "publishedBundleHash": "sha256:83b1ae3652cdc0f4e426c7a7730fc83f05a05f41f2970ea1888a85683a591ea7",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/CameraDirectionController-BW_oil0e.js",
+    "docs/demos/assets/dense-grass-system-DLdt83Sf.js",
+    "docs/demos/assets/index-DaYWIlwO.js",
+    "docs/demos/assets/index-KefgGsrN.css",
+    "docs/demos/assets/integration-adapter-DJwgA3KT.js",
+    "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
+    "docs/demos/assets/meadow-density-b-hrBezR3V.png",
+    "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/pose-storage-CvIYfGBz.js",
+    "docs/demos/assets/precipitation-system-CxUv8UiU.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js",
+    "docs/demos/assets/webgpu-bounded-water-BkZeiMWD.js"
+  ],
+  "publishedBundleHash": "sha256:478f9e0c49e5896f0bc2da168ffc66fd97a87c60a4255d5f5af6582728a1d7a9",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

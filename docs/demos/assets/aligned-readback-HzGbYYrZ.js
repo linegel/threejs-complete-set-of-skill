@@ -1,1 +1,0 @@
-function e(e,t){if(!Number.isInteger(e)||e<=0)throw RangeError(`${t} must be a positive integer`)}function t(t,n,r=256){e(t,`width`),e(n,`bytesPerPixel`),e(r,`alignment`);let i=t*n;if(!Number.isSafeInteger(i))throw RangeError(`logical row size exceeds the safe integer range`);return Math.ceil(i/r)*r}export{t};

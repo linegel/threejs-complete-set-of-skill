@@ -10,7 +10,15 @@
   ],
   "sourceHashInputs": [
     "labs/runtime/aligned-readback.mjs",
+    "labs/runtime/numeric-evidence.mjs",
+    "labs/schema/evidence-bundle-v2.schema.json",
+    "labs/schema/lab-manifest.schema.json",
+    "labs/schema/physics-integration.schema.json",
+    "labs/schema/runtime-graph.schema.json",
     "scripts/capture-lab-browser.mjs",
+    "scripts/lib/checked-json-schema.mjs",
+    "scripts/lib/evidence-manifest-contract.mjs",
+    "scripts/lib/evidence-runtime-claims.mjs",
     "scripts/lib/evidence-v2.mjs",
     "scripts/lib/lab-registry.mjs",
     "scripts/lib/png-rgba.mjs",
@@ -19,13 +27,28 @@
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
-  "sourceHash": "sha256:e8633e8c9f83c081d41f9ef7a5c589dae230915598f29d26e10ecf2b14f6cb92",
+  "sourceHash": "sha256:24e18b51759411a4fa013bc7f15dd48af3701cc57cc5064a8158df70415094e3",
   "publishedHashInputs": [
     "docs/demos/webgpu-bounded-water",
-    "docs/demos/assets"
+    "docs/demos/assets/aligned-readback-XAnJComS.js",
+    "docs/demos/assets/index-C6aOrbtQ.js",
+    "docs/demos/assets/integration-stage-CdszCH3J.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/webgpu-bounded-water-BkZeiMWD.js"
   ],
-  "publishedBundleHash": "sha256:89eb18970fbbd7e27e6b6f7c0816b3de886b11782b81b578e84b4e6409fb15bb",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/aligned-readback-XAnJComS.js",
+    "docs/demos/assets/index-C6aOrbtQ.js",
+    "docs/demos/assets/integration-stage-CdszCH3J.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/webgpu-bounded-water-BkZeiMWD.js"
+  ],
+  "publishedBundleHash": "sha256:a48a18211997bec091b0c7e79f6e2817d1928208b5d7a7721034101d58d85545",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

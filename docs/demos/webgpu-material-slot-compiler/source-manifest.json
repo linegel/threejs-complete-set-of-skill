@@ -13,10 +13,21 @@
   "sourceHash": "sha256:7ad7958a7bf3a2a3bdda298b38666f2e4f4983b7b0780aef6b74d4795e99da3b",
   "publishedHashInputs": [
     "docs/demos/webgpu-material-slot-compiler",
-    "docs/demos/assets"
+    "docs/demos/assets/compiler-CgFt0OYt.js",
+    "docs/demos/assets/index-BqWWXv64.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:637704704e5fcbe0c606911c080592cfe332bfda44d90650b3594f81d3dc8e7b",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/compiler-CgFt0OYt.js",
+    "docs/demos/assets/index-BqWWXv64.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:7df6c21cbc73ebda97b91ab282ee0065d8b39c2d60c2d1d8f8e346b57a3b79e5",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

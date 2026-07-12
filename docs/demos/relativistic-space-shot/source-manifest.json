@@ -49,13 +49,44 @@
     "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
   ],
   "browserEntry": "integration-labs/relativistic-space-shot/index.html",
-  "sourceHash": "sha256:cd1a484962b562728a67488ed71312fa4b68126e261a801024bfee9b2aa89f96",
+  "sourceHash": "sha256:5fe1522e9185fbdff551194ad251caeb878b925459a9a59cd10d0bcc4995d89f",
   "publishedHashInputs": [
     "docs/demos/relativistic-space-shot",
-    "docs/demos/assets"
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/CameraDirectionController-BW_oil0e.js",
+    "docs/demos/assets/TRAANode-BHDUI1yA.js",
+    "docs/demos/assets/index-DX3ZMqR9.css",
+    "docs/demos/assets/index-Dnme6gnb.js",
+    "docs/demos/assets/lab-BGP-o5Ut.js",
+    "docs/demos/assets/main-CsPbDMZE.js",
+    "docs/demos/assets/main-JlnaXcHu.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/node-selective-bloom-DURI2Cz7.js",
+    "docs/demos/assets/readback-DKeMx131.js",
+    "docs/demos/assets/space-transfer-stage-Biw3Y0fc.js",
+    "docs/demos/assets/stage-Cd2YMrtA.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:3c08fdb4a3e97cd0c852a564bce9d04d36c3e1535d20329e686f19f658639151",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/CameraDirectionController-BW_oil0e.js",
+    "docs/demos/assets/TRAANode-BHDUI1yA.js",
+    "docs/demos/assets/index-DX3ZMqR9.css",
+    "docs/demos/assets/index-Dnme6gnb.js",
+    "docs/demos/assets/lab-BGP-o5Ut.js",
+    "docs/demos/assets/main-CsPbDMZE.js",
+    "docs/demos/assets/main-JlnaXcHu.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/node-selective-bloom-DURI2Cz7.js",
+    "docs/demos/assets/readback-DKeMx131.js",
+    "docs/demos/assets/space-transfer-stage-Biw3Y0fc.js",
+    "docs/demos/assets/stage-Cd2YMrtA.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:6739b118d24d1350922d0bff8829839c2c749130fcb0f00966708ca802a22413",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

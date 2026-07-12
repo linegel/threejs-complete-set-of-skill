@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d" />
+<meta name="skill-pack-build-revision" content="sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -30,10 +30,10 @@
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Exposure And Color Grading evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Exposure and grading render-target readback for Exposure And Color Grading" />
 <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png" />
-<meta name="twitter:image:alt" content="Exposure And Color Grading evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
+<meta name="twitter:image:alt" content="Exposure and grading render-target readback for Exposure And Color Grading" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
 <meta name="twitter:description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
@@ -124,29 +124,31 @@
  ]
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css" />
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 
 @view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 :root{
   --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
   --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
-  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
   --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
-body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
-  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
-  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
@@ -175,13 +177,12 @@ code{font-family:var(--mono)}
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 .card:active{translate:0 -1px;scale:.99}
-.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .status--accepted{color:var(--lime)}
 .status--pending{color:var(--amber)}
 .status--secondary{color:var(--dim)}
@@ -191,15 +192,15 @@ a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
-.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
-.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
 .primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
-figcaption span{color:var(--dim)}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
@@ -257,9 +258,9 @@ a.chip:active{scale:.96}
 .pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
 .pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
-.hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.hero-evidence-caption{margin-top:14px;font:10px/1.45 var(--mono);color:var(--cyan)}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
-.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
+.card>.primary-evidence-panel{margin:0 0 14px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 .runtime-evidence-disclosures{display:grid;gap:14px;margin:0 0 28px}.runtime-evidence-disclosure{padding:20px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}
@@ -270,7 +271,6 @@ a.chip:active{scale:.96}
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
-  .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
   .evidence-ledger{align-items:flex-start;flex-direction:column}
   .runtime-evidence-head{align-items:flex-start;flex-direction:column}
 }
@@ -289,17 +289,16 @@ a.chip:active{scale:.96}
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.webp" />
           <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
         </picture>
-  <span class="hero-preview-badge">Exposure and grading render-target readback</span>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Exposure And Color Grading</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-exposure-color-grading">Exposure And Color Grading</h1>
     <p class="lede">Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.</p>
+    <p class="hero-evidence-caption">Image: Exposure and grading render-target readback. Source lab: webgpu-exposure-color-pipeline.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-exposure-color-grading</span>
       <span class="chip">1 primary implementation</span>
 <span class="chip">2 flagships</span>
 <span class="chip">1 secondary surface</span>
-      
       <span class="chip">native evidence pending</span>
       <span class="chip">Latest skill update <time datetime="2026-07-11T13:30:23+03:00">2026-07-11</time></span>
     <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/d508c69a72089690a6801144692591b8a1fe0e11">commit d508c69 ↗</a>
@@ -319,8 +318,8 @@ a.chip:active{scale:.96}
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.webp" />
           <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="Exposure and grading render-target readback for WebGPU Exposure Color Pipeline" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">Exposure and grading render-target readback</span></span>
-        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        </picture><span class="media-caption">Exposure and grading render-target readback</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Exposure Color Pipeline</h3>
         <p>5 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -336,10 +335,10 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>f5f18643cb1d</code> source hash</span>
+    <span><code>0e56ab6926da</code> source hash</span>
     <span>10 fixed states · 12 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-index">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -347,10 +346,10 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="relativistic-space-shot">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>cd1a484962b5</code> source hash</span>
+    <span><code>5fe1522e9185</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-index">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Relativistic Space Shot</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -383,56 +382,56 @@ transform is the classic double-transform bug.</p></div>
       <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
         <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Exposure Color Pipeline</h3></div><span class="status status--pending">Acceptance pending</span></div>
         <dl><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
-        <ul><li>The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.</li><li>Lifecycle stability remains unaccepted.</li></ul>
+        <ul><li>The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.</li><li>The promoted percentile frame is a selection mask, not proof that histogram bin totals, prefix scan, or f64 oracle parity pass.</li><li>Lifecycle stability remains unaccepted.</li></ul>
       </article></div>
     <div class="gallery">
-      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="Exposure And Color Grading — Exposure and grading render-target readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Exposure and grading render-target readback</strong></figcaption>
+          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="Exposure And Color Grading: Exposure and grading render-target readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Exposure and grading render-target readback</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-source.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-source.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/meter-source.png" alt="Exposure And Color Grading — Weighted log-luminance meter source diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Weighted log-luminance meter source diagnostic.</strong></figcaption>
+          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/meter-source.png" alt="Exposure And Color Grading: Weighted log-luminance meter source diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Weighted log-luminance meter source diagnostic.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png" alt="Exposure And Color Grading — Histogram and percentile diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Histogram and percentile diagnostic.</strong></figcaption>
+          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png" alt="Exposure And Color Grading: Percentile-selection mask emitted by the histogram path; not a plotted histogram." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Percentile-selection mask emitted by the histogram path; not a plotted histogram.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.png" alt="Exposure And Color Grading — Metering-mask diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Metering-mask diagnostic.</strong></figcaption>
+          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.png" alt="Exposure And Color Grading: Metering-mask diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Metering-mask diagnostic.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/tone-map.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/tone-map.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/tone-map.png" alt="Exposure And Color Grading — Tone-map stage diagnostic before the creative LUT." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Tone-map stage diagnostic before the creative LUT.</strong></figcaption>
+          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/tone-map.png" alt="Exposure And Color Grading: Tone-map stage diagnostic before the creative LUT." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Tone-map stage diagnostic before the creative LUT.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/lut.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/lut.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/lut.png" alt="Exposure And Color Grading — Creative LUT stage diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
-        <figcaption itemprop="caption"><strong>Creative LUT stage diagnostic.</strong></figcaption>
+          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/lut.png" alt="Exposure And Color Grading: Creative LUT stage diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Creative LUT stage diagnostic.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure></div>
   </div></div>
 
@@ -620,7 +619,7 @@ transient-lifetime decisions; <code>$threejs-bloom</code> for the HDR glare sour
           <source type="image/avif" srcset="../previews/provider/exposure-color-grading-demo.avif" />
           <source type="image/webp" srcset="../previews/provider/exposure-color-grading-demo.webp" />
           <img data-responsive-preview src="../previews/provider/exposure-color-grading-demo.png" alt="Live concept proxy screenshot for Scene-Referred Exposure Rig; not canonical runtime evidence" width="1440" height="757" loading="lazy" decoding="async" />
-        </picture><span class="preview-badge">Concept proxy preview</span></span>
+        </picture></span>
         <figcaption><strong>Scene-Referred Exposure Rig</strong><span>Concept proxy · The docs page simulates the meter state in live scene controls for readability. The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.</span></figcaption>
       </figure></a>
     </div>
@@ -630,7 +629,7 @@ transient-lifetime decisions; <code>$threejs-bloom</code> for the HDR glare sour
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>580768503f5b</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 41 primary implementations · registry <code>875aca6c1820</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

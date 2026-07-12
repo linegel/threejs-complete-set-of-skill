@@ -13,10 +13,21 @@
   "sourceHash": "sha256:6030ee02f228505590a3a9c61ed20a8fc2955e63d64396fe6c098d18e82a5759",
   "publishedHashInputs": [
     "docs/demos/webgpu-exposure-color-pipeline",
-    "docs/demos/assets"
+    "docs/demos/assets/index-BirgHsGS.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/stage-Cd2YMrtA.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:a12fc62a2229abe22662ae98e4859e1eb157f33e8ed371710d601fef5afe063c",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-BirgHsGS.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/stage-Cd2YMrtA.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:590be9134e96529f9c37c51b432cfa8bbcbafd774700c58e8d0f330a22bdbd4f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

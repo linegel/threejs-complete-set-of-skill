@@ -21,10 +21,21 @@
   "sourceHash": "sha256:6c5063ccb8e9b53f5e7e7b9202e8f4073745a7c3f27705001c4190bc9b4d762f",
   "publishedHashInputs": [
     "docs/demos/webgpu-quadtree-planet",
-    "docs/demos/assets"
+    "docs/demos/assets/index-uk7lPrFu.js",
+    "docs/demos/assets/integration-adapter-D1hpYAab2.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:10b5e5b272454b551b54e3fb3464990f09cabba1c11ab614fb2233ebf51519cc",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-uk7lPrFu.js",
+    "docs/demos/assets/integration-adapter-D1hpYAab2.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:715178451bedcfa8c083aa77102b6ff48f48ee581ddecaef26e22f0cad573e75",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

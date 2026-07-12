@@ -13,10 +13,23 @@
   "sourceHash": "sha256:ef8576bd7bb49d234967864afbb9638e126f5398b3704015c39f285d14a33281",
   "publishedHashInputs": [
     "docs/demos/webgpu-cached-clipmap-shadow",
-    "docs/demos/assets"
+    "docs/demos/assets/canonical-lab-C_swluIP.js",
+    "docs/demos/assets/index-BbrcYlON.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:e758292fbb989b22ff39c3966cd413399e603e628a5cd1574b1d64f1b868ca19",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/canonical-lab-C_swluIP.js",
+    "docs/demos/assets/index-BbrcYlON.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:057537b1bc695c2880aa795dff5a50da5425dddb6477145ad09c3b2406d41d22",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

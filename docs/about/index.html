@@ -8,7 +8,7 @@
 <link rel="canonical" href="https://threejs-skills.com/about/" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d" />
+<meta name="skill-pack-build-revision" content="sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -22,14 +22,7 @@
 <meta property="og:title" content="About the Three.js WebGPU Skill Pack Methodology" />
 <meta property="og:description" content="Meet the maintainers and review the open-source evidence methodology, licensing, update policy, and claim standards behind the Three.js WebGPU Skill Pack." />
 <meta property="og:url" content="https://threejs-skills.com/about/" />
-<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
-<meta property="og:image:type" content="image/png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Generated crater-field asset preview representing the evidence-led Three.js WebGPU Skill Pack methodology" />
-<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Generated crater-field asset preview representing the evidence-led Three.js WebGPU Skill Pack methodology" />
-<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="About the Three.js WebGPU Skill Pack Methodology" />
 <meta name="twitter:description" content="Meet the maintainers and review the open-source evidence methodology, licensing, update policy, and claim standards behind the Three.js WebGPU Skill Pack." />
 <script type="application/ld+json">
@@ -56,7 +49,7 @@
    "url": "https://threejs-skills.com/about/",
    "name": "About the Three.js WebGPU Skill Pack Methodology",
    "description": "Meet the maintainers and review the open-source evidence methodology, licensing, update policy, and claim standards behind the Three.js WebGPU Skill Pack.",
-   "dateModified": "2026-07-11",
+   "dateModified": "2026-07-12",
    "inLanguage": "en",
    "isPartOf": {
     "@id": "https://threejs-skills.com/#website"
@@ -88,25 +81,27 @@
  ]
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
+
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />
 <style>
 
 @view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 :root{
   --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
   --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
-  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
   --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
-body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
-  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
-  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
@@ -135,13 +130,12 @@ code{font-family:var(--mono)}
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 .card:active{translate:0 -1px;scale:.99}
-.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .status--accepted{color:var(--lime)}
 .status--pending{color:var(--amber)}
 .status--secondary{color:var(--dim)}
@@ -151,15 +145,15 @@ a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
-.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
-.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
 .primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
-figcaption span{color:var(--dim)}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
@@ -203,7 +197,7 @@ footer code{color:var(--cyan);font-size:11px}
     <p class="kicker">Open source · Evidence gated · Publicly versioned</p>
     <h1>How this skill pack earns trust.</h1>
     <p class="lede">The Three.js WebGPU Skill Pack is a public technical reference for AI coding agents and graphics engineers. This page identifies who maintains it, how claims are classified, what counts as evidence, and how published guidance stays synchronized with source.</p>
-    <div class="about-meta"><span>Three.js 0.185.1</span><span>27 expert skills</span><span>40 primary implementations</span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Public repository ↗</a></div>
+    <div class="about-meta"><span>Three.js 0.185.1</span><span>27 expert skills</span><span>41 primary implementations</span><a href="https://github.com/linegel/threejs-complete-set-of-skill">Public repository ↗</a></div>
   </div></header>
 
   <section class="about-section" aria-labelledby="identity-title"><div class="wrap">
@@ -246,7 +240,7 @@ footer code{color:var(--cyan);font-size:11px}
 </main>
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>580768503f5b</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 41 primary implementations · registry <code>875aca6c1820</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

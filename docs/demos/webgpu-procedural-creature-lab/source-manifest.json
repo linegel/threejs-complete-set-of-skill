@@ -10,13 +10,24 @@
     "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
   ],
   "browserEntry": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
-  "sourceHash": "sha256:4566656ba16c784c8403fbe3a003580746ea2fe84caff859e88c66e76762d3c4",
+  "sourceHash": "sha256:02c7af6a0987e22e86693a78a4ff5ea846cddcf623a6e50a394d858f7d31e611",
   "publishedHashInputs": [
     "docs/demos/webgpu-procedural-creature-lab",
-    "docs/demos/assets"
+    "docs/demos/assets/index-3iRyTm5j.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/pose-storage-CvIYfGBz.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:3b9f8ed9f0d1d6d775964870e48b1b82cb59432a6772a0b306d43947e8e468a7",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-3iRyTm5j.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/pose-storage-CvIYfGBz.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:02892b4d8ed40cd9e67639aaf0a47268ddee4c4e1474fc1d94ece6a07bf23437",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

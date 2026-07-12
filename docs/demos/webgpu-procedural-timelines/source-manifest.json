@@ -10,6 +10,9 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/browser.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture-hook.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validate-artifacts.mjs",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/launch-and-staging/index.html",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/spin-docking/index.html",
@@ -25,13 +28,24 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
   ],
   "browserEntry": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
-  "sourceHash": "sha256:19124fd4449829f795f22a3b12d3309b52b2058db6968dd0c65f844ac73b5ecc",
+  "sourceHash": "sha256:3db072e5c8ac16ac2eb82b9cbffa767255b1035bce9adb40b4a0ad04b46b41bf",
   "publishedHashInputs": [
     "docs/demos/webgpu-procedural-timelines",
-    "docs/demos/assets"
+    "docs/demos/assets/index-C7F1AnE8.js",
+    "docs/demos/assets/main-CsPbDMZE.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:99f6bb1ed11609be8689a300a66911d8a766ffe28b0a644a5b676648bd0bc573",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-C7F1AnE8.js",
+    "docs/demos/assets/main-CsPbDMZE.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:1981344e83dffd4f8a21aa4b159394cdbbfdd76f3e7e620c5efba9bf187d64c4",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

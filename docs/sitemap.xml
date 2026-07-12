@@ -1,98 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://threejs-skills.com/</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png</image:loc><image:title>Three.js WebGPU Skill Pack</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/about/</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png</image:loc><image:title>About the Three.js WebGPU Skill Pack methodology</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-ambient-contact-shading.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-16x9.png</image:loc><image:title>Ambient Contact Shading</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-black-holes-and-space-effects-16x9.png</image:loc><image:title>Black Holes and Space Effects</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-bloom.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-bloom-16x9.png</image:loc><image:title>Bloom</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-16x9.png</image:loc><image:title>Camera Controls And Rigs</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-choose-skills.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-choose-skills-16x9.png</image:loc><image:title>Three.js WebGPU/TSL Choose Skills</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png</image:loc><image:title>Three.js Compatibility Fallbacks</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/about/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-ambient-contact-shading.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-bloom.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-choose-skills.html</loc><lastmod>2026-07-12</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-choose-skills-16x9.png</image:loc><image:title>Three.js WebGPU/TSL Choose Skills</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-debugging.html</loc><lastmod>2026-07-10</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-debugging-16x9.png</image:loc><image:title>Three.js Debugging</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-16x9.png</image:loc><image:title>Dynamic Surface Effects</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-exposure-color-grading.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-exposure-color-grading-16x9.png</image:loc><image:title>Exposure And Color Grading</image:title></image:image></url>
   <url><loc>https://threejs-skills.com/skills/threejs-image-pipeline.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-image-pipeline-16x9.png</image:loc><image:title>Image Pipeline</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-object-sculptor.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-object-sculptor-16x9.png</image:loc><image:title>Three.js Object Sculptor</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-16x9.png</image:loc><image:title>Particles, Trails, and Effects</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-16x9.png</image:loc><image:title>Procedural Buildings and Cities</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-creatures.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-creatures-16x9.png</image:loc><image:title>Procedural Creatures</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-fields.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-fields-16x9.png</image:loc><image:title>Procedural Fields</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-geometry.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-geometry-16x9.png</image:loc><image:title>Procedural Geometry</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-materials.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-materials-16x9.png</image:loc><image:title>Procedural Materials</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-motion-systems.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-motion-systems-16x9.png</image:loc><image:title>Procedural Motion Systems</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-planets.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-planets-16x9.png</image:loc><image:title>Procedural Planets</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-procedural-vegetation.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-procedural-vegetation-16x9.png</image:loc><image:title>Procedural Vegetation</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-16x9.png</image:loc><image:title>Rain, Snow, and Wet Surfaces</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-16x9.png</image:loc><image:title>Scalable Real-Time Shadows</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-16x9.png</image:loc><image:title>Sky, Atmosphere, and Haze</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-spectral-ocean.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-spectral-ocean-16x9.png</image:loc><image:title>Spectral Ocean</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-visual-validation.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png</image:loc><image:title>Visual Validation</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-volumetric-clouds.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-volumetric-clouds-16x9.png</image:loc><image:title>Volumetric Clouds</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-water-optics.html</loc><lastmod>2026-07-11</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-water-optics-16x9.png</image:loc><image:title>Water Optics</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/demos/ambient-contact-shading-demo/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-object-sculptor.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-creatures.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-fields.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-geometry.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-materials.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-motion-systems.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-planets.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-procedural-vegetation.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-spectral-ocean.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-visual-validation.html</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-volumetric-clouds.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-water-optics.html</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/ambient-contact-shading-demo/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/browser-fallback-harness/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/camera-rig-handoff-demo/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/camera-rig-handoff-demo/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/cloud-generated-weather-maps/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/compatibility-fallback-planner-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/creature-habitat/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/debugging-contract-lab/</loc><lastmod>2026-07-10</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/exposure-color-grading-demo/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/fields-generated-biome-maps/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/final-image-flight/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/fields-generated-biome-maps/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/final-image-flight/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/frost-generated-crystals/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/image-pipeline-framegraph-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/integration-image-pipeline-ao/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/integration-precipitation-image-pipeline/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/integration-temporal-surface/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/materials-generated-lava-causes/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/node-selective-bloom/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/materials-generated-lava-causes/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/node-selective-bloom/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/ocean-generated-wave-seeds/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/planet-generated-craters/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/pooled-particles-effects-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/procedural-building-compiler-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/procedural-creature-lab-demo/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/procedural-district/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/procedural-geometry-writer-demo/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/procedural-motion-timeline-demo/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/procedural-district/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/procedural-geometry-writer-demo/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/procedural-motion-timeline-demo/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/rain-generated-ripples/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/relativistic-space-shot/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/relativistic-space-shot/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/router-manifest-lab/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/selective-bloom-demo/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/semantic-mesh-writer/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/selective-bloom-demo/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/semantic-mesh-writer/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/shadow-cascade-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/skill-router-manifest-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/sky-atmosphere-haze-demo/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/space-generated-starfields/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/structured-ash-growth/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/tsl-curved-ray/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/tsl-procedural-pbr/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/tsl-procedural-pbr/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/vegetation-generated-meadow-density/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/visual-validation-harness-demo/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/visual-validation-harness-demo/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/water-generated-caustics/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/water-integration-surface/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/weathered-world/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-bounded-water/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-bounded-water/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-cached-clipmap-shadow/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-camera-rig/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-camera-rig/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-dense-grass/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-exposure-color-pipeline/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-fft-ocean/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-field-bake/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-field-bake/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-image-pipeline/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-lut-atmosphere/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-material-slot-compiler/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-node-gtao/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-node-gtao/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-pooled-effects/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-procedural-creature-lab/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-procedural-timelines/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-procedural-creature-lab/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-procedural-timelines/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-quadtree-planet/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-rain-snow-and-wet-surfaces/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-shadow-architecture-bench/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-shadow-pipeline-integration/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-temporal-history/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-touch-history-frost/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-validation-harness/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-tower-ship-sculptor/</loc><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-validation-harness/</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-vegetation-integration/</loc><lastmod>2026-07-11</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-weather-volume-clouds/</loc><lastmod>2026-07-11</lastmod></url>
 </urlset>

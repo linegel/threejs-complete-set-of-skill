@@ -17,10 +17,23 @@
   "sourceHash": "sha256:acc472f7c027972d668998d5087a5d42534983271f7c156af24af4ec1a4e0ffb",
   "publishedHashInputs": [
     "docs/demos/webgpu-pooled-effects",
-    "docs/demos/assets"
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/index-sgeVz14H.js",
+    "docs/demos/assets/lab-BGP-o5Ut.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:cba5a953ebe1cda047db70aaa1360e84fd58b4801a52072269a92b95e33b34ef",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/index-sgeVz14H.js",
+    "docs/demos/assets/lab-BGP-o5Ut.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:ca2dee934df84aeec4406795ce026baa89cdb0c1dfd455ec00007b2594aea6bb",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

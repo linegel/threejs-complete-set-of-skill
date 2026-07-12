@@ -10,13 +10,24 @@
     "threejs-procedural-geometry/examples/semantic-mesh-writer"
   ],
   "browserEntry": "threejs-procedural-geometry/examples/semantic-mesh-writer/index.html",
-  "sourceHash": "sha256:9218a7322fe2c95e48d0640697f04334c0d71b870de7e27bcf4c4ab287d2d6a8",
+  "sourceHash": "sha256:c89d28b0f984e240d99c7d5c75324dd570bf6d9a66a570e89d9c5f8820b5835c",
   "publishedHashInputs": [
     "docs/demos/semantic-mesh-writer",
-    "docs/demos/assets"
+    "docs/demos/assets/index-DwEXuqkc.js",
+    "docs/demos/assets/mesh-writer-BbagFjei.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:16e45821c7af995b37e586d9b02793350b915d9f3cdbb151e7525edf2ac538a4",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-DwEXuqkc.js",
+    "docs/demos/assets/mesh-writer-BbagFjei.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:ed478c1702f91224300f03534038ba61784797c7b7d05e32ff301d350b42181f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

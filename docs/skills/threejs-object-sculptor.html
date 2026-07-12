@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-object-sculptor.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d" />
+<meta name="skill-pack-build-revision" content="sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,17 +24,11 @@
 <meta property="og:title" content="Three.js Object Sculptor | Three.js WebGPU Skill" />
 <meta property="og:description" content="Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-object-sculptor.html" />
-<meta property="article:modified_time" content="2026-07-11T17:12:50+03:00" />
+<meta property="article:modified_time" content="2026-07-12T18:56:49+03:00" />
 <meta property="article:published_time" content="2026-07-11T04:29:27+03:00" />
 <meta property="article:section" content="Procedural Content" />
-<meta property="og:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
-<meta property="og:image:type" content="image/png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="760" />
-<meta property="og:image:alt" content="Three.js Object Sculptor evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
-<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png" />
-<meta name="twitter:image:alt" content="Three.js Object Sculptor evidence or generated-asset preview; consult the schema-v2 demo registry for acceptance status" />
-<meta name="twitter:card" content="summary_large_image" />
+
+<meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Three.js Object Sculptor | Three.js WebGPU Skill" />
 <meta name="twitter:description" content="Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image…" />
 <script type="application/ld+json">
@@ -68,13 +62,8 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-object-sculptor.html"
    },
-   "image": [
-    "https://threejs-skills.com/seo/article/threejs-object-sculptor-1x1.png",
-    "https://threejs-skills.com/seo/article/threejs-object-sculptor-4x3.png",
-    "https://threejs-skills.com/seo/article/threejs-object-sculptor-16x9.png"
-   ],
    "datePublished": "2026-07-11T04:29:27+03:00",
-   "dateModified": "2026-07-11T17:12:50+03:00",
+   "dateModified": "2026-07-12T18:56:49+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -129,29 +118,28 @@
  ]
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
 <style>
 
 @view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 :root{
   --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
   --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
-  --disp:'Bricolage Grotesque',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'Atkinson Hyperlegible',sans-serif;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
   --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
   --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 picture.responsive-preview{display:contents}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
-body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;
-  background-image:radial-gradient(ellipse 80% 48% at 50% -12%,rgba(255,180,84,.075),transparent 68%),
-  radial-gradient(ellipse 58% 38% at 100% 108%,rgba(127,212,193,.055),transparent 70%)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
@@ -180,13 +168,12 @@ code{font-family:var(--mono)}
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 .card:active{translate:0 -1px;scale:.99}
-.card-index{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
 .card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
-.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .status--accepted{color:var(--lime)}
 .status--pending{color:var(--amber)}
 .status--secondary{color:var(--dim)}
@@ -196,15 +183,15 @@ a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
 figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
 .preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
 .preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
-.preview-badge{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);padding:5px 8px;border-radius:8px;background:rgba(5,8,12,.84);box-shadow:0 0 0 1px rgba(255,255,255,.13),0 8px 24px rgba(0,0,0,.32);backdrop-filter:blur(12px);font-family:var(--mono);font-size:9px;line-height:1.35;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
-.preview-missing{aspect-ratio:16/10;display:grid;align-content:center;justify-items:center;gap:8px;padding:18px;background:#0b0f14;outline:1px dashed rgba(255,180,84,.34);outline-offset:-1px;color:var(--amber);text-align:center;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.preview-missing code{color:var(--dim);font-size:9px;text-transform:none;letter-spacing:0}
-.primary-evidence-panel{display:grid;align-content:center;gap:7px;min-height:168px;padding:20px;background:rgba(8,11,16,.72);box-shadow:inset 3px 0 var(--amber),inset 0 0 0 1px rgba(255,255,255,.075);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
-.primary-evidence-panel[data-evidence-state="accepted"]{box-shadow:inset 3px 0 var(--lime),inset 0 0 0 1px rgba(255,255,255,.075)}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
 .primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
-figcaption span{color:var(--dim)}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
@@ -262,9 +249,9 @@ a.chip:active{scale:.96}
 .pn{display:flex;justify-content:space-between;gap:16px;margin-top:40px}
 .pn a{font-family:var(--mono);font-size:13px;color:var(--dim);border:1px solid var(--line);padding:12px 18px;transition:color .2s,border-color .2s}
 .pn a:hover{color:var(--amber);border-color:var(--amber)}
-.hero-preview-badge{position:absolute;z-index:2;right:clamp(20px,4vw,56px);top:22px;max-width:min(520px,calc(100% - 40px));padding:7px 10px;border-radius:9px;background:rgba(7,10,14,.82);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 36px rgba(0,0,0,.3);backdrop-filter:blur(14px);font-family:var(--mono);font-size:10px;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.hero-evidence-caption{margin-top:14px;font:10px/1.45 var(--mono);color:var(--cyan)}
 .card-preview-wrap{position:relative;display:block;overflow:hidden;margin:-10px -10px 8px;border-radius:11px;background:#090c11}
-.card>.primary-evidence-panel{margin:-10px -10px 8px;border-radius:11px}
+.card>.primary-evidence-panel{margin:0 0 14px}
 .evidence-ledger{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-18px 0 24px;padding:14px 16px;border-radius:13px;background:rgba(14,17,23,.82);box-shadow:0 0 0 1px rgba(255,255,255,.075)}
 .evidence-ledger code{font-family:var(--mono);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
 .runtime-evidence-disclosures{display:grid;gap:14px;margin:0 0 28px}.runtime-evidence-disclosure{padding:20px;border-radius:16px;background:linear-gradient(145deg,rgba(19,24,33,.94),rgba(10,13,18,.96));box-shadow:var(--shadow-card)}
@@ -275,7 +262,6 @@ a.chip:active{scale:.96}
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
   .skill-hero:before{background:linear-gradient(90deg,rgba(10,12,16,.98),rgba(10,12,16,.82)),linear-gradient(0deg,rgba(10,12,16,.96),rgba(10,12,16,.45) 54%,rgba(10,12,16,.88))}
-  .hero-preview-badge{position:relative;display:inline-flex;right:auto;top:auto;margin:14px 20px 0}
   .evidence-ledger{align-items:flex-start;flex-direction:column}
   .runtime-evidence-head{align-items:flex-start;flex-direction:column}
 }
@@ -295,13 +281,13 @@ a.chip:active{scale:.96}
     <p class="lede">Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image suitability checks, ObjectSculptSpec extraction, geometry/material/lighting planning, code-native model implementation, staged visual comparison, animation-ready hierarchy, or destruction-ready component design. Adapted from Three.js Object Sculptor by Vinh Hiển.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-object-sculptor</span>
-      <span class="chip">1 primary implementation</span>
+      <span class="chip">2 primary implementations</span>
 
 
       <a class="chip" href="https://github.com/vinhhien112">Original author: Vinh Hiển ↗</a>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T17:12:50+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/6677d4ac15c009064f4eb246aabae8cb4ad9b080">commit 6677d4a ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-12T18:56:49+03:00">2026-07-12</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/16349bc436eaee7bdf6da2b455c5048c6517e9e8">commit 16349bc ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-object-sculptor/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -313,14 +299,26 @@ a.chip:active{scale:.96}
     <h2 id="primary-implementations-title">Primary implementation surface</h2>
     <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
     <div class="grid">
+      <a class="card" href="../demos/webgpu-object-sculptor-corpus/">
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-object-sculptor-corpus">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>0c806bcf4f5a</code> source hash</span>
+    <span>11 fixed states · 9 runtime proof requirements</span>
+  </span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <h3>Object Sculptor Multi-Subject Corpus</h3>
+        <p>3 fixed scenarios, 5 mechanism routes, and 3 locked tiers.</p>
+        <span class="card-meta">Open published implementation →</span>
+      </a>
       <a class="card" href="../demos/webgpu-tower-ship-sculptor/">
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-tower-ship-sculptor">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>36250f53fbaa</code> source hash</span>
+    <span><code>092f816d582d</code> source hash</span>
     <span>11 fixed states · 5 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-index">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Tower Ship Sculptor</h3>
         <p>3 fixed scenarios, 5 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -341,7 +339,7 @@ a.chip:active{scale:.96}
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
 
-    <div class="preview-missing"><span>Preview capture pending</span><code>npm run pages:capture-previews</code></div>
+    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
@@ -401,9 +399,11 @@ Replace generic starter <code>featureReviewTargets</code> with the object&#39;s 
 <li>After each visual pass, capture a browser screenshot, create one full reference/render comparison pair, inspect it once with AI vision, then update <code>reviewHistory</code> with overall, layer, and semantic feature scores.</li>
 <li>Run project typecheck/build and browser visual review; use the Codex in-app Browser screenshot tool first. Do not install or download Playwright/Chromium just for this skill unless the user explicitly requests that route.</li>
 </ol>
-<h3>Canonical WebGPU Demo</h3>
-<p>Use <code>examples/webgpu-tower-ship-sculptor/</code> as the executable reference for this skill&#39;s complete contract. It includes the strict <code>ObjectSculptSpec</code>, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/colliders/destruction groups, <code>final</code>/<code>blockout</code>/<code>hierarchy</code>/<code>materials</code>/<code>interaction</code> modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.</p>
-<p>Run <code>npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick</code> before browser capture. Treat the lab&#39;s <code>incomplete</code> evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.</p>
+<h3>Executable WebGPU References</h3>
+<p>Use <code>examples/webgpu-tower-ship-sculptor/</code> as the reference-reconstruction exemplar. It includes the strict <code>ObjectSculptSpec</code>, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/collider-construction inputs/destruction groups, <code>final</code>/<code>blockout</code>/<code>hierarchy</code>/<code>materials</code>/<code>interaction</code> modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.</p>
+<p>Use <code>examples/webgpu-object-sculptor-corpus/</code> as the cross-subject representation and architecture benchmark. It deliberately spans an articulated hard-surface lamp, an organic potted bonsai, and a rotational ceramic teapot. Its shared runtime separates semantic and live-instance identity, visual LOD from collider construction, authored action preview from solver motion, and runtime-owned from registered external resources. Its gates target failure classes that a single ship cannot: hinge reset and constraint frames, shade apertures, botanical ring/crown winding, nondegenerate lathe poles, sweep boundaries, open vessel interiors, seed envelopes, directed collider-error lower-bound regressions, tier invariants, route locks, lifecycle, and aligned-readback layout/normalization. These self-authored benchmarks have no external reference image; they exercise transfer and runtime contracts, while native browser, visual, bidirectional collider-error, timing, and performance evidence remain separate gates.</p>
+<p>From the repository root, run <code>npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick</code> before browser capture. Treat the lab&#39;s <code>incomplete</code> evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.</p>
+<p>From the repository root, run <code>npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick</code> before corpus browser review. Its artifact validator must remain <code>INSUFFICIENT_EVIDENCE</code> until the declared visual, resource, lifecycle, GPU-timing, and target-performance evidence exists.</p>
 <h2>3D Terminology Discipline</h2>
 <p>Descriptions must be clear, concrete, and compatible with real-time 3D graphics language. When describing the object, prefer terms from <code>references/3d-graphics-terminology.md</code>.</p>
 <p>Do not rely on vague descriptions such as &quot;nice&quot;, &quot;realistic&quot;, &quot;smooth&quot;, &quot;rough&quot;, &quot;bumpy&quot;, &quot;shiny&quot;, &quot;dark&quot;, or &quot;dirty&quot; unless they are translated into technical terms:</p>
@@ -518,7 +518,7 @@ Replace generic starter <code>featureReviewTargets</code> with the object&#39;s 
 <li>dimensions: width, height, depth, radius, length, taper ratios, and confidence</li>
 <li>transforms: position, rotation, scale, taper, bend, twist, bevel, boolean cut, noise displacement</li>
 <li>joints: parent component, overlap, seam, hinge, socket, embedded, glued, floating</li>
-<li>action profile: animation role, pivot mode/local position/axis, transform channels, sockets, collider proxy, constraints, destruction behavior</li>
+<li>action profile: animation role, pivot mode/local position/axis, transform channels, sockets, collider construction intent/input, constraints, destruction behavior</li>
 <li>material layers: base color, palette variation, roughness, metalness, normal, bump, displacement, transparency, edge wear, dirt, moss, scratches, chips, wetness, grain</li>
 <li>local features: per-region marks, dents, holes, seams, stains, ridges, raised details, carved lines, decals, chips, and wear patches</li>
 <li>evidence refs: which image region supports this component or local feature</li>
@@ -535,6 +535,7 @@ Replace generic starter <code>featureReviewTargets</code> with the object&#39;s 
 <li><code>buildPasses</code> to state the sculpt order and acceptance criteria from coarse to fine.</li>
 </ul>
 <p>Anti-shallow rule: a complex object with only one root component, no repetition systems, no material local overrides, and no micro feature groups is not implementation-ready even if the JSON schema validates.</p>
+<p>Before selecting geometry, repetition, hierarchy, motion, physics handoff, material, or mobile representations, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/references/multi-subject-algorithm-and-architecture.md">multi-subject algorithm and architecture selection</a>. It contains the falsifiable selection matrices and exact topology, normal, frame, bounds, collider-error, seed, motion, diagnostic, and lifecycle tests. Do not choose an algorithm from object category alone; choose per semantic component from the frozen view, action, tier-invariant, and target contracts.</p>
 <h2>Action-Ready Model Contract</h2>
 <p>Build every generated model as if the user may later ask for animation, transformation, physics, or destruction. Do not generate a beautiful but inert lump of meshes.</p>
 <p>Use <code>references/action-ready-models.md</code> for pivot, socket, collider, and destruction hierarchy rules.</p>
@@ -545,22 +546,39 @@ The sculpt specification and <code>root.userData.sculptRuntime</code> maps are a
 inputs, not an independent solver ABI. Convert source dimensions once through
 the route&#39;s SI <code>PhysicsContext</code>, preserve stable component/entity generations,
 and keep visual geometry LOD separate from physical representation.</p>
-<p>The generated asset adapter publishes a canonical <code>ColliderProxy</code> for every
-physics-relevant solid or trigger and a canonical <code>RigidBodyProperties</code> record
-when mass, center of mass, inertia, and material evidence are sufficient. Each
-proxy names its owning entity generation, local frame, SI dimensions, shape
-approximation/error, physics-material identity, source revision, and validity.
-A decorative mesh or collider-shaped <code>userData</code> object is not collision
-authority. Missing scale, density, inertia, material, or approximation evidence
-blocks the corresponding dynamic claim instead of inventing defaults.</p>
-<p>When a selected engine or domain solver owns motion, contact, constraints, or
-fracture, the route binds it through the canonical <code>ExternalSolverAdapter</code>.
-That adapter maps exact context/frame/unit/clock/state versions and publishes
-complete canonical <code>InteractionRecord</code> contact, impulse, constraint, or
-breakage entries for the route coordinator and authoritative solver. The
-object-sculptor owns semantic pivots, sockets, collider construction inputs,
-fracture groups, and visual component identity; it does not become a contact or
-rigid-body solver merely because a model is action-ready.</p>
+<p>The object factory publishes a <code>ColliderConstructionInput</code> for every
+physics-relevant solid, trigger, sensor, boundary, or query shape. It contains
+stable semantic and live-instance identity, explicit authoring units, a local
+authored frame, analytic or compound shape intent, physics-material binding
+request, source revision, and a conservative authored approximation envelope.
+It has no contact, rigid-body, frame-registration, or solver authority.</p>
+<p>An articulated factory may also publish a <code>ConstraintConstructionInput</code> with
+stable parent/child identities, parent- and child-local anchor frames, authored
+axis/limits/compliance intent, source units, and revision. It is not an active
+constraint, state equation, or solve claim until the selected route owner
+adapts and commits it.</p>
+<p>Only the selected route adapter may publish a canonical <code>ColliderProxy</code>, after
+it supplies the versioned <code>PhysicsContext</code>, performs the one explicit unit
+conversion, registers frame/origin/transform revisions, binds committed pose,
+cadence, validity, filters, and residency, and validates the approximation
+error. It publishes a canonical <code>RigidBodyProperties</code> record only when mass,
+center of mass, inertia, and material evidence are sufficient. A decorative
+mesh or collider-shaped <code>userData</code> object is not collision authority. Missing
+scale, density, inertia, material, or approximation evidence blocks the
+corresponding dynamic claim instead of inventing defaults.</p>
+<p>When a route-native engine or domain solver owns motion, contact, constraints,
+or fracture, register it directly as the relevant <code>PhysicsGraph</code> state owner
+with the route&#39;s ordinary versioned cost, state, and commit records. When an
+external library, process, or device owns that work, bind it through the
+canonical <code>ExternalSolverAdapter</code>, which maps exact context/frame/unit/clock/
+state versions. Contact lifecycle publishes <code>ContactManifoldRecord</code>; closed
+dimensional payloads such as impulse or <code>constraintTarget</code> publish the matching
+<code>InteractionRecord</code>. Fracture remains a named state equation or transition owned
+by the selected solver; only its supported dimensional exchanges use an
+<code>InteractionRecord</code> arm. The object-sculptor owns semantic pivots, sockets,
+collider and constraint construction inputs, fracture groups, and visual
+component identity; it does not become a contact or rigid-body solver merely
+because a model is action-ready.</p>
 <p>The adapter owner publishes <code>PhysicsExternalAdapterCost</code> in the same route
 opportunity rows as solver-driven state and presentation. Evidence includes
 request/response/batch counts, logical and physical bytes, serialization plus
@@ -586,17 +604,17 @@ state, presented binding, physical error bound, and stable component ID.</p>
 <li><code>pivot</code>: mode, local position, axis, and confidence. Use a semantic pivot such as base, hinge, joint, center of mass, branch root, handle socket, or custom.</li>
 <li><code>transformChannels</code>: whether translate, rotate, scale, bend, twist, detach, visibility, or material-state changes are expected.</li>
 <li><code>sockets</code>: named attachment points for hands, tools, branches, wheels, lids, projectiles, effects, or later child objects.</li>
-<li><code>collider</code>: simplified runtime proxy such as box, sphere, capsule, cylinder, convex hull, compound, trigger, or none.</li>
-<li><code>constraints</code>: hinge limits, slide limits, bend limits, spring behavior, parent locks, or physics constraints.</li>
+<li><code>colliderConstructionInput</code>: authoring shape intent such as box, sphere, capsule, cylinder, convex hull, compound, trigger, query, boundary, or none; include source units, local authored frame, stable identities, material-binding request, source revision, and conservative authored error envelope.</li>
+<li><code>constraints</code>: a <code>ConstraintConstructionInput</code> for authored hinge, slide, bend, spring, or parent-lock intent with stable participants, local anchor frames, axis/limits, units, and revision; it is not a solver constraint until the selected route owner adapts and commits it.</li>
 <li><code>destruction</code>: breakable flag, fracture group, seam refs, detachable fragments, break impulse, debris material, and effect anchors.</li>
 </ul>
 <p>Generation rules:</p>
 <ul>
 <li>Put each independently transformable part under a stable <code>THREE.Group</code> pivot node; put the visual mesh as its child.</li>
-<li>Store runtime maps in <code>root.userData.sculptRuntime</code>: <code>nodes</code>, <code>meshes</code>, <code>sockets</code>, <code>colliders</code>, and <code>destructionGroups</code>.</li>
+<li>Store runtime maps in <code>root.userData.sculptRuntime</code>: <code>nodes</code>, <code>meshes</code>, <code>sockets</code>, <code>colliders</code>, and <code>destructionGroups</code>. Values in the <code>colliders</code> map are <code>ColliderConstructionInput</code> records, not canonical <code>ColliderProxy</code> records.</li>
 <li>Avoid merging parts that may move, detach, bend, break, swap materials, or receive independent collision later.</li>
 <li>Use procedural seams and component boundaries as future break lines; do not rely on random explosions.</li>
-<li>If the object truly has no moving parts, still include a root pivot, whole-object collider, and destruction policy so later whole-object actions remain easy.</li>
+<li>If the object truly has no moving parts, still include a root pivot, whole-object collider construction input, and destruction policy so later whole-object actions remain easy.</li>
 </ul>
 <h2>Self-Correction Loop</h2>
 <p>Construction must be a feedback loop, not a blind one-way generation.</p>
@@ -679,8 +697,8 @@ Group repeated parts into one semantic system. Do not create a target for every 
 <li><code>form-refinement</code>: screenshot proves bevel/chamfer/taper/bend/deformation, local geometry features, and no floating child joints.</li>
 <li><code>material-pass</code>: screenshot proves albedo, roughness, metalness, normal/bump/displacement, AO, dirt, wear, local overrides.</li>
 <li><code>lighting-pass</code>: screenshot proves reference-independent material readability plus optional reference lighting match.</li>
-<li><code>interaction-pass</code>: screenshot or short render capture proves pivots, sockets, colliders, animation anchors, fracture seams, detachable fragments, and runtime metadata.</li>
-<li><code>optimization-pass</code>: triangle budget, draw calls, instancing, LOD, and FPS target.</li>
+<li><code>interaction-pass</code>: screenshot or short render capture demonstrates authored preview motion, pivots, sockets, construction-input overlays, fracture seams, and detachable fragments. Structural tests—not pixels—validate IDs, local frames, exact reset, records, and tier invariants; physical validity remains blocked until the canonical route gates pass.</li>
+<li><code>optimization-pass</code>: visual-error-qualified geometry/material tiers plus sustained CPU, GPU, presentation, memory, traffic, binding, and lifecycle gates on each named device/browser/backend target.</li>
 </ol>
 <h3>Locked Build Pass Gate</h3>
 <p>The construction loop is sequential. Codex must not jump from a completed spec directly to a polished model.</p>
@@ -720,8 +738,8 @@ Group repeated parts into one semantic system. Do not create a target for every 
 <li><code>surface pass</code>: add generated normal maps, procedural noise, vertex colors, bark/stone/metal/plastic/cloth patterns, scratches, wetness, dirt, edge highlights, and small repeated geometry only where it matters.</li>
 <li><code>material pass</code>: tune roughness/metalness/clearcoat/transmission/alpha so surfaces do not look like plastic unless they should.</li>
 <li><code>lighting pass</code>: separate actual object material from photo lighting; create a neutral turntable light plus optional reference-matching light.</li>
-<li><code>interaction pass</code>: add pivots, bones, colliders, animation handles, break points, and detachable fragments only when the user needs motion or destruction.</li>
-<li><code>optimization pass</code>: instance repeated details, merge static pieces where safe, cap geometry density, and preserve FPS targets.</li>
+<li><code>interaction pass</code>: add pivots, bones, collider construction inputs, animation handles, break points, and detachable fragments only when the user needs motion or destruction.</li>
+<li><code>optimization pass</code>: instance repeated details, merge static pieces where safe, and derive candidates from projected visual error before measuring the complete sustained workload on each named target.</li>
 </ol>
 <h2>Three.js Implementation Rules</h2>
 <ul>
@@ -784,7 +802,7 @@ Group repeated parts into one semantic system. Do not create a target for every 
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>580768503f5b</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 41 primary implementations · registry <code>875aca6c1820</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

@@ -10,13 +10,28 @@
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
   "browserEntry": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/index.html",
-  "sourceHash": "sha256:13b12376bae7428325bcf963253dd9a063e46f1191f7cb3db038604f35c093bc",
+  "sourceHash": "sha256:1f8f4fbc0e5e0f8be6eb8e1a38bcf095de1afe3447c57bf27c4c9f3a0374d450",
   "publishedHashInputs": [
     "docs/demos/webgpu-node-gtao",
-    "docs/demos/assets"
+    "docs/demos/assets/GTAONode-DrPYssY_.js",
+    "docs/demos/assets/TRAANode-BHDUI1yA.js",
+    "docs/demos/assets/index-D6xqPDxM.js",
+    "docs/demos/assets/main-C-eg0su8.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:0b657d8fad5f41d1681515eb8b1e6b76251e5a8ccd06cee74884fc67d6767885",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/GTAONode-DrPYssY_.js",
+    "docs/demos/assets/TRAANode-BHDUI1yA.js",
+    "docs/demos/assets/index-D6xqPDxM.js",
+    "docs/demos/assets/main-C-eg0su8.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:cfa213d74e495d2720477a6fc7d33f382615bd0fe895c2e48a88323f2ac4b7cf",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

@@ -14,13 +14,22 @@
     "threejs-choose-skills/examples/router-manifest-lab"
   ],
   "browserEntry": "threejs-choose-skills/examples/router-manifest-lab/index.html",
-  "sourceHash": "sha256:bd1faf3bb97980b022ae32e0491cc8fe3e41fb29994479b083422185fd846412",
+  "sourceHash": "sha256:174cbf305f43878c96d871ce02cc473525a4a59f0a5b5a22058579b373290d58",
   "publishedHashInputs": [
     "docs/demos/router-manifest-lab",
-    "docs/demos/assets"
+    "docs/demos/assets/index-CLshCA06.js",
+    "docs/demos/assets/index-D1LiYhRx.css",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/router-fixtures-BBUXxe5H.json"
   ],
-  "publishedBundleHash": "sha256:6a1b90d7a3de6ad94d248269ec9cb2c65d26ca7987ffd28abb1b002df24074d5",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-CLshCA06.js",
+    "docs/demos/assets/index-D1LiYhRx.css",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/router-fixtures-BBUXxe5H.json"
+  ],
+  "publishedBundleHash": "sha256:c9dced2407c1ec71b892eeb465b72a2d84f42f93ac5099ac41a1871eaf359c63",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

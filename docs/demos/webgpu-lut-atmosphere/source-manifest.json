@@ -20,10 +20,21 @@
   "sourceHash": "sha256:3fa15f99b8c751a662324fbb5d148f4ae7d426f54786e80e607881c0c7471797",
   "publishedHashInputs": [
     "docs/demos/webgpu-lut-atmosphere",
-    "docs/demos/assets"
+    "docs/demos/assets/index-DG1t1Glt.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/webgpu-lut-atmosphere-BQM5Fa5Z.js"
   ],
-  "publishedBundleHash": "sha256:c059aead384cb14bc2658b3b2e1c7a65425bb5233172c228b74c624758b15cf1",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-DG1t1Glt.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/webgpu-lut-atmosphere-BQM5Fa5Z.js"
+  ],
+  "publishedBundleHash": "sha256:ca073e2b64f80fc7f9f8608c45a324fa1069a046665af1160ea2cf1141b24219",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

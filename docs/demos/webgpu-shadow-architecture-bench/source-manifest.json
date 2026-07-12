@@ -21,10 +21,23 @@
   "sourceHash": "sha256:40940db67adf92fe7da2e55717e3ef0b5a58e672e51dddf4a986618f97628367",
   "publishedHashInputs": [
     "docs/demos/webgpu-shadow-architecture-bench",
-    "docs/demos/assets"
+    "docs/demos/assets/canonical-lab-C_swluIP.js",
+    "docs/demos/assets/index-CrHumWUw.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:31dca3b71875e3e9d524b3bd0acd443635497b77f3a2f9567c3f44819406aff4",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/canonical-lab-C_swluIP.js",
+    "docs/demos/assets/index-CrHumWUw.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:c957ef117fc7263b624ba46d704c3abaa1a733bc5f9f09e03d199e057639807b",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

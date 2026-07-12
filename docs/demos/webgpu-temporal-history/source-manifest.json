@@ -20,10 +20,33 @@
   "sourceHash": "sha256:432b825e938de8915f5e3d442fd6a41f288a7975870af1ba51d96698ee88ef0f",
   "publishedHashInputs": [
     "docs/demos/webgpu-temporal-history",
-    "docs/demos/assets"
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/GTAONode-DrPYssY_.js",
+    "docs/demos/assets/TRAANode-BHDUI1yA.js",
+    "docs/demos/assets/canonical-browser-app-3kX_K8Zh.js",
+    "docs/demos/assets/canonical-browser-app-DP12SSG4.js",
+    "docs/demos/assets/index-BIViWmuf.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/preload-helper-DYl5dUZ5.js",
+    "docs/demos/assets/stage-Cd2YMrtA.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:6edb3c4c3628da3ce018ce27f717c67f4209ec9507fac1737a45a2a981ff110d",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/GTAONode-DrPYssY_.js",
+    "docs/demos/assets/TRAANode-BHDUI1yA.js",
+    "docs/demos/assets/canonical-browser-app-3kX_K8Zh.js",
+    "docs/demos/assets/canonical-browser-app-DP12SSG4.js",
+    "docs/demos/assets/index-BIViWmuf.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/preload-helper-DYl5dUZ5.js",
+    "docs/demos/assets/stage-Cd2YMrtA.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:c35b2f7a54d934ad3eb5dfbfd50f97192cbc58384fa28fc7f146283c9f6af55f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

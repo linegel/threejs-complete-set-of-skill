@@ -23,10 +23,23 @@
   "sourceHash": "sha256:5de5585573eafd9df333f25b0e7f13d31ae6254f4eb7bdadbc7c958040b58bdf",
   "publishedHashInputs": [
     "docs/demos/integration-precipitation-image-pipeline",
-    "docs/demos/assets"
+    "docs/demos/assets/index-BY3iI31t.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/precipitation-system-CxUv8UiU.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js"
   ],
-  "publishedBundleHash": "sha256:919958bf27da7b8a798585b613a03a75fff5543791102031e87e06f81de20510",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-BY3iI31t.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/precipitation-system-CxUv8UiU.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js"
+  ],
+  "publishedBundleHash": "sha256:417f8db1469f38c8e2d6624473ac1916258a00267372dd1669f9fbdbbd985c80",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

@@ -21,10 +21,33 @@
   "sourceHash": "sha256:047eef14e678046964839d0403d5d409e7604613b720c07c4d47b89e2b4c2509",
   "publishedHashInputs": [
     "docs/demos/structured-ash-growth",
-    "docs/demos/assets"
+    "docs/demos/assets/ash-CJFpracT.png",
+    "docs/demos/assets/ash-scene-BFhrLeuM.js",
+    "docs/demos/assets/bark-color-BZZMY0gm.jpg",
+    "docs/demos/assets/bark-normal-TBmAUNgD.jpg",
+    "docs/demos/assets/bark-roughness-BvhmIB3z.jpg",
+    "docs/demos/assets/index-DzWbUIT_.js",
+    "docs/demos/assets/lab.manifest-CwzYjeyv.json",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/strict-lab-controller-DqIV3RB2.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:3fe9b93d813291b973d9579117078a72f6c47741b6c3b9b33fe579eee1e5c67b",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/ash-CJFpracT.png",
+    "docs/demos/assets/ash-scene-BFhrLeuM.js",
+    "docs/demos/assets/bark-color-BZZMY0gm.jpg",
+    "docs/demos/assets/bark-normal-TBmAUNgD.jpg",
+    "docs/demos/assets/bark-roughness-BvhmIB3z.jpg",
+    "docs/demos/assets/index-DzWbUIT_.js",
+    "docs/demos/assets/lab.manifest-CwzYjeyv.json",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/strict-lab-controller-DqIV3RB2.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:8e712ebe651c2a7a20ee9415049c483816a72bc063f841f1024426fb238c7973",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

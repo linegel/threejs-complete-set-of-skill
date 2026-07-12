@@ -22,10 +22,21 @@
   "sourceHash": "sha256:f3f47206aa6c750cc28690d364ad97847fb87523e2ed3477c71f310c44b2f26c",
   "publishedHashInputs": [
     "docs/demos/integration-temporal-surface",
-    "docs/demos/assets"
+    "docs/demos/assets/frost-surface-effect-CpkjK4mw.js",
+    "docs/demos/assets/index-BOZPDL4P.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:2ecc06caa63bbc4a7b2a1292447a318e3ceb033c731bfc3d1ef7d731f87df162",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/frost-surface-effect-CpkjK4mw.js",
+    "docs/demos/assets/index-BOZPDL4P.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:f3add9e05f0013574f6e89780b5f45c2346c2908dcf8659436b093f30b715210",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

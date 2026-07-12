@@ -1,2161 +1,1248 @@
 {
+  "schemaVersion": 2,
   "generatedBy": "scripts/generate-responsive-images.mjs",
   "sources": {
     "generated-asset-contact-sheet.png": {
+      "ownerId": "generated-asset-archive",
       "url": "https://threejs-skills.com/generated-asset-contact-sheet.png",
       "width": 480,
       "height": 2020,
       "bytes": 1498383,
+      "sourceSha256": "sha256:a7570e43b898fdf44972331fccd5bf8f8a76e4991c724ff850a1c630e3cdaaa4",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/generated-asset-contact-sheet.avif",
           "width": 480,
           "height": 2020,
           "bytes": 96211,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:aaf22e1135b47b3f6414141f25ba4aa0b7f24f9bbe1cdabc4615eac02d9d892e"
         },
         "webp": {
           "url": "https://threejs-skills.com/generated-asset-contact-sheet.webp",
           "width": 480,
           "height": 2020,
           "bytes": 119590,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:8dbe5ca7da48f121e91ec9b72b1b3770a2d4b1712f98ca9fa72644aa41dbb96f"
         }
-      }
-    },
-    "previews/primary/browser-fallback-harness.png": {
-      "url": "https://threejs-skills.com/previews/primary/browser-fallback-harness.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 277839,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/previews/primary/browser-fallback-harness.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 33562,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/previews/primary/browser-fallback-harness.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 62410,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:abb701164e341c506a395cad9f0ec8ceaf24adb10374ee4f747176b86c2ec3fb"
     },
     "previews/primary/debugging-contract-lab.png": {
+      "ownerId": "debugging-contract-lab",
       "url": "https://threejs-skills.com/previews/primary/debugging-contract-lab.png",
       "width": 1200,
       "height": 760,
       "bytes": 486079,
+      "sourceSha256": "sha256:ced9ea884fdd0cc43f8dcc92c8bfdc0c54305f8f9f67523586fc330bf7f96615",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/primary/debugging-contract-lab.avif",
           "width": 1200,
           "height": 760,
           "bytes": 28478,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:2b428bf907b771c75d17833b4905c2ed7be6a10a4c9777481d95fd0951143a56"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/primary/debugging-contract-lab.webp",
           "width": 1200,
           "height": 760,
           "bytes": 47870,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:4b62a415980927ca5f357c454dffda021c504327fef61cab1d044e093db437f7"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:59447e4d68807902b00ac1ff7c9a63acd9ab3844cfe7e5648d0691d8f18263ef"
     },
     "previews/primary/router-manifest-lab.png": {
+      "ownerId": "router-manifest-lab",
       "url": "https://threejs-skills.com/previews/primary/router-manifest-lab.png",
       "width": 1200,
       "height": 760,
       "bytes": 266278,
+      "sourceSha256": "sha256:41f0f4ac9ae1c75b93faac8e8eb855582f9b4cb874bbfae3baad2e04faa41882",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/primary/router-manifest-lab.avif",
           "width": 1200,
           "height": 760,
           "bytes": 33881,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:ae7ba0637190776d14bf480e1efc4d4470fce5d70ee9ef68df519b321b9c6085"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/primary/router-manifest-lab.webp",
           "width": 1200,
           "height": 760,
           "bytes": 62294,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:9b0c422c394cac0075590e268b5b2e825a14beef6c99ab45fc7e27b2ba781363"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:fa75169df1c220111cabf2bf332df31156b7eab932e488cbb09170018d434214"
     },
     "previews/provider/ambient-contact-shading-demo.png": {
+      "ownerId": "ambient-contact-shading-demo",
       "url": "https://threejs-skills.com/previews/provider/ambient-contact-shading-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 418791,
+      "sourceSha256": "sha256:07af7e2079ea3909ba568e76b29be59a5ab0d9e1b7b2483b747cb17bbac380e0",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/ambient-contact-shading-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 28294,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:f2a4b236d108d40bfb68f9f5c891d8593e4dff453f6b6c4686f7852db9aef9e0"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/ambient-contact-shading-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 36354,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:23fd828913dbc9b6189bfc34bcb73d754b4247facc426339aefe291cd8a267f5"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:a30e67f6fe7615914d5703221b41c520f674f2249dab7841e6a3328e9624dbcc"
     },
     "previews/provider/camera-rig-handoff-demo.png": {
+      "ownerId": "camera-rig-handoff-demo",
       "url": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 414687,
+      "sourceSha256": "sha256:9ca0dfe0cefd710c8837a38c1703fce5858eb3473d0389b839fbd94e8c99e1bf",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 31776,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:39634f42d459eba5168cce464d6cb14f32383217ca80e9b9317859649306b7ac"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/camera-rig-handoff-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 39418,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:d38d974cd92abd743d65d4b895d519b2240ab15a4722659879f7cfcd44675e7d"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:a68e30c6b24bb60fd0c93ba9fc38236e5c9c1c9bb9c09a6145252436b2618b61"
     },
     "previews/provider/compatibility-fallback-planner-demo.png": {
+      "ownerId": "compatibility-fallback-planner-demo",
       "url": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 313482,
+      "sourceSha256": "sha256:686c2a929fd50d67c91ba806b34585ba86eb006fc39680d1f7b86e642aa4cd75",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 29880,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:73117ed3122d5f96b74cd4e83e3a55bcbe8500df691a4d0536379682e194917d"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/compatibility-fallback-planner-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 39728,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:87c5be66e048fd94061220a8c4dbb98b486390a2f0769a805d018f5e20453ae1"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:9b3588b5ae977e49fef3204655158abae5cd570888939cb28c6adb3ab3fb0b47"
     },
     "previews/provider/exposure-color-grading-demo.png": {
+      "ownerId": "exposure-color-grading-demo",
       "url": "https://threejs-skills.com/previews/provider/exposure-color-grading-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 324117,
+      "sourceSha256": "sha256:3300cface6f74b8d6e006013cd13fb98d18815206be93ceda3d6ed332fe0c43d",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/exposure-color-grading-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 25557,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:0cdc43f4a7b4dc6a0f436ee6c661bfb915b81eea9967c5469d8f81e3cadfe32a"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/exposure-color-grading-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 34612,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:dd4c063db86c603f22811f0076531eafebb47580fb4d94128b3237fd6200c1cb"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:4500484856daabc165fe8b9072c64084eeace13277c7cd59ab4d39a8ef41ce7e"
     },
     "previews/provider/image-pipeline-framegraph-demo.png": {
+      "ownerId": "image-pipeline-framegraph-demo",
       "url": "https://threejs-skills.com/previews/provider/image-pipeline-framegraph-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 377288,
+      "sourceSha256": "sha256:5407f16a7bed13855b9bcaa4a4e1a851d69d4b35e35148b29da3e3f3cdadef45",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/image-pipeline-framegraph-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 30363,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:cdfd4642924fb0e6a6d0aaada1d6dc8e8c94b56529effe750c9b3d4d413c7feb"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/image-pipeline-framegraph-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 37434,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:cece002af3f2f6cb2f5bbc18bb0bc705eeb823677f2effeafc9381dc4f26e0eb"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:b42872f4638ab0cbdeb791569236889980bdeeb79fb0d75cbdb0eeac23e61134"
     },
     "previews/provider/pooled-particles-effects-demo.png": {
+      "ownerId": "pooled-particles-effects-demo",
       "url": "https://threejs-skills.com/previews/provider/pooled-particles-effects-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 319763,
+      "sourceSha256": "sha256:45eeaba0b4650c5b3fe17d1acde36d7e5624a21ba9e47ec2c2d5133f9d700266",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/pooled-particles-effects-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 29018,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:59d560478c23f5c0b1153185894ffd13a359906d5906219ffa395e300361ea60"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/pooled-particles-effects-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 36704,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:00a684bb281c54176fc33067aceb64e92b7b545b17b9e67531e378d41ab82780"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:8b1f34dcbe127b8b210ea934a241ae96fd34fa4397c9b5c348f80798a42c048d"
     },
     "previews/provider/procedural-building-compiler-demo.png": {
+      "ownerId": "procedural-building-compiler-demo",
       "url": "https://threejs-skills.com/previews/provider/procedural-building-compiler-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 578797,
+      "sourceSha256": "sha256:ae868d1959b723392d3350bfd19e5143c2fdfb55e704cf71f14cf056336c9f20",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/procedural-building-compiler-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 44698,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:37d96047644ae38f06c9a5c96e6424dc3c57b0422fff9a15fe7bfaec1475d8fc"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/procedural-building-compiler-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 53028,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:f283d5273767234aa22e9be86a2b4d76fc7da592ed6e0008e72f6fb4fba37717"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:44cfb856371c4063a77d04d32614840372c18a7bb2d047480e822c8425cc75e1"
     },
     "previews/provider/procedural-creature-lab-demo.png": {
+      "ownerId": "procedural-creature-lab-demo",
       "url": "https://threejs-skills.com/previews/provider/procedural-creature-lab-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 455053,
+      "sourceSha256": "sha256:db9464a53e4aed25fe48dca4740182d535fdb77d9abfc2303f34437716b36745",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/procedural-creature-lab-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 35376,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:f1fbadec0d1f2f098fdbbd643e29ab5ddbac17e26135c40178d81acf77fd17b8"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/procedural-creature-lab-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 43720,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:c28a293337a4bb027efe7f0f161315580ede170924b9a0f6a902d9c8c176cc79"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:062fb9f8deef86b1a35404300fa57178bc0bf10665c95bbc0e375b7dba392cfc"
     },
     "previews/provider/procedural-geometry-writer-demo.png": {
+      "ownerId": "procedural-geometry-writer-demo",
       "url": "https://threejs-skills.com/previews/provider/procedural-geometry-writer-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 313848,
+      "sourceSha256": "sha256:60b62a8b93e674a6833db0d21555b0dd1d1418932f658c70bd2345a6362f77a7",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/procedural-geometry-writer-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 28758,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:d3066b0b079f5beb16f619d9e4011b3a087254769ef5757d23c85f7f3f218ff5"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/procedural-geometry-writer-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 35128,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:87e7e8ca84f7f561f230ea777cd6d3c8c289b5ccb7ff0b90bf247a0c6e15f02c"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:5e0961eede3d0735381242ec67847eac08c3f3338736505e65ffdbef89a6b254"
     },
     "previews/provider/procedural-motion-timeline-demo.png": {
+      "ownerId": "procedural-motion-timeline-demo",
       "url": "https://threejs-skills.com/previews/provider/procedural-motion-timeline-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 249007,
+      "sourceSha256": "sha256:97ee569086d7c0aca137d6f9fdc9d48166d14bfc04de8d2c444b2b053bf228bd",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/procedural-motion-timeline-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 24110,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:0d812ca71e88aa3ee2e623e622afe3842d965fffd399dda8430297be180faf39"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/procedural-motion-timeline-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 31320,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:23c1feb267c37d40f915ae6e63fa359fd8f3e2e5478610b62a84d68b4691856f"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:d17a48c8c7fd5e1a010f34b0a2f9a405146ca5c2f35f7c0d4eca3a58dec8249f"
     },
     "previews/provider/selective-bloom-demo.png": {
+      "ownerId": "selective-bloom-demo",
       "url": "https://threejs-skills.com/previews/provider/selective-bloom-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 384931,
+      "sourceSha256": "sha256:abb5c529f2ed669a67ce5a79ce456741d0214b077b6a23ec698d4e01f755d117",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/selective-bloom-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 27442,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:eb55a1ba3522696b7451daa5acd9086c01a96196deed146afabcd30e7678fb99"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/selective-bloom-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 33726,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:1765b3c6cf2c812f25621bc943596638f029385a5c7376cfcc2ac42a95cca191"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:e31de0aa5e86f7ea331fd0d92a64cdccd1025792b35b2a4c2fcde4239cbcde9e"
     },
     "previews/provider/shadow-cascade-demo.png": {
+      "ownerId": "shadow-cascade-demo",
       "url": "https://threejs-skills.com/previews/provider/shadow-cascade-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 486599,
+      "sourceSha256": "sha256:a01fdb4a2a8f222fce940bc0dac984b6b08ebfb5e3f66df334d2266c0bcd6255",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/shadow-cascade-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 31973,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:7b5706bc090eefbda321ee620c9658310832d48f3764af11304b4ef2ea0c396d"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/shadow-cascade-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 39962,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:5d40dfde387860d5395df3322a873bb30fea8ba1b3cc4e38885d28c909f961b6"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:1d161fc9fd703c86f7d5bb5768fdb76adf9e9a0392bb7f1e5a2a27dffbdedcb4"
     },
     "previews/provider/skill-router-manifest-demo.png": {
+      "ownerId": "skill-router-manifest-demo",
       "url": "https://threejs-skills.com/previews/provider/skill-router-manifest-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 361243,
+      "sourceSha256": "sha256:7e4352e53cb84b18a08bd1fc9946abcf38ac2488c60fe5844f7bf2fa97a28696",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/skill-router-manifest-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 35075,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:19a3c575e61784553758402c542e2bd2c8b8eac017ca29ab39bbff971c7abfda"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/skill-router-manifest-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 42982,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:990e591e6d1f03c3589eb6d8cf9b047be3e8822980169ecaa0a7c07baebe14ce"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:988dde8c053c98ba51efa25b3b318f0286c87a48bb4b0261037f3a3b8c223059"
     },
     "previews/provider/sky-atmosphere-haze-demo.png": {
+      "ownerId": "sky-atmosphere-haze-demo",
       "url": "https://threejs-skills.com/previews/provider/sky-atmosphere-haze-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 731193,
+      "sourceSha256": "sha256:b05e0ddb7e14441d475799d1f0cebce8217653f29f11761cb79014fd563a9db1",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/sky-atmosphere-haze-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 40946,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:52511bc0a927a43d7647c024e1daa9c1d161a3ca9ce8d5a6d18c8abd99d605eb"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/sky-atmosphere-haze-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 49128,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:0a7a104af0e8f1fa90867826b99e3ab2a07ef7a3a9f20e3ce4c2ff1cacfb3e2b"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:e9e818e790eff0d143d3fcd0b42b6fa6d7c0dfeaf0135e101a24a595b517f6ec"
     },
     "previews/provider/visual-validation-harness-demo.png": {
+      "ownerId": "visual-validation-harness-demo",
       "url": "https://threejs-skills.com/previews/provider/visual-validation-harness-demo.png",
       "width": 1440,
       "height": 757,
       "bytes": 341066,
+      "sourceSha256": "sha256:8cac9e90c14b9b153354924a80414290d08337665fa116efae28a1444d0eac14",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/previews/provider/visual-validation-harness-demo.avif",
           "width": 1440,
           "height": 757,
           "bytes": 34936,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:7800fe49ea26b0f894fbb98c95f7453880e14e7b384225a0145059702d7f3e00"
         },
         "webp": {
           "url": "https://threejs-skills.com/previews/provider/visual-validation-harness-demo.webp",
           "width": 1440,
           "height": 757,
           "bytes": 43596,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:e98cc63da6368eee4cb000bd9808befcc95758bb5cf5d0fbb7aca48e0b26863d"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:85fb40f42970342fc2d3dc2d6daa9d92e9f3fd1b926a372b2481ad69a1856997"
     },
     "visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png": {
+      "ownerId": "cloud-generated-weather-maps",
       "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.png",
       "width": 1200,
       "height": 760,
       "bytes": 1284882,
+      "sourceSha256": "sha256:c066078dbb74a5671a7e2be839113f93ba18377cf9bdd6125a1a87e003a401ac",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 760,
           "bytes": 46616,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:5ddec54ae2af5dca1c766ede0c326e77940810cf5740e21141270e06ed3a9554"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/diagnostics.mosaic.webp",
           "width": 1200,
           "height": 760,
           "bytes": 63824,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:0c23fd49ee4477c83ae5e92ea4f2f1b0fbb524414956ec85579f2f4a9fc6c4b3"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:2408eab6f51dda13b873da14c650954824ebf0e5a1a4f03ea13c1be7a58d04a1"
     },
     "visual-validation/cloud-generated-weather-maps/final.design.png": {
+      "ownerId": "cloud-generated-weather-maps",
       "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 219555,
+      "sourceSha256": "sha256:592e447e137f7137896b65bd6a3a1285183bb1b25f62ae0ff7a1e61bb42355d6",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 14624,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:6623ebfaba8f7730ff9664de46ccf635ec7d418d0f024b9d56c014f80afe3032"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 23720,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:b645b20fedc29ff7e6129925a90707f6f38867bea0c7d53245064302bcb07377"
         }
-      }
-    },
-    "visual-validation/cloud-generated-weather-maps/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 469165,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 16661,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 23960,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/cloud-generated-weather-maps/temporal.t001.png": {
-      "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/temporal.t001.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 189058,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/temporal.t001.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 7932,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/cloud-generated-weather-maps/temporal.t001.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 12110,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:2a59056f6dd94d517911cba918dfb647701f25680f65afcc33fa2b500acf1422"
     },
     "visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png": {
+      "ownerId": "fields-generated-biome-maps",
       "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.png",
       "width": 1200,
       "height": 760,
       "bytes": 1714161,
+      "sourceSha256": "sha256:4d6ae8c4b79d4a8c5ed7f1729b0db3981f05c1712f6ddbf852c415387d4c63e7",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 760,
           "bytes": 158770,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:5a3814013981d9975736489606e2f35a91824dca90b3e990e60fc2c78ff1ec99"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/diagnostics.mosaic.webp",
           "width": 1200,
           "height": 760,
           "bytes": 153140,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:af6521adeece70349cb779432353754ca5fc2f3843621fb736dc79afdb9d89e4"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:6c8f4c237671bfcfc5bd3d4827771d959d66228ff7ec95a86fd61951e7aa2ad3"
     },
     "visual-validation/fields-generated-biome-maps/final.design.png": {
+      "ownerId": "fields-generated-biome-maps",
       "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 1217765,
+      "sourceSha256": "sha256:89947819ab2449fc087643685a1469a1a5d24a5d60bd42845359e39118f670ca",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 101320,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:d17bc6fc21fe603e8a690092f01f4c80cdf35fb632367d1185ade32a913b351a"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 120004,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:7c4a8459227d1fe6db8a43a0b4a60003a05be612c42856333113c031845b6887"
         }
-      }
-    },
-    "visual-validation/fields-generated-biome-maps/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 1090016,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 72137,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 82182,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/fields-generated-biome-maps/seed-stress.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/seed-stress.final.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 1714161,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/seed-stress.final.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 158770,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/fields-generated-biome-maps/seed-stress.final.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 153140,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/frost-generated-crystals/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 788788,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 68557,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 72288,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:70391cc19fa988926f7733c4afb706e9e56f28f99e6444210ea4b0656beb57af"
     },
     "visual-validation/frost-generated-crystals/final.design.png": {
+      "ownerId": "frost-generated-crystals",
       "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 617709,
+      "sourceSha256": "sha256:bf68b7a11c8e0adc544b43c02068e5e76e92f2069e4da4ee76c800b6ec147187",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 36370,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:7bdfc762def3452d2de4798a53ccbac9b529e37025d7d4f01d1dc0aa5705e0a1"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 36548,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:03683d993bdb3d9e74c7916e8ec2099b39861abac0656033fbc2177336a01672"
         }
-      }
-    },
-    "visual-validation/frost-generated-crystals/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 418090,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 20375,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 22512,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/frost-generated-crystals/temporal.t001.png": {
-      "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/temporal.t001.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 358900,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/temporal.t001.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 14749,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/frost-generated-crystals/temporal.t001.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 15872,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 1378891,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 68433,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 101692,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:0ddd5f601918202087ae3500d33ac449eb7ca82dff734bf251523d3025b2f2e9"
     },
     "visual-validation/materials-generated-lava-causes/final.design.png": {
+      "ownerId": "materials-generated-lava-causes",
       "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 798390,
+      "sourceSha256": "sha256:367c058df6048c0fbe4a3368a0d8040ecb69b4457fd628b4e33922a12d484007",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 39907,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:0c7d6f436d4d7c405b9b99c25359cf441af627a87e9ab6b21b885f624062ba14"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 55954,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:6bf30183e11cc2bff63bfb1cb318499486fde435bee277740e6c66a9ea6f8ae7"
         }
-      }
-    },
-    "visual-validation/materials-generated-lava-causes/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 858880,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 33599,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 42798,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/materials-generated-lava-causes/temporal.t001.png": {
-      "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/temporal.t001.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 689845,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/temporal.t001.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 25548,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/materials-generated-lava-causes/temporal.t001.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 31988,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/node-selective-bloom/bloom-only.png": {
-      "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/bloom-only.png",
-      "width": 600,
-      "height": 400,
-      "bytes": 162283,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/bloom-only.avif",
-          "width": 600,
-          "height": 400,
-          "bytes": 2530,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/bloom-only.webp",
-          "width": 600,
-          "height": 400,
-          "bytes": 2786,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/node-selective-bloom/bright-pass.png": {
-      "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/bright-pass.png",
-      "width": 600,
-      "height": 400,
-      "bytes": 2995,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/bright-pass.avif",
-          "width": 600,
-          "height": 400,
-          "bytes": 2216,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/bright-pass.webp",
-          "width": 600,
-          "height": 400,
-          "bytes": 1168,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/node-selective-bloom/emissive.png": {
-      "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/emissive.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 6542,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/emissive.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 3586,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/emissive.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 1430,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/node-selective-bloom/scene-no-bloom.png": {
-      "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/scene-no-bloom.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 17939,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/scene-no-bloom.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4303,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/node-selective-bloom/scene-no-bloom.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 8788,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 1297776,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 101824,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 173918,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:88e5d4ad22a97bd64b2b5891f4d530c88f2d8346989cacaa13e9e7c141da71c9"
     },
     "visual-validation/ocean-generated-wave-seeds/final.design.png": {
+      "ownerId": "ocean-generated-wave-seeds",
       "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 985120,
+      "sourceSha256": "sha256:01f6a37ab38a4c9784a2d88edcac3a40844c06d5e94263394747dd298121933b",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 45560,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:f46182da602f369ceb8377c596e4d816e45b8f1c9c0c8d2d019b401748061252"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 76962,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:bb2442631996fae3ea0a4cfb08330cfed8ad14e65bb7a2edf6168f1eeb99f07e"
         }
-      }
-    },
-    "visual-validation/ocean-generated-wave-seeds/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 484435,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 35378,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 48074,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/ocean-generated-wave-seeds/seed-stress.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/seed-stress.final.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 1297776,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/seed-stress.final.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 101824,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/ocean-generated-wave-seeds/seed-stress.final.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 173918,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/planet-generated-craters/camera.near.png": {
-      "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/camera.near.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 247094,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/camera.near.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 8418,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/camera.near.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 9820,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:e1725c30033da975d5550ffcb40e0b5c2239df44d5ec587bfa0ace4a4af2328f"
     },
     "visual-validation/planet-generated-craters/diagnostics.mosaic.png": {
+      "ownerId": "planet-generated-craters",
       "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/diagnostics.mosaic.png",
       "width": 1200,
       "height": 760,
       "bytes": 592864,
+      "sourceSha256": "sha256:f542b9679c08a6dcde6f40f5a5a3c4c237e0a704d10d1a8863dafb1dcf628436",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 760,
           "bytes": 34041,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:af8229c62ed76d286ca63b24208ba2df380c073137c5c71e65959fd73bf0300b"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/diagnostics.mosaic.webp",
           "width": 1200,
           "height": 760,
           "bytes": 44344,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:baae57d73aa83a54b1ab84d180d53a19b9bc6292e9b3cd9fa3522bcfef72f34c"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:4b03590aca69d9de968bc71d81076ee203f7350d7d3292714dacf1dda1b368ad"
     },
     "visual-validation/planet-generated-craters/final.design.png": {
+      "ownerId": "planet-generated-craters",
       "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 391420,
+      "sourceSha256": "sha256:6c9d3276865ec08ffbb305991b4a6f194adcd5bf953fbc66211be403ca13cc9a",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 21136,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:086e2645708a4634f1e53194c628a287c0cc02e894f9a0a3d4ed83befd1a4760"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 29194,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:e8cd4c3293290fe1b1241a99ed026781bcafc090436059adfe48daf0959c0029"
         }
-      }
-    },
-    "visual-validation/planet-generated-craters/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 274218,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 15479,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/planet-generated-craters/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 23404,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/rain-generated-ripples/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 1077046,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 138541,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 160448,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:68c8b5ffeb1626380f8b3f0052a352ca4ba55896e3a482a0efd8322a148bde2a"
     },
     "visual-validation/rain-generated-ripples/final.design.png": {
+      "ownerId": "rain-generated-ripples",
       "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 741379,
+      "sourceSha256": "sha256:55598a10f9b7b0c2a2184735b411ab4760da2b24d77626c1251ef2d8187e11df",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 77105,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:223b69adcac397d3e22c0c6f810cad2edc6361dfdb8957644be07838552532ec"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 104662,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:ea22b2458e054c95755d16dab419ec822753121813b5006075f7bed5a4d62328"
         }
-      }
-    },
-    "visual-validation/rain-generated-ripples/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 414103,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 41123,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/rain-generated-ripples/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 56788,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/space-generated-starfields/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 194857,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 23182,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 47852,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:612b28a64226f4d94204a1397fe57e1b160dc0212623c189393303e3452ec54e"
     },
     "visual-validation/space-generated-starfields/final.design.png": {
+      "ownerId": "space-generated-starfields",
       "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 423479,
+      "sourceSha256": "sha256:1a625f04d8239416006f8c9696300884e221ebab0380c6d1377f74ca0126234f",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 32270,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:8f4356a7c9d38ae9de683fe54309969cdd4df9207aeb6ecc56e8ff2149017052"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 41620,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:11568cbd2cccf33b8ec15aada98a7e8486756cd059b3a179c9dca011d3f2fc32"
         }
-      }
-    },
-    "visual-validation/space-generated-starfields/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 390930,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 21689,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 35422,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/space-generated-starfields/seed-stress.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/seed-stress.final.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 194857,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/seed-stress.final.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 23182,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/space-generated-starfields/seed-stress.final.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 47852,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 95882,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 36556,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 59068,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:db52a9294523d91e071ec799dc2b961d30690d97cb2da47dacbf81b83b19b236"
     },
     "visual-validation/vegetation-generated-meadow-density/final.design.png": {
+      "ownerId": "vegetation-generated-meadow-density",
       "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 72754,
+      "sourceSha256": "sha256:9b87d06ddafa99bdff994b9ebccbb12b92aeef4ef4baae50725456676379f4cf",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 16612,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:bd76ca62cf5318da1a34d9c24e9b03769f74cbd49e03752ff9997a1a6cf12da8"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 27530,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:c17a0fe6ed31d9f115dbf5c063b6c8d076b42b60b1a9214c5671578430041099"
         }
-      }
-    },
-    "visual-validation/vegetation-generated-meadow-density/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 92223,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 16509,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 23294,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/vegetation-generated-meadow-density/seed-stress.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/seed-stress.final.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 95882,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/seed-stress.final.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 36556,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/vegetation-generated-meadow-density/seed-stress.final.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 59068,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/water-generated-caustics/camera.near.png": {
-      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/camera.near.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 408274,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/camera.near.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 23155,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/camera.near.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 31444,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/water-generated-caustics/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 854444,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 112225,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 171250,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:7f4e943417401df67e42c082d24d7d974fa807ae8357def374d67b5266e38073"
     },
     "visual-validation/water-generated-caustics/final.design.png": {
+      "ownerId": "water-generated-caustics",
       "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.png",
       "width": 1200,
       "height": 760,
       "bytes": 374165,
+      "sourceSha256": "sha256:b98cd0baa4de26cdf63de84a3cef390c904a9b2e594eecc7488e0b43dff92e13",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.avif",
           "width": 1200,
           "height": 760,
           "bytes": 44858,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:593607f5a51338f512d0e816b81086a21c5649ddc98e90e620527343e259e873"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/final.design.webp",
           "width": 1200,
           "height": 760,
           "bytes": 79836,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:dd60b28a04f390873e20352882f662a202a8e523b48df77597e3916e8271b6ec"
         }
-      }
-    },
-    "visual-validation/water-generated-caustics/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/no-post.design.png",
-      "width": 1200,
-      "height": 760,
-      "bytes": 352486,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/no-post.design.avif",
-          "width": 1200,
-          "height": 760,
-          "bytes": 19248,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/water-generated-caustics/no-post.design.webp",
-          "width": 1200,
-          "height": 760,
-          "bytes": 27246,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:101b2051f8eba9f80a3c109a096ca2e1386e796425280ee03580ade873c25e13"
     },
     "visual-validation/water-integration-surface/integration-surface-readback.png": {
+      "ownerId": "water-integration-surface",
       "url": "https://threejs-skills.com/visual-validation/water-integration-surface/integration-surface-readback.png",
       "width": 640,
       "height": 400,
       "bytes": 106576,
+      "sourceSha256": "sha256:2eec8517a81bc5f67bb1d4ce48fbab992f794411c8fc74ef09c4be1d5de20245",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/water-integration-surface/integration-surface-readback.avif",
           "width": 640,
           "height": 400,
           "bytes": 5415,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:23adfe8471f093f928fb234f612b02c523f29c7645c38c7736615a59bb03876a"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/water-integration-surface/integration-surface-readback.webp",
           "width": 640,
           "height": 400,
           "bytes": 6028,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:9575bc4cf47caae78d3827afa11bec72494d8ec392d77e97f5703c94e4fce021"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:badd6055043c4d1626ef1ffe3320cf7eb397f1d95fa4b565c4620ec44da0a73b"
     },
     "visual-validation/webgpu-exposure-color-pipeline/final.design.png": {
+      "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png",
       "width": 1200,
       "height": 800,
       "bytes": 25880,
+      "sourceSha256": "sha256:fe08f16a1076862bc019175eb990eef3ba275871605efc10d70cdb73c3802f42",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.avif",
           "width": 1200,
           "height": 800,
           "bytes": 1788,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:fdefa8db34ac59f4ac6e2db4e7a1616ea26c9ad0bcf3f8406a1d50dab2ee3cff"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.webp",
           "width": 1200,
           "height": 800,
           "bytes": 3876,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:2f6e2e85ed9f1f6461bcd359729208f9eb17fb75ec31528627b6165ef78ae238"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:9cbba6d5df9927cb527a13cdcadf078f73515708b49b3c1dd4c5714c5b418514"
     },
     "visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png": {
+      "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png",
       "width": 1200,
       "height": 800,
       "bytes": 10308,
+      "sourceSha256": "sha256:e2e1431f129d4e83296185f43d3bfe6e9cb908bb616a0b43661c9e422b2fb8ad",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.avif",
           "width": 1200,
           "height": 800,
           "bytes": 853,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:30475f2b0e56ba07e310964aeee98fcdfba88e7c784ec80562dae22579f919ef"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.webp",
           "width": 1200,
           "height": 800,
           "bytes": 104,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:6592c54d86729ab36f338d8d886797114424ea98a17266bbd174f6086e298551"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:e4fbfb933845930998300efe3c621c1eaf5e296b80f13b63239e28d4f168f0ec"
     },
     "visual-validation/webgpu-exposure-color-pipeline/lut.png": {
+      "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/lut.png",
       "width": 1200,
       "height": 800,
       "bytes": 9108,
+      "sourceSha256": "sha256:5f461c04d8de208879e522a3df53ad28a9952993d22e7a9f943f986700846a61",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/lut.avif",
           "width": 1200,
           "height": 800,
           "bytes": 1985,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:c38d3deffcae940f656d2b97fbb8349f55cb1cca4c83ef7b067904d35032bac0"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/lut.webp",
           "width": 1200,
           "height": 800,
           "bytes": 1292,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:a7f3f920a98e671a05c49bac90a22e5fd0ac163eeeef362e49f884b1cbeb7e51"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:064ddbe098d6bb50151eb46b0b6a9ae6ada627259a316161437eadf3e9e80199"
     },
     "visual-validation/webgpu-exposure-color-pipeline/meter-mask.png": {
+      "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-mask.png",
       "width": 1200,
       "height": 800,
       "bytes": 6714,
+      "sourceSha256": "sha256:0ba25f69d6905f2c637ba7b09aa3f1ea39b2f87fa3f9314d3fc4c295c4b52092",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-mask.avif",
           "width": 1200,
           "height": 800,
           "bytes": 736,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:9a55968bdfe9aaa3dd4e90294c56ee41971f17e7a97b2f273b665395c19f5cfe"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-mask.webp",
           "width": 1200,
           "height": 800,
           "bytes": 98,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:bec88976d3ccce600934b4ff52979147c11c697c83ec512defeb2ed1570f31c0"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:3fcb23fcccc38702e17018cf41d8889ffb3361d4244aa60a4fe0d6d371c50760"
     },
     "visual-validation/webgpu-exposure-color-pipeline/meter-source.png": {
+      "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-source.png",
       "width": 1200,
       "height": 800,
       "bytes": 10387,
+      "sourceSha256": "sha256:0b4b2630aaacd5c9439b988f3908a982ed9aadae9d133eb205523cd8df6c92d4",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-source.avif",
           "width": 1200,
           "height": 800,
           "bytes": 2001,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:6e084984c08f3d06360594396a9b33a71b7396a4debbb93262774371027827c6"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-source.webp",
           "width": 1200,
           "height": 800,
           "bytes": 2228,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:7fe9764ed69cfc3b399524d6953f6011a6acd6d1112e5fabcc82e722bc5cd5cb"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:82b22979d96a6a3c5c715ce98efa89bd78c5c07bac39b45e714ee80c26fde622"
     },
     "visual-validation/webgpu-exposure-color-pipeline/tone-map.png": {
+      "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/tone-map.png",
       "width": 1200,
       "height": 800,
       "bytes": 9427,
+      "sourceSha256": "sha256:0be426a3713547e6469d4452988f0fed36f5a6a71a48dcde9b3c62ea4589dd33",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/tone-map.avif",
           "width": 1200,
           "height": 800,
           "bytes": 1982,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:e2dba839c1bc2ae56379f3cda61c1500eb4e61594ec08e4d6681a776acb2db51"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/tone-map.webp",
           "width": 1200,
           "height": 800,
           "bytes": 1750,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:6688be243614a4051f6db63d8c7a6e766bcb0ae0a7945f8af24adb2398310783"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:88f041699eb8a66ecfebf51b6769a49acf1b488eb6df83cbf3f70ab3ba34370a"
     },
     "visual-validation/webgpu-image-pipeline/bloom.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/bloom.png",
       "width": 1200,
       "height": 800,
       "bytes": 71151,
+      "sourceSha256": "sha256:b561afc5a6e6be9595df688adf2d12eaefb43ff00bd0dba11a7c8628e51f0f85",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/bloom.avif",
           "width": 1200,
           "height": 800,
           "bytes": 2175,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:2aecd1f28756fe7ca812cd9ebccd9d3dda48edb227b8050179d9531b977d9f76"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/bloom.webp",
           "width": 1200,
           "height": 800,
           "bytes": 4086,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:b36c3e79651d0d8126104546fd6b4b02696bf45a274acb1fb23bd5ae2a2758b1"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:26f76eb31e360efa6b73e284b90021fe5977e0b3a7f053d493e5ad21d77e43d5"
     },
     "visual-validation/webgpu-image-pipeline/diagnostics.mosaic.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.png",
       "width": 1200,
       "height": 800,
       "bytes": 53726,
+      "sourceSha256": "sha256:3551b43b73c1d7f3849596c8f233bef7c2fe455c262a2847a323b40c8f2a18fc",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 800,
           "bytes": 3451,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:99f2bd12e31644bb391a66a338a08f9cde421851864c554468d9f443e7686f9b"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.webp",
           "width": 1200,
           "height": 800,
           "bytes": 6372,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:18d62b09e15e31c0b06d00c45b9fd54821cd725ec63c94ca5559914a2f473aad"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:6926b85514e5732e4c689abe387bb6584c67f358861543e2b38d89fdb502a2c9"
     },
     "visual-validation/webgpu-image-pipeline/emissive.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/emissive.png",
       "width": 1200,
       "height": 800,
       "bytes": 8290,
+      "sourceSha256": "sha256:6fd583f6d313d44b48d40af4b06f394ae42ba504e9301d614a61b4f39b632897",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/emissive.avif",
           "width": 1200,
           "height": 800,
           "bytes": 1311,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:7b96af5f4506b92a119f1df634466bb10f59bfa08243470df6cebfbf654bddd2"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/emissive.webp",
           "width": 1200,
           "height": 800,
           "bytes": 562,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:1d282767c3d07f45bebc7eeba73b43e33c3ccfc81f8105cafdd66c312f596e35"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:31195e32a81df47c859d0db8ec38a053493f6581949dcf8101142f659b3497a7"
     },
     "visual-validation/webgpu-image-pipeline/final.design.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png",
       "width": 1200,
       "height": 800,
       "bytes": 107354,
+      "sourceSha256": "sha256:494ca78d45b7d6f038f633da172c5365f67a43a802e01c3c56b4321778e6f732",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.avif",
           "width": 1200,
           "height": 800,
           "bytes": 4243,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:b294fcc1b166dbccf23705acf656144b9d2f1d171a27817a4b978e6661269801"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.webp",
           "width": 1200,
           "height": 800,
           "bytes": 7002,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:3ae64811b79d2607a0df219a3fe322e672e54db71ba6f9fd6eac6761361cd30b"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:64a781488ebae55dccab6ec3d71c9520f70783171b6fdce50fd6dfdc9e865a28"
     },
     "visual-validation/webgpu-image-pipeline/no-post.design.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/no-post.design.png",
       "width": 1200,
       "height": 800,
       "bytes": 15327,
+      "sourceSha256": "sha256:df560a96dbda1eb0d173999f59c3063d570b46d4af48f63025361f88a79f7805",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/no-post.design.avif",
           "width": 1200,
           "height": 800,
           "bytes": 1937,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:b0efaa28570900a1455971a8b3d058e099213dc79ced70d7f8fb9d66fe34bf75"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/no-post.design.webp",
           "width": 1200,
           "height": 800,
           "bytes": 4590,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:d494994387b9b6dc96ceb21dcd479580b129d5eef48679c0743ba4a885b4e1f9"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:f6805cbc0dbee325f385913b517a4e852ff20e25d8550dd27c7624bdd3e59ae4"
     },
     "visual-validation/webgpu-image-pipeline/normal.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/normal.png",
       "width": 1200,
       "height": 800,
       "bytes": 29932,
+      "sourceSha256": "sha256:b9552246b0e78707b2368ab850206d24002827d14134f3427d64c49649c1034e",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/normal.avif",
           "width": 1200,
           "height": 800,
           "bytes": 2905,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:de3e554d32b312ea85b55650a09b6768c97b7c7e0c344f4b4e09f9e829699b34"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/normal.webp",
           "width": 1200,
           "height": 800,
           "bytes": 5002,
-          "encoding": "lossless"
+          "encoding": "lossless",
+          "sha256": "sha256:8ba1a4e39ba4050b57f7b7322441d104f508ecb2b72ed3a9e6570756080f918e"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:1d9b8386d8135653b06192d27f65a90cc4d02e11240a03b60ed3d12e3dced4d9"
     },
     "visual-validation/webgpu-image-pipeline/temporal.history.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/temporal.history.png",
       "width": 1200,
       "height": 800,
       "bytes": 15597,
+      "sourceSha256": "sha256:2d9d12931a82d48de7a27c7838c0366d40e19c82db358335b169fe0f8a1de1b4",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/temporal.history.avif",
           "width": 1200,
           "height": 800,
           "bytes": 2038,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:adb493b9ca260db97c3733a394e45010d4e7d51b2fb31f5646a618f84285a202"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/temporal.history.webp",
           "width": 1200,
           "height": 800,
           "bytes": 3362,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:63095df4622ab6e977d18584f148bd3fc63b0cf0a4cad609a36f092871cc61b0"
         }
-      }
+      },
+      "dependencyClosureHash": "sha256:d32252463601e3977d60bec96547dee0ecdea40f2f013e2e118dca3be6299a72"
     },
     "visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.png": {
+      "ownerId": "webgpu-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.png",
       "width": 1200,
       "height": 800,
       "bytes": 10090,
+      "sourceSha256": "sha256:b63e11098811ad4db5205321e48b1e1a434fc95311d251e48f3cbc89e0a1b594",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.avif",
           "width": 1200,
           "height": 800,
           "bytes": 1145,
-          "encoding": "quality-60"
+          "encoding": "quality-60",
+          "sha256": "sha256:bc5dc72960afe8596e199958680b0e097c54ab0a9a11da12dae2ec109218b3fd"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.webp",
           "width": 1200,
           "height": 800,
           "bytes": 2162,
-          "encoding": "quality-80"
+          "encoding": "quality-80",
+          "sha256": "sha256:173aba9346ac98cfb383a6a986da571808020c169f540a159d6765f0e71af52b"
         }
-      }
-    },
-    "visual-validation/webgpu-node-gtao/final.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 23829,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 2453,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 6008,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-node-gtao/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/no-post.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 8672,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/no-post.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4172,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/no-post.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 2280,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/webgpu-node-gtao/normal.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/normal.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 8240,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/normal.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 5658,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/normal.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 1804,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/webgpu-node-gtao/raw-gtao.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/raw-gtao.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 103748,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/raw-gtao.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 5286,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/raw-gtao.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 5286,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-node-gtao/reconstructed-gtao.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/reconstructed-gtao.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 80383,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/reconstructed-gtao.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 2102,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/reconstructed-gtao.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 3270,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-node-gtao/velocity.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/velocity.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 5021,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/velocity.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 773,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/velocity.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 84,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/camera.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 52530,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4833,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 11724,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/camera.far.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.far.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 30517,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.far.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 3655,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.far.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 8830,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/camera.near.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.near.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 73379,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.near.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 6742,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/camera.near.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 17486,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/diagnostic.emissive.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostic.emissive.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 7837,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostic.emissive.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4909,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostic.emissive.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 2112,
-          "encoding": "lossless"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/diagnostic.normal.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostic.normal.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 183628,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostic.normal.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 7154,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostic.normal.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 9724,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/diagnostics.mosaic.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostics.mosaic.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 116946,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostics.mosaic.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 8758,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/diagnostics.mosaic.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 18912,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/final.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 52530,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4833,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 11724,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/no-post.design.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/no-post.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 56795,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/no-post.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4956,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/no-post.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 11786,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/odd-size.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/odd-size.final.png",
-      "width": 641,
-      "height": 359,
-      "bytes": 20370,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/odd-size.final.avif",
-          "width": 641,
-          "height": 359,
-          "bytes": 2532,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/odd-size.final.webp",
-          "width": 641,
-          "height": 359,
-          "bytes": 5042,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/seed-0001.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/seed-0001.final.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 52530,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/seed-0001.final.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4833,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/seed-0001.final.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 11724,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/seed-9e3779b9.final.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/seed-9e3779b9.final.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 43101,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/seed-9e3779b9.final.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 3960,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/seed-9e3779b9.final.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 9036,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/temporal.t000.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/temporal.t000.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 52530,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/temporal.t000.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4833,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/temporal.t000.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 11724,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/temporal.t001.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/temporal.t001.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 52470,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/temporal.t001.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 4853,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/temporal.t001.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 11688,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/tier.governor-stress.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.governor-stress.png",
-      "width": 1920,
-      "height": 1080,
-      "bytes": 99369,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.governor-stress.avif",
-          "width": 1920,
-          "height": 1080,
-          "bytes": 10965,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.governor-stress.webp",
-          "width": 1920,
-          "height": 1080,
-          "bytes": 16040,
-          "encoding": "quality-80"
-        }
-      }
-    },
-    "visual-validation/webgpu-validation-harness/tier.target-performance.png": {
-      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.target-performance.png",
-      "width": 1920,
-      "height": 1080,
-      "bytes": 81526,
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.target-performance.avif",
-          "width": 1920,
-          "height": 1080,
-          "bytes": 6434,
-          "encoding": "quality-60"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.target-performance.webp",
-          "width": 1920,
-          "height": 1080,
-          "bytes": 17888,
-          "encoding": "quality-80"
-        }
-      }
+      },
+      "dependencyClosureHash": "sha256:1b943654929196cf5f1a3c50fd2b25d1f8d7acd15fcf492dcff88705c3879ca7"
     }
   }
 }

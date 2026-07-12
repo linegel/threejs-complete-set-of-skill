@@ -17,10 +17,23 @@
   "sourceHash": "sha256:88f02b547cf8c5ad93a38e88b1a3bc1fe8de1185524820c282eec39e9bc3bde8",
   "publishedHashInputs": [
     "docs/demos/tsl-curved-ray",
-    "docs/demos/assets"
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/index-CHtg9ro9.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/space-transfer-stage-Biw3Y0fc.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:5542b8ccdbc3a9f04e4d52909e2a822bd9bfc5ae88ef9756b69a37a5b3701f5a",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/BloomNode-qktuf1Q7.js",
+    "docs/demos/assets/index-CHtg9ro9.js",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
+    "docs/demos/assets/space-transfer-stage-Biw3Y0fc.js",
+    "docs/demos/assets/three.tsl-0l0bfIsw.js",
+    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+  ],
+  "publishedBundleHash": "sha256:2b8fbbb098609598c3d69a1da22a125abbe79adee35294dd803948d50580ee13",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }

@@ -22,10 +22,17 @@
   "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
   "publishedHashInputs": [
     "docs/demos/debugging-contract-lab",
-    "docs/demos/assets"
+    "docs/demos/assets/index-BRat-IVG.js",
+    "docs/demos/assets/index-C9Tc45Xr.css",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js"
   ],
-  "publishedBundleHash": "sha256:084b495dc0b64661d1e77a6ea34d9bef889df6316b0e617b26efbbaa1126a7ad",
+  "emittedAssetDependencies": [
+    "docs/demos/assets/index-BRat-IVG.js",
+    "docs/demos/assets/index-C9Tc45Xr.css",
+    "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js"
+  ],
+  "publishedBundleHash": "sha256:54c0f735c6aacd52ea99a65f6ecfc10436751a1a7ec560d57528f02683620239",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
+  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
   "evidenceBundleId": null
 }
