@@ -137,6 +137,7 @@ assert.equal(manifest.publishPath, "/demos/integration-temporal-surface/");
 for (const path of manifest.canonicalSource) assert(existsSync(resolve(here, path)), path);
 
 const browserHost = readFileSync(resolve(here, "browser-host.js"), "utf8");
+const browserMain = readFileSync(resolve(here, "main.js"), "utf8");
 for (const token of [
   "new WebGPURenderer",
   "await this.renderer.init()",
@@ -148,5 +149,7 @@ for (const token of [
   "routeSelection",
   "MutableSceneLinearNode",
 ]) assert(browserHost.includes(token), `browser host missing ${token}`);
+assert(browserMain.includes("return controller;"), "bootstrap promise must resolve to the canonical controller");
+assert(browserMain.includes("globalThis.labController = controllerPromise"), "bootstrap must expose the in-flight controller promise");
 
 console.log("temporal-surface integration validation passed");
