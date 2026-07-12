@@ -9,11 +9,16 @@ export function createReferenceCreatureMaterial(options = {}) {
 	material.name = `CreatureReferenceMaterial:${options.tier ?? 'hero'}`;
 	material.positionNode = deformation.worldPosition;
 	material.castShadowPositionNode = deformation.worldPosition;
-	material.normalNode = deformation.worldNormal;
+	// The deformation map varies across the surface with the static skin
+	// weights, so blending per-slot inverse-transpose normals is not the true
+	// derivative of the final position. Flat geometric normals are derived from
+	// that final displaced position and cannot disagree with the rendered face.
+	material.flatShading = true;
 	material.colorNode = attribute(options.colorAttribute ?? 'color', 'vec3');
 	material.userData.referenceDeformation = deformation;
 	material.userData.representation = 'canonical-reference-surface-candidate';
 	material.userData.fieldEvaluation = 'none in canonical fragment shading';
+	material.userData.normalSource = 'fragment derivative of final deformed position';
 	material.userData.shadowCasterParity = {
 		sharedPositionNode: deformation.worldPosition,
 		positionNode: material.positionNode,

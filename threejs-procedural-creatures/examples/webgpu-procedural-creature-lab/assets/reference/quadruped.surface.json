@@ -1,9 +1,9 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "87867d8997321e376cd59d21a6e8625f",
-    "topologySignature": "b5c7220df3265bab17301e4dff26d4f3",
-    "geometryDigest": "c3c46a51b4c1826799cc95c10be9acbf",
+    "compilerSignature": "bcd1e5a00141c80e55a4b3a07384d29e",
+    "topologySignature": "2b07e5609120905a707bcf0cc05913f2",
+    "geometryDigest": "a4f877f7fdab671742b75baddb3c24b3",
     "sourceRigIdentity": {
       "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
       "topologySignature": "47a713e93144b565e292c147af51bcd9",
@@ -13,7 +13,7 @@
   "tier": "hero",
   "representation": "canonical-reference-surface-candidate",
   "extraction": {
-    "algorithm": "marching-cubes-kuhn-ambiguity-v2",
+    "algorithm": "marching-cubes-kuhn-ambiguity-v3",
     "ambiguityPolicy": "globally-consistent-kuhn-tetrahedral-subdivision",
     "cellSize": 0.024749999999999998,
     "cellSizeDerivation": {
@@ -72,8 +72,8 @@
     "topology": {
       "status": "accepted-topology-baseline",
       "failures": [],
-      "vertexCount": 18362,
-      "triangleCount": 36720,
+      "vertexCount": 18336,
+      "triangleCount": 36668,
       "finitePositions": true,
       "finiteNormals": true,
       "invalidIndices": 0,
@@ -92,31 +92,31 @@
         "broadPhase": "deterministic-median-bvh-v1"
       },
       "area": {
-        "min": 1.0127477555179446e-12,
-        "p05": 0.0000012729272853362552,
-        "median": 0.0000581474179314327
+        "min": 4.4259006411290866e-10,
+        "p05": 0.0000013212005041513424,
+        "median": 0.00005828495431265322
       },
       "minimumAngleRadians": {
-        "min": 0.00005802910897908576,
-        "p05": 0.07406094995060922
+        "min": 0.0006878057124188687,
+        "p05": 0.07473245958160299
       },
       "signedOrientation": {
-        "min": 2.0174017233022668e-12,
-        "p05": 0.0000022197719430385018,
-        "median": 0.00010582777940636465
+        "min": 6.937396678204048e-10,
+        "p05": 0.0000023458981328529383,
+        "median": 0.00010608442214682493
       },
       "limitations": []
     },
     "meshToFieldVertexResidual": {
-      "samples": 18362,
+      "samples": 18336,
       "maximum": 0.010530794788522368,
-      "mean": 0.00032428362051610066
+      "mean": 0.00032474871102312035
     },
     "meshToFieldHausdorff": {
-      "samples": 55082,
+      "samples": 55004,
       "maximum": 0.010530794788522368,
-      "p95": 0.0018108797004769295,
-      "mean": 0.0004972675779284046,
+      "p95": 0.001812330577385968,
+      "mean": 0.0004977553079080671,
       "sampling": "all vertices plus all triangle centroids; |field| / max(|gradient|, 1e-8)"
     },
     "fieldToMeshHausdorff": {
@@ -137,10 +137,10 @@
       "sampling": "stratified axis rays; every complete-field sign-change root to nearest reference triangle"
     },
     "normalAngleError": {
-      "samples": 18362,
+      "samples": 18336,
       "maximum": 0.000001952108990226877,
-      "p95": 3.2578723295145546e-7,
-      "mean": 9.525705253431417e-8,
+      "p95": 3.254462729072817e-7,
+      "mean": 9.517682101853282e-8,
       "unit": "radians",
       "sampling": "every reference vertex against analytic complete-field gradient"
     },
@@ -156,70 +156,70 @@
     "positions": {
       "type": "Float32Array",
       "byteOffset": 0,
-      "length": 55086,
-      "byteLength": 220344
+      "length": 55008,
+      "byteLength": 220032
     },
     "normals": {
       "type": "Float32Array",
-      "byteOffset": 220352,
-      "length": 55086,
-      "byteLength": 220344
+      "byteOffset": 220032,
+      "length": 55008,
+      "byteLength": 220032
     },
     "indices": {
       "type": "Uint32Array",
-      "byteOffset": 440704,
-      "length": 110160,
-      "byteLength": 440640
+      "byteOffset": 440064,
+      "length": 110004,
+      "byteLength": 440016
     },
     "skinIndices": {
       "type": "Uint16Array",
-      "byteOffset": 881344,
-      "length": 73448,
-      "byteLength": 146896
+      "byteOffset": 880080,
+      "length": 73344,
+      "byteLength": 146688
     },
     "skinWeights": {
       "type": "Float32Array",
-      "byteOffset": 1028240,
-      "length": 73448,
-      "byteLength": 293792
+      "byteOffset": 1026768,
+      "length": 73344,
+      "byteLength": 293376
     },
     "semanticIndices": {
       "type": "Uint16Array",
-      "byteOffset": 1322032,
-      "length": 18362,
-      "byteLength": 36724
+      "byteOffset": 1320144,
+      "length": 18336,
+      "byteLength": 36672
     },
     "colorIndices": {
       "type": "Uint16Array",
-      "byteOffset": 1358768,
-      "length": 73448,
-      "byteLength": 146896
+      "byteOffset": 1356816,
+      "length": 73344,
+      "byteLength": 146688
     },
     "colorWeights": {
       "type": "Float32Array",
-      "byteOffset": 1505664,
-      "length": 73448,
-      "byteLength": 293792
+      "byteOffset": 1503504,
+      "length": 73344,
+      "byteLength": 293376
     },
     "correctionMask": {
       "type": "Uint8Array",
-      "byteOffset": 1799456,
-      "length": 18362,
-      "byteLength": 18362
+      "byteOffset": 1796880,
+      "length": 18336,
+      "byteLength": 18336
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 1817824,
-      "length": 110172,
-      "byteLength": 440688
+      "byteOffset": 1815216,
+      "length": 110016,
+      "byteLength": 440064
     }
   },
   "binary": {
-    "byteLength": 2258512,
+    "byteLength": 2255280,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "d006987d90c7a1c3086244d5065cb56b",
-    "sha256": "28efb2912a526d716f1605b2a884cc05ea12774efda95a394201e9fb94959c20",
+    "contentDigest128": "6e6ddad3998fe3fd4184771b61a37925",
+    "sha256": "c1ea20886881319911a3f400f5e5792d6a939f4cfd0a7678ada1dc1d28116587",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "quadruped",
@@ -233,9 +233,15 @@
     "sigma": 0.33,
     "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
   },
+  "deformation": {
+    "status": "not-certified",
+    "selectedMethod": null,
+    "correctionLayout": null,
+    "limitation": "The full deterministic deformation selection sweep has not produced an accepted candidate for this species."
+  },
   "acceptanceStatus": "provisional-reference-candidate",
   "limitations": [
-    "Deformation selection, correction-region selection, and direct near/design/far silhouette evidence remain open.",
+    "Deformation selection and correction-region selection remain open.",
     "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
   ]
 }

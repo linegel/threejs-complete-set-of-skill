@@ -48,5 +48,7 @@ export function buildReferenceBufferGeometry(asset, compiled) {
 	geometry.userData.topologySignature = asset.manifest.identity.topologySignature;
 	geometry.userData.geometryDigest = asset.manifest.identity.geometryDigest;
 	geometry.userData.sha256 = asset.manifest.binary.sha256;
+	geometry.userData.deformationStatus = asset.manifest.deformation?.status ?? 'missing';
+	geometry.userData.skinningMethod = asset.manifest.deformation?.selectedMethod ?? 'provisional-lbs-preview';
 	return geometry;
 }

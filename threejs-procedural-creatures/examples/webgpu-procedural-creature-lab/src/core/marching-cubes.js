@@ -13,9 +13,9 @@ const KUHN_TETRAHEDRA = Object.freeze([
 	[0, 7, 4, 6], [0, 4, 5, 6], [0, 5, 1, 6],
 ]);
 
-export const MARCHING_CUBES_ALGORITHM = 'marching-cubes-kuhn-ambiguity-v2';
+export const MARCHING_CUBES_ALGORITHM = 'marching-cubes-kuhn-ambiguity-v3';
 export const MARCHING_CUBES_AMBIGUITY_POLICY = 'globally-consistent-kuhn-tetrahedral-subdivision';
-export const EDGE_ENDPOINT_SNAP_FRACTION = 1e-5;
+export const EDGE_ENDPOINT_SNAP_FRACTION = 1e-3;
 
 function finiteVec3(value, name) {
 	if (!Array.isArray(value) || value.length !== 3 || value.some((entry) => !Number.isFinite(entry))) {

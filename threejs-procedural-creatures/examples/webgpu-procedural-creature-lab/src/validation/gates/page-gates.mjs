@@ -95,8 +95,11 @@ async function runReferenceRenderBindings() {
 	const valid = geometry.attributes.position.count === manifest.certification.topology.vertexCount
 		&& geometry.index.count === manifest.certification.topology.triangleCount * 3
 		&& geometry.userData.representation === 'canonical-reference-surface-candidate'
+		&& geometry.userData.deformationStatus === 'accepted-deformation-selection'
+		&& geometry.userData.skinningMethod === 'lbs'
 		&& material.positionNode === material.castShadowPositionNode
-		&& material.userData.fieldEvaluation === 'none in canonical fragment shading';
+		&& material.userData.fieldEvaluation === 'none in canonical fragment shading'
+		&& material.flatShading === true;
 	const details = { vertices: geometry.attributes.position.count, triangles: geometry.index.count / 3, representation: geometry.userData.representation, sharedShadowNode: material.positionNode === material.castShadowPositionNode };
 	material.dispose();
 	geometry.dispose();

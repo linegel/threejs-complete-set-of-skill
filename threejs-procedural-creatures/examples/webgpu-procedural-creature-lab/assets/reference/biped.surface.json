@@ -1,9 +1,9 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "f1efcc102afe6540d61c5b5a8903e544",
-    "topologySignature": "679864720d94d47800575a6ebf7d76d0",
-    "geometryDigest": "82464ebeac726f62ee6df8b8db306b26",
+    "compilerSignature": "7404ac1d18f348c9038afebb3dffbb65",
+    "topologySignature": "7aa5fa7a9921fe08d491000e43919af0",
+    "geometryDigest": "30e42f354e05defd3a565a27ade22139",
     "sourceRigIdentity": {
       "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
       "topologySignature": "9e82f77bd5e4471dd9980bf3c3836e6d",
@@ -13,7 +13,7 @@
   "tier": "hero",
   "representation": "canonical-reference-surface-candidate",
   "extraction": {
-    "algorithm": "marching-cubes-kuhn-ambiguity-v2",
+    "algorithm": "marching-cubes-kuhn-ambiguity-v3",
     "ambiguityPolicy": "globally-consistent-kuhn-tetrahedral-subdivision",
     "cellSize": 0.03,
     "cellSizeDerivation": {
@@ -72,8 +72,8 @@
     "topology": {
       "status": "accepted-topology-baseline",
       "failures": [],
-      "vertexCount": 11058,
-      "triangleCount": 22112,
+      "vertexCount": 11029,
+      "triangleCount": 22054,
       "finitePositions": true,
       "finiteNormals": true,
       "invalidIndices": 0,
@@ -92,31 +92,31 @@
         "broadPhase": "deterministic-median-bvh-v1"
       },
       "area": {
-        "min": 6.343957850708024e-13,
-        "p05": 8.561817876941537e-7,
-        "median": 0.0000758095547155807
+        "min": 6.106721794907344e-10,
+        "p05": 9.7290926827936e-7,
+        "median": 0.00007640204243697114
       },
       "minimumAngleRadians": {
-        "min": 0.00005420817364424088,
-        "p05": 0.04397474762506372
+        "min": 0.0004127834892897319,
+        "p05": 0.04485577245733703
       },
       "signedOrientation": {
-        "min": 6.924719064188447e-13,
-        "p05": 0.0000016051774668720648,
-        "median": 0.00014727439050086464
+        "min": 1.1152494317431864e-9,
+        "p05": 0.0000018411874880676453,
+        "median": 0.00014762188941254848
       },
       "limitations": []
     },
     "meshToFieldVertexResidual": {
-      "samples": 11058,
+      "samples": 11029,
       "maximum": 0.006432041147579559,
-      "mean": 0.0003153597837617525
+      "mean": 0.00031618909608277084
     },
     "meshToFieldHausdorff": {
-      "samples": 33170,
+      "samples": 33083,
       "maximum": 0.006706847787326444,
-      "p95": 0.0016873531911364365,
-      "mean": 0.0004883629299294063,
+      "p95": 0.0016875353558208728,
+      "mean": 0.0004891215386068116,
       "sampling": "all vertices plus all triangle centroids; |field| / max(|gradient|, 1e-8)"
     },
     "fieldToMeshHausdorff": {
@@ -137,10 +137,10 @@
       "sampling": "stratified axis rays; every complete-field sign-change root to nearest reference triangle"
     },
     "normalAngleError": {
-      "samples": 11058,
+      "samples": 11029,
       "maximum": 4.856041293382789e-7,
       "p95": 1.9428737179048833e-7,
-      "mean": 5.0582013784377235e-8,
+      "mean": 5.048894394119604e-8,
       "unit": "radians",
       "sampling": "every reference vertex against analytic complete-field gradient"
     },
@@ -156,70 +156,70 @@
     "positions": {
       "type": "Float32Array",
       "byteOffset": 0,
-      "length": 33174,
-      "byteLength": 132696
+      "length": 33087,
+      "byteLength": 132348
     },
     "normals": {
       "type": "Float32Array",
-      "byteOffset": 132704,
-      "length": 33174,
-      "byteLength": 132696
+      "byteOffset": 132352,
+      "length": 33087,
+      "byteLength": 132348
     },
     "indices": {
       "type": "Uint32Array",
-      "byteOffset": 265408,
-      "length": 66336,
-      "byteLength": 265344
+      "byteOffset": 264704,
+      "length": 66162,
+      "byteLength": 264648
     },
     "skinIndices": {
       "type": "Uint16Array",
-      "byteOffset": 530752,
-      "length": 44232,
-      "byteLength": 88464
+      "byteOffset": 529360,
+      "length": 44116,
+      "byteLength": 88232
     },
     "skinWeights": {
       "type": "Float32Array",
-      "byteOffset": 619216,
-      "length": 44232,
-      "byteLength": 176928
+      "byteOffset": 617600,
+      "length": 44116,
+      "byteLength": 176464
     },
     "semanticIndices": {
       "type": "Uint16Array",
-      "byteOffset": 796144,
-      "length": 11058,
-      "byteLength": 22116
+      "byteOffset": 794064,
+      "length": 11029,
+      "byteLength": 22058
     },
     "colorIndices": {
       "type": "Uint16Array",
-      "byteOffset": 818272,
-      "length": 44232,
-      "byteLength": 88464
+      "byteOffset": 816128,
+      "length": 44116,
+      "byteLength": 88232
     },
     "colorWeights": {
       "type": "Float32Array",
-      "byteOffset": 906736,
-      "length": 44232,
-      "byteLength": 176928
+      "byteOffset": 904368,
+      "length": 44116,
+      "byteLength": 176464
     },
     "correctionMask": {
       "type": "Uint8Array",
-      "byteOffset": 1083664,
-      "length": 11058,
-      "byteLength": 11058
+      "byteOffset": 1080832,
+      "length": 11029,
+      "byteLength": 11029
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 1094736,
-      "length": 66348,
-      "byteLength": 265392
+      "byteOffset": 1091872,
+      "length": 66174,
+      "byteLength": 264696
     }
   },
   "binary": {
-    "byteLength": 1360128,
+    "byteLength": 1356576,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "78f312ae2d1ff3da7c034cd03cb26cce",
-    "sha256": "5cc5e57cc51fce29f4c9db93a69c4f4b81f7c57d1106095d3c6b62ed797786b9",
+    "contentDigest128": "53960e2ceffb0f1866aa93aaba373a34",
+    "sha256": "8f38b1ce6f2ded9e47ed1926129ccac6d90b7a3462819e661628b4be8b59a8be",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "biped",
@@ -230,12 +230,52 @@
     "maximumPartitionError": 4.470348358154297e-8,
     "maximumBarrierLeakage": 0,
     "fallbackVertices": 0,
-    "sigma": 0.33,
+    "sigma": 0.13,
     "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
+  },
+  "deformation": {
+    "version": "creature-deformation-sweep-v2",
+    "status": "accepted-deformation-selection",
+    "selectedMethod": "lbs",
+    "correctionLayout": "none",
+    "selectionRule": "Prefer skin-only LBS, then skin-only DQS; require non-collapsed manifold geometry, direct projected silhouettes, and geometric-normal alignment; permit a static bounded correction mask only when it covers at most 25% and the corrected full sweep passes; otherwise reject.",
+    "corpus": {
+      "version": "creature-deformation-sweep-v2",
+      "locomotionType": "biped",
+      "durationSeconds": 4,
+      "sampleCount": 25,
+      "deterministicSampling": "integer 60 Hz ticks addressed by seek()"
+    },
+    "thresholds": {
+      "worldUnitsPerPixel": 0.03,
+      "maximumSurfaceErrorWorld": 0.03,
+      "maximumSilhouetteErrorPx": 1,
+      "maximumNormalAngleRadians": 0.3665191429188092
+    },
+    "worst": {
+      "surfaceDistance": 0.1909944190197646,
+      "normalAngleRadians": 0.35155506087330834,
+      "projectedSilhouetteErrorBoundPx": 6.366480633992154,
+      "directSilhouetteErrorPx": 2,
+      "directSilhouetteP95ErrorPx": 1,
+      "silhouetteDisagreementFraction": 0.0322265625
+    },
+    "totals": {
+      "collapsedTriangles": 0,
+      "invertedTriangles": 0,
+      "nonAdjacentSelfIntersections": 0
+    },
+    "dqsFailures": [
+      "57 pose self-intersections"
+    ],
+    "limitations": [
+      "Deterministic CPU silhouettes certify three orthographic design directions; browser near/design/far perspective captures remain required evidence.",
+      "Morphology-envelope endpoint poses are not included unless supplied through options.corpus."
+    ]
   },
   "acceptanceStatus": "provisional-reference-candidate",
   "limitations": [
-    "Deformation selection, correction-region selection, and direct near/design/far silhouette evidence remain open.",
+    "Deterministic orthographic deformation selection passes; direct browser near/design/far perspective evidence remains open.",
     "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
   ]
 }

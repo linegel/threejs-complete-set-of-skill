@@ -1,9 +1,9 @@
 {
   "schemaVersion": "creature-reference-asset-v2",
   "identity": {
-    "compilerSignature": "8e3c7c1738781d4fe788baedd74112d3",
-    "topologySignature": "326908c0c73ab41ea5ce0af0e982658e",
-    "geometryDigest": "8ab21d3e28826bc88e5142a6b1b18d58",
+    "compilerSignature": "41448edcfcbc75a22bec35fc7b658fa2",
+    "topologySignature": "c9eb0310dd4f5d1e6122e1280fd4d216",
+    "geometryDigest": "c192f1253f02a7bb9bca1275c7f5330b",
     "sourceRigIdentity": {
       "compilerSignature": "af9253acc0264ae89e7269ba4c989be4",
       "topologySignature": "e2eaca7481dc3c5ac799ed14ada9060a",
@@ -13,7 +13,7 @@
   "tier": "hero",
   "representation": "canonical-reference-surface-candidate",
   "extraction": {
-    "algorithm": "marching-cubes-kuhn-ambiguity-v2",
+    "algorithm": "marching-cubes-kuhn-ambiguity-v3",
     "ambiguityPolicy": "globally-consistent-kuhn-tetrahedral-subdivision",
     "cellSize": 0.012,
     "cellSizeDerivation": {
@@ -72,8 +72,8 @@
     "topology": {
       "status": "accepted-topology-baseline",
       "failures": [],
-      "vertexCount": 36526,
-      "triangleCount": 73048,
+      "vertexCount": 36488,
+      "triangleCount": 72972,
       "finitePositions": true,
       "finiteNormals": true,
       "invalidIndices": 0,
@@ -92,38 +92,38 @@
         "broadPhase": "deterministic-median-bvh-v1"
       },
       "area": {
-        "min": 2.6957652419812655e-12,
-        "p05": 3.588511861011704e-7,
-        "median": 0.000013096148922175745
+        "min": 1.0833442476432253e-10,
+        "p05": 3.7560242689904327e-7,
+        "median": 0.000013106660844930791
       },
       "minimumAngleRadians": {
-        "min": 0.00027473679572332884,
-        "p05": 0.07863324425455769
+        "min": 0.0004136296992446522,
+        "p05": 0.07917346661130435
       },
       "signedOrientation": {
-        "min": 5.380519839061785e-12,
-        "p05": 7.040158184396249e-7,
-        "median": 0.00002544337287701825
+        "min": 7.403531394816866e-11,
+        "p05": 7.178858466883757e-7,
+        "median": 0.000025479309343500256
       },
       "limitations": []
     },
     "meshToFieldVertexResidual": {
-      "samples": 36526,
+      "samples": 36488,
       "maximum": 0.003272599791654174,
-      "mean": 0.00007512154537907404
+      "mean": 0.0000752016505035844
     },
     "meshToFieldHausdorff": {
-      "samples": 109574,
+      "samples": 109460,
       "maximum": 0.003538774991152571,
-      "p95": 0.00039940892997412356,
-      "mean": 0.00011409050053529695,
+      "p95": 0.0003997893067542167,
+      "mean": 0.00011418969072703626,
       "sampling": "all vertices plus all triangle centroids; |field| / max(|gradient|, 1e-8)"
     },
     "fieldToMeshHausdorff": {
       "samples": 232,
       "maximum": 0.0011183996795542381,
       "p95": 0.0005637721359193389,
-      "mean": 0.00015134918424241853,
+      "mean": 0.00015134838909198532,
       "signChangeRoots": 232,
       "rayResolution": 18,
       "rayStep": 0.009000000000000001,
@@ -137,10 +137,10 @@
       "sampling": "stratified axis rays; every complete-field sign-change root to nearest reference triangle"
     },
     "normalAngleError": {
-      "samples": 36526,
+      "samples": 36488,
       "maximum": 0.0000029840668208529006,
-      "p95": 2.8585383434967613e-7,
-      "mean": 7.309559019549468e-8,
+      "p95": 2.862419592186602e-7,
+      "mean": 7.311838503610647e-8,
       "unit": "radians",
       "sampling": "every reference vertex against analytic complete-field gradient"
     },
@@ -156,70 +156,70 @@
     "positions": {
       "type": "Float32Array",
       "byteOffset": 0,
-      "length": 109578,
-      "byteLength": 438312
+      "length": 109464,
+      "byteLength": 437856
     },
     "normals": {
       "type": "Float32Array",
-      "byteOffset": 438320,
-      "length": 109578,
-      "byteLength": 438312
+      "byteOffset": 437856,
+      "length": 109464,
+      "byteLength": 437856
     },
     "indices": {
       "type": "Uint32Array",
-      "byteOffset": 876640,
-      "length": 219144,
-      "byteLength": 876576
+      "byteOffset": 875712,
+      "length": 218916,
+      "byteLength": 875664
     },
     "skinIndices": {
       "type": "Uint16Array",
-      "byteOffset": 1753216,
-      "length": 146104,
-      "byteLength": 292208
+      "byteOffset": 1751376,
+      "length": 145952,
+      "byteLength": 291904
     },
     "skinWeights": {
       "type": "Float32Array",
-      "byteOffset": 2045424,
-      "length": 146104,
-      "byteLength": 584416
+      "byteOffset": 2043280,
+      "length": 145952,
+      "byteLength": 583808
     },
     "semanticIndices": {
       "type": "Uint16Array",
-      "byteOffset": 2629840,
-      "length": 36526,
-      "byteLength": 73052
+      "byteOffset": 2627088,
+      "length": 36488,
+      "byteLength": 72976
     },
     "colorIndices": {
       "type": "Uint16Array",
-      "byteOffset": 2702896,
-      "length": 146104,
-      "byteLength": 292208
+      "byteOffset": 2700064,
+      "length": 145952,
+      "byteLength": 291904
     },
     "colorWeights": {
       "type": "Float32Array",
-      "byteOffset": 2995104,
-      "length": 146104,
-      "byteLength": 584416
+      "byteOffset": 2991968,
+      "length": 145952,
+      "byteLength": 583808
     },
     "correctionMask": {
       "type": "Uint8Array",
-      "byteOffset": 3579520,
-      "length": 36526,
-      "byteLength": 36526
+      "byteOffset": 3575776,
+      "length": 36488,
+      "byteLength": 36488
     },
     "restRadialFrames": {
       "type": "Float32Array",
-      "byteOffset": 3616048,
-      "length": 219156,
-      "byteLength": 876624
+      "byteOffset": 3612272,
+      "length": 218928,
+      "byteLength": 875712
     }
   },
   "binary": {
-    "byteLength": 4492672,
+    "byteLength": 4487984,
     "alignment": 16,
     "byteOrder": "little-endian",
-    "contentDigest128": "970ceb159de26ba33f989ec5d5b7ff3b",
-    "sha256": "746367ba9cc2c5426f24a37aaf224cca66be83ef3c37d179aa02e2346f004d37",
+    "contentDigest128": "d3cca649e7b3627b7be868e5286fc59b",
+    "sha256": "6b34f36eae29a940ef35c2590c3dbb1dd2402acace447b460fe71cdee47b8a76",
     "sha256Status": "verified-by-asset-writer"
   },
   "name": "flyer",
@@ -233,9 +233,15 @@
     "sigma": 0.27,
     "barrierPolicy": "ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly"
   },
+  "deformation": {
+    "status": "not-certified",
+    "selectedMethod": null,
+    "correctionLayout": null,
+    "limitation": "The full deterministic deformation selection sweep has not produced an accepted candidate for this species."
+  },
   "acceptanceStatus": "provisional-reference-candidate",
   "limitations": [
-    "Deformation selection, correction-region selection, and direct near/design/far silhouette evidence remain open.",
+    "Deformation selection and correction-region selection remain open.",
     "Runtime promotion is forbidden while acceptanceStatus is provisional-reference-candidate."
   ]
 }

@@ -84,6 +84,8 @@ async function runGateCoverage() {
 		'dq-rest-antipodal',
 		'dq-scale-fixture',
 		'projected-silhouette-fixture',
+		'deformation-selection-fixture',
+		'biped-deformation-sweep',
 		'bounded-correction',
 		'correction-failure-preserves-skin',
 		'correction-region-policy',

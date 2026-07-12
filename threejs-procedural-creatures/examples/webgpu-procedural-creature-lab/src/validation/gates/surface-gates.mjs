@@ -18,6 +18,7 @@ import {
 } from '../../core/deformation.js';
 import { validateMeshTopology } from '../../core/mesh-validity.js';
 import { compareProjectedSilhouettes } from '../../core/silhouette.js';
+import { certifyDeformationSelection } from '../../core/deformation-sweep.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const specsDir = resolve(here, '../../lab/specs');
@@ -211,6 +212,10 @@ async function runBundledReferenceAssets() {
 		if (manifest.acceptanceStatus !== 'provisional-reference-candidate' || manifest.representation !== 'canonical-reference-surface-candidate') {
 			return { status: 'fail', details: { message: `bundled asset '${name}' overstates acceptance`, acceptanceStatus: manifest.acceptanceStatus, representation: manifest.representation } };
 		}
+		const expectedDeformationStatus = name === 'biped' ? 'accepted-deformation-selection' : 'not-certified';
+		if (manifest.deformation?.status !== expectedDeformationStatus || (name === 'biped' && manifest.deformation?.selectedMethod !== 'lbs')) {
+			return { status: 'fail', details: { message: `bundled asset '${name}' deformation status drifted`, expectedDeformationStatus, deformation: manifest.deformation } };
+		}
 		records.push({ name, vertices, triangles: arrays.indices.length / 3, bytes: binary.byteLength, sha256 });
 	}
 	return { status: 'pass', details: { records, acceptanceStatus: 'provisional-reference-candidate' } };
@@ -317,6 +322,64 @@ async function runProjectedSilhouetteFixture() {
 	return { status: 'pass', details: { baselineMaximumErrorPx: baseline.maximumErrorPx, mutatedMaximumErrorPx: mutation.maximumErrorPx, baselineDisagreementFraction: baseline.maximumDisagreementFraction, mutatedDisagreementFraction: mutation.maximumDisagreementFraction } };
 }
 
+async function runDeformationSelectionFixture() {
+	const compiled = compileFixture(sphereSpec);
+	const surface = extractReferenceSurface(compiled, { cellSize: 0.1, maxSamples: 300_000 });
+	const skinning = generateGeodesicSkinWeights(surface, compiled);
+	const options = {
+		durationSeconds: 1,
+		sampleCount: 3,
+		worldUnitsPerPixel: 0.05,
+		maximumSilhouetteErrorPx: 1,
+		maximumNormalAngleRadians: Math.PI / 6,
+		silhouetteResolution: 32,
+		silhouetteRayStep: 0.03,
+		maximumCorrectionTrials: 0,
+		checkSelfIntersections: true,
+	};
+	const accepted = certifyDeformationSelection(sphereSpec, compiled, surface, skinning, options);
+	const brokenWeights = { ...skinning, skinWeights: new Float32Array(skinning.skinWeights.length) };
+	const rejected = certifyDeformationSelection(sphereSpec, compiled, surface, brokenWeights, options);
+	if (accepted.status !== 'accepted-deformation-selection' || accepted.selectedMethod !== 'lbs'
+		|| rejected.status !== 'rejected' || rejected.candidates.lbs.totals.collapsedTriangles === 0) {
+		return { status: 'fail', details: { message: 'deformation selection did not accept the stable sphere and reject collapsed skinning', accepted: { status: accepted.status, method: accepted.selectedMethod, failures: accepted.candidates.lbs.failures }, rejected: { status: rejected.status, failures: rejected.candidates.lbs.failures, totals: rejected.candidates.lbs.totals } } };
+	}
+	return { status: 'pass', details: { selectedMethod: accepted.selectedMethod, silhouette: accepted.candidates.lbs.worst.directSilhouetteP95ErrorPx, rejectedFailures: rejected.candidates.lbs.failures } };
+}
+
+async function runBipedDeformationSweep() {
+	const [specText, manifestText, binary] = await Promise.all([
+		readFile(resolve(specsDir, 'biped.json'), 'utf8'),
+		readFile(resolve(referenceAssetsDir, 'biped.surface.json'), 'utf8'),
+		readFile(resolve(referenceAssetsDir, 'biped.surface.bin')),
+	]);
+	const spec = JSON.parse(specText);
+	const manifest = JSON.parse(manifestText);
+	const arrays = unpackReferenceAsset(manifest, new Uint8Array(binary));
+	const compiled = compileFixture(spec);
+	const result = certifyDeformationSelection(
+		spec,
+		compiled,
+		{ positions: arrays.positions, normals: arrays.normals, indices: arrays.indices },
+		{ skinIndices: arrays.skinIndices, skinWeights: arrays.skinWeights },
+		{
+			durationSeconds: 4,
+			sampleCount: 25,
+			worldUnitsPerPixel: manifest.extraction.cellSize,
+			maximumSilhouetteErrorPx: 1,
+			silhouetteResolution: 32,
+			silhouetteRayStep: manifest.extraction.cellSize,
+			maximumCorrectionTrials: 0,
+			checkSelfIntersections: true,
+		},
+	);
+	if (manifest.skinning?.sigma !== 0.13 || result.status !== 'accepted-deformation-selection' || result.selectedMethod !== 'lbs'
+		|| result.candidates.lbs.totals.collapsedTriangles !== 0 || result.candidates.lbs.totals.nonAdjacentSelfIntersections !== 0) {
+		return { status: 'fail', details: { message: 'frozen biped weight/deformation sweep rejected', sigma: manifest.skinning?.sigma, status: result.status, selectedMethod: result.selectedMethod, failures: result.candidates.lbs.failures, totals: result.candidates.lbs.totals } };
+	}
+	return { status: 'pass', details: { sigma: manifest.skinning.sigma, selectedMethod: result.selectedMethod, corpus: result.corpus, worst: result.candidates.lbs.worst, totals: result.candidates.lbs.totals, dqsFailures: result.candidates.dqs.failures } };
+}
+
 export const gates = [
 	{ id: 'reference-surface-sphere', run: runReferenceSphere },
 	{ id: 'reference-surface-determinism', run: runReferenceDeterminism },
@@ -329,4 +392,6 @@ export const gates = [
 	{ id: 'dq-rest-antipodal', run: runDqRestAndAntipodal },
 	{ id: 'dq-scale-fixture', run: runDqScaleFixture },
 	{ id: 'projected-silhouette-fixture', run: runProjectedSilhouetteFixture },
+	{ id: 'deformation-selection-fixture', run: runDeformationSelectionFixture },
+	{ id: 'biped-deformation-sweep', run: runBipedDeformationSweep },
 ];

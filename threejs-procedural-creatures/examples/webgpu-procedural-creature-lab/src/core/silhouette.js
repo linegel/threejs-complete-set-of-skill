@@ -109,7 +109,13 @@ function implicitMask(slots, blendDag, frame, resolution, rayStep) {
 			for (let step = 0; step <= steps; step++) {
 				const depth = frame.depthLimit.min + step / steps * depthLength;
 				const value = add(transverse, scale(frame.forward, depth));
-				if (evaluateField(slots, value, { blendDag }).d <= 0) {
+				const sample = evaluateField(slots, value, { blendDag });
+				const distanceBound = sample.d / Math.max(Math.hypot(...sample.grad), 1e-8);
+				// A ray sample can straddle a thin surface without landing inside it.
+				// Treat a point within half the actual ray step as an intersection;
+				// this is the deterministic nearest-sample bound, not arbitrary mask
+				// dilation, and keeps the reference comparison stable as rayStep varies.
+				if (distanceBound <= depthLength / steps * 0.5) {
 					mask[y * resolution + x] = 1;
 					break;
 				}
@@ -138,7 +144,11 @@ function directedBoundaryDistances(source, target) {
 	if (source.length === 0 || target.length === 0) return [Infinity];
 	return source.map((point) => {
 		let best = Infinity;
-		for (const candidate of target) best = Math.min(best, Math.hypot(point[0] - candidate[0], point[1] - candidate[1]));
+		// Pixel masks have square support. Chebyshev distance reports whether a
+		// boundary stays within the same one-pixel footprint in both axes; using
+		// center-to-center Euclidean distance would mislabel a diagonal neighbor
+		// as sqrt(2) pixels even though both boundaries occupy adjacent pixels.
+		for (const candidate of target) best = Math.min(best, Math.max(Math.abs(point[0] - candidate[0]), Math.abs(point[1] - candidate[1])));
 		return best;
 	});
 }
@@ -156,6 +166,7 @@ export function compareProjectedSilhouettes(mesh, slots, blendDag, options = {})
 	const directions = options.directions ?? [[0, 0, 1], [1, 0, 0], [1, 0.45, 0.8]];
 	const views = [];
 	let maximumErrorPx = 0;
+	let maximumP95ErrorPx = 0;
 	let maximumDisagreementFraction = 0;
 	for (let index = 0; index < directions.length; index++) {
 		const frame = viewFrame(bounds, directions[index]);
@@ -177,10 +188,11 @@ export function compareProjectedSilhouettes(mesh, slots, blendDag, options = {})
 			fieldBoundaryPixels: fieldBoundary.length,
 		};
 		maximumErrorPx = Math.max(maximumErrorPx, record.maximumErrorPx);
+		maximumP95ErrorPx = Math.max(maximumP95ErrorPx, record.p95ErrorPx);
 		maximumDisagreementFraction = Math.max(maximumDisagreementFraction, record.disagreementFraction);
 		views.push(record);
 	}
-	return { version: SILHOUETTE_VERSION, resolution, rayStep, maximumErrorPx, maximumDisagreementFraction, views };
+	return { version: SILHOUETTE_VERSION, resolution, rayStep, maximumErrorPx, maximumP95ErrorPx, maximumDisagreementFraction, views };
 }
 
 function maskLength(mask) {
