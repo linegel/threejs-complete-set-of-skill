@@ -16,6 +16,7 @@ import {
   loadCanonicalTargets,
   validatePrimaryRosterClosure,
 } from './lab-registry.mjs';
+import { loadCheckedSchemas, validateCheckedJsonSchema } from './checked-json-schema.mjs';
 import { validateEvidenceBundle } from './evidence-v2.mjs';
 
 const ID = /^[a-z0-9][a-z0-9-]*$/;
@@ -147,6 +148,8 @@ function validateRawRequirement(requirement, path, errors) {
 
 export function validateRawLabManifest(raw) {
   const errors = [];
+  const schemaResult = validateCheckedJsonSchema(loadCheckedSchemas().labManifest, raw);
+  errors.push(...schemaResult.errors.map((error) => `lab-manifest.schema.json: ${error}`));
   for (const key of [
     'schemaVersion', 'id', 'skill', 'threeRevision', 'kind', 'status',
     'canonicalSource', 'browserEntry', 'publishPath', 'scenarios', 'mechanisms',
