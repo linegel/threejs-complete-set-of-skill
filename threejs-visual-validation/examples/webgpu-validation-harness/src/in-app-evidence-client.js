@@ -241,38 +241,57 @@ async function collectRoute( plan, operation = null ) {
 
 }
 
-async function collectPerformanceSegment( controller, minimumDurationMs, label ) {
+async function collectPerformanceSegment( controller, minimumDurationMs, label, refreshPeriodMs ) {
 
+	if ( Number.isFinite( refreshPeriodMs ) === false || refreshPeriodMs <= 0 ) throw new Error( `${ label } requires a positive measured refresh period.` );
 	const started = performance.now();
-	const presentationSamples = [];
 	const timestampBatches = [];
-	let expectedPresentationSamples = 0;
-	while ( performance.now() - started < minimumDurationMs || presentationSamples.length < 120 ) {
+	const presentationTimestamps = [];
+	let samplePresentation = true;
+	let finishPresentation;
+	const presentationComplete = new Promise( ( resolve ) => { finishPresentation = resolve; } );
+	function presentationFrame( timestamp ) {
 
-		const batch = await controller.runPerformanceProfile( { warmupFrames: 30, sampleFrames: 240, presentationFrames: 240 } );
-		presentationSamples.push( ...batch.presentationSamples );
-		expectedPresentationSamples += Math.max( 0, batch.presentationFrames - 1 );
-		timestampBatches.push( {
-			verdict: batch.gpuSamples.length === batch.sampleFrames ? 'PASS' : 'FAIL',
-			mappingCadence: batch.timestampMappingCadence,
-			sampleFrames: numericDatum( batch.sampleFrames, 'frame', 'Measured', `${ label } native timestamp batch population` ),
-			resolveCount: numericDatum( batch.timestampResolveCount, 'resolve', 'Measured', `${ label } native timestamp batch mapping` ),
-			gpuSamples: { values: batch.gpuSamples, unit: 'ms', label: 'Measured', source: `${ label } resolved WebGPU render timestamp scopes` },
-			timestampRows: batch.timestampRows,
-			stageContextIds: batch.stageContextIds,
-			lastFrameResolveResidualMs: batch.lastFrameResolveResidualMs,
-			independentPerFrameTotalsAvailable: batch.independentPerFrameTotalsAvailable,
-			reconciliationScope: batch.timestampReconciliationScope
-		} );
+		presentationTimestamps.push( timestamp );
+		if ( samplePresentation ) requestAnimationFrame( presentationFrame );
+		else finishPresentation();
 
 	}
-	const duration = performance.now() - started;
+	requestAnimationFrame( presentationFrame );
+	try {
+
+		while ( performance.now() - started < minimumDurationMs ) {
+
+			const batch = await controller.runPerformanceProfile( { warmupFrames: 30, sampleFrames: 240, presentationFrames: 240 } );
+			timestampBatches.push( {
+				verdict: batch.gpuSamples.length === batch.sampleFrames ? 'PASS' : 'FAIL',
+				mappingCadence: batch.timestampMappingCadence,
+				sampleFrames: numericDatum( batch.sampleFrames, 'frame', 'Measured', `${ label } native timestamp batch population` ),
+				resolveCount: numericDatum( batch.timestampResolveCount, 'resolve', 'Measured', `${ label } native timestamp batch mapping` ),
+				gpuSamples: { values: batch.gpuSamples, unit: 'ms', label: 'Measured', source: `${ label } resolved WebGPU render timestamp scopes` },
+				timestampRows: batch.timestampRows,
+				stageContextIds: batch.stageContextIds,
+				lastFrameResolveResidualMs: batch.lastFrameResolveResidualMs,
+				independentPerFrameTotalsAvailable: batch.independentPerFrameTotalsAvailable,
+				reconciliationScope: batch.timestampReconciliationScope
+			} );
+
+		}
+
+	} finally {
+
+		samplePresentation = false;
+		await presentationComplete;
+
+	}
+	const presentationSamples = presentationTimestamps.slice( 1 ).map( ( timestamp, index ) => timestamp - presentationTimestamps[ index ] );
+	const duration = presentationTimestamps.at( -1 ) - presentationTimestamps[ 0 ];
 	return {
 		duration: numericDatum( duration, 'ms', 'Measured', `${ label } monotonic physical-browser clock` ),
 		sampleCount: numericDatum( presentationSamples.length, 'sample', 'Measured', `${ label } foreground presentation interval population` ),
 		presentationSamples: { values: presentationSamples, unit: 'ms', label: 'Measured', source: `${ label } foreground requestAnimationFrame intervals` },
 		maximumPresentationGap: numericDatum( Math.max( ...presentationSamples ), 'ms', 'Measured', `${ label } foreground requestAnimationFrame intervals` ),
-		presentationCoverage: numericDatum( expectedPresentationSamples === 0 ? 0 : presentationSamples.length / expectedPresentationSamples, 'ratio', 'Measured', `${ label } observed intervals divided by expected intervals inside timestamp-free cadence blocks` ),
+		presentationCoverage: numericDatum( duration === 0 ? 0 : presentationSamples.length / ( duration / refreshPeriodMs ), 'ratio', 'Derived', `${ label } continuous interval count divided by elapsed measured idle-refresh intervals` ),
 		gpuTimestampBatches: timestampBatches
 	};
 
@@ -337,10 +356,10 @@ async function runHardwarePerformance() {
 	const refresh = await measureIdleRefresh();
 	const session = await collectBaseSession( HARDWARE_PERFORMANCE_PROFILE, HARDWARE_PERFORMANCE_ROUTE_PLAN, refresh );
 	const target = await collectRoute( HARDWARE_PERFORMANCE_ROUTE_PLAN[ 0 ], async ( controller ) => ( {
-		cold: await collectPerformanceSegment( controller, HARDWARE_PERFORMANCE_CONTRACT.coldMinimumDuration.value, 'cold segment' ),
+		cold: await collectPerformanceSegment( controller, HARDWARE_PERFORMANCE_CONTRACT.coldMinimumDuration.value, 'cold segment', refresh.p50.value ),
 		sustainedWindows: [
-			await collectPerformanceSegment( controller, HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value, 'sustained window 0' ),
-			await collectPerformanceSegment( controller, HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value, 'sustained window 1' )
+			await collectPerformanceSegment( controller, HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value, 'sustained window 0', refresh.p50.value ),
+			await collectPerformanceSegment( controller, HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value, 'sustained window 1', refresh.p50.value )
 		]
 	} ) );
 	session.routes.push( target.record );

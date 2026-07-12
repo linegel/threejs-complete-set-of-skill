@@ -152,6 +152,8 @@ function serving( plan ) {
 
 function baseSession( profile, plan ) {
 
+	const refreshIntervals = Array( 120 ).fill( 16.67 );
+	refreshIntervals.fill( 17.17, 0, 8 );
 	return {
 		schemaVersion: 1,
 		profile,
@@ -159,8 +161,11 @@ function baseSession( profile, plan ) {
 		browser: { webdriver: false, headless: false, visibilityState: 'visible' },
 		adapter: { adapterClass: 'hardware', identity: { vendor: 'Apple', device: 'M-series' } },
 		refresh: {
-			hz: numericDatum( 60, 'Hz', 'Measured', 'idle-rAF' ),
-			measurementDuration: numericDatum( 2100, 'ms', 'Measured', 'idle-rAF' )
+			hz: numericDatum( 1000 / 16.67, 'Hz', 'Measured', 'idle-rAF' ),
+			measurementDuration: numericDatum( 2100, 'ms', 'Measured', 'idle-rAF' ),
+			intervals: { values: refreshIntervals, unit: 'ms', label: 'Measured', source: 'idle-rAF intervals' },
+			p50: numericDatum( 16.67, 'ms', 'Measured', 'idle-rAF intervals' ),
+			p95: numericDatum( 17.17, 'ms', 'Measured', 'idle-rAF intervals' )
 		},
 		immutableBuild: immutableBuild(),
 		routeOrder: plan.map( ( route ) => route.key ),
@@ -199,12 +204,14 @@ function timestampBatch() {
 
 function sustainedWindow() {
 
+	const presentationSamples = Array( 1800 ).fill( 16.67 );
+	const duration = presentationSamples.reduce( ( sum, sample ) => sum + sample, 0 );
 	return {
-		duration: numericDatum( 30000, 'ms', 'Measured', 'monotonic clock' ),
-		sampleCount: numericDatum( 120, 'sample', 'Measured', 'rAF intervals' ),
-		presentationSamples: { values: Array( 120 ).fill( 16.67 ), unit: 'ms', label: 'Measured', source: 'rAF intervals' },
+		duration: numericDatum( duration, 'ms', 'Measured', 'monotonic clock' ),
+		sampleCount: numericDatum( presentationSamples.length, 'sample', 'Measured', 'rAF intervals' ),
+		presentationSamples: { values: presentationSamples, unit: 'ms', label: 'Measured', source: 'rAF intervals' },
 		maximumPresentationGap: numericDatum( 16.67, 'ms', 'Measured', 'rAF intervals' ),
-		presentationCoverage: numericDatum( 1, 'ratio', 'Measured', 'observed/expected intervals' ),
+		presentationCoverage: numericDatum( presentationSamples.length / ( duration / 16.67 ), 'ratio', 'Derived', 'observed/expected intervals' ),
 		gpuTimestampBatches: [ timestampBatch() ]
 	};
 
@@ -349,6 +356,7 @@ test( 'physical session mutations reject nonphysical or mutable evidence', () =>
 		[ 'virtual adapter', ( value ) => { value.adapter.adapterClass = 'virtual'; }, /Software, virtual, and unknown/ ],
 		[ 'unknown adapter', ( value ) => { value.adapter.adapterClass = 'unknown'; }, /Software, virtual, and unknown/ ],
 		[ 'authored refresh', ( value ) => { value.refresh.hz.label = 'Authored'; }, /Measured/ ],
+		[ 'forged refresh Hz', ( value ) => { value.refresh.hz.value = 30; }, /does not reconcile/ ],
 		[ 'route state drift', ( value ) => { value.routes[ 0 ].state.camera = 'near'; }, /camera drifted/ ],
 		[ 'linearized capture resource', ( value ) => { value.routes[ 0 ].readback.resourceFormat = 'rgba8unorm'; }, /sRGB RGBA8 capture-target resource/ ],
 		[ 'copy bytes mislabeled sRGB', ( value ) => { value.routes[ 0 ].readback.format = 'rgba8unorm-srgb'; }, /distinguish raw four-channel/ ],
@@ -369,7 +377,17 @@ test( 'physical session mutations reject nonphysical or mutable evidence', () =>
 
 test( 'hardware performance session passes long-window and timestamp gates', () => {
 
-	assert.deepEqual( validateHardwarePerformanceSession( performanceSession() ), { valid: true, profile: 'performance', sustainedWindowCount: 2 } );
+	assert.deepEqual( validateHardwarePerformanceSession( performanceSession() ), {
+		valid: true,
+		profile: 'performance',
+		sustainedWindowCount: 2,
+		frameTargetMs: 16.67,
+		presentationP50Ms: 16.67,
+		presentationP95Ms: 16.67,
+		deadlineMissRatio: 0,
+		gpuP50Ms: 1.5,
+		gpuP95Ms: 1.5
+	} );
 
 } );
 
@@ -385,10 +403,49 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 		[ 'one sustained window', ( value ) => { value.sustainedWindows.pop(); }, /at least two/ ],
 		[ 'short sustained window', ( value ) => { value.sustainedWindows[ 0 ].duration.value = 29999; }, /shorter than 30 seconds/ ],
 		[ 'too few samples', ( value ) => { value.sustainedWindows[ 0 ].sampleCount.value = 119; }, /fewer than 120/ ],
-		[ 'presentation gap', ( value ) => { value.sustainedWindows[ 0 ].maximumPresentationGap.value = 101; }, /presentation-gap/ ],
+		[ 'sample-count mismatch', ( value ) => { value.sustainedWindows[ 0 ].sampleCount.value += 1; }, /sampleCount/ ],
+		[ 'forged maximum gap', ( value ) => { value.sustainedWindows[ 0 ].maximumPresentationGap.value = 17; }, /does not match/ ],
+		[ 'presentation gap', ( value ) => {
+
+			value.sustainedWindows[ 0 ].presentationSamples.values[ 0 ] = 101;
+			value.sustainedWindows[ 0 ].maximumPresentationGap.value = 101;
+			value.sustainedWindows[ 0 ].duration.value = value.sustainedWindows[ 0 ].presentationSamples.values.reduce( ( sum, sample ) => sum + sample, 0 );
+			value.sustainedWindows[ 0 ].presentationCoverage.value = value.sustainedWindows[ 0 ].sampleCount.value / ( value.sustainedWindows[ 0 ].duration.value / 16.67 );
+
+		}, /presentation-gap/ ],
 		[ 'coverage gap', ( value ) => { value.sustainedWindows[ 0 ].presentationCoverage.value = 0.9; }, /presentation-coverage/ ],
+		[ 'p95 cadence overrun', ( value ) => {
+
+			value.sustainedWindows[ 0 ].presentationSamples.values.fill( 21, 0, 100 );
+			value.sustainedWindows[ 0 ].maximumPresentationGap.value = 21;
+			value.sustainedWindows[ 0 ].duration.value = value.sustainedWindows[ 0 ].presentationSamples.values.reduce( ( sum, sample ) => sum + sample, 0 );
+			value.sustainedWindows[ 0 ].presentationCoverage.value = value.sustainedWindows[ 0 ].sampleCount.value / ( value.sustainedWindows[ 0 ].duration.value / 16.67 );
+
+		}, /presentation p95/ ],
+		[ 'deadline miss ratio', ( value ) => {
+
+			value.sustainedWindows[ 0 ].presentationSamples.values.fill( 26, 0, 20 );
+			value.sustainedWindows[ 0 ].maximumPresentationGap.value = 26;
+			value.sustainedWindows[ 0 ].duration.value = value.sustainedWindows[ 0 ].presentationSamples.values.reduce( ( sum, sample ) => sum + sample, 0 );
+			value.sustainedWindows[ 0 ].presentationCoverage.value = value.sustainedWindows[ 0 ].sampleCount.value / ( value.sustainedWindows[ 0 ].duration.value / 16.67 );
+
+		}, /deadline-miss ratio/ ],
 		[ 'per-frame resolves', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].resolveCount.value = 120; }, /per frame/ ],
 		[ 'missing timestamp row', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].timestampRows.pop(); }, /explicit timestamp row/ ],
+		[ 'GPU sample-row mismatch', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].gpuSamples.values[ 0 ] = 2; }, /bound GPU sample/ ],
+		[ 'GPU p95 overrun', ( value ) => {
+
+			const batch = value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ];
+			for ( let index = 0; index < 8; index ++ ) {
+
+				batch.timestampRows[ index ].sceneMs = 15;
+				batch.timestampRows[ index ].outputMs = 0.5;
+				batch.timestampRows[ index ].totalMs = 15.5;
+				batch.gpuSamples.values[ index ] = 15.5;
+
+			}
+
+		}, /GPU p95/ ],
 		[ 'fabricated per-frame total', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].timestampRows[ 0 ].independentPerFrameTotalAvailable = true; }, /fabricates/ ],
 		[ 'unsettled governor', ( value ) => { value.governor.settled = false; }, /did not settle/ ]
 	];

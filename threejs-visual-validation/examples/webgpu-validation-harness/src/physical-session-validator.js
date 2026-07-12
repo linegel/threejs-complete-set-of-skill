@@ -90,6 +90,17 @@ function numericArray( value, label, expectedLabel = null ) {
 
 }
 
+function percentile( samples, q ) {
+
+	if ( samples.length === 0 ) return null;
+	const ordered = [ ...samples ].sort( ( a, b ) => a - b );
+	const position = ( ordered.length - 1 ) * q;
+	const lower = Math.floor( position );
+	const upper = Math.ceil( position );
+	return lower === upper ? ordered[ lower ] : ordered[ lower ] + ( ordered[ upper ] - ordered[ lower ] ) * ( position - lower );
+
+}
+
 function assertImmutableBuild( build ) {
 
 	requireObject( build, 'immutableBuild' );
@@ -128,6 +139,12 @@ function assertCaptureEnvironment( session ) {
 	if ( Object.keys( session.adapter.identity ).length === 0 ) fail( 'Physical adapter identity is empty.' );
 	const refreshHz = numeric( session.refresh?.hz, 'refresh.hz', 'Measured' );
 	if ( refreshHz <= 0 ) fail( 'Measured display refresh must be positive.' );
+	const refreshIntervals = numericArray( session.refresh?.intervals, 'refresh.intervals', 'Measured' );
+	if ( refreshIntervals.length < 120 || refreshIntervals.some( ( sample ) => sample <= 0 ) ) fail( 'Measured display refresh requires at least 120 positive foreground intervals.' );
+	const refreshP50 = numeric( session.refresh?.p50, 'refresh.p50', 'Measured' );
+	const refreshP95 = numeric( session.refresh?.p95, 'refresh.p95', 'Measured' );
+	if ( Math.abs( refreshP50 - percentile( refreshIntervals, 0.5 ) ) > 1e-9 || Math.abs( refreshP95 - percentile( refreshIntervals, 0.95 ) ) > 1e-9 ) fail( 'Measured refresh percentiles do not reconcile with their interval population.' );
+	if ( Math.abs( refreshHz - 1000 / refreshP50 ) > 1e-6 ) fail( 'Measured refresh Hz does not reconcile with the median interval.' );
 	return assertImmutableBuild( session.immutableBuild );
 
 }
@@ -344,21 +361,33 @@ export function validatePhysicalRouteSession( session ) {
 
 }
 
-function assertPerformanceWindow( window, index ) {
+function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 
 	const label = `sustainedWindows[${ index }]`;
 	requireObject( window, label );
 	const duration = numeric( window.duration, `${ label }.duration`, 'Measured' );
 	const sampleCount = numeric( window.sampleCount, `${ label }.sampleCount`, 'Measured' );
 	const maxGap = numeric( window.maximumPresentationGap, `${ label }.maximumPresentationGap`, 'Measured' );
-	const coverage = numeric( window.presentationCoverage, `${ label }.presentationCoverage`, 'Measured' );
+	const coverage = numeric( window.presentationCoverage, `${ label }.presentationCoverage`, 'Derived' );
 	const presentationSamples = numericArray( window.presentationSamples, `${ label }.presentationSamples`, 'Measured' );
 	if ( duration < HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value ) fail( `${ label } is shorter than 30 seconds.` );
 	if ( sampleCount < HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumSamples.value || presentationSamples.length < HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumSamples.value ) fail( `${ label } has fewer than 120 presentation samples.` );
+	if ( sampleCount !== presentationSamples.length ) fail( `${ label } sampleCount does not match its presentation population.` );
+	if ( presentationSamples.some( ( sample ) => sample <= 0 ) ) fail( `${ label } contains a nonpositive presentation interval.` );
+	if ( Math.abs( presentationSamples.reduce( ( sum, sample ) => sum + sample, 0 ) - duration ) > 1e-6 ) fail( `${ label } presentation intervals do not cover the full sustained duration.` );
+	const observedMaximumGap = Math.max( ...presentationSamples );
+	if ( Math.abs( observedMaximumGap - maxGap ) > 1e-9 ) fail( `${ label } maximumPresentationGap does not match its presentation population.` );
 	if ( maxGap > HARDWARE_PERFORMANCE_CONTRACT.maximumPresentationGap.value ) fail( `${ label } exceeds the presentation-gap gate.` );
+	const derivedCoverage = presentationSamples.length / ( duration / refreshPeriodMs );
+	if ( Math.abs( coverage - derivedCoverage ) > 1e-9 ) fail( `${ label } presentation-coverage value does not reconcile with elapsed time and the refresh target.` );
 	if ( coverage < HARDWARE_PERFORMANCE_CONTRACT.minimumPresentationCoverage.value || coverage > 1.05 ) fail( `${ label } fails the presentation-coverage gate.` );
+	const presentationP95 = percentile( presentationSamples, 0.95 );
+	if ( presentationP95 > HARDWARE_PERFORMANCE_CONTRACT.presentationP95Maximum.value ) fail( `${ label } presentation p95 exceeds the declared cadence gate.` );
+	const deadlineMissRatio = presentationSamples.filter( ( sample ) => sample > HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ).length / presentationSamples.length;
+	if ( deadlineMissRatio > HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value ) fail( `${ label } deadline-miss ratio exceeds the declared gate.` );
 	const batches = requireArray( window.gpuTimestampBatches, `${ label }.gpuTimestampBatches` );
 	if ( batches.length === 0 ) fail( `${ label } has no GPU timestamp batches.` );
+	const windowGpuSamples = [];
 	for ( const [ batchIndex, batch ] of batches.entries() ) {
 
 		const batchLabel = `${ label }.gpuTimestampBatches[${ batchIndex }]`;
@@ -368,6 +397,7 @@ function assertPerformanceWindow( window, index ) {
 		if ( frames < 1 || resolves < 1 || resolves >= frames ) fail( `${ batchLabel } mapped timestamps per frame or has invalid coverage.` );
 		const gpuSamples = numericArray( batch.gpuSamples, `${ batchLabel }.gpuSamples`, 'Measured' );
 		if ( gpuSamples.length !== frames ) fail( `${ batchLabel } timestamp sample count does not match its frame population.` );
+		windowGpuSamples.push( ...gpuSamples );
 		const timestampRows = requireArray( batch.timestampRows, `${ batchLabel }.timestampRows` );
 		if ( timestampRows.length !== frames ) fail( `${ batchLabel } must bind every frame to an explicit timestamp row.` );
 		for ( const [ rowIndex, row ] of timestampRows.entries() ) {
@@ -376,6 +406,7 @@ function assertPerformanceWindow( window, index ) {
 			requireObject( row, rowLabel );
 			for ( const key of [ 'sceneMs', 'outputMs', 'totalMs' ] ) requireFinite( row[ key ], `${ rowLabel }.${ key }`, 0 );
 			if ( Math.abs( row.sceneMs + row.outputMs - row.totalMs ) > 1e-9 ) fail( `${ rowLabel } total is not derived from its explicit stages.` );
+			if ( Math.abs( gpuSamples[ rowIndex ] - row.totalMs ) > 1e-9 ) fail( `${ rowLabel } total does not match the bound GPU sample.` );
 			if ( row.totalProvenance !== 'Derived' || row.independentPerFrameTotalAvailable !== false || row.residualMs !== null ) fail( `${ rowLabel } fabricates an independent per-frame aggregate.` );
 
 		}
@@ -384,6 +415,17 @@ function assertPerformanceWindow( window, index ) {
 		if ( typeof batch.reconciliationScope !== 'string' || /final-frame/i.test( batch.reconciliationScope ) === false ) fail( `${ batchLabel } does not confine the independent resolve residual to the final frame.` );
 
 	}
+	const gpuP95 = percentile( windowGpuSamples, 0.95 );
+	if ( gpuP95 > HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value ) fail( `${ label } GPU p95 exceeds the declared current-adapter gate.` );
+	return {
+		presentationSamples,
+		gpuSamples: windowGpuSamples,
+		presentationP50: percentile( presentationSamples, 0.5 ),
+		presentationP95,
+		deadlineMissRatio,
+		gpuP50: percentile( windowGpuSamples, 0.5 ),
+		gpuP95
+	};
 
 }
 
@@ -397,6 +439,9 @@ export function validateHardwarePerformanceSession( session ) {
 	if ( session.viewport?.width !== 1920 || session.viewport?.height !== 1080 || session.viewport?.dpr !== 1 ) fail( 'Hardware performance capture must use 1920x1080 at DPR 1.' );
 	if ( numeric( session.refresh?.measurementDuration, 'refresh.measurementDuration', 'Measured' ) < HARDWARE_PERFORMANCE_CONTRACT.idleRefreshMinimumDuration.value ) fail( 'Idle-rAF refresh measurement is shorter than two seconds.' );
 	if ( numeric( session.hostReserve?.p95, 'hostReserve.p95', 'Measured' ) < 0 ) fail( 'Measured host reserve is invalid.' );
+	const refreshP50 = numeric( session.refresh.p50, 'refresh.p50', 'Measured' );
+	const refreshP95 = numeric( session.refresh.p95, 'refresh.p95', 'Measured' );
+	if ( Math.abs( session.hostReserve.p95.value - Math.max( 0, refreshP95 - refreshP50 ) ) > 1e-9 ) fail( 'Measured host reserve does not reconcile with the idle refresh distribution.' );
 	const compositor = requireObject( session.compositorReserve, 'compositorReserve' );
 	if ( compositor.verdict === 'PASS' ) {
 
@@ -408,11 +453,23 @@ export function validateHardwarePerformanceSession( session ) {
 	if ( numeric( session.cold?.duration, 'cold.duration', 'Measured' ) < HARDWARE_PERFORMANCE_CONTRACT.coldMinimumDuration.value ) fail( 'Cold performance segment is shorter than two seconds.' );
 	const windows = requireArray( session.sustainedWindows, 'sustainedWindows' );
 	if ( windows.length < HARDWARE_PERFORMANCE_CONTRACT.minimumSustainedWindows.value ) fail( 'Hardware performance evidence requires at least two sustained windows.' );
-	windows.forEach( assertPerformanceWindow );
+	const windowSummaries = windows.map( ( window, index ) => assertPerformanceWindow( window, index, refreshP50 ) );
 	const governor = requireObject( session.governor, 'governor' );
 	if ( governor.verdict !== 'PASS' || governor.oscillationDetected !== false || governor.settled !== true || typeof governor.settledState !== 'string' ) fail( 'Quality governor did not settle cleanly.' );
 	if ( numeric( governor.settledResidenceWindows, 'governor.settledResidenceWindows', 'Measured' ) < 2 ) fail( 'Quality governor lacks a two-window settled residence.' );
-	return { valid: true, profile: session.profile, sustainedWindowCount: windows.length };
+	const presentationSamples = windowSummaries.flatMap( ( window ) => window.presentationSamples );
+	const gpuSamples = windowSummaries.flatMap( ( window ) => window.gpuSamples );
+	return {
+		valid: true,
+		profile: session.profile,
+		sustainedWindowCount: windows.length,
+		frameTargetMs: HARDWARE_PERFORMANCE_CONTRACT.frameTarget.value,
+		presentationP50Ms: percentile( presentationSamples, 0.5 ),
+		presentationP95Ms: percentile( presentationSamples, 0.95 ),
+		deadlineMissRatio: presentationSamples.filter( ( sample ) => sample > HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ).length / presentationSamples.length,
+		gpuP50Ms: percentile( gpuSamples, 0.5 ),
+		gpuP95Ms: percentile( gpuSamples, 0.95 )
+	};
 
 }
 

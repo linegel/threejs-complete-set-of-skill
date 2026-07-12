@@ -122,6 +122,11 @@ checked schema and semantic contract. A release must contain:
 Missing evidence is `INSUFFICIENT_EVIDENCE`. Contradictory, malformed, stale or
 cross-bound evidence is `FAIL`. Software timing is diagnostic only, and Browser
 cadence is never relabelled as GPU attribution or compositor presentation.
+Hardware performance uses a continuous foreground-rAF interval population that
+spans every timestamp batch and the gaps between batches. The validator
+recomputes refresh identity, coverage, p50, p95, deadline misses, timestamp-row
+totals, and the 14.67 ms GPU p95 gate against the declared 16.67 ms frame
+target; a duration-only or discontinuous trace cannot pass.
 
 ## Browser subject
 

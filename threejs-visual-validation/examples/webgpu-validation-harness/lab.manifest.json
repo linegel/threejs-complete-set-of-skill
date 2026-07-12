@@ -55,7 +55,7 @@
     {
       "id": "target-performance",
       "targetClass": "current-adapter-performance",
-      "frameTargetMs": null,
+      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "60 Hz current-adapter release target" },
       "resolutionPolicy": { "scenePassScale": 1, "dprCap": 1 },
       "mechanismLimits": { "gpuTimestampsRequired": true },
       "resourceLimits": { "sustainedTraceRequired": true },
@@ -66,7 +66,7 @@
     {
       "id": "governor-stress",
       "targetClass": "current-adapter-governor-stress",
-      "frameTargetMs": null,
+      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "60 Hz current-adapter release target" },
       "resolutionPolicy": { "scenePassScale": 0.5, "dprCap": 1 },
       "mechanismLimits": { "governorTraceRequired": true },
       "resourceLimits": { "oscillationAllowed": false },
@@ -77,7 +77,7 @@
     {
       "id": "release",
       "targetClass": "current-adapter-release",
-      "frameTargetMs": null,
+      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "60 Hz current-adapter release target" },
       "resolutionPolicy": { "scenePassScale": 1, "dprCap": 1 },
       "mechanismLimits": { "allClaimClassesResolved": true },
       "resourceLimits": { "lifecycleCyclesMinimum": 50, "lifecycleCyclesMaximum": 100 },
