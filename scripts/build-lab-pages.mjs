@@ -345,7 +345,7 @@ function demoSeoHead(lab, { indexable = true } = {}) {
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${canonicalUrl}">
-  ${preview ? `<meta property="og:image" content="${preview.url}">
+${preview ? `  <meta property="og:image" content="${preview.url}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="${preview.width}">
   <meta property="og:image:height" content="${preview.height}">
@@ -353,7 +353,7 @@ function demoSeoHead(lab, { indexable = true } = {}) {
   <meta name="twitter:card" content="${preview ? 'summary_large_image' : 'summary'}">
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
-  ${preview ? `<meta name="twitter:image" content="${preview.url}">
+${preview ? `  <meta name="twitter:image" content="${preview.url}">
   <meta name="twitter:image:alt" content="${escapeHtml(preview.alt)}">` : ''}
   <script type="application/ld+json">${JSON.stringify(schema)}</script>`;
 }
