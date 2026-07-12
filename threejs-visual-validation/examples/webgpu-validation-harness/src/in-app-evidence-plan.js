@@ -33,6 +33,7 @@ export const HARDWARE_PERFORMANCE_ROUTE_PLAN = Object.freeze( [
 
 export const HARDWARE_PERFORMANCE_CONTRACT = Object.freeze( {
 	frameTarget: numericDatum( 16.67, 'ms', 'Gated', '60 Hz current-adapter release target' ),
+	cpuP95Maximum: numericDatum( 14.67, 'ms', 'Gated', 'frame target minus 2 ms host and presentation reserve' ),
 	gpuP95Maximum: numericDatum( 14.67, 'ms', 'Gated', 'frame target minus 2 ms host and presentation reserve' ),
 	presentationP95Maximum: numericDatum( 20, 'ms', 'Gated', 'foreground 60 Hz cadence jitter gate' ),
 	deadlineThreshold: numericDatum( 25.005, 'ms', 'Gated', '1.5 times the 16.67 ms frame target' ),

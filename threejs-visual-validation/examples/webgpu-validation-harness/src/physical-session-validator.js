@@ -387,14 +387,21 @@ function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 	if ( deadlineMissRatio > HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value ) fail( `${ label } deadline-miss ratio exceeds the declared gate.` );
 	const batches = requireArray( window.gpuTimestampBatches, `${ label }.gpuTimestampBatches` );
 	if ( batches.length === 0 ) fail( `${ label } has no GPU timestamp batches.` );
+	const windowCpuSamples = [];
 	const windowGpuSamples = [];
 	for ( const [ batchIndex, batch ] of batches.entries() ) {
 
 		const batchLabel = `${ label }.gpuTimestampBatches[${ batchIndex }]`;
 		if ( batch.verdict !== 'PASS' || batch.mappingCadence !== 'once-per-batch' ) fail( `${ batchLabel } is not a passing batched timestamp population.` );
+		const warmupFrames = numeric( batch.warmupFrames, `${ batchLabel }.warmupFrames`, 'Measured' );
+		const warmupCpuSamples = numericArray( batch.warmupCpuSamples, `${ batchLabel }.warmupCpuSamples`, 'Measured' );
 		const frames = numeric( batch.sampleFrames, `${ batchLabel }.sampleFrames`, 'Measured' );
 		const resolves = numeric( batch.resolveCount, `${ batchLabel }.resolveCount`, 'Measured' );
 		if ( frames < 1 || resolves < 1 || resolves >= frames ) fail( `${ batchLabel } mapped timestamps per frame or has invalid coverage.` );
+		const cpuSamples = numericArray( batch.cpuSamples, `${ batchLabel }.cpuSamples`, 'Measured' );
+		if ( warmupCpuSamples.length !== warmupFrames ) fail( `${ batchLabel } warm-up CPU sample count does not match its frame population.` );
+		if ( cpuSamples.length !== frames ) fail( `${ batchLabel } CPU sample count does not match its frame population.` );
+		windowCpuSamples.push( ...cpuSamples );
 		const gpuSamples = numericArray( batch.gpuSamples, `${ batchLabel }.gpuSamples`, 'Measured' );
 		if ( gpuSamples.length !== frames ) fail( `${ batchLabel } timestamp sample count does not match its frame population.` );
 		windowGpuSamples.push( ...gpuSamples );
@@ -415,14 +422,19 @@ function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 		if ( typeof batch.reconciliationScope !== 'string' || /final-frame/i.test( batch.reconciliationScope ) === false ) fail( `${ batchLabel } does not confine the independent resolve residual to the final frame.` );
 
 	}
+	const cpuP95 = percentile( windowCpuSamples, 0.95 );
+	if ( cpuP95 > HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value ) fail( `${ label } CPU p95 exceeds the declared current-adapter gate.` );
 	const gpuP95 = percentile( windowGpuSamples, 0.95 );
 	if ( gpuP95 > HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value ) fail( `${ label } GPU p95 exceeds the declared current-adapter gate.` );
 	return {
 		presentationSamples,
+		cpuSamples: windowCpuSamples,
 		gpuSamples: windowGpuSamples,
 		presentationP50: percentile( presentationSamples, 0.5 ),
 		presentationP95,
 		deadlineMissRatio,
+		cpuP50: percentile( windowCpuSamples, 0.5 ),
+		cpuP95,
 		gpuP50: percentile( windowGpuSamples, 0.5 ),
 		gpuP95
 	};
@@ -458,6 +470,7 @@ export function validateHardwarePerformanceSession( session ) {
 	if ( governor.verdict !== 'PASS' || governor.oscillationDetected !== false || governor.settled !== true || typeof governor.settledState !== 'string' ) fail( 'Quality governor did not settle cleanly.' );
 	if ( numeric( governor.settledResidenceWindows, 'governor.settledResidenceWindows', 'Measured' ) < 2 ) fail( 'Quality governor lacks a two-window settled residence.' );
 	const presentationSamples = windowSummaries.flatMap( ( window ) => window.presentationSamples );
+	const cpuSamples = windowSummaries.flatMap( ( window ) => window.cpuSamples );
 	const gpuSamples = windowSummaries.flatMap( ( window ) => window.gpuSamples );
 	return {
 		valid: true,
@@ -467,6 +480,8 @@ export function validateHardwarePerformanceSession( session ) {
 		presentationP50Ms: percentile( presentationSamples, 0.5 ),
 		presentationP95Ms: percentile( presentationSamples, 0.95 ),
 		deadlineMissRatio: presentationSamples.filter( ( sample ) => sample > HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ).length / presentationSamples.length,
+		cpuP50Ms: percentile( cpuSamples, 0.5 ),
+		cpuP95Ms: percentile( cpuSamples, 0.95 ),
 		gpuP50Ms: percentile( gpuSamples, 0.5 ),
 		gpuP95Ms: percentile( gpuSamples, 0.95 )
 	};

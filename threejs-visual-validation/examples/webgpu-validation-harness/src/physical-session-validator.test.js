@@ -191,7 +191,10 @@ function timestampBatch() {
 	return {
 		verdict: 'PASS',
 		mappingCadence: 'once-per-batch',
+		warmupFrames: numericDatum( 30, 'frame', 'Measured', 'warm-up batch' ),
+		warmupCpuSamples: { values: Array( 30 ).fill( 1.1 ), unit: 'ms', label: 'Measured', source: 'performance.now' },
 		sampleFrames: numericDatum( 120, 'frame', 'Measured', 'timestamp batch' ),
+		cpuSamples: { values: Array( 120 ).fill( 1.2 ), unit: 'ms', label: 'Measured', source: 'performance.now' },
 		resolveCount: numericDatum( 1, 'resolve', 'Measured', 'timestamp batch' ),
 		gpuSamples: { values: timestampRows.map( ( row ) => row.totalMs ), unit: 'ms', label: 'Measured', source: 'WebGPU timestamp rows' },
 		timestampRows,
@@ -385,6 +388,8 @@ test( 'hardware performance session passes long-window and timestamp gates', () 
 		presentationP50Ms: 16.67,
 		presentationP95Ms: 16.67,
 		deadlineMissRatio: 0,
+		cpuP50Ms: 1.2,
+		cpuP95Ms: 1.2,
 		gpuP50Ms: 1.5,
 		gpuP95Ms: 1.5
 	} );
@@ -414,6 +419,8 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 
 		}, /presentation-gap/ ],
 		[ 'coverage gap', ( value ) => { value.sustainedWindows[ 0 ].presentationCoverage.value = 0.9; }, /presentation-coverage/ ],
+		[ 'CPU sample-count mismatch', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].cpuSamples.values.pop(); }, /CPU sample count/ ],
+		[ 'CPU p95 overrun', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].cpuSamples.values.fill( 15.5, 0, 8 ); }, /CPU p95/ ],
 		[ 'p95 cadence overrun', ( value ) => {
 
 			value.sustainedWindows[ 0 ].presentationSamples.values.fill( 21, 0, 100 );
