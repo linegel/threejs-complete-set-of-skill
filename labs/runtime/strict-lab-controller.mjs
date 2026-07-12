@@ -16,6 +16,7 @@ function requireMethod(implementation, name) {
 
 export function createStrictLabController(manifest, implementation) {
   if (!manifest || manifest.schemaVersion !== 2) throw new TypeError('schema-v2 lab manifest is required');
+  if (typeof manifest.id !== 'string' || manifest.id.length === 0) throw new TypeError('lab manifest id is required');
   if (!implementation || typeof implementation !== 'object') throw new TypeError('controller implementation is required');
 
   const scenarios = ids(manifest.scenarios);
@@ -44,6 +45,7 @@ export function createStrictLabController(manifest, implementation) {
   delegatedMethods.forEach((name) => requireMethod(implementation, name));
 
   return Object.freeze({
+    get labId() { return manifest.id; },
     ready: () => implementation.ready(),
     setScenario: (id) => {
       requireKnown(scenarios, id, 'scenario');
@@ -73,7 +75,7 @@ export function createStrictLabController(manifest, implementation) {
     capturePixels: (target) => implementation.capturePixels(target),
     describePipeline: () => implementation.describePipeline(),
     describeResources: () => implementation.describeResources(),
-    getMetrics: () => implementation.getMetrics(),
+    getMetrics: () => ({ ...implementation.getMetrics(), labId: manifest.id }),
     dispose: () => implementation.dispose(),
   });
 }

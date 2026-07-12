@@ -32,17 +32,22 @@ test('unknown controller routes throw instead of falling back', () => {
   ].map((name) => [name, async () => {}]));
   implementation.describePipeline = () => ({});
   implementation.describeResources = () => ({});
-  implementation.getMetrics = () => ({});
+  implementation.getMetrics = () => ({ labId: 'forged-id', sampleCount: 3 });
   const controller = createStrictLabController({
     schemaVersion: 2,
+    id: 'strict-controller-fixture',
     scenarios: [{ id: 'known' }],
     modes: ['final'],
     tiers: [{ id: 'full' }],
     cameras: ['design'],
     seeds: [1],
   }, implementation);
+  assert.equal(controller.labId, 'strict-controller-fixture');
+  assert.deepEqual(controller.getMetrics(), { labId: 'strict-controller-fixture', sampleCount: 3 });
+  assert.equal(Object.isFrozen(controller), true);
   assert.throws(() => controller.setScenario('missing'), /unknown scenario/);
   assert.throws(() => controller.setTier('cheaper-invented-tier'), /unknown tier/);
+  assert.throws(() => createStrictLabController({ schemaVersion: 2 }, implementation), /manifest id/);
 });
 
 test('duplicate semantic producers and ambiguous owners are rejected', () => {
