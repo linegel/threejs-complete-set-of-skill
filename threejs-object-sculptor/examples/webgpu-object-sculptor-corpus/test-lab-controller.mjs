@@ -1,5 +1,13 @@
 import assert from "node:assert/strict";
 import * as THREE from "three/webgpu";
+import {
+  CORPUS_CADENCE_WINDOW_LIMITS,
+  createObjectSculptorCorpusPerformanceIdentity,
+} from "./frame-driver.js";
+import {
+  createCorpusGpuDeviceBinding,
+  disposeCorpusGpuDeviceBinding,
+} from "./gpu-device-binding.js";
 
 import {
   CORPUS_CAMERA_FOCUS_CONTRACTS,
@@ -12,6 +20,7 @@ import {
   CORPUS_SHADOW_POLICIES,
   TARGET_IDS,
   createObjectSculptorCorpusController,
+  createObjectSculptorCorpusFrameDriver,
   describeCorpusReadback,
   preserveCorpusReadbackRows,
   resolveCorpusDpr,
@@ -2031,6 +2040,137 @@ assert.deepEqual(TARGET_IDS, ["articulated-desk-lamp", "potted-bonsai", "ceramic
 }
 
 {
+  const harness = createHarness({ timestampQuerySupported: true });
+  const retainedDevice = harness.renderer.backend.device;
+  let retainedDeviceDestroyCalls = 0;
+  retainedDevice.destroy = () => {
+    retainedDeviceDestroyCalls += 1;
+  };
+  const retainedAdapter = {
+    info: {
+      vendor: "Synthetic Vendor",
+      architecture: "Synthetic Architecture",
+      device: "Synthetic Hardware Adapter",
+      description: "Synthetic Hardware Adapter",
+    },
+    isFallbackAdapter: false,
+    features: retainedDevice.features,
+    limits: {},
+    async requestDevice() {
+      return retainedDevice;
+    },
+  };
+  const previousGpuDescriptor = Object.getOwnPropertyDescriptor(globalThis.navigator, "gpu");
+  Object.defineProperty(globalThis.navigator, "gpu", {
+    configurable: true,
+    value: {
+      async requestAdapter() {
+        return retainedAdapter;
+      },
+    },
+  });
+  let gpuDeviceBinding;
+  try {
+    gpuDeviceBinding = await createCorpusGpuDeviceBinding({ requireTimestampQuery: true });
+  } finally {
+    if (previousGpuDescriptor) {
+      Object.defineProperty(globalThis.navigator, "gpu", previousGpuDescriptor);
+    } else {
+      delete globalThis.navigator.gpu;
+    }
+  }
+  const controller = await createObjectSculptorCorpusController({
+    canvas: {},
+    subjectId: "potted-bonsai",
+    runtimeProfile: "performance",
+    performanceTimestampMode: "disabled-for-cadence",
+    cameraInteractionEnabled: false,
+    gpuDeviceBinding,
+    dependencies: harness.dependencies,
+  });
+  const metrics = controller.getMetrics();
+  assert.equal(metrics.runtimeProfile, "performance");
+  assert.equal(metrics.performanceTimestampMode, "disabled-for-cadence");
+  assert.equal(metrics.timestampQueriesRequested, false);
+  assert.equal(metrics.timestampQueriesActive, false);
+  assert.equal(metrics.rendererBackendEvidence.timestampQueryFeatureOnActualDevice, true);
+  assert.equal(metrics.rendererBackendEvidence.backendTimestampTrackingActive, false);
+  assert.equal(harness.rendererOptions.trackTimestamp, false);
+  assert.equal(metrics.timingMethod, "performance-cadence-no-timestamp-query-readback");
+
+  const frameCallbacks = [];
+  let clockMs = 0;
+  const sourceClosureHash = "a".repeat(64);
+  const performanceIdentity = createObjectSculptorCorpusPerformanceIdentity({
+    lane: "sustained-cadence",
+    sourceClosureHash,
+    buildRevision: `source-sha256:${sourceClosureHash}`,
+    browser: {
+      name: "Synthetic Chromium",
+      version: "1",
+      userAgent: "synthetic-controller-test",
+      platform: "test",
+      automationSurface: "codex-in-app-browser",
+    },
+    cadenceContract: {
+      targetFrameMs: 16.67,
+      warmupFrameCount: CORPUS_CADENCE_WINDOW_LIMITS.minWarmupFrameCount,
+      measuredFrameCount: CORPUS_CADENCE_WINDOW_LIMITS.minMeasuredFrameCount,
+      minimumMeasuredDurationMs: CORPUS_CADENCE_WINDOW_LIMITS.minMeasuredDurationMs,
+    },
+    controller,
+  });
+  const cadenceErrors = [];
+  const driver = createObjectSculptorCorpusFrameDriver({
+    controller,
+    now: () => ++clockMs,
+    requestFrame: (callback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    },
+    cancelFrame: () => {},
+    onMetrics: () => {},
+    onError: (error) => cadenceErrors.push(error.message),
+    performanceIdentity,
+  });
+  const cadenceOptions = {
+    windowId: "real-cadence",
+    warmupFrameCount: CORPUS_CADENCE_WINDOW_LIMITS.minWarmupFrameCount,
+    measuredFrameCount: CORPUS_CADENCE_WINDOW_LIMITS.minMeasuredFrameCount,
+    targetFrameMs: 16.67,
+  };
+  const cadencePromise = driver.publicController.runCadenceWindow(cadenceOptions);
+  const cadenceFrameCount = cadenceOptions.warmupFrameCount + cadenceOptions.measuredFrameCount;
+  for (let index = 0; index < cadenceFrameCount; index += 1) {
+    for (let attempt = 0; attempt < 50 && frameCallbacks.length === 0; attempt += 1) {
+      await Promise.resolve();
+    }
+    assert.equal(
+      frameCallbacks.length,
+      1,
+      `real-controller cadence must own one callback at frame ${index + 1}`,
+    );
+    await frameCallbacks.shift()(100 + index * 16.5);
+  }
+  const cadence = await cadencePromise;
+  assert.equal(cadence.status, "diagnostic-continuous");
+  assert.equal(cadence.warmupSamples.length, cadenceOptions.warmupFrameCount);
+  assert.equal(cadence.samples.length, cadenceOptions.measuredFrameCount);
+  assert.equal(cadence.samples[0].fixedTimeSeconds, 0);
+  assert.equal(cadence.summary.callbackIntervalP50Ms, 16.5);
+  assert.equal(cadence.summary.deadlineMissCount, 0);
+  assert.equal(cadence.finalHealth.status, "DIAGNOSTIC");
+  assert.equal(cadence.timingAuthority.publishable, false);
+  assert.deepEqual(cadenceErrors, []);
+  assert.equal(controller.getMetrics().gpuTimestampResolveAttempts, 0);
+  assert.equal(controller.getMetrics().stepCount, 0);
+  assert.deepEqual(harness.timestampScopes, []);
+  await driver.close();
+  assert.equal(disposeCorpusGpuDeviceBinding(gpuDeviceBinding), true);
+  assert.equal(retainedDeviceDestroyCalls, 1);
+}
+
+{
   const harness = createHarness({
     timestampQuerySupported: true,
     actualTimestampQuerySupported: false,
@@ -2514,6 +2654,7 @@ console.log(JSON.stringify({
     "measured-motion-witness-no-op-and-fixed-offset-negative-controls",
     "tiered-shadow-and-invariant-antialias-policy",
     "pre-init-and-initialized-device-performance-profiles",
+    "real-controller-no-timestamp-performance-cadence-mode",
     "serialized-render-timestamp-samples",
     "bounded-cpu-and-gpu-diagnostic-retention",
     "bounded-device-resource-state-teardown-and-gpu-failure-retention",
