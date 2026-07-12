@@ -6,7 +6,17 @@ import { compileSpec } from '../../core/rig-compiler.js';
 import { extractReferenceSurface } from '../../core/reference-surface.js';
 import { packReferenceAsset, unpackReferenceAsset } from '../../core/reference-asset-format.js';
 import { generateGeodesicSkinWeights, MAX_SKIN_INFLUENCES } from '../../core/skin-weights.js';
-import { buildAffineSlotTransforms, deformReferenceSurfaceLbs, maximumSurfaceDelta, restPoseFromCompiled } from '../../core/deformation.js';
+import {
+	buildAffineSlotTransforms,
+	buildDualQuaternionSlotTransforms,
+	deformReferenceSurfaceDqs,
+	deformReferenceSurfaceLbs,
+	DQ_SLOT_FLOATS,
+	maximumSurfaceDelta,
+	restPoseFromCompiled,
+} from '../../core/deformation.js';
+import { validateMeshTopology } from '../../core/mesh-validity.js';
+import { compareProjectedSilhouettes } from '../../core/silhouette.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const specsDir = resolve(here, '../../lab/specs');
@@ -40,7 +50,14 @@ function bytesEqual(left, right) {
 }
 
 async function runReferenceSphere() {
-	const surface = extractReferenceSurface(compileFixture(sphereSpec), { cellSize: 0.12, maxSamples: 200_000 });
+	const surface = extractReferenceSurface(compileFixture(sphereSpec), {
+		cellSize: 0.12,
+		maxSamples: 200_000,
+		checkSelfIntersections: true,
+		checkBidirectionalDistance: true,
+		fieldRayResolution: 12,
+		maximumSurfaceDistance: 0.02,
+	});
 	const topology = surface.certification.topology;
 	if (topology.status !== 'accepted-topology-baseline') {
 		return { status: 'fail', details: { message: 'sphere topology baseline rejected', topology } };
@@ -51,12 +68,20 @@ async function runReferenceSphere() {
 	if (!(surface.certification.meshToFieldVertexResidual.maximum < 0.02)) {
 		return { status: 'fail', details: { message: 'sphere vertex residual exceeded fixture gate', residual: surface.certification.meshToFieldVertexResidual } };
 	}
+	if (!(surface.certification.meshToFieldHausdorff.maximum < 0.02
+		&& surface.certification.fieldToMeshHausdorff.maximum < 0.02
+		&& surface.certification.normalAngleError.maximum < 1e-5)) {
+		return { status: 'fail', details: { message: 'sphere bidirectional surface metrics exceeded the fixture gate', certification: surface.certification } };
+	}
 	return {
 		status: 'pass',
 		details: {
 			vertices: topology.vertexCount,
 			triangles: topology.triangleCount,
 			maximumVertexResidual: surface.certification.meshToFieldVertexResidual.maximum,
+			meshToFieldMaximum: surface.certification.meshToFieldHausdorff.maximum,
+			fieldToMeshMaximum: surface.certification.fieldToMeshHausdorff.maximum,
+			maximumNormalAngleRadians: surface.certification.normalAngleError.maximum,
 			algorithm: surface.extraction.algorithm,
 			ambiguityPolicy: surface.extraction.ambiguityPolicy,
 		},
@@ -112,6 +137,27 @@ async function runReferenceComponentPolicy() {
 	return { status: 'pass', details: { reason } };
 }
 
+async function runSelfIntersectionRejection() {
+	const positions = new Float32Array([
+		-1, 0, 0, 1, 0, 0, 0, 1, 0,
+		0, 0.25, -1, 0, 0.25, 1, 0, -0.75, 0,
+	]);
+	const normals = new Float32Array(positions.length);
+	const crossing = validateMeshTopology({ positions, normals, indices: new Uint32Array([0, 1, 2, 3, 4, 5]) }, { checkSelfIntersections: true });
+	if (crossing.nonAdjacentSelfIntersections.count !== 1 || !crossing.failures.some((failure) => failure.includes('self-intersections'))) {
+		return { status: 'fail', details: { message: 'crossing non-adjacent triangles were accepted', crossing } };
+	}
+	const coplanarPositions = new Float32Array([
+		-1, -1, 0, 1, -1, 0, 0, 1, 0,
+		-1, -1, 0, 1, -1, 0, 0, 1, 0,
+	]);
+	const coplanar = validateMeshTopology({ positions: coplanarPositions, normals: new Float32Array(coplanarPositions.length), indices: new Uint32Array([0, 1, 2, 3, 4, 5]) }, { checkSelfIntersections: true });
+	if (coplanar.duplicateCoincidentCoverage !== 1 || coplanar.nonAdjacentSelfIntersections.coincidentCoveragePairs !== 1) {
+		return { status: 'fail', details: { message: 'duplicate coincident coverage was not classified', coplanar } };
+	}
+	return { status: 'pass', details: { crossingPairs: crossing.nonAdjacentSelfIntersections.pairs, coincidentPairs: coplanar.nonAdjacentSelfIntersections.pairs } };
+}
+
 async function runBundledReferenceConnectivity() {
 	const records = [];
 	for (const name of bundledSpecNames) {
@@ -121,23 +167,25 @@ async function runBundledReferenceConnectivity() {
 		const cellSize = Math.min(0.03, minimumRadius);
 		let surface;
 		try {
-			surface = extractReferenceSurface(compiled, { cellSize, maxSamples: 10_000_000 });
+			surface = extractReferenceSurface(compiled, { cellSize, maxSamples: 10_000_000, checkSelfIntersections: true });
 		} catch (error) {
 			return { status: 'fail', details: { message: `bundled reference '${name}' rejected`, reason: error.message, records } };
 		}
 		if (surface.componentPolicy.componentCount !== 1 || surface.certification.topology.status !== 'accepted-topology-baseline') {
 			return { status: 'fail', details: { message: `bundled reference '${name}' failed connectivity/topology`, componentPolicy: surface.componentPolicy, topology: surface.certification.topology, records } };
 		}
-		records.push({
+			records.push({
 			name,
 			cellSize,
 			vertices: surface.positions.length / 3,
 			triangles: surface.indices.length / 3,
 			components: surface.componentPolicy.componentCount,
 			maximumVertexResidual: surface.certification.meshToFieldVertexResidual.maximum,
+			nonAdjacentSelfIntersections: surface.certification.topology.nonAdjacentSelfIntersections.count,
+			duplicateCoincidentCoverage: surface.certification.topology.duplicateCoincidentCoverage,
 		});
 	}
-	return { status: 'pass', details: { records, status: 'provisional-connectivity-only' } };
+	return { status: 'pass', details: { records, status: 'provisional-topology-and-intersection-only' } };
 }
 
 async function runSkinWeightBaseline() {
@@ -188,11 +236,68 @@ async function runLbsRestIdentity() {
 	};
 }
 
+async function runDqRestAndAntipodal() {
+	const spec = JSON.parse(await readFile(resolve(specsDir, 'biped.json'), 'utf8'));
+	const compiled = compileFixture(spec);
+	const surface = extractReferenceSurface(compiled, { cellSize: 0.08, maxSamples: 1_000_000 });
+	const skinning = generateGeodesicSkinWeights(surface, compiled);
+	const transforms = buildDualQuaternionSlotTransforms(compiled, restPoseFromCompiled(compiled));
+	const restDeformed = deformReferenceSurfaceDqs(surface, skinning, transforms);
+	const restPositionDelta = maximumSurfaceDelta(surface.positions, restDeformed.positions);
+	const restNormalDelta = maximumSurfaceDelta(surface.normals, restDeformed.normals);
+	const antipodal = transforms.slice();
+	for (let slot = 0; slot < compiled.slots.length; slot += 2) {
+		for (let component = 0; component < 8; component++) antipodal[slot * DQ_SLOT_FLOATS + component] *= -1;
+	}
+	const antipodalDeformed = deformReferenceSurfaceDqs(surface, skinning, antipodal);
+	const antipodalPositionDelta = maximumSurfaceDelta(restDeformed.positions, antipodalDeformed.positions);
+	const antipodalNormalDelta = maximumSurfaceDelta(restDeformed.normals, antipodalDeformed.normals);
+	if (Math.max(restPositionDelta, restNormalDelta, antipodalPositionDelta, antipodalNormalDelta) > 2e-7) {
+		return { status: 'fail', details: { message: 'DQ rest identity or antipodal handling failed', restPositionDelta, restNormalDelta, antipodalPositionDelta, antipodalNormalDelta } };
+	}
+	return { status: 'pass', details: { vertices: surface.positions.length / 3, restPositionDelta, restNormalDelta, antipodalPositionDelta, antipodalNormalDelta } };
+}
+
+async function runDqScaleFixture() {
+	const compiled = compileFixture(sphereSpec);
+	const surface = extractReferenceSurface(compiled, { cellSize: 0.14, maxSamples: 200_000 });
+	const skinning = generateGeodesicSkinWeights(surface, compiled);
+	const pose = restPoseFromCompiled(compiled);
+	pose[3] *= 1.5;
+	pose[7] *= 1.5;
+	const deformed = deformReferenceSurfaceDqs(surface, skinning, buildDualQuaternionSlotTransforms(compiled, pose));
+	let maximumScaleError = 0;
+	for (let vertex = 0; vertex < surface.positions.length / 3; vertex++) {
+		const restRadius = Math.hypot(...surface.positions.subarray(vertex * 3, vertex * 3 + 3));
+		const posedRadius = Math.hypot(...deformed.positions.subarray(vertex * 3, vertex * 3 + 3));
+		maximumScaleError = Math.max(maximumScaleError, Math.abs(posedRadius - restRadius * 1.5));
+	}
+	if (maximumScaleError > 3e-7) return { status: 'fail', details: { message: 'DQ separate radial scale failed', maximumScaleError } };
+	return { status: 'pass', details: { vertices: surface.positions.length / 3, scale: 1.5, maximumScaleError } };
+}
+
+async function runProjectedSilhouetteFixture() {
+	const compiled = compileFixture(sphereSpec);
+	const surface = extractReferenceSurface(compiled, { cellSize: 0.08, maxSamples: 500_000 });
+	const baseline = compareProjectedSilhouettes(surface, compiled.slots, compiled.blendDag, { resolution: 64, rayStep: 0.03 });
+	const translated = { ...surface, positions: surface.positions.slice() };
+	for (let offset = 0; offset < translated.positions.length; offset += 3) translated.positions[offset] += 0.2;
+	const mutation = compareProjectedSilhouettes(translated, compiled.slots, compiled.blendDag, { resolution: 64, rayStep: 0.03 });
+	if (baseline.maximumErrorPx > 1 || mutation.maximumErrorPx <= baseline.maximumErrorPx || mutation.maximumDisagreementFraction <= baseline.maximumDisagreementFraction) {
+		return { status: 'fail', details: { message: 'projected silhouette fixture or translation mutation failed', baseline, mutation } };
+	}
+	return { status: 'pass', details: { baselineMaximumErrorPx: baseline.maximumErrorPx, mutatedMaximumErrorPx: mutation.maximumErrorPx, baselineDisagreementFraction: baseline.maximumDisagreementFraction, mutatedDisagreementFraction: mutation.maximumDisagreementFraction } };
+}
+
 export const gates = [
 	{ id: 'reference-surface-sphere', run: runReferenceSphere },
 	{ id: 'reference-surface-determinism', run: runReferenceDeterminism },
 	{ id: 'reference-component-policy', run: runReferenceComponentPolicy },
+	{ id: 'mesh-self-intersection-rejection', run: runSelfIntersectionRejection },
 	{ id: 'bundled-reference-connectivity', run: runBundledReferenceConnectivity },
 	{ id: 'skin-weight-baseline', run: runSkinWeightBaseline },
 	{ id: 'lbs-rest-identity', run: runLbsRestIdentity },
+	{ id: 'dq-rest-antipodal', run: runDqRestAndAntipodal },
+	{ id: 'dq-scale-fixture', run: runDqScaleFixture },
+	{ id: 'projected-silhouette-fixture', run: runProjectedSilhouetteFixture },
 ];

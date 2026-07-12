@@ -13,8 +13,9 @@ const KUHN_TETRAHEDRA = Object.freeze([
 	[0, 7, 4, 6], [0, 4, 5, 6], [0, 5, 1, 6],
 ]);
 
-export const MARCHING_CUBES_ALGORITHM = 'marching-cubes-kuhn-ambiguity-v1';
+export const MARCHING_CUBES_ALGORITHM = 'marching-cubes-kuhn-ambiguity-v2';
 export const MARCHING_CUBES_AMBIGUITY_POLICY = 'globally-consistent-kuhn-tetrahedral-subdivision';
+export const EDGE_ENDPOINT_SNAP_FRACTION = 1e-5;
 
 function finiteVec3(value, name) {
 	if (!Array.isArray(value) || value.length !== 3 || value.some((entry) => !Number.isFinite(entry))) {
@@ -213,14 +214,16 @@ export function extractMarchingCubes(options = {}) {
 		// When the iso-surface lands exactly on a lattice vertex, every incident
 		// edge must reuse one vertex. Keying by the edge in this case creates
 		// coincident vertices and zero-area triangles at analytically exact roots.
-		const key = intersection.t <= 1e-10
+		const key = intersection.t <= EDGE_ENDPOINT_SNAP_FRACTION
 			? `v:${edge[0].id}`
-			: intersection.t >= 1 - 1e-10
+			: intersection.t >= 1 - EDGE_ENDPOINT_SNAP_FRACTION
 				? `v:${edge[1].id}`
 				: edgeKey(edge[0], edge[1]);
 		const cached = edgeVertices.get(key);
 		if (cached !== undefined) return cached;
-		const position = intersection.position;
+		const position = intersection.t <= EDGE_ENDPOINT_SNAP_FRACTION
+			? edge[0].position
+			: intersection.t >= 1 - EDGE_ENDPOINT_SNAP_FRACTION ? edge[1].position : intersection.position;
 		const normal = normalize(options.gradient(position));
 		if (position.some((entry) => !Number.isFinite(entry)) || normal.some((entry) => !Number.isFinite(entry))) {
 			throw new Error(`non-finite extracted vertex on edge ${key}`);
@@ -278,7 +281,7 @@ export function extractMarchingCubes(options = {}) {
 			intersectedCells,
 		},
 		rejectedDegenerateTriangles,
-		weldPolicy: 'exact-equal-f32-position',
+		weldPolicy: `integer-edge-key plus exact-equal-f32-position; endpoint fractions <= ${EDGE_ENDPOINT_SNAP_FRACTION} snap to the integer lattice vertex`,
 		weldedVertices: welded.weldedVertices,
 		collapsedByWeld: welded.collapsedByWeld,
 	};

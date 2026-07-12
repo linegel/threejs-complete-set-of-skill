@@ -1,9 +1,9 @@
 import { evaluateField } from './field.js';
 import { extractMarchingCubes, MARCHING_CUBES_ALGORITHM, MARCHING_CUBES_AMBIGUITY_POLICY } from './marching-cubes.js';
 import { findMeshComponents, isolateMeshComponent, selectComponentByHandle } from './mesh-components.js';
-import { validateMeshTopology } from './mesh-validity.js';
+import { createMeshDistanceQuery, validateMeshTopology } from './mesh-validity.js';
 
-export const REFERENCE_SURFACE_VERSION = 'creature-reference-surface-v1';
+export const REFERENCE_SURFACE_VERSION = 'creature-reference-surface-v2';
 
 export const TIER_PROJECTED_ERROR_TARGETS = Object.freeze({
 	hero: Object.freeze({ maxExtractionErrorPx: 0.5 }),
@@ -129,6 +129,114 @@ function surfaceResidual(mesh, compiled) {
 	return { samples, maximum, mean: samples > 0 ? sum / samples : null };
 }
 
+function nearestRank(values, probability) {
+	if (values.length === 0) return null;
+	const sorted = [...values].sort((a, b) => a - b);
+	return sorted[Math.max(0, Math.ceil(probability * sorted.length) - 1)];
+}
+
+function distribution(values) {
+	let sum = 0;
+	let maximum = 0;
+	for (const value of values) {
+		sum += value;
+		maximum = Math.max(maximum, value);
+	}
+	return { samples: values.length, maximum, p95: nearestRank(values, 0.95), mean: values.length > 0 ? sum / values.length : null };
+}
+
+function fieldDistanceEstimate(compiled, value) {
+	const field = completeField(compiled, value);
+	const gradientLength = Math.hypot(...field.grad);
+	return Math.abs(field.d) / Math.max(gradientLength, 1e-8);
+}
+
+function meshToFieldDistance(mesh, compiled) {
+	const distances = [];
+	for (let vertex = 0; vertex < mesh.positions.length / 3; vertex++) {
+		distances.push(fieldDistanceEstimate(compiled, [...mesh.positions.subarray(vertex * 3, vertex * 3 + 3)]));
+	}
+	for (let offset = 0; offset < mesh.indices.length; offset += 3) {
+		const a = mesh.indices[offset] * 3;
+		const b = mesh.indices[offset + 1] * 3;
+		const c = mesh.indices[offset + 2] * 3;
+		const centroid = [0, 1, 2].map((axis) => (mesh.positions[a + axis] + mesh.positions[b + axis] + mesh.positions[c + axis]) / 3);
+		distances.push(fieldDistanceEstimate(compiled, centroid));
+	}
+	return { ...distribution(distances), sampling: 'all vertices plus all triangle centroids; |field| / max(|gradient|, 1e-8)' };
+}
+
+function surfaceNormalAngleError(mesh, compiled) {
+	const angles = [];
+	for (let vertex = 0; vertex < mesh.positions.length / 3; vertex++) {
+		const value = [...mesh.positions.subarray(vertex * 3, vertex * 3 + 3)];
+		const expected = completeField(compiled, value).grad;
+		const actual = [...mesh.normals.subarray(vertex * 3, vertex * 3 + 3)];
+		const expectedLength = Math.hypot(...expected);
+		const actualLength = Math.hypot(...actual);
+		const cosine = expectedLength > 1e-8 && actualLength > 1e-8
+			? Math.max(-1, Math.min(1, expected.reduce((sum, component, axis) => sum + component * actual[axis], 0) / expectedLength / actualLength))
+			: -1;
+		angles.push(Math.acos(cosine));
+	}
+	return { ...distribution(angles), unit: 'radians', sampling: 'every reference vertex against analytic complete-field gradient' };
+}
+
+function fieldToMeshDistance(mesh, compiled, bounds, options) {
+	const query = createMeshDistanceQuery(mesh);
+	const resolution = Math.max(4, Math.floor(options.fieldRayResolution ?? 18));
+	const rayStep = finitePositive(options.fieldRayStep ?? options.cellSize * 0.75, 'fieldRayStep');
+	const distances = [];
+	let signChangeRoots = 0;
+	for (let axis = 0; axis < 3; axis++) {
+		const transverse = [0, 1, 2].filter((candidate) => candidate !== axis);
+		for (let row = 0; row < resolution; row++) {
+			for (let column = 0; column < resolution; column++) {
+				const fixed = [0, 0, 0];
+				fixed[transverse[0]] = bounds.min[transverse[0]] + (row + 0.5) / resolution * (bounds.max[transverse[0]] - bounds.min[transverse[0]]);
+				fixed[transverse[1]] = bounds.min[transverse[1]] + (column + 0.5) / resolution * (bounds.max[transverse[1]] - bounds.min[transverse[1]]);
+				const length = bounds.max[axis] - bounds.min[axis];
+				const steps = Math.max(2, Math.ceil(length / rayStep));
+				let previousCoordinate = bounds.min[axis];
+				fixed[axis] = previousCoordinate;
+				let previousDistance = completeField(compiled, fixed).d;
+				for (let stepIndex = 1; stepIndex <= steps; stepIndex++) {
+					const coordinate = bounds.min[axis] + stepIndex / steps * length;
+					fixed[axis] = coordinate;
+					const distance = completeField(compiled, fixed).d;
+					if ((previousDistance < 0 && distance >= 0) || (previousDistance > 0 && distance <= 0)) {
+						let low = previousCoordinate;
+						let high = coordinate;
+						let lowDistance = previousDistance;
+						for (let iteration = 0; iteration < 18; iteration++) {
+							const middle = (low + high) * 0.5;
+							fixed[axis] = middle;
+							const middleDistance = completeField(compiled, fixed).d;
+							if ((lowDistance < 0 && middleDistance >= 0) || (lowDistance > 0 && middleDistance <= 0)) high = middle;
+							else { low = middle; lowDistance = middleDistance; }
+						}
+						fixed[axis] = (low + high) * 0.5;
+						distances.push(query.distanceToPoint([...fixed]));
+						signChangeRoots += 1;
+					}
+					previousCoordinate = coordinate;
+					previousDistance = distance;
+				}
+			}
+		}
+	}
+	return {
+		...distribution(distances),
+		signChangeRoots,
+		rayResolution: resolution,
+		rayStep,
+		rootIterations: 18,
+		directions: ['x', 'y', 'z'],
+		broadPhase: query.broadPhase,
+		sampling: 'stratified axis rays; every complete-field sign-change root to nearest reference triangle',
+	};
+}
+
 export function extractReferenceSurface(compiled, options = {}) {
 	if (!compiled?.slots?.length || !compiled.blendDag) throw new Error('extractReferenceSurface requires compileSpec output');
 	const tier = options.tier ?? compiled.tier ?? 'hero';
@@ -163,8 +271,22 @@ export function extractReferenceSurface(compiled, options = {}) {
 		throw new Error(`reference component policy rejected ${components.length} disconnected surfaces; main handle selected component ${selected.index}`);
 	}
 	const mesh = isolateMeshComponent(extracted, components[selected.index]);
-	const topology = validateMeshTopology(mesh, { gradient });
+	const topology = validateMeshTopology(mesh, {
+		gradient,
+		checkSelfIntersections: options.checkSelfIntersections === true,
+		intersectionEpsilon: options.intersectionEpsilon,
+	});
 	const residual = surfaceResidual(mesh, compiled);
+	const distanceOptions = { ...options, cellSize: derived.cellSize };
+	const meshToFieldHausdorff = options.checkBidirectionalDistance === true ? meshToFieldDistance(mesh, compiled) : null;
+	const fieldToMeshHausdorff = options.checkBidirectionalDistance === true ? fieldToMeshDistance(mesh, compiled, bounds, distanceOptions) : null;
+	const normalAngleError = options.checkBidirectionalDistance === true ? surfaceNormalAngleError(mesh, compiled) : null;
+	const maximumSurfaceDistance = options.maximumSurfaceDistance ?? derived.cellSize * 1.5;
+	const surfaceDistancePass = options.checkBidirectionalDistance !== true || (
+		(meshToFieldHausdorff?.maximum ?? Infinity) <= maximumSurfaceDistance
+		&& (fieldToMeshHausdorff?.maximum ?? Infinity) <= maximumSurfaceDistance
+		&& (normalAngleError?.maximum ?? Infinity) <= (options.maximumNormalAngleRadians ?? Math.PI / 12)
+	);
 	const referenceCompilerSignature = digestText128(JSON.stringify({
 		version: REFERENCE_SURFACE_VERSION,
 		sourceCompilerSignature: compiled.compilerSignature,
@@ -207,11 +329,20 @@ export function extractReferenceSurface(compiled, options = {}) {
 			selectedDistanceSquared: selected.distanceSquared,
 		},
 		certification: {
-			status: topology.status === 'accepted-topology-baseline' ? 'provisional' : 'rejected',
+			status: topology.status === 'accepted-topology-baseline' && surfaceDistancePass ? 'provisional' : 'rejected',
 			topology,
 			meshToFieldVertexResidual: residual,
+			meshToFieldHausdorff,
+			fieldToMeshHausdorff,
+			normalAngleError,
+			thresholds: {
+				maximumSurfaceDistance,
+				maximumNormalAngleRadians: options.maximumNormalAngleRadians ?? Math.PI / 12,
+			},
 			limitations: [
-				'Bidirectional Hausdorff, projected silhouette, deformation, self-intersection, and duplicate-coverage gates are still required before acceptance.',
+				...(options.checkBidirectionalDistance === true ? [] : ['Bidirectional Hausdorff and normal-angle checks were not requested for this extraction.']),
+				'Projected silhouette and deformation gates are still required before acceptance.',
+				...(options.checkSelfIntersections === true ? [] : ['Self-intersection and coincident-coverage checks were not requested for this extraction.']),
 			],
 		},
 	};

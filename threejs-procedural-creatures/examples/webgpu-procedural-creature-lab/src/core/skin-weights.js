@@ -80,8 +80,17 @@ function ancestorSet(semanticParts, partIndex) {
 	return ancestors;
 }
 
-function relatedParts(ancestorSets, left, right) {
-	return left === right || ancestorSets[left]?.has(right) || ancestorSets[right]?.has(left);
+function canTraverseSlot(mesh, compiled, ancestorSets, slotIndex, ownerPart, vertex, descendantChoice) {
+	const slot = compiled.slots[slotIndex];
+	const slotPart = slot.semanticPartIndex;
+	if (slotPart === ownerPart) return true;
+	// Parent/ancestor motion may propagate down a child chain. On an ancestor
+	// surface, exactly one nearest descendant semantic branch is eligible. This
+	// keeps the influence field smooth through the authored joint while stopping
+	// left/right siblings from blending merely because both reach the torso.
+	if (ancestorSets[ownerPart]?.has(slotPart)) return true;
+	if (!ancestorSets[slotPart]?.has(ownerPart)) return false;
+	return descendantChoice(ownerPart, vertex) === slotPart;
 }
 
 function dijkstra(adjacency, seeds, canVisit) {
@@ -106,17 +115,19 @@ function dijkstra(adjacency, seeds, canVisit) {
 	return distances;
 }
 
-function fallbackSeed(mesh, slot) {
+function fallbackSeed(mesh, slot, canVisit = () => true) {
 	const handle = midpoint(slot);
-	let best = 0;
+	let best = -1;
 	let bestDistance = Number.POSITIVE_INFINITY;
 	for (let vertex = 0; vertex < mesh.positions.length / 3; vertex++) {
+		if (!canVisit(vertex)) continue;
 		const candidate = distance(point(mesh.positions, vertex), handle);
 		if (candidate < bestDistance) {
 			bestDistance = candidate;
 			best = vertex;
 		}
 	}
+	if (best < 0) throw new Error(`no barrier-valid fallback seed for slot '${slot.partId ?? slot.semanticPartIndex}'`);
 	return best;
 }
 
@@ -134,16 +145,36 @@ export function generateGeodesicSkinWeights(mesh, compiled, options = {}) {
 		ownerParts[vertex] = compiled.slots[Math.max(0, owner)]?.semanticPartIndex ?? 0;
 	}
 	const ancestorSets = compiled.semanticParts.map((part) => ancestorSet(compiled.semanticParts, part.index));
+	const descendantChoiceCache = new Map();
+	const descendantChoice = (ownerPart, vertex) => {
+		const key = ownerPart * vertexCount + vertex;
+		if (descendantChoiceCache.has(key)) return descendantChoiceCache.get(key);
+		const value = point(mesh.positions, vertex);
+		let bestPart = -1;
+		let bestDistance = Infinity;
+		for (const slot of compiled.slots) {
+			const part = slot.semanticPartIndex;
+			if (part === ownerPart || !ancestorSets[part]?.has(ownerPart)) continue;
+			const candidate = distance(value, slot.a);
+			if (candidate < bestDistance || (candidate === bestDistance && part < bestPart)) {
+				bestDistance = candidate;
+				bestPart = part;
+			}
+		}
+		descendantChoiceCache.set(key, bestPart);
+		return bestPart;
+	};
 	const distancesBySlot = [];
 	for (let slotIndex = 0; slotIndex < compiled.slots.length; slotIndex++) {
 		const slot = compiled.slots[slotIndex];
+		const canVisit = (vertex) => canTraverseSlot(mesh, compiled, ancestorSets, slotIndex, ownerParts[vertex], vertex, descendantChoice);
 		const seeds = [];
 		for (let vertex = 0; vertex < vertexCount; vertex++) if (ownerSlots[vertex] === slotIndex) seeds.push(vertex);
-		if (seeds.length === 0) seeds.push(fallbackSeed(mesh, slot));
+		if (seeds.length === 0) seeds.push(fallbackSeed(mesh, slot, canVisit));
 		distancesBySlot.push(dijkstra(
 			adjacency,
 			seeds,
-			(vertex) => relatedParts(ancestorSets, slot.semanticPartIndex, ownerParts[vertex]),
+			canVisit,
 		));
 	}
 
@@ -177,7 +208,7 @@ export function generateGeodesicSkinWeights(mesh, compiled, options = {}) {
 			skinIndices[offset] = entry.slotIndex;
 			skinWeights[offset] = weight;
 			const influencePart = compiled.slots[entry.slotIndex].semanticPartIndex;
-			if (!relatedParts(ancestorSets, ownerParts[vertex], influencePart)) maximumBarrierLeakage = Math.max(maximumBarrierLeakage, weight);
+			if (!canTraverseSlot(mesh, compiled, ancestorSets, entry.slotIndex, ownerParts[vertex], vertex, descendantChoice)) maximumBarrierLeakage = Math.max(maximumBarrierLeakage, weight);
 		}
 		let f32Sum = 0;
 		for (let influence = 0; influence < MAX_SKIN_INFLUENCES; influence++) f32Sum += skinWeights[vertex * MAX_SKIN_INFLUENCES + influence];
@@ -191,7 +222,7 @@ export function generateGeodesicSkinWeights(mesh, compiled, options = {}) {
 		maximumBarrierLeakage,
 		fallbackVertices,
 		sigma,
-		barrierPolicy: 'same semantic part or ancestor/descendant chain only',
+		barrierPolicy: 'ancestor motion may descend; an ancestor surface selects exactly one nearest descendant semantic branch; siblings never cross directly',
 	};
 	return {
 		version: SKIN_WEIGHT_VERSION,
