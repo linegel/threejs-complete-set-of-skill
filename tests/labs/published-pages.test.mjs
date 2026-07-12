@@ -30,7 +30,7 @@ test('per-lab closures follow emitted dependencies without absorbing unrelated c
   writeFileSync(join(assets, 'entry.js'), `
     import './shared.js';
     import('./lazy.js');
-    const data = new URL('./payload.bin', import.meta.url);
+    const data = new URL(\`payload.bin\`, import.meta.url);
     const falsePositive = 'href="${'${new URL(`${id}/`, base).href}'}"';
     const route = new URL(location.href);
   `);
