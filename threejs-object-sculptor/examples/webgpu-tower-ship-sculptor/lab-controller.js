@@ -113,11 +113,16 @@ export async function createTowerShipLabController({
   tier = "full",
   seed = TOWER_SHIP_SEEDS[0],
   camera = "design",
+  onDeviceLost = () => {},
 } = {}) {
   assertKnown(mode, TOWER_SHIP_MODES, "mode");
   assertKnown(tier, TOWER_SHIP_TIERS, "tier");
   assertKnown(seed, TOWER_SHIP_SEEDS, "seed");
   assertKnown(camera, TOWER_SHIP_CAMERAS, "camera");
+  if (typeof onDeviceLost !== "function") throw new TypeError("onDeviceLost must be a function");
+
+  let disposed = false;
+  let deviceLossReason = null;
 
   const renderer = new THREE.WebGPURenderer({
     canvas,
@@ -133,6 +138,19 @@ export async function createTowerShipLabController({
   if (renderer.backend.isWebGPUBackend !== true) {
     throw new Error("WebGPU is required for the canonical Tower Ship demo; no fallback was activated.");
   }
+  const initializedDevice = renderer.backend.device;
+  if (!initializedDevice?.lost || typeof initializedDevice.lost.then !== "function") {
+    throw new Error("Initialized WebGPU device does not expose a loss observer.");
+  }
+  initializedDevice.lost.then((info) => {
+    if (disposed) return;
+    deviceLossReason = info?.message || info?.reason || "unknown device loss";
+    onDeviceLost(info);
+  }, (error) => {
+    if (disposed) return;
+    deviceLossReason = error instanceof Error ? error.message : String(error);
+    onDeviceLost(error);
+  });
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x091012);
@@ -188,7 +206,6 @@ export async function createTowerShipLabController({
   let appliedDpr = 1;
   let ship = null;
   let summary = null;
-  let disposed = false;
   let initialized = false;
   let stepCount = 0;
   let renderSubmissions = 0;
@@ -341,6 +358,7 @@ export async function createTowerShipLabController({
         completedFrames,
         rebuildCount,
         lastFrameError,
+        deviceLossReason,
         ...summary,
       };
     },
