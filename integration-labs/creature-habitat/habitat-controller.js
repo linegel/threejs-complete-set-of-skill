@@ -76,6 +76,7 @@ import {
 import { assertStaticSpawnStorageImmutable, captureStaticSpawnStorage } from "./static-storage-audit.mjs";
 import { createScaledBoundedWaterStage } from "./scaled-water-stage.js";
 
+const LAB_ID = "creature-habitat";
 const WORLD_UNITS_PER_METER = 1;
 const CONTACT_CAPACITY = 8;
 const MRT_TARGETS = Object.freeze(["output", "normal", "emissive", "velocity"]);
@@ -327,6 +328,10 @@ export class HabitatController {
       ownerNames.length === Object.keys(this.owners).length ? 0 : 1,
       1,
     );
+  }
+
+  get labId() {
+    return LAB_ID;
   }
 
   assertActive() {
@@ -1321,6 +1326,7 @@ export class HabitatController {
       ? computeGpuP95(this.measuredGpuFrameMs)
       : null;
     return {
+      labId: this.labId,
       status: "native-webgpu-runtime; acceptance incomplete pending evidence",
       rendererBackend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
       threeRevision: REVISION,

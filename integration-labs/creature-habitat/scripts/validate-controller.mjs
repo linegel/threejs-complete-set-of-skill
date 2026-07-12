@@ -18,6 +18,9 @@ const contract = JSON.parse(read("contract.json"));
 const packageJson = JSON.parse(read("package.json"));
 
 for (const token of [
+  'const LAB_ID = "creature-habitat"',
+  "get labId()",
+  "labId: this.labId",
   "new WebGPURenderer",
   "await this.renderer.init()",
   "isWebGPUBackend !== true",
