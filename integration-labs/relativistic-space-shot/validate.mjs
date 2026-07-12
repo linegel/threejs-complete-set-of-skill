@@ -181,6 +181,8 @@ assert.match(mainSource, /particleStage\.sparkPool\.reset\(renderer\)/);
 assert.match(mainSource, /particleStage\.debrisPool\.reset\(renderer\)/);
 assert.match(mainSource, /renderer\.toneMapping = NoToneMapping/);
 assert.match(mainSource, /renderPipeline\.outputColorTransform = false/);
+assert.match(mainSource, /async ready\(\) \{\s*cameraStage\.update\(\);\s*await this\.renderOnce\(\);\s*\}/);
+assert.doesNotMatch(mainSource, /cameraStage\.update\(deltaSeconds\)/);
 assert.doesNotMatch(mainSource, /WebGLRenderer|automatic fallback|fallbackRenderer/);
 
 console.log("Relativistic Space Shot strict manifest, exact routes, live adapters, single-owner graph, deterministic motion, and browser-free contracts validated");

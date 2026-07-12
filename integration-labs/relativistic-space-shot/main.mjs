@@ -387,7 +387,7 @@ export async function createRelativisticSpaceShotLab({
 
   const labController = {
     async ready() {
-      cameraStage.update(deltaSeconds);
+      cameraStage.update();
       await this.renderOnce();
     },
     async setScenario(id) {
