@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { validateUnifiedV2ArtifactBundle } from '../evidence-bundle-v2.js';
 import { validateArtifactBundle as validateV1ArtifactBundle } from './artifact-schemas.js';
-import { EVIDENCE_SCHEMA_VERSION, validateV2ArtifactBundle } from './v2.js';
 
 export async function detectEvidenceSchemaVersion( artifactDir ) {
 
@@ -15,7 +15,7 @@ export async function validateVersionedArtifactBundle( artifactDir, options = {}
 
 	const version = await detectEvidenceSchemaVersion( artifactDir );
 
-	if ( version === EVIDENCE_SCHEMA_VERSION ) return validateV2ArtifactBundle( artifactDir, options );
+	if ( version === 2 ) return validateUnifiedV2ArtifactBundle( artifactDir, options );
 
 	if ( version === 1 ) {
 
