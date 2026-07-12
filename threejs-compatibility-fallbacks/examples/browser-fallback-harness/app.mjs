@@ -78,6 +78,7 @@ export class FallbackLabController {
 	#scenarioId;
 	#explicitRequest = false;
 	#liveCapabilities = null;
+	#canonicalRenderer = null;
 	#result = null;
 	#runtime = null;
 	#disposed = false;
@@ -92,7 +93,13 @@ export class FallbackLabController {
 	async ready() {
 
 		this.#assertLive();
-		this.#liveCapabilities = await probeCanonicalBackend();
+		if ( this.#liveCapabilities === null ) {
+
+			const probe = await probeCanonicalBackend();
+			this.#liveCapabilities = probe.capabilities;
+			this.#canonicalRenderer = probe.renderer;
+
+		}
 		await this.renderOnce();
 
 	}
@@ -218,6 +225,8 @@ export class FallbackLabController {
 
 		this.#runtime?.dispose();
 		this.#runtime = null;
+		this.#canonicalRenderer?.dispose();
+		this.#canonicalRenderer = null;
 		this.#disposed = true;
 
 	}
@@ -225,6 +234,7 @@ export class FallbackLabController {
 	get catalog() { return this.#catalog; }
 	get labId() { return LAB_ID; }
 	get liveCapabilities() { return this.#liveCapabilities; }
+	get renderer() { return this.#canonicalRenderer; }
 	get explicitRequest() { return this.#explicitRequest; }
 
 	#assertLive() { if ( this.#disposed ) throw new Error( 'FallbackLabController is disposed.' ); }

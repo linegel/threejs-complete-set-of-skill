@@ -1,33 +1,46 @@
-export async function probeCanonicalBackend() {
+export async function probeCanonicalBackend( {
+	loadWebGPU = () => import( 'three/webgpu' )
+} = {} ) {
 
 	let renderer = null;
 	try {
 
-		const { WebGPURenderer, REVISION } = await import( 'three/webgpu' );
+		const { WebGPURenderer, REVISION } = await loadWebGPU();
 		renderer = new WebGPURenderer( { antialias: false } );
 		await renderer.init();
-		return {
+		const webgpu = renderer.backend.isWebGPUBackend === true;
+		const capabilities = {
 			tested: true,
-			webgpu: renderer.backend.isWebGPUBackend === true,
+			webgpu,
 			compatibilityMode: renderer.backend.compatibilityMode === true,
 			threeRevision: REVISION,
 			backendName: renderer.backend.constructor.name
 		};
+		if ( ! webgpu ) {
+
+			renderer.dispose();
+			renderer = null;
+
+		}
+		return {
+			capabilities,
+			renderer
+		};
 
 	} catch ( error ) {
 
-		return {
-			tested: false,
-			webgpu: null,
-			compatibilityMode: null,
-			threeRevision: null,
-			backendName: null,
-			error: error instanceof Error ? error.message : String( error )
-		};
-
-	} finally {
-
 		renderer?.dispose();
+		return {
+			capabilities: {
+				tested: false,
+				webgpu: null,
+				compatibilityMode: null,
+				threeRevision: null,
+				backendName: null,
+				error: error instanceof Error ? error.message : String( error )
+			},
+			renderer: null
+		};
 
 	}
 

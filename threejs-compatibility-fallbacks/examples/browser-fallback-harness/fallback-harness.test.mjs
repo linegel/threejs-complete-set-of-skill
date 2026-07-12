@@ -10,6 +10,7 @@ import {
 	measureBoundedWaterBranch,
 	planFallback
 } from './fallback-core.mjs';
+import { probeCanonicalBackend } from './backend-probe.mjs';
 import { buildDemoRegistry } from '../../../scripts/lib/lab-registry.mjs';
 import { validateLabManifest } from '../../../scripts/lib/lab-validation.mjs';
 
@@ -147,6 +148,56 @@ assert.match( runtimeSource, /authorization\?\.explicitRequest !== true/ );
 assert.match( runtimeSource, /authorization\?\.testedUnavailable !== true/ );
 assert.match( runtimeSource, /forceWebGL:\s*true/ );
 assert.match( runtimeSource, /isWebGPUBackend === true/ );
+
+function fakeWebGpuModule( { webgpu, initError = null } ) {
+
+	let disposeCalls = 0;
+	class FakeRenderer {
+
+		initialized = false;
+		backend = {
+			isWebGPUBackend: webgpu,
+			compatibilityMode: ! webgpu,
+			device: { lost: Promise.resolve( { reason: 'fixture' } ) }
+		};
+
+		async init() {
+
+			if ( initError ) throw initError;
+			this.initialized = true;
+
+		}
+
+		dispose() { disposeCalls ++; }
+
+	}
+
+	return {
+		module: { WebGPURenderer: FakeRenderer, REVISION: '185' },
+		disposeCalls: () => disposeCalls
+	};
+
+}
+
+const nativeFixture = fakeWebGpuModule( { webgpu: true } );
+const nativeProbe = await probeCanonicalBackend( { loadWebGPU: async () => nativeFixture.module } );
+assert.equal( nativeProbe.capabilities.webgpu, true );
+assert.equal( nativeProbe.renderer?.initialized, true );
+assert.equal( nativeFixture.disposeCalls(), 0, 'native renderer must remain owned until controller disposal' );
+nativeProbe.renderer.dispose();
+assert.equal( nativeFixture.disposeCalls(), 1 );
+
+const compatibilityFixture = fakeWebGpuModule( { webgpu: false } );
+const compatibilityProbe = await probeCanonicalBackend( { loadWebGPU: async () => compatibilityFixture.module } );
+assert.equal( compatibilityProbe.capabilities.webgpu, false );
+assert.equal( compatibilityProbe.renderer, null );
+assert.equal( compatibilityFixture.disposeCalls(), 1, 'non-WebGPU probes must be disposed immediately' );
+
+const failedFixture = fakeWebGpuModule( { webgpu: true, initError: new Error( 'fixture init failure' ) } );
+const failedProbe = await probeCanonicalBackend( { loadWebGPU: async () => failedFixture.module } );
+assert.equal( failedProbe.capabilities.tested, false );
+assert.equal( failedProbe.renderer, null );
+assert.equal( failedFixture.disposeCalls(), 1, 'failed probes must dispose partial renderer state' );
 
 assert.throws( () => getFallbackScenario( catalog, 'unknown' ), ( error ) => error.code === FALLBACK_REASON.UNKNOWN );
 
