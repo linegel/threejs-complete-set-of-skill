@@ -74,6 +74,13 @@ material-current velocity relative to the complete body point velocity,
 including `omega cross r`. It must never use surface-point velocity as fluid
 current.
 
+A nine-column clip under-resolves the continuous waterplane second moment.
+The bounded GPU reference therefore carries explicit linearized roll/pitch
+righting moments and angular damping as versioned hull-law terms. Their units
+are `N m rad^-1` and `N m s rad^-1`; they are not camera animation. The route
+must measure them against a denser clipped-hull reference before promoting the
+hydrostatic approximation beyond its declared heel/trim envelope.
+
 The bounded water mode stores a perturbation about a pre-balanced hydrostatic
 reference. Static hull reaction is balanced by the bed/reference pressure
 owner. Only departure from equilibrium excites the perturbation mode, while

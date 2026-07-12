@@ -14,7 +14,9 @@
     "threejs-physics-integration/examples/external-physics-adapter-conformance/decision-record.js",
     "threejs-physics-integration/examples/external-physics-adapter-conformance/external-adapter-contract.js",
     "threejs-physics-integration/examples/external-physics-adapter-conformance/fixtures.js",
-    "threejs-physics-integration/examples/external-physics-adapter-conformance/bounded-skiff-coupling.js"
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/bounded-skiff-coupling.js",
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/bounded-skiff-webgpu.js",
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/bounded-skiff-webgpu-app.js"
   ],
   "browserEntry": "threejs-physics-integration/examples/external-physics-adapter-conformance/index.html",
   "publishPath": "/demos/external-physics-adapter-conformance/",
@@ -31,11 +33,11 @@
     { "id": "bounded-gpu-skiff-reference", "route": "/demos/external-physics-adapter-conformance/mechanism/bounded-gpu-skiff-reference/", "startup": { "scenario": "dynamic-skiff-coupling" }, "acceptanceStatus": "incomplete" }
   ],
   "tiers": [],
-  "modes": ["decision", "adapter-contract"],
-  "cameras": ["not-applicable"],
+  "modes": ["decision", "adapter-contract", "native-skiff"],
+  "cameras": ["hero", "broadside", "overhead"],
   "seeds": [0],
   "capabilityRequirements": [
-    { "id": "rendering-not-required", "required": false, "evidence": "This source unit validates decision and adapter records and makes no native rendering claim.", "status": "not-applicable" }
+    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" }
   ],
   "runtimeProof": [
     { "id": "five-distinct-solutions", "required": true, "evidence": "Every fixture rejects fewer than five distinct algorithm families and scores six frozen axes.", "status": "accepted" },
@@ -56,9 +58,9 @@
   },
   "sourceHash": null,
   "proxyStatus": null,
-  "nonRenderingScenarioSuite": true,
+  "nonRenderingScenarioSuite": false,
   "notes": [
     "The contract fixture does not prove a native WebGPU physics implementation.",
-    "The bounded GPU skiff route, in-app Browser diagnostics, recovery, and target performance evidence remain required."
+    "The bounded GPU skiff source route exists and has been interactively inspected in Codex's in-app Browser; retained artifacts, recovery/device-loss proof, timestamp timing, and named-target sustained performance evidence remain required."
   ]
 }
