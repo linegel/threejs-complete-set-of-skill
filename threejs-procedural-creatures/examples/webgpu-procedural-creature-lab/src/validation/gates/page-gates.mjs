@@ -1,4 +1,5 @@
 import { IdentityPagePool } from '../../runtime/identity-pages.js';
+import { createReferencePageStorage } from '../../tsl/reference-page-storage.js';
 
 const identity = Object.freeze({ compilerSignature: 'compiler', topologySignature: 'topology', geometryDigest: 'geometry', tier: 'hero', skinningMethod: 'lbs', correctionLayout: 'none' });
 
@@ -42,7 +43,30 @@ async function runPageReuseGeneration() {
 	return { status: 'pass', details: { first, reused, nextGeneration, staleRejected, exhausted } };
 }
 
+async function runReferencePageStorage() {
+	const storage = createReferencePageStorage({ capacity: 4, slotCount: 2 });
+	const transform = new Float32Array(2 * 24);
+	transform.fill(0.25);
+	storage.writeTransforms(2, transform);
+	storage.writeRoot(2, 1, 2, 3, 0.5);
+	storage.writeVisibleSlots([2]);
+	const upload = storage.markDirty();
+	const expectedTransformBytes = transform.byteLength;
+	if (upload.transforms.bytes !== expectedTransformBytes || upload.roots.bytes !== 16 || upload.visibleSlots.bytes !== 4
+		|| upload.totalBytes !== expectedTransformBytes + 20 || storage.visibleSlotsArray[0] !== 2 || storage.visibleCount !== 1) {
+		return { status: 'fail', details: { message: 'reference page storage layout or exact dirty bytes drifted', upload } };
+	}
+	const idle = storage.markDirty();
+	if (idle.totalBytes !== 0) return { status: 'fail', details: { message: 'idle reference page storage scheduled an upload', idle } };
+	let duplicateRejected = false;
+	try { storage.writeVisibleSlots([1, 1]); } catch (error) { duplicateRejected = /duplicated/.test(error.message); }
+	storage.dispose();
+	if (!duplicateRejected) return { status: 'fail', details: { message: 'duplicate visible stable slots were accepted' } };
+	return { status: 'pass', details: { upload, idle, duplicateRejected } };
+}
+
 export const gates = [
 	{ id: 'stable-identity-pages', run: runStableIdentityPages },
 	{ id: 'page-reuse-generation', run: runPageReuseGeneration },
+	{ id: 'reference-page-storage', run: runReferencePageStorage },
 ];
