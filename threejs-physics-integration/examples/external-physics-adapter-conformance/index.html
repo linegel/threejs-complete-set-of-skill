@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Physics Integration Decision Lab</title>
+  <style>
+    :root { color-scheme: dark; font: 15px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #10151b; color: #dce7ef; }
+    body { margin: 0; padding: 24px; }
+    main { max-width: 1120px; margin: 0 auto; }
+    header { display: grid; gap: 8px; margin-bottom: 24px; }
+    h1, h2 { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; }
+    p { margin: 0; color: #aebfcb; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; }
+    button { border: 1px solid #405364; border-radius: 999px; padding: 8px 12px; color: inherit; background: #17212b; cursor: pointer; }
+    button[aria-pressed="true"] { background: #205d72; border-color: #58bdd7; }
+    .status { border-left: 4px solid #f0b44d; background: #1b2229; padding: 12px 14px; margin: 18px 0; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 18px 0; }
+    .metric { background: #17212b; border: 1px solid #2b3c49; padding: 12px; }
+    .metric strong { display: block; font-size: 1.35rem; color: #84d7e9; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th, td { padding: 9px 8px; border-bottom: 1px solid #2b3c49; text-align: left; vertical-align: top; }
+    th { color: #84d7e9; position: sticky; top: 0; background: #10151b; }
+    tr[data-winner="true"] { background: #15333d; }
+    .pass { color: #7fe2ae; } .fail { color: #ff9d8f; }
+    code { color: #f0cf83; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Physics integration decision lab</h1>
+      <p>Five distinct problems, six algorithm families each, frozen axes, hard gates, and one reproducible winner.</p>
+      <nav id="scenarios" aria-label="Decision scenarios"></nav>
+    </header>
+    <div class="status"><strong>Native evidence:</strong> contract-only. The bounded GPU skiff, recovery, and target performance remain <code>INSUFFICIENT_EVIDENCE</code>.</div>
+    <section class="summary" id="summary"></section>
+    <section aria-labelledby="decision-heading">
+      <h2 id="decision-heading">Scored candidates</h2>
+      <p id="observable"></p>
+      <div style="overflow:auto;max-height:62vh;margin-top:12px"><table><thead id="head"></thead><tbody id="body"></tbody></table></div>
+    </section>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

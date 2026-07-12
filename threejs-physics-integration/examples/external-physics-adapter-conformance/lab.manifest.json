@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "id": "external-physics-adapter-conformance",
+  "title": "Physics Solver Selection And External Adapter Conformance",
+  "skill": "threejs-physics-integration",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "incomplete",
+  "canonicalSource": [
+    "threejs-physics-integration/SKILL.md",
+    "threejs-physics-integration/references/solver-selection-and-architecture.md",
+    "threejs-physics-integration/references/external-solver-boundaries.md",
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/decision-record.js",
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/external-adapter-contract.js",
+    "threejs-physics-integration/examples/external-physics-adapter-conformance/fixtures.js"
+  ],
+  "browserEntry": "threejs-physics-integration/examples/external-physics-adapter-conformance/index.html",
+  "publishPath": "/demos/external-physics-adapter-conformance/",
+  "scenarios": [
+    { "id": "static-product-query", "route": "/demos/external-physics-adapter-conformance/scenario/static-product-query/", "startup": { "scenario": "static-product-query" }, "acceptanceStatus": "accepted" },
+    { "id": "tower-authored-motion", "route": "/demos/external-physics-adapter-conformance/scenario/tower-authored-motion/", "startup": { "scenario": "tower-authored-motion" }, "acceptanceStatus": "accepted" },
+    { "id": "dynamic-skiff-coupling", "route": "/demos/external-physics-adapter-conformance/scenario/dynamic-skiff-coupling/", "startup": { "scenario": "dynamic-skiff-coupling" }, "acceptanceStatus": "incomplete" },
+    { "id": "dense-rigid-assembly", "route": "/demos/external-physics-adapter-conformance/scenario/dense-rigid-assembly/", "startup": { "scenario": "dense-rigid-assembly" }, "acceptanceStatus": "accepted" },
+    { "id": "overturning-breaker-reference", "route": "/demos/external-physics-adapter-conformance/scenario/overturning-breaker-reference/", "startup": { "scenario": "overturning-breaker-reference" }, "acceptanceStatus": "accepted" }
+  ],
+  "mechanisms": [
+    { "id": "five-candidate-ranking", "route": "/demos/external-physics-adapter-conformance/mechanism/five-candidate-ranking/", "startup": { "scenario": "static-product-query" }, "acceptanceStatus": "accepted" },
+    { "id": "external-adapter-boundary", "route": "/demos/external-physics-adapter-conformance/mechanism/external-adapter-boundary/", "startup": { "scenario": "dense-rigid-assembly" }, "acceptanceStatus": "accepted" },
+    { "id": "bounded-gpu-skiff-reference", "route": "/demos/external-physics-adapter-conformance/mechanism/bounded-gpu-skiff-reference/", "startup": { "scenario": "dynamic-skiff-coupling" }, "acceptanceStatus": "incomplete" }
+  ],
+  "tiers": [],
+  "modes": ["decision", "adapter-contract"],
+  "cameras": ["not-applicable"],
+  "seeds": [0],
+  "capabilityRequirements": [
+    { "id": "rendering-not-required", "required": false, "evidence": "This source unit validates decision and adapter records and makes no native rendering claim.", "status": "not-applicable" }
+  ],
+  "runtimeProof": [
+    { "id": "five-distinct-solutions", "required": true, "evidence": "Every fixture rejects fewer than five distinct algorithm families and scores six frozen axes.", "status": "accepted" },
+    { "id": "external-adapter-conformance", "required": true, "evidence": "Positive and mutation fixtures validate ownership, SI/frame/clock maps, capabilities, exact-once receipts, synchronization, recovery, and cost closure.", "status": "accepted" },
+    { "id": "native-webgpu-skiff-coupling", "required": true, "evidence": null, "status": "incomplete" }
+  ],
+  "evidenceContract": "v2",
+  "validationCommand": "node threejs-physics-integration/examples/external-physics-adapter-conformance/validate-conformance.mjs",
+  "commands": {
+    "check": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run check",
+    "test": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run validate:unit",
+    "mutations": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run test:mutations",
+    "capture": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run capture",
+    "validateArtifacts": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run validate:quick",
+    "validateFull": "npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "nonRenderingScenarioSuite": true,
+  "notes": [
+    "The contract fixture does not prove a native WebGPU physics implementation.",
+    "The bounded GPU skiff route, in-app Browser diagnostics, recovery, and target performance evidence remain required."
+  ]
+}

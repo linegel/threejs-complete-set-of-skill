@@ -1,0 +1,15 @@
+{
+  "name": "@threejs-skills/external-physics-adapter-conformance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check decision-record.js && node --check external-adapter-contract.js && node --check fixtures.js && node --check app.mjs && node --check validate-conformance.mjs && node --check test-mutations.mjs",
+    "validate:unit": "node validate-conformance.mjs",
+    "test:mutations": "node test-mutations.mjs",
+    "capture": "node validate-conformance.mjs",
+    "validate:artifacts": "node validate-conformance.mjs",
+    "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
+    "validate:full": "npm run validate:quick"
+  }
+}

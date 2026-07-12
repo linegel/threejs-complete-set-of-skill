@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "skillsExpected": 27,
-  "primaryExpected": 41,
+  "skillsExpected": 28,
+  "primaryExpected": 42,
   "integrationsExpected": 10,
   "flagshipsExpected": 5,
-  "fixedRoutesExpected": 516,
+  "fixedRoutesExpected": 524,
   "requiredCapabilitiesExpected": 90,
-  "requiredRuntimeProofsExpected": 224,
+  "requiredRuntimeProofsExpected": 227,
   "primaryRoster": [
     {
       "id": "browser-fallback-harness",
@@ -41,6 +41,14 @@
       "id": "debugging-contract-lab",
       "kind": "canonical-lab",
       "canonicalDir": "threejs-debugging/examples/debugging-contract-lab",
+      "executionClass": "non-rendering",
+      "flagship": false,
+      "dependencyLabIds": []
+    },
+    {
+      "id": "external-physics-adapter-conformance",
+      "kind": "canonical-lab",
+      "canonicalDir": "threejs-physics-integration/examples/external-physics-adapter-conformance",
       "executionClass": "non-rendering",
       "flagship": false,
       "dependencyLabIds": []
@@ -460,6 +468,15 @@
       "canonicalDir": "threejs-debugging/examples/debugging-contract-lab",
       "scenarios": ["ordinary-scene-design", "older-release-suspicious-output", "merged-but-unreleased", "closed-but-unrelated", "installed-source-docs-disagree", "current-release-reproduces-without-match", "local-usage-error"],
       "mechanisms": ["activation-gate", "version-matrix", "release-containment", "candidate-classification", "decision-boundary"],
+      "tiers": [],
+      "nonRenderingScenarioSuite": true
+    },
+    {
+      "skill": "threejs-physics-integration",
+      "id": "external-physics-adapter-conformance",
+      "canonicalDir": "threejs-physics-integration/examples/external-physics-adapter-conformance",
+      "scenarios": ["static-product-query", "tower-authored-motion", "dynamic-skiff-coupling", "dense-rigid-assembly", "overturning-breaker-reference"],
+      "mechanisms": ["five-candidate-ranking", "external-adapter-boundary", "bounded-gpu-skiff-reference"],
       "tiers": [],
       "nonRenderingScenarioSuite": true
     },
