@@ -50,6 +50,12 @@ frame-readback events. It reports elapsed wall time but explicitly makes no GPU
 timing claim. The HUD's resource byte count is the exact logical typed-array
 inventory; backend alignment and physical residency remain unmeasured.
 
+`?lifecycle=dispose` verifies the owned lifecycle after bootstrap: it stops the
+animation loop, waits for `GPUQueue.onSubmittedWorkDone()`, disposes solver,
+display, controls, and renderer resources, and requires the owned device-loss
+reason to be `destroyed`. This is a single-owner disposal proof, not the later
+50-cycle harness stress profile.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,

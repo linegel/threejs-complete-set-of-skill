@@ -79,6 +79,8 @@ let frameCount = 0;
 let stoppedByGpuError = false;
 const gpuErrors = [];
 let lastDiagnosticSummary = '';
+let display = null;
+let appDisposed = false;
 
 function resize() {
 
@@ -239,6 +241,37 @@ function formatGpuError( event ) {
 
 }
 
+async function disposeApp() {
+
+	if ( appDisposed ) return Object.freeze( { passed: true, idempotent: true, owner: owner?.describe() ?? null } );
+	appDisposed = true;
+	pausedForDiagnostic = true;
+	for ( const button of [ diagnosticButton, rollbackButton, sustainedButton ] ) button.disabled = true;
+	renderer.setAnimationLoop( null );
+	const device = renderer.backend.device;
+	const before = owner.describe();
+	await device.queue.onSubmittedWorkDone();
+	owner.dispose();
+	display?.geometry.dispose();
+	display?.material.dispose();
+	controls.dispose();
+	renderer.dispose();
+	const loss = await device.lost;
+	if ( loss.reason !== 'destroyed' ) throw new Error( `owned WebGPU device disposal resolved as '${ loss.reason ?? 'unknown' }'` );
+	const after = owner.describe();
+	if ( after.disposed !== true ) throw new Error( 'GPU SWE owner did not enter disposed state' );
+	return Object.freeze( {
+		passed: true,
+		idempotent: false,
+		queueSettlement: 'GPUQueue.onSubmittedWorkDone-resolved',
+		deviceLossReason: loss.reason,
+		ownerBefore: before,
+		ownerAfter: after,
+		gpuErrors: Object.freeze( [ ...gpuErrors ] )
+	} );
+
+}
+
 async function verifyNativeBootstrap( device ) {
 
 	status.textContent = 'VERIFYING NATIVE WEBGPU COMPUTE GRAPH…';
@@ -281,7 +314,7 @@ async function boot() {
 	owner = createGpuSparseSweOwner( renderer, { tierId, preparedCommit: sparseCommit, initialCondition } );
 	residentFrame = measureResidentFrame();
 	setCamera( params.get( 'camera' ) ?? 'hero' );
-	const display = buildDisplayMesh();
+	display = buildDisplayMesh();
 	scene.add( display );
 	const bootstrapDiagnostic = await verifyNativeBootstrap( device );
 	diagnosticButton.disabled = false;
@@ -290,7 +323,7 @@ async function boot() {
 	diagnosticButton.addEventListener( 'click', captureDiagnostic );
 	rollbackButton.addEventListener( 'click', runRollbackMutation );
 	sustainedButton.addEventListener( 'click', () => runSustainedDiagnostic() );
-	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, runSustainedDiagnostic, bootstrapDiagnostic, gpuErrors } );
+	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, runSustainedDiagnostic, dispose: disposeApp, bootstrapDiagnostic, gpuErrors } );
 	status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · verified gen ${ bootstrapDiagnostic.committedGeneration } · ${ owner.initial.residentTileCount }/${ contract.tier.logicalTilesX * contract.tier.logicalTilesZ } tiles · ${ owner.initial.residentCellCount } cells · ${ contract.totalLogicalBytes } logical bytes`;
 	renderer.setAnimationLoop( ( time ) => {
 
@@ -309,6 +342,23 @@ async function boot() {
 		}
 
 	} );
+	if ( params.get( 'lifecycle' ) === 'dispose' ) requestAnimationFrame( () => requestAnimationFrame( async () => {
+
+		try {
+
+			const evidence = await disposeApp();
+			window.__sparseSweLifecycle = evidence;
+			status.textContent = `DISPOSE PASS · queue settled · owner disposed ${ evidence.ownerAfter.disposed } · device loss ${ evidence.deviceLossReason } · delayed GPU errors ${ evidence.gpuErrors.length }`;
+
+		} catch ( error ) {
+
+			status.textContent = `DISPOSE FAILED: ${ error.message }`;
+			window.__sparseSweLifecycle = Object.freeze( { passed: false, error: error.message } );
+			throw error;
+
+		}
+
+	} ) );
 
 }
 

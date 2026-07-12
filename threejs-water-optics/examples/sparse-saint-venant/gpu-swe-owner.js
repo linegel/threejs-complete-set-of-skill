@@ -478,6 +478,7 @@ export function createGpuSparseSweOwner( renderer, {
 			return Object.freeze( {
 				backend: 'native-webgpu', model: 'nonlinear-Saint-Venant-HLL-hydrostatic', authority: 'gpu-float32',
 				tierId, submittedTicks, dispatchCount, droppedTimeSeconds, diagnosticReadbackCount, rollbackMutationProbeCount, frameCriticalReadbackCount: 0,
+				disposed,
 				residentTileCount: initial.residentTileCount, residentCellCount: initial.residentCellCount,
 				logicalResourceBytes: contract.totalLogicalBytes, resourceInventory,
 				backendAllocatedBytes: null, backendAllocationClaim: 'unmeasured-backend-alignment-and-residency', dispatchOrder: contract.dispatchOrder
