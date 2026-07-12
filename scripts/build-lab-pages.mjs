@@ -7,6 +7,7 @@ import {
   readFileSync,
   readdirSync,
   realpathSync,
+  unlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -32,7 +33,12 @@ import {
   lockedRouteSelectionMatchesWithKeys,
   plannedPublishedRoutes,
 } from './lib/page-routes.mjs';
-import { computePublishedBundleHash, publishedHashInputs } from './lib/published-pages.mjs';
+import {
+  allPublishedAssetFiles,
+  computePublishedBundleHash,
+  publishedAssetDependencies,
+  publishedHashInputs,
+} from './lib/published-pages.mjs';
 import { labViteAliases } from './lib/vite-lab-config.mjs';
 import { buildDemoRoadmap } from './lib/demo-roadmap.mjs';
 
@@ -416,6 +422,7 @@ function metadataFor(lab, registry, published) {
     browserEntry: lab.browserEntry,
     sourceHash: lab.sourceHash,
     publishedHashInputs: published.inputs,
+    emittedAssetDependencies: published.inputs.filter((path) => path.startsWith('docs/demos/assets/')),
     publishedBundleHash: published.hash,
     threeRevision: lab.threeRevision,
     buildRevision: registry.buildRevision,
@@ -658,8 +665,18 @@ for (const lab of placeholderPrimary) {
   writeFileSync(join(outputDir, 'index.html'), injectDemoSeoShell(injectDemoSeo(placeholderHtml, lab, { indexable: false }), lab));
 }
 
+const publishedLabs = [...bundledPrimary, ...secondaryProviders, ...placeholderPrimary];
+const retainedAssets = new Set(publishedLabs.flatMap((lab) => publishedAssetDependencies(REPO_ROOT, lab.id)));
+let prunedAssets = 0;
+for (const asset of allPublishedAssetFiles(REPO_ROOT)) {
+  if (retainedAssets.has(asset)) continue;
+  unlinkSync(join(REPO_ROOT, asset));
+  prunedAssets += 1;
+}
+if (prunedAssets > 0) console.log(`Pruned ${prunedAssets} unreferenced Vite asset(s) outside every lab dependency closure.`);
+
 const publishedById = new Map();
-for (const lab of [...bundledPrimary, ...secondaryProviders, ...placeholderPrimary]) {
+for (const lab of publishedLabs) {
   const inputs = publishedHashInputs(REPO_ROOT, lab.id);
   const published = { inputs, hash: computePublishedBundleHash(REPO_ROOT, inputs) };
   if (!published.hash) throw new Error(`published output for ${lab.id} is empty`);
