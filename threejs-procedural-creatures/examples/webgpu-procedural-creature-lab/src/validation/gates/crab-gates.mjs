@@ -33,6 +33,12 @@ assert( rigs[ 0 ].slots.filter( ( slot ) => slot.family === 'eye' ).length === 2
 assert( rigs[ 0 ].slots.filter( ( slot ) => slot.family === 'walking-leg' ).length === 24, 'crab walking-leg slot count failed' );
 assert( rigs[ 0 ].slots.filter( ( slot ) => slot.family === 'claw' ).length === 12, 'crab claw slot count failed' );
 assert( rigs[ 0 ].slots.every( ( slot ) => /^closed-/.test( slot.geometry ) ), 'crab has an open or diagnostic-only production segment' );
+for ( const side of [ 'L', 'R' ] ) {
+
+	assert( rigs[ 0 ].slots.find( ( slot ) => slot.id === `claw.${ side }.fixed-finger` )?.parentId === `claw.${ side }.palm`, `crab ${ side } fixed finger does not branch from its palm` );
+	assert( rigs[ 0 ].slots.find( ( slot ) => slot.id === `claw.${ side }.hinged-finger` )?.parentId === `claw.${ side }.palm`, `crab ${ side } hinged finger does not branch from its palm` );
+
+}
 
 const support = createFlatCrabSupportProvider( { slopeRadians: 0.15, waterDepthMeters: 0.04 } );
 const gait = createCrabGaitState( { supportProvider: support } );

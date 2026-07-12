@@ -42,12 +42,13 @@ export function createCoastalCrabRig( profileId = 'ochre-rock', spec = COASTAL_C
 		for ( const segment of CLAW_SEGMENTS ) {
 
 			const id = `claw.${ side}.${ segment }`;
-			slots.push( slot( slots.length, id, 'claw', segment.includes( 'finger' ) ? 'dactyl' : 'shell', parentId, {
+			const segmentParentId = segment.includes( 'finger' ) ? `claw.${ side }.palm` : parentId;
+			slots.push( slot( slots.length, id, 'claw', segment.includes( 'finger' ) ? 'dactyl' : 'shell', segmentParentId, {
 				segment,
 				geometry: segment.includes( 'finger' ) ? 'closed-swept-finger' : segment === 'palm' ? 'closed-claw-palm' : 'closed-capped-tapered-segment',
 				...( segment === 'hinged-finger' ? { hingeAxis: [ ...spec.claws.hingeAxis ], restAngleDegrees: spec.claws.restAngleDegrees, threatAngleDegrees: spec.claws.threatAngleDegrees } : {} )
 			} ) );
-			parentId = id;
+			if ( ! segment.includes( 'finger' ) ) parentId = id;
 
 		}
 
