@@ -190,14 +190,15 @@ test( 'trace segments distinguish measured cadence from an authored target', () 
 	assert.equal( authored.presentationSamples.label, 'Authored' );
 	assert.equal( authored.presentationP95.label, 'Authored' );
 	assert.equal( authored.deadlineMissRatio.label, 'Authored' );
-	assert.equal( authored.deadlineMissRatio.value, 1 );
+	assert.equal( authored.deadlineMissRatio.value, 0 );
 
-	const measured = buildTraceSegment( [ 2, 4, 6 ], 'unit trace', 16, [ 15, 16, 17, 18 ] );
+	const measured = buildTraceSegment( [ 2, 4, 6 ], 'unit trace', 16, [ 15, 16, 17, 26 ], 25.005 );
 	assert.equal( measured.presentationSamples.label, 'Measured' );
-	assert.deepEqual( measured.presentationSamples.values, [ 15, 16, 17, 18 ] );
+	assert.deepEqual( measured.presentationSamples.values, [ 15, 16, 17, 26 ] );
 	assert.equal( measured.presentationP95.label, 'Measured' );
 	assert.equal( measured.deadlineMissRatio.label, 'Measured' );
-	assert.equal( measured.deadlineMissRatio.value, 0.5 );
+	assert.equal( measured.deadlineMissRatio.value, 0.25 );
+	assert.throws( () => buildTraceSegment( [ 1 ], 'unit trace', 16, [ 16 ], 0 ), /positive deadline interval/ );
 
 } );
 

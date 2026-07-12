@@ -478,8 +478,9 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 
 }
 
-export function buildTraceSegment( samples, label, targetIntervalMs, presentationSamples = null ) {
+export function buildTraceSegment( samples, label, targetIntervalMs, presentationSamples = null, deadlineIntervalMs = targetIntervalMs ) {
 
+	if ( Number.isFinite( deadlineIntervalMs ) === false || deadlineIntervalMs <= 0 ) throw new Error( 'Trace segment requires a positive deadline interval.' );
 	const source = `${ RUNTIME_SOURCE }; ${ label } CPU samples`;
 	const measuredPresentation = Array.isArray( presentationSamples ) && presentationSamples.length > 0;
 	const presentationSource = measuredPresentation
@@ -487,16 +488,16 @@ export function buildTraceSegment( samples, label, targetIntervalMs, presentatio
 		: 'authored target interval; presentation cadence was not measured';
 	const cadenceSamples = measuredPresentation ? presentationSamples : [ targetIntervalMs ];
 	const presentationP95 = percentile( cadenceSamples, 0.95 );
-	const deadlineMissRatio = measuredPresentation
-		? cadenceSamples.filter( ( sample ) => sample > targetIntervalMs ).length / cadenceSamples.length
-		: 1;
+	const deadlineMissRatio = cadenceSamples.filter( ( sample ) => sample > deadlineIntervalMs ).length / cadenceSamples.length;
 	return {
 		cpuSamples: MA( samples, 'ms', source ),
 		presentationSamples: measuredPresentation ? MA( cadenceSamples, 'ms', presentationSource ) : AA( cadenceSamples, 'ms', presentationSource ),
 		cpuP50: M( percentile( samples, 0.5 ), 'ms', source ),
 		cpuP95: M( percentile( samples, 0.95 ), 'ms', source ),
 		presentationP95: measuredPresentation ? M( presentationP95, 'ms', presentationSource ) : A( presentationP95, 'ms', presentationSource ),
-		deadlineMissRatio: measuredPresentation ? M( deadlineMissRatio, 'ratio', presentationSource ) : A( deadlineMissRatio, 'ratio', 'conservative unknown because presentation cadence was not measured' )
+		deadlineMissRatio: measuredPresentation
+			? M( deadlineMissRatio, 'ratio', `${ presentationSource }; intervals above the ${ deadlineIntervalMs } ms deadline` )
+			: A( deadlineMissRatio, 'ratio', `authored cadence sample compared with the ${ deadlineIntervalMs } ms deadline; presentation cadence was not measured` )
 	};
 
 }
@@ -853,6 +854,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		gpuSceneEnvelope: D( performanceGates.gpuP95, 'ms', 'exact 60 Hz refresh period - compositor reserve - GPU reserve' ),
 		cpuP95Gate: G( performanceGates.cpuP95, 'ms', 'frozen 60 Hz scene budget' ),
 		gpuP95Gate: G( performanceGates.gpuP95, 'ms', 'frozen 60 Hz scene budget' ),
+		deadlineInterval: G( HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value, 'ms', '1.5 times the authored 16.67 ms current-adapter frame target' ),
 		deadlineMissRatioGate: G( performanceGates.deadlineMissRatio, 'ratio', performanceTrace === null ? 'authored target; presentation cadence unmeasured' : 'authored target applied to measured presentation cadence' )
 	} );
 	const samples = ( performanceTrace?.cpuSamples ?? metrics.cpuFrameMs.samples ).filter( Number.isFinite );
@@ -867,13 +869,14 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		captureProfile: session.profile,
 		adapterClass,
 		clockSource: 'performance.now around RenderPipeline.render calls',
-		warmup: buildTraceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs ),
-		cold: buildTraceSegment( [ samples[ 0 ] ], 'first post-initialization render', targetIntervalMs ),
+		warmup: buildTraceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs, null, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ),
+		cold: buildTraceSegment( [ samples[ 0 ] ], 'first post-initialization render', targetIntervalMs, null, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ),
 		sustained: buildTraceSegment(
 			sustainedSamples,
 			performanceTrace === null ? 'remaining correctness capture sequence; not a sustained performance run' : `${ performanceTrace.sampleFrames }-frame sustained target-performance trace`,
 			targetIntervalMs,
-			measuredPresentationSamples
+			measuredPresentationSamples,
+			performanceTrace?.deadlineIntervalMs ?? HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value
 		),
 		gpuTimingAvailable: gpuTiming.verdict === 'PASS',
 		renderTimestamp: gpuSamples.length > 0

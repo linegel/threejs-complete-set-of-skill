@@ -692,7 +692,7 @@ function validatePerformance( envelope, trace, manifest, contract ) {
 		'gpuTimingRequirement', 'refreshPeriod', 'browserMainThreadReserve',
 		'compositorGpuReserve', 'cpuSafetyReserve', 'gpuSafetyReserve',
 		'cpuSceneEnvelope', 'gpuSceneEnvelope', 'cpuP95Gate', 'gpuP95Gate',
-		'deadlineMissRatioGate'
+		'deadlineInterval', 'deadlineMissRatioGate'
 	], 'performance-envelope.json' );
 	if ( envelope.gpuTimingRequirement !== contract.performanceClaims.gpuTimingRequirement ) throw new Error( 'GPU timing requirement drifted between contract and envelope.' );
 	requireKeys( trace, [ 'clockSource', 'warmup', 'cold', 'sustained', 'gpuTimingAvailable', 'renderTimestamp', 'computeTimestamp', 'presentationCadence', 'excludedPhases' ], 'frame-trace.json' );
@@ -711,7 +711,7 @@ function validatePerformance( envelope, trace, manifest, contract ) {
 		requireRecomputed( numericValue( segment.cpuP50 ), percentile( cpuSamples, 0.5 ), `frame-trace.json.${ segmentName }.cpuP50` );
 		requireRecomputed( numericValue( segment.cpuP95 ), percentile( cpuSamples, 0.95 ), `frame-trace.json.${ segmentName }.cpuP95` );
 		requireRecomputed( numericValue( segment.presentationP95 ), percentile( presentationSamples, 0.95 ), `frame-trace.json.${ segmentName }.presentationP95` );
-		const deadline = numericValue( envelope.refreshPeriod, 'performance-envelope.json.refreshPeriod' );
+		const deadline = numericValue( envelope.deadlineInterval, 'performance-envelope.json.deadlineInterval' );
 		const missRatio = presentationSamples.filter( ( value ) => value > deadline ).length / presentationSamples.length;
 		requireRecomputed( numericValue( segment.deadlineMissRatio ), missRatio, `frame-trace.json.${ segmentName }.deadlineMissRatio` );
 
@@ -1104,6 +1104,7 @@ export function validatePublishableProvenance( artifacts ) {
 	const contract = artifacts[ 'visual-contract.json' ];
 	const manifest = artifacts[ 'evidence-manifest.json' ];
 	const rendererInfo = artifacts[ 'renderer-info.json' ];
+	const envelope = artifacts[ 'performance-envelope.json' ];
 	const trace = artifacts[ 'frame-trace.json' ];
 	const governor = artifacts[ 'quality-governor.json' ];
 	const leakLoop = artifacts[ 'leak-loop.json' ];
@@ -1122,6 +1123,7 @@ export function validatePublishableProvenance( artifacts ) {
 	requireObject( rendererInfo.adapterInfo, 'renderer-info.json.adapterInfo' );
 	requireString( manifest.gpuAdapter.identitySource, 'evidence-manifest.json.gpuAdapter.identitySource' );
 	requireString( rendererInfo.adapterInfo.identitySource, 'renderer-info.json.adapterInfo.identitySource' );
+	requireNumericProvenance( envelope.deadlineInterval, [ 'Gated' ], 'performance-envelope.json.deadlineInterval' );
 	for ( const key of [ 'cpuSamples', 'presentationSamples', 'cpuP50', 'cpuP95', 'presentationP95', 'deadlineMissRatio' ] ) requireNumericProvenance( trace.sustained[ key ], [ 'Measured' ], `frame-trace.json.sustained.${ key }` );
 	for ( const key of [ 'sampleFrames', 'timestampResolveCount' ] ) requireNumericProvenance( trace[ key ], [ 'Measured' ], `frame-trace.json.${ key }` );
 	for ( const key of [ 'gpuSamples', 'gpuP50', 'gpuP95' ] ) requireNumericProvenance( trace[ key ], [ 'Derived' ], `frame-trace.json.${ key }` );

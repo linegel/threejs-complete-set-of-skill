@@ -222,6 +222,7 @@ export function createV2ContractFixtureArtifacts() {
 		gpuSceneEnvelope: D( 14.6666666667, 'ms', 'refresh period - compositor reserve - GPU reserve' ),
 		cpuP95Gate: G( 14.6666666667, 'ms', 'frozen from derived CPU scene envelope' ),
 		gpuP95Gate: G( 14.6666666667, 'ms', 'frozen from derived GPU scene envelope' ),
+		deadlineInterval: G( 25.005, 'ms', '1.5 times the authored 16.67 ms fixture frame target' ),
 		deadlineMissRatioGate: G( 0.01, 'ratio', 'fixture gate' )
 	} );
 
@@ -231,7 +232,7 @@ export function createV2ContractFixtureArtifacts() {
 		cpuP50: A( 0.9, 'ms' ),
 		cpuP95: A( 0.99, 'ms' ),
 		presentationP95: A( 16.69, 'ms' ),
-		deadlineMissRatio: A( 1 / 3, 'ratio' )
+		deadlineMissRatio: A( 0, 'ratio' )
 	} );
 	const frameTrace = schema( {
 		captureProfile: 'schema-fixture',

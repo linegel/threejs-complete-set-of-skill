@@ -49,3 +49,15 @@ test( 'authored fixture numbers cannot be relabelled as publishable measurements
 	assert.throws( () => validatePublishableProvenance( artifacts ), /numeric provenance/ );
 
 } );
+
+test( 'deadline misses are recomputed from the explicit gated threshold', async () => {
+
+	const dir = await mkdtemp( join( tmpdir(), 'threejs-v2-deadline-threshold-negative-' ) );
+	await writeV2ContractFixture( dir );
+	const path = join( dir, 'performance-envelope.json' );
+	const envelope = JSON.parse( await readFile( path, 'utf8' ) );
+	envelope.deadlineInterval.value = 1000 / 60;
+	await writeFile( path, `${ JSON.stringify( envelope, null, 2 ) }\n` );
+	await assert.rejects( validateV2ArtifactBundle( dir ), /deadlineMissRatio does not match/ );
+
+} );
