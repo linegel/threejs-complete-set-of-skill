@@ -1133,6 +1133,74 @@ detail supplement.
 | Wet-sand response bundle | Required when a beach is visible | Dry/wet albedo and roughness endpoints, drying law inputs, waterline mask owner |
 | Underwater color/visibility coefficients | Required optics inputs | `sigma_a`, `sigma_s`, and `sigma_t` in `m^-1`; phase/source model or explicit empirical-extinction label; refractive indices; calibration lighting |
 
+### Asset-source decision and image-generation gate
+
+For **each** raster, texture set, mesh supplement, or reference image, compare
+at least these five materially different source families rather than defaulting
+to the first available image:
+
+| Source family | Strength | Hard failure for water work |
+| --- | --- | --- |
+| Deterministic runtime procedural | Parameterized, seedable, no asset fetch, scale-aware | Runtime bandwidth/ALU or repetition exceeds the selected tier |
+| Deterministic offline bake/simulation | Exact channels, mips, units, and cheap runtime sampling | Invalidation/build cost or interpolation error exceeds the gate |
+| Authored, measured, scanned, or licensed library asset | Physical detail and controllable capture provenance | License/provenance, lighting removal, scale, seam, or channel semantics are unknown |
+| `gpt-image-2` through the imagegen tool | Fast style-matched visual detail and rare reference coverage | Asked to invent solver truth, physical coefficients, conserved state, collision, or unverified data channels |
+| Hybrid generated reference plus deterministic derivation | Generated appearance guides authored/procedural height, masks, materials, or geometry | The derived artifact is accepted by visual resemblance alone instead of its channel-specific gates |
+
+Score every candidate `0..5` for semantic/physical truth, controllability,
+tileability and filtering, target-style fit, runtime cost, memory/bandwidth,
+provenance/reproducibility, invalidation cost, and named-view marginal. Record
+weights, hard gates, evidence class, winner, and why the runner-up lost. A
+generated image is not automatically the winner merely because the tool is
+available; failing all candidates is preferable to admitting an inapplicable
+asset.
+
+When image generation wins, use the imagegen tool directly and prompt
+`gpt-image-2` with all of the following:
+
+```yaml
+generatedAssetPrompt:
+  role: "visual reference | linear height source | color albedo source | foam microstructure supplement | ..."
+  targetStyle: "named art direction and forbidden style drift"
+  projection: "orthographic top-down | triplanar source | view reference"
+  footprint: "width x height metres represented by the image"
+  output: "pixel dimensions, aspect, alpha requirement, one semantic channel only"
+  material: "substrate/object, age, wet/dry state, feature-size range in metres"
+  lighting: "none for data/albedo; explicit camera/light only for a view reference"
+  tiling: "wrap intent, border continuation, no unique edge landmarks"
+  frequency: "macro/meso/micro bands required and bands deliberately omitted"
+  exclusions: "text, logos, perspective, cast shadows, highlights, fake normals, baked foam coverage, compression artifacts"
+  integration: "color/data space, deterministic channels derived afterward, mip and compression target"
+```
+
+Do not request a packed ORM/normal/height/data atlas from the image model and
+assume that its channels have meaning. Generate or author one interpretable
+source at a time. Derive normals, curvature, roughness masks, SDFs, coverage,
+and mip chains deterministically where applicable. Never use an image-generated
+color as bathymetry, water depth, velocity, obstacle fraction, coast ownership,
+foam source/coverage, wetness history, extinction coefficient, or caustic power.
+
+Inspect every returned image itself before integration. At minimum:
+
+1. open it at original resolution and reject unintended lighting, perspective,
+   text, semantic artifacts, style drift, or missing scale bands;
+2. inspect a `3 x 3` wrapped preview and measure opposite-edge mismatch before
+   calling it tileable;
+3. verify dimensions, alpha, bit depth, color/data space, dynamic range, and
+   channel count; an 8-bit display PNG is not silently promoted to metric data;
+4. compare feature sizes against the declared metre footprint and projected
+   pixels in every accepted camera/tier;
+5. build and inspect the intended mip/compression path for coverage loss,
+   ringing, block artifacts, and color-space mistakes;
+6. render the actual material with and without the asset at fixed exposure and
+   accept only if the named-view marginal justifies bytes and sampling cost;
+7. retain model identifier, exact prompt, input/reference hashes, generation
+   time, output hash, license/provenance status, deterministic postprocess
+   revision, rejection notes, and invalidation dependencies.
+
+If inspection fails, refine the prompt or reject the generated result. Do not
+repair a failed causal/data asset with increasingly elaborate visual prompting.
+
 Generated caches are build products, not independent artistic truth:
 
 - bathymetry gradients, curvature, depth bands, coast SDF, nearest-coast ID,

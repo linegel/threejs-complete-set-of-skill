@@ -587,6 +587,9 @@ applicable subset below and every algorithm-specific gate from those references:
 - exact Fresnel versus approximation error, TIR classification, refraction-ray
   residual, and invalid-sample fraction;
 - foam source/transport/reaction coverage plus bed wetness/inundation history;
+- a five-family source decision for every supplemental visual/data asset, plus
+  original-resolution, wrap-seam, scale, channel/color-space, mip/compression,
+  fixed-view marginal, and provenance inspection for every imagegen result;
 - canonical `WaterSurfaceProvider` conformance, absent-channel rejection, footprint
   filtering, state-version/error propagation, mandatory normal-velocity
   projection identity, valid absence of the optional full surface velocity,
