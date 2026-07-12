@@ -8,7 +8,7 @@
     "validate:unit": "node validate-field-contract.mjs --allow-missing-gpu && node validate-routes.mjs",
     "test:mutations": "node validate-field-mutations.mjs",
     "validate:generated-assets": "node validate-generated-biome-fields.mjs",
-    "capture": "node capture.mjs --profile correctness",
+    "capture": "node capture.mjs",
     "capture:mechanisms": "npm run capture",
     "validate:artifacts": "node validate-field-contract.mjs --artifacts ../../../artifacts/visual-validation/webgpu-field-bake/correctness",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",

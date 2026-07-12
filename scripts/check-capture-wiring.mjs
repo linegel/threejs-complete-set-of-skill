@@ -145,8 +145,8 @@ export function checkCaptureImplementation({
 
   const sharedKind = sharedCaptureKind(packageCapture, captureSource, captureProgramPath);
   if (sharedKind) {
-    if (sharedKind === 'shared-direct' && /--profile\s+(?:correctness|performance)/.test(packageCapture)) {
-      errors.push(`${id}: direct shared capture hard-codes a profile and overrides root profile forwarding`);
+    if (/--profile\s+(?:correctness|performance)/.test(packageCapture)) {
+      errors.push(`${id}: shared capture command hard-codes a profile and overrides root profile forwarding`);
     }
     if (sharedKind === 'shared-wrapper' && !/--profile/.test(captureSource)) {
       errors.push(`${id}: shared wrapper does not accept the forwarded --profile argument`);

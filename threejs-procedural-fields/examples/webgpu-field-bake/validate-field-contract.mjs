@@ -67,6 +67,11 @@ import {
   validateReportedFieldMechanismStatistics,
   validateFieldMechanismStatistics,
 } from "./mechanism-evidence.mjs";
+import {
+  CAPTURE_PROFILES,
+  DEFAULT_ARTIFACT_DIR,
+  parseCaptureArgs,
+} from "./capture.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const manifestPath = resolve(here, "../../assets/generated-variants/manifest.json");
@@ -1668,7 +1673,26 @@ function validateSourceContract() {
     "../../../artifacts/visual-validation/webgpu-field-bake/correctness",
   ));
   const packageJson = JSON.parse(sources["package.json"]);
-  assert.equal(packageJson.scripts.capture, "node capture.mjs --profile correctness");
+  assert.equal(
+    packageJson.scripts.capture,
+    "node capture.mjs",
+    "the root runner must be able to forward correctness or performance without a package override",
+  );
+  assert.deepEqual(CAPTURE_PROFILES, ["correctness", "performance"]);
+  assert.deepEqual(parseCaptureArgs([]), {
+    profile: "correctness",
+    outputDir: DEFAULT_ARTIFACT_DIR,
+    target: "display",
+  });
+  assert.equal(parseCaptureArgs(["--profile", "performance"]).profile, "performance");
+  assert.throws(
+    () => parseCaptureArgs(["--profile", "invented"]),
+    /unsupported field capture profile/,
+  );
+  assert.throws(
+    () => parseCaptureArgs(["--profile"]),
+    /requires a value/,
+  );
   assert(packageJson.scripts["validate:artifacts"].includes(
     "../../../artifacts/visual-validation/webgpu-field-bake/correctness",
   ));

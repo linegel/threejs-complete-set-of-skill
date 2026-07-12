@@ -10,6 +10,7 @@ export const DEFAULT_ARTIFACT_DIR = resolve(
   "../../../artifacts/visual-validation/webgpu-field-bake/correctness",
 );
 export const CAPTURE_HOOK_PATH = resolve(LAB_DIR, "capture-hook.mjs");
+export const CAPTURE_PROFILES = Object.freeze(["correctness", "performance"]);
 
 export function validateCaptureArtifactPathContract(captureOutputDir, validatorArtifactDir) {
   const capturePath = resolve(captureOutputDir);
@@ -25,7 +26,16 @@ function optionValue(argv, name) {
   return index >= 0 ? argv[index + 1] : null;
 }
 
-function parseArgs(argv) {
+function validateProfile(profile) {
+  if (!CAPTURE_PROFILES.includes(profile)) {
+    throw new Error(
+      `unsupported field capture profile: ${profile}; expected ${CAPTURE_PROFILES.join(" or ")}`,
+    );
+  }
+  return profile;
+}
+
+export function parseCaptureArgs(argv) {
   const allowed = new Set(["--profile", "--output", "--target"]);
   for (let index = 0; index < argv.length; index += 2) {
     const option = argv[index];
@@ -34,7 +44,7 @@ function parseArgs(argv) {
       throw new Error(`${option} requires a value`);
     }
   }
-  const profile = optionValue(argv, "--profile") ?? "correctness";
+  const profile = validateProfile(optionValue(argv, "--profile") ?? "correctness");
   return {
     profile,
     outputDir: optionValue(argv, "--output") ?? (
@@ -47,6 +57,7 @@ function parseArgs(argv) {
 }
 
 export async function captureFieldBake(options = {}) {
+  const profile = validateProfile(options.profile ?? "correctness");
   const outputDir = options.outputDir ?? DEFAULT_ARTIFACT_DIR;
   validateCaptureArtifactPathContract(
     outputDir,
@@ -54,7 +65,7 @@ export async function captureFieldBake(options = {}) {
   );
   return captureLabBrowser({
     labId: "webgpu-field-bake",
-    profile: options.profile ?? "correctness",
+    profile,
     outputDir,
     hookPath: CAPTURE_HOOK_PATH,
     target: options.target ?? "display",
@@ -62,7 +73,7 @@ export async function captureFieldBake(options = {}) {
 }
 
 async function main() {
-  const result = await captureFieldBake(parseArgs(process.argv.slice(2)));
+  const result = await captureFieldBake(parseCaptureArgs(process.argv.slice(2)));
   console.log(JSON.stringify({
     labId: result.labId,
     profile: result.profile,

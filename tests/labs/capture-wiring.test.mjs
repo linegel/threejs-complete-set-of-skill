@@ -28,7 +28,7 @@ test('shared wrappers accept forwarded profiles and rely on the shared final PNG
   }), []);
 });
 
-test('direct shared commands cannot hard-code correctness over the requested profile', () => {
+test('shared commands cannot hard-code correctness over the requested profile', () => {
   const errors = checkCaptureImplementation({
     id: 'fixture',
     packageCapture: 'node ../../../scripts/capture-lab-browser.mjs --lab fixture --profile correctness',
@@ -36,6 +36,14 @@ test('direct shared commands cannot hard-code correctness over the requested pro
     captureProgramPath: '/repo/scripts/capture-lab-browser.mjs',
   });
   assert.match(errors.join('\n'), /hard-codes a profile/);
+
+  const wrapperErrors = checkCaptureImplementation({
+    id: 'fixture',
+    packageCapture: 'node capture.mjs --profile correctness',
+    captureSource: SHARED_SOURCE,
+    captureProgramPath: '/repo/fixture/capture.mjs',
+  });
+  assert.match(wrapperErrors.join('\n'), /hard-codes a profile/);
 });
 
 test('shared hooks must exist and emit the standard final image', () => {
