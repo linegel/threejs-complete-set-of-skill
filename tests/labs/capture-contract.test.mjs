@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
 
 import {
@@ -21,6 +24,7 @@ import {
   runtimeFailureMessages,
   validateCaptureOutputPlan,
   validateHookDerivedOutput,
+  verifyCaptureWriteLedgerOnDisk,
   waitForPostDisposeObservations,
 } from '../../scripts/capture-lab-browser.mjs';
 import { encodeRgbaPng } from '../../scripts/lib/png-rgba.mjs';
@@ -323,24 +327,72 @@ test('hook source closure is promoted verbatim and cannot forge Three or revisio
 
 test('artifact write ledger distinguishes fresh session output from stale pre-existing files', () => {
   const ledger = createCaptureWriteLedger();
+  const originalBytes = Buffer.from('immutable-final-pixels');
+  const expectedSha256 = `sha256:${createHash('sha256').update(originalBytes).digest('hex')}`;
   assert.equal(ledger.has('final.design.png'), false);
-  ledger.record('final.design.png', 'hook-artifact', { existedBefore: true });
+  const binding = ledger.record('final.design.png', 'hook-artifact', originalBytes, { existedBefore: true });
+  originalBytes.fill(0);
+  let writtenBytes = null;
+  binding.writeBoundBytes((bytes) => {
+    writtenBytes = Buffer.from(bytes);
+  });
   assert.equal(ledger.has('final.design.png'), true);
   assert.deepEqual(ledger.get('final.design.png'), {
     sequence: 1,
     path: 'final.design.png',
     kind: 'hook-artifact',
     existedBefore: true,
+    contentBinding: 'sha256-byte-length-immutable-buffer-v1',
+    sha256: expectedSha256,
+    byteLength: 22,
   });
+  assert.equal(writtenBytes.toString('utf8'), 'immutable-final-pixels');
   assert.throws(
-    () => ledger.record('final.design.png', 'hook-artifact'),
+    () => binding.writeBoundBytes(() => {}),
+    /already committed/,
+  );
+  assert.throws(
+    () => ledger.record('final.design.png', 'hook-artifact', Buffer.from('duplicate')),
     /more than once/,
   );
   assert.throws(
-    () => ledger.record('../escaped.png', 'hook-artifact'),
+    () => ledger.record('../escaped.png', 'hook-artifact', Buffer.from('escaped')),
     /escapes output/,
   );
+  assert.throws(
+    () => ledger.record('missing-bytes.png', 'hook-artifact'),
+    /must be an exact string, ArrayBuffer, or ArrayBuffer view/,
+  );
+  ledger.recordSelfExcluded('capture-session.json', 'capture-session-record');
+  assert.deepEqual(ledger.get('capture-session.json'), {
+    sequence: 2,
+    path: 'capture-session.json',
+    kind: 'capture-session-record',
+    existedBefore: false,
+    contentBinding: 'self-excluded-finalized-offline',
+    sha256: null,
+    byteLength: null,
+  });
   assert.equal(ledger.has('diagnostics.mosaic.png'), false, 'a stale file absent from the ledger is not fresh evidence');
+});
+
+test('capture finalization rejects an artifact substituted after its bound write', () => {
+  const outputDir = mkdtempSync(join(tmpdir(), 'threejs-capture-ledger-'));
+  const artifactPath = join(outputDir, 'bound-artifact.bin');
+  const ledger = createCaptureWriteLedger();
+  const binding = ledger.record(
+    'bound-artifact.bin',
+    'hook-artifact',
+    Buffer.from('immutable-final-pixels'),
+  );
+  binding.writeBoundBytes((bytes) => writeFileSync(artifactPath, bytes));
+  assert.doesNotThrow(() => verifyCaptureWriteLedgerOnDisk(outputDir, ledger));
+
+  writeFileSync(artifactPath, Buffer.alloc(binding.byteLength, 0x78));
+  assert.throws(
+    () => verifyCaptureWriteLedgerOnDisk(outputDir, ledger),
+    /sha256 changed after ledger binding/,
+  );
 });
 
 test('realpath confinement rejects symbolic-link and resolved-path escapes', () => {

@@ -150,6 +150,15 @@ function sha256(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
+function immutableBufferCopy(bytes, label = 'capture artifact bytes') {
+  if (typeof bytes === 'string') return Buffer.from(bytes, 'utf8');
+  if (bytes instanceof ArrayBuffer) return Buffer.from(new Uint8Array(bytes));
+  if (ArrayBuffer.isView(bytes)) {
+    return Buffer.from(new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength));
+  }
+  throw new TypeError(`${label} must be an exact string, ArrayBuffer, or ArrayBuffer view`);
+}
+
 function requireCaptureFilename(filename, label = 'capture filename') {
   if (typeof filename !== 'string' || !/^[a-z0-9][a-z0-9._-]*\.png$/.test(filename)) {
     throw new Error(`${label} must be a confined lowercase PNG filename`);
@@ -186,15 +195,50 @@ function normalizedArtifactRelativePath(value) {
 export function createCaptureWriteLedger() {
   const writes = new Map();
   let sequence = 0;
+  const assertFreshPath = (path) => {
+    const normalized = normalizedArtifactRelativePath(path);
+    if (writes.has(normalized)) throw new Error(`capture session wrote ${normalized} more than once`);
+    return normalized;
+  };
   return Object.freeze({
-    record(path, kind, { existedBefore = false } = {}) {
-      const normalized = normalizedArtifactRelativePath(path);
-      if (writes.has(normalized)) throw new Error(`capture session wrote ${normalized} more than once`);
+    record(path, kind, bytes, { existedBefore = false } = {}) {
+      const normalized = assertFreshPath(path);
+      const immutableBytes = immutableBufferCopy(bytes, `capture ledger bytes for ${normalized}`);
+      let written = false;
+      const record = {
+        sequence: ++sequence,
+        path: normalized,
+        kind,
+        existedBefore: existedBefore === true,
+        contentBinding: 'sha256-byte-length-immutable-buffer-v1',
+        sha256: sha256(immutableBytes),
+        byteLength: immutableBytes.byteLength,
+      };
+      Object.defineProperty(record, 'writeBoundBytes', {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value(writer) {
+          if (typeof writer !== 'function') throw new TypeError('capture ledger writer must be a function');
+          if (written) throw new Error(`capture session already committed ${normalized}`);
+          written = true;
+          return writer(immutableBytes);
+        },
+      });
+      Object.freeze(record);
+      writes.set(normalized, record);
+      return record;
+    },
+    recordSelfExcluded(path, kind, { existedBefore = false } = {}) {
+      const normalized = assertFreshPath(path);
       const record = Object.freeze({
         sequence: ++sequence,
         path: normalized,
         kind,
         existedBefore: existedBefore === true,
+        contentBinding: 'self-excluded-finalized-offline',
+        sha256: null,
+        byteLength: null,
       });
       writes.set(normalized, record);
       return record;
@@ -209,6 +253,67 @@ export function createCaptureWriteLedger() {
       return Object.freeze([...writes.values()]);
     },
   });
+}
+
+function verifyFileBindingOnDisk(outputDir, binding, label) {
+  if (!binding || typeof binding !== 'object') throw new TypeError(`${label} binding is required`);
+  if (typeof binding.sha256 !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(binding.sha256)) {
+    throw new Error(`${label} must contain an exact sha256 binding`);
+  }
+  if (!Number.isInteger(binding.byteLength) || binding.byteLength < 0) {
+    throw new Error(`${label} must contain an exact byteLength binding`);
+  }
+  const bytes = readFileSync(captureArtifactPath(outputDir, binding.path));
+  if (bytes.byteLength !== binding.byteLength) {
+    throw new Error(`${label} byte length changed after ledger binding`);
+  }
+  if (sha256(bytes) !== binding.sha256) {
+    throw new Error(`${label} sha256 changed after ledger binding`);
+  }
+  return Object.freeze({
+    path: binding.path,
+    sha256: binding.sha256,
+    byteLength: binding.byteLength,
+  });
+}
+
+export function verifyCaptureWriteOnDisk(outputDir, record) {
+  if (record?.contentBinding !== 'sha256-byte-length-immutable-buffer-v1') {
+    throw new Error(`capture write ${record?.path ?? '<unknown>'} is not content-bound`);
+  }
+  return verifyFileBindingOnDisk(outputDir, record, `capture write ${record.path}`);
+}
+
+export function verifyCaptureWriteLedgerOnDisk(outputDir, writeLedger) {
+  if (!writeLedger || typeof writeLedger.snapshot !== 'function') {
+    throw new TypeError('capture write ledger with snapshot() is required');
+  }
+  const verified = [];
+  for (const record of writeLedger.snapshot()) {
+    if (record.contentBinding === 'self-excluded-finalized-offline') {
+      if (
+        record.path !== 'capture-session.json'
+        || record.kind !== 'capture-session-record'
+        || record.sha256 !== null
+        || record.byteLength !== null
+      ) {
+        throw new Error('capture-session self-exclusion record is invalid');
+      }
+      continue;
+    }
+    verified.push(verifyCaptureWriteOnDisk(outputDir, record));
+  }
+  return Object.freeze(verified);
+}
+
+function writeLedgerBoundArtifact(outputDir, writeLedger, relativePath, kind, bytes) {
+  if (writeLedger.has(relativePath)) throw new Error(`capture session wrote ${relativePath} more than once`);
+  const path = prepareArtifactWrite(outputDir, relativePath);
+  const existedBefore = existsSync(path);
+  const record = writeLedger.record(relativePath, kind, bytes, { existedBefore });
+  record.writeBoundBytes((immutableBytes) => writeFileSync(path, immutableBytes));
+  verifyCaptureWriteOnDisk(outputDir, record);
+  return record;
 }
 
 function graphProofPresent(value) {
@@ -1268,11 +1373,7 @@ function writeCapturePayload(outputDir, payload, writeLedger) {
     [payload.normalized.artifact.path, payload.bytes.normalized, 'writeCapture-normalized'],
   ];
   for (const [relativePath, bytes, kind] of paths) {
-    if (writeLedger.has(relativePath)) throw new Error(`capture session wrote ${relativePath} more than once`);
-    const path = prepareArtifactWrite(outputDir, relativePath);
-    const existedBefore = existsSync(path);
-    writeFileSync(path, bytes);
-    writeLedger.record(relativePath, kind, { existedBefore });
+    writeLedgerBoundArtifact(outputDir, writeLedger, relativePath, kind, bytes);
   }
 }
 
@@ -1748,11 +1849,7 @@ export async function captureLabBrowser({
         return readFileSync(captureArtifactPath(output, relativePath));
       },
       async writeArtifact(relativePath, bytes) {
-        if (writeLedger.has(relativePath)) throw new Error(`capture session wrote ${relativePath} more than once`);
-        const path = prepareArtifactWrite(output, relativePath);
-        const existedBefore = existsSync(path);
-        writeFileSync(path, bytes);
-        writeLedger.record(relativePath, 'hook-artifact', { existedBefore });
+        writeLedgerBoundArtifact(output, writeLedger, relativePath, 'hook-artifact', bytes);
       },
       async writeCapture(filename, captureTarget) {
         const capture = await capturePixels(page, captureTarget);
@@ -1834,9 +1931,12 @@ export async function captureLabBrowser({
       }),
     });
 
+    verifyCaptureWriteLedgerOnDisk(output, writeLedger);
     const captureSessionPath = prepareArtifactWrite(output, 'capture-session.json');
     const captureSessionExisted = existsSync(captureSessionPath);
-    writeLedger.record('capture-session.json', 'capture-session-record', { existedBefore: captureSessionExisted });
+    writeLedger.recordSelfExcluded('capture-session.json', 'capture-session-record', {
+      existedBefore: captureSessionExisted,
+    });
     const record = {
       schemaVersion: 2,
       labId,
@@ -1878,7 +1978,25 @@ export async function captureLabBrowser({
       requestErrors,
       note: 'Capture-session record only; it is not a complete v2 evidence bundle.',
     };
-    writeFileSync(captureSessionPath, `${JSON.stringify(record, null, 2)}\n`);
+    const captureSessionBytes = immutableBufferCopy(`${JSON.stringify(record, null, 2)}\n`);
+    writeFileSync(captureSessionPath, captureSessionBytes);
+    const finalizedCaptureSessionFile = Object.freeze({
+      path: 'capture-session.json',
+      contentBinding: 'finalized-file-hash-for-offline-promotion',
+      sha256: sha256(captureSessionBytes),
+      byteLength: captureSessionBytes.byteLength,
+    });
+    verifyFileBindingOnDisk(
+      output,
+      finalizedCaptureSessionFile,
+      'finalized capture-session file',
+    );
+    Object.defineProperty(record, 'finalizedCaptureSessionFile', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: finalizedCaptureSessionFile,
+    });
     return record;
   } finally {
     if (page && !controllerDisposed) {
