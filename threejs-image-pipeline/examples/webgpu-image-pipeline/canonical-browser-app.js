@@ -7,6 +7,8 @@ import {
 	resolveImagePipelineRoute
 } from './canonical-main.js';
 
+const LAB_ID = 'webgpu-image-pipeline';
+
 const canvas = document.querySelector( '#view' );
 const status = document.querySelector( '#status' );
 let resolvePublishedController;
@@ -105,6 +107,7 @@ async function initialize() {
 	}
 
 	const controller = {
+		get labId() { return LAB_ID; },
 		async ready() {},
 		async setScenario( id ) { if ( id !== 'pipeline-fixture' ) throw new Error( `Unknown image-pipeline scenario "${ id }".` ); return id; },
 		async setMode( id ) { return app.setMode( id ); },
@@ -124,6 +127,7 @@ async function initialize() {
 
 			const pipeline = app.describePipeline();
 			return {
+				labId: LAB_ID,
 				...app.getMetrics(),
 				scenario: 'pipeline-fixture',
 				mechanism: startup.mechanism,

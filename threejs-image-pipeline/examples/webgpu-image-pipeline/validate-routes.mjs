@@ -44,6 +44,8 @@ const browserSource = await readFile( new URL( './canonical-browser-app.js', imp
 assert( browserSource.includes( 'Locked image-pipeline route rejects' ), 'Browser app does not reject locked-route overrides.' );
 assert( browserSource.includes( 'Object.freeze( { ...locked } )' ), 'Locked image-pipeline startup is mutable.' );
 assert( browserSource.includes( 'window.labController = controller' ) && browserSource.includes( 'routeSelection:' ), 'Published routes cannot acknowledge their locked startup through getMetrics().' );
+assert( browserSource.includes( "const LAB_ID = 'webgpu-image-pipeline'" ), 'Published controller lacks a canonical lab identity.' );
+assert( browserSource.includes( 'get labId() { return LAB_ID; }' ) && browserSource.includes( 'labId: LAB_ID' ), 'Controller and metrics identity can drift.' );
 const captureSource = await readFile( new URL( './canonical-capture.mjs', import.meta.url ), 'utf8' );
 assert( captureSource.includes( "import { createServer } from 'vite'" ) && captureSource.includes( 'if ( ! url )' ), 'Root capture lacks a deterministic self-serving URL.' );
 assert( captureSource.includes( "--profile" ) && captureSource.includes( "'correctness', 'performance'" ), 'Root capture does not enforce the standard profile contract.' );
