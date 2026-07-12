@@ -61,6 +61,17 @@ const REQUIRED_CLAIMS = Object.freeze([
   'lifecycleStability',
 ]);
 const VERDICTS = new Set(['PASS', 'FAIL', 'INSUFFICIENT_EVIDENCE', 'NOT_CLAIMED']);
+const UNIFIED_V2_BUNDLE_KINDS = new Set([
+  'contract-fixture',
+  'raw-capture-session',
+  'release-bundle',
+]);
+const UNIFIED_V2_LEDGER_KEYS = Object.freeze([
+  'captureSessions',
+  'files',
+  'images',
+  'promotion',
+]);
 const DISTINCT_IMAGE_PAIRS = Object.freeze([
   ['final.design.png', 'diagnostics.mosaic.png', 0.01],
   ['final.design.png', 'no-post.design.png', 0.001],
@@ -427,7 +438,10 @@ export function validateEvidenceBundle(bundleDir, { requireRequiredClaimsPass = 
   if (manifest.schemaVersion === 1) {
     return validateLegacyManifestOnly(manifest, requireRequiredClaimsPass);
   }
-  if (manifest.schemaVersion === 2 && typeof manifest.bundleKind !== 'string') {
+  const hasUnifiedLedgerSurface = UNIFIED_V2_LEDGER_KEYS.some((key) => Object.hasOwn(manifest, key));
+  if (manifest.schemaVersion === 2
+    && !UNIFIED_V2_BUNDLE_KINDS.has(manifest.bundleKind)
+    && !hasUnifiedLedgerSurface) {
     return validateLegacyV2Bundle(bundleDir, manifest, requireRequiredClaimsPass);
   }
   if (manifest.schemaVersion !== 2) {

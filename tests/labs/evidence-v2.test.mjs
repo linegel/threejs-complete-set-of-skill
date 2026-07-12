@@ -68,6 +68,7 @@ function createLegacyV2Bundle() {
   for (const filename of REQUIRED_EVIDENCE_JSON) writeJson(join(directory, filename), { schemaVersion: 2 });
   writeJson(join(directory, 'evidence-manifest.json'), {
     schemaVersion: 2,
+    bundleKind: 'browser-capture-incomplete',
     claimVerdicts: {
       visualCorrectness: 'PASS',
       mechanismCorrectness: 'PASS',
@@ -180,6 +181,17 @@ test('unified v2 schema mutations fail before an evidence claim can be consumed'
   const result = validateEvidenceBundle(directory);
   assert.equal(result.valid, false);
   assert(result.errors.some((error) => error.includes('unknown property browserLauncher')));
+});
+
+test('a unified ledger cannot downgrade itself by adopting a legacy bundle kind', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'threejs-unified-evidence-v2-downgrade-'));
+  const manifest = createUnifiedV2ContractFixtureManifest();
+  manifest.bundleKind = 'browser-capture-incomplete';
+  writeJson(join(directory, 'evidence-manifest.json'), manifest);
+  const result = validateEvidenceBundle(directory);
+  assert.equal(result.protocol, 'unified-v2');
+  assert.equal(result.valid, false);
+  assert(result.errors.some((error) => error.includes('bundleKind')));
 });
 
 test('a fully materialized unified release bundle satisfies strict acceptance', () => {

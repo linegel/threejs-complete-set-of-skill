@@ -28,6 +28,7 @@ try {
 }
 
 const result = await validateVersionedArtifactBundle( artifactDir );
+if ( result.migrationWarning ) throw new Error( `INSUFFICIENT_EVIDENCE: ${ result.migrationWarning }` );
 if ( bundle === 'raw' && ( result.bundleKind !== 'raw-capture-session' || result.captureProfiles.includes( profile ) === false ) ) throw new Error( `INSUFFICIENT_EVIDENCE: raw ${ profile } path does not contain the requested immutable capture lane.` );
 if ( bundle === 'release' && ( result.schemaVersion !== 2 || result.bundleKind !== 'release-bundle' || result.publishable !== true ) ) {
 
