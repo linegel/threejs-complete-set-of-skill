@@ -4,8 +4,10 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  NativePooledEffectsLab,
   PARTICLE_SCENARIOS,
   PARTICLE_TIERS,
+  POOLED_EFFECTS_LAB_ID,
   resolvePooledEffectsRoute,
 } from "./lab.mjs";
 
@@ -22,6 +24,14 @@ assert.deepEqual(manifest.mechanisms.map(({ id }) => id), target.mechanisms);
 assert.deepEqual(manifest.tiers.map(({ id }) => id), target.tiers);
 assert.deepEqual([...PARTICLE_SCENARIOS], target.mechanisms);
 assert.deepEqual([...PARTICLE_TIERS], target.tiers);
+const controllerContract = new NativePooledEffectsLab({ canvas: {} });
+assert.equal(controllerContract.labId, POOLED_EFFECTS_LAB_ID);
+assert.equal(POOLED_EFFECTS_LAB_ID, manifest.id);
+const labSource = await readFile(join(here, "lab.mjs"), "utf8");
+assert(labSource.includes("labId: POOLED_EFFECTS_LAB_ID"), "pooled-effects metrics identity can drift");
+assert(labSource.includes("globalThis.labController = lab"), "canonical controller is not published through labController");
+assert(labSource.includes("globalThis.__LAB_CONTROLLER__ = lab"), "canonical controller compatibility alias is missing");
+assert(labSource.includes("globalThis.__THREE_LAB__ = lab"), "legacy pooled-effects controller alias is missing");
 
 for (const id of target.mechanisms) {
   const path = join(here, "mechanism", id, "index.html");

@@ -52,6 +52,7 @@ export const PARTICLE_MODES = Object.freeze([
 ]);
 
 export const PARTICLE_TIERS = Object.freeze(["ultra", "high", "medium"]);
+export const POOLED_EFFECTS_LAB_ID = "webgpu-pooled-effects";
 
 export const POOLED_EFFECT_MECHANISM_CLAIMS = Object.freeze([
   "gpuPoolCompaction",
@@ -437,6 +438,10 @@ export class NativePooledEffectsLab {
     this.time = 0;
     this.initialized = false;
     this.disposed = false;
+  }
+
+  get labId() {
+    return POOLED_EFFECTS_LAB_ID;
   }
 
   async ready() {
@@ -879,6 +884,7 @@ export class NativePooledEffectsLab {
   getMetrics() {
     const timestampSupported = this.renderer.hasFeature?.("timestamp-query") === true;
     return {
+      labId: POOLED_EFFECTS_LAB_ID,
       backend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
       tier: this.tier,
       scenario: this.scenario,
@@ -918,6 +924,8 @@ export async function mountNativePooledEffectsLab({ canvas, status, metrics, ani
   const width = Math.max(1, globalThis.innerWidth ?? 1200);
   const height = Math.max(1, globalThis.innerHeight ?? 800);
   await lab.resize(width, height, Math.min(globalThis.devicePixelRatio ?? 1, 2));
+  globalThis.labController = lab;
+  globalThis.__LAB_CONTROLLER__ = lab;
   globalThis.__THREE_LAB__ = lab;
   let previous = performance.now();
   let request = 0;
