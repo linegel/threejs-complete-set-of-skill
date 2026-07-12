@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
+import { remoteRuntimeAssetViolations } from './lib/site-runtime-assets.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,6 +19,12 @@ const previewManifest = JSON.parse(readFileSync(join(docs, 'previews', 'manifest
 const skillManifest = JSON.parse(rootSkillsText);
 const evidencePreviewConfig = JSON.parse(readFileSync(join(root, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
 const errors = [];
+
+const htmlFilesUnder = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+  const path = join(directory, entry.name);
+  if (entry.isDirectory()) return htmlFilesUnder(path);
+  return entry.isFile() && entry.name.endsWith('.html') ? [path] : [];
+});
 
 const assert = (condition, message) => {
   if (!condition) errors.push(message);
@@ -60,6 +67,25 @@ const routes = primary.flatMap((demo) => [
 ]);
 const uniqueRoutes = new Set(routes);
 const acceptedFlagshipIds = new Set(flagships.filter((demo) => demo.status === 'accepted').map((demo) => demo.id));
+const requiredLocalAssets = [
+  'assets/vendor/katex/NOTICE.json',
+  'assets/vendor/katex/LICENSE',
+  'assets/vendor/katex/katex.min.css',
+  'assets/vendor/katex/katex.min.js',
+  'assets/vendor/katex/auto-render.min.js',
+  'assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2',
+  'assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2',
+  'assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2',
+];
+
+for (const asset of requiredLocalAssets) {
+  assert(existsSync(join(docs, asset)), `required local presentation asset is missing: ${asset}`);
+}
+for (const htmlPath of htmlFilesUnder(docs)) {
+  const html = readFileSync(htmlPath, 'utf8');
+  const relative = htmlPath.slice(docs.length + 1);
+  errors.push(...remoteRuntimeAssetViolations(html, relative));
+}
 
 assert(registry.counts.skills === skillManifest.skills.length, 'registry skill count does not match the published skill manifest');
 assert(primary.length === registry.counts.primary, 'primary demo count does not match registry counts');
