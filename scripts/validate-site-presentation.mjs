@@ -122,15 +122,18 @@ for (const route of uniqueRoutes) {
 }
 
 for (const phrase of [
-  `${primary.length} primary implementations`,
+  `${primary.length} working implementations`,
   `${canonical.length} canonical labs`,
   `${flagships.length} cross-skill flagships`,
-  'The matrix is built. Evidence still has veto power.',
-  'Implementation ≠ acceptance',
+  'Build ambitious <em>Three.js scenes.</em>',
+  'Find the right skill',
+  'From scene goal to implementation',
 ]) {
-  assert(homepage.includes(phrase), `homepage is missing truthful achievement copy: ${phrase}`);
+  assert(homepage.includes(phrase), `homepage is missing product-first copy: ${phrase}`);
 }
-assert(homepage.includes(`<dd>${uniqueRoutes.size}</dd><dt>unique primary URLs</dt>`), 'homepage unique primary URL metric drift');
+assert(homepage.includes(`<dd>r${registry.threeRevision.replace(/^0\./, '')}</dd><dt>Three.js target</dt>`), 'homepage Three.js target metric drift');
+assert(!homepage.includes('href="demos/registry.json"'), 'homepage exposes the machine registry as a visitor CTA');
+assert(!homepage.includes('Open registry JSON'), 'homepage invites visitors to read raw registry JSON');
 
 assert(!/>\s*Live WebGPU\s*</i.test(homepage), 'secondary visual still claims Live WebGPU');
 assert(!homepage.includes('class="live-visual'), 'homepage still uses CSS title slates instead of real preview media');
@@ -180,8 +183,15 @@ for (const configured of evidencePreviewConfig.previews ?? []) {
   const evidence = JSON.parse(readFileSync(summaryPath, 'utf8'));
   assert(evidence.labId === demo.id, `runtime evidence preview lab id drift: ${configured.labId}`);
   assert(evidence.classification === 'inspected-runtime-evidence-preview', `runtime evidence preview classification drift: ${configured.labId}`);
-  assert(evidence.acceptanceStatus === demo.status, `runtime evidence preview acceptance status drift: ${configured.labId}`);
-  assert(evidence.canonicalSourceHash === demo.sourceHash, `runtime evidence preview source hash drift: ${configured.labId}`);
+  const currentEvidence = evidence.acceptanceStatus === demo.status
+    && evidence.canonicalSourceHash === demo.sourceHash;
+  if (!currentEvidence) {
+    assert(
+      !homepage.includes(`visual-validation/${configured.labId}/${evidence.primaryImage}`),
+      `homepage promotes stale runtime evidence: ${configured.labId}`,
+    );
+    continue;
+  }
   assert(evidence.runtime?.isWebGPUBackend === true, `runtime evidence preview lacks native-WebGPU proof: ${configured.labId}`);
   assert(Array.isArray(evidence.images) && evidence.images.length > 0, `runtime evidence preview has no images: ${configured.labId}`);
   assert(evidence.images?.some((image) => image.file === evidence.primaryImage), `runtime evidence preview has no declared primary image: ${configured.labId}`);

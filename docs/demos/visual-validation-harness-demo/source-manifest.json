@@ -18,7 +18,7 @@
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:5dad4ec2548fb247c4e4b5c11101c2a0b24812557e4c08106dab09d742237b14",
+  "sourceHash": "sha256:0bb41ba2af3832391ea865a8e8340abe745973b4aa3528a1598ff45c5b40d70b",
   "publishedHashInputs": [
     "docs/demos/visual-validation-harness-demo",
     "docs/demos/assets/OrbitControls-CJtJSLBE.js",
@@ -94,8 +94,8 @@
     "docs/demos/assets/weather-map-b-BdrawmJ-.png",
     "docs/demos/assets/weather-map-c-CZsKB9yR.png"
   ],
-  "publishedBundleHash": "sha256:9bf4af184cafb4b0bf9f2e38c435785cfa9101ce5917e83b3c73aea68d88ba0c",
+  "publishedBundleHash": "sha256:026e489589b54c882178a70078b66d478ac6e6b93c71c3d0c1c19d6de8105ddb",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }

@@ -10,24 +10,24 @@
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
   "browserEntry": "threejs-visual-validation/examples/webgpu-validation-harness/index.html",
-  "sourceHash": "sha256:d5359278276b47f6de0d52f768dcc31a06baec9a50143494cdd8dd5b7a435074",
+  "sourceHash": "sha256:1e1a50d6f63a2ca0930c75ea9f7b89502ccc00c4c1823dfb625ddba09bc2f9b9",
   "publishedHashInputs": [
     "docs/demos/webgpu-validation-harness",
-    "docs/demos/assets/index-30OnEe8d2.js",
+    "docs/demos/assets/index-C_MFe7Rr2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/readback-DKeMx131.js",
     "docs/demos/assets/three.tsl-0l0bfIsw.js",
     "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-30OnEe8d2.js",
+    "docs/demos/assets/index-C_MFe7Rr2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/readback-DKeMx131.js",
     "docs/demos/assets/three.tsl-0l0bfIsw.js",
     "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:13bfa0fe0720148863b6129db170debbb298c13ebad1dc84d0daccb99f1118b3",
+  "publishedBundleHash": "sha256:6d08fd8916eefbb493eb42c010ce0704898ea6094b76658861e46a841e1029c7",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }

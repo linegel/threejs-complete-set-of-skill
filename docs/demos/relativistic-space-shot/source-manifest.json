@@ -85,8 +85,8 @@
     "docs/demos/assets/three.tsl-0l0bfIsw.js",
     "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
   ],
-  "publishedBundleHash": "sha256:f7c9332ba6ccce7abae1d2866c407b678105ecfd1084d12d8aea777a15df5c98",
+  "publishedBundleHash": "sha256:b1efee23625a0afbbc9502fcfc668b0a7f25d40cc6bde491f0d4a147af344150",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }

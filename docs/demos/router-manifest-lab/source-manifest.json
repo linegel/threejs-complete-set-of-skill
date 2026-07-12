@@ -28,8 +28,8 @@
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/router-fixtures-BBUXxe5H.json"
   ],
-  "publishedBundleHash": "sha256:2caabc1175da222bbfc7fd5b046fae0de0735cb7dd29244c43b3cd7d6f1ebf5d",
+  "publishedBundleHash": "sha256:987fc77c35bd40c44ba837bcb308bd6308516bf70151bf24eb14e592857dbb05",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }

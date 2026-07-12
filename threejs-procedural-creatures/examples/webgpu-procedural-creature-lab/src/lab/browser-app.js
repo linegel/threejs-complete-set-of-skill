@@ -23,7 +23,6 @@ import {
 	Fn,
 	attributeArray,
 	color,
-	emissive,
 	instanceIndex,
 	int,
 	mrt,
@@ -42,8 +41,13 @@ import { createLCG } from '../core/lcg.js';
 import { perceptualColorDeltaE } from '../core/locomotion/genome.js';
 import { compileSpec, digest128, TIER_CONFIG } from '../core/rig-compiler.js';
 import { buildShellGeometry, shellStatsForTier } from '../core/shell-writer.js';
+import { buildAffineSlotTransforms, buildDualQuaternionSlotTransforms } from '../core/deformation.js';
 import { validateSpec } from '../core/spec-schema.js';
 import { createGenomeSpec } from './specs/genome.js';
+import { evaluatePerformanceResult, PERFORMANCE_PROFILE_VERSION, performanceProfile } from './performance-profiles.js';
+import { loadBundledReferenceAssets } from './reference-assets.js';
+import { buildReferenceBufferGeometry } from './reference-geometry.js';
+import { renderGraphMatchesProfile, tierRenderGraph } from './tier-render-graphs.js';
 import {
 	CREATURE_FOCI,
 	CREATURE_MODES,
@@ -59,11 +63,16 @@ import { buildFieldNodes, createFieldParityProbe } from '../tsl/field-nodes.js';
 import { createCreatureMaterial, materialCacheSize, clearMaterialVariantCache, releaseCreatureMaterial } from '../tsl/materials.js';
 import { createOutlinePass } from '../tsl/outline-pass.js';
 import { createCandidateStorage, createPoseStorage } from '../tsl/pose-storage.js';
+import { createReferencePageStorage } from '../tsl/reference-page-storage.js';
+import { createReferenceCreatureMaterial } from '../tsl/reference-material.js';
 
 const specNames = [...CREATURE_FOCI];
 const debugModes = [...CREATURE_MODES];
 const tiers = [...CREATURE_TIERS];
 const startup = startupFromDataset(document.body?.dataset ?? {});
+const representation = new URLSearchParams(window.location.search).get('representation') === 'reference-candidate'
+	? 'reference-candidate'
+	: 'diagnostic-shell';
 const specUrls = Object.freeze({
 	biped: new URL('./specs/biped.json', import.meta.url),
 	quadruped: new URL('./specs/quadruped.json', import.meta.url),
@@ -85,12 +94,14 @@ const statusEl = document.getElementById('status');
 const state = {
 	ready: false,
 	specs: [],
+	referenceAssets: new Map(),
 	species: [],
 	activeCreatures: [],
 	focusIndex: Math.max(0, specNames.indexOf(startup.focus)),
 	tier: startup.tier,
 	debugMode: startup.mode,
 	startup,
+	representation,
 	renderer: null,
 	renderPipeline: null,
 	scenePass: null,
@@ -100,6 +111,7 @@ const state = {
 	light: null,
 	poseStorage: null,
 	outline: null,
+	tierGraph: null,
 	lastFrameMs: 16.667,
 	frameCount: 0,
 	bootCounters: null,
@@ -115,6 +127,8 @@ const state = {
 	},
 	certifications: new Map(),
 	presentationLastMs: null,
+	gpuErrors: [],
+	deviceLoss: null,
 	viewFrustum: new Frustum(),
 	viewProjection: new Matrix4(),
 	cullingEnabled: true,
@@ -191,6 +205,7 @@ function shellToBufferGeometry(shell) {
 	geometry.computeVertexNormals();
 	geometry.computeBoundingSphere();
 	geometry.userData.shell = shell;
+	geometry.userData.representation = 'diagnostic-owner-masked-shell';
 	return geometry;
 }
 
@@ -233,6 +248,7 @@ function posedSphereFromPoseInto(pose, slotCount, root, layoutPosition, out) {
 
 function updateSpeciesMaterials() {
 	for (const species of state.species) {
+		if (species.pageStorage) continue;
 		const previousMaterial = species.mesh.material;
 		const material = createCreatureMaterial({
 			tier: state.tier,
@@ -258,6 +274,17 @@ function updateSpeciesMaterials() {
 	}
 }
 
+function disposeSpeciesRecord(species) {
+	state.scene.remove(species.mesh);
+	species.geometry.dispose();
+	if (species.pageStorage) {
+		species.material.dispose();
+		species.pageStorage.dispose();
+	} else {
+		releaseCreatureMaterial(species.mesh.material);
+	}
+}
+
 function updatePoseStorage() {
 	state.camera.updateMatrixWorld(true);
 	state.viewProjection.multiplyMatrices(state.camera.projectionMatrix, state.camera.matrixWorldInverse);
@@ -270,28 +297,47 @@ function updatePoseStorage() {
 			posedSphereFromPoseInto(pose, species.compiled.slots.length, creature.driver.root, creature.layoutPosition, creature.boundingSphere);
 		}
 		let compactIndex = 0;
+		const visibleStableSlots = [];
 		species.unionSphere.makeEmpty();
 		for (let i = 0; i < species.creatures.length; i++) {
 			const creature = species.creatures[i];
 			totalInstances += 1;
 			const isVisible = species.mesh.visible && (!state.cullingEnabled || state.viewFrustum.intersectsSphere(creature.boundingSphere));
 			creature.visible = isVisible;
-			creature.visibleStorageIndex = isVisible ? species.creatureOffset + compactIndex : -1;
-			if (!isVisible) continue;
 			const pose = creature.driver.presentPose ?? creature.driver.currentPose;
+			if (species.pageStorage) {
+				creature.visibleStorageIndex = isVisible ? i : -1;
+				const skinningMethod = species.referenceAsset.manifest.deformation?.selectedMethod ?? 'lbs';
+				const transforms = skinningMethod === 'dqs-log-scale'
+					? buildDualQuaternionSlotTransforms(species.compiled, pose)
+					: buildAffineSlotTransforms(species.compiled, pose);
+				species.pageStorage.writeTransforms(i, transforms);
+				species.pageStorage.writePose(i, pose);
+				species.pageStorage.writeRoot(
+					i,
+					creature.layoutPosition[0] + (creature.driver.root?.position?.[0] ?? 0),
+					creature.layoutPosition[1] + (creature.driver.root?.position?.[1] ?? 0),
+					creature.layoutPosition[2] + (creature.driver.root?.position?.[2] ?? 0),
+					creature.driver.root?.yaw ?? 0,
+				);
+				if (isVisible) visibleStableSlots.push(i);
+			} else {
+				creature.visibleStorageIndex = isVisible ? species.creatureOffset + compactIndex : -1;
+			}
+			if (!isVisible) continue;
 			const creatureIndex = creature.visibleStorageIndex;
-			state.poseStorage.writePose(creatureIndex, pose, species.compiled.slots.length, species.compiled.radialFrames);
+			if (!species.pageStorage) state.poseStorage.writePose(creatureIndex, pose, species.compiled.slots.length, species.compiled.radialFrames);
 			// Storage root = layout + driver root; the shader applies it once (a
 			// custom positionNode clobbers instanceMatrix in r185 setupPosition, so
 			// the instance matrix cannot carry root motion — see LAB_FINDINGS).
-			state.poseStorage.writeRootValues(
+			if (!species.pageStorage) state.poseStorage.writeRootValues(
 				creatureIndex,
 				creature.layoutPosition[0] + (creature.driver.root?.position?.[0] ?? 0),
 				creature.layoutPosition[1] + (creature.driver.root?.position?.[1] ?? 0),
 				creature.layoutPosition[2] + (creature.driver.root?.position?.[2] ?? 0),
 				creature.driver.root?.yaw ?? 0,
 			);
-			species.mesh.setMatrixAt(compactIndex, IDENTITY_MATRIX);
+			if (!species.pageStorage) species.mesh.setMatrixAt(compactIndex, IDENTITY_MATRIX);
 			species.visibleIndices[compactIndex] = i;
 			if (species.unionSphere.isEmpty()) species.unionSphere.copy(creature.boundingSphere);
 			else species.unionSphere.union(creature.boundingSphere);
@@ -300,7 +346,8 @@ function updatePoseStorage() {
 		}
 		species.visibleCount = compactIndex;
 		species.mesh.count = compactIndex;
-		species.mesh.instanceMatrix.needsUpdate = true;
+		if (species.pageStorage) species.lastPageUpload = (() => { species.pageStorage.writeVisibleSlots(visibleStableSlots); return species.pageStorage.markDirty(); })();
+		else species.mesh.instanceMatrix.needsUpdate = true;
 		// Real posed bounds (doctrine: never frustumCulled=false, never a stale
 		// unit-shell sphere). The displaced surface lives at storage positions,
 		// so computeBoundingSphere() over the unit shell + identity matrices
@@ -311,7 +358,13 @@ function updatePoseStorage() {
 	state.culling.visibleInstances = visibleInstances;
 	state.culling.culledInstances = totalInstances - visibleInstances;
 	state.culling.submittedInstances = visibleInstances;
-	state.lastPoseUpload = state.poseStorage.markDirty();
+	const shellUpload = state.poseStorage.markDirty();
+	const pageUploads = state.species.filter((species) => species.lastPageUpload).map((species) => ({ species: species.spec.name, ...species.lastPageUpload }));
+	state.lastPoseUpload = {
+		...shellUpload,
+		pageUploads,
+		bytes: shellUpload.bytes + pageUploads.reduce((sum, upload) => sum + upload.totalBytes, 0),
+	};
 	return state.culling;
 }
 
@@ -356,13 +409,34 @@ function createScene(renderer) {
 	state.camera = camera;
 	state.ground = ground;
 	state.light = sun;
-	state.scenePass = pass(scene, camera);
-	state.scenePass.setMRT(mrt({ output, normal: normalView, emissive }));
-	state.outline = createOutlinePass(state.scenePass);
 	state.renderPipeline = new RenderPipeline(renderer);
 	state.renderPipeline.outputColorTransform = false;
-	state.renderPipeline.outputNode = state.outline.outputNode;
+	configureTierRenderGraph(state.tier);
+}
+
+function configureTierRenderGraph(tier) {
+	const contract = tierRenderGraph(tier);
+	const previousPass = state.scenePass;
+	const previousOutline = state.outline;
+	const scenePass = pass(state.scene, state.camera);
+	if (contract.colorAttachments.includes('normal')) scenePass.setMRT(mrt({ output, normal: normalView }));
+	else scenePass.setMRT(mrt({ output }));
+	scenePass.renderTarget.samples = contract.sampleCount;
+	const outline = contract.outlineMode === 'shared-normal-depth-edge' ? createOutlinePass(scenePass) : null;
+	state.scenePass = scenePass;
+	state.outline = outline;
+	state.tierGraph = contract;
+	state.renderPipeline.outputNode = outline?.outputNode ?? renderOutput(scenePass.getTextureNode('output'));
 	state.renderPipeline.needsUpdate = true;
+	if (state.light.shadow.mapSize.x !== contract.shadowMapSize || state.light.shadow.mapSize.y !== contract.shadowMapSize) {
+		state.light.shadow.map?.dispose?.();
+		state.light.shadow.map = null;
+		state.light.shadow.mapSize.set(contract.shadowMapSize, contract.shadowMapSize);
+		state.light.shadow.needsUpdate = true;
+	}
+	previousOutline?.dispose?.();
+	previousPass?.dispose?.();
+	return contract;
 }
 
 function layoutForSpecies(index) {
@@ -415,16 +489,19 @@ function buildSpeciesRecords(specs) {
 		const spec = validateSpec(specs[index], { maxParts: MAX_PARTS });
 		const certification = certificationFor(spec, state.tier);
 		const compiled = certification.compiled;
-		const shell = buildShellGeometry(compiled.slots.length, state.tier);
-		const geometry = shellToBufferGeometry(shell);
+		const useReferenceCandidate = state.representation === 'reference-candidate';
+		const shell = useReferenceCandidate ? null : buildShellGeometry(compiled.slots.length, state.tier);
+		const referenceAsset = useReferenceCandidate ? state.referenceAssets.get(specNames[index]) : null;
+		if (useReferenceCandidate && !referenceAsset) throw new Error(`missing reference asset '${specNames[index]}'`);
+		const geometry = useReferenceCandidate ? buildReferenceBufferGeometry(referenceAsset, compiled) : shellToBufferGeometry(shell);
 		// Same lifetime rule as poseStorage: the cached material variant for this
 		// species+tier pins whichever candidate storage node it was compiled
 		// with, so reuse one per species+tier (candidate sets are static for a
 		// given spec topology + tier K).
 		const candidateStorageKey = `${compiled.compilerSignature}:${compiled.topologySignature}:${compiled.geometryDigest}:${state.tier}:K${compiled.candidateK}`;
 		state.candidateStorages ??= new Map();
-		let candidateStorage = state.candidateStorages.get(candidateStorageKey);
-		if (!candidateStorage) {
+		let candidateStorage = useReferenceCandidate ? null : state.candidateStorages.get(candidateStorageKey);
+		if (!useReferenceCandidate && !candidateStorage) {
 			candidateStorage = createCandidateStorage({
 				candidateSets: compiled.candidateSets,
 				maxParts: MAX_PARTS,
@@ -434,7 +511,17 @@ function buildSpeciesRecords(specs) {
 			});
 			state.candidateStorages.set(candidateStorageKey, candidateStorage);
 		}
-		const material = createCreatureMaterial({
+		const pageStorage = useReferenceCandidate ? createReferencePageStorage({ capacity: SPECIES_CAP, slotCount: compiled.slots.length, transformsLabel: `ReferenceTransforms_${wgslSafeLabel(spec.name)}`, posesLabel: `ReferencePoses_${wgslSafeLabel(spec.name)}`, rootsLabel: `ReferenceRoots_${wgslSafeLabel(spec.name)}`, visibleLabel: `ReferenceVisible_${wgslSafeLabel(spec.name)}` }) : null;
+		const material = useReferenceCandidate ? createReferenceCreatureMaterial({
+			storage: pageStorage,
+			slotCount: compiled.slots.length,
+			tier: state.tier,
+			skinningMethod: referenceAsset.manifest.deformation?.selectedMethod ?? 'lbs',
+			correctionLayout: referenceAsset.manifest.deformation?.correctionLayout ?? 'none',
+			correctionTrustRadius: referenceAsset.manifest.deformation?.correctionRegion?.trustRadius ?? 0,
+			correctionTrials: referenceAsset.manifest.deformation?.correctionRegion?.maximumTrials ?? 0,
+			blendDag: compiled.blendDag,
+		}) : createCreatureMaterial({
 			tier: state.tier,
 			debugMode: state.debugMode,
 			K: compiled.candidateK,
@@ -460,6 +547,8 @@ function buildSpeciesRecords(specs) {
 		mesh.count = 1;
 		mesh.visible = !state.focusIsolation || index === state.focusIndex;
 		mesh.userData.shadowCasterParity = material.userData.shadowCasterParity;
+		for (let slot = 0; slot < SPECIES_CAP; slot++) mesh.setMatrixAt(slot, IDENTITY_MATRIX);
+		mesh.instanceMatrix.needsUpdate = true;
 		const driver = createDriver(spec, compiled, { seed: spec.seed ?? index + 1 });
 		const species = {
 			spec,
@@ -468,6 +557,8 @@ function buildSpeciesRecords(specs) {
 			shell,
 			geometry,
 			candidateStorage,
+			pageStorage,
+			referenceAsset,
 			material,
 			mesh,
 			creatureOffset: index * SPECIES_CAP,
@@ -476,7 +567,7 @@ function buildSpeciesRecords(specs) {
 			unionSphere: new Sphere(),
 			creatures: [{ driver, genomeSpec: spec, genomeDigest: compiled.geometryDigest, layoutPosition: layoutForSpecies(index), boundingSphere: new Sphere() }],
 		};
-		candidateStorage.markDirty();
+		candidateStorage?.markDirty();
 		state.species.push(species);
 		state.activeCreatures.push(species.creatures[0]);
 		state.scene.add(mesh);
@@ -556,16 +647,24 @@ function shadowParityTelemetry() {
 	});
 }
 
-function packedReadbackBytesPerRow(width, height, pixelLength, bytesPerTexel = 4) {
+function readbackLayout(width, height, pixelLength, bytesPerTexel = 4) {
 	const rowBytes = width * bytesPerTexel;
-	const compactLength = rowBytes * height;
-	if (pixelLength === compactLength) return rowBytes;
 	const alignedRowBytes = Math.ceil(rowBytes / 256) * 256;
-	const paddedLength = alignedRowBytes * (height - 1) + rowBytes;
-	if (pixelLength !== paddedLength) {
-		throw new Error(`Unexpected WebGPU readback length ${pixelLength}; expected ${compactLength} or ${paddedLength}.`);
+	// Three r185 WebGPUTextureUtils.copyTextureToBuffer owns this exact copy
+	// layout: every non-final row uses the aligned GPU stride and the final row
+	// stores only its tight texels. Carry that authored/inspected backend stride
+	// directly; never infer it from total buffer length divided by height.
+	const bufferByteLength = alignedRowBytes * (height - 1) + rowBytes;
+	if (pixelLength !== bufferByteLength) {
+		throw new Error(`Unexpected WebGPU readback length ${pixelLength}; expected backend copy length ${bufferByteLength}.`);
 	}
-	return alignedRowBytes;
+	return {
+		bytesPerRow: alignedRowBytes,
+		gpuCopyBytesPerRow: alignedRowBytes,
+		tightBytesPerRow: rowBytes,
+		bufferByteLength,
+		alignment: 256,
+	};
 }
 
 function bytesToBase64(bytes) {
@@ -581,14 +680,22 @@ function bytesToBase64(bytes) {
 function metricFromSamples(samples) {
 	const finite = samples.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
 	if (finite.length === 0) return { median: 0, p95: 0, samples: 0 };
+	const nearestRank = (probability) => finite[Math.max(0, Math.ceil(probability * finite.length) - 1)];
 	return {
-		median: Number(finite[Math.floor(finite.length / 2)].toFixed(4)),
-		p95: Number(finite[Math.min(finite.length - 1, Math.floor(finite.length * 0.95))].toFixed(4)),
+		median: Number(nearestRank(0.5).toFixed(4)),
+		p95: Number(nearestRank(0.95).toFixed(4)),
 		samples: finite.length,
 	};
 }
 
 function describePipeline() {
+	const graph = state.tierGraph ?? tierRenderGraph(state.tier);
+	const outlineConsumers = graph.outlineMode === 'shared-normal-depth-edge' ? ['outline-composite'] : ['final-output'];
+	const signals = [
+		{ id: 'output', producer: 'scene-mrt', consumers: outlineConsumers },
+		...(graph.colorAttachments.includes('normal') ? [{ id: 'normal', producer: 'scene-mrt', consumers: ['outline-composite'] }] : []),
+		{ id: 'depth', producer: 'scene-mrt-depth', consumers: graph.outlineMode === 'shared-normal-depth-edge' ? ['outline-composite'] : [] },
+	];
 	return {
 		schemaVersion: 2,
 		owners: {
@@ -599,13 +706,9 @@ function describePipeline() {
 			toneMap: 'renderOutput',
 			outputColorTransform: 'renderOutput',
 		},
-		signals: [
-			{ id: 'output', producer: 'scene-mrt', consumers: ['outline-composite'] },
-			{ id: 'normal', producer: 'scene-mrt', consumers: ['outline-composite'] },
-			{ id: 'depth', producer: 'scene-mrt-depth', consumers: ['outline-composite'] },
-			{ id: 'emissive', producer: 'scene-mrt', consumers: [] },
-		],
-		sceneSubmissions: [{ id: 'scene-mrt', kind: 'lit-scene', attachments: ['output', 'normal', 'emissive', 'depth'] }],
+		tierGraph: graph,
+		signals,
+		sceneSubmissions: [{ id: 'scene-mrt', kind: 'lit-scene', attachments: [...graph.colorAttachments, ...(graph.depthAttachment ? ['depth'] : [])] }],
 		computeDispatches: [],
 		resources: describeResources().resources,
 		finalToneMapOwner: 'renderOutput',
@@ -617,17 +720,23 @@ function describePipeline() {
 
 function describeResources() {
 	const pose = state.poseStorage;
+	const graph = state.tierGraph ?? tierRenderGraph(state.tier);
 	const candidateBytes = [...(state.candidateStorages?.values?.() ?? [])]
 		.reduce((sum, storage) => sum + storage.byteLength, 0);
 	const resources = [
+		...[...state.referenceAssets.values()].map((asset) => ({ id: `reference-${asset.name}`, kind: 'reference-asset-cpu', bytes: asset.binaryByteLength, acceptanceStatus: asset.manifest.acceptanceStatus, sha256: asset.manifest.binary.sha256 })),
+		...state.species.filter((species) => species.pageStorage).flatMap((species) => [
+			{ id: `reference-transforms-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.transformsArray.byteLength },
+			{ id: `reference-poses-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.posesArray.byteLength },
+			{ id: `reference-roots-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.rootsArray.byteLength },
+			{ id: `reference-visible-slots-${species.spec.name}`, kind: 'storage-buffer', bytes: species.pageStorage.visibleSlotsArray.byteLength },
+		]),
 		{ id: 'creature-pose-storage', kind: 'storage-buffer', bytes: pose?.poseArray?.byteLength ?? 0 },
 		{ id: 'creature-root-storage', kind: 'storage-buffer', bytes: pose?.rootsArray?.byteLength ?? 0 },
 		{ id: 'creature-radial-frame-storage', kind: 'storage-buffer', bytes: pose?.framesArray?.byteLength ?? 0 },
 		{ id: 'creature-candidate-storage', kind: 'storage-buffer', bytes: candidateBytes },
-		{ id: 'scene-mrt-output', kind: 'render-target', producer: 'scene-mrt' },
-		{ id: 'scene-mrt-normal', kind: 'render-target', producer: 'scene-mrt' },
-		{ id: 'scene-mrt-emissive', kind: 'render-target', producer: 'scene-mrt' },
-		{ id: 'scene-depth', kind: 'depth-target', producer: 'scene-mrt' },
+		...graph.colorAttachments.map((attachment) => ({ id: `scene-mrt-${attachment}`, kind: 'render-target', producer: 'scene-mrt' })),
+		...(graph.depthAttachment ? [{ id: 'scene-depth', kind: 'depth-target', producer: 'scene-mrt' }] : []),
 		{ id: 'directional-shadow-atlas', kind: 'depth-target', width: state.light?.shadow?.mapSize?.x ?? 0, height: state.light?.shadow?.mapSize?.y ?? 0 },
 	];
 	return {
@@ -652,10 +761,12 @@ function telemetry() {
 		focus: species?.spec.name,
 		tier: state.tier,
 		debugMode: state.debugMode,
+		representation: state.representation,
+		acceptanceEligible: state.representation === 'reference-candidate' ? false : null,
 		route: state.startup,
 		rigSlots: species?.compiled.slots.length ?? 0,
 		bodyLift: species?.compiled.bodyLift ?? 0,
-		geometry: species?.compiled.geometry ?? shellStatsForTier(state.tier),
+		geometry: species?.geometry?.userData?.representation ?? species?.compiled.geometry ?? shellStatsForTier(state.tier),
 		driver: creature ? getPoseSnapshot(creature.driver) : null,
 		camera: state.camera ? {
 			position: state.camera.position.toArray(),
@@ -700,7 +811,7 @@ function telemetry() {
 				semantics: 'total contributor capacity including owner',
 				initial: entry.certification.kInitial,
 				required: entry.certification.kRequired,
-				storageCapacity: entry.candidateStorage.K,
+				storageCapacity: entry.candidateStorage?.K ?? 0,
 				corpusVersion: entry.certification.corpusVersion,
 				corpusDigest: entry.certification.corpusDigest,
 				blendDagVersion: entry.compiled.blendDag.version,
@@ -715,6 +826,8 @@ function telemetry() {
 			},
 			bodyLift: entry.compiled.bodyLift,
 			geometry: entry.compiled.geometry,
+			representation: entry.geometry.userData.representation ?? 'diagnostic-owner-masked-shell',
+			pageStorage: entry.pageStorage ? { capacity: entry.pageStorage.capacity, visibleCount: entry.pageStorage.visibleCount, lastUpload: entry.lastPageUpload } : null,
 			visibleInstances: entry.visibleCount,
 			bounds: entry.creatures.map((creatureEntry) => ({
 				center: creatureEntry.boundingSphere.center.toArray(),
@@ -811,18 +924,18 @@ function setCamera(cameraId = 'design', options = {}) {
 
 async function setTier(value = 'hero', options = {}) {
 	const tier = validateCreatureTier(value);
+	if (state.representation === 'reference-candidate' && tier !== 'hero') {
+		throw new Error(`reference candidate currently has fixed hero assets only; tier '${tier}' requires a separately compiled and certified asset`);
+	}
 	if (state.startup.locked && options.overrideLock !== true && tier !== state.startup.tier) {
 		throw new Error(`route locks creature tier '${state.startup.tier}', not '${tier}'`);
 	}
 	if (tier === state.tier) return renderOnce();
 	const population = Math.max(1, state.species.reduce((sum, species) => sum + species.creatures.length, 0));
-	for (const species of state.species) {
-		state.scene.remove(species.mesh);
-		species.geometry.dispose();
-		releaseCreatureMaterial(species.mesh.material);
-	}
+	for (const species of state.species) disposeSpeciesRecord(species);
 	disposeCandidateStorages();
 	state.tier = tier;
+	configureTierRenderGraph(tier);
 	buildSpeciesRecords(state.specs);
 	spawnGrid(state.startup.seed, population, { render: false });
 	renderOnce();
@@ -891,14 +1004,13 @@ function advanceAll(deltaSeconds = 0) {
 
 function setSpecJSON(json) {
 	try {
+		if (state.representation === 'reference-candidate') {
+			throw new Error('reference candidate uses fixed bundled identities; live spec edits require the compile Worker and a newly certified reference asset');
+		}
 		const parsed = typeof json === 'string' ? JSON.parse(json) : json;
 		const spec = validateSpec(parsed, { maxParts: MAX_PARTS });
 		state.specs[state.focusIndex] = spec;
-		for (const species of state.species) {
-			state.scene.remove(species.mesh);
-			species.geometry.dispose();
-			releaseCreatureMaterial(species.mesh.material);
-		}
+		for (const species of state.species) disposeSpeciesRecord(species);
 		disposeCandidateStorages();
 		buildSpeciesRecords(state.specs);
 		return telemetry();
@@ -1199,7 +1311,7 @@ async function captureFrame({ width = 960, height = 600, camera = 'main' } = {})
 		return {
 			width: captureWidth,
 			height: captureHeight,
-			bytesPerRow: packedReadbackBytesPerRow(captureWidth, captureHeight, pixels.length),
+			...readbackLayout(captureWidth, captureHeight, pixels.length),
 			pixelsBase64: bytesToBase64(pixels),
 			camera,
 		};
@@ -1270,7 +1382,7 @@ async function captureShadowAtlas({ creatureIndex = 1, width = 512, height = 512
 		return {
 			width,
 			height,
-			bytesPerRow: packedReadbackBytesPerRow(width, height, pixels.length),
+			...readbackLayout(width, height, pixels.length),
 			pixelsBase64: bytesToBase64(pixels),
 			source: 'DirectionalLight.shadow.map.depthTexture sampled by a fullscreen NodeMaterial',
 			shadowMapSize: [state.light.shadow.mapSize.x, state.light.shadow.mapSize.y],
@@ -1299,7 +1411,9 @@ async function capturePipelinePixels(targetId = 'output') {
 		};
 	}
 	if (targetId === 'shadow-atlas') return captureShadowAtlas({ width, height });
-	if (!['normal', 'emissive', 'depth'].includes(targetId)) throw new Error(`unknown creature capture target '${targetId}'`);
+	if (!['normal', 'depth'].includes(targetId)) throw new Error(`unknown creature capture target '${targetId}'`);
+	if (targetId === 'normal' && !state.tierGraph.colorAttachments.includes('normal')) throw new Error(`tier '${state.tier}' does not allocate a normal attachment`);
+	if (targetId === 'depth' && !state.tierGraph.depthAttachment) throw new Error(`tier '${state.tier}' does not allocate a depth attachment`);
 	updatePoseStorage();
 	state.renderPipeline.render();
 	await state.renderer.backend.device.queue.onSubmittedWorkDone();
@@ -1328,7 +1442,7 @@ async function capturePipelinePixels(targetId = 'output') {
 			format: 'rgba8unorm',
 			outputColorSpace: state.renderer.outputColorSpace,
 			bytesPerPixel: 4,
-			bytesPerRow: packedReadbackBytesPerRow(width, height, pixels.length),
+			...readbackLayout(width, height, pixels.length),
 			pixels,
 		};
 	} finally {
@@ -1447,6 +1561,241 @@ function driftMarkers({ creatureIndex = 0, seconds = 4 } = {}) {
 	};
 }
 
+function stepSimulationTick() {
+	for (const species of state.species) {
+		for (const creature of species.creatures) step(creature.driver, 1, { rootVelocity: FIXED_ROOT_VELOCITY });
+	}
+}
+
+async function measureTimestampedPipelineFrame() {
+	const frameStart = instrumentationNow();
+	const simulationStart = frameStart;
+	stepSimulationTick();
+	const simulationEnd = instrumentationNow();
+	const storageStart = simulationEnd;
+	updatePoseStorage();
+	const storageEnd = instrumentationNow();
+	const submissionStart = storageEnd;
+	state.renderPipeline.render();
+	const submissionEnd = instrumentationNow();
+	const gpuRenderMs = await state.renderer.resolveTimestampsAsync('render');
+	return {
+		cpu: {
+			simulation: simulationEnd - simulationStart,
+			storageAndCulling: storageEnd - storageStart,
+			renderSubmission: submissionEnd - submissionStart,
+			total: submissionEnd - frameStart,
+		},
+		gpuRenderMs: Number.isFinite(gpuRenderMs) && gpuRenderMs > 0 ? gpuRenderMs : null,
+	};
+}
+
+function collectAnimationIntervals(durationMs) {
+	return new Promise((resolve) => {
+		const intervals = [];
+		let start = null;
+		let previous = null;
+		function sample(timestamp) {
+			if (start === null) start = timestamp;
+			if (previous !== null) intervals.push(timestamp - previous);
+			previous = timestamp;
+			if (timestamp - start >= durationMs && intervals.length > 0) resolve(intervals);
+			else requestAnimationFrame(sample);
+		}
+		requestAnimationFrame(sample);
+	});
+}
+
+function setCreatureMeshesVisible(visible) {
+	for (const species of state.species) species.mesh.visible = visible;
+}
+
+function geometryByteLength(geometry) {
+	let bytes = geometry?.index?.array?.byteLength ?? 0;
+	for (const attribute of Object.values(geometry?.attributes ?? {})) bytes += attribute?.array?.byteLength ?? 0;
+	return bytes;
+}
+
+function performanceResourceSnapshot(profile) {
+	const storageBytes = describeResources().storageBytes;
+	const geometryBytes = state.species.reduce((sum, species) => sum
+		+ geometryByteLength(species.geometry)
+		+ (species.mesh.instanceMatrix?.array?.byteLength ?? 0), 0);
+	const physicalPixels = profile.viewport.width * profile.viewport.height * profile.viewport.dpr ** 2;
+	const actualSampleCount = state.scenePass?.renderTarget?.samples ?? 1;
+	// PassNode defaults every MRT color target to RGBA16F (8 B/pixel). For MSAA,
+	// WebGPUTextureUtils owns a single-sample resolve texture plus an N-sample
+	// color attachment; depth32 is N-sample with no resolve allocation. This is
+	// an app-owned attachment ledger, not a claim about driver heap residency.
+	const colorBytesPerPixel = state.scenePass.renderTarget.textures.length * 8;
+	const colorSampleMultiplier = actualSampleCount > 1 ? 1 + actualSampleCount : 1;
+	const depthBytesPerPixel = state.scenePass.renderTarget.depthBuffer === false ? 0 : 4 * actualSampleCount;
+	const renderTargetBytes = physicalPixels * (colorBytesPerPixel * colorSampleMultiplier + depthBytesPerPixel);
+	const shadowBytes = state.light.shadow.mapSize.x * state.light.shadow.mapSize.y * 4;
+	return {
+		storageBytes,
+		geometryBytes,
+		renderTargetBytes,
+		shadowBytes,
+		ownedGpuBytes: storageBytes + geometryBytes + renderTargetBytes + shadowBytes,
+		actualSampleCount,
+		ledgerBasis: 'app-owned buffers plus rgba16f MRT resolve/MSAA, depth32, and depth32float shadow allocations',
+		excludes: ['driver allocation granularity', 'pipeline cache', 'bind-group metadata', 'browser compositor surfaces'],
+	};
+}
+
+function adapterIdentity() {
+	const info = state.renderer.backend?.device?.adapterInfo ?? state.renderer.backend?.adapterInfo;
+	if (!info) return null;
+	const identity = {};
+	for (const key of ['vendor', 'architecture', 'device', 'description', 'subgroupMinSize', 'subgroupMaxSize']) {
+		if (info[key] !== undefined && info[key] !== '') identity[key] = info[key];
+	}
+	return Object.keys(identity).length > 0 ? identity : null;
+}
+
+function assertPerformanceGraph(profile) {
+	if (!renderGraphMatchesProfile(state.tierGraph, profile)) throw new Error(`tier '${profile.tier}' render graph drifted from performance profile '${profile.id}'`);
+	if (state.scenePass.renderTarget.samples !== profile.sampleCount
+		|| state.light.shadow.mapSize.x !== profile.shadowMapSize
+		|| state.light.shadow.mapSize.y !== profile.shadowMapSize) throw new Error(`tier '${profile.tier}' live render resources drifted from performance profile '${profile.id}'`);
+}
+
+async function measurePerformanceProfile(profileId) {
+	const profile = performanceProfile(profileId);
+	await setTier(profile.tier, { overrideLock: true });
+	state.viewportOverride = { ...profile.viewport };
+	state.renderer.setPixelRatio(profile.viewport.dpr);
+	assertPerformanceGraph(profile);
+	spawnGrid(profile.seed, profile.population, { render: false });
+	state.focusIsolation = false;
+	setCreatureMeshesVisible(true);
+	frameCameraOnPopulation(false);
+	resizeRenderer();
+	const timestampSupported = state.renderer.backend?.trackTimestamp === true
+		&& state.renderer.hasFeature?.('timestamp-query') === true;
+	if (!timestampSupported) {
+		return {
+			schemaVersion: 1,
+			performanceProfileVersion: PERFORMANCE_PROFILE_VERSION,
+			profileId,
+			verdict: 'INSUFFICIENT_EVIDENCE',
+			unavailableReason: 'INSUFFICIENT_EVIDENCE_GPU_TIMING: timestamp-query is unavailable or trackTimestamp was not enabled before initialization',
+		};
+	}
+	pauseLoop();
+	try {
+		await state.renderer.resolveTimestampsAsync('render');
+		for (let frame = 0; frame < profile.warmupFrames; frame++) await measureTimestampedPipelineFrame();
+		await state.renderer.resolveTimestampsAsync('render');
+		const beforeCounters = state.bootCounters.snapshot();
+		const cpuSamples = { simulation: [], storageAndCulling: [], renderSubmission: [], total: [] };
+		const gpuSamples = [];
+		for (let frame = 0; frame < profile.sampleFrames; frame++) {
+			const sample = await measureTimestampedPipelineFrame();
+			for (const key of Object.keys(cpuSamples)) cpuSamples[key].push(sample.cpu[key]);
+			if (sample.gpuRenderMs !== null) gpuSamples.push(sample.gpuRenderMs);
+		}
+
+		const marginalBlocks = [];
+		for (let block = 0; block < profile.marginalBlocks; block++) {
+			const enabled = block % 2 === 1;
+			setCreatureMeshesVisible(enabled);
+			const samples = [];
+			for (let frame = 0; frame < profile.marginalFramesPerBlock; frame++) {
+				const sample = await measureTimestampedPipelineFrame();
+				if (sample.gpuRenderMs !== null) samples.push(sample.gpuRenderMs);
+			}
+			marginalBlocks.push({ block, creaturesEnabled: enabled, gpuRender: metricFromSamples(samples), raw: samples });
+		}
+		setCreatureMeshesVisible(true);
+		const pausedBaselineSamples = await collectAnimationIntervals(2_000);
+		resumeLoop();
+		const activePresentationSamples = await collectAnimationIntervals(profile.sustainedDurationMs);
+		pauseLoop();
+		const afterCounters = state.bootCounters.snapshot();
+		const resourceSnapshot = performanceResourceSnapshot(profile);
+		const activeMetric = metricFromSamples(activePresentationSamples);
+		const deadlineMisses = activePresentationSamples.filter((value) => value > profile.frameDeadlineMs).length;
+		const actualRepresentation = state.species.every((species) => species.geometry.userData.representation === 'canonical-reference-surface')
+			? 'canonical-reference-surface'
+			: state.species.every((species) => species.geometry.userData.representation === 'canonical-reference-surface-candidate')
+				? 'canonical-reference-surface-candidate'
+				: 'diagnostic-owner-masked-shell';
+		const actualOutlineMode = state.renderPipeline.outputNode === state.outline?.outputNode ? 'shared-normal-depth-edge' : 'none';
+		const result = {
+			schemaVersion: 1,
+			performanceProfileVersion: PERFORMANCE_PROFILE_VERSION,
+			profileId,
+			environment: {
+				threeRevision: '185',
+				browser: navigator.userAgent,
+				platform: navigator.userAgentData?.platform ?? navigator.platform ?? null,
+				adapter: adapterIdentity(),
+				features: state.renderer.backend?.device?.features ? [...state.renderer.backend.device.features] : [],
+				limits: state.renderer.backend?.device?.limits ? { ...state.renderer.backend.device.limits } : {},
+				isWebGPUBackend: state.renderer.backend?.isWebGPUBackend === true,
+				trackTimestamp: state.renderer.backend?.trackTimestamp === true,
+				timestampQuery: state.renderer.hasFeature?.('timestamp-query') === true,
+				deviceLoss: state.deviceLoss,
+				uncapturedErrors: [...state.gpuErrors],
+			},
+			target: { refreshHz: profile.refreshHz, frameDeadlineMs: profile.frameDeadlineMs, allowedMissRate: profile.allowedMissRate },
+			workload: {
+				tier: state.tier,
+				population: state.species.reduce((sum, species) => sum + species.creatures.length, 0),
+				speciesMix: state.species.map((species) => ({ name: species.spec.name, instances: species.creatures.length })),
+				seed: profile.seed,
+				viewport: { width: profile.viewport.width, height: profile.viewport.height, dpr: state.renderer.getPixelRatio() },
+				sampleCount: resourceSnapshot.actualSampleCount,
+				shadowMapSize: state.light.shadow.mapSize.x,
+				outlineMode: actualOutlineMode,
+				colorAttachments: [...state.tierGraph.colorAttachments],
+				depthAttachment: state.tierGraph.depthAttachment,
+				representation: actualRepresentation,
+				topologySignatures: state.species.map((species) => species.compiled.topologySignature),
+				geometryDigests: state.species.map((species) => species.compiled.geometryDigest),
+				pages: state.species.length,
+				visibleInstances: state.culling.visibleInstances,
+			},
+			sampling: {
+				warmupFrames: profile.warmupFrames,
+				sampleFrames: profile.sampleFrames,
+				marginalBlocks: profile.marginalBlocks,
+				marginalFramesPerBlock: profile.marginalFramesPerBlock,
+				sustainedDurationMs: profile.sustainedDurationMs,
+				quantile: 'nearest-rank',
+			},
+			cpu: {
+				simulation: metricFromSamples(cpuSamples.simulation),
+				storageAndCulling: metricFromSamples(cpuSamples.storageAndCulling),
+				renderSubmission: metricFromSamples(cpuSamples.renderSubmission),
+				total: metricFromSamples(cpuSamples.total),
+			},
+			gpu: { render: metricFromSamples(gpuSamples), timestampSampleCount: gpuSamples.length, marginalBlocks },
+			presentation: {
+				pausedBaseline: metricFromSamples(pausedBaselineSamples),
+				active: activeMetric,
+				deadlineMisses,
+				missRate: activePresentationSamples.length > 0 ? deadlineMisses / activePresentationSamples.length : 1,
+			},
+			resources: {
+				...resourceSnapshot,
+				postRevealPipelineCompiles: afterCounters.createRenderPipeline + afterCounters.createRenderPipelineAsync - beforeCounters.createRenderPipeline - beforeCounters.createRenderPipelineAsync,
+				steadyStateBufferCreates: afterCounters.createBuffer - beforeCounters.createBuffer,
+				dirtyUploadBytes: state.lastPoseUpload?.bytes ?? 0,
+			},
+			quality: { selectedTier: state.tier, transitions: [], settled: true },
+			rawSamples: { cpu: cpuSamples, gpuRenderMs: gpuSamples, pausedPresentationMs: pausedBaselineSamples, activePresentationMs: activePresentationSamples },
+		};
+		Object.assign(result, evaluatePerformanceResult(result));
+		return result;
+	} finally {
+		setCreatureMeshesVisible(true);
+		resumeLoop();
+	}
+}
+
 async function measureSteadyFrames(count = 120) {
 	// Fairness contract: the first-frame ratio compares like with like. The first
 	// frame is timed as an awaited renderAsync at reveal (init), so steady frames
@@ -1483,7 +1832,15 @@ async function measureSteadyFrames(count = 120) {
 	};
 	const steady = metricFromSamples(samples);
 	state.boot.firstFrameRatio = Number((Math.max(state.timing.revealMedianMs ?? state.timing.firstFrameMs, steady.median) / Math.max(steady.median, 1e-6)).toFixed(4));
-	return { samples: samples.map((sample) => Number(sample.toFixed(4))), steady, deltas: state.bootCounters.steadyStateDeltas };
+	return {
+		metricKind: 'cpu-submission-proxy',
+		acceptanceEligible: false,
+		gpuTiming: null,
+		deprecation: 'Use measurePerformanceProfile(profileId); renderAsync submission latency is not GPU completion time.',
+		samples: samples.map((sample) => Number(sample.toFixed(4))),
+		steady,
+		deltas: state.bootCounters.steadyStateDeltas,
+	};
 }
 
 async function leakLoop(cycles = 50) {
@@ -1513,11 +1870,7 @@ async function leakLoop(cycles = 50) {
 
 function dispose() {
 	state.renderer?.setAnimationLoop(null);
-	for (const species of state.species) {
-		state.scene?.remove(species.mesh);
-		species.geometry.dispose();
-		releaseCreatureMaterial(species.mesh.material);
-	}
+	for (const species of state.species) disposeSpeciesRecord(species);
 	state.ground?.geometry?.dispose?.();
 	state.ground?.material?.dispose?.();
 	state.outline?.dispose?.();
@@ -1533,6 +1886,7 @@ function dispose() {
 	state.scenePass = null;
 	state.renderPipeline = null;
 	state.outline = null;
+	state.tierGraph = null;
 	state.renderer = null;
 	state.scene = null;
 	state.camera = null;
@@ -1616,6 +1970,7 @@ function createLabController() {
 		},
 		async renderOnce() { return renderOnce(); },
 		async capturePixels(target) { return capturePipelinePixels(target); },
+		async measurePerformanceProfile(profileId) { return measurePerformanceProfile(profileId); },
 		describePipeline,
 		describeResources,
 		getMetrics() { return telemetry(); },
@@ -1656,6 +2011,7 @@ function installLabApi() {
 		spawnCostSample,
 		driftMarkers,
 		measureSteadyFrames,
+		measurePerformanceProfile,
 		leakLoop,
 		pauseLoop,
 		resumeLoop,
@@ -1675,7 +2031,17 @@ function installLabApi() {
 
 async function init() {
 	setStatus('Creature Lab Initializing WebGPU');
-	const renderer = new WebGPURenderer({ canvas, antialias: true });
+	const renderer = new WebGPURenderer({ canvas, antialias: false, trackTimestamp: true });
+	const inheritedOnError = renderer.onError.bind(renderer);
+	const inheritedOnDeviceLost = renderer.onDeviceLost.bind(renderer);
+	renderer.onError = (error) => {
+		state.gpuErrors.push({ type: error?.type ?? 'GPUError', message: error?.message ?? String(error) });
+		inheritedOnError(error);
+	};
+	renderer.onDeviceLost = (info) => {
+		state.deviceLoss = { reason: info?.reason ?? null, message: info?.message ?? 'Unknown WebGPU device loss' };
+		inheritedOnDeviceLost(info);
+	};
 	await renderer.init();
 	if (renderer.backend?.isWebGPUBackend !== true) throw new Error('WebGPU backend unavailable for the canonical creature path.');
 	state.renderer = renderer;
@@ -1690,11 +2056,14 @@ async function init() {
 	state.bootCounters.mark('scene');
 
 	setStatus('Creature Lab Loading Specs');
-	state.specs = await Promise.all(specNames.map((name) => {
-		const url = specUrls[name];
-		if (!url) throw new Error(`missing browser spec URL for '${name}'`);
-		return fetchJson(url);
-	}));
+	[state.specs, state.referenceAssets] = await Promise.all([
+		Promise.all(specNames.map((name) => {
+			const url = specUrls[name];
+			if (!url) throw new Error(`missing browser spec URL for '${name}'`);
+			return fetchJson(url);
+		})),
+		loadBundledReferenceAssets(specNames),
+	]);
 	for (const tierName of tiers) buildShellGeometry(1, tierName);
 	buildSpeciesRecords(state.specs);
 	spawnGrid(startup.seed, startup.population, { render: false });

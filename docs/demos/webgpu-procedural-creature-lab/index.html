@@ -44,11 +44,11 @@
       }
     }
   </script>
-  <script type="module" crossorigin src="../assets/index-3iRyTm5j.js"></script>
+  <script type="module" crossorigin src="../assets/index-DyXy1p0r.js"></script>
   <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
   <link rel="modulepreload" crossorigin href="../assets/three.webgpu-Bjfb9xWU.js">
   <link rel="modulepreload" crossorigin href="../assets/three.tsl-0l0bfIsw.js">
-  <link rel="modulepreload" crossorigin href="../assets/pose-storage-CvIYfGBz.js">
+  <link rel="modulepreload" crossorigin href="../assets/pose-storage-BtQJsU6J.js">
 </head>
 <body>
 <main class="demo-seo-shell" data-demo-seo-shell data-demo-id="webgpu-procedural-creature-lab" data-owning-skill="threejs-procedural-creatures">
@@ -59,15 +59,11 @@
       <h1>WebGPU Procedural Creature Lab</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Procedural Creature Lab, with 7 scenarios, 7 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="11">
-        <summary>Readiness &amp; remaining fixes <span>11</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="10">
+        <summary>Readiness &amp; remaining fixes <span>10</span></summary>
         <div class="demo-roadmap__body">
-          <p>11 open closure items. Loadable does not mean accepted or performance-valid.</p>
-          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
-          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
-          <p>The hero, crowd, background tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
-          <code>tiers[].frameTargetMs</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <p>10 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="capability">
           <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
           <p>src/lab/browser-app.js blocks unless renderer.backend.isWebGPUBackend is true; current-source capture is pending</p>
           <code>capabilityRequirements.native-webgpu</code>
@@ -97,7 +93,7 @@
           <code>runtimeProof.shadow-parity</code>
         </li><li data-roadmap-item data-priority="P0" data-category="runtime">
           <div><span>P0</span><strong>Current Adapter Performance runtime proof</strong></div>
-          <p>NOT_CLAIMED: every tier has frameTargetMs null, so this lab makes no performance claim. measureSteadyFrames times renderAsync submission rather than timestamp-resolved GPU completion, and WebGPURenderer is constructed without trackTimestamp. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused, so those timing rows remain diagnostic and cannot support acceptance.</p>
+          <p>INSUFFICIENT_EVIDENCE: frozen hero/crowd/background 60 Hz profiles and a timestamp-query measurement API now exist, but current-source profile artifacts are pending and the runtime still identifies its geometry as a diagnostic owner-masked shell. The legacy measureSteadyFrames submission proxy is explicitly ineligible for acceptance. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused; the fail-closed evaluator rejects that host cadence.</p>
           <code>runtimeProof.current-adapter-performance</code>
         </li><li data-roadmap-item data-priority="P1" data-category="evidence">
           <div><span>P1</span><strong>Capture a current-source evidence bundle</strong></div>
@@ -110,13 +106,13 @@
         </li></ol>
         </div>
       </details>
-      <p>Use the linked skill, registry, and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
+      <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
       <dl>
         <div><dt>Owning skill</dt><dd>Procedural Creatures</dd></div>
         <div><dt>Published routes</dt><dd>7 scenarios · 7 mechanisms · 3 quality tiers</dd></div>
       </dl>
       <h2>Supported mechanisms</h2>
-      <ul data-demo-mechanisms><li><code>field-and-surface-certification</code> — Field And Surface Certification</li><li><code>snap-and-ownership</code> — Snap And Ownership</li><li><code>locomotion-and-foot-planting</code> — Locomotion And Foot Planting</li><li><code>tails-ears-and-secondary-motion</code> — Tails Ears And Secondary Motion</li><li><code>crowd-and-culling</code> — Crowd And Culling</li><li><code>outline-and-shadow</code> — Outline And Shadow</li><li>1 additional mechanisms are listed in the registry.</li></ul>
+      <ul data-demo-mechanisms><li><code>field-and-surface-certification</code> — Field And Surface Certification</li><li><code>snap-and-ownership</code> — Snap And Ownership</li><li><code>locomotion-and-foot-planting</code> — Locomotion And Foot Planting</li><li><code>tails-ears-and-secondary-motion</code> — Tails Ears And Secondary Motion</li><li><code>crowd-and-culling</code> — Crowd And Culling</li><li><code>outline-and-shadow</code> — Outline And Shadow</li><li>1 additional mechanisms are documented by the owning skill.</li></ul>
       <nav aria-label="Demo documentation and provenance"><a href="../../skills/threejs-procedural-creatures.html">Owning skill</a><a href="../../evidence/webgpu-procedural-creature-lab/">Evidence report</a><a href="../registry.json">Demo registry</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-procedural-creatures">Source repository</a></nav>
     </div>
   </details>

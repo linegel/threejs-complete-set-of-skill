@@ -33,8 +33,8 @@
     "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
     "docs/demos/assets/webgpu-lut-atmosphere-BQM5Fa5Z.js"
   ],
-  "publishedBundleHash": "sha256:fdacb547d2d9b58fe5d0e1acaa180d4278d7cd118872548e7245ce4ec7c68579",
+  "publishedBundleHash": "sha256:500458457a073fb8d8ce223c46bfe622e06d9ae5c350870ddb8703dd7ec95818",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }

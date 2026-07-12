@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:221880dc187fd00ae0596bab0592fd9e340b7b3a3a0f100c1f229cd0651b58ad",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -341,7 +341,7 @@
     "flagships": 5,
     "fixedRoutes": 516,
     "requiredCapabilities": 90,
-    "requiredRuntimeProofs": 223
+    "requiredRuntimeProofs": 224
   },
   "demos": [
     {
@@ -1084,7 +1084,7 @@
         "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
         "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
       },
-      "sourceHash": "sha256:c9f2853e309c6492e25ca8e36bfeb9cb062423f0d0b9ad1b55ce8fe1360cd352",
+      "sourceHash": "sha256:25111e22bb87efc41efa764b6c83539ed526cb68c79f27571550502c285dc7a7",
       "proxyStatus": null,
       "notes": [
         "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
@@ -6368,7 +6368,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:fb045ee274b66664731d66f5f3c29c88a341fbbcfc5daf9ec502288fb4a0d4fa",
+      "sourceHash": "sha256:0bb41ba2af3832391ea865a8e8340abe745973b4aa3528a1598ff45c5b40d70b",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -10493,7 +10493,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
+      "evidenceBundle": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
       "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
       "commands": {
         "check": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run check",
@@ -10942,7 +10942,12 @@
         {
           "id": "hero",
           "targetClass": "close-subject",
-          "frameTargetMs": null,
+          "frameTargetMs": {
+            "value": 16.6667,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "Frozen hero-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence"
+          },
           "resolutionPolicy": {
             "dprCap": 2
           },
@@ -10967,7 +10972,12 @@
         {
           "id": "crowd",
           "targetClass": "repeated-population",
-          "frameTargetMs": null,
+          "frameTargetMs": {
+            "value": 16.6667,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "Frozen crowd-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence"
+          },
           "resolutionPolicy": {
             "dprCap": 1.5
           },
@@ -10995,7 +11005,12 @@
         {
           "id": "background",
           "targetClass": "small-projected-silhouette",
-          "frameTargetMs": null,
+          "frameTargetMs": {
+            "value": 16.6667,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "Frozen background-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence"
+          },
           "resolutionPolicy": {
             "dprCap": 1
           },
@@ -11086,8 +11101,8 @@
         },
         {
           "id": "current-adapter-performance",
-          "required": false,
-          "evidence": "NOT_CLAIMED: every tier has frameTargetMs null, so this lab makes no performance claim. measureSteadyFrames times renderAsync submission rather than timestamp-resolved GPU completion, and WebGPURenderer is constructed without trackTimestamp. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused, so those timing rows remain diagnostic and cannot support acceptance.",
+          "required": true,
+          "evidence": "INSUFFICIENT_EVIDENCE: frozen hero/crowd/background 60 Hz profiles and a timestamp-query measurement API now exist, but current-source profile artifacts are pending and the runtime still identifies its geometry as a diagnostic owner-masked shell. The legacy measureSteadyFrames submission proxy is explicitly ineligible for acceptance. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused; the fail-closed evaluator rejects that host cadence.",
           "status": "incomplete"
         }
       ],
@@ -11103,7 +11118,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:02c7af6a0987e22e86693a78a4ff5ea846cddcf623a6e50a394d858f7d31e611",
+      "sourceHash": "sha256:a582a8a97afcf3023234bd7025d31054f6b008f3f93253affb6e5263c3b126fa",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -13439,7 +13454,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:9dc845766e61e33645d9c20b715b6c92a54fef07b60671fed03c620fa9f2bfb4",
+      "sourceHash": "sha256:1e1a50d6f63a2ca0930c75ea9f7b89502ccc00c4c1823dfb625ddba09bc2f9b9",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."

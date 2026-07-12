@@ -27,6 +27,10 @@ function requireNonNegative(value, path) {
 	if (value !== undefined && (!isFiniteNumber(value) || value < 0)) fail(path, 'must be >= 0');
 }
 
+function requireUnitInterval(value, path) {
+	if (value !== undefined && (!isFiniteNumber(value) || value < 0 || value > 1)) fail(path, 'must be in [0,1]');
+}
+
 function requireVec3(value, path) {
 	if (!Array.isArray(value) || value.length !== 3 || value.some((n) => !isFiniteNumber(n))) {
 		fail(path, 'must be a finite [x,y,z]');
@@ -60,6 +64,7 @@ export function validateSpec(spec, options = {}) {
 	for (const field of ['speed', 'stepLength', 'stepHeight', 'hopLength', 'hopHeight', 'altitude', 'radius', 'buoyancy', 'undulation']) {
 		requireNonNegative(spec.locomotion[field], `locomotion.${field}`);
 	}
+	requireUnitInterval(spec.locomotion.squashAmplitude, 'locomotion.squashAmplitude');
 
 	if (!Array.isArray(spec.parts) || spec.parts.length === 0) fail('spec.parts', 'must be a non-empty array');
 
@@ -102,6 +107,7 @@ export function validateSpec(spec, options = {}) {
 			requirePositive(part.length, `${part.id}.length`);
 			requirePositive(part.r, `${part.id}.r`);
 			if (part.taper !== undefined) requireNonNegative(part.taper, `${part.id}.taper`);
+			requireUnitInterval(part.followStrength, `${part.id}.followStrength`);
 		} else if (part.shape === 'leg') {
 			requireVec3(part.hip, `${part.id}.hip`);
 			requirePositive(part.upper, `${part.id}.upper`);

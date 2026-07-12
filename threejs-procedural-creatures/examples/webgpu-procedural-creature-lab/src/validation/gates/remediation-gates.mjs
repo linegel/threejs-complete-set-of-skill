@@ -256,20 +256,24 @@ async function runSupportSpringGenomeMutation() {
 }
 
 async function runControllerPipelineContractMutation() {
-	const [browser, outline, materials, manifest] = await Promise.all([
+	const [browser, outline, materials, tierGraphs, manifest] = await Promise.all([
 		readFile(resolve(labRoot, 'src/lab/browser-app.js'), 'utf8'),
 		readFile(resolve(labRoot, 'src/tsl/outline-pass.js'), 'utf8'),
 		readFile(resolve(labRoot, 'src/tsl/materials.js'), 'utf8'),
+		readFile(resolve(labRoot, 'src/lab/tier-render-graphs.js'), 'utf8'),
 		readFile(resolve(labRoot, 'lab.manifest.json'), 'utf8'),
 	]);
 	const requiredBrowserTokens = [
 		'new RenderPipeline(renderer)',
-		'setMRT(mrt({ output, normal: normalView, emissive }))',
+		'configureTierRenderGraph(state.tier)',
+		'setMRT(mrt({ output, normal: normalView }))',
+		'setMRT(mrt({ output }))',
 		'outputColorTransform = false',
 		'DirectionalLight.shadow.map.depthTexture',
 		'async ready()', 'async setScenario(id)', 'async setMode(id)', 'async setTier(id)', 'async setSeed(seed)',
 		'async setCamera(id)', 'async setTime(seconds)', 'async step(deltaSeconds)', 'async resetHistory(cause)',
 		'async resize(width, height, dpr)', 'async renderOnce()', 'async capturePixels(target)',
+		'async measurePerformanceProfile(profileId)',
 		'describePipeline', 'describeResources', 'getMetrics()', 'async dispose()',
 		'async function leakLoop(cycles = 50)', 'state.measureTarget?.dispose?.()',
 		'species.mesh.visible && (!state.cullingEnabled',
@@ -282,6 +286,12 @@ async function runControllerPipelineContractMutation() {
 	}
 	if (!outline.includes("getTextureNode('normal')") || !outline.includes("getTextureNode('depth')") || !outline.includes('outputNode: renderOutput')) {
 		return { status: 'fail', details: { message: 'outline remains a descriptor instead of an MRT edge graph' } };
+	}
+	if (!tierGraphs.includes("hero: graph('hero', ['output', 'normal'], 'shared-normal-depth-edge', 4, 2048)")
+		|| !tierGraphs.includes("crowd: graph('crowd', ['output', 'normal'], 'shared-normal-depth-edge', 1, 1024)")
+		|| !tierGraphs.includes("background: graph('background', ['output'], 'none', 1, 512)")
+		|| browser.includes('normal: normalView, emissive')) {
+		return { status: 'fail', details: { message: 'tier render graphs allocate the wrong MRT or retain the unused emissive attachment' } };
 	}
 	if (!materials.includes('const objectIds = new WeakMap()') || !materials.includes('entry.refCount += 1') || materials.includes('material.receivedShadowPositionNode =')) {
 		return { status: 'fail', details: { message: 'material cache identity/refcount or received-shadow transform contract regressed' } };
@@ -298,7 +308,7 @@ async function runControllerPipelineContractMutation() {
 			return { status: 'fail', details: { message: 'population distribution multiplies totals per species', tier, counts: [...counts] } };
 		}
 	}
-	return { status: 'pass', details: { controllerMethods: 16, populations, status: parsedManifest.status } };
+	return { status: 'pass', details: { controllerMethods: 17, populations, status: parsedManifest.status } };
 }
 
 export const gates = [

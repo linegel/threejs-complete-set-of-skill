@@ -8,6 +8,11 @@ function readA(pose, slot) {
 	return [pose[base], pose[base + 1], pose[base + 2]];
 }
 
+function readB(pose, slot) {
+	const base = slot * POSE_STRIDE;
+	return [pose[base + 4], pose[base + 5], pose[base + 6]];
+}
+
 function writeSegment(pose, slot, a, b) {
 	const base = slot * POSE_STRIDE;
 	pose[base + 0] = a[0];
@@ -43,7 +48,12 @@ function groupRopes(records) {
 			continue;
 		}
 		if (!current || current.partId !== record.partId || record.ropeSegment === 0) {
-			current = { partId: record.partId, slots: [], restLengths: [] };
+			current = {
+				partId: record.partId,
+				slots: [],
+				restLengths: [],
+				followStrength: record.ropeFollowStrength ?? 0,
+			};
 			groups.push(current);
 		}
 		current.slots.push(record.partSlot);
@@ -82,7 +92,7 @@ function initializeGroup(group, pose) {
 	group.previous[0] = group.particles[0].slice();
 }
 
-function verlet(group, anchor, dt) {
+function verlet(group, anchor, targets, dt) {
 	group.particles[0] = anchor.slice();
 	group.previous[0] = anchor.slice();
 	let speedSum = 0;
@@ -96,6 +106,12 @@ function verlet(group, anchor, dt) {
 		p[0] += vx;
 		p[1] += vy - GRAVITY * dt * dt;
 		p[2] += vz;
+		const follow = group.followStrength;
+		if (follow > 0) {
+			p[0] += (targets[i][0] - p[0]) * follow;
+			p[1] += (targets[i][1] - p[1]) * follow;
+			p[2] += (targets[i][2] - p[2]) * follow;
+		}
 		speedSum += Math.hypot(vx / dt, vy / dt, vz / dt);
 	}
 	for (let pass = 0; pass < RELAXATION_PASSES; pass++) {
@@ -128,7 +144,12 @@ export function stepRopes(state, pose, dt) {
 	for (const group of state.groups) {
 		if (!group.particles) initializeGroup(group, pose);
 		const anchor = readA(pose, group.slots[0]);
-		verlet(group, anchor, dt);
+		const targets = [anchor, ...group.slots.map((slot) => readB(pose, slot))];
+		verlet(group, anchor, targets, dt);
+		let maximumTargetDeviation = 0;
+		for (let i = 1; i < group.particles.length; i++) {
+			maximumTargetDeviation = Math.max(maximumTargetDeviation, length(sub(group.particles[i], targets[i])));
+		}
 		for (let i = 0; i < group.slots.length; i++) {
 			writeSegment(pose, group.slots[i], group.particles[i], group.particles[i + 1]);
 		}
@@ -137,6 +158,8 @@ export function stepRopes(state, pose, dt) {
 			anchor: group.particles[0].slice(),
 			expectedAnchor: anchor.slice(),
 			speedSum: group.speedSum,
+			followStrength: group.followStrength,
+			maximumTargetDeviation,
 			firstSlot: group.slots[0],
 			lastSlot: group.slots[group.slots.length - 1],
 			particles: group.particles.map((p) => p.slice()),

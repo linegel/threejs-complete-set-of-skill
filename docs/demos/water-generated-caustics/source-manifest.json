@@ -18,7 +18,7 @@
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:904ae4eb1bfed1d75e9af4505351b2c78a67c3de108c463dea9238dacf1e6b89",
+  "sourceHash": "sha256:b839742fd56ef63d6196c30c354357b27cc1805b46dbea9587a08df3d1c00495",
   "publishedHashInputs": [
     "docs/demos/water-generated-caustics",
     "docs/demos/assets/OrbitControls-CJtJSLBE.js",
@@ -94,8 +94,8 @@
     "docs/demos/assets/weather-map-b-BdrawmJ-.png",
     "docs/demos/assets/weather-map-c-CZsKB9yR.png"
   ],
-  "publishedBundleHash": "sha256:2a878edc7da83b2f73d80b0193ce544544485bd6d855bf9fbde6e0936a1bbd6b",
+  "publishedBundleHash": "sha256:fca09213424a2967f763f0262418c3edde45d823bb815e14f6624dd6add7e340",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }

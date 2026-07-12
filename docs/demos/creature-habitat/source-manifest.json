@@ -63,44 +63,44 @@
     "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
   ],
   "browserEntry": "integration-labs/creature-habitat/index.html",
-  "sourceHash": "sha256:4e0f768c182c289032ff33410988460cb789d950f8241e747d8766c1f98e5236",
+  "sourceHash": "sha256:25111e22bb87efc41efa764b6c83539ed526cb68c79f27571550502c285dc7a7",
   "publishedHashInputs": [
     "docs/demos/creature-habitat",
     "docs/demos/assets/CameraDirectionController-BW_oil0e.js",
     "docs/demos/assets/dense-grass-system-DLdt83Sf.js",
-    "docs/demos/assets/index-DaYWIlwO.js",
+    "docs/demos/assets/index-FjDRVpQe.js",
     "docs/demos/assets/index-KefgGsrN.css",
     "docs/demos/assets/integration-adapter-DJwgA3KT.js",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
     "docs/demos/assets/meadow-density-b-hrBezR3V.png",
     "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/pose-storage-CvIYfGBz.js",
+    "docs/demos/assets/pose-storage-BtQJsU6J.js",
     "docs/demos/assets/precipitation-system-CxUv8UiU.js",
     "docs/demos/assets/three.tsl-0l0bfIsw.js",
     "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
     "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js",
-    "docs/demos/assets/webgpu-bounded-water-BkZeiMWD.js"
+    "docs/demos/assets/webgpu-bounded-water-BN4VBzH1.js"
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/CameraDirectionController-BW_oil0e.js",
     "docs/demos/assets/dense-grass-system-DLdt83Sf.js",
-    "docs/demos/assets/index-DaYWIlwO.js",
+    "docs/demos/assets/index-FjDRVpQe.js",
     "docs/demos/assets/index-KefgGsrN.css",
     "docs/demos/assets/integration-adapter-DJwgA3KT.js",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
     "docs/demos/assets/meadow-density-b-hrBezR3V.png",
     "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/pose-storage-CvIYfGBz.js",
+    "docs/demos/assets/pose-storage-BtQJsU6J.js",
     "docs/demos/assets/precipitation-system-CxUv8UiU.js",
     "docs/demos/assets/three.tsl-0l0bfIsw.js",
     "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
     "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js",
-    "docs/demos/assets/webgpu-bounded-water-BkZeiMWD.js"
+    "docs/demos/assets/webgpu-bounded-water-BN4VBzH1.js"
   ],
-  "publishedBundleHash": "sha256:773a3e286cd70952daded02e00d472f68bd78dfa8ff65f6698719293377cd6dc",
+  "publishedBundleHash": "sha256:25aaf9a93bd02ff7943dcd7574ae5c281d8f4c5326e262e4563a3dfe0c5c29df",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:875aca6c18206af65a378ec51c53a551b40b7a8e0aa934a9602b4c534cee3528",
+  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
   "evidenceBundleId": null
 }
