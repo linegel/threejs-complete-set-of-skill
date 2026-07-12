@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { remoteRuntimeAssetViolations } from './lib/site-runtime-assets.mjs';
 import { validateEvidenceReportManifest } from './lib/evidence-report-validation.mjs';
+import { buildSiteRoutePresentation } from './lib/site-route-presentation.mjs';
+import { authoritativeSiteSkillSlugs } from './lib/site-skill-roster.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,6 +22,13 @@ const previewManifest = JSON.parse(readFileSync(join(docs, 'previews', 'manifest
 const skillManifest = JSON.parse(rootSkillsText);
 const evidencePreviewConfig = JSON.parse(readFileSync(join(root, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
 const evidenceReportManifest = JSON.parse(readFileSync(join(docs, 'evidence', 'manifest.json'), 'utf8'));
+const routerFixtures = JSON.parse(readFileSync(join(
+  root,
+  'threejs-choose-skills',
+  'examples',
+  'router-manifest-lab',
+  'router-fixtures.json',
+), 'utf8'));
 const errors = [];
 
 const htmlFilesUnder = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -52,10 +61,13 @@ const sameLabImageSourceId = (urlString) => {
     ?? null;
 };
 
-const primary = registry.demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
+const authoritativeSkillSlugs = authoritativeSiteSkillSlugs(registry, PRIMARY_DEMO_KINDS);
+const siteDemos = registry.demos.filter((demo) => authoritativeSkillSlugs.has(demo.skill));
+const primary = siteDemos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
+const secondary = siteDemos.filter((demo) => !PRIMARY_DEMO_KINDS.includes(demo.kind));
 const canonical = primary.filter((demo) => demo.kind === 'canonical-lab');
 const accepted = primary.filter((demo) => demo.status === 'accepted');
-const loadable = primary.filter((demo) => demo.publishPath && (
+const entrypointTargets = primary.filter((demo) => demo.publishPath && (
   demo.nonRenderingScenarioSuite || (demo.browserEntry && existsSync(join(root, demo.browserEntry)))
 ));
 const flagships = registry.integrationIds.map((id) => registry.demos.find((demo) => demo.id === id)).filter(Boolean);
@@ -80,6 +92,7 @@ const requiredLocalAssets = [
   'assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2',
 ];
 const evidenceReportUrl = (labId) => `${site}evidence/${labId}/`;
+const oceanPlanetRoute = buildSiteRoutePresentation(routerFixtures, 'ocean-planet');
 
 for (const asset of requiredLocalAssets) {
   assert(existsSync(join(docs, asset)), `required local presentation asset is missing: ${asset}`);
@@ -90,9 +103,9 @@ for (const htmlPath of htmlFilesUnder(docs)) {
   errors.push(...remoteRuntimeAssetViolations(html, relative));
 }
 
-assert(registry.counts.skills === skillManifest.skills.length, 'registry skill count does not match the published skill manifest');
+assert(registry.skillsExpected === skillManifest.skills.length, 'authoritative skill count does not match the published skill manifest');
 assert(primary.length === registry.counts.primary, 'primary demo count does not match registry counts');
-assert(loadable.length === primary.length, `${primary.length - loadable.length} primary implementation(s) are not loadable`);
+assert(entrypointTargets.length === primary.length, `${primary.length - entrypointTargets.length} primary target(s) lack declared entrypoints`);
 const canonicalSkillNames = new Set(canonical.map((demo) => demo.skill));
 const skillsWithoutCanonicalLabs = skillManifest.skills.filter((skill) => !canonicalSkillNames.has(skill.name));
 assert(skillsWithoutCanonicalLabs.length === 0, `skills lack canonical labs: ${skillsWithoutCanonicalLabs.map((skill) => skill.name).join(', ')}`);
@@ -105,14 +118,15 @@ assert(skillManifest.coverageSummary, 'skills.json has no coverageSummary');
 const summary = skillManifest.coverageSummary ?? {};
 assert(summary.threeRevision === registry.threeRevision, 'coverageSummary Three.js revision drift');
 assert(summary.buildRevision === registry.buildRevision, 'coverageSummary build revision drift');
-assert(summary.skills === registry.counts.skills, 'coverageSummary skill count drift');
+assert(summary.skills === registry.skillsExpected, 'coverageSummary skill count drift');
 assert(summary.primaryImplementations === primary.length, 'coverageSummary primary count drift');
-assert(summary.loadablePrimaryImplementations === loadable.length, 'coverageSummary loadable count drift');
+assert(summary.declaredEntrypointPrimaryTargets === entrypointTargets.length, 'coverageSummary declared entrypoint count drift');
 assert(summary.canonicalLabs === canonical.length, 'coverageSummary canonical count drift');
 assert(summary.crossSkillFlagships === flagships.length, 'coverageSummary flagship count drift');
 assert(summary.focusedSupportPrimaries === support.length, 'coverageSummary support count drift');
 assert(summary.acceptedPrimary === accepted.length, 'coverageSummary accepted count drift');
 assert(summary.pendingPrimary === primary.length - accepted.length, 'coverageSummary pending count drift');
+assert(summary.secondaryRecords === secondary.length, 'coverageSummary secondary count drift');
 assert(summary.routes?.declaredContracts === routes.length, 'coverageSummary declared route count drift');
 assert(summary.routes?.uniquePublishedPaths === uniqueRoutes.size, 'coverageSummary unique route count drift');
 
@@ -122,8 +136,8 @@ for (const route of uniqueRoutes) {
 }
 
 for (const phrase of [
-  `${primary.length} working implementations`,
-  `${canonical.length} canonical labs`,
+  `${primary.length} primary targets`,
+  `${canonical.length} canonical targets`,
   `${flagships.length} cross-skill flagships`,
   'Build ambitious <em>Three.js scenes.</em>',
   'Find the right skill',
@@ -143,6 +157,17 @@ assert(!homepage.includes('class="card-index'), 'homepage presents decorative ca
 assert(!homepage.includes('class="rail-track'), 'homepage presents acceptance as a decorative progress track');
 assert(!homepage.includes('class="rail-fill'), 'homepage presents acceptance as a decorative progress fill');
 assert(!homepage.includes('.hero:before'), 'homepage uses a decorative hero pseudo-element');
+assert(!homepage.includes('.hero-showcase:before'), 'homepage uses a decorative showcase pseudo-element');
+assert(!homepage.includes('demos/shared/generated-variants/caustic-field-a.png'), 'homepage uses unrelated generated caustics as hero media');
+assert(!/\bworking implementations\b/i.test(homepage), 'homepage inflates primary targets into working implementations');
+assert(!/\ball \d+ primary targets are loadable\b/i.test(homepage), 'homepage claims all primary targets are loadable without runtime proof');
+assert(homepage.includes(`data-route-fixture="${oceanPlanetRoute.id}"`), 'homepage does not bind the hero route to its router fixture');
+assert(homepage.includes(`data-primary-owner="${oceanPlanetRoute.primaryOwner}"`), 'homepage hero route primary owner drift');
+const publishedOceanRoute = [...homepage.matchAll(/data-route-skill="([^"]+)"/g)].map((match) => match[1]);
+assert(
+  JSON.stringify(publishedOceanRoute) === JSON.stringify(oceanPlanetRoute.selectedSkills.map((skill) => skill.id)),
+  'homepage ocean route order drifted from the canonical router fixture',
+);
 assert((homepage.match(/data-preview-for=/g) ?? []).length >= primary.length, 'homepage does not attach preview media to every primary lab card');
 assert(!homepage.includes('data-preview-classification="related-'), 'homepage reuses related-skill media as a primary preview');
 assert(!/\brunnable examples\b/i.test(homepage), 'homepage still uses directory-derived runnable-example language');
@@ -296,7 +321,7 @@ for (const demo of flagships) {
   assert(origin?.ownerSkills?.length > 1, `flagship ${demo.id} has no cross-skill owner set`);
 }
 
-for (const demo of registry.demos.filter((entry) => (
+for (const demo of siteDemos.filter((entry) => (
   entry.publishPath
   && (PRIMARY_DEMO_KINDS.includes(entry.kind) || ['proxy-demo', 'generated-asset-demo'].includes(entry.kind))
 ))) {
@@ -336,6 +361,7 @@ for (const skill of skillManifest.skills) {
     `${skill.name} first primary card does not link its first canonical lab`,
   );
   const ownedPrimaryIds = new Set(primary.filter((demo) => demo.skill === skill.name).map((demo) => demo.id));
+  const ownedPrimary = primary.filter((demo) => demo.skill === skill.name);
   const participatingFlagshipIds = new Set(flagships
     .filter((demo) => registry.origins[demo.id]?.ownerSkills?.includes(skill.name))
     .map((demo) => demo.id));
@@ -354,6 +380,11 @@ for (const skill of skillManifest.skills) {
   assert(!page.includes('class="hero-preview-badge'), `${skill.name} overlays a decorative badge on hero evidence`);
   assert(!page.includes('class="preview-missing'), `${skill.name} presents missing evidence as a visual placeholder`);
   assert(page.includes('Preview and evidence ledger'), `${skill.name} page has no preview/evidence ledger`);
+  if (ownedPrimary.length > 0 && ownedPrimary.every((demo) => demo.executionClass === 'non-rendering')) {
+    assert(page.includes('non-rendering scenario suite'), `${skill.name} does not identify its non-rendering acceptance surface`);
+    assert(page.includes('rather than GPU pixels'), `${skill.name} incorrectly implies that GPU pixels prove its scenario suite`);
+    assert(!page.includes('rendering acceptance still requires same-lab readback'), `${skill.name} applies rendering evidence copy to a non-rendering suite`);
+  }
   assert(
     page.includes('data-preview-classification=') || page.includes('data-evidence-state='),
     `${skill.name} page has neither classified preview media nor an evidence-status panel`,
@@ -410,5 +441,5 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Validated site presentation: ${registry.counts.skills} skills, ${primary.length} primary implementations, ${flagships.length} flagships, ${uniqueRoutes.size} unique primary URLs.`);
+  console.log(`Validated site presentation: ${authoritativeSkillSlugs.size} skills, ${primary.length} primary targets, ${flagships.length} flagships, ${uniqueRoutes.size} unique primary URLs.`);
 }
