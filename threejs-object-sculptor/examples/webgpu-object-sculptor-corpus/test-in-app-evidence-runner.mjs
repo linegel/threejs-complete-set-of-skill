@@ -244,40 +244,64 @@ await assert.rejects(
     && error.errors[2] === resetError,
 );
 
-const evidenceJson = `${JSON.stringify(documentRecord)}\n`;
-const artifacts = new Map(routes.flatMap((route, routeIndex) => (
-  Object.values(route.readback.artifacts).map((artifact, representationIndex) => [
+const tarRoutes = structuredClone(routes);
+const artifacts = new Map(tarRoutes.flatMap((route) => (
+  Object.values(route.readback.artifacts).map((artifact) => [
     artifact.path,
-    new Uint8Array(artifact.byteLength).fill(routeIndex + representationIndex + 1),
+    artifact.byteLength === 4
+      ? Uint8Array.of(Number.parseInt(artifact.sha256.slice(-2), 16), 0, 0, 0)
+      : new Uint8Array(artifact.byteLength),
   ])
 )));
+for (const route of tarRoutes) {
+  for (const artifact of Object.values(route.readback.artifacts)) {
+    artifact.sha256 = createHash("sha256").update(artifacts.get(artifact.path)).digest("hex");
+    if (artifact.layout.startsWith("renderer-transport")) route.readback.transportSha256 = artifact.sha256;
+    else route.readback.normalizedSha256 = artifact.sha256;
+  }
+}
+const tarDocument = buildRouteEvidenceDocument({
+  bundleId: "corpus-bundle-tar-test",
+  runId: "corpus-routes-tar-test",
+  captureSession,
+  routes: tarRoutes,
+});
+const tarEvidenceJson = `${JSON.stringify(tarDocument)}\n`;
 assert.equal(artifacts.size, CORPUS_IN_APP_ROUTE_PLAN.length * 2);
-const tar = buildRouteEvidenceTar({ evidenceJson, artifacts });
+const tar = await buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts });
 assert.equal(tar.byteLength % 512, 0);
 assert.equal(new TextDecoder().decode(tar.subarray(0, 27)), "route-runtime-evidence.json");
 assert(tar.subarray(-1024).every((byte) => byte === 0));
 assert.equal(CORPUS_ROUTE_EVIDENCE_TAR_FILENAME, "route-runtime-evidence.tar");
-assert.throws(
-  () => buildRouteEvidenceTar({ evidenceJson, artifacts, maxBytes: 512 }),
+await assert.rejects(
+  buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts, maxBytes: 512 }),
   /safety bound/,
 );
-assert.throws(
-  () => buildRouteEvidenceTar({ evidenceJson, artifacts: new Map([["../escape.bin", Uint8Array.of(1)]]) }),
+await assert.rejects(
+  buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts: new Map([["../escape.bin", Uint8Array.of(1)]]) }),
   /confined route-readback namespace/,
 );
-assert.throws(
-  () => buildRouteEvidenceTar({ evidenceJson, artifacts: new Map([["route-readbacks/scenario-articulated-desk-lamp.rgba8unorm.bin", Uint8Array.of(1)]]) }),
+await assert.rejects(
+  buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts: new Map([["route-readbacks/scenario-articulated-desk-lamp.rgba8unorm.bin", Uint8Array.of(1)]]) }),
   /confined route-readback namespace/,
 );
-assert.throws(
-  () => buildRouteEvidenceTar({ evidenceJson, artifacts: new Map([["route-readbacks/normalized/scenario-articulated-desk-lamp.png", Uint8Array.of(1)]]) }),
+await assert.rejects(
+  buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts: new Map([["route-readbacks/normalized/scenario-articulated-desk-lamp.png", Uint8Array.of(1)]]) }),
   /confined route-readback namespace/,
 );
 const missingArtifact = new Map(artifacts);
 missingArtifact.delete(routes[0].readback.artifacts.transport.path);
-assert.throws(
-  () => buildRouteEvidenceTar({ evidenceJson, artifacts: missingArtifact }),
+await assert.rejects(
+  buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts: missingArtifact }),
   /exactly 30 referenced readback artifacts/,
+);
+const substitutedArtifact = new Map(artifacts);
+const substitutedPath = tarRoutes[0].readback.artifacts.transport.path;
+substitutedArtifact.set(substitutedPath, new Uint8Array(substitutedArtifact.get(substitutedPath).byteLength).fill(0xff));
+await assert.rejects(
+  buildRouteEvidenceTar({ evidenceJson: tarEvidenceJson, artifacts: substitutedArtifact }),
+  /declared SHA-256 digest/,
+  "same-length substituted readback bytes must not enter the evidence TAR",
 );
 
 console.log(JSON.stringify({
@@ -285,7 +309,7 @@ console.log(JSON.stringify({
   routeRecords: routes.length,
   query: CORPUS_ROUTE_EVIDENCE_QUERY,
   exactDocumentKeys: Object.keys(documentRecord),
-  negativeCases: 16,
+  negativeCases: 17,
   digestParity: true,
   tarBytes: tar.byteLength,
 }, null, 2));

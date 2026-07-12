@@ -43,8 +43,8 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence-runner.js",
-    "sha256": "de8398967101d3b1e40db6bf06305faccbceb798729fab4e939c199703dfe268",
-    "byteLength": 28524
+    "sha256": "ddfe97944cfdc97582cbf42240f1c5abc423609f14b24c42dea6f4b91e8efaf8",
+    "byteLength": 28530
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.css",
@@ -83,8 +83,8 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-document.js",
-    "sha256": "cc1d82f66cdfc16ade5cdef5069060066e3143b6cdd23d5b1680ab582042a349",
-    "byteLength": 14286
+    "sha256": "ba9ac5c86a5119522ac281d99ccc7a44527f02368d369b2c1f9b6d713f1ca48c",
+    "byteLength": 14836
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-plan.js",
@@ -117,7 +117,7 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
     "byteLength": 40108
   }
 ].map((entry) => Object.freeze(entry)));
-export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "d1a6047439b0d6a37f66e1c64b17b0714f60f1ec6b97049d1a464ddbde7def7c";
+export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "fc6f2e55c0a9da64059182508fd0a8989def013494f10bf9dbdeb9685a0db4b4";
 export const CORPUS_TRUSTED_ROUTE_HTML_SHA256_BY_ROUTE_ID = Object.freeze({
   "scenario:articulated-desk-lamp": "a648f2c0b779c9978051e957a02fd1cf0b699f58eade01235b65f338a5f8609a",
   "scenario:potted-bonsai": "ba6b7d70751b740c5fe60b84cc540c3060297a3074f0fc8ec175b3b34b70a1f4",
@@ -223,7 +223,7 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence-runner.js",
-      "sha256": "de8398967101d3b1e40db6bf06305faccbceb798729fab4e939c199703dfe268"
+      "sha256": "ddfe97944cfdc97582cbf42240f1c5abc423609f14b24c42dea6f4b91e8efaf8"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/in-app-evidence.css",
@@ -271,7 +271,7 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-document.js",
-      "sha256": "cc1d82f66cdfc16ade5cdef5069060066e3143b6cdd23d5b1680ab582042a349"
+      "sha256": "ba9ac5c86a5119522ac281d99ccc7a44527f02368d369b2c1f9b6d713f1ca48c"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/route-evidence-plan.js",
@@ -357,11 +357,11 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     }
   ],
   "threeRevision": "0.185.1",
-  "sourceHash": "07ce661eeb798dc005b52d8d0d10c2e676c318ec1d8bb028e8335edff7117b6d",
-  "buildRevision": "source-sha256:07ce661eeb798dc005b52d8d0d10c2e676c318ec1d8bb028e8335edff7117b6d"
+  "sourceHash": "da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f",
+  "buildRevision": "source-sha256:da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f"
 });
-export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_SHA256 = "07ce661eeb798dc005b52d8d0d10c2e676c318ec1d8bb028e8335edff7117b6d";
+export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_SHA256 = "da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f";
 export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION = "0.185.1";
 export const CORPUS_EXECUTABLE_SOURCE_THREE_REVISION = CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION;
-export const CORPUS_CAPTURE_SOURCE_HASH = "07ce661eeb798dc005b52d8d0d10c2e676c318ec1d8bb028e8335edff7117b6d";
-export const CORPUS_CAPTURE_BUILD_REVISION = "source-sha256:07ce661eeb798dc005b52d8d0d10c2e676c318ec1d8bb028e8335edff7117b6d";
+export const CORPUS_CAPTURE_SOURCE_HASH = "da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f";
+export const CORPUS_CAPTURE_BUILD_REVISION = "source-sha256:da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f";

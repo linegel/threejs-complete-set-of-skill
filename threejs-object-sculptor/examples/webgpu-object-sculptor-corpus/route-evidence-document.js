@@ -227,7 +227,13 @@ function tarEntry(path, bytes) {
   return entry;
 }
 
-export function buildRouteEvidenceTar({ evidenceJson, artifacts, maxBytes = CORPUS_ROUTE_EVIDENCE_MAX_TAR_BYTES } = {}) {
+async function sha256Hex(bytes) {
+  if (!globalThis.crypto?.subtle) throw new Error("Web Crypto SHA-256 is required for route evidence TAR export");
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export async function buildRouteEvidenceTar({ evidenceJson, artifacts, maxBytes = CORPUS_ROUTE_EVIDENCE_MAX_TAR_BYTES } = {}) {
   if (typeof evidenceJson !== "string" || evidenceJson.length === 0) throw new TypeError("Evidence JSON is required for TAR export");
   if (!(artifacts instanceof Map)) throw new TypeError("Evidence TAR artifacts must be a Map");
   for (const [path, bytes] of artifacts) {
@@ -259,6 +265,7 @@ export function buildRouteEvidenceTar({ evidenceJson, artifacts, maxBytes = CORP
       if (!ROUTE_READBACK_PATH_PATTERN.test(artifact?.path)
         || !Number.isSafeInteger(artifact.byteLength)
         || artifact.byteLength <= 0
+        || !/^[a-f0-9]{64}$/.test(artifact.sha256 ?? "")
         || referencedArtifacts.has(artifact.path)) {
         throw new Error(`Evidence TAR ${route.routeId} ${representation} artifact reference is invalid or duplicated`);
       }
@@ -273,6 +280,9 @@ export function buildRouteEvidenceTar({ evidenceJson, artifacts, maxBytes = CORP
     const bytes = artifacts.get(path);
     if (!bytes || bytes.byteLength !== reference.byteLength) {
       throw new Error(`Evidence TAR artifact ${path} is missing or has the wrong byte length`);
+    }
+    if (await sha256Hex(bytes) !== reference.sha256) {
+      throw new Error(`Evidence TAR artifact ${path} bytes do not match its declared SHA-256 digest`);
     }
   }
   const entries = [tarEntry(CORPUS_ROUTE_EVIDENCE_FILENAME, new TextEncoder().encode(evidenceJson))];

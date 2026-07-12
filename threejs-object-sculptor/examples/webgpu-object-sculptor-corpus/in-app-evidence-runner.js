@@ -590,7 +590,7 @@ async function runEvidence() {
     if (evidenceArtifacts.size !== CORPUS_IN_APP_ROUTE_PLAN.length * 2) {
       throw new Error(`Route evidence requires exactly ${CORPUS_IN_APP_ROUTE_PLAN.length * 2} retained readback artifacts`);
     }
-    evidenceTar = buildRouteEvidenceTar({ evidenceJson, artifacts: evidenceArtifacts });
+    evidenceTar = await buildRouteEvidenceTar({ evidenceJson, artifacts: evidenceArtifacts });
     window.__CORPUS_ROUTE_EVIDENCE_RESULT__ = documentRecord;
     publishArtifactApi();
     outputJson.textContent = evidenceJson;
