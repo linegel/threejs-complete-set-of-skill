@@ -1,159 +1,109 @@
-# Native WebGPU Validation Harness
+# Native WebGPU validation harness
 
-This directory contains two deliberately separate surfaces:
+This lab has one canonical evidence contract: the checked
+`labs/schema/evidence-bundle-v2.schema.json` manifest plus its semantic and
+byte-ledger reconciliation. Runtime capture is performed only in Codex's
+in-app Browser from an immutable production build.
 
-- `index.html` is the canonical native-WebGPU subject. It initializes
-  `WebGPURenderer`, rejects a non-WebGPU backend, renders a real NodeMaterial
-  scene through one `RenderPipeline` and an `output + normal + emissive` MRT,
-  and exposes the required `LabController` as `window.__THREEJS_LAB__`.
-- the Node generators are **contract fixtures**. They test schema transport and
-  mutations. Their synthetic images, authored timing sentinels, and one-cycle
-  lifecycle records are permanently `bundleKind: "contract-fixture"`,
-  `publishable: false`, and all claim verdicts are `NOT_CLAIMED`.
+The three capture lanes are deliberately separate:
 
-The fixture can never satisfy canonical acceptance. Only evidence captured
-from the browser subject's render targets can do that.
+- `correctness`: native-WebGPU readbacks, fixed states, standard images and
+  correctness diagnostics;
+- `physical-route`: all 19 locked scenario/mechanism/tier routes, disposal and
+  exact served-byte proof;
+- `performance`: hardware-only cold, cadence, timestamp, sustained and governor
+  populations.
 
-A real browser run may be assembled as
-`bundleKind: "browser-capture-incomplete"` with `publishable: false` while one
-or more required claims remain `INSUFFICIENT_EVIDENCE`. This is an inspectable
-runtime bundle, not accepted evidence. `bundleKind: "browser-capture"` is
-reserved for a publishable bundle whose five required claims are all `PASS`.
+Every raw lane remains `bundleKind: "raw-capture-session"` and
+`publishable: false`. Offline promotion copies the finalized lane documents and
+write ledgers into a separate `release-bundle`, reconciles source/build/Three,
+route, browser, adapter, device, OS, refresh, color and limitation identities,
+and binds an authored direct visual review. Capture never promotes itself.
+
+Schema-v1 evidence remains readable only as explicitly nonpublishable migration
+input. The former incompatible v2 browser-capture manifest is not dispatched by
+the canonical validator.
 
 ## Commands
 
 ```bash
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run check
-npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:v1
-npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:v2
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run test:routes
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run test:physical
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run test:mutations
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:v2
 npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full
-npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture -- --profile correctness
-npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture -- --profile performance
 ```
 
-`validate:v1` retains the migration reader for old bundles. A v1 result is
-always returned as non-publishable fixture evidence by
-`src/schema/dispatcher.js`.
+To collect evidence:
 
-`validate:v2` writes a fixture under `/tmp`, validates all fourteen v2 JSON
-artifacts and standard images, then runs the blocking mutation suite.
+```bash
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run capture
+```
 
-`validate:artifacts` and `validate:full` require a native browser bundle at
-`artifacts/visual-validation/webgpu-validation-harness/correctness` (or
-`LAB_EVIDENCE_DIR`). They intentionally exit nonzero with
-`INSUFFICIENT_EVIDENCE` while only fixtures exist. `validate:quick` remains
-browser-free.
+The command builds a unique sibling staging directory outside the repository,
+validates every staged byte, atomically renames it to its content-addressed
+final directory, starts an exact-byte HTTP server, and prints the runner URL and
+served-byte ledger. It does not launch a browser. Open the printed
+`/src/in-app-evidence.html` URL using Codex's in-app Browser.
 
-The correctness `capture` profile writes the ten standard PNGs under
-`images/`, assembles all fourteen JSON artifacts from live controller and
-readback facts, validates the result as `browser-capture-incomplete`, and keeps
-it non-publishable. `validate:artifacts` continues to reject that bundle until
-mechanism, sustained performance, GPU attribution, and lifecycle verdicts all
-become `PASS` from their required runs.
+The runner rejects WebDriver/headless execution and offers independent buttons
+for correctness, physical-route and performance records. Import each downloaded
+record with the served-byte ledger and immutable build directory:
 
-The performance profile first captures the same 1200x800 correctness set, then
-captures `final.performance.png` at 1920x1080 and measures 30 warm-up frames,
-120 individually resolved WebGPU render timestamps, 120 CPU submission
-samples, and 119 `requestAnimationFrame` cadence intervals. Timestamp mapping
-is disabled during the cadence window so the presentation samples describe
-rendering cadence rather than readback stalls. The subject owns the exact
-adapter/device request, serializes its allowlisted identity, features, and
-limits, and attributes each sustained frame to the scene MRT and final-output
-render contexts. Their sum must reconcile with the frame total within 0.001
-ms. The profile remains non-publishable until mechanism proof and visual
-sign-off are present. A measured total-frame budget overrun is still reported as
-`FAIL` immediately instead of being hidden behind `INSUFFICIENT_EVIDENCE`.
+```bash
+npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run physical:import -- \
+  --record /absolute/session.json \
+  --ledger /absolute/served.ndjson \
+  --build /absolute/sha256-build \
+  --out /absolute/finalized-session.json
+```
 
-The same performance capture runs six measured governor windows with 30 GPU
-timestamps each. The two-state controller uses a two-window minimum residence,
-a 2 ms upgrade hysteresis, and a two-window cooldown. It passes only after the
-trace settles without alternating transition directions; fast adapters may
-correctly remain at `target-performance`, while over-budget adapters degrade to
-`governor-stress` and must remain stable there. Acceptance checks both a
-whole-frame mean RGB error and a p95 RGB error over a reference-gradient edge
-mask, so unchanged background pixels cannot hide unacceptable tier blur.
+Keep imported raw records outside the repository until the offline release join
+and direct visual review are complete.
+
+## Immutable build and serving rules
+
+- Source closure includes the lab, checked evidence/runtime-graph schemas,
+  aligned-readback implementation, registry inputs and exact package locks.
+- The content address binds source closure, registry build revision and Three
+  revision.
+- Build output is written to a unique sibling staging directory. The manifest
+  and file ledger are validated there before one atomic directory rename.
+- No destination is emptied or overwritten. A failed staging directory is
+  retained for forensic inspection; no deletion is attempted.
+- The server performs no transform, redirect, route fallback or SPA fallback.
+  Every 200 response is hashed and appended to the served-byte ledger.
+
+## Evidence contract
+
+`validate:v2`, artifact validation and offline promotion all consume the same
+checked schema and semantic contract. A release must contain:
+
+- separate finalized correctness and physical-route sessions;
+- a hardware timestamped performance session when performance or GPU
+  attribution is `PASS`;
+- the fourteen normative JSON artifacts;
+- the ten standard image slots, each captured or structurally proved
+  inapplicable;
+- captured and hash-distinct final and diagnostic images;
+- byte-accurate session-document, write-ledger, file and image references;
+- recomputed route, limitation, claims, session-set, artifact, image, promotion
+  and visual-review digests;
+- approved review of every applicable standard image before publication.
+
+Missing evidence is `INSUFFICIENT_EVIDENCE`. Contradictory, malformed, stale or
+cross-bound evidence is `FAIL`. Software timing is diagnostic only, and Browser
+cadence is never relabelled as GPU attribution or compositor presentation.
 
 ## Browser subject
 
-Serve the repository through the root Vite toolchain and open this directory's
-`index.html`. The URL accepts fixed startup controls:
+The immutable subject initializes `WebGPURenderer`, requires the native WebGPU
+backend, renders a real NodeMaterial scene through one RenderPipeline, and
+exposes `window.__THREEJS_LAB__`. Fixed route wrappers live under
+`mechanism/<id>/` and `tier/<id>/`; each wrapper rejects state drift.
 
-```text
-?scenario=browser-capture&tier=webgpu-correctness&mode=final&camera=design&seed=1
-```
-
-Valid scenarios are:
-
-```text
-browser-capture
-pipeline-graph-inspector
-resource-ledger
-timing-and-governor
-lifecycle-and-leaks
-visual-error-metrics
-mutation-gallery
-artifact-inspector
-```
-
-Valid modes are `final`, `no-post`, `normal`, and `emissive`. The debug modes
-replace the actual `RenderPipeline.outputNode` and set
-`renderPipeline.needsUpdate = true`; they are not labels over the final image.
-
-The controller supports deterministic camera, tier, seed, time, step, resize,
-history-reset, render, readback, pipeline-description, resource-description,
-metrics, and disposal operations. Unknown scenario, mode, tier, seed, or camera
-values throw.
-
-Every declared mechanism and tier also has a physical wrapper under
-`mechanism/<id>/index.html` or `tier/<id>/index.html`. Wrappers import the same
-canonical subject through `src/locked-route.js`; their exposed controller
-rejects attempts to change the locked scenario, mode, or tier.
-
-## Capture invariants
-
-- correctness: 1200×800 at DPR 1;
-- odd-size readback: 641×359;
-- fixed seeds: `0x00000001` and `0x9e3779b9`;
-- render-target pixels, never a page screenshot, prove WebGPU output;
-- row pitch is an integer aligned to 256 bytes and is unpacked explicitly;
-- final, no-post, normal, and emissive are distinct graph routes;
-- GPU timestamp failure is `INSUFFICIENT_EVIDENCE`, never zero or `SKIP`;
-- lifecycle evidence requires 50–100 fresh create/render/resize/mode/tier/
-  dispose cycles.
-
-The current manifest stays `incomplete` until the browser capture, timestamp
-sufficiency decision, and lifecycle run have produced a real v2 bundle on the
-current adapter. Static and fixture tests do not change that status.
-
-## Blocking mutations
-
-`src/v2-self-test.js` proves rejection of:
-
-```text
-missing-label
-final-only-evidence
-false-diagnostic-route
-stale-pipeline-graph
-missing-timestamp
-publishable-with-insufficient-claim
-p95-overrun
-gpu-p95-overrun
-deadline-overrun
-missing-stage-attribution
-governor-oscillation
-governor-performance-overrun
-governor-visual-overrun
-governor-edge-visual-overrun
-visual-error-overrun
-target-leak
-storage-leak
-unconfined-path
-bad-padded-stride
-duplicate-output-owner
-baseline-equals-candidate
-```
-
-Mutation fixtures remain in the operating-system temp directory for forensic
-inspection; the suite performs no recursive forced deletion.
+Readbacks retain the actual integer WebGPU row stride, raw copy format, resource
+format, origin, compact bytes, normalized padded bytes and hashes. Diagnostic
+modes replace the actual output node and mark the graph dirty; they are not
+labels over a final screenshot.

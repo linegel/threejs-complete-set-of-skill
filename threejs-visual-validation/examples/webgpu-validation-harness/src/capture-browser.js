@@ -1,33 +1,17 @@
 import { fileURLToPath } from 'node:url';
 
-import { captureLabBrowser } from '../../../../scripts/capture-lab-browser.mjs';
-import { resolveValidationBundleDirectory } from './artifact-paths.js';
+import { startImmutablePhysicalServer } from './immutable-physical-server.js';
 
-function option( name, fallback ) {
+if ( process.argv[ 1 ] === fileURLToPath( import.meta.url ) ) {
 
-	const index = process.argv.indexOf( name );
-	return index === - 1 ? fallback : process.argv[ index + 1 ];
+	const result = await startImmutablePhysicalServer();
+	process.stdout.write( `${ JSON.stringify( {
+		automationSurface: 'codex-in-app-browser',
+		url: `http://${ result.host }:${ result.port }/src/in-app-evidence.html`,
+		buildDirectory: result.immutableBuild.directory,
+		servedByteLedger: result.ledgerPath,
+		publishable: false,
+		note: 'Open the URL only in Codex in-app Browser; the server never launches a browser.'
+	}, null, 2 ) }\n` );
 
 }
-
-const profile = option( '--profile', 'correctness' );
-const outputDir = resolveValidationBundleDirectory( {
-	bundle: 'raw',
-	profile,
-	override: option( '--out', null )
-} );
-const record = await captureLabBrowser( {
-	labId: 'webgpu-validation-harness',
-	profile,
-	outputDir,
-	hookPath: fileURLToPath( new URL( '../capture-hook.mjs', import.meta.url ) ),
-	target: 'final'
-} );
-
-console.log( JSON.stringify( {
-	labId: record.labId,
-	profile: record.profile,
-	outputDir,
-	adapterClass: record.adapterClass,
-	hookResult: record.hookResult
-}, null, 2 ) );
