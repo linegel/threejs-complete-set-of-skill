@@ -29,6 +29,7 @@ import {
   LAB_CONTROLLER_GLOBALS,
   awaitLockedRouteController,
   lockedRouteContract,
+  lockedRouteSelectionMatchesWithKeys,
   plannedPublishedRoutes,
 } from './lib/page-routes.mjs';
 import { computePublishedBundleHash, publishedHashInputs } from './lib/published-pages.mjs';
@@ -438,7 +439,8 @@ function routeWrapper({ lab, routeKind, routeId, startup, canonicalDir }) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="lab-${routeKind}" content="${routeId}">
+  <meta name="lab-id" content="${escapeHtml(lab.id)}">
+  <meta name="lab-${escapeHtml(routeKind)}" content="${escapeHtml(routeId)}">
   <meta name="description" content="Fixed ${routeKind} state for ${escapeHtml(demoTitle(lab))}; the canonical interactive demo contains the indexable content.">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="${canonicalUrl}">
@@ -458,6 +460,7 @@ function routeWrapper({ lab, routeKind, routeId, startup, canonicalDir }) {
     const startupAcknowledgementKeys = ${JSON.stringify(startupAcknowledgementKeys)};
     const controllerGlobals = ${JSON.stringify(LAB_CONTROLLER_GLOBALS)};
     const awaitLockedRouteController = ${awaitLockedRouteController.toString()};
+    const lockedRouteSelectionMatchesWithKeys = ${lockedRouteSelectionMatchesWithKeys.toString()};
     let routeInitializationStarted = false;
     frame.addEventListener('load', async () => {
       if (routeInitializationStarted) return;
@@ -490,23 +493,15 @@ function routeWrapper({ lab, routeKind, routeId, startup, canonicalDir }) {
         if (typeof controller.renderOnce === 'function') await controller.renderOnce();
         if (typeof controller.getMetrics !== 'function') throw new Error('Canonical lab controller has no getMetrics() route acknowledgement.');
         const metrics = await controller.getMetrics();
-        const nested = metrics?.routeSelection;
-        const normalizeRouteValue = (value) => value && typeof value === 'object' ? (value.id ?? value.name ?? null) : value;
-        const candidates = (keys, kind) => [
-          ...keys.map((key) => metrics?.[key]),
-          nested?.[kind],
-          nested?.kind === kind ? nested.id : null
-        ].map(normalizeRouteValue);
-        const directAcknowledgement = candidates(acknowledgementKeys, routeKind).includes(routeId);
-        const startupEntries = Object.entries(startup);
-        const startupAcknowledged = startupEntries.every(([key, expected]) => (
-          candidates(startupAcknowledgementKeys[key] ?? [], key).includes(expected)
-        ));
-        if (!startupAcknowledged) {
-          throw new Error('Canonical lab setters did not apply every explicit locked startup value.');
-        }
-        if (!directAcknowledgement && startupEntries.length === 0) {
-          throw new Error('Canonical lab did not acknowledge locked ' + routeKind + ' route "' + routeId + '" in getMetrics().');
+        if (!lockedRouteSelectionMatchesWithKeys(
+          metrics,
+          routeKind,
+          routeId,
+          startup,
+          acknowledgementKeys,
+          startupAcknowledgementKeys,
+        )) {
+          throw new Error('Canonical lab did not acknowledge locked ' + routeKind + ' route "' + routeId + '" and every explicit startup value in getMetrics().');
         }
         window.labController = controller;
         window.dispatchEvent(new CustomEvent('lab-route-ready', { detail: { kind: ${JSON.stringify(routeKind)}, id: ${JSON.stringify(routeId)}, startup } }));

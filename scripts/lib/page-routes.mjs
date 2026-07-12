@@ -20,7 +20,7 @@ const ROUTE_STARTUP_KEYS = Object.freeze({
 
 const ROUTE_ACKNOWLEDGEMENT_KEYS = Object.freeze({
   scenario: Object.freeze(['scenario', 'scenarioId', 'activeScenario']),
-  mechanism: Object.freeze(['mechanism', 'mechanismId', 'activeMechanism', 'scenario', 'scenarioId', 'mode']),
+  mechanism: Object.freeze(['mechanism', 'mechanismId', 'activeMechanism']),
   tier: Object.freeze(['tier', 'tierId', 'activeTier', 'quality', 'qualityTier']),
 });
 const STARTUP_ACKNOWLEDGEMENT_KEYS = Object.freeze({
@@ -104,29 +104,44 @@ export async function awaitLockedRouteController(resolveCandidate, {
   );
 }
 
-function routeValue(value) {
-  if (value && typeof value === 'object') return value.id ?? value.name ?? null;
-  return value;
-}
-
-function metricCandidates(metrics, keys, nestedKey) {
-  const nested = metrics.routeSelection;
-  return [
-    ...keys.map((key) => metrics[key]),
-    nested?.[nestedKey],
-    nested?.kind === nestedKey ? nested.id : null,
-  ].map(routeValue);
+export function lockedRouteSelectionMatchesWithKeys(
+  metrics,
+  kind,
+  id,
+  startup = {},
+  acknowledgementKeys = [],
+  startupAcknowledgementKeys = {},
+) {
+  if (!metrics || typeof metrics !== 'object') return false;
+  const routeValue = (value) => {
+    if (value && typeof value === 'object') return value.id ?? value.name ?? null;
+    return value;
+  };
+  const metricCandidates = (keys, nestedKey) => {
+    const nested = metrics.routeSelection;
+    return [
+      ...keys.map((key) => metrics[key]),
+      nested?.[nestedKey],
+      nested?.kind === nestedKey ? nested.id : null,
+    ].map(routeValue);
+  };
+  const direct = metricCandidates(acknowledgementKeys, kind).includes(id);
+  const startupEntries = Object.entries(startup);
+  const startupMatches = startupEntries.every(([key, expected]) => (
+    metricCandidates(startupAcknowledgementKeys[key] ?? [], key).includes(expected)
+  ));
+  return direct && startupMatches;
 }
 
 export function lockedRouteSelectionMatches(metrics, kind, id, startup = {}) {
-  if (!metrics || typeof metrics !== 'object') return false;
-  const direct = metricCandidates(metrics, ROUTE_ACKNOWLEDGEMENT_KEYS[kind] ?? [], kind).includes(id);
-  const startupEntries = Object.entries(startup);
-  const startupMatches = startupEntries.every(([key, expected]) => (
-    metricCandidates(metrics, STARTUP_ACKNOWLEDGEMENT_KEYS[key] ?? [], key).includes(expected)
-  ));
-  if (!startupMatches) return false;
-  return direct || startupEntries.length > 0;
+  return lockedRouteSelectionMatchesWithKeys(
+    metrics,
+    kind,
+    id,
+    startup,
+    ROUTE_ACKNOWLEDGEMENT_KEYS[kind] ?? [],
+    STARTUP_ACKNOWLEDGEMENT_KEYS,
+  );
 }
 
 export function lockedRouteContract({ kind, id, startup = {}, labId = 'lab' }) {
@@ -169,4 +184,247 @@ export function plannedPublishedRoutes(lab) {
     }
   }
   return routes;
+}
+
+const STATIC_PAGES_SMOKE_ROUTES = Object.freeze([
+  Object.freeze({ path: '/', category: 'site-html', responseKind: 'html', canonicalPath: '/' }),
+  Object.freeze({ path: '/about/', category: 'site-html', responseKind: 'html', canonicalPath: '/about/' }),
+  Object.freeze({ path: '/skills.json', category: 'site-json', responseKind: 'json', jsonKind: 'skills' }),
+  Object.freeze({ path: '/llms.txt', category: 'site-text', responseKind: 'text', bodyMarker: '# Three.js' }),
+  Object.freeze({ path: '/robots.txt', category: 'site-text', responseKind: 'text', bodyMarker: 'User-agent:' }),
+  Object.freeze({ path: '/sitemap.xml', category: 'site-xml', responseKind: 'xml', bodyMarker: '<urlset' }),
+  Object.freeze({ path: '/demos/registry.json', category: 'site-json', responseKind: 'json', jsonKind: 'registry' }),
+]);
+
+function addUniqueSmokeRoute(routes, paths, route) {
+  if (paths.has(route.path)) throw new Error(`duplicate Pages smoke route: ${route.path}`);
+  paths.add(route.path);
+  routes.push(route);
+}
+
+export function plannedPagesSmokeRoutes({ registry, skillIds, primaryDemoKinds }) {
+  if (!registry || !Array.isArray(registry.demos)) throw new TypeError('registry.demos must be an array');
+  if (!Array.isArray(skillIds)) throw new TypeError('skillIds must be an array');
+  if (!Array.isArray(primaryDemoKinds)) throw new TypeError('primaryDemoKinds must be an array');
+  const primaryKinds = new Set(primaryDemoKinds);
+  const routes = [];
+  const paths = new Set();
+
+  for (const route of STATIC_PAGES_SMOKE_ROUTES) addUniqueSmokeRoute(routes, paths, { ...route });
+  for (const skillId of [...skillIds].sort()) {
+    addUniqueSmokeRoute(routes, paths, {
+      path: `/skills/${skillId}.html`,
+      category: 'skill-page',
+      responseKind: 'html',
+      canonicalPath: `/skills/${skillId}.html`,
+      skillId,
+    });
+  }
+  for (const lab of registry.demos) {
+    if (!lab.publishPath) continue;
+    if (primaryKinds.has(lab.kind)) {
+      addUniqueSmokeRoute(routes, paths, {
+        path: lab.publishPath,
+        category: 'primary-base',
+        responseKind: 'html',
+        labId: lab.id,
+        nonRenderingScenarioSuite: lab.nonRenderingScenarioSuite === true,
+      });
+      for (const fixed of plannedPublishedRoutes(lab)) {
+        const contract = lockedRouteContract({
+          kind: fixed.kind,
+          id: fixed.id,
+          startup: fixed.startup,
+          labId: lab.id,
+        });
+        addUniqueSmokeRoute(routes, paths, {
+          path: fixed.path,
+          category: 'primary-fixed',
+          responseKind: 'html',
+          labId: lab.id,
+          routeKind: fixed.kind,
+          routeId: fixed.id,
+          startup: fixed.startup,
+          acknowledgementKeys: contract.acknowledgementKeys,
+          startupAcknowledgementKeys: contract.startupAcknowledgementKeys,
+          nonRenderingScenarioSuite: lab.nonRenderingScenarioSuite === true,
+        });
+      }
+    } else if (lab.status === 'secondary') {
+      addUniqueSmokeRoute(routes, paths, {
+        path: lab.publishPath,
+        category: 'secondary-base',
+        responseKind: 'html',
+        labId: lab.id,
+      });
+    }
+  }
+  return routes;
+}
+
+export function plannedPagesBrowserRoutes(routes) {
+  if (!Array.isArray(routes)) throw new TypeError('routes must be an array');
+  return routes.filter((route) => route.category === 'primary-base' || route.category === 'primary-fixed');
+}
+
+function htmlAttribute(tag, name) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return tag.match(new RegExp(`\\b${escaped}\\s*=\\s*(["'])(.*?)\\1`, 'i'))?.[2] ?? null;
+}
+
+function htmlTagWithAttributes(body, tagName, attributes) {
+  const tags = body.match(new RegExp(`<${tagName}\\b[^>]*>`, 'gi')) ?? [];
+  return tags.some((tag) => Object.entries(attributes).every(([name, value]) => htmlAttribute(tag, name) === value));
+}
+
+function canonicalPathFromHtml(body) {
+  const links = body.match(/<link\b[^>]*>/gi) ?? [];
+  const canonical = links.find((link) => htmlAttribute(link, 'rel')?.split(/\s+/).includes('canonical'));
+  const href = canonical ? htmlAttribute(canonical, 'href') : null;
+  if (!href) return null;
+  try {
+    return new URL(href, 'https://threejs-skills.com/').pathname;
+  } catch {
+    return null;
+  }
+}
+
+export function assertPagesRouteResponse(route, response) {
+  if (!route || typeof route.path !== 'string') throw new TypeError('route.path must be a string');
+  if (!response || typeof response !== 'object') throw new TypeError('response must be an object');
+  if (response.status !== 200) throw new Error(`${route.path} returned ${response.status ?? 'no response'}`);
+  const finalPath = (() => {
+    try {
+      return new URL(response.url).pathname;
+    } catch {
+      return null;
+    }
+  })();
+  if (finalPath !== route.path) throw new Error(`${route.path} resolved to unexpected path ${finalPath ?? 'unknown'}`);
+  const contentType = String(response.contentType ?? '').toLowerCase();
+  const body = String(response.body ?? '');
+  if (route.responseKind === 'html' && !contentType.includes('text/html')) {
+    throw new Error(`${route.path} returned non-HTML content type ${response.contentType ?? 'missing'}`);
+  }
+  if (route.responseKind === 'json' && !contentType.includes('json')) {
+    throw new Error(`${route.path} returned non-JSON content type ${response.contentType ?? 'missing'}`);
+  }
+  if (route.responseKind === 'text' && !contentType.includes('text/plain')) {
+    throw new Error(`${route.path} returned non-text content type ${response.contentType ?? 'missing'}`);
+  }
+  if (route.responseKind === 'xml' && !contentType.includes('xml')) {
+    throw new Error(`${route.path} returned non-XML content type ${response.contentType ?? 'missing'}`);
+  }
+
+  if (route.category === 'site-html' || route.category === 'skill-page') {
+    if (canonicalPathFromHtml(body) !== route.canonicalPath) {
+      throw new Error(`${route.path} does not identify canonical page ${route.canonicalPath}`);
+    }
+  } else if (route.category === 'primary-base' || route.category === 'secondary-base') {
+    if (!htmlTagWithAttributes(body, '(?:aside|main)', { 'data-demo-id': route.labId })) {
+      throw new Error(`${route.path} does not identify demo ${route.labId}`);
+    }
+  } else if (route.category === 'primary-fixed') {
+    if (!htmlTagWithAttributes(body, 'meta', { name: 'lab-id', content: route.labId })) {
+      throw new Error(`${route.path} does not identify demo ${route.labId}`);
+    }
+    if (!htmlTagWithAttributes(body, 'meta', { name: `lab-${route.routeKind}`, content: route.routeId })) {
+      throw new Error(`${route.path} does not identify locked ${route.routeKind} ${route.routeId}`);
+    }
+  } else if (route.category === 'site-json') {
+    let document;
+    try {
+      document = JSON.parse(body);
+    } catch {
+      throw new Error(`${route.path} is not valid JSON`);
+    }
+    if (route.jsonKind === 'skills' && !Array.isArray(document.skills)) {
+      throw new Error(`${route.path} does not identify the skill manifest`);
+    }
+    if (route.jsonKind === 'registry' && (document.schemaVersion !== 2 || !Array.isArray(document.demos))) {
+      throw new Error(`${route.path} does not identify the demo registry`);
+    }
+  } else if (route.category === 'site-text' || route.category === 'site-xml') {
+    if (!body.includes(route.bodyMarker)) throw new Error(`${route.path} is missing ${route.bodyMarker}`);
+  }
+}
+
+export function pagesNativeWebGPUProven(backendProof) {
+  if (!backendProof || typeof backendProof !== 'object') return false;
+  const direct = backendProof.direct;
+  if (
+    direct
+    && direct.source === 'controller.renderer'
+    && direct.isWebGPUBackend === true
+    && direct.initialized === true
+    && direct.deviceIdentityObserved === true
+    && direct.lossPromiseObservedOnActualDevice === true
+  ) return true;
+
+  const structured = backendProof.structured;
+  const evidence = structured?.rendererBackendEvidence;
+  return evidence?.isWebGPUBackend === true
+    && evidence.initialized === true
+    && evidence.deviceIdentityVerified === true
+    && evidence.lossPromiseObservedOnActualDevice === true
+    && structured.rendererDeviceStatus === 'active'
+    && structured.deviceLossGeneration === 0
+    && structured.deviceLostObserved === false
+    && Array.isArray(structured.uncapturedErrors)
+    && structured.uncapturedErrors.length === 0
+    && Array.isArray(structured.deviceErrors)
+    && structured.deviceErrors.length === 0
+    && structured.deviceErrorCount === 0
+    && structured.lastDeviceError === null;
+}
+
+export function assertPagesBrowserObservation(route, observation) {
+  if (!route || typeof route.path !== 'string') throw new TypeError('route.path must be a string');
+  if (!observation || typeof observation !== 'object') throw new TypeError('observation must be an object');
+  let finalPath = null;
+  try {
+    finalPath = new URL(observation.url).pathname;
+  } catch {
+    // Report the invalid URL through the same exact-path error below.
+  }
+  if (finalPath !== route.path) {
+    throw new Error(`${route.path} browser resolved to unexpected path ${finalPath ?? 'unknown'}`);
+  }
+  if (observation.ready !== true) throw new Error(`${route.path} controller did not become ready`);
+  if (observation.documentLabId !== route.labId) {
+    throw new Error(`${route.path} document did not identify lab ${route.labId}`);
+  }
+  if (observation.controllerLabId !== route.labId) {
+    throw new Error(`${route.path} controller did not identify lab ${route.labId}`);
+  }
+  for (const [label, key] of [
+    ['page', 'pageErrors'],
+    ['console', 'consoleErrors'],
+    ['request', 'requestErrors'],
+    ['device', 'deviceErrors'],
+  ]) {
+    const values = Array.isArray(observation[key])
+      ? observation[key].filter((value) => value !== null && value !== undefined && String(value).length > 0)
+      : (observation[key] ? [observation[key]] : []);
+    if (values.length > 0) throw new Error(`${route.path} ${label} errors: ${values.map(String).join(' | ')}`);
+  }
+  if (route.nonRenderingScenarioSuite !== true && !pagesNativeWebGPUProven(observation.backendProof)) {
+    throw new Error(`${route.path} did not prove a native WebGPU backend`);
+  }
+  if (route.category === 'primary-fixed') {
+    if (observation.lockedKind !== route.routeKind || observation.lockedId !== route.routeId) {
+      throw new Error(`${route.path} browser metadata did not preserve locked ${route.routeKind} ${route.routeId}`);
+    }
+    if (!lockedRouteSelectionMatchesWithKeys(
+      observation.routeMetrics,
+      route.routeKind,
+      route.routeId,
+      route.startup,
+      route.acknowledgementKeys,
+      route.startupAcknowledgementKeys,
+    )) {
+      throw new Error(`${route.path} controller did not acknowledge locked ${route.routeKind} ${route.routeId} and every startup value`);
+    }
+  }
+  if (observation.disposed !== true) throw new Error(`${route.path} controller was not disposed`);
 }
