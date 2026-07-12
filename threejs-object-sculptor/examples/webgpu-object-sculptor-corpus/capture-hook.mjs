@@ -8,6 +8,10 @@ import { encodeRgbaPng } from "../../../scripts/lib/png-rgba.mjs";
 import { SCULPT_TARGET_IDS } from "./object-catalog.js";
 import { objectSculptorCorpusFrameOwner } from "./frame-driver.js";
 import {
+  CORPUS_TARGET_MASK_PLAN,
+  decodeBinaryTargetMask,
+} from "./mask-raster.mjs";
+import {
   assertDistinctPngRasters,
   assertMeaningfulRgbaRaster,
   comparePngRgb,
@@ -994,6 +998,7 @@ export async function captureLab(session) {
   }
 
   const captures = [];
+  const targetMasks = [];
   const rasterByFilename = new Map();
   const standardSourceFilenames = new Set(CORPUS_STANDARD_OUTPUT_PLAN
     .filter(({ status }) => status === "CAPTURED")
@@ -1066,6 +1071,46 @@ export async function captureLab(session) {
     }
   }
 
+  for (const plan of CORPUS_TARGET_MASK_PLAN) {
+    const state = {
+      subjectId: plan.subjectId,
+      mode: plan.mode,
+      tier: plan.tier,
+      camera: plan.camera,
+      seed: plan.seed,
+      time: plan.time,
+    };
+    await configureState(session, state);
+    let capture;
+    try {
+      capture = await session.writeCapture(plan.filename, "target-mask");
+    } catch (error) {
+      throw new Error(`native target-mask readback failed for ${plan.filename}: ${error?.message ?? String(error)}`, { cause: error });
+    }
+    const metrics = await session.controllerCall("getMetrics");
+    const pipeline = await session.controllerCall("describePipeline");
+    requireNativeBackend(metrics, pipeline);
+    assertAppliedState(metrics, state);
+    if (capture.maskKind !== plan.maskKind) throw new Error(`${plan.filename} mask kind drifted: expected ${plan.maskKind}, received ${capture.maskKind}`);
+    if (plan.maskKind === "named-moving-semantic-regions" && (!Array.isArray(capture.semanticNodeIds) || capture.semanticNodeIds.length === 0)) {
+      throw new Error(`${plan.filename} must bind at least one named moving semantic node`);
+    }
+    const normalized = validateCorpusCaptureMetadata(capture, pipeline);
+    const pixelEvidence = await retainCorpusPixelEvidence(session, { filename: plan.filename, capture });
+    const decoded = decodePngRaster(await readSessionArtifact(session, plan.filename));
+    const binary = decodeBinaryTargetMask({ width: decoded.width, height: decoded.height, rgba: decoded.rgba }, plan.filename);
+    const { data: _discardPackedData, pixels: _discardPixelAlias, transport: _discardTransportBytes, normalized: _discardNormalizedBytes, ...normalizedMetadata } = normalized;
+    targetMasks.push(Object.freeze({
+      ...plan,
+      ...normalizedMetadata,
+      semanticNodeIds: Object.freeze([...(capture.semanticNodeIds ?? [])]),
+      selectedPixels: binary.selectedPixels,
+      file: pixelEvidence.png,
+      pixelEvidence,
+      runtimeState: runtimeStateEvidence(metrics),
+    }));
+  }
+
   await configureState(session, {
     subjectId: "potted-bonsai",
     mode: "action-ready",
@@ -1103,6 +1148,8 @@ export async function captureLab(session) {
     evidenceRunId,
     sourceClosure,
     captures: Object.freeze(captures),
+    targetMaskPlan: CORPUS_TARGET_MASK_PLAN,
+    targetMasks: Object.freeze(targetMasks),
     subjectFinals,
     standardOutputs,
     tierContracts: Object.freeze(tierContracts),

@@ -281,6 +281,41 @@ function floorMaterial() {
   return material;
 }
 
+function binaryTargetMaskMaterial() {
+  const material = new THREE.MeshBasicNodeMaterial();
+  material.colorNode = color(0xffffff);
+  material.side = THREE.DoubleSide;
+  material.depthTest = true;
+  material.depthWrite = true;
+  material.toneMapped = false;
+  return material;
+}
+
+function movingSemanticRoots(target) {
+  const runtime = target?.runtime;
+  const roots = [];
+  if (runtime?.motionPreviewBindings instanceof Map) {
+    for (const binding of runtime.motionPreviewBindings.values()) {
+      const node = runtime.nodes?.get(binding.nodeId);
+      if (node) roots.push(node);
+    }
+  }
+  if (Array.isArray(runtime?.previewMotionBindings)) {
+    for (const binding of runtime.previewMotionBindings) if (binding?.node) roots.push(binding.node);
+  }
+  if (runtime?.subjectId === "ceramic-teapot") {
+    const lid = runtime.nodes?.get("lid-pivot");
+    if (lid) roots.push(lid);
+  }
+  const unique = [...new Set(roots)];
+  if (unique.length === 0) throw new Error(`Subject ${runtime?.subjectId ?? "unknown"} has no named moving semantic roots`);
+  return unique;
+}
+
+export function corpusMovingSemanticNodeIds(target) {
+  return Object.freeze(movingSemanticRoots(target).map((node) => node.userData?.sculptId ?? node.name).sort());
+}
+
 function defaultDependencies() {
   return {
     createRenderer: (options) => new THREE.WebGPURenderer(options),
@@ -1150,6 +1185,7 @@ export async function createObjectSculptorCorpusController({
   let renderer = null;
   let controls = null;
   let floor = null;
+  let targetMaskMaterial = null;
   let keyLight = null;
   let captureTarget = null;
   let activeTarget = null;
@@ -2373,6 +2409,47 @@ export async function createObjectSculptorCorpusController({
     return captureTarget;
   }
 
+  function beginTargetMaskRenderState() {
+    if (!activeTarget?.root || !targetMaskMaterial) throw new Error("target-mask capture requires an active subject and mask material");
+    const visibility = [];
+    activeTarget.root.traverse((object) => visibility.push([object, object.visible]));
+    const movingRoots = currentMode === "action-ready" ? movingSemanticRoots(activeTarget) : [];
+    const selectedMeshes = new Set();
+    if (movingRoots.length > 0) for (const root of movingRoots) root.traverse((object) => {
+      if (object.isMesh) selectedMeshes.add(object);
+    });
+    if (movingRoots.length > 0) activeTarget.root.traverse((object) => {
+      if (object.isMesh) object.visible = object.visible && selectedMeshes.has(object);
+    });
+    const snapshot = {
+      background: scene.background,
+      fog: scene.fog,
+      overrideMaterial: scene.overrideMaterial,
+      floorVisible: floor.visible,
+      toneMapping: renderer.toneMapping,
+      toneMappingExposure: renderer.toneMappingExposure,
+    };
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = null;
+    scene.overrideMaterial = targetMaskMaterial;
+    floor.visible = false;
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.toneMappingExposure = 1;
+    return Object.freeze({
+      maskKind: movingRoots.length > 0 ? "named-moving-semantic-regions" : "subject-silhouette",
+      semanticNodeIds: movingRoots.length > 0 ? corpusMovingSemanticNodeIds(activeTarget) : Object.freeze([]),
+      restore() {
+        for (const [object, visible] of visibility) object.visible = visible;
+        scene.background = snapshot.background;
+        scene.fog = snapshot.fog;
+        scene.overrideMaterial = snapshot.overrideMaterial;
+        floor.visible = snapshot.floorVisible;
+        renderer.toneMapping = snapshot.toneMapping;
+        renderer.toneMappingExposure = snapshot.toneMappingExposure;
+      },
+    });
+  }
+
   async function disposeTargetOnce(target, phase = "target-retirement") {
     if (!target || disposedTargets.has(target)) return false;
     disposedTargets.set(target, "attempting");
@@ -2799,6 +2876,7 @@ export async function createObjectSculptorCorpusController({
     floor.position.y = -0.006;
     floor.receiveShadow = true;
     scene.add(floor);
+    targetMaskMaterial = binaryTargetMaskMaterial();
     recordResourceTransition({
       allocationId: "floor-geometry",
       resourceKind: "geometry",
@@ -2811,6 +2889,12 @@ export async function createObjectSculptorCorpusController({
     });
     recordResourceTransition({
       allocationId: "floor-material",
+      resourceKind: "material",
+      action: "allocate",
+      phase: "controller-initialization",
+    });
+    recordResourceTransition({
+      allocationId: "target-mask-material",
       resourceKind: "material",
       action: "allocate",
       phase: "controller-initialization",
@@ -2844,6 +2928,7 @@ export async function createObjectSculptorCorpusController({
       ["orbit-controls", "controls", controls, () => controls.dispose()],
       ["floor-geometry", "geometry", floor?.geometry, () => floor.geometry.dispose()],
       ["floor-material", "material", floor?.material, () => floor.material.dispose()],
+      ["target-mask-material", "material", targetMaskMaterial, () => targetMaskMaterial.dispose()],
       ["capture-target", "render-target", captureTarget, () => captureTarget.dispose()],
       ["renderer", "renderer", renderer, () => renderer.dispose()],
     ]) {
@@ -3474,7 +3559,7 @@ export async function createObjectSculptorCorpusController({
     },
     async capturePixels(target = "presentation") {
       return enqueueControllerOperation("capturePixels", async (generationGuard) => {
-        if (!new Set(["presentation", "output"]).has(target)) {
+        if (!new Set(["presentation", "output", "target-mask"]).has(target)) {
           throw new RangeError(`Unknown capture target "${target}"`);
         }
         if (
@@ -3494,13 +3579,19 @@ export async function createObjectSculptorCorpusController({
         let result = null;
         let pendingReadbackLayout = null;
         let operationError = null;
+        let targetMaskState = null;
         try {
           renderer.setRenderTarget(output);
           if (renderer.getRenderTarget() !== output) {
             throw new Error("renderer did not bind the requested Object Sculptor capture target");
           }
           generationGuard.assert("capture-target-bound");
-          await submitSceneRender("capture-forward-scene", generationGuard);
+          if (target === "target-mask") targetMaskState = beginTargetMaskRenderState();
+          try {
+            await submitSceneRender(target === "target-mask" ? "capture-target-mask" : "capture-forward-scene", generationGuard);
+          } finally {
+            targetMaskState?.restore();
+          }
           const requestedLayout = describeCorpusReadback(
             output.width,
             output.height,
@@ -3552,6 +3643,8 @@ export async function createObjectSculptorCorpusController({
           });
           result = {
             target,
+            maskKind: targetMaskState?.maskKind ?? null,
+            semanticNodeIds: targetMaskState?.semanticNodeIds ?? Object.freeze([]),
             ...layout,
             sourceBytesPerRow: layout.bytesPerRow,
             sourceByteLength: normalizedReadback.byteLength,
@@ -3927,7 +4020,8 @@ export async function createObjectSculptorCorpusController({
       const targetAndFloorGeometryBytes = targetRenderResources.geometry.uniqueBackingStoreBytes
         + floorRenderResources.geometry.uniqueBackingStoreBytes;
       const targetAndFloorMaterialCount = targetRenderResources.uniqueMaterialCount
-        + floorRenderResources.uniqueMaterialCount;
+        + floorRenderResources.uniqueMaterialCount
+        + 1;
       const livenessIntervalsFor = (ids) => ids.map((id) => {
         const interval = knownLiveResourceIntervals.get(id)
           ?? uncertainResourceIntervals.get(id)
@@ -3975,16 +4069,16 @@ export async function createObjectSculptorCorpusController({
         },
         {
           category: "target-materials",
-          owner: `${currentSubjectId}+controller-static-floor`,
-          resourceKind: "subject and controller-static Three.js material descriptors",
-          allocationIds: [activeRenderAllocationIds.materials, "floor-material"],
+          owner: `${currentSubjectId}+controller-static-materials`,
+          resourceKind: "subject, floor, and target-mask Three.js material descriptors",
+          allocationIds: [activeRenderAllocationIds.materials, "floor-material", "target-mask-material"],
           elementCount: targetAndFloorMaterialCount,
           bytesPerElement: 0,
           sampleCount: 1,
           multiplicity: 1,
           logicalByteLength: 0,
           transient: false,
-          accountingStatus: "subject plus floor material descriptor count is exact; light/backend state, driver pipelines, and residency bytes are opaque",
+          accountingStatus: "subject plus floor and target-mask material descriptor count is exact; light/backend state, driver pipelines, and residency bytes are opaque",
         },
         {
           category: "shadow",
@@ -4283,6 +4377,7 @@ export async function createObjectSculptorCorpusController({
           ["orbit-controls", "controls", controls, () => controls.dispose()],
           ["floor-geometry", "geometry", floor?.geometry, () => floor.geometry.dispose()],
           ["floor-material", "material", floor?.material, () => floor.material.dispose()],
+          ["target-mask-material", "material", targetMaskMaterial, () => targetMaskMaterial.dispose()],
           ["capture-target", "render-target", captureTarget, () => captureTarget.dispose()],
           ["renderer", "renderer", renderer, () => renderer.dispose()],
         ];

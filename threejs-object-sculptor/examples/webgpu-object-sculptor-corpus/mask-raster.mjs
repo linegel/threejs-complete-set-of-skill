@@ -9,7 +9,7 @@ const ACTION_MASK_TIMES = Object.freeze([
 export const CORPUS_TARGET_MASK_PLAN = Object.freeze(SCULPT_TARGET_IDS.flatMap((subjectId) => [
   ...FINAL_MASK_TIERS.map((tier) => Object.freeze({
     id: `target-mask:${subjectId}:final:${tier}`,
-    filename: `masks/${subjectId}.final.${tier}.target-mask.png`,
+    filename: `${subjectId}.final.${tier}.target-mask.png`,
     subjectId,
     maskKind: "subject-silhouette",
     mode: "final",
@@ -21,7 +21,7 @@ export const CORPUS_TARGET_MASK_PLAN = Object.freeze(SCULPT_TARGET_IDS.flatMap((
   })),
   ...ACTION_MASK_TIMES.map(({ suffix, time }) => Object.freeze({
     id: `target-mask:${subjectId}:action-ready:${suffix}`,
-    filename: `masks/${subjectId}.action-ready.full.design.${suffix}.target-mask.png`,
+    filename: `${subjectId}.action-ready.full.design.${suffix}.target-mask.png`,
     subjectId,
     maskKind: "named-moving-semantic-regions",
     mode: "action-ready",

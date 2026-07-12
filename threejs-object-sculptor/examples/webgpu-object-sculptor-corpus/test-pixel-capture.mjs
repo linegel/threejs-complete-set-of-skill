@@ -18,6 +18,7 @@ import {
   validateCorpusCaptureMetadata,
   validateCorpusStandardDerivation,
 } from "./capture-hook.mjs";
+import { CORPUS_TARGET_MASK_PLAN } from "./mask-raster.mjs";
 import {
   computeCorpusExecutableSourceClosure,
   extractCorpusExecutableSourceReferences,
@@ -330,12 +331,14 @@ function fakeReadback(filename) {
   const seed = filenameSeed(filename);
   const compact = new Uint8Array(rowBytes * height);
   const transport = new Uint8Array(fullSourceByteLength);
+  const isTargetMask = filename.endsWith(".target-mask.png");
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const offset = (y * width + x) * 4;
-      compact[offset] = (x * 17 + y * 31 + seed) & 0xff;
-      compact[offset + 1] = (x * 7 + y * 53 + (seed >>> 8)) & 0xff;
-      compact[offset + 2] = (x * 3 + y * 97 + (seed >>> 16)) & 0xff;
+      const maskValue = x >= 80 + (seed % 11) && x < 500 && y >= 1 ? 255 : 0;
+      compact[offset] = isTargetMask ? maskValue : (x * 17 + y * 31 + seed) & 0xff;
+      compact[offset + 1] = isTargetMask ? maskValue : (x * 7 + y * 53 + (seed >>> 8)) & 0xff;
+      compact[offset + 2] = isTargetMask ? maskValue : (x * 3 + y * 97 + (seed >>> 16)) & 0xff;
       compact[offset + 3] = 255;
       transport.set(compact.subarray(offset, offset + 4), y * sourceBytesPerRow + x * 4);
     }
@@ -415,6 +418,12 @@ const fakeSession = {
     return {
       ...normalizedCapture,
       target,
+      maskKind: target === "target-mask"
+        ? filename.includes(".action-ready.")
+          ? "named-moving-semantic-regions"
+          : "subject-silhouette"
+        : null,
+      semanticNodeIds: target === "target-mask" && filename.includes(".action-ready.") ? ["moving-node"] : [],
       transportByteLength: readback.compact.byteLength,
       readbackSourceBytesPerRow: rowBytes,
       readbackSourceByteLength: readback.compact.byteLength,
@@ -469,9 +478,13 @@ const hookResult = await captureLab(fakeSession);
 assert.equal(hookResult.evidenceStatus, "INSUFFICIENT_EVIDENCE");
 assert.equal(hookResult.frameOwnership.owner, "capture-harness");
 assert.equal(hookResult.captures.length, CORPUS_CAPTURE_PLAN.length);
-assert.deepEqual(written, CORPUS_CAPTURE_PLAN.map(({ filename }) => filename));
+assert.equal(hookResult.targetMasks.length, CORPUS_TARGET_MASK_PLAN.length);
+assert.deepEqual(written, [
+  ...CORPUS_CAPTURE_PLAN.map(({ filename }) => filename),
+  ...CORPUS_TARGET_MASK_PLAN.map(({ filename }) => filename),
+]);
 assert.equal(explicitRenderCalls, 2, "the hook may initialize and restore explicitly, but each planned image must use only writeCapture's render");
-assert.equal(completedFrames, CORPUS_CAPTURE_PLAN.length + 2);
+assert.equal(completedFrames, CORPUS_CAPTURE_PLAN.length + CORPUS_TARGET_MASK_PLAN.length + 2);
 assert.equal(hookResult.sourceClosure.sourceHash, canonicalSourceClosure.sourceHash);
 assert.equal(hookResult.sourceClosure.files.length, canonicalSourceClosure.files.length);
 assert.equal(hookResult.subjectFinals.length, SCULPT_TARGET_COUNT_FOR_TESTS);
@@ -586,5 +599,6 @@ console.log(JSON.stringify({
   sourceByteLength: fullSourceByteLength,
   sourceLayout: normalized.sourceLayout,
   capturePlan: hookResult.captures.length,
+  targetMasks: hookResult.targetMasks.length,
   exclusiveFrameOwner: hookResult.frameOwnership.owner,
 }, null, 2));

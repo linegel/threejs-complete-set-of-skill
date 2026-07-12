@@ -1135,6 +1135,14 @@ assert.deepEqual(TARGET_IDS, ["articulated-desk-lamp", "potted-bonsai", "ceramic
     capture.normalized.pixels,
     "transport and normalized readbacks must be independent retained byte arrays",
   );
+  await controller.setMode("final");
+  const maskCapture = await controller.capturePixels("target-mask");
+  assert.equal(maskCapture.target, "target-mask");
+  assert.equal(maskCapture.maskKind, "subject-silhouette");
+  assert.deepEqual(maskCapture.semanticNodeIds, []);
+  assert.equal(maskCapture.origin, "top-left");
+  assert.equal(maskCapture.normalized.layout.byteLength, capture.normalized.layout.byteLength);
+  await controller.setMode("action-ready");
   assert.equal(controller.describeResources().renderTargets[0].allocation, "lazy-capture-only");
   resources = controller.describeResources();
   assert.equal(resources.renderTargets[0].effectiveSampleCount, 1);
@@ -2524,8 +2532,8 @@ assert.deepEqual(TARGET_IDS, ["articulated-desk-lamp", "potted-bonsai", "ceramic
     },
   );
   const report = controller.getTeardownReport();
-  assert.equal(report.attempted, 5);
-  assert.equal(report.succeeded, 2);
+  assert.equal(report.attempted, 6);
+  assert.equal(report.succeeded, 3);
   assert.equal(report.uncertain, 3);
   assert.deepEqual(
     report.records.filter((record) => record.status === "uncertain").map((record) => record.resourceId),

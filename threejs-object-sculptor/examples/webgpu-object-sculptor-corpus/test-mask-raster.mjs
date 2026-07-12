@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 
+import { corpusMovingSemanticNodeIds } from "./lab-controller.js";
 import {
   computeMaskedTierError,
   computeNamedMotionOverlap,
@@ -7,6 +8,7 @@ import {
   CORPUS_TARGET_MASK_PLAN,
   decodeBinaryTargetMask,
 } from "./mask-raster.mjs";
+import { createSculptTarget, SCULPT_TARGET_IDS } from "./object-catalog.js";
 
 function raster(width, height, pixel) {
   const rgba = new Uint8Array(width * height * 4);
@@ -21,6 +23,13 @@ function mask(width, height, selected) {
 assert.equal(CORPUS_TARGET_MASK_PLAN.length, 15);
 assert.equal(CORPUS_TARGET_MASK_PLAN.filter(({ maskKind }) => maskKind === "subject-silhouette").length, 9);
 assert.equal(CORPUS_TARGET_MASK_PLAN.filter(({ maskKind }) => maskKind === "named-moving-semantic-regions").length, 6);
+for (const subjectId of SCULPT_TARGET_IDS) {
+  const target = createSculptTarget(subjectId, { tier: "minimum", seed: 1, instanceId: "mask-test" });
+  const ids = corpusMovingSemanticNodeIds(target);
+  assert(ids.length > 0, `${subjectId} must expose named moving semantic roots`);
+  assert(ids.every((id) => target.runtime.nodes.has(id)), `${subjectId} moving roots must resolve through runtime.nodes`);
+  target.dispose();
+}
 
 const fullMask = mask(8, 8, (x, y) => x >= 2 && x <= 5 && y >= 2 && y <= 5);
 const shiftedMask = mask(8, 8, (x, y) => x >= 3 && x <= 6 && y >= 2 && y <= 5);

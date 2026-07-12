@@ -58,8 +58,8 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/lab-controller.js",
-    "sha256": "d5a74e66c913459ef824f9d6a620fdc62249ba5e23a1185bfc5be40934b2cc78",
-    "byteLength": 171034
+    "sha256": "39a5fab6d79b32fd88270881c0ef0cad2dacc99dadd6967d2ce28a4a767a8c27",
+    "byteLength": 175146
   },
   {
     "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/object-catalog.js",
@@ -117,7 +117,7 @@ export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST = Object.freeze([
     "byteLength": 40108
   }
 ].map((entry) => Object.freeze(entry)));
-export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "fc6f2e55c0a9da64059182508fd0a8989def013494f10bf9dbdeb9685a0db4b4";
+export const CORPUS_TRUSTED_RUNTIME_SOURCE_MANIFEST_SHA256 = "bf4fd91bf903cd5c222032f904eec897c40b904113d133e229adecaf20003462";
 export const CORPUS_TRUSTED_ROUTE_HTML_SHA256_BY_ROUTE_ID = Object.freeze({
   "scenario:articulated-desk-lamp": "a648f2c0b779c9978051e957a02fd1cf0b699f58eade01235b65f338a5f8609a",
   "scenario:potted-bonsai": "ba6b7d70751b740c5fe60b84cc540c3060297a3074f0fc8ec175b3b34b70a1f4",
@@ -235,7 +235,7 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/lab-controller.js",
-      "sha256": "d5a74e66c913459ef824f9d6a620fdc62249ba5e23a1185bfc5be40934b2cc78"
+      "sha256": "39a5fab6d79b32fd88270881c0ef0cad2dacc99dadd6967d2ce28a4a767a8c27"
     },
     {
       "repositoryPath": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/mechanism/action-ready/index.html",
@@ -357,11 +357,11 @@ export const CORPUS_EXECUTABLE_SOURCE_CLOSURE = deepFreezeGenerated({
     }
   ],
   "threeRevision": "0.185.1",
-  "sourceHash": "da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f",
-  "buildRevision": "source-sha256:da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f"
+  "sourceHash": "c01020020cde5fdb30eba8b494fb5fa04c2ea782410b249af8e52bdaaa36a12d",
+  "buildRevision": "source-sha256:c01020020cde5fdb30eba8b494fb5fa04c2ea782410b249af8e52bdaaa36a12d"
 });
-export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_SHA256 = "da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f";
+export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_SHA256 = "c01020020cde5fdb30eba8b494fb5fa04c2ea782410b249af8e52bdaaa36a12d";
 export const CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION = "0.185.1";
 export const CORPUS_EXECUTABLE_SOURCE_THREE_REVISION = CORPUS_EXECUTABLE_SOURCE_CLOSURE_THREE_REVISION;
-export const CORPUS_CAPTURE_SOURCE_HASH = "da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f";
-export const CORPUS_CAPTURE_BUILD_REVISION = "source-sha256:da9b6badddf38504e123b8001fa72dfb7902716a512241c1819b653ea3562c8f";
+export const CORPUS_CAPTURE_SOURCE_HASH = "c01020020cde5fdb30eba8b494fb5fa04c2ea782410b249af8e52bdaaa36a12d";
+export const CORPUS_CAPTURE_BUILD_REVISION = "source-sha256:c01020020cde5fdb30eba8b494fb5fa04c2ea782410b249af8e52bdaaa36a12d";
